@@ -18,4 +18,3 @@
 (** Abstract domain that abstracts away the interface of agents, and see each rule as a multiset-rewriting reaction over typed agents *)
 
 module Domain:Analyzer_domain_sig.Domain
-

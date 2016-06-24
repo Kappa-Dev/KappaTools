@@ -14,68 +14,68 @@
   * under the terms of the GNU Library General Public License *)
 
 module type Domain =
-  sig
-    type static_information
+sig
+  type static_information
 
-    type local_dynamic_information
+  type local_dynamic_information
 
-    type dynamic_information =
-      {
-	local : local_dynamic_information;
-	global: Analyzer_headers.global_dynamic_information
-      }
+  type dynamic_information =
+    {
+      local : local_dynamic_information;
+      global: Analyzer_headers.global_dynamic_information
+    }
 
-    val get_parameter: static_information -> Remanent_parameters_sig.parameters
-    val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
-    val set_global_dynamic_information:  Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
-    val initialize:
-      Analyzer_headers.global_static_information ->
-      Analyzer_headers.global_dynamic_information ->
-      Exception.method_handler ->
-      Exception.method_handler * static_information * dynamic_information
+  val get_parameter: static_information -> Remanent_parameters_sig.parameters
+  val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
+  val set_global_dynamic_information:  Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
+  val initialize:
+    Analyzer_headers.global_static_information ->
+    Analyzer_headers.global_dynamic_information ->
+    Exception.method_handler ->
+    Exception.method_handler * static_information * dynamic_information
 
-    type 'a zeroary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> Exception.method_handler * dynamic_information * 'a
+  type 'a zeroary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> Exception.method_handler * dynamic_information * 'a
 
-    type ('a, 'b) unary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> 'a
-      -> Exception.method_handler * dynamic_information * 'b
+  type ('a, 'b) unary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> Exception.method_handler * dynamic_information * 'b
 
-    type ('a, 'b, 'c) binary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> 'a
-      -> 'b
-      -> Exception.method_handler * dynamic_information * 'c
+  type ('a, 'b, 'c) binary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> Exception.method_handler * dynamic_information * 'c
 
-    val add_initial_state:
-      (Analyzer_headers.initial_state, Communication.event list) unary
+  val add_initial_state:
+    (Analyzer_headers.initial_state, Communication.event list) unary
 
-    val is_enabled:
-      (Ckappa_sig.c_rule_id,
-       Communication.precondition, Communication.precondition option) binary
+  val is_enabled:
+    (Ckappa_sig.c_rule_id,
+     Communication.precondition, Communication.precondition option) binary
 
-    val apply_rule:
-      (Ckappa_sig.c_rule_id,
-       Communication.precondition, Communication.precondition * Communication.event list) binary
+  val apply_rule:
+    (Ckappa_sig.c_rule_id,
+     Communication.precondition, Communication.precondition * Communication.event list) binary
 
-    val apply_event_list:
-      (Communication.event list, Communication.event list) unary
+  val apply_event_list:
+    (Communication.event list, Communication.event list) unary
 
-    val export:
-      (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
+  val export:
+    (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
-    val print: (Loggers.t list, unit) unary
+  val print: (Loggers.t list, unit) unary
 
-    val cc_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+  val cc_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
 
-    val lkappa_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+  val lkappa_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
 
-  end
+end

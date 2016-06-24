@@ -331,7 +331,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id views bonds store_bo
 
 let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full error rule_id rule store_result =
   (*let store_bonds_rhs_full = get_bonds_rhs_full static in
-  let store_result = get_rule_has_parallel_bonds_rhs static in*)
+    let store_result = get_rule_has_parallel_bonds_rhs static in*)
   let error, store_result =
     collect_rule_has_parallel_bonds
       parameter
@@ -344,7 +344,7 @@ let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full error rul
   in
   error, store_result
 (*let static = set_rule_has_parallel_bonds_rhs store_result static in
-error, static*)
+  error, static*)
 
 (**************************************************************************)
 (*non parallel bonds*)
@@ -419,26 +419,26 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                   if site_type <> site_type_source && site_type' <> site_type_target && agent_id = agent_id_source && agent_id' <> agent_id_target && agent_type' = agent_type_target
                   then
                     (*two elements in the list of A: A.x.y*)
-                      (*non parallel bonds*)
-                      let error, old_list =
-                        match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-                                parameter error rule_id store_result
-                        with
-                        | error, None -> error, []
-                        | error, Some l -> error, l
-                      in
-                      (*A.x.y, B.z.t*)
-                      let new_list =
-                        ((agent_id_source, agent_type_source, site_type_source, state_source) (*A.x*),
-                         (agent_id, agent_type, site_type, state) (*A.y*),
-                         (agent_id_target, agent_type_target, site_type_target, state_target) (*B.z*),
-                         (agent_id', agent_type', site_type', state')) :: old_list
-                      in
-                      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-                        parameter error
-                        rule_id
-                        new_list
-                        store_result
+                    (*non parallel bonds*)
+                    let error, old_list =
+                      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+                              parameter error rule_id store_result
+                      with
+                      | error, None -> error, []
+                      | error, Some l -> error, l
+                    in
+                    (*A.x.y, B.z.t*)
+                    let new_list =
+                      ((agent_id_source, agent_type_source, site_type_source, state_source) (*A.x*),
+                       (agent_id, agent_type, site_type, state) (*A.y*),
+                       (agent_id_target, agent_type_target, site_type_target, state_target) (*B.z*),
+                       (agent_id', agent_type', site_type', state')) :: old_list
+                    in
+                    Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+                      parameter error
+                      rule_id
+                      new_list
+                      store_result
                   else
                     error, store_result
                 ) bonds_full_set (error, store_result)
@@ -451,7 +451,7 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
 
 let collect_rule_has_non_parallel_bonds_rhs parameter error rule_id rule store_bonds_rhs_full store_result =
   (*let store_bonds_rhs_full = get_bonds_rhs_full static in
-  let store_result = get_rule_has_non_parallel_bonds_rhs static in*)
+    let store_result = get_rule_has_non_parallel_bonds_rhs static in*)
   let error, store_result =
     collect_rule_has_non_parallel_bonds
       parameter
@@ -464,7 +464,7 @@ let collect_rule_has_non_parallel_bonds_rhs parameter error rule_id rule store_b
   in
   error, store_result
 (*let static = set_rule_has_non_parallel_bonds_rhs store_result static in
-error, static*)
+  error, static*)
 
 
 (**************************************************************************)
@@ -472,7 +472,7 @@ error, static*)
 
 let collect_parallel_bonds_rhs parameter store_rule_has_parallel_bonds error rule_id store_result =
   (*let parameter = get_parameter static in
-  let store_rule_has_parallel_bonds = get_rule_has_parallel_bonds_rhs static in*)
+    let store_rule_has_parallel_bonds = get_rule_has_parallel_bonds_rhs static in*)
   let error, parallel_set =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
@@ -499,60 +499,60 @@ let collect_parallel_bonds_rhs parameter store_rule_has_parallel_bonds error rul
       ) parallel_set (error, store_result)
   in
   error, store_result
-  (*let static = set_parallel_bonds_rhs store_result static in
+(*let static = set_parallel_bonds_rhs store_result static in
   error, static*)
 
 (**************************************************************************)
 (*collect views in the rhs*)
 
 let collect_views_rhs parameter error rule_id rule store_result =
-let error, store_result =
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-    (fun parameter error agent_id agent store_result ->
-     match agent with
-     | Cckappa_sig.Unknown_agent _
-     | Cckappa_sig.Ghost -> error, store_result
-     | Cckappa_sig.Dead_agent (agent,_,_,_)
-     | Cckappa_sig.Agent agent ->
-       let agent_type = agent.Cckappa_sig.agent_name in
-       let error, set =
-         Ckappa_sig.Site_map_and_set.Map.fold
-           (fun site_type port (error, store_set) ->
-              let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-              let error, store_set =
-                Parallel_bonds_type.AgentsSiteState_map_and_set.Set.add_when_not_in
-                  parameter error
-                  (agent_id, agent_type, site_type, state)
-                  store_set
-                in
-                error, store_set
-           ) agent.Cckappa_sig.agent_interface (error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty)
-       in
-       let error, old_set =
-         match
-           Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-             parameter error rule_id store_result
-         with
-         | error, None -> error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty
-         | error, Some s -> error, s
-       in
-       let error', new_set =
-         Parallel_bonds_type.AgentsSiteState_map_and_set.Set.union
-           parameter error old_set set
-       in
-       let error = Exception.check warn parameter error error'
-           (Some "line 549") Exit
-       in
-       let error, store_result =
-         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-           parameter error rule_id
-           new_set
-           store_result
-       in
-       error, store_result
-    ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
-in
-error, store_result
+  let error, store_result =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
+      (fun parameter error agent_id agent store_result ->
+         match agent with
+         | Cckappa_sig.Unknown_agent _
+         | Cckappa_sig.Ghost -> error, store_result
+         | Cckappa_sig.Dead_agent (agent,_,_,_)
+         | Cckappa_sig.Agent agent ->
+           let agent_type = agent.Cckappa_sig.agent_name in
+           let error, set =
+             Ckappa_sig.Site_map_and_set.Map.fold
+               (fun site_type port (error, store_set) ->
+                  let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                  let error, store_set =
+                    Parallel_bonds_type.AgentsSiteState_map_and_set.Set.add_when_not_in
+                      parameter error
+                      (agent_id, agent_type, site_type, state)
+                      store_set
+                  in
+                  error, store_set
+               ) agent.Cckappa_sig.agent_interface (error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty)
+           in
+           let error, old_set =
+             match
+               Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+                 parameter error rule_id store_result
+             with
+             | error, None -> error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty
+             | error, Some s -> error, s
+           in
+           let error', new_set =
+             Parallel_bonds_type.AgentsSiteState_map_and_set.Set.union
+               parameter error old_set set
+           in
+           let error = Exception.check warn parameter error error'
+               (Some "line 549") Exit
+           in
+           let error, store_result =
+             Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+               parameter error rule_id
+               new_set
+               store_result
+           in
+           error, store_result
+      ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
+  in
+  error, store_result
 
 (******************************************************************)
 (**************************************************************************)
@@ -577,7 +577,7 @@ let collect_value_parallel_bonds_rhs parameter
          in
          new_list
       ) store_rule_has_parallel_bonds_rhs
-  in*)
+    in*)
   (*--------------------------------------------------------------*)
   (*return a value true for a rule that has parallel bonds*)
   let error, store_result =
@@ -701,8 +701,8 @@ let collect_fst_site_create_parallel_bonds parameter error rule_id store_action_
 
 let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_action_binding store_parallel_bonds store_result =
   (*let store_action_binding = get_action_binding static in
-  let store_parallel_bonds = get_parallel_bonds_rhs static in
-  let store_fst_site_create_parallel_bonds_rhs = get_fst_site_create_parallel_bonds_rhs static in*)
+    let store_parallel_bonds = get_parallel_bonds_rhs static in
+    let store_fst_site_create_parallel_bonds_rhs = get_fst_site_create_parallel_bonds_rhs static in*)
   let store_result =
     collect_fst_site_create_parallel_bonds
       parameter error rule_id
@@ -711,7 +711,7 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_act
       store_result
   in
   error, store_result
-  (*let static = set_fst_site_create_parallel_bonds_rhs store_result static in
+(*let static = set_fst_site_create_parallel_bonds_rhs store_result static in
   error, static*)
 
 (**************************************************************************)
@@ -776,8 +776,8 @@ let collect_snd_site_create_parallel_bonds parameter error rule_id store_action_
 
 let collect_snd_site_create_parallel_bonds_rhs parameter error rule_id store_action_binding  store_parallel_bonds store_result =
   (*let store_parallel_bonds = get_parallel_bonds_rhs static in
-  let store_action_binding = get_action_binding static in
-  let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in*)
+    let store_action_binding = get_action_binding static in
+    let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in*)
   let store_result =
     collect_snd_site_create_parallel_bonds
       parameter
@@ -788,8 +788,8 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error rule_id store_act
       store_result
   in
   error, store_result
-  (*let static = set_snd_site_create_parallel_bonds_rhs store_result static in
-    error, static*)
+(*let static = set_snd_site_create_parallel_bonds_rhs store_result static in
+  error, static*)
 
 (******************************************************************)
 (*REMOVE*)
@@ -798,7 +798,7 @@ let collect_result_from_site_create_parallel' parameter error rule_id store_view
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_views_rhs with
     | error, None -> error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty
     | error, Some s -> error, s
-    in
+  in
   let error, store_result =
     (*fold over a binding action map*)
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
@@ -810,54 +810,54 @@ let collect_result_from_site_create_parallel' parameter error rule_id store_view
           (*views rhs*)
           Parallel_bonds_type.AgentsSiteState_map_and_set.Set.fold
             (fun (agent_id_views, agent_type_views, site_type_views, state_views) (error, store_result) ->
-        (*fold over a list of parallel bonds*)
-        let error, store_result =
-          List.fold_left (fun (error, store_result)                               (*A.x.y.B.z.t, B.z.t.A.x.y*)
-          ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-           (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
-                           (*let _ =
-                             if agent_id = agent_id_views &&
-                                agent
-                           in*)
-                           (**)
-                           (*let _ =
-                             Loggers.fprintf log
-                               "rule_id:%i:agent_id:%i:agent_type:%i:site_type:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
-                                agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
-                                agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
-                               (Ckappa_sig.int_of_rule_id rule_id)
-                               (Ckappa_sig.int_of_agent_id agent_id)
-                               (Ckappa_sig.int_of_agent_name agent_type)
-                               (Ckappa_sig.int_of_site_name site_type)
-                               (Ckappa_sig.int_of_state_index state)
-                               (Ckappa_sig.int_of_agent_id agent_id')
-                               (Ckappa_sig.int_of_agent_name agent_type')
-                               (Ckappa_sig.int_of_site_name site_type')
-                               (Ckappa_sig.int_of_state_index state')
-                               (*views*)
-                               (Ckappa_sig.int_of_agent_id agent_id_views)
-                               (Ckappa_sig.int_of_agent_name agent_type_views)
-                               (Ckappa_sig.int_of_site_name site_type_views)
-                               (Ckappa_sig.int_of_state_index state_views)
-                               (*parallel*)
-                               (Ckappa_sig.int_of_agent_id agent_id1)
-                               (Ckappa_sig.int_of_agent_name agent_type1)
-                               (Ckappa_sig.int_of_site_name site_type1)
-                               (Ckappa_sig.int_of_site_name site_type2)
-                               (Ckappa_sig.int_of_state_index state1)
-                               (Ckappa_sig.int_of_state_index state2)
-                               (Ckappa_sig.int_of_agent_id agent_id1')
-                               (Ckappa_sig.int_of_agent_name agent_type1')
-                               (Ckappa_sig.int_of_site_name site_type1')
-                               (Ckappa_sig.int_of_site_name site_type2')
-                               (Ckappa_sig.int_of_state_index state1')
-                               (Ckappa_sig.int_of_state_index state2');
-                             Loggers.print_newline log
-                           in*)
-                           error, store_result
-                         )(error, store_result) list
-        in
-        error, store_result
+               (*fold over a list of parallel bonds*)
+               let error, store_result =
+                 List.fold_left (fun (error, store_result)                               (*A.x.y.B.z.t, B.z.t.A.x.y*)
+                                  ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+                                   (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
+                                  (*let _ =
+                                    if agent_id = agent_id_views &&
+                                       agent
+                                    in*)
+                                  (**)
+                                  (*let _ =
+                                    Loggers.fprintf log
+                                      "rule_id:%i:agent_id:%i:agent_type:%i:site_type:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
+                                       agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
+                                       agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
+                                      (Ckappa_sig.int_of_rule_id rule_id)
+                                      (Ckappa_sig.int_of_agent_id agent_id)
+                                      (Ckappa_sig.int_of_agent_name agent_type)
+                                      (Ckappa_sig.int_of_site_name site_type)
+                                      (Ckappa_sig.int_of_state_index state)
+                                      (Ckappa_sig.int_of_agent_id agent_id')
+                                      (Ckappa_sig.int_of_agent_name agent_type')
+                                      (Ckappa_sig.int_of_site_name site_type')
+                                      (Ckappa_sig.int_of_state_index state')
+                                      (*views*)
+                                      (Ckappa_sig.int_of_agent_id agent_id_views)
+                                      (Ckappa_sig.int_of_agent_name agent_type_views)
+                                      (Ckappa_sig.int_of_site_name site_type_views)
+                                      (Ckappa_sig.int_of_state_index state_views)
+                                      (*parallel*)
+                                      (Ckappa_sig.int_of_agent_id agent_id1)
+                                      (Ckappa_sig.int_of_agent_name agent_type1)
+                                      (Ckappa_sig.int_of_site_name site_type1)
+                                      (Ckappa_sig.int_of_site_name site_type2)
+                                      (Ckappa_sig.int_of_state_index state1)
+                                      (Ckappa_sig.int_of_state_index state2)
+                                      (Ckappa_sig.int_of_agent_id agent_id1')
+                                      (Ckappa_sig.int_of_agent_name agent_type1')
+                                      (Ckappa_sig.int_of_site_name site_type1')
+                                      (Ckappa_sig.int_of_site_name site_type2')
+                                      (Ckappa_sig.int_of_state_index state1')
+                                      (Ckappa_sig.int_of_state_index state2');
+                                    Loggers.print_newline log
+                                    in*)
+                                  error, store_result
+                                )(error, store_result) list
+               in
+               error, store_result
             ) views_rhs_set (error, store_result)
         in
         error, store_result

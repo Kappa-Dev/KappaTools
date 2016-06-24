@@ -20,35 +20,35 @@ let warn parameters mh message exn default =
 let local_trace = false
 
 module type Analyzer =
-  sig
+sig
 
-    type static_information
-    type dynamic_information
+  type static_information
+  type dynamic_information
 
-    val main:
-      Remanent_parameters_sig.parameters ->
-      StoryProfiling.StoryStats.log_info ->
-      Exception.method_handler ->
-      Ckappa_sig.Views_bdu.handler ->
-      Cckappa_sig.compil ->
-      Cckappa_sig.kappa_handler ->
-      Exception.method_handler * StoryProfiling.StoryStats.log_info * static_information * dynamic_information
+  val main:
+    Remanent_parameters_sig.parameters ->
+    StoryProfiling.StoryStats.log_info ->
+    Exception.method_handler ->
+    Ckappa_sig.Views_bdu.handler ->
+    Cckappa_sig.compil ->
+    Cckappa_sig.kappa_handler ->
+    Exception.method_handler * StoryProfiling.StoryStats.log_info * static_information * dynamic_information
 
-    val export:
-      static_information ->
-      dynamic_information ->
-      Exception.method_handler ->
-      Analyzer_headers.kasa_state ->
-      Exception.method_handler * dynamic_information * Analyzer_headers.kasa_state
+  val export:
+    static_information ->
+    dynamic_information ->
+    Exception.method_handler ->
+    Analyzer_headers.kasa_state ->
+    Exception.method_handler * dynamic_information * Analyzer_headers.kasa_state
 
-    val print:
-      static_information ->
-      dynamic_information ->
-      Exception.method_handler ->
-      Loggers.t list ->
-      Exception.method_handler * dynamic_information
+  val print:
+    static_information ->
+    dynamic_information ->
+    Exception.method_handler ->
+    Loggers.t list ->
+    Exception.method_handler * dynamic_information
 
-  end
+end
 
 (*****************************************************************************************)
 (*Analyzer is a functor takes a module Domain as its parameter.*)
@@ -99,10 +99,10 @@ struct
         (fun (error, dynamic, i) chemical_species ->
            let error, dynamic = add_event  parameter error (StoryProfiling.Initial_state i) None dynamic in
            let error, dynamic, () =
-            Domain.add_initial_state static dynamic error chemical_species
+             Domain.add_initial_state static dynamic error chemical_species
            in
            let error, dynamic = close_event parameter error  (StoryProfiling.Initial_state i) None dynamic in
-            error, dynamic, i+1)
+           error, dynamic, i+1)
         (error, dynamic, 1)
         init
     in
@@ -115,32 +115,32 @@ struct
         | Some rule_id ->
           let _ =
             if local_trace
-              || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
-              || Remanent_parameters.get_trace parameter
+            || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+            || Remanent_parameters.get_trace parameter
             then
               let error, rule_id_string =
                 try
                   Handler.string_of_rule parameter error kappa_handler
-		    compil rule_id
+                    compil rule_id
                 with
                   _ -> warn parameter error (Some "line 99") Exit
-		    (Ckappa_sig.string_of_rule_id rule_id)
+                         (Ckappa_sig.string_of_rule_id rule_id)
               in
               let () = Loggers.print_newline log in
               let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
               let () = Loggers.print_newline log in
               ()
           in
-	  begin
-	    let error, dynamic, is_enabled =
+          begin
+            let error, dynamic, is_enabled =
               Domain.is_enabled static dynamic error rule_id
             in
-	    match is_enabled with
-	    | None ->
+            match is_enabled with
+            | None ->
               let _ =
                 if local_trace
-                  || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
-                  || Remanent_parameters.get_trace parameter
+                || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+                || Remanent_parameters.get_trace parameter
                 then
                   let () =
                     Loggers.fprintf log "\t\tthe precondition is not satisfied yet"
@@ -150,21 +150,21 @@ struct
                   ()
               in
               aux error dynamic
-	    | Some precondition ->
+            | Some precondition ->
               let _ =
                 if local_trace
-                  || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
-                  || Remanent_parameters.get_trace parameter
+                || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+                || Remanent_parameters.get_trace parameter
                 then
                   let () = Loggers.fprintf log "\t\tthe precondition is satisfied" in
                   let () = Loggers.print_newline log in
                   ()
               in
-	      let error, dynamic, () =
+              let error, dynamic, () =
                 Domain.apply_rule static dynamic error rule_id precondition
               in
               aux error dynamic
-	  end
+          end
       in aux error dynamic
     in
     (*print test*)

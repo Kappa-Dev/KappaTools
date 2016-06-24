@@ -17,7 +17,7 @@ type event =
 | Dummy (* to avoid compilation warning *)
 | Check_rule of Ckappa_sig.c_rule_id
 | See_a_new_bond of
-    ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) * 
+    ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
         (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 type step =
@@ -59,7 +59,7 @@ type 'a fold =
       Exception.method_handler * 'a) ->
      Exception.method_handler -> 'a ->
      Exception.method_handler * 'a) Usual_domains.flat_lattice
-				    
+
 val dummy_precondition: precondition
 
 val is_the_rule_applied_for_the_first_time:
@@ -82,7 +82,7 @@ val get_state_of_site:
   Analyzer_headers.global_dynamic_information ->
   precondition ->
   path ->
-  Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition * 
+  Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition *
     Ckappa_sig.c_state list Usual_domains.flat_lattice
 
 type prefold = { fold: 'a. 'a fold}
@@ -97,7 +97,7 @@ val refine_information_about_state_of_site:
    Analyzer_headers.global_dynamic_information ->
    path ->
    Ckappa_sig.c_state list Usual_domains.flat_lattice ->
-   Exception.method_handler * Analyzer_headers.global_dynamic_information * 
+   Exception.method_handler * Analyzer_headers.global_dynamic_information *
      Ckappa_sig.c_state list Usual_domains.flat_lattice) ->
   precondition
 
@@ -118,7 +118,7 @@ val fold_over_potential_partners:
    Exception.method_handler * 'a -> Exception.method_handler * 'a) ->
   'a ->
   Exception.method_handler * precondition * 'a Usual_domains.top_or_not
-					       
+
 val overwrite_potential_partners_map:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
@@ -129,5 +129,3 @@ val overwrite_potential_partners_map:
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) Usual_domains.flat_lattice)
   -> prefold ->
   Exception.method_handler * precondition
-
-

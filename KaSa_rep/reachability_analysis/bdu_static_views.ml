@@ -35,29 +35,29 @@ type bdu_analysis_static =
   {
     store_pre_static : pre_static;
     store_covering_classes: Covering_classes_type.remanent
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
     store_covering_classes_id : Covering_classes_type.cv_id list Ckappa_sig.AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
     store_remanent_triple:
       ((Covering_classes_type.Dictionary_of_List_sites.key *
-          Covering_classes_type.Dictionary_of_List_sites.value *
-          Ckappa_sig.Site_map_and_set.Set.t) list)
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+        Covering_classes_type.Dictionary_of_List_sites.value *
+        Ckappa_sig.Site_map_and_set.Set.t) list)
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
     store_proj_bdu_creation_restriction_map:
       Ckappa_sig.Views_bdu.mvbdu
-      Covering_classes_type.AgentCV_setmap.Map.t
-      Ckappa_sig.Rule_setmap.Map.t;
+        Covering_classes_type.AgentCV_setmap.Map.t
+        Ckappa_sig.Rule_setmap.Map.t;
     store_modif_list_restriction_map:
       Ckappa_sig.Views_bdu.hconsed_association_list
-      Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
+        Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
     store_proj_bdu_potential_restriction_map :
       (Ckappa_sig.Views_bdu.mvbdu * Ckappa_sig.Views_bdu.hconsed_association_list)
-      Covering_classes_type.AgentSiteCV_setmap.Map.t
-      Ckappa_sig.Rule_setmap.Map.t;
+        Covering_classes_type.AgentSiteCV_setmap.Map.t
+        Ckappa_sig.Rule_setmap.Map.t;
     store_proj_bdu_test_restriction :
       Ckappa_sig.Views_bdu.mvbdu
-      Covering_classes_type.AgentsCV_setmap.Map.t
-      Ckappa_sig.Rule_setmap.Map.t;
+        Covering_classes_type.AgentsCV_setmap.Map.t
+        Ckappa_sig.Rule_setmap.Map.t;
   }
 
 (************************************************************************************)
@@ -83,21 +83,21 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent_modif store_result ->
-        if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
-        then error, store_result
-        else
-          let agent_type = agent_modif.Cckappa_sig.agent_name in
-          (*return*)
-          let error, store_result =
-            Ckappa_sig.Site_map_and_set.Map.fold
-              (fun site_type _ (error, store_result) ->
-                let error, store_result =
-                  add_link error (agent_id, agent_type, site_type) rule_id store_result
-                in
-                error, store_result
-              ) agent_modif.Cckappa_sig.agent_interface (error, store_result)
-          in
-          error, store_result
+         if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
+         then error, store_result
+         else
+           let agent_type = agent_modif.Cckappa_sig.agent_name in
+           (*return*)
+           let error, store_result =
+             Ckappa_sig.Site_map_and_set.Map.fold
+               (fun site_type _ (error, store_result) ->
+                  let error, store_result =
+                    add_link error (agent_id, agent_type, site_type) rule_id store_result
+                  in
+                  error, store_result
+               ) agent_modif.Cckappa_sig.agent_interface (error, store_result)
+           in
+           error, store_result
       ) diff_direct store_result
   in
   let store_result =
@@ -110,14 +110,14 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
 let collect_modif_map parameter error store_modification_sites =
   Covering_classes_type.Project2_modif.monadic_proj
     (fun parameter error (agent_id, agent_type, site_type) ->
-      error, (agent_type, site_type))
+       error, (agent_type, site_type))
     parameter
     error
     Ckappa_sig.Rule_map_and_set.Set.empty
     (fun parameter error s1 s2 ->
-      let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 118") Exit in
-      error, new_set
+       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
+       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
+       error, new_set
     ) store_modification_sites
 
 (************************************************************************************)
@@ -145,22 +145,22 @@ let collect_test_sites parameter error rule_id viewslhs
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
-       match agent with
-       | Cckappa_sig.Unknown_agent _
-       | Cckappa_sig.Ghost -> error, store_result
-       | Cckappa_sig.Dead_agent (agent,_,_,_)
-       | Cckappa_sig.Agent agent ->
-         let agent_type = agent.Cckappa_sig.agent_name in
-         let error, store_result_test =
-           Ckappa_sig.Site_map_and_set.Map.fold
-             (fun site_type _ (error, store_result) ->
-               let error, store_result_test =
-                 add_link (agent_id, agent_type, site_type) rule_id store_result
-               in
-               error, store_result_test
-             ) agent.Cckappa_sig.agent_interface (error, store_result)
-         in
-         error, store_result_test
+         match agent with
+         | Cckappa_sig.Unknown_agent _
+         | Cckappa_sig.Ghost -> error, store_result
+         | Cckappa_sig.Dead_agent (agent,_,_,_)
+         | Cckappa_sig.Agent agent ->
+           let agent_type = agent.Cckappa_sig.agent_name in
+           let error, store_result_test =
+             Ckappa_sig.Site_map_and_set.Map.fold
+               (fun site_type _ (error, store_result) ->
+                  let error, store_result_test =
+                    add_link (agent_id, agent_type, site_type) rule_id store_result
+                  in
+                  error, store_result_test
+               ) agent.Cckappa_sig.agent_interface (error, store_result)
+           in
+           error, store_result_test
       ) viewslhs store_result
   in
   let store_result =
@@ -173,22 +173,22 @@ let collect_test_sites parameter error rule_id viewslhs
 let collect_test_map parameter error store_test_sites =
   Covering_classes_type.Project2_modif.monadic_proj
     (fun parameter error (agent_id, agent_type, site_type) ->
-      error, (agent_type, site_type))
+       error, (agent_type, site_type))
     parameter
     error
     (Ckappa_sig.Rule_map_and_set.Set.empty)
     (fun parameter error s1 s2 ->
-      let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 118") Exit in
-      error, ( new_set)
+       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
+       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
+       error, ( new_set)
     ) store_test_sites
 
 (************************************************************************************)
 (*TODO: modification and test rule that has rule_id union together.
-For example:
-modification: agent_type:0:site_type:0:[5;6]
-test: agent_type:0:site_type:0:[4;5;6;7]
-=> result: agent_type:0:site_type:0:[4;5;6;7]
+  For example:
+  modification: agent_type:0:site_type:0:[5;6]
+  test: agent_type:0:site_type:0:[4;5;6;7]
+  => result: agent_type:0:site_type:0:[4;5;6;7]
 *)
 
 let collect_test_modification_sites
@@ -196,7 +196,7 @@ let collect_test_modification_sites
   let add_link error (agent_id, agent_type, site_type) rule_id_set store_result =
     let error, old =
       match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs parameter error
-        (agent_id, agent_type, site_type) store_result
+              (agent_id, agent_type, site_type) store_result
       with
       | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
       | error, Some s -> error, s
@@ -215,26 +215,26 @@ let collect_test_modification_sites
     parameter error
     (*exists in 'a t*)
     (fun parameter error (agent_id, agent_type, site_type) s1 store_result ->
-      let error, store_result =
-        add_link error (agent_id, agent_type, site_type) s1 store_result
-      in
-      error, store_result
+       let error, store_result =
+         add_link error (agent_id, agent_type, site_type) s1 store_result
+       in
+       error, store_result
     )
     (*exists in 'b t*)
     (fun parameter error (agent_id, agent_type, site_type) s2 store_result ->
-      let error, store_result =
-        add_link error (agent_id, agent_type, site_type) s2 store_result
-      in
-      error, store_result
+       let error, store_result =
+         add_link error (agent_id, agent_type, site_type) s2 store_result
+       in
+       error, store_result
     )
     (*exists in both*)
     (fun parameter error (agent_id, agent_type, site_type) s1 s2 store_result ->
-      let error',union = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 212") Exit in
-      let error, store_result =
-        add_link error (agent_id, agent_type, site_type) union store_result
-      in
-      error, store_result
+       let error',union = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
+       let error = Exception.check warn parameter error error' (Some "line 212") Exit in
+       let error, store_result =
+         add_link error (agent_id, agent_type, site_type) union store_result
+       in
+       error, store_result
     ) store_modification_map store_test_map store_result
 
 (*valuations of the views that are created without agent_id*)
@@ -242,14 +242,14 @@ let collect_test_modification_sites
 let collect_test_modif_map parameter error store_test_modification_sites =
   Covering_classes_type.Project2_modif.monadic_proj
     (fun parameter error (agent_id, agent_type, site_type) ->
-      error, (agent_type, site_type)
+       error, (agent_type, site_type)
     )
     parameter error
     (Ckappa_sig.Rule_map_and_set.Set.empty)
     (fun parameter error s1 s2 ->
-      let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 118") Exit in
-      error, (new_set)
+       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
+       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
+       error, (new_set)
     )
     store_test_modification_sites
 
@@ -328,7 +328,7 @@ let site_covering_classes parameter error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
     let error, old =
       match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
-        (agent_type, site_type) store_result
+              (agent_type, site_type) store_result
       with
       | error, None -> error, []
       | error, Some l -> error, l
@@ -343,24 +343,24 @@ let site_covering_classes parameter error covering_classes =
     (*From sites return a list of covering_class_id*)
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_type_cv remanent store_result ->
-        (*get a list of covering_class_id from remanent*)
-        let cv_dic = remanent.Covering_classes_type.store_dic in
-        (*fold a dictionary*)
-        let error, store_result =
-          Covering_classes_type.Dictionary_of_List_sites.fold
-            (fun list_of_site_type ((),()) cv_id (error, store_result) ->
-              (*get site_cv in value*)
-              List.fold_left (fun (error, store_result) site_type_cv ->
-                let error, result =
-                  add_link (agent_type_cv, site_type_cv) cv_id store_result
-                in
-                error, result
-              ) (error, store_result) list_of_site_type
-            ) cv_dic (error, store_result)
-        in
-        error, store_result
-      (*REMARK: when it is folding inside a list, start with empty result,
-        because the add_link function has already called the old result.*)
+         (*get a list of covering_class_id from remanent*)
+         let cv_dic = remanent.Covering_classes_type.store_dic in
+         (*fold a dictionary*)
+         let error, store_result =
+           Covering_classes_type.Dictionary_of_List_sites.fold
+             (fun list_of_site_type ((),()) cv_id (error, store_result) ->
+                (*get site_cv in value*)
+                List.fold_left (fun (error, store_result) site_type_cv ->
+                    let error, result =
+                      add_link (agent_type_cv, site_type_cv) cv_id store_result
+                    in
+                    error, result
+                  ) (error, store_result) list_of_site_type
+             ) cv_dic (error, store_result)
+         in
+         error, store_result
+         (*REMARK: when it is folding inside a list, start with empty result,
+           because the add_link function has already called the old result.*)
       ) covering_classes Ckappa_sig.AgentSite_map_and_set.Map.empty
   in
   let store_result =
@@ -400,8 +400,8 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
 let list2set parameter error list =
   let error', set =
     List.fold_left (fun (error,current_set) elt ->
-      Ckappa_sig.Site_map_and_set.Set.add parameter error elt current_set
-    ) (error, Ckappa_sig.Site_map_and_set.Set.empty) list
+        Ckappa_sig.Site_map_and_set.Set.add parameter error elt current_set
+      ) (error, Ckappa_sig.Site_map_and_set.Set.empty) list
   in
   let error = Exception.check warn parameter error error' (Some "line 509") Exit in
   error, set
@@ -416,26 +416,26 @@ let list2set parameter error list =
 let collect_remanent_triple parameter error store_remanent store_result =
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_type remanent store_result ->
-      let store_dic = remanent.Covering_classes_type.store_dic in
-      (*-----------------------------------------------------------------*)
-      let error, triple_list =
-        Covering_classes_type.Dictionary_of_List_sites.fold
-          (fun list _ cv_id (error, current_list) ->
-            let error, set = list2set parameter error list in
-            let triple_list = (cv_id, list, set) :: current_list in
-            error, triple_list
-          ) store_dic (error, [])
-      in
-      (*--------------------------------------------------------*)
-      let error, store_result =
-        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-          parameter
-          error
-          agent_type
-          (List.rev triple_list)
-          store_result
-      in
-      error, store_result
+       let store_dic = remanent.Covering_classes_type.store_dic in
+       (*-----------------------------------------------------------------*)
+       let error, triple_list =
+         Covering_classes_type.Dictionary_of_List_sites.fold
+           (fun list _ cv_id (error, current_list) ->
+              let error, set = list2set parameter error list in
+              let triple_list = (cv_id, list, set) :: current_list in
+              error, triple_list
+           ) store_dic (error, [])
+       in
+       (*--------------------------------------------------------*)
+       let error, store_result =
+         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+           parameter
+           error
+           agent_type
+           (List.rev triple_list)
+           store_result
+       in
+       error, store_result
     ) store_remanent store_result
 
 (******************************************************************)
@@ -493,86 +493,86 @@ let collect_bdu_creation_restriction_map parameter handler error
   (*-----------------------------------------------------------------*)
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_type' triple_list (handler,store_result) ->
-      List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
-        let error, agent =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        in
-        match agent with
-	| Some Cckappa_sig.Unknown_agent _
-        | Some Cckappa_sig.Dead_agent _
-        | None -> warn parameter error (Some "168") Exit (handler,store_result)
-	| Some Cckappa_sig.Ghost -> error, (handler,store_result)
-        | Some Cckappa_sig.Agent agent ->
-          if agent_type' = agent_type
-          then
-            (*-----------------------------------------------------------------*)
-            (*get map restriction from covering classes*)
-            let error, get_pair_list =
-              List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-		let error, (map_new_index_forward, _) =
-                  new_index_pair_map parameter error list
-                in
-                (*-----------------------------------------------------------------*)
-		let add site state (error, store_result) =
-                  let error, site' =
-                    match Ckappa_sig.Site_map_and_set.Map.find_option
-                      parameter
-                      error
-                      site
-                      map_new_index_forward
-                    with
-                    | error, None -> warn parameter error (Some "282") Exit
-                      Ckappa_sig.dummy_site_name
-                    | error, Some s -> error, s
-                  in
-                  Ckappa_sig.Site_map_and_set.Map.add parameter error
-                    site'
-                    state
-                    store_result
-		in
-                (*-----------------------------------------------------------------*)
-		let error', map_res =
-		  Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
-                    parameter error
-                    (fun site port -> add site port.Cckappa_sig.site_state.Cckappa_sig.min)
-		    (fun site -> add site Ckappa_sig.dummy_state_index)
-		    set
-		    agent.Cckappa_sig.agent_interface
-		    Ckappa_sig.Site_map_and_set.Map.empty
-                in
-		let error =
-                  Exception.check warn parameter error error' (Some "line 212") Exit
-                in
-                error, (cv_id, map_res) :: current_list)
-		(error, []) triple_list
-            in
-            (*-----------------------------------------------------------------*)
-            (*fold a list and get a pair of site and state and rule_id*)
-            let error, handler, store_result  =
-              List.fold_left
-                (fun (error, handler, store_result) (cv_id,map_res) ->
-                  let error, pair_list =
-                    Ckappa_sig.Site_map_and_set.Map.fold
-                      (fun site' state (error, current_list) ->
-                        let pair_list = (site', state) :: current_list in
-                        error, pair_list
-                      ) map_res (error, [])
-                  in
-		  let error, handler, bdu_creation =
-		    build_bdu parameter handler error pair_list
-		  in
-		   let error, handler, store_result =
-		     add_link handler
-                       (agent_type, rule_id, cv_id)
-                       bdu_creation store_result
-		   in
-		   error, handler, store_result
-                ) (error, handler, store_result) get_pair_list
-            in
-            error, (handler, store_result)
-          else error, (handler, store_result)
-      ) (error, (handler, store_result)) rule.Cckappa_sig.actions.Cckappa_sig.creation
+       List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
+           let error, agent =
+             Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+               parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+           in
+           match agent with
+           | Some Cckappa_sig.Unknown_agent _
+           | Some Cckappa_sig.Dead_agent _
+           | None -> warn parameter error (Some "168") Exit (handler,store_result)
+           | Some Cckappa_sig.Ghost -> error, (handler,store_result)
+           | Some Cckappa_sig.Agent agent ->
+             if agent_type' = agent_type
+             then
+               (*-----------------------------------------------------------------*)
+               (*get map restriction from covering classes*)
+               let error, get_pair_list =
+                 List.fold_left (fun (error, current_list) (cv_id, list, set) ->
+                     let error, (map_new_index_forward, _) =
+                       new_index_pair_map parameter error list
+                     in
+                     (*-----------------------------------------------------------------*)
+                     let add site state (error, store_result) =
+                       let error, site' =
+                         match Ckappa_sig.Site_map_and_set.Map.find_option
+                                 parameter
+                                 error
+                                 site
+                                 map_new_index_forward
+                         with
+                         | error, None -> warn parameter error (Some "282") Exit
+                                            Ckappa_sig.dummy_site_name
+                         | error, Some s -> error, s
+                       in
+                       Ckappa_sig.Site_map_and_set.Map.add parameter error
+                         site'
+                         state
+                         store_result
+                     in
+                     (*-----------------------------------------------------------------*)
+                     let error', map_res =
+                       Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
+                         parameter error
+                         (fun site port -> add site port.Cckappa_sig.site_state.Cckappa_sig.min)
+                         (fun site -> add site Ckappa_sig.dummy_state_index)
+                         set
+                         agent.Cckappa_sig.agent_interface
+                         Ckappa_sig.Site_map_and_set.Map.empty
+                     in
+                     let error =
+                       Exception.check warn parameter error error' (Some "line 212") Exit
+                     in
+                     error, (cv_id, map_res) :: current_list)
+                   (error, []) triple_list
+               in
+               (*-----------------------------------------------------------------*)
+               (*fold a list and get a pair of site and state and rule_id*)
+               let error, handler, store_result  =
+                 List.fold_left
+                   (fun (error, handler, store_result) (cv_id,map_res) ->
+                      let error, pair_list =
+                        Ckappa_sig.Site_map_and_set.Map.fold
+                          (fun site' state (error, current_list) ->
+                             let pair_list = (site', state) :: current_list in
+                             error, pair_list
+                          ) map_res (error, [])
+                      in
+                      let error, handler, bdu_creation =
+                        build_bdu parameter handler error pair_list
+                      in
+                      let error, handler, store_result =
+                        add_link handler
+                          (agent_type, rule_id, cv_id)
+                          bdu_creation store_result
+                      in
+                      error, handler, store_result
+                   ) (error, handler, store_result) get_pair_list
+               in
+               error, (handler, store_result)
+             else error, (handler, store_result)
+         ) (error, (handler, store_result)) rule.Cckappa_sig.actions.Cckappa_sig.creation
     ) store_remanent_triple (handler, store_result)
 
 (*projection with rule_id*)
@@ -607,11 +607,11 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
       (fun (agent_type, rule_id, cv_id) -> agent_type, cv_id)
       bdu_true
       (fun parameter (error, handler_bdu) bdu bdu' ->
-        let error, handler_bdu, bdu_union =
-          Ckappa_sig.Views_bdu.mvbdu_and
-          parameter handler_bdu error bdu bdu'
-        in
-        (error, handler_bdu), bdu_union
+         let error, handler_bdu, bdu_union =
+           Ckappa_sig.Views_bdu.mvbdu_and
+             parameter handler_bdu error bdu bdu'
+         in
+         (error, handler_bdu), bdu_union
       )
       store_bdu_creation_restriction_map
   in
@@ -639,92 +639,92 @@ let collect_modif_list_restriction_map
   (*-----------------------------------------------------------------*)
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_id agent_modif (handler, store_result) ->
-      if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
-      then error, (handler, store_result)
-      else
-        let agent_type = agent_modif.Cckappa_sig.agent_name in
-	let error, triple_list =
-	  match
-	    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
-              parameter
-              error
-              agent_type
-              store_remanent_triple
-	  with
-	  | error, None -> warn parameter error (Some "Line 476") Exit []
-	  | error, Some x -> error, x
-	in
-        (*-----------------------------------------------------------------*)
-        (*get map restriction from covering classes*)
-        let error, get_pair_list =
-          List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-            (*-----------------------------------------------------------------*)
-            (*new index for site type in covering class*)
-            let error, (map_new_index_forward, _) =
-              new_index_pair_map parameter error list
-            in
-            (*-----------------------------------------------------------------*)
-            let error', map_res =
-              Ckappa_sig.Site_map_and_set.Map.fold_restriction parameter error
-                (fun site port (error, store_result) ->
-                  let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
-                  let error, site' =
-                    Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
-                      parameter
-                      error
-                      Ckappa_sig.dummy_site_name
-                      site
-                      map_new_index_forward
-                  in
-                  let error, map_res =
-                    Ckappa_sig.Site_map_and_set.Map.add parameter error
-                      site'
-                      state
-                      store_result
-                  in
-                  error, map_res
-                ) set agent_modif.Cckappa_sig.agent_interface Ckappa_sig.Site_map_and_set.Map.empty
-            in
-	    let error = Exception.check warn parameter error error' (Some "line 293") Exit
-            in
-            error, (cv_id, map_res) :: current_list
-	  ) (error, []) triple_list
-        in
-        (*-----------------------------------------------------------------*)
-        (*fold a list and get a pair of site and state and rule_id*)
-        let error, handler, store_result =
-          List.fold_left
-            (fun (error, handler, store_result) (cv_id,map_res) ->
-	      if Ckappa_sig.Site_map_and_set.Map.is_empty map_res
-	      then error, handler, store_result
-	      else
-		begin
-                  (*get a list of pair (site, state) in a map of new indexes of site.*)
-		  let error, pair_list =
-                    Ckappa_sig.Site_map_and_set.Map.fold
-                      (fun site' state (error, current_list) ->
-			let pair_list = (site', state) :: current_list in
-			error, pair_list
-                      ) map_res (error, [])
-		  in
-		  (*-----------------------------------------------------------------*)
-		  (*build list_a*)
-		  let error, handler, list_a =
-                    Ckappa_sig.Views_bdu.build_association_list
-		      parameter
-		      handler
-		      error
-		      pair_list
-		  in
-		  let error, store_result =
-		    add_link (agent_id, agent_type, rule_id, cv_id) list_a store_result
-		  in
-		  error, handler, store_result
-		end
-	    )
-	    (error, handler, store_result)
-	    get_pair_list
-	in error, (handler, store_result))
+       if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
+       then error, (handler, store_result)
+       else
+         let agent_type = agent_modif.Cckappa_sig.agent_name in
+         let error, triple_list =
+           match
+             Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+               parameter
+               error
+               agent_type
+               store_remanent_triple
+           with
+           | error, None -> warn parameter error (Some "Line 476") Exit []
+           | error, Some x -> error, x
+         in
+         (*-----------------------------------------------------------------*)
+         (*get map restriction from covering classes*)
+         let error, get_pair_list =
+           List.fold_left (fun (error, current_list) (cv_id, list, set) ->
+               (*-----------------------------------------------------------------*)
+               (*new index for site type in covering class*)
+               let error, (map_new_index_forward, _) =
+                 new_index_pair_map parameter error list
+               in
+               (*-----------------------------------------------------------------*)
+               let error', map_res =
+                 Ckappa_sig.Site_map_and_set.Map.fold_restriction parameter error
+                   (fun site port (error, store_result) ->
+                      let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
+                      let error, site' =
+                        Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
+                          parameter
+                          error
+                          Ckappa_sig.dummy_site_name
+                          site
+                          map_new_index_forward
+                      in
+                      let error, map_res =
+                        Ckappa_sig.Site_map_and_set.Map.add parameter error
+                          site'
+                          state
+                          store_result
+                      in
+                      error, map_res
+                   ) set agent_modif.Cckappa_sig.agent_interface Ckappa_sig.Site_map_and_set.Map.empty
+               in
+               let error = Exception.check warn parameter error error' (Some "line 293") Exit
+               in
+               error, (cv_id, map_res) :: current_list
+             ) (error, []) triple_list
+         in
+         (*-----------------------------------------------------------------*)
+         (*fold a list and get a pair of site and state and rule_id*)
+         let error, handler, store_result =
+           List.fold_left
+             (fun (error, handler, store_result) (cv_id,map_res) ->
+                if Ckappa_sig.Site_map_and_set.Map.is_empty map_res
+                then error, handler, store_result
+                else
+                  begin
+                    (*get a list of pair (site, state) in a map of new indexes of site.*)
+                    let error, pair_list =
+                      Ckappa_sig.Site_map_and_set.Map.fold
+                        (fun site' state (error, current_list) ->
+                           let pair_list = (site', state) :: current_list in
+                           error, pair_list
+                        ) map_res (error, [])
+                    in
+                    (*-----------------------------------------------------------------*)
+                    (*build list_a*)
+                    let error, handler, list_a =
+                      Ckappa_sig.Views_bdu.build_association_list
+                        parameter
+                        handler
+                        error
+                        pair_list
+                    in
+                    let error, store_result =
+                      add_link (agent_id, agent_type, rule_id, cv_id) list_a store_result
+                    in
+                    error, handler, store_result
+                  end
+             )
+             (error, handler, store_result)
+             get_pair_list
+         in error, (handler, store_result))
     rule.Cckappa_sig.diff_direct (handler, store_result)
 
 (************************************************************************************)
@@ -752,90 +752,90 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
   (*-----------------------------------------------------------------*)
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_type' triple_list (handler, store_result) ->
-      (*map of potential partner side_effect with site is bond*)
-      Ckappa_sig.AgentRule_map_and_set.Map.fold
-        (fun (agent_type, rule_id) pair_list (error, (handler, store_result)) ->
-	 if agent_type' = agent_type
-         then
-           let error, get_pair_list =
-             List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-	       (*-----------------------------------------------------------------*)
-               (*get new indexes for sites*)
-	       let error, (map_new_index_forward, _) =
-                 new_index_pair_map parameter error list
-               in
-	       (*-----------------------------------------------------------------*)
-               let error', map_res =
-                 List.fold_left
-		   (fun (error, map_res) (site, state) ->
-		     if Ckappa_sig.Site_map_and_set.Set.mem site set
-		     then
-		       let error, site' =
-			 Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
-                           parameter
-                           error
-                           Ckappa_sig.dummy_site_name
-                           site
-                           map_new_index_forward
-		       in
-		       let error, old =
-			 Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
-			   parameter error
-			   []
-			   site'
-			   map_res
-		       in
-		       let error, map_res =
-			 Ckappa_sig.Site_map_and_set.Map.add_or_overwrite parameter error
-			   site'
-			   (state :: old)
-			   map_res
-                       in
-                       error, map_res
-		     else error, map_res
-		   ) (error, Ckappa_sig.Site_map_and_set.Map.empty) pair_list
-               in
-	       (*-----------------------------------------------------------------*)
-               let error =
-                 Exception.check warn parameter error error' (Some "line 630") Exit
-	       in
-	       error,
-	       Ckappa_sig.Site_map_and_set.Map.fold (fun site' list_state list ->
-                 (cv_id, site', list_state) :: list) map_res current_list)
-               (error, []) triple_list
-           in
-	   (*-----------------------------------------------------------------*)
-           let error, handler, store_result =
-             List.fold_left
-	       (fun (error, handler, store_result) (cv_id, site', map_res) ->
-		 let error, handler, bdu =
-		   List.fold_left (fun (error, handler, bdu) state ->
-		     (*------------------------------------------------------------*)
-                     (*build bdu_potential side effects*)
-		     let error, handler, bdu_potential_effect =
-		       build_bdu parameter handler error [site', state]
-		     in
-                     (*union of bdu and bdu effect*)
-		     let error, handler, bdu =
-                       Ckappa_sig.Views_bdu.mvbdu_or
-                         parameter handler error bdu bdu_potential_effect
-		     in
-		     error, handler, bdu)
-		     (error, handler, bdu_false)
-		     map_res
-		 in
-		 let error, handler, store_result =
-		   add_link handler (agent_type, site', rule_id, cv_id) bdu store_result
-		 in
-		 error, handler, store_result
-	       )
-	       (error, handler, store_result)
-	       get_pair_list
-           in
-	   error, (handler, store_result)
-         else
-	   error, (handler, store_result)
-	) store_potential_side_effects (error, (handler, store_result))
+       (*map of potential partner side_effect with site is bond*)
+       Ckappa_sig.AgentRule_map_and_set.Map.fold
+         (fun (agent_type, rule_id) pair_list (error, (handler, store_result)) ->
+            if agent_type' = agent_type
+            then
+              let error, get_pair_list =
+                List.fold_left (fun (error, current_list) (cv_id, list, set) ->
+                    (*-----------------------------------------------------------------*)
+                    (*get new indexes for sites*)
+                    let error, (map_new_index_forward, _) =
+                      new_index_pair_map parameter error list
+                    in
+                    (*-----------------------------------------------------------------*)
+                    let error', map_res =
+                      List.fold_left
+                        (fun (error, map_res) (site, state) ->
+                           if Ckappa_sig.Site_map_and_set.Set.mem site set
+                           then
+                             let error, site' =
+                               Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
+                                 parameter
+                                 error
+                                 Ckappa_sig.dummy_site_name
+                                 site
+                                 map_new_index_forward
+                             in
+                             let error, old =
+                               Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
+                                 parameter error
+                                 []
+                                 site'
+                                 map_res
+                             in
+                             let error, map_res =
+                               Ckappa_sig.Site_map_and_set.Map.add_or_overwrite parameter error
+                                 site'
+                                 (state :: old)
+                                 map_res
+                             in
+                             error, map_res
+                           else error, map_res
+                        ) (error, Ckappa_sig.Site_map_and_set.Map.empty) pair_list
+                    in
+                    (*-----------------------------------------------------------------*)
+                    let error =
+                      Exception.check warn parameter error error' (Some "line 630") Exit
+                    in
+                    error,
+                    Ckappa_sig.Site_map_and_set.Map.fold (fun site' list_state list ->
+                        (cv_id, site', list_state) :: list) map_res current_list)
+                  (error, []) triple_list
+              in
+              (*-----------------------------------------------------------------*)
+              let error, handler, store_result =
+                List.fold_left
+                  (fun (error, handler, store_result) (cv_id, site', map_res) ->
+                     let error, handler, bdu =
+                       List.fold_left (fun (error, handler, bdu) state ->
+                           (*------------------------------------------------------------*)
+                           (*build bdu_potential side effects*)
+                           let error, handler, bdu_potential_effect =
+                             build_bdu parameter handler error [site', state]
+                           in
+                           (*union of bdu and bdu effect*)
+                           let error, handler, bdu =
+                             Ckappa_sig.Views_bdu.mvbdu_or
+                               parameter handler error bdu bdu_potential_effect
+                           in
+                           error, handler, bdu)
+                         (error, handler, bdu_false)
+                         map_res
+                     in
+                     let error, handler, store_result =
+                       add_link handler (agent_type, site', rule_id, cv_id) bdu store_result
+                     in
+                     error, handler, store_result
+                  )
+                  (error, handler, store_result)
+                  get_pair_list
+              in
+              error, (handler, store_result)
+            else
+              error, (handler, store_result)
+         ) store_potential_side_effects (error, (handler, store_result))
     ) store_remanent_triple (handler, store_result)
 
 (************************************************************************************)
@@ -921,110 +921,110 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
   (*-----------------------------------------------------------------*)
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_id agent (handler,store_result) ->
-      match agent with
-      | Cckappa_sig.Unknown_agent _
-      (* Unfortunatly, we can do nothing with undefined agents in the views domain *)
-      (* They will be handled with properly in the agents domain *)
-      | Cckappa_sig.Ghost -> error, (handler, store_result)
-      | Cckappa_sig.Dead_agent (agent, _, _, _) ->
-	  let agent_type = agent.Cckappa_sig.agent_name in
-	  let error, triple_list =
-	    match
-	      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                parameter error agent_type store_remanent_triple
-	    with
-	    | error, None -> error, []
-	    | error, Some x -> error, x
-	  in
-	  let error, store_result =
-	    List.fold_left
-	      (fun (error, store_result) (cv_id, _, _) ->
-	       error,
-	        Covering_classes_type.AgentsRuleCV_setmap.Map.add
-                 (agent_id, agent_type, rule_id, cv_id) bdu_false store_result
-	      )
-	      (error, store_result) triple_list
-	  in
-	  error, (handler, store_result)
-      | Cckappa_sig.Agent agent ->
-        let agent_type = agent.Cckappa_sig.agent_name in
-	let error, triple_list =
-	  match
-	    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-              parameter error agent_type store_remanent_triple
-	  with
-	  | error, None ->  error, []
-	  | error, Some x -> error, x
-	in
-	(*-----------------------------------------------------------------*)
-        (*get map restriction from covering classes*)
-        let error, get_pair_list =
-          List.fold_left
-	    (fun (error, current_list) (cv_id, list, set) ->
-	     (*-----------------------------------------------------------------*)
-	     (*new index for site type in covering class*)
-	     let error, (map_new_index_forward, _) =
-	       new_index_pair_map parameter error list
-	     in
-             (*-----------------------------------------------------------------*)
-             let error', map_res =
-	       Ckappa_sig.Site_map_and_set.Map.fold_restriction
-		 parameter error
-		 (fun site port (error, store_result) ->
-                  let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
-                  let error, site' =
-                    Ckappa_sig.Site_map_and_set.Map.find_default parameter error
-		      Ckappa_sig.dummy_site_name
-                      site map_new_index_forward
-                  in
-                  let error, map_res =
-                    Ckappa_sig.Site_map_and_set.Map.add parameter error
-		      site'
-		      state
-		      store_result
-                  in
-                  error, map_res
-		 ) set agent.Cckappa_sig.agent_interface
-                 Ckappa_sig.Site_map_and_set.Map.empty
-             in
-	     let error = Exception.check warn parameter error error'
-	       (Some "line 178") Exit
-             in
-             error, (cv_id, map_res) :: current_list)
-	    (error, []) triple_list
-        in
-        (*-----------------------------------------------------------------*)
-        let error, handler, store_result =
-          List.fold_left
-            (fun (error, handler, store_result) (cv_id,map_res) ->
-	     if Ckappa_sig.Site_map_and_set.Map.is_empty map_res
-		then
-		  error, handler, store_result
-	     else
-	       begin
-		 let error, pair_list =
-		   Ckappa_sig.Site_map_and_set.Map.fold
-		     (fun site' state (error, current_list) ->
-		      let pair_list = (site', state) :: current_list in
-		      error, pair_list
-		     ) map_res (error, [])
-		 in
-		 (*build bdu_test*)
-		 let error, handler, bdu_test =
-		   build_bdu parameter handler error pair_list
-		 in
-		 let error, store_result =
-		   error, Covering_classes_type.AgentsRuleCV_setmap.Map.add
-                     (agent_id, agent_type, rule_id, cv_id)
-                     bdu_test
-                     store_result
-		 in
-		 error, handler, store_result
-	       end)
+       match agent with
+       | Cckappa_sig.Unknown_agent _
+       (* Unfortunatly, we can do nothing with undefined agents in the views domain *)
+       (* They will be handled with properly in the agents domain *)
+       | Cckappa_sig.Ghost -> error, (handler, store_result)
+       | Cckappa_sig.Dead_agent (agent, _, _, _) ->
+         let agent_type = agent.Cckappa_sig.agent_name in
+         let error, triple_list =
+           match
+             Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+               parameter error agent_type store_remanent_triple
+           with
+           | error, None -> error, []
+           | error, Some x -> error, x
+         in
+         let error, store_result =
+           List.fold_left
+             (fun (error, store_result) (cv_id, _, _) ->
+                error,
+                Covering_classes_type.AgentsRuleCV_setmap.Map.add
+                  (agent_id, agent_type, rule_id, cv_id) bdu_false store_result
+             )
+             (error, store_result) triple_list
+         in
+         error, (handler, store_result)
+       | Cckappa_sig.Agent agent ->
+         let agent_type = agent.Cckappa_sig.agent_name in
+         let error, triple_list =
+           match
+             Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+               parameter error agent_type store_remanent_triple
+           with
+           | error, None ->  error, []
+           | error, Some x -> error, x
+         in
+         (*-----------------------------------------------------------------*)
+         (*get map restriction from covering classes*)
+         let error, get_pair_list =
+           List.fold_left
+             (fun (error, current_list) (cv_id, list, set) ->
+                (*-----------------------------------------------------------------*)
+                (*new index for site type in covering class*)
+                let error, (map_new_index_forward, _) =
+                  new_index_pair_map parameter error list
+                in
+                (*-----------------------------------------------------------------*)
+                let error', map_res =
+                  Ckappa_sig.Site_map_and_set.Map.fold_restriction
+                    parameter error
+                    (fun site port (error, store_result) ->
+                       let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
+                       let error, site' =
+                         Ckappa_sig.Site_map_and_set.Map.find_default parameter error
+                           Ckappa_sig.dummy_site_name
+                           site map_new_index_forward
+                       in
+                       let error, map_res =
+                         Ckappa_sig.Site_map_and_set.Map.add parameter error
+                           site'
+                           state
+                           store_result
+                       in
+                       error, map_res
+                    ) set agent.Cckappa_sig.agent_interface
+                    Ckappa_sig.Site_map_and_set.Map.empty
+                in
+                let error = Exception.check warn parameter error error'
+                    (Some "line 178") Exit
+                in
+                error, (cv_id, map_res) :: current_list)
+             (error, []) triple_list
+         in
+         (*-----------------------------------------------------------------*)
+         let error, handler, store_result =
+           List.fold_left
+             (fun (error, handler, store_result) (cv_id,map_res) ->
+                if Ckappa_sig.Site_map_and_set.Map.is_empty map_res
+                then
+                  error, handler, store_result
+                else
+                  begin
+                    let error, pair_list =
+                      Ckappa_sig.Site_map_and_set.Map.fold
+                        (fun site' state (error, current_list) ->
+                           let pair_list = (site', state) :: current_list in
+                           error, pair_list
+                        ) map_res (error, [])
+                    in
+                    (*build bdu_test*)
+                    let error, handler, bdu_test =
+                      build_bdu parameter handler error pair_list
+                    in
+                    let error, store_result =
+                      error, Covering_classes_type.AgentsRuleCV_setmap.Map.add
+                        (agent_id, agent_type, rule_id, cv_id)
+                        bdu_test
+                        store_result
+                    in
+                    error, handler, store_result
+                  end)
 
-	    (error, handler, store_result) get_pair_list
-        in
-        error, (handler, store_result)
+             (error, handler, store_result) get_pair_list
+         in
+         error, (handler, store_result)
     ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views  (handler,store_result)
 
 (************************************************************************************)
@@ -1058,11 +1058,11 @@ let collect_proj_bdu_test_restriction parameter handler error
       (fun (agent_id, agent_type, rule_id, cv_id) -> (agent_id, agent_type, cv_id))
       bdu_true
       (fun parameter (error, handler) bdu bdu' ->
-        let error, handler, bdu_union =
-          Ckappa_sig.Views_bdu.mvbdu_and
-          parameter handler error bdu bdu'
-        in
-        (error, handler), bdu_union
+         let error, handler, bdu_union =
+           Ckappa_sig.Views_bdu.mvbdu_and
+             parameter handler error bdu bdu'
+         in
+         (error, handler), bdu_union
       )
       store_bdu_test_restriction_map
   in
@@ -1230,26 +1230,26 @@ let init_bdu_analysis_static parameter error =
 (************************************************************************************)
 
 let scan_rule_set parameter log_info handler_bdu error handler_kappa compiled
-   store_potential_side_effects =
+    store_potential_side_effects =
   let error, init = init_bdu_analysis_static parameter error in
   let error, (handler_bdu, log_info, store_results) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule (handler_bdu, log_info, store_result) ->
-        let error, log_info, handler_bdu, store_result =
-          scan_rule_static
-            parameter
-            log_info
-            error
-            handler_kappa
-            handler_bdu
-            rule_id
-            rule.Cckappa_sig.e_rule_c_rule
-            store_potential_side_effects
-            compiled
-            store_result
-        in
-        error, (handler_bdu, log_info, store_result)
+         let error, log_info, handler_bdu, store_result =
+           scan_rule_static
+             parameter
+             log_info
+             error
+             handler_kappa
+             handler_bdu
+             rule_id
+             rule.Cckappa_sig.e_rule_c_rule
+             store_potential_side_effects
+             compiled
+             store_result
+         in
+         error, (handler_bdu, log_info, store_result)
       ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init)
   in
   error, (handler_bdu, log_info, store_results)

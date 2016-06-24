@@ -111,8 +111,8 @@ struct
     let init_dead_rule_array = Array.make nrules false in
     let init_global_dynamic_information =
       {
-	global = dynamic;
-	local = init_dead_rule_array;
+        global = dynamic;
+        local = init_dead_rule_array;
       }
     in
     error, init_global_static_information, init_global_dynamic_information
@@ -127,7 +127,7 @@ struct
     Analyzer_headers.Sure_value true
     (*if rule_id apply for the first time, false in dynamic.
     otherwise sure_value false. no maybe
-  *)
+   *)
     }
   *)
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
@@ -136,18 +136,18 @@ struct
     if not bool
     then
       let error, precondition =
-	Communication.the_rule_is_applied_for_the_first_time
-	  (get_parameter static)
-	  error
-	  precondition
+        Communication.the_rule_is_applied_for_the_first_time
+          (get_parameter static)
+          error
+          precondition
       in
       error, dynamic, Some precondition
     else
       let error, precondition =
-	Communication.the_rule_is_not_applied_for_the_first_time
-	  (get_parameter static)
-	  error
-	  precondition
+        Communication.the_rule_is_not_applied_for_the_first_time
+          (get_parameter static)
+          error
+          precondition
       in
       error, dynamic, Some precondition
 
@@ -176,8 +176,8 @@ struct
         let dynamic =
           let log = Remanent_parameters.get_logger parameter in
           if local_trace
-            || Remanent_parameters.get_trace parameter
-            || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+          || Remanent_parameters.get_trace parameter
+          || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
           then
             let () = Loggers.print_newline log in
             let () =
@@ -185,7 +185,7 @@ struct
             in
             let () = Loggers.print_newline log in
             let () = Loggers.print_newline log in
-	    let dynamic = set_dead_rule dead_rule_array dynamic in
+            let dynamic = set_dead_rule dead_rule_array dynamic in
             dynamic
           else
             dynamic
@@ -235,27 +235,27 @@ struct
       let rec aux k error =
         if (Ckappa_sig.int_of_rule_id k) = size then error
         else
-	  let bool = Array.get result (Ckappa_sig.int_of_rule_id k) in
-	  let error =
-	    if bool
-	    then
-	      error
-	    else
-	      let error', rule_string =
+          let bool = Array.get result (Ckappa_sig.int_of_rule_id k) in
+          let error =
+            if bool
+            then
+              error
+            else
+              let error', rule_string =
                 try
                   Handler.string_of_rule parameter error handler compiled k
                 with
                   _ -> warn parameter error (Some "line 249") Exit (Ckappa_sig.string_of_rule_id k)
-	      in
-	      let error =
+              in
+              let error =
                 Exception.check warn parameter error error' (Some "line 252") Exit
               in
               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "%s will never be applied." rule_string
-	      in
-	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-	      error
-	  in
+                  "%s will never be applied." rule_string
+              in
+              let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+              error
+          in
           aux
             (Ckappa_sig.rule_id_of_int ((Ckappa_sig.int_of_rule_id k) + 1))
             error

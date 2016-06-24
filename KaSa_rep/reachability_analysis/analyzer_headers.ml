@@ -34,22 +34,22 @@ type global_dynamic_information =
   }
 
 type event =
-| Dummy
-| Check_rule of Ckappa_sig.c_rule_id
-| See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-                     * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+  | Dummy
+  | Check_rule of Ckappa_sig.c_rule_id
+  | See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+                       * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 type 'a bot_or_not =
-| Bot
-| Not_bot of 'a
+  | Bot
+  | Not_bot of 'a
 
 type 'a top_or_not =
-| Top
-| Not_top of 'a
+  | Top
+  | Not_top of 'a
 
 type maybe_bool =
-| Sure_value of bool
-| Maybe
+  | Sure_value of bool
+  | Maybe
 
 type step =
   {
@@ -84,7 +84,7 @@ module PathMap =
     let add     = PathSetMap.Map.add
     let find    = PathSetMap.Map.find_option
 
-   end:PathMap)
+  end:PathMap)
 
 type kasa_state = unit
 
@@ -103,7 +103,7 @@ let get_bdu_common_static static = static.global_bdu_common_static
 let set_bdu_common_static common static =
   {
     static with
-      global_bdu_common_static = common
+    global_bdu_common_static = common
   }
 
 let get_agent_name static =
@@ -113,7 +113,7 @@ let set_agent_name agent_name static =
   set_bdu_common_static
     {
       (get_bdu_common_static static) with
-        Common_static.store_agent_name = agent_name
+      Common_static.store_agent_name = agent_name
     }
     static
 
@@ -124,7 +124,7 @@ let set_side_effects eff static =
   set_bdu_common_static
     {
       (get_bdu_common_static static) with
-        Common_static.store_side_effects = eff
+      Common_static.store_side_effects = eff
     }
     static
 
@@ -135,7 +135,7 @@ let set_potential_side_effects eff static =
   set_bdu_common_static
     {
       (get_bdu_common_static static) with
-        Common_static.store_potential_side_effects = eff
+      Common_static.store_potential_side_effects = eff
     }
     static
 
@@ -146,7 +146,7 @@ let set_bonds_rhs bonds static =
   set_bdu_common_static
     {
       (get_bdu_common_static static) with
-        Common_static.store_bonds_rhs = bonds
+      Common_static.store_bonds_rhs = bonds
     }
     static
 
@@ -157,7 +157,7 @@ let set_bonds_lhs bonds static =
   set_bdu_common_static
     {
       (get_bdu_common_static static) with
-        Common_static.store_bonds_lhs = bonds
+      Common_static.store_bonds_lhs = bonds
     }
     static
 
@@ -168,7 +168,7 @@ let set_action_binding bonds static =
   set_bdu_common_static
     {
       (get_bdu_common_static static) with
-        Common_static.store_action_binding = bonds
+      Common_static.store_action_binding = bonds
     }
     static
 
@@ -206,8 +206,8 @@ let initialize_global_information parameter log_info error mvbdu_handler compila
     {
       global_compilation_result =
         {
-	  cc_code = compilation;
-	  kappa_handler = kappa_handler;
+          cc_code = compilation;
+          kappa_handler = kappa_handler;
         };
       global_parameter     = parameter;
       global_bdu_common_static = init_common

@@ -16,34 +16,34 @@
 (** Analyzer entry point *)
 
 module type Analyzer =
-  sig
+sig
 
-    type static_information
-    type dynamic_information
+  type static_information
+  type dynamic_information
 
-    val main:
-      Remanent_parameters_sig.parameters ->
-      StoryProfiling.StoryStats.log_info ->
-      Exception.method_handler ->
-      Ckappa_sig.Views_bdu.handler ->
-      Cckappa_sig.compil ->
-      Cckappa_sig.kappa_handler ->
-      Exception.method_handler * StoryProfiling.StoryStats.log_info * static_information * dynamic_information
+  val main:
+    Remanent_parameters_sig.parameters ->
+    StoryProfiling.StoryStats.log_info ->
+    Exception.method_handler ->
+    Ckappa_sig.Views_bdu.handler ->
+    Cckappa_sig.compil ->
+    Cckappa_sig.kappa_handler ->
+    Exception.method_handler * StoryProfiling.StoryStats.log_info * static_information * dynamic_information
 
-    val export:
-      static_information ->
-      dynamic_information ->
-      Exception.method_handler ->
-      Analyzer_headers.kasa_state ->
-      Exception.method_handler * dynamic_information * Analyzer_headers.kasa_state
+  val export:
+    static_information ->
+    dynamic_information ->
+    Exception.method_handler ->
+    Analyzer_headers.kasa_state ->
+    Exception.method_handler * dynamic_information * Analyzer_headers.kasa_state
 
-    val print:
-      static_information ->
-      dynamic_information ->
-      Exception.method_handler ->
-      Loggers.t list ->
-      Exception.method_handler * dynamic_information
+  val print:
+    static_information ->
+    dynamic_information ->
+    Exception.method_handler ->
+    Loggers.t list ->
+    Exception.method_handler * dynamic_information
 
-  end
+end
 
 module Make : functor (Domain:Composite_domain.Composite_domain) -> Analyzer

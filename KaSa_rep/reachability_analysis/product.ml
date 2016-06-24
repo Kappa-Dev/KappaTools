@@ -15,15 +15,15 @@
 
 
 module Product
-  (New_domain:Analyzer_domain_sig.Domain)
-  (Underlying_domain:Analyzer_domain_sig.Domain) =
+    (New_domain:Analyzer_domain_sig.Domain)
+    (Underlying_domain:Analyzer_domain_sig.Domain) =
 
   (struct
 
     type ('a, 'b) pair =
       {
-	new_domain       : 'a;
-	underlying_domain: 'b
+        new_domain       : 'a;
+        underlying_domain: 'b
       }
 
     type static_information =
@@ -35,8 +35,8 @@ module Product
 
     type dynamic_information =
       {
-	local : local_dynamic_information;
-	global: Analyzer_headers.global_dynamic_information;
+        local : local_dynamic_information;
+        global: Analyzer_headers.global_dynamic_information;
       }
 
     let get_parameter static = Underlying_domain.get_parameter static.underlying_domain
@@ -45,31 +45,31 @@ module Product
     let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
 
     let warn static mh message exn default =
-  Exception.warn (get_parameter static) mh (Some "product_domain") message exn (fun () -> default)
+      Exception.warn (get_parameter static) mh (Some "product_domain") message exn (fun () -> default)
 
     let smash_dynamic underlying_domain new_domain =
       {
-	global = new_domain.New_domain.global;
-	local =
-	  {
-	    new_domain = new_domain.New_domain.local;
-	    underlying_domain = underlying_domain.Underlying_domain.local
-	  }}
+        global = new_domain.New_domain.global;
+        local =
+          {
+            new_domain = new_domain.New_domain.local;
+            underlying_domain = underlying_domain.Underlying_domain.local
+          }}
 
     let underlying_domain_dynamic_information dynamic =
       {
-	Underlying_domain.global = dynamic.global;
-	Underlying_domain.local = dynamic.local.underlying_domain
+        Underlying_domain.global = dynamic.global;
+        Underlying_domain.local = dynamic.local.underlying_domain
       }
     let new_domain_dynamic_information underlying_dynamic global_dynamic =
       {
-	New_domain.global = underlying_dynamic.Underlying_domain.global;
-	New_domain.local = global_dynamic.local.new_domain
+        New_domain.global = underlying_dynamic.Underlying_domain.global;
+        New_domain.local = global_dynamic.local.new_domain
       }
 
     let initialize global_static_information global_dynamic_information error =
       let error, underlying_domain_static_information,
-        underlying_domain_dynamic_information =
+          underlying_domain_dynamic_information =
         Underlying_domain.initialize global_static_information
           global_dynamic_information
           error
@@ -119,7 +119,7 @@ module Product
         New_domain.add_initial_state
           static.new_domain
           (new_domain_dynamic_information underlying_domain_dynamic dynamic)
-	  error
+          error
           initial_state
       in
       error,
@@ -133,20 +133,20 @@ module Product
         Underlying_domain.is_enabled
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-	  error
+          error
           rule_id
           precondition
       in
       let new_domain_dynamic_information =
-	new_domain_dynamic_information underlying_domain_dynamic_information dynamic
+        new_domain_dynamic_information underlying_domain_dynamic_information dynamic
       in
       match output_opt with
       | None ->
-	error,
-	smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
-	None
+        error,
+        smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
+        None
       | Some precondition ->
-	let error, new_domain_dynamic_information, output_opt =
+        let error, new_domain_dynamic_information, output_opt =
           New_domain.is_enabled
             static.new_domain
             new_domain_dynamic_information
@@ -154,19 +154,19 @@ module Product
             rule_id
             precondition
         in
-	let dynamic =
+        let dynamic =
           smash_dynamic
             underlying_domain_dynamic_information
             new_domain_dynamic_information
         in
-	error, dynamic, output_opt
+        error, dynamic, output_opt
 
     let apply_rule static dynamic error rule_id precondition =
       let error, underlying_domain_dynamic_information, (precondition, event_list) =
         Underlying_domain.apply_rule
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-	  error
+          error
           rule_id
           precondition
       in
@@ -176,7 +176,7 @@ module Product
           (new_domain_dynamic_information
              underlying_domain_dynamic_information
              dynamic)
-	  error
+          error
           rule_id
           precondition
       in
@@ -185,7 +185,7 @@ module Product
         underlying_domain_dynamic_information
         new_domain_dynamic_information,
       (precondition',
-      List.fold_left (fun list a -> a :: list) event_list event_list')
+       List.fold_left (fun list a -> a :: list) event_list event_list')
     (* be careful, the concatenation should be done in the correct order to get
        a linear time complexity instead of a quadratic one*)
 
@@ -194,7 +194,7 @@ module Product
         Underlying_domain.apply_event_list
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-	  error
+          error
           event_list
       in
       let error, new_domain_dynamic_information, event_list'' =
@@ -203,7 +203,7 @@ module Product
           (new_domain_dynamic_information
              underlying_domain_dynamic_information
              dynamic)
-	  error
+          error
           event_list
       in
       let event_list = List.fold_left (fun list a -> a :: list) event_list' event_list'' in
@@ -220,7 +220,7 @@ module Product
         Underlying_domain.export
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-	  error
+          error
           kasa_state
       in
       let error, new_domain_dynamic_information, kasa_state =
@@ -229,7 +229,7 @@ module Product
           (new_domain_dynamic_information
              underlying_domain_dynamic_information
              dynamic)
-	  error
+          error
           kasa_state
       in
       error,
@@ -243,7 +243,7 @@ module Product
         Underlying_domain.print
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-	  error
+          error
           loggers
       in
       let error, new_domain_dynamic_information, () =
@@ -252,7 +252,7 @@ module Product
           (new_domain_dynamic_information
              underlying_domain_dynamic_information
              dynamic)
-	  error
+          error
           loggers
       in
       error,
@@ -262,52 +262,52 @@ module Product
       ()
 
     let mixture_is_reachable_gen get_under get_new_d static dynamic error lkappa_mixture =
-    let error, underlying_domain_dynamic_information, maybe_under =
-      get_under
-        static.underlying_domain
-        (underlying_domain_dynamic_information dynamic)
-	error
-        lkappa_mixture
-    in
-    let error, new_domain_dynamic_information, maybe_new =
-      get_new_d
-        static.new_domain
-        (new_domain_dynamic_information
-           underlying_domain_dynamic_information
-           dynamic)
-	error
-        lkappa_mixture
-    in
-    let error, output =
-      match maybe_under, maybe_new
-      with
-      | Usual_domains.Maybe,_ -> error, maybe_new
-      | _,Usual_domains.Maybe -> error, maybe_under
-      | _ ->
-	if maybe_under = maybe_new
-	then error, maybe_under
-	else
-	  warn
-	    static error
-	    (Some "line 289, inconsistent computation in three-values logic")
-	    Exit (Usual_domains.Sure_value false)
-    in
-    error,
-    smash_dynamic
-      underlying_domain_dynamic_information
-      new_domain_dynamic_information,
-    output
+      let error, underlying_domain_dynamic_information, maybe_under =
+        get_under
+          static.underlying_domain
+          (underlying_domain_dynamic_information dynamic)
+          error
+          lkappa_mixture
+      in
+      let error, new_domain_dynamic_information, maybe_new =
+        get_new_d
+          static.new_domain
+          (new_domain_dynamic_information
+             underlying_domain_dynamic_information
+             dynamic)
+          error
+          lkappa_mixture
+      in
+      let error, output =
+        match maybe_under, maybe_new
+        with
+        | Usual_domains.Maybe,_ -> error, maybe_new
+        | _,Usual_domains.Maybe -> error, maybe_under
+        | _ ->
+          if maybe_under = maybe_new
+          then error, maybe_under
+          else
+            warn
+              static error
+              (Some "line 289, inconsistent computation in three-values logic")
+              Exit (Usual_domains.Sure_value false)
+      in
+      error,
+      smash_dynamic
+        underlying_domain_dynamic_information
+        new_domain_dynamic_information,
+      output
 
     let lkappa_mixture_is_reachable static dynamic error lkappa =
       mixture_is_reachable_gen
-	Underlying_domain.lkappa_mixture_is_reachable
-	New_domain.lkappa_mixture_is_reachable
-	static dynamic error lkappa
+        Underlying_domain.lkappa_mixture_is_reachable
+        New_domain.lkappa_mixture_is_reachable
+        static dynamic error lkappa
 
     let cc_mixture_is_reachable static dynamic error ccmixture =
       mixture_is_reachable_gen
-	Underlying_domain.cc_mixture_is_reachable
-	New_domain.cc_mixture_is_reachable
-	static dynamic error ccmixture
+        Underlying_domain.cc_mixture_is_reachable
+        New_domain.cc_mixture_is_reachable
+        static dynamic error ccmixture
 
-   end:Analyzer_domain_sig.Domain)
+  end:Analyzer_domain_sig.Domain)

@@ -18,57 +18,57 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 module type Composite_domain =
-  sig
-    type static_information
-    type dynamic_information
+sig
+  type static_information
+  type dynamic_information
 
-    val initialize:
-      Analyzer_headers.global_static_information ->
-      Analyzer_headers.global_dynamic_information ->
-      Exception.method_handler ->
-      Exception.method_handler * static_information * dynamic_information
+  val initialize:
+    Analyzer_headers.global_static_information ->
+    Analyzer_headers.global_dynamic_information ->
+    Exception.method_handler ->
+    Exception.method_handler * static_information * dynamic_information
 
-    type 'a zeroary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> Exception.method_handler * dynamic_information * 'a
+  type 'a zeroary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> Exception.method_handler * dynamic_information * 'a
 
-    type ('a,'b) unary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> 'a
-      -> Exception.method_handler * dynamic_information * 'b
+  type ('a,'b) unary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> Exception.method_handler * dynamic_information * 'b
 
-    type ('a,'b,'c) binary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> 'a
-      -> 'b
-      -> Exception.method_handler * dynamic_information * 'c
+  type ('a,'b,'c) binary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> Exception.method_handler * dynamic_information * 'c
 
-    val next_rule: Ckappa_sig.c_rule_id option zeroary
+  val next_rule: Ckappa_sig.c_rule_id option zeroary
 
-    val add_initial_state: (Analyzer_headers.initial_state, unit) unary
+  val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 
-    val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
+  val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
 
-    val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition,unit) binary
+  val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition,unit) binary
 
-    val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
+  val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
-    val print: (Loggers.t list, unit) unary
+  val print: (Loggers.t list, unit) unary
 
-    val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
-    val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
-    val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
-    val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
-    val set_global_dynamic_information:
-      Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
-  end
+  val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+  val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
+  val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
+  val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
+  val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
+  val set_global_dynamic_information:
+    Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
+end
 
 (*****************************************************************************************)
 (*Analyzer is a functor takes a module Domain as its parameter.*)
@@ -173,24 +173,24 @@ struct
     let parameter = get_parameter static in
     let error, dynamic =
       List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
-        let error, agent =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter
-            error
-            agent_id
-            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        in
-        match agent with
-        | Some Cckappa_sig.Dead_agent _
-        | Some Cckappa_sig.Ghost -> error, dynamic
-        | None -> warn parameter error (Some "line 156") Exit dynamic
-        | Some Cckappa_sig.Unknown_agent _
-        | Some Cckappa_sig.Agent _ ->
-          let error, dynamic =
-            push_rule static dynamic error rule_id
+          let error, agent =
+            Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+              parameter
+              error
+              agent_id
+              rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
           in
-          error, dynamic
-      ) (error, dynamic) rule.Cckappa_sig.actions.Cckappa_sig.creation
+          match agent with
+          | Some Cckappa_sig.Dead_agent _
+          | Some Cckappa_sig.Ghost -> error, dynamic
+          | None -> warn parameter error (Some "line 156") Exit dynamic
+          | Some Cckappa_sig.Unknown_agent _
+          | Some Cckappa_sig.Agent _ ->
+            let error, dynamic =
+              push_rule static dynamic error rule_id
+            in
+            error, dynamic
+        ) (error, dynamic) rule.Cckappa_sig.actions.Cckappa_sig.creation
     in
     error, dynamic
 
@@ -202,15 +202,15 @@ struct
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error rule_id rule dynamic ->
-          let error, dynamic =
-            push_rule_creation
-              static
-              dynamic
-              error
-              rule_id
-              rule.Cckappa_sig.e_rule_c_rule
-          in
-          error, dynamic
+           let error, dynamic =
+             push_rule_creation
+               static
+               dynamic
+               error
+               rule_id
+               rule.Cckappa_sig.e_rule_c_rule
+           in
+           error, dynamic
         )
         rules dynamic
     in
@@ -300,16 +300,16 @@ struct
           event_list
       in
       let error, dynamic =
-	List.fold_left (fun (error, dynamic) event ->
-	  match event with
-	  | Communication.Check_rule rule_id ->
-            push_rule
-              static
-              dynamic
-              error
-              rule_id
-	  | _ -> error, dynamic
-        )(error, dynamic) event_list
+        List.fold_left (fun (error, dynamic) event ->
+            match event with
+            | Communication.Check_rule rule_id ->
+              push_rule
+                static
+                dynamic
+                error
+                rule_id
+            | _ -> error, dynamic
+          )(error, dynamic) event_list
       in
       apply_event_list static dynamic error event_list'
 
