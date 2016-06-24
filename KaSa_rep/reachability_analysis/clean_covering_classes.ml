@@ -83,7 +83,7 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
 
 (*------------------------------------------------------------------------------*)
 (*compute covering class dictionary*)
-
+zrhizhirihuihuehiueihue
 let covering_class_dic parameter error covering_class good_covering_class =
   let error, output =
     Covering_classes_type.Dictionary_of_Covering_class.allocate

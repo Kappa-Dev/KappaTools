@@ -41,7 +41,7 @@ sig
     static_information ->
     dynamic_information ->
     Exception.method_handler ->
-    Loggers.t list ->
+    Loggers.t ->
     Exception.method_handler * dynamic_information
 
 end

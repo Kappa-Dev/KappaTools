@@ -77,7 +77,7 @@ let collect_agent_name parameter error rule_id rule store_result =
 
 let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
-  let add_link (agent_type, site_type) (r, state) store_result =
+  let add_link error (agent_type, site_type) (r, state) store_result =
     let error, (l, old) =
       match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
               (agent_type, site_type) store_result
@@ -99,7 +99,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
         let agent_type = site_address.Cckappa_sig.agent_type in
         let site_type = site_address.Cckappa_sig.site in
         (*state*)
-        let error, (state_min, state_max) =
+        let error, (state_min, _state_max) =
           match state_op with
           | None ->
             begin
@@ -123,7 +123,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
         (*-------------------------------------------------------------------------------*)
         (*return result*)
         let error, store_result =
-          add_link (agent_type, site_type) (rule_id, state_min) store_result
+          add_link error (agent_type, site_type) (rule_id, state_min) store_result
         in
         (*let _ =
           Printf.fprintf stdout "HALF ACTION: agent_type:%i:site_type:%i:rule_id:%i:state:%i\n"
@@ -145,7 +145,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
 (*FIXME: state = 0 or there is no state?*)
 
 let remove_action parameter error rule_id remove store_result =
-  let add_link (agent_type, site_type) r store_result =
+  let add_link error (agent_type, site_type) r store_result =
     let error, (l, old) =
       match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, site_type) store_result
@@ -161,21 +161,16 @@ let remove_action parameter error rule_id remove store_result =
   in
   (*-------------------------------------------------------------------------------*)
   let error, store_result =
-    List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
+    List.fold_left
+      (fun (error, store_result) (_agent_index, agent, list_undoc) ->
         let agent_type = agent.Cckappa_sig.agent_name in
         (*NOTE: if it is a site_free then do not consider this case.*)
         (*result*)
-        let store_result =
-          List.fold_left (fun store_result site_type ->
-              let error, result =
-                add_link (agent_type, site_type) rule_id store_result
-              in
-              (*let _ =
-                Printf.fprintf stdout "REMOVE ACTION: agent_type:%i:site_type:%i:rule_id:%i\n"
-                  agent_type site_type rule_id
-                in*)
-              result
-            ) store_result list_undoc
+        let error, store_result =
+          List.fold_left
+            (fun (error, store_result) site_type ->
+               add_link error (agent_type, site_type) rule_id store_result
+            ) (error, store_result) list_undoc
         in
         error, store_result
       ) (error, store_result) remove
@@ -191,7 +186,7 @@ let remove_action parameter error rule_id remove store_result =
 
 let store_potential_half_break parameter error handler rule_id half_break store_result =
   (*map of potential partner that is bond/free*)
-  let add_link (agent_type, rule_id) (site_type, state) store_result =
+  let add_link error (agent_type, rule_id) (site_type, state) store_result =
     let error, old =
       match Ckappa_sig.AgentRule_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, rule_id) store_result
@@ -206,7 +201,8 @@ let store_potential_half_break parameter error handler rule_id half_break store_
     error, result
   in
   (*-------------------------------------------------------------------------------*)
-  List.fold_left (fun (error, store_modif_minus) (add, state_op) ->
+  List.fold_left
+    (fun (error, store_modif_minus) (add, state_op) ->
       let agent_type = add.Cckappa_sig.agent_type in
       let site_type = add.Cckappa_sig.site in
       (*state*)
@@ -233,7 +229,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
       in
       (*-------------------------------------------------------------------------------*)
       let rec aux k (error, store_result) =
-        if k > state_max
+        if Ckappa_sig.int_of_state_index k > Ckappa_sig.int_of_state_index state_max
         then
           error, store_result
         else
@@ -242,7 +238,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
           | error, None -> error, store_result
           | error, Some (agent_type2, site2, state2) ->
             let error, store_potential_free =
-              add_link (agent_type2, rule_id) (site2, Ckappa_sig.dummy_state_index) (fst store_result)
+              add_link error (agent_type2, rule_id) (site2, Ckappa_sig.dummy_state_index) (fst store_result)
             in
             (*Print*)
             (*let _ =
@@ -254,7 +250,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
               ) store_potential_free
               in*)
             let error, store_potential_bind =
-              add_link (agent_type2, rule_id) (site2, state2) (snd store_result)
+              add_link error (agent_type2, rule_id) (site2, state2) (snd store_result)
             in
             (*Print*)
             (*let _ =
@@ -265,7 +261,9 @@ let store_potential_half_break parameter error handler rule_id half_break store_
                 ) l
               ) store_potential_bind
               in*)
-            error, (store_potential_free, store_potential_bind)
+            aux
+              (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k)+1))
+              (error, (store_potential_free, store_potential_bind))
       in aux state_min (error, store_result)
     ) (error, store_result) half_break
 

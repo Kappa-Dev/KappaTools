@@ -59,7 +59,7 @@ sig
 
   val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
-  val print: (Loggers.t list, unit) unary
+  val print: (Loggers.t, unit) unary
 
   val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
   val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary

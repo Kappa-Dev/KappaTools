@@ -15,7 +15,7 @@
 module A =
   Analyzer.Make
     (Composite_domain.Make
- (Product.Product
+       (Product.Product
           (Parallel_bonds.Domain)
           (Product.Product
              (Site_accross_bonds_domain.Domain)
@@ -42,7 +42,7 @@ let main () =
   let compil =
     List.fold_left (KappaLexer.compile Format.std_formatter) Ast.empty_compil files in
   let error, log_info =
-      StoryProfiling.StoryStats.close_event parameters error StoryProfiling.KaSim_compilation None log_info
+    StoryProfiling.StoryStats.close_event parameters error StoryProfiling.KaSim_compilation None log_info
   in
   let error, log_info =
     StoryProfiling.StoryStats.add_event parameters error StoryProfiling.KaSa_precompilation None log_info
@@ -92,7 +92,7 @@ let main () =
     then Print_cckappa.print_compil parameters_compil error handler c_compil
     else error
   in
-   let error =
+  let error, log_info =
     if Remanent_parameters.get_do_influence_map parameters
     then
       let error, log_info =
@@ -118,39 +118,40 @@ let main () =
       let error, log_info =
         StoryProfiling.StoryStats.close_event parameters error (StoryProfiling.Influence_map "raw") None log_info
       in
-      let error,wake_up_map,inhibition_map =
+      let error, log_info, wake_up_map, inhibition_map =
         match
           Remanent_parameters.get_influence_map_accuracy_level parameters_influence_map
         with
         | Remanent_parameters_sig.None
-        | Remanent_parameters_sig.Low -> error,wake_up_map,inhibition_map
+        | Remanent_parameters_sig.Low ->
+          error, log_info, wake_up_map, inhibition_map
         | Remanent_parameters_sig.Medium
         | Remanent_parameters_sig.High
         | Remanent_parameters_sig.Full ->
-        let error, log_info =
-          StoryProfiling.StoryStats.add_event
-            parameters error
-            (StoryProfiling.Influence_map "refined")
-            None log_info
-        in
-        let parameters_refine_influence_map =
-          Remanent_parameters.update_prefix parameters "Refine_influence_map:"
-        in
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-            "Refining the influence map..."
-        in
-        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)
-        in
-        let error,wake_up_map = Algebraic_construction.filter_influence
-            parameters_refine_influence_map error handler c_compil wake_up_map true in
-        let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in
-        let error, log_info =
-          StoryProfiling.StoryStats.close_event
-            parameters error
-            (StoryProfiling.Influence_map "refined")
-            None log_info
-        in
-        error,wake_up_map,inhibition_map
+          let error, log_info =
+            StoryProfiling.StoryStats.add_event
+              parameters error
+              (StoryProfiling.Influence_map "refined")
+              None log_info
+          in
+          let parameters_refine_influence_map =
+            Remanent_parameters.update_prefix parameters "Refine_influence_map:"
+          in
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+              "Refining the influence map..."
+          in
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          let error,wake_up_map = Algebraic_construction.filter_influence
+              parameters_refine_influence_map error handler c_compil wake_up_map true in
+          let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in
+          let error, log_info =
+            StoryProfiling.StoryStats.close_event
+              parameters error
+              (StoryProfiling.Influence_map "refined")
+              None log_info
+          in
+          error, log_info, wake_up_map, inhibition_map
       in
       let error =
         if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace
@@ -186,44 +187,44 @@ let main () =
         else error
       in
       let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
-      error
+      error, log_info
     else
-      error
+      error, log_info
   in
   (*-----------------------------------------------------------------------*)
   let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
   let error, log_info, static_opt, dynamic_opt =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
-    (*covering classes*)
-    let error, covering_classes =
-      (*Remark: this parameter is a trick not to print covering classes twice*)
-      if Remanent_parameters.get_do_site_dependencies parameters
-      then
-        let parameters_cv =
-          Remanent_parameters.update_prefix
-            parameters "Potential dependencies between sites:"
-        in
-        let _ =
-          if (Remanent_parameters.get_trace parameters_cv)
-          then
-            let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters_cv)
-                "Potential dependencies between sites:"
-            in
-            let () =
-              Loggers.print_newline
-                (Remanent_parameters.get_logger parameters_cv)
-            in ()
-        in
-        let error, dep =
-          Covering_classes_main.covering_classes
-            parameters_cv error handler c_compil
-        in error, Some dep
-      else
-        error, None
-    in
+      (*    (*covering classes*)
+      let error, covering_classes =
+        (*Remark: this parameter is a trick not to print covering classes twice*)
+        if Remanent_parameters.get_do_site_dependencies parameters
+        then
+          let parameters_cv =
+            Remanent_parameters.update_prefix
+              parameters "Potential dependencies between sites:"
+          in
+          let _ =
+            if (Remanent_parameters.get_trace parameters_cv)
+            then
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters_cv)
+                  "Potential dependencies between sites:"
+              in
+              let () =
+                Loggers.print_newline
+                  (Remanent_parameters.get_logger parameters_cv)
+              in ()
+          in
+          let error, dep =
+            Covering_classes_main.covering_classes
+              parameters_cv error handler c_compil
+          in error, Some dep
+        else
+          error, None
+      in*)
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Reachability analysis..." in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
@@ -263,16 +264,17 @@ let main () =
     then
       let parameters_ode = Remanent_parameters.update_prefix parameters "Flow of information in the ODE semantics:" in
       let _ =
-	if (Remanent_parameters.get_trace parameters)
- then
-   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters_ode) "Flow of information in the ODE semantics:" in
-   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_ode) in ()
-       in
+        if (Remanent_parameters.get_trace parameters)
+        then
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters_ode) "Flow of information in the ODE semantics:" in
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_ode) in ()
+      in
       let error, ode_fragmentation =
         Ode_fragmentation_main.ode_fragmentation parameters_ode error handler c_compil
       in error, Some ode_fragmentation
     else error, None
   in
+  let _ = log_info, static_opt, dynamic_opt, stochastic_flow, ode_flow in
   let _ = Exception.print parameters error in
   ()
 

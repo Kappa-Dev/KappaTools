@@ -45,7 +45,7 @@ sig
     static_information ->
     dynamic_information ->
     Exception.method_handler ->
-    Loggers.t list ->
+    Loggers.t ->
     Exception.method_handler * dynamic_information
 
 end
@@ -170,7 +170,7 @@ struct
       in aux error dynamic
     in
     (*print test*)
-    let _ = print static dynamic error [] in
+    let _ = print static dynamic error log in
     error, log_info, static, dynamic
 
   let export static dynamic error kasa_state =
