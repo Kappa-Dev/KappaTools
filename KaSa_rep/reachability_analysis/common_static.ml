@@ -202,7 +202,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
   in
   (*-------------------------------------------------------------------------------*)
   List.fold_left
-    (fun (error, store_modif_minus) (add, state_op) ->
+    (fun (error, store_result) (add, state_op) ->
       let agent_type = add.Cckappa_sig.agent_type in
       let site_type = add.Cckappa_sig.site in
       (*state*)
@@ -271,7 +271,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
 (*potential partner of remove action*)
 
 let store_potential_remove parameter error handler rule_id remove store_result =
-  let add_link (agent_type, rule_id) (site, state) store_result =
+  let add_link error (agent_type, rule_id) (site, state) store_result =
     let error, old =
       match Ckappa_sig.AgentRule_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, rule_id) store_result
@@ -287,7 +287,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
     error, result
   in
   (*-------------------------------------------------------------------------------*)
-  List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
+  List.fold_left (fun (error, store_result) (_agent_index, agent, list_undoc) ->
       let agent_type = agent.Cckappa_sig.agent_name in
       let error, store_result =
         List.fold_left (fun (error, store_result) site ->
@@ -321,7 +321,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                     | error, Some (agent_type2, site2, state2) ->
                       (*---------------------------------------------------------------------*)
                       let error, store_potential_free =
-                        add_link (agent_type2, rule_id) (site2, Ckappa_sig.dummy_state_index) (fst store_result)
+                        add_link error (agent_type2, rule_id) (site2, Ckappa_sig.dummy_state_index) (fst store_result)
                       in
                       (*Print*)
                       (*let _ =
@@ -334,7 +334,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                         ) store_potential_free
                         in*)
                       let error, store_potential_bind =
-                        add_link (agent_type2, rule_id) (site2, state2) (snd store_result)
+                        add_link error (agent_type2, rule_id) (site2, state2) (snd store_result)
                       in
                       (*Print*)
                       (*let _ =
@@ -346,7 +346,9 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                           ) l
                         ) store_potential_bind
                         in*)
-                      error, (store_potential_free, store_potential_bind)
+                      aux
+                        (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k)+1))
+                        (error, (store_potential_free, store_potential_bind))
                 in
                 aux Ckappa_sig.dummy_state_index_1 (error, store_result)
               end
@@ -402,21 +404,21 @@ let collect_potential_side_effects_free parameter error handler rule_id
     parameter
     error
     (*exists in 'a t*)
-    (fun parameter error (agent_type, rule_id) l1 store_result ->
+    (fun _parameter error (agent_type, rule_id) l1 store_result ->
        let error, store_result =
          add_link error (agent_type, rule_id) l1 store_result
        in
        error, store_result
     )
     (*exists in 'b t*)
-    (fun paramter error (agent_type, rule_id) l2 store_result ->
+    (fun _paramter error (agent_type, rule_id) l2 store_result ->
        let error, store_result =
          add_link error (agent_type, rule_id) l2 store_result
        in
        error, store_result
     )
     (*exists in both*)
-    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+    (fun _parameter error (agent_type, rule_id) l1 l2 store_result ->
        let concat = List.concat [l1; l2] in
        let error, store_result =
          add_link error (agent_type, rule_id) concat store_result
@@ -472,21 +474,21 @@ let collect_potential_side_effects_bind parameter error handler rule_id
     parameter
     error
     (*exists in 'a t*)
-    (fun parameter error (agent_type, rule_id) l1 store_result ->
+    (fun _parameter error (agent_type, rule_id) l1 store_result ->
        let error, store_result =
          add_link error (agent_type, rule_id) l1 store_result
        in
        error, store_result
     )
     (*exists in 'b t*)
-    (fun paramter error (agent_type, rule_id) l2 store_result ->
+    (fun _paramter error (agent_type, rule_id) l2 store_result ->
        let error, store_result =
          add_link error (agent_type, rule_id) l2 store_result
        in
        error, store_result
     )
     (*exists in both*)
-    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+    (fun _parameter error (agent_type, rule_id) l1 l2 store_result ->
        let concat = List.concat [l1; l2] in
        let error, store_result =
          add_link error (agent_type, rule_id) concat store_result
