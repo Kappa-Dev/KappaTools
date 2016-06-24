@@ -18,17 +18,17 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 type event =
-| Dummy (* to avoid compilation warning *)
-| Check_rule of Ckappa_sig.c_rule_id
-| See_a_new_bond of
-    ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) * 
-        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+  | Dummy (* to avoid compilation warning *)
+  | Check_rule of Ckappa_sig.c_rule_id
+  | See_a_new_bond of
+      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 (*For example:
   E_1(x!1),R_2(x!1,y!2),R_3(y!2,x) -> E_1(x!1),R_2(x!1,y),R_3(y,x)
-  
+
   - Agent_id: 1 (E)
-  - relative_addres: 
+  - relative_addres:
      [{
        site_out : x
        agent_type_in: R2
@@ -50,7 +50,7 @@ type event =
 type step =
   {
     site_out: Ckappa_sig.c_site_name;
-    site_in: Ckappa_sig.c_site_name; 
+    site_in: Ckappa_sig.c_site_name;
     agent_type_in: Ckappa_sig.c_agent_name
   }
 
@@ -73,12 +73,12 @@ module PathSetMap =
   SetMap.Make (struct type t = path let compare = compare let print _ _ = () end)
 
 module PathMap =
-(struct
-  include PathSetMap.Map
+  (struct
+    include PathSetMap.Map
 
-  let empty _ = empty
-  let find = find_option
- end:PathMap)
+    let empty _ = empty
+    let find = find_option
+  end:PathMap)
 
 type 'a fold =
   Remanent_parameters_sig.parameters ->
@@ -86,37 +86,37 @@ type 'a fold =
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   Exception.method_handler *
-    ((Remanent_parameters_sig.parameters ->
-      Ckappa_sig.c_state ->
-      Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
+  ((Remanent_parameters_sig.parameters ->
+    Ckappa_sig.c_state ->
+    Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
     Exception.method_handler * 'a ->
     Exception.method_handler * 'a) ->
-     Exception.method_handler ->  'a ->
-     Exception.method_handler * 'a) Usual_domains.flat_lattice
+   Exception.method_handler ->  'a ->
+   Exception.method_handler * 'a) Usual_domains.flat_lattice
 
-type prefold = 
+type prefold =
   {
     fold: 'a. 'a fold
   }
 
 (*precondition is used to get the information between domains*)
 type precondition =
- {
-   precondition_dummy: unit (* to avoid compilation warning *);
-   the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool ;
-   state_of_site:
-     Exception.method_handler ->
-     Analyzer_headers.global_dynamic_information ->
-     path ->
-     Exception.method_handler * 
-       Analyzer_headers.global_dynamic_information * 
-       Ckappa_sig.c_state list Usual_domains.flat_lattice;
-   cache_state_of_site: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
-   partner_map: Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> 
-                Ckappa_sig.c_state -> (Ckappa_sig.c_agent_name * 
-                                         Ckappa_sig.c_site_name * 
-                                         Ckappa_sig.c_state) Usual_domains.flat_lattice;
-   partner_fold: 'a. 'a fold }
+  {
+    precondition_dummy: unit (* to avoid compilation warning *);
+    the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool ;
+    state_of_site:
+      Exception.method_handler ->
+      Analyzer_headers.global_dynamic_information ->
+      path ->
+      Exception.method_handler *
+      Analyzer_headers.global_dynamic_information *
+      Ckappa_sig.c_state list Usual_domains.flat_lattice;
+    cache_state_of_site: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
+    partner_map: Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
+      Ckappa_sig.c_state -> (Ckappa_sig.c_agent_name *
+                             Ckappa_sig.c_site_name *
+                             Ckappa_sig.c_state) Usual_domains.flat_lattice;
+    partner_fold: 'a. 'a fold }
 
 let is_the_rule_applied_for_the_first_time precondition =
   precondition.the_rule_is_applied_for_the_first_time
@@ -124,13 +124,13 @@ let is_the_rule_applied_for_the_first_time precondition =
 let the_rule_is_or_not_applied_for_the_first_time bool parameter error precondition =
   match precondition.the_rule_is_applied_for_the_first_time with
   | Usual_domains.Maybe -> error,
-    {
-      precondition with
-        the_rule_is_applied_for_the_first_time = Usual_domains.Sure_value bool
-    }
+                           {
+                             precondition with
+                             the_rule_is_applied_for_the_first_time = Usual_domains.Sure_value bool
+                           }
   | Usual_domains.Sure_value b when b = bool -> error, precondition
   | Usual_domains.Sure_value _ -> warn parameter error
-    (Some "inconsistent computation in three-value logic") Exit precondition
+                                    (Some "inconsistent computation in three-value logic") Exit precondition
 
 let the_rule_is_applied_for_the_first_time p e wp =
   the_rule_is_or_not_applied_for_the_first_time true p e wp
@@ -147,12 +147,12 @@ let dummy_precondition =
     partner_map = (fun _ _ _ -> Usual_domains.Any);
     partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
-    
+
 let get_state_of_site error dynamic precondition path =
   match
     PathMap.find path precondition.cache_state_of_site
   with
-  | Some output -> 
+  | Some output ->
     let _ =
       match output with
       | Usual_domains.Val l ->
@@ -163,19 +163,19 @@ let get_state_of_site error dynamic precondition path =
   | None ->
     begin
       let error, dynamic, output =
-        precondition.state_of_site error dynamic path 
+        precondition.state_of_site error dynamic path
       in
       (*let _ =
         match output with
         | Usual_domains.Val l ->
           List.iter (fun i -> Printf.fprintf stdout "None_state:%i\n" (Ckappa_sig.int_of_state_index i)) l
         | _ -> ()
-      in*)
+        in*)
       let precondition =
-	{
+        {
           precondition with
-	    cache_state_of_site =
-	    PathMap.add path output precondition.cache_state_of_site
+          cache_state_of_site =
+            PathMap.add path output precondition.cache_state_of_site
         }
       in
       error, dynamic, precondition, output
@@ -188,8 +188,8 @@ let refine_information_about_state_of_site precondition f =
   in
   {
     precondition with
-      cache_state_of_site = PathMap.empty Usual_domains.Any;
-      state_of_site = new_f
+    cache_state_of_site = PathMap.empty Usual_domains.Any;
+    state_of_site = new_f
   }
 
 let get_potential_partner precondition agent_type site state =
@@ -208,7 +208,7 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
     in
     error, precondition, Usual_domains.Not_top init
   | error, Usual_domains.Val v ->
-    let error, output = v f error init in 
+    let error, output = v f error init in
     error, precondition, Usual_domains.Not_top output
 
 let overwrite_potential_partners_map
@@ -220,8 +220,8 @@ let overwrite_potential_partners_map
   error,
   {
     precondition with
-      partner_map = f;
-      partner_fold =
+    partner_map = f;
+    partner_fold =
       (fun parameters error agent_type site_type ->
-        fold.fold parameters error agent_type site_type)
+         fold.fold parameters error agent_type site_type)
   }
