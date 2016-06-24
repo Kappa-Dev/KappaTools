@@ -113,7 +113,7 @@ struct
         match next_opt with
         | None -> error, static, dynamic
         | Some rule_id ->
-          let _ =
+          let error =
             if local_trace
             || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
             || Remanent_parameters.get_trace parameter
@@ -129,7 +129,9 @@ struct
               let () = Loggers.print_newline log in
               let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
               let () = Loggers.print_newline log in
-              ()
+              error
+            else
+              error
           in
           begin
             let error, dynamic, is_enabled =

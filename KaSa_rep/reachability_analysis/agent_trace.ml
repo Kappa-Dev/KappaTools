@@ -544,7 +544,7 @@ let powerset  map_interface =
   in
   let list =
     List.sort
-      (fun (a,b) (c,d) ->
+      (fun (_,b) (_,d) ->
          compare
            (Ckappa_sig.Views_intbdu.nbr_variables d) (Ckappa_sig.Views_intbdu.nbr_variables b)
       )
@@ -669,7 +669,6 @@ let add_singular parameter error transition_system =
                            let list_var = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed in
                            List.fold_left
                              (fun (error, transition_system) (_,hconsed') ->
-
                                 let length' = Ckappa_sig.Views_intbdu.nbr_variables hconsed' in
                                 let hconsed'' =
                                   Ckappa_sig.Views_intbdu.merge_variables_lists hconsed hconsed'
@@ -685,6 +684,7 @@ let add_singular parameter error transition_system =
                                   let lista,listb,listc = distrib_list list_var list_var' in
                                   List.fold_left
                                     (fun (error, transition_system) list_var ->
+                                       let hconsed = Ckappa_sig.Views_intbdu.build_variables_list list_var in
                                        let restricted_mvbdu = Ckappa_sig.Views_intbdu.mvbdu_project_keep_only mvbdu hconsed in
                                        let mvbdu_list =
                                          Ckappa_sig.Views_intbdu.extensional_of_mvbdu restricted_mvbdu

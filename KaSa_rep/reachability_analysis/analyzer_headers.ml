@@ -179,7 +179,7 @@ let compute_initial_state error static =
     (Int_storage.Nearly_inf_Imperatif.fold
        parameter
        error
-       (fun parameter error _ i l -> error, i :: l)
+       (fun _parameter error _ i l -> error, i :: l)
        compil.Cckappa_sig.init
        [])
   in

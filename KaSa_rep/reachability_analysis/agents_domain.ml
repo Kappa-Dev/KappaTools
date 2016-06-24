@@ -160,7 +160,7 @@ struct
       aux list_lhs_views (error, [])
     in
     let error, agents_created_list =
-      List.fold_left (fun (error, current_list) (agent_id, agent_type) ->
+      List.fold_left (fun (error, current_list) (_agent_id, agent_type) ->
           let agent_list = agent_type :: current_list in
           error, agent_list
         ) (error, []) rule.Cckappa_sig.actions.Cckappa_sig.creation
@@ -444,38 +444,38 @@ struct
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let rec apply_event_list static dynamic error event_list =
+  let apply_event_list _static dynamic error _event_list =
     let event_list' = [] in
     error, dynamic, event_list'
 
-  let export static dynamic error kasa_state =
+  let export _static dynamic error kasa_state =
     error, dynamic, kasa_state
 
   (**************************************************************************)
 
-  let print_dead_agent static dynamic error =
+  let print_dead_agent loggers static dynamic error =
     let parameter = get_parameter static in
     let local = get_seen_agent dynamic in
     let handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       let parameter = Remanent_parameters.update_prefix parameter "" in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.print_newline loggers in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        Loggers.fprintf loggers
           "------------------------------------------------------------"
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.print_newline loggers in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        Loggers.fprintf loggers
           "* Dead agents :"
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.print_newline loggers in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        Loggers.fprintf loggers
           "------------------------------------------------------------"
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.print_newline loggers in
       let size = Array.length local in
       let rec aux k error =
         if k = size then error
@@ -496,10 +496,10 @@ struct
               let error =
                 Exception.check warn parameter error error' (Some "line 234") Exit
               in
-              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              let () = Loggers.fprintf loggers
                   "%s is a dead agent." agent_string
               in
-              let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+              let () = Loggers.print_newline loggers in
               error
           in aux (k + 1) error
       in aux 0 error
@@ -508,14 +508,14 @@ struct
 
   let print static dynamic error loggers =
     let error =
-      print_dead_agent static dynamic error
+      print_dead_agent loggers static dynamic error
     in
     error, dynamic, ()
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable static dynamic error ccmixture =
+  let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
 end

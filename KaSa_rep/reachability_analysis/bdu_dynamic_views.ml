@@ -127,7 +127,7 @@ let store_covering_classes_modification_side_effects parameter error
     Ckappa_sig.AgentRule_map_and_set.Map.fold
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result) ->
          List.fold_left
-           (fun (error, store_result) (site_type_partner, state) ->
+           (fun (error, store_result) (site_type_partner, _state) ->
               let error, rule_id_set =
                 match
                   Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -147,11 +147,11 @@ let store_covering_classes_modification_side_effects parameter error
               in
               let error, store_result =
                 Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-                  (fun parameter error agent_type_cv remanent store_result ->
+                  (fun parameter error _agent_type_cv remanent store_result ->
                      let cv_dic = remanent.Covering_classes_type.store_dic in
                      let error, store_result =
                        Covering_classes_type.Dictionary_of_List_sites.fold
-                         (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
+                         (fun _list_of_site_type ((), ()) cv_id (error, store_result) ->
                             (*get a set of rule_id in update(c)*)
                             let error, store_result =
                               add_link parameter error
@@ -307,7 +307,7 @@ let collect_dual_map parameter error handler store_result =
 
 (************************************************************************************)
 
-let scan_rule_dynamic parameter log_info error (*rule_id rule*) compiled
+let scan_rule_dynamic parameter log_info error _compiled
     kappa_handler
     handler_bdu
     covering_classes
