@@ -5,7 +5,7 @@ open Panel_tab
 
 module Html5 = Tyxml_js.Html5
 let document = Dom_html.window##document
-let main_container = <:html5<<div class="row">
+let main_container = <:html<<div class="row">
                                      $Panel_editor.xml$
                                      $Panel_tab.xml$
                              </div> >>

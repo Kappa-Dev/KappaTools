@@ -1,5 +1,5 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 open ApiTypes
 module UIState = Ui_state
 
@@ -43,17 +43,17 @@ let configuration : Widget_export.configuration =
 
 let content =
   let flux_select =
-    Tyxml_js.R.Html5.select
-      ~a:[ Html5.a_class ["form-control"]
-         ; Html5.a_id select_id ]
+    Tyxml_js.R.Html.select
+      ~a:[ Html.a_class ["form-control"]
+         ; Html.a_id select_id ]
       (let flux_list, flux_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun state ->
            ReactiveData.RList.set
              flux_handle
-             (List.mapi (fun i flux -> Html5.option
-               ~a:[ Html5.a_value (string_of_int i) ]
-               (Html5.pcdata
+             (List.mapi (fun i flux -> Html.option
+               ~a:[ Html.a_value (string_of_int i) ]
+               (Html.pcdata
                   (Display_common.option_label flux.ApiTypes.flux_name)))
                 (state_fluxmap state)
              )
@@ -63,16 +63,16 @@ let content =
       )
   in
   let flux_label =
-    Tyxml_js.R.Html5.li
-      ~a:[ Html5.a_class ["list-group-item"] ]
+    Tyxml_js.R.Html.li
+      ~a:[ Html.a_class ["list-group-item"] ]
       (let flux_list, flux_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun state ->
            ReactiveData.RList.set
              flux_handle
              (match state_fluxmap state with
-               head::[] -> [Html5.h4
-                               [ Html5.pcdata
+               head::[] -> [Html.h4
+                               [ Html.pcdata
                                    (Display_common.option_label
                                       head.ApiTypes.flux_name)]]
              | _ -> [flux_select]
@@ -84,13 +84,13 @@ let content =
       )
   in
   let checkbox =
-    Html5.input ~a:[ Html5.a_id "checkbox_self_influence"
-                   ; Html5.a_class ["checkbox-control"]
-                   ; Html5.a_input_type `Checkbox ] () in
+    Html.input ~a:[ Html.a_id "checkbox_self_influence"
+                   ; Html.a_class ["checkbox-control"]
+                   ; Html.a_input_type `Checkbox ] () in
   let export_controls =
     Widget_export.content configuration
   in
-  <:html5<<div>
+  <:html<<div>
           <div class="row">
                <div class="center-block display-header">
                 Dynamic influence map between t = <span id="begin_time"/>s
@@ -138,8 +138,8 @@ let content =
      </div> >>
 
 let navcontent =
-  [ Html5.div
-      ~a:[Tyxml_js.R.Html5.a_class
+  [ Html.div
+      ~a:[Tyxml_js.R.Html.a_class
              (React.S.bind
                 UIState.model_runtime_state
                 (fun state -> React.S.const

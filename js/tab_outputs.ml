@@ -1,5 +1,5 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module UIState = Ui_state
 open ApiTypes
 
@@ -48,9 +48,9 @@ let navli =
 
 let content =
   let select =
-    Tyxml_js.R.Html5.select
-      ~a:[ Html5.a_class ["form-control"]
-         ; Html5.a_id select_id ]
+    Tyxml_js.R.Html.select
+      ~a:[ Html.a_class ["form-control"]
+         ; Html.a_id select_id ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun state ->
@@ -78,16 +78,16 @@ let content =
              handle
              (List.mapi
                 (fun i (key,_) ->
-                  Html5.option
-                    ~a:([ Html5.a_value (string_of_int i)]
+                  Html.option
+                    ~a:([ Html.a_value (string_of_int i)]
                        @
                        if (match (React.S.value current_file) with
                           | None -> false
                           | Some (k,_) -> key = k
                           )
-                       then [Html5.a_selected `Selected]
+                       then [Html.a_selected ()]
                        else [])
-                    (Html5.pcdata
+                    (Html.pcdata
                        (Display_common.option_label
                           (match key with
                           | None -> ""
@@ -103,8 +103,8 @@ let content =
       )
   in
   let file_select =
-    Tyxml_js.R.Html5.div
-      ~a:[ Html5.a_class ["list-group-item"] ]
+    Tyxml_js.R.Html.div
+      ~a:[ Html.a_class ["list-group-item"] ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun state ->
@@ -112,8 +112,8 @@ let content =
              handle
              (match state_outputs state with
                (key,_)::[] ->
-                 [Html5.h4
-                     [ Html5.pcdata
+                 [Html.h4
+                     [ Html.pcdata
                          (Display_common.option_label
                             (match key with
                             | None -> ""
@@ -129,7 +129,7 @@ let content =
       )
   in
   let file_content =
-    Tyxml_js.R.Html5.div
+    Tyxml_js.R.Html.div
       (let line_list, line_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun (file : (string option * string list) option) ->
@@ -138,13 +138,13 @@ let content =
            | Some (_,lines) ->
              ReactiveData.RList.set
                line_handle
-               (List.map (fun line -> Html5.p [ Html5.pcdata line ]) lines)
+               (List.map (fun line -> Html.p [ Html.pcdata line ]) lines)
          )
          current_file
        in
        line_list)
   in
-  <:html5<<div>
+  <:html<<div>
    <div class="row">
       <div class="center-block display-header">
       $file_select$
@@ -179,8 +179,8 @@ let select_outputs () =
       ()
 
 let navcontent =
-  [ Html5.div
-      ~a:[Tyxml_js.R.Html5.a_class
+  [ Html.div
+      ~a:[Tyxml_js.R.Html.a_class
              (React.S.bind
                 UIState.model_runtime_state
                 (fun state -> React.S.const

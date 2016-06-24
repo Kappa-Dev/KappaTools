@@ -1,10 +1,10 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 let toggle_element projection content =
-  Html5.div
-    ~a:[Tyxml_js.R.Html5.a_class
+  Html.div
+    ~a:[Tyxml_js.R.Html.a_class
            (React.S.bind
               UIState.model_runtime_state
               (fun state -> React.S.const
@@ -32,35 +32,35 @@ let export_controls
     [export_data_label]
   in
   let export_filename =
-    Html5.input
-      ~a:[ Html5.a_id export_filename_id ;
-           Html5.a_input_type `Text;
-           Html5.a_class ["form-control"];
-           Html5.a_placeholder "file name"]
+    Html.input
+      ~a:[ Html.a_id export_filename_id ;
+           Html.a_input_type `Text;
+           Html.a_class ["form-control"];
+           Html.a_placeholder "file name"]
       ()
   in
   let export_button =
-    Html5.button
-      ~a:[ Html5.a_id export_button_id
-         ; Html5.Unsafe.string_attrib "role" "button"
-         ; Html5.a_class ["btn";"btn-default";"pull-right"]
+    Html.button
+      ~a:[ Html.a_id export_button_id
+         ; Html.Unsafe.string_attrib "role" "button"
+         ; Html.a_class ["btn";"btn-default";"pull-right"]
          ]
-      [ Html5.cdata "export" ]
+      [ Html.cdata "export" ]
   in
   let export_formats_select =
     List.map
       (fun format ->
-        <:html5<<option $list:Html5.a_value format$>
+        <:html<<option $list:Html.a_value format$>
            $str:format$
         </option> >>)
       export_formats
   in
-  <:html5<<div class="row">
+  <:html<<div class="row">
   <div class="col-sm-12">
      <div class="form-inline">
         <div class="form-group">
            <select class="form-control"
-                   $list:Html5.a_id export_select_id$>
+                   $list:Html.a_id export_select_id$>
               <option value="png">png</option>
               <option value="svg">svg</option>
               $list:export_formats_select$
@@ -170,7 +170,7 @@ let save_plot_ui
   ()
 let badge counter
     =
-  [ Tyxml_js.R.Html5.span
+  [ Tyxml_js.R.Html.span
       (let badge_list, badge_handle =
          ReactiveData.RList.create [] in
        let _ = React.S.map
@@ -179,9 +179,9 @@ let badge counter
                if count > 0  then
                  ReactiveData.RList.set
                    badge_handle
-                   [ Html5.pcdata " ";
-                     Html5.span ~a:[ Html5.a_class ["badge"]]
-                       [ Html5.pcdata (string_of_int count) ]
+                   [ Html.pcdata " ";
+                     Html.span ~a:[ Html.a_class ["badge"]]
+                       [ Html.pcdata (string_of_int count) ]
                    ]
                else
                  ReactiveData.RList.set badge_handle []

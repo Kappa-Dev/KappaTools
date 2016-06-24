@@ -1,5 +1,5 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 open Js_distances
@@ -17,8 +17,8 @@ let state_distances state = match state with
 
 let content =
   let export_controls =
-  Html5.div
-      ~a:[Tyxml_js.R.Html5.a_class
+  Html.div
+      ~a:[Tyxml_js.R.Html.a_class
              (React.S.bind
                 UIState.model_runtime_state
                 (fun state ->
@@ -35,15 +35,15 @@ let content =
           ~export_data_label:"json"
       ]
   in
-  <:html5<<div>
+  <:html<<div>
              <div class="row">
-                <div $list:Html5.a_id div_id$ class="col-sm-8">
+                <div $list:Html.a_id div_id$ class="col-sm-8">
                 </div>
              </div>
              $export_controls$
         </div> >>
 
-let navcontent = [ Html5.div [content] ]
+let navcontent = [ Html.div [content] ]
 
 let update_distances
     (distances : distances_plot Js.t)

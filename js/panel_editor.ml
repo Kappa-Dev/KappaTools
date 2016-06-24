@@ -14,16 +14,16 @@ open Lwt
 let document = Dom_html.window##document
 let has_been_modified = ref (false)
 
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 let file_selector_id = "file-selector"
 let file_selector =
-  Html5.input
-    ~a:[ Html5.a_id file_selector_id ;
-         Html5.Unsafe.string_attrib "type" "file" ;
-         Html5.Unsafe.string_attrib "accept" ".ka" ]
+  Html.input
+    ~a:[ Html.a_id file_selector_id ;
+         Html.Unsafe.string_attrib "type" "file" ;
+         Html.Unsafe.string_attrib "accept" ".ka" ]
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
-       Tyxml_js.R.Html5.pcdata
+       Tyxml_js.R.Html.pcdata
             (React.S.bind
                file_label_signal
                (fun env ->
@@ -31,25 +31,26 @@ let file_label =
 
 let save_button_id = "save_button"
 let save_button =
-  Html5.a
-    ~a:[ Html5.a_id save_button_id
-       ; Tyxml_js.R.Html5.Unsafe.string_attrib
+  Html.a
+    ~a:[ Html.a_id save_button_id
+       ; Tyxml_js.R.Html.Unsafe.string_attrib
          "download"
          UIState.opened_filename
-       ; Html5.Unsafe.string_attrib "role" "button"
-       ; Html5.a_class ["btn";"btn-default";"pull-right"]
+       ; Html.Unsafe.string_attrib "role" "button"
+       ; Html.a_class ["btn";"btn-default";"pull-right"]
        ]
-    [ Html5.cdata "save" ]
+    [ Html.cdata "save" ]
 
 let file_selector =
-  Html5.input
-    ~a:[ Html5.a_id "file-selector" ;
-         Html5.Unsafe.string_attrib "type" "file" ;
-         Html5.Unsafe.string_attrib "accept" ".ka" ] ()
+  Html.input
+    ~a:[ Html.a_id "file-selector" ;
+         Html.Unsafe.string_attrib "type" "file" ;
+         Html.Unsafe.string_attrib "accept" ".ka" ] ()
 let panel_heading =
-  <:html5<<div class="row">
+  <:html<<div class="row">
              <div class="col-md-2">
-                <label class="btn btn-default" for="file-selector">
+                <label class="btn btn-default"
+                       $list:Html5.Unsafe.string_attrib "for" "file-selector"$>
                    $file_selector$
                    Load
                 </label>
@@ -65,7 +66,7 @@ let panel_heading =
             </div> >>
 
 let xml =
-  <:html5<<div class="col-md-6">
+  <:html<<div class="col-md-6">
              <div class="panel panel-default">
                 <div class="panel-heading">
                    $panel_heading$

@@ -1,6 +1,6 @@
 module UIState = Ui_state
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 
 open ApiTypes
@@ -8,24 +8,24 @@ open ApiTypes
 let document = Dom_html.window##document
 let number_events_id = "number_events"
 let number_events =
-  Html5.input
-    ~a:[Html5.a_id number_events_id ;
-        Html5.a_input_type `Number;
-        Html5.a_class ["form-control"];
-        Html5.a_placeholder "Max number";
-        Tyxml_js.R.Html5.a_value
+  Html.input
+    ~a:[Html.a_id number_events_id ;
+        Html.a_input_type `Number;
+        Html.a_class ["form-control"];
+        Html.a_placeholder "Max number";
+        Tyxml_js.R.Html.a_value
           (React.S.l1 (fun x -> match x with
                                 | Some va -> string_of_int va
                                 | None -> "") UIState.model_max_events)]
     ()
 let time_limit_id = "time_limit"
 let time_limit =
-  Html5.input
-    ~a:[Html5.a_id time_limit_id ;
-        Html5.a_input_type `Number;
-        Html5.a_class ["form-control"];
-        Html5.a_placeholder "Time limit";
-        Tyxml_js.R.Html5.a_value
+  Html.input
+    ~a:[Html.a_id time_limit_id ;
+        Html.a_input_type `Number;
+        Html.a_class ["form-control"];
+        Html.a_placeholder "Time limit";
+        Tyxml_js.R.Html.a_value
           (React.S.l1
              (fun x -> match x with
              | Some value ->
@@ -48,13 +48,13 @@ let time_limit =
     ()
 let plot_points_id = "plot_points"
 let plot_points =
-  Html5.input
-    ~a:[Html5.a_id plot_points_id;
-        Html5.a_input_type `Number;
-        Html5.Unsafe.int_attrib "min" 1 ;
-        Html5.a_class ["form-control"];
-        Html5.a_placeholder "Expected number";
-        Tyxml_js.R.Html5.a_value
+  Html.input
+    ~a:[Html.a_id plot_points_id;
+        Html.a_input_type `Number;
+        Html.Unsafe.int_attrib "min" 1 ;
+        Html.a_class ["form-control"];
+        Html.a_placeholder "Expected number";
+        Tyxml_js.R.Html.a_value
           (React.S.l1 string_of_int UIState.model_nb_plot)]
     ()
 let signal_change id signal_handler =
@@ -70,8 +70,8 @@ let signal_change id signal_handler =
          in Js._true)
 
 let error_messages signal =
-  Html5.div
-    ~a:[Tyxml_js.R.Html5.a_class
+  Html.div
+    ~a:[Tyxml_js.R.Html.a_class
           (React.S.bind
              signal
              (fun e -> React.S.const
@@ -85,7 +85,7 @@ let error_messages signal =
                ))
           )
        ]
-    [Tyxml_js.R.Html5.pcdata
+    [Tyxml_js.R.Html.pcdata
        (React.S.bind
           signal
           (fun error ->
@@ -100,12 +100,12 @@ let error_messages signal =
 
 let code_messages = error_messages UIState.model_error
 let start_button_id = "start-button"
-let start_button = Html5.button ~a:([ Html5.a_id start_button_id
-                                    ; Html5.Unsafe.string_attrib "type" "button"
-                                    ; Html5.a_class ["btn";"btn-default"] ])
-                                [ Html5.cdata "start" ]
+let start_button = Html.button ~a:([ Html.a_id start_button_id
+                                    ; Html.Unsafe.string_attrib "type" "button"
+                                    ; Html.a_class ["btn";"btn-default"] ])
+                                [ Html.cdata "start" ]
 let configuration_settings =
-  <:html5<<div class="panel-footer panel-footer-white">
+  <:html<<div class="panel-footer panel-footer-white">
             <div class="row">
                         <div class="col-md-4">
                            $number_events$
@@ -135,17 +135,19 @@ let configuration_settings =
           </div> >>
 let select_default_runtime = [ UIState.WebWorker ; UIState.Embedded ]
 let select_runtime_id = "select_runtime_id"
-let select_runtime_options, select_runtime_options_handle = ReactiveData.RList.create select_default_runtime
-let select_runtime = Tyxml_js.R.Html5.select
-                       ~a:[Html5.a_id select_runtime_id ]
-                       (ReactiveData.RList.map
-                          (fun runtime -> Html5.option
-                                            ~a:[Html5.a_value (UIState.runtime_value runtime)]
-                                            (Html5.pcdata (UIState.runtime_label runtime)))
-                          select_runtime_options)
+let select_runtime_options, select_runtime_options_handle =
+  ReactiveData.RList.create select_default_runtime
+let select_runtime =
+  Tyxml_js.R.Html.select
+    ~a:[Html.a_id select_runtime_id ]
+    (ReactiveData.RList.map
+       (fun runtime -> Html.option
+         ~a:[Html.a_value (UIState.runtime_value runtime)]
+         (Html.pcdata (UIState.runtime_label runtime)))
+       select_runtime_options)
 
 let configuration_button =
-    <:html5<<div class="panel-footer">
+    <:html<<div class="panel-footer">
                  <div class="row">
                     <div class="col-md-4">
                        $start_button$
@@ -158,17 +160,18 @@ let configuration_button =
 
 let configuration_id = "configuration-id"
 let configuration_xml =
-  Html5.div
-    ~a:[ Html5.a_id configuration_id
-       ; Tyxml_js.R.Html5.a_class (React.S.bind
-                                     UIState.model_is_running
-                                     (fun is_running -> React.S.const (if is_running then
-                                                                         ["hidden"]
-                                                                       else
-                                                                         ["visible"]
-                                                                      )
-                                     )
-                                  )
+  Html.div
+    ~a:[ Html.a_id configuration_id
+       ; Tyxml_js.R.Html.a_class
+	 (React.S.bind
+            UIState.model_is_running
+            (fun is_running -> React.S.const (if is_running then
+                ["hidden"]
+              else
+                ["visible"]
+             )
+            )
+         )
        ]
     [code_messages; configuration_settings; configuration_button ]
 
@@ -185,17 +188,20 @@ let map_events (f)
       (UIState.model_runtime_state)
 
 let progress_bar percent_signal value_signal =
-  Html5.div ~a:[ Html5.a_id start_button_id
-               ; Html5.Unsafe.string_attrib "role" "progressbar"
-               ; Tyxml_js.R.Html5.Unsafe.int_attrib "aria-valuenow" percent_signal
-               ; Html5.Unsafe.int_attrib "aria-valuemin" 0
-               ; Html5.Unsafe.int_attrib "aria-valuemax" 100
-               ; Tyxml_js.R.Html5.Unsafe.string_attrib "style"
-                                                       (React.S.map (fun s -> Format.sprintf
-                                                                                "width: %d%%;" s)
-                                                                    percent_signal)
-               ; Html5.a_class ["progress-bar"] ]
-            [ Tyxml_js.R.Html5.pcdata
+  Html.div ~a:[ Html.a_id start_button_id
+               ; Html.Unsafe.string_attrib "role" "progressbar"
+               ; Tyxml_js.R.Html.Unsafe.int_attrib
+		 "aria-valuenow"
+		 percent_signal
+               ; Html.Unsafe.int_attrib "aria-valuemin" 0
+               ; Html.Unsafe.int_attrib "aria-valuemax" 100
+               ; Tyxml_js.R.Html.Unsafe.string_attrib
+		 "style"
+                 (React.S.map (fun s -> Format.sprintf
+                   "width: %d%%;" s)
+                    percent_signal)
+               ; Html.a_class ["progress-bar"] ]
+            [ Tyxml_js.R.Html.pcdata
                 (React.S.bind
                    value_signal
                    (fun value -> React.S.const value)
@@ -203,25 +209,26 @@ let progress_bar percent_signal value_signal =
             ]
 let lift f x = match x with None -> None | Some x -> f x
 let default x d = match x with None -> d | Some x -> x
-let time_progress_bar = progress_bar
-                          (React.S.map (fun state ->
-                                        let time_percent : int option =
-                                          lift
-                                            (fun (state : ApiTypes.state) -> state.time_percentage)
-                                            state
-                                        in
-                                        let time_percent : int = default time_percent 0 in
-                                        time_percent
-                                       )
-                                       UIState.model_runtime_state)
-                          (React.S.map (fun state ->
-                                        let time : float option = lift (fun (state : ApiTypes.state) ->
+let time_progress_bar =
+  progress_bar
+    (React.S.map (fun state ->
+      let time_percent : int option =
+        lift
+          (fun (state : ApiTypes.state) -> state.time_percentage)
+          state
+      in
+      let time_percent : int = default time_percent 0 in
+      time_percent
+     )
+       UIState.model_runtime_state)
+    (React.S.map (fun state ->
+      let time : float option = lift (fun (state : ApiTypes.state) ->
 
-                                                                        Some state.time) state in
-                                        let time : float = default time 0.0 in
-                                        string_of_float time
-                                       )
-                                       UIState.model_runtime_state)
+        Some state.time) state in
+      let time : float = default time 0.0 in
+      string_of_float time
+     )
+       UIState.model_runtime_state)
 
 let event_progress_bar =
   progress_bar
@@ -234,7 +241,8 @@ let event_progress_bar =
      )
        UIState.model_runtime_state)
     (React.S.map (fun state ->
-      let event : int option = lift (fun (state : ApiTypes.state) -> Some state.event)
+      let event : int option =
+	lift (fun (state : ApiTypes.state) -> Some state.event)
         state
       in
       let event : int = default event 0 in
@@ -243,10 +251,10 @@ let event_progress_bar =
        UIState.model_runtime_state)
 let stop_button_id = "stop_button"
 let stop_button =
-  Html5.button
-    ~a:[ Html5.a_id stop_button_id
-       ; Html5.Unsafe.string_attrib "type" "button"
-       ; Html5.a_class ["btn";"btn-default"] ] [ Html5.cdata "stop" ]
+  Html.button
+    ~a:[ Html.a_id stop_button_id
+       ; Html.Unsafe.string_attrib "type" "button"
+       ; Html.a_class ["btn";"btn-default"] ] [ Html.cdata "stop" ]
 let tracked_events state =
   let tracked_events : int option =
     lift (fun (state : ApiTypes.state) -> state.tracked_events)
@@ -259,14 +267,14 @@ let tracked_events state =
     else
       None
 let tracked_events_count =
-  Tyxml_js.R.Html5.pcdata
+  Tyxml_js.R.Html.pcdata
     (React.S.map (fun state -> match tracked_events state with
       Some tracked_events -> string_of_int tracked_events
     | None -> " "
      )
        UIState.model_runtime_state)
 
-let tracked_events_label = Tyxml_js.R.Html5.pcdata
+let tracked_events_label = Tyxml_js.R.Html.pcdata
   (React.S.map (fun state -> match tracked_events state with
     Some _ -> "tracked events"
   | None -> " "
@@ -275,7 +283,7 @@ let tracked_events_label = Tyxml_js.R.Html5.pcdata
 
 let simulation_messages = error_messages UIState.model_error
 let simulation_progress =
-    <:html5<<div class="panel-footer panel-footer-white">
+    <:html<<div class="panel-footer panel-footer-white">
                 <div class="row">
                   <div class="col-md-4">
                     <div class="progress">
@@ -310,25 +318,26 @@ let simulation_progress =
               </div> >>
 
 let simulation_buttons =
-              <:html5<<div class="panel-footer">
+              <:html<<div class="panel-footer">
                       $stop_button$
                       </div> >>
 let simulation_id : string = "simulation-panel"
 let simulation_xml =
-  Html5.div
-    ~a:[ Html5.a_id simulation_id
-       ; Tyxml_js.R.Html5.a_class (React.S.bind
-                                     UIState.model_is_running
-                                     (fun model_is_running -> React.S.const (if model_is_running then
-                                                                               ["visible"]
-                                                                             else
-                                                                               ["hidden"]
-                                                                 ))
-                                  )
+  Html.div
+    ~a:[ Html.a_id simulation_id
+       ; Tyxml_js.R.Html.a_class
+	 (React.S.bind
+            UIState.model_is_running
+            (fun model_is_running -> React.S.const (if model_is_running then
+                ["visible"]
+              else
+                ["hidden"]
+             ))
+         )
        ]
     [simulation_messages; simulation_progress ; simulation_buttons ]
 
-let xml = <:html5<<div>
+let xml = <:html<<div>
                   $configuration_xml$
                   $simulation_xml$
                   </div> >>
@@ -348,11 +357,12 @@ let onload () : unit =
                   (fun () -> assert false)) in
   let args = Url.Current.arguments in
   let set_runtime runtime continuation =
-    UIState.set_runtime runtime
-                        (fun success -> if success then
-                                          select_runtime_dom##value <- Js.string (UIState.runtime_value runtime)
-                                        else
-                                          continuation ())
+    UIState.set_runtime
+      runtime
+      (fun success -> if success then
+          select_runtime_dom##value <- Js.string (UIState.runtime_value runtime)
+        else
+          continuation ())
   in
   let format_url url =
     let length = String.length url in
@@ -362,32 +372,42 @@ let onload () : unit =
       url
   in
   let default_embedded () = set_runtime UIState.Embedded (fun _ -> ()) in
-  let () = try let hosts = args in
-               let hosts = List.filter (fun (key,value) -> key = "host") hosts in
-               let hosts = List.map snd hosts in
-               let hosts = List.map (fun h -> (h,Url.url_of_string h)) hosts in
-               let hosts = List.map (fun x -> match x with
-                                                (_,None) -> None
-                                              | (url,Some parsed) ->
-                                                 let label = (match parsed with
-                                                                Url.Http http -> http.Url.hu_host                                                                                                                                                            | Url.Https https -> https.Url.hu_host                                                                                                                                                         | Url.File file -> url
-                                                             ) in
-                                                 Some (UIState.Remote { UIState.label = label; UIState.url = format_url url })
-                                    ) hosts in
-               let hosts = List.fold_left (fun acc value -> match value with
-                                                              Some remote -> remote::acc
-                                                            | None -> acc)
-                                          []
-                                          hosts
-               in
-               let hosts = List.concat [select_default_runtime;hosts] in
-               let () = ReactiveData.RList.set select_runtime_options_handle hosts in
-               let selected_runtime : UIState.runtime = (match hosts with
-                                                           head::_ -> head
-                                                         | _ -> UIState.Embedded) in
-               let () = set_runtime selected_runtime (default_embedded) in
-               ()
-           with _ -> default_embedded () in
+  let () =
+    try let hosts = args in
+        let hosts = List.filter (fun (key,value) -> key = "host") hosts in
+        let hosts = List.map snd hosts in
+        let hosts = List.map (fun h -> (h,Url.url_of_string h)) hosts in
+        let hosts =
+	  List.map
+	    (fun x -> match x with
+            | (_,None) -> None
+            | (url,Some parsed) ->
+              let label =
+		(match parsed with
+		| Url.Http http -> http.Url.hu_host
+		| Url.Https https -> https.Url.hu_host
+		| Url.File file -> url
+                ) in
+              Some (UIState.Remote
+		      { UIState.label = label; UIState.url = format_url url })
+            ) hosts in
+        let hosts = List.fold_left
+	  (fun acc value ->
+	    match value with
+            |  Some remote -> remote::acc
+            | None -> acc)
+          []
+          hosts
+        in
+        let hosts = List.concat [select_default_runtime;hosts] in
+        let () = ReactiveData.RList.set select_runtime_options_handle hosts in
+        let selected_runtime : UIState.runtime =
+	  (match hosts with
+          | head::_ -> head
+          | _ -> UIState.Embedded) in
+        let () = set_runtime selected_runtime (default_embedded) in
+        ()
+    with _ -> default_embedded () in
 
   let init_ui () =
     let _ = start_button_dom##disabled <- Js._true in
@@ -411,41 +431,49 @@ let onload () : unit =
                 let () = UIState.set_model_is_running true in
                 let _ = init_ui () in
                 let _ = UIState.start_model
-                          ~start_continuation:(fun stop_process ->
-                                               stop_ui ();
-                                               Lwt_js_events.async
-                                                 (fun _ -> Lwt_js_events.clicks
-                                                             stop_button_dom
-                                                             (fun _ _ ->
-                                                              let _ = init_ui () in
-                                                              stop_process ()
-                                                              ))
+                  ~start_continuation:(fun stop_process ->
+                                       stop_ui ();
+                                       Lwt_js_events.async
+                                         (fun _ -> Lwt_js_events.clicks
+                                           stop_button_dom
+                                           (fun _ _ ->
+                                             let _ = init_ui () in
+                                             stop_process ()
+                                           ))
                           )
                           ~stop_continuation:start_ui
                 in Js._true)
   in
   let () = select_runtime_dom##onchange <-
              Dom.handler
-               (fun _ -> let () = UIState.set_runtime_url
-                                    (Js.to_string select_runtime_dom##value)
-                                    (fun success -> if success then
-                                                      ()
-                                                    else
-                                                      select_runtime_dom##value <- Js.string (UIState.runtime_value UIState.default_runtime)
-                                    ) in
-                         Js._true
+               (fun _ ->
+		 let () = UIState.set_runtime_url
+                   (Js.to_string select_runtime_dom##value)
+                   (fun success ->
+		     if success then
+                       ()
+                     else
+                       select_runtime_dom##value <-
+			 Js.string
+			 (UIState.runtime_value UIState.default_runtime)
+                   ) in
+                 Js._true
                )
   in
-  let () = signal_change number_events_id (fun value -> UIState.set_model_max_events
-                                                          (try Some (int_of_string value)
-                                                           with Failure _ -> None)
-                                          ) in
-  let () = signal_change time_limit_id    (fun value ->
-                                           UIState.set_model_max_time
-                                                          (try Some (float_of_string value)
-                                                           with Failure _ -> None)) in
-  let () = signal_change plot_points_id   (fun value -> try UIState.set_model_nb_plot
-                                                              (int_of_string value)
-                                                        with Not_found
-                                                           | Failure "int_of_string" -> ()) in
+  let () = signal_change number_events_id
+                         (fun value -> UIState.set_model_max_events
+			   (try Some (int_of_string value)
+			    with Failure _ -> None)
+			 ) in
+  let () = signal_change time_limit_id
+                         (fun value ->
+                           UIState.set_model_max_time
+                             (try Some (float_of_string value)
+                              with Failure _ -> None)) in
+  let () = signal_change plot_points_id
+                         (fun value ->
+			   try UIState.set_model_nb_plot
+                                 (int_of_string value)
+                           with Not_found
+                           | Failure "int_of_string" -> ()) in
   ()

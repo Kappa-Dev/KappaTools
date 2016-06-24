@@ -1,5 +1,5 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 open Js_plot
@@ -61,32 +61,32 @@ let configuration : Widget_export.configuration =
 
 let content =
   let plot_show_legend =
-    Html5.input ~a:[ Html5.a_id "plot-show-legend"
-                   ; Html5.a_input_type `Checkbox
-                   ; Html5.a_class ["checkbox-control"]
-                   ; Html5.Unsafe.string_attrib "checked" "true"
+    Html.input ~a:[ Html.a_id "plot-show-legend"
+                   ; Html.a_input_type `Checkbox
+                   ; Html.a_class ["checkbox-control"]
+                   ; Html.Unsafe.string_attrib "checked" "true"
                    ] () in
   let plot_x_axis_log_checkbox =
-    Html5.input ~a:[ Html5.a_id "plot-x-axis-log-checkbox"
-                   ; Html5.a_class ["checkbox-control"]
-                   ; Html5.a_input_type `Checkbox
+    Html.input ~a:[ Html.a_id "plot-x-axis-log-checkbox"
+                   ; Html.a_class ["checkbox-control"]
+                   ; Html.a_input_type `Checkbox
                    ] () in
   let plot_y_axis_log_checkbox =
-    Html5.input ~a:[ Html5.a_id "plot-y-axis-log-checkbox"
-                   ; Html5.a_class ["checkbox-control"]
-                   ; Html5.a_input_type `Checkbox
+    Html.input ~a:[ Html.a_id "plot-y-axis-log-checkbox"
+                   ; Html.a_class ["checkbox-control"]
+                   ; Html.a_input_type `Checkbox
                    ] () in
   let export_controls =
     Widget_export.content configuration
   in
-  <:html5<<div>
+  <:html<<div>
       <div class="row">
           <div id="plot-label-div" class="center-block display-header">
           Plot
           </div>
       </div>
       <div class="row">
-        <div $list:Html5.a_id display_id$ class="col-sm-12"></div>
+        <div $list:Html.a_id display_id$ class="col-sm-12"></div>
       </div>
       <div class="row">
 
@@ -99,7 +99,7 @@ let content =
                Log Y $plot_y_axis_log_checkbox$
          </div>
 
-         <div class="col-sm-4" $list:Html5.a_id div_axis_select_id$>
+         <div class="col-sm-4" $list:Html.a_id div_axis_select_id$>
          </div>
 
       </div>
@@ -108,8 +108,8 @@ let content =
   </div> >>
 
 let navcontent =
-  [ Html5.div
-      ~a:[Tyxml_js.R.Html5.a_class
+  [ Html.div
+      ~a:[Tyxml_js.R.Html.a_class
              (React.S.bind
                 UIState.model_runtime_state
                 (fun state ->

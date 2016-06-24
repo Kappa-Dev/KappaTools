@@ -1,5 +1,5 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 let navli = []
@@ -36,15 +36,15 @@ let content =
   let export_controls =
     Widget_export.content configuration
   in
-  <:html5<<div>
+  <:html<<div>
              <div class="row">
-                <div $list:Html5.a_id display_id$ class="col-sm-8">
+                <div $list:Html.a_id display_id$ class="col-sm-8">
                 </div>
              </div>
              $export_controls$
         </div> >>
 
-let navcontent = [ Html5.div [content] ]
+let navcontent = [ Html.div [content] ]
 
 let onload () =
   let () = Widget_export.onload configuration in

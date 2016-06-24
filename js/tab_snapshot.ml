@@ -1,5 +1,5 @@
 module ApiTypes = ApiTypes_j
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 let current_snapshot, set_current_snapshot =
@@ -57,9 +57,9 @@ let configuration : Widget_export.configuration =
 
 let content =
   let select =
-    Tyxml_js.R.Html5.select
-      ~a:[ Html5.a_class ["form-control"]
-         ; Html5.a_id select_id ]
+    Tyxml_js.R.Html.select
+      ~a:[ Html.a_class ["form-control"]
+         ; Html.a_id select_id ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun state ->
@@ -67,8 +67,8 @@ let content =
              handle
              (List.mapi
                 (fun i snapshot ->
-                  Html5.option
-                    ~a:([ Html5.a_value (string_of_int i)]
+                  Html.option
+                    ~a:([ Html.a_value (string_of_int i)]
                        @
                        if (match (React.S.value current_snapshot) with
                           | None ->
@@ -76,9 +76,9 @@ let content =
                           | Some s ->
                             s.ApiTypes.snap_file = snapshot.ApiTypes.snap_file
                           )
-                       then [Html5.a_selected `Selected]
+                       then [Html.a_selected ()]
                        else [])
-                    (Html5.pcdata
+                    (Html.pcdata
                        (Display_common.option_label snapshot.ApiTypes.snap_file)))
                 (state_snapshot state)
              )
@@ -91,8 +91,8 @@ let content =
   Display_common.toggle_element
     state_snapshot
     [
-    Tyxml_js.R.Html5.div
-      ~a:[ Html5.a_class ["list-group-item"] ]
+    Tyxml_js.R.Html.div
+      ~a:[ Html.a_class ["list-group-item"] ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
          (fun state ->
@@ -100,8 +100,8 @@ let content =
              handle
              (match state_snapshot state with
                head::[] ->
-                 [Html5.h4
-                     [ Html5.pcdata
+                 [Html.h4
+                     [ Html.pcdata
                          (Display_common.option_label head.ApiTypes.snap_file)]]
              | _ -> [select]
              )
@@ -115,14 +115,14 @@ let content =
   let export_controls =
     Widget_export.content configuration
   in
-  <:html5<<div>
+  <:html<<div>
              <div class="row">
                <div class="center-block display-header">
                 $snapshot_select$
                </div>
              </div>
              <div class="row">
-                <div class="col-sm-12" $list:Html5.a_id display_id$>
+                <div class="col-sm-12" $list:Html.a_id display_id$>
                 </div>
              </div>
              $export_controls$

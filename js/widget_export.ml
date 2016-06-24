@@ -1,4 +1,4 @@
-module Html5 = Tyxml_js.Html5
+module Html = Tyxml_js.Html5
 
 type handler  =
   { suffix : string;
@@ -29,35 +29,35 @@ let export_data_label
 let content
     (configuration :  configuration) =
   let export_filename =
-    Html5.input
-      ~a:[ Html5.a_id (export_filename_id configuration)
-         ; Html5.a_input_type `Text
-         ; Html5.a_class ["form-control"]
-         ; Html5.a_placeholder "file name" ]
+    Html.input
+      ~a:[ Html.a_id (export_filename_id configuration)
+         ; Html.a_input_type `Text
+         ; Html.a_class ["form-control"]
+         ; Html.a_placeholder "file name" ]
       ()
   in
   let export_button =
-    Html5.button
-      ~a:[ Html5.a_id (export_button_id configuration)
-         ; Html5.Unsafe.string_attrib "role" "button"
-         ; Html5.a_class ["btn";"btn-default";"pull-right"]
+    Html.button
+      ~a:[ Html.a_id (export_button_id configuration)
+         ; Html.Unsafe.string_attrib "role" "button"
+         ; Html.a_class ["btn";"btn-default";"pull-right"]
          ]
-      [ Html5.cdata "export" ]
+      [ Html.cdata "export" ]
   in
   let export_formats_select =
     List.map
       (fun handler ->
-        <:html5<<option $list:Html5.a_value handler.label$>
+        <:html<<option $list:Html.a_value handler.label$>
            $str:handler.label$
         </option> >>)
       configuration.handlers
   in
   let xml_div =
-    <:html5<<div class="col-sm-12">
+    <:html<<div class="col-sm-12">
      <div class="form-inline">
         <div class="form-group">
            <select class="form-control"
-                   $list:Html5.a_id (export_format_id configuration)$>
+                   $list:Html.a_id (export_format_id configuration)$>
               $list:export_formats_select$
            </select>
         </div>
@@ -74,8 +74,8 @@ let content
      </div>
   </div> >>
   in
-  Html5.div
-    ~a:[Tyxml_js.R.Html5.a_class
+  Html.div
+    ~a:[Tyxml_js.R.Html.a_class
            (React.S.bind
               configuration.show
               (fun show ->
