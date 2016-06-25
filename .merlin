@@ -12,7 +12,7 @@ S Error
 S generated
 S main
 
-S KaSa_rep/export_to_KaSim
+S KaSa_rep/export
 S KaSa_rep/tools
 S KaSa_rep/data_structures
 S KaSa_rep/config
