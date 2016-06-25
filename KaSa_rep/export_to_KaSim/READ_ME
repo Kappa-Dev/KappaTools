@@ -1,0 +1,15 @@
+(* Example pour KaSim *)
+let error = Exception.empty_error_handler 
+let error,_,files  = Get_option.get_option error 
+let compil =
+    let _ = Ast.init_compil() in 
+    let _ =  
+      List.iter (fun fic -> 
+        let _ = KappaLexer.compile fic in 
+        ())
+      files 
+    in 
+    !Ast.result
+let state = Export_to_KaSim.Export_to_KaSim.init compil 
+let state,contact_map = Export_to_KaSim.Export_to_KaSim.get_contact_map state 
+let _ = Export_to_KaSim.Export_to_KaSim.dump_contact_map state 

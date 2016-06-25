@@ -4,7 +4,7 @@ val init_kasa :
   Remanent_parameters_sig.called_from -> Signature.s ->
   (string Location.annot * Ast.port list, Ast.mixture, string, Ast.rule)
     Ast.compil ->
-  Primitives.contact_map * Export.Export.state
+  Primitives.contact_map * Export_to_KaSim.Export_to_KaSim.state
 
 val compile_bool:
   Primitives.contact_map -> Connected_component.PreEnv.t ->

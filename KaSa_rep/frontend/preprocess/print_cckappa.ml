@@ -312,7 +312,7 @@ let rec print_short_alg parameters error handler alg =
                      | Operator.PLOTNUM
                      | Operator.CPUTIME
                 ),_
-  | Ast.CONST (Nbr.I64 _),_
+  | Ast.CONST (Nbr.F _ | Nbr.I _ | Nbr.I64 _),_
   | Ast.TOKEN_ID _,_
   | Ast.KAPPA_INSTANCE _,_ ->  (*to do*) error
  (* | Ast.INFINITY _ ->
