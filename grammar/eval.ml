@@ -542,12 +542,12 @@ let translate_contact_map sigs kasa_contact_map =
   sol
 
 let init_kasa called_from sigs result =
-  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init ~called_from result in
+  let pre_kasa_state = Export.Export.init ~called_from result in
   let kasa_state,contact_map =
-    Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-  let () = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
+    Export.Export.get_contact_map pre_kasa_state in
+  let () = Export.Export.dump_errors_light kasa_state in
   translate_contact_map sigs contact_map,
-  Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state
+  Export.Export.flush_errors kasa_state
 
 
 let compile ~outputs ~pause ~return
