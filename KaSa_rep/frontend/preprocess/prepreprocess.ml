@@ -153,7 +153,7 @@ let rec scan_interface parameters k agent interface remanent =
       | Ast.LNK_ANY,_
       | Ast.FREE, _
       | Ast.LNK_TYPE _,_
-      | Ast.LNK_SOME _,_       -> remanent),set)
+      | Ast.LNK_SOME,_       -> remanent),set)
 
 let scan_agent parameters k agent remanent =
   fst (scan_interface parameters k (fst (fst agent)) (snd agent) (remanent,Mods.StringSet.empty))
