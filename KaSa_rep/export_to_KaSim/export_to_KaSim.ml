@@ -129,7 +129,7 @@ module Export_to_KaSim =
       InfluenceNodeMap.iter
         (fun x y ->
            InfluenceNodeMap.iter
-             (fun y labellist ->
+             (fun y _labellist ->
                 let () =
                   Loggers.fprintf
                     (Remanent_parameters.get_logger parameters)
@@ -146,7 +146,7 @@ module Export_to_KaSim =
       InfluenceNodeMap.iter
         (fun x y ->
            InfluenceNodeMap.iter
-             (fun y labellist ->
+             (fun y _labellist ->
                 let () =
                   Loggers.fprintf
                     (Remanent_parameters.get_logger parameters)
@@ -223,7 +223,7 @@ module Export_to_KaSim =
       let () =
         match called_from with
         | Remanent_parameters_sig.Internalised -> assert false
-        | Remanent_parameters_sig.Server 
+        | Remanent_parameters_sig.Server
         | Remanent_parameters_sig.KaSim
         | Remanent_parameters_sig.JS
         | Remanent_parameters_sig.KaSa -> ()
@@ -322,7 +322,7 @@ module Export_to_KaSim =
              let error =
                Ckappa_sig.Dictionary_of_States.iter
                  parameters error
-                 (fun parameters error s state  () () ->
+                 (fun _parameters error _s state  () () ->
                     let () =
                       sol := add_internal_state (ag,site) state (!sol)
                     in
@@ -337,7 +337,7 @@ module Export_to_KaSim =
       let error, sol =
         Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
           parameters error
-          (fun parameters error (i, (j , k)) (i', j', k') sol ->
+          (fun _parameters error (i, (j , _k)) (i', j', _k') sol ->
              let error, ag_i =
                Handler.translate_agent parameters error handler i
              in
@@ -367,18 +367,26 @@ module Export_to_KaSim =
       if a<0 then Side_effect (-(a+1))
       else Direct a
 
-    let convert_id x nrules =
+  let convert_id x nrules =
       if x<nrules
       then
         Rule x
       else
         Var (x-nrules)
 
+(*  let convert_id x nrules =
+      let x = int_of_string (Ckappa_sig.string_of_rule_id x) in
+      if x < nrules
+      then
+        Rule x
+      else
+        Var (x-nrules)*)
+
     let convert_influence_map influence nrules  =
         Ckappa_sig.PairRule_setmap.Map.fold
           (fun (x,y) list map ->
-             let x = convert_id (Ckappa_sig.int_of_rule_id x) nrules in
-             let y = convert_id (Ckappa_sig.int_of_rule_id y) nrules in
+             let x = convert_id (int_of_string (Ckappa_sig.string_of_rule_id x)) nrules in
+    let y = convert_id (int_of_string (Ckappa_sig.string_of_rule_id y)) nrules in
              let old =
                match
                  InfluenceNodeMap.find_option x map

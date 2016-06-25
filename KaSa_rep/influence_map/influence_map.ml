@@ -17,7 +17,7 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-let generic_add fold2_common agent_diag rule_diag parameters error handler (n:int) a b c =
+let generic_add fold2_common agent_diag rule_diag parameters error _handler (n:int) a b c =
   fold2_common
     parameters
     error
@@ -30,7 +30,7 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler (n:in
               parameters
               error
               (fun parameters error (rule':Ckappa_sig.c_rule_id) a' map ->
-                 let rule' = Ckappa_sig.rule_id_of_int (n + (Ckappa_sig.int_of_rule_id rule')) in
+                 let rule' = Ckappa_sig.add_rule_id rule' n in
                  if (not rule_diag && rule = rule')
                  then
                    (error,map)

@@ -54,10 +54,10 @@ let print_agent_map parameters error handler map =
            error
            (fun parameters error key' im' ->
               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  "%sagent_type:%i,rule:%i->"
+                  "%sagent_type:%s,rule:%s->"
                   (Remanent_parameters.get_prefix parameters)
-                  (Ckappa_sig.int_of_agent_name key)
-                  (Ckappa_sig.int_of_rule_id key')
+                  (Ckappa_sig.string_of_agent_name key)
+                  (Ckappa_sig.string_of_rule_id key')
               in
               let _ = Quark_type.Labels.dump parameters error handler im' in
               let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -77,10 +77,10 @@ let print_agent_var_map parameters error handler map =
            error
            (fun parameters error key' im' ->
               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  "%sagent_type:%i,var:%i->"
+                  "%sagent_type:%s,var:%s->"
                   (Remanent_parameters.get_prefix parameters)
-                  (Ckappa_sig.int_of_agent_name key)
-                  (Ckappa_sig.int_of_rule_id key')
+                  (Ckappa_sig.string_of_agent_name key)
+                  (Ckappa_sig.string_of_rule_id key')
               in
               let _ = Quark_type.Labels.dump parameters error handler im' in
               let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -99,10 +99,10 @@ let print_string_map parameters error handler map =
              error
              (fun parameters error key' im' ->
                 let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                    "%sagent_type:%s,rule_id:%i->"
+                    "%sagent_type:%s,rule_id:%s->"
                     (Remanent_parameters.get_prefix parameters)
                     key
-                    (Ckappa_sig.int_of_rule_id key')
+                    (Ckappa_sig.string_of_rule_id key')
                 in
                 let _ = Quark_type.Labels.dump parameters error handler im' in
                 let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -123,10 +123,10 @@ let print_var_string_map parameters error handler map =
              error
              (fun parameters error key' im' ->
                 let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                    "%sagent_type:%s,var_id:%i->"
+                    "%sagent_type:%s,var_id:%s->"
                     (Remanent_parameters.get_prefix parameters)
                     key
-                    (Ckappa_sig.int_of_rule_id key')
+                    (Ckappa_sig.string_of_rule_id key')
                 in
                 let _ = Quark_type.Labels.dump parameters error handler im' in
                 let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -156,19 +156,19 @@ let print_site_map parameter error handler map =
     error
     (fun parameters error (agent_type,(site_type,state)) im ->
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
-         parameter
+         parameters
          error
          (fun parameters error rule im' ->
             let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "%sagent_type:%i,site_type:%i,state:%i,rule:%i->"
+                "%sagent_type:%s,site_type:%s,state:%s,rule:%s->"
                 (Remanent_parameters.get_prefix parameter)
-                (Ckappa_sig.int_of_agent_name agent_type)
-                (Ckappa_sig.int_of_site_name site_type)
-                (Ckappa_sig.int_of_state_index state)
-                (Ckappa_sig.int_of_rule_id rule)
+                (Ckappa_sig.string_of_agent_name agent_type)
+                (Ckappa_sig.string_of_site_name site_type)
+                (Ckappa_sig.string_of_state_index state)
+                (Ckappa_sig.string_of_rule_id rule)
             in
             let _ = Quark_type.Labels.dump parameter error handler im' in
-            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             error)
          im
     ) map
@@ -179,19 +179,19 @@ let print_site_var_map parameter error handler map =
     error
     (fun parameters error (agent_type,(site_type,state)) im ->
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
-         parameter
+         parameters
          error
          (fun parameters error rule im' ->
             let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "%sagent_type:%i,site_type:%i,state:%i,var:%i->"
+                "%sagent_type:%s,site_type:%s,state:%s,var:%s->"
                 (Remanent_parameters.get_prefix parameter)
-                (Ckappa_sig.int_of_agent_name agent_type)
-                (Ckappa_sig.int_of_site_name site_type)
-                (Ckappa_sig.int_of_state_index state)
-                (Ckappa_sig.int_of_rule_id rule)
+                (Ckappa_sig.string_of_agent_name agent_type)
+                (Ckappa_sig.string_of_site_name site_type)
+                (Ckappa_sig.string_of_state_index state)
+                (Ckappa_sig.string_of_rule_id rule)
             in
             let _ = Quark_type.Labels.dump parameter error handler im' in
-            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             error)
          im
     ) map
@@ -229,15 +229,15 @@ let print_quarks parameters  error handler quark =
 
 let print_maps ?directives:(directives=[]) parameters logger error handler
     compilation print_rule print_var get_label_of_rule get_label_of_var
-    print_labels prefix suffix map =
+    print_labels prefix _suffix map =
   let error  =
     Ckappa_sig.PairRule_setmap.Map.fold
       (fun (a,b) couple error ->
-         let error, bool, s1 =
+         let error, _bool, s1 =
            string_of_rule_var parameters error handler compilation
              print_rule print_var get_label_of_rule get_label_of_var a
          in
-         let error, bool, s2  =
+         let error, _bool, s2  =
            string_of_rule_var parameters error handler compilation
              print_rule print_var get_label_of_rule get_label_of_var b
          in
@@ -245,7 +245,7 @@ let print_maps ?directives:(directives=[]) parameters logger error handler
            let s = Buffer.create 0 in
            let fmt = Format.formatter_of_buffer s in
            let parameters = Remanent_parameters.set_logger parameters
-             (Loggers.open_logger_from_formatter fmt) in
+               (Loggers.open_logger_from_formatter fmt) in
            let error  =
              print_labels parameters error handler couple
            in
@@ -286,7 +286,8 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
     if nrules > 0
     then
       let rec aux k error =
-        if (Ckappa_sig.int_of_rule_id k) >= nrules then error
+        if Ckappa_sig.compare_rule_id k (Ckappa_sig.rule_id_of_int nrules) >= 0
+        then error
         else
           let error, bool, s =
             string_of_rule_var parameters error handler compilation
@@ -311,7 +312,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
               ()
           in
           aux
-            (Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_rule_id k + 1))
+            (Ckappa_sig.next_rule_id k)
             error
       in aux Ckappa_sig.dummy_rule_id error
     else
@@ -385,22 +386,22 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
     then error
     else
       (*      let () =
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameters_dot)
-          "edge [color=%s, arrowhead=%s];"
-          (Remanent_parameters.get_inhibition_color parameters_dot)
-          (Remanent_parameters.get_inhibition_arrow parameters_dot)
+              Loggers.fprintf
+              (Remanent_parameters.get_logger parameters_dot)
+              "edge [color=%s, arrowhead=%s];"
+              (Remanent_parameters.get_inhibition_color parameters_dot)
+              (Remanent_parameters.get_inhibition_arrow parameters_dot)
               in*)
       (*  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in*)
       let error =
         print_maps
-        ~directives:[Graph_loggers.Color (Remanent_parameters.get_inhibition_color parameters_dot);
-                     Graph_loggers.ArrowHead (Remanent_parameters.get_inhibition_arrow parameters_dot);
-                    ]
-        parameters_dot logger error handler compilation
-        Handler.print_rule_dot Handler.print_var_dot
-        Handler.get_label_of_rule_dot Handler.get_label_of_var_dot
-        Handler.print_labels "" " ;" inhibition_map
+          ~directives:[Graph_loggers.Color (Remanent_parameters.get_inhibition_color parameters_dot);
+                       Graph_loggers.ArrowHead (Remanent_parameters.get_inhibition_arrow parameters_dot);
+                      ]
+          parameters_dot logger error handler compilation
+          Handler.print_rule_dot Handler.print_var_dot
+          Handler.get_label_of_rule_dot Handler.get_label_of_var_dot
+          Handler.print_labels "" " ;" inhibition_map
 
       in
       error

@@ -156,8 +156,9 @@ let get_state_of_site error dynamic precondition path =
     let _ =
       match output with
       | Usual_domains.Val l ->
-        List.iter (fun i -> Printf.fprintf stdout "state:%i\n" (Ckappa_sig.int_of_state_index i)) l
-      | _ -> ()
+        List.iter
+          (fun i -> Printf.fprintf stdout "state:%s\n" (Ckappa_sig.string_of_state_index i)) l
+      | Usual_domains.Any | Usual_domains.Undefined -> ()
     in
     error, dynamic, precondition, output
   | None ->
@@ -212,7 +213,7 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
     error, precondition, Usual_domains.Not_top output
 
 let overwrite_potential_partners_map
-    (parameters:Remanent_parameters_sig.parameters)
+    (_parameters:Remanent_parameters_sig.parameters)
     (error:Exception.method_handler)
     precondition
     f

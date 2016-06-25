@@ -34,15 +34,15 @@ let print_sites_modified_set parameter error handler_kappa result =
        in
        let () =
          Loggers.fprintf (Remanent_parameters.get_logger parameter)
-           "agent_type:%i:%s"
-           (Ckappa_sig.int_of_agent_name agent_type) agent_name
+           "agent_type:%s:%s"
+           (Ckappa_sig.string_of_agent_name agent_type) agent_name
        in
        let () =
          Loggers.print_newline (Remanent_parameters.get_logger parameter)
        in
        (*convert site of type int to string*)
-       let _ =
-         Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
+       let error =
+         Ckappa_sig.Site_map_and_set.Set.fold (fun site_type error ->
              let error, site_string =
                try
                  Handler.string_of_site parameter error handler_kappa agent_type site_type
@@ -51,12 +51,13 @@ let print_sites_modified_set parameter error handler_kappa result =
                         (Ckappa_sig.string_of_site_name site_type)
              in
              let () = Loggers.fprintf
-                 (Remanent_parameters.get_logger parameter)  "site_type:%i:%s"
-                 (Ckappa_sig.int_of_site_name site_type)
+                 (Remanent_parameters.get_logger parameter)  "site_type:%s:%s"
+                 (Ckappa_sig.string_of_site_name site_type)
                  site_string
              in
-             Loggers.print_newline (Remanent_parameters.get_logger parameter)
-           ) site_set
+             let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+             error
+           ) site_set error
        in
        error
     ) result
@@ -76,8 +77,8 @@ let cartesian_prod_eq i a b =
   in
   loop a []
 
-let print_internal_flow parameter error handler_kappa result =
-  let store_result1, store_result2 = result in
+let print_internal_flow parameter _error _handler_kappa result =
+  let store_result1, _store_result2 = result in
   if Remanent_parameters.get_do_ODE_flow_of_information parameter
   then
     if Remanent_parameters.get_trace parameter
@@ -100,11 +101,11 @@ let print_internal_flow parameter error handler_kappa result =
            let _ =
              List.iter (fun (agent_type, site_type, site_modif) ->
                  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                     "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:site_type:%i -> agent_type:%i:site_type_modified:%i"
-                     (Ckappa_sig.int_of_agent_name agent_type)
-                     (Ckappa_sig.int_of_site_name site_type)
-                     (Ckappa_sig.int_of_agent_name agent_type)
-                     (Ckappa_sig.int_of_site_name site_modif)
+                     "Flow of information in the ODE semantics:Internal flow\n-agent_type:%s:site_type:%s -> agent_type:%s:site_type_modified:%s"
+                     (Ckappa_sig.string_of_agent_name agent_type)
+                     (Ckappa_sig.string_of_site_name site_type)
+                     (Ckappa_sig.string_of_agent_name agent_type)
+                     (Ckappa_sig.string_of_site_name site_modif)
                  in
                  Loggers.print_newline (Remanent_parameters.get_logger parameter)
                ) cartesian_output

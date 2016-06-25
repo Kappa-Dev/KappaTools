@@ -74,7 +74,7 @@ let pop_entry parameters error id (map,set) =
       set
   then
     match list with
-    | Some [a] ->
+    | Some [_] ->
        let error,map =
          Ckappa_sig.Agent_id_map_and_set.Map.remove
            parameters
@@ -84,7 +84,7 @@ let pop_entry parameters error id (map,set) =
        in
        warn parameters error (Some "line 55, dandling bond detected\n") Exit (None,map)
     | Some [] ->  warn parameters error (Some "line 56, internal bug, link id is ignored") Exit (None,map)
-    | Some (h::t) ->
+    | Some (_::t) ->
       let error,map =
         Ckappa_sig.Agent_id_map_and_set.Map.overwrite
           parameters
@@ -117,7 +117,7 @@ let pop_entry parameters error id (map,set) =
            map
        in
        error,(Some b,map)
-    | Some (h::t) ->
+    | Some (_::t) ->
        let error,map =
          Ckappa_sig.Agent_id_map_and_set.Map.overwrite
            parameters
@@ -150,7 +150,10 @@ let rec scan_interface parameters k agent interface remanent =
           (fst port.Ast.port_nme)
           k
           remanent
-      | _ -> remanent),set)
+      | Ast.LNK_ANY,_
+      | Ast.FREE, _
+      | Ast.LNK_TYPE _,_
+      | Ast.LNK_SOME _,_       -> remanent),set)
 
 let scan_agent parameters k agent remanent =
   fst (scan_interface parameters k (fst (fst agent)) (snd agent) (remanent,Mods.StringSet.empty))
@@ -162,7 +165,7 @@ let rec collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) rem
       parameters
       mixture
       f
-      (Ckappa_sig.agent_id_of_int (Ckappa_sig.int_of_agent_id k+1))
+      (Ckappa_sig.next_agent_id k)
       (scan_agent parameters (f k) agent remanent)
   | [] -> remanent
 
@@ -245,11 +248,11 @@ let translate_lnk_state parameters lnk_state remanent =
      | Ast.FREE,_ -> Ckappa_sig.FREE,remanent
      | Ast.LNK_ANY,position -> Ckappa_sig.LNK_ANY position,remanent
      | Ast.LNK_SOME,position -> Ckappa_sig.LNK_SOME position,remanent
-     | Ast.LNK_TYPE (x,y),position -> Ckappa_sig.LNK_TYPE (y,x),remanent
+     | Ast.LNK_TYPE (x,y),_position -> Ckappa_sig.LNK_TYPE (y,x),remanent
 
 let translate_port parameters int_set port remanent =
   let error,map = remanent in
-  let error,int_set =
+  let error,_ =
     check_freshness parameters error "Site" (fst (port.Ast.port_nme)) int_set
   in
   let remanent = error,map in
@@ -420,8 +423,13 @@ let longuest_prefix mixture1 mixture2 =
 
 let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mixture =
      let f i =
-       if (Ckappa_sig.int_of_agent_id i) > prefix_size
-       then Ckappa_sig.agent_id_of_int ((Ckappa_sig.int_of_agent_id i) + empty_size)
+       if
+         Ckappa_sig.compare_agent_id
+           i
+           (Ckappa_sig.agent_id_of_int prefix_size)
+         > 0
+       then
+         Ckappa_sig.add_agent_id i empty_size
        else i
      in
      let remanent =
@@ -532,7 +540,7 @@ let rec modif_map f_forbidding_question_marks f_allowing_question_marks error al
   with
   | Ast.INTRO (alg,(mixture,pos)) ->
     let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
-    let error,mixture' = f_forbidding_question_marks error mixture in 
+    let error,mixture' = f_forbidding_question_marks error mixture in
     error,Ast.INTRO(alg',(mixture',pos))
   | Ast.DELETE (alg,(mixture,pos)) ->
     let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in

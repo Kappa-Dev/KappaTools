@@ -20,6 +20,9 @@ let trace = false
 
 (************************************************************************************)
 
+let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
+
+
 let collect_modified_map parameter error diff_reverse store_modified_map =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error _agent_id site_modif store_modified_map ->
@@ -179,9 +182,9 @@ let scan_rule_covering_classes parameter error _handler rule classes =
 let scan_rule_set_covering_classes parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
   let error, init_modif_map =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error n_agents in
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameter error n_agents in
   let error, init_class =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error n_agents in
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (* add each singleton as a covering class *)
   let error, init_class =
@@ -262,7 +265,7 @@ let store_remanent parameter error covering_class _modified_map remanent =
     Covering_classes_type.Dictionary_of_List_sites.allocate
       parameter
       error
-      Misc_sa.compare_unit_covering_class_id
+      compare_unit_covering_class_id
       covering_class (*value: c_site_name list*)
       ()
       Misc_sa.const_unit
@@ -498,8 +501,8 @@ let scan_rule_set_remanent parameter error handler rules =
                     let _ =
                       (*print covering_class_id*)
                       Printf.fprintf stdout
-                        "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n"
-                        (Ckappa_sig.int_of_agent_name agent_type)
+                        "Potential dependencies between sites:\nagent_type:%s:%s:covering_class_id:%i\n"
+                        (Ckappa_sig.string_of_agent_name agent_type)
                         agent_string
                         (Covering_classes_type.int_of_cv_id elt_id)
                     in
@@ -508,7 +511,7 @@ let scan_rule_set_remanent parameter error handler rules =
                           let error, site_string =
                             Handler.string_of_site parameter error handler agent_type site_type
                           in
-                          let () = 
+                          let () =
                             Printf.fprintf stdout "site_type:%i:%s\n"
                             (Ckappa_sig.int_of_site_name site_type)
                             site_string

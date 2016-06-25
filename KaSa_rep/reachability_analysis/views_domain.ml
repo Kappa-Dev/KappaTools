@@ -344,12 +344,12 @@ struct
     error, static, dynamic
 
   (** get type bdu_analysis_static*)
-  let get_bdu_analysis_static static dynamic error =
+  let get_bdu_analysis_static static _dynamic error =
     let result = static.domain_static_information in
     error, result
 
   (**get type bdu_analysis_dynamic*)
-  let get_bdu_analysis_dynamic static dynamic error =
+  let get_bdu_analysis_dynamic _static dynamic error =
     let result = get_domain_dynamic_information dynamic in
     error, result
 
@@ -365,7 +365,7 @@ struct
   (**************************************************************************)
   (**get type bdu_analysis_dynamic*)
 
-  let get_store_covering_classes_modification_update_full static dynamic error =
+  let get_store_covering_classes_modification_update_full _static dynamic error =
     let result = get_domain_dynamic_information dynamic in
     error, result.Bdu_dynamic_views.store_update
 
@@ -467,7 +467,7 @@ struct
         begin
           let log = Remanent_parameters.get_logger parameter in
           (*-----------------------------------------------------------------------*)
-          let error, agent_string =
+          let error, _agent_string =
             try
               Handler.string_of_agent parameter error kappa_handler agent_type
             with
@@ -493,8 +493,8 @@ struct
               error
           in
           (*-----------------------------------------------------------------------*)
-          let () =
-            Ckappa_sig.Rule_map_and_set.Set.iter (fun rule_id ->
+          let error =
+            Ckappa_sig.Rule_map_and_set.Set.fold (fun rule_id error ->
                 let compiled = get_compil static in
                 let error, rule_id_string =
                   try
@@ -511,8 +511,9 @@ struct
                   Loggers.fprintf log "%s%s(%s) should be investigated "
                     (Remanent_parameters.get_prefix parameter) tab rule_id_string
                 in
-                let () = Loggers.print_newline log in ())
-              s1 in
+                let () = Loggers.print_newline log in error)
+              s1 error
+          in
           error
         end
       else error
@@ -572,7 +573,7 @@ struct
       (*-----------------------------------------------------------------------*)
       (*build a pair of coresspondence map:
         - map1: global -> local; map2: local -> global*)
-      let error, (map1, map2) =
+      let error, (_map1, map2) =
         Bdu_static_views.new_index_pair_map parameter error site_correspondence
       in
       (*-----------------------------------------------------------------------
@@ -690,9 +691,9 @@ struct
   let add_link ?title error static dynamic (agent_type, cv_id) bdu event_list =
     let parameter = get_parameter static in
     let log = Remanent_parameters.get_logger parameter in
-    let error, store_remanent_triple =
+    (*let error, store_remanent_triple =
       get_store_remanent_triple static dynamic error
-    in
+      in*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store = get_fixpoint_result dynamic in
     let error, bdu_old =
@@ -711,7 +712,7 @@ struct
     let dynamic = set_mvbdu_handler handler dynamic in
     let updates_list = [] in
     (*-----------------------------------------------------------*)
-    let error, dynamic, title, is_new_views, updates_list =
+    let error, dynamic, _title, is_new_views, updates_list =
       if Ckappa_sig.Views_bdu.equal bdu_old bdu_union
       then
         error, dynamic, title, false, updates_list
@@ -836,7 +837,6 @@ struct
 
   let bdu_build static dynamic error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
     let parameter = get_parameter static in
-    let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_result =
       Bdu_static_views.build_bdu
@@ -857,7 +857,7 @@ struct
     in
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-        (fun parameter error agent_id agent (dynamic, event_list) ->
+        (fun parameter error _agent_id agent (dynamic, event_list) ->
            match agent with
            | Cckappa_sig.Unknown_agent _
            | Cckappa_sig.Ghost -> error, (dynamic, event_list)
@@ -890,7 +890,7 @@ struct
                            pair_list
                        in
                        (*----------------------------------------------------------------*)
-                       let error, is_new_views, dynamic, event_list =
+                       let error, _is_new_views, dynamic, event_list =
                          add_link
                            ~title:"Views in initial state"
                            error
@@ -1008,7 +1008,7 @@ struct
       in
       aux site_correspondence
     in
-    let error, (map1, map2) =
+    let error, (map1, _map2) =
       Bdu_static_views.new_index_pair_map
         parameter
         error
@@ -1030,7 +1030,7 @@ struct
 
   (*****************************************************************)
 
-  let step_list_empty kappa_handler dynamic parameter error rule_id agent_id agent_type site_name
+  let step_list_empty kappa_handler dynamic parameter error _rule_id agent_id agent_type site_name
       cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true site_correspondence =
     (*------------------------------------------------------------*)
     let error, dynamic, bdu =
@@ -1040,7 +1040,7 @@ struct
              get_new_site_name
                parameter error cv_id site_name site_correspondence
            in
-           let error, new_site_string =
+           let error, _new_site_string =
              try
                Handler.string_of_site parameter error kappa_handler
                  agent_type site_name
@@ -1154,7 +1154,7 @@ struct
         (fun (error, output) list ->
            match list with
            | [_, state] -> (* the site name is fictitious, do not take it *)
-             let error, site_string =
+             let error, _site_string =
                try
                  Handler.string_of_site parameter error kappa_handler
                    agent_type site_name
@@ -1162,7 +1162,7 @@ struct
                  _ -> warn parameter error (Some "line 1088") Exit
                         (Ckappa_sig.string_of_site_name site_name)
              in
-             let error, state_string =
+             let error, _state_string =
                try
                  Handler.string_of_state_fully_deciphered parameter error kappa_handler
                    agent_type site_name state
@@ -1314,7 +1314,7 @@ struct
               Ckappa_sig.Dictionary_of_States.allocate
                 parameter
                 error
-                Misc_sa.compare_unit_state_index
+                Ckappa_sig.compare_unit_state_index
                 (Ckappa_sig.Binding state)
                 ()
                 Misc_sa.const_unit
@@ -1400,7 +1400,7 @@ struct
             Ckappa_sig.Dictionary_of_States.allocate
               parameter
               error
-              Misc_sa.compare_unit_state_index
+              Ckappa_sig.compare_unit_state_index
               (Ckappa_sig.Binding state)
               ()
               Misc_sa.const_unit

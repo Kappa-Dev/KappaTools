@@ -267,7 +267,7 @@ struct
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let nagents = Handler.nagents parameter error kappa_handler in
+    let nagents = Ckappa_sig.int_of_agent_name (Handler.nagents parameter error kappa_handler) in
     let init_seen_agents_array = Array.make (nagents+1) false in
     let init_global_dynamic_information =
       {

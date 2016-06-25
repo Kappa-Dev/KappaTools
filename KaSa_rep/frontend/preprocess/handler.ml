@@ -17,9 +17,9 @@ let warn parameters mh message exn default =
 
 let local_trace = true
 
-let nrules parameter error handler = handler.Cckappa_sig.nrules
-let nvars parameter error handler = handler.Cckappa_sig.nvars
-let nagents parameter error handler = handler.Cckappa_sig.nagents
+let nrules _parameter _error handler = handler.Cckappa_sig.nrules
+let nvars _parameter _error handler = handler.Cckappa_sig.nvars
+let nagents _parameter _error handler = handler.Cckappa_sig.nagents
 
 let translate_agent parameter error handler ag =
   let error,(a, _, _) =
@@ -105,10 +105,16 @@ let complementary_interface parameters error handler agent_name interface =
   let error, last_entry =
     Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic
   in
-  let l = Misc_sa.list_0_n (Ckappa_sig.int_of_site_name last_entry) in
-  let l = List.fold_left (fun l i ->
-    (Ckappa_sig.site_name_of_int i) :: l
-  ) [] l
+  let l =
+    let rec aux k output =
+      if
+        Ckappa_sig.compare_site_name k Ckappa_sig.dummy_site_name < 0
+      then
+        output
+      else
+        aux (Ckappa_sig.pred_site_name k) (k::output)
+    in
+    aux last_entry []
   in
   error, Misc_sa.list_minus l interface
 
@@ -116,7 +122,8 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
-  if (Ckappa_sig.int_of_rule_id rule_id) < nrules
+  if
+    Ckappa_sig.compare_rule_id rule_id (Ckappa_sig.rule_id_of_int nrules) < 0
   then
     begin
       let error,rule =
@@ -150,18 +157,18 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
     end
   else
     begin
-      let var_id = (Ckappa_sig.int_of_rule_id rule_id) - nrules in
+      let var_id = Ckappa_sig.sub_rule_id rule_id nrules in
       let error,var =
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
-          (Ckappa_sig.rule_id_of_int var_id)
+          var_id
           vars
       in
       match var
       with
       | None  -> warn parameters error (Some "line 12299") Exit
-        ("VAR " ^ (string_of_int var_id))
+        ("VAR " ^ (Ckappa_sig.string_of_rule_id var_id))
       | Some _ ->
            (*TO DO*)
         error,"ALG"
@@ -262,7 +269,7 @@ let string_of_site_contact_map parameter error handler_kappa agent_name site_int
 
 (*mapping state of type int to string*)
 
-let print_state parameter error handler_kappa state =
+let print_state _parameter error _handler_kappa state =
   match state with
   | Ckappa_sig.Internal a -> error, a
   | Ckappa_sig.Binding Ckappa_sig.C_Free -> error, "free"
@@ -315,14 +322,14 @@ let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple
   in error
 
-let get_label_of_rule_txt parameters error rule = error, rule.Cckappa_sig.e_rule_label
-let get_label_of_rule_dot parameters error rule = error, rule.Cckappa_sig.e_rule_label_dot
+let get_label_of_rule_txt _parameters error rule = error, rule.Cckappa_sig.e_rule_label
+let get_label_of_rule_dot _parameters error rule = error, rule.Cckappa_sig.e_rule_label_dot
 
 
-let get_label_of_var_txt parameters error rule = error,rule.Cckappa_sig.e_id
-let get_label_of_var_dot parameters error rule = error,rule.Cckappa_sig.e_id_dot
+let get_label_of_var_txt _parameters error rule = error,rule.Cckappa_sig.e_id
+let get_label_of_var_dot _parameters error rule = error,rule.Cckappa_sig.e_id_dot
 
-let print_rule_txt parameters error rule_id m1 m2 rule =
+let print_rule_txt parameters error rule_id m1 _m2 rule =
   let m = "'"^ m1 ^"' " in
   let error, _ = error,
     Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
@@ -332,7 +339,7 @@ let print_rule_txt parameters error rule_id m1 m2 rule =
   let error = Print_ckappa.print_rule parameters error rule in
   error
 
-let print_var_txt parameters error var_id m1 m2 var =
+let print_var_txt parameters error var_id m1 _m2 var =
   let m = "'"^m1^"' " in
   let error,_ =
     error, Loggers.fprintf
@@ -340,12 +347,12 @@ let print_var_txt parameters error var_id m1 m2 var =
       "%s"
       (if m=""
        then
-          ("var(" ^ (string_of_int var_id)^")")
-       else ("var(" ^ string_of_int var_id)^"):"^m) in
+          ("var(" ^ (Ckappa_sig.string_of_rule_id var_id)^")")
+       else ("var(" ^ Ckappa_sig.string_of_rule_id var_id)^"):"^m) in
   let error = Print_ckappa.print_alg parameters error var  in
   error
 
-let print_rule_dot parameters error rule_id m1 m2 rule =
+let print_rule_dot parameters error _rule_id m1 m2 rule =
   let error =
     if m1<>"" && (not (Remanent_parameters.get_prompt_full_rule_def parameters))
     then
@@ -358,7 +365,7 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
   in
   error
 
-let print_var_dot parameters (error:Exception.method_handler)  var_id m1 m2 var =
+let print_var_dot parameters (error:Exception.method_handler)  _var_id m1 m2 var =
   let error =
     if m1<>"" && (not (Remanent_parameters.get_prompt_full_var_def parameters))
     then
@@ -377,7 +384,7 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
-  if (Ckappa_sig.int_of_rule_id rule_id) < nrules
+  if Ckappa_sig.compare_rule_id rule_id (Ckappa_sig.rule_id_of_int nrules) < 0
   then
     begin
       let error,rule =
@@ -417,12 +424,12 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
     end
   else
     begin
-      let var_id = (Ckappa_sig.int_of_rule_id rule_id) - nrules in
+      let var_id = Ckappa_sig.sub_rule_id rule_id nrules in
       let error,var =
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
-          (Ckappa_sig.rule_id_of_int var_id)
+          var_id
           vars
       in
       match var
@@ -433,7 +440,7 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
       | Some var ->
         let b = var.Cckappa_sig.c_variable in
         let error,m1 = get_label_of_var parameters error var in
-        let m2 = string_of_int var_id in
+        let m2 = Ckappa_sig.string_of_rule_id var_id in
         let error =
           print_var parameters error var_id m1 m2 b
         in error,true,()

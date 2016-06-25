@@ -25,7 +25,7 @@ let trace = false
 let collect_sites_modified_set parameter error rule handler_kappa store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-      (fun parameter error agent_id site_modif store_result ->
+      (fun parameter error _agent_id site_modif store_result ->
          if Ckappa_sig.Site_map_and_set.Map.is_empty site_modif.Cckappa_sig.agent_interface
          then
            error, store_result
@@ -46,48 +46,52 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
            in
            (*----------------------------------------------------------------------*)
            (*PRINT at each rule*)
-           let _ =
+           let error =
              if Remanent_parameters.get_do_ODE_flow_of_information parameter
+             && Remanent_parameters.get_trace parameter
              then
-               if Remanent_parameters.get_trace parameter
-               then
-                 let () =
-                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                     "Flow of information in the ODE semantics:modified sites:"
-                 in
-                 let () =
-                   Loggers.print_newline (Remanent_parameters.get_logger parameter)
-                 in
-                 let error, agent_string =
-                   try
-                     Handler.string_of_agent parameter error handler_kappa agent_type
-                   with
-                     _ -> warn parameter error (Some "line 67") Exit
-                            (Ckappa_sig.string_of_agent_name agent_type)
-                 in
-                 let _ =
-                   Printf.fprintf stdout "\tagent_type:%i:%s\n"
-                     (Ckappa_sig.int_of_agent_name agent_type)
-                     agent_string
-                 in
-                 Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
-                     let error, site_string =
-                       try
-                         Handler.string_of_site parameter error handler_kappa agent_type
-                           site_type
-                       with
-                         _ -> warn parameter error (Some "line 79") Exit
-                                (Ckappa_sig.string_of_site_name site_type)
-                     in
-                     let () = Loggers.fprintf
-                         (Remanent_parameters.get_logger parameter)
-                         "\t\tsite_type:%i:%s"
-                         (Ckappa_sig.int_of_site_name site_type)
-                         site_string
-                     in
-                     Loggers.print_newline (Remanent_parameters.get_logger parameter)
-                   ) site_set
-               else ()
+               let () =
+                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                   "Flow of information in the ODE semantics:modified sites:"
+               in
+               let () =
+                 Loggers.print_newline (Remanent_parameters.get_logger parameter)
+               in
+               let error, agent_string =
+                 try
+                   Handler.string_of_agent parameter error handler_kappa agent_type
+                 with
+                   _ -> warn parameter error (Some "line 67") Exit
+                          (Ckappa_sig.string_of_agent_name agent_type)
+               in
+               let _ =
+                 Printf.fprintf stdout "\tagent_type:%s:%s\n"
+                   (Ckappa_sig.string_of_agent_name agent_type)
+                   agent_string
+               in
+               Ckappa_sig.Site_map_and_set.Set.fold
+                 (fun site_type error ->
+                    let error, site_string =
+                      try
+                        Handler.string_of_site parameter error handler_kappa agent_type
+                          site_type
+                      with
+                        _ -> warn parameter error (Some "line 79") Exit
+                               (Ckappa_sig.string_of_site_name site_type)
+                    in
+                    let () = Loggers.fprintf
+                        (Remanent_parameters.get_logger parameter)
+                        "\t\tsite_type:%s:%s"
+                        (Ckappa_sig.string_of_site_name site_type)
+                        site_string
+                    in
+                    let () =
+                      Loggers.print_newline (Remanent_parameters.get_logger parameter)
+                    in
+                    error)
+                 site_set error
+             else
+               error
            in
            (*----------------------------------------------------------------------*)
            (*get old?*)
@@ -154,52 +158,53 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
       in
       (*----------------------------------------------------------------------*)
       (*PRINT*)
-      let _ =
+      let error =
         if Remanent_parameters.get_do_ODE_flow_of_information parameter
+        && Remanent_parameters.get_trace parameter
         then
-          if Remanent_parameters.get_trace parameter
-          then
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "Flow of information in the ODE semantics:bond sites (first agent):"
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameter)
-            in
-            let error, agent_string1 =
-              try
-                Handler.string_of_agent parameter error handler_kappa agent_type1
-              with
-                _ -> warn parameter error (Some "line 158") Exit
-                       ((Ckappa_sig.string_of_agent_name agent_type1))
-            in
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "\tagent_type:%i:%s"
-                (Ckappa_sig.int_of_agent_name agent_type1 )
-                agent_string1
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameter)
-            in
-            Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
-                let error, site_string =
-                  try
-                    Handler.string_of_site parameter error handler_kappa agent_type1
-                      site_type
-                  with
-                    _ -> warn parameter error (Some "line 169") Exit
-                           (Ckappa_sig.string_of_site_name site_type)
-                in
-                let () =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "\t\tsite_type:%i:%s"
-                    (Ckappa_sig.int_of_site_name site_type)
-                    site_string
-                in
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              ) sites_bond_set1
-          else ()
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "Flow of information in the ODE semantics:bond sites (first agent):"
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          let error, agent_string1 =
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type1
+            with
+              _ -> warn parameter error (Some "line 158") Exit
+                     ((Ckappa_sig.string_of_agent_name agent_type1))
+          in
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "\tagent_type:%s:%s"
+              (Ckappa_sig.string_of_agent_name agent_type1 )
+              agent_string1
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          Ckappa_sig.Site_map_and_set.Set.fold
+            (fun site_type error ->
+               let error, site_string =
+                 try
+                   Handler.string_of_site parameter error handler_kappa agent_type1
+                     site_type
+                 with
+                   _ -> warn parameter error (Some "line 169") Exit
+                          (Ckappa_sig.string_of_site_name site_type)
+               in
+               let () =
+                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                   "\t\tsite_type:%s:%s"
+                   (Ckappa_sig.string_of_site_name site_type)
+                   site_string
+               in
+               let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+               error
+            ) sites_bond_set1 error
+        else error
       in
       (*----------------------------------------------------------------------*)
       (*compute first pair*)
@@ -239,52 +244,52 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
       in
       (*----------------------------------------------------------------------*)
       (*PRINT*)
-      let _ =
+      let error =
         if Remanent_parameters.get_do_ODE_flow_of_information parameter
+        && Remanent_parameters.get_trace parameter
         then
-          if Remanent_parameters.get_trace parameter
-          then
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "Flow of information in the ODE semantics:bond sites (second agent):"
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameter)
-            in
-            let error, agent_string2 =
-              try
-                Handler.string_of_agent parameter error handler_kappa agent_type2
-              with
-                _ -> warn parameter error (Some "line 223") Exit
-                       ((Ckappa_sig.string_of_agent_name agent_type2))
-            in
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "\tagent_type:%i:%s"
-                (Ckappa_sig.int_of_agent_name agent_type2 )
-                agent_string2
-            in
-            let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameter)
-            in
-            Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
-                let error, site_string =
-                  try
-                    Handler.string_of_site parameter error handler_kappa agent_type2
-                      site_type
-                  with
-                    _ -> warn parameter error (Some "line 234") Exit
-                           (Ckappa_sig.string_of_site_name site_type)
-                in
-                let () =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "\t\tsite_type:%i:%s"
-                    (Ckappa_sig.int_of_site_name site_type)
-                    site_string
-                in
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              ) sites_bond_set2
-          else ()
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "Flow of information in the ODE semantics:bond sites (second agent):"
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          let error, agent_string2 =
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type2
+            with
+              _ -> warn parameter error (Some "line 223") Exit
+                     ((Ckappa_sig.string_of_agent_name agent_type2))
+          in
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "\tagent_type:%s:%s"
+              (Ckappa_sig.string_of_agent_name agent_type2 )
+              agent_string2
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          Ckappa_sig.Site_map_and_set.Set.fold (fun site_type error ->
+              let error, site_string =
+                try
+                  Handler.string_of_site parameter error handler_kappa agent_type2
+                    site_type
+                with
+                  _ -> warn parameter error (Some "line 234") Exit
+                         (Ckappa_sig.string_of_site_name site_type)
+              in
+              let () =
+                Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  "\t\tsite_type:%s:%s"
+                  (Ckappa_sig.string_of_site_name site_type)
+                  site_string
+              in
+              let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+              error
+            ) sites_bond_set2 error
+        else error
       in
       (*----------------------------------------------------------------------*)
       (*get old*)
@@ -403,7 +408,7 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
 let collect_sites_lhs parameter error rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-      (fun parameter error agent_id agent store_result ->
+      (fun parameter error _agent_id agent store_result ->
          match agent with
          | Cckappa_sig.Ghost
          | Cckappa_sig.Unknown_agent _ -> error, store_result
@@ -450,7 +455,7 @@ let collect_sites_anchor_set parameter error handler_kappa rule
     store_sites_lhs
     store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-    (fun parameter error agent_id agent store_result ->
+    (fun parameter error _agent_id agent store_result ->
        let store_result1, store_result2 = store_result in
        match agent with
        | Cckappa_sig.Ghost
@@ -577,52 +582,53 @@ let collect_sites_anchor_set parameter error handler_kappa rule
          in
          (*----------------------------------------------------------------------*)
          (*PRINT*)
-         let _ =
+         let error =
            if Remanent_parameters.get_do_ODE_flow_of_information parameter
+           && Remanent_parameters.get_trace parameter
            then
-             if Remanent_parameters.get_trace parameter
-             then
-               let () =
-                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                   "Flow of information in the ODE semantics:anchor sites:"
-               in
-               let () =
-                 Loggers.print_newline (Remanent_parameters.get_logger parameter)
-               in
-               let error, agent_string =
-                 try
-                   Handler.string_of_agent parameter error handler_kappa agent_type
-                 with
-                   _ -> warn parameter error (Some "line 510") Exit
-                          (Ckappa_sig.string_of_agent_name agent_type)
-               in
-               let () =
-                 Loggers.fprintf
-                   (Remanent_parameters.get_logger parameter)
-                   "\tagent_type:%i:%s"
-                   (Ckappa_sig.int_of_agent_name agent_type)
-                   agent_string
-               in
-               let () =
-                 Loggers.print_newline (Remanent_parameters.get_logger parameter)
-               in
-               Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
-                   let error, site_string =
-                     try
-                       Handler.string_of_site parameter error handler_kappa agent_type
-                         site_type
-                     with
-                       _ -> warn parameter error (Some "line 522") Exit
-                              (Ckappa_sig.string_of_site_name site_type)
-                   in
-                   let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                       "\t\tsite_type:%i:%s"
-                       (Ckappa_sig.int_of_site_name site_type)
-                       site_string
-                   in
-                   Loggers.print_newline (Remanent_parameters.get_logger parameter)
-                 ) union_set
-             else ()
+             let () =
+               Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "Flow of information in the ODE semantics:anchor sites:"
+             in
+             let () =
+               Loggers.print_newline (Remanent_parameters.get_logger parameter)
+             in
+             let error, agent_string =
+               try
+                 Handler.string_of_agent parameter error handler_kappa agent_type
+               with
+                 _ -> warn parameter error (Some "line 510") Exit
+                        (Ckappa_sig.string_of_agent_name agent_type)
+             in
+             let () =
+               Loggers.fprintf
+                 (Remanent_parameters.get_logger parameter)
+                 "\tagent_type:%s:%s"
+                 (Ckappa_sig.string_of_agent_name agent_type)
+                 agent_string
+             in
+             let () =
+               Loggers.print_newline (Remanent_parameters.get_logger parameter)
+             in
+             Ckappa_sig.Site_map_and_set.Set.fold
+               (fun site_type error ->
+                  let error, site_string =
+                    try
+                      Handler.string_of_site parameter error handler_kappa agent_type
+                        site_type
+                    with
+                      _ -> warn parameter error (Some "line 522") Exit
+                             (Ckappa_sig.string_of_site_name site_type)
+                  in
+                  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      "\t\tsite_type:%s:%s"
+                      (Ckappa_sig.string_of_site_name site_type)
+                      site_string
+                  in
+                  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+                  error
+               ) union_set error
+           else error
          in
          (*----------------------------------------------------------------------*)
          (*result*)
@@ -654,7 +660,7 @@ let collect_internal_flow parameter error handler_kappa rule
     store_sites_anchor_set
     store_result =
   (*----------------------------------------------------------------------*)
-  let add_link agent_type (site_list, set) store_result =
+  let add_link error agent_type (site_list, set) store_result =
     let result =
       Ode_fragmentation_type.Internal_flow_map.Map.add
         agent_type (site_list, set) store_result
@@ -663,7 +669,7 @@ let collect_internal_flow parameter error handler_kappa rule
   in
   (*----------------------------------------------------------------------*)
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-    (fun parameter error agent_id agent store_result ->
+    (fun parameter error _agent_id agent store_result ->
        let store_result1, store_result2 = store_result in
        match agent with
        | Cckappa_sig.Ghost
@@ -711,124 +717,129 @@ let collect_internal_flow parameter error handler_kappa rule
          in
          (*------------------------------------------------------------------------------*)
          (*PRINT*)
-         let _ =
+         let error =
            if Remanent_parameters.get_do_ODE_flow_of_information parameter
+           && Remanent_parameters.get_trace parameter
            then
-             if Remanent_parameters.get_trace parameter
-             then
-               let _ =
-                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                   "Flow of information in the ODE semantics:internal flow (first case):\n"
-               in
-               let modified_list =
-                 Ckappa_sig.Site_map_and_set.Set.elements modified_set
-               in
-               let cartesian_output =
-                 cartesian_prod_eq agent_type site_list modified_list
-               in
-               let _ =
-                 List.iter (fun (agent_type, site_type, site_modif) ->
-                     let error, agent_string =
-                       try
-                         Handler.string_of_agent parameter error handler_kappa agent_type
-                       with
-                         _ -> warn parameter error (Some "line 631") Exit
-                                (Ckappa_sig.string_of_agent_name agent_type)
-                     in
-                     let error, site_string =
-                       try
-                         Handler.string_of_site parameter error handler_kappa agent_type
-                           site_type
-                       with
-                         _ -> warn parameter error (Some "line 639") Exit
-                                (Ckappa_sig.string_of_site_name site_type)
-                     in
-                     let error, site_modif_string =
+             let _ =
+               Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "Flow of information in the ODE semantics:internal flow (first case):\n"
+             in
+             let modified_list =
+               Ckappa_sig.Site_map_and_set.Set.elements modified_set
+             in
+             let cartesian_output =
+               cartesian_prod_eq agent_type site_list modified_list
+             in
+             let error =
+               List.fold_left (fun error (agent_type, site_type, site_modif)  ->
+                   let error, agent_string =
+                     try
+                       Handler.string_of_agent parameter error handler_kappa agent_type
+                     with
+                       _ -> warn parameter error (Some "line 631") Exit
+                              (Ckappa_sig.string_of_agent_name agent_type)
+                   in
+                   let error, site_string =
+                     try
                        Handler.string_of_site parameter error handler_kappa agent_type
-                         site_modif
-                     in
-                     let () =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                         "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s"
-                         (Ckappa_sig.int_of_agent_name agent_type)
-                         agent_string
-                         (Ckappa_sig.int_of_site_name site_type)
-                         site_string
-                         (Ckappa_sig.int_of_agent_name agent_type)
-                         agent_string
-                         (Ckappa_sig.int_of_site_name site_modif)
-                         site_modif_string
-                     in
-                     Loggers.print_newline (Remanent_parameters.get_logger parameter)
-                   ) cartesian_output
-               in
-               ()
+                         site_type
+                     with
+                       _ -> warn parameter error (Some "line 639") Exit
+                              (Ckappa_sig.string_of_site_name site_type)
+                   in
+                   let error, site_modif_string =
+                     Handler.string_of_site parameter error handler_kappa agent_type
+                       site_modif
+                   in
+                   let () =
+                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                       "Flow of information in the ODE semantics:Internal flow\n-agent_type:%s:%s:site_type:%s:%s -> agent_type:%s:%s:site_type_modified:%s:%s"
+                       (Ckappa_sig.string_of_agent_name agent_type)
+                       agent_string
+                       (Ckappa_sig.string_of_site_name site_type)
+                       site_string
+                       (Ckappa_sig.string_of_agent_name agent_type)
+                       agent_string
+                       (Ckappa_sig.string_of_site_name site_modif)
+                       site_modif_string
+                   in
+                   let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)
+                   in
+                   error
+                 ) error cartesian_output
+             in
+             error
+           else
+             error
          in
          (*------------------------------------------------------------------------------*)
          (*PRINT second internal flow*)
-         let _ =
+         let error =
            if Remanent_parameters.get_do_ODE_flow_of_information parameter
+           && Remanent_parameters.get_trace parameter
            then
-             if Remanent_parameters.get_trace parameter
-             then
-               let () =
-                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                   "Flow of information in the ODE semantics:internal flow (second case):"
-               in
-               let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-               let anchor_list =
-                 Ckappa_sig.Site_map_and_set.Set.elements anchor_set
-               in
-               let cartesian_output =
-                 cartesian_prod_eq agent_type site_list anchor_list
-               in
-               let _ =
-                 List.iter (fun (agent_type, site_type, site_anchor) ->
-                     let error, agent_string =
-                       try
-                         Handler.string_of_agent parameter error handler_kappa agent_type
-                       with
-                         _ -> warn parameter error (Some "line 678") Exit
-                                (Ckappa_sig.string_of_agent_name agent_type)
-                     in
-                     let error, site_string =
-                       try
-                         Handler.string_of_site parameter error handler_kappa agent_type
-                           site_type
-                       with
-                         _ -> warn parameter error (Some "line 687") Exit
-                                (Ckappa_sig.string_of_site_name site_type)
-                     in
-                     let error, site_anchor_string =
-                       try
-                         Handler.string_of_site parameter error handler_kappa agent_type
-                           site_anchor
-                       with
-                         _ -> warn parameter error (Some "line 695") Exit
-                                (Ckappa_sig.string_of_site_name site_anchor)
-                     in
-                     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_anchor:%i:%s"
-                         (Ckappa_sig.int_of_agent_name agent_type)
-                         agent_string
-                         (Ckappa_sig.int_of_site_name site_type)
-                         site_string
-                         (Ckappa_sig.int_of_agent_name agent_type)
-                         agent_string
-                         (Ckappa_sig.int_of_site_name site_anchor)
-                         site_anchor_string
-                     in
-                     Loggers.print_newline (Remanent_parameters.get_logger parameter)
-                   ) cartesian_output
-               in
-               ()
+             let () =
+               Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "Flow of information in the ODE semantics:internal flow (second case):"
+             in
+             let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+             let anchor_list =
+               Ckappa_sig.Site_map_and_set.Set.elements anchor_set
+             in
+             let cartesian_output =
+               cartesian_prod_eq agent_type site_list anchor_list
+             in
+             let error =
+               List.fold_left (fun error (agent_type, site_type, site_anchor) ->
+                   let error, agent_string =
+                     try
+                       Handler.string_of_agent parameter error handler_kappa agent_type
+                     with
+                       _ -> warn parameter error (Some "line 678") Exit
+                              (Ckappa_sig.string_of_agent_name agent_type)
+                   in
+                   let error, site_string =
+                     try
+                       Handler.string_of_site parameter error handler_kappa agent_type
+                         site_type
+                     with
+                       _ -> warn parameter error (Some "line 687") Exit
+                              (Ckappa_sig.string_of_site_name site_type)
+                   in
+                   let error, site_anchor_string =
+                     try
+                       Handler.string_of_site parameter error handler_kappa agent_type
+                         site_anchor
+                     with
+                       _ -> warn parameter error (Some "line 695") Exit
+                              (Ckappa_sig.string_of_site_name site_anchor)
+                   in
+                   let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:Internal flow\n-agent_type:%s:%s:site_type:%s:%s -> agent_type:%s:%s:site_type_anchor:%s:%s"
+                       (Ckappa_sig.string_of_agent_name agent_type)
+                       agent_string
+                       (Ckappa_sig.string_of_site_name site_type)
+                       site_string
+                       (Ckappa_sig.string_of_agent_name agent_type)
+                       agent_string
+                       (Ckappa_sig.string_of_site_name site_anchor)
+                       site_anchor_string
+                   in
+                   let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+                   error
+                 ) error cartesian_output
+             in
+             error
+           else
+             error
          in
          (*------------------------------------------------------------------------------*)
          let error, store_result1 =
-           add_link agent_type (site_list, modified_set) store_result1
+           add_link error agent_type (site_list, modified_set) store_result1
          in
          (*------------------------------------------------------------------------------*)
          let error, store_result2 =
-           add_link agent_type (site_list, anchor_set) store_result2
+           add_link error agent_type (site_list, anchor_set) store_result2
          in
          (*------------------------------------------------------------------------------*)
          let error, store_result =
@@ -861,7 +872,7 @@ let collect_external_flow parameter error handler_kappa rule
     store_sites_anchor_set
     store_result =
   (*------------------------------------------------------------------------------*)
-  let add_link (agent_type1, agent_type2) (anchor_set, bond_fst_set, bond_snd_set)
+  let add_link error (agent_type1, agent_type2) (anchor_set, bond_fst_set, bond_snd_set)
       store_result =
     let result =
       Ode_fragmentation_type.External_flow_map.Map.add (agent_type1, agent_type2)
@@ -896,7 +907,7 @@ let collect_external_flow parameter error handler_kappa rule
       (*get anchor set*)
       let error, anchor_set1 =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-          (fun parameter error agent_type site_set old_set ->
+          (fun parameter error _agent_type site_set old_set ->
              let error, set =
                Ckappa_sig.Site_map_and_set.Set.union
                  parameter
@@ -909,7 +920,7 @@ let collect_external_flow parameter error handler_kappa rule
       in
       let error, anchor_set2 =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-          (fun parameter error agent_type site_set old_set ->
+          (fun parameter error _agent_type site_set old_set ->
              let error, set =
                Ckappa_sig.Site_map_and_set.Set.union
                  parameter
@@ -938,65 +949,66 @@ let collect_external_flow parameter error handler_kappa rule
           bond_fst_list
           bond_snd_set
       in
-      let _ =
+      let error =
         if Remanent_parameters.get_do_ODE_flow_of_information parameter
+        && Remanent_parameters.get_trace parameter
         then
-          if Remanent_parameters.get_trace parameter
-          then
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "Flow of information in the ODE semantics:external flow:"
-            in
-            let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)
-            in
-            List.iter (fun (agent_type, anchor_site_type, agent_type', site_modif) ->
-                let error, agent_string =
-                  try
-                    Handler.string_of_agent parameter error handler_kappa agent_type
-                  with
-                    _ -> warn parameter error (Some "line 835") Exit
-                           (Ckappa_sig.string_of_agent_name agent_type)
-                in
-                let error, agent_string' =
-                  try
-                    Handler.string_of_agent parameter error handler_kappa agent_type'
-                  with
-                    _ -> warn parameter error (Some "line 841") Exit
-                           (Ckappa_sig.string_of_agent_name agent_type')
-                in
-                let error, anchor_site_type_string =
-                  try
-                    Handler.string_of_site parameter error handler_kappa agent_type
-                      anchor_site_type
-                  with
-                    _ -> warn parameter error (Some "line 848") Exit
-                           (Ckappa_sig.string_of_site_name anchor_site_type)
-                in
-                let error, site_modif_string =
-                  try
-                    Handler.string_of_site parameter error handler_kappa agent_type'
-                      site_modif
-                  with
-                    _ -> warn parameter error (Some "line 856") Exit
-                           (Ckappa_sig.string_of_site_name site_modif)
-                in
-                let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:External flow:\n-agent-type:%i:%s:site_type_anchor:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s"
-                    (Ckappa_sig.int_of_agent_name agent_type)
-                    agent_string
-                    (Ckappa_sig.int_of_site_name anchor_site_type)
-                    anchor_site_type_string
-                    (Ckappa_sig.int_of_agent_name agent_type')
-                    agent_string'
-                    (Ckappa_sig.int_of_site_name site_modif)
-                    site_modif_string
-                in
-                Loggers.print_newline (Remanent_parameters.get_logger parameter)
-              ) cartesian_output
-          else ()
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "Flow of information in the ODE semantics:external flow:"
+          in
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          List.fold_left
+            (fun error (agent_type, anchor_site_type, agent_type', site_modif) ->
+               let error, agent_string =
+                 try
+                   Handler.string_of_agent parameter error handler_kappa agent_type
+                 with
+                   _ -> warn parameter error (Some "line 835") Exit
+                          (Ckappa_sig.string_of_agent_name agent_type)
+               in
+               let error, agent_string' =
+                 try
+                   Handler.string_of_agent parameter error handler_kappa agent_type'
+                 with
+                   _ -> warn parameter error (Some "line 841") Exit
+                          (Ckappa_sig.string_of_agent_name agent_type')
+               in
+               let error, anchor_site_type_string =
+                 try
+                   Handler.string_of_site parameter error handler_kappa agent_type
+                     anchor_site_type
+                 with
+                   _ -> warn parameter error (Some "line 848") Exit
+                          (Ckappa_sig.string_of_site_name anchor_site_type)
+               in
+               let error, site_modif_string =
+                 try
+                   Handler.string_of_site parameter error handler_kappa agent_type'
+                     site_modif
+                 with
+                   _ -> warn parameter error (Some "line 856") Exit
+                          (Ckappa_sig.string_of_site_name site_modif)
+               in
+               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:External flow:\n-agent-type:%s:%s:site_type_anchor:%s:%s -> agent_type:%s:%s:site_type_modified:%s:%s"
+                   (Ckappa_sig.string_of_agent_name agent_type)
+                   agent_string
+                   (Ckappa_sig.string_of_site_name anchor_site_type)
+                   anchor_site_type_string
+                   (Ckappa_sig.string_of_agent_name agent_type')
+                   agent_string'
+                   (Ckappa_sig.string_of_site_name site_modif)
+                   site_modif_string
+               in
+               let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+               error
+            ) error cartesian_output
+        else error
       in
       (*------------------------------------------------------------------------------*)
       let error, store_result =
-        add_link (agent_type1, agent_type2) (anchor_set, bond_fst_set, bond_snd_set)
+        add_link error (agent_type1, agent_type2) (anchor_set, bond_fst_set, bond_snd_set)
           store_result
       in
       error, store_result
@@ -1131,21 +1143,21 @@ let scan_rule_set parameter error handler_kappa compiled =
          (*PRINT*)
          let _ =
            if Remanent_parameters.get_do_ODE_flow_of_information parameter
+           && Remanent_parameters.get_trace parameter
            then
              let parameter =
                Remanent_parameters.update_prefix parameter ""
              in
-             if Remanent_parameters.get_trace parameter
-             then
-               (*Print at each rule:*)
-               let error, rule_string =
-                 try
-                   Handler.string_of_rule parameter error handler_kappa compiled rule_id
-                 with
-                   _ -> warn parameter error (Some "line 1010") Exit (Ckappa_sig.string_of_rule_id rule_id)
-               in
-               Printf.fprintf stdout "%s\n" rule_string
-             else ()
+             (*Print at each rule:*)
+             let error, rule_string =
+               try
+                 Handler.string_of_rule parameter error handler_kappa compiled rule_id
+               with
+                 _ -> warn parameter error (Some "line 1010") Exit (Ckappa_sig.string_of_rule_id rule_id)
+             in
+             let () = Printf.fprintf stdout "%s\n" rule_string in
+             error
+           else error
          in
          (*----------------------------------------------------------------------*)
          let error, store_result =

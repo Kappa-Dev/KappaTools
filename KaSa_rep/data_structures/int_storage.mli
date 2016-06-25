@@ -19,19 +19,21 @@ type ('a,'b) unary = Remanent_parameters_sig.parameters -> Exception.method_hand
 type ('a,'b,'c) binary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * 'c
 type ('a,'b,'c,'d) ternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> Exception.method_handler * 'd
 type ('a,'b,'c,'d,'e) quaternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * 'e
-																			  
+
 type 'a unary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler
 type ('a,'b) binary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler
-														
+
 
 module type Storage =
 sig
   type 'a t
   type key
   type dimension
-																       
+
   val create: (dimension,'a t) unary
-  val expand_and_copy: ('a t,dimension,'a t) binary 
+  val create_biggest_key: (key,'a t) unary
+
+  val expand_and_copy: ('a t,dimension,'a t) binary
   val init: (dimension, (key, 'a) unary, 'a t) binary
   val set: (key,'a,'a t,'a t) ternary
   val get: (key,'a t,'a option) binary
@@ -41,9 +43,9 @@ sig
   val key_list: ('a t, key list) unary
   val iter:((key,'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
-  val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary						
+  val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
-								     
+
 end
 
 (** Cartesian product *)

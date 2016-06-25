@@ -382,7 +382,7 @@ struct
   (**rules*)
   (*****************************************************************)
 
-  let scan_rule_set_bonds_rhs static dynamic error rule_id rule =
+  let scan_rule_set_bonds_rhs static _dynamic error rule_id rule =
     let parameter = get_parameter static in
     let store_views_rhs = get_views_rhs static in
     let error, store_views_rhs =
@@ -641,7 +641,7 @@ struct
   (*************************************************************)
   (* TODO *)
   (* if a parallel bound occur in a lhs, check that this is possible *)
-  let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
+  let is_enabled _static dynamic error (_rule_id:Ckappa_sig.c_rule_id) precondition =
     error, dynamic, Some precondition
 
   (***************************************************************)
@@ -1230,7 +1230,7 @@ struct
     error, dynamic, precondition, store_result
 
 
-  let collect_result_of_non_parallel parameter error rule_id non_parallel_rhs_list store_result =
+  let collect_result_of_non_parallel parameter error _rule_id non_parallel_rhs_list store_result =
     List.fold_left (fun (error, store_result) (x, y, z, t) ->
         let (_, ag_type, s_type, state) = x in
         let (_, _, s_type', state') = y in (*A*)
@@ -1409,13 +1409,13 @@ let apply_rule static dynamic error rule_id precondition =
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let rec apply_event_list static dynamic error event_list =
+  let apply_event_list _static dynamic error _event_list =
     let event_list = [] in
     error, dynamic, event_list
 
   (****************************************************************)
 
-  let print static dynamic error loggers =
+  let print static dynamic (error:Exception.method_handler) loggers =
     let handler_kappa = get_kappa_handler static in
     let parameter = get_parameter static in
     (*--------------------------------------------------------------*)
@@ -1493,7 +1493,8 @@ let apply_rule static dynamic error rule_id precondition =
       then
         begin
           let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameter) "The value of a list of parallel bonds:\n";
+            Loggers.fprintf (Remanent_parameters.get_logger parameter) "The value of a list of parallel bonds:\n" in
+          let error =
             Print_parallel_bonds.print_result handler_kappa parameter error store_value_of_parallel_bonds(*;                                                                                                     Print_parallel_bonds.print_result handler_kappa parameter error (snd store_value_of_parallel_bonds)*)
           in error
         end
@@ -1504,13 +1505,13 @@ let apply_rule static dynamic error rule_id precondition =
 
   (****************************************************************)
 
-  let export static dynamic error kasa_state =
+  let export _static dynamic error kasa_state =
     error, dynamic, kasa_state
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable static dynamic error ccmixture =
+  let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
 end

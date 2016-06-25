@@ -623,15 +623,15 @@ struct
     let error, store_result =
       List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
           let agent_id1 = site_add1.Cckappa_sig.agent_index in
-          let agent_type1 = site_add1.Cckappa_sig.agent_type in
+          (*      let agent_type1 = site_add1.Cckappa_sig.agent_type in*)
           let site_type1 = site_add1.Cckappa_sig.site in
           let agent_id2 = site_add2.Cckappa_sig.agent_index in
-          let agent_type2 = site_add2.Cckappa_sig.agent_type in
+          (*let agent_type2 = site_add2.Cckappa_sig.agent_type in*)
           let site_type2 = site_add2.Cckappa_sig.site in
           Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
             (fun (x, y) (error, store_result) ->
-               let (agent_id, _, site_type, site_type') = x in
-               let (agent_id', _, site_type', site_type2') = y in
+               let (agent_id, _, site_type, _site_type') = x in
+               let (agent_id', _, site_type', _site_type2') = y in
                (*if the first site in the pair is the site that created a bound*)
                if agent_id1 = agent_id && agent_id2 = agent_id' && site_type = site_type1 && site_type2 = site_type' ||
                   agent_id1 = agent_id' && agent_id2 = agent_id &&
@@ -782,7 +782,7 @@ struct
     let error, new_set =
       List.fold_left (fun (error, store_set) (agent_id, site_type) ->
           Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold (fun m (error, store_set) ->
-              let (agent_id_m, agent_type_m, site_type_m, _) = m in
+              let (_agent_id_m, agent_type_m, site_type_m, _) = m in
               let error, agent =
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
               in
@@ -1960,7 +1960,7 @@ let collect_result parameter error rule_id store_result_aux store_result =
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
-        let () =
+        let error =
           Print_site_accross_bonds_domain.print_views_rhs parameter error handler_kappa log store_views_rhs
         in error
       else error
@@ -1970,7 +1970,7 @@ let collect_result parameter error rule_id store_result_aux store_result =
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
-        let () =
+        let error =
           Print_site_accross_bonds_domain.print_bonds_rhs parameter error handler_kappa log store_bonds_rhs
         in error
       else error
@@ -1980,7 +1980,7 @@ let collect_result parameter error rule_id store_result_aux store_result =
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
-        let () =
+        let error =
           Print_site_accross_bonds_domain.print_modified_map parameter error handler_kappa log store_modified_map
         in error
       else error
@@ -1990,50 +1990,47 @@ let collect_result parameter error rule_id store_result_aux store_result =
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
-        let () =
+        let error =
           Print_site_accross_bonds_domain.print_created_bond parameter error handler_kappa log store_created_bond
         in error
       else error
     in
     (*--------------------------------------------------------*)
     let store_modified_internal_state_and_bond = get_modified_internal_state_and_bond static in
-    let error =
+    let () =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
         let () =
           Print_site_accross_bonds_domain.print_modified_internal_state_bond parameter error handler_kappa log store_modified_internal_state_and_bond
-        in error
-      else error
+        in ()
     in
     (*--------------------------------------------------------*)
     let store_explicit_static = get_explicit_rule static in
-    let error =
+    let () =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
         let () =
           Print_site_accross_bonds_domain.print_explicit_static parameter error handler_kappa log store_explicit_static
-        in error
-      else error
+        in ()
     in
     (*--------------------------------------------------------*)
     let store_question_marks_rhs = get_question_marks_rhs static in
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
-        let () =
+        let error =
           Print_site_accross_bonds_domain.print_question_marks_rhs parameter error handler_kappa log store_question_marks_rhs
         in error
       else error
     in
     (*--------------------------------------------------------*)
     let store_implicit_static = get_implicit_rule static in
-    let error =
+    let () =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
         let () =
           Print_site_accross_bonds_domain.print_implicit_static parameter error handler_kappa log store_implicit_static
-        in error
-      else error
+        in ()
     in
     (*--------------------------------------------------------*)
     (*let store_tuple_pair = get_tuple_pair static in
@@ -2087,33 +2084,32 @@ let collect_result parameter error rule_id store_result_aux store_result =
       in*)
     (*--------------------------------------------------------*)
     let store_init = get_init dynamic in
-    let error =
+    let () =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
-        let () =
+        let ()
+          =
           Print_site_accross_bonds_domain.print_init parameter error handler_kappa log store_init
-        in error
-      else error
+        in ()
+      else ()
     in
     (*--------------------------------------------------------*)
     let store_tuple_pair_state = get_tuple_pair_state dynamic in
-    let error =
+    let () =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
         let () =
           Print_site_accross_bonds_domain.print_tuple_pair_state parameter error handler_kappa log store_tuple_pair_state
-        in error
-      else error
+        in ()
     in
     (*--------------------------------------------------------*)
     let store_tuple_pair_state2 = get_tuple_pair_state2 dynamic in
-    let error =
+    let () =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
         let () =
           Print_site_accross_bonds_domain.print_tuple_pair_state2 parameter error handler_kappa log store_tuple_pair_state2
-        in error
-      else error
+        in ()
     in
     (*--------------------------------------------------------*)
     (*dynamic information*)

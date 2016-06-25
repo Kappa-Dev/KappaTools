@@ -63,6 +63,19 @@ let string_of_rule_id (a: c_rule_id) : string = string_of_int a
 
 let int_of_agent_id (a: c_agent_id) : int = a
 let agent_id_of_int (a: int) : c_agent_id = a
+let string_of_agent_id (a: c_agent_id) : string = string_of_int a
+
+let get_agent_shape n_sites parameters =
+  Misc_sa.fetch_array
+    (int_of_site_name n_sites)
+    (Remanent_parameters.get_agent_shape_array parameters)
+    (Remanent_parameters.get_agent_shape_def parameters)
+
+let get_agent_color n_sites parameters =
+  Misc_sa.fetch_array
+    (int_of_site_name n_sites)
+    (Remanent_parameters.get_agent_color_array parameters)
+    (Remanent_parameters.get_agent_color_def parameters)
 
 (****************************************************************************************)
 
@@ -412,7 +425,7 @@ type site = (site_name, site_name) site_type
 
 type state = (internal_state, binding_state) site_type
 
-(*move from cckappa_sig*)
+(*move from c*)
 type c_binding_state =
 | C_Free
 | C_Lnk_type of c_agent_name * c_site_name
@@ -596,3 +609,40 @@ type c_compil =
     c_perturbations :
       c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t
   }
+
+let lift to_int from_int p =
+  fun a i -> from_int (p (to_int a) i)
+let pred_site_name = pred
+let gen_rule_id = lift int_of_rule_id rule_id_of_int
+let sub_rule_id = gen_rule_id (fun a b -> a - b)
+let add_rule_id = gen_rule_id (fun a b -> a + b)
+let add_agent_id = lift int_of_agent_id agent_id_of_int (fun a b -> a + b)
+let next_rule_id = succ
+let next_agent_id = succ
+let next_agent_name = succ
+let next_site_name = succ
+let next_state_index = succ
+let compare_rule_id = compare
+let compare_agent_id = compare
+let compare_site_name = compare
+let compare_state_index = compare
+let compare_agent_name = compare
+
+let compare_unit _ _ = 0
+let compare_unit_agent_name _ _ = dummy_agent_name
+let compare_unit_site_name _ _ = dummy_site_name
+let compare_unit_state_index _ _ = dummy_state_index
+
+let array_of_list_rule_id create set parameters error list =
+  let n = List.length list in
+  let a = create parameters error n in
+  let rec aux l k a =
+    match l with
+    | [] -> a
+    | t::q ->
+      begin
+        aux q
+          (next_rule_id k)
+          (set parameters (fst a) k t (snd a))
+      end
+  in aux list dummy_rule_id a

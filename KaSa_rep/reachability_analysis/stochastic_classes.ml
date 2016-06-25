@@ -29,7 +29,7 @@ type stochastic_class =
 (************************************************************************************)
 (*RULE*)
 
-let scan_rule parameter error handler rule classes =
+let scan_rule parameter error _handler rule _classes =
   let error, store_result =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
   in
@@ -80,7 +80,7 @@ let scan_rule parameter error handler rule classes =
   let error, stochastic_classes =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
-      (fun parameter error agent_id agent store_result ->
+      (fun parameter error _agent_id agent store_result ->
          match agent with
          | Cckappa_sig.Unknown_agent _
          | Cckappa_sig.Ghost -> error, store_result
@@ -144,7 +144,8 @@ let get_nsites parameter error key handler =
       parameter
       error
       sites_dic
-  in (Ckappa_sig.int_of_site_name nsites) + 1
+  in
+  error, Ckappa_sig.next_site_name nsites
 
 (*------------------------------------------------------------------------------*)
 (*RULES*)
@@ -152,7 +153,7 @@ let get_nsites parameter error key handler =
 let scan_rule_set parameter error handler rules =
   let nagents = handler.Cckappa_sig.nagents in
   let error, init_stochastic_class =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error nagents
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameter error nagents
   in
   let error, init =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
@@ -166,7 +167,7 @@ let scan_rule_set parameter error handler rules =
   let error, stochastic_class =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
-      (fun parameter error rule_id rule stochastic_class ->
+      (fun parameter error _rule_id rule stochastic_class ->
          (*------------------------------------------------------------------------*)
          let error, map =
            scan_rule
@@ -181,7 +182,7 @@ let scan_rule_set parameter error handler rules =
            Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
              parameter error
              (fun parameter error agent_type sites_list store_result ->
-                let nsites =
+                let error, nsites =
                   get_nsites
                     parameter
                     error
@@ -201,7 +202,7 @@ let scan_rule_set parameter error handler rules =
                   in
                   let error, array =
                     match get_array with
-                    | None -> Ckappa_sig.Site_union_find.create parameter error nsites
+                    | None -> Ckappa_sig.Site_union_find.create parameter error (Ckappa_sig.int_of_site_name nsites)
                     | Some a -> error, a
                   in
                   (*compute the union for the list of site*)
@@ -244,13 +245,13 @@ let sprintf_array parameter error handler agent_type array =
          in
          let _ =
            acc := !acc ^ (* avoid this, this is very slow, Use Printf.fprintf directly *)
-                  if (Ckappa_sig.int_of_site_name i) <> 0
-                  then Printf.sprintf "; %d:%s"
-                      (Ckappa_sig.int_of_site_name site_type)
+                  if Ckappa_sig.compare_site_name i Ckappa_sig.dummy_site_name <> 0
+                  then Printf.sprintf "; %s:%s"
+                      (Ckappa_sig.string_of_site_name site_type)
                       site_string
                   else
-                    Printf.sprintf "%d:%s"
-                      (Ckappa_sig.int_of_site_name site_type)
+                    Printf.sprintf "%s:%s"
+                      (Ckappa_sig.string_of_site_name site_type)
                       site_string
          in
          error
@@ -286,8 +287,8 @@ let print_stochastic_class parameter error handler result =
                             (Ckappa_sig.string_of_agent_name agent_type)
                  in
                  let _ =
-                   Printf.fprintf stdout "agent_type:%i:%s\n"
-                     (Ckappa_sig.int_of_agent_name agent_type)
+                   Printf.fprintf stdout "agent_type:%s:%s\n"
+                     (Ckappa_sig.string_of_agent_name agent_type)
                      agent_string
                  in
                  error

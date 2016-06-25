@@ -44,7 +44,7 @@ let collect_agent_type_state parameter error agent site_type =
         warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-        if (Ckappa_sig.int_of_state_index state) > 0
+        if Ckappa_sig.compare_state_index state Ckappa_sig.dummy_state_index > 0
         then
           error, state
         else
@@ -582,7 +582,7 @@ let collect_value_parallel_bonds_rhs parameter
   (*return a value true for a rule that has parallel bonds*)
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.fold
-      (fun rule_id parallel_set (error, store_result) ->
+      (fun _rule_id parallel_set (error, store_result) ->
          let error, store_result =
            Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold (fun x (error, store_result)->
                Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
@@ -642,59 +642,66 @@ let collect_value_parallel_bonds_rhs parameter
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
   which rules can create a bond of type A.x.z.B (and at which position)*)
 
-let collect_fst_site_create_parallel_bonds parameter error rule_id store_action_binding store_parallel_bonds store_result =
+let collect_fst_site_create_parallel_bonds parameter error _rule_id store_action_binding store_parallel_bonds store_result =
   (*let parameter = get_parameter static in*)
-  Ckappa_sig.Rule_map_and_set.Map.map
-    (fun set ->
-       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
-         (*A.x -> B.z; B.z -> A.x*)
-         (fun ((agent_id, agent_type, site_type, state),
-               (agent_id', agent_type', site_type', state')) store_result ->
-           let error, old_list =
-             match
-               Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.find_option_without_logs
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun k set (error,map) ->
+       let error, new_set
+         =
+         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
+           (*A.x -> B.z; B.z -> A.x*)
+           (fun ((agent_id, agent_type, site_type, state),
+                 (agent_id', agent_type', site_type', state')) (error,store_result) ->
+             let error, old_list =
+               match
+                 Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.find_option_without_logs
+                   parameter
+                   error
+                   ((agent_id, agent_type, site_type, state),
+                    (agent_id', agent_type', site_type', state'))
+                   store_result
+               with
+               | error, None -> error, []
+               | error, Some l -> error, l
+             in
+             let error, new_list =
+               Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold_inv
+                 (fun ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+                       (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                   (error, current_list) ->
+                   if
+                     agent_id = agent_id1 &&
+                     site_type = site_type1 &&
+                     agent_id' = agent_id1' &&
+                     site_type' = site_type1'
+                   then
+                     (*A.x.B.z, B.z.A.x*)
+                     let new_list =
+                       ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+                        (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) :: current_list
+                     in
+                     error, new_list
+                   else
+                     error, current_list
+                 ) store_parallel_bonds (error, old_list)
+             in
+             let error, store_result =
+               Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.add_or_overwrite
                  parameter
                  error
                  ((agent_id, agent_type, site_type, state),
                   (agent_id', agent_type', site_type', state'))
+                 new_list
                  store_result
-             with
-             | error, None -> error, []
-             | error, Some l -> error, l
-           in
-           let error, new_list =
-             Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold_inv
-               (fun ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-                     (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
-                 (error, current_list) ->
-                 if
-                   agent_id = agent_id1 &&
-                   site_type = site_type1 &&
-                   agent_id' = agent_id1' &&
-                   site_type' = site_type1'
-                 then
-                   (*A.x.B.z, B.z.A.x*)
-                   let new_list =
-                     ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-                      (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) :: current_list
-                   in
-                   error, new_list
-                 else
-                   error, current_list
-               ) store_parallel_bonds (error, old_list)
-           in
-           let error, store_result =
-             Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.add_or_overwrite
-               parameter
-               error
-               ((agent_id, agent_type, site_type, state),
-                (agent_id', agent_type', site_type', state'))
-               new_list
-               store_result
-           in
-           store_result
-         ) set Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
-    ) store_action_binding
+             in
+             error, store_result
+           )
+           set
+           (error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty)
+           (* JF: very suspicious, start over from the former value instead *)
+       in
+       Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set map)
+    store_action_binding (error,store_result)
 
 (**************************************************************************)
 (*in the rhs*)
@@ -703,7 +710,7 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_act
   (*let store_action_binding = get_action_binding static in
     let store_parallel_bonds = get_parallel_bonds_rhs static in
     let store_fst_site_create_parallel_bonds_rhs = get_fst_site_create_parallel_bonds_rhs static in*)
-  let store_result =
+  let error, store_result =
     collect_fst_site_create_parallel_bonds
       parameter error rule_id
       store_action_binding
@@ -717,60 +724,66 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_act
 (**************************************************************************)
 (*the second map (A,x,y, B,z,t) -> A.y.t.B*)
 
-let collect_snd_site_create_parallel_bonds parameter error rule_id store_action_binding store_parallel_bonds store_result =
+let collect_snd_site_create_parallel_bonds parameter error _rule_id store_action_binding store_parallel_bonds store_result =
   (*let parameter = get_parameter static in*)
-  Ckappa_sig.Rule_map_and_set.Map.map
-    (fun set ->
-       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
-         (*A.y -> B.t; B.t -> A.y*)
-         (fun ((agent_id, agent_type, site_type, state),
-               (agent_id', agent_type', site_type', state')) store_result ->
-           let error, old_list =
-             match
-               Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.find_option_without_logs
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun k set (error,store_result) ->
+       let error, new_set =
+         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
+           (*A.y -> B.t; B.t -> A.y*)
+           (fun ((agent_id, agent_type, site_type, state),
+                 (agent_id', agent_type', site_type', state')) (error,store_result) ->
+             let error, old_list =
+               match
+                 Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.find_option_without_logs
+                   parameter
+                   error
+                   ((agent_id, agent_type, site_type, state),
+                    (agent_id', agent_type', site_type', state'))
+                   store_result
+               with
+               | error, None -> error, []
+               | error, Some l -> error, l
+             in
+             let error, new_list =
+               Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold_inv
+                 (fun ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+                       (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                   (error, current_list) ->
+                   (*check site_type2, and site_type2': A.y -> B.t*)
+                   if
+                     agent_id = agent_id1 &&
+                     site_type = site_type2 &&
+                     agent_id' = agent_id1' &&
+                     site_type' = site_type2'
+                   then
+                     let new_list =
+                       (*A.x.y.B.z.t, B.z.t.A.x.y*)
+                       ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+                        (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) :: current_list
+                     in
+                     error, new_list
+                   else
+                     error, current_list
+                 ) store_parallel_bonds (error, old_list)
+             in
+             let error, store_result =
+               Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.add_or_overwrite
                  parameter
                  error
                  ((agent_id, agent_type, site_type, state),
                   (agent_id', agent_type', site_type', state'))
+                 new_list
                  store_result
-             with
-             | error, None -> error, []
-             | error, Some l -> error, l
-           in
-           let error, new_list =
-             Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold_inv
-               (fun ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-                     (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
-                 (error, current_list) ->
-                 (*check site_type2, and site_type2': A.y -> B.t*)
-                 if
-                   agent_id = agent_id1 &&
-                   site_type = site_type2 &&
-                   agent_id' = agent_id1' &&
-                   site_type' = site_type2'
-                 then
-                   let new_list =
-                     (*A.x.y.B.z.t, B.z.t.A.x.y*)
-                     ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-                      (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) :: current_list
-                   in
-                   error, new_list
-                 else
-                   error, current_list
-               ) store_parallel_bonds (error, old_list)
-           in
-           let error, store_result =
-             Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.add_or_overwrite
-               parameter
-               error
-               ((agent_id, agent_type, site_type, state),
-                (agent_id', agent_type', site_type', state'))
-               new_list
-               store_result
-           in
-           store_result
-         ) set Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
-    ) store_action_binding
+             in
+             error, store_result
+           )
+           set
+           (error,Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty)
+           (* JF: very suspicious, start over from the former value instead *)
+       in
+       Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set store_result
+    ) store_action_binding (error, store_result)
 
 (**************************************************************************)
 
@@ -778,7 +791,7 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error rule_id store_act
   (*let store_parallel_bonds = get_parallel_bonds_rhs static in
     let store_action_binding = get_action_binding static in
     let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in*)
-  let store_result =
+  let error, store_result =
     collect_snd_site_create_parallel_bonds
       parameter
       error
@@ -793,7 +806,7 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error rule_id store_act
 
 (******************************************************************)
 (*REMOVE*)
-let collect_result_from_site_create_parallel' parameter error rule_id store_views_rhs store_pair_bind_map rule_has_parallel_bonds_rhs_set =
+let collect_result_from_site_create_parallel' parameter error rule_id store_views_rhs store_pair_bind_map _rule_has_parallel_bonds_rhs_set =
   let error, views_rhs_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_views_rhs with
     | error, None -> error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty
@@ -802,19 +815,19 @@ let collect_result_from_site_create_parallel' parameter error rule_id store_view
   let error, store_result =
     (*fold over a binding action map*)
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
-      (*A.x.B.z*)
-      (fun ((agent_id, agent_type, site_type, state),
-            (agent_id', agent_type', site_type', state'))
+(*A.x.B.z*)
+      (fun ((_agent_id, _agent_type, _site_type, _state),
+            (_agent_id', _agent_type', _site_type', _state'))
         list (error, store_result) ->
         let error, store_result =
           (*views rhs*)
           Parallel_bonds_type.AgentsSiteState_map_and_set.Set.fold
-            (fun (agent_id_views, agent_type_views, site_type_views, state_views) (error, store_result) ->
+            (fun (_agent_id_views, _agent_type_views, _site_type_views, _state_views) (error, store_result) ->
                (*fold over a list of parallel bonds*)
                let error, store_result =
                  List.fold_left (fun (error, store_result)                               (*A.x.y.B.z.t, B.z.t.A.x.y*)
-                                  ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-                                   (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
+                                  ((_agent_id1, _agent_type1, _site_type1, _site_type2, _state1, _state2),
+                                   (_agent_id1', _agent_type1', _site_type1', _site_type2', _state1', _state2')) ->
                                   (*let _ =
                                     if agent_id = agent_id_views &&
                                        agent

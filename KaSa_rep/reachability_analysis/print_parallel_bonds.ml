@@ -24,8 +24,8 @@ let local_trace = false
 (*PRINT*)
 
 let print_parallel_pair parameter error handler_kappa (x, y) =
-  let (agent_id, agent_type, site_type1, site_type2, state1, state2) = x in
-  let (agent_id', agent_type', site_type1', site_type2', state1', state2') = y in
+  let (_agent_id, agent_type, site_type1, site_type2, state1, state2) = x in
+  let (_agent_id', agent_type', site_type1', site_type2', state1', state2') = y in
   let error, site_type1_string =
     try
       Handler.string_of_site parameter error handler_kappa
@@ -96,8 +96,8 @@ let print_parallel_pair parameter error handler_kappa (x, y) =
 (**************************************************************************)
 
 let print_pair parameter error handler_kappa (x, y) =
-  let (agent_id, agent_type, site_type, state) = x in
-  let (agent_id', agent_type', site_type', state') = y in
+  let (_agent_id, agent_type, site_type, state) = x in
+  let (_agent_id', agent_type', site_type', state') = y in
   let error, site_type_string =
     try
       Handler.string_of_site parameter error handler_kappa
@@ -134,15 +134,23 @@ let print_pair parameter error handler_kappa (x, y) =
 
 (**************************************************************************)
 
-let print_parallel_bonds parameter handler_kappa static dynamic error store_result =
-  let _ =
+let print_parallel_bonds parameter handler_kappa _static _dynamic error store_result =
+  let error =
     if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.is_empty store_result
-    then Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "empty set\n\n"
+    then
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "empty set" in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () =
+          Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+
+      error
     else
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.iter
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold
         (fun ((agent_id, agent_type, site_type1, site_type2, state1, state2),
-              (agent_id', agent_type', site_type1', site_type2', state1', state2')) ->
+              (agent_id', agent_type', site_type1', site_type2', state1', state2')) error ->
           let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
                       (site_type1_string', site_type2_string', state1_string', state2_string')) =
             print_parallel_pair
@@ -164,29 +172,29 @@ let print_parallel_bonds parameter handler_kappa static dynamic error store_resu
           in
           let _ =
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
-              "agent_id:%i:%s:site_type:%i:%s.%s:site_type:%i:%s.%s->\
-               agent_id:%i:%s:site_type:%i:%s.%s:site_type:%i:%s.%s\n"
-              (Ckappa_sig.int_of_agent_id agent_id)
+              "agent_id:%s:%s:site_type:%s:%s.%s:site_type:%s:%s.%s->\
+               agent_id:%s:%s:site_type:%s:%s.%s:site_type:%s:%s.%s\n"
+              (Ckappa_sig.string_of_agent_id agent_id)
               agent_string
-              (Ckappa_sig.int_of_site_name site_type1)
+              (Ckappa_sig.string_of_site_name site_type1)
               site_type1_string
               state1_string
-              (Ckappa_sig.int_of_site_name site_type2)
+              (Ckappa_sig.string_of_site_name site_type2)
               site_type2_string
               state2_string
-              (Ckappa_sig.int_of_agent_id agent_id')
+              (Ckappa_sig.string_of_agent_id agent_id')
               agent_string'
-              (Ckappa_sig.int_of_site_name site_type1')
+              (Ckappa_sig.string_of_site_name site_type1')
               site_type1_string'
               state1_string'
-              (Ckappa_sig.int_of_site_name site_type2')
+              (Ckappa_sig.string_of_site_name site_type2')
               site_type2_string'
               state2_string'
           in
-          Loggers.print_newline (Remanent_parameters.get_logger parameter)
-        ) store_result
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in error
+        ) store_result error
   in
-  ()
+  error
 
 (**************************************************************************)
 
@@ -204,7 +212,7 @@ let print_rule_has_parallel_bonds parameter handler_kappa static dynamic error s
     Ckappa_sig.Rule_map_and_set.Map.iter
       (fun rule_id set ->
          Loggers.fprintf (Remanent_parameters.get_logger parameter)
-           "rule_id:%i\n" (Ckappa_sig.int_of_rule_id rule_id);
+           "rule_id:%s\n" (Ckappa_sig.string_of_rule_id rule_id);
          let _ =
            print_parallel_bonds parameter handler_kappa static dynamic error set
          in
@@ -223,18 +231,18 @@ let print_rule_has_parallel_bonds_rhs parameter handler_kappa
 
 (**************************************************************************)
 
-let print_action_binding parameter handler_kappa store_action_binding static dynamic error =
+let print_action_binding parameter handler_kappa store_action_binding _static _dynamic error =
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "Binding action:\n";
-  let _ =
-    Ckappa_sig.Rule_map_and_set.Map.iter
-      (fun rule_id set ->
+  let error =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rule_id set error ->
          Loggers.fprintf (Remanent_parameters.get_logger parameter)
-           "rule_id:%i\n" (Ckappa_sig.int_of_rule_id rule_id);
-         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.iter
+           "rule_id:%s\n" (Ckappa_sig.string_of_rule_id rule_id);
+         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
            (fun ((agent_id, agent_type, site_type, state),
-                 (agent_id', agent_type', site_type', state')) ->
-             let error, (site_type_string, site_type_string', state_string, state_string') =
+                 (agent_id', agent_type', site_type', state')) error ->
+             let error, (site_type_string, site_type_string', _state_string, _state_string') =
                print_pair parameter error handler_kappa
                  ((agent_id, agent_type, site_type, state),
                   (agent_id', agent_type', site_type', state'))
@@ -253,47 +261,50 @@ let print_action_binding parameter handler_kappa store_action_binding static dyn
                  _ -> warn parameter error (Some "line 1125") Exit
                         (Ckappa_sig.string_of_agent_name agent_type')
              in
-             Loggers.fprintf (Remanent_parameters.get_logger parameter)
-               "agent_id:%i:%s:site_type:%i:%s -> agent_id:%i:%s:site_type:%i:%s\n\
-                agent_id:%i:%s:site_type:%i:%s -> agent_id:%i:%s:site_type:%i:%s\n"
-               (Ckappa_sig.int_of_agent_id agent_id)
+             let () =
+               Loggers.fprintf (Remanent_parameters.get_logger parameter)
+               "agent_id:%s:%s:site_type:%s:%s -> agent_id:%s:%s:site_type:%s:%s\n\
+                agent_id:%s:%s:site_type:%s:%s -> agent_id:%s:%s:site_type:%s:%s\n"
+               (Ckappa_sig.string_of_agent_id agent_id)
                agent_string
-               (Ckappa_sig.int_of_site_name site_type)
+               (Ckappa_sig.string_of_site_name site_type)
                site_type_string
-               (Ckappa_sig.int_of_agent_id agent_id')
+               (Ckappa_sig.string_of_agent_id agent_id')
                agent_string'
-               (Ckappa_sig.int_of_site_name site_type')
+               (Ckappa_sig.string_of_site_name site_type')
                site_type_string'
                (*reverse direction*)
-               (Ckappa_sig.int_of_agent_id agent_id')
+               (Ckappa_sig.string_of_agent_id agent_id')
                agent_string'
-               (Ckappa_sig.int_of_site_name site_type')
+               (Ckappa_sig.string_of_site_name site_type')
                site_type_string'
-               (Ckappa_sig.int_of_agent_id agent_id)
+               (Ckappa_sig.string_of_agent_id agent_id)
                agent_string
-               (Ckappa_sig.int_of_site_name site_type)
+               (Ckappa_sig.string_of_site_name site_type)
                site_type_string
-             ;
-             Loggers.print_newline (Remanent_parameters.get_logger parameter)
-           ) set
-      ) store_action_binding
+             in
+             let () =
+               Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+             error
+           ) set error
+      ) store_action_binding error
   in
-  ()
+  error
 
 (**************************************************************************)
 
-let print_site_create_parallel parameter handler_kappa static dynamic error store_result =
-  let _ =
-    Ckappa_sig.Rule_map_and_set.Map.iter
-      (fun rule_id map ->
+let print_site_create_parallel parameter handler_kappa _static _dynamic error store_result =
+  let error =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rule_id map error ->
          let _ =
            Loggers.fprintf (Remanent_parameters.get_logger parameter)
-             "rule_id:%i\n"
-             (Ckappa_sig.int_of_rule_id rule_id)
+             "rule_id:%s\n"
+             (Ckappa_sig.string_of_rule_id rule_id)
          in
-         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.iter
+         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
            (fun ((agent_id, agent_type, site_type, state),
-                 (agent_id', agent_type', site_type', state')) list ->
+                 (agent_id', agent_type', site_type', state')) list error ->
              let error, (site_type_string, site_type_string', state_string, state_string') =
                print_pair parameter error handler_kappa
                  ((agent_id, agent_type, site_type, state),
@@ -315,34 +326,34 @@ let print_site_create_parallel parameter handler_kappa static dynamic error stor
              in
              let _ =
                Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                 "Binding action:\n(agent_id:%i:%s:site_type:%i:%s.%s, agent_id:%i:%s:site_type:%i:%s.%s)\n\
-                  (agent_id:%i:%s:site_type:%i:%s.%s, agent_id:%i:%s:site_type:%i:%s.%s)\n"
-                 (Ckappa_sig.int_of_agent_id agent_id)
+                 "Binding action:\n(agent_id:%s:%s:site_type:%s:%s.%s, agent_id:%s:%s:site_type:%s:%s.%s)\n\
+                  (agent_id:%s:%s:site_type:%s:%s.%s, agent_id:%s:%s:site_type:%s:%s.%s)\n"
+                 (Ckappa_sig.string_of_agent_id agent_id)
                  agent_string
-                 (Ckappa_sig.int_of_site_name site_type)
+                 (Ckappa_sig.string_of_site_name site_type)
                  site_type_string
                  state_string
-                 (Ckappa_sig.int_of_agent_id agent_id')
+                 (Ckappa_sig.string_of_agent_id agent_id')
                  agent_string'
-                 (Ckappa_sig.int_of_site_name site_type')
+                 (Ckappa_sig.string_of_site_name site_type')
                  site_type_string'
                  state_string'
                  (*reverse binding*)
-                 (Ckappa_sig.int_of_agent_id agent_id')
+                 (Ckappa_sig.string_of_agent_id agent_id')
                  agent_string'
-                 (Ckappa_sig.int_of_site_name site_type')
+                 (Ckappa_sig.string_of_site_name site_type')
                  site_type_string'
                  state_string'
-                 (Ckappa_sig.int_of_agent_id agent_id)
+                 (Ckappa_sig.string_of_agent_id agent_id)
                  agent_string
-                 (Ckappa_sig.int_of_site_name site_type)
+                 (Ckappa_sig.string_of_site_name site_type)
                  site_type_string
                  state_string
              in
              (*--------------------------------------------------------------------*)
-             List.iter
+             List.fold_left
                (*A.x.y.B.z.t, B.z.t.A.x.y*)
-               (fun ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+               (fun error ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                      (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
                  let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
                              (site_type1_string', site_type2_string', state1_string', state2_string')) =
@@ -364,51 +375,54 @@ let print_site_create_parallel parameter handler_kappa static dynamic error stor
                      _ -> warn parameter error (Some "line 1220") Exit
                             (Ckappa_sig.string_of_agent_name agent_type1')
                  in
-                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                   "List of parallel bonds:\nagent_id:%i:%s:site_type:%i:%s%s:site_type:%i:%s%s->\
-                    agent_id:%i:%s:site_type:%i:%s%s:site_type:%i:%s%s\n\
-                    agent_id:%i:%s:site_type:%i:%s%s:site_type:%i:%s%s->\
-                    agent_id:%i:%s:site_type:%i:%s%s:site_type:%i:%s%s\n"
-                   (Ckappa_sig.int_of_agent_id agent_id)
+                 let () =
+                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                   "List of parallel bonds:\nagent_id:%s:%s:site_type:%s:%s%s:site_type:%s:%s%s->\
+                    agent_id:%s:%s:site_type:%s:%s%s:site_type:%s:%s%s\n\
+                    agent_id:%s:%s:site_type:%s:%s%s:site_type:%s:%s%s->\
+                    agent_id:%s:%s:site_type:%s:%s%s:site_type:%s:%s%s\n"
+                   (Ckappa_sig.string_of_agent_id agent_id)
                    agent_string1
-                   (Ckappa_sig.int_of_site_name site_type1)
+                   (Ckappa_sig.string_of_site_name site_type1)
                    site_type1_string
                    state1_string
-                   (Ckappa_sig.int_of_site_name site_type2)
+                   (Ckappa_sig.string_of_site_name site_type2)
                    site_type2_string
                    state2_string
-                   (Ckappa_sig.int_of_agent_id agent_id')
+                   (Ckappa_sig.string_of_agent_id agent_id')
                    agent_string1'
-                   (Ckappa_sig.int_of_site_name site_type1')
+                   (Ckappa_sig.string_of_site_name site_type1')
                    site_type1_string'
                    state1_string'
-                   (Ckappa_sig.int_of_site_name site_type2')
+                   (Ckappa_sig.string_of_site_name site_type2')
                    site_type2_string'
                    state2_string'
                    (*reverse binding*)
-                   (Ckappa_sig.int_of_agent_id agent_id1')
+                   (Ckappa_sig.string_of_agent_id agent_id1')
                    agent_string1'
-                   (Ckappa_sig.int_of_site_name site_type1')
+                   (Ckappa_sig.string_of_site_name site_type1')
                    site_type1_string'
                    state1_string'
-                   (Ckappa_sig.int_of_site_name site_type2')
+                   (Ckappa_sig.string_of_site_name site_type2')
                    site_type2_string'
                    state2_string'
-                   (Ckappa_sig.int_of_agent_id agent_id1)
+                   (Ckappa_sig.string_of_agent_id agent_id1)
                    agent_string1
-                   (Ckappa_sig.int_of_site_name site_type1)
+                   (Ckappa_sig.string_of_site_name site_type1)
                    site_type1_string
                    state1_string
-                   (Ckappa_sig.int_of_site_name site_type2)
+                   (Ckappa_sig.string_of_site_name site_type2)
                    site_type2_string
                    state2_string
-                 ;
-                 Loggers.print_newline (Remanent_parameters.get_logger parameter)
-               ) list
-           ) map
-      ) store_result
+                 in
+                 let () =
+                   Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+                 error
+               ) error list
+           ) map error
+      ) store_result error
   in
-  ()
+  error
 
 (**************************************************************************)
 
@@ -440,10 +454,10 @@ let print_value parameter value =
 
 (**************************************************************************)
 
-let print_result' handler_kappa parameter error store_result =
-  Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.iter
+let print_result' handler_kappa parameter (error:Exception.method_handler) store_result =
+  Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
     (fun ((agent_id, agent_type, site_type1, site_type2, state1, state2),
-          (agent_id', agent_type', site_type1', site_type2', state1', state2')) value ->
+          (agent_id', agent_type', site_type1', site_type2', state1', state2')) value error ->
       let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
                   (site_type1_string', site_type2_string', state1_string', state2_string'))=
         print_parallel_pair parameter error handler_kappa
@@ -462,60 +476,65 @@ let print_result' handler_kappa parameter error store_result =
         with
           _ -> warn parameter error (Some "line 1401") Exit (Ckappa_sig.string_of_agent_name agent_type')
       in
-      if (Ckappa_sig.int_of_state_index state2) = 0 (*if it is free then do not print*)
+      if Ckappa_sig.compare_state_index state2 Ckappa_sig.dummy_state_index = 0
+            (*if it is free then do not print*)
       then
-        ()
+        error
         (*Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "Undefined\n"*)
       else
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_id:%i:%s:site_type:%i:%s%s:site_type:%i:%s%s->\
-           agent_id:%i:%s:site_type:%i:%s%s:site_type:%i:%s%s\n"
-          (Ckappa_sig.int_of_agent_id agent_id)
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_id:%s:%s:site_type:%s:%s%s:site_type:%s:%s%s->\
+           agent_id:%s:%s:site_type:%s:%s%s:site_type:%s:%s%s\n"
+          (Ckappa_sig.string_of_agent_id agent_id)
           agent_string
-          (Ckappa_sig.int_of_site_name site_type1)
+          (Ckappa_sig.string_of_site_name site_type1)
           site_type1_string
           state1_string
-          (Ckappa_sig.int_of_site_name site_type2)
+          (Ckappa_sig.string_of_site_name site_type2)
           site_type2_string
           state2_string
-          (Ckappa_sig.int_of_agent_id agent_id')
+          (Ckappa_sig.string_of_agent_id agent_id')
           agent_string'
-          (Ckappa_sig.int_of_site_name site_type1')
+          (Ckappa_sig.string_of_site_name site_type1')
           site_type1_string'
           state1_string'
-          (Ckappa_sig.int_of_site_name site_type2')
+          (Ckappa_sig.string_of_site_name site_type2')
           site_type2_string'
-          state2_string';
-      print_value parameter value
-    ) store_result
+          state2_string' in
+        let () = print_value parameter value in
+        error
+    ) store_result error
 
-let print_result handler_kappa parameter error store_result =
-  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.iter
+let print_result _handler_kappa parameter error store_result =
+  let () =
+    Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.iter
     (fun ((agent_type, site_type1, site_type2, state1, state2),
-          (agent_type', site_type1', site_type2', state1', state2')) value ->
+          (agent_type', site_type1', site_type2', state1', state2')) value  ->
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i->\
-         agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
-        (Ckappa_sig.int_of_agent_name agent_type)
-        (Ckappa_sig.int_of_site_name site_type1)
-        (Ckappa_sig.int_of_site_name site_type2)
-        (Ckappa_sig.int_of_state_index state1)
-        (Ckappa_sig.int_of_state_index state2)
+        "agent_type:%s:site_type:%s:site_type:%s:state:%s:state:%s->\
+         agent_type:%s:site_type:%s:site_type:%s:state:%s:state:%s\n"
+        (Ckappa_sig.string_of_agent_name agent_type)
+        (Ckappa_sig.string_of_site_name site_type1)
+        (Ckappa_sig.string_of_site_name site_type2)
+        (Ckappa_sig.string_of_state_index state1)
+        (Ckappa_sig.string_of_state_index state2)
 
-        (Ckappa_sig.int_of_agent_name agent_type')
-        (Ckappa_sig.int_of_site_name site_type1')
-        (Ckappa_sig.int_of_site_name site_type2')
-        (Ckappa_sig.int_of_state_index state1')
-        (Ckappa_sig.int_of_state_index state2')
+        (Ckappa_sig.string_of_agent_name agent_type')
+        (Ckappa_sig.string_of_site_name site_type1')
+        (Ckappa_sig.string_of_site_name site_type2')
+        (Ckappa_sig.string_of_state_index state1')
+        (Ckappa_sig.string_of_state_index state2')
       ;
       print_value parameter value
     ) store_result
+  in error
 
 (**************************************************************************)
 (*print result of parallel bonds in the initial state*)
 
-let print_parallel_bonds_init parameter handler_kappa store_parallel_bonds_init static dynamic error =
+let print_parallel_bonds_init parameter handler_kappa store_parallel_bonds_init _static _dynamic error =
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "\nResult of parallel bonds in the initial states:\n";
   print_result handler_kappa parameter error store_parallel_bonds_init;
@@ -543,33 +562,36 @@ let print_action_binding_test parameter error handler_kappa rule_id (x, y) =
     with
       _ -> warn parameter error (Some "line 1648") Exit (Ckappa_sig.string_of_agent_name agent_type')
   in
+  let () =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "\nrule_id:%s: binding action appears\n"
+    (Ckappa_sig.string_of_rule_id rule_id);
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "\nrule_id:%i: binding action appears\n"
-    (Ckappa_sig.int_of_rule_id rule_id);
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "agent_id:%i:%s:site_type:%i:%s%s-> agent_id:%i:%s:site_type:%i:%s%s\n\
-     agent_id:%i:%s:site_type:%i:%s%s-> agent_id:%i:%s:site_type:%i:%s%s\n"
-    (Ckappa_sig.int_of_agent_id agent_id)
+    "agent_id:%s:%s:site_type:%s:%s%s-> agent_id:%s:%s:site_type:%s:%s%s\n\
+     agent_id:%s:%s:site_type:%s:%s%s-> agent_id:%s:%s:site_type:%s:%s%s\n"
+    (Ckappa_sig.string_of_agent_id agent_id)
     agent_string
-    (Ckappa_sig.int_of_site_name site_type)
+    (Ckappa_sig.string_of_site_name site_type)
     site_type_string
     state_string
-    (Ckappa_sig.int_of_agent_id agent_id')
+    (Ckappa_sig.string_of_agent_id agent_id')
     agent_string'
-    (Ckappa_sig.int_of_site_name site_type')
+    (Ckappa_sig.string_of_site_name site_type')
     site_type_string'
     state_string'
     (*reverse direction*)
-    (Ckappa_sig.int_of_agent_id agent_id')
+    (Ckappa_sig.string_of_agent_id agent_id')
     agent_string'
-    (Ckappa_sig.int_of_site_name site_type')
+    (Ckappa_sig.string_of_site_name site_type')
     site_type_string'
     state_string'
-    (Ckappa_sig.int_of_agent_id agent_id)
+    (Ckappa_sig.string_of_agent_id agent_id)
     agent_string
-    (Ckappa_sig.int_of_site_name site_type)
+    (Ckappa_sig.string_of_site_name site_type)
     site_type_string
     state_string
+  in
+  error
 
 (******************************************************************)
 (*print non parallel bonds*)
@@ -577,27 +599,28 @@ let print_action_binding_test parameter error handler_kappa rule_id (x, y) =
 let print_rule_has_non_parallel_bonds_rhs parameter store_result =
   Ckappa_sig.Rule_map_and_set.Map.iter (fun rule_id list ->
       let log = Remanent_parameters.get_logger parameter in
-      Loggers.fprintf log "rule_id:%i\n"
-        (Ckappa_sig.int_of_rule_id rule_id);
+      Loggers.fprintf log "rule_id:%s\n"
+        (Ckappa_sig.string_of_rule_id rule_id);
       List.iter (fun ((agent_id, agent_type, site_type, state),
-                      (agent_id', agent_type', site_type', state'),
+                      (_agent_id', _agent_type', site_type', state'),
                       (agent_id1, agent_type1, site_type1, state1),
-                      (agent_id1', agent_type1', site_type1', state1')) ->
-                  Loggers.fprintf log
-                    "agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i -> agent_id:%i:agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
-                    (Ckappa_sig.int_of_agent_id agent_id)
-                    (Ckappa_sig.int_of_agent_name agent_type)
-                    (Ckappa_sig.int_of_site_name site_type)
-                    (Ckappa_sig.int_of_site_name site_type')
-                    (Ckappa_sig.int_of_state_index state)
-                    (Ckappa_sig.int_of_state_index state')
+                      (agent_id1', _agent_type1', site_type1', state1')) ->
+                  let () = Loggers.fprintf log
+                    "agent_id:%s:agent_type:%s:site_type:%s:site_type:%s:state:%s:state:%s -> agent_id:%s:agent_id:%s:agent_type:%s:site_type:%s:site_type:%s:state:%s:state:%s"
+                    (Ckappa_sig.string_of_agent_id agent_id)
+                    (Ckappa_sig.string_of_agent_name agent_type)
+                    (Ckappa_sig.string_of_site_name site_type)
+                    (Ckappa_sig.string_of_site_name site_type')
+                    (Ckappa_sig.string_of_state_index state)
+                    (Ckappa_sig.string_of_state_index state')
                     (**)
-                    (Ckappa_sig.int_of_agent_id agent_id1)
-                    (Ckappa_sig.int_of_agent_id agent_id1')
-                    (Ckappa_sig.int_of_agent_name agent_type1)
-                    (Ckappa_sig.int_of_site_name site_type1)
-                    (Ckappa_sig.int_of_site_name site_type1')
-                    (Ckappa_sig.int_of_state_index state1)
-                    (Ckappa_sig.int_of_state_index state1')
+                    (Ckappa_sig.string_of_agent_id agent_id1)
+                    (Ckappa_sig.string_of_agent_id agent_id1')
+                    (Ckappa_sig.string_of_agent_name agent_type1)
+                    (Ckappa_sig.string_of_site_name site_type1)
+                    (Ckappa_sig.string_of_site_name site_type1')
+                    (Ckappa_sig.string_of_state_index state1)
+                    (Ckappa_sig.string_of_state_index state1') in
+                  Loggers.print_newline log
                 ) list
     ) store_result

@@ -45,7 +45,7 @@ val dummy_state_index_1 : c_state
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
 val agent_name_of_int : int -> c_agent_name
-
+val string_of_agent_id: c_agent_id -> string
 val site_name_of_int : int -> c_site_name
 val int_of_site_name : c_site_name -> int
 val string_of_site_name : c_site_name -> string
@@ -60,6 +60,28 @@ val string_of_rule_id : c_rule_id -> string
 
 val int_of_agent_id : c_agent_id -> int
 val agent_id_of_int : int -> c_agent_id
+val add_agent_id: c_agent_id -> int -> c_agent_id
+val sub_rule_id: c_rule_id -> int -> c_rule_id
+val add_rule_id: c_rule_id -> int -> c_rule_id
+val next_agent_id: c_agent_id -> c_agent_id
+val next_agent_name: c_agent_name -> c_agent_name
+val next_rule_id: c_rule_id -> c_rule_id
+val next_site_name: c_site_name -> c_site_name
+val next_state_index: c_state -> c_state
+val pred_site_name: c_site_name -> c_site_name
+val compare_agent_id: c_agent_id -> c_agent_id -> int
+val compare_rule_id: c_rule_id -> c_rule_id -> int
+val compare_site_name: c_site_name -> c_site_name -> int
+val compare_state_index: c_state -> c_state -> int
+val compare_agent_name: c_agent_name -> c_agent_name -> int
+
+val get_agent_shape: c_site_name -> Remanent_parameters_sig.parameters -> string
+val get_agent_color: c_site_name -> Remanent_parameters_sig.parameters -> string
+
+val compare_unit_agent_name: unit -> unit -> c_agent_name
+val compare_unit_site_name: unit -> unit -> c_site_name
+val compare_unit_state_index: unit -> unit -> c_state
+
 
 (****************************************************************************************)
 
@@ -286,6 +308,7 @@ module Dictionary_of_sites : Dictionary.Dictionary
   with type key = c_site_name
   and type value = site
 
+
 type site_list =
     {
       used     : (site_name list * position) list;
@@ -414,3 +437,16 @@ type c_compil =
     c_perturbations :
       c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t
   }
+
+val array_of_list_rule_id:
+    (Rule_nearly_Inf_Int_storage_Imperatif.dimension,
+              'a Rule_nearly_Inf_Int_storage_Imperatif.t)
+      Int_storage.unary ->
+      (Rule_nearly_Inf_Int_storage_Imperatif.key, 'a,
+              'a Rule_nearly_Inf_Int_storage_Imperatif.t,
+              'a Rule_nearly_Inf_Int_storage_Imperatif.t)
+        Int_storage.ternary ->
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    'a list ->
+    Exception.method_handler * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
