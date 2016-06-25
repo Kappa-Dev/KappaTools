@@ -642,6 +642,8 @@ let collect_value_parallel_bonds_rhs parameter
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
   which rules can create a bond of type A.x.z.B (and at which position)*)
 
+(* You do not use rule_id *)
+(* This means you repeat the same computation many times *)
 let collect_fst_site_create_parallel_bonds parameter error _rule_id store_action_binding store_parallel_bonds store_result =
   (*let parameter = get_parameter static in*)
   Ckappa_sig.Rule_map_and_set.Map.fold
@@ -701,7 +703,7 @@ let collect_fst_site_create_parallel_bonds parameter error _rule_id store_action
            (* JF: very suspicious, start over from the former value instead *)
        in
        Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set map)
-    store_action_binding (error,store_result)
+    store_action_binding (error,Ckappa_sig.Rule_map_and_set.Map.empty)
 
 (**************************************************************************)
 (*in the rhs*)
@@ -724,6 +726,8 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_act
 (**************************************************************************)
 (*the second map (A,x,y, B,z,t) -> A.y.t.B*)
 
+(* You do not use rule_id *)
+(* This means you repeat the same computation many times *)
 let collect_snd_site_create_parallel_bonds parameter error _rule_id store_action_binding store_parallel_bonds store_result =
   (*let parameter = get_parameter static in*)
   Ckappa_sig.Rule_map_and_set.Map.fold
@@ -783,7 +787,7 @@ let collect_snd_site_create_parallel_bonds parameter error _rule_id store_action
            (* JF: very suspicious, start over from the former value instead *)
        in
        Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set store_result
-    ) store_action_binding (error, store_result)
+    ) store_action_binding (error, Ckappa_sig.Rule_map_and_set.Map.empty)
 
 (**************************************************************************)
 

@@ -495,9 +495,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                     in
                     let state_min =
                       if Ckappa_sig.compare_state_index max Ckappa_sig.dummy_state_index < 0 then
-                        Ckappa_sig.dummy_state_index
-                      else
                         max
+                      else
+                        Ckappa_sig.dummy_state_index
                     in
                     let error',c_interface =
                       Ckappa_sig.Site_map_and_set.Map.add
@@ -620,10 +620,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                               max
                               Ckappa_sig.dummy_state_index_1
                              < 0
-                          then Ckappa_sig.dummy_state_index_1
-                          else max
+                          then max
+                          else
+                            Ckappa_sig.dummy_state_index_1
                         in
-
                         let error',c_interface =
                           Ckappa_sig.Site_map_and_set.Map.add
                             parameters

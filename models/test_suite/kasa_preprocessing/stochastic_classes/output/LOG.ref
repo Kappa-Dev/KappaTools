@@ -164,7 +164,6 @@ Compilation:rules:4:actions:deletion:(agent_id_0,agent_type_4)
 Compilation:rules:4:actions:deletion:documented_site:(agent_id_0,agent_type_4)@site_type_0
 Compilation:rules:4:actions:deletion:documented_site:(agent_id_0,agent_type_4)@site_type_1
 Compilation:rules:4:actions:deletion:undocumented_site:(agent_id_0,agent_type_4)@site_type_2
-Compilation:rules:4:actions:deletion:undocumented_site:(agent_id_0,agent_type_4)@site_type_1
 Compilation:rules:5:
 Compilation:rules:5:lhs:
 Compilation:rules:5:lhs:agent_id_0:
@@ -186,12 +185,12 @@ Compilation:rules:5:actions:1/2unbinding:(agent_id_1,agent_type_4)@site_type_2
 Compilation:rules:5:actions:1/2unbinding:(agent_id_0,agent_type_4)@site_type_1
 Compilation:rules:5:actions:deletion:(agent_id_0,agent_type_4)
 Compilation:rules:5:actions:deletion:documented_site:(agent_id_0,agent_type_4)@site_type_1
-Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_0,agent_type_4)@site_type_2
 Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_0,agent_type_4)@site_type_0
+Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_0,agent_type_4)@site_type_2
 Compilation:rules:5:actions:deletion:(agent_id_1,agent_type_4)
 Compilation:rules:5:actions:deletion:documented_site:(agent_id_1,agent_type_4)@site_type_2
-Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_1,agent_type_4)@site_type_1
 Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_1,agent_type_4)@site_type_0
+Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_1,agent_type_4)@site_type_1
 Compilation:rules:6:
 Compilation:rules:6:lhs:
 Compilation:rules:6:lhs:agent_id_0:

@@ -160,9 +160,9 @@ Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_mi
 Compilation:rules:3:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_2
 Compilation:rules:3:actions:deletion:(agent_id_0,agent_type_0)
 Compilation:rules:3:actions:deletion:documented_site:(agent_id_0,agent_type_0)@site_type_2
-Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_3
-Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
 Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
+Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_3
 Compilation:rules:4:
 Compilation:rules:4:lhs:
 Compilation:rules:4:lhs:agent_id_0:
@@ -276,9 +276,9 @@ Compilation:rules:7:reverse:agent_id_0:agent_type_2:site_type_2->state:[state_mi
 Compilation:rules:7:actions:1/2unbinding:(agent_id_0,agent_type_2)@site_type_2
 Compilation:rules:7:actions:deletion:(agent_id_0,agent_type_2)
 Compilation:rules:7:actions:deletion:documented_site:(agent_id_0,agent_type_2)@site_type_2
-Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_3
-Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
 Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_0
+Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
+Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_3
 Compilation:rules:8:
 Compilation:rules:8:lhs:
 Compilation:rules:8:lhs:agent_id_0:
@@ -293,9 +293,9 @@ Compilation:rules:8:reverse:agent_id_0:agent_type_0:site_type_3->state:[state_mi
 Compilation:rules:8:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_3
 Compilation:rules:8:actions:deletion:(agent_id_0,agent_type_0)
 Compilation:rules:8:actions:deletion:documented_site:(agent_id_0,agent_type_0)@site_type_3
-Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_2
-Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
 Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
+Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_2
 Compilation:rules:9:
 Compilation:rules:9:lhs:
 Compilation:rules:9:lhs:agent_id_0:
@@ -409,9 +409,9 @@ Compilation:rules:12:reverse:agent_id_0:agent_type_2:site_type_3->state:[state_m
 Compilation:rules:12:actions:1/2unbinding:(agent_id_0,agent_type_2)@site_type_3
 Compilation:rules:12:actions:deletion:(agent_id_0,agent_type_2)
 Compilation:rules:12:actions:deletion:documented_site:(agent_id_0,agent_type_2)@site_type_3
-Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_2
-Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
 Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_0
+Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
+Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_2
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0

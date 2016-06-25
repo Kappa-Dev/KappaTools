@@ -15,9 +15,9 @@
 module A =
   Analyzer.Make
     (Composite_domain.Make
-(*(Product.Product
-          (Parallel_bonds.Domain)*)
-(Product.Product
+       (Product.Product
+          (Parallel_bonds.Domain)
+          (Product.Product
              (Site_accross_bonds_domain.Domain)
              (Product.Product
                 (Views_domain.Domain)
@@ -25,7 +25,7 @@ module A =
                    (Contact_map_domain.Domain)
                    (Product.Product
                       (Agents_domain.Domain)
-                      (Rules_domain.Domain))))))(*)*)
+                      (Rules_domain.Domain)))))))
 
 let main () =
   let error = Exception.empty_error_handler in
@@ -196,15 +196,15 @@ let main () =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
       (*    (*covering classes*)
-      let error, covering_classes =
-        (*Remark: this parameter is a trick not to print covering classes twice*)
-        if Remanent_parameters.get_do_site_dependencies parameters
-        then
-          let parameters_cv =
+            let error, covering_classes =
+            (*Remark: this parameter is a trick not to print covering classes twice*)
+            if Remanent_parameters.get_do_site_dependencies parameters
+            then
+            let parameters_cv =
             Remanent_parameters.update_prefix
               parameters "Potential dependencies between sites:"
-          in
-          let _ =
+            in
+            let _ =
             if (Remanent_parameters.get_trace parameters_cv)
             then
               let () =
@@ -216,14 +216,14 @@ let main () =
                 Loggers.print_newline
                   (Remanent_parameters.get_logger parameters_cv)
               in ()
-          in
-          let error, dep =
+            in
+            let error, dep =
             Covering_classes_main.covering_classes
               parameters_cv error handler c_compil
-          in error, Some dep
-        else
-          error, None
-      in*)
+            in error, Some dep
+            else
+            error, None
+            in*)
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Reachability analysis..." in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
