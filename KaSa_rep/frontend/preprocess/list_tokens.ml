@@ -125,9 +125,9 @@ let declare_agent parameters error handler agent_name =
           begin
             if Ckappa_sig.compare_agent_name k handler.Cckappa_sig.nagents  > 0
             then
-              handler.Cckappa_sig.nagents
-            else
               k
+            else
+              handler.Cckappa_sig.nagents
           end;
           Cckappa_sig.agents_dic = dic ;
         Cckappa_sig.interface_constraints = int_constraints;
