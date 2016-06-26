@@ -18,9 +18,14 @@ module AccuracyMap: SetMap.Map with type elt = accuracy_level
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
+type quark_map = Quark_type.quarks
+
 type rule_id = int
 type var_id =  int
-type compilation = Cckappa_sig.compil
+
+type compilation = ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+
+type refined_compilation = (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
 
 type influence_node =
   | Rule of rule_id
@@ -40,6 +45,9 @@ type influence_map =
     negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
   }
 
+type internal_influence_map =
+  Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+
 type state
 
 val create_state:
@@ -47,20 +55,31 @@ val create_state:
   ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
   -> state
 
+val set_parameters: Remanent_parameters_sig.parameters -> state -> state
 val get_parameters: state -> Remanent_parameters_sig.parameters
-val get_compilation: state -> ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+val add_event: StoryProfiling.step_kind -> (unit -> int) option -> state -> state
+val close_event: StoryProfiling.step_kind -> (unit -> int) option -> state -> state
+val get_compilation: state -> compilation
 val set_handler: Cckappa_sig.kappa_handler -> state -> state
 val get_handler: state -> Cckappa_sig.kappa_handler option
-val set_refined_compil:
-  (Ckappa_sig.agent, Ckappa_sig.mixture, string,
-   Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule)
-    Ast.compil
-  -> state
-  -> state
+val set_refined_compil: refined_compilation -> state -> state
 val get_refined_compil:
   state
-  -> (Ckappa_sig.agent, Ckappa_sig.mixture, string,
-      Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule)
-    Ast.compil option
+  -> refined_compilation option
+val set_c_compil: Cckappa_sig.compil -> state -> state
+val get_c_compil: state -> Cckappa_sig.compil option
 val get_errors: state -> Exception.method_handler
 val set_errors: Exception.method_handler -> state -> state
+
+val set_contact_map: accuracy_level -> contact_map -> state -> state
+val get_contact_map: accuracy_level -> state -> contact_map option
+val set_signature: Signature.s -> state -> state
+val get_signature: state -> Signature.s option
+val set_quark_map: quark_map -> state -> state
+val get_quark_map: state -> quark_map option
+val set_internal_influence_map: accuracy_level -> internal_influence_map -> state -> state
+val get_internal_influence_map: accuracy_level -> state -> internal_influence_map option
+val set_influence_map: accuracy_level -> influence_map -> state -> state
+val get_influence_map: accuracy_level -> state -> influence_map option
+val get_influence_map_map: state -> influence_map AccuracyMap.t
+val get_contact_map_map: state -> contact_map AccuracyMap.t

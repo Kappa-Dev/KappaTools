@@ -63,6 +63,7 @@ type step_kind =
   | KaSa_lexing
   | KaSa_linking
   | Influence_map of string
+  | Internal_influence_map of string
 
 let string_of_step_kind x =
   match
@@ -107,7 +108,7 @@ let string_of_step_kind x =
     | KaSa_lexing -> Printf.sprintf "KaSa Lexing"
     | KaSa_linking -> Printf.sprintf "KaSa Linkind"
     | Influence_map string -> Printf.sprintf "Influence map (%s)" string
-
+    | Internal_influence_map string -> Printf.sprintf "Influence map (internal %s)" string
 
 let print_step_kind parameters x =
   Loggers.print_cell (Remanent_parameters.get_profiler parameters)
