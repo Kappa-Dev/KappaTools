@@ -90,8 +90,9 @@ type contact_map =
 
 type state =
   {
-    parameters    : Remanent_parameters_sig.parameters  ;
-    log_info : StoryProfiling.StoryStats.log_info;
+    parameters    : Remanent_parameters_sig.parameters ;
+    log_info : StoryProfiling.StoryStats.log_info ;
+    prehandler: Cckappa_sig.kappa_handler option ;
     handler       : Cckappa_sig.kappa_handler option ;
     init : init ;
     compilation   : compilation option ;
@@ -112,6 +113,7 @@ let create_state ?errors parameters init =
   {
     parameters = parameters;
     log_info = StoryProfiling.StoryStats.init_log_info ();
+    prehandler = None ;
     handler = None ;
     init = init ;
     compilation = None ;
@@ -148,6 +150,8 @@ let get_parameters state = state.parameters
 let get_init state = state.init
 let set_compilation compilation state = {state with compilation = Some compilation}
 let get_compilation state = state.compilation
+let set_prehandler handler state = {state with prehandler = Some handler}
+let get_prehandler state = state.prehandler
 let set_handler handler state = {state with handler = Some handler}
 let get_handler state = state.handler
 let set_compil compil state = {state with compilation = compil}

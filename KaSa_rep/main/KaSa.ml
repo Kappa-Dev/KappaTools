@@ -29,29 +29,21 @@ module A =
 
 let main () =
   let (state:Remanent_state.state) =
-    Export.Export.init  ~called_from:Remanent_parameters_sig.KaSa ()
+    Export.init  ~called_from:Remanent_parameters_sig.KaSa ()
   in
-  let state,handler = Export.Export.get_handler state in
+  let state,handler = Export.get_handler state in
   let error = Remanent_state.get_errors state in
   let parameters = Remanent_state.get_parameters state in
   let log_info = StoryProfiling.StoryStats.init_log_info () in
-
-      let parameters_sig = Remanent_parameters.update_prefix parameters "Signature:" in
-      let error =
-      if (Remanent_parameters.get_trace parameters_sig) || Print_handler.trace
-      then Print_handler.print_handler parameters_sig error handler
-      else
-      error
-      in
-      let error =
-      if Remanent_parameters.get_do_contact_map parameters
-      then
+  let error =
+    if Remanent_parameters.get_do_contact_map parameters
+    then
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Generating the raw contact map..." in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       Print_handler.dot_of_contact_map parameters error handler
-      else error
-      in
-  let state, (wake_ip_map, inhibition_map) = Export.Export.get_internal_influence_map ~accuracy_level:Remanent_state.Low state in
+    else error
+  in
+  let state = Remanent_state.set_errors error state in
   let parameters = Remanent_state.get_parameters state in
   let state =
     match
@@ -59,18 +51,18 @@ let main () =
     with
     | Remanent_parameters_sig.None -> state
     | Remanent_parameters_sig.Low ->
-      let state, _ = Export.Export.get_internal_influence_map ~accuracy_level:Remanent_state.Low state in
+      let state, _ = Export.get_internal_influence_map ~accuracy_level:Remanent_state.Low state in
       state
     | Remanent_parameters_sig.Medium
     | Remanent_parameters_sig.High
     | Remanent_parameters_sig.Full ->
-      let state, _ = Export.Export.get_internal_influence_map ~accuracy_level:Remanent_state.Medium state in
+      let state, _ = Export.get_internal_influence_map ~accuracy_level:Remanent_state.Medium state in
       state
   in
   let () =
     if (Remanent_parameters.get_trace parameters) || Print_quarks.trace
     then
-      Export.Export.dump_influence_map
+      Export.dump_influence_map
         (  match
              Remanent_parameters.get_influence_map_accuracy_level parameters
            with
@@ -88,7 +80,7 @@ let c_compil =
     None -> assert false
   | Some c_compil -> c_compil
   in
-  let state,handler = Export.Export.get_handler state in
+  let state,handler = Export.get_handler state in
   let error = Remanent_state.get_errors state in
   let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
   let error, log_info, static_opt, dynamic_opt =
