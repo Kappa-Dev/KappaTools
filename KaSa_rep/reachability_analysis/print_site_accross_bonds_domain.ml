@@ -1054,35 +1054,10 @@ let print_tuple_pair_binding_state parameter error handler_kappa log store_resul
 
 (****************************************************************)
 
-let print_tuple_pair_state2 parameter error handler_kappa log store_result =
+let print_tuple_pair_binding_and_state parameter error handler_kappa log store_result =
   Loggers.fprintf log
     "------------------------------------------------------------\n";
   Loggers.fprintf log "* Tuple set:\n";
-  Ckappa_sig.Rule_map_and_set.Map.iter (fun rule_id set ->
-      Loggers.fprintf log "rule_id:%s\n" (Ckappa_sig.string_of_rule_id
-                                            rule_id);
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter (fun (x, y) ->
-          print_tuple parameter error handler_kappa log (x, y)
-
-         (*let (_, _, site_type, state) = x in
-           let (_, _, site_type', state') = y in
-           let _,
-             ((agent_string, site_string, state_string),(agent_string', site_string', state_string')) =
-           print_pair_agents_site_state parameter error handler_kappa
-             (x, y)
-           in
-           let  () =
-           Loggers.fprintf log
-             "(%s,%s:%s, %s,%s:%s) -> %s, %s\n"
-             agent_string
-             (Ckappa_sig.string_of_site_name site_type)
-             site_string
-             agent_string'
-             (Ckappa_sig.string_of_site_name site_type')
-             site_string'
-             state_string
-             state_string'
-           in
-           ()*)
-        ) set
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter (fun (x, y) ->
+      print_tuple parameter error handler_kappa log (x, y)
     ) store_result
