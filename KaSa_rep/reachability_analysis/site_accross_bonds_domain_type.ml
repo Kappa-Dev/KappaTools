@@ -88,3 +88,26 @@ module PairAgentsSitesStates_map_and_set =
          let compare = compare
          let print _ _ = ()
        end))
+
+module PairAgentsSitesState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module AgentsSitesState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
