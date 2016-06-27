@@ -87,7 +87,9 @@ let c_compil =
   match Remanent_state.get_c_compil state with
     None -> assert false
   | Some c_compil -> c_compil
-in
+  in
+  let state,handler = Export.Export.get_handler state in
+  let error = Remanent_state.get_errors state in
   let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
   let error, log_info, static_opt, dynamic_opt =
   if Remanent_parameters.get_do_reachability_analysis parameters
