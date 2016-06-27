@@ -1057,7 +1057,7 @@ let print_tuple_pair_binding_state parameter error handler_kappa log store_resul
 let print_tuple_pair_binding_and_state parameter error handler_kappa log store_result =
   Loggers.fprintf log
     "------------------------------------------------------------\n";
-  Loggers.fprintf log "* Tuple set:\n";
+  Loggers.fprintf log "* Tuple set when modification of the second site accross a bound that is preserved \nor creation of a bond with/without of the first site (including initial state):\n";
   Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter (fun (x, y) ->
       print_tuple parameter error handler_kappa log (x, y)
     ) store_result
