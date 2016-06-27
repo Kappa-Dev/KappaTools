@@ -11,6 +11,7 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+type init = Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil | Files of string list
 type accuracy_level = Low | Medium | High | Full
 
 module AccuracySetMap =
@@ -92,7 +93,8 @@ type state =
     parameters    : Remanent_parameters_sig.parameters  ;
     log_info : StoryProfiling.StoryStats.log_info;
     handler       : Cckappa_sig.kappa_handler option ;
-    compilation   : compilation ;
+    init : init ;
+    compilation   : compilation option ;
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;
     quark_map: quark_map option ;
@@ -106,12 +108,13 @@ type state =
     errors        : Exception.method_handler ;
   }
 
-let create_state parameters compil =
+let create_state ?errors parameters init =
   {
     parameters = parameters;
     log_info = StoryProfiling.StoryStats.init_log_info ();
     handler = None ;
-    compilation = compil ;
+    init = init ;
+    compilation = None ;
     refined_compilation = None ;
     c_compil = None ;
     quark_map = None ;
@@ -119,7 +122,11 @@ let create_state parameters compil =
     influence_map = AccuracyMap.empty ;
     contact_map = AccuracyMap.empty ;
     signature = None ;
-    errors = Exception.empty_error_handler ;
+    errors =
+      match errors
+      with None ->
+        Exception.empty_error_handler
+         | Some errors -> errors      ;
   }
 
 let do_event_gen f phase n state =
@@ -134,10 +141,12 @@ let do_event_gen f phase n state =
   {state with errors = error ; log_info = log_info}
 
 let add_event = do_event_gen StoryProfiling.StoryStats.add_event
-let close_event = do_event_gen StoryProfiling.StoryStats.close_event 
+let close_event = do_event_gen StoryProfiling.StoryStats.close_event
 
 let set_parameters parameters state = {state with parameters = parameters}
 let get_parameters state = state.parameters
+let get_init state = state.init
+let set_compilation compilation state = {state with compilation = Some compilation}
 let get_compilation state = state.compilation
 let set_handler handler state = {state with handler = Some handler}
 let get_handler state = state.handler

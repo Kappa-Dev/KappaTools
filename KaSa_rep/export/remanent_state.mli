@@ -11,6 +11,7 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+type init = Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil | Files of string list
 type accuracy_level = Low | Medium | High | Full
 
 module AccuracyMap: SetMap.Map with type elt = accuracy_level
@@ -51,15 +52,15 @@ type internal_influence_map =
 type state
 
 val create_state:
-  Remanent_parameters_sig.parameters ->
-  ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
-  -> state
+  ?errors:Exception.method_handler -> Remanent_parameters_sig.parameters -> init -> state
 
 val set_parameters: Remanent_parameters_sig.parameters -> state -> state
 val get_parameters: state -> Remanent_parameters_sig.parameters
 val add_event: StoryProfiling.step_kind -> (unit -> int) option -> state -> state
 val close_event: StoryProfiling.step_kind -> (unit -> int) option -> state -> state
-val get_compilation: state -> compilation
+val get_init: state -> init
+val set_compilation: compilation -> state -> state
+val get_compilation: state -> compilation option
 val set_handler: Cckappa_sig.kappa_handler -> state -> state
 val get_handler: state -> Cckappa_sig.kappa_handler option
 val set_refined_compil: refined_compilation -> state -> state

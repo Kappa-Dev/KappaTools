@@ -23,8 +23,8 @@ module type Export =
 sig
 
   val init:
-    called_from:Remanent_parameters_sig.called_from ->
-    ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil -> Remanent_state.state
+    ?compil:((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil ->
+    called_from:Remanent_parameters_sig.called_from -> unit -> Remanent_state.state
 
   val flush_errors:
     Remanent_state.state -> Remanent_state.state
@@ -32,6 +32,10 @@ sig
   val get_contact_map:
     ?accuracy_level:Remanent_state.accuracy_level ->
     Remanent_state.state -> Remanent_state.state * Remanent_state.contact_map
+
+  val get_internal_influence_map:
+    ?accuracy_level:Remanent_state.accuracy_level ->
+    Remanent_state.state -> Remanent_state.state * Remanent_state.internal_influence_map
 
   val get_influence_map:
     ?accuracy_level:Remanent_state.accuracy_level ->
@@ -50,6 +54,8 @@ sig
   val dump_errors: Remanent_state.state -> unit
   val dump_errors_light: Remanent_state.state -> unit
 
+
+  val get_handler: Remanent_state.state -> Remanent_state.state * Cckappa_sig.kappa_handler
 end
 
 (*******************************************************************************)
@@ -135,20 +141,56 @@ module Export =
     (*-------------------------------------------------------------------------------*)
     (*operations of module signatures*)
 
-    let init ~called_from compil =
-      let parameters = Remanent_parameters.get_parameters ~called_from () in
-      let state = Remanent_state.create_state parameters compil in
-      let () =
-        match called_from with
-        | Remanent_parameters_sig.Internalised -> assert false
-        | Remanent_parameters_sig.Server
-        | Remanent_parameters_sig.KaSim
-        | Remanent_parameters_sig.JS
-        | Remanent_parameters_sig.KaSa -> ()
-      in
-      state
+    let init ?compil ~called_from () =
+      match
+        compil
+      with
+      | Some compil ->
+        let parameters = Remanent_parameters.get_parameters ~called_from () in
+        let state = Remanent_state.create_state parameters (Remanent_state.Compil compil)
+        in state
+      | None ->
+        begin
+          match
+            called_from
+          with
+          | Remanent_parameters_sig.Internalised
+          | Remanent_parameters_sig.Server
+          | Remanent_parameters_sig.KaSim
+          | Remanent_parameters_sig.JS -> assert false
+          | Remanent_parameters_sig.KaSa ->
+            begin
+              let errors = Exception.empty_error_handler in
+              let errors,parameters,files  = Get_option.get_option errors in
+              let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_full_version parameters) in
+              let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+              let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_launched_when_and_where parameters) in
+              let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+              Remanent_state.create_state ~errors parameters (Remanent_state.Files files)
+            end
+        end
 
-    let get_gen trace stack_title_option log_option prefix_option phase int get compute state =
+    (*              let log_info = StoryProfiling.StoryStats.init_log_info () in
+                    let error, log_info =
+                    StoryProfiling.StoryStats.add_event parameters error StoryProfiling.KaSim_compilation None log_info
+                    in
+                    let compil =
+                    List.fold_left (KappaLexer.compile Format.std_formatter) Ast.empty_compil files in
+                    in
+                    state*)
+
+    let get_gen
+        ?debug_mode
+        ?stack_title
+        ?log_title
+        ?log_prefix
+        ?phase
+        ?int get compute state =
+      let debug_mode =
+        match debug_mode with
+        | None | Some false -> false
+        | Some true -> true
+      in
       match
         get state
       with
@@ -156,23 +198,25 @@ module Export =
         let parameters = Remanent_state.get_parameters state in
         let parameters' =
           Remanent_parameters.update_call_stack
-            parameters trace stack_title_option
+            parameters debug_mode stack_title
         in
         let parameters' =
-          match prefix_option with
+          match log_prefix with
           | None -> parameters'
           | Some prefix -> Remanent_parameters.update_prefix parameters' prefix
         in
         let state = Remanent_state.set_parameters parameters' state in
-        let () =
-          match log_option with
+        let show_title =
+          (fun state ->
+             let parameters = Remanent_state.get_parameters state in
+             match log_title with
           | None -> ()
           | Some title ->
             let () =
               Loggers.fprintf
                 (Remanent_parameters.get_logger parameters) "%s" title
             in
-            Loggers.print_newline (Remanent_parameters.get_logger parameters')
+            Loggers.print_newline (Remanent_parameters.get_logger parameters'))
         in
         let state =
           match phase
@@ -180,7 +224,7 @@ module Export =
           | None -> state
           | Some phase -> Remanent_state.add_event phase int state
         in
-        let state, output = compute state in
+        let state, output = compute show_title state in
         let state =
           match phase
           with
@@ -194,10 +238,30 @@ module Export =
     let flush_errors state =
       Remanent_state.set_errors Exception.empty_error_handler state
 
-    let compute_refined_compil state =
-      let compil = Remanent_state.get_compilation state in
+    let compute_compilation show_title state =
+      let compil =
+        match Remanent_state.get_init state
+        with
+        | Remanent_state.Compil compil -> compil
+        | Remanent_state.Files files ->
+          let () = show_title state in
+          List.fold_left (KappaLexer.compile Format.std_formatter) Ast.empty_compil files
+      in
+      let state = Remanent_state.set_compilation compil state in
+      state, compil
+
+    let get_compilation =
+      get_gen
+        ~phase:StoryProfiling.KaSa_lexing
+        Remanent_state.get_compilation
+        compute_compilation
+
+
+    let compute_refined_compil show_title state =
+      let state,compil = get_compilation state in
       let errors = Remanent_state.get_errors state in
       let parameters = Remanent_state.get_parameters state in
+      let () = show_title state in
       let errors,refined_compil =
         Prepreprocess.translate_compil parameters errors compil
       in
@@ -207,19 +271,17 @@ module Export =
 
     let get_refined_compil =
       get_gen
-        Preprocess.local_trace
-        (Some "Prepreprocess.translate_compil")
-        None
-        None
-        (Some StoryProfiling.KaSim_compilation)
-        None
+        ~debug_mode:Preprocess.local_trace
+        ~stack_title:"Prepreprocess.translate_compil"
+        ~phase:StoryProfiling.KaSim_compilation
         Remanent_state.get_refined_compil
         compute_refined_compil
 
-    let compute_handler state =
+    let compute_handler show_title state =
       let state, refined_compil = get_refined_compil state in
       let parameters = Remanent_state.get_parameters state in
       let errors = Remanent_state.get_errors state in
+      let () = show_title state in
       let errors, handler =
         List_tokens.scan_compil parameters errors refined_compil
       in
@@ -229,19 +291,17 @@ module Export =
 
     let get_handler =
       get_gen
-        List_tokens.local_trace
-        (Some "List_tokens.scan_compil")
-        None
-        None
-        (Some StoryProfiling.KaSa_lexing)
-        None
+        ~debug_mode:List_tokens.local_trace
+        ~stack_title:"List_tokens.scan_compil"
+        ~phase:StoryProfiling.KaSa_lexing
         Remanent_state.get_handler compute_handler
 
-    let compute_c_compilation state =
+    let compute_c_compilation show_title state =
       let parameters = Remanent_state.get_parameters state in
       let state, refined_compil = get_refined_compil state in
       let state, handler = get_handler state in
       let error = Remanent_state.get_errors state in
+      let () = show_title state in
       let error, handler, c_compil =
         Preprocess.translate_c_compil
           parameters error handler refined_compil
@@ -254,15 +314,13 @@ module Export =
 
     let get_c_compilation =
       get_gen
-      List_tokens.local_trace
-      (Some "Preprocess.translate_c_compil")
-      (Some "Compiling...")
-      None
-      (Some StoryProfiling.KaSa_linking)
-      None
-      Remanent_state.get_c_compil compute_c_compilation
+        ~debug_mode:List_tokens.local_trace
+        ~stack_title:"Preprocess.translate_c_compil"
+        ~log_title:"Compiling..."
+        ~phase:StoryProfiling.KaSa_linking
+        Remanent_state.get_c_compil compute_c_compilation
 
-    let compute_raw_contact_map state =
+    let compute_raw_contact_map show_title state =
       let sol        = ref Mods.StringMap.empty in
       let state, handler = get_handler state in
       let parameters = Remanent_state.get_parameters state in
@@ -288,6 +346,7 @@ module Export =
         | Ckappa_sig.Internal site_name -> site_name
       in
       (*----------------------------------------------------------------*)
+      let () = show_title state in
       let error =
         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
           parameters error
@@ -345,14 +404,9 @@ module Export =
 
     let get_raw_contact_map =
       get_gen
-      false
-      None
-      (Some "+ Compute the contact map")
-      None
-      None
-      None
-      (Remanent_state.get_contact_map Remanent_state.Low)
-      compute_raw_contact_map
+        ~log_title:"+ Compute the contact map"
+        (Remanent_state.get_contact_map Remanent_state.Low)
+        compute_raw_contact_map
 
     let convert_label a =
       if a<0 then Remanent_state.Side_effect (-(a+1))
@@ -392,13 +446,23 @@ module Export =
         influence
         Remanent_state.InfluenceNodeMap.empty
 
-    let compute_quark_map state =
+    let compute_quark_map show_title state =
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
       let state, handler = get_handler state in
       let state, c_compil = get_c_compilation state in
+      let () = show_title state in
       let error,quark_map =
         Quark.quarkify parameters error handler c_compil
+      in
+      let error =
+        if
+          (Remanent_parameters.get_trace parameters)
+          || Print_quarks.trace
+        then
+          Print_quarks.print_quarks parameters error handler quark_map
+        else
+          error
       in
       Remanent_state.set_errors error
         (Remanent_state.set_quark_map quark_map state),
@@ -406,21 +470,19 @@ module Export =
 
     let get_quark_map =
       get_gen
-        Quark.local_trace
-        (Some "Quark.quarkify")
-        (Some "Quarks:")
-        None
-        None
-        None
+        ~debug_mode:Quark.local_trace
+        ~stack_title:"Quark.quarkify"
+        ~log_prefix:"Quarks:"
         Remanent_state.get_quark_map
         compute_quark_map
 
-    let compute_raw_internal_influence_map state =
+    let compute_raw_internal_influence_map show_title state =
       let parameters = Remanent_state.get_parameters state in
       let state, handler = get_handler state in
       let error = Remanent_state.get_errors state in
       let nrules = Handler.nrules parameters error handler in
       let state, quark_map = get_quark_map state in
+      let () = show_title state in
       let error,wake_up_map,inhibition_map =
         Influence_map.compute_influence_map parameters
           error handler quark_map nrules
@@ -435,20 +497,18 @@ module Export =
 
     let get_raw_internal_influence_map =
       get_gen
-        true
-        None
-        (Some "Influence_map: (internal)")
-        (Some "Generating the raw influence map (internal)...")
-        (Some (StoryProfiling.Internal_influence_map "raw"))
-        None
+        ~log_prefix:"Influence_map: (internal)"
+        ~log_title:"Generating the raw influence map (internal)..."
+        ~phase:(StoryProfiling.Internal_influence_map "raw")
         (Remanent_state.get_internal_influence_map Remanent_state.Low)
         compute_raw_internal_influence_map
 
-    let compute_raw_influence_map state =
+    let compute_raw_influence_map show_title state =
       let parameters = Remanent_state.get_parameters state in
       let state, handler = get_handler state in
       let error = Remanent_state.get_errors state in
       let nrules = Handler.nrules parameters error handler in
+      let () = show_title state in
       let state, (wake_up_map, inhibition_map) =
         get_raw_internal_influence_map state
       in
@@ -469,17 +529,14 @@ module Export =
 
     let get_raw_influence_map =
       get_gen
-      true
-      None
-      (Some "Influence_map:")
-      (Some "Generating the raw influence map...")
-      (Some (StoryProfiling.Influence_map "raw"))
-      None
-      (Remanent_state.get_influence_map Remanent_state.Low)
-      compute_raw_influence_map
+        ~log_prefix:"Influence_map:"
+        ~log_title:"Generating the raw influence map..."
+        ~phase:(StoryProfiling.Influence_map "raw")
+        (Remanent_state.get_influence_map Remanent_state.Low)
+        compute_raw_influence_map
 
 
-    let compute_intermediary_internal_influence_map state =
+    let compute_intermediary_internal_influence_map show_title state =
       let state, handler = get_handler state in
       let state, compil = get_c_compilation state in
       let state,(wake_up_map,inhibition_map) =
@@ -487,7 +544,7 @@ module Export =
       in
       let parameters = Remanent_state.get_parameters state in
       let error = Remanent_state.get_errors state in
-      let nrules = Handler.nrules parameters error handler in
+      let () = show_title state in
       let error,wake_up_map =
         Algebraic_construction.filter_influence
           parameters error handler compil wake_up_map true
@@ -501,6 +558,8 @@ module Export =
           (wake_up_map,inhibition_map)
           state
       in
+      let state, handler = get_handler state in
+      let nrules = Handler.nrules parameters error handler in
       let state =
         Remanent_state.set_influence_map Remanent_state.Medium
           {
@@ -514,23 +573,21 @@ module Export =
 
     let get_intermediary_internal_influence_map =
       get_gen
-      true
-      None
-      (Some "Influence_map:")
-      (Some "+refining the influence map")
-      (Some (StoryProfiling.Internal_influence_map "medium"))
-      None
+        ~log_prefix:"Influence_map:"
+        ~log_title:"+refining the influence map"
+        ~phase:(StoryProfiling.Internal_influence_map "medium")
         (Remanent_state.get_internal_influence_map Remanent_state.Medium)
         compute_intermediary_internal_influence_map
 
-    let compute_intermediary_influence_map state =
-      let parameters = Remanent_state.get_parameters state in
-      let state, handler = get_handler state in
-      let error = Remanent_state.get_errors state in
-      let nrules = Handler.nrules parameters error handler in
+    let compute_intermediary_influence_map show_title state =
       let state, (wake_up_map, inhibition_map) =
         get_intermediary_internal_influence_map state
       in
+      let state, handler = get_handler state in
+      let parameters = Remanent_state.get_parameters state in
+      let error = Remanent_state.get_errors state in
+      let nrules = Handler.nrules parameters error handler in
+      let () = show_title state in
       let output =
         {
           Remanent_state.positive = convert_influence_map wake_up_map nrules ;
@@ -548,12 +605,9 @@ module Export =
 
     let get_intermediary_influence_map =
       get_gen
-      true
-      None
-      (Some "Influence_map:")
-      (Some "+refining the influence map")
-      (Some (StoryProfiling.Internal_influence_map "medium"))
-      None
+        ~log_prefix:"Influence_map:"
+        ~log_title:"+refining the influence map"
+        ~phase:(StoryProfiling.Internal_influence_map "medium")
         (Remanent_state.get_influence_map Remanent_state.Medium)
         compute_intermediary_influence_map
 
@@ -577,9 +631,19 @@ module Export =
       | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
         get_intermediary_influence_map state
 
+     let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
+            state =
+          match
+            accuracy_level
+          with
+          | Remanent_state.Low ->
+            get_raw_internal_influence_map state
+          | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
+            get_intermediary_internal_influence_map state
 
-    let compute_signature state =
+    let compute_signature show_title state =
       let state,l = get_contact_map state in
+      let () = show_title state in
       let l =
         Mods.StringMap.fold
           (fun a interface list ->
@@ -601,12 +665,6 @@ module Export =
 
     let get_signature =
       get_gen
-        false
-        None
-        None
-        None
-        None
-        None
         Remanent_state.get_signature
         compute_signature
 
