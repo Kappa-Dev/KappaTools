@@ -88,6 +88,8 @@ type influence_map =
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
+type internal_contact_map = Cckappa_sig.kappa_handler
+
 type state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
@@ -104,6 +106,7 @@ type state =
        Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t)
         AccuracyMap.t ;
     influence_map : influence_map AccuracyMap.t ;
+    internal_contact_map: internal_contact_map AccuracyMap.t;
     contact_map   : contact_map AccuracyMap.t ;
     signature     : Signature.s option;
     errors        : Exception.method_handler ;
@@ -122,6 +125,7 @@ let create_state ?errors parameters init =
     quark_map = None ;
     internal_influence_map = AccuracyMap.empty ;
     influence_map = AccuracyMap.empty ;
+    internal_contact_map = AccuracyMap.empty ;
     contact_map = AccuracyMap.empty ;
     signature = None ;
     errors =
@@ -183,6 +187,13 @@ let set_internal_influence_map accuracy map state =
           AccuracyMap.add accuracy map state.internal_influence_map}
 let get_internal_influence_map accuracy state =
   AccuracyMap.find_option accuracy state.internal_influence_map
+let set_internal_contact_map accuracy int_contact_map state =
+  {state
+   with internal_contact_map = AccuracyMap.add accuracy int_contact_map state.internal_contact_map}
+let get_internal_contact_map accuracy state =
+    AccuracyMap.find_option accuracy state.internal_contact_map
 
 let get_influence_map_map state = state.influence_map
 let get_contact_map_map state = state.contact_map
+
+let get_log_info state = state.log_info

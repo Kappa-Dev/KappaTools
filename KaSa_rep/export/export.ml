@@ -314,6 +314,21 @@ let get_handler =
   ~phase:StoryProfiling.KaSa_linking
   Remanent_state.get_handler (choose snd)
 
+let compute_raw_internal_contact_map show_title state =
+  let state, handler = get_handler state in
+  let () = show_title state in
+  Remanent_state.set_internal_contact_map Remanent_state.Low handler state,
+  handler
+
+let dump_raw_internal_contact_map parameters error handler =
+    Print_handler.dot_of_contact_map parameters error handler
+
+let get_raw_internal_contact_map =
+  get_gen
+    ~log_title:"Generating the raw contact map..."
+    ~dump:dump_raw_internal_contact_map
+    (Remanent_state.get_internal_contact_map Remanent_state.Low)
+    compute_raw_internal_contact_map
 
 let compute_raw_contact_map show_title state =
   let sol        = ref Mods.StringMap.empty in
@@ -615,6 +630,15 @@ let get_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   | Remanent_state.Medium
   | Remanent_state.High
   | Remanent_state.Full -> get_raw_contact_map state
+
+let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+    match
+      accuracy_level
+    with
+    | Remanent_state.Low
+    | Remanent_state.Medium
+    | Remanent_state.High
+    | Remanent_state.Full -> get_raw_internal_contact_map state
 
 let get_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =

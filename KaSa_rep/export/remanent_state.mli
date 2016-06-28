@@ -16,6 +16,8 @@ type accuracy_level = Low | Medium | High | Full
 
 module AccuracyMap: SetMap.Map with type elt = accuracy_level
 
+type internal_contact_map = Cckappa_sig.kappa_handler
+
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
@@ -72,6 +74,8 @@ val get_c_compil: state -> Cckappa_sig.compil option
 val get_errors: state -> Exception.method_handler
 val set_errors: Exception.method_handler -> state -> state
 
+val set_internal_contact_map: accuracy_level -> internal_contact_map -> state -> state
+val get_internal_contact_map: accuracy_level -> state -> internal_contact_map option
 val set_contact_map: accuracy_level -> contact_map -> state -> state
 val get_contact_map: accuracy_level -> state -> contact_map option
 val set_signature: Signature.s -> state -> state
@@ -84,3 +88,4 @@ val set_influence_map: accuracy_level -> influence_map -> state -> state
 val get_influence_map: accuracy_level -> state -> influence_map option
 val get_influence_map_map: state -> influence_map AccuracyMap.t
 val get_contact_map_map: state -> contact_map AccuracyMap.t
+val get_log_info: state -> StoryProfiling.StoryStats.log_info

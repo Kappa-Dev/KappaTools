@@ -31,19 +31,7 @@ let main () =
   let (state:Remanent_state.state) =
     Export.init  ~called_from:Remanent_parameters_sig.KaSa ()
   in
-  let state,handler = Export.get_handler state in
-  let error = Remanent_state.get_errors state in
-  let parameters = Remanent_state.get_parameters state in
-  let log_info = StoryProfiling.StoryStats.init_log_info () in
-  let error =
-    if Remanent_parameters.get_do_contact_map parameters
-    then
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Generating the raw contact map..." in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-      Print_handler.dot_of_contact_map parameters error handler
-    else error
-  in
-  let state = Remanent_state.set_errors error state in
+  let state,_ = Export.get_internal_contact_map ~accuracy_level:Remanent_state.Low state in
   let parameters = Remanent_state.get_parameters state in
   let state =
     match
@@ -83,6 +71,7 @@ let c_compil =
   let state,handler = Export.get_handler state in
   let error = Remanent_state.get_errors state in
   let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
+  let log_info = Remanent_state.get_log_info state in
   let error, log_info, static_opt, dynamic_opt =
   if Remanent_parameters.get_do_reachability_analysis parameters
   then
