@@ -13,7 +13,6 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Site accross domain static information") message exn
     (fun () -> default)
@@ -200,6 +199,7 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
 
 (***************************************************************)
 (*collect rule that can be modified*)
+
 let collect_site_modified parameter error rule_id rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
@@ -343,10 +343,6 @@ let collect_created_bond parameter error rule_id rule store_tuple_pair store_res
                 agent_id1 = agent_id' && agent_id2 = agent_id &&
                 site_type' = site_type1 && site_type2 = site_type
              then
-               (*let pair =
-                 ((agent_id1, agent_type1, site_type1, site_type'),
-                 (agent_id2, agent_type2, site_type2, site_type2'))
-                 in*)
                let error, set =
                  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error (x,y)
                    Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
@@ -581,3 +577,361 @@ let init_basic_static_information =
     store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_implicit_static = Ckappa_sig.Rule_map_and_set.Map.empty;
   }
+
+(****************************************************************)
+(*PRINT*)
+(****************************************************************)
+
+let print_views_rhs parameter error handler_kappa log store_result =
+  Loggers.fprintf log
+    "\n* Views on the right hand side rule:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (fun (agent_id, agent_type, site_type, state) error ->
+            let error, (agent_string, site_string, state_string) =
+              Print_site_accross_bonds_domain.print_agents_site_state parameter error handler_kappa
+                (agent_id, agent_type, site_type, state)
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s:%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                state_string
+                (Ckappa_sig.string_of_state_index state)
+            in error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+(*bonds on the right hand side*)
+
+let print_bonds_rhs parameter error handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Rule that has site can be bound:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+         (fun (x, y) error ->
+            let (_, _, site_type, state) = x in
+            let (_, _, site_type', state') = y in
+            let error, ((agent_string, site_string, state_string),
+                        (agent_string', site_string', state_string')) =
+              Print_site_accross_bonds_domain.print_pair_agents_site_state parameter error handler_kappa (x, y)
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s:%s:%s), %s(%s:%s:%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                state_string
+                (Ckappa_sig.string_of_state_index state)
+                agent_string'
+                (Ckappa_sig.string_of_site_name site_type')
+                site_string'
+                state_string'
+                (Ckappa_sig.string_of_state_index state')
+            in
+            error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_modified_map parameter error handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Rule that has site can be modified:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (fun x error ->
+            let (_, _, site_type, state) = x in
+            let error, (agent_string, site_string, state_string) =
+              Print_site_accross_bonds_domain.print_agents_site_state parameter error handler_kappa x
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s:%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                state_string
+                (Ckappa_sig.string_of_state_index state)
+            in
+            error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_created_bond parameter error handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Rule that created a site can be bound:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+         (fun (x, y) error ->
+            let (_, _, site_type, site_type2) = x in
+            let (_, _, site_type', site_type2') = y in
+            let _,
+                ((agent_string, site_string, site_string2),(agent_string', site_string', site_string2')) =
+              Print_site_accross_bonds_domain.print_pair_agents_sites parameter error handler_kappa log
+                (x, y)
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s,%s:%s), %s(%s:%s,%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                (Ckappa_sig.string_of_site_name site_type2)
+                site_string2
+                agent_string'
+                (Ckappa_sig.string_of_site_name site_type')
+                site_string'
+                (Ckappa_sig.string_of_site_name site_type2')
+                site_string2'
+            in
+            error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_modified_internal_state_bond parameter error
+    handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Rule that has the first site can be bound, and the second site has internal state can be modified:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+         (fun (x, y) error ->
+            let (_, _, site_type, site_type2) = x in
+            let (_, _, site_type', site_type2') = y in
+            let _,
+                ((agent_string, site_string, site_string2),(agent_string', site_string', site_string2')) =
+              Print_site_accross_bonds_domain.print_pair_agents_sites parameter error handler_kappa log
+                (x, y)
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s,%s:%s), %s(%s:%s,%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                (Ckappa_sig.string_of_site_name site_type2)
+                site_string2
+                agent_string'
+                (Ckappa_sig.string_of_site_name site_type')
+                site_string'
+                (Ckappa_sig.string_of_site_name site_type2')
+                site_string2'
+            in
+            error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_question_marks_rhs parameter error handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Question marks on the rhs:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.fold (fun (agent_id, agent_type, site_type, site_type') error ->
+           let error, (agent_string, site_string) =
+             Print_site_accross_bonds_domain.print_agents_site parameter error handler_kappa (agent_id, agent_type, site_type)
+           in
+           let error, site_string' =
+             try
+               Handler.string_of_site parameter error handler_kappa
+                 agent_type site_type'
+             with
+               _ -> warn parameter error (Some "line 30") Exit
+                      (Ckappa_sig.string_of_site_name site_type')
+           in
+           let () =
+             Loggers.fprintf log
+               "rule_id:%s: %s(%s:%s,%s:%s)\n"
+               (Ckappa_sig.string_of_rule_id rule_id)
+               agent_string
+               (Ckappa_sig.string_of_site_name site_type)
+               site_string
+               (Ckappa_sig.string_of_site_name site_type')
+               site_string'
+           in
+           error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_explicit_static parameter error
+    handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Explicit static information:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+         (fun (x, y) error ->
+            let (_, _, site_type, site_type2) = x in
+            let (_, _, site_type', site_type2') = y in
+            let _,
+                ((agent_string, site_string, site_string2),(agent_string', site_string', site_string2')) =
+              Print_site_accross_bonds_domain.print_pair_agents_sites parameter error handler_kappa log
+                (x, y)
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s,%s:%s), %s(%s:%s,%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                (Ckappa_sig.string_of_site_name site_type2)
+                site_string2
+                agent_string'
+                (Ckappa_sig.string_of_site_name site_type')
+                site_string'
+                (Ckappa_sig.string_of_site_name site_type2')
+                site_string2'
+            in
+            error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_implicit_static parameter error
+    handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log
+    "* Implicit static information:\n";
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set error ->
+       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+         (fun (x, y) error ->
+            let (_, _, site_type, site_type2) = x in
+            let (_, _, site_type', site_type2') = y in
+            let _,
+                ((agent_string, site_string, site_string2),(agent_string', site_string', site_string2')) =
+              Print_site_accross_bonds_domain.print_pair_agents_sites parameter error handler_kappa log
+                (x, y)
+            in
+            let () =
+              Loggers.fprintf log
+                "rule_id:%s: %s(%s:%s,%s:%s), %s(%s:%s,%s:%s)\n"
+                (Ckappa_sig.string_of_rule_id rule_id)
+                agent_string
+                (Ckappa_sig.string_of_site_name site_type)
+                site_string
+                (Ckappa_sig.string_of_site_name site_type2)
+                site_string2
+                agent_string'
+                (Ckappa_sig.string_of_site_name site_type')
+                site_string'
+                (Ckappa_sig.string_of_site_name site_type2')
+                site_string2'
+            in
+            error
+         ) set error
+    ) store_result error
+
+(****************************************************************)
+
+let print_basic_static_information parameter error handler_kappa log store_views_rhs store_bonds_rhs store_modified_map store_created_bond store_modified_internal_state_and_bond store_question_marks_rhs store_explicit_static store_implicit_static =
+  (*--------------------------------------------------------*)
+  (*views on the right hand side*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_views_rhs parameter error handler_kappa log store_views_rhs
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*bonds on the right hand side*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_bonds_rhs parameter error handler_kappa log store_bonds_rhs
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*modification*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_modified_map parameter error handler_kappa log store_modified_map
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*created bonds*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_created_bond parameter error handler_kappa log store_created_bond
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*internal state*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_modified_internal_state_bond parameter error handler_kappa log store_modified_internal_state_and_bond
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*question marks on the right hand side*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_question_marks_rhs parameter error handler_kappa log store_question_marks_rhs
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*explicit static*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_explicit_static parameter error handler_kappa log store_explicit_static
+      in error
+    else error
+  in
+  (*--------------------------------------------------------*)
+  (*implicit*)
+  let error =
+    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    then
+      let error =
+        print_implicit_static parameter error handler_kappa log store_implicit_static
+      in error
+    else error
+  in
+  error
