@@ -90,6 +90,14 @@ type contact_map =
 
 type internal_contact_map = Cckappa_sig.kappa_handler
 
+type reachability_result =
+  Domain_selection.Reachability_analysis.static_information
+  * Domain_selection.Reachability_analysis.dynamic_information
+
+type flow =
+  Ckappa_sig.Site_union_find.t
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+
 type state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
@@ -109,10 +117,22 @@ type state =
     internal_contact_map: internal_contact_map AccuracyMap.t;
     contact_map   : contact_map AccuracyMap.t ;
     signature     : Signature.s option;
+    bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
+    reachability_state: reachability_result option ;
+    ode_flow: Ode_fragmentation_type.ode_frag option ;
+    ctmc_flow: flow option ;
     errors        : Exception.method_handler ;
   }
 
 let create_state ?errors parameters init =
+  let error =
+    match
+      errors
+    with
+    | None -> Exception.empty_error_handler
+    | Some error -> error
+  in
+  let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
   {
     parameters = parameters;
     log_info = StoryProfiling.StoryStats.init_log_info ();
@@ -128,12 +148,12 @@ let create_state ?errors parameters init =
     internal_contact_map = AccuracyMap.empty ;
     contact_map = AccuracyMap.empty ;
     signature = None ;
-    errors =
-      match errors
-      with None ->
-        Exception.empty_error_handler
-         | Some errors -> errors      ;
-  }
+    bdu_handler = handler_bdu ;
+    ode_flow = None ;
+    ctmc_flow = None ;
+    reachability_state = None ;
+    errors = error ;
+    }
 
 let do_event_gen f phase n state =
   let error, log_info =
@@ -192,8 +212,21 @@ let set_internal_contact_map accuracy int_contact_map state =
    with internal_contact_map = AccuracyMap.add accuracy int_contact_map state.internal_contact_map}
 let get_internal_contact_map accuracy state =
     AccuracyMap.find_option accuracy state.internal_contact_map
+let get_reachability_result state = state.reachability_state
+let set_reachability_result reachability_state state =
+  {state with reachability_state = Some reachability_state}
+let set_bdu_handler bdu_handler state =
+  {state with bdu_handler = bdu_handler}
+let get_bdu_handler state = state.bdu_handler
+let set_ode_flow flow state = {state with ode_flow = Some flow}
+let get_ode_flow state = state.ode_flow
+let set_ctmc_flow flow state = {state with ctmc_flow = Some flow}
+let get_ctmc_flow state = state.ctmc_flow
+
+
 
 let get_influence_map_map state = state.influence_map
 let get_contact_map_map state = state.contact_map
 
 let get_log_info state = state.log_info
+let set_log_info log state = {state with log_info = log}

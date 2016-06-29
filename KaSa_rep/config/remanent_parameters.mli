@@ -52,6 +52,7 @@ val update_call_stack:
 
 val get_link_mode: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.link_mode
 val get_influence_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
+val get_contact_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 
 (** Kappa pretty-printing *)
 val get_btype_sep_symbol: Remanent_parameters_sig.parameters -> string

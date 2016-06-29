@@ -308,11 +308,11 @@ let get_c_compilation =
 
 let get_handler =
   get_gen
-  ~debug_mode:List_tokens.local_trace
-  ~stack_title:"Preprocess.translate_c_compil"
-  ~log_title:"Compiling..."
-  ~phase:StoryProfiling.KaSa_linking
-  Remanent_state.get_handler (choose snd)
+    ~debug_mode:List_tokens.local_trace
+    ~stack_title:"Preprocess.translate_c_compil"
+    ~log_title:"Compiling..."
+    ~phase:StoryProfiling.KaSa_linking
+    Remanent_state.get_handler (choose snd)
 
 let compute_raw_internal_contact_map show_title state =
   let state, handler = get_handler state in
@@ -323,7 +323,7 @@ let compute_raw_internal_contact_map show_title state =
 let dump_raw_internal_contact_map parameters error handler =
     Print_handler.dot_of_contact_map parameters error handler
 
-let get_raw_internal_contact_map =
+let get_raw_internal_contact_map  =
   get_gen
     ~log_title:"Generating the raw contact map..."
     ~dump:dump_raw_internal_contact_map
@@ -508,7 +508,7 @@ let compute_raw_internal_influence_map show_title state =
 let get_raw_internal_influence_map =
   get_gen
     ~log_prefix:"Influence_map: (internal)"
-    ~log_title:"Generating the raw influence map (internal)..."
+    ~log_title:"Generating the raw influence map..."
     ~phase:(StoryProfiling.Internal_influence_map "raw")
     (Remanent_state.get_internal_influence_map Remanent_state.Low)
     compute_raw_internal_influence_map
@@ -584,7 +584,7 @@ let compute_intermediary_internal_influence_map show_title state =
 let get_intermediary_internal_influence_map =
   get_gen
     ~log_prefix:"Influence_map:"
-    ~log_title:"+refining the influence map"
+    ~log_title:"Refining the influence map..."
     ~phase:(StoryProfiling.Internal_influence_map "medium")
     (Remanent_state.get_internal_influence_map Remanent_state.Medium)
     compute_intermediary_internal_influence_map
@@ -632,13 +632,13 @@ let get_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   | Remanent_state.Full -> get_raw_contact_map state
 
 let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
-    match
-      accuracy_level
-    with
-    | Remanent_state.Low
-    | Remanent_state.Medium
-    | Remanent_state.High
-    | Remanent_state.Full -> get_raw_internal_contact_map state
+  match
+    accuracy_level
+  with
+  | Remanent_state.Low
+  | Remanent_state.Medium
+  | Remanent_state.High
+  | Remanent_state.Full -> get_raw_internal_contact_map state
 
 let get_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =
@@ -686,6 +686,70 @@ let get_signature =
   get_gen
     Remanent_state.get_signature
     compute_signature
+
+let compute_reachability_result show_title state =
+  let state, c_compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let () = show_title state in
+  let bdu_handler = Remanent_state.get_bdu_handler state in
+  let log_info = Remanent_state.get_log_info state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error, log_info, static, dynamic =
+    Domain_selection.Reachability_analysis.main
+      parameters log_info error bdu_handler c_compil handler
+  in
+  let state = Remanent_state.set_errors error state in
+  let state = Remanent_state.set_log_info log_info state in
+  let state = Remanent_state.set_bdu_handler bdu_handler state in
+  let state = Remanent_state.set_reachability_result (static, dynamic) state in
+  state, (static, dynamic)
+
+let get_reachability_analysis =
+  get_gen
+    ~log_title:"Reachability analysis..."
+    (Remanent_state.get_reachability_result)
+    compute_reachability_result
+
+let compute_ctmc_flow show_title state =
+  let state, c_compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let () = show_title state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error, output = Stochastic_classes.stochastic_classes parameters error handler c_compil in
+  Remanent_state.set_errors
+    error
+    (Remanent_state.set_ctmc_flow output state),
+  output
+
+let get_ctmc_flow =
+  get_gen
+    ~log_prefix:"Flow of information in the CTMC semantics:"
+    ~log_title:"Flow of information in the CTMC semantcs:"
+    Remanent_state.get_ctmc_flow
+    compute_ctmc_flow
+
+let compute_ode_flow show_title state =
+  let state, c_compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let () = show_title state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error, output = Ode_fragmentation_main.ode_fragmentation
+      parameters error handler c_compil
+  in
+  Remanent_state.set_errors
+    error
+    (Remanent_state.set_ode_flow output state),
+  output
+
+let get_ode_flow =
+  get_gen
+    ~log_prefix:"Flow of information in the ODE semantics:"
+    ~log_title:"Flow of information in the ODE semantcs:"
+    Remanent_state.get_ode_flow
+    compute_ode_flow
 
 let find_most_precise map =
   match

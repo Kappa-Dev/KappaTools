@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: June, the 25th of 2016
+  * Last modification: Time-stamp: <Jun 29 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -49,7 +49,16 @@ type influence_map =
   }
 
 type internal_influence_map =
-  Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+  Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+  * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+
+type reachability_result =
+  Domain_selection.Reachability_analysis.static_information
+  * Domain_selection.Reachability_analysis.dynamic_information
+
+type flow =
+    Ckappa_sig.Site_union_find.t
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
 type state
 
@@ -86,6 +95,16 @@ val set_internal_influence_map: accuracy_level -> internal_influence_map -> stat
 val get_internal_influence_map: accuracy_level -> state -> internal_influence_map option
 val set_influence_map: accuracy_level -> influence_map -> state -> state
 val get_influence_map: accuracy_level -> state -> influence_map option
+val set_ode_flow: Ode_fragmentation_type.ode_frag -> state -> state
+val get_ode_flow: state -> Ode_fragmentation_type.ode_frag option
+val set_ctmc_flow: flow -> state -> state
+val get_ctmc_flow: state -> flow option
+val get_bdu_handler: state -> Mvbdu_wrapper.Mvbdu.handler
+val set_bdu_handler: Mvbdu_wrapper.Mvbdu.handler -> state -> state
+val set_reachability_result: reachability_result -> state -> state
+val get_reachability_result: state -> reachability_result option
 val get_influence_map_map: state -> influence_map AccuracyMap.t
 val get_contact_map_map: state -> contact_map AccuracyMap.t
+
+val set_log_info: StoryProfiling.StoryStats.log_info -> state -> state
 val get_log_info: state -> StoryProfiling.StoryStats.log_info
