@@ -27,9 +27,13 @@ type basic_dynamic_information =
     store_pair_tuple_init: Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t;
     (*return the internal state in the case of explicit static information*)
     store_explicit_dynamic: Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t;
-    (*return the internal state in the case of implicit static information*)
+    (*return the internal state in the case of implicit static information, todo*)
     store_implicit_dynamic:
       (Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.t * Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.t);
+    (*prepare database mvbdu to print in natural language, firstly print the explicit dynamic *)
+    store_relation_mvbdu :
+    Ckappa_sig.Views_bdu.mvbdu
+      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
   }
 
 (***************************************************************)
@@ -395,7 +399,7 @@ let error, store_result =
               (*------------------------------------------------*)
               (*check the site on the rhs belongs to the first site of the tuple pair*)
               let error, first_agent =
-                if agent_type = agent_type1 && site_type = site_type1
+                if agent_type = agent_type1 && site_type = site_type1 (*todo*)
                 then
                   let binding_state =
                     (agent_id1, agent_type1, site_type1, site_type2, state, state2)
@@ -497,9 +501,6 @@ let collect_explicit_dynamic parameter error
     store_tuple_pair_binding_internal_state_explicit
     store_pair_tuple_init store_result =
   (*add information about initial state*)
-  (*let error, store_tuple_pair_binding_internal_state_explicit_aux =
-    collect_tuple_pair_binding_internal_state_explicit_aux parameter error rule_id store_views_rhs store_internal_state_explicit
-  in*)
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.fold
       (fun _ pair_set (error, store_result) ->
@@ -663,6 +664,35 @@ let collect_implicit_dynamic parameter error rule_id store_tuple_pair_init store
   error, store_result
 
 (***************************************************************)
+(*relation mvbdu*)
+
+let collect_relation_mvbdu parameter error handler store_explicit_dynamic store_result =
+(*get the set of tuple when both agents are connected via x.z*)
+  let error, handler, store_result =
+    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
+      (fun (x, y) (error, handler, store_result)->
+        (*build the mvbdu of two sites y(site_type2) and z(site_type2')*)
+         let (_, _, _, site_type2, _, state2) = x in
+         let (_, _, _, site_type2', _, state2') = y in
+         (*build (key * value) list *)
+         let pair_list =
+           [(site_type2, state2);(site_type2', state2')]
+         in
+         let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list parameter handler error pair_list in
+         let error, store_result =
+           Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+             parameter
+             error
+             (x,y)
+             mvbdu
+             store_result
+         in
+         error, handler, store_result
+      ) store_explicit_dynamic (error, handler, store_result)
+  in
+  error, handler, store_result
+
+(***************************************************************)
 (*initial*)
 
 let init_basic_dynamic_information =
@@ -673,7 +703,8 @@ let init_basic_dynamic_information =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty;
     store_implicit_dynamic =
       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty,
-      Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty
+      Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty;
+    store_relation_mvbdu = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
   }
 
 (***************************************************************)
