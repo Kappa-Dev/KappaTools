@@ -1,4 +1,4 @@
-%agent:A(z,t~u~p)
+q%agent:A(z,t~u~p)		
 %agent:B(z~u~p,t~u~p)
 
 %init: 10 A(z,t)
