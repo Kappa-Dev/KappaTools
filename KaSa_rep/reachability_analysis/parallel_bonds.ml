@@ -534,9 +534,7 @@ struct
         store_value_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_non_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_of_parallel_bonds = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty(*,
-                                                                                                        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty*)
-      }
+        store_value_of_parallel_bonds = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty  }
     in
     let init_global_dynamic_information =
       {
@@ -571,6 +569,7 @@ struct
         error
         init_state
     in
+    (*------------------------------------------------------------*)
     let error, store_site_pair_list =
       Parallel_bonds_init.collect_non_parallel_init_aux
         parameter
@@ -586,6 +585,7 @@ struct
         error
         init_state
     in
+    (*------------------------------------------------------------*)
     let store_result = get_value_non_parallel_bonds_init dynamic in
     let error, store_result =
       Parallel_bonds_init.collect_value_non_parallel_bonds
@@ -1418,6 +1418,21 @@ let apply_rule static dynamic error rule_id precondition =
   let print static dynamic (error:Exception.method_handler) loggers =
     let handler_kappa = get_kappa_handler static in
     let parameter = get_parameter static in
+    let log = Remanent_parameters.get_logger parameter in    (*--------------------------------------------------------*)
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_parallel
+          parameter
+      then
+        let () =
+          Loggers.fprintf log
+            "------------------------------------------------------------\n";
+          Loggers.fprintf log "* Parallel bonds domain\n";
+          Loggers.fprintf log
+            "------------------------------------------------------------\n"
+        in
+        error
+      else error
+    in
     (*--------------------------------------------------------------*)
     (*let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
       let _ =
@@ -1461,14 +1476,17 @@ let apply_rule static dynamic error rule_id precondition =
     in
     (*-----------------------------------------------------------*)
     (*print value of initial state*)
-    (*let store_value_of_init = get_value_of_init dynamic in
-      let _ =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "Value in the initial state:\n";
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.iter
-      (fun ((agent_type, site_type, site_type1, state, state1),
+    let store_value_of_init = get_value_of_init dynamic in
+    let error =
+      if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
+      then
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "Value in the initial state:\n";
+          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.iter
+            (fun ((agent_type, site_type, site_type1, state, state1),
             (agent_type', site_type', site_type1', state', state1')) value ->
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i->\
            agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
           (Ckappa_sig.int_of_agent_name agent_type)
@@ -1483,8 +1501,11 @@ let apply_rule static dynamic error rule_id precondition =
           (Ckappa_sig.int_of_state_index state1');
         Print_parallel_bonds.print_value parameter value
       ) store_value_of_init;
-      Loggers.print_newline (Remanent_parameters.get_logger parameter)
-      in*)
+          Loggers.print_newline (Remanent_parameters.get_logger parameter)
+        in
+        error
+      else error
+    in
     (*--------------------------------------------------------------*)
     (*print value of parallel in the rhs*)
     let store_value_of_parallel_bonds = get_value_of_parallel_bonds dynamic in

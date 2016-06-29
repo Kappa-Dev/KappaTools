@@ -20,10 +20,10 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-(**************************************************************************)
+(*******************************************************************)
 (*Right hand side bonds:
   (agent_id, site_type, state, -> agent_id, site_type, state)*)
-(**************************************************************************)
+(*******************************************************************)
 
 let collect_agent_type_state parameter error agent site_type =
   match agent with
