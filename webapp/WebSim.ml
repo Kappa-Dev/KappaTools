@@ -23,7 +23,7 @@ let fatal ~exn (msg : string) : unit Lwt.t =
 class runtime ()  = object
   method yield () = Lwt_main.yield ()
   method log ?exn (msg : string) = log ?exn msg
-  inherit Api.Base.runtime
+  inherit Api.Base.runtime 0.1
 end
 
 let runtime_state = new runtime ()

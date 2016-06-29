@@ -8,17 +8,6 @@ let msg_token_not_found =
 let msg_observables_less_than_zero =
   "Plot observables must be greater than zero"
 
-let time_yield
-    (seconds : float)
-    (yield : (unit -> unit Lwt.t)) : (unit -> unit Lwt.t) =
-  let lastyield = ref (Sys.time ()) in
-  fun () ->
-    let t = Sys.time () in
-    if t -. !lastyield > seconds then
-      let () = lastyield := t in
-      yield ()
-    else Lwt.return_unit
-
 let () = Printexc.record_backtrace true
 
 type runtime =
@@ -51,7 +40,7 @@ module Base : sig
 
 
   class virtual runtime :
-  object
+  float -> object
     inherit session
     method info : unit -> Api_types_j.info ApiTypes.result Lwt.t
     method parse : ApiTypes.code -> ApiTypes.parse ApiTypes.result Lwt.t
@@ -146,15 +135,23 @@ end = struct
         failwith ""
 
   end;;
-  class virtual runtime =
+  class virtual runtime min_run_duration =
   object(self)
     inherit session
+  val mutable lastyield = Sys.time ()
   method virtual log : ?exn:exn -> string -> unit Lwt.t
   method virtual yield : unit -> unit Lwt.t
   val mutable context = { states = IntMap.empty
                         ; id = 0 }
   (* not sure if this is good *)
-  val start_time : float = Sys.time()
+  val start_time : float = Sys.time ()
+
+  method private time_yield () =
+    let t = Sys.time () in
+    if t -. lastyield > min_run_duration then
+      let () = lastyield <- t in
+      self#yield ()
+    else Lwt.return_unit
 
   method info () : Api_types_j.info ApiTypes.result Lwt.t =
     Lwt.return
@@ -166,7 +163,7 @@ end = struct
     method parse
       (code : ApiTypes.code) : ApiTypes.parse ApiTypes.result Lwt.t =
       Lwt.bind
-        (build_ast code self#yield self#log)
+        (build_ast code self#time_yield self#log)
         (function
           | `Right ((sigs,_,_,_),contact_map) ->
              Lwt.return
@@ -260,14 +257,13 @@ end = struct
             (fun () ->
              (Lwt.catch
                 (fun () ->
-                 (build_ast parameter.ApiTypes.code self#yield self#log) >>=
+                 (build_ast parameter.ApiTypes.code self#time_yield self#log) >>=
                    (function
                        `Right ((sig_nd,tk_nd,updated_vars,result)
                               ,contact_map) ->
                        Eval.compile
-                         ~pause:(fun f -> Lwt.bind (self#yield ()) f)
-                         ~return:Lwt.return
-                         ?rescale_init:None
+                         ~pause:(fun f -> Lwt.bind (self#time_yield ()) f)
+                         ~return:Lwt.return ?rescale_init:None
                          ~outputs:(outputs (Signature.create []))
                          sig_nd tk_nd contact_map
                          simulation.counter result >>=
@@ -281,7 +277,7 @@ end = struct
                           let (env,graph_state) =
                             Eval.build_initial_state
                               ~bind:(fun x f ->
-                                     (self#yield ()) >>= (fun () -> x >>= f))
+                                     (self#time_yield ()) >>= (fun () -> x >>= f))
                               ~return:Lwt.return [] simulation.counter
                               env_store domain story_compression
                               store_distances updated_vars init_l in
@@ -300,25 +296,33 @@ end = struct
                                  { !plot
                                    with ApiTypes.legend = Array.to_list legend}
                              in
-                             let rec iter graph state =
-                               let (stop,graph',state') =
-                                 State_interpreter.a_loop
-                                   ~outputs:(outputs sigs)
-                                   env domain simulation.counter graph state in
-                               if stop then
+                             let rstop = ref false in
+                             let rgraph = ref graph in
+                             let rstate = ref state in
+                             let rec iter () =
+                               let () =
+                                 while (not !rstop) &&
+                                       Sys.time () -. lastyield < min_run_duration do
+                                   let (stop,graph',state') =
+                                     State_interpreter.a_loop
+                                       ~outputs:(outputs sigs)
+                                       env domain simulation.counter !rgraph !rstate in
+                                   rstop := stop; rgraph := graph'; rstate := state'
+                                 done in
+                               if !rstop then
                                  (Lwt_switch.turn_off simulation.switch)
-                                   >>= (fun () -> Lwt.return (graph',state'))
+                                 >>= (fun () -> Lwt.return_unit)
                                else
-                                 if Lwt_switch.is_on simulation.switch
-                                 then (self#yield ()) >>=
-                                        (fun () -> iter graph' state')
-                                 else Lwt.return (graph',state') in
-                             (iter graph state) >>=
-                               (fun (graph,state) ->
+                               if Lwt_switch.is_on simulation.switch
+                               then (let () = lastyield <- Sys.time () in
+                                     self#yield ()) >>= iter
+                               else Lwt.return_unit in
+                             (iter ()) >>=
+                             (fun () ->
                                 let _ =
                                   State_interpreter.end_of_simulation
                                     ~outputs:(outputs sigs) log_form env
-                                    simulation.counter graph state in
+                                    simulation.counter !rgraph !rstate in
                                 Lwt.return_unit)))
                      | `Left e ->
                         let () = error_messages := e

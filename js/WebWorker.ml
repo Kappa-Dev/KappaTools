@@ -4,10 +4,9 @@ open Lwt
 open WebMessage
 
 class webworker ()  = object
-  val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.01 Lwt_js.yield
-  method yield () = delayed_yield ()
+  method yield = Lwt_js.yield
   method log ?exn (_: string) = Lwt.return_unit
-  inherit Api.Base.runtime
+  inherit Api.Base.runtime 0.1
 end
 
 let runtime = (new webworker () :> Api.runtime)

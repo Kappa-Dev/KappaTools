@@ -1,5 +1,3 @@
-val time_yield : float -> (unit -> unit Lwt.t) -> unit -> unit Lwt.t
-
 val msg_process_not_running : string
 val msg_token_not_found : string
 val msg_observables_less_than_zero : string
@@ -33,7 +31,7 @@ module Base : sig
   end;;
 
   class virtual runtime :
-  object
+    float (** min_run_duration *) -> object
     inherit session
     method info :
       unit ->

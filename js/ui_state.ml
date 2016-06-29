@@ -39,10 +39,9 @@ let runtime_value runtime =
   | Remote remote -> remote.url
 
 class embedded_runtime ()  = object
-  val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.1 Lwt_js.yield
-  method yield () = delayed_yield ()
+  method yield = Lwt_js.yield
   method log ?exn (_: string) = Lwt.return_unit
-  inherit Api.Base.runtime
+  inherit Api.Base.runtime 0.1
 end
 
 let default_runtime = WebWorker
