@@ -158,6 +158,38 @@ let print_pair_agents_sites_states parameter error handler_kappa _log (x, y) =
   error, ((agent_string, site_string, site_string2, state_string, state_string2),(agent_string', site_string', site_string2', state_string', state_string2'))
 
 (****************************************************************)
+
+let print_tuple_pair parameter error handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";
+  Loggers.fprintf log "A set of tuple\n ";
+  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.iter
+    (fun (x, y) ->
+       let (_, _, site_type, site_type2) = x in
+       let (_, _, site_type', site_type2') = y in
+       let _,
+           ((agent_string, site_string, site_string2),
+            (agent_string', site_string', site_string2')) =
+         print_pair_agents_sites parameter error handler_kappa log
+           (x, y)
+       in
+       let  () =
+         Loggers.fprintf log
+           "(%s,%s:%s,%s:%s, %s,%s:%s,%s:%s)\n"
+           agent_string
+           (Ckappa_sig.string_of_site_name site_type)
+           site_string
+           (Ckappa_sig.string_of_site_name site_type2)
+           site_string2
+           agent_string'
+           (Ckappa_sig.string_of_site_name site_type')
+           site_string'
+           (Ckappa_sig.string_of_site_name site_type2')
+           site_string2'
+       in
+       ()
+    ) store_result
+
+(****************************************************************)
 (*remove*)
 let print_pair_sites_aux _parameter error _handler_kappa log store_result =
   let () =
@@ -382,43 +414,7 @@ let print_tuple parameter error handler_kappa log (x, y) =
     state_string'
     state_string2'
 
-let print_init parameter error handler_kappa log store_result =
-  Loggers.fprintf log "------------------------------------------------------------\n";  Loggers.fprintf log "* Inititial states:\n";
-  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter
-    (fun (x, y) ->
-       print_tuple parameter error handler_kappa log (x, y)
-    ) store_result
 
-(****************************************************************)
-
-let print_tuple_pair parameter error handler_kappa log store_result =
-  Loggers.fprintf log "------------------------------------------------------------\n";
-  Loggers.fprintf log "A set of tuple\n ";
-  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.iter
-    (fun (x, y) ->
-       let (_, _, site_type, site_type2) = x in
-       let (_, _, site_type', site_type2') = y in
-       let _,
-           ((agent_string, site_string, site_string2),(agent_string', site_string', site_string2')) =
-         print_pair_agents_sites parameter error handler_kappa log
-           (x, y)
-       in
-       let  () =
-         Loggers.fprintf log
-           "(%s,%s:%s,%s:%s, %s,%s:%s,%s:%s)\n"
-           agent_string
-           (Ckappa_sig.string_of_site_name site_type)
-           site_string
-           (Ckappa_sig.string_of_site_name site_type2)
-           site_string2
-           agent_string'
-           (Ckappa_sig.string_of_site_name site_type')
-           site_string'
-           (Ckappa_sig.string_of_site_name site_type2')
-           site_string2'
-       in
-       ()
-    ) store_result
 
 (****************************************************************)
 
@@ -583,16 +579,6 @@ let print_tuple_pair_binding_state parameter error handler_kappa log store_resul
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter (fun (x, y) ->
           print_tuple parameter error handler_kappa log (x, y)
         ) set
-    ) store_result
-
-(****************************************************************)
-
-let print_tuple_pair_binding_and_state parameter error handler_kappa log store_result =
-  Loggers.fprintf log
-    "------------------------------------------------------------\n";
-  Loggers.fprintf log "* Tuple set when modification of the second site accross a bound that is preserved \nor creation of a bond with/without of the first site (including initial state):\n";
-  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter (fun (x, y) ->
-      print_tuple parameter error handler_kappa log (x, y)
     ) store_result
 
 (****************************************************************)
