@@ -16,20 +16,16 @@ let main () =
   let state = Export.init  ~called_from:Remanent_parameters_sig.KaSa () in
   let state,_ = Export.get_internal_contact_map ~accuracy_level:Remanent_state.Low state in
   let parameters = Remanent_state.get_parameters state in
-  (*  let state =
-    match
-      Remanent_parameters.get_influence_map_accuracy_level parameters
-    with
-    | Remanent_parameters_sig.None -> state
-    | Remanent_parameters_sig.Low ->
-      let state, _ = Export.get_internal_influence_map ~accuracy_level:Remanent_state.Low state in
+  let state =
+    if (Remanent_parameters.get_do_contact_map parameters)
+    then
+      let state, handler = Export.get_handler state in
+      let error = Remanent_state.get_errors state in
+      let error = Print_handler.dot_of_contact_map parameters error handler in
+      Remanent_state.set_errors error state
+    else
       state
-    | Remanent_parameters_sig.Medium
-    | Remanent_parameters_sig.High
-    | Remanent_parameters_sig.Full ->
-      let state, _ = Export.get_internal_influence_map ~accuracy_level:Remanent_state.Medium state in
-      state
-      in*)
+  in
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then
@@ -50,22 +46,13 @@ let main () =
       let state, handler = Export.get_handler state in
       let error = Remanent_state.get_errors state in
       let error =
-          Print_quarks.dot_of_influence_map parameters error handler c_compil influence_map
+        Print_quarks.dot_of_influence_map parameters error handler c_compil influence_map
       in
-        Remanent_state.set_errors error state
-    else
-      state
-  in
-  let state =
-    if (Remanent_parameters.get_do_contact_map parameters)
-    then
-      let state, handler = Export.get_handler state in
-      let error = Remanent_state.get_errors state in
-      let error = Print_handler.dot_of_contact_map parameters error handler in
       Remanent_state.set_errors error state
     else
       state
   in
+
   (*-----------------------------------------------------------------------*)
   let state, reachability_result_opt =
     if Remanent_parameters.get_do_reachability_analysis parameters

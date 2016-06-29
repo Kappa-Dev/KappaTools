@@ -44,6 +44,7 @@ val get_prefix: Remanent_parameters_sig.parameters -> string
 val set_trace: Remanent_parameters_sig.parameters -> bool -> Remanent_parameters_sig.parameters
 val set_logger: Remanent_parameters_sig.parameters -> Loggers.t -> Remanent_parameters_sig.parameters
 val update_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_parameters_sig.parameters
+val set_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_parameters_sig.parameters
 val update_call_stack:
   Remanent_parameters_sig.parameters ->
   bool ->
