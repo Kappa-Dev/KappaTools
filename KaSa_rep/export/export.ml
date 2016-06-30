@@ -313,15 +313,6 @@ let compute_c_compilation_handler show_title state =
 
 let choose f show_title state =
   let state,pair = compute_c_compilation_handler show_title state in
-  (*let parameters = Remanent_state.get_parameters state in
-  let parameters = Remanent_parameters.update_prefix  parameters "Compilation:" in
-  let error = Remanent_state.get_errors state in
-  let error =
-    if Remanent_parameters.get_trace parameters || Print_cckappa.trace
-    then Print_cckappa.print_compil parameters error (snd pair) (fst pair)
-    else error
-  in
-    let state = Remanent_state.set_errors error state in*)
   state,f pair
 
 let get_c_compilation =
@@ -344,7 +335,7 @@ let get_handler =
 let compute_raw_internal_contact_map show_title state =
   let state, _ = get_compilation  state in
   let state, handler = get_handler state in
-  let () = show_title state in  
+  let () = show_title state in
   let state, c_compil = get_c_compilation state in
   let parameters = Remanent_state.get_parameters state in
   let parameters = Remanent_parameters.update_prefix  parameters "Compilation:" in
@@ -526,6 +517,7 @@ let get_quark_map =
 
 let compute_raw_internal_influence_map show_title state =
   let parameters = Remanent_state.get_parameters state in
+  let state, compil = get_c_compilation state in
   let state, quark_map = get_quark_map state in
   let state, handler = get_handler state in
   let error = Remanent_state.get_errors state in
@@ -534,6 +526,41 @@ let compute_raw_internal_influence_map show_title state =
   let error,wake_up_map,inhibition_map =
     Influence_map.compute_influence_map parameters
       error handler quark_map nrules
+  in
+  let error =
+    if
+      (Remanent_parameters.get_trace parameters  || Print_quarks.trace)
+      && Remanent_parameters.get_influence_map_accuracy_level parameters = Remanent_parameters_sig.Low
+    then
+      Print_quarks.print_wake_up_map
+        parameters
+        error
+        handler
+        compil
+        Handler.print_rule_txt
+        Handler.print_var_txt
+        Handler.get_label_of_rule_txt
+        Handler.get_label_of_var_txt
+        Handler.print_labels "\n"
+        wake_up_map
+    else error
+  in
+  let error =
+    if
+      (Remanent_parameters.get_trace parameters  || Print_quarks.trace)
+      && Remanent_parameters.get_influence_map_accuracy_level parameters = Remanent_parameters_sig.Low
+    then
+      Print_quarks.print_inhibition_map
+        parameters error handler
+        compil
+        Handler.print_rule_txt
+        Handler.print_var_txt
+        Handler.get_label_of_rule_txt
+        Handler.get_label_of_var_txt
+        Handler.print_labels
+        "\n"
+        inhibition_map
+    else error
   in
   let state =
     Remanent_state.set_internal_influence_map Remanent_state.Low
@@ -545,7 +572,7 @@ let compute_raw_internal_influence_map show_title state =
 
 let get_raw_internal_influence_map =
   get_gen
-    ~log_prefix:"Influence_map: (internal)"
+    ~log_prefix:"Influence_map:"
     ~log_main_title:"Generating the raw influence map..."
     ~phase:(StoryProfiling.Internal_influence_map "raw")
     (Remanent_state.get_internal_influence_map Remanent_state.Low)

@@ -14,16 +14,29 @@
 
 let main () =
   let state = Export.init  ~called_from:Remanent_parameters_sig.KaSa () in
-  let state,_ = Export.get_internal_contact_map ~accuracy_level:Remanent_state.Low state in
   let parameters = Remanent_state.get_parameters state in
   let state =
     if (Remanent_parameters.get_do_contact_map parameters)
     then
+      let state,_ =
+        Export.get_internal_contact_map ~accuracy_level:Remanent_state.Low state
+      in
       let state, handler = Export.get_handler state in
       let error = Remanent_state.get_errors state in
       let error = Print_handler.dot_of_contact_map parameters error handler in
       Remanent_state.set_errors error state
     else
+      let state, c_compil = Export.get_c_compilation state in
+      let state, handler = Export.get_handler state in
+      let parameters = Remanent_state.get_parameters state in
+      let parameters = Remanent_parameters.update_prefix  parameters "Compilation:" in
+      let error = Remanent_state.get_errors state in
+      let error =
+        if Remanent_parameters.get_trace parameters || Print_cckappa.trace
+        then Print_cckappa.print_compil parameters error handler c_compil
+        else error
+      in
+      let state = Remanent_state.set_errors error state in
       state
   in
   let state =
