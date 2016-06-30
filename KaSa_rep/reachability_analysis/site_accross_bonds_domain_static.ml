@@ -370,18 +370,24 @@ let collect_created_bond parameter error rule_id rule store_tuple_pair store_res
 (*collect internal state in case of modificiation and know the bond*)
 
 let collect_modified_internal_and_bond parameter error rule_id store_tuple_pair store_bonds_rhs store_modified_map store_result =
+  let empty_pair_set = Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+  in
+  let empty_set = Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+  in
+  let empty_sitestate_set = Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+  in
   let error, store_bond_set =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
         parameter error rule_id store_bonds_rhs with
-    | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+    | error, None -> error, empty_pair_set
     | error, Some s -> error, s
   in
   let error, store_modified_set =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
         parameter error rule_id store_modified_map with
-    | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+    | error, None -> error, empty_sitestate_set
     | error, Some s -> error, s
   in
   Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
@@ -402,12 +408,11 @@ let collect_modified_internal_and_bond parameter error rule_id store_tuple_pair 
                       agent_id' = agent_id_b' && site_type' = site_type_b')
                   then
                     let error, set =
-                      Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error (x,y)
-                        Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+                      Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error (x,y) empty_set
                     in
                     let error, old_set =
                       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
-                      | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+                      | error, None -> error, empty_set
                       | error, Some s -> error, s
                     in
                     let error', new_set =

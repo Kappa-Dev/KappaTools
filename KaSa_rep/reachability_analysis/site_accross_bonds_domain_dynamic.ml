@@ -34,6 +34,11 @@ type basic_dynamic_information =
     store_relation_mvbdu :
     Ckappa_sig.Views_bdu.mvbdu
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
+    store_range_mvbdu1 :Ckappa_sig.Views_bdu.mvbdu
+    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t ;
+    store_range_mvbdu2:
+    Ckappa_sig.Views_bdu.mvbdu
+    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
   }
 
 (***************************************************************)
@@ -224,12 +229,12 @@ let collect_pair_sites_init parameter error store_sites_init =
     let error, store_result =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold_inv
         (fun (x, y) (error, store_result) ->
-           let (agent_id, agent_type, site_type, _, state, _) = x in
-           let (agent_id', agent_type', site_type', _, state', _) = y in
+           let (agent_id, agent_type, site_type, _, state, state2) = x in
+           let (agent_id', agent_type', site_type', _, state', state2') = y in
            if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
                ((agent_id, agent_type, site_type, state),
                 (agent_id', agent_type', site_type', state'))
-               store_bonds_init
+               store_bonds_init && state2 = state2' (*todo*)
            then
              let error, pair_set =
                Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in parameter error
@@ -476,7 +481,7 @@ let collect_tuple_pair_binding_internal_state_explicit parameter error store_tup
            Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold (fun (agent_id, agent_type, site_type, site_type2, state, state2) (error, store_set) ->
                Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
                  (fun (agent_id', agent_type', site_type', site_type2', state', state2') (error, store_set) ->
-                    if agent_type <> agent_type'
+                    if agent_type <> agent_type' && state2 = state2' (*todo*)
                     then
                       let pair =
                         ((agent_id, agent_type, site_type, site_type2, state, state2),
@@ -672,12 +677,13 @@ let collect_relation_mvbdu parameter error handler store_explicit_dynamic store_
     Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
       (fun (x, y) (error, handler, store_result)->
         (*build the mvbdu of two sites y(site_type2) and z(site_type2')*)
-         let (_, _, _, site_type2, _, state2) = x in
-         let (_, _, _, site_type2', _, state2') = y in
+         let (_, _, site_type, site_type2, state, state2) = x in
          (*build (key * value) list *)
-         let pair_list =
+         (*let pair_list =
            [(site_type2, state2);(site_type2', state2')]
-         in
+           in*)
+         (*binding and internal state of agent type A*)
+         let pair_list = [(site_type, state); (site_type2, state2)] in
          let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list parameter handler error pair_list in
          let error, store_result =
            Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
@@ -692,6 +698,67 @@ let collect_relation_mvbdu parameter error handler store_explicit_dynamic store_
   in
   error, handler, store_result
 
+  (***************************************************************)
+  (*relation mvbdu*)
+
+  let collect_range_mvbdu1 parameter error handler store_explicit_dynamic store_result =
+  (*get the set of tuple when both agents are connected via x.z*)
+    let error, handler, store_result =
+      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
+        (fun (x, y) (error, handler, store_result)->
+          (*build the mvbdu of two sites y(site_type2) and z(site_type2')*)
+           let (_, _, _, site_type2, _, state2) = x in
+           (*build (key * value) list *)
+           (*let pair_list =
+             [(site_type2, state2);(site_type2', state2')]
+             in*)
+           (*binding and internal state of agent type A*)
+           let pair_list = [(site_type2, state2)] in
+           let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list parameter handler error pair_list in
+           let error, store_result =
+             Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+               parameter
+               error
+               (x,y)
+               mvbdu
+               store_result
+           in
+           error, handler, store_result
+        ) store_explicit_dynamic (error, handler, store_result)
+    in
+    error, handler, store_result
+
+    (***************************************************************)
+    (*relation mvbdu*)
+
+    let collect_range_mvbdu2 parameter error handler store_explicit_dynamic store_result =
+    (*get the set of tuple when both agents are connected via x.z*)
+      let error, handler, store_result =
+        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
+          (fun (x, y) (error, handler, store_result)->
+            (*build the mvbdu of two sites y(site_type2) and z(site_type2')*)
+             let (_, _, _, site_type2, _, state2) = y in
+             (*build (key * value) list *)
+             (*let pair_list =
+               [(site_type2, state2);(site_type2', state2')]
+               in*)
+             (*binding and internal state of agent type A*)
+             let pair_list = [(site_type2, state2)] in
+             let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list parameter handler error pair_list in
+             let error, store_result =
+               Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+                 parameter
+                 error
+                 (x,y)
+                 mvbdu
+                 store_result
+             in
+             error, handler, store_result
+          ) store_explicit_dynamic (error, handler, store_result)
+      in
+      error, handler, store_result
+
+
 (***************************************************************)
 (*initial*)
 
@@ -705,6 +772,8 @@ let init_basic_dynamic_information =
       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty,
       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty;
     store_relation_mvbdu = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
+    store_range_mvbdu1 = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
+    store_range_mvbdu2 = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
   }
 
 (***************************************************************)
