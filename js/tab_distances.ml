@@ -32,7 +32,7 @@ let content =
           ~export_select_id:export_format_id
           ~export_filename_id:export_filename_id
           ~export_button_id:export_button_id
-          ~export_data_label:"json"
+          ~export_data_label:"dat"
       ]
   in
   <:html<<div>

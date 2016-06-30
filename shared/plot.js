@@ -1,37 +1,43 @@
 "use strict"
 
-/* Mode to render observable.  These codes determine
- * how an observable in a plot is to be rendered.
- */
-var MODES = {
-    MARKS :  0,  // use marks
-    LINE :   1,  // use a continuious line
-    HIDDEN : 2,  // hide observable
-    XAXIS :  3,  // observable is the x axis
-    cycle : function(mode){
-        return (mode+1) % 3;
-    }
-};
-// enum for tick marks
-var TICKS = {
-    CIRCLE : 0,
-    PLUS   : 1,
-    CROSS  : 2,
-    cycle : function(mode){
-        return (mode+1) % 3;
-    },
-    index : function(index){
-        return (index+1) % 3;
-    },
-    xlink : function(index){
-        return ["#plot-circle"
-               ,"#plot-plus"
-               ,"#plot-cross"][index];
-    }
-};
 
 function observable_plot(configuration){
     var that = this;
+    /* Mode to render observable.  These codes determine
+     * how an observable in a plot is to be rendered.
+     */
+    this.modes = {
+	DOT    : 0,  // use dots
+	LINE   : 1,  // use a continuious line
+	HIDDEN : 2,  // hide observable
+	XAXIS  : 3,  // observable is the x axis
+	MARKS  : 4,  // use marks
+	cycle : function(mode){
+            return (mode+1) % 3;
+	}
+    };
+
+    // enum for tick marks
+    this.ticks = {
+	CIRCLE : 0,
+	PLUS   : 1,
+	CROSS  : 2,
+	DOT    : 3,
+	cycle : function(mode){
+            return (mode+1) % 3;
+	},
+	index : function(index){
+            return (index+1) % 3;
+	},
+	xlink : function(index){
+        return ["#plot-circle"
+	       ,"#plot-plus"
+	       ,"#plot-cross"
+	       ,"#plot-dot" ][index];
+	}
+    };
+
+
     /* plotDivId                - div which plot is rendered on
        plotLabelDivId           - div to place plot interval
        plotStyleId              - style sheet for the plot need to export
@@ -41,9 +47,6 @@ function observable_plot(configuration){
        plotYAxisLogCheckboxId   - checkbox to toggle log on y axis
      */
     this.configuration = configuration;
-
-
-
 
     /* This should be a list of objects of the form
        index  - there is an assumption of could be duplicated so
@@ -73,8 +76,16 @@ function observable_plot(configuration){
     /* Get all observables.
      */
     this.getObservables = function(){
-        return this.state.filter(function(obs){ return obs.mode != MODES.XAXIS; })
+        return this.state.filter(function(obs)
+				 { return obs.mode != that.modes.XAXIS });
     }
+    this.getVisible = function(){
+        return this.state.filter(function(obs)
+				 { return obs.mode != that.modes.XAXIS
+				   && obs.mode != that.modes.HIDDEN;
+				 });
+    }
+
     this.getStatesByMode = function(mode){
         return this.state.filter(function(obs){ return obs.mode == mode; })
     }
@@ -109,7 +120,7 @@ function observable_plot(configuration){
          */
         legend.forEach(function(legend,i){
             var old_observable = that.getObservable(i);
-            var mode = MODES.MARKS;
+            var mode = that.modes.DOT;
             if(old_observable && old_observable.label == legend){
                 mode = old_observable.mode;
             };
@@ -134,13 +145,13 @@ function observable_plot(configuration){
          */
         // not sure what is happening here
         var time_observable = that.state.slice(-1)[0]; // 1.
-        var time_mode = MODES.XAXIS;             // 2.
+        var time_mode = that.modes.XAXIS;             // 2.
         if(time_observable && time_observable.label == that.timeLabel) // 3.
         { time_mode = time_observable.mode;     // 4.
         };
 
-        if(new_state.every(function(state){ return state.mode != MODES.XAXIS; })){ // 5.
-            time_mode = MODES.XAXIS; // 6.
+        if(new_state.every(function(state){ return state.mode != that.modes.XAXIS; })){ // 5.
+            time_mode = that.modes.XAXIS; // 6.
         }
         that.state = new_state;
         that.start_time = null;
@@ -167,7 +178,7 @@ function observable_plot(configuration){
         var color = d3.scale.category10();
         color.domain(that.state.map(function(c,i){ return i; }));
         that.state.forEach(function(s,i){ s.color = color(i);
-                                          s.tick = TICKS.index(i);
+                                          s.tick = that.ticks.index(i);
                                         });
         that.render();
 
@@ -175,7 +186,7 @@ function observable_plot(configuration){
     this.setPlot = wrap(this.setPlot);
     this.formatTime = d3.format(".02f");
     this.getXAxis = function(){
-        return this.state.find(function(state){ state.mode = MODES.XAXIS });
+        return this.state.find(function(state){ state.mode = that.modes.XAXIS });
     }
     this.setPlot = wrap(this.setPlot);
     this.renderPlot = function(){
@@ -187,7 +198,7 @@ function observable_plot(configuration){
 
         // setup x-axis
         var x = (that.getXAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([0, width]);
-        var xState = that.getStatesByMode(MODES.XAXIS)[0];
+        var xState = that.getStatesByMode(that.modes.XAXIS)[0];
         x.domain(d3.extent(xState.values));
         var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
@@ -199,11 +210,13 @@ function observable_plot(configuration){
                       .orient("left")
                       .tickFormat(d3.format(".3n"));
 
-        var observables = that.getObservables();
-        var y_bounds = [d3.min(observables,
+        var visible = that.getVisible();
+        var y_bounds = [d3.min(visible,
                          function(c)
-                               { return d3.min(c.values.filter(function(d){return !that.getYAxisLog() || d > 0; })); }),
-                        d3.max(observables,function(c) { return d3.max(c.values); })
+                         { return d3.min(c.values.filter(function(d)
+							 {return !that.getYAxisLog() || d > 0; }));
+			 }),
+                        d3.max(visible,function(c) { return d3.max(c.values); })
                        ];
         y.domain(y_bounds);
 
@@ -240,6 +253,15 @@ function observable_plot(configuration){
            .attr("id","plot-circle")
            .append("circle")
            .attr("r", 1.5)
+           .attr("fill","none")
+           .style("stroke", "currentColor");
+
+        // defs - dots
+        svg.append("defs")
+           .append("g")
+           .attr("id","plot-dot")
+           .append("circle")
+           .attr("r", 0.5)
            .attr("fill","none")
            .style("stroke", "currentColor");
 
@@ -292,23 +314,53 @@ function observable_plot(configuration){
             .attr("class", "plot-observable")
             .each(function(d)
                   { switch(d.mode) {
-                  case MODES.MARKS:
-                      var values = d.values.filter(function(d,i){ var x = xMap(d,i);
-                                                                  var y = yMap(d);
-                                                                  return (!isNaN(x) && !isNaN(y)) });
+  	          case that.modes.DOT:
+                      var values = d.values
+			            .filter(function(d,i)
+					    { var x = xMap(d,i);
+                                              var y = yMap(d);
+                                              return (!isNaN(x) && !isNaN(y)) });
                       var tick =
                           d3.select(this)
-                          .selectAll(".plot-tick")
-                          .data(values)
-                          .enter()
-                          .append("g")
-                          .attr("class", "plot-tick")
-                          .attr("fill",d.color);
+                            .selectAll(".plot-tick")
+                            .data(values)
+                            .enter()
+                            .append("g")
+                            .attr("class", "plot-tick")
+                            .attr("fill",d.color);
 
 
                       // add link to definitions
                       tick.append("use")
-                          .attr("xlink:href",TICKS.xlink(d.tick))
+                          .attr("xlink:href",that.ticks.xlink(that.ticks.DOT))
+                          .style("color",d.color)
+                          .attr("transform"
+                                ,function(d,i)
+				 { var x = xMap(d,i);
+                                   var y = yMap(d);
+                                   var t = "translate(" + x + "," + y + ")";
+                                   return t;
+                                 });
+                      break;
+                  case that.modes.MARKS:
+                      var values = d.values
+			            .filter(function(d,i)
+					    { var x = xMap(d,i);
+                                              var y = yMap(d);
+                                              return (!isNaN(x) && !isNaN(y)) });
+                      var tick =
+                          d3.select(this)
+                            .selectAll(".plot-tick")
+                            .data(values)
+                            .enter()
+                            .append("g")
+                            .attr("class", "plot-tick")
+                            .attr("fill",d.color);
+
+
+                      // add link to definitions
+                      tick.append("use")
+                          .attr("xlink:href",that.ticks.xlink(d.tick))
                           .style("color",d.color)
                           .attr("transform"
                                 ,function(d,i){ var x = xMap(d,i);
@@ -317,16 +369,16 @@ function observable_plot(configuration){
                                                 return t;
                                               });
                       break;
-                  case MODES.LINE:
+                  case that.modes.LINE:
                       d3.select(this)
                           .append("path")
                           .attr("class", "plot-line")
                           .attr("d", function(d) { return line(d.values); })
                           .style("stroke", function(d) { return d.color; });
                       break;
-                  case MODES.HIDDEN:
+                  case that.modes.HIDDEN:
                       break;
-                  case MODES.XAXIS:
+                  case that.modes.XAXIS:
                       break;
                   default:
                       break;
@@ -350,7 +402,7 @@ function observable_plot(configuration){
                   });
         // cycle through styles
         var cycle = function(d,i)
-                    { d.mode = MODES.cycle(d.mode);
+                    { d.mode = that.modes.cycle(d.mode);
                       that.renderPlot();
                     };
         // legend swatches
@@ -361,7 +413,7 @@ function observable_plot(configuration){
               .style('fill',
                      function(d){
                          var color = d.color;
-                         if(MODES.HIDDEN == d.mode){
+                         if(that.modes.HIDDEN == d.mode){
                              color = "white";
                          };
                          return color;
@@ -369,7 +421,7 @@ function observable_plot(configuration){
               .style('stroke',
                      function(d){
                          var color = d.color;
-                         if(MODES.HIDDEN == d.mode){
+                         if(that.modes.HIDDEN == d.mode){
                              color = "white";
                          };
                          return color;
@@ -377,7 +429,7 @@ function observable_plot(configuration){
               .style('opacity',
                      function(d){
                          var opacity = 1.0;
-                         if(MODES.HIDDEN == d.mode){
+                         if(that.modes.HIDDEN == d.mode){
                              opacity = 0.0;
                          };
                          return opacity;
@@ -385,7 +437,7 @@ function observable_plot(configuration){
               .style('stroke-opacity',
                      function(d){
                          var opacity = 1.0;
-                         if(MODES.HIDDEN == d.mode){
+                         if(that.modes.HIDDEN == d.mode){
                              opacity = 0.0;
                          };
                          return opacity;
@@ -414,11 +466,11 @@ function observable_plot(configuration){
                 var index = parseInt(this.options[this.selectedIndex].value);
                 assert(typeof index !== 'undefined',"plot selection invalid");
                 that.state.forEach(function(state,i){
-                    if(state.mode == MODES.XAXIS){
-                        state.mode = MODES.MARKS;
+                    if(state.mode == that.modes.XAXIS){
+                        state.mode = that.modes.DOT;
                     }
                     if(i == index){
-                        state.mode = MODES.XAXIS;
+                        state.mode = that.modes.XAXIS;
                     }
                 });
                 // re-render plot
@@ -450,7 +502,7 @@ function observable_plot(configuration){
                 .text(function(d) { return d.label; });
             that.divAxisSelect
                 .selectAll('option')
-                .filter(function(d){ return d.mode == MODES.XAXIS; })
+                .filter(function(d){ return d.mode == that.modes.XAXIS; })
                 .attr("selected","true");
 
     }
@@ -468,11 +520,11 @@ function observable_plot(configuration){
                 var index = parseInt(this.options[this.selectedIndex].value);
                 assert(typeof index !== 'undefined',"plot selection invalid");
                 that.state.forEach(function(state,i){
-                    if(state.mode == MODES.XAXIS){
-                        state.mode = MODES.MARKS;
+                    if(state.mode == that.modes.XAXIS){
+                        state.mode = that.modes.DOT;
                     }
                     if(i == index){
-                        state.mode = MODES.XAXIS;
+                        state.mode = that.modes.XAXIS;
                     }
                 });
                 // re-render plot
@@ -488,7 +540,7 @@ function observable_plot(configuration){
                   .attr("value",function(d,i) { return i; })
                   .text(function(d) { return d.label; });
             select.selectAll('option')
-                  .filter(function(d){ return d.mode == MODES.XAXIS; })
+                  .filter(function(d){ return d.mode == that.modes.XAXIS; })
                   .attr("selected","true");
         }
     }
