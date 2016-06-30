@@ -15,3 +15,5 @@ include Export
 let init () = init ~called_from:Remanent_parameters_sig.KaSa ()
 let get_contact_map = get_internal_contact_map
 let get_influence_map = get_internal_influence_map
+let output_contact_map = output_internal_contact_map
+let output_influence_map = output_internal_influence_map

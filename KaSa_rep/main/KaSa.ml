@@ -18,13 +18,7 @@ let main () =
   let state =
     if (Remanent_parameters.get_do_contact_map parameters)
     then
-      let state,_ =
-        Export_to_KaSa.get_contact_map ~accuracy_level:Remanent_state.Low state
-      in
-      let state, handler = Export_to_KaSa.get_handler state in
-      let error = Export_to_KaSa.get_errors state in
-      let error = Print_handler.dot_of_contact_map parameters error handler in
-      Export_to_KaSa.set_errors error state
+        Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Low state
     else
       let state, c_compil = Export_to_KaSa.get_c_compilation state in
       let state, handler = Export_to_KaSa.get_handler state in
@@ -42,26 +36,17 @@ let main () =
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then
-      let state, influence_map =
-        Export_to_KaSa.get_influence_map
+        Export_to_KaSa.output_influence_map
           ~accuracy_level:(match
-                             Remanent_parameters.get_influence_map_accuracy_level parameters
-                           with
-                           | Remanent_parameters_sig.None
-                           | Remanent_parameters_sig.Low ->
-                             Remanent_state.Low
-                           | Remanent_parameters_sig.Medium
-                           | Remanent_parameters_sig.High
-                           | Remanent_parameters_sig.Full -> Remanent_state.Medium)
-          state
-      in
-      let state, c_compil = Export_to_KaSa.get_c_compilation state in
-      let state, handler = Export_to_KaSa.get_handler state in
-      let error = Export_to_KaSa.get_errors state in
-      let error =
-        Print_quarks.dot_of_influence_map parameters error handler c_compil influence_map
-      in
-      Export_to_KaSa.set_errors error state
+                           Remanent_parameters.get_influence_map_accuracy_level parameters
+                         with
+                         | Remanent_parameters_sig.None
+                         | Remanent_parameters_sig.Low ->
+                           Remanent_state.Low
+                         | Remanent_parameters_sig.Medium
+                         | Remanent_parameters_sig.High
+                         | Remanent_parameters_sig.Full -> Remanent_state.Medium)
+        state
     else
       state
   in

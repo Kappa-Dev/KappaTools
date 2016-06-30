@@ -271,8 +271,13 @@ let print_inhibition_map parameters error handler compilation print_rule print_v
   let parameters = Remanent_parameters.update_prefix parameters "Inhibition_map:" in
   print_maps parameters (Remanent_parameters.get_logger parameters) error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
 
-let dot_of_influence_map parameters error handler compilation (wake_up_map,inhibition_map) =
-  let parameters_dot = Remanent_parameters.open_influence_map_file parameters in
+let dot_of_influence_map ?loggers parameters error handler compilation (wake_up_map,inhibition_map) =
+  let parameters_dot =
+    match loggers
+    with
+    | None -> Remanent_parameters.open_influence_map_file parameters
+    | Some loggers -> Remanent_parameters.set_logger parameters loggers
+  in
   let logger = Remanent_parameters.get_logger parameters_dot in
   let () =
     Graph_loggers.print_graph_preamble
@@ -407,5 +412,8 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
       error
   in
   let _ = Graph_loggers.print_graph_foot logger in
-  let () = Loggers.close_logger (Remanent_parameters.get_logger  parameters_dot)
+  let () =
+    match loggers with
+    | None -> Loggers.close_logger (Remanent_parameters.get_logger  parameters_dot)
+    | Some _ -> Loggers.flush_logger (Remanent_parameters.get_logger parameters_dot)
   in error

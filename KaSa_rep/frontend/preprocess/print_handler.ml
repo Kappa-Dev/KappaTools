@@ -158,9 +158,13 @@ let print_handler parameters error handler =
   in
   error
 
-let dot_of_contact_map parameters (error:Exception.method_handler) handler =
+let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) handler =
   let parameters_dot =
-    Remanent_parameters.open_contact_map_file parameters
+    match
+      loggers
+    with
+    | None -> Remanent_parameters.open_contact_map_file parameters
+    | Some loggers -> Remanent_parameters.set_logger parameters loggers
   in
   let _ =
     List.iter
@@ -325,5 +329,11 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
   in
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) "}" in
   let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
-  let () = Loggers.close_logger (Remanent_parameters.get_logger parameters_dot) in
+  let () =
+    match
+      loggers
+    with
+    | None -> Loggers.close_logger (Remanent_parameters.get_logger parameters_dot)
+    | Some _ -> Loggers.flush_logger (Remanent_parameters.get_logger parameters_dot)
+  in
   error

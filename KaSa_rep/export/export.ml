@@ -882,13 +882,33 @@ let get_most_accurate_influence_map state =
   let map = Remanent_state.get_influence_map_map state in
   find_most_precise map
 
-let dump_influence_map accuracy state =
+let dump_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   match
-    Remanent_state.get_influence_map accuracy state
+    Remanent_state.get_influence_map accuracy_level state
   with
   | None -> ()
   | Some influence_map ->
     print_influence_map (Remanent_state.get_parameters state) influence_map
+
+let output_internal_influence_map ?loggers ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+  let parameters = get_parameters state in
+  let state, influence_map = get_internal_influence_map ~accuracy_level state in
+  let state, c_compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let error = get_errors state in
+  let error =
+    Print_quarks.dot_of_influence_map ?loggers parameters error handler c_compil influence_map
+  in
+  set_errors error state
+
+let output_best_internal_influence_map state =
+  let map = Remanent_state.get_internal_influence_map_map state in
+  match
+    Remanent_state.AccuracyMap.max_key map
+  with
+  | None -> state
+  | Some accuracy_level ->
+      output_internal_influence_map ~accuracy_level state
 
 let dump_contact_map accuracy state =
   match
@@ -897,6 +917,14 @@ let dump_contact_map accuracy state =
   | None -> ()
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
+
+let output_internal_contact_map ?loggers ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+  let parameters = Remanent_state.get_parameters state in
+let state, contact_map = get_internal_contact_map ~accuracy_level state in
+  let error = get_errors state in
+  let error = Print_handler.dot_of_contact_map ?loggers parameters error contact_map in
+  set_errors error state
+
 
 let dump_signature state =
   match

@@ -105,6 +105,8 @@ val set_reachability_result: reachability_result -> state -> state
 val get_reachability_result: state -> reachability_result option
 val get_influence_map_map: state -> influence_map AccuracyMap.t
 val get_contact_map_map: state -> contact_map AccuracyMap.t
+val get_internal_influence_map_map: state -> internal_influence_map AccuracyMap.t
+val get_internal_contact_map_map: state -> internal_contact_map AccuracyMap.t
 
 val set_log_info: StoryProfiling.StoryStats.log_info -> state -> state
 val get_log_info: state -> StoryProfiling.StoryStats.log_info

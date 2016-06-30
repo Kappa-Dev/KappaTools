@@ -227,6 +227,7 @@ let get_ctmc_flow state = state.ctmc_flow
 
 let get_influence_map_map state = state.influence_map
 let get_contact_map_map state = state.contact_map
-
+let get_internal_contact_map_map state = state.internal_contact_map
+let get_internal_influence_map_map state = state.internal_influence_map
 let get_log_info state = state.log_info
 let set_log_info log state = {state with log_info = log}

@@ -41,3 +41,6 @@ state -> state * internal_influence_map
 val get_reachability_analysis: state -> state * reachability_analysis
 val get_ctmc_flow: state -> state * ctmc_flow
 val get_ode_flow: state -> state * ode_flow
+
+val output_contact_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
+val output_influence_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
