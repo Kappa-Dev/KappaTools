@@ -139,7 +139,7 @@ let init ?compil ~called_from () =
     end
 
 let get_parameters = Remanent_state.get_parameters
-
+let set_parameters = Remanent_state.set_parameters
 let set_errors = Remanent_state.set_errors
 let get_errors = Remanent_state.get_errors
 
@@ -153,7 +153,6 @@ let get_gen
     ?phase
     ?int
     ?dump
-    ?dump_h
     get compute state =
   let debug_mode =
     match debug_mode with
@@ -167,12 +166,7 @@ let get_gen
   in
   let dump =
     match dump with
-    | None -> (fun _ error _ -> error)
-    | Some f -> f
-  in
-  let dump_h =
-    match dump_h with
-    | None -> (fun p error _ x -> dump p error x)
+    | None -> (fun state _output -> state)
     | Some f -> f
   in
   match
@@ -229,16 +223,7 @@ let get_gen
       if
         Remanent_parameters.get_trace parameters' || dump_result
       then
-        let handler = Remanent_state.get_handler state in
-        match handler with
-        | None ->
-          Remanent_state.set_errors
-            (dump parameters' (Remanent_state.get_errors state) output)
-            state
-        | Some handler ->
-          Remanent_state.set_errors
-            (dump_h parameters' (Remanent_state.get_errors state) handler output)
-            state
+        dump state output
       else
         state
     in
@@ -300,6 +285,12 @@ let compute_prehandler show_title state =
   let state = Remanent_state.set_handler handler state in
   state, handler
 
+let lift_dump_parameter_error dump state output =
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error = dump parameters error output in
+  Remanent_state.set_errors error state
+
 let get_prehandler =
   get_gen
     ~debug_mode:List_tokens.local_trace
@@ -309,7 +300,7 @@ let get_prehandler =
     ~phase:StoryProfiling.KaSa_lexing
     Remanent_state.get_handler
     compute_prehandler
-    ~dump:Print_handler.print_handler
+    ~dump:(lift_dump_parameter_error Print_handler.print_handler)
 
 let compute_c_compilation_handler show_title state =
   let parameters = Remanent_state.get_parameters state in
@@ -348,6 +339,13 @@ let get_handler =
     ~phase:StoryProfiling.KaSa_linking
     Remanent_state.get_handler (choose snd)
 
+let dump_c_compil state c_compil =
+  let state, handler = get_handler state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error = Print_cckappa.print_compil parameters error handler c_compil in
+  let state = Remanent_state.set_errors error state in
+  state
 let compute_raw_internal_contact_map show_title state =
   let state, _ = get_compilation  state in
   let state, handler = get_handler state in
@@ -365,8 +363,11 @@ let compute_raw_internal_contact_map show_title state =
   Remanent_state.set_internal_contact_map Remanent_state.Low handler state,
   handler
 
-let dump_raw_internal_contact_map parameters error handler =
-  Print_handler.dot_of_contact_map parameters error handler
+let dump_raw_internal_contact_map state  handler =
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error = Print_handler.dot_of_contact_map parameters error handler in
+  Remanent_state.set_errors error state
 
 let get_raw_internal_contact_map  =
   get_gen
@@ -908,7 +909,7 @@ let output_best_internal_influence_map state =
   with
   | None -> state
   | Some accuracy_level ->
-      output_internal_influence_map ~accuracy_level state
+    output_internal_influence_map ~accuracy_level state
 
 let dump_contact_map accuracy state =
   match
@@ -920,11 +921,10 @@ let dump_contact_map accuracy state =
 
 let output_internal_contact_map ?loggers ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let parameters = Remanent_state.get_parameters state in
-let state, contact_map = get_internal_contact_map ~accuracy_level state in
+  let state, contact_map = get_internal_contact_map ~accuracy_level state in
   let error = get_errors state in
   let error = Print_handler.dot_of_contact_map ?loggers parameters error contact_map in
   set_errors error state
-
 
 let dump_signature state =
   match

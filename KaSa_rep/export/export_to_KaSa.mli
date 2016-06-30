@@ -28,19 +28,21 @@ val init:
   unit -> state
 
 val get_parameters: state -> parameters
+val set_parameters: parameters -> state -> state
 val get_contact_map:
-?accuracy_level:Remanent_state.accuracy_level ->
-state -> state * internal_contact_map
+  ?accuracy_level:Remanent_state.accuracy_level ->
+  state -> state * internal_contact_map
 val get_handler: state -> state * handler
 val get_errors: state -> errors
 val set_errors: errors -> state -> state
 val get_c_compilation: state -> state * c_compilation
 val get_influence_map:
-?accuracy_level:Remanent_state.accuracy_level ->
-state -> state * internal_influence_map
+  ?accuracy_level:Remanent_state.accuracy_level ->
+  state -> state * internal_influence_map
 val get_reachability_analysis: state -> state * reachability_analysis
 val get_ctmc_flow: state -> state * ctmc_flow
 val get_ode_flow: state -> state * ode_flow
 
+val dump_c_compil: state -> c_compilation -> state 
 val output_contact_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
 val output_influence_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state

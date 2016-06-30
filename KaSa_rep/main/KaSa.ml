@@ -20,17 +20,15 @@ let main () =
     then
         Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Low state
     else
+    if Remanent_parameters.get_trace parameters || Print_cckappa.trace
+    then
       let state, c_compil = Export_to_KaSa.get_c_compilation state in
-      let state, handler = Export_to_KaSa.get_handler state in
-      let parameters = Export_to_KaSa.get_parameters state in
-      let parameters = Remanent_parameters.update_prefix  parameters "Compilation:" in
-      let error = Export_to_KaSa.get_errors state in
-      let error =
-        if Remanent_parameters.get_trace parameters || Print_cckappa.trace
-        then Print_cckappa.print_compil parameters error handler c_compil
-        else error
-      in
-      let state = Export_to_KaSa.set_errors error state in
+      let parameters' = Remanent_parameters.update_prefix  parameters "Compilation:" in
+      let state = Export_to_KaSa.set_parameters parameters' state in
+      let state = Export_to_KaSa.dump_c_compil state c_compil in
+      let state = Export_to_KaSa.set_parameters parameters state in
+      state
+    else
       state
   in
   let state =
