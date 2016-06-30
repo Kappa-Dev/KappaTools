@@ -82,6 +82,8 @@ Quark
 Algebraic_construction
 Influence_map
 Export
+Export_to_KaSa
+Export_to_KaSim
 
 Agent_trace
 Agents_domain
