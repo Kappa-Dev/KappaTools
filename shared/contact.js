@@ -198,13 +198,16 @@ function Node(nodeData){
 /**
  * DTO for contact map.
  */
-function DataTransfer(data,isSnapshot){
+function DataTransfer(data,isSnapshot,nodeCount){
     var that = this;
-    this.isSnapshot = isSnapshot;
-    that.data = data.map(
+
+    this.data = data.map(
         function(nodeData){
             return Node(nodeData);
         });
+    this.isSnapshot = isSnapshot;
+    this.nodeCount = nodeCount;
+
 
     this.node = function(id){
         return that.data[id];
@@ -441,9 +444,15 @@ function Render(id,contactMap){
         });
 
     //if (agentNames.length > 10)
-    { that.color = hashColor }
+    // { that.color = hashColor }
     //else
     //{ that.color = d3.scale.category10().domain(agentNames); }
+
+    if(that.contactMap.nodeCount && that.contactMap.nodeCount <= 10){
+	that.color = hashColor
+    } else {
+	that.color = d3.scale.category10().domain(agentNames);
+    }
     /* given a node return the fill color */
     that.fill = function(node){
         var color = that.color(node.label).toString();
@@ -720,11 +729,11 @@ function ContactMap(id,isSnapshot){
     var that = this;
     this.id = "#"+id;
     this.isSnapshot = isSnapshot;
-    this.setData = function(json){
+    this.setData = function(json,nodeCount){
         debug(json);
         var data = JSON.parse(json);
         that.data = data;
-        var contactMap = new DataTransfer(data,isSnapshot);
+        var contactMap = new DataTransfer(data,isSnapshot,nodeCount);
         that.clearData();
         if(that.data.length > 0){
             this.clearData();

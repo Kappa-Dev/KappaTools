@@ -509,40 +509,47 @@ function observable_plot(configuration){
     this.updateAxisSelect = wrap(this.updateAxisSelect);
 
     this.renderAxisSelect = function(){
-        var that = this;
-        /* check for the div to add the axis */
-        if(that.configuration.plotDivAxisSelectId){
-            // Clear div first
-            var divAxisSelect = d3.select("#"+configuration.plotDivAxisSelectId);
-            divAxisSelect.html("");
-            /* Handler to update when the select changes */
-            var changeHandler = function(){
-                var index = parseInt(this.options[this.selectedIndex].value);
-                assert(typeof index !== 'undefined',"plot selection invalid");
-                that.state.forEach(function(state,i){
-                    if(state.mode == that.modes.XAXIS){
-                        state.mode = that.modes.DOT;
-                    }
-                    if(i == index){
-                        state.mode = that.modes.XAXIS;
-                    }
-                });
-                // re-render plot
+	var reRender = true;
+	if(that.select){
+	    var oldState = that.select.selectAll('option').data();
+	    var oldLabels = oldState.map(function(option){ return option.label; });
+	    var newLabels = that.state.map(function(observable){ return observable.label; });
+	    reRender = !is_same(oldLabels,newLabels);
+	}
+	if (reRender){
+            /* check for the div to add the axis */
+            if(that.configuration.plotDivAxisSelectId){
+		// Clear div first
+		var divAxisSelect = d3.select("#"+configuration.plotDivAxisSelectId);
+		divAxisSelect.html("");
+		/* Handler to update when the select changes */
+		var changeHandler = function(){
+                    var index = parseInt(this.options[this.selectedIndex].value);
+                    assert(typeof index !== 'undefined',"plot selection invalid");
+                    that.state.forEach(function(state,i){
+			if(state.mode == that.modes.XAXIS){
+                            state.mode = that.modes.DOT;
+			}
+			if(i == index){
+                            state.mode = that.modes.XAXIS;
+			}
+                    });
+                    // re-render plot
                 that.renderPlot();
+		}
+		that.select = divAxisSelect.append("select")
+                    .attr("class","form-control")
+                    .on("change", changeHandler);
+		that.select.selectAll('option')
+                    .data(that.state)
+                    .enter().append("option")
+                    .attr("value",function(d,i) { return i; })
+                    .text(function(d) { return d.label; });
+		that.select.selectAll('option')
+                    .filter(function(d){ return d.mode == that.modes.XAXIS; })
+                    .attr("selected","true");
             }
-            var select = divAxisSelect
-                         .append("select")
-                         .attr("class","form-control")
-                         .on("change", changeHandler);
-            select.selectAll('option')
-                  .data(that.state)
-                  .enter().append("option")
-                  .attr("value",function(d,i) { return i; })
-                  .text(function(d) { return d.label; });
-            select.selectAll('option')
-                  .filter(function(d){ return d.mode == that.modes.XAXIS; })
-                  .attr("selected","true");
-        }
+	}
     }
     this.renderAxisSelect = wrap(this.renderAxisSelect);
 

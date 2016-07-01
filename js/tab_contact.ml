@@ -59,7 +59,11 @@ let onload () =
           let json : string =
             ApiTypes_j.string_of_site_graph data.ApiTypes.contact_map
           in
-          contactmap##setData (Js.string json))
+          (contactmap##setData
+	     ((Js.string json),
+	      Js.Opt.option (Ui_state.agent_count ()))
+	  )
+      )
       UIState.model_parse
   in
   let () = Common.jquery_on
@@ -71,8 +75,12 @@ let onload () =
       | Some data ->
         let site_graph : ApiTypes.site_graph =
           Api_data.api_contactmap_site_graph data in
+	(* quick cheat to get the count of the agent *)
         let json : string =
           ApiTypes_j.string_of_site_graph site_graph in
-        contactmap##setData (Js.string json))
+        contactmap##setData
+	  ((Js.string json)
+	  ,(Js.Opt.option (Ui_state.agent_count ())))
+    )
   in
   ()

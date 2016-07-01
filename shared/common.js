@@ -68,9 +68,13 @@ function jqueryOn(selector,event,handler){
 
 // http://stackoverflow.com/questions/22395357/how-to-compare-two-arrays-are-equal-using-javascript-or-jquery
 function is_same(array1,array2){
-    (array1.length == array2.length) && array1.every(function(element, index) {
-        return element === array2[index];
-    });
+    var same =
+    (array1.length == array2.length)
+	&&
+	array1.every(function(element, index) {
+            return element === array2[index];
+	});
+    return same;
 }
 /* needed to add the stylesheet to the export */
 var cssTextToken = "/* stylesheet : a5f23ffb-e635-435c-ae44-c10779c2a843 */";

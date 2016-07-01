@@ -149,7 +149,9 @@ let update_snapshot
   let json : string =
     ApiTypes_j.string_of_site_graph site_graph
   in
-  snapshot_js##setData (Js.string json)
+  snapshot_js##setData
+    (Js.string json,
+     Js.Opt.option (Ui_state.agent_count ()))
 
 let select_snapshot () =
   let snapshot_js : Js_contact.contact_map Js.t =

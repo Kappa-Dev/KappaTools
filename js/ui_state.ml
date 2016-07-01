@@ -295,3 +295,11 @@ let stop_model token = match !runtime_state with
                                          let () = set_model_error [] in
                                          Lwt.return_unit))
      in ()
+(* return the agent count *)
+let agent_count () : int option =
+  match (React.S.value model_parse) with
+  | None -> None
+  | Some data ->
+     let site_graph : ApiTypes.site_graph =
+       Api_data.api_contactmap_site_graph data in
+     Some (Array.length site_graph)
