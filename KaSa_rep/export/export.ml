@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jun 30 2016>
+  * Last modification: Time-stamp: <Jul 01 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -26,7 +26,7 @@ type c_compilation = Cckappa_sig.compil
 type reachability_analysis = Remanent_state.reachability_result
 type parameters = Remanent_parameters_sig.parameters
 type errors = Exception.method_handler
-type internal_contact_map = Cckappa_sig.kappa_handler
+type internal_contact_map = Remanent_state.internal_contact_map
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
@@ -346,6 +346,7 @@ let dump_c_compil state c_compil =
   let error = Print_cckappa.print_compil parameters error handler c_compil in
   let state = Remanent_state.set_errors error state in
   state
+
 let compute_raw_internal_contact_map show_title state =
   let state, _ = get_compilation  state in
   let state, handler = get_handler state in
@@ -359,9 +360,12 @@ let compute_raw_internal_contact_map show_title state =
     then Print_cckappa.print_compil parameters error handler c_compil
     else error
   in
+  let error, contact_map =
+    Preprocess.export_contact_map parameters error handler
+  in
   let state = Remanent_state.set_errors error state in
-  Remanent_state.set_internal_contact_map Remanent_state.Low handler state,
-  handler
+  Remanent_state.set_internal_contact_map Remanent_state.Low contact_map state,
+  contact_map
 
 let dump_raw_internal_contact_map state  handler =
   let parameters = Remanent_state.get_parameters state in
@@ -372,7 +376,7 @@ let dump_raw_internal_contact_map state  handler =
 let get_raw_internal_contact_map  =
   get_gen
     ~log_title:"Generating the raw contact map..."
-    ~dump:dump_raw_internal_contact_map
+    (*  ~dump:dump_raw_internal_contact_map *)
     (Remanent_state.get_internal_contact_map Remanent_state.Low)
     compute_raw_internal_contact_map
 
@@ -922,8 +926,9 @@ let dump_contact_map accuracy state =
 let output_internal_contact_map ?loggers ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let parameters = Remanent_state.get_parameters state in
   let state, contact_map = get_internal_contact_map ~accuracy_level state in
+  let state, handler = get_handler state in
   let error = get_errors state in
-  let error = Print_handler.dot_of_contact_map ?loggers parameters error contact_map in
+  let error = Preprocess.dot_of_contact_map ?loggers parameters error handler contact_map in
   set_errors error state
 
 let dump_signature state =

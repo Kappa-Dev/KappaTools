@@ -88,7 +88,10 @@ type influence_map =
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
-type internal_contact_map = Cckappa_sig.kappa_handler
+type internal_contact_map =
+  (Ckappa_sig.c_state list *
+   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
+    Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
 type reachability_result =
   Domain_selection.Reachability_analysis.static_information

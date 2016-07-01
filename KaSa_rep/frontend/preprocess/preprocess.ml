@@ -1757,3 +1757,293 @@ let translate_c_compil parameters error handler compil =
     Cckappa_sig.observables = c_observables ;
     Cckappa_sig.init = c_inits ;
     Cckappa_sig.perturbations = c_perturbations }
+
+let declare_agent parameters error ag sol =
+Ckappa_sig.Agent_map_and_set.Map.add parameters error
+  ag
+  Ckappa_sig.Site_map_and_set.Map.empty
+  sol
+
+let declare_site parameters error  a b sol =
+  let error, sol_a =
+    Ckappa_sig.Agent_map_and_set.Map.find_default
+      parameters error
+      Ckappa_sig.Site_map_and_set.Map.empty a sol
+  in
+  let error, sol_a =
+    Ckappa_sig.Site_map_and_set.Map.add parameters error
+    b ([],[]) sol_a
+  in
+  Ckappa_sig.Agent_map_and_set.Map.overwrite parameters error
+    a sol_a sol
+
+let add_link_in_contact_map parameters error (a,b) (c,d) sol =
+  let error, sol_a =
+    Ckappa_sig.Agent_map_and_set.Map.find_default
+      parameters error
+      Ckappa_sig.Site_map_and_set.Map.empty a sol
+  in
+  let error, (l,old) =
+    Ckappa_sig.Site_map_and_set.Map.find_default
+      parameters error
+      ([],[]) b sol_a
+  in
+  let error, sol'_a =
+    Ckappa_sig.Site_map_and_set.Map.overwrite
+      parameters error b
+      (l,((c,d)::old)) sol_a
+  in
+  Ckappa_sig.Agent_map_and_set.Map.overwrite
+    parameters error a sol'_a
+    sol
+
+(*----------------------------------------------------------------*)
+let add_internal_state_in_contact_map parameters error (a,b) c sol =
+  let error, sol_a =
+    Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs parameters error
+      Ckappa_sig.Site_map_and_set.Map.empty a sol
+  in
+  let error, (old,l) =
+    Ckappa_sig.Site_map_and_set.Map.find_default_without_logs parameters error
+      ([],[]) b sol_a
+  in
+  let error, sol'_a =
+    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+      parameters error b (c::old,l) sol_a
+  in
+  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters error
+    a  sol'_a sol
+
+let export_contact_map parameters error handler =
+  let sol = Ckappa_sig.Agent_map_and_set.Map.empty in
+  (*----------------------------------------------------------------*)
+  let error, sol =
+    Ckappa_sig.Dictionary_of_agents.fold
+      (fun _ _ agent_id (error,sol) ->
+         declare_agent parameters error agent_id sol)
+      handler.Cckappa_sig.agents_dic
+      (error, sol)
+  in
+  let error, sol =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error agent_id site_dic  sol ->
+         Ckappa_sig.Dictionary_of_sites.fold
+           (fun _ _ site_id (error,sol) ->
+              declare_site parameters error agent_id site_id sol)
+           site_dic (error,sol))
+      handler.Cckappa_sig.sites
+      sol
+  in
+  let error,sol  =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+      parameters error
+      (fun parameters error (i,j) s sol ->
+         let error,site =
+           Handler.translate_site parameters error handler i j
+         in
+         match site with
+         | Ckappa_sig.Binding _ -> error, sol
+         | Ckappa_sig.Internal _ ->
+           Ckappa_sig.Dictionary_of_States.fold
+             (fun _ ((),()) state (error,sol) ->
+                add_internal_state_in_contact_map parameters error (i,j) state sol
+             )
+             s
+             (error,sol)
+      )
+      handler.Cckappa_sig.states_dic
+      sol
+  in
+  (*----------------------------------------------------------------*)
+  let error, sol =
+    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+      parameters error
+      (fun _parameters error (i, (j , _k)) (i', j', _k') sol ->
+         add_link_in_contact_map parameters error (i,j) (i',j') sol)
+      handler.Cckappa_sig.dual sol
+  in
+  let sol =
+    Ckappa_sig.Agent_map_and_set.Map.map
+      (Ckappa_sig.Site_map_and_set.Map.map (fun (l,x) -> List.rev l,List.rev x))
+      sol
+  in
+  error, sol
+
+let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) handler contact_map =
+  let parameters_dot =
+    match
+      loggers
+    with
+    | None -> Remanent_parameters.open_contact_map_file parameters
+    | Some loggers -> Remanent_parameters.set_logger parameters loggers
+  in
+  let _ =
+    List.iter
+      (fun x ->
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters_dot)
+             "%s%s"
+             Headers.dot_comment
+             x
+         in
+         let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
+         ())
+      (Headers.head parameters_dot)
+  in
+  let _ =
+    List.iter
+      (fun x->
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters_dot)
+             "%s%s"
+             Headers.dot_comment
+             x
+         in
+         let () =
+           Loggers.print_newline
+             (Remanent_parameters.get_logger parameters_dot)
+         in
+         ())
+      Headers.head_contact_map_in_dot
+  in
+  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) "graph G{ \n" in
+  let error =
+    Ckappa_sig.Agent_map_and_set.Map.fold
+      (fun i site_map error ->
+         let error, agent_name = Handler.translate_agent parameters_dot error handler i in
+         let _ =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters_dot)
+             "subgraph cluster%s {\n"
+             (Ckappa_sig.string_of_agent_name i)
+         in
+         let n_sites,error =
+           Ckappa_sig.Site_map_and_set.Map.fold
+             (fun j _ (n,error) ->
+                let error, site = Handler.translate_site parameters_dot error handler i j in
+                let _ =
+                  match site with
+                  | Ckappa_sig.Internal site_name ->
+                    if not (Remanent_parameters.get_pure_contact parameters_dot)
+                    then
+                      let () =
+                        Loggers.fprintf
+                          (Remanent_parameters.get_logger parameters_dot)
+                          "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                          (Ckappa_sig.string_of_agent_name i)
+                          (Ckappa_sig.string_of_site_name j)
+                          site_name
+                          (Remanent_parameters.get_internal_site_shape parameters_dot)
+                          (Remanent_parameters.get_internal_site_color parameters_dot) in
+                      Loggers.print_newline (Remanent_parameters.get_logger parameters_dot)
+                    else
+                      ()
+                  | Ckappa_sig.Binding site_name ->
+                    let () =
+                      Loggers.fprintf
+                        (Remanent_parameters.get_logger parameters_dot)
+                        "   %s.%s [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]"
+                        (Ckappa_sig.string_of_agent_name i)
+                        (Ckappa_sig.string_of_site_name j)
+                        site_name
+                        (Remanent_parameters.get_binding_site_shape parameters_dot)
+                        (Remanent_parameters.get_binding_site_color parameters_dot)
+                    in
+                    let () =
+                      Loggers.print_newline
+                        (Remanent_parameters.get_logger parameters_dot)
+                    in ()
+                in
+                (Ckappa_sig.next_site_name n,error))
+             site_map (Ckappa_sig.dummy_site_name,error)
+         in
+         let () =
+           if Ckappa_sig.compare_site_name n_sites Ckappa_sig.dummy_site_name <= 0
+           then
+             let () =
+               Loggers.fprintf
+                 (Remanent_parameters.get_logger parameters_dot)
+                 "   %s.0 [shape = plaintext label = \"\"]"
+                 (Ckappa_sig.string_of_agent_name i)
+             in
+             let () =
+               Loggers.print_newline
+                 (Remanent_parameters.get_logger parameters_dot)
+             in ()
+         in
+         let color =
+           Ckappa_sig.get_agent_color
+             n_sites parameters_dot
+         in
+         let shape =
+           Ckappa_sig.get_agent_shape
+             n_sites
+             parameters_dot
+         in
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters_dot)
+             "label =  \"%s\";  shape = %s; color = %s"
+             agent_name
+             shape
+             color
+         in
+         let () =
+           Loggers.print_newline
+             (Remanent_parameters.get_logger parameters_dot)
+         in
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters_dot) "} ; " in
+         let () =
+           Loggers.print_newline (Remanent_parameters.get_logger parameters_dot)
+         in
+         error)
+      contact_map error
+  in
+  let error =
+    Ckappa_sig.Agent_map_and_set.Map.fold
+      (fun i site_map error ->
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (fun j (_,b) error ->
+              let error, site = Handler.translate_site parameters_dot error handler i j in
+              let _ =
+                match site with
+                | Ckappa_sig.Internal _ -> error
+                | Ckappa_sig.Binding _ ->
+                  List.fold_left
+                    (fun error (i',j') ->
+                       if Ckappa_sig.compare_agent_name i i' < 0
+                       || (Ckappa_sig.compare_agent_name i i' = 0 &&
+                           Ckappa_sig.compare_site_name j j' <= 0)
+                       then
+                         let _ =
+                           Loggers.fprintf
+                             (Remanent_parameters.get_logger parameters_dot) "%s.%s -- %s.%s\n"
+                             (Ckappa_sig.string_of_agent_name i)
+                             (Ckappa_sig.string_of_site_name j)
+                             (Ckappa_sig.string_of_agent_name i')
+                             (Ckappa_sig.string_of_site_name j')
+                         in error
+                       else
+                         error
+                    ) error b
+              in
+              error)
+           site_map
+           error)
+      contact_map error
+  in
+  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) "}" in
+  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
+  let () =
+    match
+      loggers
+    with
+    | None -> Loggers.close_logger (Remanent_parameters.get_logger parameters_dot)
+    | Some _ -> Loggers.flush_logger (Remanent_parameters.get_logger parameters_dot)
+  in
+  error
