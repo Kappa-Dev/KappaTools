@@ -173,14 +173,14 @@ module type Map =
     val fold_restriction_with_missing_associations_with_logs:
       ('parameters,'error,
        (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
-       (elt -> ('error * 'b) -> ('error * 'b)) -> 
+       (elt -> ('error * 'b) -> ('error * 'b)) ->
        set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
-      
+
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val fold_with_interruption: (elt -> 'a -> 'b -> ('b,'c) Stop.stop) -> 'a t -> 'b -> ('b,'c) Stop.stop
-  
+
     val monadic_fold2:
       'parameters -> 'method_handler ->
       ('parameters -> 'method_handler ->
@@ -235,11 +235,11 @@ module type Projection = sig
     type elt_b
     type 'a map_a
     type 'a map_b
-    val proj: (elt_a -> elt_b) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_b
+    val proj: (elt_a -> elt_b) -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_b
     val proj_monadic:
-      'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'a ->
-      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
-      'a map_a -> 'method_handler * 'a map_b
+      'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'b ->
+      ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
+      'a map_a -> 'method_handler * 'b map_b
   end
 
 module Proj(A:S)(B:S): Projection with
@@ -255,12 +255,12 @@ module type Projection2 = sig
     type 'a map_c
     val proj2:
       (elt_a -> elt_b) -> (elt_a -> elt_c) ->
-      'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+      'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_c map_b
     val proj2_monadic:
       'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) ->
-      'a ->
-      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
-      'a map_a -> 'method_handler * 'a map_c map_b
+      'b ->
+      ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
+      'a map_a -> 'method_handler * 'b map_c map_b
  end
 
 module Proj2(A:S)(B:S)(C:S): Projection2 with

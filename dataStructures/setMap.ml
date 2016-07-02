@@ -190,7 +190,7 @@ module type Map =
     val fold_restriction_with_missing_associations_with_logs:
       ('parameters,'error,
        (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
-       (elt -> ('error * 'b) -> ('error * 'b)) -> 
+       (elt -> ('error * 'b) -> ('error * 'b)) ->
        set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
@@ -1462,30 +1462,30 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  match map with
           | Private.Empty -> false,Stop.success value
           | Private.Node(left,key,data,right,_,_) ->
-	    let outputl = fold_with_interruption f left value in 
-	    let interrupted,value = outputl in 
+	    let outputl = fold_with_interruption f left value in
+	    let interrupted,value = outputl in
 	    if interrupted then outputl
-	    else 
+	    else
 	      Stop.success_or_stop
 		(fun value ->
-		 let val_opt = 
-		   try 
+		 let val_opt =
+		   try
 		     Some (f key data value)
 		   with Sys.Break -> None
-		 in 
-		 match 
+		 in
+		 match
 		   val_opt
-		 with 
+		 with
 		 | None -> (true,Stop.success value)
 		 | Some v ->
 		    Stop.success_or_stop
-		      (fun v -> 
+		      (fun v ->
 		       fold_with_interruption f right v )
 		      (fun v -> false,Stop.stop v)
 		      v)
 		(fun x -> false,Stop.stop x)
 		value
-		   
+
 	let fold_with_interruption f map value = snd (fold_with_interruption f map value)
 
 	let rec monadic_fold param err f map value =
@@ -1806,7 +1806,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              match data2 with
              | None ->
 		let error, res' = fold_restriction_with_missing_associations_with_logs warn parameters error f g left1 left2 res in
-		let error, res'' = g key1 (error,res') in 
+		let error, res'' = g key1 (error,res') in
                 fold_restriction_with_missing_associations_with_logs
 		  warn parameters error f g right1 right2 res''
              | Some data2 ->
@@ -1815,8 +1815,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                 fold_restriction_with_missing_associations_with_logs
 		  warn parameters error f g right1 right2 res''
 
-	let fold_restriction_with_logs warn parameters error f set map res = fold_restriction_with_missing_associations_with_logs warn parameters error f (fun _ x -> x) set map res 
-   
+	let fold_restriction_with_logs warn parameters error f set map res = fold_restriction_with_missing_associations_with_logs warn parameters error f (fun _ x -> x) set map res
+
       end
   end
 
@@ -1825,11 +1825,11 @@ module type Projection = sig
     type elt_b
     type 'a map_a
     type 'a map_b
-    val proj: (elt_a -> elt_b) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_b
+    val proj: (elt_a -> elt_b) -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_b
     val proj_monadic:
-      'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'a ->
-      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
-      'a map_a -> 'method_handler * 'a map_b
+      'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'b ->
+      ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
+      'a map_a -> 'method_handler * 'b map_b
   end
 
 module Proj(A:S)(B:S) =
@@ -1872,11 +1872,11 @@ module Proj(A:S)(B:S) =
 module IntMap = Make(struct type t = int let compare = compare end)
 module P = Proj(IntMap)(IntMap)
 
-	       
+
 let f = List.fold_left
 	  (fun map (a,b) -> IntMap.Map.add a b map)
 	  IntMap.Map.empty
-	  [1,[2;3];2,[3;4];5,[6;7];8,[12;13]] 
+	  [1,[2;3];2,[3;4];5,[6;7];8,[12;13]]
 
 (* bad implementation (quadratic time complexity) *)
 let g = P.proj (fun i -> i mod 2) [] (List.append) f
@@ -1884,9 +1884,9 @@ let g = P.proj (fun i -> i mod 2) [] (List.append) f
 (* good implementation (linear time complexity)*)
 let g' = IntMap.Map.map List.rev (P.proj (fun i -> i mod 2) [] (fun x y -> List.append (List.rev y) x) f)
 
-		      
+
 let dump (s:string) f =
-  let _ = Printf.fprintf stderr "%s: \n" s in 
+  let _ = Printf.fprintf stderr "%s: \n" s in
   let _ = IntMap.Map.iter
 	    (fun a l ->
 	     let _ = Printf.fprintf stderr "  %i:" a in
@@ -1895,18 +1895,18 @@ let dump (s:string) f =
 	    f in
   ()
 let _ = dump "f" f
-let _ = dump "g" g 
+let _ = dump "g" g
 let _ = dump "g'" g'
-	    
-	     (* should dump: *)
-(*	     
 
-f: 
+	     (* should dump: *)
+(*
+
+f:
   1:2,3,
   2:3,4,
   5:6,7,
   8:12,13,
-g: 
+g:
   0:3,4,12,13,
   1:2,3,6,7,
  *)
@@ -1921,12 +1921,12 @@ module type Projection2 = sig
     type 'a map_c
     val proj2:
       (elt_a -> elt_b) -> (elt_a -> elt_c) ->
-      'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+      'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_c map_b
     val proj2_monadic:
       'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) ->
-      'a ->
-      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
-      'a map_a -> 'method_handler * 'a map_c map_b
+      'b ->
+      ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
+      'a map_a -> 'method_handler * 'b map_c map_b
   end
 
 module Proj2(A:S)(B:S)(C:S) =

@@ -105,8 +105,9 @@ module type Projection = sig
     type elt_b
     type 'a map_a
     type 'a map_b
-    val monadic_proj: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a -> Exception.method_handler * 'a) -> 'a map_a -> Exception.method_handler * 'a map_b
-    val proj: (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> Exception.method_handler * 'a map_b
+    val monadic_proj: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> 'a -> Exception.method_handler * 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
+    val monadic_proji: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> elt_a -> 'a -> Exception.method_handler * 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
+    val proj: (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
   end
 
 module Proj(A:S_with_logs)(B:S_with_logs) : Projection
@@ -125,22 +126,22 @@ module type Projection2 =
     type 'a map_c
 
     val proj2:
-      Remanent_parameters_sig.parameters -> Exception.method_handler ->
+      Remanent_parameters_sig.parameters -> Exception.method_handler  ->
       (elt_a -> elt_b) ->
       (elt_a -> elt_c) ->
-      'a ->
-      (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a -> 'a) ->
+      'b ->
+      (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> 'a -> 'b) ->
       'a map_a ->
-      'a map_c map_b
+      'b map_c map_b
 
     val proj2_monadic:
-      Remanent_parameters_sig.parameters -> Exception.method_handler ->
+      Remanent_parameters_sig.parameters -> Exception.method_handler -> 'mvbdu_handler ->
       (elt_a -> elt_b) ->
       (elt_a -> elt_c) ->
-      'a ->
-      (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a ->
-       Exception.method_handler * 'a) ->
-      'a map_a -> Exception.method_handler * 'a map_c map_b
+      'b ->
+      (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'mvbdu_handler -> 'b -> 'a ->
+       Exception.method_handler * 'mvbdu_handler * 'b) ->
+      'a map_a -> Exception.method_handler * 'mvbdu_handler  * 'b map_c map_b
   end
 
 module Proj2 (A:S_with_logs)(B:S_with_logs)(C:S_with_logs) : Projection2
