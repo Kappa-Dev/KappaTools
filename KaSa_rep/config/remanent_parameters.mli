@@ -22,6 +22,8 @@ val get_parameters:
   called_from:Remanent_parameters_sig.called_from ->
   unit -> Remanent_parameters_sig.parameters
 val dummy_parameters: called_from:Remanent_parameters_sig.called_from -> unit -> Remanent_parameters_sig.parameters
+
+val get_called_from: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.called_from
 val get_logger: Remanent_parameters_sig.parameters -> Loggers.t
 
 val get_command_line: Remanent_parameters_sig.parameters -> string array

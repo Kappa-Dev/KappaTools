@@ -656,6 +656,7 @@ let open_contact_map_file parameters =
    || lexical_analysis_of_tested_only_patterns_is_required_by_the_contact_map parameter
    || lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter
 
+let get_called_from parameter = parameter.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.called_from
 
  let get_profiler parameter = parameter.Remanent_parameters_sig.profiler
  let get_compression_status_logger parameter = parameter.Remanent_parameters_sig.compression_status

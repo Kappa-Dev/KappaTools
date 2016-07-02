@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jul 01 2016>
+  * Last modification: Time-stamp: <Jul 02 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -143,10 +143,43 @@ let set_parameters = Remanent_state.set_parameters
 let set_errors = Remanent_state.set_errors
 let get_errors = Remanent_state.get_errors
 
+let title_only_in_kasa parameters =
+  match
+    Remanent_parameters.get_called_from parameters
+  with
+  | Remanent_parameters_sig.JS
+  | Remanent_parameters_sig.Server
+  | Remanent_parameters_sig.Internalised
+  | Remanent_parameters_sig.KaSim -> false
+  | Remanent_parameters_sig.KaSa -> true
+
+let compute_show_title do_we_show_title log_title =
+  (fun state ->
+     let parameters = Remanent_state.get_parameters state in
+     if do_we_show_title parameters
+     then
+       match log_title with
+       | None -> ()
+       | Some title ->
+         let title =
+           if title_only_in_kasa parameters
+           then title^"..."
+           else
+              "+ "^title
+         in
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters) "%s" title
+         in
+         Loggers.print_newline (Remanent_parameters.get_logger parameters)
+     else
+       ())
+
 let get_gen
     ?debug_mode
     ?dump_result
     ?stack_title
+    ?do_we_show_title
     ?log_title
     ?log_main_title
     ?log_prefix
@@ -167,6 +200,11 @@ let get_gen
   let dump =
     match dump with
     | None -> (fun state _output -> state)
+    | Some f -> f
+  in
+  let do_we_show_title =
+    match do_we_show_title with
+    | None -> (fun _ -> true)
     | Some f -> f
   in
   match
@@ -194,18 +232,7 @@ let get_gen
         in
         Loggers.print_newline (Remanent_parameters.get_logger parameters')
     in
-    let show_title =
-      (fun state ->
-         let parameters = Remanent_state.get_parameters state in
-         match log_title with
-         | None -> ()
-         | Some title ->
-           let () =
-             Loggers.fprintf
-               (Remanent_parameters.get_logger parameters) "%s" title
-           in
-           Loggers.print_newline (Remanent_parameters.get_logger parameters'))
-    in
+    let show_title = compute_show_title do_we_show_title log_title in
     let state =
       match phase
       with
@@ -327,7 +354,8 @@ let get_c_compilation =
     ~debug_mode:List_tokens.local_trace
     ~stack_title:"Preprocess.translate_c_compil"
     ~log_prefix:"Compilation:"
-    ~log_title:"Compiling..."
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Compiling"
     ~phase:StoryProfiling.KaSa_linking
     Remanent_state.get_c_compil (choose fst)
 
@@ -335,7 +363,8 @@ let get_handler =
   get_gen
     ~debug_mode:List_tokens.local_trace
     ~stack_title:"Preprocess.translate_c_compil"
-    ~log_title:"Compiling..."
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Compiling"
     ~phase:StoryProfiling.KaSa_linking
     Remanent_state.get_handler (choose snd)
 
@@ -375,7 +404,8 @@ let dump_raw_internal_contact_map state  handler =
 
 let get_raw_internal_contact_map  =
   get_gen
-    ~log_title:"Generating the raw contact map..."
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Generating the raw contact map"
     (*  ~dump:dump_raw_internal_contact_map *)
     (Remanent_state.get_internal_contact_map Remanent_state.Low)
     compute_raw_internal_contact_map
@@ -464,7 +494,8 @@ let compute_raw_contact_map show_title state =
 
 let get_raw_contact_map =
   get_gen
-    ~log_title:"+ Compute the contact map"
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Compute the contact map"
     (Remanent_state.get_contact_map Remanent_state.Low)
     compute_raw_contact_map
 
@@ -479,7 +510,7 @@ let convert_id x nrules =
   else
     Remanent_state.Var (x-nrules)
 
-let convert_influence_map influence nrules  =
+let convert_half_influence_map influence nrules  =
   Ckappa_sig.PairRule_setmap.Map.fold
     (fun (x,y) list map ->
        let x = convert_id (int_of_string (Ckappa_sig.string_of_rule_id x)) nrules in
@@ -593,25 +624,88 @@ let compute_raw_internal_influence_map show_title state =
 
 let get_raw_internal_influence_map =
   get_gen
+    ~do_we_show_title:title_only_in_kasa
     ~log_prefix:"Influence_map:"
     ~log_main_title:"Generating the raw influence map..."
     ~phase:(StoryProfiling.Internal_influence_map "raw")
     (Remanent_state.get_internal_influence_map Remanent_state.Low)
     compute_raw_internal_influence_map
 
-let compute_raw_influence_map show_title state =
-  let () = show_title state in
-  let state, (wake_up_map, inhibition_map) =
-    get_raw_internal_influence_map state
-  in
+
+module AgentProj =
+  Map_wrapper.Proj
+    (Ckappa_sig.Agent_map_and_set)
+    (Map_wrapper.Make(Mods.StringSetMap))
+
+module SiteProj =
+  Map_wrapper.Proj
+    (Ckappa_sig.Site_map_and_set)
+    (Map_wrapper.Make(Mods.StringSetMap))
+
+module StateProj =
+  Map_wrapper.Proj
+    (Ckappa_sig.State_map_and_set)
+    (Map_wrapper.Make(Mods.StringSetMap))
+
+
+
+let convert_contact_map show_title state  contact_map =
   let parameters = Remanent_state.get_parameters state in
   let state, handler = get_handler state in
   let error = Remanent_state.get_errors state in
+  let () = show_title state in
+  let error, contact_map =
+    AgentProj.monadic_proji
+      (fun parameters error (ag:Ckappa_sig.c_agent_name) ->
+         (Handler.translate_agent parameters error handler ag:Exception.method_handler * Ckappa_sig.agent_name))
+      parameters error
+      Mods.StringMap.empty
+      (fun parameters error _ ag sitemap->
+         SiteProj.monadic_proji
+           (fun parameters errors site ->
+              let error, site = Handler.translate_site parameters errors handler ag (site:Ckappa_sig.c_site_name) in
+              error, Handler.print_site_contact_map site)
+           parameters error
+           ([],[])
+           (fun parameters error (list_a,list_b) site (list_a',list_b') ->
+              let error, list_a'' =
+                List.fold_left
+                  (fun (error, list) state ->
+                     let error, state = Handler.translate_state parameters error handler ag site state in
+                     match state with
+                     | Ckappa_sig.Internal state -> error, state::list
+                     | Ckappa_sig.Binding _ ->
+                       warn parameters error (Some "line 645") Exit list)
+                  (error, list_a) (List.rev list_a')
+              in
+              let error, list_b'' =
+                List.fold_left
+                  (fun (error, list) (agent,site) ->
+                     let error, ag = Handler.translate_agent parameters error handler agent in
+                     let error, site = Handler.translate_site parameters error handler agent site in
+                     let st = Handler.print_site_contact_map site in
+                     error, (ag,st)::list)
+                  (error, list_b) (List.rev list_b')
+              in
+              error, (list_a'', list_b''))
+           sitemap)
+      contact_map
+  in
+  Remanent_state.set_errors error state,
+  contact_map
+
+
+let convert_influence_map show_title state (wake_up_map, inhibition_map) =
+  let parameters = Remanent_state.get_parameters state in
+  let state, handler = get_handler state in
+  let error = Remanent_state.get_errors state in
+  let () = show_title state in
   let nrules = Handler.nrules parameters error handler in
+  let state = Remanent_state.set_errors error state in
   let output =
     {
-      Remanent_state.positive = convert_influence_map wake_up_map nrules ;
-      Remanent_state.negative = convert_influence_map inhibition_map nrules ;
+      Remanent_state.positive = convert_half_influence_map wake_up_map nrules ;
+      Remanent_state.negative = convert_half_influence_map inhibition_map nrules ;
     }
   in
   let state =
@@ -622,14 +716,6 @@ let compute_raw_influence_map show_title state =
   in
   state,
   output
-
-let get_raw_influence_map =
-  get_gen
-    ~log_prefix:"Influence_map:"
-    ~log_main_title:"Generating the raw influence map..."
-    ~phase:(StoryProfiling.Influence_map "raw")
-    (Remanent_state.get_influence_map Remanent_state.Low)
-    compute_raw_influence_map
 
 
 let compute_intermediary_internal_influence_map show_title state =
@@ -661,8 +747,8 @@ let compute_intermediary_internal_influence_map show_title state =
   let state =
     Remanent_state.set_influence_map Remanent_state.Medium
       {
-        Remanent_state.positive = convert_influence_map wake_up_map nrules ;
-        Remanent_state.negative = convert_influence_map inhibition_map nrules ;
+        Remanent_state.positive = convert_half_influence_map wake_up_map nrules ;
+        Remanent_state.negative = convert_half_influence_map inhibition_map nrules ;
       }
       state
   in
@@ -704,52 +790,10 @@ let compute_intermediary_internal_influence_map show_title state =
 let get_intermediary_internal_influence_map =
   get_gen
     ~log_prefix:"Influence_map:"
-    ~log_title:"Refining the influence map..."
+    ~log_title:"Refining the influence map"
     ~phase:(StoryProfiling.Internal_influence_map "medium")
     (Remanent_state.get_internal_influence_map Remanent_state.Medium)
     compute_intermediary_internal_influence_map
-
-let compute_intermediary_influence_map show_title state =
-  let state, (wake_up_map, inhibition_map) =
-    get_intermediary_internal_influence_map state
-  in
-  let state, handler = get_handler state in
-  let parameters = Remanent_state.get_parameters state in
-  let error = Remanent_state.get_errors state in
-  let nrules = Handler.nrules parameters error handler in
-  let () = show_title state in
-  let output =
-    {
-      Remanent_state.positive = convert_influence_map wake_up_map nrules ;
-      Remanent_state.negative = convert_influence_map inhibition_map nrules ;
-    }
-  in
-  let state =
-    Remanent_state.set_influence_map
-      Remanent_state.Medium
-      output
-      state
-  in
-  state,
-  output
-
-let get_intermediary_influence_map =
-  get_gen
-    ~log_prefix:"Influence_map:"
-    ~log_title:"+refining the influence map"
-    ~phase:(StoryProfiling.Internal_influence_map "medium")
-    (Remanent_state.get_influence_map Remanent_state.Medium)
-    compute_intermediary_influence_map
-
-
-let get_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
-  match
-    accuracy_level
-  with
-  | Remanent_state.Low
-  | Remanent_state.Medium
-  | Remanent_state.High
-  | Remanent_state.Full -> get_raw_contact_map state
 
 let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   match
@@ -760,15 +804,40 @@ let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
   | Remanent_state.High
   | Remanent_state.Full -> get_raw_internal_contact_map state
 
-let get_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
+let get_map_gen
+    (get: ?accuracy_level:Remanent_state.accuracy_level ->
+     Remanent_state.state ->
+     Remanent_state.state * 'a )
+    convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title
     state =
-  match
-    accuracy_level
-  with
-  | Remanent_state.Low ->
-    get_raw_influence_map state
-  | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
-    get_intermediary_influence_map state
+  let show_title =
+    match log_title with
+    | None -> (fun _ -> ())
+    | Some log_title ->
+      compute_show_title do_we_show_title (log_title accuracy_level)
+  in
+  let () = show_title state in
+  let state, internal =
+    get ~accuracy_level:accuracy_level state
+  in
+  convert (fun _ -> ()) state internal
+
+let get_contact_map =
+  get_map_gen
+    ~do_we_show_title:(fun _ -> true)
+    ~log_title:(fun x ->
+        match
+          x
+        with
+        | Remanent_state.Low ->
+          Some "Compute the contact map"
+        | Remanent_state.Medium
+        | Remanent_state.High | Remanent_state.Full ->
+          Some "Refine the contact map")
+    get_internal_contact_map
+    convert_contact_map
 
 let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =
@@ -779,6 +848,13 @@ let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Lo
     get_raw_internal_influence_map state
   | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
     get_intermediary_internal_influence_map state
+
+(*convert_influence_map state (get_influence_map ?accuracy_level state)*)
+
+let get_influence_map =
+  get_map_gen
+    get_internal_influence_map
+    convert_influence_map
 
 let compute_signature show_title state =
   let state,l = get_contact_map state in
@@ -827,7 +903,7 @@ let compute_reachability_result show_title state =
 
 let get_reachability_analysis =
   get_gen
-    ~log_title:"Reachability analysis..."
+    ~log_title:"Reachability analysis"
     (Remanent_state.get_reachability_result)
     compute_reachability_result
 
