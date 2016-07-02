@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: September, the 27th of 2015
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * algebraic check for the influence map.
    *

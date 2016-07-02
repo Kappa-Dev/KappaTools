@@ -1,3 +1,5 @@
+(** Time-stamp: <Jul 02 2016> *)
+
 module type Set_with_logs =
   sig
     type elt

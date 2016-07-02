@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification:
+   * Last modification: Time-stamp: <Jul 02 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -392,7 +392,7 @@ let collect_modified_internal_and_bond parameter error rule_id store_tuple_pair 
   in
   Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
-       let (agent_id, _, site_type, site_type') = x in
+       let (agent_id, _, site_type, _site_type') = x in
        let (agent_id', _, site_type', site_type2') = y in
        (*if the second site belong to modified and the first site belong to the bond set*)
        let error, store_result =

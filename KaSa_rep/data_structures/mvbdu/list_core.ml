@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/03/2010
-    * Last modification: 23/11/2010
+    * Last modification: Time-stamp: <Jul 02 2016>
     * *
     * This library provides primitives to deal associations list
     *

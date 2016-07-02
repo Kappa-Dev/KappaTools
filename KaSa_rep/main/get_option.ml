@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <2016-03-23 20:52:19 feret>
+  * Last modification: Time-stamp: <Jul 02 2016>
   * *
   * primitive to parse command-line options
   *
@@ -13,7 +13,6 @@
   * under the terms of the GNU Library General Public License *)
 
 open Superarg
-open SuperargTk
 
 let options =
   List.rev

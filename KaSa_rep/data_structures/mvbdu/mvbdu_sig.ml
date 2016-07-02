@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/11/2010
-    * Last modification: 15/11/2010
+    * Last modification: Time-stamp: <Jul 02 2016>
     * *
     * Signature for  primitives to deal set of finite maps from integers to integers
     *
@@ -15,7 +15,7 @@
 
 type variable = int (*Ckappa_sig.c_site_name*)
 type upper_bound = int
-type hash_key = int 
+type hash_key = int
 
 type ('a,'b) precell =
     {

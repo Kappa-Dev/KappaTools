@@ -23,4 +23,4 @@ let lub a b =
   | _,Undefined -> a
   | Any, _ | _,Any -> Any
   | Val x,Val y when x=y -> a
-  | Val x,Val y -> Any
+  | Val _,Val _ -> Any

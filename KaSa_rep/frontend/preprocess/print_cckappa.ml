@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: 2014, the 9th of December
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * Pretty printing of token library
    *

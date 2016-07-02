@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 8th 2011.
- * Last modification: February, the 5th 2015
+ * Last modification: Time-stamp: <Jul 02 2016>
  * *
  * Pretty printing of influence map
  *

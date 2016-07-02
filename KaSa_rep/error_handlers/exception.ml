@@ -1,22 +1,22 @@
-    (**
-    * exception.ml
-    * openkappa
-    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
-    *
-    * Creation: 08/03/2010
-    * Last modification: 05/02/2015
-    * *
-    * This library declares exceptions
-    *
-    * Copyright 2010 Institut National de Recherche en Informatique et
-    * en Automatique.  All rights reserved.  This file is distributed
-    *  under the terms of the GNU Library General Public License *)
+(**
+ * exception.ml
+ * openkappa
+ * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+ *
+ * Creation: 08/03/2010
+ * Last modification: Time-stamp: <Jul 02 2016>
+ * *
+ * This library declares exceptions
+ *
+ * Copyright 2010 Institut National de Recherche en Informatique et
+ * en Automatique.  All rights reserved.  This file is distributed
+ *  under the terms of the GNU Library General Public License *)
 
 
 type method_handler = Exception_without_parameter.method_handler
 let empty_error_handler = Exception_without_parameter.empty_error_handler
 
-let safe_warn parameters error_handler file message exn default =
+let safe_warn parameters _error_handler file message exn _default =
   let uncaught = Exception_without_parameter.build_uncaught_exception file message exn in
   let stringlist = Exception_without_parameter.stringlist_of_uncaught uncaught [Remanent_parameters.get_prefix parameters] in
   let _ =
@@ -27,7 +27,7 @@ let safe_warn parameters error_handler file message exn default =
   let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   raise (Exception_without_parameter.Uncaught_exception uncaught)
 
-let unsafe_warn parameters error_handler file message exn default =
+let unsafe_warn _parameters error_handler file message exn default =
   let uncaught = Exception_without_parameter.build_uncaught_exception file message exn in
   Exception_without_parameter.add_uncaught_error uncaught error_handler, default ()
 
@@ -45,23 +45,23 @@ let print_for_KaSim parameters handlers =
   let _ =
     List.iter
       (fun caught ->
-       let stringlist = (Remanent_parameters.get_prefix parameters)::(Exception_without_parameter.stringlist_of_caught caught []) in
-       let _ = List.iter
-           (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s") stringlist
-       in
-       let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-       ())
+         let stringlist = (Remanent_parameters.get_prefix parameters)::(Exception_without_parameter.stringlist_of_caught caught []) in
+         let _ = List.iter
+             (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s") stringlist
+         in
+         let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+         ())
       (List.rev (Exception_without_parameter.get_caught_exception_list handlers))
-      in
+  in
   let _ =
     List.iter
       (fun uncaught ->
-       let stringlist =  (Remanent_parameters.get_prefix parameters)::(Exception_without_parameter.stringlist_of_uncaught uncaught []) in
-       let _ = List.iter (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s") stringlist in
-       let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-       ())
+         let stringlist =  (Remanent_parameters.get_prefix parameters)::(Exception_without_parameter.stringlist_of_uncaught uncaught []) in
+         let _ = List.iter (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s") stringlist in
+         let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+         ())
       (List.rev (Exception_without_parameter.get_uncaught_exception_list handlers))
-      in
+  in
   ()
 
 let print parameters handlers =

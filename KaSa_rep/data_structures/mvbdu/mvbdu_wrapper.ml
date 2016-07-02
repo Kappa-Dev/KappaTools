@@ -1,4 +1,16 @@
-
+(**
+   * mvbdu_wrapper.ml
+   * openkappa
+   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+   *
+   * Creation: 08/03/2010
+   * Last modification: Time-stamp: <Jul 02 2016>
+   * *
+   * This library provides test benchmarks for the library of sets of finite maps from integers to integers
+   *
+   * Copyright 2010 Institut National de Recherche en Informatique et
+   * en Automatique.  All rights reserved.  This file is distributed
+   * under the terms of the GNU Library General Public License *)
 
 module type Mvbdu =
 sig

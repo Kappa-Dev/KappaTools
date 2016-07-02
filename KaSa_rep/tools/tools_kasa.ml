@@ -1,18 +1,18 @@
 let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "Tools") message exn (fun () -> default) 
+     Exception.warn parameters mh (Some "Tools") message exn (fun () -> default)
 
-let fst_option x = 
-  match x 
-  with 
-  | Some (x,_) -> Some x 
-  | _ -> None 
+let fst_option x =
+  match x
+  with
+  | Some (x,_) -> Some x
+  | _ -> None
 
-let snd_option x = 
-  match x 
-  with 
-  | Some (_,x) -> Some x 
-  | _ -> None 
-   
+let snd_option x =
+  match x
+  with
+  | Some (_,x) -> Some x
+  | _ -> None
+
 
 (** dot output*)
 (* OCaml manual: In particular, if you want a regular expression that
@@ -33,14 +33,14 @@ let escape_label_in_dot s =
   error,escape_label_in_dot string*)
 
 let make_id_compatible_with_dot_format parameters error string =
-  let tab = 
-    Remanent_parameters.get_make_labels_compatible_with_dot parameters 
-  in 
-  let rec aux pos l = 
-    if pos<0 
-    then l 
+  let tab =
+    Remanent_parameters.get_make_labels_compatible_with_dot parameters
+  in
+  let rec aux pos l =
+    if pos<0
+    then l
     else
-      let char = String.get string pos in 
+      let char = String.get string pos in
       match Remanent_parameters_sig.CharMap.find_option char tab with
       | Some liste_char ->
 	 aux (pos-1)
@@ -53,9 +53,9 @@ let make_id_compatible_with_dot_format parameters error string =
       | None ->
 	 aux (pos-1) (char::l)
   in
-  let l = aux (String.length string -1) [] in 
+  let l = aux (String.length string -1) [] in
   error,
-  String.concat "" (List.rev_map (String.make 1) (List.rev l)) 
+  String.concat "" (List.rev_map (String.make 1) (List.rev l))
 
 
 let sorted_parts_of_list n list =

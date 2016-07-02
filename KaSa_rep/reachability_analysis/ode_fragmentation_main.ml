@@ -4,7 +4,7 @@
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 2015, the 9th of Apirl
-    * Last modification:
+    * Last modification: Time-stamp: <Jul 02 2016>
     * *
     * ODE fragmentation
     *
@@ -13,6 +13,7 @@
     * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
 
+(* DEAD CODE ?*)
 open Int_storage
 open Cckappa_sig
 open Printf

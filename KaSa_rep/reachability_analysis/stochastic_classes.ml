@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 13th of March
-  * Last modification:
+  * Last modification: Time-stamp: <Jul 02 2016>
   *
   * Compute the relations between sites in an agent.
   *

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: December, the 9th of 2014
+  * Last modification: Time-stamp: <Jul 02 2016>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -21,21 +21,21 @@ type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_ty
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
 
 type kappa_handler =
-    {
-      nrules                : int;
-      nvars                 : int;
-      nagents               : Ckappa_sig.c_agent_name;
-      agents_dic            : Ckappa_sig.agent_dic;
-      interface_constraints : Ckappa_sig.agent_specification
-                              Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
-      sites                 : Ckappa_sig.site_dic
+  {
+    nrules                : int;
+    nvars                 : int;
+    nagents               : Ckappa_sig.c_agent_name;
+    agents_dic            : Ckappa_sig.agent_dic;
+    interface_constraints : Ckappa_sig.agent_specification
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
-      states_dic            : state_dic
+    sites                 : Ckappa_sig.site_dic
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
+    states_dic            : state_dic
         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
-      dual                  :
-        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+    dual                  :
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
         Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t
-    }
+  }
 
 type 'a interval = {min:'a; max:'a}
 
@@ -64,11 +64,11 @@ val upgrade_some_interface:
   'a option Ckappa_sig.Site_map_and_set.Map.t proper_agent
 
 type site_address =
-    {
-      agent_index : Ckappa_sig.c_agent_id;
-      site        : Ckappa_sig.c_site_name;
-      agent_type  : Ckappa_sig.c_agent_name
-    }
+  {
+    agent_index : Ckappa_sig.c_agent_id;
+    site        : Ckappa_sig.c_site_name;
+    agent_type  : Ckappa_sig.c_agent_name
+  }
 
 type bond = site_address * site_address
 
@@ -80,14 +80,14 @@ module KaSim_Site_map_and_set: Map_wrapper.S_with_logs
   with type elt = (string, string) Ckappa_sig.site_type
 
 type agent =
-| Ghost
-| Agent of Ckappa_sig.c_state interval interface proper_agent
-| Dead_agent of Ckappa_sig.c_state interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t  * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
-(* agent with a site or state that never occur in the rhs or an initial
-   state, set of the undefined sites, map of sites with undefined
-   internal states, map of sites with undefined binding states*)
-| Unknown_agent of (string * Ckappa_sig.c_agent_id)
-(* agent with a type that never occur in rhs or initial states *)
+  | Ghost
+  | Agent of Ckappa_sig.c_state interval interface proper_agent
+  | Dead_agent of Ckappa_sig.c_state interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t  * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
+  (* agent with a site or state that never occur in the rhs or an initial
+     state, set of the undefined sites, map of sites with undefined
+     internal states, map of sites with undefined binding states*)
+  | Unknown_agent of (string * Ckappa_sig.c_agent_id)
+  (* agent with a type that never occur in rhs or initial states *)
 
 type agent_sig = Ckappa_sig.c_state list interface proper_agent
 
@@ -106,18 +106,18 @@ type mixture =
     c_mixture : Ckappa_sig.mixture;
     views     : views;
     bonds     : site_address Ckappa_sig.Site_map_and_set.Map.t
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t;
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t;
     plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list;
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
-    }
+  }
 
 type enriched_variable =
-    {
-      e_id       : string;
-      e_id_dot   : string;
-      c_variable : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
-      e_variable : (mixture,string) Ast.variable_def
-    }
+  {
+    e_id       : string;
+    e_id_dot   : string;
+    c_variable : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
+    e_variable : (mixture,string) Ast.variable_def
+  }
 
 type actions =
   {
@@ -140,13 +140,13 @@ type rule =
     diff_direct  : diff_views;
     diff_reverse : diff_views;
     actions      : actions
-    }
+  }
 
 type perturbation =
   ((((mixture,string) Ast.ast_alg_expr Ast.bool_expr) * Ckappa_sig.position) *
-     (modif_expr list) *
-       (((mixture,string) Ast.ast_alg_expr Ast.bool_expr * Ckappa_sig.position)  option)) *
-    Ckappa_sig.position
+   (modif_expr list) *
+   (((mixture,string) Ast.ast_alg_expr Ast.bool_expr * Ckappa_sig.position)  option)) *
+  Ckappa_sig.position
 
 and modif_expr =
   | INTRO    of ((mixture,string) Ast.ast_alg_expr * mixture * Ckappa_sig.position)
@@ -157,22 +157,22 @@ and modif_expr =
   | SNAPSHOT of Ckappa_sig.position (*maybe later of mixture too*)
 
 type enriched_rule =
-    {
-      e_rule_label             : (string * Ckappa_sig.position) option;
-      e_rule_label_dot         : (string * Ckappa_sig.position) option;
-      e_rule_initial_direction : Ckappa_sig.direction;
-      e_rule_rule              : Ckappa_sig.mixture Ckappa_sig.rule;
-      e_rule_c_rule            : rule
-    }
+  {
+    e_rule_label             : (string * Ckappa_sig.position) option;
+    e_rule_label_dot         : (string * Ckappa_sig.position) option;
+    e_rule_initial_direction : Ckappa_sig.direction;
+    e_rule_rule              : Ckappa_sig.mixture Ckappa_sig.rule;
+    e_rule_c_rule            : rule
+  }
 
 type enriched_init =
-    {
-      e_init_factor     : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
-      e_init_c_factor   : (mixture,string) Ast.ast_alg_expr;
-      e_init_string_pos : string Location.annot option;
-      e_init_mixture    : Ckappa_sig.mixture;
-      e_init_c_mixture  : mixture
-    }
+  {
+    e_init_factor     : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
+    e_init_c_factor   : (mixture,string) Ast.ast_alg_expr;
+    e_init_string_pos : string Location.annot option;
+    e_init_mixture    : Ckappa_sig.mixture;
+    e_init_c_mixture  : mixture
+  }
 
 val dummy_init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * enriched_init
 
@@ -192,4 +192,4 @@ type compil =
     (*initial graph declaration*)
     perturbations :
       mixture Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t
-    }
+  }

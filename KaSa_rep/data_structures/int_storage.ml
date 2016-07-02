@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <2016-03-14 16:00:36 feret>
+   * Last modification: Time-stamp: <Jul 02 2016>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt

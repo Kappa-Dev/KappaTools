@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th of March
-   * Last modification: 2011, the 23rd of March
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *

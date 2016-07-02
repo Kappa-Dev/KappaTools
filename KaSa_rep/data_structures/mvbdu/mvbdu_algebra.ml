@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th or March
-   * Last modification: 2011, the 23rd of March
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -60,7 +60,7 @@ let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.una
         | Mvbdu_sig.Node x ->
           begin
             match generic_unary
-              allocate memoized_fun handler error parameters 
+              allocate memoized_fun handler error parameters
               x.Mvbdu_sig.branch_true
             with
             | error,(handler,None) -> error,(handler,None)
@@ -333,10 +333,10 @@ let rec keep_head_only allocate memoized_fun bdu_true handler error parameters (
             | Mvbdu_sig.Node x when x.Mvbdu_sig.variable = var_ref ->
               begin
 		let error, (handler, b_true) =
-                  aux handler error x.Mvbdu_sig.branch_true 
+                  aux handler error x.Mvbdu_sig.branch_true
                 in
 		let error, (handler, b_false) =
-                  aux handler error x.Mvbdu_sig.branch_false 
+                  aux handler error x.Mvbdu_sig.branch_false
                 in
 		match b_true, b_false with
                 | Some b_true, Some b_false ->
@@ -355,9 +355,9 @@ let rec keep_head_only allocate memoized_fun bdu_true handler error parameters (
 	      end
             | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu)
 	    | Mvbdu_sig.Node _ ->
-	      let error, (handler, output) = 
+	      let error, (handler, output) =
                 bdu_true parameters handler error parameters
-              in 
+              in
               begin
                 match output with
                 |  None ->
@@ -585,10 +585,10 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
 		let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
 		if cmp < 0
 		then
-		  monotonicaly_rename 
+		  monotonicaly_rename
                     allocate
                     memoized_fun error parameters handler
-                    mvbdu_input 
+                    mvbdu_input
                     list.List_sig.tail
 		else if cmp = 0
 		then
@@ -772,7 +772,7 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters handle
                       | error, Some(id, cell, mvbdu, handler) ->
                         error, (handler, Some(mvbdu))
                     end
-		      
+
 	      else
 		project_keep_only
 		  allocate
@@ -784,7 +784,7 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters handle
 		  mvbdu_input
 		  list.List_sig.tail
 	  end
-      in 	
+      in
       match output with
       | None -> error, (handler, None)
       | Some mvbdu_output ->
@@ -798,7 +798,7 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters handle
         in
         error, (handler, Some (mvbdu_output:'mvbdu))
     end
-      
+
 let rec project_abstract_away allocate memoized_fun error parameters handler mvbdu_input list_input =
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_input, list_input)
   with
@@ -876,7 +876,7 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
                   | error, Some(id, cell, mvbdu, handler) ->
                     error, (handler, Some (mvbdu))
                 end
-	      else 
+	      else
                 if cmp = 0
 	        then
 		  let error, depreciated =
@@ -917,7 +917,7 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
 		    mvbdu_input
 		    list.List_sig.tail
 	  end
-      in 	
+      in
       match output with
       | None ->
         error, (handler, None)
@@ -932,7 +932,7 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
         in
         error, (handler, Some (mvbdu_output:'mvbdu))
     end
-      
+
 let mvbdu_identity handler parameters error mvbdu = error, (handler,Some mvbdu)
 let mvbdu_constant a handler parameters error _   = error, (handler,Some a)
 

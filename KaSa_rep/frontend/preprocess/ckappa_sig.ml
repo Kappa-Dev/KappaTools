@@ -1,16 +1,16 @@
- (**
-  * ckappa_sig.ml
-  * openkappa
-  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
-  *
-  * Creation: 01/17/2011
-  * Last modification: 09/12/2014
-  * *
-  * Signature for prepreprocessing language ckappa
-  *
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
-  * en Automatique.  All rights reserved.  This file is distributed
-  * under the terms of the GNU Library General Public License *)
+(**
+ * ckappa_sig.ml
+ * openkappa
+ * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
+ *
+ * Creation: 01/17/2011
+ * Last modification: Time-stamp: <Jul 02 2016>
+ * *
+ * Signature for prepreprocessing language ckappa
+ *
+ * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+ * en Automatique.  All rights reserved.  This file is distributed
+ * under the terms of the GNU Library General Public License *)
 
 (*let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) *)
@@ -82,74 +82,74 @@ let get_agent_color n_sites parameters =
 module Agent_type_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-   with type key = c_agent_name
-   and type dimension = int
+    with type key = c_agent_name
+     and type dimension = int
   )
 
 module Agent_type_quick_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Quick_key_list (Agent_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
     with type key = c_agent_name
-    and type dimension = int
+     and type dimension = int
   )
 
 module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
   (
     Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage
-   with type key = c_agent_name * c_site_name
-   and type dimension = int * int
+    with type key = c_agent_name * c_site_name
+     and type dimension = int * int
   )
 
 module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
   (
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif : Int_storage.Storage
-   with type key = (c_agent_name * (c_site_name * c_state))
-   and type dimension = (int * (int * int))
+    with type key = (c_agent_name * (c_site_name * c_state))
+     and type dimension = (int * (int * int))
   )
 
 (*site*)
 module Site_type_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-   with type key = c_site_name
-   and type dimension = int
+    with type key = c_site_name
+     and type dimension = int
   )
 
 module Site_type_quick_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
     with type key = c_site_name
-    and type dimension = int
+     and type dimension = int
   )
 
 (*state*)
 module State_index_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-   with type key = c_state
-   and type dimension = int
+    with type key = c_state
+     and type dimension = int
   )
 
 module State_index_quick_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Quick_key_list (State_index_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
     with type key = c_state
-    and type dimension = int
+     and type dimension = int
   )
 
 (*rule_id*)
 module Rule_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-   with type key = c_rule_id
-   and type dimension = int
+    with type key = c_rule_id
+     and type dimension = int
   )
 
 module Rule_quick_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Quick_key_list (Rule_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
-   with type key = c_rule_id
-   and type dimension = int
+    with type key = c_rule_id
+     and type dimension = int
   )
 
 module Site_union_find =
@@ -159,11 +159,11 @@ module Site_union_find =
 (*Define module fifo take rule_id*)
 
 module Rule =
-  struct
-    type t = c_rule_id
-    let compare = compare
-    let print = Format.pp_print_int
-  end
+struct
+  type t = c_rule_id
+  let compare = compare
+  let print = Format.pp_print_int
+end
 
 module Rule_FIFO = Fifo.WlMake (Rule)
 
@@ -172,15 +172,15 @@ module Rule_FIFO = Fifo.WlMake (Rule)
 module Agent_id_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif : Int_storage.Storage
-   with type key = c_agent_id
-   and type dimension = int
+    with type key = c_agent_id
+     and type dimension = int
   )
 
 module Agent_id_quick_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Quick_key_list (Agent_id_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
-   with type key = c_agent_id
-   and type dimension = int
+    with type key = c_agent_id
+     and type dimension = int
   )
 
 (****************************************************************************************)
@@ -191,8 +191,8 @@ module Agent_map_and_set =
        (struct
          type t = c_agent_name
          let compare = compare
-	 let print = Format.pp_print_int
-        end
+         let print = Format.pp_print_int
+       end
        ))
 
 module Agent_id_map_and_set =
@@ -201,8 +201,8 @@ module Agent_id_map_and_set =
        (struct
          type t = c_agent_id
          let compare = compare
-	 let print = Format.pp_print_int
-        end
+         let print = Format.pp_print_int
+       end
        ))
 
 module Rule_map_and_set =
@@ -211,8 +211,8 @@ module Rule_map_and_set =
        (struct
          type t = c_rule_id
          let compare = compare
-	 let print = Format.pp_print_int
-        end))
+         let print = Format.pp_print_int
+       end))
 
 module State_map_and_set =
   Map_wrapper.Make
@@ -220,8 +220,8 @@ module State_map_and_set =
        (struct
          type t = c_state
          let compare = compare
-	 let print = Format.pp_print_int
-        end))
+         let print = Format.pp_print_int
+       end))
 
 module AgentRule_map_and_set =
   Map_wrapper.Make
@@ -229,8 +229,8 @@ module AgentRule_map_and_set =
        (struct
          type t = c_agent_name * c_rule_id
          let compare = compare
-	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
-        end))
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
 
 module RuleAgent_map_and_set =
   Map_wrapper.Make
@@ -238,18 +238,18 @@ module RuleAgent_map_and_set =
        (struct
          type t = c_rule_id * c_agent_id
          let compare = compare
-	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
-        end))
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
 
 (*use in site_accross_bonds_domain*)
 module SiteState_map_and_set =
-Map_wrapper.Make
+  Map_wrapper.Make
     (SetMap.Make
        (struct
          type t = c_site_name * c_state
          let compare = compare
-	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
-        end))
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
 
 
 module AgentSiteState_map_and_set =
@@ -258,24 +258,24 @@ module AgentSiteState_map_and_set =
        (struct
          type t = c_agent_name * c_site_name * c_state
          let compare = compare
-	 let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
-        end))
+         let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
+       end))
 
 module Rule_setmap =
   SetMap.Make (
-    struct
-      type t = c_rule_id
-      let compare = compare
-      let print = Format.pp_print_int
-    end)
+  struct
+    type t = c_rule_id
+    let compare = compare
+    let print = Format.pp_print_int
+  end)
 
 module Agent_id_setmap =
   SetMap.Make (
-    struct
-      type t = c_agent_id
-      let compare = compare
-      let print = Format.pp_print_int
-    end)
+  struct
+    type t = c_agent_id
+    let compare = compare
+    let print = Format.pp_print_int
+  end)
 
 module PairRule_setmap =
   SetMap.Make
@@ -283,7 +283,7 @@ module PairRule_setmap =
       type t = c_rule_id * c_rule_id
       let compare = compare
       let print = Pp.pair Format.pp_print_int Format.pp_print_int
-     end)
+    end)
 
 (****************************************************************************************)
 
@@ -293,17 +293,17 @@ module Site_map_and_set =
        (struct
          type t      = c_site_name
          let compare = compare
-	 let print = Format.pp_print_int
-        end))
+         let print = Format.pp_print_int
+       end))
 
 module AgentSite_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-	 type t = c_agent_name * c_site_name
-	 let compare = compare
-	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
-	end))
+         type t = c_agent_name * c_site_name
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
 
 module Agents_map_and_set =
   Map_wrapper.Make
@@ -311,8 +311,8 @@ module Agents_map_and_set =
        (struct
          type t = c_agent_id * c_agent_name
          let compare = compare
-	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
-        end))
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
 
 module AgentsSite_map_and_set =
   Map_wrapper.Make
@@ -320,8 +320,8 @@ module AgentsSite_map_and_set =
        (struct
          type t = c_agent_id * c_agent_name * c_site_name
          let compare = compare
-	 let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
-        end))
+         let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
+       end))
 
 (****************************************************************************************)
 (*bonds in rhs and lhs*)
@@ -331,20 +331,20 @@ module PairAgentsSiteState_map_and_set =
     (SetMap.Make
        (struct
          type t = (c_agent_id * c_agent_name * c_site_name * c_state) *
-           (c_agent_id * c_agent_name * c_site_name * c_state)
+                  (c_agent_id * c_agent_name * c_site_name * c_state)
          let compare = compare
-	 let print _ _ = ()
-        end))
+         let print _ _ = ()
+       end))
 
 module PairAgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
          type t = (c_agent_name * c_site_name * c_state) *
-           (c_agent_name * c_site_name * c_state)
+                  (c_agent_name * c_site_name * c_state)
          let compare = compare
-	 let print _ _ = ()
-        end))
+         let print _ _ = ()
+       end))
 
 (*******************************************************************)
 
@@ -367,44 +367,44 @@ type mixture =
   | EMPTY_MIX
 
 and agent =
-    {
-      ag_nme     : string;
-      ag_intf    : interface;
-      ag_nme_pos : position (*; ag_pos:position*)
-    }
+  {
+    ag_nme     : string;
+    ag_intf    : interface;
+    ag_nme_pos : position (*; ag_pos:position*)
+  }
 
 and interface =
   | EMPTY_INTF
   | PORT_SEP of port * interface
 
 and port =
-    {
-      port_nme  : string;
-      port_int  : internal;
-      port_lnk  : link;
-      (*port_pos: position ;*)
-      port_free : bool option
-    }
+  {
+    port_nme  : string;
+    port_int  : internal;
+    port_lnk  : link;
+    (*port_pos: position ;*)
+    port_free : bool option
+  }
 
 and internal = string list
 
 and link =
-    | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
-    | FREE
-    | LNK_ANY   of position
-    | LNK_SOME  of position
-    | LNK_TYPE  of (string Location.annot * string Location.annot)
+  | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
+  | FREE
+  | LNK_ANY   of position
+  | LNK_SOME  of position
+  | LNK_TYPE  of (string Location.annot * string Location.annot)
 
 type 'mixture rule =
   {
     prefix: int;
     delta: int;
-      lhs   : 'mixture;
-      arrow : Ast.arrow;
-      rhs   : 'mixture;
-      k_def : ('mixture,string) Ast.ast_alg_expr Location.annot;
-      k_un  : ('mixture,string) Ast.ast_alg_expr Location.annot option
-    }
+    lhs   : 'mixture;
+    arrow : Ast.arrow;
+    rhs   : 'mixture;
+    k_def : ('mixture,string) Ast.ast_alg_expr Location.annot;
+    k_un  : ('mixture,string) Ast.ast_alg_expr Location.annot option
+  }
 
 type 'mixture perturbation = ('mixture,string) Ast.perturbation
 
@@ -427,8 +427,8 @@ type state = (internal_state, binding_state) site_type
 
 (*move from c*)
 type c_binding_state =
-| C_Free
-| C_Lnk_type of c_agent_name * c_site_name
+  | C_Free
+  | C_Lnk_type of c_agent_name * c_site_name
 
 type state' = (internal_state, c_binding_state) site_type
 
@@ -442,8 +442,8 @@ end
 module Dictionary_of_States =
   (
     Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
-   with type key = c_state
-   and type value = state'
+    with type key = c_state
+     and type value = state'
   )
 
 (**)
@@ -470,73 +470,73 @@ end
 module Dictionary_of_agents =
   (
     Dictionary.Dictionary_of_Ord (Kasim_agent_name): Dictionary.Dictionary
-   with type key = c_agent_name
-   and type value = agent_name
+    with type key = c_agent_name
+     and type value = agent_name
   )
 
 module Dictionary_of_sites =
   (
     Dictionary.Dictionary_of_Ord (Site): Dictionary.Dictionary
-   with type key = c_site_name
-   and type value = site
+    with type key = c_site_name
+     and type value = site
   )
 
 type site_list =
-    {
-      used     : (site_name list * position) list;
-      declared : (site_name list * position) list;
-      creation : (site_name list * position) list
-    }
+  {
+    used     : (site_name list * position) list;
+    declared : (site_name list * position) list;
+    creation : (site_name list * position) list
+  }
 
 type agent_dic = (unit,unit) Dictionary_of_agents.dictionary
 type site_dic  = (unit,unit) Dictionary_of_sites.dictionary
 type state_dic = (unit,unit) Dictionary_of_States.dictionary
 
 type agent_specification =
-    {
-      binding_sites_usage : site_list;
-      marked_sites_usage  : site_list
-    }
+  {
+    binding_sites_usage : site_list;
+    marked_sites_usage  : site_list
+  }
 
 type kappa_handler =
-    {
-      agents_dic            : agent_dic;
-      interface_constraints : agent_specification Int_storage.Nearly_inf_Imperatif.t;
-      sites                 : site_dic Int_storage.Nearly_inf_Imperatif.t;
-      states_dic            : state_dic Int_storage.Nearly_inf_Imperatif.t
-                              Int_storage.Nearly_inf_Imperatif.t
-    }
+  {
+    agents_dic            : agent_dic;
+    interface_constraints : agent_specification Int_storage.Nearly_inf_Imperatif.t;
+    sites                 : site_dic Int_storage.Nearly_inf_Imperatif.t;
+    states_dic            : state_dic Int_storage.Nearly_inf_Imperatif.t
+        Int_storage.Nearly_inf_Imperatif.t
+  }
 
 type 'a interval  = {min:'a; max:'a}
 
 type c_port =
-    {
-      c_site_name     : c_site_name;
-      c_site_position : position;
-      c_site_interval : c_state interval
-    }
+  {
+    c_site_name     : c_site_name;
+    c_site_position : position;
+    c_site_interval : c_state interval
+  }
 
 type c_interface = c_port Site_map_and_set.Map.t
 
 type c_proper_agent =
-    {
-      c_agent_kasim_id  : c_agent_id;
-      c_agent_name      : c_agent_name;
-      c_agent_interface : c_interface;
-      c_agent_position  : position
-    }
+  {
+    c_agent_kasim_id  : c_agent_id;
+    c_agent_name      : c_agent_name;
+    c_agent_interface : c_interface;
+    c_agent_position  : position
+  }
 
 type site_address =
-    {
-      agent_index : c_agent_id;
-      site        : c_site_name
-    }
+  {
+    agent_index : c_agent_id;
+    site        : c_site_name
+  }
 
 type c_bond = site_address * site_address
 
 type c_agent =
-   | C_ghost
-   | C_agent of c_proper_agent
+  | C_ghost
+  | C_agent of c_proper_agent
 
 type c_mixture =
   {
@@ -555,14 +555,14 @@ type action =
   | Half_breaf of site_address
 
 type c_rule =
-    {
-      c_rule_lhs     : c_mixture;
-      c_rule_arrow   : Ast.arrow;
-      c_rule_rhs     : c_mixture;
-      c_diff_direct  : c_mixture;
-      c_diff_reverse : c_mixture;
-      c_side_effects : action list
-    }
+  {
+    c_rule_lhs     : c_mixture;
+    c_rule_arrow   : Ast.arrow;
+    c_rule_rhs     : c_mixture;
+    c_diff_direct  : c_mixture;
+    c_diff_reverse : c_mixture;
+    c_side_effects : action list
+  }
 
 type c_perturbation =
   ((((c_mixture,string) Ast.ast_alg_expr Ast.bool_expr) * position)
@@ -579,20 +579,20 @@ and c_modif_expr =
   | C_SNAPSHOT of position (*maybe later of mixture too*)
 
 type enriched_rule =
-    {
-      e_rule_label  : (string * position) option;
-      e_rule_direct : bool;
-      e_rule_rule   : c_mixture rule;
-      e_rule_c_rule : c_rule
-    }
+  {
+    e_rule_label  : (string * position) option;
+    e_rule_direct : bool;
+    e_rule_rule   : c_mixture rule;
+    e_rule_c_rule : c_rule
+  }
 
 type enriched_init =
-    {
-      e_init_factor    : int;
-      e_init_mixture   : mixture;
-      e_init_c_mixture : c_mixture;
-      e_init_pos       : position
-    }
+  {
+    e_init_factor    : int;
+    e_init_mixture   : mixture;
+    e_init_c_mixture : c_mixture;
+    e_init_pos       : position
+  }
 
 type c_compil =
   {

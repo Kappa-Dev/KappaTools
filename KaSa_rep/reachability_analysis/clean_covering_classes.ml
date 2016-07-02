@@ -4,13 +4,15 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 23th of Feburary
-  * Last modification:
+  * Last modification: Time-stamp: <Jul 02 2016>
   *
   * Compute the relations between the left hand site of a rule and its sites.
   *
   * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
+
+(** DEAD CODE ? *)
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn

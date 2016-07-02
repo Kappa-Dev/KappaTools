@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-04-12 16:15:46 feret>
+  * Last modification: Time-stamp: <Jul 02 2016>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent

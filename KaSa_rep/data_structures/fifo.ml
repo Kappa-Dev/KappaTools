@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 27th of July
-  * Last modification:
+  * Last modification: Time-stamp: <Jul 02 2016>
   *
   * Work list - FIFO
   *

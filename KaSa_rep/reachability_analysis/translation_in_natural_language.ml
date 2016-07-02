@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification:
+ * Last modification: Time-stamp: <Jul 02 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -240,7 +240,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
             list
         in
         error, (handler, Range (x, list))
-      | [x; y] ->
+      | [_; _] ->
         begin
           match list with
           | [] | [_] -> warn parameter error (Some "line 138") Exit

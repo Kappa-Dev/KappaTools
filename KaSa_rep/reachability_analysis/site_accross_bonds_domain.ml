@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification:
+   * Last modification: Time-stamp: <Jul 02 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -698,7 +698,7 @@ struct
      global domain does not collect information *)
 
   (* to do *)
-  let rec apply_event_list static dynamic error event_list =
+  let (*rec*) apply_event_list _static dynamic error _event_list =
     let event_list = [] in
     error, dynamic, event_list
 

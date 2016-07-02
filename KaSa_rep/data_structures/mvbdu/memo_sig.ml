@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 22/11/2010
-   * Last modification: 19/12/2010
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * Signature for memoized function
    *
@@ -77,7 +77,7 @@ type ('a,'b,'blist,'vlist,'c,'d,'e) unary_other_memoized_fun =
         'c,
         'e
     ) memoized_fun
- 
+
 type ('a,'b,'blist,'vlist,'c,'d,'e) reset =
   {
     empty_association_list :

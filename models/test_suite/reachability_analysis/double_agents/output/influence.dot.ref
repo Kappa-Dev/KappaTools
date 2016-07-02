@@ -28,7 +28,7 @@ digraph G{
 "r5" -> "r6" [label="[0->0]" color="green"];
 "r6" -> "r7" [label="[1->2]" color="green"];
 "r7" -> "r3" [label="[1*->0];[0*->0]" color="green"];
-"r7" -> "r6" [label="[2*->0]" color="green"];
+"r7" -> "r6" [label="[2*->0];[0*->0]" color="green"];
 "r3" -> "r2" [label="[1->0]" color="red" arrowhead="tee"];
 "r3" -> "r6" [label="[1->1]" color="red" arrowhead="tee"];
 "r4" -> "r3" [label="[1->0]" color="red" arrowhead="tee"];

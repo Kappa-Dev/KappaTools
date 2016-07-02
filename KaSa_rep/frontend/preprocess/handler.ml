@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: 2015, the 4th of February
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * Primitives to use a kappa handler
    *
@@ -37,18 +37,18 @@ let translate_site parameter error handler agent_name site =
   let error, dic =
     Misc_sa.unsome
       (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-          parameter
-          error
-          agent_name
-          handler.Cckappa_sig.sites)
+         parameter
+         error
+         agent_name
+         handler.Cckappa_sig.sites)
       (fun error -> warn parameter error (Some "line 44") Exit
-        (Ckappa_sig.Dictionary_of_sites.init ()))
+          (Ckappa_sig.Dictionary_of_sites.init ()))
   in
   let error, (a, _, _) =
     Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_sites.translate parameter error site dic)
       (fun error ->
-        warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "", (), ()))
+         warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "", (), ()))
   in
   error, a
 
@@ -56,18 +56,18 @@ let translate_state parameter error handler agent site state =
   let error, dic =
     Misc_sa.unsome
       (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-          parameter
-          error
-          (agent, site)
-          handler.Cckappa_sig.states_dic)
+         parameter
+         error
+         (agent, site)
+         handler.Cckappa_sig.states_dic)
       (fun error -> warn parameter error (Some "line 44") Exit
-        (Ckappa_sig.Dictionary_of_States.init ()))
+          (Ckappa_sig.Dictionary_of_States.init ()))
   in
   let error, (a, _, _) =
     Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_States.translate parameter error state dic)
       (fun error ->
-        warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "",(),()))
+         warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "",(),()))
   in
   error, a
 
@@ -100,7 +100,7 @@ let complementary_interface parameters error handler agent_name interface =
           agent_name
           handler.Cckappa_sig.sites)
       (fun error -> warn parameters error (Some "line 89") Exit
-        (Ckappa_sig.Dictionary_of_sites.init ()))
+          (Ckappa_sig.Dictionary_of_sites.init ()))
   in
   let error, last_entry =
     Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic
@@ -139,17 +139,17 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
       | Some rule ->
         let label = rule.Cckappa_sig.e_rule_label in
         let error, (m1, _) = Misc_sa.unsome (error,label)
-	  (fun error -> error,Location.dummy_annot "") in
+            (fun error -> error,Location.dummy_annot "") in
         let m1 =
-	  if m1 = "" then m1
-	  else
-	    match
-	      rule.Cckappa_sig.e_rule_initial_direction
-	    with
-	    | Ckappa_sig.Direct -> m1
-	    | Ckappa_sig.Reverse -> Ast.flip_label m1
-	in
-	error,
+          if m1 = "" then m1
+          else
+            match
+              rule.Cckappa_sig.e_rule_initial_direction
+            with
+            | Ckappa_sig.Direct -> m1
+            | Ckappa_sig.Reverse -> Ast.flip_label m1
+        in
+        error,
         (if m1 = ""
          then ("rule "^ (Ckappa_sig.string_of_rule_id rule_id))
          else ("rule "^ Ckappa_sig.string_of_rule_id rule_id)^": "^ m1
@@ -168,16 +168,16 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
       match var
       with
       | None  -> warn parameters error (Some "line 12299") Exit
-        ("VAR " ^ (Ckappa_sig.string_of_rule_id var_id))
+                   ("VAR " ^ (Ckappa_sig.string_of_rule_id var_id))
       | Some _ ->
-           (*TO DO*)
+        (*TO DO*)
         error,"ALG"
     (*
       warn parameters error (Some "line 122") Exit "ALG"*)
-    (* | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) -> let m1 = b in let m2 =
-       string_of_int var_id in let m = m1^m2 in error,(if m="" then
-       ("var"^(string_of_int var_id)) else ("var"^(string_of_int
-       var_id)^":"^m))*)
+        (* | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) -> let m1 = b in let m2 =
+           string_of_int var_id in let m = m1^m2 in error,(if m="" then
+           ("var"^(string_of_int var_id)) else ("var"^(string_of_int
+           var_id)^":"^m))*)
 
     end
 
@@ -212,7 +212,7 @@ let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckapp
         handler_kappa.Cckappa_sig.sites
     with
     | error, None -> warn parameter error (Some "line 171") Exit
-      (Ckappa_sig.Dictionary_of_sites.init())
+                       (Ckappa_sig.Dictionary_of_sites.init())
     | error, Some i -> error, i
   in
   let error, site_type =
@@ -275,7 +275,7 @@ let print_state _parameter error _handler_kappa state =
   | Ckappa_sig.Binding Ckappa_sig.C_Free -> error, "free"
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
     error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
-      (Ckappa_sig.string_of_site_name b)
+           (Ckappa_sig.string_of_site_name b)
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
@@ -298,7 +298,7 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
         handler_kappa.Cckappa_sig.states_dic
     with
     | error, None -> warn parameter error (Some "line 206") Exit
-      (Ckappa_sig.Dictionary_of_States.init())
+                       (Ckappa_sig.Dictionary_of_States.init())
     | error, Some i -> error, i
   in
   let error, value =
@@ -332,10 +332,10 @@ let get_label_of_var_dot _parameters error rule = error,rule.Cckappa_sig.e_id_do
 let print_rule_txt parameters error rule_id m1 _m2 rule =
   let m = "'"^ m1 ^"' " in
   let error, _ = error,
-    Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
-      (if m = ""
-       then ("rule(" ^ (Ckappa_sig.string_of_rule_id rule_id) ^ "): ")
-       else ("rule(" ^ Ckappa_sig.string_of_rule_id rule_id) ^ "):"^ m) in
+                 Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+                   (if m = ""
+                    then ("rule(" ^ (Ckappa_sig.string_of_rule_id rule_id) ^ "): ")
+                    else ("rule(" ^ Ckappa_sig.string_of_rule_id rule_id) ^ "):"^ m) in
   let error = Print_ckappa.print_rule parameters error rule in
   error
 
@@ -347,7 +347,7 @@ let print_var_txt parameters error var_id m1 _m2 var =
       "%s"
       (if m=""
        then
-          ("var(" ^ (Ckappa_sig.string_of_rule_id var_id)^")")
+         ("var(" ^ (Ckappa_sig.string_of_rule_id var_id)^")")
        else ("var(" ^ Ckappa_sig.string_of_rule_id var_id)^"):"^m) in
   let error = Print_ckappa.print_alg parameters error var  in
   error

@@ -4,7 +4,7 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2015, the 23th of Feburary
- * Last modification:
+ * Last modification: Time-stamp: <Jul 02 2016>
  *
  * Type definitions for the covering classes relations between the left hand site of a rule and its sites.
  *

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification:
+ * Last modification: Time-stamp: <Jul 02 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *

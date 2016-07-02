@@ -1,10 +1,10 @@
     (**
-    * exception.ml
+    * exception.mli
     * openkappa
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/03/2010
-    * Last modification: 05/02/2015
+ * Last modification: Time-stamp: <Jul 02 2016>
     * *
     * This library declares exceptions
     *

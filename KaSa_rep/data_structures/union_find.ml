@@ -2,15 +2,15 @@
     * union_find.ml
     * openkappa
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-    * 
+    *
     * Creation: 2015, the 11th of March
-    * Last modification: 
-    * * 
+    * Last modification: Time-stamp: <Jul 02 2016>
+    * *
     * This library provides primitives to deal with union find algorithm with
     * path compression
-    *  
-    * Copyright 2010,2011 Institut National de Recherche en Informatique et   
-    * en Automatique.  All rights reserved.  This file is distributed     
+    *
+    * Copyright 2010,2011 Institut National de Recherche en Informatique et
+    * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
 
 let warn parameters mh message exn default =
@@ -56,7 +56,7 @@ module Make =
       let create parameters error n =
 	Storage.init parameters error n (fun p e x -> e,x)
 
-(************************************************************************************) 
+(************************************************************************************)
 (* findSet(e): which return a pointer to the representative of the set
    containing e. Since the set are disjoint, e containted in one set
    only. Therefore, the returned representative can be uniquely determined.
@@ -72,13 +72,13 @@ module Make =
 	in
 	let rec helper parameter error e l t =
 	  let error, parent =
-	    Storage.get parameter error e t 
+	    Storage.get parameter error e t
 	  in
 	  match parent
 	  with
-	  | None -> 
+	  | None ->
 	    warn parameter error (Some "Missing association") Exit (t,None)
-	  | Some p when p <> e -> 
+	  | Some p when p <> e ->
 	      helper parameter error p (e::l) t
 	  | Some p ->
 	    begin
@@ -92,13 +92,13 @@ module Make =
 
 let dump a = Array.iteri (Printf.fprintf stdout "%i:%i") a
 
-(************************************************************************************)   
+(************************************************************************************)
 (*UNION*)
 
 let union parameter error x y t =
   let error, (t, root_x) = findSet parameter error x t in
   let error, (t, root_y) = findSet parameter error y t in
-  match 
+  match
     root_x,root_y
   with
   | None, _ | _, None -> warn parameter error (Some "Missing associations") Exit t
@@ -116,42 +116,42 @@ let union x y a =
   let _ = a.(root_x) <- root_y in
   (*let _ = print_string "dump: "; dump a; print_string "\n" in*)
   a
-              
+
 let eq_classes_map parameter error a =
   let classes = Ckappa_sig.Site_map_and_set.Map.empty in
 >>>>>>> remove doublicate module, todo: hidden type site_name
   let size = Array.length a in
   let rec aux k (classes,union_list) =
-    if  k < 0 
+    if  k < 0
     then
       classes, union_list
-    else 
+    else
       (*find the parent of the union*)
       let rep = findSet k a in
       (*check if inside classes has already has this parent*)
 <<<<<<< HEAD
       let error',get_rep =
 (*        Cckappa_sig.Site_map_and_set.Map.find_default parameter error [] rep classes in*)
-      let error = Exception.check warn parameter error error' (Some "line 73") Exit in 
+      let error = Exception.check warn parameter error error' (Some "line 73") Exit in
       (*store the result inside classes*)
 (*      let error,classes =
 	Cckappa_sig.Site_map_and_set.Map.add_or_overwrite
 =======
       let error', get_rep =
-        Ckappa_sig.Site_map_and_set.Map.find_default 
+        Ckappa_sig.Site_map_and_set.Map.find_default
           parameter
           error
-          [] 
+          []
           rep
-          classes 
+          classes
       in
-      let error = Exception.check warn parameter error error' (Some "line 73") Exit in 
+      let error = Exception.check warn parameter error error' (Some "line 73") Exit in
       (*store the result inside classes*)
       let error,classes =
 	Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
 >>>>>>> remove doublicate module, todo: hidden type site_name
 	  parameter
-	  error 
+	  error
           rep
 	  (k :: get_rep)
 	  classes
@@ -161,7 +161,7 @@ let eq_classes_map parameter error a =
   let classes, a = aux (size - 1) (classes, a) in
   classes, a*)
 
-(************************************************************************************)   
+(************************************************************************************)
 (* compute union-find in a list*)
 
 let union_list parameter error a (list: key list) =

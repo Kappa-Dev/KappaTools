@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification:
+   * Last modification: Time-stamp: <Jul 02 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1265,7 +1265,7 @@ struct
 
   let precondition_typing parameter error kappa_handler rule_id step_list path
       store_agent_name dual_contact_map =
-    let rec aux acc =
+    let rec aux acc error =
       match acc with
       | [] -> error, Usual_domains.Any
       | step :: tl ->
@@ -1330,14 +1330,14 @@ struct
                   dual_contact_map
               with
               | error, None -> error, Usual_domains.Undefined
-              | error, Some _ -> (*recursive call*) aux tl
+              | error, Some _ -> (*recursive call*) aux tl error
           in
           error, answer_contact_map
         else
           (*state is not defined*)
           error, Usual_domains.Undefined
     in
-    aux step_list
+    aux step_list error
 
   (*-----------------------------------------------------------*)
   (*intersection:
@@ -2399,7 +2399,7 @@ struct
 
   (**************************************************************************)
 
-  let rec apply_event_list static dynamic error event_list =
+  let apply_event_list static dynamic error event_list =
     let error, dynamic, event_list =
       List.fold_left (fun (error, dynamic, event_list) event ->
           let error, dynamic, event_list =
@@ -2412,7 +2412,7 @@ struct
     in
     error, dynamic, event_list
 
-  let export static dynamic error kasa_state =
+  let export _static dynamic error kasa_state =
     error, dynamic, kasa_state
 
   (**************************************************************************)

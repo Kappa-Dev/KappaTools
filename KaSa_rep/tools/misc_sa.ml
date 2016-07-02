@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 16/12/2010
-  * Last modification: 07/01/2011
+  * Last modification: Time-stamp: <Jul 02 2016>
   * *
   * Various functions
   *

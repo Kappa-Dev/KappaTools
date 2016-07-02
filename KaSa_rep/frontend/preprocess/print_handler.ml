@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 17th of January
- * Last modification: 2015, the 05th of February
+ * Last modification: Time-stamp: <Jul 02 2016>
  * *
  * Pretty printing of Ckappa handler
  *

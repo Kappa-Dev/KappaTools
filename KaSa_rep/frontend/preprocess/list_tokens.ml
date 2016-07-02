@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 17th of January
-   * Last modification: 2015, the 17th of February
+   * Last modification: Time-stamp: <Jul 02 2016>
    * *
    * Number agents, sites, states in ckappa represenations
    *
@@ -98,7 +98,7 @@ let declare_agent parameters error handler agent_name =
   in
   match output with
   | None -> warn parameters error (Some "line 61")
-    Exit (handler, Ckappa_sig.dummy_agent_name)
+              Exit (handler, Ckappa_sig.dummy_agent_name)
   | Some (k, _, _, dic) ->
     if bool
     then
@@ -129,10 +129,10 @@ let declare_agent parameters error handler agent_name =
             else
               handler.Cckappa_sig.nagents
           end;
-          Cckappa_sig.agents_dic = dic ;
+        Cckappa_sig.agents_dic = dic ;
         Cckappa_sig.interface_constraints = int_constraints;
         Cckappa_sig.sites = sites;
-      }, k)
+       }, k)
     else
       error, (handler, k)
 
@@ -149,7 +149,7 @@ let declare_site create parameters make_site make_state (error, handler)
   in
   match sites with
   | None  -> warn parameters error (Some "line 87") Exit
-    (handler, [], Ckappa_sig.dummy_site_name)
+               (handler, [], Ckappa_sig.dummy_site_name)
   | Some sites ->
     let error, (bool, output) =
       Ckappa_sig.Dictionary_of_sites.allocate_bool
@@ -164,7 +164,7 @@ let declare_site create parameters make_site make_state (error, handler)
     begin
       match output with
       | None -> warn parameters error (Some "line 92") Exit
-        (handler, [], Ckappa_sig.dummy_site_name)
+                  (handler, [], Ckappa_sig.dummy_site_name)
       | Some (k, _, _, sites) ->
         let error, (states_dic, dic_states, handler) =
           if bool
@@ -221,29 +221,29 @@ let declare_site create parameters make_site make_state (error, handler)
         let error, (new_dic_states, l, bool) =
           List.fold_left
             (fun (error, (dic_states, l, bool)) internal ->
-              let state = make_state internal in
-              let error, (bool2, output) =
-                Ckappa_sig.Dictionary_of_States.allocate_bool
-                  parameters
-                  error
-                  Ckappa_sig.compare_unit_state_index
-                  state
-                  ()
-                  Misc_sa.const_unit
-                  dic_states
-              in
-              begin
-                match output with
-                | None ->
-                  warn parameters error (Some "line 126") Exit (dic_states, l, bool2)
-                | Some (state_id, _, _, dic) ->
-                  let l = (agent_name, k, state_id) :: l in
-                  if bool2
-                  then
-                    error, (dic, l, bool2)
-                  else
-                    error,(dic_states, l, bool)
-              end)
+               let state = make_state internal in
+               let error, (bool2, output) =
+                 Ckappa_sig.Dictionary_of_States.allocate_bool
+                   parameters
+                   error
+                   Ckappa_sig.compare_unit_state_index
+                   state
+                   ()
+                   Misc_sa.const_unit
+                   dic_states
+               in
+               begin
+                 match output with
+                 | None ->
+                   warn parameters error (Some "line 126") Exit (dic_states, l, bool2)
+                 | Some (state_id, _, _, dic) ->
+                   let l = (agent_name, k, state_id) :: l in
+                   if bool2
+                   then
+                     error, (dic, l, bool2)
+                   else
+                     error,(dic_states, l, bool)
+               end)
             (error, (dic_states, [], bool))
             list
         in
@@ -339,58 +339,58 @@ let scan_agent parameters (error, handler) agent =
         | Ckappa_sig.LNK_VALUE (_, agent', site', _, _)
         | Ckappa_sig.LNK_TYPE ((agent', _), (site', _)) ->
           (let error, (handler, ag_id') =
-              declare_agent parameters error handler agent'
-            in
-            let error, (handler, _, _site_id) =
-              declare_site_with_binding_states
-                parameters
-                (error,handler)
-                ag_id
-                site_name
-                []
-            in
-	    let error, (handler, _, site_id') =
-              declare_site_with_binding_states
-                parameters
-                (error, handler)
-                ag_id'
-                site'
-                []
-            in
-            let error, (handler, l1, site_id) =
-              declare_site_with_binding_states
-                parameters
-                (error, handler)
-                ag_id
-                site_name
-                [Ckappa_sig.C_Lnk_type (ag_id', site_id')]
-            in
-            let error, (handler, l2, _site_id') =
-              declare_site_with_binding_states
-                parameters
-                (error, handler)
-                ag_id'
-                site'
-                [Ckappa_sig.C_Lnk_type (ag_id, site_id)]
-            in
-            let error, handler =
-              begin
-                match l1, l2 with
-                | [agent_id1,site_id1,state_id1],[agent_id2,site_id2,state_id2] ->
-                  declare_dual
-                    parameters
-                    error
-                    handler
-                    agent_id1
-                    site_id1
-                    state_id1
-                    agent_id2
-                    site_id2
-                    state_id2
-                | _ -> warn parameters error (Some "line 204") Exit handler
-              end
-            in
-            error, handler)
+             declare_agent parameters error handler agent'
+           in
+           let error, (handler, _, _site_id) =
+             declare_site_with_binding_states
+               parameters
+               (error,handler)
+               ag_id
+               site_name
+               []
+           in
+           let error, (handler, _, site_id') =
+             declare_site_with_binding_states
+               parameters
+               (error, handler)
+               ag_id'
+               site'
+               []
+           in
+           let error, (handler, l1, site_id) =
+             declare_site_with_binding_states
+               parameters
+               (error, handler)
+               ag_id
+               site_name
+               [Ckappa_sig.C_Lnk_type (ag_id', site_id')]
+           in
+           let error, (handler, l2, _site_id') =
+             declare_site_with_binding_states
+               parameters
+               (error, handler)
+               ag_id'
+               site'
+               [Ckappa_sig.C_Lnk_type (ag_id, site_id)]
+           in
+           let error, handler =
+             begin
+               match l1, l2 with
+               | [agent_id1,site_id1,state_id1],[agent_id2,site_id2,state_id2] ->
+                 declare_dual
+                   parameters
+                   error
+                   handler
+                   agent_id1
+                   site_id1
+                   state_id1
+                   agent_id2
+                   site_id2
+                   state_id2
+               | _ -> warn parameters error (Some "line 204") Exit handler
+             end
+           in
+           error, handler)
         | Ckappa_sig.LNK_SOME _ ->
           let error, (handler, _, _site_id) =
             declare_site_with_binding_states
@@ -417,7 +417,7 @@ let rec scan_mixture parameters remanent mixture =
 let scan_token parameters remanent _alg = (*TO DO*)
   let error,remanent = remanent in
   let error,remanent = warn parameters error
-    (Some "line 221, scan_token is not implemented yet") Exit remanent
+      (Some "line 221, scan_token is not implemented yet") Exit remanent
   in
   error,remanent
 
@@ -427,14 +427,14 @@ let scan_alg _parameters remanent _alg = (*TO DO*)
 let scan_initial_states parameters =
   List.fold_left
     (fun remanent (_,(alg,_pos),init_t) ->
-     let remanent = scan_alg parameters remanent alg in
-     match
-	init_t
-      with
-      | Ast.INIT_MIX mixture,_pos' ->
-        scan_mixture parameters remanent mixture
-      | Ast.INIT_TOK tok,pos' ->
-	scan_token parameters remanent (tok,pos'))
+       let remanent = scan_alg parameters remanent alg in
+       match
+         init_t
+       with
+       | Ast.INIT_MIX mixture,_pos' ->
+         scan_mixture parameters remanent mixture
+       | Ast.INIT_TOK tok,pos' ->
+         scan_token parameters remanent (tok,pos'))
 
 let scan_declarations parameters  =
   List.fold_left
@@ -446,15 +446,15 @@ let scan_observables _scan_mixt _parameters remanent _variable = (*TODO*)
 let scan_perts scan_mixt parameters =
   List.fold_left
     (fun remanent ((_,m,_),_) ->
-      List.fold_left
-        (fun remanent m ->
-          match m with
-          | (Ast.INTRO (_,(m,_)) | Ast.DELETE(_,(m,_)) | Ast.CFLOWMIX (_,(m,_))) ->
-	    scan_mixt parameters remanent m
-          | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
-	  | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOWLABEL _
-	  | Ast.FLUXOFF _ | Ast.FLUX _ -> remanent
-        ) remanent m)
+       List.fold_left
+         (fun remanent m ->
+            match m with
+            | (Ast.INTRO (_,(m,_)) | Ast.DELETE(_,(m,_)) | Ast.CFLOWMIX (_,(m,_))) ->
+              scan_mixt parameters remanent m
+            | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
+            | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOWLABEL _
+            | Ast.FLUXOFF _ | Ast.FLUX _ -> remanent
+         ) remanent m)
 
 let scan_rules scan_mixt parameters a b =
   let _ =
@@ -466,9 +466,9 @@ let scan_rules scan_mixt parameters a b =
   in
   List.fold_left
     (fun remanent (_,((_,rule),_)) ->
-      scan_mixture
-        parameters
-        (scan_mixt parameters remanent rule.Ckappa_sig.lhs) rule.Ckappa_sig.rhs)
+       scan_mixture
+         parameters
+         (scan_mixt parameters remanent rule.Ckappa_sig.lhs) rule.Ckappa_sig.rhs)
     a b
 
 let scan_compil parameters error compil =
@@ -489,10 +489,10 @@ let scan_compil parameters error compil =
   let remanent = scan_initial_states parameters remanent compil.Ast.init in
   let remanent = scan_declarations parameters remanent compil.Ast.signatures  in
   let remanent = scan_observables scan_tested_mixture parameters remanent
-    compil.Ast.observables
+      compil.Ast.observables
   in
   let remanent = scan_perts scan_tested_mixture parameters remanent
-    compil.Ast.perturbations
+      compil.Ast.perturbations
   in
   let remanent = scan_rules scan_tested_mixture parameters remanent compil.Ast.rules
   in

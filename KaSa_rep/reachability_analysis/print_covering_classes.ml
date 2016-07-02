@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 26th of June
-  * Last modification:
+  * Last modification: Time-stamp: <Jul 02 2016>
   *
   * Print the relations between the left hand site of a rule and its sites.
   *
@@ -18,6 +18,8 @@ open Int_storage
 open Covering_classes_new_index
 
 (*------------------------------------------------------------------------------*)
+
+(* DEAD CODE ? *)
 
 let print_site_type l =
   let rec aux acc =
