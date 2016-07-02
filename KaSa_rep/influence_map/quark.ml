@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: 2014, the 5th of October
+ * Last modification: Time-stamp: <Jul 02 2016>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -512,7 +512,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error agent_id agent
+      (fun parameter error _agent_id agent
         (agent_var, site_var, site_bound_var, dead_agents, dead_sites, dead_states) ->
         let dealwith agent error (agent_var,site_var, site_bound_var) =
           let error, kasim_id =
@@ -682,12 +682,18 @@ let scan_pos_mixture = scan_mixture_in_var true
 let scan_neg_mixture = scan_mixture_in_var false
 
 let scan_var parameter error handler var_id var quarks =
-  let rec aux error var list_pos list_neg =
+  let aux error var list_pos list_neg =
     match var
     with
     | Ast.KAPPA_INSTANCE(mixture) -> error,mixture::list_pos,list_neg
-    | _ ->
-      begin
+    | Ast.BIN_ALG_OP _
+    | Ast.UN_ALG_OP _
+    | Ast.CONST _
+    | Ast.TOKEN_ID _
+    | Ast.STATE_ALG_OP _
+    | Ast.OBS_VAR _
+     ->
+     begin (* to do *)
         error,list_pos,list_neg
       end
   in
@@ -724,11 +730,11 @@ let scan_rule parameter error handler rule_id rule quarks =
   let site_bound_modif_plus = Quark_type.BoundSite.Set.empty in
   let site_bound_modif_minus = Quark_type.BoundSite.Set.empty in
   let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
-  let error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states) = (*what is tested in the lhs*)
+  let error,(agent_test,site_test,_site_bound_test,dead_agents,dead_sites,dead_states) = (*what is tested in the lhs*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error agent_id agent (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states) ->
+      (fun parameter error _agent_id agent (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states) ->
          let dealwith agent error (agent_test,site_test,site_bound_test) =
            let error,kasim_id =
              Quark_type.Labels.label_of_int
@@ -835,7 +841,7 @@ let scan_rule parameter error handler rule_id rule quarks =
   let _ = Misc_sa.trace parameter (fun () -> "REMOVAL\n") in
   let error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus) = (*the agents that are removed *)
     List.fold_left
-      (fun (error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus)) (agent_id,agent,list) ->
+      (fun (error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus)) (_agent_id,agent,list) ->
          let agent_type = agent.Cckappa_sig.agent_name in
          let error,kasim_id =
            Quark_type.Labels.label_of_int parameter error
@@ -876,6 +882,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                             parameter error handler rule_id mkasim_id agent_type site k
                             (site_modif_plus,site_modif_minus,site_bound_modif_minus)
                         in
+                        aux (Ckappa_sig.next_state_index k)
                         (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
                     in
                     aux (Ckappa_sig.dummy_state_index_1) (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
@@ -895,7 +902,7 @@ let scan_rule parameter error handler rule_id rule quarks =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error agent_id agent (site_modif_plus,site_bound_modif_plus) ->
+      (fun parameter error _agent_id agent (site_modif_plus,site_bound_modif_plus) ->
          let error,kasim_id =
            Quark_type.Labels.label_of_int parameter error
              (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
