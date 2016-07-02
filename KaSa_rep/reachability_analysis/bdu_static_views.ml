@@ -576,7 +576,6 @@ let collect_bdu_creation_restriction_map parameter handler error
     ) store_remanent_triple (handler, store_result)
 
 (*projection with rule_id*)
-(*FIXME: return handler*)
 
 let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
     rule_id rule store_remanent_triple
