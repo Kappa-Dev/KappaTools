@@ -849,8 +849,6 @@ let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Lo
   | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
     get_intermediary_internal_influence_map state
 
-(*convert_influence_map state (get_influence_map ?accuracy_level state)*)
-
 let get_influence_map =
   get_map_gen
     get_internal_influence_map
