@@ -96,8 +96,8 @@ class TestKappaClient(unittest.TestCase):
         with open("../models/abc-pert.ka") as f:
             data = f.read()
             token = runtime.start({ 'code': data
-                                  , 'nb_plot': 150
-                                  , 'max_time' : 10.01 })
+                                  , 'nb_plot': 15000
+                                  , 'max_time' : 1000.01 })
             status = runtime.status(token)
             assert('plot' in status)
             assert('log_messages' in status)

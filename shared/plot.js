@@ -7,14 +7,15 @@ function observable_plot(configuration){
      * how an observable in a plot is to be rendered.
      */
     this.modes = {
-	DOT    : 0,  // use dots
-	LINE   : 1,  // use a continuious line
+	LINE   : 0,  // use dots
+	DOT    : 1,  // use a continuious line
 	HIDDEN : 2,  // hide observable
 	XAXIS  : 3,  // observable is the x axis
 	MARKS  : 4,  // use marks
 	cycle : function(mode){
             return (mode+1) % 3;
-	}
+	},
+	DEFAULT : 0
     };
 
     // enum for tick marks
@@ -120,7 +121,7 @@ function observable_plot(configuration){
          */
         legend.forEach(function(legend,i){
             var old_observable = that.getObservable(i);
-            var mode = that.modes.DOT;
+            var mode = that.modes.DEFAULT;
             if(old_observable && old_observable.label == legend){
                 mode = old_observable.mode;
             };
@@ -467,7 +468,7 @@ function observable_plot(configuration){
                 assert(typeof index !== 'undefined',"plot selection invalid");
                 that.state.forEach(function(state,i){
                     if(state.mode == that.modes.XAXIS){
-                        state.mode = that.modes.DOT;
+                        state.mode = that.modes.DEFAULT;
                     }
                     if(i == index){
                         state.mode = that.modes.XAXIS;
@@ -528,7 +529,7 @@ function observable_plot(configuration){
                     assert(typeof index !== 'undefined',"plot selection invalid");
                     that.state.forEach(function(state,i){
 			if(state.mode == that.modes.XAXIS){
-                            state.mode = that.modes.DOT;
+                            state.mode = that.modes.DEFAULT;
 			}
 			if(i == index){
                             state.mode = that.modes.XAXIS;

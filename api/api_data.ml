@@ -223,6 +223,7 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
       ((l,r) : (int * int) * (int * int)) : (int * int) * (int * int) =
     if (l < r) then (l,r) else (r,l)
   in
+  (*
   let format_edge
       (label : string)
       (((a,b),(c,d)) : (int * int) * (int * int)) : string =
@@ -230,12 +231,14 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
       "\n%s ((%d,%d),(%d,%d))\n"
       label a b c d
   in
+
   let debug_edge
       (label : string)
       (edge : (int * int) * (int * int)) : unit =
     print_string
       (format_edge label edge)
   in
+  *)
   let site_nodes : ApiTypes_t.site_node list =
     Array.to_list (api_snapshot_site_graph snapshot)
   in
