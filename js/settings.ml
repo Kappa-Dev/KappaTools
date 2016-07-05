@@ -1,7 +1,6 @@
 module UIState = Ui_state
 module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
-module R = Tyxml_js.R
 
 open ApiTypes
 
@@ -99,9 +98,7 @@ let error_messages signal =
     ]
 
 let code_messages = error_messages UIState.model_error
-let start_button_id = "start-button"
-let start_button = Html.button ~a:([ Html.a_id start_button_id
-                                   ; Html.Unsafe.string_attrib "type" "button"
+let start_button = Html.button ~a:([ Html.Unsafe.string_attrib "type" "button"
                                    ; Html.a_class ["btn";"btn-default"] ])
     [ Html.cdata "start" ]
 let configuration_settings =
@@ -134,12 +131,10 @@ let configuration_settings =
                      </div>
           </div> >>
 let select_default_runtime = [ UIState.WebWorker ; UIState.Embedded ]
-let select_runtime_id = "select_runtime_id"
 let select_runtime_options, select_runtime_options_handle =
   ReactiveData.RList.create select_default_runtime
 let select_runtime =
   Tyxml_js.R.Html.select
-    ~a:[Html.a_id select_runtime_id ]
     (ReactiveData.RList.map
        (fun runtime -> Html.option
            ~a:[Html.a_value (UIState.runtime_value runtime)]
@@ -185,8 +180,7 @@ let map_events f (format : 'a -> 'b) (identity : 'a) : 'b React.signal =
     (UIState.model_runtime_state)
 
 let progress_bar percent_signal value_signal =
-  Html.div ~a:[ Html.a_id start_button_id
-              ; Html.Unsafe.string_attrib "role" "progressbar"
+  Html.div ~a:[ Html.Unsafe.string_attrib "role" "progressbar"
               ; Tyxml_js.R.Html.Unsafe.int_attrib
                   "aria-valuenow"
                   percent_signal
@@ -244,11 +238,9 @@ let event_progress_bar =
          string_of_int event
        )
         UIState.model_runtime_state)
-let stop_button_id = "stop_button"
 let stop_button =
   Html.button
-    ~a:[ Html.a_id stop_button_id
-       ; Html.Unsafe.string_attrib "type" "button"
+    ~a:[ Html.Unsafe.string_attrib "type" "button"
        ; Html.a_class ["btn";"btn-default"] ] [ Html.cdata "stop" ]
 let tracked_events state =
   let tracked_events : int option =
@@ -338,18 +330,9 @@ let xml = <:html<<div>
                   </div> >>
 
 let onload () : unit =
-  let select_runtime_dom : Dom_html.selectElement Js.t =
-    Js.Unsafe.coerce
-      (Js.Opt.get (document##getElementById (Js.string select_runtime_id))
-         (fun () -> assert false)) in
-  let start_button_dom : Dom_html.linkElement Js.t =
-    Js.Unsafe.coerce
-      (Js.Opt.get (document##getElementById (Js.string start_button_id))
-         (fun () -> assert false)) in
-  let stop_button_dom : Dom_html.linkElement Js.t =
-    Js.Unsafe.coerce
-      (Js.Opt.get (document##getElementById (Js.string stop_button_id))
-         (fun () -> assert false)) in
+  let select_runtime_dom = Tyxml_js.To_dom.of_select select_runtime in
+  let start_button_dom = Tyxml_js.To_dom.of_button start_button in
+  let stop_button_dom = Tyxml_js.To_dom.of_button stop_button in
   let args = Url.Current.arguments in
   let set_runtime runtime continuation =
     UIState.set_runtime
@@ -468,5 +451,5 @@ let onload () : unit =
          try UIState.set_model_nb_plot
                (int_of_string value)
          with Not_found
-            | Failure "int_of_string" -> ()) in
+            | Failure _ -> ()) in
   ()
