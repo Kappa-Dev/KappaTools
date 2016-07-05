@@ -37,7 +37,11 @@ let runtime_value runtime =
   match runtime with
   | WebWorker -> "WebWorker"
   | Embedded -> "Embedded"
-  | Remote remote -> remote.url
+  | Remote remote ->
+    remote.url ^
+    (match remote.shutdown_key with
+     | None -> ""
+     | Some x -> "/?shutdown_key="^x)
 
 class embedded_runtime ()  = object
   method yield = Lwt_js.yield
@@ -45,50 +49,85 @@ class embedded_runtime ()  = object
   inherit Api.Base.runtime 0.1
 end
 
+let compute_remote url =
+  let cleaned_url http =
+    http.Url.hu_host ^":"^ string_of_int http.Url.hu_port ^"/"^
+    http.Url.hu_path_string in
+  let format_url url =
+    let length = String.length url in
+    if length > 0 && String.get url (length - 1) == '/' then
+      String.sub url 0 (length - 1)
+    else
+      url
+  in
+  match Url.url_of_string url with
+  | None -> None
+  | Some parsed ->
+    let cleaned_url =
+      match parsed with
+      | Url.Http http -> "http://" ^ cleaned_url http
+      | Url.Https https -> "https://" ^ cleaned_url https
+      | Url.File file -> "file://" ^ file.Url.fu_path_string in
+    let label =
+      match parsed with
+      | Url.Http http -> http.Url.hu_host
+      | Url.Https https -> https.Url.hu_host
+      | Url.File file -> file.Url.fu_path_string in
+    let shutdown =
+      try
+        Some
+          (List.assoc "shutdown_key" (match parsed with
+               | Url.Http http -> http.Url.hu_arguments
+               | Url.Https https -> https.Url.hu_arguments
+               | Url.File file -> file.Url.fu_arguments
+             ))
+      with Not_found -> None in
+    Some { label = label;
+           url = format_url cleaned_url;
+           shutdown_key = shutdown; }
+
 let default_runtime = WebWorker
 let runtime_state : Api.runtime option ref = ref None
-let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
+let set_runtime_url url (continuation : bool -> unit) : unit =
   try
   let () = set_model_error [] in
   if url = "WebWorker" then
     let () = runtime_state := Some (new JsWorker.runtime () :> Api.runtime) in
-    let () = continuation true in
-    ()
-  else if url = "Embedded" then
+    continuation true
+  else if url="Embedded" then
     let () = runtime_state := Some (new embedded_runtime () :> Api.runtime) in
-    let () = continuation true in
-    ()
+    continuation true
   else
-    let version_url : string = Format.sprintf "%s/v1/version" url  in
-    let () =
+    match compute_remote url with
+    | Some r ->
+      let version_url : string = Format.sprintf "%s/v1/version" r.url  in
       Lwt.async
         (fun () ->
-          (XmlHttpRequest.perform_raw
-             ~response_type:XmlHttpRequest.Text
-             version_url)
-          >>=
-            (fun frame ->
+           (XmlHttpRequest.perform_raw
+              ~response_type:XmlHttpRequest.Text
+              version_url)
+           >>=
+           (fun frame ->
               let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
-              let () = if is_valid_server then
+              let () =
+                if is_valid_server then
                   runtime_state :=
-                    Some (new JsRemote.runtime url :> Api.runtime)
+                    Some (new JsRemote.runtime
+                           ?shutdown_key:r.shutdown_key r.url :> Api.runtime)
                 else
                   let error_msg : string =
                     Format.sprintf "Bad Response %d from %s "
-                    frame.XmlHttpRequest.code
-                    url
-                  in
-                  set_model_error (Api_data.api_message_errors error_msg)
+                      frame.XmlHttpRequest.code
+                      r.url
+                    in
+                    set_model_error (Api_data.api_message_errors error_msg)
               in
               let () = continuation is_valid_server in
               Lwt.return_unit
-            )
+           )
         )
-    in
-    ()
+    | None -> continuation false
   with _ -> continuation false
-let set_runtime (runtime : runtime) (continuation : bool -> unit) : unit =
-  set_runtime_url (runtime_value runtime) continuation
 
 let set_text text = set_model_text text
 let parse_text text =
@@ -285,17 +324,30 @@ let stop_model token = match !runtime_state with
       set_model_error
         (Api_data.api_message_errors "Runtime not available");
   | Some runtime_state ->
-     let () = Lwt.async (fun () -> (runtime_state#stop token)
-                                   >>=
-                                     (fun result ->
-                                      match result with
-                                        `Left error ->
-                                        let () = set_model_error error in
-                                        Lwt.return_unit
-                                      | `Right () ->
-                                         let () = set_model_error [] in
-                                         Lwt.return_unit))
-     in ()
+    Lwt.async (fun () -> (runtime_state#stop token) >>=
+                (fun result ->
+                   match result with
+                     `Left error ->
+                     let () = set_model_error error in
+                     Lwt.return_unit
+                   | `Right () ->
+                     let () = set_model_error [] in
+                     Lwt.return_unit))
+
+let shutdown () =
+  match !runtime_state with
+  | None -> Lwt.return_unit
+  | Some runtime_state ->
+    runtime_state#shutdown () >>=
+    (fun result ->
+       match result with
+         `Left error ->
+         let () = set_model_error error in
+         Lwt.return_unit
+       | `Right () ->
+         let () = set_model_error [] in
+         Lwt.return_unit)
+
 (* return the agent count *)
 let agent_count () : int option =
   match (React.S.value model_parse) with

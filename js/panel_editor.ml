@@ -298,3 +298,6 @@ let onload () : unit =
   in
   let () = Settings.onload () in
   ()
+
+let onunload () =
+  Ui_state.shutdown ()

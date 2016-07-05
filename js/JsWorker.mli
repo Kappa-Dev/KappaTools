@@ -5,4 +5,5 @@ class runtime : ?timeout:float -> unit -> object
   method status : ApiTypes_j.token -> ApiTypes_j.state ApiTypes_j.result Lwt.t
   method list : unit -> ApiTypes_j.catalog ApiTypes_j.result Lwt.t
   method stop : ApiTypes_j.token -> unit ApiTypes_j.result Lwt.t
+  method shutdown : unit -> unit ApiTypes_j.result Lwt.t
 end

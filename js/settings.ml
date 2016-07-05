@@ -335,60 +335,25 @@ let onload () : unit =
   let stop_button_dom = Tyxml_js.To_dom.of_button stop_button in
   let args = Url.Current.arguments in
   let set_runtime runtime continuation =
-    UIState.set_runtime
-      runtime
+    let r_val = Ui_state.runtime_value runtime in
+    Ui_state.set_runtime_url
+      r_val
       (fun success -> if success then
-          select_runtime_dom##value <- Js.string (UIState.runtime_value runtime)
+          select_runtime_dom##value <- Js.string r_val
         else
           continuation ())
   in
-  let format_url url =
-    let length = String.length url in
-    if length > 0 && String.get url (length - 1) == '/' then
-      String.sub url 0 (length - 1)
-    else
-      url
-  in
   let default_runtime () = set_runtime UIState.default_runtime (fun _ -> ()) in
-  let cleaned_url http =
-    http.Url.hu_host ^":"^ string_of_int http.Url.hu_port ^"/"^
-    http.Url.hu_path_string in
   let () =
-    try let hosts = args in
-      let hosts = List.filter (fun (key,value) -> key = "host") hosts in
+    try
+      let hosts = List.filter (fun (key,value) -> key = "host") args in
       let hosts =
         List.map
-          (fun (_,url) -> match Url.url_of_string url with
-             | None -> None
-             | Some parsed ->
-               let cleaned_url =
-                 match parsed with
-                 | Url.Http http -> "http://" ^ cleaned_url http
-                 | Url.Https https -> "https://" ^ cleaned_url https
-                 | Url.File file -> "file://" ^ file.Url.fu_path_string in
-                 let label =
-                 match parsed with
-                  | Url.Http http -> http.Url.hu_host
-                  | Url.Https https -> https.Url.hu_host
-                  | Url.File file -> file.Url.fu_path_string in
-               let shutdown =
-                 try
-                   Some
-                     (List.assoc "shutdown_key" (match parsed with
-                          | Url.Http http -> http.Url.hu_arguments
-                          | Url.Https https -> https.Url.hu_arguments
-                          | Url.File file -> file.Url.fu_arguments
-                        ))
-                 with Not_found -> None in
-                 Some (UIState.Remote
-                         { UIState.label = label;
-                           UIState.url = format_url cleaned_url;
-                           Ui_state.shutdown_key = shutdown; })
-) hosts in
+          (fun (_,url) -> Ui_state.compute_remote url) hosts in
       let hosts = List.fold_left
           (fun acc value ->
              match value with
-             |  Some remote -> remote::acc
+             |  Some remote -> Ui_state.Remote remote::acc
              | None -> acc)
           select_default_runtime
           hosts

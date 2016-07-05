@@ -9,7 +9,7 @@ type runtime =
     status : ApiTypes_j.token -> ApiTypes_j.state ApiTypes_j.result Lwt.t;
     list : unit -> ApiTypes_j.catalog ApiTypes_j.result Lwt.t;
     stop : ApiTypes_j.token -> unit ApiTypes_j.result Lwt.t;
-
+    shutdown : unit -> unit ApiTypes_j.result Lwt.t;
   >;;
 
 module Base : sig
@@ -51,6 +51,7 @@ module Base : sig
     method stop :
       ApiTypes_j.token ->
         unit ApiTypes_j.result Lwt.t
+    method shutdown : unit -> unit ApiTypes_j.result Lwt.t
     method virtual log :
         ?exn:exn ->
           string ->

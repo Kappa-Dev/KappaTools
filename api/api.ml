@@ -17,6 +17,7 @@ type runtime =
     status : ApiTypes.token -> ApiTypes.state ApiTypes.result Lwt.t;
     list : unit -> ApiTypes.catalog ApiTypes.result Lwt.t;
     stop : ApiTypes.token -> unit ApiTypes.result Lwt.t;
+    shutdown : unit -> unit ApiTypes.result Lwt.t;
   >;;
 
 module Base : sig
@@ -48,6 +49,7 @@ module Base : sig
     method status : ApiTypes.token -> ApiTypes.state ApiTypes.result Lwt.t
     method list : unit -> ApiTypes.catalog ApiTypes.result Lwt.t
     method stop : ApiTypes.token -> unit ApiTypes.result Lwt.t
+    method shutdown : unit -> unit ApiTypes.result Lwt.t
     method virtual log : ?exn:exn -> string -> unit Lwt.t
     method virtual yield : unit -> unit Lwt.t
   end;;
@@ -420,5 +422,8 @@ end = struct
            else
              Api_data.lwt_msg msg_process_not_running)
         (fun e -> Api_data.lwt_msg (Printexc.to_string e))
+
+    method shutdown () : unit ApiTypes.result Lwt.t = Lwt.return (`Right ())
+
   end;;
   end;;

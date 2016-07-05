@@ -1,8 +1,7 @@
-module IntMap = Map.Make(struct type t = int let compare = compare end)
+module IntMap = Mods.IntMap
 module WebMessage = WebMessage_j
 module ApiTypes = ApiTypes_j
 
-open WebMessage
 open Lwt
 
 type context = { worker : (string, string) Worker.worker Js.t
@@ -61,17 +60,17 @@ object(self)
              WebMessage.message_of_string
                WebMessage.read_response
                response_text in
-           try let value : WebMessage.response option Lwt_mvar.t =
-                 IntMap.find message.WebMessage.id context.mailboxes
-               in
-               let () =
-                 Lwt.async
-                   (fun () ->
-                     Lwt_mvar.put value (Some message.data))
-               in
-               Js._true
-        with Not_found -> Js._true
-       ))
+
+           let () =
+             match IntMap.find_option
+                     message.WebMessage.id context.mailboxes with
+             | Some value ->
+               Lwt.async
+                 (fun () ->
+                    Lwt_mvar.put value (Some message.WebMessage.data))
+             | None -> () in
+           Js._true
+         ))
     in
     var
 
@@ -168,4 +167,7 @@ object(self)
        | Some response ->
          Lwt.fail (BadResponse response)
       )
+
+  method shutdown () : unit ApiTypes.result Lwt.t = Lwt.return (`Right ())
+
 end

@@ -1,3 +1,5 @@
+S ../api
+
 PKG js_of_ocaml.tyxml
 PKG lwt
 PKG atdgen

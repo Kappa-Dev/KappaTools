@@ -75,7 +75,7 @@ let post
       None -> Lwt.fail TimeOut
     | Some response -> Lwt.return response)
 
-class runtime ?(timeout:float = 10.0) (url:string) =
+class runtime ?(timeout:float = 10.0) ?shutdown_key url =
 object(self)
   method private hydrate :
     'a. ((Js.js_string Js.t) XmlHttpRequest.generic_http_frame)
@@ -183,4 +183,16 @@ object(self)
                       frame
                       Api_types.alias_unit_of_string
                       Api_types.errors_of_string)
+
+  method shutdown () : unit Api_types.result Lwt.t =
+    match shutdown_key with
+    | None -> Lwt.return (`Right ())
+    | Some shutdown_key ->
+      let () = Common.debug "shutting down" in
+      post timeout
+        shutdown_key
+        (url ^ "/v1/shutdown")
+        (fun _ -> ())
+        Api_types.errors_of_string
+
 end;;
