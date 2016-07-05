@@ -349,25 +349,42 @@ let onload () : unit =
     else
       url
   in
-  let default_embedded () = set_runtime UIState.Embedded (fun _ -> ()) in
+  let default_runtime () = set_runtime UIState.default_runtime (fun _ -> ()) in
+  let cleaned_url http =
+    http.Url.hu_host ^":"^ string_of_int http.Url.hu_port ^"/"^
+    http.Url.hu_path_string in
   let () =
     try let hosts = args in
       let hosts = List.filter (fun (key,value) -> key = "host") hosts in
-      let hosts = List.map (fun (_,h) -> (h,Url.url_of_string h)) hosts in
       let hosts =
         List.map
-          (fun x -> match x with
-             | (_,None) -> None
-             | (url,Some parsed) ->
-               let label =
-                 (match parsed with
+          (fun (_,url) -> match Url.url_of_string url with
+             | None -> None
+             | Some parsed ->
+               let cleaned_url =
+                 match parsed with
+                 | Url.Http http -> "http://" ^ cleaned_url http
+                 | Url.Https https -> "https://" ^ cleaned_url https
+                 | Url.File file -> "file://" ^ file.Url.fu_path_string in
+                 let label =
+                 match parsed with
                   | Url.Http http -> http.Url.hu_host
                   | Url.Https https -> https.Url.hu_host
-                  | Url.File file -> url
-                 ) in
-               Some (UIState.Remote
-                       { UIState.label = label; UIState.url = format_url url })
-          ) hosts in
+                  | Url.File file -> file.Url.fu_path_string in
+               let shutdown =
+                 try
+                   Some
+                     (List.assoc "shutdown_key" (match parsed with
+                          | Url.Http http -> http.Url.hu_arguments
+                          | Url.Https https -> https.Url.hu_arguments
+                          | Url.File file -> file.Url.fu_arguments
+                        ))
+                 with Not_found -> None in
+                 Some (UIState.Remote
+                         { UIState.label = label;
+                           UIState.url = format_url cleaned_url;
+                           Ui_state.shutdown_key = shutdown; })
+) hosts in
       let hosts = List.fold_left
           (fun acc value ->
              match value with
@@ -377,13 +394,10 @@ let onload () : unit =
           hosts
       in
       let () = ReactiveData.RList.set select_runtime_options_handle hosts in
-      let selected_runtime : UIState.runtime =
-        (match hosts with
-         | head::_ -> head
-         | _ -> UIState.Embedded) in
-      let () = set_runtime selected_runtime (default_embedded) in
-      ()
-    with _ -> default_embedded () in
+      match hosts with
+      | head::_ -> set_runtime head (default_runtime)
+      | _ -> default_runtime ()
+    with _ -> default_runtime () in
 
   let init_ui () =
     let _ = start_button_dom##disabled <- Js._true in

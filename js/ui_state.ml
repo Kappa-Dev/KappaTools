@@ -23,7 +23,8 @@ let opened_filename, set_opened_filename =
 let model_runtime_state , set_model_runtime_state =
   React.S.create (None : ApiTypes.state option)
 
-type runtime_remote = { label : string ; url : string }
+type runtime_remote =
+  { label : string ; url : string ; shutdown_key : string option}
 type runtime = | WebWorker | Embedded | Remote of runtime_remote
 
 let runtime_label runtime =
