@@ -350,16 +350,16 @@ let onload () : unit =
       let hosts =
         List.map
           (fun (_,url) -> Ui_state.compute_remote url) hosts in
-      let hosts = List.fold_left
-          (fun acc value ->
+      let () = List.iter
+          (fun value ->
              match value with
-             |  Some remote -> Ui_state.Remote remote::acc
-             | None -> acc)
-          select_default_runtime
+             | Some remote ->
+               ReactiveData.RList.cons
+                 (Ui_state.Remote remote) select_runtime_options_handle
+             | None -> ())
           hosts
       in
-      let () = ReactiveData.RList.set select_runtime_options_handle hosts in
-      match hosts with
+      match ReactiveData.RList.value select_runtime_options with
       | head::_ -> set_runtime head (default_runtime)
       | _ -> default_runtime ()
     with _ -> default_runtime () in
