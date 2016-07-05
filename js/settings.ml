@@ -375,8 +375,7 @@ let onload () : unit =
   let () =
     try let hosts = args in
         let hosts = List.filter (fun (key,value) -> key = "host") hosts in
-        let hosts = List.map snd hosts in
-        let hosts = List.map (fun h -> (h,Url.url_of_string h)) hosts in
+        let hosts = List.map (fun (_,h) -> (h,Url.url_of_string h)) hosts in
         let hosts =
 	  List.map
 	    (fun x -> match x with
@@ -396,10 +395,9 @@ let onload () : unit =
 	    match value with
             |  Some remote -> remote::acc
             | None -> acc)
-          []
+          select_default_runtime
           hosts
         in
-        let hosts = List.concat [select_default_runtime;hosts] in
         let () = ReactiveData.RList.set select_runtime_options_handle hosts in
         let selected_runtime : UIState.runtime =
 	  (match hosts with
