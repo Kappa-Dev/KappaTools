@@ -80,7 +80,7 @@ class TestKappaClient(unittest.TestCase):
             data = f.read()
             token = runtime.start({ 'code': data
                                   , 'nb_plot': 150
-                                  , 'max_time' : 10.01 })
+                                  , 'max_time' : 100.01 })
             status = runtime.status(token)
             assert('plot' in status)
             assert('log_messages' in status)
