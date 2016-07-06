@@ -144,18 +144,18 @@ let content =
        in
        line_list)
   in
-  <:html<<div>
+  [%html {|<div>
    <div class="row">
       <div class="center-block display-header">
-      $file_select$
+      |}[file_select]{|
       </div>
    </div>
    <div class="row">
       <div class="col-sm-12">
-      $file_content$
+      |}[file_content]{|
       </div>
    </div>
-</div> >>
+</div>|}]
 
 let select_outputs () =
   let index = Js.Opt.bind
@@ -163,7 +163,7 @@ let select_outputs () =
     (fun dom ->
       let select_dom : Dom_html.inputElement Js.t =
         Js.Unsafe.coerce dom in
-      let fileindex = Js.to_string (select_dom##value) in
+      let fileindex = Js.to_string (select_dom##.value) in
       try Js.some (int_of_string fileindex) with
         _ -> Js.null
     )
@@ -200,7 +200,7 @@ let onload () =
              (Js.string select_id))
           (fun () -> assert false))
           : Dom_html.element Js.t) in
-  let () = select_dom##onchange <- Dom_html.handler
+  let () = select_dom##.onchange := Dom_html.handler
     (fun _ ->
       let () = select_outputs ()
       in Js._true)

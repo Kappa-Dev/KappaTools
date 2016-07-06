@@ -1,4 +1,3 @@
-module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
@@ -79,33 +78,33 @@ let content =
   let export_controls =
     Widget_export.content configuration
   in
-  <:html<<div>
+  [%html {|<div>
       <div class="row">
           <div id="plot-label-div" class="center-block display-header">
           Plot
           </div>
       </div>
       <div class="row">
-        <div $list:Html.a_id display_id$ class="col-sm-12"></div>
+        <div id="|}display_id{|" class="col-sm-12"></div>
       </div>
       <div class="row">
 
          <div class="col-sm-2">
-            $plot_show_legend$ Legend
+            |}[plot_show_legend]{| Legend
          </div>
 
          <div class="col-sm-3">
-               Log X $plot_x_axis_log_checkbox$
-               Log Y $plot_y_axis_log_checkbox$
+               Log X |}[plot_x_axis_log_checkbox]{|
+               Log Y |}[plot_y_axis_log_checkbox]{|
          </div>
 
-         <div class="col-sm-4" $list:Html.a_id div_axis_select_id$>
+         <div class="col-sm-4" id="|}div_axis_select_id{|">
          </div>
 
       </div>
       <div class="row"><p></p></div>
-      $export_controls$
-  </div> >>
+      |}[export_controls]{|
+  </div>|}]
 
 let navcontent =
   [ Html.div
@@ -136,7 +135,7 @@ let update_plot
       Js.Opt.get (Display_common.document##getElementById
                     (Js.string display_id))
         (fun () -> assert false) in
-    let width = max 400 (div##offsetWidth - 20)  in
+    let width = max 400 (div##.offsetWidth - 20)  in
     let height = width/2 in
     let dimension =
       Js_plot.create_dimension
@@ -144,7 +143,7 @@ let update_plot
         ~width:width
     in
     let () = plot##setDimensions(dimension) in
-    let data : plot_data Js.t = Js_plot.create_data data in
+    let data : plot_data Js.t = Js_plot.create_data ~plot:data in
     plot##setPlot(data)
 
 let onload () =

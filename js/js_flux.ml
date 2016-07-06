@@ -27,42 +27,42 @@ let create_configuration
     ~(width: int)
     : flux_configuration Js.t  =
   let configuration : flux_configuration Js.t =
-    jsnew constructor_configuration ()
+    new%js constructor_configuration
   in
   let () =
     (Js.Unsafe.coerce configuration)
-      ##
-      beginTimeId <- Js.string begin_time_id;
+      ##.
+      beginTimeId := Js.string begin_time_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      endTimeId <- Js.string end_time_id;
+      ##.
+      endTimeId := Js.string end_time_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      selectCorrectionId <- Js.string select_correction_id;
+      ##.
+      selectCorrectionId := Js.string select_correction_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      checkboxSelfInfluenceId <- Js.string checkbox_self_influence_id;
+      ##.
+      checkboxSelfInfluenceId := Js.string checkbox_self_influence_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      toggleRulesId <- Js.string toggle_rules_id;
+      ##.
+      toggleRulesId := Js.string toggle_rules_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      nbEventsId <- Js.string nb_events_id;
+      ##.
+      nbEventsId := Js.string nb_events_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      svgId <- Js.string svg_id;
+      ##.
+      svgId := Js.string svg_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      rulesCheckboxesId <- Js.string rules_checkboxes_id;
+      ##.
+      rulesCheckboxesId := Js.string rules_checkboxes_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      height <- height;
+      ##.
+      height := height;
     (Js.Unsafe.coerce configuration)
-      ##
-      width <- width;
+      ##.
+      width := width;
     (Js.Unsafe.coerce configuration)
-      ##
-      shortLabels <- short_labels;
+      ##.
+      shortLabels := short_labels;
   in configuration
 
 class type flux_data = object
@@ -80,12 +80,12 @@ let create_data ~(flux_begin_time : float)
                 ~(flux_hits: int list)
                 ~(flux_fluxs : float list list)
     : flux_data Js.t  =
-  let data : flux_data Js.t = jsnew constructor_data () in
-  let () = (Js.Unsafe.coerce data)##bioBeginTime <- flux_begin_time;
-           (Js.Unsafe.coerce data)##bioEndTime <- flux_end_time;
-           (Js.Unsafe.coerce data)##rules <- Js.array (Array.of_list (List.map Js.string flux_rules));
-           (Js.Unsafe.coerce data)##hits <- Js.array (Array.of_list flux_hits);
-           (Js.Unsafe.coerce data)##fluxs <- Js.array (Array.of_list (List.map (fun a -> Js.array (Array.of_list a)) flux_fluxs));
+  let data : flux_data Js.t = new%js constructor_data in
+  let () = (Js.Unsafe.coerce data)##.bioBeginTime := flux_begin_time;
+           (Js.Unsafe.coerce data)##.bioEndTime := flux_end_time;
+           (Js.Unsafe.coerce data)##.rules := Js.array (Array.of_list (List.map Js.string flux_rules));
+           (Js.Unsafe.coerce data)##.hits := Js.array (Array.of_list flux_hits);
+           (Js.Unsafe.coerce data)##.fluxs := Js.array (Array.of_list (List.map (fun a -> Js.array (Array.of_list a)) flux_fluxs));
            ()
   in
   data

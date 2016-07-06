@@ -54,7 +54,7 @@ before_install:
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install -y ocamlfind
-  - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml yojson atdgen ; fi"
+  - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml-ppx js_of_ocaml yojson atdgen ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
 

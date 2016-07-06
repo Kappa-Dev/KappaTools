@@ -115,18 +115,18 @@ let content =
   let export_controls =
     Widget_export.content configuration
   in
-  <:html<<div>
+  [%html {|<div>
              <div class="row">
                <div class="center-block display-header">
-                $snapshot_select$
+                |}[snapshot_select]{|
                </div>
              </div>
              <div class="row">
-                <div class="col-sm-12" $list:Html.a_id display_id$>
+                <div class="col-sm-12" id="|}display_id{|">
                 </div>
              </div>
-             $export_controls$
-        </div> >>
+             |}[export_controls]{|
+        </div>|}]
 
 
 let navcontent = [content]
@@ -150,8 +150,8 @@ let update_snapshot
     ApiTypes_j.string_of_site_graph site_graph
   in
   snapshot_js##setData
-    (Js.string json,
-     Js.Opt.option (Ui_state.agent_count ()))
+    (Js.string json)
+     (Js.Opt.option (Ui_state.agent_count ()))
 
 let select_snapshot () =
   let snapshot_js : Js_contact.contact_map Js.t =
@@ -161,7 +161,7 @@ let select_snapshot () =
     (fun dom ->
       let snapshot_select_dom : Dom_html.inputElement Js.t =
         Js.Unsafe.coerce dom in
-      let fileindex = Js.to_string (snapshot_select_dom##value) in
+      let fileindex = Js.to_string (snapshot_select_dom##.value) in
       try Js.some (int_of_string fileindex) with
         _ -> Js.null
     )
@@ -190,8 +190,8 @@ let onload () : unit =
       : Dom_html.element Js.t) in
   let () =
     snapshot_select_dom
-      ##
-      onchange <- Dom_html.handler
+      ##.
+      onchange := Dom_html.handler
       (fun _ ->
         let () = select_snapshot ()
         in Js._true)
@@ -203,13 +203,13 @@ let onload () : unit =
       (fun _ ->
         match (React.S.value UIState.model_runtime_state) with
           None -> ()
-        | Some state -> select_snapshot ())
+        | Some _state -> select_snapshot ())
   in
   let () = Widget_export.onload configuration in
   let _ : unit React.signal = React.S.l1
     (fun state -> match state with
       None -> ()
-    | Some state -> select_snapshot ()
+    | Some _state -> select_snapshot ()
     )
     UIState.model_runtime_state
   in

@@ -90,18 +90,19 @@ let content =
   let export_controls =
     Widget_export.content configuration
   in
-  <:html<<div>
+  [%html {|<div>
           <div class="row">
                <div class="center-block display-header">
-                Dynamic influence map between t = <span id="begin_time"/>s
-                and t = <span id="end_time"/>s (<span id="nb_events"/>events)
+                Dynamic influence map between t = <span id="begin_time"></span>s
+                and t = <span id="end_time"></span>s
+                (<span id="nb_events"></span>events)
                </div>
              </div>
 
              <div class="row">
                 <div id="control" class="col-sm-4">
                 <ul class="list-group">
-                   $flux_label$
+                   |}[flux_label]{|
                    <li class="list-group-item">
                       <h4 class="list-group-item-heading">Rules</h4>
                       <button class="btn,btn-default"
@@ -113,7 +114,7 @@ let content =
                    <li class="list-group-item">
                     <div class="input-group">
                       <label class="checkbox-control">
-                         $checkbox$
+                         |}[checkbox]{|
                          Self influence
                       </label>
                     </div>
@@ -122,20 +123,16 @@ let content =
                     <div class="input-group">
                       <p>Correction
                       <select class="form-control"
-                              id="select_correction">
-                           <option value="none">None</option>
-                           <option value="hits">Occurences</option>
-                           <option value="time">Time</option>
-                      </select>
+                              id="select_correction"><option value="none">None</option><option value="hits">Occurences</option><option value="time">Time</option></select>
                       </p>
                     </div>
                    </li>
                 </ul>
              </div>
-          <div id=$str:display_id$ class="col-sm-8"></div>
+          <div id="|}display_id{|" class="col-sm-8"></div>
           </div>
-          $export_controls$
-     </div> >>
+          |}[export_controls]{|
+     </div>|}]
 
 let navcontent =
   [ Html.div
@@ -167,7 +164,7 @@ let select_fluxmap flux_map =
     (Display_common.document##getElementById (Js.string select_id))
     (fun dom -> let select_dom : Dom_html.inputElement Js.t =
                   Js.Unsafe.coerce dom in
-                let fileindex = Js.to_string (select_dom##value) in
+                let fileindex = Js.to_string (select_dom##.value) in
                 try Js.some (int_of_string fileindex) with
                   _ -> Js.null
     )
@@ -213,7 +210,7 @@ let onload () =
              (Js.string select_id))
           (fun () -> assert false))
           : Dom_html.element Js.t) in
-  let () = select_dom##onchange <- Dom_html.handler
+  let () = select_dom##.onchange := Dom_html.handler
     (fun _ ->
       let () = select_fluxmap flux
       in Js._true)
@@ -223,7 +220,7 @@ let onload () =
       (Display_common.document##getElementById
          (Js.string display_id))
       (fun () -> assert false) in
-  let () = div##innerHTML <- Js.string
+  let () = div##.innerHTML := Js.string
     ("<svg id=\""^
         svg_id^
         "\" width=\"300\" height=\"300\"><g/></svg>") in

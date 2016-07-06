@@ -22,29 +22,29 @@ let create_configuration
     ~(plot_y_axis_log_checkbox_id : string)
     : plot_configuration Js.t  =
   let configuration : plot_configuration Js.t =
-    jsnew constructor_configuration () in
+    new%js constructor_configuration in
   let () =
     (Js.Unsafe.coerce configuration)
-      ##
-      plotDivId <- Js.string plot_div_id;
+      ##.
+      plotDivId := Js.string plot_div_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      plotDivAxisSelectId <- Js.string plot_div_select_id;
+      ##.
+      plotDivAxisSelectId := Js.string plot_div_select_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      plotLabelDivId <- Js.string plot_label_div_id;
+      ##.
+      plotLabelDivId := Js.string plot_label_div_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      plotStyleId <- Js.string plot_style_id;
+      ##.
+      plotStyleId := Js.string plot_style_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      plotShowLegendCheckboxId <- Js.string plot_show_legend_checkbox_id;
+      ##.
+      plotShowLegendCheckboxId := Js.string plot_show_legend_checkbox_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      plotXAxisLogCheckboxId <- Js.string plot_x_axis_log_checkbox_id;
+      ##.
+      plotXAxisLogCheckboxId := Js.string plot_x_axis_log_checkbox_id;
     (Js.Unsafe.coerce configuration)
-      ##
-      plotYAxisLogCheckboxId <- Js.string plot_y_axis_log_checkbox_id;
+      ##.
+      plotYAxisLogCheckboxId := Js.string plot_y_axis_log_checkbox_id;
     ()
   in configuration
 
@@ -58,9 +58,9 @@ let constructor_dimension : plot_dimension Js.t Js.constr =
 let create_dimension ~(height : int)
                      ~(width : int)
     : plot_dimension Js.t  =
-  let configuration : plot_dimension Js.t = jsnew constructor_dimension () in
-  let () = (Js.Unsafe.coerce configuration)##height <- height;
-           (Js.Unsafe.coerce configuration)##width <- width;
+  let configuration : plot_dimension Js.t = new%js constructor_dimension in
+  let () = (Js.Unsafe.coerce configuration)##.height := height;
+           (Js.Unsafe.coerce configuration)##.width := width;
            ()
   in configuration
 
@@ -73,13 +73,13 @@ let constructor_observable : plot_observable Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 let create_observable ~(observable : ApiTypes.observable)
     : plot_observable Js.t  =
-  let configuration : plot_observable Js.t = jsnew constructor_observable () in
+  let configuration : plot_observable Js.t = new%js constructor_observable in
   let () = (Js.Unsafe.coerce configuration)
-           ##
-           time <- observable.ApiTypes.time;
+           ##.
+           time := observable.ApiTypes.time;
            (Js.Unsafe.coerce configuration)
-           ##
-           values <- Js.array (Array.of_list observable.ApiTypes.values);
+           ##.
+           values := Js.array (Array.of_list observable.ApiTypes.values);
            ()
   in configuration
 
@@ -92,14 +92,14 @@ end
 let constructor_data : plot_data Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_data ~(plot : ApiTypes.plot)
     : plot_data Js.t  =
-  let configuration : plot_observable Js.t = jsnew constructor_observable () in
+  let configuration : plot_observable Js.t = new%js constructor_observable in
   let () =
-    (Js.Unsafe.coerce configuration)##legend <- Js.array
+    (Js.Unsafe.coerce configuration)##.legend := Js.array
       (Array.map
          (fun l -> Js.string l)
          (Array.of_list plot.ApiTypes.legend));
-    (Js.Unsafe.coerce configuration)##observables <- Js.array
-      (Array.map (fun o -> create_observable o)
+    (Js.Unsafe.coerce configuration)##.observables := Js.array
+      (Array.map (fun o -> create_observable ~observable:o)
          (Array.of_list plot.ApiTypes.observables));
     ()
   in configuration

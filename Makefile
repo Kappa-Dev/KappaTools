@@ -119,7 +119,9 @@ JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(lwt)" \
+	-tag-line "<js/{panel_editor,codemirror,settings,JsRemote,JsWorker,widget_export,display_common}.ml*> : package(tyxml.syntax), package(js_of_ocaml.syntax), syntax(camlp4o)" \
+	-tag-line "<js/{JsSim,tab_*,js_*}.ml*> : package(js_of_ocaml.ppx), package(tyxml.ppx)" \
 	$@
 
 TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)

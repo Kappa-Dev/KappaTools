@@ -1,8 +1,9 @@
 S ../api
 
 PKG js_of_ocaml.tyxml
+PKG js_of_ocaml.ppx
+PKG tyxml.ppx
 PKG lwt
 PKG atdgen
-EXT js
 
 REC

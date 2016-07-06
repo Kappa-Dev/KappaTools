@@ -17,17 +17,17 @@ let state_distances state = match state with
 
 let content =
   let export_controls =
-  Html.div
+    Html.div
       ~a:[Tyxml_js.R.Html.a_class
-             (React.S.bind
-                UIState.model_runtime_state
-                (fun state ->
+            (React.S.bind
+               UIState.model_runtime_state
+               (fun state ->
                   React.S.const
                     (match state_distances state with
-                      None -> ["hidden"]
-                    | Some _ -> ["show"])
-                )
-             )]
+                       None -> ["hidden"]
+                     | Some _ -> ["show"])
+               )
+            )]
       [ Display_common.export_controls
           ~export_select_id:export_format_id
           ~export_filename_id:export_filename_id
@@ -35,13 +35,13 @@ let content =
           ~export_data_label:"dat"
       ]
   in
-  <:html<<div>
+  [%html {|<div>
              <div class="row">
-                <div $list:Html.a_id div_id$ class="col-sm-8">
+                <div id="|}div_id{|" class="col-sm-8">
                 </div>
              </div>
-             $export_controls$
-        </div> >>
+             |}[export_controls]{|
+        </div>|}]
 
 let navcontent = [ Html.div [content] ]
 
@@ -59,32 +59,34 @@ let onload () =
   let distances_plot : distances_plot Js.t =
     Js_distances.create_distances_plot div_id in
   let () = Display_common.save_plot_ui
-    (fun f -> let filename = Js.string f in
-              distances_plot##exportJSON(filename)
-    )
-    "distances plot"
-    export_button_id
-    export_filename_id
-    export_format_id
-    div_id
-    "json"
+      (fun f -> let filename = Js.string f in
+        distances_plot##exportJSON(filename)
+      )
+      "distances plot"
+      export_button_id
+      export_filename_id
+      export_format_id
+      div_id
+      "json"
   in
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)
   let () = Common.jquery_on
-    "#navgraph"
-    "shown.bs.tab"
-    (fun _ ->
-      match (React.S.value UIState.model_runtime_state) with
-        None -> ()
-      | Some state -> update_distances distances_plot state.ApiTypes.distances)
+      "#navgraph"
+      "shown.bs.tab"
+      (fun _ ->
+         match (React.S.value UIState.model_runtime_state) with
+           None -> ()
+         | Some state ->
+           update_distances distances_plot state.ApiTypes.distances)
   in
   let _ =
     React.S.l1
       (fun state -> match state with
-        None -> ()
-      | Some state -> update_distances distances_plot state.ApiTypes.distances)
+           None -> ()
+         | Some state ->
+           update_distances distances_plot state.ApiTypes.distances)
       UIState.model_runtime_state
   in
   ()
