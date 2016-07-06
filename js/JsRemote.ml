@@ -47,20 +47,20 @@ let post
       XmlHttpRequest.create()
     in
     let () =
-      request##_open(Js.string "POST",Js.string url, Js._true) in
+      request##_open(Js.string "POST") (Js.string url) Js._true in
     let () =
       request##setRequestHeader
-        (Js.string "Content-type"
-        ,Js.string "application/x-www-form-urlencoded") in
+        (Js.string "Content-type")
+        (Js.string "application/x-www-form-urlencoded") in
     let () =
-      request##onload <-
+      request##.onload :=
         Dom.handler
         (fun e ->
           let msg : string =
-            Js.to_string request##responseText in
+            Js.to_string request##.responseText in
           let () = Lwt.async  (fun () ->
             let result : a Api_types.result =
-              if request##status == 200 then
+              if request##.status == 200 then
                 `Right(success msg)
               else
                 `Left (fail msg)

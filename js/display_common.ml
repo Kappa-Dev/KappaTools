@@ -50,37 +50,31 @@ let export_controls
   let export_formats_select =
     List.map
       (fun format ->
-        <:html<<option $list:Html.a_value format$>
-           $str:format$
-        </option> >>)
+        [%html {|<option value="|}format{|">|}(Html.cdata format){|</option>|}])
       export_formats
   in
-  <:html<<div class="row">
+  [%html {|<div class="row">
   <div class="col-sm-12">
      <div class="form-inline">
         <div class="form-group">
            <select class="form-control"
-                   $list:Html.a_id export_select_id$>
-              <option value="png">png</option>
-              <option value="svg">svg</option>
-              $list:export_formats_select$
-           </select>
+                   id="|}export_select_id{|"><option value="png">png</option><option value="svg">svg</option>|}export_formats_select{|</select>
         </div>
         <div class="form-group">
            <label class="checkbox-inline">
-              $export_filename$
+              |}[export_filename]{|
            </label>
         </div>
         <div class="form-group">
            <label class="checkbox-inline">
-              $export_button$
+              |}[export_button]{|
            </label>
         </div>
      </div>
   </div>
-</div> >>
+</div>|}]
 
-let document = Dom_html.window##document
+let document = Dom_html.window##.document
 
 let default_svg_style_id = "plot-svg-style"
 
@@ -114,14 +108,14 @@ let save_plot_ui
        : Dom_html.element Js.t) in
   let export_button_toggle () : unit =
     let filename : string =
-      Js.to_string (export_filename##value)
+      Js.to_string (export_filename##.value)
     in
     let is_disabled : bool Js.t =
       Js.bool
         (String.length (String.trim filename) == 0)
     in
     let () =
-      export_button##disabled <- is_disabled
+      export_button##.disabled := is_disabled
     in
     ()
   in
@@ -129,22 +123,22 @@ let save_plot_ui
     export_button_toggle ()
   in
   let () =
-    export_filename##oninput <-
+    export_filename##.oninput :=
       Dom_html.handler
       (fun _ ->
         let () = export_button_toggle () in
         Js._true)
   in
   let () =
-    export_button##onclick <-
+    export_button##.onclick :=
       Dom_html.handler
       (fun _ ->
         let suffix : string =
-          Js.to_string (export_format##value)
+          Js.to_string (export_format##.value)
         in
         let filename default : string =
           let root : string =
-            Js.to_string (export_filename##value)
+            Js.to_string (export_filename##.value)
           in
           if String.contains root '.' then
             root

@@ -50,11 +50,11 @@ object(self)
       { context with
         mailboxes = IntMap.add context.id var context.mailboxes }
     in
-    let () = context.worker##onmessage <-
+    let () = context.worker##.onmessage :=
       (Dom.handler
          (fun (response_message : string Worker.messageEvent Js.t) ->
            let response_text : string =
-             response_message##data
+             response_message##.data
            in
            let message : WebMessage.response WebMessage.message =
              WebMessage.message_of_string

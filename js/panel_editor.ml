@@ -11,16 +11,10 @@ let rec list_last =
   | _ :: l -> list_last l
 
 open Lwt
-let document = Dom_html.window##document
+let document = Dom_html.window##.document
 let has_been_modified = ref (false)
 
 module Html = Tyxml_js.Html5
-let file_selector_id = "file-selector"
-let file_selector =
-  Html.input
-    ~a:[ Html.a_id file_selector_id ;
-         Html.Unsafe.string_attrib "type" "file" ;
-         Html.Unsafe.string_attrib "accept" ".ka" ]
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
        Tyxml_js.R.Html.pcdata
@@ -47,48 +41,42 @@ let file_selector =
          Html.Unsafe.string_attrib "type" "file" ;
          Html.Unsafe.string_attrib "accept" ".ka" ] ()
 let panel_heading =
-  <:html<<div class="row">
+  [%html {|<div class="row">
              <div class="col-md-2">
-                <label class="btn btn-default"
-                       $list:Html5.Unsafe.string_attrib "for" "file-selector"$>
-                   $file_selector$
+                <label class="btn btn-default" for="file-selector">
+                   |}[file_selector]{|
                    Load
                 </label>
              </div>
              <div class="col-md-4">
-                <label id="$file_label_id$" class="filename">
-                   $file_label$
-                </label>
+                <label class="filename">|}[file_label]{|</label>
               </div>
               <div class="col-md-2 col-sm-offset-4 pull-right">
-                 $save_button$
+                 |}[save_button]{|
               </div>
-            </div> >>
+            </div>|}]
 
 let xml =
-  <:html<<div class="col-md-6">
+  [%html {|<div class="col-md-6">
              <div class="panel panel-default">
                 <div class="panel-heading">
-                   $panel_heading$
-                </div> <!-- panel heading -->
+                   |}[panel_heading]{|
+                </div>
 
                 <div class="panel-body">
-                   <textarea id="code-mirror"></textarea>
-                </div> <!-- panel body -->
+                   <textarea id="code-mirror">
+                   </textarea>
+                </div>
 
-                <!-- footers -->
-
-                <!-- configuration panel -->
                 <div id="configuration-panel">
-                   $Settings.xml$
-                </div> <!-- configuration panel -->
+                   |}[Settings.xml]{|
+                </div>
 
-                <!-- simulation panel -->
-                <div id="simulation-panel">
-                </div> <!-- simulation panel -->
+
+                <div id="simulation-panel"></div>
 
               </div>
-           </div> >>
+           </div>|}]
 
 let setup_lint codemirror update_linting =
   let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
@@ -149,15 +137,15 @@ let initialize codemirror () =
   let () =
     try UIState.set_model_max_events
           (Some (int_of_string (List.assoc "nb_events" args)))
-    with Not_found | Failure "int_of_string" -> () in
+    with Not_found | Failure _ -> () in
   let () =
     try UIState.set_model_nb_plot
           (int_of_string (List.assoc "plot_points" args))
-    with Not_found | Failure "int_of_string" -> () in
+    with Not_found | Failure _ -> () in
   let () =
     try UIState.set_model_max_time
           (Some (float_of_string (List.assoc "time_limit" args)))
-    with Not_found | Failure "float_of_string" -> () in
+    with Not_found | Failure _ -> () in
   try
     let url = List.assoc "model" args in
     XmlHttpRequest.get url >>=
@@ -204,11 +192,11 @@ let onload () : unit =
     Js.Opt.get (document##getElementById (Js.string "code-mirror"))
                (fun () -> assert false) in
   let () =
-    (Js.Unsafe.coerce configuration)##lineNumbers <- Js._true;
-    (Js.Unsafe.coerce configuration)##autofocus <- Js._true;
-    (Js.Unsafe.coerce configuration)##gutters <- gutter_option;
-    (Js.Unsafe.coerce configuration)##lint <- Js._true;
-    (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa")
+    (Js.Unsafe.coerce configuration)##.lineNumbers := Js._true;
+    (Js.Unsafe.coerce configuration)##.autofocus := Js._true;
+    (Js.Unsafe.coerce configuration)##.gutters := gutter_option;
+    (Js.Unsafe.coerce configuration)##.lint := Js._true;
+    (Js.Unsafe.coerce configuration)##.mode := (Js.string "Kappa")
   in
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea
@@ -219,14 +207,14 @@ let onload () : unit =
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let () = has_been_modified := true in
-    let text : string = Js.to_string codemirror##getValue() in
+    let text : string = Js.to_string codemirror##getValue in
     let () = UIState.set_text text in
     let () = match !timeout with
         None -> ()
       | Some timeout -> Dom_html.window ##
         clearTimeout (timeout) in
     let delay : float =
-      if (((Js.str_array (change##text ))##length) > 1)
+      if (((Js.str_array (change##.text ))##.length) > 1)
          ||
          (List.length (React.S.value UIState.model_error) > 0)
       then
@@ -237,43 +225,39 @@ let onload () : unit =
     let handle_timeout () =
       let () = Common.info "handle_timeout" in
       let () = Common.info text in
-      UIState.parse_text (Js.to_string codemirror##getValue()) in
+      UIState.parse_text (Js.to_string codemirror##getValue) in
     let () = timeout := Some
       (Dom_html.window ## setTimeout
-         (Js.wrap_callback (fun _ -> handle_timeout ()), delay)) in
+         (Js.wrap_callback (fun _ -> handle_timeout ())) delay) in
     ()
   in
   let () = codemirror##onChange(handler)
   in
 
 
-  let file_select_dom : Dom_html.inputElement Js.t =
-    Js.Unsafe.coerce
-    ((Js.Opt.get (document##getElementById (Js.string file_selector_id))
-                (fun () -> assert false))
-     : Dom_html.element Js.t) in
+  let file_select_dom = Tyxml_js.To_dom.of_input file_selector in
   let save_button_dom  : Dom_html.linkElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string save_button_id))
                   (fun () -> assert false)) in
 
   let () =
-    save_button_dom##onclick <-
+    save_button_dom##.onclick :=
       Dom.handler
       (fun _ ->
         let header = Js.string "data:text/plain;charset=utf-8," in
-        let editor_text :  Js.js_string Js.t = codemirror##getValue() in
+        let editor_text :  Js.js_string Js.t = codemirror##getValue in
         let () =
-          save_button_dom##href <- header##concat((Js.escape editor_text)) in
+          save_button_dom##.href := header##concat((Js.escape editor_text)) in
         Js._true) in
   let file_select_handler () =
-    let files = Js.Optdef.get (file_select_dom##files)
+    let files = Js.Optdef.get (file_select_dom##.files)
       (fun () -> assert false)
     in
     let file = Js.Opt.get (files##item (0))
       (fun () -> assert false)
     in
-    let filename = file##name in
+    let filename = file##.name in
     let () = set_file_label (to_string filename) ;
       Lwt_js_events.async (fun _ -> File.readAsText file >>=
         (fun (va : Js.js_string Js.t) ->

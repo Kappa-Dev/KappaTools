@@ -4,7 +4,7 @@ module Html = Tyxml_js.Html5
 
 open ApiTypes
 
-let document = Dom_html.window##document
+let document = Dom_html.window##.document
 let number_events_id = "number_events"
 let number_events =
   Html.input
@@ -62,10 +62,10 @@ let signal_change id signal_handler =
       ((Js.Opt.get (document##getElementById (Js.string id))
           (fun () -> assert false))
        : Dom_html.element Js.t) in
-  input_dom##onchange <-
+  input_dom##.onchange :=
     Dom_html.handler
       (fun _ ->
-         let () = signal_handler (Js.to_string (input_dom##value))
+         let () = signal_handler (Js.to_string (input_dom##.value))
          in Js._true)
 
 let error_messages signal =
@@ -102,10 +102,10 @@ let start_button = Html.button ~a:([ Html.Unsafe.string_attrib "type" "button"
                                    ; Html.a_class ["btn";"btn-default"] ])
     [ Html.cdata "start" ]
 let configuration_settings =
-  <:html<<div class="panel-footer panel-footer-white">
+  [%html {|<div class="panel-footer panel-footer-white">
             <div class="row">
                         <div class="col-md-4">
-                           $number_events$
+                           |}[number_events]{|
                         </div>
                         <div class="col-md-2">
                            events
@@ -114,7 +114,7 @@ let configuration_settings =
 
                      <div class="row">
                         <div class="col-md-4">
-                           $time_limit$
+                           |}[time_limit]{|
                         </div>
                         <div class="col-md-2">
                            sec
@@ -123,13 +123,13 @@ let configuration_settings =
 
                      <div class="row">
                         <div class="col-md-4">
-                           $plot_points$
+                           |}[plot_points]{|
                         </div>
                         <div class="col-md-2">
                            points
                         </div>
                      </div>
-          </div> >>
+          </div>|}]
 let select_default_runtime = [ UIState.WebWorker ; UIState.Embedded ]
 let select_runtime_options, select_runtime_options_handle =
   ReactiveData.RList.create select_default_runtime
@@ -142,16 +142,16 @@ let select_runtime =
        select_runtime_options)
 
 let configuration_button =
-    <:html<<div class="panel-footer">
+    [%html {|<div class="panel-footer">
                  <div class="row">
                     <div class="col-md-4">
-                       $start_button$
+                       |}[start_button]{|
                     </div>
                     <div class="col-md-2">
-                       $select_runtime$
+                       |}[select_runtime]{|
                     </div>
                  </div>
-            </div> >>
+            </div>|}]
 
 let configuration_id = "configuration-id"
 let configuration_xml =
@@ -270,11 +270,11 @@ let tracked_events_label = Tyxml_js.R.Html.pcdata
 
 let simulation_messages = error_messages UIState.model_error
 let simulation_progress =
-  <:html<<div class="panel-footer panel-footer-white">
+  [%html {|<div class="panel-footer panel-footer-white">
                 <div class="row">
                   <div class="col-md-4">
                     <div class="progress">
-                       $event_progress_bar$
+                       |}[event_progress_bar]{|
                     </div>
                   </div>
                   <div class="col-md-2">
@@ -285,7 +285,7 @@ let simulation_progress =
                 <div class="row">
                   <div class="col-md-4">
                     <div class="progress">
-                       $time_progress_bar$
+                       |}[time_progress_bar]{|
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -295,19 +295,19 @@ let simulation_progress =
 
                 <div class="row">
                   <div class="col-md-4">
-                    $tracked_events_count$
+                    |}[tracked_events_count]{|
                   </div>
                   <div class="col-md-4">
-                    $tracked_events_label$
+                    |}[tracked_events_label]{|
                   </div>
                   <div class="col-md-1 panel-pre"> </div>
                 </div>
-              </div> >>
+              </div>|}]
 
-let simulation_buttons =
-              <:html<<div class="panel-footer">
-                      $stop_button$
-                      </div> >>
+let%html simulation_buttons =
+              {|<div class="panel-footer">
+                      |}[stop_button]{|
+                      </div>|}
 let simulation_id : string = "simulation-panel"
 let simulation_xml =
   Html.div
@@ -324,10 +324,7 @@ let simulation_xml =
        ]
     [simulation_messages; simulation_progress ; simulation_buttons ]
 
-let xml = <:html<<div>
-                  $configuration_xml$
-                  $simulation_xml$
-                  </div> >>
+let%html xml = "<div>"[configuration_xml;simulation_xml]"</div>"
 
 let onload () : unit =
   let select_runtime_dom = Tyxml_js.To_dom.of_select select_runtime in
@@ -339,7 +336,7 @@ let onload () : unit =
     Ui_state.set_runtime_url
       r_val
       (fun success -> if success then
-          select_runtime_dom##value <- Js.string r_val
+          select_runtime_dom##.value := Js.string r_val
         else
           continuation ())
   in
@@ -365,21 +362,21 @@ let onload () : unit =
     with _ -> default_runtime () in
 
   let init_ui () =
-    let _ = start_button_dom##disabled <- Js._true in
-    let _ = stop_button_dom##disabled <- Js._true in
+    let _ = start_button_dom##.disabled := Js._true in
+    let _ = stop_button_dom##.disabled := Js._true in
     ()
   in
   let stop_ui () =
-    let _ = start_button_dom##disabled <- Js._true in
-    let _ = stop_button_dom##disabled <- Js._false in
+    let _ = start_button_dom##.disabled := Js._true in
+    let _ = stop_button_dom##.disabled := Js._false in
     ()
   in
   let start_ui () =
-    let _ = start_button_dom##disabled <- Js._false in
-    let _ = stop_button_dom##disabled <- Js._true in
+    let _ = start_button_dom##.disabled := Js._false in
+    let _ = stop_button_dom##.disabled := Js._true in
     ()
   in
-  let () = start_button_dom##onclick <-
+  let () = start_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
            let () = UIState.set_model_error [] in
@@ -399,16 +396,16 @@ let onload () : unit =
                ~stop_continuation:start_ui
            in Js._true)
   in
-  let () = select_runtime_dom##onchange <-
+  let () = select_runtime_dom##.onchange :=
       Dom.handler
         (fun _ ->
            let () = UIState.set_runtime_url
-               (Js.to_string select_runtime_dom##value)
+               (Js.to_string select_runtime_dom##.value)
                (fun success ->
                   if success then
                     ()
                   else
-                    select_runtime_dom##value <-
+                    select_runtime_dom##.value :=
                       Js.string
                         (UIState.runtime_value UIState.default_runtime)
                ) in

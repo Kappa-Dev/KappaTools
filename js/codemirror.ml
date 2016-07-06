@@ -11,7 +11,7 @@ let create_handler label =
   let head : char = Char.uppercase (String.get label 0) in
   let tail : string = String.sub label 1 ((String.length label) -1) in
   let on_label = "on"^(Char.escaped head)^tail in
-  let wrapper handler = (Js.Unsafe.variable "this")##on(label,handler) in
+  let wrapper handler = (Js.Unsafe.variable "this")##on label handler in
   let () = Js.Unsafe.set prototype
                          (Js.string on_label)
                          wrapper
@@ -47,7 +47,7 @@ end
 let constructor_lint_configuration : lint_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 let create_lint_configuration () : lint_configuration Js.t  =
-  jsnew constructor_lint_configuration ()
+  new%js constructor_lint_configuration
 
 class type configuration =
     object
@@ -142,7 +142,7 @@ end
 let constructor_configuration : configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 let create_configuration () : configuration Js.t  =
-  jsnew constructor_configuration ()
+  new%js constructor_configuration
 
 class type position =
 object
@@ -153,9 +153,9 @@ end
 let constructor_position : position Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 let create_position ~(ch : int) ~(line : int) : position Js.t  =
-  let result = jsnew constructor_position () in
-  let () = (Js.Unsafe.coerce result)##ch <- ch in
-  let () = (Js.Unsafe.coerce result)##line <- line in
+  let result = new%js constructor_position in
+  let () = (Js.Unsafe.coerce result)##.ch := ch in
+  let () = (Js.Unsafe.coerce result)##.line := line in
   result
 
 class type change =
@@ -168,7 +168,7 @@ object
 end;;
 
 let constructor_change : change Js.t Js.constr = (Js.Unsafe.variable "Object")
-let create_change () : change Js.t  = jsnew constructor_change ()
+let create_change () : change Js.t  = new%js constructor_change
 
 type severity = Error | Warning
 class type lint =
@@ -184,17 +184,17 @@ let create_lint ~(message : string)
                 ~(severity : severity)
                 ~(from : position Js.t)
                 ~(to_ :  position Js.t) : lint Js.t  =
-  let result = jsnew constructor_lint () in
-  let () = (Js.Unsafe.coerce result)##message <-
+  let result = new%js constructor_lint in
+  let () = (Js.Unsafe.coerce result)##.message :=
     message
   in
-  let () = (Js.Unsafe.coerce result)##severity <-
+  let () = (Js.Unsafe.coerce result)##.severity :=
     match severity with
     | Error -> Js.string "error"
     | Warning -> Js.string "warning"
   in
-  let () = (Js.Unsafe.coerce result)##from <- from in
-  let () = (Js.Unsafe.coerce result)##to_ <- to_ in
+  let () = (Js.Unsafe.coerce result)##.from := from in
+  let () = (Js.Unsafe.coerce result)##.to_ := to_ in
   result
 
 class type codemirror =
@@ -383,6 +383,5 @@ let fromTextArea
       (configuration : configuration Js.t)
     : codemirror Js.t =
   (* let () = Js.debugger() in *)
-  Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "CodeMirror")##fromTextArea
-    [| Js.Unsafe.inject dom ; Js.Unsafe.inject configuration |]
+    (Js.Unsafe.inject dom) (Js.Unsafe.inject configuration)

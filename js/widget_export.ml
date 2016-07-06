@@ -47,50 +47,42 @@ let content
   let export_formats_select =
     List.map
       (fun handler ->
-        <:html<<option $list:Html.a_value handler.label$>
-           $str:handler.label$
-        </option> >>)
+         [%html {|<option value="|}handler.label{|">|}(Html.cdata handler.label){|</option>|}])
       configuration.handlers
   in
   let xml_div =
-    <:html<<div class="col-sm-12">
+    [%html {|<div class="col-sm-12">
      <div class="form-inline">
         <div class="form-group">
            <select class="form-control"
-                   $list:Html.a_id (export_format_id configuration)$>
-              $list:export_formats_select$
-           </select>
+             id="|}(export_format_id configuration){|">|}export_formats_select{|</select>
         </div>
         <div class="form-group">
            <label class="checkbox-inline">
-              $export_filename$
+              |}[export_filename]{|
            </label>
         </div>
         <div class="form-group">
            <label class="checkbox-inline">
-              $export_button$
+              |}[export_button]{|
            </label>
         </div>
      </div>
-  </div> >>
+  </div>|}]
   in
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
-           (React.S.bind
-              configuration.show
-              (fun show ->
+          (React.S.bind
+             configuration.show
+             (fun show ->
                 React.S.const
-                (if show then
-                  ["row"]
-                else
-                  ["hidden"])
-              )
-           )
+                  (if show then ["row"] else ["hidden"])
+             )
+          )
        ]
     [xml_div]
 
-let onload
- (configuration :  configuration) =
+let onload (configuration :  configuration) =
   let export_button : Dom_html.buttonElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -98,14 +90,14 @@ let onload
              (Js.string (export_button_id configuration))
           )
           (fun () -> assert false))
-          : Dom_html.element Js.t) in
+       : Dom_html.element Js.t) in
   let export_filename : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
           (Display_common.document##getElementById
              (Js.string (export_filename_id configuration)))
           (fun () -> assert false))
-          : Dom_html.element Js.t) in
+       : Dom_html.element Js.t) in
   let export_format : Dom_html.selectElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -115,14 +107,14 @@ let onload
        : Dom_html.element Js.t) in
   let export_button_toggle () : unit =
     let filename : string =
-      Js.to_string (export_filename##value)
+      Js.to_string (export_filename##.value)
     in
     let is_disabled : bool Js.t =
       Js.bool
         (String.length (String.trim filename) == 0)
     in
     let () =
-      export_button##disabled <- is_disabled
+      export_button##.disabled := is_disabled
     in
     ()
   in
@@ -130,34 +122,34 @@ let onload
     export_button_toggle ()
   in
   let () =
-    export_filename##oninput <-
+    export_filename##.oninput :=
       Dom_html.handler
-      (fun _ ->
-        let () = export_button_toggle () in
-        Js._true)
+        (fun _ ->
+           let () = export_button_toggle () in
+           Js._true)
   in
   let () =
-    export_button##onclick <-
+    export_button##.onclick :=
       Dom_html.handler
-      (fun _ ->
-        let handler : handler =
-          List.nth
-            configuration.handlers
-            (export_format##selectedIndex)
-        in
-        let filename default : string =
-          let root : string =
-            Js.to_string (export_filename##value)
-          in
-          if String.contains root '.' then
-            root
-          else
-            root^"."^default
-        in
-        let () =
-          handler.export (filename handler.suffix)
-        in
-        Js._true)
+        (fun _ ->
+           let handler : handler =
+             List.nth
+               configuration.handlers
+               (export_format##.selectedIndex)
+           in
+           let filename default : string =
+             let root : string =
+               Js.to_string (export_filename##.value)
+             in
+             if String.contains root '.' then
+               root
+             else
+               root^"."^default
+           in
+           let () =
+             handler.export (filename handler.suffix)
+           in
+           Js._true)
   in
   ()
 
@@ -195,7 +187,7 @@ let export_png
 
 let export_json
     ~(serialize_json : unit -> string)
-    : handler =
+  : handler =
   { suffix = "json"
   ; label = "json"
   ; export =
