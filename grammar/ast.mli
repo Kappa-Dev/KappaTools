@@ -1,9 +1,11 @@
+(** Kappa AST just after parsing *)
+
 type ('a,'annot) link =
   | LNK_VALUE of int * 'annot
   | FREE
   | LNK_ANY
   | LNK_SOME
-  | LNK_TYPE of 'a (* port *) * 'a (*agent_type*)
+  | LNK_TYPE of 'a * 'a (** port * agent_type *)
 
 type internal = string Location.annot list
 

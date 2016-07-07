@@ -27,6 +27,7 @@ Primitives
 Environment
 Kappa_printer
 
+Ast
 LKappa
 Snip
 Eval
@@ -60,6 +61,11 @@ Rules_domain
 Views_domain
 Agents_domain
 Contact_map_domain
+Parallel_bonds
+Site_accross_bonds_domain
 
 Int_storage
 Mvbdu_wrapper
+
+Export_to_KaSim
+Export_to_KaSa

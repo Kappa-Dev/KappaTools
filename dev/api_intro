@@ -16,7 +16,7 @@ In term/ directory stands all definitions the simulator works on.
 Instantiation Alg_expr Raw_mixture Primitives Environment Kappa_printer }
 
 In grammar/ are the parser and the compilers
-{!modules:LKappa Snip Eval}
+{!modules:Ast LKappa Snip Eval}
 
 The module to store and manipulate the state of the simulation are in
 siteGraph/
