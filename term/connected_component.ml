@@ -11,7 +11,7 @@ type cc = {
   (*pattern graph id -> [|... link_j...|] i.e agent_id on site_j has a link*)
   internals: int array Mods.IntMap.t;
   (*internal state id -> [|... state_j...|]
-    i.e agent_id on site_j has internal state state_j*)
+    i.e agent_id on site_j has internal state state_j (-1 means any) *)
   recogn_nav: Navigation.step list;
   discover_nav: Navigation.step list;
 }
@@ -137,13 +137,13 @@ let weight cc =
        Array.fold_right (fun i acc -> if i <> UnSpec then succ acc else acc))
     cc.links ints
 
-let are_compatible root1 links1 ints1 root2 links2 ints2 =
+let are_compatible ~strict root1 links1 ints1 root2 links2 ints2 =
   let rec aux rename = function
     | [] -> Some rename
     | (o,p)::todos ->
       if
         Tools.array_fold_left2i
-          (fun _ b x y -> b && x = y) true
+          (fun _ b x y -> b && ((not strict && (x = -1||y = -1)) || x = y)) true
           (Mods.IntMap.find_default [||] o ints1)
           (Mods.IntMap.find_default [||] p ints2) then
         match Tools.array_fold_left2i
@@ -152,9 +152,10 @@ let are_compatible root1 links1 ints1 root2 links2 ints2 =
                    | None -> c
                    | Some (todo,ren) ->
                      match x, y with
+                     | (Link _, Free| Free, Link _) -> None
                      | (UnSpec, Free| Free, UnSpec
-                       |Link _, Free| Free, Link _
-                       |UnSpec, Link _| Link _, UnSpec) -> None
+                       |UnSpec, Link _| Link _, UnSpec) ->
+                       if strict then None else c
                      | UnSpec, UnSpec -> c
                      | Free, Free -> c
                      | Link (n1,s1), Link (n2,s2) ->
@@ -187,7 +188,8 @@ let equal a b =
       (fun bool ag ->
          match bool with
          | Some _ -> bool
-         | None -> are_compatible h1 a.links a.internals ag b.links b.internals)
+         | None -> are_compatible
+                     ~strict:true h1 a.links a.internals ag b.links b.internals)
       None ags
 
 let automorphisms a =
@@ -196,9 +198,10 @@ let automorphisms a =
           (0,[]) a.nodes_by_type with
   | _,[] -> [Renaming.empty]
   | _,(h::_ as l) -> List.fold_left (fun acc ag ->
-        match are_compatible h a.links a.internals ag a.links a.internals with
-        | None -> acc
-        | Some r -> r::acc) [] l
+      match are_compatible
+              ~strict:true h a.links a.internals ag a.links a.internals with
+      | None -> acc
+      | Some r -> r::acc) [] l
 
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =
