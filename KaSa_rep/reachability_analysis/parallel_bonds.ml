@@ -101,9 +101,12 @@ struct
      type, then they are never bound to the same B*)
   (* Maybe: both case may happen*)
 
+  (*JF: YOU SHOULD HAVE ONLY ONE MAP *)
+  (* Whenever you discover a new value in for a given tuple,
+     you have to enrich the abstract value associated to this tuple, by taking the lub between the former value (Undefined if it does not exist) and the new one*)
   type local_dynamic_information =
     {
-      store_value_parallel_bonds_init:
+      (*        store_value_parallel_bonds_init:
         bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
       store_value_non_parallel_bonds_init:
         bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
@@ -118,8 +121,8 @@ struct
       (*the final value of parallel bonds and non parallel bonds in the rhs *)
       store_value_bonds_rhs :
         bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      (*final result*)
-      store_value_of_parallel_bonds:
+                (*final result*)*)
+      store_value:
         bool Usual_domains.flat_lattice
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t
           (*Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t*) (*
@@ -279,39 +282,39 @@ struct
     }
 
   (*initial states*)
-  let get_value_parallel_bonds_init dynamic =
-    (get_local_dynamic_information dynamic).store_value_parallel_bonds_init
+(*  let get_value_parallel_bonds_init dynamic =
+    (get_local_dynamic_information dynamic).store_value_parallel_bonds_init*)
 
-  let set_value_parallel_bonds_init bonds dynamic =
+(*  let set_value_parallel_bonds_init bonds dynamic =
     set_local_dynamic_information
       {
         (get_local_dynamic_information dynamic) with
         store_value_parallel_bonds_init = bonds
-      } dynamic
+      } dynamic*)
 
-  let get_value_non_parallel_bonds_init dynamic =
-    (get_local_dynamic_information dynamic).store_value_non_parallel_bonds_init
+(*  let get_value_non_parallel_bonds_init dynamic =
+    (get_local_dynamic_information dynamic).store_value_non_parallel_bonds_init*)
 
-  let set_value_non_parallel_bonds_init bonds dynamic =
+(*  let set_value_non_parallel_bonds_init bonds dynamic =
     set_local_dynamic_information
       {
         (get_local_dynamic_information dynamic) with
         store_value_non_parallel_bonds_init = bonds
-      } dynamic
+      } dynamic*)
 
-  let get_value_of_init dynamic =
-    (get_local_dynamic_information dynamic).store_value_of_init
+(*  let get_value_of_init dynamic =
+    (get_local_dynamic_information dynamic).store_value_of_init*)
 
-  let set_value_of_init bonds dynamic =
+(*  let set_value_of_init bonds dynamic =
     set_local_dynamic_information
       {
         (get_local_dynamic_information dynamic) with
         store_value_of_init = bonds
-      } dynamic
+      } dynamic*)
 
   (*value in the rhs*)
 
-  let get_value_parallel_bonds_rhs dynamic =
+(*  let get_value_parallel_bonds_rhs dynamic =
     (get_local_dynamic_information dynamic).store_value_parallel_bonds_rhs
 
   let set_value_parallel_bonds_rhs bonds dynamic =
@@ -319,9 +322,9 @@ struct
       {
         (get_local_dynamic_information dynamic) with
         store_value_parallel_bonds_rhs = bonds
-      } dynamic
+      } dynamic*)
 
-  let get_value_non_parallel_bonds_rhs dynamic =
+(*  let get_value_non_parallel_bonds_rhs dynamic =
     (get_local_dynamic_information dynamic).store_value_non_parallel_bonds_rhs
 
   let set_value_non_parallel_bonds_rhs bonds dynamic =
@@ -329,9 +332,9 @@ struct
       {
         (get_local_dynamic_information dynamic) with
         store_value_non_parallel_bonds_rhs = bonds
-      } dynamic
+      } dynamic*)
 
-  let get_value_bonds_rhs dynamic =
+(*  let get_value_bonds_rhs dynamic =
     (get_local_dynamic_information dynamic).store_value_bonds_rhs
 
   let set_value_bonds_rhs bonds dynamic =
@@ -339,17 +342,17 @@ struct
       {
         (get_local_dynamic_information dynamic) with
         store_value_bonds_rhs = bonds
-      } dynamic
+      } dynamic*)
 
   (*final value of parallel bonds*)
-  let get_value_of_parallel_bonds dynamic =
-    (get_local_dynamic_information dynamic).store_value_of_parallel_bonds
+  let get_value dynamic =
+    (get_local_dynamic_information dynamic).store_value
 
-  let set_value_of_parallel_bonds value dynamic =
+  let set_value value dynamic =
     set_local_dynamic_information
       {
         (get_local_dynamic_information dynamic) with
-        store_value_of_parallel_bonds = value
+        store_value = value
       } dynamic
 
   (*--------------------------------------------------------------*)
@@ -528,13 +531,13 @@ struct
     in
     let init_local_dynamic_information =
       {
-        store_value_parallel_bonds_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
+        (*        store_value_parallel_bonds_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_non_parallel_bonds_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_of_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_non_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_of_parallel_bonds = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty  }
+                  store_value_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;*)
+        store_value = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty  }
     in
     let init_global_dynamic_information =
       {
@@ -586,7 +589,7 @@ struct
         init_state
     in
     (*------------------------------------------------------------*)
-    let store_result = get_value_non_parallel_bonds_init dynamic in
+    let store_result = get_value dynamic in
     let error, store_result =
       Parallel_bonds_init.collect_value_non_parallel_bonds
         parameter
@@ -595,7 +598,7 @@ struct
         init_state
         store_result
     in
-    let dynamic = set_value_non_parallel_bonds_init store_result dynamic in
+    let dynamic = set_value store_result dynamic in
     (*------------------------------------------------------------*)
     let error, store_parallel_bonds_init =
       Parallel_bonds_init.collect_parallel_bonds_init
@@ -604,7 +607,7 @@ struct
         error
         init_state
     in
-    let store_result = get_value_parallel_bonds_init dynamic in
+    let store_result = get_value dynamic in
     let error, store_result =
       Parallel_bonds_init.collect_value_parallel_bonds
         parameter
@@ -613,9 +616,9 @@ struct
         init_state
         store_result
     in
-    let dynamic = set_value_parallel_bonds_init store_result dynamic in
+    let dynamic = set_value store_result dynamic in
     (*-------------------------------------------------------------*)
-    let value_parallel_bonds = get_value_parallel_bonds_init dynamic in
+    (*let value_parallel_bonds = get_value dynamic in
     let value_non_parallel_bonds = get_value_non_parallel_bonds_init dynamic in
     let store_result = get_value_of_init dynamic in
     let error, store_result =
@@ -626,8 +629,8 @@ struct
         error
         init_state
         store_result
-    in
-    let dynamic = set_value_of_init store_result dynamic in
+      in*)
+    (*    let dynamic = set_value_of_init store_result dynamic in*)
     error, dynamic
 
   let add_initial_state static dynamic error species =
@@ -1309,7 +1312,7 @@ let apply_rule static dynamic error rule_id precondition =
     in
     (*-----------------------------------------------------------*)
     (*fold2*)
-    let add_link error x value store_result =
+    (*    let add_link error x value store_result =
       let error, old_value =
         match Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs parameter error x store_result
         with
@@ -1321,27 +1324,27 @@ let apply_rule static dynamic error rule_id precondition =
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameter error x new_value store_result
       in
       error, store_result
-    in
+          in*)
     (*-----------------------------------------------------------*)
     let error, store_value =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold2
         parameter error
-        (fun _ error x value store_result ->
+        (fun parameter  error x value store_result ->
            let error, store_result =
-             add_link error x value store_result
+             Parallel_bonds_type.add_value_from_refined_tuple parameter  error x value store_result
            in
            error, store_result
         )
-        (fun _ error x value store_result ->
+        (fun parameter  error x value store_result ->
            let error, store_result =
-             add_link error x value store_result
+             Parallel_bonds_type.add_value_from_refined_tuple parameter error x value store_result
            in
            error, store_result
         )
-        (fun _ error x value1 value2 store_result ->
+        (fun parameter error x value1 value2 store_result ->
            let new_value = Usual_domains.lub value1 value2 in
            let error, store_result =
-             add_link error x new_value store_result
+             Parallel_bonds_type.add_value_from_refined_tuple parameter  error x new_value store_result
            in
            error, store_result
         )
@@ -1368,7 +1371,7 @@ let apply_rule static dynamic error rule_id precondition =
     in
     (*--------------------------------------------------------------*)
     (*fold2*)
-    let store_result = get_value_of_parallel_bonds dynamic in
+    let store_result = get_value(*_of_parallel_bonds*) dynamic in
     let add_map error x value store_result =
       let error, old_value =
         match Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameter error x store_result with

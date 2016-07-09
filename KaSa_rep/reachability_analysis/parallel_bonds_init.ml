@@ -258,7 +258,7 @@ let collect_value_parallel_bonds parameter store_parallel_bonds_init error init_
   let error, value_parallel_bonds =
     List.fold_left (fun (error, store_result) x ->
         let error, store_result =
-          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+          Parallel_bonds_type.add_value
             parameter error
             x
             (Usual_domains.Val true)
@@ -306,7 +306,7 @@ let collect_value_non_parallel_bonds parameter store_non_parallel_init error ini
       (fun agent_type list (error, store_result) ->
          let error, store_result =
            List.fold_left (fun (error, store_result) x ->
-               Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+               Parallel_bonds_type.add_value
                  parameter error
                  x
                  (Usual_domains.Val false)
@@ -324,40 +324,27 @@ let collect_value_non_parallel_bonds parameter store_non_parallel_init error ini
 (*return a value of initial state, if it has parallel bonds -> yes,
   if non parallel bonds -> no, if it is both -> any, if there is non:
   undefined*)
-
+    (*
 let collect_value_of_init parameter value_parallel_bonds value_non_parallel_bonds error init_state store_result =
   (*let parameter = get_parameter static in
     let value_parallel_bonds = get_value_parallel_bonds_init dynamic in
     let value_non_parallel_bonds = get_value_non_parallel_bonds_init dynamic in*)
   (*------------------------------------------------------------------------------*)
   (*do the lub in the initial state*)
-  let add_link error x value store_result =
-    let error, old_value =
-      match Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-              parameter error x store_result
-      with
-      | error, None -> error, Usual_domains.Undefined
-      | error, Some v -> error, v
-    in
-    let new_value = Usual_domains.lub value old_value in
-    let error, store_result =
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite parameter error x new_value store_result
-    in
-    error, store_result
-  in
   (*let store_result = get_value_of_init dynamic in*)
   (*------------------------------------------------------------------------------*)
   let error, store_result =
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2 parameter error
       (fun parameter error x p_value store_result ->
-         add_link error x p_value store_result)
+         Parallel_bonds_type.add_value parameter error x p_value store_result)
       (fun parameter error x nonp_value store_result ->
-         add_link error x  nonp_value store_result)
+         Parallel_bonds_type.add_value parameter error x nonp_value store_result)
       (fun parameter error x p_value nonp_value store_result ->
          let new_value = Usual_domains.lub p_value nonp_value in
-         add_link error x new_value store_result
+         Parallel_bonds_type.add_value parameter error x new_value store_result
       ) value_parallel_bonds value_non_parallel_bonds store_result
   in
   error, store_result
 (*let dynamic = set_value_of_init store_result dynamic in
   error, dynamic*)
+*)
