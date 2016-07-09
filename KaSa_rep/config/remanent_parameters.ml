@@ -168,8 +168,10 @@ let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_
                                                    (*Remanent_parameters_sig.dump_reachability_analysis_parallel = true*)
                          }
 let reachability_map_2 = { reachability_map_1 with Remanent_parameters_sig.dump_reachability_analysis_iteration = true }
-let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true }
-let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true                        }
+let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true ;
+Remanent_parameters_sig.dump_reachability_analysis_parallel = true}
+let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true ;
+                         }
 
 let add_debugging_parameters_to_reachability_map reachability =
   let trace = !Config.trace in
