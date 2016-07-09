@@ -227,6 +227,7 @@ let create_plot (filename,title,head) jsonDistances =
     else
       let d_chan = Kappa_files.open_out filename in
       let d = Format.formatter_of_out_channel d_chan in
+      let () = Format.fprintf d "# %s@." title in
       let () = print_header_raw d head in
       Raw {desc=d_chan; form=d} in
   let () = plotDescr := Some format in

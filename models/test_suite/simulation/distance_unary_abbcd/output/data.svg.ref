@@ -4,7 +4,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
-<title>abbcd.ka output</title>
+<title>Output of 'KaSim' '-e' '200' '-seed' '718860825' '-o' 'data.svg' '-d' 'output' '-p' '100' 'abbcd.ka'</title>
 <descr></descr>
 
 <style type="text/css" >

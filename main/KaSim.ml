@@ -229,12 +229,7 @@ let () =
 	  (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
 	  env in
       if !pointNumberValue > 0 || head <> [||] then
-	let title =
-	  if !marshalizedInFile <> ""
-	  then !marshalizedInFile ^" output"
-	  else match !inputKappaFileNames with
-               | [ f ] -> f^" output"
-               | _ -> "KaSim output" in
+	let title = "Output of " ^ command_line in
 	Outputs.create_plot
 	  (Kappa_files.get_data (),title,head)
 	  (match unary_distances with Some x -> x | None -> false) in
