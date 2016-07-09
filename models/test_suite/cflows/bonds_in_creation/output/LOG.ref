@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'bonds_in_creation.ka' '-t' '40' '-p' '100' '-seed' '611463625' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'bonds_in_creation.ka' '-t' '40' '-p' '100' '-seed' '611463625' '-d' 'output' '--time-independent'
 Parsing bonds_in_creation.ka...
 done
-+ Initialized random number generator with seed 611463625
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

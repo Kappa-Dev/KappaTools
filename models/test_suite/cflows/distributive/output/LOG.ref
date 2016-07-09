@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'distributive.ka' '-seed' '240056667' '-e' '1000' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'distributive.ka' '-seed' '240056667' '-e' '1000' '-d' 'output' '--time-independent'
 Parsing distributive.ka...
 done
-+ Initialized random number generator with seed 240056667
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

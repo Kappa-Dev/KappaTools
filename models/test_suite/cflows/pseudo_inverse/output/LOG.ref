@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' 'pseudo.ka' '-seed' '924556145' '-var' 'n_a' '1000' '-e' '10000' '-d' 'output' '-p' '50' '--time-independent'
++ Command line to rerun is: 'KaSim' 'pseudo.ka' '-seed' '924556145' '-var' 'n_a' '1000' '-e' '10000' '-d' 'output' '-p' '50' '--time-independent'
 Parsing pseudo.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

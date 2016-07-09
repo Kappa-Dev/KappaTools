@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-e' '1000' '-d' 'output' '-p' '50' '--time-independent'
++ Command line to rerun is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-e' '1000' '-d' 'output' '-p' '50' '--time-independent'
 Parsing none_only.ka...
 done
-+ Initialized random number generator with seed 627933151
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

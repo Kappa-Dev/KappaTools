@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-e' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '100' 'a_bn_c.ka'
++ Command line to rerun is: 'KaSim' '-e' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '100' 'a_bn_c.ka'
 Parsing a_bn_c.ka...
 done
-+ Initialized random number generator with seed 656095496
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '--implicit-signature' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' '--implicit-signature' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output' '--time-independent'
 Parsing side-effects.ka...
 done
-+ Initialized random number generator with seed 253329392
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

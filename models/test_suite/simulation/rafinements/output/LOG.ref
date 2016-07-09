@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-t' '2' '-p' '250' '-d' 'output' 'rafinements.ka' '-seed' '16602'
++ Command line to rerun is: 'KaSim' '-t' '2' '-p' '250' '-d' 'output' 'rafinements.ka' '-seed' '16602'
 Parsing rafinements.ka...
 done
-+ Initialized random number generator with seed 16602
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

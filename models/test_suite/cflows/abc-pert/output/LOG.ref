@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '--batch'
++ Command line to rerun is: 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '--batch'
 Parsing abc-pert.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

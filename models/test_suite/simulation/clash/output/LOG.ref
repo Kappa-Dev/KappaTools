@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-e' '3' '-d' 'output'
++ Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-e' '3' '-d' 'output'
 Parsing clash.ka...
 done
-+ Initialized random number generator with seed 728130018
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

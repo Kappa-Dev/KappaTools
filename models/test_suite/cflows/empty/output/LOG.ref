@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'empty.ka' '-e' '18' '-t' '10' '-d' 'output' '-seed' '126704914' '-p' '50' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'empty.ka' '-e' '18' '-t' '10' '-d' 'output' '-seed' '126704914' '-p' '50' '--time-independent'
 Parsing empty.ka...
 done
-+ Initialized random number generator with seed 126704914
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

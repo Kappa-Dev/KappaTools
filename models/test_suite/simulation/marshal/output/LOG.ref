@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '--compile' '-make-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '496408597' '-d' 'output' 'model.ka'
++ Command line to rerun is: 'KaSim' '--compile' '-make-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '496408597' '-d' 'output' 'model.ka'
 Parsing model.ka...
 done
-+ Initialized random number generator with seed 496408597
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map
@@ -16,13 +15,11 @@ done
 	 -initial conditions
 + Building initial state
 Done
-+ Command line is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '958076642' '-d' 'output'
-+ Initialized random number generator with seed 958076642
++ Command line to rerun is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '958076642' '-d' 'output'
 + Loading simulation package /tmp/KaSim-test-blob-marshal...
 + Building initial state
 Done
-+ Command line is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '458154606' '-d' 'output' '-var' 'init' '300'
-+ Initialized random number generator with seed 458154606
++ Command line to rerun is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '458154606' '-d' 'output' '-var' 'init' '300'
 + Loading simulation package /tmp/KaSim-test-blob-marshal...
 + Building initial state
 Done

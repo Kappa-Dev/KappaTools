@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'agents_without_sites.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '50' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'agents_without_sites.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '50' '--time-independent'
 Parsing agents_without_sites.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

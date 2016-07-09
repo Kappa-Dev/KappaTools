@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-e' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug'
++ Command line to rerun is: 'KaSim' '-e' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug'
 Parsing clashing_instances.ka...
 done
-+ Initialized random number generator with seed 923639563
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

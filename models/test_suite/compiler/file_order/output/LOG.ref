@@ -1,9 +1,8 @@
-+ Command line is: 'KaSim' 'file1.ka' 'file2.ka' '-seed' '1061933100' '--compile' '-d' 'output' '-t' '0'
++ Command line to rerun is: 'KaSim' 'file1.ka' 'file2.ka' '-seed' '1061933100' '--compile' '-d' 'output' '-t' '0'
 Parsing file2.ka...
 done
 Parsing file1.ka...
 done
-+ Initialized random number generator with seed 1061933100
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

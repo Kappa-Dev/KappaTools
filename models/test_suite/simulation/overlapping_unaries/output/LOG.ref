@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-t' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-p' '100' 'overlapping_unaries.ka'
++ Command line to rerun is: 'KaSim' '-t' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-p' '100' 'overlapping_unaries.ka'
 Parsing overlapping_unaries.ka...
 done
-+ Initialized random number generator with seed 56235278
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

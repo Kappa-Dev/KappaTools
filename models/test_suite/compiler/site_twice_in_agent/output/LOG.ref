@@ -1,20 +1,16 @@
-+ Command line is: 'KaSim' 'lhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
++ Command line to rerun is: 'KaSim' 'lhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing lhs.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
-+ Command line is: 'KaSim' 'rhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
++ Command line to rerun is: 'KaSim' 'rhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing rhs.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
-+ Command line is: 'KaSim' 'internal.ka' '-seed' '924556145' '-d' 'output' '--compile'
++ Command line to rerun is: 'KaSim' 'internal.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing internal.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
-+ Command line is: 'KaSim' 'remove.ka' '-seed' '924556145' '-d' 'output' '--compile'
++ Command line to rerun is: 'KaSim' 'remove.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing remove.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks

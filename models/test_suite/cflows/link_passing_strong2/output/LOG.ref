@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'link_passing_strong2.ka' '-seed' '611463625' '-e' '280' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'link_passing_strong2.ka' '-seed' '611463625' '-e' '280' '-d' 'output' '--time-independent'
 Parsing link_passing_strong2.ka...
 done
-+ Initialized random number generator with seed 611463625
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

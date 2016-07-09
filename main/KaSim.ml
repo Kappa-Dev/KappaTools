@@ -106,30 +106,28 @@ let () =
     Printexc.record_backtrace
       (!Parameter.debugModeOn || !backtrace); (*Possible backtrace*)
 
-    Format.printf "+ Command line is: @[<h>%a@]@."
-		  (Pp.array Pp.space
-			    (fun i f s ->
-			     Format.fprintf
-			       f "'%s'" (if i = 0 then "KaSim" else s)))
-		  Sys.argv;
+    let theSeed,seed_arg =
+      match !seedValue with
+      | Some seed -> seed,[||]
+      | None ->
+        let () = Format.printf "+ Self seeding...@." in
+        let () = Random.self_init() in
+        let out = Random.bits () in
+        out,[|"-seed";string_of_int out|]
+    in Random.init theSeed ;
+    let command_line =
+      Format.asprintf "@[<h>%a%a@]"
+        (Pp.array Pp.space
+           (fun i f s ->
+              Format.fprintf
+                f "'%s'" (if i = 0 then "KaSim" else s)))
+        Sys.argv
+        (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
+    Format.printf "+ Command line to rerun is: %s@." command_line;
 
     let result =
       List.fold_left (KappaLexer.compile Format.std_formatter)
 		     Ast.empty_compil !inputKappaFileNames in
-
-    let theSeed =
-      match !seedValue with
-      | Some seed -> seed
-      | None ->
-	 begin
-	   Format.printf "+ Self seeding...@." ;
-	   Random.self_init() ;
-	   Random.bits ()
-	 end
-    in
-    Random.init theSeed ;
-    Format.printf
-      "+ Initialized random number generator with seed %d@." theSeed;
 
     let counter =
       Counter.create

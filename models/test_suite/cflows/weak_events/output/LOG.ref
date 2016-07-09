@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'weak_events.ka' '-seed' '924556145' '-e' '100' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'weak_events.ka' '-seed' '924556145' '-e' '100' '-d' 'output' '--time-independent'
 Parsing weak_events.ka...
 done
-+ Initialized random number generator with seed 924556145
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

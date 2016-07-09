@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' '-i' 'cube.ka' '-seed' '240056667' '-e' '30000' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'cube.ka' '-seed' '240056667' '-e' '30000' '-d' 'output' '--time-independent'
 Parsing cube.ka...
 done
-+ Initialized random number generator with seed 240056667
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' 'lpc1.ka' '-seed' '785872661' '-e' '2' '-d' 'output'
++ Command line to rerun is: 'KaSim' 'lpc1.ka' '-seed' '785872661' '-e' '2' '-d' 'output'
 Parsing lpc1.ka...
 done
-+ Initialized random number generator with seed 785872661
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map

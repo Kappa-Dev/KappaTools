@@ -1,7 +1,6 @@
-+ Command line is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-e' '0' '-p' '10'
++ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-e' '0' '-p' '10'
 Parsing symmetry.ka...
 done
-+ Initialized random number generator with seed 880671133
 + Sanity checks
 + KaSa tools initialization
 + Compute the contact map
