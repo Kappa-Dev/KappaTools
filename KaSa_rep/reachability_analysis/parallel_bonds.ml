@@ -101,6 +101,30 @@ struct
      type, then they are never bound to the same B*)
   (* Maybe: both case may happen*)
 
+
+(*JF: YOU SHOULD HAVE ONLY ONE MAP *)
+(* Whenever you discover a new value in for a given tuple,
+   you have to enrich the abstract value associated to this tuple, by taking the lub between the former value (Undefined if it does not exist) and the new one*)
+
+  (* add an abstract value for a tuple *)
+  let add_value parameters error x value store_result =
+     let error, old_value =
+       match Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameters error x store_result
+       with
+       | error, None -> error, Usual_domains.Undefined
+       | error, Some v -> error, v
+     in
+     let new_value = Usual_domains.lub old_value value in
+     let error, store_result =
+       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameters error x new_value store_result
+     in
+     error, store_result
+
+  let project (a,b,c,d,e,f) = (b,c,d,e,f)
+  let project2 (x,y) = (project x,projext y)
+  let add_value_from_refined_tuple parameters error x =
+    add_value parameters error (project x)
+
   type local_dynamic_information =
     {
       store_value_parallel_bonds_init:
@@ -1466,7 +1490,7 @@ let apply_rule static dynamic error rule_id precondition =
     (*---------------------------------------------------------*)
     let store_rule_has_non_parallel_bonds_rhs = get_rule_has_non_parallel_bonds_rhs static in
     let error =
-      if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
+      if local_trace || Remanent_parameters.get_trace parameter
       then
         let () =
           Print_parallel_bonds.print_rule_has_non_parallel_bonds_rhs parameter store_rule_has_non_parallel_bonds_rhs
@@ -1478,7 +1502,7 @@ let apply_rule static dynamic error rule_id precondition =
     (*print value of initial state*)
     let store_value_of_init = get_value_of_init dynamic in
     let error =
-      if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
+      if local_trace || Remanent_parameters.get_trace parameter
       then
         let () =
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
