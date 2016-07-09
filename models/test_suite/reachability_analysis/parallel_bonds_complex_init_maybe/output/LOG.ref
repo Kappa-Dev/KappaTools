@@ -1096,4 +1096,6 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 7: r7:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
+Value in the initial state:
+
 execution finished without any exception

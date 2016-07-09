@@ -252,4 +252,6 @@ B is a dead agent.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+Value in the initial state:
+
 execution finished without any exception

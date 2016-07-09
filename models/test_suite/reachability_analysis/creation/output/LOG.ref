@@ -576,4 +576,6 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D ranges over u and p.
+Value in the initial state:
+
 execution finished without any exception

@@ -1427,4 +1427,6 @@ Id=95
 
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent C ranges over free and B@x.
+Value in the initial state:
+
 execution finished without any exception

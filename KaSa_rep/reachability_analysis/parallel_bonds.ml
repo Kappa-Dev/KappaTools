@@ -116,14 +116,14 @@ struct
      in
      let new_value = Usual_domains.lub old_value value in
      let error, store_result =
-       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameters error x new_value store_result
+       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite parameters error x new_value store_result
      in
      error, store_result
 
-  let project (a,b,c,d,e,f) = (b,c,d,e,f)
-  let project2 (x,y) = (project x,projext y)
+  let project (_,b,c,d,e,f) = (b,c,d,e,f)
+  let project2 (x,y) = (project x,project y)
   let add_value_from_refined_tuple parameters error x =
-    add_value parameters error (project x)
+    add_value parameters error (project2 x)
 
   type local_dynamic_information =
     {
