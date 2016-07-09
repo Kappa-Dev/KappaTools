@@ -84,13 +84,13 @@ function createSVGDefs(svg){
 }
 function plotPNG(plotDivId,title,plotName,plotStyleId){
     try { var html = d3.select("#"+plotDivId)
-          .select("svg")
-          .attr("title", title)
-          .attr("version", 1.1)
-          .attr("xmlns", "http://www.w3.org/2000/svg")
-          .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-          .node()
-          .outerHTML;
+                       .select("svg")
+                       .attr("title", title)
+                       .attr("version", 1.1)
+                       .attr("xmlns", "http://www.w3.org/2000/svg")
+                       .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+                       .node()
+                       .outerHTML;
           var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
           style = "<![CDATA["+style+"]]>";
           html = html.replace(cssTextToken,style);
@@ -140,7 +140,7 @@ function saveFile(data,mime,filename){
 function plotSVG(plotDivId,title,plotName,plotStyleId){
         try { var html = d3.select("#"+plotDivId)
                            .select("svg")
-                           .attr("title", title)
+                           //.attr("title", title)
                            .attr("version", 1.1)
                            .attr("xmlns", "http://www.w3.org/2000/svg")
                            .node()
@@ -148,6 +148,11 @@ function plotSVG(plotDivId,title,plotName,plotStyleId){
               var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
               style = "<![CDATA["+style+"]]>";
               html = html.replace(cssTextToken,style);
+	      var header =
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+              + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
+              + "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
+	      html = header+html;
               saveFile(html,"image/svg+xml",plotName);
         } catch (e) {
             alert(e);
