@@ -754,7 +754,7 @@ struct
     let log = Remanent_parameters.get_logger parameter in 
     (*--------------------------------------------------------*)
     let error =
-      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      if Remanent_parameters.get_dump_reachability_analysis_result parameter
       then
         let () =
           Loggers.fprintf log
@@ -817,7 +817,7 @@ struct
     let handler = get_mvbdu_handler dynamic in
     let error =
     if
-      Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       let () =
         Loggers.fprintf log
@@ -855,7 +855,7 @@ struct
              in
              let error =
                if
-                 Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+                 Remanent_parameters.get_dump_reachability_analysis_result parameter
                then
                  Translation_in_natural_language.print
                    ~show_dep_with_dimmension_higher_than:1
@@ -884,7 +884,8 @@ struct
     in
     let error =
     if
-      Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      Remanent_parameters.get_dump_reachability_analysis_result
+         parameter
     then
       let () =
         Loggers.fprintf log
@@ -926,7 +927,7 @@ struct
                  (*------------------------------------------*)
                  let error =
                    if
-                     Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+                     Remanent_parameters.get_dump_reachability_analysis_result parameter
                    then
                      Translation_in_natural_language.print
                        ~show_dep_with_dimmension_higher_than:1
@@ -955,7 +956,7 @@ struct
     in
     let error =
     if
-      Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       let () =
         Loggers.fprintf log
@@ -997,7 +998,7 @@ struct
                  (*------------------------------------------*)
                  let error =
                    if
-                     Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+                     Remanent_parameters.get_dump_reachability_analysis_result parameter
                    then
                      Translation_in_natural_language.print
                        ~show_dep_with_dimmension_higher_than:1

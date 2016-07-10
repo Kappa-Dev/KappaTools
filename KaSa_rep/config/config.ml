@@ -93,8 +93,6 @@ let dump_reachability_analysis_static = ref false
 let dump_reachability_analysis_dynamic = ref false
 let dump_reachability_analysis_diff = ref false
 let dump_reachability_analysis_wl = ref false
-let dump_reachability_analysis_parallel = ref false
-let dump_reachability_analysis_site_accross_bonds = ref false
 
 let hide_one_d_relations_from_cartesian_decomposition = ref true
 let smash_relations = ref true

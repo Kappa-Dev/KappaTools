@@ -122,6 +122,7 @@ struct
       store_value_bonds_rhs :
         bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
                 (*final result*)*)
+      dummy: unit;
       store_value:
         bool Usual_domains.flat_lattice
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t
@@ -537,6 +538,7 @@ struct
         store_value_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
         store_value_non_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
                   store_value_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;*)
+        dummy = ();
         store_value = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty  }
     in
     let init_global_dynamic_information =
@@ -566,6 +568,7 @@ struct
 
   let compute_value_init static dynamic error init_state =
     let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     let error, store_bonds_init =
       Parallel_bonds_init.collect_bonds_initial
         parameter
@@ -595,6 +598,7 @@ struct
         parameter
         store_non_parallel_init
         error
+        kappa_handler
         init_state
         store_result
     in
@@ -613,6 +617,7 @@ struct
         parameter
         store_parallel_bonds_init
         error
+        kappa_handler
         init_state
         store_result
     in
@@ -1255,6 +1260,7 @@ let apply_rule static dynamic error rule_id precondition =
   (*todo: add init*)
     let event_list = [] in
     let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     (*-----------------------------------------------------------*)
     (*a map of rule that has a set of parallel bonds in the rhs*)
     let store_rule_has_parallel_bonds_rhs = get_rule_has_parallel_bonds_rhs static in
@@ -1331,20 +1337,24 @@ let apply_rule static dynamic error rule_id precondition =
         parameter error
         (fun parameter  error x value store_result ->
            let error, store_result =
-             Parallel_bonds_type.add_value_from_refined_tuple parameter  error x value store_result
+             Parallel_bonds_type.add_value_from_refined_tuple parameter  error kappa_handler x value store_result
            in
            error, store_result
         )
         (fun parameter  error x value store_result ->
            let error, store_result =
-             Parallel_bonds_type.add_value_from_refined_tuple parameter error x value store_result
+             Parallel_bonds_type.add_value_from_refined_tuple
+               parameter error kappa_handler
+               x value store_result
            in
            error, store_result
         )
         (fun parameter error x value1 value2 store_result ->
            let new_value = Usual_domains.lub value1 value2 in
            let error, store_result =
-             Parallel_bonds_type.add_value_from_refined_tuple parameter  error x new_value store_result
+             Parallel_bonds_type.add_value_from_refined_tuple
+               parameter error kappa_handler
+               x new_value store_result
            in
            error, store_result
         )
@@ -1392,20 +1402,26 @@ let apply_rule static dynamic error rule_id precondition =
         parameter error
         (fun parameter error x value store_result ->
            let error, store_result =
-             Parallel_bonds_type.add_value parameter error x value store_result
+             Parallel_bonds_type.add_value
+               parameter error kappa_handler
+               x value store_result
            in
            error, store_result
         )
         (fun parameter error x value store_result ->
            let error, store_result =
-              Parallel_bonds_type.add_value parameter error x value store_result
+             Parallel_bonds_type.add_value
+               parameter error kappa_handler
+               x value store_result
            in
            error, store_result
         )
         (fun parameter error x value1 value2 store_result ->
            let new_value = Usual_domains.lub value1 value2 in
            let error, store_result =
-             Parallel_bonds_type.add_value parameter error x new_value store_result
+             Parallel_bonds_type.add_value
+               parameter error kappa_handler
+               x new_value store_result
            in
            error, store_result) map_value store_non_parallel store_result
     in
@@ -1424,10 +1440,10 @@ let apply_rule static dynamic error rule_id precondition =
   let print static dynamic (error:Exception.method_handler) loggers =
     let handler_kappa = get_kappa_handler static in
     let parameter = get_parameter static in
-    let log = Remanent_parameters.get_logger parameter in
-    let () = Loggers.fprintf log "COMEON HERE\n" in   (*-------------------------------------------------------*)
+    let log = loggers in
+   (*-------------------------------------------------------*)
     let error =
-      if Remanent_parameters.get_dump_reachability_analysis_parallel
+      if Remanent_parameters.get_dump_reachability_analysis_result
           parameter
       then
         let () =

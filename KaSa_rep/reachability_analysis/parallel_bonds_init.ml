@@ -238,7 +238,7 @@ let collect_non_parallel_init parameter store_bonds_init store_site_pair_list er
 (**************************************************************************)
 (*collect result of parallel bonds in the intitial state*)
 
-let collect_value_parallel_bonds parameter store_parallel_bonds_init error init_state store_result =
+let collect_value_parallel_bonds parameter store_parallel_bonds_init error kappa_handler init_state store_result =
   (*let parameter = get_parameter static in
     let error, store_parallel_bonds_init = collect_parallel_bonds_init static dynamic error init_state in*)
   (*--------------------------------------------------------------------*)
@@ -259,7 +259,7 @@ let collect_value_parallel_bonds parameter store_parallel_bonds_init error init_
     List.fold_left (fun (error, store_result) x ->
         let error, store_result =
           Parallel_bonds_type.add_value
-            parameter error
+            parameter error kappa_handler
             x
             (Usual_domains.Val true)
             store_result
@@ -274,7 +274,7 @@ let collect_value_parallel_bonds parameter store_parallel_bonds_init error init_
 (**************************************************************************)
 (*collect result of non parallel bonds in the initital state*)
 
-let collect_value_non_parallel_bonds parameter store_non_parallel_init error init_state store_result =
+let collect_value_non_parallel_bonds parameter store_non_parallel_init error kappa_handler init_state store_result =
   (*let parameter = get_parameter static in
     (*non parallel bonds*)
     let error, store_non_parallel_init = collect_non_parallel_init static dynamic error init_state in*)
@@ -307,7 +307,7 @@ let collect_value_non_parallel_bonds parameter store_non_parallel_init error ini
          let error, store_result =
            List.fold_left (fun (error, store_result) x ->
                Parallel_bonds_type.add_value
-                 parameter error
+                 parameter error kappa_handler
                  x
                  (Usual_domains.Val false)
                  store_result

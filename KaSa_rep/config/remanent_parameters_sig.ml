@@ -90,8 +90,6 @@ type reachability_map_output =
     dump_reachability_analysis_dynamic : bool;
     dump_reachability_analysis_diff : bool;
     dump_reachability_analysis_wl : bool;
-    dump_reachability_analysis_parallel : bool;
-    dump_reachability_analysis_site_accross_bonds : bool;
     hide_one_d_relations_from_cartesian_decomposition : bool;
     smash_relations : bool;
     compute_local_traces: bool;

@@ -69,19 +69,19 @@ let collect_views_init parameter error init_state =
                     store_set
                 in
                 error, store_set
-             ) agent.Cckappa_sig.agent_interface 
+             ) agent.Cckappa_sig.agent_interface
              (error,
               Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty)
          in
          let error', new_set =
-           Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.union 
+           Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.union
              parameter error store_result set
          in
          let error = Exception.check warn parameter error error'
              (Some "line 62") Exit
          in
          error, new_set
-    ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views 
+    ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
     Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
 
 (***************************************************************)
@@ -89,11 +89,11 @@ let collect_views_init parameter error init_state =
 
 let collect_sites_init parameter error store_views_init =
   let error, store_result =
-    Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold_inv 
+    Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold_inv
       (fun (agent_id, agent_type, site_type, state) (error, store_result) ->
         (*fold again views in the initial states*)
         let error, pair_set =
-          Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold_inv 
+          Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold_inv
             (fun (agent_id', _, site_type', state') (error, current_set) ->
               if agent_id = agent_id' && site_type <> site_type'
               then
@@ -132,7 +132,7 @@ let collect_pair_sites_init parameter error store_sites_init =
                 if agent_id <> agent_id'
                 then
                   let error, pair_set =
-                    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in 
+                    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in
                       parameter error
                       ((agent_id, agent_type, site_type, site_type2, state, state2),
                        (agent_id', agent_type', site_type', site_type2', state', state2'))
@@ -163,7 +163,7 @@ let collect_pair_sites_init parameter error store_sites_init =
       in
       let error, agent_target =
         match
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get 
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_index_target views
         with
         | error, None -> warn parameter error (Some "line 640") Exit Cckappa_sig.Ghost
@@ -276,13 +276,13 @@ let collect_pair_sites_init parameter error store_sites_init =
 let collect_internal_state_explicit_aux parameter error rule_id store_views_rhs store_explicit_static =
   let error, views_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id store_views_rhs 
+            parameter error rule_id store_views_rhs
     with
     | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
     | error, Some s -> error, s
   in
   let error, tuple_pair_explicit_set =
-    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs 
+    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
             parameter error rule_id store_explicit_static
     with
     | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
@@ -298,8 +298,8 @@ let collect_internal_state_explicit_aux parameter error rule_id store_views_rhs 
          (*------------------------------------------------------*)
          let (_, agent_type, site_type, state) = x in
          (*fold over an explicit tuple pair*)
-         let error, store_result = 
-           Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold 
+         let error, store_result =
+           Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
              (fun (t, z) (error, store_result) ->
                 let (agent_id1, agent_type1, site_type1, site_type2) = t in
                 let (agent_id1', agent_type1', site_type1', site_type2') = z in
@@ -313,7 +313,7 @@ let collect_internal_state_explicit_aux parameter error rule_id store_views_rhs 
                       (agent_id1, agent_type1, site_type1, site_type2, state)
                     in
                     let error, set =
-                      Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.add_when_not_in 
+                      Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.add_when_not_in
                         parameter error
                         internal_state
                         empty_set
@@ -331,7 +331,7 @@ let collect_internal_state_explicit_aux parameter error rule_id store_views_rhs 
                       (agent_id1', agent_type1', site_type1', site_type2', state)
                     in
                     let error, set =
-                      Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.add_when_not_in 
+                      Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.add_when_not_in
                         parameter error
                         internal_state
                         empty_set
@@ -343,18 +343,18 @@ let collect_internal_state_explicit_aux parameter error rule_id store_views_rhs 
                 (*---------------------------------------------------*)
                 let error, (old_set1, old_set2) =
                   match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-                          parameter error rule_id store_result 
+                          parameter error rule_id store_result
                   with
                   | error, None -> error, (empty_set, empty_set)
                   | error, Some (s1, s2) -> error, (s1, s2)
                 in
-                let error, new_set1 = 
-                  Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.union 
-                    parameter error first_agent old_set1 
+                let error, new_set1 =
+                  Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.union
+                    parameter error first_agent old_set1
                 in
-                let error, new_set2 = 
-                  Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.union 
-                    parameter error second_agent old_set2 
+                let error, new_set2 =
+                  Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.union
+                    parameter error second_agent old_set2
                 in
                 let error, store_result =
                   Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
@@ -367,10 +367,9 @@ let collect_internal_state_explicit_aux parameter error rule_id store_views_rhs 
       ) views_set (error, Ckappa_sig.Rule_map_and_set.Map.empty)
   in
   error, store_result
-  
+
 (***************************************************************)
-  
-let collect_internal_state_explicit parameter error rule_id store_internal_state_collect_internal_state_explicit_aux =
+let collect_internal_state_explicit parameter error _rule_id store_internal_state_collect_internal_state_explicit_aux =
   (*let error, store_internal_state_collect_internal_state_explicit_aux = collect_internal_state_explicit_aux
       parameter error rule_id store_views_rhs store_explicit_static
     in*)
@@ -402,15 +401,15 @@ let collect_internal_state_explicit parameter error rule_id store_internal_state
       ) store_internal_state_collect_internal_state_explicit_aux
   in
   store_result
-    
+
 (****************************************************************)
 (*return both state information of binding state and internal state of tuple pair*)
-    
+
 let collect_tuple_pair_binding_internal_state_explicit_aux parameter error rule_id
     store_views_rhs store_internal_state_explicit =
   let error, views_set =
-    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs 
-            parameter error rule_id store_views_rhs 
+    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+            parameter error rule_id store_views_rhs
     with
     | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
     | error, Some s -> error, s
@@ -418,7 +417,7 @@ let collect_tuple_pair_binding_internal_state_explicit_aux parameter error rule_
   (*------------------------------------------------*)
   let error, tuple_pair_internal_state_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id store_internal_state_explicit 
+            parameter error rule_id store_internal_state_explicit
     with
     | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty
     | error, Some s -> error, s
@@ -478,7 +477,7 @@ let collect_tuple_pair_binding_internal_state_explicit_aux parameter error rule_
                 (*------------------------------------------------*)
                 let error, (old_set1, old_set2) =
                   match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-                          parameter error rule_id store_result 
+                          parameter error rule_id store_result
                   with
                   | error, None -> error, (empty_set, empty_set)
                   | error, Some (s1, s2) -> error, (s1, s2)
@@ -508,17 +507,17 @@ let collect_tuple_pair_binding_internal_state_explicit_aux parameter error rule_
       ) views_set (error, Ckappa_sig.Rule_map_and_set.Map.empty)
   in
   error, store_result
-  
+
 (****************************************************************)
 (**)
-  
-let collect_tuple_pair_binding_internal_state_explicit parameter error 
+
+let collect_tuple_pair_binding_internal_state_explicit parameter error
     store_tuple_pair_binding_internal_state_explicit_aux =
   let store_result =
     Ckappa_sig.Rule_map_and_set.Map.map
       (fun (set1, set2) ->
          let _, set =
-           Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold 
+           Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
              (fun (agent_id, agent_type, site_type, site_type2, state, state2) (error, store_set) ->
                 Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
                   (fun (agent_id', agent_type', site_type', site_type2', state', state2') (error, store_set) ->
@@ -541,7 +540,7 @@ let collect_tuple_pair_binding_internal_state_explicit parameter error
       ) store_tuple_pair_binding_internal_state_explicit_aux
   in
   store_result
-    
+
 (****************************************************************)
 
 let collect_explicit_dynamic parameter error
@@ -567,22 +566,22 @@ let collect_explicit_dynamic parameter error
       store_result
   in
   error, store_result
-  
+
 (***************************************************************)
 (*check in the case of implicit static information*)
 (***************************************************************)
 
 let collect_implicit_dynamic_aux parameter error rule_id store_views_rhs store_implicit_static =
   let error, views_set =
-    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs 
-            parameter error rule_id store_views_rhs 
+    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+            parameter error rule_id store_views_rhs
     with
     | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
     | error, Some s -> error, s
   in
   let error, implicit_static_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id store_implicit_static 
+            parameter error rule_id store_implicit_static
     with
     | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
     | error, Some s -> error, s
@@ -597,7 +596,7 @@ let collect_implicit_dynamic_aux parameter error rule_id store_views_rhs store_i
         let (_, agent_type, site_type, state) = x in
         (*fold over implicit static tuple pair*)
         let error, store_result =
-          Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold 
+          Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
             (fun (t, z) (error, store_result) ->
               let (agent_id1, agent_type1, site_type1, site_type2) = t in
               let (agent_id1', agent_type1', site_type1', site_type2') = z in
@@ -637,21 +636,21 @@ let collect_implicit_dynamic_aux parameter error rule_id store_views_rhs store_i
               (*------------------------------------------------*)
               let error, (old_set1, old_set2) =
                 match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-                        parameter error rule_id store_result 
+                        parameter error rule_id store_result
                 with
                 | error, None -> error, (empty_site_set, empty_site_state_set)
                 | error, Some (s1, s2) -> error, (s1, s2)
               in
-              let error, new_set1 = 
-                Site_accross_bonds_domain_type.PairAgentsSitesState_Sites_map_and_set.Set.union 
-                  parameter error first_agent old_set1 
+              let error, new_set1 =
+                Site_accross_bonds_domain_type.PairAgentsSitesState_Sites_map_and_set.Set.union
+                  parameter error first_agent old_set1
               in
-              let error, new_set2 = 
-                Site_accross_bonds_domain_type.PairAgentsSites_SitesState_map_and_set.Set.union 
-                  parameter error second_agent old_set2 
+              let error, new_set2 =
+                Site_accross_bonds_domain_type.PairAgentsSites_SitesState_map_and_set.Set.union
+                  parameter error second_agent old_set2
               in
               let error, store_result =
-                Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite 
+                Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
                   parameter error rule_id (new_set1, new_set2) store_result
               in
               error, store_result
@@ -664,15 +663,15 @@ let collect_implicit_dynamic_aux parameter error rule_id store_views_rhs store_i
 
 (***************************************************************)
 
-let collect_implicit_dynamic parameter error rule_id store_tuple_pair_init 
+let collect_implicit_dynamic parameter error rule_id store_tuple_pair_init
     store_implicit_dynamic_aux store_result =
   let error, (pair_set1, _pair_set2) =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id store_implicit_dynamic_aux 
+            parameter error rule_id store_implicit_dynamic_aux
     with
-    | error, None -> 
-      error, 
-      (Site_accross_bonds_domain_type.PairAgentsSitesState_Sites_map_and_set.Set.empty, 
+    | error, None ->
+      error,
+      (Site_accross_bonds_domain_type.PairAgentsSitesState_Sites_map_and_set.Set.empty,
        Site_accross_bonds_domain_type.PairAgentsSites_SitesState_map_and_set.Set.empty)
     | error, Some (s1, s2) -> error, (s1, s2)
   in
@@ -689,7 +688,7 @@ let collect_implicit_dynamic parameter error rule_id store_tuple_pair_init
            Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
              (fun (z, t) (error, store_result) ->
                 let (store_result1, store_result2) = store_result in
-                let (agent_id_init, agent_type_init, 
+                let (agent_id_init, agent_type_init,
                      site_type_init, site_type_init2, _, state_init2) = z in
                 let (agent_id_init', agent_type_init',
                      site_type_init', site_type_init2', _, state_init2') = t in
@@ -704,7 +703,7 @@ let collect_implicit_dynamic parameter error rule_id store_tuple_pair_init
                       (agent_id_init, agent_type_init, site_type_init, site_type_init2, state_init2)
                     in
                     let error, set =
-                      Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.add_when_not_in 
+                      Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.add_when_not_in
                         parameter error pair
                         store_result1
                     in
@@ -753,8 +752,8 @@ let collect_relation_mvbdu parameter error handler store_explicit_dynamic store_
            in*)
          (*binding and internal state of agent type A*)
          let pair_list = [(site_type, state); (site_type2, state2)] in
-         let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list 
-             parameter handler error pair_list 
+         let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list
+             parameter handler error pair_list
          in
          let error, store_result =
            Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
@@ -785,8 +784,8 @@ let collect_relation_mvbdu parameter error handler store_explicit_dynamic store_
              in*)
            (*binding and internal state of agent type A*)
            let pair_list = [(site_type2, state2)] in
-           let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list 
-               parameter handler error pair_list 
+           let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list
+               parameter handler error pair_list
            in
            let error, store_result =
              Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
@@ -818,7 +817,7 @@ let collect_relation_mvbdu parameter error handler store_explicit_dynamic store_
              (*binding and internal state of agent type A*)
              let pair_list = [(site_type2, state2)] in
              let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                 parameter handler error pair_list 
+                 parameter handler error pair_list
              in
              let error, store_result =
                Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
@@ -858,7 +857,7 @@ let init_basic_dynamic_information =
 (*print initial state*)
 
 let print_init parameter error handler_kappa log store_result =
-  Loggers.fprintf log "------------------------------------------------------------\n"; 
+  Loggers.fprintf log "------------------------------------------------------------\n";
   Loggers.fprintf log "* Inititial states:\n";
   Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
     (fun (x, y) error ->
@@ -873,15 +872,15 @@ let print_init parameter error handler_kappa log store_result =
 let print_explicit_dynamic parameter error handler_kappa log store_result =
   Loggers.fprintf log
     "------------------------------------------------------------\n";
-  Loggers.fprintf log 
+  Loggers.fprintf log
     "* Tuple set when modification of the second site accross a bound that is preserved \nor creation of a bond with/without of the first site (including initial state):\n";
-  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold 
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
     (fun (x, y) error ->
        let () =
          Print_site_accross_bonds_domain.print_tuple parameter error handler_kappa log (x, y)
        in error
     ) store_result error
-    
+
 (***************************************************************)
 
 let print_implicit_dynamic parameter error handler_kappa log store_result =
@@ -1000,26 +999,14 @@ let print_implicit_dynamic parameter error handler_kappa log store_result =
 let print_basic_dynamic_information parameter error handler_kappa
     log store_pair_tuple_init store_explicit_dynamic store_implicit_dynamic =
   let error =
-    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+    if Remanent_parameters.get_dump_reachability_analysis_dynamic parameter
     then
       let error =
         print_init parameter error handler_kappa log store_pair_tuple_init
-      in error
-    else error
-  in
-  (*--------------------------------------------------------*)
-  let error =
-    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
-    then
+      in
       let error =
         print_explicit_dynamic parameter error handler_kappa log store_explicit_dynamic
-      in error
-    else error
-  in
-  (*--------------------------------------------------------*)
-  let error =
-    if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
-    then
+      in
       let error =
         print_implicit_dynamic parameter error handler_kappa log store_implicit_dynamic
       in error
