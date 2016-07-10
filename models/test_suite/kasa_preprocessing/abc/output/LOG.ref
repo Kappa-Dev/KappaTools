@@ -1515,6 +1515,4 @@ Id=127
 
 EXTENSIONAL DESCRIPTION:
 The binding state of site x2 in agent C ranges over free and A@c.
-Value in the initial state:
-
 execution finished without any exception

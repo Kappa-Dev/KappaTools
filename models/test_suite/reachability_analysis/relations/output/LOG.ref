@@ -960,6 +960,4 @@ Id=136
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A ranges over u, p, 0, and q.
-Value in the initial state:
-
 execution finished without any exception

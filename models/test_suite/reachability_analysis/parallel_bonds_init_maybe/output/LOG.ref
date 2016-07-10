@@ -634,10 +634,4 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-Value in the initial state:
-agent_type:0:site_type:0:site_type:1:state:1:state:1->agent_type:1:site_type:0:site_type:1:state:1:state:1
-Val false
-agent_type:0:site_type:1:site_type:0:state:1:state:1->agent_type:1:site_type:1:site_type:0:state:1:state:1
-Val false
-
 execution finished without any exception
