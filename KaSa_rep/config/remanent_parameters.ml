@@ -181,7 +181,7 @@ let add_debugging_parameters_to_reachability_map reachability =
     with
       Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = !Config.hide_one_d_relations_from_cartesian_decomposition;
       Remanent_parameters_sig.smash_relations = !Config.smash_relations;
-      Remanent_parameters_sig.dump_reachability_analysis_parallel = !Config.dump_reachability_analysis_parallel;
+      (*  Remanent_parameters_sig.dump_reachability_analysis_parallel = !Config.dump_reachability_analysis_parallel;*)
       Remanent_parameters_sig.dump_reachability_analysis_site_accross_bonds = !Config.dump_reachability_analysis_site_accross_bonds;
 
       Remanent_parameters_sig.use_natural_language = !Config.use_natural_language;

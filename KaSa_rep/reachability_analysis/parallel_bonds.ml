@@ -1348,11 +1348,12 @@ let apply_rule static dynamic error rule_id precondition =
            in
            error, store_result
         )
-        store_value1 store_value2 Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
+        store_value1
+        store_value2 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
     in
     (*--------------------------------------------------------------*)
-    let error, map_value =
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold (fun (x,y) value (error, store_result)->
+    let error, map_value = error, store_value in
+    (*      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold (fun (x,y) value (error, store_result)->
           let (_, agent_type, site_type, site_type1, state, state1) = x in
           let (_, agent_type', site_type', site_type1', state', state1') = y in
           let error, store_result =
@@ -1363,8 +1364,10 @@ let apply_rule static dynamic error rule_id precondition =
               store_result
           in
           error, store_result
-        ) store_value (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
-    in
+        )
+        store_value
+        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
+            in*)
     let error, store_non_parallel =
       collect_result_of_non_parallel parameter error rule_id
         non_parallel_rhs_list Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
@@ -1372,7 +1375,7 @@ let apply_rule static dynamic error rule_id precondition =
     (*--------------------------------------------------------------*)
     (*fold2*)
     let store_result = get_value(*_of_parallel_bonds*) dynamic in
-    let add_map error x value store_result =
+    (*  let add_map error x value store_result =
       let error, old_value =
         match Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameter error x store_result with
         | error, None -> error, Usual_domains.Undefined
@@ -1383,30 +1386,30 @@ let apply_rule static dynamic error rule_id precondition =
         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite parameter error x new_value store_result
       in
       error, store_result
-    in
+        in*)
     let error, store_result =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
         parameter error
-        (fun _ error x value store_result ->
+        (fun parameter error x value store_result ->
            let error, store_result =
-             add_map error x value store_result
+             Parallel_bonds_type.add_value parameter error x value store_result
            in
            error, store_result
         )
-        (fun _ error x value store_result ->
+        (fun parameter error x value store_result ->
            let error, store_result =
-             add_map error x value store_result
+              Parallel_bonds_type.add_value parameter error x value store_result
            in
            error, store_result
         )
-        (fun _ error x value1 value2 store_result ->
+        (fun parameter error x value1 value2 store_result ->
            let new_value = Usual_domains.lub value1 value2 in
            let error, store_result =
-             add_map error x new_value store_result
+             Parallel_bonds_type.add_value parameter error x new_value store_result
            in
            error, store_result) map_value store_non_parallel store_result
     in
-    let dynamic = set_value_of_parallel_bonds store_result dynamic in
+    let dynamic = set_value store_result dynamic in
     error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
@@ -1421,7 +1424,8 @@ let apply_rule static dynamic error rule_id precondition =
   let print static dynamic (error:Exception.method_handler) loggers =
     let handler_kappa = get_kappa_handler static in
     let parameter = get_parameter static in
-    let log = Remanent_parameters.get_logger parameter in    (*--------------------------------------------------------*)
+    let log = Remanent_parameters.get_logger parameter in
+    let () = Loggers.fprintf log "COMEON HERE\n" in   (*-------------------------------------------------------*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_parallel
           parameter
@@ -1433,9 +1437,14 @@ let apply_rule static dynamic error rule_id precondition =
           Loggers.fprintf log
             "------------------------------------------------------------\n"
         in
+        let store_value = get_value dynamic in
+        let error =
+          Print_parallel_bonds.print_result handler_kappa parameter error store_value(*;                                                                                                     Print_parallel_bonds.print_result handler_kappa parameter error (snd store_value_of_parallel_bonds)*)
+        in error
+      else
         error
-      else error
     in
+
     (*--------------------------------------------------------------*)
     (*let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
       let _ =
@@ -1467,7 +1476,7 @@ let apply_rule static dynamic error rule_id precondition =
         store_rule_has_parallel_bonds_rhs static dynamic error
       in*)
     (*---------------------------------------------------------*)
-    let store_rule_has_non_parallel_bonds_rhs = get_rule_has_non_parallel_bonds_rhs static in
+    (*let store_rule_has_non_parallel_bonds_rhs = get_rule_has_non_parallel_bonds_rhs static in
     let error =
       if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
       then
@@ -1476,10 +1485,10 @@ let apply_rule static dynamic error rule_id precondition =
         in
         error
       else error
-    in
+      in*)
     (*-----------------------------------------------------------*)
     (*print value of initial state*)
-    let store_value_of_init = get_value_of_init dynamic in
+    (*let store_value_of_init = get_value dynamic in
     let error =
       if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
       then
@@ -1511,7 +1520,7 @@ Loggers.fprintf (Remanent_parameters.get_logger parameter)
     in
     (*--------------------------------------------------------------*)
     (*print value of parallel in the rhs*)
-    let store_value_of_parallel_bonds = get_value_of_parallel_bonds dynamic in
+    let store_value_of_parallel_bonds = get_value dynamic in
     let error =
       if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
       then
@@ -1524,7 +1533,7 @@ Loggers.fprintf (Remanent_parameters.get_logger parameter)
         end
       else
         error
-    in
+      in*)
     error, dynamic, ()
 
   (****************************************************************)
