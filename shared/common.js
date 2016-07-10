@@ -113,10 +113,7 @@ function plotPNG(plotDivId,title,plotName,plotStyleId){
           var image = new Image(width, height);
           image.onload = function() {
               context.fillStyle = "white";
-              context.fillRect(0,
-			       0,
-			       width,
-			       height);
+              context.fillRect(0, 0, width, height);
               context.drawImage(image, 0, 0, width, height);
               var canvasdata = canvas.toDataURL("image/png");
               var a = document.createElement("a");
