@@ -79,7 +79,10 @@ function is_same(array1,array2){
 /* needed to add the stylesheet to the export */
 var cssTextToken = "/* stylesheet : a5f23ffb-e635-435c-ae44-c10779c2a843 */";
 function createSVGDefs(svg){
-    var svgDefs = svg.append('defs').append("style").attr("type","text/css").text(cssTextToken);
+    var svgDefs = svg.append('defs')
+	             .append("style")
+	             .attr("type","text/css")
+	             .text(cssTextToken);
     return svgDefs;
 }
 function plotPNG(plotDivId,title,plotName,plotStyleId){
@@ -96,15 +99,24 @@ function plotPNG(plotDivId,title,plotName,plotStyleId){
           html = html.replace(cssTextToken,style);
           var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
           var canvas = document.createElement("canvas");
-          var width = parseInt(d3.select("#"+plotDivId).select("svg").style("width").replace("px", ""))
-          var height = parseInt(d3.select("#"+plotDivId).select("svg").style("height").replace("px", ""))
+          var width = parseInt(d3.select("#"+plotDivId)
+			         .select("svg")
+			         .style("width")
+  			         .replace("px", ""));
+          var height = parseInt(d3.select("#"+plotDivId)
+				  .select("svg")
+				  .style("height")
+				  .replace("px", ""));
           canvas.width = width; // get original canvas width
           canvas.height = height; //get original canvas height
           var context = canvas.getContext("2d");
           var image = new Image(width, height);
           image.onload = function() {
               context.fillStyle = "white";
-              context.fillRect(0, 0, width, height);
+              context.fillRect(0,
+			       0,
+			       width,
+			       height);
               context.drawImage(image, 0, 0, width, height);
               var canvasdata = canvas.toDataURL("image/png");
               var a = document.createElement("a");
@@ -151,7 +163,7 @@ function plotSVG(plotDivId,title,plotName,plotStyleId){
 	      var header =
 		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
               + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
-              + "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
+              + "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
 	      html = header+html;
               saveFile(html,"image/svg+xml",plotName);
         } catch (e) {
