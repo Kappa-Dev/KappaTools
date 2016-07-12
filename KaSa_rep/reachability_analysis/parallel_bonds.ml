@@ -101,34 +101,12 @@ struct
      type, then they are never bound to the same B*)
   (* Maybe: both case may happen*)
 
-  (*JF: YOU SHOULD HAVE ONLY ONE MAP *)
-  (* Whenever you discover a new value in for a given tuple,
-     you have to enrich the abstract value associated to this tuple, by taking the lub between the former value (Undefined if it does not exist) and the new one*)
   type local_dynamic_information =
     {
-      (*        store_value_parallel_bonds_init:
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      store_value_non_parallel_bonds_init:
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      store_value_of_init:
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      (*value of parallel bonds in the rhs*)
-      store_value_parallel_bonds_rhs :
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      (*value of non parallel bonds in the rhs*)
-      store_value_non_parallel_bonds_rhs :
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      (*the final value of parallel bonds and non parallel bonds in the rhs *)
-      store_value_bonds_rhs :
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-                (*final result*)*)
       dummy: unit;
       store_value:
         bool Usual_domains.flat_lattice
           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t
-          (*Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t*) (*
-        (*reverse direction*)
-        bool Usual_domains.flat_lattice Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t*)
     }
 
   type dynamic_information =
@@ -282,70 +260,7 @@ struct
       dynamic with global = global
     }
 
-  (*initial states*)
-(*  let get_value_parallel_bonds_init dynamic =
-    (get_local_dynamic_information dynamic).store_value_parallel_bonds_init*)
-
-(*  let set_value_parallel_bonds_init bonds dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_value_parallel_bonds_init = bonds
-      } dynamic*)
-
-(*  let get_value_non_parallel_bonds_init dynamic =
-    (get_local_dynamic_information dynamic).store_value_non_parallel_bonds_init*)
-
-(*  let set_value_non_parallel_bonds_init bonds dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_value_non_parallel_bonds_init = bonds
-      } dynamic*)
-
-(*  let get_value_of_init dynamic =
-    (get_local_dynamic_information dynamic).store_value_of_init*)
-
-(*  let set_value_of_init bonds dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_value_of_init = bonds
-      } dynamic*)
-
-  (*value in the rhs*)
-
-(*  let get_value_parallel_bonds_rhs dynamic =
-    (get_local_dynamic_information dynamic).store_value_parallel_bonds_rhs
-
-  let set_value_parallel_bonds_rhs bonds dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_value_parallel_bonds_rhs = bonds
-      } dynamic*)
-
-(*  let get_value_non_parallel_bonds_rhs dynamic =
-    (get_local_dynamic_information dynamic).store_value_non_parallel_bonds_rhs
-
-  let set_value_non_parallel_bonds_rhs bonds dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_value_non_parallel_bonds_rhs = bonds
-      } dynamic*)
-
-(*  let get_value_bonds_rhs dynamic =
-    (get_local_dynamic_information dynamic).store_value_bonds_rhs
-
-  let set_value_bonds_rhs bonds dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_value_bonds_rhs = bonds
-      } dynamic*)
-
-  (*final value of parallel bonds*)
+  (*current value of parallel bonds*)
   let get_value dynamic =
     (get_local_dynamic_information dynamic).store_value
 
@@ -529,14 +444,9 @@ struct
     in
     let init_local_dynamic_information =
       {
-        (*        store_value_parallel_bonds_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_non_parallel_bonds_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_of_init = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-        store_value_non_parallel_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
-                  store_value_bonds_rhs = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;*)
         dummy = ();
-        store_value = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty  }
+        store_value = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
+      }
     in
     let init_global_dynamic_information =
       {
@@ -632,13 +542,13 @@ struct
     error, dynamic, event_list
 
   (*************************************************************)
-  (* TODO *)
+  (* TODO, STILL TODO  *)
   (* if a parallel bound occur in a lhs, check that this is possible *)
   let is_enabled _static dynamic error (_rule_id:Ckappa_sig.c_rule_id) precondition =
     error, dynamic, Some precondition
 
   (***************************************************************)
-  (* to do, when one bond is created, check in the precondition, whether the two other sites may be bound, check whether they must be bound to the same agents, whether they cannot be bound to the same agent, whether we cannot know, and deal with accordingly *)
+  (* when one bond is created, check in the precondition, whether the two other sites may be bound, check whether they must be bound to the same agents, whether they cannot be bound to the same agent, whether we cannot know, and deal with accordingly *)
 
   let get_state_of_site_in_precondition parameter error dynamic agent_id site_type precondition =
     (*binding action: A.x.B.z -> parallel bonds: A.x.y.B.z.t, B.z.t.A.x.y (first bound)*)
@@ -680,7 +590,7 @@ struct
         then
           begin
             (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
-            if (Ckappa_sig.int_of_state_index p_state2 = 0) || (Ckappa_sig.int_of_state_index p_state2') = 0
+            if (Ckappa_sig.int_of_state_index p_state2 = 0)
             then
               (*answer of question 1: the second site is free*)
               (*let error =
@@ -698,7 +608,8 @@ struct
             else
               (* the pre_state2 is bound or pre_state2' is bound. Question 2: both sites are bound with the good sites, then return Any, if not return false*)
               begin
-                if s_type2 = s_type2' && p_state2 = p_state2'
+                if s_type2 = s_type2' && p_state2 = p_state2' &&
+                   not (Ckappa_sig.int_of_state_index p_state2' = 0)
                 then
                   (*both question1 and 2 are yes: return any*)
                   (*let error =
@@ -820,122 +731,6 @@ struct
                         error, potential_list
                       ) (error, []) state_list
                   in
-                  (*print for test, list of potential_list*)
-                  (*let error =
-                    if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
-                    then
-                      begin
-                        let () = Print_parallel_bonds.print_action_binding_test parameter error handler_kappa rule_id
-                      ((agent_id, agent_type, site_type, state),
-                       (agent_id', agent_type', site_type', state'));
-                          Loggers.fprintf log "List of potential sites:\n";
-                          List.iter
-                            (fun
-                              ((ag_id, ag_type, s_type, s_type2, p_state, p_state2),
-                               (ag_id', ag_type', s_type', s_type2', p_state', p_state2')) ->
-                              let error, ag_string =
-                                try
-                                  Handler.string_of_agent parameter error handler_kappa ag_type
-                                with
-                                  _ -> warn parameter error (Some "line 1706") Exit (Ckappa_sig.string_of_agent_name ag_type)
-                              in
-                              let error, s_type_string =
-                                try                          Handler.string_of_site parameter error
-                              handler_kappa ag_type s_type
-                                with
-                                  _ -> warn parameter error (Some "line 1714") Exit
-                                         (Ckappa_sig.string_of_site_name s_type)
-                              in
-                              let error, p_state_string =
-                          try
-                            Handler.string_of_state_fully_deciphered parameter error handler_kappa
-                              ag_type s_type p_state
-                          with
-                            _ -> warn parameter error (Some "line 1530") Exit
-                                   (Ckappa_sig.string_of_state_index p_state)
-                        in
-                        let error, s_type2_string =
-                          try
-                            Handler.string_of_site parameter error
-                              handler_kappa ag_type s_type2
-                          with
-                            _ -> warn parameter error (Some "line 1714") Exit
-                                   (Ckappa_sig.string_of_site_name s_type2)
-                        in
-                        let error, p_state2_string =
-                          try
-                            Handler.string_of_state_fully_deciphered parameter error handler_kappa
-                              ag_type s_type2 p_state2
-                          with
-                            _ -> warn parameter error (Some "line 1530") Exit
-                                   (Ckappa_sig.string_of_state_index p_state2)
-                        in
-                        (**)
-                        let error, ag_string' =
-                          try
-                            Handler.string_of_agent parameter error handler_kappa ag_type'
-                          with
-                            _ -> warn parameter error (Some "line 1706") Exit
-                                   (Ckappa_sig.string_of_agent_name ag_type')
-                        in
-                        let error, s_type'_string =
-                          try
-                            Handler.string_of_site parameter error
-                              handler_kappa ag_type' s_type'
-                          with
-                            _ -> warn parameter error (Some "line 1714") Exit
-                                   (Ckappa_sig.string_of_site_name s_type')
-                        in
-                        let error, p_state'_string =
-                          try
-                            Handler.string_of_state_fully_deciphered parameter error handler_kappa
-                              ag_type' s_type' p_state'
-                          with
-                            _ -> warn parameter error (Some "line 1530") Exit
-                                   (Ckappa_sig.string_of_state_index p_state')
-                        in
-                        let error, s_type2'_string =
-                          try
-                            Handler.string_of_site parameter error
-                              handler_kappa ag_type' s_type2'
-                          with
-                            _ -> warn parameter error (Some "line 1714") Exit
-                                   (Ckappa_sig.string_of_site_name s_type2')
-                        in
-                        let error, p_state2'_string =
-                          try
-                            Handler.string_of_state_fully_deciphered parameter error handler_kappa
-                              ag_type' s_type2' p_state2'
-                          with
-                            _ -> warn parameter error (Some "line 1530") Exit
-                                   (Ckappa_sig.string_of_state_index p_state2')
-                        in
-                        Loggers.fprintf log
-                        "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:%s:site_type:%i:%s:%s ->\
-                         agent_id:%i:agent_type:%i:%s:site_type:%i:%s:%s:site_type:%i:%s:%s\n"
-                        (Ckappa_sig.int_of_agent_id ag_id)
-                        (Ckappa_sig.int_of_agent_name ag_type)
-                        ag_string
-                        (Ckappa_sig.int_of_site_name s_type)
-                        s_type_string
-                        p_state_string
-                        (Ckappa_sig.int_of_site_name s_type2)
-                        s_type2_string
-                        p_state2_string
-                        (**)
-                        (Ckappa_sig.int_of_agent_id ag_id')
-                        (Ckappa_sig.int_of_agent_name ag_type')
-                        ag_string'
-                        (Ckappa_sig.int_of_site_name s_type')
-                        s_type'_string
-                        p_state'_string
-                        (Ckappa_sig.int_of_site_name s_type2')
-                        s_type2'_string
-                        p_state2'_string) potential_list
-                        in error
-                      end
-                    else error
-                    in*)
                   (*fold over a potential list and compare with parallel_list*)
                   let error, value =
                     compute_value_fst_aux error site_type2 state2
@@ -971,7 +766,7 @@ struct
         then
           begin
             (*question 1*)
-            if (Ckappa_sig.int_of_state_index p_state) = 0 || (Ckappa_sig.int_of_state_index p_state') = 0
+            if (Ckappa_sig.int_of_state_index p_state) = 0
             then
               (**)
               (*let error =
@@ -987,7 +782,8 @@ struct
               in error, new_value
             else
               begin
-                if s_type = s_type' && p_state = p_state'
+                if s_type = s_type' && p_state = p_state' &&
+                   not (Ckappa_sig.int_of_state_index p_state' = 0)
                 then
                   (*let error =
                     if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
@@ -1364,7 +1160,7 @@ let apply_rule static dynamic error rule_id precondition =
            error, store_result
         )
         (fun parameter error x value1 value2 store_result ->
-           let new_value = Usual_domains.lub value1 value2 in
+            let new_value = Usual_domains.lub value1 value2 in
            let error, store_result =
              Parallel_bonds_type.add_value_from_refined_tuple
                parameter error kappa_handler
