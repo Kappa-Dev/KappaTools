@@ -79,6 +79,17 @@ let convert_tuple parameters error kappa_handler tuple =
   let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
   error, (agent,site,site',agent'',site'',site''')
 
+let convert_refined_tuple parameters error kappa_handler tuple =
+  let (agent_id,agent,site,site',_,_),(agent_id',agent'',site'',site''',_,_) =
+    tuple
+  in
+  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
+  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
+  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
+  let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
+  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
 let print_parallel_constraint ?prefix:(prefix="") ?final_resul:(final_result=false)
     ?dump_any:(dump_any=false) parameters error kappa_handler tuple value =
   let modalite = if final_result then "are necessarily" else "may be" in
@@ -139,3 +150,17 @@ let project (_,b,c,d,e,f) = (b,c,d,e,f)
 let project2 (x,y) = (project x,project y)
 let add_value_from_refined_tuple parameters error kappa_handler x =
   add_value parameters error kappa_handler (project2 x)
+
+
+let swap_sites_in_tuple (a,b,s,s',st,st') = (a,b,s',s,st',st)
+
+let add_symmetric_tuple_pair f parameter error (x,y) remanent =
+  let x' = swap_sites_in_tuple x in
+  let y' = swap_sites_in_tuple y in
+  List.fold_left
+    (fun (error, remanent) t ->
+       f
+         parameter error t remanent
+      )
+      (error, remanent)
+      [x,y;(*y,x;*)x',y';(*y',x'*)]
