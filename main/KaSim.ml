@@ -116,12 +116,13 @@ let () =
         out,[|"-seed";string_of_int out|]
     in Random.init theSeed ;
     let command_line =
-      Format.asprintf "@[<h>%a%a@]"
+      Format.asprintf "@[<h>%a%t%a@]"
         (Pp.array Pp.space
            (fun i f s ->
               Format.fprintf
                 f "'%s'" (if i = 0 then "KaSim" else s)))
         Sys.argv
+        (fun f -> if Array.length seed_arg > 0 then Format.pp_print_space f ())
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
