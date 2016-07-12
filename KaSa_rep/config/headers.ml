@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 08/03/2010
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Jul 12 2016>
  * *
  * Some parameters
  * references can be tuned thanks to command-line options
@@ -23,7 +23,7 @@ let head parameters = ["This file has been computed by KaSa: a Static Analyzer f
 		       "Download sources/binaries at https://github.com/Kappa-Dev/KaSim";
 		       "";
 		       Remanent_parameters.get_launched_when_and_where parameters;
-		       "Command line is: "^(String.concat " " (match Array.to_list (Remanent_parameters.get_command_line parameters) with t::q -> "KaSa"::q | [] -> []));
+		       "Command line is: "^(String.concat " " (match Array.to_list (Remanent_parameters.get_command_line parameters) with _t::q -> "KaSa"::q | [] -> []));
   		       "";
 	   ]
 

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 06/10/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 12 2016>
    * *
    * Choices of algebrae for counting or enumerating the shapes that we can do with puzzle pieces
    *
@@ -62,10 +62,10 @@ module Explicit_enumeration =
 
     let size_of_abstract_species_set set = set.cardinal
 
-    let print_brick kappa stdout brick =
+    let print_brick _kappa stdout brick =
       Printf.fprintf stdout "%i" brick
 
-    let print_regular_formula error kappa stdout print_hole set =
+    let print_regular_formula _error kappa stdout print_hole set =
       let rec aux regular_formula =
         match regular_formula
         with
@@ -99,7 +99,7 @@ module Explicit_enumeration =
         with
             Brick _ | Nil ->
               aux regular_formula
-          | _ ->
+        | Sum _ | Infinity  | Product _ | Square _ ->
             let _ = Printf.fprintf stdout "(" in
             let _ = aux regular_formula in
             let _ = Printf.fprintf stdout ")" in
@@ -118,7 +118,7 @@ module Explicit_enumeration =
                 Nil
               | Brick _
               | Sum _ -> true
-              | _ -> false)
+            | Product _ | Square _ | Infinity -> false)
           x
       in
       let _ = aux set.regular_formula in
@@ -188,7 +188,7 @@ module Counting =
 
     (*let dual _ kappa_handler = kappa_handler.Kappa.dual_of_puzzle_hole *)
 
-    let print error kappa stdout _ (*_*) set =
+    let print _error _kappa stdout _ (*_*) set =
       let _ = Printf.fprintf stdout "\n\n There are %s chemical species.\n" (Int_inf.bi_string_of set) in
       ()
 
@@ -196,7 +196,7 @@ module Counting =
 
     let promote linear_combination  =
       List.fold_left
-        (fun cardinal (n,brick) -> Int_inf.bi_add (Int_inf.bi_of_int n) cardinal)
+        (fun cardinal (n,_brick) -> Int_inf.bi_add (Int_inf.bi_of_int n) cardinal)
         Int_inf.bi_zero
         linear_combination
 

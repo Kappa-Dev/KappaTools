@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 12 2016>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -41,18 +41,9 @@ val get_dump_site_dependencies: Remanent_parameters_sig.parameters -> bool
 val get_unsafe: Remanent_parameters_sig.parameters -> bool
 val get_trace: Remanent_parameters_sig.parameters -> bool
 
-(*val get_dump_error_as_soon_as_they_occur = upgrade_from_marshal_field get_dump_error_as_soon_as_they_occur_1*)
 val get_prefix: Remanent_parameters_sig.parameters -> string
-val set_trace: Remanent_parameters_sig.parameters -> bool -> Remanent_parameters_sig.parameters
 val set_logger: Remanent_parameters_sig.parameters -> Loggers.t -> Remanent_parameters_sig.parameters
-val update_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_parameters_sig.parameters
 val set_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_parameters_sig.parameters
-val update_call_stack:
-  Remanent_parameters_sig.parameters ->
-  bool ->
-  string option ->
-  Remanent_parameters_sig.parameters
-
 val get_link_mode: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.link_mode
 val get_influence_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 val get_contact_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
