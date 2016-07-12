@@ -23,17 +23,23 @@ let local_trace = false
 module Domain =
 struct
 
-  (* the type of the struct that contains all static information as in the previous version of the analysis *)
+  (* the type of the struct that contains all static information as in the
+     previous version of the analysis *)
 
   (* domain specific info: *)
-  (* collect the set of tuples (A,x,y,B,z,t) such that there exists a rule with a bond connecting the site A.x and B.z and that the agent of type A document a site y <> x, and the agent of type B document a site t <> z *)
+  (* collect the set of tuples (A,x,y,B,z,t) such that there exists a rule
+     with a bond connecting the site A.x and B.z and that the agent of type A
+     document a site y <> x, and the agent of type B document a site t <> z *)
 
   (* for each tuple, collect three maps -> (A,x,y,B,z,t) -> Ag_id list
      RuleIdMap to explain in which rule and which agent_id the site y can be modified
 
-     -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and which agent_id the site t can be modified
+     -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and
+        which agent_id the site t can be modified
 
-     -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and which agent_id (A) a site x of A may become bound to a site z of B *)
+     -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and
+        which agent_id (A) a site x of A may become bound to a site z of
+        B *)
 
   type local_static_information =
     {
@@ -50,11 +56,17 @@ struct
   (*--------------------------------------------------------------*)
   (* a triple of maps : mvbdu_of_association_list*)
 
-  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with two variables that describes the relation between the state of y and the state of t, when both agents are connected via x and z *)
+  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with two variables
+     that describes the relation between the state of y and the state of t,
+     when both agents are connected via x and z *)
 
-  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables that decribes the range of y when both agents are connected via x and z *)
+  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables
+     that decribes the range of y when both agents are connected via x and
+     z *)
 
-  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables that decribes the range of t when both agents are connected via x and z *)
+  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables
+     that decribes the range of t when both agents are connected via x and
+     z *)
 
   type local_dynamic_information =
     {
@@ -78,8 +90,9 @@ struct
     }
 
   (*------------------------------------------------------------*)
-  (** global static information.
-      explain how to extract the handler for kappa expressions from a value of type static_information. Kappa handler is static and thus it should never updated. *)
+  (** global static information.  explain how to extract the handler for
+      kappa expressions from a value of type static_information. Kappa
+      handler is static and thus it should never updated. *)
 
   let get_global_static_information static = static.global_static_information
 
@@ -218,7 +231,8 @@ struct
   let set_mvbdu_handler handler dynamic =
     {
       dynamic with
-      global = Analyzer_headers.set_mvbdu_handler handler (get_global_dynamic_information dynamic)
+      global = Analyzer_headers.set_mvbdu_handler handler 
+          (get_global_dynamic_information dynamic)
     }
 
   let get_local_dynamic_information dynamic = dynamic.local
@@ -402,32 +416,37 @@ struct
     (*views on the right hand side*)
     let store_views_rhs = get_views_rhs static in
     let error, store_views_rhs =
-      Site_accross_bonds_domain_static.collect_views_rhs parameter error rule_id rule store_views_rhs
+      Site_accross_bonds_domain_static.collect_views_rhs
+        parameter error rule_id rule store_views_rhs
     in
     let static = set_views_rhs store_views_rhs static in
     (*------------------------------------------------------------*)
     (*bonds on the right hand side*)
     let store_bonds_rhs = get_bonds_rhs static in
     let error, store_bonds_rhs =
-      Site_accross_bonds_domain_static.collect_bonds_rhs parameter error rule_id rule store_bonds_rhs
+      Site_accross_bonds_domain_static.collect_bonds_rhs 
+        parameter error rule_id rule store_bonds_rhs
     in
     let static = set_bonds_rhs store_bonds_rhs static in
     (*------------------------------------------------------------*)
     (*tuple pair*)
     let store_views_rhs = get_views_rhs static in
     let error, store_test =
-      Site_accross_bonds_domain_static.collect_pair_sites_aux parameter error rule_id store_views_rhs
+      Site_accross_bonds_domain_static.collect_pair_sites_aux
+        parameter error rule_id store_views_rhs
     in
     let store_tuple_pair = get_tuple_pair static in
     let error, store_tuple_pair =
-      Site_accross_bonds_domain_static.collect_tuple_pair parameter error rule_id store_test store_tuple_pair
+      Site_accross_bonds_domain_static.collect_tuple_pair
+        parameter error rule_id store_test store_tuple_pair
     in
     let static = set_tuple_pair store_tuple_pair static in
     (*------------------------------------------------------------*)
     (*modification*)
     let store_modified_map = get_modified_map static in
     let error, store_modified_map =
-      Site_accross_bonds_domain_static.collect_site_modified parameter error rule_id rule store_modified_map
+      Site_accross_bonds_domain_static.collect_site_modified 
+        parameter error rule_id rule store_modified_map
     in
     let static = set_modified_map store_modified_map static in
     (*------------------------------------------------------------*)
@@ -435,39 +454,53 @@ struct
     let store_tuple_pair = get_tuple_pair static in
     let store_created_bond = get_created_bond static in
     let error, store_created_bond =
-      Site_accross_bonds_domain_static.collect_created_bond parameter error rule_id rule store_tuple_pair store_created_bond
+      Site_accross_bonds_domain_static.collect_created_bond
+        parameter error rule_id rule store_tuple_pair store_created_bond
     in
     let static = set_created_bond store_created_bond static in
     (*------------------------------------------------------------*)
     (*internal state*)
     let store_bonds_rhs = get_bonds_rhs static in
     let store_modified_map = get_modified_map static in
-    let store_modified_internal_state_and_bond = get_modified_internal_state_and_bond static in
+    let store_modified_internal_state_and_bond =
+      get_modified_internal_state_and_bond static in
     let error, store_modified_internal_state_and_bond =
-      Site_accross_bonds_domain_static.collect_modified_internal_and_bond parameter error rule_id store_tuple_pair store_bonds_rhs store_modified_map store_modified_internal_state_and_bond
+      Site_accross_bonds_domain_static.collect_modified_internal_and_bond 
+        parameter error rule_id
+        store_tuple_pair 
+        store_bonds_rhs 
+        store_modified_map 
+        store_modified_internal_state_and_bond
     in
     let static = set_modified_internal_state_and_bond store_modified_internal_state_and_bond static in
     (*------------------------------------------------------------*)
     (*question marks on the right hand side*)
     let store_question_marks_rhs = get_question_marks_rhs static in
     let error, store_question_marks_rhs =
-      Site_accross_bonds_domain_static.collect_question_marks_rhs parameter error rule_id kappa_handler rule store_modified_map store_question_marks_rhs
+      Site_accross_bonds_domain_static.collect_question_marks_rhs 
+        parameter error rule_id kappa_handler rule 
+        store_modified_map
+        store_question_marks_rhs
     in
     let static = set_question_marks_rhs store_question_marks_rhs static in
     (*------------------------------------------------------------*)
     (*implicit static information*)
     let store_question_marks_rhs = get_question_marks_rhs static in
     let store_implicit_static =
-      Site_accross_bonds_domain_static.collect_implicit_static parameter error store_tuple_pair store_question_marks_rhs
+      Site_accross_bonds_domain_static.collect_implicit_static
+        parameter error store_tuple_pair store_question_marks_rhs
     in
     let static = set_implicit_rule store_implicit_static static in
     (*------------------------------------------------------------*)
     (*explicit static information*)
-    let store_modified_internal_state_and_bond = get_modified_internal_state_and_bond static in
+    let store_modified_internal_state_and_bond = 
+      get_modified_internal_state_and_bond static in
     let store_created_bond = get_created_bond static in
     let store_explicit_static = get_explicit_rule static in
     let error, store_explicit_static =
-      Site_accross_bonds_domain_static.collect_explicit_static parameter error store_created_bond store_modified_internal_state_and_bond store_explicit_static
+      Site_accross_bonds_domain_static.collect_explicit_static
+        parameter error store_created_bond 
+        store_modified_internal_state_and_bond store_explicit_static
     in
     let static = set_explicit_rule store_explicit_static static in
     error, static
@@ -536,7 +569,8 @@ struct
     let parameter = get_parameter static in
     let store_result = get_pair_tuple_init dynamic in
     let error, store_tuple_pair_init =
-      Site_accross_bonds_domain_dynamic.collect_pair_tuple_init parameter error species store_result
+      Site_accross_bonds_domain_dynamic.collect_pair_tuple_init
+        parameter error species store_result
     in
     let dynamic = set_pair_tuple_init store_tuple_pair_init dynamic in
     let event_list = [] in
@@ -545,7 +579,8 @@ struct
   (*------------------------------------------------------------*)
   (*implementation dynamic information*)
 
-  (*first map, (A,x,y,B,z,t) to a mvbdu: describes the relation between the state of y and the state of t, when both agents are connected via x.z*)
+  (*first map, (A,x,y,B,z,t) to a mvbdu: describes the relation between the
+    state of y and the state of t, when both agents are connected via x.z*)
 
   (*------------------------------------------------------------*)
   (*range of the second site of the first agent, when both agents are connected via the first site*)
@@ -635,18 +670,22 @@ struct
         store_explicit_static
     in
     let store_internal_state_explicit =
-      Site_accross_bonds_domain_dynamic.collect_internal_state_explicit parameter error rule_id
+      Site_accross_bonds_domain_dynamic.collect_internal_state_explicit
+        parameter error rule_id
         store_internal_state_collect_internal_state_explicit_aux
     in
     (*------------------------------------------------*)
     let error, store_tuple_pair_binding_internal_state_explicit_aux =
-      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit_aux parameter error rule_id
+      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit_aux
+        parameter error rule_id
         store_views_rhs
         store_internal_state_explicit
     in
     let store_tuple_pair_binding_internal_state_explicit =
-      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit parameter
-        error store_tuple_pair_binding_internal_state_explicit_aux
+      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit 
+        parameter
+        error
+        store_tuple_pair_binding_internal_state_explicit_aux
     in
     (*------------------------------------------------*)
     let store_pair_tuple_init = get_pair_tuple_init dynamic in
@@ -660,7 +699,8 @@ struct
     in
     let dynamic = set_explicit_dynamic store_explicit_dynamic dynamic in
     (*------------------------------------------------*)
-    (* modification of y and/or t and we do not know whether the agents are bound : implicit case, todo precondition*)
+    (* modification of y and/or t and we do not know whether the agents are
+       bound : implicit case, todo precondition*)
     (*------------------------------------------------*)
     let store_implicit_static = get_implicit_rule static in
     let error, store_implicit_dynamic_aux =
@@ -711,7 +751,8 @@ struct
   let print static dynamic error loggers =
     let parameter = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let log = Remanent_parameters.get_logger parameter in    (*--------------------------------------------------------*)
+    let log = Remanent_parameters.get_logger parameter in 
+    (*--------------------------------------------------------*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
@@ -753,7 +794,8 @@ struct
     let store_explicit_dynamic = get_explicit_dynamic dynamic in
     let store_implicit_dynamic = get_implicit_dynamic dynamic in
     let error =
-      Site_accross_bonds_domain_dynamic.print_basic_dynamic_information parameter error handler_kappa log
+      Site_accross_bonds_domain_dynamic.print_basic_dynamic_information
+        parameter error handler_kappa log
         store_pair_tuple_init
         store_explicit_dynamic
         store_implicit_dynamic
@@ -837,7 +879,8 @@ struct
     let store_range_mvbdu1 = get_range_mvbdu1 dynamic in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, store_range_mvbdu1 =
-      Site_accross_bonds_domain_dynamic.collect_range_mvbdu1 parameter error handler store_explicit_dynamic store_range_mvbdu1
+      Site_accross_bonds_domain_dynamic.collect_range_mvbdu1
+        parameter error handler store_explicit_dynamic store_range_mvbdu1
     in
     let error =
     if
@@ -907,7 +950,8 @@ struct
     let store_range_mvbdu2 = get_range_mvbdu2 dynamic in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, store_range_mvbdu2 =
-      Site_accross_bonds_domain_dynamic.collect_range_mvbdu2 parameter error handler store_explicit_dynamic store_range_mvbdu2
+      Site_accross_bonds_domain_dynamic.collect_range_mvbdu2 
+        parameter error handler store_explicit_dynamic store_range_mvbdu2
     in
     let error =
     if
