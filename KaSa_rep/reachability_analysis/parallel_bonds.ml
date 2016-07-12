@@ -566,6 +566,7 @@ struct
   let compute_value_init static dynamic error init_state =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
+    let parameter = Remanent_parameters.update_prefix parameter "        " in
     let error, store_bonds_init =
       Parallel_bonds_init.collect_bonds_initial
         parameter
@@ -620,19 +621,6 @@ struct
     in
     let dynamic = set_value store_result dynamic in
     (*-------------------------------------------------------------*)
-    (*let value_parallel_bonds = get_value dynamic in
-    let value_non_parallel_bonds = get_value_non_parallel_bonds_init dynamic in
-    let store_result = get_value_of_init dynamic in
-    let error, store_result =
-      Parallel_bonds_init.collect_value_of_init
-        parameter
-        value_parallel_bonds
-        value_non_parallel_bonds
-        error
-        init_state
-        store_result
-      in*)
-    (*    let dynamic = set_value_of_init store_result dynamic in*)
     error, dynamic
 
   let add_initial_state static dynamic error species =
