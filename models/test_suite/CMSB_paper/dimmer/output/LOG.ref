@@ -5,6 +5,14 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+                Update information about potential double bindings
+                Update information about potential double bindings
+                Update information about potential double bindings
+                Update information about potential double bindings
+                Update information about potential double bindings
+                Update information about potential double bindings
+                Update information about potential double bindings
+                Update information about potential double bindings
 
 ------------------------------------------------------------
 * Dead rules :
@@ -33,4 +41,9 @@ The binding state of site n in agent R ranges over free and R@cr.
 The binding state of site cr in agent R ranges over free and R@n.
 The binding state of site c in agent R ranges over free and R@c.
 The binding state of site x in agent R ranges over free and E@x.
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
+When the agent R has its site c bound to the site c of a R, and its site cr bound to the site n of a R, then both instances of R are necessarily the same.
+When the agent R has its site c bound to the site c of a R, and its site n bound to the site cr of a R, then both instances of R are necessarily the same.
 execution finished without any exception

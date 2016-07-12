@@ -273,9 +273,13 @@ EXTENSIONAL DESCRIPTION:
 			B(z!A@z,t!A@t)
 
 	Wake-up rules
+                Update information about potential double bindings
+                Update information about potential double bindings
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
+                Update information about potential double bindings
+                Update information about potential double bindings
 execution finished without any exception

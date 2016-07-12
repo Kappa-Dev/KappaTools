@@ -90,34 +90,69 @@ let convert_refined_tuple parameters error kappa_handler tuple =
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
   let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
   error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
-let print_parallel_constraint ?prefix:(prefix="") ?final_resul:(final_result=false)
+
+let print_parallel_constraint 
+    ?verbose:(verbose=true)
+    ?sparse:(sparse=false)
+    ?final_resul:(final_result=false)
     ?dump_any:(dump_any=false) parameters error kappa_handler tuple value =
   let modalite = if final_result then "are necessarily" else "may be" in
   let error, (agent,site,site',agent'',site'',site''') =
     convert_tuple parameters error kappa_handler tuple
   in
+  let prefix = Remanent_parameters.get_prefix parameters in
+  if sparse && compare site site' > 0
+  then error
+  else
+
   let () =
     match value
     with
     | Usual_domains.Val true ->
       let () =
+        if verbose then
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "When the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s %s the same"
-          agent site site'' agent'' site' site''' agent'' agent'' modalite
+          "%sWhen the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s %s the same."
+          prefix agent site site'' agent'' site' site''' agent'' agent'' modalite
+        else
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s%s(%s!1,%s!2),%s(%s!1,%s!2)"
+          prefix agent site site'' agent'' site' site'''
       in Loggers.print_newline (Remanent_parameters.get_logger parameters)
     | Usual_domains.Val false ->
       let () =
+        if verbose then
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "When the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s %s  different"
-          agent site site'' agent'' site' site''' agent'' agent'' modalite
+          "%sWhen the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s %s  different."
+          prefix agent site site'' agent'' site' site''' agent'' agent'' modalite
+        else
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "%s%s(%s!1,%s!2),%s(%s!1),%s(%s!2)"
+          prefix agent site site'' agent'' site' agent site'''
       in Loggers.print_newline (Remanent_parameters.get_logger parameters)
     | Usual_domains.Undefined -> ()
     | Usual_domains.Any ->
       if dump_any then
         let () =
+          if verbose then
           Loggers.fprintf (Remanent_parameters.get_logger parameters)
-            "When the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s may be  different or not"
-            agent site site'' agent'' site' site''' agent'' agent''
+            "%sWhen the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s may be  different or not."
+            prefix agent site site'' agent'' site' site''' agent'' agent''
+          else
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                "%s%s(%s!1,%s!2),%s(%s!1,%s!2)"
+                prefix agent site site'' agent'' site' site'''
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameters)
+            in
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                "%s%s(%s!1,%s!2),%s(%s!1),%s(%s!2)"
+                  prefix agent site site'' agent'' site' agent site'''
+            in
+            ()
         in Loggers.print_newline (Remanent_parameters.get_logger parameters)
   in error
 
@@ -138,7 +173,8 @@ let add_value parameters error kappa_handler x value store_result =
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters
       then
-        print_parallel_constraint ~dump_any:true parameters error kappa_handler x value
+        let parameters = Remanent_parameters.update_prefix parameters "         " in
+        print_parallel_constraint  ~verbose:false ~dump_any:true parameters error kappa_handler x value
       else error
     in
     let error, store_result =

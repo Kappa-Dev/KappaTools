@@ -371,6 +371,9 @@ The internal state of site w in agent A ranges over u and p.
 The internal state of site z in agent A ranges over u and p.
 The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
 execution finished without any exception
 Parsing relations.ka...
 done
@@ -409,4 +412,7 @@ The internal state of site w in agent A ranges over u and p.
 The internal state of site z in agent A ranges over u and p.
 The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
 execution finished without any exception

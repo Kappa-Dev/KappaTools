@@ -1005,4 +1005,7 @@ Id=140
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A ranges over u, p, 0, and q.
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
 execution finished without any exception

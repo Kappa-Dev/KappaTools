@@ -99,8 +99,20 @@ let options =
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the view analysis",
       ["2_Reachability_analysis"],
-      Normal;
+      Hidden;
 
+      "--verbosity-level-for-reachability-analysis",
+      (Choice
+         ([
+           "Mute","No information displayed";
+           "Low","Show analysis result only";
+           "Medium","Also show which rules are applied";
+           "High","Also show when patterns are discovered";
+           "Full","Also show which rules are put in the working list"],
+           Config.verbosity_level_for_reachability_analysis)),
+      "Tune the verbosity level for the reachability analysis",
+      ["2_Reachability_analysis"],
+      Normal;
       "--hide-one-d-relations-from-cartesian-decomposition",
       Bool Config.hide_one_d_relations_from_cartesian_decomposition,
       "Filter out 1-d relations from the Cartesian decomposition",

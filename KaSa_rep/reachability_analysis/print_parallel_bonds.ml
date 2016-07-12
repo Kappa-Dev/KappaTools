@@ -19,7 +19,7 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 let local_trace = false
-
+let sparse = true (* print constraints up to symmetries *)
 (*******************************************************************)
 (*PRINT*)
 
@@ -507,38 +507,27 @@ let print_result' handler_kappa parameter (error:Exception.method_handler) store
         error
     ) store_result error
 
-let print_result _handler_kappa parameter error store_result =
-  let () =
-    Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.iter
-    (fun ((agent_type, site_type1, site_type2, state1, state2),
-          (agent_type', site_type1', site_type2', state1', state2')) value  ->
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "agent_type:%s:site_type:%s:site_type:%s:state:%s:state:%s->\
-         agent_type:%s:site_type:%s:site_type:%s:state:%s:state:%s\n"
-        (Ckappa_sig.string_of_agent_name agent_type)
-        (Ckappa_sig.string_of_site_name site_type1)
-        (Ckappa_sig.string_of_site_name site_type2)
-        (Ckappa_sig.string_of_state_index state1)
-        (Ckappa_sig.string_of_state_index state2)
-
-        (Ckappa_sig.string_of_agent_name agent_type')
-        (Ckappa_sig.string_of_site_name site_type1')
-        (Ckappa_sig.string_of_site_name site_type2')
-        (Ckappa_sig.string_of_state_index state1')
-        (Ckappa_sig.string_of_state_index state2')
-      ;
-      print_value parameter value
-    ) store_result
+let print_result kappa_handler parameter error store_result =
+  let error =
+    Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
+    (fun tuple  value  error ->
+      Parallel_bonds_type.print_parallel_constraint
+        ~verbose:true
+        ~sparse
+        ~final_resul:true
+        ~dump_any:true parameter error kappa_handler tuple value
+    ) store_result error
   in error
 
 (**************************************************************************)
 (*print result of parallel bonds in the initial state*)
 
 let print_parallel_bonds_init parameter handler_kappa store_parallel_bonds_init _static _dynamic error =
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "\nResult of parallel bonds in the initial states:\n";
-  print_result handler_kappa parameter error store_parallel_bonds_init;
-  Loggers.print_newline (Remanent_parameters.get_logger parameter)
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "\nResult of parallel bonds in the initial states:\n"; in
+  let error = print_result handler_kappa parameter error store_parallel_bonds_init in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  error
 
 (******************************************************************)
 

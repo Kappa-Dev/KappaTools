@@ -1268,6 +1268,16 @@ let apply_rule static dynamic error rule_id precondition =
     let kappa_handler = get_kappa_handler static in
     (*-----------------------------------------------------------*)
     (*a map of rule that has a set of parallel bonds in the rhs*)
+    let parameter = Remanent_parameters.update_prefix parameter "                " in
+    let dump_title () =
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameter)
+          "%sUpdate information about potential double bindings"
+          (Remanent_parameters.get_prefix parameter)
+      in
+      Loggers.print_newline (Remanent_parameters.get_logger parameter)
+    in
     let store_rule_has_parallel_bonds_rhs = get_rule_has_parallel_bonds_rhs static in
     let error, rule_has_parallel_bonds_rhs_set =
       match
@@ -1321,6 +1331,16 @@ let apply_rule static dynamic error rule_id precondition =
         dynamic precondition store_snd_pair_bind_map rule_has_parallel_bonds_rhs_set
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
     in
+    let bool =
+      if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.is_empty store_value1
+      && Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.is_empty store_value2
+      then
+        false
+      else
+        let () = dump_title () in
+        true
+    in
+
     (*-----------------------------------------------------------*)
     (*fold2*)
     (*    let add_link error x value store_result =
@@ -1386,6 +1406,13 @@ let apply_rule static dynamic error rule_id precondition =
     let error, store_non_parallel =
       collect_result_of_non_parallel parameter error rule_id
         non_parallel_rhs_list Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
+    in
+    let () =
+      if not bool && Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty store_non_parallel
+            then
+              ()
+      else
+        dump_title ()
     in
     (*--------------------------------------------------------------*)
     (*fold2*)
@@ -1460,7 +1487,11 @@ let apply_rule static dynamic error rule_id precondition =
         in
         let store_value = get_value dynamic in
         let error =
-          Print_parallel_bonds.print_result handler_kappa parameter error store_value(*;                                                                                                     Print_parallel_bonds.print_result handler_kappa parameter error (snd store_value_of_parallel_bonds)*)
+          Print_parallel_bonds.print_result
+            handler_kappa
+            parameter
+            error
+            store_value(*;                                                                                                     Print_parallel_bonds.print_result handler_kappa parameter error (snd store_value_of_parallel_bonds)*)
         in error
       else
         error
