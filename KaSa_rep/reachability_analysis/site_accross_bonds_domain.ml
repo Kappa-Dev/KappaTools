@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -70,6 +70,7 @@ struct
 
   type local_dynamic_information =
     {
+      dumy: unit;
       store_basic_dynamic_information: Site_accross_bonds_domain_dynamic.basic_dynamic_information;
       (*store_relation_mvbdu :
         Ckappa_sig.Views_bdu.mvbdu
@@ -231,7 +232,7 @@ struct
   let set_mvbdu_handler handler dynamic =
     {
       dynamic with
-      global = Analyzer_headers.set_mvbdu_handler handler 
+      global = Analyzer_headers.set_mvbdu_handler handler
           (get_global_dynamic_information dynamic)
     }
 
@@ -424,7 +425,7 @@ struct
     (*bonds on the right hand side*)
     let store_bonds_rhs = get_bonds_rhs static in
     let error, store_bonds_rhs =
-      Site_accross_bonds_domain_static.collect_bonds_rhs 
+      Site_accross_bonds_domain_static.collect_bonds_rhs
         parameter error rule_id rule store_bonds_rhs
     in
     let static = set_bonds_rhs store_bonds_rhs static in
@@ -445,7 +446,7 @@ struct
     (*modification*)
     let store_modified_map = get_modified_map static in
     let error, store_modified_map =
-      Site_accross_bonds_domain_static.collect_site_modified 
+      Site_accross_bonds_domain_static.collect_site_modified
         parameter error rule_id rule store_modified_map
     in
     let static = set_modified_map store_modified_map static in
@@ -465,11 +466,11 @@ struct
     let store_modified_internal_state_and_bond =
       get_modified_internal_state_and_bond static in
     let error, store_modified_internal_state_and_bond =
-      Site_accross_bonds_domain_static.collect_modified_internal_and_bond 
+      Site_accross_bonds_domain_static.collect_modified_internal_and_bond
         parameter error rule_id
-        store_tuple_pair 
-        store_bonds_rhs 
-        store_modified_map 
+        store_tuple_pair
+        store_bonds_rhs
+        store_modified_map
         store_modified_internal_state_and_bond
     in
     let static = set_modified_internal_state_and_bond store_modified_internal_state_and_bond static in
@@ -477,8 +478,8 @@ struct
     (*question marks on the right hand side*)
     let store_question_marks_rhs = get_question_marks_rhs static in
     let error, store_question_marks_rhs =
-      Site_accross_bonds_domain_static.collect_question_marks_rhs 
-        parameter error rule_id kappa_handler rule 
+      Site_accross_bonds_domain_static.collect_question_marks_rhs
+        parameter error rule_id kappa_handler rule
         store_modified_map
         store_question_marks_rhs
     in
@@ -493,13 +494,13 @@ struct
     let static = set_implicit_rule store_implicit_static static in
     (*------------------------------------------------------------*)
     (*explicit static information*)
-    let store_modified_internal_state_and_bond = 
+    let store_modified_internal_state_and_bond =
       get_modified_internal_state_and_bond static in
     let store_created_bond = get_created_bond static in
     let store_explicit_static = get_explicit_rule static in
     let error, store_explicit_static =
       Site_accross_bonds_domain_static.collect_explicit_static
-        parameter error store_created_bond 
+        parameter error store_created_bond
         store_modified_internal_state_and_bond store_explicit_static
     in
     let static = set_explicit_rule store_explicit_static static in
@@ -544,6 +545,7 @@ struct
     in
     let init_local_dynamic_information =
       {
+        dumy = ();
         store_basic_dynamic_information =
           Site_accross_bonds_domain_dynamic.init_basic_dynamic_information;
       }
@@ -648,7 +650,7 @@ struct
   (* to do *)
   (* check for each bond that occur in the lhs, whether
      the constraints in the lhs are consistent *)
-  let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
+  let is_enabled _static dynamic error (_rule_id:Ckappa_sig.c_rule_id) precondition =
     error, dynamic, Some precondition
 
   (****************************************************************)
@@ -682,7 +684,7 @@ struct
         store_internal_state_explicit
     in
     let store_tuple_pair_binding_internal_state_explicit =
-      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit 
+      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit
         parameter
         error
         store_tuple_pair_binding_internal_state_explicit_aux
@@ -742,16 +744,16 @@ struct
     let event_list = [] in
     error, dynamic, event_list
 
-  let export static dynamic error kasa_state =
+  let export _static dynamic error kasa_state =
     error, dynamic, kasa_state
 
   (****************************************************************)
 (* to do *)
 
-  let print static dynamic error loggers =
+  let print static dynamic error _loggers =
     let parameter = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let log = Remanent_parameters.get_logger parameter in 
+    let log = Remanent_parameters.get_logger parameter in
     (*--------------------------------------------------------*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_result parameter
@@ -951,7 +953,7 @@ struct
     let store_range_mvbdu2 = get_range_mvbdu2 dynamic in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, store_range_mvbdu2 =
-      Site_accross_bonds_domain_dynamic.collect_range_mvbdu2 
+      Site_accross_bonds_domain_dynamic.collect_range_mvbdu2
         parameter error handler store_explicit_dynamic store_range_mvbdu2
     in
     let error =
@@ -1019,10 +1021,10 @@ struct
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable static dynamic error ccmixture =
+  let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
 end
