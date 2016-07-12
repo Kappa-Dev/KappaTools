@@ -957,9 +957,11 @@ struct
                       site_type2' state2' rule_has_parallel_bonds_rhs_set old_value potential_list
                   in
                   let error, store_result =
-                    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameter error
+                    Parallel_bonds_type.add_symmetric_tuple_pair
+                      (fun parameter error t map ->
+                         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameter error t value map)
+                      parameter error
                       ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),                              (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
-                      value
                       store_result
                   in
                   error, dynamic, precondition, store_result
@@ -1220,10 +1222,13 @@ struct
                     compute_value_snd_aux error site_type state site_type' state' rule_has_parallel_bonds_rhs_set old_value potential_list
                   in
                   let error, store_result =
+                    Parallel_bonds_type.add_symmetric_tuple_pair
+                      (fun parameter error t map ->
                     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameter error
+                      t value map)
+                      parameter error
                       ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                        (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
-                      value
                       store_result
                   in
                   error, dynamic, precondition, store_result

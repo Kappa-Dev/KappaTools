@@ -153,13 +153,13 @@ let get_state_of_site error dynamic precondition path =
     PathMap.find path precondition.cache_state_of_site
   with
   | Some output ->
-    let _ =
+    (*  let _ =
       match output with
       | Usual_domains.Val l ->
         List.iter
           (fun i -> Printf.fprintf stdout "state:%s\n" (Ckappa_sig.string_of_state_index i)) l
       | Usual_domains.Any | Usual_domains.Undefined -> ()
-    in
+        in*)
     error, dynamic, precondition, output
   | None ->
     begin
