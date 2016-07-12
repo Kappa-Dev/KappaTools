@@ -595,8 +595,8 @@ Glossary of Symbols
     Specifies site ``Y`` in state ``foo``
 
 .. _proto-IDE : https://dev/executableknowledge.org/try/
-.. _Hook effect  : https://en.wikipedia.org/wiki/Hook_effect
-.. _KaSim nightly builds: http://www.kappalanguage.org/nightly-builds/
+.. _Hook effect : https://en.wikipedia.org/wiki/Hook_effect
+.. _KaSim nightly builds : http://www.kappalanguage.org/nightly-builds/
 .. _KaSim source code : https://github.com/Kappa-Dev/KaSim
 .. _Notepad++ : https://notepad-plus-plus.org/
 .. _development home page : http://dev.executableknowledge.org/
