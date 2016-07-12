@@ -531,8 +531,6 @@ EXTENSIONAL DESCRIPTION:
 			B(z!A@z,t!free)
 
 	Wake-up rules
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -601,8 +599,6 @@ EXTENSIONAL DESCRIPTION:
 			B(z!free,t!A@t)
 
 	Wake-up rules
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -611,8 +607,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -621,20 +615,14 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 execution finished without any exception

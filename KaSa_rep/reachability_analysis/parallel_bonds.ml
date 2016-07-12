@@ -1270,13 +1270,17 @@ let apply_rule static dynamic error rule_id precondition =
     (*a map of rule that has a set of parallel bonds in the rhs*)
     let parameter = Remanent_parameters.update_prefix parameter "                " in
     let dump_title () =
-      let () =
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameter)
-          "%sUpdate information about potential double bindings"
-          (Remanent_parameters.get_prefix parameter)
-      in
-      Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      if local_trace || Remanent_parameters.get_dump_reachability_analysis_wl parameter
+      then
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameter)
+            "%sUpdate information about potential double bindings"
+            (Remanent_parameters.get_prefix parameter)
+        in
+        Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      else
+        ()
     in
     let store_rule_has_parallel_bonds_rhs = get_rule_has_parallel_bonds_rhs static in
     let error, rule_has_parallel_bonds_rhs_set =

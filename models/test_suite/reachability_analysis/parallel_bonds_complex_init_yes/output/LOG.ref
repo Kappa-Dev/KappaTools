@@ -689,8 +689,6 @@ EXTENSIONAL DESCRIPTION:
 			B(x~u,z!free,t!A@t)
 
 	Wake-up rules
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -779,8 +777,6 @@ EXTENSIONAL DESCRIPTION:
 			B(x~u,z!A@z,t!A@t)
 
 	Wake-up rules
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 5: r5:
 		the precondition is not satisfied yet
@@ -995,22 +991,16 @@ EXTENSIONAL DESCRIPTION:
 			B(x~p,z!A@z,t!free)
 
 	Wake-up rules
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 4: r4:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -1023,8 +1013,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -1078,8 +1066,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -1133,22 +1119,16 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 4: r4:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 5: r5:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -1162,8 +1142,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
-                Update information about potential double bindings
-                Update information about potential double bindings
 
 	Applying rule 7: r7:
 		the precondition is satisfied
