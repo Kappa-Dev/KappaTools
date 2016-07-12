@@ -114,6 +114,14 @@ let collect_action_binding parameter error rule_id rule store_result =
           ((agent_id1, agent_type1, site_type1, state1), (agent_id2, agent_type2, site_type2, state2))
           old_set
       in
+      let error', set =
+        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+          parameter
+          error
+          ((agent_id2, agent_type2, site_type2, state2),
+           (agent_id1, agent_type1, site_type1, state1))
+          set
+      in
       let error = Exception.check warn parameter error error' (Some "line 358") Exit in
       let error, store_result =
         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
