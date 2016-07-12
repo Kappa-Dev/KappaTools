@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 12 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -460,31 +460,7 @@ struct
         store_result
     in
     let static = set_parallel_bonds_rhs store_result static in
-    (*------------------------------------------------------*)
-    let store_action_binding = get_action_binding static in
-    let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
-    let store_result = get_fst_site_create_parallel_bonds_rhs static in
-    let error, store_result =
-      Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
-        parameter
-        error
-        rule_id
-        store_action_binding
-        store_parallel_bonds_rhs
-        store_result
-    in
-    let static = set_fst_site_create_parallel_bonds_rhs store_result static in
-    (*------------------------------------------------------*)
-    let store_result = get_snd_site_create_parallel_bonds_rhs static in
-    let error, store_result =
-      Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
-        parameter error rule_id
-        store_action_binding
-        store_parallel_bonds_rhs
-        store_result
-    in
-    let static = set_snd_site_create_parallel_bonds_rhs store_result static in
-    error, static
+      error, static
 
   (****************************************************************)
 
@@ -507,6 +483,27 @@ struct
            error, static
         ) compil.Cckappa_sig.rules static
     in
+    (*------------------------------------------------------*)
+    let store_action_binding = get_action_binding static in
+    let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
+    let error, store_result =
+      Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
+        parameter
+        error
+        store_action_binding
+        store_parallel_bonds_rhs
+    in
+    let static = set_fst_site_create_parallel_bonds_rhs store_result static in
+    (*------------------------------------------------------*)
+    let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
+    let error, store_result =
+      Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
+        parameter error
+        store_action_binding
+        store_parallel_bonds_rhs
+    in
+    let static = set_snd_site_create_parallel_bonds_rhs store_result static in
+    (*------------------------------------------------------*)
     error, static, dynamic
 
   (* todo *)

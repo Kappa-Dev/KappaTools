@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 12 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -52,7 +52,7 @@ let collect_agent_type_state parameter error agent site_type =
     in
     error, (agent_type1, state1)
 
-(************************************************************************************)
+(************************************************************************ *****)
 (*action binding in the rhs*)
 
 let collect_action_binding parameter error rule_id rule store_result =
@@ -117,7 +117,7 @@ let collect_action_binding parameter error rule_id rule store_result =
       let error', set =
         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
           parameter
-          error
+          error'
           ((agent_id2, agent_type2, site_type2, state2),
            (agent_id1, agent_type1, site_type1, state1))
           set
@@ -134,8 +134,8 @@ let collect_action_binding parameter error rule_id rule store_result =
       error, store_result
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
 
-(******************************************************************)
 
+(******************************************************************)
 let collect_bonds_full parameter error rule_id views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter error
@@ -652,7 +652,7 @@ let collect_value_parallel_bonds_rhs parameter
 
 (* You do not use rule_id *)
 (* This means you repeat the same computation many times *)
-let collect_fst_site_create_parallel_bonds parameter error _rule_id store_action_binding store_parallel_bonds store_result =
+let collect_fst_site_create_parallel_bonds parameter error store_action_binding store_parallel_bonds =
   (*let parameter = get_parameter static in*)
   Ckappa_sig.Rule_map_and_set.Map.fold
     (fun k set (error,map) ->
@@ -708,26 +708,22 @@ let collect_fst_site_create_parallel_bonds parameter error _rule_id store_action
            )
            set
            (error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty)
-           (* JF: very suspicious, start over from the former value instead *)
        in
        Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set map)
-    store_action_binding (error,Ckappa_sig.Rule_map_and_set.Map.empty)
+    store_action_binding
+    (error,Ckappa_sig.Rule_map_and_set.Map.empty)
 
 (**************************************************************************)
 (*in the rhs*)
 
-let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_action_binding store_parallel_bonds store_result =
+let collect_fst_site_create_parallel_bonds_rhs parameter error store_action_binding store_parallel_bonds  =
   (*let store_action_binding = get_action_binding static in
     let store_parallel_bonds = get_parallel_bonds_rhs static in
     let store_fst_site_create_parallel_bonds_rhs = get_fst_site_create_parallel_bonds_rhs static in*)
-  let error, store_result =
     collect_fst_site_create_parallel_bonds
-      parameter error rule_id
+      parameter error
       store_action_binding
       store_parallel_bonds
-      store_result
-  in
-  error, store_result
 (*let static = set_fst_site_create_parallel_bonds_rhs store_result static in
   error, static*)
 
@@ -736,7 +732,7 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error rule_id store_act
 
 (* You do not use rule_id *)
 (* This means you repeat the same computation many times *)
-let collect_snd_site_create_parallel_bonds parameter error _rule_id store_action_binding store_parallel_bonds store_result =
+let collect_snd_site_create_parallel_bonds parameter error store_action_binding store_parallel_bonds =
   (*let parameter = get_parameter static in*)
   Ckappa_sig.Rule_map_and_set.Map.fold
     (fun k set (error,store_result) ->
@@ -792,14 +788,13 @@ let collect_snd_site_create_parallel_bonds parameter error _rule_id store_action
            )
            set
            (error,Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty)
-           (* JF: very suspicious, start over from the former value instead *)
        in
        Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set store_result
     ) store_action_binding (error, Ckappa_sig.Rule_map_and_set.Map.empty)
 
 (**************************************************************************)
 
-let collect_snd_site_create_parallel_bonds_rhs parameter error rule_id store_action_binding  store_parallel_bonds store_result =
+let collect_snd_site_create_parallel_bonds_rhs parameter error store_action_binding  store_parallel_bonds =
   (*let store_parallel_bonds = get_parallel_bonds_rhs static in
     let store_action_binding = get_action_binding static in
     let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in*)
@@ -807,87 +802,9 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error rule_id store_act
     collect_snd_site_create_parallel_bonds
       parameter
       error
-      rule_id
       store_action_binding
       store_parallel_bonds
-      store_result
   in
   error, store_result
 (*let static = set_snd_site_create_parallel_bonds_rhs store_result static in
   error, static*)
-
-(******************************************************************)
-(*REMOVE*)
-let collect_result_from_site_create_parallel' parameter error rule_id store_views_rhs store_pair_bind_map _rule_has_parallel_bonds_rhs_set =
-  let error, views_rhs_set =
-    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_views_rhs with
-    | error, None -> error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty
-    | error, Some s -> error, s
-  in
-  let error, store_result =
-    (*fold over a binding action map*)
-    Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
-(*A.x.B.z*)
-      (fun ((_agent_id, _agent_type, _site_type, _state),
-            (_agent_id', _agent_type', _site_type', _state'))
-        list (error, store_result) ->
-        let error, store_result =
-          (*views rhs*)
-          Parallel_bonds_type.AgentsSiteState_map_and_set.Set.fold
-            (fun (_agent_id_views, _agent_type_views, _site_type_views, _state_views) (error, store_result) ->
-               (*fold over a list of parallel bonds*)
-               let error, store_result =
-                 List.fold_left (fun (error, store_result)                               (*A.x.y.B.z.t, B.z.t.A.x.y*)
-                                  ((_agent_id1, _agent_type1, _site_type1, _site_type2, _state1, _state2),
-                                   (_agent_id1', _agent_type1', _site_type1', _site_type2', _state1', _state2')) ->
-                                  (*let _ =
-                                    if agent_id = agent_id_views &&
-                                       agent
-                                    in*)
-                                  (**)
-                                  (*let _ =
-                                    Loggers.fprintf log
-                                      "rule_id:%i:agent_id:%i:agent_type:%i:site_type:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
-                                       agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
-                                       agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
-                                      (Ckappa_sig.int_of_rule_id rule_id)
-                                      (Ckappa_sig.int_of_agent_id agent_id)
-                                      (Ckappa_sig.int_of_agent_name agent_type)
-                                      (Ckappa_sig.int_of_site_name site_type)
-                                      (Ckappa_sig.int_of_state_index state)
-                                      (Ckappa_sig.int_of_agent_id agent_id')
-                                      (Ckappa_sig.int_of_agent_name agent_type')
-                                      (Ckappa_sig.int_of_site_name site_type')
-                                      (Ckappa_sig.int_of_state_index state')
-                                      (*views*)
-                                      (Ckappa_sig.int_of_agent_id agent_id_views)
-                                      (Ckappa_sig.int_of_agent_name agent_type_views)
-                                      (Ckappa_sig.int_of_site_name site_type_views)
-                                      (Ckappa_sig.int_of_state_index state_views)
-                                      (*parallel*)
-                                      (Ckappa_sig.int_of_agent_id agent_id1)
-                                      (Ckappa_sig.int_of_agent_name agent_type1)
-                                      (Ckappa_sig.int_of_site_name site_type1)
-                                      (Ckappa_sig.int_of_site_name site_type2)
-                                      (Ckappa_sig.int_of_state_index state1)
-                                      (Ckappa_sig.int_of_state_index state2)
-                                      (Ckappa_sig.int_of_agent_id agent_id1')
-                                      (Ckappa_sig.int_of_agent_name agent_type1')
-                                      (Ckappa_sig.int_of_site_name site_type1')
-                                      (Ckappa_sig.int_of_site_name site_type2')
-                                      (Ckappa_sig.int_of_state_index state1')
-                                      (Ckappa_sig.int_of_state_index state2');
-                                    Loggers.print_newline log
-                                    in*)
-                                  error, store_result
-                                )(error, store_result) list
-               in
-               error, store_result
-            ) views_rhs_set (error, store_result)
-        in
-        error, store_result
-      ) store_pair_bind_map (error, Ckappa_sig.Rule_map_and_set.Map.empty)
-  in
-  error, store_result
-
-(******************************************************************)
