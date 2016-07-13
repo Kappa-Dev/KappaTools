@@ -4,8 +4,10 @@ module PairAgentsSiteState_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -14,8 +16,9 @@ module PairAgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-                  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -52,7 +55,8 @@ module AgentsSiteState_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -62,7 +66,9 @@ module AgentsSitesStates_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_rule_id *  Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state)
+           (Ckappa_sig.c_rule_id *  Ckappa_sig.c_agent_id *
+            Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -89,7 +95,8 @@ let convert_refined_tuple parameters error kappa_handler tuple =
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
   let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
-  error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
+  error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',
+          Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
 
 let print_parallel_constraint 
     ?verbose:(verbose=true)
@@ -112,7 +119,8 @@ let print_parallel_constraint
       let () =
         if verbose then
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "%sWhen the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s %s the same."
+          "%sWhen the agent %s has its site %s bound to the site %s of a %s,\
+           and its site %s bound to the site %s of a %s, then both instances of %s %s the same."
           prefix agent site site'' agent'' site' site''' agent'' agent'' modalite
         else
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
@@ -123,7 +131,8 @@ let print_parallel_constraint
       let () =
         if verbose then
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "%sWhen the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s %s  different."
+          "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
+           and its site %s bound to the site %s of a %s, then both instances of %s %s  different."
           prefix agent site site'' agent'' site' site''' agent'' agent'' modalite
         else
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
@@ -136,7 +145,8 @@ let print_parallel_constraint
         let () =
           if verbose then
           Loggers.fprintf (Remanent_parameters.get_logger parameters)
-            "%sWhen the agent %s has its site %s bound to the site %s of a %s, and its site %s bound to the site %s of a %s, then both instances of %s may be  different or not."
+            "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
+             and its site %s bound to the site %s of a %s, then both instances of %s may be  different or not."
             prefix agent site site'' agent'' site' site''' agent'' agent''
           else
             let () =
@@ -160,7 +170,8 @@ let print_parallel_constraint
 let add_value parameters error kappa_handler x value store_result =
   let error, old_value =
     match
-      PairAgentSitesStates_map_and_set.Map.find_option_without_logs parameters error x store_result
+      PairAgentSitesStates_map_and_set.Map.find_option_without_logs 
+        parameters error x store_result
     with
     | error, None -> error, Usual_domains.Undefined
     | error, Some v -> error, v
@@ -183,10 +194,11 @@ let add_value parameters error kappa_handler x value store_result =
     error, store_result
 
 let project (_,b,c,d,e,f) = (b,c,d,e,f)
+
 let project2 (x,y) = (project x,project y)
+
 let add_value_from_refined_tuple parameters error kappa_handler x =
   add_value parameters error kappa_handler (project2 x)
-
 
 let swap_sites_in_tuple (a,b,s,s',st,st') = (a,b,s',s,st',st)
 
