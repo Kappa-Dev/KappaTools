@@ -20,38 +20,153 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
+type local_static_information =
+  {
+    store_views_rhs : 
+      Parallel_bonds_type.AgentsSiteState_map_and_set.Set.t 
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    store_action_binding :
+      Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    store_bonds_rhs_full :
+      Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    (*collect a potential parallel bonds on the right hand side*)
+    store_potential_parallel_bonds_rhs :
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+   (* store_first_site_bind_rhs :
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    store_combine_first_site_bind_with_parallel_list :
+      (Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t *
+       (
+         ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+           Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+           Ckappa_sig.c_state * Ckappa_sig.c_state) * bool Usual_domains.flat_lattice) *
+
+         ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+          Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+          Ckappa_sig.c_state * Ckappa_sig.c_state) * bool Usual_domains.flat_lattice) *
+
+         ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+          Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+          Ckappa_sig.c_state * Ckappa_sig.c_state) * bool Usual_domains.flat_lattice)
+       )
+          list
+       *
+        (
+         ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+           Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+           Ckappa_sig.c_state * Ckappa_sig.c_state) * bool Usual_domains.flat_lattice) *
+
+         ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+          Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+          Ckappa_sig.c_state * Ckappa_sig.c_state) * bool Usual_domains.flat_lattice) *
+
+         ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+          Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+          Ckappa_sig.c_state * Ckappa_sig.c_state) * bool Usual_domains.flat_lattice)
+       )
+          list
+      )
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
+    (*TODO*)
+    store_parallel_bonds_rhs: 
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
+    store_rule_has_parallel_bonds_rhs:
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+    (*a map check a bond between A.x and B.z*)
+    store_fst_site_create_parallel_bonds_rhs:
+      ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+        Ckappa_sig.c_state * Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+        Ckappa_sig.c_state * Ckappa_sig.c_state)
+      ) list
+        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t Ckappa_sig.Rule_map_and_set.Map.t;
+    (*rule has non parallel bonds in the rhs*)
+    store_rule_has_non_parallel_bonds_rhs:
+      ((Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
+        Ckappa_sig.c_agent_name * Ckappa_sig.Site_map_and_set.Map.elt *
+        Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.Site_map_and_set.Map.elt * Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+        list
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    (*a map check a bond between A.y and B.t*)
+    store_snd_site_create_parallel_bonds_rhs:
+      ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+        Ckappa_sig.c_state * Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+        Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+        Ckappa_sig.c_state * Ckappa_sig.c_state)
+      ) list
+        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    (*lhs*)
+    store_bonds_lhs_full :
+      Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+  }
+
+(*******************************************************************)
+
+let init_local_static =
+  {
+    store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_bonds_rhs_full = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_bonds_lhs_full = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_potential_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_first_site_bind_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_combine_first_site_bind_with_parallel_list = Ckappa_sig.Rule_map_and_set.Map.empty;*)
+    store_parallel_bonds_rhs = Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty;
+    store_rule_has_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_rule_has_non_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_snd_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty
+  }
+
 (*******************************************************************)
 (*Right hand side bonds:
   (agent_id, site_type, state, -> agent_id, site_type, state)*)
 (*******************************************************************)
 
 let collect_agent_type_state parameter error agent site_type =
+  let dummy_agent = Ckappa_sig.dummy_agent_name in
+  let dummy_state = Ckappa_sig.dummy_state_index in
   match agent with
   | Cckappa_sig.Ghost
-  | Cckappa_sig.Unknown_agent _ -> 
-    error,
-    (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+  | Cckappa_sig.Unknown_agent _ -> error,(dummy_agent, dummy_state)
   | Cckappa_sig.Dead_agent _ ->
     warn parameter error (Some "line 127") Exit 
-      (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+      (dummy_agent, dummy_state)
   | Cckappa_sig.Agent agent1 ->
     let agent_type1 = agent1.Cckappa_sig.agent_name in
     let error, state1 =
-      match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-              parameter
-              error
-              site_type
-              agent1.Cckappa_sig.agent_interface
+      match 
+        Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+          parameter
+          error
+          site_type
+          agent1.Cckappa_sig.agent_interface
       with
       | error, None ->
-        warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
+        warn parameter error (Some "line 228") Exit dummy_state
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-        if Ckappa_sig.compare_state_index state Ckappa_sig.dummy_state_index > 0
+        if Ckappa_sig.compare_state_index state dummy_state > 0
         then
           error, state
         else
-          warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
+          warn parameter error (Some "line 196") Exit dummy_state
     in
     error, (agent_type1, state1)
 
@@ -70,7 +185,8 @@ let collect_action_binding parameter error rule_id rule store_result =
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
-        | error, None -> warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
+        | error, None ->
+          warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       (*get pair agent_type, state*)
@@ -139,6 +255,7 @@ let collect_action_binding parameter error rule_id rule store_result =
 
 
 (******************************************************************)
+
 let collect_bonds_full parameter error rule_id views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter error
