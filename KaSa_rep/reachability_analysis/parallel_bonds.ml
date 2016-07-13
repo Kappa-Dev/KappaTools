@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 12 2016>
+  * Last modification: Time-stamp: <Jul 13 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -526,7 +526,7 @@ struct
   (****************************************************************)
   (*return the first site that created a parallel sites *)
 
-  let compute_value_fst_aux error site_type2 state2 site_type2' state2' 
+  let compute_value_fst_aux error site_type2 state2 site_type2' state2'
       rule_has_parallel_bonds_rhs_set old_value potential_list =
     List.fold_left (fun (error, value) (x, y) ->
         (*the first site s_type and s_type' are bound together, the action
@@ -570,7 +570,7 @@ struct
           (*the set of parallel bonds is not empty. Check the second sites
             of A and B and its states whether or not it belongs to parallel
             set*)
-        if s_type2 = site_type2 && p_state2 = state2 && 
+        if s_type2 = site_type2 && p_state2 = state2 &&
            s_type2' = site_type2' && p_state2' = state2'
         then
           (*it belongs to parallel set, the answer is yes*)
@@ -580,8 +580,8 @@ struct
           let new_value = Usual_domains.lub value Usual_domains.Undefined in
           error, new_value
       ) (error, old_value) potential_list
-      
-  let collect_result_from_site_create_parallel parameter error dynamic precondition 
+
+  let collect_result_from_site_create_parallel parameter error dynamic precondition
       store_pair_bind_map rule_has_parallel_bonds_rhs_set store_result =
     let error, dynamic, precondition, store_result =
       (*fold over a binding action map*)
@@ -596,13 +596,13 @@ struct
             List.fold_left
               (fun (error, dynamic, precondition, store_result)
                 (*A.t.z.B.t.z, B.t.z.A.t.z*)
-                ((agent_id1, agent_type1, site_type1, site_type2, state1, state2), 
+                ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                  (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
                 if agent_type = agent_type1 && site_type1 = site_type
                 then
                   let error, old_value =
                     match
-                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs 
+                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
                         parameter error
                         ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                          (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
@@ -659,7 +659,7 @@ struct
                          Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
                            parameter error t value map)
                       parameter error
-                      ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),         
+                      ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                        (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
                       store_result
                   in
@@ -675,14 +675,14 @@ struct
 
   (****************************************************************)
 
-  let compute_value_snd_aux error site_type state site_type' state' 
+  let compute_value_snd_aux error site_type state site_type' state'
       rule_has_parallel_bonds_rhs_set old_value potential_list =
     List.fold_left (fun (error, value) (x, y) ->
         (*parallel_list*)
         let (_, _, s_type, _, p_state, _) = x in
         let (_, _, s_type', _, p_state', _) = y in
         (*first check if the parallel set is empty*)
-        if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.is_empty 
+        if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.is_empty
             rule_has_parallel_bonds_rhs_set
         then
           begin
@@ -719,7 +719,7 @@ struct
           error, new_value
       ) (error, old_value) potential_list
 
-  let collect_result_from_snd_site_create_parallel parameter error dynamic precondition 
+  let collect_result_from_snd_site_create_parallel parameter error dynamic precondition
       store_snd_pair_bind_map rule_has_parallel_bonds_rhs_set store_result =
     let error, dynamic, precondition, store_result =
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
@@ -773,7 +773,7 @@ struct
                   in
                   (*fold over the potential_list and compare with parallel_list*)
                   let error, value =
-                    compute_value_snd_aux error site_type state site_type' state' 
+                    compute_value_snd_aux error site_type state site_type' state'
                       rule_has_parallel_bonds_rhs_set old_value potential_list
                   in
                   let error, store_result =
@@ -823,7 +823,7 @@ let apply_rule static dynamic error rule_id precondition =
     (*a map of rule that has a set of parallel bonds in the rhs*)
     let parameter = Remanent_parameters.update_prefix parameter "                " in
     let dump_title () =
-      if local_trace || Remanent_parameters.get_dump_reachability_analysis_wl parameter
+      if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
       then
         let () =
           Loggers.fprintf
@@ -852,7 +852,7 @@ let apply_rule static dynamic error rule_id precondition =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
           parameter error
-          rule_id 
+          rule_id
           store_fst_site_create_parallel_bonds_rhs
       with
       | error, None -> error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
@@ -874,9 +874,9 @@ let apply_rule static dynamic error rule_id precondition =
     let store_non_parallel_map = get_rule_has_non_parallel_bonds_rhs static
     in
     let error, non_parallel_rhs_list =
-      match 
-        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter 
-          error rule_id store_non_parallel_map 
+      match
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter
+          error rule_id store_non_parallel_map
       with
       | error, None -> error, []
       | error, Some l -> error, l
@@ -885,20 +885,20 @@ let apply_rule static dynamic error rule_id precondition =
     (*check the first binding site in the parallel bonds*)
     let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in
     let error, store_snd_pair_bind_map =
-      match 
+      match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter error 
+          parameter error
           rule_id
-          store_snd_site_create_parallel_bonds_rhs 
+          store_snd_site_create_parallel_bonds_rhs
       with
       | error, None ->
         error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
       | error, Some  m -> error, m
     in
     let error, dynamic, precondition, store_value2 =
-      collect_result_from_snd_site_create_parallel 
+      collect_result_from_snd_site_create_parallel
         parameter error
-        dynamic 
+        dynamic
         precondition
         store_snd_pair_bind_map
         rule_has_parallel_bonds_rhs_set
@@ -919,7 +919,7 @@ let apply_rule static dynamic error rule_id precondition =
         parameter error
         (fun parameter error x value store_result ->
            let error, store_result =
-             Parallel_bonds_type.add_value_from_refined_tuple 
+             Parallel_bonds_type.add_value_from_refined_tuple
                parameter error kappa_handler x value store_result
            in
            error, store_result
@@ -942,17 +942,17 @@ let apply_rule static dynamic error rule_id precondition =
            error, store_result
         )
         store_value1
-        store_value2 
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty 
+        store_value2
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
     in
     (*--------------------------------------------------------------*)
     let error, map_value = error, store_value in
     let error, store_non_parallel =
-      collect_result_of_non_parallel 
-        parameter error 
+      collect_result_of_non_parallel
+        parameter error
         rule_id
         non_parallel_rhs_list
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty 
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
     in
     let () =
       if not bool &&
@@ -1004,7 +1004,7 @@ let apply_rule static dynamic error rule_id precondition =
     error, dynamic, event_list
 
   (****************************************************************)
-    
+
   let print static dynamic (error:Exception.method_handler) loggers =
     let handler_kappa = get_kappa_handler static in
     let parameter = get_parameter static in
