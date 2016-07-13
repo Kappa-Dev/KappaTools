@@ -6,7 +6,7 @@ module PairAgentsSiteState_map_and_set =
          type t =
            (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
@@ -55,7 +55,7 @@ module AgentsSiteState_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
@@ -98,7 +98,7 @@ let convert_refined_tuple parameters error kappa_handler tuple =
   error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',
           Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
 
-let print_parallel_constraint 
+let print_parallel_constraint
     ?verbose:(verbose=true)
     ?sparse:(sparse=false)
     ?final_resul:(final_result=false)
@@ -119,7 +119,7 @@ let print_parallel_constraint
       let () =
         if verbose then
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "%sWhen the agent %s has its site %s bound to the site %s of a %s,\
+          "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
            and its site %s bound to the site %s of a %s, then both instances of %s %s the same."
           prefix agent site site'' agent'' site' site''' agent'' agent'' modalite
         else
@@ -170,7 +170,7 @@ let print_parallel_constraint
 let add_value parameters error kappa_handler x value store_result =
   let error, old_value =
     match
-      PairAgentSitesStates_map_and_set.Map.find_option_without_logs 
+      PairAgentSitesStates_map_and_set.Map.find_option_without_logs
         parameters error x store_result
     with
     | error, None -> error, Usual_domains.Undefined
