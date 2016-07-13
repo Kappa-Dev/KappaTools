@@ -94,105 +94,105 @@ struct
 
   (*rhs*)
   let get_action_binding static =
-    (get_local_static_information static).store_action_binding
+    (get_local_static_information static).Parallel_bonds_static.store_action_binding
 
   let set_action_binding bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_action_binding = bonds
+        Parallel_bonds_static.store_action_binding = bonds
       }
       static
 
   let get_views_rhs static =
-    (get_local_static_information static).store_views_rhs
+    (get_local_static_information static).Parallel_bonds_static.store_views_rhs
 
   let set_views_rhs bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_views_rhs = bonds
+        Parallel_bonds_static.store_views_rhs = bonds
       }
       static
 
   let get_bonds_rhs_full static =
-    (get_local_static_information static).store_bonds_rhs_full
+    (get_local_static_information static).Parallel_bonds_static.store_bonds_rhs_full
 
   let set_bonds_rhs_full bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_bonds_rhs_full = bonds
+        Parallel_bonds_static.store_bonds_rhs_full = bonds
       }
       static
 
   let get_parallel_bonds_rhs static =
-    (get_local_static_information static).store_parallel_bonds_rhs
+    (get_local_static_information static).Parallel_bonds_static.store_parallel_bonds_rhs
 
   let set_parallel_bonds_rhs bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_parallel_bonds_rhs = bonds
+        Parallel_bonds_static.store_parallel_bonds_rhs = bonds
       }
       static
 
   (*parallel bonds*)
   let get_rule_has_parallel_bonds_rhs static =
-    (get_local_static_information static).store_rule_has_parallel_bonds_rhs
+    (get_local_static_information static).Parallel_bonds_static.store_rule_has_parallel_bonds_rhs
 
   let set_rule_has_parallel_bonds_rhs bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_rule_has_parallel_bonds_rhs = bonds
+        Parallel_bonds_static.store_rule_has_parallel_bonds_rhs = bonds
       }
       static
 
   (*non parallel bonds*)
   let get_rule_has_non_parallel_bonds_rhs static =
-    (get_local_static_information static).store_rule_has_non_parallel_bonds_rhs
+    (get_local_static_information static).Parallel_bonds_static.store_rule_has_non_parallel_bonds_rhs
 
   let set_rule_has_non_parallel_bonds_rhs bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_rule_has_non_parallel_bonds_rhs = bonds
+        Parallel_bonds_static.store_rule_has_non_parallel_bonds_rhs = bonds
       }
       static
 
   let get_fst_site_create_parallel_bonds_rhs static =
-    (get_local_static_information static).store_fst_site_create_parallel_bonds_rhs
+    (get_local_static_information static).Parallel_bonds_static.store_fst_site_create_parallel_bonds_rhs
 
   let set_fst_site_create_parallel_bonds_rhs l static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_fst_site_create_parallel_bonds_rhs = l
+        Parallel_bonds_static.store_fst_site_create_parallel_bonds_rhs = l
       }
       static
 
   let get_snd_site_create_parallel_bonds_rhs static =
-    (get_local_static_information static).store_snd_site_create_parallel_bonds_rhs
+    (get_local_static_information static).Parallel_bonds_static.store_snd_site_create_parallel_bonds_rhs
 
   let set_snd_site_create_parallel_bonds_rhs l static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_snd_site_create_parallel_bonds_rhs = l
+        Parallel_bonds_static.store_snd_site_create_parallel_bonds_rhs = l
       }
       static
 
   (*lhs*)
 
   let get_bonds_lhs_full static =
-    (get_local_static_information static).store_bonds_lhs_full
+    (get_local_static_information static).Parallel_bonds_static.store_bonds_lhs_full
 
   let set_bonds_lhs_full bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        store_bonds_lhs_full = bonds
+        Parallel_bonds_static.store_bonds_lhs_full = bonds
       }
       static
 
