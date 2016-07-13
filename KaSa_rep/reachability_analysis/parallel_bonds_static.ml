@@ -31,7 +31,6 @@ type local_static_information =
     store_bonds_rhs_full :
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    (*collect a potential parallel bonds on the right hand side*)
     store_potential_parallel_bonds_rhs :
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -682,31 +681,6 @@ let collect_views_rhs parameter error rule_id rule store_result =
   error, store_result
 
 (**************************************************************************)
-(*REMOVE? return the value true if it belongs to the set of parallel bonds*)
-
-(*let collect_value_parallel_bonds_rhs parameter
-    store_rule_has_parallel_bonds_rhs error =
-  (*--------------------------------------------------------------*)
-  (*return a value true for a rule that has parallel bonds*)
-  let error, store_result =
-    Ckappa_sig.Rule_map_and_set.Map.fold
-      (fun _rule_id parallel_set (error, store_result) ->
-         let error, store_result =
-           Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold
-             (fun x (error, store_result)->
-                Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
-                  parameter error x
-                  (Usual_domains.Val true)
-                  store_result
-             ) parallel_set (error, store_result)
-         in
-         error, store_result
-      ) store_rule_has_parallel_bonds_rhs
-      (error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
-  in
-  error, store_result*)
-
-(**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
   which rules can create a bond of type A.x.z.B (and at which position)*)
 
@@ -715,8 +689,7 @@ let collect_views_rhs parameter error rule_id rule store_result =
 let collect_fst_site_create_parallel_bonds parameter error store_action_binding store_parallel_bonds =
   Ckappa_sig.Rule_map_and_set.Map.fold
     (fun k set (error,map) ->
-       let error, new_set
-         =
+       let error, new_set =
          Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
            (*A.x -> B.z; B.z -> A.x*)
            (fun ((agent_id, agent_type, site_type, state),
