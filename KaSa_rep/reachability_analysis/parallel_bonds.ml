@@ -256,6 +256,8 @@ struct
 
   let scan_rule static _dynamic error rule_id rule =
     let parameter = get_parameter static in
+    (*------------------------------------------------------*)
+    (*views on the right hand side*)
     let store_views_rhs = get_views_rhs static in
     let error, store_views_rhs =
       Parallel_bonds_static.collect_views_rhs
@@ -263,6 +265,7 @@ struct
     in
     let static = set_views_rhs store_views_rhs static in
     (*------------------------------------------------------*)
+    (*action created a binding site*)
     let store_action_binding = get_action_binding static in
     let error, store_action_binding =
       Parallel_bonds_static.collect_action_binding
@@ -270,6 +273,7 @@ struct
     in
     let static = set_action_binding store_action_binding static in
     (*------------------------------------------------------*)
+    (*binding on the right hand side*)
     let store_bonds_rhs_full = get_bonds_rhs_full static in
     let error, store_bonds_rhs_full =
       Parallel_bonds_static.collect_bonds_rhs_full
@@ -281,6 +285,7 @@ struct
     in
     let static = set_bonds_rhs_full store_bonds_rhs_full static in
     (*------------------------------------------------------*)
+    (*binding on the left hand side*)
     let store_bonds_lhs_full = get_bonds_lhs_full static in
     let error, store_bonds_lhs_full =
       Parallel_bonds_static.collect_bonds_lhs_full
@@ -292,6 +297,7 @@ struct
     in
     let static = set_bonds_lhs_full store_bonds_lhs_full static in
     (*------------------------------------------------------*)
+    (*a set of rules that has a potential double bindings on the rhs*)
     let store_bonds_rhs_full = get_bonds_rhs_full static in
     let store_result = get_rule_has_parallel_bonds_rhs static in
     let error, store_result =
@@ -305,6 +311,7 @@ struct
     in
     let static = set_rule_has_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
+    (*a set of rules that has a potential non double bindings on the rhs*)
     let store_result = get_rule_has_non_parallel_bonds_rhs static in
     let error, store_result =
       Parallel_bonds_static.collect_rule_has_non_parallel_bonds_rhs
@@ -317,6 +324,7 @@ struct
     in
     let static = set_rule_has_non_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
+    (*a set of double bindings on the rhs*)
     let store_rule_has_parallel_bonds_rhs = get_rule_has_parallel_bonds_rhs static in
     let store_result = get_parallel_bonds_rhs static in
     let error, store_result =
@@ -352,6 +360,7 @@ struct
         ) compil.Cckappa_sig.rules static
     in
     (*------------------------------------------------------*)
+    (*A(x!1, y), B(x!1, y): first site is an action binding*)
     let store_action_binding = get_action_binding static in
     let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
     let error, store_result =
@@ -363,6 +372,7 @@ struct
     in
     let static = set_fst_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
+    (*A(x, y!1), B(x, y!1): second site is an action binding *)
     let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
     let error, store_result =
       Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
@@ -419,6 +429,8 @@ struct
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let parameter = Remanent_parameters.update_prefix parameter "        " in
+    (*------------------------------------------------------------*)
+    (*binding information*)
     let error, store_bonds_init =
       Parallel_bonds_init.collect_bonds_initial
         parameter
@@ -426,50 +438,33 @@ struct
         init_state
     in
     (*------------------------------------------------------------*)
+    (*potential non double bindings*)
     let error, store_site_pair_list =
-      Parallel_bonds_init.collect_non_parallel_init_aux
+      Parallel_bonds_init.collect_site_pair_list
         parameter
         store_bonds_init
         error
         init_state
     in
-    let error, store_non_parallel_init =
+    let error, store_result =
       Parallel_bonds_init.collect_non_parallel_init
         parameter
+        kappa_handler
         store_bonds_init
         store_site_pair_list
         error
         init_state
     in
-    (*------------------------------------------------------------*)
-    let store_result = get_value dynamic in
-    let error, store_result =
-      Parallel_bonds_init.collect_value_non_parallel_bonds
-        parameter
-        store_non_parallel_init
-        error
-        kappa_handler
-        init_state
-        store_result
-    in
     let dynamic = set_value store_result dynamic in
     (*------------------------------------------------------------*)
-    let error, store_parallel_bonds_init =
-      Parallel_bonds_init.collect_parallel_bonds_init
-        parameter
+    (*potential double bindings*)
+    let error, store_result =
+      Parallel_bonds_init.collect_parallel_bonds_init 
+        parameter 
+        kappa_handler
         store_bonds_init
         error
         init_state
-    in
-    let store_result = get_value dynamic in
-    let error, store_result =
-      Parallel_bonds_init.collect_value_parallel_bonds
-        parameter
-        store_parallel_bonds_init
-        error
-        kappa_handler
-        init_state
-        store_result
     in
     let dynamic = set_value store_result dynamic in
     (*-------------------------------------------------------------*)

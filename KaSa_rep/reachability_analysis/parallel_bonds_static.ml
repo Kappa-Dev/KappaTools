@@ -170,8 +170,9 @@ let collect_agent_type_state parameter error agent site_type =
     in
     error, (agent_type1, state1)
 
-(************************************************************************ *****)
+(************************************************************************)
 (*action binding in the rhs*)
+(************************************************************************)
 
 let collect_action_binding parameter error rule_id rule store_result =
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
@@ -254,7 +255,9 @@ let collect_action_binding parameter error rule_id rule store_result =
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
 
 
-(******************************************************************)
+(************************************************************************)
+(* Binding information *)
+(************************************************************************)
 
 let collect_bonds_full parameter error rule_id views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -347,7 +350,7 @@ let collect_bonds_lhs_full parameter error rule_id rule store_result =
     store_result
 
 (****************************************************************)
-(**Parallel bonds*)
+(** Potential parallel bindings *)
 (****************************************************************)
 
 let collect_rule_has_parallel_bonds parameter error rule_id 
@@ -458,7 +461,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id
   error, store_result
 
 (******************************************************************)
-(*collect a set of parallel bonds in the rhs correspond with its rule*)
+(*A set of rule has a potential double bindings on the rhs*)
 
 let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full 
     error rule_id rule store_result =
@@ -598,7 +601,7 @@ let collect_rule_has_non_parallel_bonds_rhs parameter error rule_id rule
   error, store_result
 
 (**************************************************************************)
-(*collect a set of parallel bonds in the rhs*)
+(*A set of potential parallel bonds on the rhs*)
 
 let collect_parallel_bonds_rhs parameter store_rule_has_parallel_bonds error rule_id store_result =
   let error, parallel_set =
@@ -629,7 +632,8 @@ let collect_parallel_bonds_rhs parameter store_rule_has_parallel_bonds error rul
   error, store_result
 
 (**************************************************************************)
-(*collect views in the rhs*)
+(*views on the rhs*)
+(**************************************************************************)
 
 let collect_views_rhs parameter error rule_id rule store_result =
   let error, store_result =
@@ -678,9 +682,9 @@ let collect_views_rhs parameter error rule_id rule store_result =
   error, store_result
 
 (**************************************************************************)
-(*return the value true if it belongs to the set of parallel bonds*)
+(*REMOVE? return the value true if it belongs to the set of parallel bonds*)
 
-let collect_value_parallel_bonds_rhs parameter
+(*let collect_value_parallel_bonds_rhs parameter
     store_rule_has_parallel_bonds_rhs error =
   (*--------------------------------------------------------------*)
   (*return a value true for a rule that has parallel bonds*)
@@ -700,11 +704,13 @@ let collect_value_parallel_bonds_rhs parameter
       ) store_rule_has_parallel_bonds_rhs
       (error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
   in
-  error, store_result
+  error, store_result*)
 
 (**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
   which rules can create a bond of type A.x.z.B (and at which position)*)
+
+(*FIXME*)
 
 let collect_fst_site_create_parallel_bonds parameter error store_action_binding store_parallel_bonds =
   Ckappa_sig.Rule_map_and_set.Map.fold
@@ -778,6 +784,8 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error store_action_bind
 
 (**************************************************************************)
 (*the second map (A,x,y, B,z,t) -> A.y.t.B*)
+
+(*FIXME*)
 
 let collect_snd_site_create_parallel_bonds parameter error store_action_binding store_parallel_bonds =
   Ckappa_sig.Rule_map_and_set.Map.fold

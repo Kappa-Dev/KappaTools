@@ -21,7 +21,7 @@ let warn parameters mh message exn default =
 let local_trace = false
 
 (******************************************************************)
-(*parallel bonds in the initial state*)
+(*parallel bonds in the initial states*)
 (******************************************************************)
 
 let collect_pair_of_bonds parameter error site_add agent_id site_type_source views =
@@ -33,7 +33,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_id views
       with
-      | error, None -> warn parameter error (Some "line 632") Exit Cckappa_sig.Ghost
+      | error, None -> warn parameter error (Some "line 36") Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, agent_target =
@@ -41,7 +41,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_index_target views
       with
-      | error, None -> warn parameter error (Some "line 640") Exit Cckappa_sig.Ghost
+      | error, None -> warn parameter error (Some "line 43") Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
@@ -65,10 +65,10 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
   in
   error, pair
 
+(******************************************************************)
 (*collect a set of binding sites in the initial states*)
-
+  
 let collect_bonds_initial parameter error init_state =
-  (*let parameter = get_parameter static in*)
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
@@ -79,12 +79,16 @@ let collect_bonds_initial parameter error init_state =
                 let error, ((agent_type_source, site_type_source, state_source),
                             (agent_type_target, site_type_target, state_target)) =
                   collect_pair_of_bonds
-                    parameter error site_add agent_id site_type_source
+                    parameter error
+                    site_add
+                    agent_id
+                    site_type_source
                     init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
                 in
-                let pair = ((agent_id, agent_type_source, site_type_source, state_source),
-                            (site_add.Cckappa_sig.agent_index, agent_type_target, site_type_target,
-                             state_target))
+                let pair = 
+                  ((agent_id, agent_type_source, site_type_source, state_source),
+                   (site_add.Cckappa_sig.agent_index, agent_type_target, site_type_target,
+                    state_target))
                 in
                 let error, store_result =
                   Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
@@ -103,9 +107,11 @@ let collect_bonds_initial parameter error init_state =
   error, store_result
 
 (**************************************************************************)
-(*a set of parallel bonds in the initial states*)
+(*a set of potential parallel bonds in the initial states*)
+(**************************************************************************)
 
-let collect_parallel_bonds_init parameter store_bonds_init error init_state =
+let collect_parallel_bonds_init parameter kappa_handler store_bonds_init error init_state =
+  let views = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
@@ -113,10 +119,14 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
          let error, store_result =
            Ckappa_sig.Site_map_and_set.Map.fold
              (fun site_type_source site_add (error, store_result) ->
+                let agent_id_target = site_add.Cckappa_sig.agent_index in
                 let error, pair =
                   collect_pair_of_bonds
-                    parameter error site_add agent_id_source site_type_source
-                    init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
+                    parameter error 
+                    site_add 
+                    agent_id_source 
+                    site_type_source
+                    views
                 in
                 let ((agent_type_source, site_type_source, state_source),
                      (agent_type_target, site_type_target, state_target)) = pair in
@@ -126,19 +136,23 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
                     (fun ((agent_id, agent_type, site_type, state),
                           (agent_id', agent_type', site_type', state')) (error, store_result) ->
                       if agent_id = agent_id_source &&
-                         agent_id' = site_add.Cckappa_sig.agent_index &&
+                         agent_id' = agent_id_target &&
                          site_type_source <> site_type &&
                          site_type_target <> site_type'
                       then
-                        let error', store_result =
-                          Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in
-                            parameter error
-                            ((agent_id, agent_type_source, site_type_source, site_type, state_source, state),
-                             (site_add.Cckappa_sig.agent_index, agent_type_target,
-                              site_type_target, site_type', state_target, state'))
+                        let x = (agent_id, agent_type_source, site_type_source,
+                                 site_type, state_source, state) in
+                        let y = (agent_id_target, agent_type_target,
+                                 site_type_target, site_type', state_target, state') in
+                        let pair = Parallel_bonds_type.project2 (x, y) in
+                        let error, store_result =
+                          Parallel_bonds_type.add_value
+                            parameter error 
+                            kappa_handler
+                            pair
+                            (Usual_domains.Val true)
                             store_result
                         in
-                        let error = Exception.check warn parameter error error' (Some "line 872") Exit in
                         error, store_result
                       else
                         error, store_result
@@ -149,7 +163,7 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
          in
          error, store_result
       ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
   in
   error, store_result
 
@@ -157,27 +171,32 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
 (*non parallel bonds in the initial state*)
 (**************************************************************************)
 
-let collect_non_parallel_init_aux parameter store_bonds_init error init_state =
+let collect_site_pair_list parameter store_bonds_init error init_state =
   let error, store_result =
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
-      (fun ((agent_id, agent_type, site_type, state),
+      (fun ((agent_id, _, site_type, state),
             (agent_id', agent_type', site_type', state')) (error, store_result) ->
         (*get old*)
         let error, old_list =
-          match Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
-                  parameter error agent_type' store_result
+          match 
+            Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
+              parameter error 
+              agent_type'
+              store_result
           with
           | error, None -> error, []
           | error, Some l -> error, l
         in
         (*get a map of agent_type with a site pair list: (A.x, B.x)*)
         let site_pair_list =
-          (*id:0:x:1, id:1:y:1*)
           ((agent_id, site_type, state), (agent_id', site_type', state')) :: old_list
         in
         let error, store_result =
           Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
-            parameter error agent_type' site_pair_list store_result
+            parameter error 
+            agent_type' (*B*)
+            site_pair_list 
+            store_result
         in
         error, store_result
       ) store_bonds_init (error, Ckappa_sig.Agent_map_and_set.Map.empty)
@@ -185,51 +204,46 @@ let collect_non_parallel_init_aux parameter store_bonds_init error init_state =
   error, store_result
 
 (**************************************************************************)
-(*non parallel bonds in initial state*)
+(*non parallel bonds in initial states*)
 
-let collect_non_parallel_init parameter store_bonds_init store_site_pair_list error init_state =
+let collect_non_parallel_init parameter kappa_handler store_bonds_init
+    store_site_pair_list error init_state =
   let error, store_result =
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
       (*A.x, B.z*)
-      (fun ((agent_id, agent_type, site_type, state),
-            (agent_id', agent_type', site_type', state')) (error, store_result) ->
-        let error, store_result =
-          Ckappa_sig.Agent_map_and_set.Map.fold
-            (fun agent_type1' pair_list (error, store_result) ->
-               let error, store_result =
-                 List.fold_left
-                   (fun (error, store_result)
-                     ((agent_id1, site_type1, state1), (agent_id1', site_type1', state1')) ->
-                     (*B = B, and their id are different*)
-                     if agent_id' <> agent_id1' &&  
-                        agent_type' = agent_type1'
-                     then
-                       (*two elements in the list*)
-                       if site_type <> site_type1 (*A.x <> A.y*)
+      (fun (x, y) (error, store_result) ->
+         let (agent_id, agent_type, site_type, state) (*A*) = x in
+         let (agent_id', agent_type', site_type', state') = y in
+         let error, store_result =
+           Ckappa_sig.Agent_map_and_set.Map.fold
+             (fun agent_type1' pair_list (error, store_result) ->
+                let error, store_result =
+                  List.fold_left
+                    (fun (error, store_result) (z, t) ->
+                       let (agent_id1, site_type1, state1) (*A*) = z in
+                       let (agent_id1', site_type1', state1') = t in
+                       (*B = B, and its id are different*)
+                       if agent_id' <> agent_id1' &&  
+                          agent_type' = agent_type1'
                        then
-                         (*non parallel set*)
-                         let error, old_list =
-                           match Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
-                                   parameter error agent_type' store_result
-                           with
-                           | error, None -> error, []                                       
-                           | error, Some l -> error, l                                 
-                         in
-                         (*A.x.y, B.z.t*)
-                         let new_list =
-                           ((agent_id, agent_type, site_type, state), (*A.x*)      
-                            (agent_id1, agent_type, site_type1, state1), (*A.y*)       
-                            (agent_id', agent_type', site_type', state'), (*B.z*)  
-                            (agent_id1', agent_type', site_type1', state1')) :: old_list
-                         in                     
-                         Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite 
-                           parameter error      
-                           agent_type'
-                           new_list
-                           store_result
+                         (*two elements in the list*)
+                         if site_type <> site_type1 (*A.x <> A.y*)
+                         then
+                           let x = (agent_id, agent_type, site_type, site_type1, state, state1) in
+                           let y = (agent_id', agent_type', site_type', site_type1', state', state1') in
+                           let pair = Parallel_bonds_type.project2 (x, y) in
+                           let error, store_result =
+                             Parallel_bonds_type.add_value
+                               parameter error
+                               kappa_handler
+                               pair
+                               (Usual_domains.Val false)
+                               store_result
+                           in
+                           error, store_result
+                         else
+                           error, store_result
                        else
-                         error, store_result
-                     else
                        error, store_result
                    ) (error, store_result) pair_list
                in
@@ -237,82 +251,6 @@ let collect_non_parallel_init parameter store_bonds_init store_site_pair_list er
             ) store_site_pair_list (error, store_result)
         in
         error, store_result
-      ) store_bonds_init (error, Ckappa_sig.Agent_map_and_set.Map.empty)
+      ) store_bonds_init (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
   in
   error, store_result
-  
-(**************************************************************************)
-(*collect result of parallel bonds in the intitial state*)
-  
-let collect_value_parallel_bonds parameter store_parallel_bonds_init error kappa_handler
-    init_state store_result =
-  (*--------------------------------------------------------------------*)
-  (*parallel bonds in the initial state:
-    (agent_type, site_type, site_type, state, state -> agent_type, site_type, site_type, state, state)
-  *)
-  let error, parallel_list =
-    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold
-      (fun ((agent_id, agent_type, site_type, site_type1, state, state1),
-            (agent_id', agent_type', site_type', site_type1', state', state1')) (error, current_list) ->
-        error, ((agent_type, site_type, site_type1, state, state1),
-                (agent_type', site_type', site_type1', state', state1')) :: current_list
-      ) store_parallel_bonds_init (error, [])
-  in
-  (*--------------------------------------------------------------------*)
-  let error, value_parallel_bonds =
-    List.fold_left (fun (error, store_result) x ->
-        let error, store_result =
-          Parallel_bonds_type.add_value
-            parameter error kappa_handler
-            x
-            (Usual_domains.Val true)
-            store_result
-        in
-        error, store_result
-      ) (error, store_result) parallel_list
-  in
-  error, value_parallel_bonds
-
-(**************************************************************************)
-(*collect result of non parallel bonds in the initital state*)
-
-let collect_value_non_parallel_bonds parameter store_non_parallel_init error
-    kappa_handler init_state store_result =
-  (*--------------------------------------------------------------------*)
-  (*a map contents a list of non parallel bonds:
-    (agent_type, site_type, site_type, state, state) -> (agent_type, site_type, site_type, state, state)
-  *)
-  let store_non_parallel_init_list =
-    Ckappa_sig.Agent_map_and_set.Map.map
-      (fun list ->
-         let new_pair_list =
-           List.fold_left (fun current_list
-                            ((agent_id, agent_type, site_type, state),
-                             (agent_id1, agent_type1, site_type1, state1),
-                             (agent_id', agent_type'', site_type', state'),
-                             (agent_id1', agent_type1', site_type1', state1')) ->
-                            ((agent_type, site_type, site_type1, state, state1),
-                             (agent_type'', site_type', site_type1', state', state1')) :: current_list
-                          ) [] list
-         in
-         new_pair_list
-      ) store_non_parallel_init
-  in
-  (*--------------------------------------------------------------------*)
-  (*value of a set of non parallel bonds is Val false*)
-  let error, value_non_parallel_bonds =
-    Ckappa_sig.Agent_map_and_set.Map.fold
-      (fun agent_type list (error, store_result) ->
-         let error, store_result =
-           List.fold_left (fun (error, store_result) x ->
-               Parallel_bonds_type.add_value
-                 parameter error kappa_handler
-                 x
-                 (Usual_domains.Val false)
-                 store_result
-             ) (error, store_result) list
-         in
-         error, store_result
-      ) store_non_parallel_init_list (error, store_result)
-  in
-  error, value_non_parallel_bonds
