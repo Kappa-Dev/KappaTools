@@ -422,7 +422,7 @@ struct
     it is belong to the parallel bonds then return true, if it is belong to
     not parallel bonds return false, both return any.*)
 
-  let compute_value_init static dynamic error init_state =
+  (*let compute_value_init' static dynamic error init_state =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let parameter = Remanent_parameters.update_prefix parameter "        " in
@@ -456,8 +456,8 @@ struct
     (*------------------------------------------------------------*)
     (*potential double bindings*)
     let error, store_result =
-      Parallel_bonds_init.collect_parallel_bonds_init 
-        parameter 
+      Parallel_bonds_init.collect_parallel_bonds_init
+        parameter
         kappa_handler
         store_bonds_init
         error
@@ -465,7 +465,62 @@ struct
     in
     let dynamic = set_value store_result dynamic in
     (*-------------------------------------------------------------*)
-    error, dynamic
+    error, dynamic*)
+
+  (**)
+  let compute_value_init static dynamic error init_state =
+        let parameter = get_parameter static in
+        let kappa_handler = get_kappa_handler static in
+        let error, store_bonds_init =
+          Parallel_bonds_init.collect_bonds_initial
+            parameter
+            error
+            init_state
+        in
+        (*--------------------------------------------------------*)
+        let error, store_site_pair_list =
+          Parallel_bonds_init.collect_non_parallel_init_aux
+            parameter
+            store_bonds_init
+            error
+        in
+        let error, store_non_parallel_init =
+          Parallel_bonds_init.collect_non_parallel_init
+            parameter
+            store_bonds_init
+            store_site_pair_list
+            error
+        in
+        (*---------------------------------------------------------*)
+        let store_result = get_value dynamic in
+        let error, store_result =
+          Parallel_bonds_init.collect_value_non_parallel_bonds
+            parameter
+            store_non_parallel_init
+            error
+            kappa_handler
+            store_result
+        in
+        let dynamic = set_value store_result dynamic in
+        (*---------------------------------------------------------*)
+        let error, store_parallel_bonds_init =
+          Parallel_bonds_init.collect_parallel_bonds_init
+            parameter
+            store_bonds_init
+            error
+            init_state
+        in
+        let store_result = get_value dynamic in
+        let error, store_result =
+          Parallel_bonds_init.collect_value_parallel_bonds
+            parameter
+            store_parallel_bonds_init
+            error
+            kappa_handler
+            store_result
+        in
+        let dynamic = set_value store_result dynamic in
+        error, dynamic
 
   let add_initial_state static dynamic error species =
     let event_list = [] in
@@ -1041,7 +1096,7 @@ struct
                  let (agent_id1, agent_type1, site_type1, site_type2, state1, state2) = z in
                  let (agent_id1', agent_type1', site_type1', site_type2', state1', state2') = t in
                  (*to be checked the agent_type, and site_type1*)
-                 let error, old_value = 
+                 let error, old_value =
                    match
                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
                        parameter error
@@ -1122,7 +1177,7 @@ struct
                            else
                              (*no*)
                              let new_value = Usual_domains.lub value Usual_domains.Undefined in
-                             error, new_value                              
+                             error, new_value
                          end
                      ) (error, old_value) potential_list
                  in
@@ -1132,7 +1187,7 @@ struct
                      (fun parameter error t map ->
                         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
                           parameter error
-                          t 
+                          t
                           value
                           map)
                      parameter
@@ -1143,9 +1198,9 @@ struct
                  error, dynamic, precondition, store_result
                ) (error, dynamic, precondition, store_result) parallel_list
            in
-           error, dynamic, precondition, store_result           
-        ) store_pair_bind_map 
-        (error, dynamic, precondition, 
+           error, dynamic, precondition, store_result
+        ) store_pair_bind_map
+        (error, dynamic, precondition,
          Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
     in
     (*-----------------------------------------------------------*)
@@ -1172,18 +1227,18 @@ struct
                let (agent_id1', agent_type1', site_type1', site_type2', state1', state2') = t in
                (*to be check agent_type and site_type1*)
                let error, old_value =
-                 match 
+                 match
                    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
                      parameter error
                      (z, t)
                      store_result
                  with
                  | error, None -> error, Usual_domains.Undefined
-                 | error, Some value -> error, value                     
+                 | error, Some value -> error, value
                in
                (*-----------------------------------------------------------*)
                let error, dynamic, precondition, state_list =
-                 get_state_of_site_in_precondition 
+                 get_state_of_site_in_precondition
                    parameter error
                    dynamic
                    agent_id1
@@ -1207,7 +1262,7 @@ struct
                             (agent_id', agent_type', site_type1', site_type', pre_state', state'))
                            :: current_list
                          in
-                         error, potential_list                           
+                         error, potential_list
                        ) (error, current_list) state_list'
                    ) (error, []) state_list
                in
@@ -1247,12 +1302,12 @@ struct
                          else
                            let new_value = Usual_domains.lub value Usual_domains.Undefined in
                            error, new_value
-                       end                     
+                       end
                    ) (error, old_value) potential_list
                in
                (*-----------------------------------------------------------*)
                let error, store_result =
-                 Parallel_bonds_type.add_symmetric_tuple_pair 
+                 Parallel_bonds_type.add_symmetric_tuple_pair
                    (fun parameter error t map ->
                       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
                         parameter error
@@ -1262,7 +1317,7 @@ struct
                    store_result
                in
                error, dynamic, precondition, store_result
-             ) (error, dynamic, precondition, store_result) parallel_list         
+             ) (error, dynamic, precondition, store_result) parallel_list
         ) store_pair_bind_map2
         (error, dynamic, precondition, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
     in
@@ -1335,7 +1390,7 @@ struct
           in
           error, store_result
         )
-        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty) 
+        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
         non_parallel_rhs_list
     in
     (*--------------------------------------------------------------*)
@@ -1343,7 +1398,7 @@ struct
     let error, map_value = error, store_value in
     let () =
       if not bool &&
-         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty 
+         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
            store_non_parallel
       then
         ()
@@ -1382,13 +1437,13 @@ struct
                (Usual_domains.Val true)
                store_result
            in
-           error, store_result         
-        ) rule_has_parallel_bonds_rhs_set 
+           error, store_result
+        ) rule_has_parallel_bonds_rhs_set
         (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
     in
     (*--------------------------------------------------------------*)
-    let () = 
-      if not bool && 
+    let () =
+      if not bool &&
          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
            store_parallel
       then
@@ -1415,8 +1470,8 @@ struct
         store_result
     in
     let dynamic = set_value store_result dynamic in
-    error, dynamic, (precondition, event_list)   
-    
+    error, dynamic, (precondition, event_list)
+
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
