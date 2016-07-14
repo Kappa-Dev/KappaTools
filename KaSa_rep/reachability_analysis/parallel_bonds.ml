@@ -1092,23 +1092,35 @@ struct
                    List.fold_left (fun (error, value) (x', y') ->
                        let (_, _, _, s_type2, _, pre_state2) = x' in
                        let (_, _, _, s_type2', _, pre_state2') = y' in
+                       (*check if the pre_state2 and pre_state2' of the second site are
+                         bound and if yes which the good state?  - Firstly check that if the
+                         parallel bonds is an empty set then depend on the state of the
+                         second site, it will give a different value: whether Undefined or
+                         Any, (question 1 and 2)*)
                        if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.is_empty
                             rule_has_parallel_bonds_rhs_set
                        then
                          begin
+                           (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
                            if Ckappa_sig.int_of_state_index pre_state2 = 0 (*||
                               Ckappa_sig.int_of_state_index pre_state2' = 0*)
                            then
+                             (*answer of question 1: the second site is free*)
                              let new_value = Usual_domains.lub value Usual_domains.Undefined in
                              error, new_value
                            else
+                             (* the pre_state2 is bound or pre_state2' is bound. Question
+                                2: both sites are bound with the good sites, then return Any,
+                                if not return false*)
                              begin
                                if s_type2 = s_type2' && pre_state2 = pre_state2' &&
                                   not (Ckappa_sig.int_of_state_index pre_state2' = 0)
                                then
+                                 (*both question1 and 2 are yes: return any*)
                                  let new_value = Usual_domains.lub value Usual_domains.Any in
                                  error, new_value
                                else
+                                 (*the question1 is true but the question 2 is false -> false*)
                                  let new_value = Usual_domains.lub value (Usual_domains.Val false) in
                                  error, new_value
                              end
@@ -1121,7 +1133,7 @@ struct
                            if s_type2 = site_type2 && pre_state2 = state2 &&
                               s_type2' = site_type2' && pre_state2' = state2'
                            then
-                             (*yes*)
+                             (*it belongs to parallel set, the answer is yes*)
                              let new_value = Usual_domains.lub value (Usual_domains.Val true) in
                              error, new_value
                            else
@@ -1132,6 +1144,7 @@ struct
                      ) (error, old_value) potential_list
                  in
                  (*------------------------------------------------------*)
+                 (*call the symmetric add *)
                  let error, store_result =
                    Parallel_bonds_type.add_symmetric_tuple_pair
                      (fun parameter error t map ->
@@ -1392,6 +1405,7 @@ struct
         (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
     in
     (*--------------------------------------------------------------*)
+    (*fold over the store_value and parallel bond value *)
     let () =
       if not bool &&
          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
