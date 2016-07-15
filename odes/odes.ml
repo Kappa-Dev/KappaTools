@@ -1,208 +1,267 @@
 module type Interface =
 sig
-  type pattern
-  type canonic_pattern
-  val print_canonic_pattern: Format.formatter -> canonic_pattern -> unit
+  type mixture              (* not necessarily connected, fully specified *)
+  type chemical_species     (* connected, fully specified *)
+  type pattern              (* not necessarity connected, maybe partially specified *)
+  type connected_component  (* connected, maybe partially specified *)
+
+  val dummy_chemical_species: chemical_species
+  val print_chemical_species: Format.formatter -> chemical_species -> unit
 
   type connected_component_id
   val print_connected_component_id: Format.formatter -> connected_component_id -> unit
 
-  val nbr_automorphisms: pattern -> int
-  val canonic_form: pattern -> canonic_pattern
-  val connected_components:
-    pattern -> (connected_component_id * pattern) list
+  val nbr_automorphisms_in_chemical_species: chemical_species -> int
+  val nbr_automorphisms_in_pattern: pattern -> int
 
-  type embedding
+  val canonic_form: chemical_species -> chemical_species
 
-  val find_embeddings: pattern -> pattern -> embedding list
+  val connected_components_of_patterns:
+    pattern -> (connected_component_id * connected_component) list
+
+  val connected_components_of_mixture:
+    mixture -> chemical_species list
+
+  type embedding (* the domain is connected *)
+  type embedding_forest (* the domain may be not connected *)
+  val lift_embedding: embedding -> embedding_forest
+  val find_embeddings: connected_component -> chemical_species -> embedding list
+  val find_embeddings_unary_binary:
+    pattern -> chemical_species -> embedding_forest list
   val disjoint_union:
-    (pattern * embedding * pattern) list ->
-    pattern * embedding * pattern
+    (connected_component * embedding * chemical_species) list ->
+    pattern * embedding_forest * mixture
 
   type rule
+  type rule_id
 
   val binary_rule_that_can_be_applied_in_a_unary_context: rule -> bool
   val lhs: rule -> pattern
-  type rule_id
+
   val print_rule_id: Format.formatter -> rule_id -> unit
   val rule_id: rule -> rule_id
 
-  val apply: rule -> embedding -> pattern -> pattern
-
+  val apply: rule -> embedding_forest -> mixture  -> mixture
+  val lift_species: chemical_species -> mixture
 
 end
 
 
-module Make(I:Interface) =
-struct
+  module Make(I:Interface) =
+  struct
 
-  module PatternSetMap =
-    SetMap.Make
-      (struct
-        type t = I.canonic_pattern
-        let compare = compare
-        let print = I.print_canonic_pattern
-      end)
-  module PatternSet = PatternSetMap.Set
+    module SpeciesSetMap =
+      SetMap.Make
+        (struct
+          type t = I.chemical_species
+          let compare = compare
+          let print = I.print_chemical_species
+        end)
+    module SpeciesSet = SpeciesSetMap.Set
+    module SpeciesMap = SpeciesSetMap.Map
+    module Store =
+      SetMap.Make
+        (struct
+          type t = I.rule_id * I.connected_component_id
+          let compare = compare
+          let print a (r,cc) =
+              let () = Format.fprintf a "Component_wise:(%a,%a)" I.print_rule_id r I.print_connected_component_id cc  in
+              let () = I.print_rule_id a r in
+              let () = I.print_connected_component_id a cc in
+              ()
+        end)
 
-  type store_key =
-    | Component_wise of I.rule_id * I.connected_component_id
-    | Global of I.rule_id
+    module StoreMap = Store.Map
 
-  module Store =
-    SetMap.Make
-      (struct
-        type t = store_key
-        let compare = compare
-        let print a b =
-          match
-            b
-          with
-          | Component_wise (r,cc) ->
-            let () = Format.fprintf a "Component_wise:(%a,%a)" I.print_rule_id r I.print_connected_component_id cc  in
-            let () = I.print_rule_id a r in
-            let () = I.print_connected_component_id a cc in
-            ()
-          | Global r ->
-            Format.fprintf a "Global:%a"
-              I.print_rule_id r
-      end)
-  module StoreMap = Store.Map
+    type species_id = int
+    let fst_species_id = 0
+    let next_species_id id = id + 1
+    type network =
+      {
+        species : SpeciesSet.t ;
+        species_tab: I.chemical_species Mods.DynArray.t ;
+        id_of_species: species_id SpeciesMap.t ;
+        reactions: (species_id list * species_id list * I.rule) list ;
+        fresh_species_id: species_id ;
+      }
 
-  let enrich_rule rule =
-    let lhs = I.lhs rule in
-    let lhs_cc = I.connected_components lhs in
-    (rule,lhs,lhs_cc)
-
-  let add_embedding key embed store =
-    let old_list =
-      StoreMap.find_default [] key store
-    in
-    StoreMap.add key (embed::old_list) store
-
-  let add_embedding_list key lembed store =
-    let old_list =
-      StoreMap.find_default [] key store
-    in
-    let new_list =
+    let fold_left_swap f a b =
       List.fold_left
-        (fun list embed -> embed::list)
-        old_list
-        lembed
-    in
-    StoreMap.add key new_list store
+        (fun a b -> f b a)
+        b a
 
-  let check_if_a_pattern_is_new pattern (to_be_visited,set) =
-    let canonic = I.canonic_form pattern in
-    if PatternSet.mem canonic set
-    then
-      to_be_visited,set
-    else
-      pattern::to_be_visited,
-      PatternSet.add canonic set
+    let init () =
+      {
+        species = SpeciesSet.empty ;
+        id_of_species = SpeciesMap.empty ;
+        species_tab = Mods.DynArray.create 0 I.dummy_chemical_species ;
+        reactions = [] ;
+        fresh_species_id = fst_species_id
+      }
 
-  let compute_reactions rules initial_states =
-    (* Let us annotate the rules with cc decomposition *)
-    let rules =
-      List.rev_map
-        enrich_rule
-        (List.rev rules)
-    in
-    let set = PatternSet.empty in
-    let to_be_visited = [] in
-    let to_be_visited,set =
-      List.fold_left
-        (fun remanent pattern ->
-           check_if_a_pattern_is_new pattern remanent)
-        (to_be_visited,set)
-        initial_states
-    in
-    let store = StoreMap.empty in
-    (* set is the set of pattern in cannonic forms *)
-    (* store maps each cc in the lhs of a rule to the list of embedding between this cc and a pattern in set\to_be_visited, and for unary applciation of rules, the list of the embedding between the whole lhs and a pattern in set\to_be_visited*)
-    let rec aux to_be_visited set store =
+    let is_known_species species network =
+      SpeciesSet.mem species network.species
+
+    let add_new_species species network =
+      let () = Mods.DynArray.set network.species_tab network.fresh_species_id species in
+      { network
+        with
+          species = SpeciesSet.add species network.species ;
+          id_of_species = SpeciesMap.add species network.fresh_species_id network.id_of_species ;
+          fresh_species_id = next_species_id network.fresh_species_id
+      },
+      network.fresh_species_id
+
+    let enrich_rule rule =
+      let lhs = I.lhs rule in
+      let lhs_cc = I.connected_components_of_patterns lhs in
+      (rule,lhs,lhs_cc)
+
+    let add_embedding key embed store =
+      let old_list =
+        StoreMap.find_default [] key store
+      in
+      StoreMap.add key (embed::old_list) store
+
+    let add_embedding_list key lembed store =
+      let old_list =
+        StoreMap.find_default [] key store
+      in
+      let new_list =
+        fold_left_swap (fun a b -> a::b)
+          lembed
+          old_list
+      in
+      StoreMap.add key new_list store
+
+    let translate_canonic_species species remanent =
+      let id_opt = SpeciesMap.find_option species (snd remanent).id_of_species in
       match
-        to_be_visited
+        id_opt
       with
-      | []   -> set,store
-      | new_species::to_be_visited ->
-        (* add in store the embeddings from cc of lhs to new_species
-           as well as the embeddings from lhs to a new species for unary application of a binary application *)
-        let store' =
-          List.fold_left
-            (fun store (rule,lhs,lhs_cc)->
-               let rule_id = I.rule_id rule in
-               let store =
-                 List.fold_left
-                   (fun store (cc_id, cc) ->
-                      let lembed = I.find_embeddings cc new_species in
-                           add_embedding_list
-                             (Component_wise (rule_id,cc_id))
-                             lembed
-                             store
-                   )
-                   store
-                   lhs_cc
-               in
-               let store =
-                 if I.binary_rule_that_can_be_applied_in_a_unary_context rule
-                 then
-                   begin
-                     let lembed = I.find_embeddings lhs new_species in
-                     add_embedding_list (Global rule_id) lembed store
-                   end
-                 else
-                   store
-               in
-               store
-            )
-            store
-            rules
-        in
-        (* compute the list of embeeding from lhs to new_species
-           for unary application of binary rules *)
-        let new_embedding_list =
-          List.fold_left
-            (fun embedding_list (rule,lhs,_lhs_cc) ->
-            if I.binary_rule_that_can_be_applied_in_a_unary_context rule
-            then
-              begin
-                let lembed = I.find_embeddings lhs new_species in
-                List.fold_left
-                  (fun list embed -> (rule,embed,new_species)::list)
-                  embedding_list
-                  lembed
-              end
-            else
-              embedding_list
-            )
-            []
-            rules
-        in
-        (* compute the embedding betwen lhs and tuple of species that contain
-           at least one occurence of new_species *)
-        let new_embedding_list = (* TODO *)
-          new_embedding_list
-        in
-        (* compute the corresponding rhs, and put the new species in the working list *)
-        let to_be_visited,set =
-          List.fold_left
-            (fun working_list  (rule,embed,mixture) ->
-               let refined_rhs = I.apply rule embed mixture in
-               let cc_rhs = I.connected_components refined_rhs in
-               List.fold_left
-                 (fun working_list (_cc_id,pattern) ->
-                    check_if_a_pattern_is_new pattern working_list)
-                 working_list
-                 cc_rhs
-            )
-            (to_be_visited,set)
-            new_embedding_list
-        in
-        aux to_be_visited set store'
-    in
-    aux to_be_visited set store
+      | None ->
+        let to_be_visited, network = remanent in
+        let network, id = add_new_species species network in
+        (species::to_be_visited,
+         network), id
+      | Some i -> remanent,i
 
-end
+    let translate_species species remanent =
+      translate_canonic_species (I.canonic_form species) remanent
+
+    let petrify_canonic_species = translate_canonic_species
+    let petrify_species species =
+      translate_canonic_species (I.canonic_form species)
+    let petrify_species_list l remanent =
+      fold_left_swap
+        (fun species (remanent,l) ->
+           let remanent, i =
+             petrify_species species remanent
+           in
+           remanent,(i::l))
+        l
+        (remanent,[])
+
+    let petrify_mixture mixture =
+    petrify_species_list (I.connected_components_of_mixture mixture)
+
+    let add_reaction rule embedding_forest mixture remanent =
+      let remanent, reactants = petrify_mixture mixture remanent in
+      let products = I.apply rule embedding_forest mixture in
+      let remanent, products = petrify_mixture products remanent in
+      let to_be_visited, network = remanent in
+      let network =
+        {
+          network
+          with reactions = (List.rev reactants, List.rev products, rule)::network.reactions
+        }
+      in
+      to_be_visited, network
+
+    let initial_network initial_states =
+      List.fold_left
+        (fun remanent species -> fst (translate_species species remanent))
+        ([], init ())
+        initial_states
+
+    let compute_reactions rules initial_states =
+      (* Let us annotate the rules with cc decomposition *)
+      let rules = List.rev_map enrich_rule (List.rev rules) in
+      let to_be_visited, network = initial_network initial_states in
+      let store = StoreMap.empty in
+      (* store maps each cc in the lhs of a rule to the list of embedding between this cc and a pattern in set\to_be_visited *)
+      let rec aux to_be_visited network store =
+        match
+          to_be_visited
+        with
+        | []   -> network
+        | new_species::to_be_visited ->
+          (* add in store the embeddings from cc of lhs to new_species,
+             for unary application of binary rule, the dictionary of species is updated, and the reaction entered directly *)
+          let store, to_be_visited, network  =
+            List.fold_left
+              (fun (store, to_be_visited, network)  (rule,lhs,lhs_cc)->
+                 let rule_id = I.rule_id rule in
+                 (* regular application of tules, we store the embeddings*)                 let store' =
+                   List.fold_left
+                     (fun store (cc_id, cc) ->
+                        let lembed = I.find_embeddings cc new_species in
+                        add_embedding_list
+                          (rule_id,cc_id)
+                          lembed
+                          store
+                     )
+                     store
+                     lhs_cc
+                 in
+                 (* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
+                 let new_embedding_list,_ =
+                   List.fold_left
+                     (fun (embedding_list,partial_emb_list) (cc_id,cc) ->
+                        (* TO DO *)
+                        embedding_list,partial_emb_list)
+                     ([],[[]])
+                     lhs_cc
+                 in
+                 (* compute the corresponding rhs, and put the new species in the working list, and store the corrsponding reactions *)
+                 let to_be_visited, network =
+                   List.fold_left
+                     (fun remanent (rule,embed,mixture) ->
+                        add_reaction rule embed mixture remanent)
+                     (to_be_visited,network)
+                     new_embedding_list
+                 in
+                 (* unary application of binary rules *)
+                 let to_be_visited, network =
+                   if I.binary_rule_that_can_be_applied_in_a_unary_context rule
+                   then
+                     begin
+                       let lembed = I.find_embeddings_unary_binary lhs new_species in
+                       fold_left_swap
+                         (fun embed ->
+                            add_reaction rule embed
+                              (I.lift_species new_species))
+                         lembed
+                         (to_be_visited, network)
+                         end
+                   else
+                     to_be_visited, network
+                 in
+                 store', to_be_visited, network
+              )
+              (store, to_be_visited, network)
+              rules
+          in
+          aux to_be_visited network store
+      in
+      aux to_be_visited network store
+
+      let species_of_species_id network =
+        (fun i -> Mods.DynArray.get network.species_tab i)
+      let get_reactions network = network.reactions
+
+  end
+
+
 
 let dummy () = ()
