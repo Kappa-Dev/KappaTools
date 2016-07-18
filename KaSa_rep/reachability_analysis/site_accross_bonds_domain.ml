@@ -490,12 +490,12 @@ struct
     error, dynamic, kasa_state
 
   (****************************************************************)
-(* to do *)
+  (* to do *)
 
-  let print static dynamic error _loggers =
+  let print static dynamic error loggers =
     let parameter = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let log = Remanent_parameters.get_logger parameter in
+    let log = loggers in
     (*--------------------------------------------------------*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_result parameter
@@ -510,30 +510,6 @@ struct
         error
       else error
     in
-    (*--------------------------------------------------------*)
-    (*print basic static information*)
-    let store_views_rhs = get_views_rhs static in
-    let store_bonds_rhs = get_bonds_rhs static in
-    let store_modified_map = get_modified_map static in
-    let store_created_bond = get_created_bond static in
-    let store_modified_internal_state_and_bond =
-      get_modified_internal_state_and_bond static in
-    let store_question_marks_rhs = get_question_marks_rhs static in
-    let store_explicit_static = get_explicit_rule static in
-    let store_implicit_static = get_implicit_rule static in
-    let error =
-      Site_accross_bonds_domain_static.print_basic_static_information
-        parameter error handler_kappa log
-        store_views_rhs
-        store_bonds_rhs
-        store_modified_map
-        store_created_bond
-        store_modified_internal_state_and_bond
-        store_question_marks_rhs
-        store_explicit_static
-        store_implicit_static
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

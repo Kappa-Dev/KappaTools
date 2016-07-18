@@ -1172,7 +1172,7 @@ struct
   (****************************************************************)
 
   let print static dynamic (error:Exception.method_handler) loggers =
-    let handler_kappa = get_kappa_handler static in
+    let kappa_handler = get_kappa_handler static in
     let parameter = get_parameter static in
     let log = loggers in
    (*-------------------------------------------------------*)
@@ -1189,11 +1189,14 @@ struct
         in
         let store_value = get_value dynamic in
         let error =
-          Print_parallel_bonds.print_result
-            handler_kappa
-            parameter
-            error
-            store_value
+          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
+            (fun tuple value error ->
+               Parallel_bonds_type.print_parallel_constraint
+                 ~verbose:true
+                 ~sparse:true
+                 ~final_resul:true
+                 ~dump_any:true parameter error kappa_handler tuple value
+            ) store_value error
         in error
       else
         error

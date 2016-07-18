@@ -106,7 +106,7 @@ let collect_views_rhs parameter error rule_id rule store_result =
                (error, old_set)
            in
            let error = Exception.check warn parameter error error'
-               (Some "line 210") Exit
+               (Some "line 109") Exit
            in
            (*--------------------------------------------*)
            (*store*)
@@ -170,7 +170,8 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
               | error, None -> warn parameter error (Some "line 332") Exit Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
-            (*get the first pair (agent_type, state)*)
+            (*----------------------------------------------------*)
+            (*the first pair*)
             let error, (agent_type1, state1) =
               collect_agent_type_state
                 parameter
@@ -201,7 +202,8 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
               match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
                       parameter error rule_id store_result
               with
-              | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+              | error, None ->
+                error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
               | error, Some p -> error, p
             in
             let error', new_set =
@@ -325,21 +327,22 @@ let collect_pair_sites_aux parameter error rule_id store_views_rhs =
   in
   error, store_result
 
+(*pair (A,x,y, B, z, t) without state information*)
+
 let collect_tuple_pair parameter error rule_id store_pair_rhs store_result =
   let error, store_pair_set =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-        parameter error rule_id store_pair_rhs with
+        parameter error rule_id store_pair_rhs 
+    with
     | error, None ->
       error, Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.empty
     | error, Some s -> error, s
   in
   let error, store_result =
-    (*fold over this set*)
     Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
       (fun x (error, current_set) ->
          let (agent_id, agent_type, site_type, site_type2, _, _) = x in (*A*)
-         (*fold again*)
          let error, pair_set =
            Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold_inv
              (fun z (error, current_set) ->
