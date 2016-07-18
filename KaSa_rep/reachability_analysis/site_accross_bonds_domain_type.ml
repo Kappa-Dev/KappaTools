@@ -146,3 +146,25 @@ module PairAgentsSites_SitesState_map_and_set =
          let compare = compare
          let print _ _ = ()
        end))
+
+(*todo*)
+let print_site_accross_domain
+    ?verbose:(verbose = true)
+    ?sparse: (sparse = false)
+    ?final_resul:(final_result = false) 
+    ?dump_any:(dump_any = false) parameters error kappa_handler tuple value =
+  let prefix = Remanent_parameters.get_prefix parameters in
+  if sparse (*todo*)
+  then error
+  else
+    let () =
+      if verbose
+      then
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "test\n"
+      else 
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "test\n";
+      Loggers.print_newline (Remanent_parameters.get_logger parameters)
+    in
+    error

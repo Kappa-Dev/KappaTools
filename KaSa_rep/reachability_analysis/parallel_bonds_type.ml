@@ -185,7 +185,9 @@ let add_value parameters error kappa_handler x value store_result =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters
       then
         let parameters = Remanent_parameters.update_prefix parameters "         " in
-        print_parallel_constraint  ~verbose:false ~dump_any:true parameters error kappa_handler x value
+        print_parallel_constraint
+          ~verbose:false 
+          ~dump_any:true parameters error kappa_handler x value
       else error
     in
     let error, store_result =

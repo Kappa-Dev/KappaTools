@@ -690,6 +690,9 @@ Id=27
 EXTENSIONAL DESCRIPTION:
 The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 When the agent A has its site t bound to the site t of a B, and its site z bound to the site z of a B, then both instances of B are necessarily the same.

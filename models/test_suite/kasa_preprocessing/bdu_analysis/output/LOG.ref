@@ -1051,6 +1051,9 @@ Id=33
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent C ranges over free and A@y.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

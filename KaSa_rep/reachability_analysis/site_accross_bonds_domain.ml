@@ -456,12 +456,12 @@ struct
 
   let add_initial_state static dynamic error species =
     let parameter = get_parameter static in
-    let store_result = get_pair_tuple_init dynamic in
+    (*let store_result = get_pair_tuple_init dynamic in
     let error, store_tuple_pair_init =
       Site_accross_bonds_domain_dynamic.collect_pair_tuple_init
         parameter error species store_result
     in
-    let dynamic = set_pair_tuple_init store_tuple_pair_init dynamic in
+    let dynamic = set_pair_tuple_init store_tuple_pair_init dynamic in*)
     let event_list = [] in
     error, dynamic, event_list
 
@@ -492,9 +492,9 @@ struct
   (****************************************************************)
   (* to do *)
 
-  let print static dynamic error loggers =
+  let print static dynamic (error:Exception.method_handler) loggers =
     let parameter = get_parameter static in
-    let handler_kappa = get_kappa_handler static in
+    let kappa_handler = get_kappa_handler static in
     let log = loggers in
     (*--------------------------------------------------------*)
     let error =
@@ -506,6 +506,19 @@ struct
           Loggers.fprintf log "* Site accross bonds domain\n";
           Loggers.fprintf log
             "------------------------------------------------------------\n"
+        in
+        (*--------------------------------------------------------*)
+        (*to do*)
+        let store_value = get_value dynamic in
+        let error =
+          Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.fold
+            (fun tuple value error ->
+               Site_accross_bonds_domain_type.print_site_accross_domain
+                 ~verbose:true
+                 ~sparse:true
+                 ~final_resul:true
+                 ~dump_any:true parameter error kappa_handler tuple value
+            ) store_value error            
         in
         error
       else error

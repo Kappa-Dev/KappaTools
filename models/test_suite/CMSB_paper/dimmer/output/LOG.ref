@@ -34,6 +34,9 @@ The binding state of site cr in agent R ranges over free and R@n.
 The binding state of site c in agent R ranges over free and R@c.
 The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 When the agent R has its site c bound to the site c of a R, and its site cr bound to the site n of a R, then both instances of R are necessarily the same.

@@ -296,7 +296,8 @@ let collect_pair_sites_aux parameter error rule_id store_views_rhs =
       (fun (agent_id, agent_type, site_type, state) (error, store_result) ->
          let error, old_set =
            match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-                   parameter error rule_id store_result with
+                   parameter error rule_id store_result 
+           with
            | error, None ->
              error, Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.empty
            | error, Some s -> error, s

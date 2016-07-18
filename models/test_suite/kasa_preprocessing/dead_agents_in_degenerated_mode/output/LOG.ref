@@ -636,6 +636,9 @@ Id=8
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent B ranges over u and p.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
