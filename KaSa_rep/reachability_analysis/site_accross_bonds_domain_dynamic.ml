@@ -247,20 +247,13 @@ let collect_pair_sites_init parameter error store_sites_init =
                 (agent_id', agent_type', site_type', state'))
                store_bonds_init && state2 = state2' (*todo*)
            then
-             let error, pair_set =
+             let error, store_result =
                Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in
                  parameter error
                  (x, y)
-                 Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
+                 store_result
              in
-             let error', new_set =
-               Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.union
-                 parameter error pair_set store_result
-             in
-             let error = Exception.check warn parameter error error'
-                 (Some "line 235") Exit
-             in
-             error, new_set
+             error, store_result
            else
              error, store_result
         ) store_pair_sites_init (error, store_result)

@@ -71,8 +71,8 @@ struct
   type local_dynamic_information =
     {
       dumy: unit;
-      store_value : Ckappa_sig.Views_bdu.mvbdu
-          Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
+      store_value :
+        Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
     }
 
   type dynamic_information =
@@ -433,7 +433,7 @@ struct
       {
         dumy = ();
        store_value =
-         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
+         Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
          
       }
     in
@@ -454,14 +454,21 @@ struct
   (*------------------------------------------------------------*)
   (* take into account bounds that may occur in initial states *)
 
+  
+
   let add_initial_state static dynamic error species =
     let parameter = get_parameter static in
-    (*let store_result = get_pair_tuple_init dynamic in
-    let error, store_tuple_pair_init =
-      Site_accross_bonds_domain_dynamic.collect_pair_tuple_init
-        parameter error species store_result
+    (*collect the first site bound, and the second site different than the
+      first site, return the information of its state, result*)
+    let store_result = get_value dynamic in
+    let error, store_result =
+      Site_accross_bonds_domain_static.collect_pair_tuple_init
+        parameter
+        error
+        species
+        store_result
     in
-    let dynamic = set_pair_tuple_init store_tuple_pair_init dynamic in*)
+    let dynamic = set_value store_result dynamic in
     let event_list = [] in
     error, dynamic, event_list
 
@@ -475,7 +482,7 @@ struct
   (* to do : add information of init ?*)
 
   let apply_rule static dynamic error rule_id precondition =
-    let parameter  = get_parameter static in
+    let _parameter  = get_parameter static in
     let event_list = [] in
     error, dynamic, (precondition, event_list)
 
@@ -511,13 +518,13 @@ struct
         (*to do*)
         let store_value = get_value dynamic in
         let error =
-          Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.fold
-            (fun tuple value error ->
+          Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
+            (fun tuple error ->
                Site_accross_bonds_domain_type.print_site_accross_domain
                  ~verbose:true
                  ~sparse:true
                  ~final_resul:true
-                 ~dump_any:true parameter error kappa_handler tuple value
+                 ~dump_any:true parameter error kappa_handler tuple
             ) store_value error            
         in
         error
