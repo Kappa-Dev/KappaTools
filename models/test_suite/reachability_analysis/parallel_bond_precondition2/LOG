@@ -1,0 +1,133 @@
+Kappa Static Analyzer (DomainBased-1636-g205351b-dirty) (without Tk interface)
+Analysis launched at 2016/07/18 09:29:36 (GMT-4) on MoyenneCell
+Parsing parallel_bonds.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+	Views in initial state
+
+			A(z!free,t!free)
+
+	Wake-up rules
+		Updating the views for A(z!,t!)
+		(rule 0: r1) should be investigated 
+		(rule 1: r2) should be investigated 
+		(rule 2: r3) should be investigated 
+	Views in initial state
+
+			A(x~u)
+
+	Wake-up rules
+		Updating the views for A(x~)
+	Views in initial state
+
+			B(z!free,t!free)
+
+	Wake-up rules
+		Updating the views for B(z!,t!)
+		(rule 0: r1) should be investigated 
+		(rule 1: r2) should be investigated 
+		(rule 2: r3) should be investigated 
+	Views in initial state
+
+			B(x~u)
+
+	Wake-up rules
+		Updating the views for B(x~)
+
+	Applying rule 0: r1:
+		the precondition is satisfied
+
+		rule 0: r1 is applied for the first time
+
+		Updating the views for A(z!,t!)
+			
+
+			A(z!B@z,t!free)
+
+	Wake-up rules
+		Updating the views for A(z!,t!)
+		(rule 0: r1) should be investigated 
+		(rule 1: r2) should be investigated 
+		(rule 2: r3) should be investigated 
+		Updating the views for B(z!,t!)
+			
+
+			B(z!A@z,t!free)
+
+	Wake-up rules
+		Updating the views for B(z!,t!)
+		(rule 0: r1) should be investigated 
+		(rule 1: r2) should be investigated 
+		(rule 2: r3) should be investigated 
+
+	Applying rule 1: r2:
+		the precondition is satisfied
+
+		rule 1: r2 is applied for the first time
+
+		Updating the views for A(z!,t!)
+			
+
+			A(z!B@z,t!B@t)
+
+	Wake-up rules
+		Updating the views for A(z!,t!)
+		(rule 0: r1) should be investigated 
+		(rule 1: r2) should be investigated 
+		(rule 2: r3) should be investigated 
+		Updating the views for B(z!,t!)
+			
+
+			B(z!free,t!A@t)
+
+	Wake-up rules
+		Updating the views for B(z!,t!)
+		(rule 0: r1) should be investigated 
+		(rule 1: r2) should be investigated 
+		(rule 2: r3) should be investigated 
+
+	Applying rule 2: r3:
+		the precondition is not satisfied yet
+
+	Applying rule 0: r1:
+		the precondition is satisfied
+		Updating the views for A(z!,t!)
+		Updating the views for B(z!,t!)
+
+	Applying rule 1: r2:
+		the precondition is satisfied
+		Updating the views for A(z!,t!)
+		Updating the views for B(z!,t!)
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+rule 2: r3 will never be applied.
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+In agent A, the binding state of site z is B@z whenever the binding state of site t is B@t.
+In agent B, the binding state of site t is free whenever the binding state of site z is A@z.
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+The binding state of site t in agent A ranges over free and B@t.
+The binding state of site z in agent A ranges over free and B@z.
+The internal state of site x in agent A is always u.
+The binding state of site t in agent B ranges over free and A@t.
+The binding state of site z in agent B ranges over free and A@z.
+The internal state of site x in agent B is always u.
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
+execution finished without any exception
