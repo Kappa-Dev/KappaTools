@@ -41,7 +41,8 @@ module AgentsSitesStates_map_and_set =
        (struct
          type t =
            (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name 
-            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state)
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name 
+            * Ckappa_sig.c_state * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -51,8 +52,10 @@ module PairAgentsSiteState_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -73,8 +76,10 @@ module PairAgentsSites_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name )
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name 
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name 
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name )
          let compare = compare
          let print _ _ = ()
        end))
@@ -110,7 +115,8 @@ module AgentsSitesState_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -120,8 +126,10 @@ module PairAgentsSitesState_Sites_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name)
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name)
          let compare = compare
          let print _ _ = ()
        end))
@@ -131,8 +139,10 @@ module PairAgentsSites_SitesState_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
+            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))

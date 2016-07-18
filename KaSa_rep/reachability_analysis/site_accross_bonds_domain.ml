@@ -71,17 +71,8 @@ struct
   type local_dynamic_information =
     {
       dumy: unit;
-      store_basic_dynamic_information: Site_accross_bonds_domain_dynamic.basic_dynamic_information;
-      (*store_relation_mvbdu :
-        Ckappa_sig.Views_bdu.mvbdu
+      store_value : Ckappa_sig.Views_bdu.mvbdu
           Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
-        (*range of the second site of the first agent, when both agents are connected via the first site*)
-        store_range_site_first_agent:
-        Ckappa_sig.Views_bdu.mvbdu
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
-        store_range_site_second_agent:
-        Ckappa_sig.Views_bdu.mvbdu
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;*)
     }
 
   type dynamic_information =
@@ -106,6 +97,8 @@ struct
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
   (*-------------------------------------------------------------*)
+  (*static information*)
+  (*-------------------------------------------------------------*)
 
   let get_local_static_information static = static.local_static_information
 
@@ -125,6 +118,8 @@ struct
       store_basic_static_information = domain
       } static
 
+  (*-------------------------------------------------------------*)
+
   let get_views_rhs static =
     (get_basic_static_information static).Site_accross_bonds_domain_static.store_views_rhs
 
@@ -135,8 +130,10 @@ struct
         Site_accross_bonds_domain_static.store_views_rhs = r
       } static
 
+  (*sites that can be bound on the rhs*)
   let get_bonds_rhs static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_bonds_rhs
+    (get_basic_static_information 
+       static).Site_accross_bonds_domain_static.store_bonds_rhs
 
   let set_bonds_rhs r static =
     set_basic_static_information
@@ -145,38 +142,11 @@ struct
         Site_accross_bonds_domain_static.store_bonds_rhs = r
       } static
 
-  let get_created_bond static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_created_bond
-
-  let set_created_bond r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_created_bond = r
-      } static
-
-  let get_modified_internal_state_and_bond static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_modified_internal_state_and_bond
-
-  let set_modified_internal_state_and_bond r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_modified_internal_state_and_bond = r
-      } static
-
-  let get_question_marks_rhs static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_question_marks_rhs
-
-  let set_question_marks_rhs r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_question_marks_rhs = r
-      } static
+  (*sites that can be modified*)
 
   let get_modified_map static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_modified_map
+    (get_basic_static_information 
+       static).Site_accross_bonds_domain_static.store_modified_map
 
   let set_modified_map r static =
     set_basic_static_information
@@ -185,8 +155,11 @@ struct
         Site_accross_bonds_domain_static.store_modified_map = r
       } static
 
+  (*tuple pair*)
+
   let get_tuple_pair static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_tuple_pair
+    (get_basic_static_information 
+       static).Site_accross_bonds_domain_static.store_tuple_pair
 
   let set_tuple_pair r static =
     set_basic_static_information
@@ -195,18 +168,50 @@ struct
         Site_accross_bonds_domain_static.store_tuple_pair = r
       } static
 
-  let get_explicit_rule static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_explicit_static
+  (*rule that can created a bond *)
 
-  let set_explicit_rule r static =
+  let get_created_bond static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_created_bond
+
+  let set_created_bond r static =
     set_basic_static_information
       {
         (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_explicit_static = r
+        Site_accross_bonds_domain_static.store_created_bond = r
       } static
 
+  (**)
+
+  let get_modified_internal_state_and_bond static =
+    (get_basic_static_information 
+       static).Site_accross_bonds_domain_static.store_modified_internal_state_and_bond
+
+  let set_modified_internal_state_and_bond r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_modified_internal_state_and_bond = r
+      } static
+      
+  (*question marks on the rhs*)
+
+  let get_question_marks_rhs static =
+    (get_basic_static_information 
+       static).Site_accross_bonds_domain_static.store_question_marks_rhs
+
+  let set_question_marks_rhs r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_question_marks_rhs = r
+      } static
+
+  (*implicit rule*)
+
   let get_implicit_rule static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_implicit_static
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_implicit_static
 
   let set_implicit_rule r static =
     set_basic_static_information
@@ -215,8 +220,22 @@ struct
         Site_accross_bonds_domain_static.store_implicit_static = r
       } static
 
+  (*explicit rule*)
+  let get_explicit_rule static =
+    (get_basic_static_information 
+       static).Site_accross_bonds_domain_static.store_explicit_static
+
+  let set_explicit_rule r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_explicit_static = r
+      } static
+
+
   (*------------------------------------------------------------*)
-  (** global dynamic information*)
+  (** dynamic information*)
+  (*------------------------------------------------------------*)
 
   let get_global_dynamic_information dynamic = dynamic.global
 
@@ -225,7 +244,6 @@ struct
       dynamic with global = gdynamic
     }
 
-  (*handler*)
   let get_mvbdu_handler dynamic =
     Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
 
@@ -243,107 +261,15 @@ struct
       dynamic with local = local
     }
 
-  let get_basic_dynamic_information dynamic =
-    (get_local_dynamic_information dynamic).store_basic_dynamic_information
+  let get_value dynamic =
+    (get_local_dynamic_information dynamic).store_value
 
-  let set_basic_dynamic_information domain dynamic =
+  let set_value value dynamic =
     set_local_dynamic_information
       {
         (get_local_dynamic_information dynamic) with
-        store_basic_dynamic_information = domain
+        store_value = value
       } dynamic
-
-  let get_pair_tuple_init dynamic =
-    (get_basic_dynamic_information dynamic).Site_accross_bonds_domain_dynamic.store_pair_tuple_init
-
-  let set_pair_tuple_init init dynamic =
-    set_basic_dynamic_information
-      {
-        (get_basic_dynamic_information dynamic) with
-        Site_accross_bonds_domain_dynamic.store_pair_tuple_init = init
-      } dynamic
-
-  let get_explicit_dynamic dynamic =
-    (get_basic_dynamic_information dynamic).Site_accross_bonds_domain_dynamic.store_explicit_dynamic
-
-  let set_explicit_dynamic ex dynamic =
-    set_basic_dynamic_information
-      {
-        (get_basic_dynamic_information dynamic) with
-        Site_accross_bonds_domain_dynamic.store_explicit_dynamic = ex
-      } dynamic
-
-  let get_implicit_dynamic dynamic =
-    (get_basic_dynamic_information dynamic).Site_accross_bonds_domain_dynamic.store_implicit_dynamic
-
-  let set_implicit_dynamic im dynamic =
-    set_basic_dynamic_information
-      {
-        (get_basic_dynamic_information dynamic) with
-        Site_accross_bonds_domain_dynamic.store_implicit_dynamic = im
-      } dynamic
-
-  let get_relation_mvbdu dynamic =
-    (get_basic_dynamic_information dynamic).Site_accross_bonds_domain_dynamic.store_relation_mvbdu
-
-  let set_relation_mvbdu im dynamic =
-    set_basic_dynamic_information
-      {
-        (get_basic_dynamic_information dynamic) with
-        Site_accross_bonds_domain_dynamic.store_relation_mvbdu = im
-      } dynamic
-
-  let get_range_mvbdu1 dynamic =
-    (get_basic_dynamic_information dynamic).Site_accross_bonds_domain_dynamic.store_range_mvbdu1
-
-  let set_range_mvbdu1 im dynamic =
-    set_basic_dynamic_information
-      {
-        (get_basic_dynamic_information dynamic) with
-        Site_accross_bonds_domain_dynamic.store_range_mvbdu1 = im
-      } dynamic
-
-  let get_range_mvbdu2 dynamic =
-    (get_basic_dynamic_information dynamic).Site_accross_bonds_domain_dynamic.store_range_mvbdu2
-
-  let set_range_mvbdu2 im dynamic =
-    set_basic_dynamic_information
-      {
-        (get_basic_dynamic_information dynamic) with
-        Site_accross_bonds_domain_dynamic.store_range_mvbdu2 = im
-      } dynamic
-
-(*
-  let get_relation_mvbdu dynamic =
-    (get_local_dynamic_information dynamic).store_relation_mvbdu
-
-  let set_relation_mvbdu mvbdu dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_relation_mvbdu = mvbdu
-      } dynamic
-
-  let get_range_site_first_agent dynamic =
-    (get_local_dynamic_information dynamic).store_range_site_first_agent
-
-  let set_range_site_first_agent mvbdu dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_range_site_first_agent = mvbdu
-      } dynamic
-
-  let get_range_site_second_agent dynamic =
-    (get_local_dynamic_information dynamic).store_range_site_second_agent
-
-  let set_range_site_second_agent mvbdu dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-        store_range_site_second_agent = mvbdu
-      } dynamic
-    *)
 
   (*-------------------------------------------------------------*)
 
@@ -527,8 +453,6 @@ struct
   (****************************************************************)
   (** [get_scan_rule_set static] *)
 
-(* todo *)
-
   let initialize static dynamic error =
     let init_local_static_information =
       {
@@ -546,8 +470,9 @@ struct
     let init_local_dynamic_information =
       {
         dumy = ();
-        store_basic_dynamic_information =
-          Site_accross_bonds_domain_dynamic.init_basic_dynamic_information;
+       store_value =
+         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
+         
       }
     in
     let init_global_dynamic_information =
@@ -660,7 +585,7 @@ struct
     let parameter  = get_parameter static in
     (*------------------------------------------------*)
     (*explicit static information*)
-    let store_views_rhs = get_views_rhs static in
+    (*let store_views_rhs = get_views_rhs static in
     let store_explicit_static = get_explicit_rule static in
     (*------------------------------------------------*)
     let error, store_internal_state_collect_internal_state_explicit_aux =
@@ -717,7 +642,7 @@ struct
         store_implicit_dynamic_aux
         store_implicit_dynamic
     in
-    let dynamic = set_implicit_dynamic store_implicit_dynamic dynamic in
+    let dynamic = set_implicit_dynamic store_implicit_dynamic dynamic in*)
     (* use the method in precondition, to ask about information captured by the view domains *)
     (*let _ =
       let error, dynamic, precondion, state_list =
@@ -792,7 +717,7 @@ struct
         store_implicit_static
     in
     (*--------------------------------------------------------*)
-    let store_pair_tuple_init = get_pair_tuple_init dynamic in
+    (*let store_pair_tuple_init = get_pair_tuple_init dynamic in
     let store_explicit_dynamic = get_explicit_dynamic dynamic in
     let store_implicit_dynamic = get_implicit_dynamic dynamic in
     let error =
@@ -1017,7 +942,7 @@ struct
            in
            error, handler
         ) store_range_mvbdu2 (error, handler)
-    in
+    in*)
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
 
