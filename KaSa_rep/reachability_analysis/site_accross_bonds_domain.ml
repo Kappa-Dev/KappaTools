@@ -295,47 +295,6 @@ struct
     -> Exception.method_handler * dynamic_information * 'c
 
   (****************************************************************)
-  (*return a set of two different agents, each agent has two different sites *)
-
-  (*let collect_pair_sites parameter error rule_id store_pair_rhs store_result =
-    let error, store_pair_set =
-      match
-        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter error rule_id store_pair_rhs with
-      | error, None -> error, Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.empty
-      | error, Some s -> error, s
-    in
-    let error, store_result =
-      (*fold over this set*)
-      let error, lists = Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
-          (fun x (error, current_set) ->
-             let (agent_id, agent_type, site_type, site_type2, state, state2) = x in (*A*)
-             (*fold again*)
-             let error, pair_set =
-               Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold_inv
-                 (fun z (error, current_set) ->
-                    let (agent_id', agent_type', site_type', site_type2', state', state2') = z in
-                    if agent_id <> agent_id'
-                    then
-                      let error, pair_set =
-                        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in parameter error
-                          ((agent_id, agent_type, site_type, site_type2, state, state2),
-                           (agent_id', agent_type', site_type', site_type2', state', state2'))
-                          current_set
-                      in
-                      error, pair_set
-                    else error, current_set
-                 ) store_pair_set (error, current_set)
-             in
-             error, pair_set
-          ) store_pair_set (error, Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty)
-      in
-      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error
-        rule_id lists store_result
-    in
-    error, store_result*)
-
-  (****************************************************************)
 
   let scan_rule parameter error rule_id rule static =
     let kappa_handler = get_kappa_handler static in
@@ -399,7 +358,8 @@ struct
         store_modified_map
         store_modified_internal_state_and_bond
     in
-    let static = set_modified_internal_state_and_bond store_modified_internal_state_and_bond static in
+    let static = set_modified_internal_state_and_bond
+        store_modified_internal_state_and_bond static in
     (*------------------------------------------------------------*)
     (*question marks on the right hand side*)
     let store_question_marks_rhs = get_question_marks_rhs static in
@@ -432,7 +392,9 @@ struct
     let static = set_explicit_rule store_explicit_static static in
     error, static
 
-  let scan_rule_set static dynamic error =
+  (****************************************************************)
+
+  let scan_rules static dynamic error =
   let parameter = get_parameter static in
   let compil = get_compil static in
   let error, static =
@@ -482,7 +444,7 @@ struct
       }
     in
     let error, static, dynamic =
-      scan_rule_set
+      scan_rules
         init_global_static_information
         init_global_dynamic_information
         error
@@ -503,75 +465,6 @@ struct
     let event_list = [] in
     error, dynamic, event_list
 
-  (*------------------------------------------------------------*)
-  (*implementation dynamic information*)
-
-  (*first map, (A,x,y,B,z,t) to a mvbdu: describes the relation between the
-    state of y and the state of t, when both agents are connected via x.z*)
-
-  (*------------------------------------------------------------*)
-  (*range of the second site of the first agent, when both agents are connected via the first site*)
-
-  (*
-  let collect_range_site_first_agent static dynamic error =
-    let parameter = get_parameter static in
-    let store_result = get_range_site_first_agent dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    (*get the set of tuple when both agents are connected via the first site*)
-    let store_first_site_is_bound = get_first_site_is_bound static in
-    let error, handler, store_result =
-      Ckappa_sig.Rule_map_and_set.Map.fold
-        (fun _ set (error, handler, store_result) ->
-           Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
-             (fun (x, y) (error, handler, store_result) ->
-                (*build the mvbdu of the site y (site_type2)*)
-                let (_, _, _, site_type2, _, state2) = x in
-                (*build (key * value) list*)
-                let pair_list = [(site_type2, state2)] in
-                let error, handler, mvbdu =
-                  Ckappa_sig.Views_bdu.mvbdu_of_association_list parameter handler error pair_list in
-                let error, store_result =
-                  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameter error (x, y) mvbdu store_result
-                in
-                error, handler, store_result
-             ) set (error, handler, store_result)
-        ) store_first_site_is_bound (error, handler, store_result)
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    let dynamic = set_range_site_first_agent store_result dynamic in
-    error, dynamic
-           *)
-
-  (*
-  let collect_range_site_second_agent static dynamic error =
-    let parameter = get_parameter static in
-    let store_result = get_range_site_second_agent dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    (*get the set of tuple when both agents are connected via the first site*)
-    let store_first_site_is_bound = get_first_site_is_bound static in
-    let error, handler, store_result =
-      Ckappa_sig.Rule_map_and_set.Map.fold
-        (fun _ set (error, handler, store_result) ->
-           Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
-             (fun (x, y) (error, handler, store_result) ->
-                (*build the mvbdu of the site y (site_type2)*)
-                let (_, _, _, site_type2, _, state2) = y in
-                (*build (key * value) list*)
-                let pair_list = [(site_type2, state2)] in
-                let error, handler, mvbdu =
-                  Ckappa_sig.Views_bdu.mvbdu_of_association_list parameter handler error pair_list in
-                let error, store_result =
-                  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite parameter error (x, y) mvbdu store_result
-                in
-                error, handler, store_result
-             ) set (error, handler, store_result)
-        ) store_first_site_is_bound (error, handler, store_result)
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    let dynamic = set_range_site_second_agent store_result dynamic in
-    error, dynamic
-
-           *)
   (* to do *)
   (* check for each bond that occur in the lhs, whether
      the constraints in the lhs are consistent *)
@@ -583,89 +476,13 @@ struct
 
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
-    (*------------------------------------------------*)
-    (*explicit static information*)
-    (*let store_views_rhs = get_views_rhs static in
-    let store_explicit_static = get_explicit_rule static in
-    (*------------------------------------------------*)
-    let error, store_internal_state_collect_internal_state_explicit_aux =
-      Site_accross_bonds_domain_dynamic.collect_internal_state_explicit_aux
-        parameter
-        error
-        rule_id
-        store_views_rhs
-        store_explicit_static
-    in
-    let store_internal_state_explicit =
-      Site_accross_bonds_domain_dynamic.collect_internal_state_explicit
-        parameter error rule_id
-        store_internal_state_collect_internal_state_explicit_aux
-    in
-    (*------------------------------------------------*)
-    let error, store_tuple_pair_binding_internal_state_explicit_aux =
-      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit_aux
-        parameter error rule_id
-        store_views_rhs
-        store_internal_state_explicit
-    in
-    let store_tuple_pair_binding_internal_state_explicit =
-      Site_accross_bonds_domain_dynamic.collect_tuple_pair_binding_internal_state_explicit
-        parameter
-        error
-        store_tuple_pair_binding_internal_state_explicit_aux
-    in
-    (*------------------------------------------------*)
-    let store_pair_tuple_init = get_pair_tuple_init dynamic in
-    let store_explicit_dynamic = get_explicit_dynamic dynamic in
-    let error, store_explicit_dynamic =
-      Site_accross_bonds_domain_dynamic.collect_explicit_dynamic
-        parameter error
-        store_tuple_pair_binding_internal_state_explicit
-        store_pair_tuple_init
-        store_explicit_dynamic
-    in
-    let dynamic = set_explicit_dynamic store_explicit_dynamic dynamic in
-    (*------------------------------------------------*)
-    (* modification of y and/or t and we do not know whether the agents are
-       bound : implicit case, todo precondition*)
-    (*------------------------------------------------*)
-    let store_implicit_static = get_implicit_rule static in
-    let error, store_implicit_dynamic_aux =
-      Site_accross_bonds_domain_dynamic.collect_implicit_dynamic_aux parameter error rule_id
-        store_views_rhs
-        store_implicit_static
-    in
-    let store_implicit_dynamic = get_implicit_dynamic dynamic in
-    let error, store_implicit_dynamic =
-      Site_accross_bonds_domain_dynamic.collect_implicit_dynamic parameter error rule_id
-        store_pair_tuple_init
-        store_implicit_dynamic_aux
-        store_implicit_dynamic
-    in
-    let dynamic = set_implicit_dynamic store_implicit_dynamic dynamic in*)
-    (* use the method in precondition, to ask about information captured by the view domains *)
-    (*let _ =
-      let error, dynamic, precondion, state_list =
-        let path =
-          {
-            Communication.agent_id = agent_id; (*A/B*)
-            Communication.relative_address = [];
-            Communication.site = site_type2 (*of type A/B*)
-
-          }
-        in
-      in
-      _
-    in*)
-
     let event_list = [] in
     error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  (* to do *)
-  let (*rec*) apply_event_list _static dynamic error _event_list =
+  let apply_event_list _static dynamic error _event_list =
     let event_list = [] in
     error, dynamic, event_list
 
@@ -716,233 +533,6 @@ struct
         store_explicit_static
         store_implicit_static
     in
-    (*--------------------------------------------------------*)
-    (*let store_pair_tuple_init = get_pair_tuple_init dynamic in
-    let store_explicit_dynamic = get_explicit_dynamic dynamic in
-    let store_implicit_dynamic = get_implicit_dynamic dynamic in
-    let error =
-      Site_accross_bonds_domain_dynamic.print_basic_dynamic_information
-        parameter error handler_kappa log
-        store_pair_tuple_init
-        store_explicit_dynamic
-        store_implicit_dynamic
-    in
-    (*--------------------------------------------------------*)
-    (*dynamic information of in natural language*)
-    let store_relation_mvbdu = get_relation_mvbdu dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, store_relation_mvbdu =
-      Site_accross_bonds_domain_dynamic.collect_relation_mvbdu
-        parameter error
-        handler
-        store_explicit_dynamic
-        store_relation_mvbdu
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    let dynamic = set_relation_mvbdu store_relation_mvbdu dynamic in
-    let store_relation_mvbdu = get_relation_mvbdu dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error =
-    if
-      Remanent_parameters.get_dump_reachability_analysis_result parameter
-    then
-      let () =
-        Loggers.fprintf log
-          "------------------------------------------------------------\n" in error
-    else error
-    in
-    let error, handler =
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.fold
-        (fun (x, _) mvbdu (error, handler) ->
-           let (_, agent_type, _, _, _, _) = x in
-           let error', agent_string =
-             try
-               Handler.string_of_agent parameter error handler_kappa agent_type
-             with
-               _ -> warn parameter error (Some "line 782") Exit
-                      (Ckappa_sig.string_of_agent_name agent_type)
-           in
-           let error = Exception.check warn parameter error error'
-               (Some "line 786") Exit
-           in
-           (*------------------------------------------*)
-           let error, handler, mvbdu_list =
-             Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-               parameter
-               handler
-               error
-               mvbdu
-           in
-           let error, handler =
-             List.fold_left (fun (error, handler) mvbdu ->
-             let error, (handler, translation) =
-                 Translation_in_natural_language.translate
-                   parameter handler error (fun _ e i -> e, i)
-                   mvbdu
-             in
-             let error =
-               if
-                 Remanent_parameters.get_dump_reachability_analysis_result parameter
-               then
-                 Translation_in_natural_language.print
-                   ~show_dep_with_dimmension_higher_than:1
-                   parameter
-                   handler_kappa
-                   error
-                   agent_string
-                   agent_type
-                   translation
-               else error
-               in
-               error, handler
-               ) (error, handler) mvbdu_list
-           in
-           error, handler
-        ) store_relation_mvbdu (error, handler)
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    (*--------------------------------------------------------*)
-    (*range site_type2 ,state2 internal state of the first agent*)
-    let store_range_mvbdu1 = get_range_mvbdu1 dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, store_range_mvbdu1 =
-      Site_accross_bonds_domain_dynamic.collect_range_mvbdu1
-        parameter error handler store_explicit_dynamic store_range_mvbdu1
-    in
-    let error =
-    if
-      Remanent_parameters.get_dump_reachability_analysis_result
-         parameter
-    then
-      let () =
-        Loggers.fprintf log
-          "------------------------------------------------------------\n" in error
-    else error
-    in
-    let error, handler =
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.fold
-        (fun (x, _) mvbdu (error, handler) ->
-           let (_, agent_type, _, _, _, _) = x in
-           let error', agent_string =
-             try
-               Handler.string_of_agent parameter error handler_kappa agent_type
-             with
-               _ -> warn parameter error (Some "line 782") Exit
-                      (Ckappa_sig.string_of_agent_name agent_type)
-           in
-           let error = Exception.check warn parameter error error'
-               (Some "line 786") Exit
-           in
-           (*------------------------------------------*)
-           let error, handler, mvbdu_list =
-             Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-               parameter
-               handler
-               error
-               mvbdu
-           in
-           let error, handler =
-             List.fold_left (fun (error, handler) mvbdu ->
-                  let error, (handler, translation) =
-                    Translation_in_natural_language.translate
-                      parameter
-                      handler
-                      error
-                      (fun _ error i -> error, i)
-                      mvbdu
-                 in
-                 (*------------------------------------------*)
-                 let error =
-                   if
-                     Remanent_parameters.get_dump_reachability_analysis_result parameter
-                   then
-                     Translation_in_natural_language.print
-                       ~show_dep_with_dimmension_higher_than:1
-                       parameter
-                       handler_kappa
-                       error
-                       agent_string
-                       agent_type
-                       translation
-                   else error
-                 in
-                 error, handler
-               ) (error, handler) mvbdu_list
-           in
-           error, handler
-        ) store_range_mvbdu1 (error, handler)
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    (*--------------------------------------------------------*)
-    (*range site_type2 ,state2 internal state of the second agent*)
-    let store_range_mvbdu2 = get_range_mvbdu2 dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, store_range_mvbdu2 =
-      Site_accross_bonds_domain_dynamic.collect_range_mvbdu2
-        parameter error handler store_explicit_dynamic store_range_mvbdu2
-    in
-    let error =
-    if
-      Remanent_parameters.get_dump_reachability_analysis_result parameter
-    then
-      let () =
-        Loggers.fprintf log
-          "------------------------------------------------------------\n" in error
-    else error
-    in
-    let error, handler =
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.fold
-        (fun (_, y) mvbdu (error, handler) ->
-           let (_, agent_type, _, _, _, _) = y in
-           let error', agent_string =
-             try
-               Handler.string_of_agent parameter error handler_kappa agent_type
-             with
-               _ -> warn parameter error (Some "line 782") Exit
-                      (Ckappa_sig.string_of_agent_name agent_type)
-           in
-           let error = Exception.check warn parameter error error'
-               (Some "line 786") Exit
-           in
-           (*------------------------------------------*)
-           let error, handler, mvbdu_list =
-             Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-               parameter
-               handler
-               error
-               mvbdu
-           in
-           let error, handler =
-             List.fold_left (fun (error, handler) mvbdu ->
-                  let error, (handler, translation) =
-                    Translation_in_natural_language.translate
-                      parameter
-                      handler
-                      error
-                      (fun _ error i -> error, i)
-                      mvbdu
-                 in
-                 (*------------------------------------------*)
-                 let error =
-                   if
-                     Remanent_parameters.get_dump_reachability_analysis_result parameter
-                   then
-                     Translation_in_natural_language.print
-                       ~show_dep_with_dimmension_higher_than:1
-                       parameter
-                       handler_kappa
-                       error
-                       agent_string
-                       agent_type
-                       translation
-                   else error
-                 in
-                 error, handler
-               ) (error, handler) mvbdu_list
-           in
-           error, handler
-        ) store_range_mvbdu2 (error, handler)
-    in*)
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
 

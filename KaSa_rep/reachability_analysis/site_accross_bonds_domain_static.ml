@@ -945,7 +945,8 @@ let print_basic_static_information parameter error handler_kappa log
         print_created_bond parameter error handler_kappa log store_created_bond
       in
       let error =
-        print_modified_internal_state_bond parameter error handler_kappa log store_modified_internal_state_and_bond
+        print_modified_internal_state_bond parameter error handler_kappa log
+          store_modified_internal_state_and_bond
       in
       let error =
         print_question_marks_rhs parameter error handler_kappa log store_question_marks_rhs
