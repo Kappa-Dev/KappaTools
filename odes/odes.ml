@@ -165,6 +165,19 @@ end
     let petrify_mixture mixture =
     petrify_species_list (I.connected_components_of_mixture mixture)
 
+    let add_to_prefix_list connected_component key prefix_list store acc =
+      let list_embeddings =
+        StoreMap.find_default [] key store
+      in
+      List.fold_left
+        (fun new_list prefix ->
+           List.fold_left
+             (fun new_list (embedding,chemical_species) ->
+                ((connected_component,embedding,chemical_species)::prefix)::new_list)
+             new_list
+             list_embeddings
+        )
+        acc prefix_list
     let add_reaction rule embedding_forest mixture remanent =
       let remanent, reactants = petrify_mixture mixture remanent in
       let products = I.apply rule embedding_forest mixture in
@@ -200,33 +213,61 @@ end
              for unary application of binary rule, the dictionary of species is updated, and the reaction entered directly *)
           let store, to_be_visited, network  =
             List.fold_left
-              (fun (store, to_be_visited, network)  (rule,lhs,lhs_cc)->
+              (fun (store_old_embeddings, to_be_visited, network)  (rule,lhs,lhs_cc)->
                  let rule_id = I.rule_id rule in
-                 (* regular application of tules, we store the embeddings*)                 let store' =
+                 (* regular application of tules, we store the embeddings*)                 let store_new_embeddings =
                    List.fold_left
                      (fun store (cc_id, cc) ->
                         let lembed = I.find_embeddings cc new_species in
                         add_embedding_list
                           (rule_id,cc_id)
-                          lembed
+                          (List.rev_map (fun a -> a,new_species) (List.rev lembed))
                           store
                      )
-                     store
+                     StoreMap.empty
                      lhs_cc
                  in
-                 (* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
-                 let new_embedding_list,_ =
+                 let (),store_all_embeddings =
+                   StoreMap.map2_with_logs
+                     (fun _ a _ _ _ -> a)
+                     ()
+                     ()
+                     (fun _ _ b -> (),b)
+                     (fun _ _ b -> (),b)
+                     (fun _ _ b c ->
+                        (),List.fold_left
+                          (fun list elt -> elt::list)
+                          b c)
+                     store_old_embeddings
+                     store_new_embeddings
+                 in
+
+
+(* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
+                 let _,new_embedding_list =
                    List.fold_left
-                     (fun (embedding_list,partial_emb_list) (cc_id,cc) ->
-                        (* TO DO *)
-                        embedding_list,partial_emb_list)
-                     ([],[[]])
+                     (fun (partial_emb_list,partial_emb_list_with_new_species) (cc_id,cc) ->
+                        (* First case, we complete with an embedding towards the new_species *)
+                        let partial_emb_list =
+                          add_to_prefix_list cc (rule_id,cc_id) partial_emb_list store_old_embeddings []
+                        in
+                        let partial_emb_list_with_new_species =
+                          add_to_prefix_list cc (rule_id,cc_id)
+                            partial_emb_list
+                            store_new_embeddings
+                          (add_to_prefix_list cc (rule_id,cc_id) partial_emb_list_with_new_species
+                             store_all_embeddings [])
+                        in
+                        partial_emb_list, partial_emb_list_with_new_species
+                     )
+                     ([[]],[[]])
                      lhs_cc
                  in
                  (* compute the corresponding rhs, and put the new species in the working list, and store the corrsponding reactions *)
                  let to_be_visited, network =
                    List.fold_left
-                     (fun remanent (rule,embed,mixture) ->
+                     (fun remanent list ->
+                        let _,embed,mixture = I.disjoint_union list in
                         add_reaction rule embed mixture remanent)
                      (to_be_visited,network)
                      new_embedding_list
@@ -247,7 +288,7 @@ end
                    else
                      to_be_visited, network
                  in
-                 store', to_be_visited, network
+                 store_all_embeddings, to_be_visited, network
               )
               (store, to_be_visited, network)
               rules
