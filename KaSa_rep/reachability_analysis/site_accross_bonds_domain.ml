@@ -454,10 +454,23 @@ struct
   (*------------------------------------------------------------*)
   (* take into account bounds that may occur in initial states *)
 
-  
-
   let add_initial_state static dynamic error species =
     let parameter = get_parameter static in
+     (*views in the initial state that has two agents and their sites are different*)
+    let error, store_views_init =
+      Site_accross_bonds_domain_static.collect_views_init
+        parameter error species in
+    let error, store_sites_init =
+      Site_accross_bonds_domain_static.collect_sites_init 
+        parameter error store_views_init in
+    let error, store_pair_sites_init =
+      Site_accross_bonds_domain_static.collect_pair_sites_init
+        parameter error store_sites_init in
+    (*a set of site that can be bounds*)
+    let error, store_bonds_init =
+      Site_accross_bonds_domain_static.collect_bonds_init
+        parameter error species
+    in
     (*collect the first site bound, and the second site different than the
       first site, return the information of its state, result*)
     let store_result = get_value dynamic in
@@ -466,6 +479,8 @@ struct
         parameter
         error
         species
+        store_bonds_init
+        store_pair_sites_init
         store_result
     in
     let dynamic = set_value store_result dynamic in

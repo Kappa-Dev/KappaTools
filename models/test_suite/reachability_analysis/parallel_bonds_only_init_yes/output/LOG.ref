@@ -692,10 +692,10 @@ The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
-When the agent A has its site t bound to the site t of a B, then its site A.t z (B@t,B@z) and B.t z (A@t,A@z) is equal to B@z, A@z
+ A.t and B.t is equal to B@t,A@t when A.z is connected to B.z
 
 
-When the agent B has its site t bound to the site t of a A, then its site B.t z (A@t,A@z) and A.t z (B@t,B@z) is equal to A@z, B@z
+ B.t and A.t is equal to A@t,B@t when B.z is connected to A.z
 
 
 ------------------------------------------------------------
