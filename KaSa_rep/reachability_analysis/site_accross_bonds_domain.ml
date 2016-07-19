@@ -370,26 +370,6 @@ struct
         store_question_marks_rhs
     in
     let static = set_question_marks_rhs store_question_marks_rhs static in
-    (*------------------------------------------------------------*)
-    (*implicit static information*)
-    let store_question_marks_rhs = get_question_marks_rhs static in
-    let store_implicit_static =
-      Site_accross_bonds_domain_static.collect_implicit_static
-        parameter error store_tuple_pair store_question_marks_rhs
-    in
-    let static = set_implicit_rule store_implicit_static static in
-    (*------------------------------------------------------------*)
-    (*explicit static information*)
-    let store_modified_internal_state_and_bond =
-      get_modified_internal_state_and_bond static in
-    let store_created_bond = get_created_bond static in
-    let store_explicit_static = get_explicit_rule static in
-    let error, store_explicit_static =
-      Site_accross_bonds_domain_static.collect_explicit_static
-        parameter error store_created_bond
-        store_modified_internal_state_and_bond store_explicit_static
-    in
-    let static = set_explicit_rule store_explicit_static static in
     error, static
 
   (****************************************************************)
@@ -410,8 +390,29 @@ struct
          error, static
       ) compil.Cckappa_sig.rules static
   in
+  (*------------------------------------------------------------*)
+  (*implicit static information*)
+  let store_tuple_pair = get_tuple_pair static in
+  let store_question_marks_rhs = get_question_marks_rhs static in
+  let store_implicit_static =
+    Site_accross_bonds_domain_static.collect_implicit_static
+      parameter error store_tuple_pair store_question_marks_rhs
+  in
+  let static = set_implicit_rule store_implicit_static static in
+  (*------------------------------------------------------------*)
+  (*explicit static information*)
+  let store_modified_internal_state_and_bond =
+    get_modified_internal_state_and_bond static in
+  let store_created_bond = get_created_bond static in
+  let store_explicit_static = get_explicit_rule static in
+  let error, store_explicit_static =
+    Site_accross_bonds_domain_static.collect_explicit_static
+      parameter error store_created_bond
+      store_modified_internal_state_and_bond store_explicit_static
+  in
+  let static = set_explicit_rule store_explicit_static static in
   error, static, dynamic
-
+  
   (****************************************************************)
   (** [get_scan_rule_set static] *)
 

@@ -35,6 +35,7 @@ type basic_static_information =
     store_created_bond :
       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    (**)
     store_modified_internal_state_and_bond :
       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
