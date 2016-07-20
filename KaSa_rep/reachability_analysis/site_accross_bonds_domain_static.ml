@@ -37,7 +37,7 @@ type basic_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     (**)
     store_modified_internal_state_and_bond :
-      Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t
+      Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_question_marks_rhs :
       Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.t
@@ -424,7 +424,7 @@ let collect_created_bond_with_potential_pair parameter error rule_id rule store_
 
 let collect_modified_internal_and_bond parameter error rule_id
     store_tuple_pair store_bonds_rhs store_modified_map store_result =
-  let empty_set = Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty in
+  let empty_set = Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty in
   (*------------------------------------------------------------*)
   (*set of bonds on the rhs*)
   let error, store_bond_set =
@@ -448,8 +448,8 @@ let collect_modified_internal_and_bond parameter error rule_id
   (*------------------------------------------------------------*)
   Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
-       let (agent_id, _, site_type, site_type2) = x in
-       let (agent_id', _, site_type', site_type2') = y in
+       let (agent_id, agent_type, site_type, site_type2) = x in
+       let (agent_id', agent_type', site_type', site_type2') = y in
        (*the second site belong to modified and the first site belong to the bond set*)
        let error, store_result =
          Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
@@ -458,8 +458,8 @@ let collect_modified_internal_and_bond parameter error rule_id
               Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
                 (fun (t, r) (error, store_result) ->
                    let (agent_id_m, _, site_type_m, _) = m in
-                   let (agent_id_b, _, site_type_b, _) = t in
-                   let (agent_id_b', _, site_type_b', _) = r in
+                   let (agent_id_b, _, site_type_b, state) = t in
+                   let (agent_id_b', _, site_type_b', state') = r in
                    (*the second site belong to modification*)
                    if (agent_id = agent_id_m && site_type2 = site_type_m
                        || 
@@ -477,10 +477,13 @@ let collect_modified_internal_and_bond parameter error rule_id
                        | error, None -> error, empty_set
                        | error, Some s -> error, s
                      in
+                     let pair = 
+                       (agent_id, agent_type, site_type, site_type2, state),
+                       (agent_id', agent_type', site_type', site_type2', state') in
                      let error', new_set =
-                       Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in
+                       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.add_when_not_in
                          parameter error 
-                         (x,y) 
+                         pair
                          old_set
                      in
                      let error = Exception.check warn parameter error error' (Some "line 540") Exit in

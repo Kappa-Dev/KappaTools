@@ -36,6 +36,12 @@ The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ E.x and E.x is equal to free,free when E.x is connected to E.x
+
+
+ R.c and E.x is equal to R@c,free when R.n is connected to E.x
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

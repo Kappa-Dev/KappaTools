@@ -517,7 +517,94 @@ struct
   (* to do : add information of init ?*)
 
   let apply_rule static dynamic error rule_id precondition =
-    let _parameter  = get_parameter static in
+    let parameter  = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    (*-----------------------------------------------------------*)
+    let parameter = Remanent_parameters.update_prefix parameter "                " in
+    let dump_title () =
+      if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+      then
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameter)
+            "%sUpdate information about site accross domain"
+            (Remanent_parameters.get_prefix parameter)
+        in
+        Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      else
+        ()
+    in
+    (*-----------------------------------------------------------*)
+    (*modified site with state information*)
+    let store_modif_map = get_modified_map static in
+    let error, store_modif_set =
+      match 
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+          parameter error rule_id store_modif_map
+      with
+      | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    (*-----------------------------------------------------------*)
+    (*modifying the site knowing the bonds*)
+    let store_modif_bond_map = get_modified_internal_state_and_bond static in
+    let error, store_modif_bond_set =
+      match 
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+          parameter error rule_id store_modif_bond_map
+      with
+      | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    (*-----------------------------------------------------------*)
+    (*TO DO*)
+    let store_value = get_value dynamic in
+    let error, dynamic, precondition, store_value =
+      (*fold over a pair where the first site is bound and the second site is modified*)
+      Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.fold
+        (fun (x, y) (error, dynamic, precondition, store_result) ->
+           let (agent_id, agent_type, site_type, site_type', state_bond) = x in
+           let (agent_id1, agent_type1, site_type1, site_type1', state_bond1) = y in
+           (*get the information of state from modification map for that rule*)
+           let error, dynamic, precondition, store_result =
+             Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+               (fun t (error, dynamic, precondition, store_result) ->
+                  let (agent_id_m, agent_type_m, site_type_m, state_m) = t in
+                  (*check the second site of the x agent belong to modif*)
+                  let error, first =
+                    if agent_id = agent_id_m && site_type' = site_type_m
+                    then
+                      error, (agent_type, site_type, site_type_m, state_bond, state_m)
+                    else
+                      error, (Ckappa_sig.dummy_agent_name,
+                              Ckappa_sig.dummy_site_name, Ckappa_sig.dummy_site_name,
+                              Ckappa_sig.dummy_state_index, Ckappa_sig.dummy_state_index)
+                  in
+                  let error, second =
+                    if agent_id1 = agent_id_m && site_type1 = site_type_m
+                    then
+                      error, (agent_type1, site_type1, site_type_m, state_bond1, state_m)
+                    else
+                      error, (Ckappa_sig.dummy_agent_name,
+                              Ckappa_sig.dummy_site_name, Ckappa_sig.dummy_site_name,
+                              Ckappa_sig.dummy_state_index, Ckappa_sig.dummy_state_index)
+                  in
+                  let pair = first, second in
+                  (*store_value*)
+                  let error, store_result =
+                    Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
+                      parameter error
+                      pair
+                      store_result
+                  in
+                  error, dynamic, precondition, store_result                  
+               ) store_modif_set (error, dynamic, precondition, store_value)
+           in
+           error, dynamic, precondition, store_result
+        ) store_modif_bond_set (error, dynamic, precondition, store_value)
+    in
+    let dynamic = set_value store_value dynamic in
+    (*------------------------------------------------------*)
     let event_list = [] in
     error, dynamic, (precondition, event_list)
 
@@ -526,6 +613,7 @@ struct
 
   let apply_event_list _static dynamic error _event_list =
     let event_list = [] in
+
     error, dynamic, event_list
 
   let export _static dynamic error kasa_state =

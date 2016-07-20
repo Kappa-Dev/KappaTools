@@ -1885,6 +1885,18 @@ The internal state of site x in agent E ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ A.x and A.x is equal to u,u when A.x is connected to A.x
+
+
+ A.x and D.x is equal to u,E@x when A.x is connected to D.x
+
+
+ A.x and A.x is equal to C@x,u when A.x is connected to A.x
+
+
+ E.x and A.x is equal to D@x,u when E.x is connected to A.x
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

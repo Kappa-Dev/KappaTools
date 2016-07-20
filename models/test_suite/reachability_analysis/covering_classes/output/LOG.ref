@@ -2470,6 +2470,12 @@ The internal state of site x in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ A.x and A.x is equal to C@x,u when A.x is connected to A.x
+
+
+ A.y and A.x is equal to C@y,u when A.y is connected to A.x
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

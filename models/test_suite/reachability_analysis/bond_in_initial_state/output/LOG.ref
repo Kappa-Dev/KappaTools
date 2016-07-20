@@ -133,7 +133,16 @@ The binding state of site x in agent B ranges over free and A@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ A.x and A.x is equal to u,u when A.x is connected to A.x
+
+
+ A.x and A.x is equal to u,B@x when A.x is connected to A.x
+
+
  A.x and B.x is equal to u,u when A.x is connected to B.x
+
+
+ B.x and A.x is equal to A@x,u when B.x is connected to A.x
 
 
  B.x and A.x is equal to u,u when B.x is connected to A.x

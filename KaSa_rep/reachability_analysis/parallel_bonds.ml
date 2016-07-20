@@ -675,8 +675,6 @@ struct
     let error, dynamic, precondition, store_value1 =
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
         (fun (_, _) parallel_list (error, dynamic, precondition, store_result) ->
-           (*let (agent_id, agent_type, site_type, state) = x in
-           let (agent_id', agent_type', site_type', state') = y in*)
            let error, dynamic, precondition, store_result =
              List.fold_left (fun (error, dynamic, precondition, store_result) (z, t) ->
                  let (agent_id1, agent_type1, site_type1, site_type2, state1, state2) = z in
