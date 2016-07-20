@@ -70,6 +70,7 @@ module AgentsSitesStates_map_and_set =
          let print _ _ = ()
        end))
 
+(*PAIR*)
 module PairAgentsSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -183,6 +184,35 @@ module PairAgentsSites_SitesState_map_and_set =
          let print _ _ = ()
        end))
 
+let convert_single_without_state parameters error kappa_handler single =
+  let (agent, site) = single in
+  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
+  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  error, (agent, site)
+
+let convert_pair_single_without_state parameters error kappa_handler pair =
+  let (agent, site), (agent', site') = pair in
+  let error, (agent, site) = convert_single_without_state parameters error kappa_handler (agent, site) in
+  let error, (agent', site') = convert_single_without_state parameters error kappa_handler (agent', site') in
+  error, (agent, site, agent', site')
+
+let convert_without_state parameters error kappa_handler single =
+  let (agent, site, site1) = single in
+  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
+  let error, site1 = Handler.string_of_site_contact_map parameters error kappa_handler agent site1 in
+  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  error, (agent, site, site1)
+
+let convert_pair_without_state parameters error kappa_handler pair =
+  let (agent, site, site1), (agent', site', site1') = pair in
+  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
+  let error, site1 = Handler.string_of_site_contact_map parameters error kappa_handler agent site1 in
+  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent' site' in
+  let error, site1' = Handler.string_of_site_contact_map parameters error kappa_handler agent' site1' in
+  let error, agent' = Handler.translate_agent parameters error kappa_handler agent' in
+  error, (agent, site, site1, agent', site', site1')
+
 let convert_single parameters error kappa_handler single =
   let (agent, site, state) = single in
   let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
@@ -261,3 +291,13 @@ let print_site_accross_domain
       Loggers.print_newline (Remanent_parameters.get_logger parameters)
     in
     error
+
+let swap_sites_in_tuple (a, b, s, s') = (a, b, s', s)
+
+let add_symmetric_tuple_pair f parameter error (x, y) remanent =
+  let x' = swap_sites_in_tuple x in
+  let y' = swap_sites_in_tuple y in
+  List.fold_left
+    (fun (error, remanent) t ->
+       f parameter error t remanent
+    ) (error, remanent) [x, y; x', y']

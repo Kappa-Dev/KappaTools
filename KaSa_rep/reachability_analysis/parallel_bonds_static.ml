@@ -75,10 +75,11 @@ type local_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     (*rule has parallel bonds on the lhs*)
     store_rule_has_parallel_bonds_lhs :
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+      (bool * Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t)
+        Ckappa_sig.Rule_map_and_set.Map.t ;
     (*rule has non parallel bonds on the lhs*)
     store_rule_has_non_parallel_bonds_lhs:
+      (bool *
       ((Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
         Ckappa_sig.c_agent_name * Ckappa_sig.Site_map_and_set.Map.elt *
         Ckappa_sig.c_state) *
@@ -88,7 +89,7 @@ type local_static_information =
         Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
        (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
         Ckappa_sig.c_site_name * Ckappa_sig.c_state))
-        list
+        list)
         Ckappa_sig.Rule_map_and_set.Map.t;
   }
 
@@ -454,7 +455,7 @@ let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full
 
 let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full 
     error rule_id rule store_result =
-  let error, store_result =
+  let error, store_result1 =
     collect_rule_has_parallel_bonds
       parameter
       error
@@ -462,7 +463,13 @@ let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
       store_bonds_lhs_full
-      store_result
+      Ckappa_sig.Rule_map_and_set.Map.empty
+  in
+  let store_result =
+    Ckappa_sig.Rule_map_and_set.Map.map
+      (fun set ->
+         (true, set)
+      ) store_result1    
   in
   error, store_result
 
@@ -591,7 +598,7 @@ let collect_rule_has_non_parallel_bonds_rhs parameter error rule_id rule
 
 let collect_rule_has_non_parallel_bonds_lhs parameter error rule_id rule 
     store_bonds_lhs_full store_result =
-  let error, store_result =
+  let error, store_result1 =
     collect_rule_has_non_parallel_bonds
       parameter
       error
@@ -599,7 +606,13 @@ let collect_rule_has_non_parallel_bonds_lhs parameter error rule_id rule
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
       store_bonds_lhs_full
-      store_result
+      Ckappa_sig.Rule_map_and_set.Map.empty
+  in
+  let store_result =
+    Ckappa_sig.Rule_map_and_set.Map.map
+      (fun set ->
+         (false, set)
+      ) store_result1    
   in
   error, store_result
 

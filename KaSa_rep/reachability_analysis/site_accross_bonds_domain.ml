@@ -170,15 +170,15 @@ struct
 
   (*rule that can created a bond *)
 
-  let get_created_bond static =
+  let get_created_bond_with_potential_pair static =
     (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_created_bond
+       static).Site_accross_bonds_domain_static.store_created_bond_with_potential_pair
 
-  let set_created_bond r static =
+  let set_created_bond_with_potential_pair r static =
     set_basic_static_information
       {
         (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_created_bond = r
+        Site_accross_bonds_domain_static.store_created_bond_with_potential_pair = r
       } static
 
   (**)
@@ -221,7 +221,7 @@ struct
       } static
 
   (*explicit rule*)
-  let get_explicit_rule static =
+  (*let get_explicit_rule static =
     (get_basic_static_information 
        static).Site_accross_bonds_domain_static.store_explicit_static
 
@@ -230,7 +230,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_explicit_static = r
-      } static
+      } static*)
 
 
   (*------------------------------------------------------------*)
@@ -324,7 +324,11 @@ struct
     let store_tuple_pair = get_tuple_pair static in
     let error, store_tuple_pair =
       Site_accross_bonds_domain_static.collect_tuple_pair
-        parameter error rule_id store_test store_tuple_pair
+        parameter error
+        kappa_handler
+        rule_id 
+        store_test
+        store_tuple_pair
     in
     let static = set_tuple_pair store_tuple_pair static in
     (*------------------------------------------------------------*)
@@ -336,14 +340,23 @@ struct
     in
     let static = set_modified_map store_modified_map static in
     (*------------------------------------------------------------*)
-    (*created bond*)
+    (*the first site of potential pair can be a created bond*)
     let store_tuple_pair = get_tuple_pair static in
-    let store_created_bond = get_created_bond static in
-    let error, store_created_bond =
-      Site_accross_bonds_domain_static.collect_created_bond
-        parameter error rule_id rule store_tuple_pair store_created_bond
+    let store_created_bond_with_potential_pair =
+      get_created_bond_with_potential_pair static 
     in
-    let static = set_created_bond store_created_bond static in
+    let error, store_created_bond_with_potential_pair =
+      Site_accross_bonds_domain_static.collect_created_bond_with_potential_pair
+        parameter error 
+        rule_id 
+        rule
+        store_tuple_pair
+        store_created_bond_with_potential_pair
+    in
+    let static = 
+      set_created_bond_with_potential_pair 
+        store_created_bond_with_potential_pair static 
+    in
     (*------------------------------------------------------------*)
     (*internal state*)
     let store_bonds_rhs = get_bonds_rhs static in
@@ -365,7 +378,10 @@ struct
     let store_question_marks_rhs = get_question_marks_rhs static in
     let error, store_question_marks_rhs =
       Site_accross_bonds_domain_static.collect_question_marks_rhs
-        parameter error rule_id kappa_handler rule
+        parameter error
+        kappa_handler
+        rule_id
+        rule
         store_modified_map
         store_question_marks_rhs
     in
@@ -392,25 +408,28 @@ struct
   in
   (*------------------------------------------------------------*)
   (*implicit static information*)
+  let kappa_handler = get_kappa_handler static in
   let store_tuple_pair = get_tuple_pair static in
   let store_question_marks_rhs = get_question_marks_rhs static in
   let store_implicit_static =
     Site_accross_bonds_domain_static.collect_implicit_static
-      parameter error store_tuple_pair store_question_marks_rhs
+      parameter error 
+      store_tuple_pair 
+      store_question_marks_rhs
   in
   let static = set_implicit_rule store_implicit_static static in
   (*------------------------------------------------------------*)
   (*explicit static information*)
-  let store_modified_internal_state_and_bond =
+  (*let store_modified_internal_state_and_bond =
     get_modified_internal_state_and_bond static in
   let store_created_bond = get_created_bond static in
-  let store_explicit_static = get_explicit_rule static in
-  let error, store_explicit_static =
+  let store_explicit_static = get_explicit_rule static in*)
+  (*let error, store_explicit_static =
     Site_accross_bonds_domain_static.collect_explicit_static
       parameter error store_created_bond
       store_modified_internal_state_and_bond store_explicit_static
   in
-  let static = set_explicit_rule store_explicit_static static in
+  let static = set_explicit_rule store_explicit_static static in*)
   error, static, dynamic
   
   (****************************************************************)
@@ -530,6 +549,37 @@ struct
           Loggers.fprintf log
             "------------------------------------------------------------\n"
         in
+        (*--------------------------------------------------------*)
+        (*test*)
+        (*let store_created_bonds = get_implicit_rule static in
+        let error =
+          Ckappa_sig.Rule_map_and_set.Map.fold
+            (fun rule_id set error ->
+               Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+                 (fun (x, y) error ->
+                     let (agent_id, agent_type, site_type, site_type2) = x in
+                     let (agent_id1, agent_type1, site_type1, site_type2') = y in
+                     let new_pair = 
+                       (agent_type, site_type, site_type2),
+                       (agent_type1, site_type1, site_type2')
+                     in
+                     let error, (agent, site, site1, agent', site', site1') =
+                       Site_accross_bonds_domain_type.convert_pair_without_state
+                         parameter error
+                         kappa_handler
+                         new_pair
+                     in
+                     let _ =
+                       Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                         "rule_id:%i %s(%s,%s); %s(%s, %s)\n"
+                         (Ckappa_sig.int_of_rule_id rule_id)
+                         agent site site1
+                         agent' site' site1'
+                     in
+                     error
+                 ) set error
+            ) store_created_bonds error
+        in*)
         (*--------------------------------------------------------*)
         (*to do*)
         let store_value = get_value dynamic in
