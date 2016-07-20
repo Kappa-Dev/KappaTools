@@ -149,7 +149,7 @@ module type Cut_pseudo_inverse =
         let error = aux 0 in
         error
 
-      let predicates_of_action parameter handler error blackboard action  =
+      let predicates_of_action _parameter _handler _error blackboard action  =
         match action with
           | Instantiation.Create (ag,interface) ->
             let ag_id = Po.K.agent_id_of_agent ag in
@@ -208,10 +208,10 @@ module type Cut_pseudo_inverse =
             let predicate_id = Predicate_maps.Here ag_id in
             blackboard,[predicate_id,Predicate_maps.Undefined],[],true,false
 
-      let no_remove parameter handler error blackboard eid =
+      let no_remove _parameter _handler _error blackboard eid =
         not (A.get blackboard.is_remove_action eid)
 
-      let same_length parameter handler error blackboard eid1 eid2 =
+      let same_length _parameter _handler _error blackboard eid1 eid2 =
         A.get blackboard.has_mod_without_test eid1
         ||
         A.get blackboard.has_mod_without_test eid2
@@ -272,12 +272,12 @@ module type Cut_pseudo_inverse =
               match
                 column
               with
-              | (_,_,false)::_ -> scan q
-              | (_,x,true)::(_,y,_)::_ when x=y -> scan q
+              | (_,_,false)::_ -> scan q (* no modif on a *)
+              | (_,x,true)::(_,y,_)::_ when x=y -> scan q (* mute modif on a *)
               | (a,x,true)::(b,_,true)::(_,y,_)::_ ->
                 if a=eid && x=y
                 then
-                  error,Some (a,b),blackboard,q
+                  error,Some (a,b),blackboard,q (* a cancels b modif *)
                 else
                   error,None,blackboard,q
               | _ -> error,None,blackboard,q
@@ -298,14 +298,14 @@ module type Cut_pseudo_inverse =
                  let column =
                    CPredicateMap.find_default [] pid blackboard.steps_by_column
                  in
-                 let column,blackboard = clean pid column blackboard in
+                 let column,_blackboard = clean pid column blackboard in
                  match
                     column
                  with
-                 | (a,_,false)::_ -> true
+                 | (_,_,false)::_ -> true (* no modif on a *)
                  | (a,x,true)::(b,_,true)::(_,y,_)::_ when b=eidb && a=eida ->
-                   x=y
-                 | (a,x,true)::(_,y,_)::_ when a=eida || a=eidb -> x=y
+                   x=y (* if yes, a cancels b modif*)
+                 | (a,x,true)::(_,y,_)::_ when a=eida  -> x=y (* is a modif is mute ? *)
                  | _ -> false)
                 q
             &&
@@ -314,19 +314,28 @@ module type Cut_pseudo_inverse =
                 let column =
                   CPredicateMap.find_default [] pid blackboard.steps_by_column
                 in
-                let column,blackboard = clean pid column blackboard in
-                match
-                   column
-                with
-                | (b,_,true)::_ when b=eidb -> false
-                | _ -> true)
+                let column,_blackboard = clean pid column blackboard in
+                let rec check_aux column =
+                  match
+                    column
+                  with
+                  | (b,x,true)::(_,y,_)::_ when b=eidb -> x=y (* is b modif is mute ? *)
+                  | (b,_,bool)::_ when b=eidb -> not bool (* if yes, b does not do modif *)
+                  | (_,_,_)::tail -> check_aux tail
+                  | [] -> true
+                in
+                match column with
+                | (a,x,true)::(b,_,true)::(_,y,_)::_ when b=eidb && a=eida ->
+                  x=y (* a cancels b modif*)
+                | _ -> check_aux column (* otherwise check that b has no effect  *)
+              )
               (A.get blackboard.predicates_of_event eidb)
 
           then error,Some (eida,eidb)
             else error,None
 
 
-      let pop parameter handler error blackboard eid =
+      let pop _parameter _handler error blackboard eid =
         let predicate_list = A.get blackboard.predicates_of_event eid in
         let rec aux l error blackboard =
           match l
@@ -358,14 +367,14 @@ module type Cut_pseudo_inverse =
         let _ = A.set blackboard.event eid None in
         error,blackboard
 
-      let predicates_of_test parameter handler error blackboard test =
+      let predicates_of_test _parameter _handler _error _blackboard test =
         match test
         with
           | Instantiation.Is_Here (agent) ->
             let ag_id = Po.K.agent_id_of_agent agent in
             let predicate_id = Predicate_maps.Here ag_id in
             [predicate_id]
-          | Instantiation.Has_Internal(site,int) ->
+          | Instantiation.Has_Internal(site,_int) ->
             let predicate_id = Predicate_maps.Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in
             [predicate_id]
           | Instantiation.Is_Free s ->
@@ -431,7 +440,7 @@ module type Cut_pseudo_inverse =
          PredicateMap.empty
          test_list
      in
-     let error,blackboard,action_map,test_map,is_remove_action,is_create_action =
+     let error,blackboard,action_map,test_map,is_remove_action,_is_create_action =
        List.fold_left
          (fun (error,blackboard,action_map,test_map,bool,bool_creation) action ->
            let blackboard,action_list,test_list,bool',bool_creation' = predicates_of_action parameter handler error blackboard action in
