@@ -73,16 +73,24 @@ end
 
     module StoreMap = Store.Map
 
-    type species_id = int
-    let fst_species_id = 0
-    let next_species_id id = id + 1
+    type id = int
+    type species_id = id
+    type intro_coef_id = id
+    type rule_coef_id = id
+    let fst_id = 0
+    let next_id id = id + 1
     type network =
       {
         species : SpeciesSet.t ;
         species_tab: I.chemical_species Mods.DynArray.t ;
-        id_of_species: species_id SpeciesMap.t ;
-        reactions: (species_id list * species_id list * I.rule) list ;
-        fresh_species_id: species_id ;
+        id_of_species: id SpeciesMap.t ;
+        reactions: (id list * id list * I.rule) list ;
+        fresh_species_id: id ;
+        intro_coef_tab: (I.chemical_species,string) Ast.ast_alg_expr Location.annot Mods.DynArray.t ;
+        fresh_intro_coef_id: id;
+        fresh_rule_coef_id: id;
+        rule_coef_tab: (I.chemical_species,string) Ast.ast_alg_expr Location.annot Mods.DynArray.t ;
+        rule_unary_coef_tab: (I.chemical_species,string) Ast.ast_alg_expr Location.annot Mods.DynArray.t ;
       }
 
     let fold_left_swap f a b =
@@ -91,12 +99,18 @@ end
         b a
 
     let init () =
+      let dummy = Location.dummy_annot (Ast.CONST (Nbr.zero)) in
       {
+        reactions = [] ;
         species = SpeciesSet.empty ;
         id_of_species = SpeciesMap.empty ;
         species_tab = Mods.DynArray.create 0 I.dummy_chemical_species ;
-        reactions = [] ;
-        fresh_species_id = fst_species_id
+        fresh_species_id = fst_id ;
+        intro_coef_tab = Mods.DynArray.create 0 dummy ;
+        fresh_intro_coef_id = fst_id ;
+        fresh_rule_coef_id = fst_id ;
+        rule_coef_tab = Mods.DynArray.create 0 dummy ;
+        rule_unary_coef_tab = Mods.DynArray.create 0 dummy ;
       }
 
     let is_known_species species network =
@@ -108,7 +122,7 @@ end
         with
           species = SpeciesSet.add species network.species ;
           id_of_species = SpeciesMap.add species network.fresh_species_id network.id_of_species ;
-          fresh_species_id = next_species_id network.fresh_species_id
+          fresh_species_id = next_id network.fresh_species_id
       },
       network.fresh_species_id
 
@@ -297,9 +311,122 @@ end
       in
       aux to_be_visited network store
 
+    let translate_species species network =
+      snd (translate_species species ([],network))
+
+    let convert_cc connected_component network =
+      SpeciesMap.fold
+        (fun species id alg ->
+           let n_embs =
+             List.length
+               (I.find_embeddings connected_component species)
+           in
+           if n_embs = 0
+           then
+             alg
+           else
+             let species = Ast.KAPPA_INSTANCE id in
+             let term =
+               if n_embs = 1
+               then
+                species
+               else
+                 Ast.BIN_ALG_OP
+                      (
+                        Operator.MULT,
+                        Location.dummy_annot (Ast.CONST (Nbr.I n_embs)),
+                        Location.dummy_annot species)
+             in
+             match
+              alg
+             with
+             | Ast.CONST (Nbr.I 0) ->  term
+             | _ ->
+                    Ast.BIN_ALG_OP
+                 (
+                   Operator.SUM,
+                   Location.dummy_annot alg,
+                   Location.dummy_annot term)
+        )
+        network.id_of_species
+        ((Ast.CONST (Nbr.I 0)))
+
+    let rec convert_alg_expr alg network =
+      match
+        alg
+      with
+      | Ast.BIN_ALG_OP (op, arg1, arg2 ),loc ->
+        Ast.BIN_ALG_OP (op, convert_alg_expr arg1 network, convert_alg_expr arg2 network),loc
+      | Ast.UN_ALG_OP (op, arg),loc ->
+        Ast.UN_ALG_OP (op, convert_alg_expr arg network),loc
+      | Ast.KAPPA_INSTANCE connected_component, loc ->
+        convert_cc connected_component network, loc
+      | Ast.TOKEN_ID a, loc -> Ast.TOKEN_ID a, loc
+      | Ast.OBS_VAR a, loc -> Ast.OBS_VAR a, loc
+      | Ast.CONST a , loc -> Ast.CONST a, loc
+      | Ast.STATE_ALG_OP op,loc ->
+        Ast.STATE_ALG_OP op,loc
+
+    let convert_var_def variable_def network =
+      let a,b = variable_def in
+      a,convert_alg_expr b network
+
+    let convert_initial_state intro network =
+      let a,b,c = intro in
+      a,
+      convert_alg_expr b network,
+      match
+        c
+      with
+      | Ast.INIT_MIX m ->
+        begin
+          let cc = I.connected_components_of_mixture m in
+          let list =
+            List.rev_map
+              (fun x -> translate_species x network,
+                        I.nbr_automorphisms_in_chemical_species x)
+              cc
+          in
+          match
+            list
+          with
+          | [] ->
+            Ast.CONST (Nbr.zero)
+          | h::t ->
+            let term (singleton, auto) =
+              let species = Ast.KAPPA_INSTANCE singleton in
+            if auto = 1
+            then
+              species
+            else
+              Ast.BIN_ALG_OP
+                (Operator.MULT,
+                 Location.dummy_annot (Ast.CONST (Nbr.I auto)),
+                 Location.dummy_annot species) in
+            let rec aux tail expr =
+              match tail
+              with
+              | [] -> expr
+              | h::t ->
+                aux t
+                  (Ast.BIN_ALG_OP
+                     (Operator.SUM,
+                      Location.dummy_annot expr,
+                      Location.dummy_annot (term h)))
+            in aux t (term h)
+
+        end
+      | Ast.INIT_TOK t ->
+        assert false
+
+
+
+
+
       let species_of_species_id network =
         (fun i -> Mods.DynArray.get network.species_tab i)
       let get_reactions network = network.reactions
+
 
   end
 

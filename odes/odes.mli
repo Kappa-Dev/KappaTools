@@ -53,6 +53,14 @@ end
     type network
 
     val compute_reactions: I.rule list -> I.chemical_species list -> network
+    val convert_var_def:
+      'a * (I.connected_component, 'b) Ast.ast_alg_expr Location.annot ->
+      network ->
+      'a * (species_id, 'b) Ast.ast_alg_expr Location.annot
+    val convert_initial_state:
+    'a * (I.connected_component, 'b) Ast.ast_alg_expr Location.annot * (I.mixture, 'c) Ast.init_t ->
+    network ->
+    'a * (species_id, 'b) Ast.ast_alg_expr Location.annot * (species_id, 'd) Ast.ast_alg_expr
     val species_of_species_id: network -> int -> I.chemical_species
     val get_reactions: network -> (species_id list * species_id list * I.rule) list
 end
