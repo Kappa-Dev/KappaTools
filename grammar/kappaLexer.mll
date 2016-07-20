@@ -1,7 +1,6 @@
 {
   open Lexing
   open KappaParser
-  open ExceptionDefn
 
   let reach_eof lexbuf =
     lexbuf.lex_eof_reached <- true
@@ -61,7 +60,7 @@ rule token = parse
 		      | "$RUN" -> RUN
 		      | s ->
 			 raise
-			   (Syntax_Error
+			   (ExceptionDefn.Syntax_Error
 			      ("Perturbation effect \""^s^"\" is not defined",
 			       Location.of_pos (Lexing.lexeme_start_p lexbuf)
 				(Lexing.lexeme_end_p lexbuf)))
@@ -89,7 +88,7 @@ rule token = parse
 		| "Tmax" -> TMAX
 		| "p" -> PLOTNUM
 		| _ as s ->
-		   raise (Syntax_Error
+		   raise (ExceptionDefn.Syntax_Error
 			    ("Symbol \""^s^"\" is not defined",
 			     Location.of_pos (Lexing.lexeme_start_p lexbuf)
 			      (Lexing.lexeme_end_p lexbuf)))
@@ -102,7 +101,7 @@ rule token = parse
 	 | '#' {comment lexbuf}
 	 | '/' '*' {inline_comment lexbuf; token lexbuf}
 	 | integer as n {try INT (int_of_string n)
-	 with Failure _ -> raise (Syntax_Error
+	 with Failure _ -> raise (ExceptionDefn.Syntax_Error
 	 (n^" is a incorrect integer",
 	     Location.of_pos (Lexing.lexeme_start_p lexbuf)
 		      (Lexing.lexeme_end_p lexbuf)))}
@@ -136,7 +135,8 @@ rule token = parse
 		| "def" -> CONFIG
 		| "token" -> TOKEN
 		| _ as s ->
-		   raise (Syntax_Error ("Instruction \""^s^"\" not recognized",
+		   raise (ExceptionDefn.Syntax_Error
+		   ("Instruction \""^s^"\" not recognized",
 					Location.of_pos
 					(Lexing.lexeme_start_p lexbuf)
 					 (Lexing.lexeme_end_p lexbuf)))
@@ -151,7 +151,7 @@ rule token = parse
 	 | blank  {token lexbuf}
 	 | eof {reach_eof lexbuf; EOF}
 	 | _ as c {
-		    raise (Syntax_Error
+		    raise (ExceptionDefn.Syntax_Error
 			     ("invalid use of character "^ String.make 1 c,
 			      Location.of_pos (Lexing.lexeme_start_p lexbuf)
 			       (Lexing.lexeme_end_p lexbuf)))
@@ -189,7 +189,7 @@ and inline_comment = parse
       let out = KappaParser.start_rule token lexbuf compil in
       let () = Format.fprintf logger "done@." in
       let () = close_in d in out
-    with Syntax_Error (msg,pos) ->
+    with ExceptionDefn.Syntax_Error (msg,pos) ->
       let () = close_in d in
       let () = Pp.error Format.pp_print_string (msg,pos) in
       exit 3

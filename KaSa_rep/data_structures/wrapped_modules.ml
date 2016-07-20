@@ -1,17 +1,16 @@
 (** Time-stamp: <Jul 02 2016> *)
-open Mods
 (* versions of the module with logging primitives *)
 (* type are shared among both versions *)
-module LoggedStringSetMap = Map_wrapper.Make(StringSetMap)
+module LoggedStringSetMap = Map_wrapper.Make(Mods.StringSetMap)
 module LoggedStringSet = LoggedStringSetMap.Set
 module LoggedStringMap = LoggedStringSetMap.Map
-module LoggedIntSetMap = Map_wrapper.Make(IntSetMap)
+module LoggedIntSetMap = Map_wrapper.Make(Mods.IntSetMap)
 module LoggedIntSet = LoggedIntSetMap.Set
 module LoggedIntMap = LoggedIntSetMap.Map
-module LoggedInt2SetMap = Map_wrapper.Make(Int2SetMap)
+module LoggedInt2SetMap = Map_wrapper.Make(Mods.Int2SetMap)
 module LoggedInt2Set = LoggedInt2SetMap.Set
 module LoggedInt2Map = LoggedInt2SetMap.Map
-module LoggedCharSetMap = Map_wrapper.Make (CharSetMap)
+module LoggedCharSetMap = Map_wrapper.Make (Mods.CharSetMap)
 module LoggedCharSet = LoggedCharSetMap.Set
 module LoggedCharMap = LoggedCharSetMap.Map
 

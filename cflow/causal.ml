@@ -1,5 +1,3 @@
-open Mods
-
 type quark_lists = {
   site_tested : (int * int) list;
   site_modified : (int * int) list;
@@ -31,9 +29,9 @@ type grid =
   }
 type config =
   {
-    events_kind: Trace.event_kind IntMap.t ;
-    prec_1: IntSet.t IntMap.t ;
-    conflict : IntSet.t IntMap.t ;
+    events_kind: Trace.event_kind Mods.IntMap.t ;
+    prec_1: Mods.IntSet.t Mods.IntMap.t ;
+    conflict : Mods.IntSet.t Mods.IntMap.t ;
   }
 type enriched_grid =
   {
@@ -45,7 +43,9 @@ type enriched_grid =
   }
 
 let empty_config =
-  { events_kind=IntMap.empty; conflict = IntMap.empty; prec_1 = IntMap.empty }
+  { events_kind = Mods.IntMap.empty;
+    conflict = Mods.IntMap.empty;
+    prec_1 = Mods.IntMap.empty }
 
 let debug_print_causal f i =
   Format.pp_print_string
@@ -81,21 +81,22 @@ let empty_grid () =
 
 let build_subs l =
   snd (List.fold_left
-         (fun (n,map) a -> (succ n,IntMap.add a n map)) (1,IntMap.empty) l)
+         (fun (n,map) a -> (succ n,Mods.IntMap.add a n map))
+         (1,Mods.IntMap.empty) l)
 
 let submap subs l m default =
   List.fold_left
     (fun m' a ->
-       match IntMap.find_option a subs with
+       match Mods.IntMap.find_option a subs with
        | None -> raise Not_found
        | Some new_a ->
-         IntMap.add new_a (
-           match IntMap.find_option a m with
+         Mods.IntMap.add new_a (
+           match Mods.IntMap.find_option a m with
            | Some x -> x
            | None ->
              match default with None -> raise Not_found | Some a -> a
          ) m')
-    IntMap.empty l
+    Mods.IntMap.empty l
 
 let add_init_pid eid pid grid =
   let eid_init = Hashtbl.find grid.pid_to_init pid in
@@ -110,24 +111,24 @@ let add_init_pid eid pid grid =
 let subset subs l s =
   List.fold_left
     (fun s' a ->
-       if IntSet.mem a s
-       then IntSet.add
-           (match IntMap.find_option a subs with
+       if Mods.IntSet.mem a s
+       then Mods.IntSet.add
+           (match Mods.IntMap.find_option a subs with
             | Some i -> i
             | None -> raise Not_found)
            s'
        else s')
-    IntSet.empty l
+    Mods.IntSet.empty l
 
 let subconfig_with_subs subs config l =
   {
     events_kind = submap subs l config.events_kind None ;
-    prec_1 = submap subs l config.prec_1 (Some IntSet.empty);
-    conflict = submap subs l config.conflict (Some IntSet.empty);
+    prec_1 = submap subs l config.prec_1 (Some Mods.IntSet.empty);
+    conflict = submap subs l config.conflict (Some Mods.IntSet.empty);
   }
 let subenriched_grid_with_subs subs  grid l =
   let depth_of_event = submap subs  l grid.depth_of_event (Some 0) in
-  let depth = IntMap.fold (fun _ -> max) depth_of_event 0 in
+  let depth = Mods.IntMap.fold (fun _ -> max) depth_of_event 0 in
   {
     prec_star = grid.prec_star;
     config = subconfig_with_subs subs grid.config l ;
@@ -259,27 +260,30 @@ let record_init (lbl,actions) event_number env grid =
   add_actions env grid event_number (Trace.INIT lbl)  actions
 
 let add_pred eid atom config =
-  let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
+  let events_kind = Mods.IntMap.add atom.eid atom.kind config.events_kind in
   let pred_set =
-    IntMap.find_default IntSet.empty eid config.prec_1 in
-  let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
+    Mods.IntMap.find_default Mods.IntSet.empty eid config.prec_1 in
+  let prec_1 =
+    Mods.IntMap.add eid (Mods.IntSet.add atom.eid pred_set) config.prec_1 in
   {config with prec_1 = prec_1 ; events_kind = events_kind}
 
 let add_conflict eid atom config =
-  let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
+  let events_kind = Mods.IntMap.add atom.eid atom.kind config.events_kind in
   let cflct_set =
-    IntMap.find_default IntSet.empty eid config.conflict in
-  let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
+    Mods.IntMap.find_default Mods.IntSet.empty eid config.conflict in
+  let cflct =
+    Mods.IntMap.add eid (Mods.IntSet.add atom.eid cflct_set) config.conflict in
   {config with conflict = cflct ; events_kind = events_kind }
 
 let rec parse_attribute last_modif last_tested attribute config =
   match attribute with
   | [] -> config
   | atom::att ->
-    let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
+    let events_kind = Mods.IntMap.add atom.eid atom.kind config.events_kind in
     let prec_1 =
-      let preds = IntMap.find_default IntSet.empty atom.eid config.prec_1 in
-      IntMap.add atom.eid preds config.prec_1 in
+      let preds =
+        Mods.IntMap.find_default Mods.IntSet.empty atom.eid config.prec_1 in
+      Mods.IntMap.add atom.eid preds config.prec_1 in
     let config = {config with events_kind =  events_kind ; prec_1 = prec_1} in
     (*atom has a modification*)
     if (atom.causal_impact = atom_modified) || (atom.causal_impact = 3) then
@@ -314,11 +318,11 @@ let cut ?with_reduction:(with_reduction=true) parameter handler log_info error a
         match attribute with
         | [] -> cfg
         | atom::att ->
-          let events_kind = IntMap.add atom.eid atom.kind cfg.events_kind in
+          let events_kind = Mods.IntMap.add atom.eid atom.kind cfg.events_kind in
           let prec_1 =
             let preds =
-              IntMap.find_default IntSet.empty atom.eid cfg.prec_1 in
-            IntMap.add atom.eid preds cfg.prec_1 in
+              Mods.IntMap.find_default Mods.IntSet.empty atom.eid cfg.prec_1 in
+            Mods.IntMap.add atom.eid preds cfg.prec_1 in
           let tested =
             if (atom.causal_impact = atom_tested) || (atom.causal_impact = 3)
             then [atom.eid] else [] in
@@ -365,21 +369,21 @@ let config_of_grid = cut
 
 (*let prec_star_of_config_old  config =
   let rec prec_closure config todo already_done closure =
-    if IntSet.is_empty todo then closure
+    if Mods.IntSet.is_empty todo then closure
     else
-      let eid = IntSet.choose todo in
-      let todo' = IntSet.remove eid todo in
-      if IntSet.mem eid already_done
+      let eid = Mods.IntSet.choose todo in
+      let todo' = Mods.IntSet.remove eid todo in
+      if Mods.IntSet.mem eid already_done
       then
         prec_closure config todo' already_done closure
       else
-        let prec = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty
+        let prec = try IntMap.find eid config.prec_1 with Not_found -> Mods.IntSet.empty
         in
       prec_closure config (IntSet.union todo' prec) (IntSet.add eid already_done) (IntSet.union prec closure)
   in
   IntMap.fold
     (fun eid kind prec_star ->
-      let set = prec_closure config (IntSet.singleton eid) IntSet.empty IntSet.empty
+      let set = prec_closure config (IntSet.singleton eid) Mods.IntSet.empty Mods.IntSet.empty
       in
       IntMap.add eid set prec_star
     ) config.events IntMap.empty *)
@@ -387,22 +391,22 @@ let config_of_grid = cut
 let prec_star_of_config = Graph_closure.closure
 
 let depth_and_size_of_event config =
-  IntMap.fold
+  Mods.IntMap.fold
     (fun eid prec_eids (emap,_) ->
        let d =
-         IntSet.fold
+         Mods.IntSet.fold
            (fun eid' d ->
-              let d' = IntMap.find_default 0 eid' emap in
+              let d' = Mods.IntMap.find_default 0 eid' emap in
               max (d'+1) d
            ) prec_eids 0
        in
-       IntMap.add eid d emap,d
-    ) config.prec_1 (IntMap.empty,0)
+       Mods.IntMap.add eid d emap,d
+    ) config.prec_1 (Mods.IntMap.empty,0)
 
 let enrich_grid parameter handler log_info error config_closure grid =
   let keep_l =
-    List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in
-  let to_keep i = IntSet.mem i keep_l in
+    List.fold_left (fun a b -> Mods.IntSet.add b a) Mods.IntSet.empty grid.obs in
+  let to_keep i = Mods.IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let error,log_info,config = config_of_grid parameter handler log_info error ids grid in
   let error,log_info,prec_star = prec_star_of_config parameter handler log_info error (Some StoryProfiling.Transitive_closure) config_closure config.prec_1 to_keep in
@@ -413,12 +417,12 @@ let enrich_grid parameter handler log_info error config_closure grid =
     prec_star = prec_star ;
     depth = depth ;
     depth_of_event = depth_of_event ;
-    size = IntMap.size config.prec_1 ;
+    size = Mods.IntMap.size config.prec_1 ;
   }
 
 let fold_over_causal_past_of_obs parameter handler log_info error config_closure grid f a =
-  let keep_l = List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in
-  let to_keep i = IntSet.mem i keep_l in
+  let keep_l = List.fold_left (fun a b -> Mods.IntSet.add b a) Mods.IntSet.empty grid.obs in
+  let to_keep i = Mods.IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Build_configuration None log_info in
   let error,log_info,config = config_of_grid ~with_reduction:false parameter handler log_info error ids grid in
@@ -431,18 +435,18 @@ let dot_of_grid profiling env enriched_grid form =
   let prec_star = enriched_grid.prec_star in
   let depth_of_event = enriched_grid.depth_of_event in
   let sorted_events =
-    IntMap.fold
+    Mods.IntMap.fold
       (fun eid d dmap ->
-         let set = IntMap.find_default IntSet.empty d dmap in
-         IntMap.add d (IntSet.add eid set) dmap
-      ) depth_of_event IntMap.empty in
+         let set = Mods.IntMap.find_default Mods.IntSet.empty d dmap in
+         Mods.IntMap.add d (Mods.IntSet.add eid set) dmap
+      ) depth_of_event Mods.IntMap.empty in
   Format.fprintf form "@[<v>%t@,digraph G{@, ranksep=.5 ;@," profiling;
-  IntMap.iter
+  Mods.IntMap.iter
     (fun d eids_at_d ->
        Format.fprintf form "@[<hv>{ rank = same ; \"%d\" [shape=plaintext] ;@," d;
-       IntSet.iter
+       Mods.IntSet.iter
          (fun eid ->
-            match IntMap.find_option eid config.events_kind with
+            match Mods.IntMap.find_option eid config.events_kind with
             | None -> raise Not_found
             | Some atom_kind ->
               if eid <> 0 then
@@ -454,26 +458,26 @@ let dot_of_grid profiling env enriched_grid form =
        Format.fprintf form "}@]@," ;
     ) sorted_events ;
   let cpt = ref 0 in
-  while !cpt+1 < (IntMap.size sorted_events) do
+  while !cpt+1 < (Mods.IntMap.size sorted_events) do
     Format.fprintf form "\"%d\" -> \"%d\" [style=\"invis\"];@," !cpt (!cpt+1);
     cpt := !cpt + 1
   done ;
-  IntMap.iter
+  Mods.IntMap.iter
     (fun eid pred_set ->
        if eid <> 0 then
-         IntSet.iter
+         Mods.IntSet.iter
            (fun eid' ->
               if eid' = 0 then ()
               else
                 Format.fprintf form "node_%d -> node_%d@," eid' eid
            ) pred_set
     ) config.prec_1 ;
-  IntMap.iter
+  Mods.IntMap.iter
     (fun eid cflct_set ->
        if eid <> 0 then
          let prec = try (fst prec_star).(eid) with _ -> [] in
          let _ =
-           IntSet.fold_inv
+           Mods.IntSet.fold_inv
              (fun eid' prec ->
                 let bool,prec =
                   let rec aux prec =
@@ -502,7 +506,7 @@ let js_of_grid env enriched_grid f =
     Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
 
   let () = Pp.set
-      ~trailing:Pp.space IntMap.bindings Pp.space
+      ~trailing:Pp.space Mods.IntMap.bindings Pp.space
       (fun f (eid,atom_kind) ->
          Format.fprintf
            f "g.setNode(%i, { label: \"%a\", style: \"fill: %s\" });"
@@ -514,9 +518,9 @@ let js_of_grid env enriched_grid f =
       f enriched_grid.config.events_kind in
   let () =
     Pp.set
-      IntMap.bindings Pp.empty
+      Mods.IntMap.bindings Pp.empty
       (fun f (eid,set) ->
-         Pp.set IntSet.elements ~trailing:Pp.space Pp.space
+         Pp.set Mods.IntSet.elements ~trailing:Pp.space Pp.space
            (fun f eid' -> Format.fprintf f "g.setEdge(%i,%i,{});" eid' eid)
            f set)
       f enriched_grid.config.prec_1 in
@@ -603,7 +607,7 @@ let pretty_print
            let av_t,ids,n =
              List.fold_left
                (fun (av_t,ids,n) info ->
-                  (av_t +. info.story_time,info.story_id::ids,n+1)
+                  (av_t +. info.Mods.story_time,info.Mods.story_id::ids,n+1)
                )
                (0.,[],0) (List.rev stories)
            in
@@ -656,8 +660,8 @@ let pretty_print
                   let size = enriched_config.size in
                   List.iter
                     (fun info  ->
-                       let time = info.story_time in
-                       let event = info.story_event in
+                       let time = info.Mods.story_time in
+                       let event = info.Mods.story_event in
                        Format.fprintf f "%i\t%i\t%E\t%i\t%i\t@,"
                          cpt event time depth size
                     ) story) form story_list in
