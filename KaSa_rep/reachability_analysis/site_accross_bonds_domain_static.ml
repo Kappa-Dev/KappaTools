@@ -230,7 +230,7 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
 (***************************************************************)
 (*collect rule that can be modified*)
 
-let collect_site_modified parameter error rule_id rule store_result =
+let collect_site_modified parameter error kappa_handler rule_id rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result->
@@ -258,6 +258,17 @@ let collect_site_modified parameter error rule_id rule store_result =
                       parameter error
                       (agent_id, agent_type, site_type, state)
                       store_set
+                  in
+                  let error, (agent, site, state) =
+                    Site_accross_bonds_domain_type.convert_single
+                      parameter error kappa_handler 
+                      (agent_type, site_type, state)
+                  in
+                  let _ =
+                    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      "rule_id:%i %s: %s:%s\n"
+                      (Ckappa_sig.int_of_rule_id rule_id)
+                      agent site state
                   in
                   error, store_set
                )
@@ -837,7 +848,7 @@ let collect_bonds_init parameter error init_state =
 
 (***************************************************************)
 
-let collect_pair_tuple_init parameter error init_state 
+let collect_pair_tuple_init parameter error handler init_state 
     store_bonds_init store_pair_sites_init
     store_result =
   (*fold over a set of pair and check the first site whether or not it
@@ -851,7 +862,41 @@ let collect_pair_tuple_init parameter error init_state
               ((agent_id, agent_type, site_type2, state2),
                (agent_id', agent_type', site_type2', state2'))
               store_bonds_init
+         then
+           let pair_list = [(site_type, state); (site_type2, state2)] in
+           let error, handler, mvbdu =
+             Ckappa_sig.Views_bdu.mvbdu_of_association_list
+               parameter handler error pair_list 
+           in
+           let pair = Site_accross_bonds_domain_type.project2 (x, y) in
+           let error, store_result =
+             Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+               parameter error
+               pair
+               mvbdu
+               store_result
+           in
+           error, store_result
+         else
+           error, store_result
+      ) store_pair_sites_init (error, store_result)
+  in
+  error, store_result
 
+let collect_pair_tuple_init' parameter error init_state 
+    store_bonds_init store_pair_sites_init
+    store_result =
+  (*fold over a set of pair and check the first site whether or not it
+    belongs to a set of sites that can be bound*)
+  let error, store_result =
+    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
+      (fun (x, y) (error, store_result) ->
+         let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
+         let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+         if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
+              ((agent_id, agent_type, site_type2, state2),
+               (agent_id', agent_type', site_type2', state2'))
+              store_bonds_init
          then
            let pair = Site_accross_bonds_domain_type.project2 (x, y) in
            let error, store_result =

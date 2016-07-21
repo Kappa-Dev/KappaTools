@@ -221,10 +221,12 @@ let convert_single parameters error kappa_handler single =
   error, (agent, site, state)
 
 let convert_pair_single parameters error kappa_handler pair =
-  let (agent, site, state), (agent', site', state') = pair in
+  let (agent, site, site', state), (agent', site1', site'', state') = pair in
+  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
+  let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent' site'' in
   let error, (agent, site, state) = convert_single parameters error kappa_handler (agent, site, state) in
-  let error, (agent', site', state') = convert_single parameters error kappa_handler (agent', site', state') in
-  error, (agent, site, state, agent', site', state')
+  let error, (agent', site1', state') = convert_single parameters error kappa_handler (agent', site1', state') in
+  error, (agent, site, site', state, agent', site1', site'', state')
   
 let convert_double parameters error kappa_handler double =
   let (agent, site, site', state, state') = double in
@@ -262,8 +264,9 @@ let print_site_accross_domain
     ?verbose:(verbose = true)
     ?sparse: (sparse = false)
     ?final_resul:(final_result = false) 
-    ?dump_any:(dump_any = false) parameters error kappa_handler tuple =
+    ?dump_any:(dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
+  let (agent_type, _, _, _, _), (agent_type', _, _, _, _) = tuple in
    let error, (agent1, site1, site2, state1, state2, agent1', site1', site2', state1', state2') =
     convert_tuple parameters error kappa_handler tuple
   in
@@ -284,6 +287,15 @@ let print_site_accross_domain
             agent1 site2
             agent1' site2'            
         in
+        let error, (handler, translation) =
+          Translation_in_natural_language.translate
+            parameters handler error (fun _ e i -> e, i) mvbdu
+        in
+        let error = 
+          Translation_in_natural_language.print
+            ~show_dep_with_dimmension_higher_than:1 parameters
+            kappa_handler error agent1 agent_type translation
+        in
         Loggers.print_newline (Remanent_parameters.get_logger parameters)
       else 
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
@@ -291,6 +303,11 @@ let print_site_accross_domain
       Loggers.print_newline (Remanent_parameters.get_logger parameters)
     in
     error
+
+(*let add_value parameter error kappa_handler x value store_result =
+  let error, old_value =
+    
+  in*)
 
 let swap_sites_in_tuple (a, b, s, s') = (a, b, s', s)
 
