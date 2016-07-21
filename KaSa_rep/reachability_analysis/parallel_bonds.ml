@@ -586,20 +586,54 @@ struct
        store_value *)
     (* if one elt is non realisable then output None, otherwise output Some
        precondition *)
-    (* You shall not fold over store_value *)
+    let bool =
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.for_all
+        (fun (x, y) ->
+           let pair = Parallel_bonds_type.project2 (x, y) in
+           let error, value =
+             match 
+               Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
+                 parameter error
+                 pair
+                 store_value
+             with
+             | error, None -> error, Usual_domains.Undefined
+             | error, Some v -> error, v
+           in
+           match value with
+           | Usual_domains.Undefined -> false
+           | Usual_domains.Val _ | Usual_domains.Any -> true 
+        ) parallel_set
+    in
+    let bool' =
+      List.for_all (fun (x, y, z, t) ->
+          let (_, agent_type, site_type, state) = x in
+          let (_, agent_type1, site_type1, state1) = y in
+          let (_, agent_type', site_type', state') = z in
+          let (_, agent_type1', site_type1', state1') = t in
+          let pair = (agent_type, site_type, site_type1, state, state1),
+                     (agent_type', site_type', site_type1', state', state1')
+          in
+          let error, value =
+            match 
+              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
+                parameter error
+                pair
+                store_value
+            with
+            | error, None -> error, Usual_domains.Undefined
+            | error, Some v -> error, v
+          in
+          match value with
+          | Usual_domains.Undefined -> false
+          | Usual_domains.Val _ | Usual_domains.Any -> true 
+        ) non_parallel_list
+    in
     let error, dynamic, op =
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
-        (fun (x,y) value (error, dynamic, op) ->
-           (*with/without parallel bonds or non parallel bonds*)
-          if b || b' || (b && b')
-          then
-            match value with
-            | Usual_domains.Val _
-            | Usual_domains.Any -> error, dynamic, op
-            | Usual_domains.Undefined -> error, dynamic, None
-          else
-            error, dynamic, op
-        ) store_value (error, dynamic, Some precondition)
+      if bool || bool' || (bool && bool')
+      then
+        error, dynamic, Some precondition
+      else error, dynamic, None
     in
     error, dynamic, op
 
