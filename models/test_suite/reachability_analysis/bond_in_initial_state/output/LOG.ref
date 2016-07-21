@@ -133,16 +133,6 @@ The binding state of site x in agent B ranges over free and A@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and B.x is equal to u,u when A.x is connected to B.x
-In agent A, the internal state of site x, and the binding state of site x, are entangled by the following 2-d relationship:
-	A(x~u,x!B@x)
-
-
- B.x and A.x is equal to u,u when B.x is connected to A.x
-In agent B, the binding state of site x, and the internal state of site x, are entangled by the following 2-d relationship:
-	B(x!free,x~p)
-
-
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -13,6 +13,28 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
+module PairStates_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_state * Ckappa_sig.c_state
+            * Ckappa_sig.c_state * Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module PairAgentSites_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
 module AgentsSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -303,11 +325,6 @@ let print_site_accross_domain
       Loggers.print_newline (Remanent_parameters.get_logger parameters)
     in
     error
-
-(*let add_value parameter error kappa_handler x value store_result =
-  let error, old_value =
-    
-  in*)
 
 let swap_sites_in_tuple (a, b, s, s') = (a, b, s', s)
 

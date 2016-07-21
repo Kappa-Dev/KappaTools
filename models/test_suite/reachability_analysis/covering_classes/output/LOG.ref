@@ -1840,12 +1840,12 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=46
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=51
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -1864,12 +1864,12 @@ Id=46
      Leaf False 
 
 agent_type:0:A:cv_id:1
-Id=46
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=51
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -2063,7 +2063,7 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=61
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2078,12 +2078,12 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=62
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=57
    Node(site_type:3<3)
     Id=1
      Leaf True 
@@ -2093,12 +2093,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=63
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=37
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2108,19 +2108,19 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=59
+Id=70
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=58
+  Id=69
    Node(site_type:1<1)
-    Id=54
+    Id=66
      Node(site_type:3<0)
       Id=0
        Leaf False 
 
-      Id=53
+      Id=65
        Node(site_type:3<1)
         Id=1
          Leaf True 
@@ -2128,14 +2128,14 @@ Id=59
         Id=0
          Leaf False 
 
-    Id=57
+    Id=68
      Node(site_type:1<2)
-      Id=56
+      Id=67
        Node(site_type:3<0)
         Id=0
          Leaf False 
 
-        Id=55
+        Id=53
          Node(site_type:3<2)
           Id=1
            Leaf True 
@@ -2149,12 +2149,12 @@ Id=59
 EXTENSIONAL DESCRIPTION:
 In agent B, the internal state of site y is p whenever the binding state of site y is A@y.
 INTENSIONAL DESCRIPTION:
-Id=62
+Id=73
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=61
+  Id=72
    Node(site_type:0<1)
     Id=5
      Node(site_type:2<0)
@@ -2169,7 +2169,7 @@ Id=62
         Id=0
          Leaf False 
 
-    Id=60
+    Id=71
      Node(site_type:0<2)
       Id=22
        Node(site_type:2<0)
@@ -2190,19 +2190,19 @@ Id=62
 EXTENSIONAL DESCRIPTION:
 In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
 INTENSIONAL DESCRIPTION:
-Id=59
+Id=70
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=58
+  Id=69
    Node(site_type:1<1)
-    Id=54
+    Id=66
      Node(site_type:3<0)
       Id=0
        Leaf False 
 
-      Id=53
+      Id=65
        Node(site_type:3<1)
         Id=1
          Leaf True 
@@ -2210,14 +2210,14 @@ Id=59
         Id=0
          Leaf False 
 
-    Id=57
+    Id=68
      Node(site_type:1<2)
-      Id=56
+      Id=67
        Node(site_type:3<0)
         Id=0
          Leaf False 
 
-        Id=55
+        Id=53
          Node(site_type:3<2)
           Id=1
            Leaf True 
@@ -2231,12 +2231,12 @@ Id=59
 EXTENSIONAL DESCRIPTION:
 In agent C, the internal state of site y is p whenever the binding state of site y is A@y.
 INTENSIONAL DESCRIPTION:
-Id=62
+Id=73
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=61
+  Id=72
    Node(site_type:0<1)
     Id=5
      Node(site_type:2<0)
@@ -2251,7 +2251,7 @@ Id=62
         Id=0
          Leaf False 
 
-    Id=60
+    Id=71
      Node(site_type:0<2)
       Id=22
        Node(site_type:2<0)
@@ -2292,7 +2292,7 @@ Id=30
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent A ranges over free, B@x, and C@x.
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=61
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2308,12 +2308,12 @@ Id=47
 EXTENSIONAL DESCRIPTION:
 The internal state of site y in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=62
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=57
    Node(site_type:3<3)
     Id=1
      Leaf True 
@@ -2324,12 +2324,12 @@ Id=49
 EXTENSIONAL DESCRIPTION:
 The binding state of site y in agent A ranges over free, B@y, and C@y.
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=63
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=37
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2356,7 +2356,7 @@ Id=22
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent B ranges over free and A@x.
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=61
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2372,12 +2372,12 @@ Id=47
 EXTENSIONAL DESCRIPTION:
 The internal state of site y in agent B ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=67
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=53
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -2388,12 +2388,12 @@ Id=56
 EXTENSIONAL DESCRIPTION:
 The binding state of site y in agent B ranges over free and A@y.
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=63
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=37
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2420,7 +2420,7 @@ Id=22
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent C ranges over free and A@x.
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=61
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2436,12 +2436,12 @@ Id=47
 EXTENSIONAL DESCRIPTION:
 The internal state of site y in agent C ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=67
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=53
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -2452,12 +2452,12 @@ Id=56
 EXTENSIONAL DESCRIPTION:
 The binding state of site y in agent C ranges over free and A@y.
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=63
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=37
    Node(site_type:0<2)
     Id=1
      Leaf True 
