@@ -5,20 +5,6 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-rule_id:0 E: x:R@x
-rule_id:0 R: x:E@x
-rule_id:1 E: x:free
-rule_id:1 R: x:free
-rule_id:2 R: c:R@c
-rule_id:2 R: c:R@c
-rule_id:3 R: c:free
-rule_id:3 R: c:free
-rule_id:4 R: cr:R@n
-rule_id:4 R: n:R@cr
-rule_id:5 R: cr:free
-rule_id:5 R: n:free
-rule_id:6 R: cr:free
-rule_id:6 R: n:free
 
 ------------------------------------------------------------
 * Dead rules :

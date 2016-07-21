@@ -434,18 +434,6 @@ Influence_map:Wake_up_map:rule(1):'r1' A(y~u),C(x)->A(y~p!1),C(x!1) -> rule(4):'
 Influence_map:Wake_up_map:rule(2):'r2' B(x!_,y),D(x)->B(x!_,y!1),D(x!1) -> rule(4):'r4' D(x!_,y!_,z),A(x!_,y!_,z)->D(x!_,y!_,z!1),A(x!_,y!_,z!1)[1->0]
 Influence_map:Wake_up_map:rule(3):'r3' C(x!_,y),D(y)->C(x!_,y!1),D(y!1) -> rule(4):'r4' D(x!_,y!_,z),A(x!_,y!_,z)->D(x!_,y!_,z!1),A(x!_,y!_,z!1)[1->0]
 Reachability analysis...
-rule_id:0 A: x:p
-rule_id:0 A: x:B@x
-rule_id:0 B: x:A@x
-rule_id:1 A: y:p
-rule_id:1 A: y:C@x
-rule_id:1 C: x:A@y
-rule_id:2 B: y:D@x
-rule_id:2 D: x:B@y
-rule_id:3 C: y:D@y
-rule_id:3 D: y:C@y
-rule_id:4 D: z:A@z
-rule_id:4 A: z:D@z
 
 ------------------------------------------------------------
 * Dead rules :

@@ -5,13 +5,6 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-rule_id:0 A: x:u
-rule_id:0 A: x:B@x
-rule_id:0 B: x:A@x
-rule_id:0 B: x:u
-rule_id:2 B: x:free
-rule_id:2 B: x:p
-rule_id:3 B: x:p
 	Views in initial state
 
 			A(x!B@x)

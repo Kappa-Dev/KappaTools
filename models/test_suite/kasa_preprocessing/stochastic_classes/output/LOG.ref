@@ -406,14 +406,6 @@ Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)-> -> rule(5):'r5' E(y~p)
 Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 Reachability analysis...
-rule_id:0 A: x:p
-rule_id:0 A: y:p
-rule_id:1 B: x:u
-rule_id:1 B: y:u
-rule_id:2 C: x:p
-rule_id:3 D: x:u
-rule_id:3 D: y:u
-rule_id:8 A: z:p
 
 	Applying rule 1: r1:
 		the precondition is satisfied

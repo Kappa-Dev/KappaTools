@@ -445,20 +445,6 @@ Influence_map:Inhibition_map:rule(4):'r4' A(x)-> -> rule(7):'r7' A(x,y),C(x)->A(
 Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'r4' A(x)->[0->0]
 Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x)->A(x!1),B(x!1) -> rule(7):'r7' A(x,y),C(x)->A(x,y!1),C(x!1)[0->0]
 Reachability analysis...
-rule_id:0 A: x:u
-rule_id:0 A: y:u
-rule_id:0 A: x:free
-rule_id:0 A: y:free
-rule_id:1 A: x:B@x
-rule_id:1 B: x:A@x
-rule_id:2 A: x:free
-rule_id:2 A: y:C@x
-rule_id:2 C: x:A@y
-rule_id:5 A: x:free
-rule_id:6 A: x:B@x
-rule_id:6 B: x:A@x
-rule_id:7 A: y:C@x
-rule_id:7 C: x:A@y
 
 	Applying rule 0: r0:
 		the precondition is satisfied

@@ -259,7 +259,7 @@ let collect_site_modified parameter error kappa_handler rule_id rule store_resul
                       (agent_id, agent_type, site_type, state)
                       store_set
                   in
-                  let error, (agent, site, state) =
+                  (*let error, (agent, site, state) =
                     Site_accross_bonds_domain_type.convert_single
                       parameter error kappa_handler 
                       (agent_type, site_type, state)
@@ -269,7 +269,7 @@ let collect_site_modified parameter error kappa_handler rule_id rule store_resul
                       "rule_id:%i %s: %s:%s\n"
                       (Ckappa_sig.int_of_rule_id rule_id)
                       agent site state
-                  in
+                  in*)
                   error, store_set
                )
                agent.Cckappa_sig.agent_interface

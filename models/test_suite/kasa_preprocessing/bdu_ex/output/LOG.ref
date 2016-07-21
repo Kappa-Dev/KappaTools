@@ -111,9 +111,6 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(1):'x' A(x~u)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
 Reachability analysis...
-rule_id:0 A: x:u
-rule_id:1 A: x:p
-rule_id:2 A: y:p
 
 	Applying rule 0: create:
 		the precondition is satisfied

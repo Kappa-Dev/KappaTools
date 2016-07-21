@@ -90,8 +90,6 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(2):'App' A(x~p?,y~p?)[0->0]
 Influence_map:Inhibition_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(0):'Auu' A(x~u?,y~u?)[0->0]
 Reachability analysis...
-rule_id:0 A: x:p
-rule_id:0 A: y:p
 
 ------------------------------------------------------------
 * Dead rules :

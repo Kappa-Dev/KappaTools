@@ -242,10 +242,6 @@ Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(1):'' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Reachability analysis...
-rule_id:0 A: x:B@x
-rule_id:0 B: x:A@x
-rule_id:1 A: x:free
-rule_id:2 B: x:free
 
 ------------------------------------------------------------
 * Dead rules :
