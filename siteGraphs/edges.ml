@@ -1,6 +1,11 @@
 type agent = int * int
 (** agent_id * agent_type *)
 
+let print_agent ?sigs f (id,ty) =
+  match sigs with
+  | None -> Format.pp_print_int f id
+  | Some sigs -> Format.fprintf f "%a_%i" (Signature.print_agent sigs) ty id
+
 module Edge = struct
   type t = agent * int
   (** agent * site *)
@@ -322,13 +327,24 @@ let debug_print f graph =
 type path = ((agent * int) * (agent * int)) list
 (** ((agent_id, agent_name),site_name) *)
 
-let rec print_path ?sigs ?graph f = function
+let aux_print_site ?sigs ty f i =
+  match sigs with
+  | None -> Format.pp_print_int f i
+  | Some sigs -> Signature.print_site sigs ty f i
+let rec print_path ?sigs f = function
   | [] -> Pp.empty_set f
-  | [((p,_),s),((p',_),s')] -> Format.fprintf f "%i.%i@,-%i.%i" p s s' p'
-  | (((p,_),s),((p',_),s'))::((((p'',_),_),_)::_ as l) ->
-    Format.fprintf f "%i.%i@,-%i.%t%a" p s s'
-      (fun f -> if p' <> p'' then Format.fprintf f "%i##" p')
-      (print_path ?sigs ?graph) l
+  | [((_,ty as ag),s),((_,ty' as ag'),s')] ->
+    Format.fprintf f "%a.%a@,-%a.%a"
+      (print_agent ?sigs) ag (aux_print_site ?sigs ty) s
+      (aux_print_site ?sigs ty') s' (print_agent ?sigs) ag'
+  | (((_,ty as ag),s),((p',ty' as ag'),s'))::((((p'',_),_),_)::_ as l) ->
+    Format.fprintf f "%a.%a@,-%a.%t%a"
+      (print_agent ?sigs) ag (aux_print_site ?sigs ty) s
+      (aux_print_site ?sigs ty') s'
+      (fun f ->
+         if p' <> p'' then Format.fprintf f "%a##" (print_agent ?sigs) ag')
+      (print_path ?sigs) l
+
 let empty_path = []
 let singleton_path n s n' s' = [(n,s),(n',s')]
 let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l

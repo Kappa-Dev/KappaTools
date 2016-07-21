@@ -3,6 +3,9 @@
 type agent = int * int
 (** agent_id * agent_type *)
 
+val print_agent :
+  ?sigs:Signature.s -> Format.formatter -> agent -> unit
+
 type t
 
 val empty : unit -> t
@@ -50,7 +53,7 @@ val empty_path : path
 val singleton_path : agent -> int -> agent -> int -> path
 val rev_path : path -> path
 val print_path :
-  ?sigs:Signature.s -> ?graph:t -> Format.formatter -> path -> unit
+  ?sigs:Signature.s -> Format.formatter -> path -> unit
 
 val are_connected :
   ?candidate:path -> Signature.s -> t -> agent list -> agent list ->
