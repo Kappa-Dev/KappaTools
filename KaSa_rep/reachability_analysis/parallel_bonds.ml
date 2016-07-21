@@ -586,11 +586,15 @@ struct
        store_value *)
     (* if one elt is non realisable then output None, otherwise output Some
        precondition *)
-    let bool =
+    let error, bool =
       begin
-        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.for_all
-          (fun (x, y) ->
-             let pair = Parallel_bonds_type.project2 (x, y) in
+        let rec scan list error =
+          match
+            list
+          with
+          | [] -> error, true
+          | head::tail ->
+             let pair = Parallel_bonds_type.project2 head in
              let error, value =
                match
                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
@@ -602,13 +606,24 @@ struct
                | error, Some v -> error, v
              in
              match value with
-             | Usual_domains.Undefined | Usual_domains.Val false -> false
-             | Usual_domains.Val true | Usual_domains.Any -> true
-          ) parallel_set
-      end
-      &&
-      begin
-        List.for_all (fun (x, y, z, t) ->
+             | Usual_domains.Undefined | Usual_domains.Val false -> error, false
+             | Usual_domains.Val true | Usual_domains.Any -> scan tail error
+        in
+        let error, bool1 =
+          scan
+            (Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.elements parallel_set)
+            error
+        in
+        if not bool1
+        then
+          error, false
+        else
+          let rec scan list error =
+            match
+              list
+            with
+            | [] -> error, true
+            | (x, y, z, t)::tail ->
             let (_, agent_type, site_type, state) = x in
             let (_, agent_type1, site_type1, state1) = y in
             let (_, agent_type', site_type', state') = z in
@@ -627,9 +642,10 @@ struct
               | error, Some v -> error, v
             in
             match value with
-            | Usual_domains.Undefined | Usual_domains.Val true -> false
-            | Usual_domains.Val false | Usual_domains.Any -> true
-          ) non_parallel_list
+            | Usual_domains.Undefined | Usual_domains.Val true -> error, false
+            | Usual_domains.Val false | Usual_domains.Any -> scan tail error
+          in
+          scan non_parallel_list error
       end
     in
     if bool
