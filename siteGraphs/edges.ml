@@ -338,17 +338,17 @@ let is_valid_path graph l =
 (* depth = number of edges between root and node *)
 let breadth_first_traversal
     ~looping dist stop_on_find is_interesting sigs links cache out todos =
-  let rec look_each_site (id,ty,path as x) site (out,next as acc) =
+  let rec look_each_site ((id,_ as ag),path as x) site (out,next as acc) =
     if site = 0 then Some (false,out,next) else
       match (Mods.DynArray.get links id).(pred site) with
       | None -> look_each_site x (pred site) acc
-      | Some ((id',ty' as ag'),site') ->
+      | Some ((id',_ as ag'),site' as y) ->
         if ag' = fst looping  && site' <> snd looping then None
         else if Cache.test cache id' then look_each_site x (pred site) acc
         else
           let () = Cache.mark cache id' in
-          let path' = ((ag',site'),((id,ty),pred site))::path in
-          let next' = (id',ty',path')::next in
+          let path' = (y,(ag,pred site))::path in
+          let next' = (ag',path')::next in
           let out',store =
             match is_interesting ag' with
             | Some x -> ((x,id'),path')::out,true
@@ -356,7 +356,7 @@ let breadth_first_traversal
           if store&&stop_on_find then Some (true,out',next')
           else look_each_site x (pred site) (out',next') in
   let rec aux depth out next = function
-    | (_,ty,_ as x)::todos ->
+    | ((_,ty),_ as x)::todos ->
       (match look_each_site x (Signature.arity sigs ty) (out,next) with
        | None -> []
        | Some (stop,out',next') ->
@@ -382,7 +382,7 @@ let paths_of_interest
     | None -> []
     | Some x -> [(x,start_point),done_path] in
   breadth_first_traversal ~looping None false is_interesting sigs graph.connect
-    graph.cache acc [start_point,start_ty,done_path]
+    graph.cache acc [(start_point,start_ty),done_path]
 
 (* nodes_x: agent_id list = (int * int) list
    nodes_y: adent_id list = int list *)
@@ -399,9 +399,9 @@ let are_connected
   | Some p when dist = None && not store_dist && is_valid_path graph p -> Some p
   | (Some _ | None) ->
     let prepare =
-      List.fold_left (fun acc (id,ty)  ->
+      List.fold_left (fun acc (id,_ as ag) ->
           let () = Cache.mark graph.cache id in
-          (id,ty,[])::acc) [] nodes_x in
+          (ag,[])::acc) [] nodes_x in
     match breadth_first_traversal ~looping:((-1,-1),-1) dist true is_in_nodes_y
             sigs graph.connect graph.cache [] prepare
     with [] -> None
