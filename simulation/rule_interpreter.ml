@@ -9,7 +9,8 @@ type t =
     tokens: Nbr.t array;
     outdated_elements:
       Operator.DepSet.t *
-      (Edges.agent * ((Connected_component.Set.t*int) * Edges.path) list) list
+      (((Connected_component.Set.t*int) * Edges.path) list
+       * ((Connected_component.Set.t*int) * Edges.path) list) list
       * bool;
     story_machinery :
       (((bool*bool*bool)*bool) *
@@ -362,7 +363,11 @@ let update_edges
         List.fold_left
           (fun (unary_cands,_ as acc) (cc,root) ->
              if Connected_component.Set.mem cc unary_ccs then
-               (root,[(Connected_component.Set.singleton cc,fst root),
+               let oths =
+                 Edges.paths_of_interest ~looping:((-1,-1),-1)
+                   (potential_root_of_unary_ccs unary_ccs edges'')
+                   sigs edges'' root (Edges.empty_path) in
+               (oths,[(Connected_component.Set.singleton cc,fst root),
                       Edges.empty_path])::unary_cands,false
              else acc) (unary_cands,no_unary') new_obs in
       if path = None && exists_root_of_unary_ccs unary_ccs roots''
@@ -376,7 +381,12 @@ let update_edges
                  (potential_root_of_unary_ccs unary_ccs edges'')
                  sigs edges'' cn (Edges.singleton_path cn s cn' s') with
              | [] -> acc
-             | l -> (cn',l) :: unary_cands,false)
+             | l ->
+               let l' =
+                 Edges.paths_of_interest ~looping:(cn,s)
+                   (potential_root_of_unary_ccs unary_ccs edges'')
+                   sigs edges'' cn' (Edges.singleton_path cn' s' cn s) in
+               (l',l) :: unary_cands,false)
           unary_pack rule.Primitives.fresh_bindings
       else unary_pack in
   (*Store event*)
@@ -426,10 +436,10 @@ let extra_outdated_var i state =
    outdated_elements =
      (Operator.DepSet.add (Operator.ALG i) deps,unary_cands,no_unary)}
 
-let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
+let new_unary_instances rule_id cc1 cc2 created_obs state =
   let (unary_candidates,unary_pathes) =
     List.fold_left
-      (fun acc (restart,l) ->
+      (fun acc (left_l,right_l) ->
          List.fold_left
            (fun acc ((ccs,id),path) ->
               let path = Edges.rev_path path in
@@ -443,20 +453,19 @@ let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
                        then cc1,true
                        else raise Not_found in
                      List.fold_left
-                       (fun (cands,pathes) (((),d),p) ->
-                          if reverse
-                          then add_candidate cands pathes rule_id d id p
-                          else add_candidate cands pathes rule_id id d p)
+                       (fun (cands,pathes as acc') ((x,d),p) ->
+                          if Connected_component.Set.exists
+                              (fun x -> Connected_component.is_equal_canonicals x goal)
+                              x then
+                            let p' = List.rev_append p path in
+                            if reverse
+                            then add_candidate cands pathes rule_id d id p'
+                            else add_candidate cands pathes rule_id id d p'
+                          else acc')
                        acc
-                       (Edges.paths_of_interest
-                          ~looping:((-1,-1),-1)
-                          (fun x ->
-                             if Connected_component.Matching.is_root_of state.edges x goal
-                             then Some ()
-                             else None)
-                          sigs state.edges restart path)
+                       left_l
                    with Not_found -> acc)
-                ccs acc) acc l)
+                ccs acc) acc right_l)
       (state.unary_candidates,state.unary_pathes) created_obs in
   {state with unary_candidates = unary_candidates;
               unary_pathes = unary_pathes }
@@ -507,7 +516,6 @@ let update_outdated_activities ~get_alg store env counter state =
            | Some (unrate, _) ->
              let state' =
                new_unary_instances
-                 (Environment.signatures env)
                  i rule.Primitives.connected_components.(0)
                  rule.Primitives.connected_components.(1) unary_cands state in
              let va =
