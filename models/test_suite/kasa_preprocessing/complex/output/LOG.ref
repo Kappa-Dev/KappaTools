@@ -469,6 +469,22 @@ Influence_map:Inhibition_map:rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y)[0*->0];[0->1]
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0*->1]
 Reachability analysis...
+rule_id:0 A: x:B@x
+rule_id:0 A: y:B@y
+rule_id:0 B: x:A@x
+rule_id:0 B: y:A@y
+rule_id:1 A: x:free
+rule_id:1 A: y:free
+rule_id:1 B: x:free
+rule_id:1 B: y:free
+rule_id:2 B: x:C@x
+rule_id:2 B: y:C@y
+rule_id:2 C: x:B@x
+rule_id:2 C: y:B@y
+rule_id:3 B: x:C@x
+rule_id:3 B: y:C@y
+rule_id:3 C: x:free
+rule_id:3 C: y:free
 
 ------------------------------------------------------------
 * Dead rules :

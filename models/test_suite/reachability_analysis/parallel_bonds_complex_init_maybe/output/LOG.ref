@@ -460,6 +460,18 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p)->A(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
+rule_id:0 A: x:p
+rule_id:1 B: x:p
+rule_id:2 A: z:B@z
+rule_id:2 B: z:A@z
+rule_id:3 A: t:B@t
+rule_id:3 B: t:A@t
+rule_id:4 A: z:B@z
+rule_id:4 B: z:A@z
+rule_id:5 A: t:B@t
+rule_id:5 B: t:A@t
+rule_id:6 A: x:u
+rule_id:7 B: x:u
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:

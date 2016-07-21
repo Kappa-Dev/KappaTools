@@ -578,9 +578,14 @@ struct
     in
     (*-----------------------------------------------------------*)
     let store_value = get_value dynamic in
-    (* JF: you should check that for all element of parallel_list the corresponding parallel bond in that list is realisable in store_value *)
-    (* and you should check that for all element of non_parallel_list the corresponding non parallel bond in that list is realisable in store_value *)
-    (* if one elt is non realisable then output None, otherwise output Some precondition *)
+    (* JF: you should check that for all element of parallel_list the
+       corresponding parallel bond in that list is realisable in
+       store_value *)
+    (* and you should check that for all element of non_parallel_list the
+       corresponding non parallel bond in that list is realisable in
+       store_value *)
+    (* if one elt is non realisable then output None, otherwise output Some
+       precondition *)
     (* You shall not fold over store_value *)
     let error, dynamic, op =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold

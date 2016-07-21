@@ -862,6 +862,32 @@ Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(6):'r6' C(x~p!1),A(
 Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(7):'r7' C(x!_)->[0->0]
 Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0*->1];[0->0]
 Reachability analysis...
+rule_id:0 A: x:u
+rule_id:0 A: y:u
+rule_id:0 A: x:free
+rule_id:0 A: y:free
+rule_id:1 B: x:u
+rule_id:1 B: y:u
+rule_id:1 B: x:free
+rule_id:1 B: y:free
+rule_id:2 C: x:u
+rule_id:2 C: y:u
+rule_id:2 C: x:free
+rule_id:2 C: y:free
+rule_id:4 A: x:B@x
+rule_id:4 B: x:p
+rule_id:4 B: x:A@x
+rule_id:5 A: x:C@x
+rule_id:5 C: x:p
+rule_id:5 C: x:A@x
+rule_id:6 A: x:p
+rule_id:9 A: y:B@y
+rule_id:9 B: y:p
+rule_id:9 B: y:A@y
+rule_id:10 A: y:C@y
+rule_id:10 C: y:p
+rule_id:10 C: y:A@y
+rule_id:11 A: y:p
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -2470,12 +2496,6 @@ The internal state of site x in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and A.x is equal to C@x,u when A.x is connected to A.x
-
-
- A.y and A.x is equal to C@y,u when A.y is connected to A.x
-
-
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

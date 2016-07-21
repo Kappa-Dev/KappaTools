@@ -527,6 +527,20 @@ Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> var(3)
 Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(4):'Cuu' C(x1~u?,x2~u?)[0->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
 Reachability analysis...
+rule_id:0 A: x:B@x
+rule_id:0 B: x:A@x
+rule_id:1 A: x:free
+rule_id:1 B: x:free
+rule_id:2 A: c:C@x1
+rule_id:2 C: x1:A@c
+rule_id:3 C: x1:p
+rule_id:3 C: x1:free
+rule_id:3 A: c:free
+rule_id:4 A: c:C@x2
+rule_id:4 C: x2:A@c
+rule_id:5 A: c:free
+rule_id:5 C: x2:p
+rule_id:5 C: x2:free
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:

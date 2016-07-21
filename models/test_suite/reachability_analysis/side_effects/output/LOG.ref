@@ -629,6 +629,28 @@ Influence_map:Inhibition_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
 Reachability analysis...
+rule_id:0 A: x:u
+rule_id:0 A: x:free
+rule_id:1 B: x:u
+rule_id:1 B: x:free
+rule_id:2 C: x:u
+rule_id:2 C: x:free
+rule_id:3 D: x:u
+rule_id:3 D: x:free
+rule_id:4 E: x:u
+rule_id:4 E: x:free
+rule_id:6 A: x:B@x
+rule_id:6 B: x:p
+rule_id:6 B: x:A@x
+rule_id:7 A: x:C@x
+rule_id:7 C: x:p
+rule_id:7 C: x:A@x
+rule_id:8 A: x:p
+rule_id:10 D: x:p
+rule_id:10 D: x:E@x
+rule_id:10 E: x:p
+rule_id:10 E: x:D@x
+rule_id:11 D: x:free
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -1885,18 +1907,6 @@ The internal state of site x in agent E ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and A.x is equal to u,u when A.x is connected to A.x
-
-
- A.x and D.x is equal to u,E@x when A.x is connected to D.x
-
-
- A.x and A.x is equal to C@x,u when A.x is connected to A.x
-
-
- E.x and A.x is equal to D@x,u when E.x is connected to A.x
-
-
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

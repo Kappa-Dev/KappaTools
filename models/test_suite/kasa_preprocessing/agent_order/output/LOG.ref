@@ -155,6 +155,10 @@ Influence_map:Inhibition_map:rule(0):'bind' A(x),B(x)->A(x!1),B(x!1) -> rule(1):
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(0):'bind' A(x),B(x)->A(x!1),B(x!1)[1->0]
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(1):'remove' A(x),A(x)->A(x),B(x),A(x)[1->0]
 Reachability analysis...
+rule_id:0 A: x:B@x
+rule_id:0 B: x:A@x
+rule_id:1 B: x:free
+rule_id:1 A: x:free
 
 	Applying rule 1: remove:
 		the precondition is not satisfied yet

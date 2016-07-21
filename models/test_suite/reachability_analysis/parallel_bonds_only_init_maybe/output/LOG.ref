@@ -219,6 +219,10 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Inhibition_map:rule(0):'r0' A(z,t),B(z,t)->A(z!1,t),B(z!1,t) -> rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1)[0->0];[1->1]
 Influence_map:Inhibition_map:rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1) -> rule(0):'r0' A(z,t),B(z,t)->A(z!1,t),B(z!1,t)[0->0];[1->1]
 Reachability analysis...
+rule_id:0 A: z:B@z
+rule_id:0 B: z:A@z
+rule_id:1 A: t:B@t
+rule_id:1 B: t:A@t
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -342,22 +346,32 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:1<1)
+Id=25
+ Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=16
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
+  Id=24
+   Node(site_type:0<2)
+    Id=23
+     Node(site_type:1<1)
       Id=0
        Leaf False 
 
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
+      Id=22
+       Node(site_type:1<2)
+        Id=21
+         Node(site_type:2<1)
+          Id=1
+           Leaf True 
+
+          Id=20
+           Node(site_type:2<2)
+            Id=0
+             Leaf False 
+
+            Id=1
+             Leaf True 
 
         Id=0
          Leaf False 
@@ -366,18 +380,18 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(z!A@z,t!free)
+			B(~,z!A@z)
 
 	Wake-up rules
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
-Id=23
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=22
+  Id=26
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -409,12 +423,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=36
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=16
+  Id=35
    Node(site_type:1<2)
     Id=5
      Node(site_type:2<0)
@@ -437,6 +451,36 @@ EXTENSIONAL DESCRIPTION:
 
 	Wake-up rules
 		Updating the views for B(z!,t!)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=36
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=35
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z!A@z,t!free)
+
+	Wake-up rules
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -447,12 +491,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=23
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=22
+  Id=26
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -485,4 +529,12 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-execution finished without any exception
+Some exceptions have been raisederror: file_name: Boolean_mvbdu; message: line 947; exception:Exit
+error: file_name: setMap.ml; message: line 659; exception:Not_found
+error: file_name: views_domain; message: line 598; exception:Exit
+error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
+error: file_name: Handler; message: line 194; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Handler; message: line 206; exception:Exit
+error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
+error: file_name: Handler; message: line 228; exception:Exit

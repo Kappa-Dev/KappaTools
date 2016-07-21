@@ -5,6 +5,13 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+rule_id:0 A: x:u
+rule_id:0 A: x:B@x
+rule_id:0 B: x:A@x
+rule_id:0 B: x:u
+rule_id:2 B: x:free
+rule_id:2 B: x:p
+rule_id:3 B: x:p
 	Views in initial state
 
 			A(x!B@x)
@@ -133,19 +140,14 @@ The binding state of site x in agent B ranges over free and A@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and A.x is equal to u,u when A.x is connected to A.x
-
-
- A.x and A.x is equal to u,B@x when A.x is connected to A.x
-
-
  A.x and B.x is equal to u,u when A.x is connected to B.x
-
-
- B.x and A.x is equal to A@x,u when B.x is connected to A.x
+In agent A, the internal state of site x, and the binding state of site x, are entangled by the following 2-d relationship:
+	A(x~u,x!B@x)
 
 
  B.x and A.x is equal to u,u when B.x is connected to A.x
+In agent B, the binding state of site x, and the internal state of site x, are entangled by the following 2-d relationship:
+	B(x!free,x~p)
 
 
 ------------------------------------------------------------

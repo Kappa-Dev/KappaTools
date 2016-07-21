@@ -5,6 +5,28 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+rule_id:1 A: a1:p
+rule_id:2 A: a2:p
+rule_id:3 A: a1:u
+rule_id:4 A: a2:u
+rule_id:5 A: b1:p
+rule_id:6 A: b2:p
+rule_id:7 A: b1:u
+rule_id:8 A: b2:u
+rule_id:9 A: c1:p
+rule_id:10 A: c2:p
+rule_id:11 A: c1:u
+rule_id:12 A: c2:u
+rule_id:13 A: d1:p
+rule_id:14 A: d2:p
+rule_id:15 A: d1:u
+rule_id:16 A: d2:u
+rule_id:17 A: e1:p
+rule_id:18 A: e2:p
+rule_id:19 A: e1:u
+rule_id:20 A: e2:u
+rule_id:21 A: g:p
+rule_id:22 A: g:u
 
 ------------------------------------------------------------
 * Dead rules :
@@ -291,6 +313,28 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+rule_id:1 A: a1:p
+rule_id:2 A: a2:p
+rule_id:3 A: a1:u
+rule_id:4 A: a2:u
+rule_id:5 A: b1:p
+rule_id:6 A: b2:p
+rule_id:7 A: b1:u
+rule_id:8 A: b2:u
+rule_id:9 A: c1:p
+rule_id:10 A: c2:p
+rule_id:11 A: c1:u
+rule_id:12 A: c2:u
+rule_id:13 A: d1:p
+rule_id:14 A: d2:p
+rule_id:15 A: d1:u
+rule_id:16 A: d2:u
+rule_id:17 A: e1:p
+rule_id:18 A: e2:p
+rule_id:19 A: e1:u
+rule_id:20 A: e2:u
+rule_id:21 A: g:p
+rule_id:22 A: g:u
 
 ------------------------------------------------------------
 * Dead rules :

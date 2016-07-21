@@ -5,4 +5,16 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+rule_id:0 A: x:u
+rule_id:0 A: y:u
+rule_id:0 A: z:u
+rule_id:1 A: x:p
+rule_id:2 A: y:p
+rule_id:3 A: x:0
+rule_id:3 A: z:q
+rule_id:4 A: x:q
+rule_id:5 A: y:q
+rule_id:6 A: z:q
+rule_id:7 A: x:1
+rule_id:7 A: y:0
 execution finished without any exception

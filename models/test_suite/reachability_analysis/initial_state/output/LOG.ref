@@ -152,6 +152,9 @@ Influence_map:Wake_up_map:rule(0):'' A(x~u,y~u)->A(x~p,y~u) -> rule(2):'' A(x~p,
 Influence_map:Inhibition_map:rule(0):'' A(x~u,y~u)->A(x~p,y~u) -> rule(1):'' A(x~u,y~u)->A(x~u,y~p)[0->0]
 Influence_map:Inhibition_map:rule(1):'' A(x~u,y~u)->A(x~u,y~p) -> rule(0):'' A(x~u,y~u)->A(x~p,y~u)[0->0]
 Reachability analysis...
+rule_id:0 A: x:p
+rule_id:1 A: y:p
+rule_id:2 D: x:u
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
