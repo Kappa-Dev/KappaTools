@@ -2,11 +2,14 @@ module type Interface =
 sig
   type mixture              (* not necessarily connected, fully specified *)
   type chemical_species     (* connected, fully specified *)
+  type canonic_species     (* chemical species in canonic form *)
   type pattern              (* not necessarity connected, maybe partially specified *)
   type connected_component  (* connected, maybe partially specified *)
 
   val dummy_chemical_species: chemical_species
+  val dummy_canonic_species: canonic_species
   val print_chemical_species: Format.formatter -> chemical_species -> unit
+  val print_canonic_species: Format.formatter -> canonic_species -> unit
 
   type connected_component_id
   val print_connected_component_id: Format.formatter -> connected_component_id -> unit
@@ -14,7 +17,7 @@ sig
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
   val nbr_automorphisms_in_pattern: pattern -> int
 
-  val canonic_form: chemical_species -> chemical_species
+  val canonic_form: chemical_species -> canonic_species
 
   val connected_components_of_patterns:
     pattern -> (connected_component_id * connected_component) list
@@ -37,6 +40,8 @@ sig
 
   val binary_rule_that_can_be_applied_in_a_unary_context: rule -> bool
   val lhs: rule -> pattern
+  val token_vector:
+    rule -> ((connected_component,string) Ast.ast_alg_expr Location.annot *  string Location.annot) list
 
   val print_rule_id: Format.formatter -> rule_id -> unit
   val rule_id: rule -> rule_id
@@ -58,9 +63,11 @@ end
       network ->
       'a * (species_id, 'b) Ast.ast_alg_expr Location.annot
     val convert_initial_state:
-    'a * (I.connected_component, 'b) Ast.ast_alg_expr Location.annot * (I.mixture, 'c) Ast.init_t ->
-    network ->
-    'a * (species_id, 'b) Ast.ast_alg_expr Location.annot * (species_id, 'd) Ast.ast_alg_expr
+    'a * (I.connected_component, 'b) Ast.ast_alg_expr Location.annot *
+              (I.mixture, 'c) Ast.init_t ->
+              network ->
+              'a * (species_id, 'b) Ast.ast_alg_expr Location.annot *
+              (species_id, 'c) Ast.ast_alg_expr
     val species_of_species_id: network -> int -> I.chemical_species
     val get_reactions: network -> (species_id list * species_id list * I.rule) list
 end
