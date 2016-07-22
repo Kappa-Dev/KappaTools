@@ -25,6 +25,8 @@ type variable =
   | Tend
   | InitialStep
   | Num_t_points
+  | Rate of int
+  | Unary_rate of int
 
 type ('a,'b) network_handler =
   {
@@ -44,6 +46,11 @@ val print_ode_preamble:
   unit
 
 val declare_global: Loggers.t -> string -> unit
+val print_options: Loggers.t -> unit
+val print_license_check: Loggers.t -> unit
+val print_integrate: Loggers.t -> unit
+val print_interpolate: Loggers.t -> int -> int -> unit
+val print_dump_plots: Loggers.t -> unit
 
 val initialize: Loggers.t -> variable -> unit
 val associate: Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr -> ('a,'b) network_handler -> unit

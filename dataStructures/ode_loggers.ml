@@ -25,6 +25,8 @@ type variable =
   | Tend
   | InitialStep
   | Num_t_points
+  | Rate of int
+  | Unary_rate of int
 
 type ('a,'b) network_handler =
   {
@@ -45,6 +47,13 @@ let shall_I_do_it format filter_in filter_out =
   in
   b1 && (not (List.mem format filter_out))
 
+
+let print_list logger l =
+  List.iter
+    (fun s ->
+       let () = Loggers.fprintf logger "%s" s in Loggers.print_newline logger)
+    l
+
 let print_ode_preamble
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
@@ -58,21 +67,16 @@ let print_ode_preamble
     with
     | Loggers.Matlab  | Loggers.Octave ->
       begin
-        let () = Loggers.fprintf logger "function main=()" in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;" in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% " in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% init - the initial abundances of each species and token" in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% tinit - the initial simulation time (likely 0)" in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% tend - the final simulation time " in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% initialstep - initial time step at the beginning of numerical integration" in
-        let () = Loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%% num_t_point - the number of time points to return" in
+        let () = print_list logger
+            [
+              "function main=()";
+              "%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
+              "%% ";
+              "%% init - the initial abundances of each species and token";
+              "%% tinit - the initial simulation time (likely 0)";
+              "%% tend - the final simulation time ";
+              "%% initialstep - initial time step at the beginning of numerical integration";
+              "%% num_t_point - the number of time points to return"] in
         let () = Loggers.print_newline logger in
         ()
       end
@@ -252,33 +256,194 @@ let print_comment
     | Loggers.TXT_Tabular
     | Loggers.XLS -> ()
 
+
+
+let print_options logger =
+  let format = Loggers.get_encoding_format logger in
+  match
+    format
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () =
+      print_list logger
+        ["options = odeset('RelTol', 1e-3, ...";
+         "                 'AbsTol', 1e-3, ...";
+         "                 'InitialStep', initialstep, ...";
+         "                 'MaxStep', tend, ...";
+         "                 'Jacobian', @ode_jacobian);"] in
+    let () = Loggers.print_newline logger in
+    ()
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
+let print_license_check logger =
+  let format = Loggers.get_encoding_format logger in
+  match
+    format
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () = print_list logger
+        [
+          "uiIsOctave = false;";
+          "uiIsMatlab = false;";
+          "LIC = license('inuse');";
+          "for elem = 1:numel(LIC)";
+          "    envStr = LIC(elem).feature";
+          "    if strcmpi(envStr,'octave')";
+          "       LICname=envStr;";
+          "       uiIsOctave = true;";
+          "       break";
+          "    end";
+          "    if strcmpi(envStr,'matlab')";
+          "       LICname=envStr";
+          "       uiIsMatlab = true;";
+          "       break";
+          "    end";
+          "end";]
+    in Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
+let print_integrate logger =
+  let format = Loggers.get_encoding_format logger in
+  match
+    format
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () =
+      print_list logger
+        [
+          "if uiIsMatlab";
+          "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);";
+          "   soln.y=soln.y';";
+          "elseif uiIsOctave";
+          "   soln = ode2r(@mode_aux,[tinit tend],ode_init(),options);";
+          "end";]
+    in
+    let () = Loggers.print_newline logger in
+    ()
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
+let print_interpolate logger nobs nvar =
+  let format = Loggers.get_encoding_format logger in
+  match
+    format
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () =
+      print_list logger
+        [
+          "t = linspace(tinit, tend, num_t_point+1);";
+          "nrows = length(soln.x);";
+          "nobs = "^(string_of_int nobs)^";";
+          "nfragments ="^(string_of_int nvar)^";";
+          "tmp = zeros(nvar,1)";
+          "obs = zeros (nrows,nobs);";
+          "";
+          "for j=1:nrows";
+          "    for i=1:nvar";
+          "        z(i)=soln.y(j,i);";
+          "    end";
+          "    h=ode_obs(z);";
+          "    for i=1:nobs";
+          "        obs(j,i)=h(i);";
+          "    end";
+          "end";
+          "if nobs==1";
+          "   y = interp1(soln.x, obs, t, 'pchip')';";
+          "else   y = interp1(soln.x, obs, t, 'pchip');";
+          "end"
+        ]
+    in Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
+let print_dump_plots logger  =
+  let format = Loggers.get_encoding_format logger in
+  match
+    format
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () =
+      print_list logger
+        [
+          "filename = 'matlab_kappa.data';";
+          "fid = fopen (filename,'w');";
+          "for j=1:num_t_point+1";
+          "    fprintf(fid,'%f',t(j));";
+          "    for i=1:nobs";
+          "        fprintf(fid,' %f',y(j,i));";
+          "    end";
+          "    fprintf(fid,'\n');";
+          "end";
+          "fclose(fid);"]
+    in Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
 let open_procedure logger name name' arg =
   let format = Loggers.get_encoding_format logger in
-    match
-      format
-    with
-    | Loggers.Matlab
-    | Loggers.Octave ->
-      let () = Loggers.fprintf logger "function %s=%s(" name name' in
-      let _ =
-        List.fold_left
-          (fun bool s ->
-             let () =
-               Loggers.fprintf logger "%s%s" (if bool then "," else "") s
-             in true)
-          false
-          arg
-      in
-      let () = Loggers.fprintf logger ")" in
-      Loggers.print_newline logger
-    | Loggers.Maple -> ()
-    | Loggers.DOT
-    | Loggers.HTML_Graph
-    | Loggers.HTML
-    | Loggers.HTML_Tabular
-    | Loggers.TXT
-    | Loggers.TXT_Tabular
-    | Loggers.XLS -> ()
+  match
+    format
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () = Loggers.fprintf logger "function %s=%s(" name name' in
+    let _ =
+      List.fold_left
+        (fun bool s ->
+           let () =
+             Loggers.fprintf logger "%s%s" (if bool then "," else "") s
+           in true)
+        false
+        arg
+    in
+    let () = Loggers.fprintf logger ")" in
+    Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
 
 let return _ _  = ()
 let close_procedure logger =
