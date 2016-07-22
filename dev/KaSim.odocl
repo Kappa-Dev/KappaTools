@@ -11,6 +11,8 @@ Buffers
 Infinite_buffers
 Circular_buffers
 Loggers
+Graph_loggers
+Ode_loggers
 
 Nbr
 NamedDecls

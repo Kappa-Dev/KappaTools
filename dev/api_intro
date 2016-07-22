@@ -8,7 +8,7 @@ The folder dataStructures/ has a transparent name. You can find there:
 Some pretty printing utilities are here too:
 {!modules: Pp Pp_svg Pp_html}
 Including the KaSa machinery:
-{!modules: Loggers}
+{!modules: Loggers Graph_loggers Ode_loggers}
 
 
 In term/ directory stands all definitions the simulator works on.

@@ -17,7 +17,8 @@
   * under the terms of the GNU Library General Public License *)
 
 type encoding =
-  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
+  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
+  | Matlab | Maple
 type t
 
 val refresh_id: t -> unit

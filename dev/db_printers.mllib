@@ -20,6 +20,7 @@ Circular_buffers
 Infinite_buffers
 Loggers
 Graph_loggers
+ODE_loggers
 
 Pp_html
 Pp_svg
@@ -151,6 +152,8 @@ Edges
 Trace
 Expr_interpreter
 Rule_interpreter
+
+Odes
 
 Debug
 Raw_printers

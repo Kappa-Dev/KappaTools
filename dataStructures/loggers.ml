@@ -18,7 +18,8 @@
 
 module StringMap = Map.Make (struct type t = string let compare = compare end)
 type encoding =
-  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
+  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
+  | Matlab | Maple
 
 type token =
   | String of string
@@ -35,7 +36,7 @@ let breakable x =
     x
   with
   | HTML_Tabular | HTML | HTML_Graph | TXT -> true
-  | DOT | TXT_Tabular | XLS -> false
+  | Matlab | Octave | Maple | DOT | TXT_Tabular | XLS -> false
 
 type t =
   {
@@ -133,6 +134,7 @@ let end_of_line_symbol logger =
     logger.encoding
   with
   | HTML | HTML_Graph -> "<Br>"
+  | Matlab | Octave | Maple
   | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
 
@@ -200,7 +202,7 @@ let print_cell logger s =
     with
     | HTML_Tabular -> "<TD>","</TD>"
     | TXT_Tabular -> "","\t"
-    | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
+    | Matlab | Octave | Maple | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
@@ -222,7 +224,7 @@ let close_logger logger =
       fprintf logger "</div>\n</body>\n"
     | HTML_Tabular ->
       fprintf logger "</TABLE>\n</div>\n</body>"
-    | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
+    | Matlab | Octave | Maple  | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
   in
   let () = flush_logger logger in
   ()
@@ -235,7 +237,7 @@ let print_preamble logger =
     fprintf logger "<body>\n<div>\n"
   | HTML_Tabular ->
     fprintf logger "<body>\n<div>\n<TABLE>\n"
-  | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
+  | Matlab | Octave | Maple | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
@@ -291,14 +293,14 @@ let open_row logger =
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>"
-  | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
+  | Matlab | Octave | Maple | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
   match
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>@."
-  | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+  | Matlab | Octave | Maple | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =
   match

@@ -471,3 +471,4 @@ end
 
 
 let dummy () = ()
+let _ = Ode_loggers.initialize
