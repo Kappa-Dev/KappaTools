@@ -538,6 +538,37 @@ struct
     let network = convert_var_defs compil network in
     network
 
+  let export_network logger network =
+    let handler =
+      {
+        Ode_loggers.int_of_obs = (fun _  -> 0) ;
+        Ode_loggers.int_of_kappa_instance = (fun _  -> 0) ;
+        Ode_loggers.int_of_token_id = (fun _ -> 0) ;
+      }
+    in
+    let () = Ode_loggers.open_procedure logger "main" "main" [] in
+    let () = Ode_loggers.print_ode_preamble logger () in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.associate logger Ode_loggers.Tinit (Ast.CONST Nbr.zero) handler in
+    let () =
+      Ode_loggers.associate logger Ode_loggers.Tend
+        (Ast.CONST (Nbr.F
+                      (match (*!KaSim.maxTimeValue *) Some 6.
+                       with None -> 1.
+                          | Some f -> f)))
+        handler
+    in
+    let () = Ode_loggers.associate logger Ode_loggers.InitialStep
+        (Ast.CONST (Nbr.F 0.000001)) handler in
+    let () = Ode_loggers.associate logger Ode_loggers.Num_t_points
+        (Ast.CONST (Nbr.I (*!KaSim.pointNumberValue*) 100)) handler in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.print_license_check logger in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.print_options logger in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.close_procedure logger in
+    ()
 
 
   let species_of_species_id network =

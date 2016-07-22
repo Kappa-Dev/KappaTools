@@ -22,4 +22,5 @@
        ((I.connected_component, string) Ast.ast_alg_expr Location.annot *
         ode_var_id  Location.annot) list  * I.rule) list
 
+    val export_network: Loggers.t -> network -> unit
   end
