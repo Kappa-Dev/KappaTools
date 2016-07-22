@@ -63,7 +63,6 @@ end
     type var_id = int
     type network
 
-    val compute_reactions: I.rule list -> I.chemical_species list -> network
     val convert_var_def:
       'a * (I.connected_component, 'b) Ast.ast_alg_expr Location.annot ->
       network ->
@@ -74,6 +73,8 @@ end
               network ->
               'a * (var_id, 'b) Ast.ast_alg_expr Location.annot *
               (var_id, 'c) Ast.ast_alg_expr
+
+    val network_from_compil: I.compil -> network
     val species_of_species_id: network -> int -> I.chemical_species
     val get_reactions:
       network -> (var_id list * var_id list * ((I.connected_component, string) Ast.ast_alg_expr Location.annot *
