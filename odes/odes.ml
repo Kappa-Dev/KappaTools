@@ -48,6 +48,13 @@ sig
   val apply: rule -> embedding_forest -> mixture  -> mixture
   val lift_species: chemical_species -> mixture
 
+
+  type compil
+  val get_rules: compil -> rule list
+  val get_initial_state: compil ->
+    (string Location.annot option *
+     (mixture,string) Ast.ast_alg_expr Location.annot *
+     (mixture,string) Ast.init_t Location.annot) list
 end
 
 
@@ -267,6 +274,7 @@ struct
         to_be_visited
       with
       | []   -> network
+
       | new_species::to_be_visited ->
         (* add in store the embeddings from cc of lhs to new_species,
            for unary application of binary rule, the dictionary of species is updated, and the reaction entered directly *)
@@ -468,7 +476,25 @@ struct
     | Ast.INIT_TOK token ->
       Ast.TOKEN_ID token
 
+  let species_of_initial_state =
+    List.fold_left
+      (fun list (_,_,(b,_)) ->
+         match b with
+         | Ast.INIT_MIX b ->
+           begin
+             List.fold_left
+               (fun list a -> a::list)
+               list
+               (I.connected_components_of_mixture b)
+           end
+         | Ast.INIT_TOK _ -> list)
+      []
 
+  let network_from_compil compil =
+    let rules = I.get_rules compil in
+    let initial_state = species_of_initial_state (I.get_initial_state compil) in
+    let network = compute_reactions rules initial_state in
+    network
 
 
 

@@ -49,6 +49,12 @@ sig
   val apply: rule -> embedding_forest -> mixture  -> mixture
   val lift_species: chemical_species -> mixture
 
+  type compil
+  val get_rules: compil -> rule list
+  val get_initial_state: compil ->
+    (string Location.annot option *
+     (mixture,string) Ast.ast_alg_expr Location.annot *
+     (mixture,string) Ast.init_t Location.annot) list
 end
 
 
