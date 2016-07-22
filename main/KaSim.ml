@@ -1,7 +1,6 @@
 let usage_msg =
   "KaSim "^Version.version_string^":\n"^
     "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
-let () = Odes.dummy () 
 let backtrace = ref false
 
 let tmp_var_name = ref ""

@@ -198,7 +198,7 @@ doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 debug:
 	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte dev/db_printers.cma
 
-all: bin/KaSim bin/KaSa bin/KaStor
+all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
 
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete

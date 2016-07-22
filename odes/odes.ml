@@ -1,64 +1,4 @@
-module type Interface =
-sig
-  type mixture              (* not necessarily connected, fully specified *)
-  type chemical_species     (* connected, fully specified *)
-  type canonic_species     (* chemical species in canonic form *)
-  type pattern              (* not necessarity connected, maybe partially specified *)
-  type connected_component  (* connected, maybe partially specified *)
-
-  val dummy_chemical_species: chemical_species
-  val dummy_canonic_species: canonic_species
-
-  val print_chemical_species: Format.formatter -> chemical_species -> unit
-  val print_canonic_species: Format.formatter -> canonic_species -> unit
-  type connected_component_id
-  val print_connected_component_id: Format.formatter -> connected_component_id -> unit
-
-  val nbr_automorphisms_in_chemical_species: chemical_species -> int
-  val nbr_automorphisms_in_pattern: pattern -> int
-
-  val canonic_form: chemical_species -> canonic_species
-
-  val connected_components_of_patterns:
-    pattern -> (connected_component_id * connected_component) list
-
-  val connected_components_of_mixture:
-    mixture -> chemical_species list
-
-  type embedding (* the domain is connected *)
-  type embedding_forest (* the domain may be not connected *)
-  val lift_embedding: embedding -> embedding_forest
-  val find_embeddings: connected_component -> chemical_species -> embedding list
-  val find_embeddings_unary_binary:
-    pattern -> chemical_species -> embedding_forest list
-  val disjoint_union:
-    (connected_component * embedding * chemical_species) list ->
-    pattern * embedding_forest * mixture
-
-  type rule
-  type rule_id
-
-  val binary_rule_that_can_be_applied_in_a_unary_context: rule -> bool
-  val lhs: rule -> pattern
-  val token_vector:
-    rule -> ((connected_component,string) Ast.ast_alg_expr Location.annot *  string Location.annot) list
-  val print_rule_id: Format.formatter -> rule_id -> unit
-  val rule_id: rule -> rule_id
-
-  val apply: rule -> embedding_forest -> mixture  -> mixture
-  val lift_species: chemical_species -> mixture
-
-
-  type compil
-  val get_rules: compil -> rule list
-  val get_initial_state: compil ->
-    (string Location.annot option *
-     (mixture,string) Ast.ast_alg_expr Location.annot *
-     (mixture,string) Ast.init_t Location.annot) list
-end
-
-
-module Make(I:Interface) =
+module Make(I:Ode_interface.Interface) =
 struct
 
   module SpeciesSetMap =
@@ -87,15 +27,16 @@ struct
   module StoreMap = Store.Map
 
   type id = int
-  type var_id = id
+  type ode_var_id = id
   type intro_coef_id = id
   type rule_coef_id = id
-  type decl_id = id
+  type var_id = id
   let fst_id = 0
   let next_id id = id + 1
 
   type ode_var = Nembed of I.canonic_species | Token of string | Dummy
   type lhs_decl = Init_decl | Var_decl of string | Init_value of ode_var
+
 
   module VarSetMap =
     SetMap.Make
@@ -113,14 +54,18 @@ struct
 
   type network =
     {
-      variables : VarSet.t ;
+      ode_variables : VarSet.t ;
       species_tab: I.chemical_species Mods.DynArray.t ;
-      vars_tab: ode_var Mods.DynArray.t ;
-      id_of_var: id VarMap.t ;
+      ode_vars_tab: ode_var Mods.DynArray.t ;
+      id_of_ode_var: id VarMap.t ;
       reactions: (id list * id list * ((I.connected_component,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * I.rule) list ;
-      fresh_var_id: id ;
-      declarations: (ode_var * (I.chemical_species,string) Ast.ast_alg_expr Location.annot) Mods.DynArray.t ;
+      fresh_ode_var_id: id ;
+      (*declarations: (ode_var * (I.chemical_species,string) Ast.ast_alg_expr Location.annot) Mods.DynArray.t ;*)
       fresh_rule_coef_id: id;
+      varmap: var_id Mods.StringMap.t ;
+      fresh_var_id: var_id ;
+      var_declaration: (var_id * string Location.annot * (ode_var_id, string) Ast.ast_alg_expr Location.annot) list ;
+
     }
 
   let fold_left_swap f a b =
@@ -128,32 +73,36 @@ struct
       (fun a b -> f b a)
       b a
 
+  let get_compil = I.get_compil
   let init () =
     {
       reactions = [] ;
-      variables = VarSet.empty ;
-      vars_tab = Mods.DynArray.create 0 Dummy ;
-      id_of_var = VarMap.empty ;
+      ode_variables = VarSet.empty ;
+      ode_vars_tab = Mods.DynArray.create 0 Dummy ;
+      id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0 I.dummy_chemical_species ;
-      fresh_var_id = fst_id ;
+      fresh_ode_var_id = fst_id ;
       fresh_rule_coef_id = fst_id ;
-      declarations = Mods.DynArray.create 0 (Dummy, Location.dummy_annot (Ast.CONST Nbr.zero)) ;
+      fresh_var_id = fst_id ;
+      (*  declarations = Mods.DynArray.create 0 (Dummy, Location.dummy_annot (Ast.CONST Nbr.zero)) ;*)
+      varmap = Mods.StringMap.empty ;
+      var_declaration = [];
     }
 
   let is_known_variable variable network =
-    VarSet.mem variable network.variables
+    VarSet.mem variable network.ode_variables
 
   let add_new_var var network =
-    let () = Mods.DynArray.set network.vars_tab network.fresh_var_id var in
+    let () = Mods.DynArray.set network.ode_vars_tab network.fresh_ode_var_id var in
     { network
       with
-        variables = VarSet.add var network.variables ;
-        id_of_var = VarMap.add var network.fresh_var_id network.id_of_var ;
-        fresh_var_id = next_id network.fresh_var_id
-    }, network.fresh_var_id
+        ode_variables = VarSet.add var network.ode_variables ;
+        id_of_ode_var = VarMap.add var network.fresh_ode_var_id network.id_of_ode_var ;
+        fresh_ode_var_id = next_id network.fresh_ode_var_id
+    }, network.fresh_ode_var_id
 
   let add_new_canonic_species canonic species network =
-    let () = Mods.DynArray.set network.species_tab network.fresh_var_id species in
+    let () = Mods.DynArray.set network.species_tab network.fresh_ode_var_id species in
     add_new_var (Nembed canonic) network
 
   let add_new_token token network =
@@ -182,7 +131,7 @@ struct
     StoreMap.add key new_list store
 
   let translate_canonic_species canonic species remanent =
-    let id_opt = VarMap.find_option (Nembed canonic) (snd remanent).id_of_var in
+    let id_opt = VarMap.find_option (Nembed canonic) (snd remanent).id_of_ode_var in
     match
       id_opt
     with
@@ -197,7 +146,7 @@ struct
     translate_canonic_species (I.canonic_form species) species remanent
 
   let translate_token token remanent =
-    let id_opt = VarMap.find_option (Token token) (snd remanent).id_of_var in
+    let id_opt = VarMap.find_option (Token token) (snd remanent).id_of_ode_var in
     match id_opt with
     | None ->
       let to_be_visited, network = remanent in
@@ -405,7 +354,7 @@ struct
          | Token _ | Dummy -> alg
 
       )
-      network.id_of_var
+      network.id_of_ode_var
       ((Ast.CONST (Nbr.I 0)))
 
   let rec convert_alg_expr alg network =
@@ -416,8 +365,21 @@ struct
       Ast.BIN_ALG_OP (op, convert_alg_expr arg1 network, convert_alg_expr arg2 network),loc
     | Ast.UN_ALG_OP (op, arg),loc ->
       Ast.UN_ALG_OP (op, convert_alg_expr arg network),loc
-    | Ast.KAPPA_INSTANCE connected_component, loc ->
-      convert_cc connected_component network, loc
+    | Ast.KAPPA_INSTANCE pattern, loc ->
+      let cc = I.connected_components_of_patterns pattern in
+      begin
+        match cc with
+        | [] -> Ast.CONST Nbr.zero
+        | (_,h)::t ->
+          List.fold_left
+            (fun expr (_,h) ->
+            Ast.BIN_ALG_OP
+              (Operator.MULT,
+               Location.dummy_annot expr,
+               Location.dummy_annot (convert_cc h network)))
+            (convert_cc h network)
+            t
+      end, loc
     | Ast.TOKEN_ID a, loc -> Ast.TOKEN_ID a, loc
     | Ast.OBS_VAR a, loc -> Ast.OBS_VAR a, loc
     | Ast.CONST a , loc -> Ast.CONST a, loc
@@ -427,6 +389,85 @@ struct
   let convert_var_def variable_def network =
     let a,b = variable_def in
     a,convert_alg_expr b network
+
+  let convert_var_defs compil network =
+    let list = I.get_variables compil in
+    let list, network =
+      List.fold_left
+        (fun (list,network) def ->
+         let a,b = convert_var_def def network in
+         (network.fresh_var_id,a,b)::list,
+         {network with fresh_var_id = next_id (network.fresh_var_id)})
+      ([],network)
+      list
+    in
+    let npred = Mods.DynArray.create network.fresh_var_id 0 in
+    let lsucc = Mods.DynArray.create network.fresh_var_id [] in
+    let dec_tab = Mods.DynArray.create network.fresh_var_id (Location.dummy_annot "",Location.dummy_annot (Ast.CONST Nbr.zero)) in
+    let add_succ i j =
+      let () = Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
+      let () = Mods.DynArray.set lsucc i (j::(Mods.DynArray.get lsucc i)) in
+      ()
+    in
+    let () =
+      List.iter
+        (fun (id,a,b) ->
+           let () = Mods.DynArray.set dec_tab id (a,b) in
+           let rec aux expr =
+             match expr with
+             | Ast.CONST _,_ -> ()
+             | Ast.BIN_ALG_OP (_,a,b),_ -> (aux a;aux b)
+             | Ast.UN_ALG_OP (_,a),_ -> aux a
+             | Ast.STATE_ALG_OP _,_ -> ()
+             | Ast.OBS_VAR string,_ ->
+               let id' = Mods.StringMap.find_option string network.varmap in
+               begin
+                 match id' with Some id' -> add_succ id' id
+                              | None -> ()
+               end
+             | Ast.TOKEN_ID _,_ -> ()
+             | Ast.KAPPA_INSTANCE _,_ -> ()
+           in
+           aux b)
+        list
+    in
+    let top_sort =
+      let clean k to_be_visited =
+        let l = Mods.DynArray.get lsucc k in
+        List.fold_left
+          (fun to_be_visited j ->
+             let old = Mods.DynArray.get npred j in
+             let () = Mods.DynArray.set npred j (old-1) in
+             if old = 1 then j::to_be_visited else to_be_visited)
+          to_be_visited l
+      in
+      let to_be_visited =
+        let rec aux k l =
+          if k < fst_id
+          then l
+          else
+          if Mods.DynArray.get npred k = 0
+          then
+            aux (k-1) (k::l)
+          else
+            aux (k-1) l
+        in
+        aux (network.fresh_var_id-1) []
+      in
+      let rec aux to_be_visited l =
+        match to_be_visited with
+        | [] -> l
+        | h::t -> aux (clean h t) (h::l)
+      in
+      let l = aux to_be_visited [] in
+      let l =
+        List.rev_map
+          (fun x ->
+             let a,b = Mods.DynArray.get dec_tab x in x,a,b
+          ) l
+      in l
+    in
+    {network with var_declaration = top_sort}
 
   let convert_initial_state intro network =
     let a,b,c = intro in
@@ -494,6 +535,7 @@ struct
     let rules = I.get_rules compil in
     let initial_state = species_of_initial_state (I.get_initial_state compil) in
     let network = compute_reactions rules initial_state in
+    let network = convert_var_defs compil network in
     network
 
 
@@ -505,7 +547,4 @@ struct
 
 end
 
-
-
-let dummy () = ()
 let _ = Ode_loggers.initialize

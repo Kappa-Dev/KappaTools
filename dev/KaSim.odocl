@@ -51,6 +51,10 @@ Priority
 Outputs
 Kappa_files
 
+Ode_interface
+Dummy_interface
+Odes
+
 Analyzer
 Analyzer_headers
 Analyzer_domain_sig

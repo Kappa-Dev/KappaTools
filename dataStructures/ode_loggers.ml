@@ -112,7 +112,9 @@ let initialize logger variable =
 
       let () =
         match variable with
-        | Expr int -> Loggers.fprintf logger "k=zeros(%i,1);" int
+        | Rate int -> Loggers.fprintf logger "k= sparse(%i,2)" int
+        | Unary_rate int -> Loggers.fprintf logger "k= sparse(%i,2)" int
+        | Expr int -> Loggers.fprintf logger "var=zeros(%i,1);" int
         | Init int -> Loggers.fprintf logger "init=zeros(%i,1);" int
         | Deriv int -> Loggers.fprintf logger "dydt=zeros(%i,1);" int
         | Jacobian (int1,int2) -> Loggers.fprintf logger "Jac = sparse(%i,%i);" int1 int2
@@ -123,6 +125,7 @@ let initialize logger variable =
       in
       let () =
         match variable with
+        | Rate _ | Unary_rate _
         | Expr _
         | Init _
         | Deriv _
@@ -190,7 +193,9 @@ let rec print_alg_expr logger alg_expr network =
 
 let string_of_variable var =
   match var with
-  | Expr int -> Printf.sprintf "k(%i)" int
+  | Rate int -> Printf.sprintf "k(%i,1)" int
+  | Unary_rate int -> Printf.sprintf "k(%i,2)" int
+  | Expr int -> Printf.sprintf "var(%i)" int
   | Init int -> Printf.sprintf "init(%i)" int
   | Deriv int -> Printf.sprintf "dydt(%i)" int
   | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
