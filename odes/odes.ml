@@ -64,15 +64,7 @@ struct
   module SpeciesSet = SpeciesSetMap.Set
   module SpeciesMap = SpeciesSetMap.Map
 
-  module CanonicSetMap =
-    SetMap.Make
-      (struct
-        type t = I.canonic_species
-        let compare = compare
-        let print = I.print_canonic_species
-      end)
-  module CanonicSet = CanonicSetMap.Set
-  module CanonicMap = CanonicSetMap.Map
+
   module Store =
     SetMap.Make
       (struct
@@ -88,21 +80,39 @@ struct
   module StoreMap = Store.Map
 
   type id = int
-  type species_id = id
+  type var_id = id
   type intro_coef_id = id
   type rule_coef_id = id
+  type decl_id = id
   let fst_id = 0
   let next_id id = id + 1
+
+  type ode_var = Nembed of I.canonic_species | Token of string | Dummy
+  type lhs_decl = Init_decl | Var_decl of string | Init_value of ode_var
+
+  module VarSetMap =
+    SetMap.Make
+      (struct
+        type t = ode_var
+        let compare = compare
+        let print log x =
+          match x with
+          | Nembed x -> I.print_canonic_species log x
+          | Token x -> Format.fprintf log "%s" x
+          | Dummy -> ()
+      end)
+  module VarSet = VarSetMap.Set
+  module VarMap = VarSetMap.Map
+
   type network =
     {
-      species : CanonicSet.t ;
+      variables : VarSet.t ;
       species_tab: I.chemical_species Mods.DynArray.t ;
-      canonic_tab: I.canonic_species Mods.DynArray.t ;
-      id_of_species: id CanonicMap.t ;
-      reactions: (id list * id list * I.rule) list ;
-      fresh_species_id: id ;
-      declarations: (Ode_loggers.variable * (I.chemical_species,string) Ast.ast_alg_expr Location.annot) list;
-      token_set: Mods.StringSet.t ;
+      vars_tab: ode_var Mods.DynArray.t ;
+      id_of_var: id VarMap.t ;
+      reactions: (id list * id list * ((I.connected_component,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * I.rule) list ;
+      fresh_var_id: id ;
+      declarations: (ode_var * (I.chemical_species,string) Ast.ast_alg_expr Location.annot) Mods.DynArray.t ;
       fresh_rule_coef_id: id;
     }
 
@@ -114,37 +124,33 @@ struct
   let init () =
     {
       reactions = [] ;
-      token_set = Mods.StringSet.empty ;
-      species = CanonicSet.empty ;
-      canonic_tab = Mods.DynArray.create 0 I.dummy_canonic_species ;
-      id_of_species = CanonicMap.empty ;
+      variables = VarSet.empty ;
+      vars_tab = Mods.DynArray.create 0 Dummy ;
+      id_of_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0 I.dummy_chemical_species ;
-      fresh_species_id = fst_id ;
+      fresh_var_id = fst_id ;
       fresh_rule_coef_id = fst_id ;
-      declarations = [];
+      declarations = Mods.DynArray.create 0 (Dummy, Location.dummy_annot (Ast.CONST Nbr.zero)) ;
     }
 
-  let is_known_canonic_species species network =
-    CanonicSet.mem species network.species
+  let is_known_variable variable network =
+    VarSet.mem variable network.variables
 
-  let add_new_canonic_species canonic species network =
-    let () = Mods.DynArray.set network.species_tab network.fresh_species_id species in
-    let () = Mods.DynArray.set network.canonic_tab network.fresh_species_id canonic in
+  let add_new_var var network =
+    let () = Mods.DynArray.set network.vars_tab network.fresh_var_id var in
     { network
       with
-        species = CanonicSet.add canonic network.species ;
-        id_of_species = CanonicMap.add canonic network.fresh_species_id           network.id_of_species ;
+        variables = VarSet.add var network.variables ;
+        id_of_var = VarMap.add var network.fresh_var_id network.id_of_var ;
+        fresh_var_id = next_id network.fresh_var_id
+    }, network.fresh_var_id
 
-        fresh_species_id = next_id network.fresh_species_id
-    },
-    network.fresh_species_id
+  let add_new_canonic_species canonic species network =
+    let () = Mods.DynArray.set network.species_tab network.fresh_var_id species in
+    add_new_var (Nembed canonic) network
 
-  let add_token token network =
-    {
-      network
-      with
-        token_set = Mods.StringSet.add token network.token_set
-    }
+  let add_new_token token network =
+    add_new_var (Token token) network
 
   let enrich_rule rule =
     let lhs = I.lhs rule in
@@ -169,7 +175,7 @@ struct
     StoreMap.add key new_list store
 
   let translate_canonic_species canonic species remanent =
-    let id_opt = CanonicMap.find_option canonic (snd remanent).id_of_species in
+    let id_opt = VarMap.find_option (Nembed canonic) (snd remanent).id_of_var in
     match
       id_opt
     with
@@ -182,6 +188,15 @@ struct
 
   let translate_species species remanent =
     translate_canonic_species (I.canonic_form species) species remanent
+
+  let translate_token token remanent =
+    let id_opt = VarMap.find_option (Token token) (snd remanent).id_of_var in
+    match id_opt with
+    | None ->
+      let to_be_visited, network = remanent in
+      let network, id = add_new_token token network in
+      (to_be_visited, network), id
+    | Some i -> remanent, i
 
   (*  let petrify_canonic_species = translate_canonic_species*)
   let petrify_species species =
@@ -212,26 +227,26 @@ struct
            list_embeddings
       )
       acc prefix_list
+
   let add_reaction rule embedding_forest mixture remanent =
     let remanent, reactants = petrify_mixture mixture remanent in
     let products = I.apply rule embedding_forest mixture in
     let tokens = I.token_vector rule in
     let remanent, products = petrify_mixture products remanent in
+    let remanent, tokens =
+      List.fold_left
+        (fun (remanent, tokens) (a,(b,c)) ->
+           let remanent, id = translate_token b remanent in
+           remanent,(a,(id,c))::tokens)
+        (remanent,[])
+        tokens
+    in
     let to_be_visited, network = remanent in
     let network =
       {
         network
-        with reactions = (List.rev reactants, List.rev products, rule)::network.reactions
+        with reactions = (List.rev reactants, List.rev products, List.rev tokens, rule)::network.reactions
       }
-    in
-    let network =
-      {network
-       with
-        token_set =
-          List.fold_left
-            (fun tokenset (_,(x,_))  -> Mods.StringSet.add x tokenset)
-            network.token_set
-            tokens}
     in
     to_be_visited, network
 
@@ -345,41 +360,44 @@ struct
     snd (translate_species species ([],network))
 
   let convert_cc connected_component network =
-    CanonicMap.fold
-      (fun _ id alg ->
-         let species = Mods.DynArray.get network.species_tab id in
-         let n_embs =
-           List.length
-             (I.find_embeddings connected_component species)
-         in
-         if n_embs = 0
-         then
-           alg
-         else
-           let species = Ast.KAPPA_INSTANCE id in
-           let term =
-             if n_embs = 1
+    VarMap.fold
+      (fun vars id alg ->
+         match vars with
+         | Nembed _ ->
+           begin
+             let species = Mods.DynArray.get network.species_tab id in
+             let n_embs =
+               List.length
+                 (I.find_embeddings connected_component species)
+             in
+             if n_embs = 0
              then
-               species
+               alg
              else
-               Ast.BIN_ALG_OP
-                 (
-                   Operator.MULT,
-                   Location.dummy_annot (Ast.CONST (Nbr.I n_embs)),
-                   Location.dummy_annot species)
-           in
-           match
-             alg
-           with
-           | Ast.CONST (Nbr.I 0) ->  term
-           | _ ->
-             Ast.BIN_ALG_OP
-               (
-                 Operator.SUM,
-                 Location.dummy_annot alg,
-                 Location.dummy_annot term)
+               let species = Ast.KAPPA_INSTANCE id in
+               let term =
+                 if n_embs = 1
+                 then
+                   species
+                 else
+                   Ast.BIN_ALG_OP
+                     (
+                       Operator.MULT,
+                       Location.dummy_annot (Ast.CONST (Nbr.I n_embs)),
+                       Location.dummy_annot species)
+               in
+               if alg = Ast.CONST (Nbr.I 0) then term
+               else
+                 Ast.BIN_ALG_OP
+                   (
+                     Operator.SUM,
+                     Location.dummy_annot alg,
+                     Location.dummy_annot term)
+           end
+         | Token _ | Dummy -> alg
+
       )
-      network.id_of_species
+      network.id_of_var
       ((Ast.CONST (Nbr.I 0)))
 
   let rec convert_alg_expr alg network =
