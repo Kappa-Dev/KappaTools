@@ -289,6 +289,7 @@ let print_site_accross_domain
     ?dump_any:(dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
   let (agent_type, _, _, _, _), (agent_type', _, _, _, _) = tuple in
+  (*state1 and state1' are a binding states*)
    let error, (agent1, site1, site2, state1, state2, agent1', site1', site2', state1', state2') =
     convert_tuple parameters error kappa_handler tuple
   in
@@ -303,11 +304,13 @@ let print_site_accross_domain
             "%s %s.%s and %s.%s is equal to %s,%s \
             when %s.%s is connected to %s.%s\n"
             prefix 
+            (*internal sites are site2*)
+            agent1 site2  agent1' site2'
+            (*its internal states are*)
+            state2 state2'
+            (*when its binding sites*)
             agent1 site1
-            agent1' site1'
-            state1 state1'
-            agent1 site2
-            agent1' site2'            
+            agent1' site1'            
         in
         let error, (handler, translation) =
           Translation_in_natural_language.translate
@@ -318,6 +321,12 @@ let print_site_accross_domain
             ~show_dep_with_dimmension_higher_than:1 parameters
             kappa_handler error agent1 agent_type translation
         in
+        (*Loggers.print_newline (Remanent_parameters.get_logger parameters);
+        let error = 
+          Translation_in_natural_language.print
+            ~show_dep_with_dimmension_higher_than:1 parameters
+            kappa_handler error agent1' agent_type' translation
+        in*)
         Loggers.print_newline (Remanent_parameters.get_logger parameters)
       else 
         Loggers.fprintf (Remanent_parameters.get_logger parameters)

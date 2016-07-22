@@ -692,6 +692,16 @@ The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ A.z and B.z is equal to B@z,A@z when A.t is connected to B.t
+In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+	A(t!B@t,~)
+
+
+ B.z and A.z is equal to A@z,B@z when B.t is connected to A.t
+In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+	B(t!A@t,~)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

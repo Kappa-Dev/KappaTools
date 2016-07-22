@@ -507,11 +507,15 @@ struct
       first site, return the information of its state, result*)
     let store_result = get_value dynamic in
     let handler = get_mvbdu_handler dynamic in
+    let kappa_handler = get_kappa_handler static in
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let error, store_result =
       Site_accross_bonds_domain_static.collect_pair_tuple_init
         parameter
         error
+        bdu_false
         handler
+        kappa_handler
         species
         store_bonds_init
         store_pair_sites_init
@@ -561,22 +565,27 @@ struct
       | error, Some s -> error, s
     in
     (*-----------------------------------------------------------*)
-    (*TO DO*)
-      let error, dynamic, precondition =
+    (*TO DO*) 
+    let prefix = Remanent_parameters.get_prefix parameter in
+    let error, dynamic, precondition =
       (*fold over a pair where the first site is bound and the second site is modified*)
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
            let store_result = get_value dynamic in
            let handler = get_mvbdu_handler dynamic in
+           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
            let pair = Site_accross_bonds_domain_type.project2 (x, y) in
            let ((agent_type, site_type, site_type', state, state'),
                 (agent_type1, site_type1, site_type1', state1, state1')) = pair
            in
-           let error, agent = Handler.translate_agent parameter error kappa_handler agent_type in
            (*-------------------------------------------------------------*)
-           let pair_list = [(site_type, state); (site_type', state')] in
-           (*let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-             let error, bdu_old =
+           (*the first site 1 is indicate for the first agent, and the
+             number 2 for the second agent*)
+           let pair_list = [(Ckappa_sig.site_name_of_int 1, state');
+                            (Ckappa_sig.site_name_of_int 2, state1')] 
+           in
+           (*-----------------------------------------------------------*)
+           let error, bdu_old =
              match
                Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
                  parameter error
@@ -585,18 +594,35 @@ struct
              with
              | error, None -> error, bdu_false
              | error, Some bdu -> error, bdu
-             in*)
+           in
            let error, handler, mvbdu =
              Ckappa_sig.Views_bdu.mvbdu_of_association_list
                parameter handler error pair_list
            in
            (*union*)
-           (*let error, handler, new_bdu =
+           let error, handler, new_bdu =
               Ckappa_sig.Views_bdu.mvbdu_or
                 parameter handler error bdu_old mvbdu
-             in*)
+           in
            (*-------------------------------------------------------------*)
-           (*let _ =
+           (*let error, (agent1, site1, site2, state1, state2, agent1', site1', site2', state1', state2') =
+             Site_accross_bonds_domain_type.convert_tuple parameter error kappa_handler pair
+           in
+           let () =
+             Loggers.fprintf (Remanent_parameters.get_logger parameter)
+               "rule_id:%i %s %s.%s and %s.%s is equal to %s,%s \
+                when %s.%s is connected to %s.%s\n"
+               (Ckappa_sig.int_of_rule_id rule_id)
+               prefix 
+               (*internal sites are site2*)
+               agent1 site2  agent1' site2'
+               (*its internal states are*)
+               state2 state2'
+               (*when its binding sites*)
+               agent1 site1
+               agent1' site1'            
+           in
+           let _ =
              let error, (handler, translation) =
                Translation_in_natural_language.translate
                  parameter handler error (fun _ e i -> e, i) new_bdu
@@ -604,16 +630,16 @@ struct
              let error =
                Translation_in_natural_language.print
                  ~show_dep_with_dimmension_higher_than:1 parameter
-                 kappa_handler error agent agent_type translation
+                 kappa_handler error agent1 agent_type translation
              in
              error
-             in*)
+           in*)
            (*-------------------------------------------------------------*)
            let error, store_result =
              Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
                parameter error
                pair
-               mvbdu
+               new_bdu
                store_result
            in
            let dynamic = set_value store_result dynamic in
@@ -688,7 +714,7 @@ struct
           in*)
         (*--------------------------------------------------------*)
         (*to do*)
-        (*let store_value = get_value dynamic in
+        let store_value = get_value dynamic in
           let error =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.fold
             (fun tuple mvbdu error ->
@@ -698,7 +724,7 @@ struct
                  ~final_resul:true
                  ~dump_any:true parameter error kappa_handler handler tuple mvbdu
             ) store_value error
-          in*)
+          in
         error
       else error
     in

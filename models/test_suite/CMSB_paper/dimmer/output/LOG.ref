@@ -36,6 +36,26 @@ The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ R.cr and R.cr is equal to R@n,R@n when R.c is connected to R.c
+In agent R, the binding state of site c, and the binding state of site cr, are entangled by the following 2-d relationship:
+	R(c!R@c,cr!R@n)
+
+
+ R.cr and R.n is equal to R@n,R@cr when R.c is connected to R.c
+In agent R, the binding state of site c, and the binding state of site cr, are entangled by the following 2-d relationship:
+	R(c!R@c,cr!R@n)
+
+
+ R.n and R.cr is equal to R@cr,R@n when R.c is connected to R.c
+In agent R, the binding state of site c, and the binding state of site cr, are entangled by the following 2-d relationship:
+	R(c!R@c,cr!R@n)
+
+
+ R.n and R.n is equal to R@cr,R@cr when R.c is connected to R.c
+In agent R, the binding state of site c, and the binding state of site cr, are entangled by the following 2-d relationship:
+	R(c!R@c,cr!R@n)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

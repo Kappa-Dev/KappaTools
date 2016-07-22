@@ -803,12 +803,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=51
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=50
    Node(site_type:1<2)
     Id=43
      Node(site_type:2<0)
@@ -871,14 +871,14 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=59
+Id=55
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=58
+  Id=54
    Node(site_type:1<2)
-    Id=57
+    Id=53
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -919,12 +919,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=57
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=56
    Node(site_type:1<2)
     Id=23
      Node(site_type:2<1)
@@ -960,12 +960,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=57
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=56
    Node(site_type:1<2)
     Id=23
      Node(site_type:2<1)
@@ -1039,12 +1039,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=81
+Id=75
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=80
+  Id=74
    Node(site_type:1<1)
     Id=23
      Node(site_type:2<1)

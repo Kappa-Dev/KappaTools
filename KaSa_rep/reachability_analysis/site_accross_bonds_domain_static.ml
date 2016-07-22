@@ -848,7 +848,7 @@ let collect_bonds_init parameter error init_state =
 
 (***************************************************************)
 
-let collect_pair_tuple_init parameter error handler init_state 
+let collect_pair_tuple_init parameter error bdu_false handler kappa_handler init_state 
     store_bonds_init store_pair_sites_init
     store_result =
   (*fold over a set of pair and check the first site whether or not it
@@ -858,16 +858,48 @@ let collect_pair_tuple_init parameter error handler init_state
       (fun (x, y) (error, store_result) ->
          let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
          let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+         (*check the first site belong to the bonds*)
          if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
-              ((agent_id, agent_type, site_type2, state2),
-               (agent_id', agent_type', site_type2', state2'))
+             ((agent_id, agent_type, site_type, state),
+               (agent_id', agent_type', site_type', state'))
               store_bonds_init
          then
-           let pair_list = [(site_type, state); (site_type2, state2)] in
+           (*-----------------------------------------------------------*)
+           (*use the number 1 to indicate for the first agent, and number 2
+             for the second agent*)
+           let pair_list =
+             [(Ckappa_sig.site_name_of_int 1, state2);
+              (Ckappa_sig.site_name_of_int 2, state2')] 
+           in
+           let new_pair_list =
+             List.fold_left (fun current_list (x, y) ->
+                 (x, y) :: current_list
+               ) [] pair_list
+           in
+           let prefix = Remanent_parameters.get_prefix parameter in
            (*test*)
            let pair = Site_accross_bonds_domain_type.project2 (x, y) in
+           let ((agent_type, site_type, site_type', state, state'),
+                (agent_type1, site_type1, site_type1', state1, state1')) = pair
+           in
+           (*let error, (agent1, site1, site2, state1, state2, agent1', site1', site2', state1', state2') =
+             Site_accross_bonds_domain_type.convert_tuple parameter error kappa_handler pair
+           in
+           let () =
+             Loggers.fprintf (Remanent_parameters.get_logger parameter)
+               "%s %s.%s and %s.%s is equal to %s,%s \
+                when %s.%s is connected to %s.%s\n"
+               prefix 
+               (*internal sites are site2*)
+               agent1 site2 agent1' site2'
+               (*its internal states are*)
+               state2 state2'
+               (*when its binding sites*)
+               agent1 site1
+               agent1' site1'            
+           in*)
            (*-----------------------------------------------------------*)
-           (*let error, bdu_old =
+           let error, bdu_old =
              match
                Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
                  parameter error
@@ -876,7 +908,7 @@ let collect_pair_tuple_init parameter error handler init_state
              with
              | error, None -> error, bdu_false
              | error, Some bdu -> error, bdu
-           in*)
+           in
            (*-----------------------------------------------------------*)
            let error, handler, mvbdu =
              Ckappa_sig.Views_bdu.mvbdu_of_association_list
@@ -884,16 +916,16 @@ let collect_pair_tuple_init parameter error handler init_state
            in
            (*-----------------------------------------------------------*)
            (*union*)
-           (*let error, handler, new_bdu =
+           let error, handler, new_bdu =
               Ckappa_sig.Views_bdu.mvbdu_or
                 parameter handler error bdu_old mvbdu
-           in*)
+           in
            (*-----------------------------------------------------------*)
            let error, store_result =
              Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
                parameter error
                pair
-               mvbdu
+               new_bdu
                store_result
            in
            error, store_result

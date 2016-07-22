@@ -588,42 +588,22 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
-Id=52
- Node(site_type:0<1)
+Id=46
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=51
-   Node(site_type:0<2)
-    Id=50
-     Node(site_type:1<0)
+  Id=45
+   Node(site_type:1<1)
+    Id=21
+     Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=49
-       Node(site_type:1<1)
-        Id=48
-         Node(site_type:2<0)
-          Id=1
-           Leaf True 
-
-          Id=47
-           Node(site_type:2<1)
-            Id=46
-             Node(site_type:3<0)
-              Id=1
-               Leaf True 
-
-              Id=45
-               Node(site_type:3<1)
-                Id=0
-                 Leaf False 
-
-                Id=1
-                 Leaf True 
-
-            Id=1
-             Leaf True 
+      Id=20
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
 
         Id=0
          Leaf False 
@@ -632,8 +612,7 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(~,z~u)
-			B(~,z~u,z!free)
+			B(z~u,z!A@z)
 
 	Wake-up rules
 
@@ -646,12 +625,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=54
+Id=46
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=53
+  Id=45
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -687,12 +666,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=60
+Id=59
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=59
+  Id=51
    Node(site_type:1<2)
     Id=29
      Node(site_type:2<1)
@@ -742,19 +721,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=87
+Id=73
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=86
+  Id=72
    Node(site_type:1<1)
-    Id=85
+    Id=71
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=84
+      Id=70
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<1)
@@ -789,57 +768,27 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=105
- Node(site_type:0<1)
-  Id=103
-   Node(site_type:1<1)
-    Id=0
-     Leaf False 
+Id=79
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
 
-    Id=102
-     Node(site_type:1<2)
-      Id=93
-       Node(site_type:2<0)
-        Id=0
-         Leaf False 
-
-        Id=92
-         Node(site_type:2<1)
-          Id=64
-           Node(site_type:3<0)
-            Id=0
-             Leaf False 
-
-            Id=26
-             Node(site_type:3<2)
-              Id=1
-               Leaf True 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
-
+  Id=78
+   Node(site_type:1<2)
+    Id=75
+     Node(site_type:2<0)
       Id=0
        Leaf False 
 
-  Id=104
-   Node(site_type:0<2)
-    Id=19
-     Node(site_type:1<1)
-      Id=0
-       Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=5
-         Node(site_type:2<0)
+      Id=74
+       Node(site_type:2<1)
+        Id=53
+         Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=4
-           Node(site_type:2<1)
+          Id=26
+           Node(site_type:3<2)
             Id=1
              Leaf True 
 
@@ -849,43 +798,12 @@ Id=105
         Id=0
          Leaf False 
 
-    Id=103
-     Node(site_type:1<1)
-      Id=0
-       Leaf False 
-
-      Id=102
-       Node(site_type:1<2)
-        Id=93
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=92
-           Node(site_type:2<1)
-            Id=64
-             Node(site_type:3<0)
-              Id=0
-               Leaf False 
-
-              Id=26
-               Node(site_type:3<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
+    Id=0
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
 			B(z~p,z!free,t~p)
 			B(z~p,z!free,t~u)
-			B(~,z~p,z!free)
 
 	Wake-up rules
 
@@ -938,7 +856,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=55
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -962,23 +880,51 @@ Id=55
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=116
- Node(site_type:0<1)
-  Id=109
-   Node(site_type:1<0)
-    Id=0
-     Leaf False 
+Id=83
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-    Id=108
-     Node(site_type:1<1)
-      Id=93
+  Id=82
+   Node(site_type:1<1)
+    Id=67
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=66
+       Node(site_type:2<1)
+        Id=53
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=26
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=20
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+    Id=81
+     Node(site_type:1<2)
+      Id=80
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=92
-         Node(site_type:2<1)
-          Id=64
+        Id=54
+         Node(site_type:2<2)
+          Id=53
            Node(site_type:3<0)
             Id=0
              Leaf False 
@@ -994,143 +940,15 @@ Id=116
           Id=0
            Leaf False 
 
-      Id=107
-       Node(site_type:1<2)
-        Id=106
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=65
-           Node(site_type:2<2)
-            Id=64
-             Node(site_type:3<0)
-              Id=0
-               Leaf False 
-
-              Id=26
-               Node(site_type:3<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-  Id=115
-   Node(site_type:0<2)
-    Id=114
-     Node(site_type:1<0)
       Id=0
        Leaf False 
-
-      Id=113
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=112
-         Node(site_type:1<2)
-          Id=111
-           Node(site_type:2<0)
-            Id=0
-             Leaf False 
-
-            Id=110
-             Node(site_type:2<1)
-              Id=1
-               Leaf True 
-
-              Id=65
-               Node(site_type:2<2)
-                Id=64
-                 Node(site_type:3<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=26
-                   Node(site_type:3<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=109
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=108
-       Node(site_type:1<1)
-        Id=93
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=92
-           Node(site_type:2<1)
-            Id=64
-             Node(site_type:3<0)
-              Id=0
-               Leaf False 
-
-              Id=26
-               Node(site_type:3<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=107
-         Node(site_type:1<2)
-          Id=106
-           Node(site_type:2<0)
-            Id=0
-             Leaf False 
-
-            Id=65
-             Node(site_type:2<2)
-              Id=64
-               Node(site_type:3<0)
-                Id=0
-                 Leaf False 
-
-                Id=26
-                 Node(site_type:3<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
 
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=117
+Id=84
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1145,12 +963,12 @@ Id=117
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=118
+Id=86
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=74
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1160,22 +978,50 @@ Id=118
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=151
- Node(site_type:-1<1)
-  Id=146
-   Node(site_type:0<0)
-    Id=0
-     Leaf False 
+Id=98
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
 
-    Id=145
-     Node(site_type:0<1)
-      Id=143
+  Id=97
+   Node(site_type:0<1)
+    Id=95
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=94
+       Node(site_type:1<1)
+        Id=37
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=20
+           Node(site_type:2<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=12
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+    Id=96
+     Node(site_type:0<2)
+      Id=49
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=142
-         Node(site_type:1<1)
+        Id=38
+         Node(site_type:1<2)
           Id=37
            Node(site_type:2<0)
             Id=0
@@ -1192,136 +1038,8 @@ Id=151
           Id=0
            Leaf False 
 
-      Id=144
-       Node(site_type:0<2)
-        Id=55
-         Node(site_type:1<0)
-          Id=0
-           Leaf False 
-
-          Id=38
-           Node(site_type:1<2)
-            Id=37
-             Node(site_type:2<0)
-              Id=0
-               Leaf False 
-
-              Id=20
-               Node(site_type:2<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-  Id=150
-   Node(site_type:-1<2)
-    Id=149
-     Node(site_type:0<0)
       Id=0
        Leaf False 
-
-      Id=148
-       Node(site_type:0<1)
-        Id=1
-         Leaf True 
-
-        Id=147
-         Node(site_type:0<2)
-          Id=129
-           Node(site_type:1<0)
-            Id=0
-             Leaf False 
-
-            Id=128
-             Node(site_type:1<1)
-              Id=1
-               Leaf True 
-
-              Id=38
-               Node(site_type:1<2)
-                Id=37
-                 Node(site_type:2<0)
-                  Id=0
-                   Leaf False 
-
-                  Id=20
-                   Node(site_type:2<2)
-                    Id=1
-                     Leaf True 
-
-                    Id=0
-                     Leaf False 
-
-                Id=0
-                 Leaf False 
-
-          Id=0
-           Leaf False 
-
-    Id=146
-     Node(site_type:0<0)
-      Id=0
-       Leaf False 
-
-      Id=145
-       Node(site_type:0<1)
-        Id=143
-         Node(site_type:1<0)
-          Id=0
-           Leaf False 
-
-          Id=142
-           Node(site_type:1<1)
-            Id=37
-             Node(site_type:2<0)
-              Id=0
-               Leaf False 
-
-              Id=20
-               Node(site_type:2<2)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=144
-         Node(site_type:0<2)
-          Id=55
-           Node(site_type:1<0)
-            Id=0
-             Leaf False 
-
-            Id=38
-             Node(site_type:1<2)
-              Id=37
-               Node(site_type:2<0)
-                Id=0
-                 Leaf False 
-
-                Id=20
-                 Node(site_type:2<2)
-                  Id=1
-                   Leaf True 
-
-                  Id=0
-                   Leaf False 
-
-              Id=0
-               Leaf False 
-
-          Id=0
-           Leaf False 
 
 EXTENSIONAL DESCRIPTION:
 In agent B: 
@@ -1330,7 +1048,7 @@ In agent B:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=117
+Id=84
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1346,12 +1064,12 @@ Id=117
 EXTENSIONAL DESCRIPTION:
 The internal state of site t in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=118
+Id=86
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=74
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1362,17 +1080,28 @@ Id=118
 EXTENSIONAL DESCRIPTION:
 The binding state of site z in agent A ranges over free and B@z.
 INTENSIONAL DESCRIPTION:
-Id=1
- Leaf True 
+Id=84
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+The binding state of site z in agent B ranges over free and A@z.
 INTENSIONAL DESCRIPTION:
-Id=118
+Id=86
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=74
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1385,33 +1114,22 @@ The internal state of site z in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ B.z and A.t is equal to u,u when B.z is connected to A.z
+In agent B, the binding state of site z, and the internal state of site t, are entangled by the following 2-d relationship:
+	B(z!free,t~u)
+
+
+ B.z and A.t is equal to p,u when B.z is connected to A.z
+In agent B, the binding state of site z, and the internal state of site t, are entangled by the following 2-d relationship:
+	B(z!A@z,t~u)
+
+
+ B.z and A.t is equal to p,p when B.z is connected to A.z
+In agent B, the binding state of site z, and the internal state of site t, are entangled by the following 2-d relationship:
+	B(z!A@z,t~p)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-Some exceptions have been raisederror: file_name: Boolean_mvbdu; message: line 947; exception:Exit
-error: file_name: Boolean_mvbdu; message: line 947; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
-error: file_name: Boolean_mvbdu; message: line 947; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
+execution finished without any exception
