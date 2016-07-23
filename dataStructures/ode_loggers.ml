@@ -69,7 +69,6 @@ let print_ode_preamble
       begin
         let () = print_list logger
             [
-              "function main=()";
               "%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
               "%% ";
               "%% init - the initial abundances of each species and token";
@@ -85,9 +84,22 @@ let print_ode_preamble
     | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+let string_of_variable var =
+      match var with
+      | Rate int -> Printf.sprintf "k(%i,1)" int
+      | Unary_rate int -> Printf.sprintf "k(%i,2)" int
+      | Expr int -> Printf.sprintf "var(%i)" int
+      | Init int -> Printf.sprintf "init(%i)" int
+      | Deriv int -> Printf.sprintf "dydt(%i)" int
+      | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
+      | Tinit -> Printf.sprintf "tinit"
+      | Tend -> Printf.sprintf "tend"
+      | InitialStep -> Printf.sprintf "initialstep"
+      | Num_t_points -> Printf.sprintf "num_t_point"
+
 let declare_global logger string =
   let format = Loggers.get_encoding_format logger in
-
+  let string = string_of_variable string in
   match
     format
   with
@@ -142,20 +154,24 @@ let initialize logger variable =
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let rec print_alg_expr logger alg_expr network =
+let rec print_alg_expr
+    ?init_mode:(init_mode=false)
+    logger  alg_expr network
+  =
+  let var = if init_mode then "init" else "y" in
   let format = Loggers.get_encoding_format logger in
   match
     format
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
-      match alg_expr with
+      match fst alg_expr with
       | Ast.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
       | Ast.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
       | Ast.CONST (Nbr.F f) -> Loggers.fprintf logger "%f" f
-      | Ast.OBS_VAR x -> Loggers.fprintf logger "k(%i)" (network.int_of_obs x)
-      | Ast.KAPPA_INSTANCE x -> Loggers.fprintf logger "y(%i)" (network.int_of_kappa_instance x)
-      | Ast.TOKEN_ID x -> Loggers.fprintf logger "y(%i)" (network.int_of_token_id x)
+      | Ast.OBS_VAR x -> Loggers.fprintf logger "var(%i)" (network.int_of_obs x)
+      | Ast.KAPPA_INSTANCE x -> Loggers.fprintf logger "%s(%i)" var (network.int_of_kappa_instance x)
+      | Ast.TOKEN_ID x -> Loggers.fprintf logger "%s(%i)" var (network.int_of_token_id x)
       | Ast.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
       | Ast.STATE_ALG_OP (Operator.CPUTIME) -> Loggers.fprintf logger "0"
       | Ast.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
@@ -163,7 +179,7 @@ let rec print_alg_expr logger alg_expr network =
       | Ast.STATE_ALG_OP (Operator.EMAX_VAR) -> Loggers.fprintf logger "event_max"
       | Ast.STATE_ALG_OP (Operator.PLOTNUM) -> Loggers.fprintf logger "num_t_point"
       | Ast.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
-      | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->
+      | Ast.BIN_ALG_OP (op, a, b) ->
         let () = Loggers.fprintf logger "(" in
         let () = print_alg_expr logger a network in
         let string_op =
@@ -174,7 +190,7 @@ let rec print_alg_expr logger alg_expr network =
         let () = print_alg_expr logger b network in
         let () = Loggers.fprintf logger ")" in
         ()
-      | Ast.UN_ALG_OP (op, (a,_)) ->
+      | Ast.UN_ALG_OP (op, a) ->
         let () = Loggers.fprintf logger "(" in
         let string_op =
           match op with
@@ -191,20 +207,7 @@ let rec print_alg_expr logger alg_expr network =
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
-let string_of_variable var =
-  match var with
-  | Rate int -> Printf.sprintf "k(%i,1)" int
-  | Unary_rate int -> Printf.sprintf "k(%i,2)" int
-  | Expr int -> Printf.sprintf "var(%i)" int
-  | Init int -> Printf.sprintf "init(%i)" int
-  | Deriv int -> Printf.sprintf "dydt(%i)" int
-  | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
-  | Tinit -> Printf.sprintf "tinit"
-  | Tend -> Printf.sprintf "tend"
-  | InitialStep -> Printf.sprintf "initialstep"
-  | Num_t_points -> Printf.sprintf "num_t_point"
-
-let associate logger variable alg_expr network =
+let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -212,7 +215,7 @@ let associate logger variable alg_expr network =
   | Loggers.Matlab  | Loggers.Octave ->
     begin
       let () = Loggers.fprintf logger "%s=" (string_of_variable variable) in
-      let () = print_alg_expr logger alg_expr network in
+      let () = print_alg_expr ~init_mode logger alg_expr network in
       let () = Loggers.fprintf logger ";" in
       let () = Loggers.print_newline logger in
       ()
@@ -221,7 +224,7 @@ let associate logger variable alg_expr network =
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let increment logger variable alg_expr network =
+let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -230,7 +233,7 @@ let increment logger variable alg_expr network =
     begin
       let var = string_of_variable variable in
       let () = Loggers.fprintf logger "%s=%s+(" var var in
-      let () = print_alg_expr logger alg_expr network in
+      let () = print_alg_expr ~init_mode logger alg_expr network in
       let () = Loggers.fprintf logger ");" in
       let () = Loggers.print_newline logger in
       ()

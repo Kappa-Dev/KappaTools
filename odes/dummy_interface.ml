@@ -50,7 +50,7 @@ struct
 
   type compil = (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil
   let get_compil () =
-    let files = !FileNames.input in
+    let files = ["essai.ka"] in
     List.fold_left
       (KappaLexer.compile Format.std_formatter) Ast.empty_compil
       files

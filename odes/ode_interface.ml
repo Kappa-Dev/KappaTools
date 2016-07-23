@@ -54,7 +54,7 @@ sig
   val get_rules: compil -> rule list
   val get_initial_state: compil ->
     (string Location.annot option *
-     (mixture,string) Ast.ast_alg_expr Location.annot *
+     (pattern,string) Ast.ast_alg_expr Location.annot *
      (mixture,string) Ast.init_t Location.annot) list
   val get_variables: compil -> (pattern,string) Ast.variable_def list
 

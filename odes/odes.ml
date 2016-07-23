@@ -29,9 +29,8 @@ struct
   type id = int
   type ode_var_id = id
   type intro_coef_id = id
-  type rule_coef_id = id
   type var_id = id
-  let fst_id = 0
+  let fst_id = 1
   let next_id id = id + 1
 
   type ode_var = Nembed of I.canonic_species | Token of string | Dummy
@@ -52,21 +51,35 @@ struct
   module VarSet = VarSetMap.Set
   module VarMap = VarSetMap.Map
 
+  type decl =
+    | Var of (var_id * string Location.annot option * (ode_var_id, string) Ast.ast_alg_expr Location.annot)
+    | Init_expr of var_id * string Location.annot option  * (ode_var_id, string) Ast.ast_alg_expr Location.annot * ode_var_id list
+    | Dummy_decl
+
   type network =
     {
       ode_variables : VarSet.t ;
-      species_tab: I.chemical_species Mods.DynArray.t ;
+      reactions: (id list * id list * ((I.connected_component,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * I.rule) list ;
+
       ode_vars_tab: ode_var Mods.DynArray.t ;
       id_of_ode_var: id VarMap.t ;
-      reactions: (id list * id list * ((I.connected_component,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * I.rule) list ;
       fresh_ode_var_id: id ;
-      (*declarations: (ode_var * (I.chemical_species,string) Ast.ast_alg_expr Location.annot) Mods.DynArray.t ;*)
-      fresh_rule_coef_id: id;
+
+      species_tab: I.chemical_species Mods.DynArray.t ;
+
       varmap: var_id Mods.StringMap.t ;
       fresh_var_id: var_id ;
-      var_declaration: (var_id * string Location.annot * (ode_var_id, string) Ast.ast_alg_expr Location.annot) list ;
-
+      var_declaration: decl list ;
     }
+
+
+  let get_fresh_var_id network = network.fresh_var_id
+  let inc_fresh_var_id network =
+    {network with fresh_var_id = next_id network.fresh_var_id}
+  let get_fresh_ode_var_id network = network.fresh_ode_var_id
+  let inc_fresh_ode_var_id network =
+    {network with fresh_ode_var_id = next_id network.fresh_ode_var_id}
+
 
   let fold_left_swap f a b =
     List.fold_left
@@ -82,9 +95,7 @@ struct
       id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0 I.dummy_chemical_species ;
       fresh_ode_var_id = fst_id ;
-      fresh_rule_coef_id = fst_id ;
       fresh_var_id = fst_id ;
-      (*  declarations = Mods.DynArray.create 0 (Dummy, Location.dummy_annot (Ast.CONST Nbr.zero)) ;*)
       varmap = Mods.StringMap.empty ;
       var_declaration = [];
     }
@@ -93,16 +104,29 @@ struct
     VarSet.mem variable network.ode_variables
 
   let add_new_var var network =
-    let () = Mods.DynArray.set network.ode_vars_tab network.fresh_ode_var_id var in
+    let () =
+      Mods.DynArray.set
+        network.ode_vars_tab
+        (get_fresh_ode_var_id network)
+        var
+    in
+    let network =
     { network
       with
         ode_variables = VarSet.add var network.ode_variables ;
         id_of_ode_var = VarMap.add var network.fresh_ode_var_id network.id_of_ode_var ;
-        fresh_ode_var_id = next_id network.fresh_ode_var_id
-    }, network.fresh_ode_var_id
+    }
+    in
+    inc_fresh_ode_var_id network,
+    get_fresh_ode_var_id network
 
   let add_new_canonic_species canonic species network =
-    let () = Mods.DynArray.set network.species_tab network.fresh_ode_var_id species in
+    let () =
+      Mods.DynArray.set
+        network.species_tab
+        (get_fresh_ode_var_id network)
+        species
+    in
     add_new_var (Nembed canonic) network
 
   let add_new_token token network =
@@ -131,22 +155,29 @@ struct
     StoreMap.add key new_list store
 
   let translate_canonic_species canonic species remanent =
-    let id_opt = VarMap.find_option (Nembed canonic) (snd remanent).id_of_ode_var in
+    let id_opt =
+      VarMap.find_option
+        (Nembed canonic)
+        (snd remanent).id_of_ode_var in
     match
       id_opt
     with
     | None ->
       let to_be_visited, network = remanent in
-      let network, id = add_new_canonic_species canonic species network in
-      (species::to_be_visited,
-       network), id
+      let network, id = add_new_canonic_species canonic species network
+      in
+      (species::to_be_visited,network), id
     | Some i -> remanent,i
 
   let translate_species species remanent =
-    translate_canonic_species (I.canonic_form species) species remanent
+    translate_canonic_species
+      (I.canonic_form species) species remanent
 
   let translate_token token remanent =
-    let id_opt = VarMap.find_option (Token token) (snd remanent).id_of_ode_var in
+    let id_opt =
+      VarMap.find_option
+        (Token token) (snd remanent).id_of_ode_var
+    in
     match id_opt with
     | None ->
       let to_be_visited, network = remanent in
@@ -316,6 +347,9 @@ struct
   let translate_species species network =
     snd (translate_species species ([],network))
 
+  let translate_token token network =
+    snd (translate_token token ([],network))
+
   let convert_cc connected_component network =
     VarMap.fold
       (fun vars id alg ->
@@ -386,24 +420,81 @@ struct
     | Ast.STATE_ALG_OP op,loc ->
       Ast.STATE_ALG_OP op,loc
 
+  let convert_initial_state intro network =
+    let a,b,c = intro in
+    a,
+    convert_alg_expr ((*Location.dummy_annot*) b) network,
+    match
+      fst c
+    with
+    | Ast.INIT_MIX m ->
+      begin
+        let cc = I.connected_components_of_mixture m in
+        let list =
+          List.rev_map
+            (fun x -> translate_species x network)
+            (List.rev cc)
+        in
+        list
+        end
+    | Ast.INIT_TOK token ->
+      [translate_token
+         token
+         network]
+
+
   let convert_var_def variable_def network =
     let a,b = variable_def in
     a,convert_alg_expr b network
 
   let convert_var_defs compil network =
-    let list = I.get_variables compil in
+    let list_var = I.get_variables compil in
     let list, network =
       List.fold_left
         (fun (list,network) def ->
          let a,b = convert_var_def def network in
-         (network.fresh_var_id,a,b)::list,
-         {network with fresh_var_id = next_id (network.fresh_var_id)})
+         (Var (get_fresh_var_id network,Some a,b))::list,
+         inc_fresh_var_id
+           {network with varmap = Mods.StringMap.add (fst a) (get_fresh_var_id network) network.varmap})     
       ([],network)
-      list
+      list_var
     in
-    let npred = Mods.DynArray.create network.fresh_var_id 0 in
-    let lsucc = Mods.DynArray.create network.fresh_var_id [] in
-    let dec_tab = Mods.DynArray.create network.fresh_var_id (Location.dummy_annot "",Location.dummy_annot (Ast.CONST Nbr.zero)) in
+    let list_init = I.get_initial_state compil in
+    let init_tab =
+      Mods.DynArray.make (get_fresh_ode_var_id network) []
+    in
+    let add i j =
+      Mods.DynArray.set
+        init_tab
+        i
+        (j::(Mods.DynArray.get init_tab i))
+    in
+    let list, network =
+      List.fold_left
+        (fun (list,network) def ->
+           let a,b,c = convert_initial_state def network in
+           let () =
+             List.iter
+               (fun id -> add id (get_fresh_var_id network))
+                c
+           in
+           (Init_expr (network.fresh_var_id,a,b,c))::list,
+           (inc_fresh_var_id network)
+        )
+        (list,network)
+        list_init
+    in
+    let size = List.length list in
+    let npred =
+      Mods.DynArray.create (get_fresh_var_id network) 0
+    in
+    let lsucc =
+      Mods.DynArray.create (get_fresh_var_id network) []
+    in
+    let dec_tab =
+      Mods.DynArray.create network.fresh_var_id
+        (Dummy_decl,None,Location.dummy_annot (Ast.CONST Nbr.zero))
+    in
     let add_succ i j =
       let () = Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
       let () = Mods.DynArray.set lsucc i (j::(Mods.DynArray.get lsucc i)) in
@@ -411,25 +502,57 @@ struct
     in
     let () =
       List.iter
-        (fun (id,a,b) ->
-           let () = Mods.DynArray.set dec_tab id (a,b) in
-           let rec aux expr =
-             match expr with
-             | Ast.CONST _,_ -> ()
-             | Ast.BIN_ALG_OP (_,a,b),_ -> (aux a;aux b)
-             | Ast.UN_ALG_OP (_,a),_ -> aux a
-             | Ast.STATE_ALG_OP _,_ -> ()
-             | Ast.OBS_VAR string,_ ->
-               let id' = Mods.StringMap.find_option string network.varmap in
-               begin
-                 match id' with Some id' -> add_succ id' id
-                              | None -> ()
-               end
-             | Ast.TOKEN_ID _,_ -> ()
-             | Ast.KAPPA_INSTANCE _,_ -> ()
-           in
-           aux b)
+        (fun decl ->
+           match decl
+           with
+           | Dummy_decl -> ()
+           | Init_expr (id,a,b,_)
+           | Var (id,a,b) ->
+             begin
+               let () = Mods.DynArray.set dec_tab id (decl,a,b) in
+               let rec aux expr =
+                 match expr with
+                 | Ast.CONST _,_ -> ()
+                 | Ast.BIN_ALG_OP (_,a,b),_ -> (aux a;aux b)
+                 | Ast.UN_ALG_OP (_,a),_ -> aux a
+                 | Ast.STATE_ALG_OP _,_ -> ()
+                 | Ast.OBS_VAR string,_ ->
+                   let id' =
+                     Mods.StringMap.find_option string
+                       network.varmap in
+                   begin
+                     match id' with
+                     | Some id' ->
+                       let _ = Printf.fprintf stdout "SOME\n" in
+                        add_succ id' id
+                     | None ->
+                       let _ = Printf.fprintf stdout "None\n" in ()
+                   end
+                 | Ast.TOKEN_ID _,_ -> ()
+                 | Ast.KAPPA_INSTANCE id',_ ->
+                   let _ = Printf.fprintf stdout "Kappa INstance\n" in
+                   let list =
+                     Mods.DynArray.get
+                       init_tab
+                       id'
+                   in
+                   List.iter (fun id' -> add_succ id id') list
+               in
+               aux b
+             end
+        )
         list
+    in
+    let _ = Printf.fprintf stdout "INIT TAB\n" in
+    let () =
+      Mods.DynArray.iteri (fun i j ->
+          List.iter (fun j -> Printf.fprintf stdout "%i -> %i \n" j i) j) init_tab
+    in
+    let _ = Printf.fprintf stdout "SUCC\n " in
+
+    let () =
+      Mods.DynArray.iteri (fun i j ->
+          List.iter (fun j -> Printf.fprintf stdout "%i -> %i \n" j i) j) lsucc
     in
     let top_sort =
       let clean k to_be_visited =
@@ -456,66 +579,25 @@ struct
       in
       let rec aux to_be_visited l =
         match to_be_visited with
-        | [] -> l
+        | [] -> List.rev l
         | h::t -> aux (clean h t) (h::l)
       in
       let l = aux to_be_visited [] in
       let l =
         List.rev_map
           (fun x ->
-             let a,b = Mods.DynArray.get dec_tab x in x,a,b
+             let decl,_,_ = Mods.DynArray.get dec_tab x in decl
           ) l
       in l
     in
-    {network with var_declaration = top_sort}
+    let size' = List.length top_sort in
+    if size' = size
+    then
+      {network with var_declaration = top_sort}
+    else
+      let () = Printf.fprintf stdout "Circular dependencies\n" in
+      assert false
 
-  let convert_initial_state intro network =
-    let a,b,c = intro in
-    a,
-    convert_alg_expr b network,
-    match
-      c
-    with
-    | Ast.INIT_MIX m ->
-      begin
-        let cc = I.connected_components_of_mixture m in
-        let list =
-          List.rev_map
-            (fun x -> translate_species x network,
-                      I.nbr_automorphisms_in_chemical_species x)
-            cc
-        in
-        match
-          list
-        with
-        | [] ->
-          Ast.CONST (Nbr.zero)
-        | h::t ->
-          let term (singleton, auto) =
-            let species = Ast.KAPPA_INSTANCE singleton in
-            if auto = 1
-            then
-              species
-            else
-              Ast.BIN_ALG_OP
-                (Operator.MULT,
-                 Location.dummy_annot (Ast.CONST (Nbr.I auto)),
-                 Location.dummy_annot species) in
-          let rec aux tail expr =
-            match tail
-            with
-            | [] -> expr
-            | h::t ->
-              aux t
-                (Ast.BIN_ALG_OP
-                   (Operator.SUM,
-                    Location.dummy_annot expr,
-                    Location.dummy_annot (term h)))
-          in aux t (term h)
-
-      end
-    | Ast.INIT_TOK token ->
-      Ast.TOKEN_ID token
 
   let species_of_initial_state =
     List.fold_left
@@ -539,29 +621,97 @@ struct
     network
 
   let export_network logger network =
-    let handler =
+    let handler_expr =
       {
-        Ode_loggers.int_of_obs = (fun _  -> 0) ;
-        Ode_loggers.int_of_kappa_instance = (fun _  -> 0) ;
+        Ode_loggers.int_of_obs = (fun string  -> Mods.StringMap.find_default 0 string network.varmap) ;
+        Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
         Ode_loggers.int_of_token_id = (fun _ -> 0) ;
       }
     in
+    let handler_init =
+      {
+        Ode_loggers.int_of_obs = (fun i  -> i) ;
+        Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
+        Ode_loggers.int_of_token_id = (fun i -> i) ;
+      }
+    in
+    let is_zero = Mods.DynArray.create (get_fresh_ode_var_id network) true in
+    let is_zero x =
+      if Mods.DynArray.get is_zero x
+      then
+        let () = Mods.DynArray.set is_zero x false in
+        true
+      else
+        false
+    in
+    let increment ?init_mode:(init_mode=false) x =
+      if is_zero x
+      then
+        Ode_loggers.associate ~init_mode logger (Ode_loggers.Init x)
+      else
+        Ode_loggers.increment ~init_mode logger (Ode_loggers.Init x)
+    in
+    let affect_var ?init_mode:(init_mode=false) decl =
+      match decl with
+      | Dummy_decl -> ()
+      | Init_expr (id',_comment, expr, list) ->
+        begin
+          match list with
+        | [] -> ()
+        | [a] ->
+          increment ~init_mode a expr handler_expr
+        | _ ->
+        let () = Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id') expr handler_expr in
+        List.iter
+          (fun id ->
+             increment ~init_mode id (Location.dummy_annot (Ast.OBS_VAR (id':int))) handler_init)
+          list
+        end
+      | Var (id,_comment,expr) ->
+        Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
+
+(*  | Init_species (_,id,list) ->
+        Ode_loggers.associate logger (Ode_loggers.Init id)
+          (match list with
+             [] -> Location.dummy_annot (Ast.CONST (Nbr.zero))
+           | [a] -> Location.dummy_annot (Ast.OBS_VAR a)
+           | h::t ->
+             let expr = Location.dummy_annot (Ast.OBS_VAR h)in
+             List.fold_left
+               (fun expr a ->
+                  Location.dummy_annot (
+                    Ast.BIN_ALG_OP (Operator.SUM,
+                                    Location.dummy_annot (Ast.OBS_VAR a),expr)))
+               expr t
+          )
+          handler*)
+    in
+
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
     let () = Ode_loggers.print_ode_preamble logger () in
     let () = Loggers.print_newline logger in
-    let () = Ode_loggers.associate logger Ode_loggers.Tinit (Ast.CONST Nbr.zero) handler in
+    let () = Ode_loggers.associate logger Ode_loggers.Tinit (Location.dummy_annot (Ast.CONST Nbr.zero)) handler_expr in
     let () =
       Ode_loggers.associate logger Ode_loggers.Tend
-        (Ast.CONST (Nbr.F
+        (Location.dummy_annot (Ast.CONST (Nbr.F
                       (match (*!KaSim.maxTimeValue *) Some 6.
                        with None -> 1.
-                          | Some f -> f)))
-        handler
+                          | Some f -> f))))
+        handler_expr
     in
     let () = Ode_loggers.associate logger Ode_loggers.InitialStep
-        (Ast.CONST (Nbr.F 0.000001)) handler in
+        (Location.dummy_annot (Ast.CONST (Nbr.F 0.000001))) handler_expr in
     let () = Ode_loggers.associate logger Ode_loggers.Num_t_points
-        (Ast.CONST (Nbr.I (*!KaSim.pointNumberValue*) 100)) handler in
+        (Location.dummy_annot (Ast.CONST (Nbr.I (*!KaSim.pointNumberValue*) 100))) handler_expr in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.declare_global logger (Ode_loggers.Expr network.fresh_var_id) in
+    let () = Ode_loggers.initialize logger (Ode_loggers.Expr network.fresh_var_id) in
+    let () = Loggers.print_newline logger in
+    let () =
+      List.iter
+        (affect_var ~init_mode:true)
+        network.var_declaration
+    in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.print_license_check logger in
     let () = Loggers.print_newline logger in
@@ -577,5 +727,3 @@ struct
 
 
 end
-
-let _ = Ode_loggers.initialize
