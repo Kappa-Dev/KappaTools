@@ -1,13 +1,13 @@
 module Interface =
 struct
   type mixture = Ast.mixture          (* not necessarily connected, fully specified *)
-  type chemical_species = unit   (* connected, fully specified *)
-  type canonic_species = unit  (* chemical species in canonic form *)
+  type chemical_species = Ast.mixture   (* connected, fully specified *)
+  type canonic_species = int (* chemical species in canonic form *)
   type pattern = Ast.mixture           (* not necessarity connected, maybe partially specified *)
-  type connected_component = unit (* connected, maybe partially specified *)
+  type connected_component = Ast.mixture (* connected, maybe partially specified *)
 
-  let dummy_chemical_species = ()
-  let dummy_canonic_species = ()
+  let dummy_chemical_species = []
+  let dummy_canonic_species = 0
 
   let print_chemical_species _ _ = ()
   let print_canonic_species _ _ = ()
@@ -18,20 +18,20 @@ struct
   let nbr_automorphisms_in_chemical_species _ = 1
   let nbr_automorphisms_in_pattern _ = 1
 
-  let canonic_form _ = ()
+  let canonic_form _ = 1
 
-  let connected_components_of_patterns _ =[0,()]
+  let connected_components_of_patterns _ =[0,[]]
 
-  let connected_components_of_mixture _ = [()]
+  let connected_components_of_mixture _ = [[]]
 
-  type embedding = unit (* the domain is connected *)
-  type embedding_forest = unit (* the domain may be not connected *)
-  let lift_embedding _ = ()
-  let find_embeddings _ _ = [()]
+  type embedding = (int * int) list (* the domain is connected *)
+  type embedding_forest = embedding (* the domain may be not connected *)
+  let lift_embedding x = x
+  let find_embeddings _ _ = [[1,1]]
 
-  let find_embeddings_unary_binary _ _ = [()]
+  let find_embeddings_unary_binary _ _ = [[1,1]]
 
-  let disjoint_union _ = [],(),[]
+  let disjoint_union _ = [],[1,1],[]
 
   type rule = (string Location.annot option * Ast.rule Location.annot)
   type rule_id = int
