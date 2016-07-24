@@ -57,15 +57,17 @@ val declare_global: Loggers.t -> variable -> unit
 val print_options: Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
 val print_integrate: Loggers.t -> unit
-val print_interpolate: Loggers.t -> int -> int -> unit
+val print_interpolate: Loggers.t -> unit
 val print_dump_plots: Loggers.t -> unit
 
 val initialize: Loggers.t -> variable -> unit
 val associate: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val increment: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
-
-
 val associate_nrows: Loggers.t -> unit
+
+val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
+
+val product: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
 
 val print_comment:
   Loggers.t ->

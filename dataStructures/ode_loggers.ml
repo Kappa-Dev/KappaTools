@@ -106,9 +106,9 @@ let string_of_variable var =
   | Tend -> "tend"
   | InitialStep -> "initialstep"
   | Num_t_points -> "num_t_point"
-  | N_ode_var -> "n_ode_var"
-  | N_obs -> "n_obs"
-  | N_rules -> "n_rules"
+  | N_ode_var -> "nodevar"
+  | N_obs -> "nobs"
+  | N_rules -> "nrules"
   | Tmp -> "tmp"
 
 let string_of_array_name var =
@@ -126,9 +126,9 @@ let string_of_array_name var =
   | Tend -> "tend"
   | InitialStep -> "initialstep"
   | Num_t_points -> "num_t_point"
-  | N_ode_var -> "n_ode_var"
-  | N_obs -> "n_obs"
-  | N_rules -> "n_rules"
+  | N_ode_var -> "nodevar"
+  | N_obs -> "nobs"
+  | N_rules -> "nrules"
   | Tmp -> "tmp"
 
 let declare_global logger string =
@@ -282,9 +282,8 @@ let associate_nrows logger =
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
-  let format = Loggers.get_encoding_format logger in
   match
-    format
+    Loggers.get_encoding_format logger
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
@@ -298,6 +297,58 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
   | Loggers.Maple -> ()
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+  let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
+    match
+      Loggers.get_encoding_format logger
+    with
+    | Loggers.Matlab  | Loggers.Octave ->
+      begin
+        let var = string_of_variable var_species in
+        let () = Loggers.fprintf logger "%s=%s%s" var var string in
+        let bool =
+          if nauto_in_species = 1
+          then false
+          else
+            let () = Loggers.fprintf logger "%i" nauto_in_species in
+            true
+        in
+        let bool =
+          if nauto_in_lhs =1
+          then
+            bool
+          else
+            let () =
+              if bool
+              then
+                Loggers.fprintf logger "/%i" nauto_in_lhs
+              else
+                Loggers.fprintf logger "1/%i" nauto_in_lhs
+            in
+            true
+        in
+        let () =
+          if bool
+          then
+            Loggers.fprintf logger "*"
+        in
+        let () = Loggers.fprintf logger "%s" (string_of_variable var_rate) in
+        let () =
+          List.iter
+            (fun var -> Loggers.fprintf logger "*%s" (string_of_variable var))
+                var_list
+        in
+        let () = Loggers.fprintf logger ";" in
+        let () = Loggers.print_newline logger in
+        ()
+      end
+    | Loggers.Maple -> ()
+    | Loggers.DOT
+    | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+
+  let consume = gen "-"
+  let product = gen "+"
 
 let print_comment
     logger
@@ -338,7 +389,7 @@ let print_options logger =
          (*     "                 'MaxStep', tend, ...";
                 "                 'Jacobian', @ode_jacobian);"] *)
          "                 'MaxStep', tend);"]
-   in
+    in
     let () = Loggers.print_newline logger in
     ()
   | Loggers.Maple -> ()
@@ -375,7 +426,7 @@ let print_license_check logger =
           "       break";
           "    end";
           "end";
-          "t = linspace(tinit, tend, num_t_point+1);";]
+        ]
     in Loggers.print_newline logger
   | Loggers.Maple -> ()
   | Loggers.DOT
@@ -400,7 +451,7 @@ let print_integrate logger =
           "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);";
           "   soln.y=soln.y';";
           "elseif uiIsOctave";
-          "   soln = ode2r(@mode_aux,[tinit tend],ode_init(),options);";
+          "   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);";
           "end";]
     in
     let () = Loggers.print_newline logger in
@@ -414,10 +465,9 @@ let print_integrate logger =
   | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
 
-let print_interpolate logger nobs nvar =
-  let format = Loggers.get_encoding_format logger in
+let print_interpolate logger =
   match
-    format
+    Loggers.get_encoding_format logger
   with
   | Loggers.Matlab
   | Loggers.Octave ->
@@ -426,13 +476,11 @@ let print_interpolate logger nobs nvar =
         [
           "t = linspace(tinit, tend, num_t_point+1);";
           "nrows = length(soln.x);";
-          "nobs = "^(string_of_int nobs)^";";
-          "nfragments ="^(string_of_int nvar)^";";
           "tmp = zeros(nvar,1)";
-          "obs = zeros (nrows,nobs);";
+          "obs = zeros(nrows,nobs);";
           "";
           "for j=1:nrows";
-          "    for i=1:nvar";
+          "    for i=1:nodevar";
           "        z(i)=soln.y(j,i);";
           "    end";
           "    h=ode_obs(z);";
@@ -442,7 +490,8 @@ let print_interpolate logger nobs nvar =
           "end";
           "if nobs==1";
           "   y = interp1(soln.x, obs, t, 'pchip')';";
-          "else   y = interp1(soln.x, obs, t, 'pchip');";
+          "else";
+          "   y = interp1(soln.x, obs, t, 'pchip');";
           "end"
         ]
     in Loggers.print_newline logger
@@ -484,6 +533,7 @@ let print_dump_plots logger  =
   | Loggers.TXT
   | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
+
 
 let open_procedure logger name name' arg =
   let format = Loggers.get_encoding_format logger in

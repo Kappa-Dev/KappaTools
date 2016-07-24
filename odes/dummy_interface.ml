@@ -8,7 +8,7 @@ struct
 
   let dummy_chemical_species = []
   let dummy_canonic_species = 0
-
+  let do_we_divide_rates_by_n_auto_in_lhs = true 
   let print_chemical_species _ _ = ()
   let print_canonic_species _ _ = ()
 

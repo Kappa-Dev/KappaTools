@@ -14,6 +14,7 @@ sig
   type connected_component_id
   val print_connected_component_id: Format.formatter -> connected_component_id -> unit
 
+  val do_we_divide_rates_by_n_auto_in_lhs: bool 
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
   val nbr_automorphisms_in_pattern: pattern -> int
 

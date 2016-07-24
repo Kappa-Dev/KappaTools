@@ -19,7 +19,7 @@
 
     val network_from_compil: I.compil -> network
     val species_of_species_id: network -> int -> I.chemical_species
-    val get_reactions:
+  val get_reactions:
       network ->
       (ode_var_id list * ode_var_id list *
        ((I.connected_component, string) Ast.ast_alg_expr Location.annot *

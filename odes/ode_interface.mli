@@ -6,14 +6,17 @@ sig
   type pattern              (* not necessarity connected, maybe partially specified *)
   type connected_component  (* connected, maybe partially specified *)
 
+
   val dummy_chemical_species: chemical_species
   val dummy_canonic_species: canonic_species
+
 
   val print_chemical_species: Format.formatter -> chemical_species -> unit
   val print_canonic_species: Format.formatter -> canonic_species -> unit
   type connected_component_id
   val print_connected_component_id: Format.formatter -> connected_component_id -> unit
 
+  val do_we_divide_rates_by_n_auto_in_lhs: bool 
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
   val nbr_automorphisms_in_pattern: pattern -> int
 
