@@ -17,9 +17,9 @@ let navcontent =
           (React.S.bind
              UIState.model_runtime_state
              (fun state -> React.S.const
-               (String.concat ""
-                  (state_log state)
-               )
+		 (String.concat ""
+                    (state_log state)
+		 )
              )
           )
       ]

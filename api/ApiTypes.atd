@@ -88,3 +88,6 @@ type state = { plot : plot nullable;
                files : file_line list;
                is_running : bool
              }
+type info = { uptime : float ;
+     	      processes : int ;
+	      build : string }

@@ -1,5 +1,6 @@
 module ApiTypes = ApiTypes_j
-module Html = Tyxml_js.Html5
+
+module Html = Tyxml_js.Html
 module UIState = Ui_state
 
 open Js_distances
@@ -28,7 +29,7 @@ let content =
                      | Some _ -> ["show"])
                )
             )]
-      [ Display_common.export_controls
+      [ Ui_common.export_controls
           ~export_select_id:export_format_id
           ~export_filename_id:export_filename_id
           ~export_button_id:export_button_id
@@ -38,9 +39,9 @@ let content =
   [%html {|<div>
              <div class="row">
                 <div id="|}div_id{|" class="col-sm-8">
-                </div>
-             </div>
-             |}[export_controls]{|
+				   </div>
+				   </div>
+				   |}[export_controls]{|
         </div>|}]
 
 let navcontent = [ Html.div [content] ]
@@ -58,7 +59,7 @@ let update_distances
 let onload () =
   let distances_plot : distances_plot Js.t =
     Js_distances.create_distances_plot div_id in
-  let () = Display_common.save_plot_ui
+  let () = Ui_common.save_plot_ui
       (fun f -> let filename = Js.string f in
         distances_plot##exportJSON(filename)
       )

@@ -6,7 +6,7 @@ type parameter = { code : code;
                    nb_plot : int;
                    max_time : float option;
                    max_events : int option
-                   }
+                 }
 
 type state = { plot : string ;
                time : float;

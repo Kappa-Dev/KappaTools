@@ -1,1 +1,3 @@
-val route : runtime:Api.Base.runtime -> Webapp_common.route list
+val route :
+  manager:Api.manager ->
+  Webapp_common.route_handler list

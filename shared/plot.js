@@ -155,12 +155,18 @@ function observable_plot(configuration){
             time_mode = that.modes.XAXIS; // 6.
         }
         that.state = new_state;
-        that.start_time = null;
-        that.end_time = null;
+
+	var first_time = null;
+	var last_time = null;
+
+        //that.start_time = null;
+        //that.end_time = null;
         // Populate observables from data.
         plot.observables.forEach(function(observable){
-            that.start_time = that.start_time || observable.time;
-            that.end_time = observable.time;
+	    first_time = first_time || observable.time;
+	    last_time = observable.time;
+            //that.start_time = that.start_time || observable.time;
+            //that.end_time = observable.time;
             time_values.push(observable.time);
             var values = observable.values;
             that.state.forEach(function(state_observable,i){
@@ -168,6 +174,13 @@ function observable_plot(configuration){
                 state_observable.values.push(current);
             });
         });
+	if (first_time && last_time){
+            that.start_time = Math.min(first_time,last_time);
+            that.end_time = Math.max(first_time,last_time);
+	} else {
+	    that.start_time = null;
+	    that.end_time = null;
+	}
         // Add time axis
         that.state.push({ label : this.timeLabel ,
                           values : time_values ,
@@ -287,7 +300,7 @@ function observable_plot(configuration){
 
         // render data
         var line = d3.svg.line()
-            .interpolate("basis")
+            .interpolate("linear")
             .defined(function(d,i) { return !that.getXAxisLog() || xState.values[i] > 0; })
             .defined(function(d,i) { return !that.getYAxisLog() || d > 0; })
             .x(function(d,i) {

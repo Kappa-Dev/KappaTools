@@ -18,12 +18,12 @@ let xml =
         default_attributes
     in
     Html.li ~a:attributes
-              [ Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
-                           ; Html.Unsafe.string_attrib "role" "tab"
-                           ; Html.Unsafe.string_attrib "aria-controls" label
-                           ; Html.a_href ("#"^label) ]
-                  (List.append [ Html.cdata label ]  decorations)
-              ] in
+      [ Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
+                  ; Html.Unsafe.string_attrib "role" "tab"
+                  ; Html.Unsafe.string_attrib "aria-controls" label
+                  ; Html.a_href ("#"^label) ]
+          (List.append [ Html.cdata label ]  decorations)
+      ] in
   let navcontent label active content =
     Html.div
       ~a:[ Html.a_id label

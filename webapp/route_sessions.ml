@@ -1,3 +1,4 @@
 open Webapp_common
 
-let route ~(runtime : Api.Base.runtime ) : route list = []
+let route
+    ~(manager: Api.manager) : route_handler list = []

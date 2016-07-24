@@ -7,7 +7,7 @@ type request = Create
              | List id
              | Stop id *Api_types.token
 type response = Create id * Api_types.error
-             | Parse id * Api_types.token result
-             | Status id * Api_types.state result
-             | List id * Api_types.catalog result
-             | Stop unit result
+              | Parse id * Api_types.token result
+              | Status id * Api_types.state result
+              | List id * Api_types.catalog result
+              | Stop unit result

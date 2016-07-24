@@ -1,3 +1,51 @@
-type info = { uptime : float ;
-              processes : int ;
-              build : string }
+(* This is a mirror of pervaises result when ocaml is upgraded
+   this should be replaced by.  It is expected than non error
+   message will decide how best to relay its messages.
+*)
+type ('ok,'error) result_data <ocaml_biniou t="result"> =
+     [ Ok of 'ok
+     | Error of 'error ] <json repr="object">
+
+type position <ocaml predef module="Location"> =
+     { chr : int ;
+       line : int }
+
+type range <ocaml predef module="Location"> =
+     { file : string ;
+       from_position : position <json name="from"> ;
+       to_position : position <json name="to"> }
+type severity =
+     [ Error <json name="error">
+     | Warning <json name="warning"> ]
+(* Range in this case is optional to support
+   non parsing errors.
+*)
+type error =
+     { severity : severity;
+       message : string;
+       range : range nullable }
+type errors =
+     error list
+
+(* Code here is the just the http code the int used here
+   to prevent there being a dependency on the cohttp package.
+   As there are success and failure codes the the response code
+   is not part othe the data variant.
+   *)
+type result_code = int
+type ('ok) result =
+     { data : ('ok,errors) result_data;
+       result_code : result_code }
+(* Give a summary of the service.  The intention is to give the
+   users an overview of the state of the kappa service.
+*)
+type service_info =
+     { sessions : int;
+       processes : int ;
+       build : string }
+
+type session_id = string
+(* use salt + hash *)
+type session_metadata = { id : string ; hash : string ; salt : string }
+type session_feedback = { id : session_id ; message : string }
+type session_info = session_metadata list

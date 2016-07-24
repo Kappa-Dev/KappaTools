@@ -1,25 +1,54 @@
 open Panel_editor
 
 module Html5 = Tyxml_js.Html5
-let document = Dom_html.window##.document
-let%html main_container = {|<div class="row">
-                              |}[Panel_editor.xml;Panel_tab.xml]{|
-                             </div>|}
+open Js
 
-let onload _ =
+module Html = Tyxml_js.Html5
+
+let prod _ =
+  let%html main_container = {|<div class="row">
+                            |}[Panel_editor.xml;
+                               Panel_tab.xml]{|
+                             </div>|}
+  in
   let main =
-    Js.Opt.get (document##getElementById (Js.string "main"))
+    Js.Opt.get (Ui_common.document##getElementById (Js.string "main"))
       (fun () -> assert false) in
   let skeleton = Tyxml_js.To_dom.of_div main_container in
   let () = Dom.appendChild main skeleton in
-  let () = Panel_editor.onload ();
+  let _ = Panel_editor.onload ();
     Panel_tab.onload ()
   in Js._true
 
-let _ = Dom_html.window##.onload := Dom_html.handler onload
+let dev _ =
+  let configuration =
+    JsNode.create_process_configuration
+      ~onStdout:(Some (fun msg -> Common.debug msg))
+      ~onStderr:(Some (fun msg -> Common.debug msg))
+      "cat"
+      []
+      ~onClose:(Some (fun () -> Common.debug "close"))
+  in
+  let process : JsNode.process Js.t = JsNode.spawn_process configuration in
+  let () = process##write(Js.string "hello") in
+  let () = process##kill in
+  let%html main_container = {|<div class="row">
+                            |}[Panel_editor.xml;
+                               Panel_tab.xml]{|
+                             </div>|}
+  in
+  let main =
+    Js.Opt.get (document##getElementById (Js.string "main"))
+      (fun () -> assert false)
+  in
+  let skeleton = Tyxml_js.To_dom.of_div main_container in
+  let () = Dom.appendChild main skeleton in
+  let _ = Panel_editor.onload ();
+    Panel_tab.onload ()
+  in Js._true
 
-let onunload _ =
-  Panel_editor.onunload ()
-
-let () =
-  Lwt.async (fun () -> Lwt.bind (Lwt_js_events.onbeforeunload ()) onunload)
+let _ = Dom_html.window##.onload :=
+    Dom_html.handler
+      (Ui_common.version
+	 ~prod:prod
+	 ~dev:dev)

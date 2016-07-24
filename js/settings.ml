@@ -1,6 +1,7 @@
 module UIState = Ui_state
 module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
+module R = Tyxml_js.R
 
 open ApiTypes
 
@@ -41,7 +42,7 @@ let time_limit =
                       n
                   in
                   let value = format_float value in
-               value
+		  value
                 | None -> "") UIState.model_max_time)
        ]
     ()
@@ -105,7 +106,7 @@ let configuration_settings =
   [%html {|<div class="panel-footer panel-footer-white">
             <div class="row">
                         <div class="col-md-4">
-                           |}[number_events]{|
+         |}[number_events]{|
                         </div>
                         <div class="col-md-2">
                            events
@@ -142,10 +143,10 @@ let select_runtime =
        select_runtime_options)
 
 let configuration_button =
-    [%html {|<div class="panel-footer">
-                 <div class="row">
-                    <div class="col-md-4">
-                       |}[start_button]{|
+  [%html {|<div class="panel-footer">
+               <div class="row">
+                  <div class="col-md-4">
+         |}[start_button]{|
                     </div>
                     <div class="col-md-2">
                        |}[select_runtime]{|
@@ -157,16 +158,15 @@ let configuration_id = "configuration-id"
 let configuration_xml =
   Html.div
     ~a:[ Html.a_id configuration_id
-       ; Tyxml_js.R.Html.a_class
-           (React.S.bind
-              UIState.model_is_running
-              (fun is_running -> React.S.const (if is_running then
-                                                  ["hidden"]
-                                                else
-                                                  ["visible"]
-                                               )
-              )
-           )
+       ; Tyxml_js.R.Html.a_class (React.S.bind
+                                    UIState.model_is_running
+                                    (fun is_running -> React.S.const (if is_running then
+                                                                        ["hidden"]
+                                                                      else
+                                                                        ["visible"]
+                                                                     )
+                                    )
+                                 )
        ]
     [code_messages; configuration_settings; configuration_button ]
 
@@ -237,10 +237,12 @@ let event_progress_bar =
          let event : int = default event 0 in
          string_of_int event
        )
-        UIState.model_runtime_state)
+	UIState.model_runtime_state)
+let stop_button_id = "stop_button"
 let stop_button =
   Html.button
-    ~a:[ Html.Unsafe.string_attrib "type" "button"
+    ~a:[ Html.a_id stop_button_id
+       ; Html.Unsafe.string_attrib "type" "button"
        ; Html.a_class ["btn";"btn-default"] ] [ Html.cdata "stop" ]
 let tracked_events state =
   let tracked_events : int option =
@@ -274,7 +276,7 @@ let simulation_progress =
                 <div class="row">
                   <div class="col-md-4">
                     <div class="progress">
-                       |}[event_progress_bar]{|
+         |}[event_progress_bar]{|
                     </div>
                   </div>
                   <div class="col-md-2">
@@ -305,8 +307,8 @@ let simulation_progress =
               </div>|}]
 
 let%html simulation_buttons =
-              {|<div class="panel-footer">
-                      |}[stop_button]{|
+  {|<div class="panel-footer">
+  |}[stop_button]{|
                       </div>|}
 let simulation_id : string = "simulation-panel"
 let simulation_xml =
@@ -315,23 +317,30 @@ let simulation_xml =
        ; Tyxml_js.R.Html.a_class
            (React.S.bind
               UIState.model_is_running
-              (fun model_is_running -> React.S.const (if model_is_running then
-                                                        ["visible"]
-                                                      else
-                                                        ["hidden"]
-             ))
+              (fun model_is_running ->
+                 React.S.const
+                   (if model_is_running then
+                      ["visible"]
+                    else
+                      ["hidden"]
+		   ))
            )
        ]
-    [simulation_messages; simulation_progress ; simulation_buttons ]
+    [ simulation_messages ;
+      simulation_progress ;
+      simulation_buttons ]
 
-let%html xml = "<div>"[configuration_xml;simulation_xml]"</div>"
+let%html xml = "<div>"[configuration_xml ;
+                       simulation_xml]"</div>"
 
 let onload () : unit =
   let select_runtime_dom = Tyxml_js.To_dom.of_select select_runtime in
   let start_button_dom = Tyxml_js.To_dom.of_button start_button in
   let stop_button_dom = Tyxml_js.To_dom.of_button stop_button in
   let args = Url.Current.arguments in
-  let set_runtime runtime continuation =
+  let set_runtime
+      (runtime : Ui_state.runtime)
+      (continuation : unit -> unit) =
     let r_val = Ui_state.runtime_value runtime in
     Ui_state.set_runtime_url
       r_val
@@ -340,24 +349,40 @@ let onload () : unit =
         else
           continuation ())
   in
-  let default_runtime () = set_runtime UIState.default_runtime (fun _ -> ()) in
+  let default_runtime () =
+    set_runtime
+      UIState.default_runtime
+      (fun _ -> ())
+  in
   let () =
     try
-      let hosts = List.filter (fun (key,value) -> key = "host") args in
       let hosts =
+        List.filter
+          (fun (key,_) -> key = "host")
+          args
+      in
+      let hosts : Ui_state.remote option list =
         List.map
-          (fun (_,url) -> Ui_state.compute_remote url) hosts in
+          (fun (_,url) ->
+             let () = Common.debug ("parse_remote:2") in
+             Ui_state.parse_remote url)
+          hosts
+      in
       let () = List.iter
           (fun value ->
              match value with
              | Some remote ->
                ReactiveData.RList.cons
-                 (Ui_state.Remote remote) select_runtime_options_handle
+                 (Ui_state.Remote remote)
+                 select_runtime_options_handle
              | None -> ())
           hosts
       in
       match ReactiveData.RList.value select_runtime_options with
-      | head::_ -> set_runtime head (default_runtime)
+      | head::_ ->
+        set_runtime
+          head
+          (default_runtime)
       | _ -> default_runtime ()
     with _ -> default_runtime () in
 

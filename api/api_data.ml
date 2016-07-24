@@ -9,7 +9,7 @@ let plot_pg_store
     ~file
     ~title
     ~descr
-    : Pp_svg.store
+  : Pp_svg.store
   = { Pp_svg.file = file;
       Pp_svg.title = title;
       Pp_svg.descr = descr;
@@ -17,27 +17,29 @@ let plot_pg_store
       Pp_svg.points =
         List.map
           (fun (observable : Api_types.observable) ->
-           (observable.Api_types.time,
-            Tools.array_map_of_list
-              (fun x -> Nbr.F x) observable.Api_types.values))
+             (observable.Api_types.time,
+              Tools.array_map_of_list
+		(fun x -> Nbr.F x) observable.Api_types.values))
           plot.Api_types.observables
     }
 
-let plot_tsv (plot : Api_types.plot) : string =
+let plot_values
+    ?(separator : string = ",")
+    (plot : Api_types.plot) : string =
   String.concat "\n"
     ((String.concat
-        ","
+        separator
         ("time"::plot.Api_types.legend))::
-        (List.map
-           (fun (observable : Api_types.observable) ->
-             String.concat ","
-               (List.map
-                  (Format.sprintf "%e")
-                  (observable.Api_types.time
-                   ::observable.Api_types.values)
-               )
-           )
-           plot.Api_types.observables)
+     (List.map
+        (fun (observable : Api_types.observable) ->
+           String.concat separator
+             (List.map
+                (Format.sprintf "%e")
+                (observable.Api_types.time
+                 ::observable.Api_types.values)
+             )
+        )
+        plot.Api_types.observables)
     )
 
 
@@ -59,49 +61,49 @@ let api_flux_map (flux_map : Data.flux_map) : Api_types.flux_map =
 
 let links_of_mix mix =
   snd @@ snd @@
-    List.fold_left
-      (fun (i,acc) a ->
+  List.fold_left
+    (fun (i,acc) a ->
        succ i,
        Tools.array_fold_lefti
          (fun j (one,two as acc) ->
-          function
-          | Raw_mixture.FREE -> acc
-          | Raw_mixture.VAL k ->
-             match Mods.IntMap.find_option k one with
-             | None -> Mods.IntMap.add k (i,j) one,two
-             | Some dst ->
+            function
+            | Raw_mixture.FREE -> acc
+            | Raw_mixture.VAL k ->
+              match Mods.IntMap.find_option k one with
+              | None -> Mods.IntMap.add k (i,j) one,two
+              | Some dst ->
                 one,Mods.Int2Map.add dst (i,j)
-                                     (Mods.Int2Map.add (i,j) dst two))
+                  (Mods.Int2Map.add (i,j) dst two))
          acc a.Raw_mixture.a_ports)
-      (0,(Mods.IntMap.empty,Mods.Int2Map.empty)) mix
+    (0,(Mods.IntMap.empty,Mods.Int2Map.empty)) mix
 
 let api_mixture sigs mix =
   let links = links_of_mix mix in
   Array.mapi
     (fun i a ->
-     { Api_types.node_quantity = None;
-       Api_types.node_name =
-         Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
-       Api_types.node_sites =
-         Array.mapi
-           (fun j s ->
-            { Api_types.site_name =
-                Format.asprintf
-                  "%a" (Signature.print_site sigs a.Raw_mixture.a_type) j;
-              Api_types.site_links =
-                (match Mods.Int2Map.find_option (i,j) links with
-                 | None -> []
-                 | Some dst -> [dst]);
-              Api_types.site_states =
-                (match s with
-                 | None -> []
-                 | Some k ->
-                    [Format.asprintf
-                       "%a" (Signature.print_internal_state
-                               sigs a.Raw_mixture.a_type j) k;]);
-            })
-           a.Raw_mixture.a_ints;
-     }
+       { Api_types.node_quantity = None;
+	 Api_types.node_name =
+           Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
+	 Api_types.node_sites =
+           Array.mapi
+             (fun j s ->
+		{ Api_types.site_name =
+                    Format.asprintf
+                      "%a" (Signature.print_site sigs a.Raw_mixture.a_type) j;
+		  Api_types.site_links =
+                    (match Mods.Int2Map.find_option (i,j) links with
+                     | None -> []
+                     | Some dst -> [dst]);
+		  Api_types.site_states =
+                    (match s with
+                     | None -> []
+                     | Some k ->
+                       [Format.asprintf
+			  "%a" (Signature.print_internal_state
+				  sigs a.Raw_mixture.a_type j) k;]);
+		})
+             a.Raw_mixture.a_ints;
+       }
     ) (Array.of_list mix)
 
 let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
@@ -111,42 +113,42 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
       snd
         (List.fold_left
            (fun (old_offset,old_agents) (agent,mixture) ->
-             let quantity = Some (float_of_int agent) in
-             let mixture = Array.to_list (api_mixture sigs mixture) in
-             let new_offset = old_offset + (List.length mixture) in
-             let update_links (agent_id,site_id : int * int) =
-               (agent_id+old_offset,site_id)
-             in
-             let update_sites site = { site with
-               Api_types.site_links =
-                 List.map
-                   update_links
-                   site.Api_types.site_links
-             } in
-             let new_agents =
-               List.map
-                 (fun (node : Api_types.site_node)->
-                   { node with
-                     Api_types.node_quantity = quantity ;
-                     Api_types.node_sites =
-                       Array.map
-                         update_sites
-                         node.Api_types.node_sites
-                   }
-                 )
-                 mixture
-             in
-             (new_offset,old_agents@new_agents)
+              let quantity = Some (float_of_int agent) in
+              let mixture = Array.to_list (api_mixture sigs mixture) in
+              let new_offset = old_offset + (List.length mixture) in
+              let update_links (agent_id,site_id : int * int) =
+		(agent_id+old_offset,site_id)
+              in
+              let update_sites site = { site with
+					Api_types.site_links =
+					  List.map
+					    update_links
+					    site.Api_types.site_links
+				      } in
+              let new_agents =
+		List.map
+                  (fun (node : Api_types.site_node)->
+                     { node with
+                       Api_types.node_quantity = quantity ;
+                       Api_types.node_sites =
+			 Array.map
+                           update_sites
+                           node.Api_types.node_sites
+                     }
+                  )
+                  mixture
+              in
+              (new_offset,old_agents@new_agents)
            )
            (0,[])
            snapshot.Data.agents
         )
   ; Api_types.tokens =
       List.map (fun (token,value) ->
-                { Api_types.node_name = token ;
-                  Api_types.node_quantity = Some (Nbr.to_float value);
-                  Api_types.node_sites = Array.of_list [] })
-               (Array.to_list snapshot.Data.tokens)
+          { Api_types.node_name = token ;
+            Api_types.node_quantity = Some (Nbr.to_float value);
+            Api_types.node_sites = Array.of_list [] })
+        (Array.to_list snapshot.Data.tokens)
   }
 
 
@@ -162,21 +164,21 @@ let find_link cm (a,s) =
 let api_contact_map sigs cm =
   Array.mapi
     (fun ag sites ->
-     { Api_types.node_quantity = None;
-       Api_types.node_name =
-         Format.asprintf "%a" (Signature.print_agent sigs) ag;
-       Api_types.node_sites =
-         Array.mapi
-           (fun site (states,links) ->
-             { Api_types.site_name =
-                 Format.asprintf "%a" (Signature.print_site sigs ag) site;
-              Api_types.site_links = links;
-              Api_types.site_states =
-                List.map
-                  (Format.asprintf "%a" (Signature.print_internal_state sigs ag site))
-                  states;
-            }) sites;
-     }) cm
+       { Api_types.node_quantity = None;
+	 Api_types.node_name =
+           Format.asprintf "%a" (Signature.print_agent sigs) ag;
+	 Api_types.node_sites =
+           Array.mapi
+             (fun site (states,links) ->
+		{ Api_types.site_name =
+                    Format.asprintf "%a" (Signature.print_site sigs ag) site;
+		  Api_types.site_links = links;
+		  Api_types.site_states =
+                    List.map
+                      (Format.asprintf "%a" (Signature.print_internal_state sigs ag site))
+                      states;
+		}) sites;
+       }) cm
 
 let api_contactmap_site_graph
     (contactmap : Api_types.parse) : Api_types.site_graph =
@@ -185,19 +187,19 @@ let api_contactmap_site_graph
 let offset_site_graph
     (offset : int)
     (site_nodes : Api_types.site_node list) :
-    Api_types.site_node list =
+  Api_types.site_node list =
   List.map
     (fun site_node ->
-      { site_node with
-        Api_types.node_sites =
-          Array.map
-            (fun site ->
-              { site with
-                Api_types.site_links =
-                  List.map (fun (i,j) -> (i+offset,j+offset))
-                    site.Api_types.site_links })
-          site_node.Api_types.node_sites
-      }
+       { site_node with
+         Api_types.node_sites =
+           Array.map
+             (fun site ->
+		{ site with
+                  Api_types.site_links =
+                    List.map (fun (i,j) -> (i+offset,j+offset))
+                      site.Api_types.site_links })
+             site_node.Api_types.node_sites
+       }
     )
     site_nodes
 
@@ -212,7 +214,7 @@ let api_snapshot_site_graph
 (* map out *)
 module EdgeMap =
   Map.Make(struct type t = (int * int) * (int * int)
-                  let compare = compare
+    let compare = compare
   end)
 
 
@@ -223,7 +225,7 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
       ((l,r) : (int * int) * (int * int)) : (int * int) * (int * int) =
     if (l < r) then (l,r) else (r,l)
   in
-  (*
+(*
   let format_edge
       (label : string)
       (((a,b),(c,d)) : (int * int) * (int * int)) : string =
@@ -238,7 +240,8 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
     print_string
       (format_edge label edge)
   in
-  *)
+*)
+
   let site_nodes : ApiTypes_t.site_node list =
     Array.to_list (api_snapshot_site_graph snapshot)
   in
@@ -251,27 +254,27 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
       (fun
         (index : int EdgeMap.t)
         ((agent_id,site_node) : int * ApiTypes_t.site_node) ->
-          let offset : int = EdgeMap.cardinal index in
-          let index_edges : (int * ((int * int) * (int * int))) list =
-            List.mapi
-              (fun i edge -> (i + offset,edge))
-              (List.flatten
-                 (List.mapi
-                    (fun
-                      (site_id : int)
-                      (site : ApiTypes_t.site) ->
-                        List.map
-                          (fun link -> ((agent_id,site_id),link))
-                          site.ApiTypes_t.site_links
-                    )
-                    (Array.to_list site_node.ApiTypes_t.node_sites)
-                 )
-              )
-          in
-          List.fold_left
-            (fun
-              (local_index : int EdgeMap.t)
-              ((key,edge) : (int * ((int * int) * (int * int))))
+        let offset : int = EdgeMap.cardinal index in
+        let index_edges : (int * ((int * int) * (int * int))) list =
+          List.mapi
+            (fun i edge -> (i + offset,edge))
+            (List.flatten
+               (List.mapi
+                  (fun
+                    (site_id : int)
+                    (site : ApiTypes_t.site) ->
+                    List.map
+                      (fun link -> ((agent_id,site_id),link))
+                      site.ApiTypes_t.site_links
+                  )
+                  (Array.to_list site_node.ApiTypes_t.node_sites)
+               )
+            )
+        in
+        List.fold_left
+          (fun
+            (local_index : int EdgeMap.t)
+            ((key,edge) : (int * ((int * int) * (int * int))))
             ->
               let edge = normalize_edge edge in
               if EdgeMap.mem edge local_index then
@@ -287,9 +290,9 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
                   edge
                   key
                   local_index
-            )
-            index
-            index_edges
+          )
+          index
+          index_edges
       )
       EdgeMap.empty
       (Array.to_list components_index)
@@ -314,13 +317,13 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
     in
     Array.iteri
       (fun i (current_component_id,current_site_node) ->
-        if current_component_id = old_component_id then
-          Array.set
-            components_index
-            i
-            (new_component_id,current_site_node)
-        else
-          ()
+         if current_component_id = old_component_id then
+           Array.set
+             components_index
+             i
+             (new_component_id,current_site_node)
+         else
+           ()
       )
       components_index
   in
@@ -340,7 +343,7 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
          fst
          (List.mapi
             (fun index (component_id,site_node) ->
-              (component_id = id,(index,site_node))
+               (component_id = id,(index,site_node))
             )
             (Array.to_list components_index)
           : (bool * (int * ApiTypes_t.site_node)) list)
@@ -362,28 +365,28 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
       ","
       (List.map
          (fun (agent_id,site_node) ->
-           let agent_label = site_node.ApiTypes_t.node_name in
-           let site_label =
-             String.concat
-               ","
-               (List.mapi
-                  (fun site_id site_node ->
-                    site_node.ApiTypes_t.site_name
+            let agent_label = site_node.ApiTypes_t.node_name in
+            let site_label =
+              String.concat
+		","
+		(List.mapi
+                   (fun site_id site_node ->
+                      site_node.ApiTypes_t.site_name
                       ^
                       (String.concat
                          ""
                          (List.map
                             (fun link ->
-                              let edge_id : (int * int) * (int * int) =
-                                  normalize_edge
-                                  ((agent_id,site_id),link)
-                              in
-                              (* let () = debug_edge "lookup" edge_id in *)
-                              let link_id : int =
-                                EdgeMap.find
-                                  edge_id
-                                  edge_index
-                              in
+                               let edge_id : (int * int) * (int * int) =
+                                 normalize_edge
+                                   ((agent_id,site_id),link)
+                               in
+                               (* let () = debug_edge "lookup" edge_id in *)
+                               let link_id : int =
+                                 EdgeMap.find
+                                   edge_id
+                                   edge_index
+                               in
 (*
                               let () =
                                 debug_edge
@@ -391,13 +394,13 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
                                   edge_id
                               in
 *)
-                              "!"^(string_of_int link_id)
+                               "!"^(string_of_int link_id)
                             )
                             site_node.ApiTypes_t.site_links))
-                  )
-                  (Array.to_list site_node.ApiTypes_t.node_sites))
-           in
-           Format.sprintf "%s(%s)" agent_label site_label
+                   )
+                   (Array.to_list site_node.ApiTypes_t.node_sites))
+            in
+            Format.sprintf "%s(%s)" agent_label site_label
          )
          connected_component
       )
@@ -405,13 +408,13 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
   let () =
     List.iteri
       (fun index site_node ->
-        Array.iter
-          (fun (site : Api_types.site) ->
-            List.iter
-              (update_site index)
-              (List.map fst site.Api_types.site_links)
-          )
-          site_node.Api_types.node_sites
+         Array.iter
+           (fun (site : Api_types.site) ->
+              List.iter
+		(update_site index)
+		(List.map fst site.Api_types.site_links)
+           )
+           site_node.Api_types.node_sites
       )
       site_nodes
   in
@@ -421,15 +424,15 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
        (fun
          (kappa_fragments : string list)
          (component : (int * ApiTypes_t.site_node) list) ->
-           match component with
-           | (_,{ Api_types.node_quantity = Some node_quantity
-                ; _ })::tail ->
-             (Format.sprintf "%%init: %f %s"
-                node_quantity
-                (match tail with
-                | [] -> render_agent (List.hd component)
-                | _ -> render_component component))::kappa_fragments
-           | _ -> kappa_fragments
+         match component with
+         | (_,{ Api_types.node_quantity = Some node_quantity
+              ; _ })::tail ->
+           (Format.sprintf "%%init: %f %s"
+              node_quantity
+              (match tail with
+               | [] -> render_agent (List.hd component)
+               | _ -> render_component component))::kappa_fragments
+         | _ -> kappa_fragments
 
        )
        []
@@ -442,7 +445,7 @@ let api_parse_is_empty (parse : Api_types.parse) =
 
 let api_message_errors
     ?(severity:Api_types.severity = `Error)
-     (message : string) : Api_types.errors =
+    (message : string) : Api_types.errors =
   [{ Api_types.severity = severity;
      Api_types.message = message ;
      Api_types.range = None }]
@@ -463,7 +466,7 @@ let lwt_msg (msg : string) =
 let lwt_bind
     (f : 'a -> 'b Api_types.result Lwt.t)
     (result : 'a Api_types.result)
-    : 'b Api_types.result Lwt.t =
+  : 'b Api_types.result Lwt.t =
   match result with
     `Left l -> Lwt.return (`Left l)
   | `Right r -> (f r)
@@ -487,7 +490,7 @@ let rec eq_errors  l r =
   match (l,r) with
   | ([],[]) -> true
   | (l::l_tail,r::r_tail) ->
-      l.Api_types.message = r.Api_types.message
-      && eq_range l.Api_types.range r.Api_types.range
-      && eq_errors l_tail r_tail
+    l.Api_types.message = r.Api_types.message
+    && eq_range l.Api_types.range r.Api_types.range
+    && eq_errors l_tail r_tail
   | _ -> false

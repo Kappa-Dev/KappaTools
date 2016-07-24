@@ -41,7 +41,7 @@ GENERATED=$(VERSION) \
 	  $(RESOURCE) \
 	  generated/ApiTypes_t.ml generated/ApiTypes_j.ml \
 	  generated/api_types_t.ml generated/api_types_j.ml \
-	  generated/WebMessage_t.ml generated/WebMessage_j.ml
+	  generated/mpi_message_t.ml generated/mpi_message_j.ml
 
 generated:
 	mkdir -p generated
@@ -58,11 +58,11 @@ generated/api_types_t.ml: api/api_types.atd generated
 generated/api_types_j.ml: api/api_types.atd generated
 	atdgen -j -j-std -o generated/api_types api/api_types.atd
 
-generated/WebMessage_t.ml: js/WebMessage.atd generated
-	atdgen -t -o generated/WebMessage js/WebMessage.atd
+generated/mpi_message_t.ml: api/mpi_message.atd generated
+	atdgen -t -o generated/mpi_message api/mpi_message.atd
 
-generated/WebMessage_j.ml: js/WebMessage.atd generated
-	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
+generated/mpi_message_j.ml: api/mpi_message.atd generated
+	atdgen -j -j-std -o generated/mpi_message api/mpi_message.atd
 
 $(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css api/test_message.json
 	./dev/generate-string.sh $^  > $@
@@ -93,7 +93,8 @@ endif
 
 
 site/JsSim.js: JsSim.byte site/external
-	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
+	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@ ;\
+	sed -i.bak 's/g.process.argv.length>0/g.process.argv.length>1/' site/JsSim.js
 
 site/WebWorker.js: WebWorker.byte
 	js_of_ocaml --debuginfo --pretty "+nat.js" _build/js/$< -o $@

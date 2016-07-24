@@ -39,9 +39,9 @@ let content =
   [%html {|<div>
              <div class="row">
                 <div id="|}display_id{|" class="col-sm-8">
-                </div>
-             </div>
-             |}[export_controls]{|
+				       </div>
+				       </div>
+				       |}[export_controls]{|
         </div>|}]
 
 let navcontent = [ Html.div [content] ]

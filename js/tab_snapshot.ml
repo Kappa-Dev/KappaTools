@@ -10,8 +10,8 @@ let state_snapshot state =
   | None -> []
   | Some state -> state.ApiTypes.snapshots
 
-let navli = Display_common.badge
-  (fun state -> List.length (state_snapshot state))
+let navli = Ui_common.badge
+    (fun state -> List.length (state_snapshot state))
 
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
@@ -22,35 +22,35 @@ let configuration : Widget_export.configuration =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
       ; Widget_export.export_png ~svg_div_id:display_id ()
       ; Widget_export.export_json
-        ~serialize_json:(fun () ->
-          (match
-              (React.S.value current_snapshot : ApiTypes.snapshot option) with
+          ~serialize_json:(fun () ->
+              (match
+		 (React.S.value current_snapshot : ApiTypes.snapshot option) with
               | None -> "null"
               | Some s -> ApiTypes.string_of_snapshot s
-          )
-        )
+              )
+            )
       ; { Widget_export.suffix = "ka"
         ; Widget_export.label = "kappa"
         ; Widget_export.export =
-      fun (filename : string) ->
-        let data = match
-            (React.S.value current_snapshot : ApiTypes.snapshot option) with
-            | None -> ""
-            | Some s -> Api_data.api_snapshot_kappa s
-        in
-        Common.saveFile
-          ~data:data
-          ~mime:"application/json"
-          ~filename:filename
+	    fun (filename : string) ->
+              let data = match
+		  (React.S.value current_snapshot : ApiTypes.snapshot option) with
+              | None -> ""
+              | Some s -> Api_data.api_snapshot_kappa s
+              in
+              Common.saveFile
+		~data:data
+		~mime:"application/json"
+		~filename:filename
         }
       ];
     show = React.S.map
-           (fun state ->
-             match state_snapshot state with
-             | [] -> false
-             | _ -> true
-           )
-           UIState.model_runtime_state
+        (fun state ->
+           match state_snapshot state with
+           | [] -> false
+           | _ -> true
+        )
+        UIState.model_runtime_state
 
   }
 
@@ -62,55 +62,55 @@ let content =
          ; Html.a_id select_id ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
-         (fun state ->
-           ReactiveData.RList.set
-             handle
-             (List.mapi
-                (fun i snapshot ->
-                  Html.option
-                    ~a:([ Html.a_value (string_of_int i)]
-                       @
-                       if (match (React.S.value current_snapshot) with
-                          | None ->
-                            false
-                          | Some s ->
-                            s.ApiTypes.snap_file = snapshot.ApiTypes.snap_file
-                          )
-                       then [Html.a_selected ()]
-                       else [])
-                    (Html.pcdata
-                       (Display_common.option_label snapshot.ApiTypes.snap_file)))
-                (state_snapshot state)
-             )
-         )
-         UIState.model_runtime_state in
+           (fun state ->
+              ReactiveData.RList.set
+		handle
+		(List.mapi
+                   (fun i snapshot ->
+                      Html.option
+			~a:([ Html.a_value (string_of_int i)]
+			    @
+			    if (match (React.S.value current_snapshot) with
+				| None ->
+				  false
+				| Some s ->
+				  s.ApiTypes.snap_file = snapshot.ApiTypes.snap_file
+                              )
+			    then [Html.a_selected ()]
+			    else [])
+			(Html.pcdata
+			   (Ui_common.option_label snapshot.ApiTypes.snap_file)))
+                   (state_snapshot state)
+		)
+           )
+           UIState.model_runtime_state in
        list
       )
   in
   let snapshot_select =
-  Display_common.toggle_element
-    state_snapshot
-    [
-    Tyxml_js.R.Html.div
-      ~a:[ Html.a_class ["list-group-item"] ]
-      (let list, handle = ReactiveData.RList.create [] in
-       let _ = React.S.map
-         (fun state ->
-           ReactiveData.RList.set
-             handle
-             (match state_snapshot state with
-               head::[] ->
-                 [Html.h4
-                     [ Html.pcdata
-                         (Display_common.option_label head.ApiTypes.snap_file)]]
-             | _ -> [select]
-             )
-         )
-         UIState.model_runtime_state
-       in
-       list
-      )
-    ]
+    Ui_common.toggle_element
+      state_snapshot
+      [
+	Tyxml_js.R.Html.div
+	  ~a:[ Html.a_class ["list-group-item"] ]
+	  (let list, handle = ReactiveData.RList.create [] in
+	   let _ = React.S.map
+               (fun state ->
+		  ReactiveData.RList.set
+		    handle
+		    (match state_snapshot state with
+		       head::[] ->
+                       [Html.h4
+			  [ Html.pcdata
+                              (Ui_common.option_label head.ApiTypes.snap_file)]]
+		     | _ -> [select]
+		    )
+               )
+               UIState.model_runtime_state
+	   in
+	   list
+	  )
+      ]
   in
   let export_controls =
     Widget_export.content configuration
@@ -118,22 +118,22 @@ let content =
   [%html {|<div>
              <div class="row">
                <div class="center-block display-header">
-                |}[snapshot_select]{|
+         |}[snapshot_select]{|
                </div>
              </div>
              <div class="row">
                 <div class="col-sm-12" id="|}display_id{|">
-                </div>
-             </div>
-             |}[export_controls]{|
+							 </div>
+							 </div>
+							 |}[export_controls]{|
         </div>|}]
 
 
 let navcontent = [content]
 
 let update_snapshot
-      (snapshot_js : Js_contact.contact_map Js.t)
-      (snapshot : ApiTypes.snapshot) : unit =
+    (snapshot_js : Js_contact.contact_map Js.t)
+    (snapshot : ApiTypes.snapshot) : unit =
   let () =
     Common.debug
       (Js.string
@@ -151,20 +151,20 @@ let update_snapshot
   in
   snapshot_js##setData
     (Js.string json)
-     (Js.Opt.option (Ui_state.agent_count ()))
+    (Js.Opt.option (Ui_state.agent_count ()))
 
 let select_snapshot () =
   let snapshot_js : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id true in
   let index = Js.Opt.bind
-    (Display_common.document##getElementById (Js.string select_id))
-    (fun dom ->
-      let snapshot_select_dom : Dom_html.inputElement Js.t =
-        Js.Unsafe.coerce dom in
-      let fileindex = Js.to_string (snapshot_select_dom##.value) in
-      try Js.some (int_of_string fileindex) with
-        _ -> Js.null
-    )
+      (Ui_common.document##getElementById (Js.string select_id))
+      (fun dom ->
+	 let snapshot_select_dom : Dom_html.inputElement Js.t =
+           Js.Unsafe.coerce dom in
+	 let fileindex = Js.to_string (snapshot_select_dom##.value) in
+	 try Js.some (int_of_string fileindex) with
+           _ -> Js.null
+      )
   in
   match (React.S.value UIState.model_runtime_state) with
     None -> ()
@@ -184,33 +184,33 @@ let onload () : unit =
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
-          (Display_common.document##getElementById
+          (Ui_common.document##getElementById
              (Js.string select_id))
           (fun () -> assert false))
-      : Dom_html.element Js.t) in
+       : Dom_html.element Js.t) in
   let () =
     snapshot_select_dom
-      ##.
+    ##.
       onchange := Dom_html.handler
-      (fun _ ->
-        let () = select_snapshot ()
-        in Js._true)
+	(fun _ ->
+           let () = select_snapshot ()
+           in Js._true)
   in
   let () =
     Common.jquery_on
       "#navsnapshot"
       "shown.bs.tab"
       (fun _ ->
-        match (React.S.value UIState.model_runtime_state) with
-          None -> ()
-        | Some _state -> select_snapshot ())
+         match (React.S.value UIState.model_runtime_state) with
+           None -> ()
+         | Some _state -> select_snapshot ())
   in
   let () = Widget_export.onload configuration in
   let _ : unit React.signal = React.S.l1
-    (fun state -> match state with
-      None -> ()
-    | Some _state -> select_snapshot ()
-    )
-    UIState.model_runtime_state
+      (fun state -> match state with
+	   None -> ()
+	 | Some _state -> select_snapshot ()
+      )
+      UIState.model_runtime_state
   in
   ()

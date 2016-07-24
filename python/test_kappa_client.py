@@ -1,123 +1,83 @@
+"""Integration test for kappa clients"""
+import json
+import urllib2
 import unittest
 import subprocess
-import uuid
 import random
 import string
 import time
-from kappa_client import KappaRuntime, RuntimeError
+from kappa_client import KappaRuntime#, KappaError
+
 
 class TestKappaClient(unittest.TestCase):
+    """ Integration test for kappa client"""
     @classmethod
-    def setUpClass(self):
-        self.websim = "../WebSim.native"
-        self.key = self.generate_key()
-        self.port = 6666
-        subprocess.Popen("{0} --shutdown-key {1} --port {2}".format(self.websim,self.key,self.port).split())
+    def setUpClass(cls):
+        """ set up unit test by launching client"""
+        cls.websim = "../WebSim.native"
+        cls.key = cls.generate_key()
+        cls.port = 6666
+        command_format = "{0} --development --shutdown-key {1} --port {2}"
+        subprocess.Popen(command_format.format(cls.websim, cls.key, cls.port).split())
         time.sleep(1)
-        self.endpoint = "http://127.0.0.1:{0}".format(self.port)
+        cls.endpoint = "http://127.0.0.1:{0}".format(cls.port)
 
     @classmethod
-    def tearDownClass(self):
-        runtime = KappaRuntime(self.endpoint)
-        print runtime.shutdown(self.key)
+    def tearDownClass(cls):
+        """ tear down test by shutting down"""
+        runtime = KappaRuntime(cls.endpoint)
+        print runtime.shutdown(cls.key)
 
-    # http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python/23728630#23728630
     @classmethod
-    def generate_key(self):
-        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(100))
+    def generate_key(cls):
+        """ generate random key for kappa server. """
+        return ''.join(random.
+                       SystemRandom().
+                       choice(string.ascii_uppercase + string.digits)
+                       for _ in range(100))
 
     def __init__(self, *args, **kwargs):
+        """ initalize test by launching kappa server """
         self.websim = "../WebSim.native"
         self.key = self.generate_key()
         self.port = 6666
         super(TestKappaClient, self).__init__(*args, **kwargs)
 
-    def test_version(self):
-        runtime = KappaRuntime(self.endpoint)
-        version = runtime.version()
-        self.assertIsNotNone('version' in version)
-        self.assertIsNotNone('build' in version)
+    def check_integration_test(self, integration_test):
+        """ run an integration test by requesting a url with
+            a given method and checking the response code.
+        """
+        method = integration_test['method']
+        handler = urllib2.HTTPHandler()
+        opener = urllib2.build_opener(handler)
+        url = "{0}{1}".format(self.endpoint, integration_test['url'])
+        arguments = integration_test['arguments']
+        request = urllib2.Request(url,
+                                  integration_test['arguments'])
+        request.get_method = lambda : method
+        connection = opener.open(request)
+        self.assertEqual(connection.code, integration_test['code'])
 
-    def test_parse(self):
-        check = lambda parse : self.assertIsNotNone('observables' in parse)
-        runtime = KappaRuntime(self.endpoint)
-        parse = runtime.parse("")
-        check(parse)
-        parse = runtime.parse("%var: 'one' 1")
-        check(parse)
-        try :
-            parse = runtime.parse("A(x!1),B(x!1) -> A(x),B(x) @ 0.01")
-            assert(False)
-        except RuntimeError as e:
-            self.assertEqual(e.errors[0]["message"],'"A" is not a declared agent.')
-        try :
-            parse = runtime.parse("A(x)")
-            assert(False)
-        except RuntimeError as e:
-            self.assertEqual(e.errors[0]["message"],'Syntax error')
 
-    def test_start(self):
+    def test_response_codes(self):
+        """Check the correct error codes are returned upon
+           request.
+        """
+        with open("test_kappa_client.json") as json_file:
+            json_data = json.loads(json_file.read())
+            for integration_test in json_data:
+                self.check_integration_test(integration_test)
+    def test_info(self):
+        """ the the ability of the server to return
+            information about the service.
+        """
         runtime = KappaRuntime(self.endpoint)
-        start_1 = runtime.start({ 'code': "%var: 'one' 1", 'nb_plot': 150 })
-        start_2 = runtime.start({ 'code': "%var: 'one' 1", 'nb_plot': 150 })
-        assert(start_1 < start_2)
-
-    def test_status_will_fail(self):
-        runtime = KappaRuntime(self.endpoint)
-        with open("../models/abc-pert.ka") as f:
-            data = f.read()
-            try:
-                token = runtime.start({ 'code': data , 'nb_plot': 150 })
-                status = runtime.status(token)
-                # decommission this test
-                # assert(False)
-            except RuntimeError as e:
-                None
-
-    def test_status_bad(self):
-        runtime = KappaRuntime(self.endpoint)
-        with open("../models/abc-pert.ka") as f:
-            data = f.read()
-            token = runtime.start({ 'code': data
-                                  , 'nb_plot': 150
-                                  , 'max_time' : 100.01 })
-            status = runtime.status(token)
-            assert('plot' in status)
-            assert('log_messages' in status)
-            assert('is_running' in status)
-            assert('tracked_events' in status)
-            assert('event_percentage' in status)
-            assert('time_percentage' in status)
-            assert('event' in status)
-            assert(status['is_running'])
-
-    def test_stop(self):
-        runtime = KappaRuntime(self.endpoint)
-        with open("../models/abc-pert.ka") as f:
-            data = f.read()
-            token = runtime.start({ 'code': data
-                                  , 'nb_plot': 15000
-                                  , 'max_time' : 1000.01 })
-            status = runtime.status(token)
-            assert('plot' in status)
-            assert('log_messages' in status)
-            assert('is_running' in status)
-            assert('tracked_events' in status)
-            assert('event_percentage' in status)
-            assert('time_percentage' in status)
-            assert('event' in status)
-            assert(status['is_running'])
-
-            runtime.stop(token)
-            status = runtime.status(token)
-            assert('plot' in status)
-            assert('log_messages' in status)
-            assert('is_running' in status)
-            assert('tracked_events' in status)
-            assert('event_percentage' in status)
-            assert('time_percentage' in status)
-            assert('event' in status)
-            assert(not status['is_running'])
+        info = runtime.info()
+        self.assertIsNotNone('sessions' in info)
+        self.assertEqual(info['sessions'], 0)
+        self.assertIsNotNone('processes' in info)
+        self.assertEqual(info['processes'], 0)
+        self.assertIsNotNone('build' in info)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

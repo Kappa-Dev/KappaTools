@@ -5,14 +5,14 @@ module UIState = Ui_state
 let toggle_element projection content =
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
-           (React.S.bind
-              UIState.model_runtime_state
-              (fun state -> React.S.const
-                (match projection state with
-                  [] -> ["hidden"]
-                | _::_ -> ["show"])
-              )
-           )]
+          (React.S.bind
+             UIState.model_runtime_state
+             (fun state -> React.S.const
+                 (match projection state with
+                    [] -> ["hidden"]
+                  | _::_ -> ["show"])
+             )
+          )]
     content
 
 
@@ -50,19 +50,19 @@ let export_controls
   let export_formats_select =
     List.map
       (fun format ->
-        [%html {|<option value="|}format{|">|}(Html.cdata format){|</option>|}])
+         [%html {|<option value="|}format{|">|}(Html.cdata format){|</option>|}])
       export_formats
   in
   [%html {|<div class="row">
-  <div class="col-sm-12">
-     <div class="form-inline">
-        <div class="form-group">
+	   <div class="col-sm-12">
+	   <div class="form-inline">
+           <div class="form-group">
            <select class="form-control"
                    id="|}export_select_id{|"><option value="png">png</option><option value="svg">svg</option>|}export_formats_select{|</select>
-        </div>
-        <div class="form-group">
-           <label class="checkbox-inline">
-              |}[export_filename]{|
+																      </div>
+																      <div class="form-group">
+																      <label class="checkbox-inline">
+																      |}[export_filename]{|
            </label>
         </div>
         <div class="form-group">
@@ -125,62 +125,79 @@ let save_plot_ui
   let () =
     export_filename##.oninput :=
       Dom_html.handler
-      (fun _ ->
-        let () = export_button_toggle () in
-        Js._true)
+	(fun _ ->
+           let () = export_button_toggle () in
+           Js._true)
   in
   let () =
     export_button##.onclick :=
       Dom_html.handler
-      (fun _ ->
-        let suffix : string =
-          Js.to_string (export_format##.value)
-        in
-        let filename default : string =
-          let root : string =
-            Js.to_string (export_filename##.value)
-          in
-          if String.contains root '.' then
-            root
-          else
-            root^"."^default
-      in
-        let () = match suffix with
-            "svg" -> Common.plotSVG svg_div_id
-              title
-              (filename "svg")
-                                 svg_style_id
-          | "png" ->
-            Common.plotPNG
-              svg_div_id
-              title
-              (filename "png")
-              svg_style_id
-          | "dat" -> export_data (filename dat_file_extension)
-        | f -> Common.error ("Unknown format"^f)
-        in
-        Js._true)
+	(fun _ ->
+           let suffix : string =
+             Js.to_string (export_format##.value)
+           in
+           let filename default : string =
+             let root : string =
+               Js.to_string (export_filename##.value)
+             in
+             if String.contains root '.' then
+               root
+             else
+               root^"."^default
+	   in
+           let () = match suffix with
+               "svg" -> Common.plotSVG svg_div_id
+			  title
+			  (filename "svg")
+                          svg_style_id
+             | "png" ->
+               Common.plotPNG
+		 svg_div_id
+		 title
+		 (filename "png")
+		 svg_style_id
+             | "dat" -> export_data (filename dat_file_extension)
+             | f -> Common.error ("Unknown format"^f)
+           in
+           Js._true)
   in
   ()
 let badge counter
-    =
+  =
   [ Tyxml_js.R.Html.span
       (let badge_list, badge_handle =
          ReactiveData.RList.create [] in
        let _ = React.S.map
-             (fun state ->
-               let count = counter state in
-               if count > 0  then
-                 ReactiveData.RList.set
-                   badge_handle
-                   [ Html.pcdata " ";
-                     Html.span ~a:[ Html.a_class ["badge"]]
-                       [ Html.pcdata (string_of_int count) ]
-                   ]
-               else
-                 ReactiveData.RList.set badge_handle []
-             )
-             UIState.model_runtime_state in
+           (fun state ->
+              let count = counter state in
+              if count > 0  then
+                ReactiveData.RList.set
+                  badge_handle
+                  [ Html.pcdata " ";
+                    Html.span ~a:[ Html.a_class ["badge"]]
+                      [ Html.pcdata (string_of_int count) ]
+                  ]
+              else
+                ReactiveData.RList.set badge_handle []
+           )
+           UIState.model_runtime_state in
        badge_list
       )
   ]
+
+let version
+    ?(test:'a option = None)
+    ~(prod:'a)
+    ~(dev:'a)
+  :'a =
+  let version : string list =
+    List.map
+      snd
+      (List.filter
+	 (fun (key,_) -> key = "version")
+	 Url.Current.arguments)
+  in
+  match (test,version) with
+  | (Some test,["test"]) -> test
+  | (_,["dev"]) -> dev
+  | _ -> prod

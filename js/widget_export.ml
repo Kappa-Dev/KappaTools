@@ -52,14 +52,14 @@ let content
   in
   let xml_div =
     [%html {|<div class="col-sm-12">
-     <div class="form-inline">
-        <div class="form-group">
-           <select class="form-control"
+	     <div class="form-inline">
+             <div class="form-group">
+             <select class="form-control"
              id="|}(export_format_id configuration){|">|}export_formats_select{|</select>
-        </div>
-        <div class="form-group">
-           <label class="checkbox-inline">
-              |}[export_filename]{|
+										</div>
+										<div class="form-group">
+										<label class="checkbox-inline">
+										|}[export_filename]{|
            </label>
         </div>
         <div class="form-group">
@@ -86,7 +86,7 @@ let onload (configuration :  configuration) =
   let export_button : Dom_html.buttonElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
-          (Display_common.document##getElementById
+          (Ui_common.document##getElementById
              (Js.string (export_button_id configuration))
           )
           (fun () -> assert false))
@@ -94,14 +94,14 @@ let onload (configuration :  configuration) =
   let export_filename : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
-          (Display_common.document##getElementById
+          (Ui_common.document##getElementById
              (Js.string (export_filename_id configuration)))
           (fun () -> assert false))
        : Dom_html.element Js.t) in
   let export_format : Dom_html.selectElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
-          (Display_common.document##getElementById
+          (Ui_common.document##getElementById
              (Js.string (export_format_id configuration)))
           (fun () -> assert false))
        : Dom_html.element Js.t) in

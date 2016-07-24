@@ -87,7 +87,7 @@ let model_domain, set_model_domain =
 let model_counter =
   React.S.l3
     (fun max_t max_e nb_points ->
-     Counter.create ?init_t:None ?init_e:None ?max_t ?max_e ~nb_points)
+       Counter.create ?init_t:None ?init_e:None ?max_t ?max_e ~nb_points)
     model_max_time model_max_events model_nb_plot
 
 let model_syntax_error, set_model_syntax_error =
@@ -105,35 +105,35 @@ let model_ast =
 
 let start ~start_continuation ~stop_continuation =
   let on_error () = set_model_is_running false;
-                    stop_continuation ();
-                    return_unit
+    stop_continuation ();
+    return_unit
   in
   match React.S.value model_syntax_error with
     Some error -> set_model_syntax_error (Some error);
-                  set_model_runtime_error_message
-                    (Some (format_error_message error));
-                  on_error ()
+    set_model_runtime_error_message
+      (Some (format_error_message error));
+    on_error ()
   | None ->
-     let log_buffer = Buffer.create 512 in
-     let log_form = Format.formatter_of_buffer log_buffer in
-     let label = string_of_float (Unix.time ()) in
-     let thread_is_running = Lwt_switch.create () in
-     catch
-       (fun () ->
-        let result = React.S.value model_ast in
-        let (counter : Counter.t) = React.S.value model_counter in
-        let () = Counter.reinitialize counter in
-        let () = start_continuation thread_is_running in
-        let () = set_model_is_running true in
-        wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
-        >>= fun (_kasa_state,env,domain,graph,state) ->
-        let () =
-          let head =
-            Environment.map_observables
-              (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
-              env in
-          set_model_runtime_state
-            (Some  {
+    let log_buffer = Buffer.create 512 in
+    let log_form = Format.formatter_of_buffer log_buffer in
+    let label = string_of_float (Unix.time ()) in
+    let thread_is_running = Lwt_switch.create () in
+    catch
+      (fun () ->
+         let result = React.S.value model_ast in
+         let (counter : Counter.t) = React.S.value model_counter in
+         let () = Counter.reinitialize counter in
+         let () = start_continuation thread_is_running in
+         let () = set_model_is_running true in
+         wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
+         >>= fun (_kasa_state,env,domain,graph,state) ->
+         let () =
+           let head =
+             Environment.map_observables
+               (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+               env in
+           set_model_runtime_state
+             (Some  {
                  plot =
                    {Pp_svg.file = "foo.svg";
                     Pp_svg.title = "KaSim output";
@@ -153,86 +153,86 @@ let start ~start_continuation ~stop_continuation =
                  tracked_events = None ;
                  log_buffer = Buffer.contents log_buffer
                }) in
-        Lwt.join [ write_out thread_is_running counter label log_buffer;
-                           State_interpreter.loop_cps
-                             ~outputs:(function
-                                        | Data.Snapshot _ -> ()
-                                        | Data.Print p ->
-                                           Format.fprintf
-                                             log_form
-                                             "%s: %s@."
-                                             p.Data.file_name
-                                             p.Data.line
-                                        | Data.Flux _ -> ()
-                                        | Data.Plot (t,v) ->
-                                           match
-                                             React.S.value model_runtime_state
-                                           with
-                                           | None -> ()
-                                           | Some s ->
-                                             s.plot.Pp_svg.points <-
-                                               (t,v) :: s.plot.Pp_svg.points
-                                      )
-                             log_form
-                             (fun f -> if Lwt_switch.is_on thread_is_running
-                                       then Lwt.bind (Lwt_js.yield ()) f
-                                       else Lwt.return_unit)
-                             (fun _ _ ->
-                              let () = ExceptionDefn.flush_warning log_form in
-                              let () =
-                                Format.fprintf log_form "Simulation ended" in
-                              let () =
-                                if Counter.nb_null_event counter = 0
-                                then Format.pp_print_newline log_form ()
-                                else
-                                  let () =
-                                    Format.fprintf
-                                      log_form " (eff.: %f, detail below)@."
-                                      ((float_of_int
-                                          (Counter.current_event counter)) /.
-                                         (float_of_int
-                                            (Counter.nb_null_event counter +
-                                               Counter.current_event counter)))
-                                  in
-                                  Counter.print_efficiency log_form counter in
-                              Lwt_switch.turn_off thread_is_running)
-                             env domain counter graph state]
-                >>= (fun _ -> Lwt_js.sleep 1.)
-                >>= (fun _ -> stop_continuation ();
-                              set_model_is_running false;
-                              Lwt.return_unit
-                    )
-       )
-       (function
-         | ExceptionDefn.Malformed_Decl error ->
-            let () =
-              set_model_runtime_error_message
-                (Some (format_error_message error))
-            in
-            let () = set_model_syntax_error (Some error) in
-            Lwt_switch.turn_off thread_is_running
-            >>=
-              (fun _ -> on_error ())
-         | ExceptionDefn.Internal_Error error ->
-            let () =
-              set_model_runtime_error_message
-                (Some (format_error_message error))
-            in
-            let () = set_model_syntax_error (Some error) in
-            Lwt_switch.turn_off thread_is_running
-            >>=
-              (fun _ -> on_error ())
-         | Invalid_argument error ->
-            let message = Format.sprintf "Runtime error %s" error in
-            let () = set_model_runtime_error_message (Some message) in
-            Lwt_switch.turn_off thread_is_running
-            >>=
-              (fun _ -> on_error ())
-         | Sys_error message ->
-            let () = set_model_runtime_error_message (Some message) in
-            Lwt_switch.turn_off thread_is_running
-            >>=
-              (fun _ -> on_error ())
-         | e -> on_error ()
-                >>= (fun _ -> fail e)
-            )
+         Lwt.join [ write_out thread_is_running counter label log_buffer;
+                    State_interpreter.loop_cps
+                      ~outputs:(function
+                          | Data.Snapshot _ -> ()
+                          | Data.Print p ->
+                            Format.fprintf
+                              log_form
+                              "%s: %s@."
+                              p.Data.file_name
+                              p.Data.line
+                          | Data.Flux _ -> ()
+                          | Data.Plot (t,v) ->
+                            match
+                              React.S.value model_runtime_state
+                            with
+                            | None -> ()
+                            | Some s ->
+                              s.plot.Pp_svg.points <-
+                                (t,v) :: s.plot.Pp_svg.points
+                        )
+                      log_form
+                      (fun f -> if Lwt_switch.is_on thread_is_running
+                        then Lwt.bind (Lwt_js.yield ()) f
+                        else Lwt.return_unit)
+                      (fun _ _ ->
+                         let () = ExceptionDefn.flush_warning log_form in
+                         let () =
+                           Format.fprintf log_form "Simulation ended" in
+                         let () =
+                           if Counter.nb_null_event counter = 0
+                           then Format.pp_print_newline log_form ()
+                           else
+                             let () =
+                               Format.fprintf
+                                 log_form " (eff.: %f, detail below)@."
+                                 ((float_of_int
+                                     (Counter.current_event counter)) /.
+                                  (float_of_int
+                                     (Counter.nb_null_event counter +
+                                      Counter.current_event counter)))
+                             in
+                             Counter.print_efficiency log_form counter in
+                         Lwt_switch.turn_off thread_is_running)
+                      env domain counter graph state]
+         >>= (fun _ -> Lwt_js.sleep 1.)
+         >>= (fun _ -> stop_continuation ();
+               set_model_is_running false;
+               Lwt.return_unit
+             )
+      )
+      (function
+        | ExceptionDefn.Malformed_Decl error ->
+          let () =
+            set_model_runtime_error_message
+              (Some (format_error_message error))
+          in
+          let () = set_model_syntax_error (Some error) in
+          Lwt_switch.turn_off thread_is_running
+          >>=
+          (fun _ -> on_error ())
+        | ExceptionDefn.Internal_Error error ->
+          let () =
+            set_model_runtime_error_message
+              (Some (format_error_message error))
+          in
+          let () = set_model_syntax_error (Some error) in
+          Lwt_switch.turn_off thread_is_running
+          >>=
+          (fun _ -> on_error ())
+        | Invalid_argument error ->
+          let message = Format.sprintf "Runtime error %s" error in
+          let () = set_model_runtime_error_message (Some message) in
+          Lwt_switch.turn_off thread_is_running
+          >>=
+          (fun _ -> on_error ())
+        | Sys_error message ->
+          let () = set_model_runtime_error_message (Some message) in
+          Lwt_switch.turn_off thread_is_running
+          >>=
+          (fun _ -> on_error ())
+        | e -> on_error ()
+          >>= (fun _ -> fail e)
+      )

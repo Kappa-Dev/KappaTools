@@ -33,7 +33,7 @@ let fatal value =
     (Js.Unsafe.js_expr "fatal")
     [| Js.Unsafe.inject value |]
 let jquery_on (selector : string)
-              (event : string) handler =
+    (event : string) handler =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "jqueryOn")
     [| Js.Unsafe.inject (Js.string selector);
@@ -46,16 +46,16 @@ let option_string (id : string option) =
   | None -> Js.null
 
 let plotPNG (plotDivId : string)
-            (title:string)
-            (plotName : string)
-            (plotStyleId : string option) =
+    (title:string)
+    (plotName : string)
+    (plotStyleId : string option) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "plotPNG")
     [| Js.Unsafe.inject (Js.string plotDivId);
        Js.Unsafe.inject (Js.string title);
        Js.Unsafe.inject (Js.string plotName);
        Js.Unsafe.inject (option_string plotStyleId)
-      |]
+    |]
 
 let plotSVG
     (plotDivId : string)
@@ -68,7 +68,7 @@ let plotSVG
        Js.Unsafe.inject (Js.string title);
        Js.Unsafe.inject (Js.string plotName);
        Js.Unsafe.inject (option_string plotStyleId)
-      |]
+    |]
 
 let saveFile
     ~(data : string)

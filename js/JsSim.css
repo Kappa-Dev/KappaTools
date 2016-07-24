@@ -117,6 +117,7 @@ rect { stroke-width: 2; }
               opacity : 0.0; }
 .link-line { stroke : black;
              stroke-width : 2;
+	     fill: none;
 }
 
 

@@ -1,4 +1,4 @@
-"use strict"
+
 // http://stackoverflow.com/questions/326596/how-do-i-wrap-a-function-in-javascript
 var wrap = function(fn){
     return function(){
@@ -60,6 +60,30 @@ var args = function () {
         }
     }
 })();
+// https://medium.com/@graeme_boy/how-to-optimize-cpu-intensive-work-in-node-js-cdc09099ed41#.2vhd0cp4g
+// http://www.codingdefined.com/2014/08/difference-between-fork-spawn-and-exec.html
+// param {command,args,onStdout,onStderr,onClose}
+function spawnProcess(param){
+    const spawn = require('child_process').spawn;
+    const process = spawn(param.command, param.args);
+    // log pid
+    debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
+    if(param.onStdout) {
+	process.stdout.on('data',(data) => { param.onStdout(`${data}`); } );
+    }
+    if(param.onStderr) {
+	process.stderr.on('data',(data) => { param.onStderr(`${data}`); } );
+    }
+    if(param.onClose){
+	process.on('close',param.onClose);
+    }
+    if(param.onError){
+	process.on('error',param.onError);
+    }
+    return { write : function(data){ process.stdin.write(data); } ,
+	     kill : function(){ process.kill(); }
+    };
+}
 
 function jqueryOn(selector,event,handler){
     $(selector).on(event, function (e) {

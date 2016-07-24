@@ -14,13 +14,13 @@ let api_snapshot_kappa_multiple_links test_ctxt =
   in
   let expected =
     ""
-   ^"%init: 6.000000 C(x1,x2)\n"
-   ^"%init: 2.000000 C(x1,x2!5),A(x,c!5)\n"
-   ^"%init: 1.000000 C(x1,x2!3),A(x!4,c!3),B(x!4)\n"
-   ^"%init: 1.000000 B(x!1),C(x1!2,x2),A(x!1,c!2)\n"
-   ^"%init: 694.000000 B(x!0),A(x!0,c)\n"
-   ^"%init: 304.000000 B(x)\n"
-   ^"%init: 302.000000 A(x,c)"
+    ^"%init: 6.000000 C(x1,x2)\n"
+    ^"%init: 2.000000 C(x1,x2!5),A(x,c!5)\n"
+    ^"%init: 1.000000 C(x1,x2!3),A(x!4,c!3),B(x!4)\n"
+    ^"%init: 1.000000 B(x!1),C(x1!2,x2),A(x!1,c!2)\n"
+    ^"%init: 694.000000 B(x!0),A(x!0,c)\n"
+    ^"%init: 304.000000 B(x)\n"
+    ^"%init: 302.000000 A(x,c)"
   in
   let actual = Api_data.api_snapshot_kappa snapshot in
   assert_equal
@@ -34,10 +34,10 @@ let api_snapshot_kappa_single test_ctxt =
   in
   let expected =
     ""
-   ^"%init: 10.000000 C(x1,x2)\n"
-   ^"%init: 264.000000 A(x,c)\n"
-   ^"%init: 264.000000 B(x)\n"
-   ^"%init: 736.000000 B(x!0),A(x!0,c)"
+    ^"%init: 10.000000 C(x1,x2)\n"
+    ^"%init: 264.000000 A(x,c)\n"
+    ^"%init: 264.000000 B(x)\n"
+    ^"%init: 736.000000 B(x!0),A(x!0,c)"
   in
   let actual = Api_data.api_snapshot_kappa snapshot in
   assert_equal
@@ -53,18 +53,18 @@ let api_plot_tsv_sample_plot test_ctxt =
   let sample_plot : Api_types.plot  =
     { sample_plot
       with Api_types.observables =
-        [List.hd sample_plot.Api_types.observables] }
+             [List.hd sample_plot.Api_types.observables] }
   in
   let expected = Api_data.plot_tsv sample_plot in
   let actual =
     "time,'AB','Cuu','Cpu','Cpp',0,'snapshots'\n"
-   ^"9.000000e+01"
-   ^",7.210000e+02"
-   ^",0.000000e+00"
-   ^",0.000000e+00"
-   ^",1.000000e+01"
-   ^",0.000000e+00"
-   ^",1.400000e+01"
+    ^"9.000000e+01"
+    ^",7.210000e+02"
+    ^",0.000000e+00"
+    ^",0.000000e+00"
+    ^",1.000000e+01"
+    ^",0.000000e+00"
+    ^",1.400000e+01"
   in
   let actual = Api_data.plot_tsv sample_plot in
   assert_equal
@@ -73,7 +73,7 @@ let api_plot_tsv_sample_plot test_ctxt =
 
 
 let suite : OUnit2.test =
-"test_api_data">:::
+  "test_api_data">:::
   ["api_snapshot_kappa_single">:: api_snapshot_kappa_single
   ;"api_plot_tsv_sample_plot" >:: api_plot_tsv_sample_plot
   ;"api_snapshot_kappa_multiple_links" >:: api_snapshot_kappa_multiple_links ]

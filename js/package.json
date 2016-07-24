@@ -1,0 +1,2 @@
+{ "name": "Kappa",
+  "main": "index.html?version=dev&level=debug&host=file://a" }
