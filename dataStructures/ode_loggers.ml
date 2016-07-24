@@ -20,13 +20,20 @@ type variable =
   | Expr of int
   | Init of int
   | Deriv of int
+  | Obs of int
   | Jacobian of int * int
   | Tinit
   | Tend
   | InitialStep
   | Num_t_points
   | Rate of int
-  | Unary_rate of int
+  | Rated of int
+  | Rateun of int
+  | Rateund of int
+  | N_rules
+  | N_ode_var
+  | N_obs
+  | Tmp
 
 type ('a,'b) network_handler =
   {
@@ -85,21 +92,48 @@ let print_ode_preamble
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let string_of_variable var =
-      match var with
-      | Rate int -> Printf.sprintf "k(%i,1)" int
-      | Unary_rate int -> Printf.sprintf "k(%i,2)" int
-      | Expr int -> Printf.sprintf "var(%i)" int
-      | Init int -> Printf.sprintf "init(%i)" int
-      | Deriv int -> Printf.sprintf "dydt(%i)" int
-      | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
-      | Tinit -> Printf.sprintf "tinit"
-      | Tend -> Printf.sprintf "tend"
-      | InitialStep -> Printf.sprintf "initialstep"
-      | Num_t_points -> Printf.sprintf "num_t_point"
+  match var with
+  | Rate int -> Printf.sprintf "k(%i,1)" int
+  | Rated int -> Printf.sprintf "kd(%i,1)" int
+  | Rateun int -> Printf.sprintf "kun(%i,1)" int
+  | Rateund int -> Printf.sprintf "kdun(%i,1)" int
+  | Expr int -> Printf.sprintf "var(%i)" int
+  | Obs int -> Printf.sprintf "obs(%i)" int
+  | Init int -> Printf.sprintf "init(%i)" int
+  | Deriv int -> Printf.sprintf "dydt(%i)" int
+  | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
+  | Tinit -> "tinit"
+  | Tend -> "tend"
+  | InitialStep -> "initialstep"
+  | Num_t_points -> "num_t_point"
+  | N_ode_var -> "n_ode_var"
+  | N_obs -> "n_obs"
+  | N_rules -> "n_rules"
+  | Tmp -> "tmp"
+
+let string_of_array_name var =
+  match var with
+  | Rate _ -> "k"
+  | Rated _ -> "kd"
+  | Rateun _ -> "kun"
+  | Rateund _ -> "kdun"
+  | Expr _ -> "var"
+  | Obs _ -> "obs"
+  | Init _ -> "init"
+  | Deriv _ -> "dydt"
+  | Jacobian _ -> "Jac"
+  | Tinit -> "tinit"
+  | Tend -> "tend"
+  | InitialStep -> "initialstep"
+  | Num_t_points -> "num_t_point"
+  | N_ode_var -> "n_ode_var"
+  | N_obs -> "n_obs"
+  | N_rules -> "n_rules"
+  | Tmp -> "tmp"
 
 let declare_global logger string =
   let format = Loggers.get_encoding_format logger in
-  let string = string_of_variable string in
+  let string = string_of_array_name string in
   match
     format
   with
@@ -124,27 +158,38 @@ let initialize logger variable =
 
       let () =
         match variable with
-        | Rate int -> Loggers.fprintf logger "k= sparse(%i,2)" int
-        | Unary_rate int -> Loggers.fprintf logger "k= sparse(%i,2)" int
-        | Expr int -> Loggers.fprintf logger "var=zeros(%i,1);" int
-        | Init int -> Loggers.fprintf logger "init=zeros(%i,1);" int
-        | Deriv int -> Loggers.fprintf logger "dydt=zeros(%i,1);" int
-        | Jacobian (int1,int2) -> Loggers.fprintf logger "Jac = sparse(%i,%i);" int1 int2
+        | Rate _ -> Loggers.fprintf logger "k=zeros(n_rules,1)"
+        | Rated _ -> Loggers.fprintf logger "kd=sparse(n_rules,1)"
+        | Rateun _ -> Loggers.fprintf logger "kun=sparse(n_rules,1)"
+        | Rateund _ -> Loggers.fprintf logger "kdun=sparse(n_rules,1)"
+        | Expr _ -> Loggers.fprintf logger "var=zeros(n_ode_var,1);"
+        | Init _ -> Loggers.fprintf logger "init=sparse(n_ode_var,1);"
+        | Deriv _ -> Loggers.fprintf logger "dydt=zeros(n_ode_var,1);"
+        | Jacobian _ -> Loggers.fprintf logger "Jac = sparse(n_ode_var,n_ode_var);"
+        | Obs _ -> Loggers.fprintf logger "obs = zeroz(nrows,nobs);"
         | Tinit
         | Tend
         | InitialStep
-        | Num_t_points -> ()
+        | Num_t_points
+        | N_ode_var
+        | N_obs
+        | N_rules -> ()
+        | Tmp -> Loggers.fprintf logger "tmp = zeros(n_ode_var,1);"
       in
       let () =
         match variable with
-        | Rate _ | Unary_rate _
+        | Tmp | Rate _ | Rateun _ | Rated _ | Rateund _
         | Expr _
         | Init _
         | Deriv _
+        | Obs _
         | Jacobian _ -> Loggers.print_newline logger
         | Tinit
         | Tend
         | InitialStep
+        | N_ode_var
+        | N_obs
+        | N_rules
         | Num_t_points -> ()
       in
       ()
@@ -208,9 +253,8 @@ let rec print_alg_expr
 
 
 let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
-  let format = Loggers.get_encoding_format logger in
   match
-    format
+    Loggers.get_encoding_format logger
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
@@ -223,6 +267,19 @@ let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
   | Loggers.Maple -> ()
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let associate_nrows logger =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab | Loggers.Octave ->
+    let () = Loggers.fprintf logger "nrows = length(soln.x);" in
+    Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
   let format = Loggers.get_encoding_format logger in
@@ -278,8 +335,10 @@ let print_options logger =
         ["options = odeset('RelTol', 1e-3, ...";
          "                 'AbsTol', 1e-3, ...";
          "                 'InitialStep', initialstep, ...";
-         "                 'MaxStep', tend, ...";
-         "                 'Jacobian', @ode_jacobian);"] in
+         (*     "                 'MaxStep', tend, ...";
+                "                 'Jacobian', @ode_jacobian);"] *)
+         "                 'MaxStep', tend);"]
+   in
     let () = Loggers.print_newline logger in
     ()
   | Loggers.Maple -> ()
@@ -315,7 +374,8 @@ let print_license_check logger =
           "       uiIsMatlab = true;";
           "       break";
           "    end";
-          "end";]
+          "end";
+          "t = linspace(tinit, tend, num_t_point+1);";]
     in Loggers.print_newline logger
   | Loggers.Maple -> ()
   | Loggers.DOT

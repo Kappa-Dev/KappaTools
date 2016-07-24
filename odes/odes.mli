@@ -3,7 +3,9 @@
     type ode_var_id = int
     type var_id = int
     type network
-    val get_compil: unit -> I.compil
+    val get_input_files: unit -> string list
+    val get_compil: string list -> I.compil
+    val get_m_output_file: I.compil -> string
     val convert_var_def:
       'a * (I.pattern, string) Ast.ast_alg_expr Location.annot ->
       network ->
@@ -23,5 +25,5 @@
        ((I.connected_component, string) Ast.ast_alg_expr Location.annot *
         ode_var_id  Location.annot) list  * I.rule) list
 
-    val export_network: Loggers.t -> network -> unit
+    val export_network: Loggers.t -> I.compil -> network -> unit
   end

@@ -20,13 +20,21 @@ type variable =
   | Expr of int
   | Init of int
   | Deriv of int
+  | Obs of int
   | Jacobian of int * int
   | Tinit
   | Tend
   | InitialStep
   | Num_t_points
   | Rate of int
-  | Unary_rate of int
+  | Rated of int
+  | Rateun of int
+  | Rateund of int
+  | N_rules
+  | N_ode_var
+  | N_obs
+  | Tmp
+
 
 type ('a,'b) network_handler =
   {
@@ -55,6 +63,10 @@ val print_dump_plots: Loggers.t -> unit
 val initialize: Loggers.t -> variable -> unit
 val associate: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val increment: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
+
+
+val associate_nrows: Loggers.t -> unit
+
 val print_comment:
   Loggers.t ->
   ?filter_in:Loggers.encoding list option ->

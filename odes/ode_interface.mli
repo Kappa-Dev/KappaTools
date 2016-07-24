@@ -36,21 +36,25 @@ sig
     pattern * embedding_forest * mixture
 
   type rule
-  type rule_id
+  type direction = Direct | Reverse
+  type arity = Usual | Unary
+  type rule_mode = direction * arity
+  type rule_id = int
+  type rule_id_with_mode = rule_id * rule_mode
 
-  val binary_rule_that_can_be_applied_in_a_unary_context: rule -> bool
-  val lhs: rule -> pattern
+  val valid_modes: rule -> rule_mode list
+  val lhs: rule -> rule_mode -> pattern
   val token_vector:
-    rule -> ((connected_component,string) Ast.ast_alg_expr Location.annot *  string Location.annot) list
+    rule -> rule_mode -> ((connected_component,string) Ast.ast_alg_expr Location.annot *  string Location.annot) list
   val print_rule_id: Format.formatter -> rule_id -> unit
-  val rule_id: rule -> rule_id
+  val rate: rule -> rule_mode -> (pattern,string) Ast.ast_alg_expr Location.annot option
 
-  val apply: rule -> embedding_forest -> mixture  -> mixture
+  val apply: rule -> rule_mode -> embedding_forest -> mixture  -> mixture
   val lift_species: chemical_species -> mixture
 
 
   type compil
-  val get_compil: unit -> compil
+  val get_compil: string list -> compil
   val get_rules: compil -> rule list
   val get_initial_state: compil ->
     (string Location.annot option *
@@ -58,4 +62,10 @@ sig
      (mixture,string) Ast.init_t Location.annot) list
   val get_variables: compil -> (pattern,string) Ast.variable_def list
 
+  val get_t_init: compil -> float option
+  val get_t_end: compil -> float option
+  val get_n_points: compil -> int option
+  val get_files: unit -> string list
+  val get_m_output_file: compil -> string
+  val get_data_output_file: compil -> string
 end
