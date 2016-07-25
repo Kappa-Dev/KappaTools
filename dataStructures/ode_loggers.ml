@@ -7,7 +7,7 @@
   * KaSim
   * Jean Krivine, Université Paris-Diderot, CNRS
   *
-  * Creation: 20/07/2016
+  * Creation: 22/07/2016
   * Last modification: Time-stamp: <Jul 25 2016>
   * *
   *

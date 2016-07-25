@@ -1,5 +1,5 @@
 (** Network/ODE generation
-  * Creation: 20/07/2016
+  * Creation: 22/07/2016
   * Last modification: Time-stamp: <Jul 25 2016>
 *)
 
@@ -70,7 +70,7 @@ sig
      (mixture,string) Ast.init_t Location.annot) list
   val get_variables: compil -> (pattern,string) Ast.variable_def list
   val get_obs: compil -> (pattern,string) Ast.ast_alg_expr Location.annot list
-  val get_tokens: compil -> string Location.annot list 
+  val get_tokens: compil -> string Location.annot list
 
   val get_t_init: compil -> float option
   val get_t_end: compil -> float option

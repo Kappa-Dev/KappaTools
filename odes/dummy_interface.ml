@@ -1,5 +1,5 @@
 (** Network/ODE generation
-  * Creation: 20/07/2016
+  * Creation: 22/07/2016
   * Last modification: Time-stamp: <Jul 25 2016>
 *)
 
@@ -106,7 +106,7 @@ struct
   let get_initial_state compil = compil.Ast.init
   let get_variables compil = compil.Ast.variables
   let get_obs compil = compil.Ast.observables
-  let get_tokens compil = compil.Ast.tokens 
+  let get_tokens compil = compil.Ast.tokens
   let get_t_init _compil = Some 0.
   let get_t_end _compil = Some 1.
   let get_n_points _compil = Some 1000
