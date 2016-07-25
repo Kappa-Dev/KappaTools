@@ -213,24 +213,29 @@ let is_agent (ag,ty) graph =
   | None -> false
 let is_free ag s graph =
   let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  (Mods.DynArray.get graph.connect ag).(s) = None
+  let t = Mods.DynArray.get graph.connect ag in t <> [||] && t.(s) = None
 let is_internal i ag s graph =
   let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  match (Mods.DynArray.get graph.state ag).(s) with
+  let t = Mods.DynArray.get graph.state ag in
+  t <> [||] && match t.(s) with
   | Some j -> j = i
   | None -> false
 let link_exists ag s ag' s' graph =
   let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  match (Mods.DynArray.get graph.connect ag).(s) with
+  let t = Mods.DynArray.get graph.connect ag in
+  t <> [||] &&
+    match t.(s) with
   | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
   | None -> false
 
 let exists_fresh ag s ty s' graph =
   let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
-  match (Mods.DynArray.get graph.connect ag).(s) with
-  | Some ((ag',ty'),s'') ->
-    if ty'=ty && s'=s'' then Some ag' else None
-  | None -> None
+  let t = Mods.DynArray.get graph.connect ag in
+  if t = [||] then None else
+    match t.(s) with
+    | Some ((ag',ty'),s'') ->
+      if ty'=ty && s'=s'' then Some ag' else None
+    | None -> None
 
 let link_destination ag s graph =
   let () = assert (not graph.outdated) in
