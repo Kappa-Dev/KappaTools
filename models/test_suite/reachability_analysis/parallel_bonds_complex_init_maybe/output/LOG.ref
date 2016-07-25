@@ -689,19 +689,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=39
+Id=41
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=38
+  Id=40
    Node(site_type:1<2)
-    Id=37
+    Id=39
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=36
+      Id=38
        Node(site_type:2<2)
         Id=15
          Node(site_type:3<1)
@@ -731,19 +731,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=45
+Id=47
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=46
    Node(site_type:1<1)
-    Id=37
+    Id=39
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=36
+      Id=38
        Node(site_type:2<2)
         Id=15
          Node(site_type:3<1)
@@ -788,19 +788,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=52
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=42
+  Id=44
    Node(site_type:1<2)
-    Id=41
+    Id=43
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=40
+      Id=42
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<0)
@@ -815,7 +815,7 @@ Id=50
             Id=0
              Leaf False 
 
-        Id=36
+        Id=38
          Node(site_type:2<2)
           Id=15
            Node(site_type:3<1)
@@ -863,12 +863,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -897,19 +897,20 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,z!B@z,t!free)
+			A(~)
+			A(~)
 
 	Wake-up rules
 		Updating the views for B(x~,z!,t!)
 			
 
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -938,7 +939,8 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~p,z!A@z,t!free)
+			B(~)
+			B(~)
 
 	Wake-up rules
 
@@ -1096,4 +1098,35 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 7: r7:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
-execution finished without any exception
+Some exceptions have been raisederror: file_name: setMap.ml; message: line 659; exception:Not_found
+error: file_name: views_domain; message: line 598; exception:Exit
+error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
+error: file_name: Handler; message: line 194; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Handler; message: line 206; exception:Exit
+error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
+error: file_name: Handler; message: line 228; exception:Exit
+error: file_name: setMap.ml; message: line 659; exception:Not_found
+error: file_name: views_domain; message: line 598; exception:Exit
+error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
+error: file_name: Handler; message: line 194; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Handler; message: line 206; exception:Exit
+error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
+error: file_name: Handler; message: line 228; exception:Exit
+error: file_name: setMap.ml; message: line 659; exception:Not_found
+error: file_name: views_domain; message: line 598; exception:Exit
+error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
+error: file_name: Handler; message: line 194; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Handler; message: line 206; exception:Exit
+error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
+error: file_name: Handler; message: line 228; exception:Exit
+error: file_name: setMap.ml; message: line 659; exception:Not_found
+error: file_name: views_domain; message: line 598; exception:Exit
+error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
+error: file_name: Handler; message: line 194; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Handler; message: line 206; exception:Exit
+error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
+error: file_name: Handler; message: line 228; exception:Exit

@@ -1890,11 +1890,21 @@ In agent A, the binding state of site x, and the internal state of site , are en
 	A(x!B@x,~)
 
 
+ A.x and C.x is equal to u,u when A.x is connected to C.x
+In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
+	A(x!free,~)
+
+
  A.x and C.x is equal to p,p when A.x is connected to C.x
 In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
 	A(x!B@x,~)
 
 
+ C.x and A.x is equal to u,u when C.x is connected to A.x
+In agent C, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
+	C(x!free,~)
+
+
  C.x and A.x is equal to p,p when C.x is connected to A.x
 In agent C, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
 	C(x!A@x,~)
@@ -1903,11 +1913,21 @@ In agent C, the binding state of site x, and the internal state of site , are en
  C.x and A.x is equal to p,p when C.x is connected to A.x
 In agent C, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
 	C(x!A@x,~)
+
+
+ D.x and E.x is equal to u,u when D.x is connected to E.x
+In agent D, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
+	D(x!free,~)
 
 
  D.x and E.x is equal to p,p when D.x is connected to E.x
 In agent D, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
 	D(x!E@x,~)
+
+
+ E.x and D.x is equal to u,u when E.x is connected to D.x
+In agent E, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
+	E(x!free,~)
 
 
  E.x and D.x is equal to p,p when E.x is connected to D.x

@@ -1265,7 +1265,7 @@ Id=108
    Leaf False 
 
   Id=107
-   Node(site_type:0<2)
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1280,7 +1280,7 @@ Id=108
    Leaf False 
 
   Id=107
-   Node(site_type:0<2)
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1393,12 +1393,11 @@ Id=187
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C, the internal state of site x1, the internal state of site x2, the binding state of site x1, and the binding state of site x2, are entangled by the following 4-d relationship:
-	C(x1~p,x2~u,x1!free,x2!free)
-	C(x1~p,x2~u,x1!free,x2!A@c)
-	C(x1~p,x2~p,x1!free,x2!free)
-	C(x1~u,x2~u,x1!A@c,x2!free)
-	C(x1~u,x2~u,x1!free,x2!free)
+In agent C: 
+	when the internal state of site x1 is equal to u, then:
+		+ the internal state of site x2 is always u.
+		+ the binding state of site x1 ranges over free and A@c.
+		+ the binding state of site x2 is always free.
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1426,7 +1425,7 @@ Id=108
    Leaf False 
 
   Id=107
-   Node(site_type:0<2)
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1434,7 +1433,7 @@ Id=108
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over free and B@x.
+The binding state of site x in agent A is always free.
 INTENSIONAL DESCRIPTION:
 Id=108
  Node(site_type:0<0)
@@ -1442,7 +1441,7 @@ Id=108
    Leaf False 
 
   Id=107
-   Node(site_type:0<2)
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1450,7 +1449,7 @@ Id=108
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent B ranges over free and A@x.
+The binding state of site x in agent B is always free.
 INTENSIONAL DESCRIPTION:
 Id=48
  Node(site_type:2<0)
@@ -1490,7 +1489,7 @@ Id=108
    Leaf False 
 
   Id=107
-   Node(site_type:0<2)
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1498,7 +1497,7 @@ Id=108
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x1 in agent C ranges over u and p.
+The internal state of site x1 in agent C is always u.
 INTENSIONAL DESCRIPTION:
 Id=127
  Node(site_type:3<0)
@@ -1518,6 +1517,36 @@ The binding state of site x2 in agent C ranges over free and A@c.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ A.x and C.x1 is equal to B@x,p when A.c is connected to C.x1
+In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
+	A(c!C@x1,~)
+
+
+ A.x and C.x1 is equal to free,u when A.c is connected to C.x2
+In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
+	A(c!free,~)
+
+
+ A.x and C.x2 is equal to free,u when A.c is connected to C.x2
+In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
+	A(c!free,~)
+
+
+ A.x and C.x1 is equal to free,free when A.c is connected to C.x2
+In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
+	A(c!free,~)
+
+
+ C.x1 and A.x is equal to p,B@x when C.x1 is connected to A.c
+In agent C, the internal state of site x2, and the binding state of site x1, are entangled by the following 2-d relationship:
+	C(x2~p,x1!A@c)
+
+
+ C.x2 and A.x is equal to u,free when C.x2 is connected to A.c
+In agent C, the internal state of site x2, and the binding state of site x1, are entangled by the following 2-d relationship:
+	C(x2~u,x1!free)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

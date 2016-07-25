@@ -413,6 +413,16 @@ EXTENSIONAL DESCRIPTION:
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
 		Updating the views for B(z!,t!)
+                          A.t and B.t is equal to free,free when A.z is connected to B.z
+                         In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	A(t!free,~)
+
+
+                          B.t and A.t is equal to free,free when B.z is connected to A.z
+                         In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	B(t!free,~)
+
+
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -454,16 +464,66 @@ EXTENSIONAL DESCRIPTION:
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
 		Updating the views for B(z!,t!)
+                          A.z and B.z is equal to free,free when A.t is connected to B.t
+                         In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	A(t!free,~)
+
+
+                          A.z and B.z is equal to free,free when A.t is connected to B.t
+                         In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	A(t!free,~)
+
+
+                          B.z and A.z is equal to free,free when B.t is connected to A.t
+                         In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	B(t!free,~)
+
+
+                          B.z and A.z is equal to free,free when B.t is connected to A.t
+                         In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	B(t!free,~)
+
+
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
+                          A.t and B.t is equal to free,free when A.z is connected to B.z
+                         In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	A(t!free,~)
+
+
+                          B.t and A.t is equal to free,free when B.z is connected to A.z
+                         In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	B(t!free,~)
+
+
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
+                          A.z and B.z is equal to free,free when A.t is connected to B.t
+                         In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	A(t!free,~)
+
+
+                          A.z and B.z is equal to free,free when A.t is connected to B.t
+                         In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	A(t!free,~)
+
+
+                          B.z and A.z is equal to free,free when B.t is connected to A.t
+                         In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	B(t!free,~)
+
+
+                          B.z and A.z is equal to free,free when B.t is connected to A.t
+                         In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+                         	B(t!free,~)
+
+
 
 ------------------------------------------------------------
 * Dead rules :
@@ -685,6 +745,26 @@ The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+ A.z and B.z is equal to free,free when A.t is connected to B.t
+In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+	A(t!free,~)
+
+
+ A.z and B.z is equal to free,free when A.t is connected to B.t
+In agent A, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+	A(t!free,~)
+
+
+ B.z and A.z is equal to free,free when B.t is connected to A.t
+In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+	B(t!free,~)
+
+
+ B.z and A.z is equal to free,free when B.t is connected to A.t
+In agent B, the binding state of site t, and the internal state of site , are entangled by the following 2-d relationship:
+	B(t!free,~)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

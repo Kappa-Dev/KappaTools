@@ -803,12 +803,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=48
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=47
    Node(site_type:1<2)
     Id=34
      Node(site_type:2<1)
@@ -837,7 +837,7 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z~p,z!A@z,t!free)
+			A(~)
 
 	Wake-up rules
 		Updating the views for A(z~,z!,t!)
@@ -1027,3 +1027,11 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(z~,z!,t!)
 		Updating the views for A(z~,z!,t!)
 Some exceptions have been raisederror: file_name: Prepreprocess.ml; message: Label 'r3' is already used; exception:Exit
+error: file_name: setMap.ml; message: line 659; exception:Not_found
+error: file_name: views_domain; message: line 598; exception:Exit
+error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
+error: file_name: Handler; message: line 194; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Handler; message: line 206; exception:Exit
+error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
+error: file_name: Handler; message: line 228; exception:Exit
