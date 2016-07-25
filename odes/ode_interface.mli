@@ -16,7 +16,7 @@ sig
   type connected_component_id
   val print_connected_component_id: Format.formatter -> connected_component_id -> unit
 
-  val do_we_divide_rates_by_n_auto_in_lhs: bool 
+  val do_we_divide_rates_by_n_auto_in_lhs: bool
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
   val nbr_automorphisms_in_pattern: pattern -> int
 
@@ -48,7 +48,7 @@ sig
   val valid_modes: rule -> rule_mode list
   val lhs: rule -> rule_mode -> pattern
   val token_vector:
-    rule -> rule_mode -> ((connected_component,string) Ast.ast_alg_expr Location.annot *  string Location.annot) list
+    rule -> rule_mode -> ((pattern,string) Ast.ast_alg_expr Location.annot *  string Location.annot) list
   val print_rule_id: Format.formatter -> rule_id -> unit
   val rate: rule -> rule_mode -> (pattern,string) Ast.ast_alg_expr Location.annot option
 

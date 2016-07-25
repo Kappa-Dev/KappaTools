@@ -19,6 +19,7 @@
 type variable =
   | Expr of int
   | Init of int
+  | Concentration of int
   | Deriv of int
   | Obs of int
   | Jacobian of int * int
@@ -93,13 +94,14 @@ let print_ode_preamble
 
 let string_of_variable var =
   match var with
-  | Rate int -> Printf.sprintf "k(%i,1)" int
-  | Rated int -> Printf.sprintf "kd(%i,1)" int
-  | Rateun int -> Printf.sprintf "kun(%i,1)" int
-  | Rateund int -> Printf.sprintf "kdun(%i,1)" int
+  | Rate int -> Printf.sprintf "k(%i)" int
+  | Rated int -> Printf.sprintf "kd(%i)" int
+  | Rateun int -> Printf.sprintf "kun(%i)" int
+  | Rateund int -> Printf.sprintf "kdun(%i)" int
   | Expr int -> Printf.sprintf "var(%i)" int
   | Obs int -> Printf.sprintf "obs(%i)" int
   | Init int -> Printf.sprintf "init(%i)" int
+  | Concentration int -> Printf.sprintf "y(%i)" int
   | Deriv int -> Printf.sprintf "dydt(%i)" int
   | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
   | Tinit -> "tinit"
@@ -120,6 +122,7 @@ let string_of_array_name var =
   | Expr _ -> "var"
   | Obs _ -> "obs"
   | Init _ -> "init"
+  | Concentration _ -> "y"
   | Deriv _ -> "dydt"
   | Jacobian _ -> "Jac"
   | Tinit -> "tinit"
@@ -164,6 +167,7 @@ let initialize logger variable =
         | Rateund _ -> Loggers.fprintf logger "kdun=sparse(n_rules,1)"
         | Expr _ -> Loggers.fprintf logger "var=zeros(n_ode_var,1);"
         | Init _ -> Loggers.fprintf logger "init=sparse(n_ode_var,1);"
+        | Concentration _ -> Loggers.fprintf logger "y=zeros(n_ode_var,1)"
         | Deriv _ -> Loggers.fprintf logger "dydt=zeros(n_ode_var,1);"
         | Jacobian _ -> Loggers.fprintf logger "Jac = sparse(n_ode_var,n_ode_var);"
         | Obs _ -> Loggers.fprintf logger "obs = zeroz(nrows,nobs);"
@@ -181,6 +185,7 @@ let initialize logger variable =
         | Tmp | Rate _ | Rateun _ | Rated _ | Rateund _
         | Expr _
         | Init _
+        | Concentration _
         | Deriv _
         | Obs _
         | Jacobian _ -> Loggers.print_newline logger
@@ -348,8 +353,46 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
 
 
   let consume = gen "-"
-  let product = gen "+"
+  let produce = gen "+"
 
+let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab  | Loggers.Octave ->
+    begin
+      let var = string_of_variable var_token in
+      let () = Loggers.fprintf logger "%s=%s+" var var in
+      let bool =
+        if nauto_in_lhs =1
+        then
+          false
+        else
+          let () =
+              Loggers.fprintf logger "1/%i" nauto_in_lhs
+          in
+          true
+      in
+      let () =
+        if bool
+        then
+          Loggers.fprintf logger "*"
+      in
+      let () = Loggers.fprintf logger "%s" (string_of_variable var_rate) in
+      let () =
+        List.iter
+          (fun var -> Loggers.fprintf logger "*%s" (string_of_variable var))
+          var_list
+      in
+      let () = Loggers.fprintf logger "*(" in
+      let () = print_alg_expr logger expr handler in
+      let () = Loggers.fprintf logger ");" in
+      let () = Loggers.print_newline logger in
+      ()
+    end
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let print_comment
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])

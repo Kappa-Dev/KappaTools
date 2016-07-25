@@ -84,11 +84,18 @@ struct
       divide_rate_by: int
     }
 
+  let var_of_rule rule =
+    match rule.mode with
+    | I.Direct, I.Usual -> Ode_loggers.Rate rule.rule_id
+    | I.Direct, I.Unary -> Ode_loggers.Rateun rule.rule_id
+    | I.Reverse, I.Usual -> Ode_loggers.Rated rule.rule_id
+    | I.Reverse, I.Unary -> Ode_loggers.Rateund rule.rule_id
+
   type network =
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
-      reactions: (id list * id list * ((I.connected_component,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * enriched_rule) list ;
+      reactions: (id list * id list * ((I.pattern,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * enriched_rule) list ;
 
       ode_vars_tab: ode_var Mods.DynArray.t ;
       id_of_ode_var: ode_var_id VarMap.t ;
@@ -887,6 +894,9 @@ struct
         handler_expr in
     let () = Loggers.print_newline logger in
     let () =
+      Ode_loggers.declare_global logger Ode_loggers.N_ode_var
+    in
+    let () =
       Ode_loggers.associate
         logger
         Ode_loggers.N_ode_var
@@ -926,6 +936,7 @@ struct
     let () = do_it (fun x -> Ode_loggers.Rated x) in
     let () = do_it (fun x -> Ode_loggers.Rateun x) in
     let () = do_it (fun x -> Ode_loggers.Rateund x) in
+    let () = Loggers.print_newline logger in
     let sorted_rules = split_rules constvarset network in
     let () =
       List.iter
@@ -954,6 +965,10 @@ struct
     let () = Loggers.print_newline logger in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
+    let () = Loggers.print_newline logger in
+    let () =
+      Ode_loggers.declare_global logger Ode_loggers.N_ode_var
+    in
     let do_it f =
       Ode_loggers.declare_global logger (f network.n_rules)
     in
@@ -966,20 +981,36 @@ struct
     let () = Loggers.print_newline logger in
     let () =
       List.iter
-        (fun (reactants, products, token_vector, rule) ->
-           let () =
-             List.iter
-               (fun _reactant -> ())
-               reactants
+        (fun (id,_rule,mode,rate) ->
+           Ode_loggers.associate
+             logger
+             (var_rate (id,mode,rate)) rate handler_expr)
+        sorted_rules.var_rate
+    in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.initialize logger (Ode_loggers.Deriv 1) in
+    let do_it f l reactants enriched_rule =
+      List.iter
+        (fun species ->
+           let nauto_in_species =
+             I.nbr_automorphisms_in_chemical_species (species_of_species_id network species)
            in
+           let nauto_in_lhs = enriched_rule.divide_rate_by in
+           f logger (Ode_loggers.Deriv species) ~nauto_in_species ~nauto_in_lhs (var_of_rule enriched_rule) reactants)
+        l
+    in
+    let () =
+      List.iter
+        (fun (reactants, products, token_vector, enriched_rule) ->
+           let nauto_in_lhs = enriched_rule.divide_rate_by in
+           let reactants' = List.rev_map (fun x -> Ode_loggers.Concentration x) (List.rev reactants) in
+
+           let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
+           let () = do_it Ode_loggers.produce products reactants' enriched_rule in
            let () =
              List.iter
-               (fun _product -> ())
-               products
-           in
-           let () =
-             List.iter
-               (fun (_expr,_token) -> ())
+               (fun (expr,(token,_loc)) ->
+                  Ode_loggers.update_token logger (Ode_loggers.Deriv token) ~nauto_in_lhs (var_of_rule enriched_rule) (convert_alg_expr expr network) reactants' handler_expr)
                token_vector
            in ()
         )

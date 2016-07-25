@@ -19,6 +19,7 @@
 type variable =
   | Expr of int
   | Init of int
+  | Concentration of int
   | Deriv of int
   | Obs of int
   | Jacobian of int * int
@@ -66,8 +67,8 @@ val increment: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_e
 val associate_nrows: Loggers.t -> unit
 
 val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
-
-val product: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
+val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
+val update_token: Loggers.t -> variable -> nauto_in_lhs:int -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> variable list -> ('a,'b) network_handler -> unit
 
 val print_comment:
   Loggers.t ->
