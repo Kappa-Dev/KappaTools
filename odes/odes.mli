@@ -1,3 +1,8 @@
+(** Network/ODE generation
+  * Creation: 20/07/2016
+  * Last modification: Time-stamp: <Jul 25 2016>
+*)
+
 module Make(I:Ode_interface.Interface) :
 sig
   type ode_var_id

@@ -1,3 +1,8 @@
+(** Network/ODE generation
+  * Creation: 20/07/2016
+  * Last modification: Time-stamp: <Jul 25 2016>
+*)
+
 module Interface =
 struct
   type mixture = Ast.mixture          (* not necessarily connected, fully specified *)
@@ -8,7 +13,7 @@ struct
 
   let dummy_chemical_species = []
   let dummy_canonic_species = 0
-  let do_we_divide_rates_by_n_auto_in_lhs = true 
+  let do_we_divide_rates_by_n_auto_in_lhs = true
   let print_chemical_species _ _ = ()
   let print_canonic_species _ _ = ()
 
@@ -100,7 +105,8 @@ struct
   let get_rules compil = compil.Ast.rules
   let get_initial_state compil = compil.Ast.init
   let get_variables compil = compil.Ast.variables
-
+  let get_obs compil = compil.Ast.observables
+  let get_tokens compil = compil.Ast.tokens 
   let get_t_init _compil = Some 0.
   let get_t_end _compil = Some 1.
   let get_n_points _compil = Some 1000

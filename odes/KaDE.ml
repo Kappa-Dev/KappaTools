@@ -1,3 +1,8 @@
+(** Network/ODE generation
+  * Creation: 20/07/2016
+  * Last modification: Time-stamp: <Jul 25 2016>
+ *)
+
 module A = Odes.Make (Dummy_interface.Interface)
 
 let main () =

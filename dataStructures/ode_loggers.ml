@@ -7,8 +7,8 @@
   * KaSim
   * Jean Krivine, Université Paris-Diderot, CNRS
   *
-  * Creation: 23/05/2016
-  * Last modification: 25/05/2016
+  * Creation: 20/07/2016
+  * Last modification: Time-stamp: <Jul 25 2016>
   * *
   *
   *
@@ -19,6 +19,7 @@
 type variable =
   | Expr of int
   | Init of int
+  | Initbis of int
   | Concentration of int
   | Deriv of int
   | Obs of int
@@ -33,8 +34,10 @@ type variable =
   | Rateund of int
   | N_rules
   | N_ode_var
+  | N_var
   | N_obs
   | Tmp
+  | Current_time
 
 type ('a,'b) network_handler =
   {
@@ -101,6 +104,7 @@ let string_of_variable var =
   | Expr int -> Printf.sprintf "var(%i)" int
   | Obs int -> Printf.sprintf "obs(%i)" int
   | Init int -> Printf.sprintf "init(%i)" int
+  | Initbis int -> Printf.sprintf "Init(%i)" int
   | Concentration int -> Printf.sprintf "y(%i)" int
   | Deriv int -> Printf.sprintf "dydt(%i)" int
   | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
@@ -109,9 +113,11 @@ let string_of_variable var =
   | InitialStep -> "initialstep"
   | Num_t_points -> "num_t_point"
   | N_ode_var -> "nodevar"
+  | N_var -> "nvar"
   | N_obs -> "nobs"
   | N_rules -> "nrules"
   | Tmp -> "tmp"
+  | Current_time -> "t"
 
 let string_of_array_name var =
   match var with
@@ -122,6 +128,7 @@ let string_of_array_name var =
   | Expr _ -> "var"
   | Obs _ -> "obs"
   | Init _ -> "init"
+  | Initbis _ -> "Init"
   | Concentration _ -> "y"
   | Deriv _ -> "dydt"
   | Jacobian _ -> "Jac"
@@ -130,9 +137,11 @@ let string_of_array_name var =
   | InitialStep -> "initialstep"
   | Num_t_points -> "num_t_point"
   | N_ode_var -> "nodevar"
+  | N_var -> "nvar"
   | N_obs -> "nobs"
   | N_rules -> "nrules"
   | Tmp -> "tmp"
+  | Current_time -> "t"
 
 let declare_global logger string =
   let format = Loggers.get_encoding_format logger in
@@ -161,30 +170,35 @@ let initialize logger variable =
 
       let () =
         match variable with
-        | Rate _ -> Loggers.fprintf logger "k=zeros(n_rules,1)"
-        | Rated _ -> Loggers.fprintf logger "kd=sparse(n_rules,1)"
-        | Rateun _ -> Loggers.fprintf logger "kun=sparse(n_rules,1)"
-        | Rateund _ -> Loggers.fprintf logger "kdun=sparse(n_rules,1)"
-        | Expr _ -> Loggers.fprintf logger "var=zeros(n_ode_var,1);"
-        | Init _ -> Loggers.fprintf logger "init=sparse(n_ode_var,1);"
-        | Concentration _ -> Loggers.fprintf logger "y=zeros(n_ode_var,1)"
-        | Deriv _ -> Loggers.fprintf logger "dydt=zeros(n_ode_var,1);"
-        | Jacobian _ -> Loggers.fprintf logger "Jac = sparse(n_ode_var,n_ode_var);"
-        | Obs _ -> Loggers.fprintf logger "obs = zeroz(nrows,nobs);"
+        | Rate _ -> Loggers.fprintf logger "k=zeros(nrules,1)"
+        | Rated _ -> Loggers.fprintf logger "kd=sparse(nrules,1)"
+        | Rateun _ -> Loggers.fprintf logger "kun=sparse(nrules,1)"
+        | Rateund _ -> Loggers.fprintf logger "kdun=sparse(nrules,1)"
+        | Expr _ -> Loggers.fprintf logger "var=zeros(nvar,1);"
+        | Init _ -> Loggers.fprintf logger "init=sparse(nodevar,1);"
+        | Initbis _ -> Loggers.fprintf logger "Init=zeros(nodevar,1);"
+        | Concentration _ -> Loggers.fprintf logger "y=zeros(nodevar,1)"
+        | Deriv _ -> Loggers.fprintf logger "dydt=zeros(nodevar,1);"
+        | Jacobian _ -> Loggers.fprintf logger "Jac = sparse(nodevar,nodevar);"
+        | Obs _ -> Loggers.fprintf logger "obs = zeros(nrows,nobs);"
         | Tinit
         | Tend
         | InitialStep
         | Num_t_points
         | N_ode_var
+        | N_var
         | N_obs
+        | Current_time
         | N_rules -> ()
-        | Tmp -> Loggers.fprintf logger "tmp = zeros(n_ode_var,1);"
+        | Tmp -> Loggers.fprintf logger "tmp = zeros(nodevar,1);"
+
       in
       let () =
         match variable with
         | Tmp | Rate _ | Rateun _ | Rated _ | Rateund _
         | Expr _
         | Init _
+        | Initbis _
         | Concentration _
         | Deriv _
         | Obs _
@@ -193,8 +207,10 @@ let initialize logger variable =
         | Tend
         | InitialStep
         | N_ode_var
+        | N_var
         | N_obs
         | N_rules
+        | Current_time
         | Num_t_points -> ()
       in
       ()
@@ -435,6 +451,30 @@ let print_options logger =
     in
     let () = Loggers.print_newline logger in
     ()
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
+let start_time logger float =
+  let () = Loggers.fprintf logger "t = %f;" float in
+  Loggers.print_newline logger
+
+let declare_init logger i =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    let () =
+      Loggers.fprintf logger
+        "Init(%i) = init(%i);" i i
+    in
+    Loggers.print_newline logger
   | Loggers.Maple -> ()
   | Loggers.DOT
   | Loggers.HTML_Graph

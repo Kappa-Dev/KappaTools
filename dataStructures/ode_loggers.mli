@@ -7,9 +7,8 @@
   * KaSim
   * Jean Krivine, Université Paris-Diderot, CNRS
   *
-  * Creation: 23/05/2016
-  * Last modification: 25/05/2016
-  * *
+  * Creation: 20/07/2016
+  * Last modification: Time-stamp: <Jul 25 2016>* *
   *
   *
   * Copyright 2016  Institut National de Recherche en Informatique et
@@ -19,6 +18,7 @@
 type variable =
   | Expr of int
   | Init of int
+  | Initbis of int
   | Concentration of int
   | Deriv of int
   | Obs of int
@@ -33,8 +33,10 @@ type variable =
   | Rateund of int
   | N_rules
   | N_ode_var
+  | N_var
   | N_obs
   | Tmp
+  | Current_time
 
 
 type ('a,'b) network_handler =
@@ -65,6 +67,9 @@ val initialize: Loggers.t -> variable -> unit
 val associate: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val increment: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val associate_nrows: Loggers.t -> unit
+
+val start_time: Loggers.t -> float -> unit
+val declare_init: Loggers.t -> int -> unit
 
 val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
 val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit

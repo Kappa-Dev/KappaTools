@@ -1,3 +1,10 @@
+(** Network/ODE generation
+  * Creation: 20/07/2016
+  * Last modification: Time-stamp: <Jul 25 2016>
+*)
+
+
+
 module Make(I:Ode_interface.Interface) =
 struct
 
@@ -104,12 +111,14 @@ struct
       species_tab: I.chemical_species Mods.DynArray.t ;
 
       varmap: var_id Mods.StringMap.t ;
+      tokenmap: ode_var_id Mods.StringMap.t ;
+
       fresh_var_id: var_id ;
       var_declaration: decl list ;
 
       n_rules: int ;
 
-      obs: (obs_id * (I.connected_component,string) Ast.ast_alg_expr Location.annot * id Location.annot) list ;
+      obs: (obs_id * (ode_var_id,string) Ast.ast_alg_expr Location.annot) list ;
       n_obs: int ;
 
     }
@@ -121,6 +130,9 @@ struct
   let get_fresh_ode_var_id network = network.fresh_ode_var_id
   let inc_fresh_ode_var_id network =
     {network with fresh_ode_var_id = next_id network.fresh_ode_var_id}
+  let get_fresh_obs_id network = network.n_obs
+  let inc_fresh_obs_id network =
+    {network with n_obs = next_id network.n_obs}
 
 
   let fold_left_swap f a b =
@@ -141,10 +153,11 @@ struct
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
       varmap = Mods.StringMap.empty ;
+      tokenmap = Mods.StringMap.empty ;
       var_declaration = [];
       n_rules = 0 ;
       obs = [] ;
-      n_obs = 0 ;
+      n_obs = 1 ;
     }
 
   let is_known_variable variable network =
@@ -177,7 +190,10 @@ struct
     add_new_var (Nembed canonic) network
 
   let add_new_token token network =
-    add_new_var (Token token) network
+    let fresh_id = get_fresh_ode_var_id network in
+    let network, id = add_new_var (Token token) network in
+    {network with tokenmap = Mods.StringMap.add token id network.tokenmap},
+      id
 
   let enrich_rule rule mode id =
     let lhs = I.lhs rule mode in
@@ -422,6 +438,14 @@ struct
         aux to_be_visited network store
     in
     aux to_be_visited network store
+
+    let convert_tokens compil network =
+      let tokens = I.get_tokens compil in
+      List.fold_left
+        (fun network (a,_) ->
+           snd (fst (translate_token a ([],network))))
+        network
+        tokens
 
   let translate_species species network =
     snd (translate_species species ([],network))
@@ -680,6 +704,27 @@ struct
       let () = Printf.fprintf stdout "Circular dependencies\n" in
       assert false
 
+  let convert_one_obs obs network =
+    let a,b = obs in
+    a,convert_alg_expr b network
+
+  let convert_obs compil network =
+    let list_obs = I.get_obs compil in
+    let network =
+      List.fold_left
+        (fun network obs ->
+           inc_fresh_obs_id
+             {network with
+              obs = (get_fresh_obs_id network,
+                     convert_alg_expr obs network)
+                    ::network.obs})
+        network
+        list_obs
+    in
+    {network with
+     obs = List.rev network.obs;
+     n_obs = network.n_obs - 1}
+
 
   let species_of_initial_state =
     List.fold_left
@@ -705,25 +750,34 @@ struct
     | Ast.UN_ALG_OP (_,a),_ -> is_const a constvarset
 
     | Ast.OBS_VAR string,_ ->
-      not (Mods.StringSet.mem string constvarset)
+      Mods.StringSet.mem string constvarset
     | Ast.STATE_ALG_OP _,_
     | Ast.TOKEN_ID _,_
     | Ast.KAPPA_INSTANCE _,_ -> false
 
   type rate =
     (ode_var_id, string) Ast.ast_alg_expr Location.annot
-  type sort_rules =
+
+  type sort_rules_and_decl =
     {
+      const_decl_set : Mods.StringSet.t ;
+      const_decl: decl list ;
+      var_decl: decl list ;
+      init: decl list ;
       const_rate :
         (I.rule_id * I.rule * I.rule_mode * rate) list ;
       var_rate :
         (I.rule_id * I.rule * I.rule_mode * rate) list ;
     }
 
-  let init_sort_rules =
+  let init_sort_rules_and_decl =
     {
+      const_decl_set = Mods.StringSet.empty ;
+      const_decl = [] ;
+      var_decl = [] ;
       const_rate = [] ;
       var_rate = [] ;
+      init = [] ;
     }
 
   let var_rate (id,mode,_) =
@@ -737,79 +791,155 @@ struct
     | I.Reverse, I.Unary ->
       Ode_loggers.Rateund id
 
-  let split_rules varset network =
-    List.fold_left
-      (fun sort_rules enriched_rule ->
-         let rate = I.rate enriched_rule.rule enriched_rule.mode in
-         match rate with
-         | None -> sort_rules
-         | Some rate ->
-           let rate = convert_alg_expr rate network in
-           let sort_rules =
-             if is_const rate varset
-             then
-               {
-                 sort_rules
-                 with const_rate =
-                        (enriched_rule.rule_id,
-                         enriched_rule.rule,
-                         enriched_rule.mode, rate)::sort_rules.const_rate
-               }
-             else
-               {
-                 sort_rules
-                 with var_rate =
-                        (enriched_rule.rule_id,
-                         enriched_rule.rule,
-                         enriched_rule.mode, rate)::sort_rules.var_rate
-               }
-           in
-           sort_rules)
-      init_sort_rules
-      network.rules
-
-  let var_declaration decl =
-    let set,decl =
+  let split_var_declaration network sort_rules_and_decls =
+    let decl =
       List.fold_left
-        (fun (constvarset,decl_var_list) decl ->
+        (fun sort_decls decl ->
            match decl with
            | Dummy_decl
            | Var (_,None,_)
-           | Init_expr _ -> constvarset,decl_var_list
+           | Init_expr _ ->
+             {
+               sort_decls
+               with
+                 init = decl::sort_decls.init}
            | Var (_id,Some (a,_),b) ->
-             if is_const b constvarset
-             then Mods.StringSet.add a constvarset,decl_var_list
+             if is_const b sort_decls.const_decl_set
+             then
+               {
+                 sort_decls
+                 with
+                   const_decl_set = Mods.StringSet.add a sort_decls.const_decl_set ;
+                   const_decl = decl::sort_decls.const_decl
+               }
              else
-               constvarset,
-               decl::decl_var_list)
-        (Mods.StringSet.empty,[])
-        decl
+               {
+                 sort_decls
+                 with
+                   var_decl =
+                     decl::sort_decls.var_decl
+               })
+        sort_rules_and_decls
+        network.var_declaration
     in
-    set, List.rev decl
+    {decl
+     with
+      const_decl = List.rev decl.const_decl ;
+      var_decl = List.rev decl.var_decl ;
+      init = List.rev decl.init}
 
+
+  let split_rules network sort_rules_and_decls =
+    let sort =
+      List.fold_left
+        (fun sort_rules enriched_rule ->
+           let rate = I.rate enriched_rule.rule enriched_rule.mode in
+           match rate with
+           | None -> sort_rules
+           | Some rate ->
+             let rate = convert_alg_expr rate network in
+             let sort_rules =
+               if is_const rate sort_rules_and_decls.const_decl_set
+               then
+                 {
+                   sort_rules
+                   with const_rate =
+                          (enriched_rule.rule_id,
+                           enriched_rule.rule,
+                           enriched_rule.mode, rate)::sort_rules.const_rate
+                 }
+               else
+                 {
+                   sort_rules
+                   with var_rate =
+                          (enriched_rule.rule_id,
+                           enriched_rule.rule,
+                           enriched_rule.mode, rate)::sort_rules.var_rate
+                 }
+             in
+             sort_rules)
+        sort_rules_and_decls
+        network.rules
+    in
+    {sort
+     with const_rate = List.rev sort.const_rate ;
+          var_rate = List.rev sort.var_rate}
+
+  let split_rules_and_decl network =
+    split_rules network (split_var_declaration network init_sort_rules_and_decl)
 
   let network_from_compil compil =
     let rules = I.get_rules compil in
     let initial_state = species_of_initial_state (I.get_initial_state compil) in
     let network = compute_reactions rules initial_state in
+    let network = convert_tokens compil network in
     let network = convert_var_defs compil network in
+    let network = convert_obs compil network in
     network
 
-  let export_network logger compil network =
-    let handler_expr =
-      {
-        Ode_loggers.int_of_obs = (fun string  -> Mods.StringMap.find_default 0 string network.varmap) ;
-        Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
-        Ode_loggers.int_of_token_id = (fun _ -> 0) ;
-      }
-    in
-    let handler_init =
-      {
-        Ode_loggers.int_of_obs = (fun i  -> i) ;
-        Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
-        Ode_loggers.int_of_token_id = (fun i -> i) ;
-      }
-    in
+  let handler_init =
+    {
+      Ode_loggers.int_of_obs = (fun i  -> i) ;
+      Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
+      Ode_loggers.int_of_token_id = (fun i -> Printf.fprintf stdout "%i" i ; i) ;
+    }
+
+  let handler_expr network =
+    {
+      Ode_loggers.int_of_obs = (fun string  -> Mods.StringMap.find_default 0 string network.varmap) ;
+      Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
+      Ode_loggers.int_of_token_id = (fun string ->
+              Mods.StringMap.find_default 0 string network.tokenmap) ;
+    }
+
+
+  let increment is_zero ?init_mode:(init_mode=false) logger x =
+    if is_zero x
+    then
+      Ode_loggers.associate ~init_mode logger (Ode_loggers.Init x)
+    else
+      Ode_loggers.increment ~init_mode logger (Ode_loggers.Init x)
+
+  let affect_var is_zero ?init_mode:(init_mode=false) logger network decl =
+    let handler_expr = handler_expr network in
+    match decl with
+    | Dummy_decl -> ()
+    | Init_expr (id',_comment, expr, list) ->
+      begin
+        match list with
+        | [] -> ()
+        | [a] ->
+          let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network a)
+          in
+          let expr =
+            if n = 1
+            then
+              expr
+            else
+              Location.dummy_annot (Ast.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
+          in
+          increment is_zero ~init_mode logger a expr handler_expr
+        | _ ->
+          let () = Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id') expr handler_expr in
+          List.iter
+            (fun id ->
+               let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network id)
+               in
+               let expr = Location.dummy_annot (Ast.OBS_VAR id') in
+               let expr =
+                 if n = 1
+                 then
+                   expr
+                 else
+                   Location.dummy_annot (Ast.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
+               in
+               increment is_zero logger ~init_mode id expr handler_init)
+            list
+      end
+    | Var (id,_comment,expr) ->
+      Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
+
+  let fresh_is_zero network =
     let is_zero = Mods.DynArray.create (get_fresh_ode_var_id network) true in
     let is_zero x =
       if Mods.DynArray.get is_zero x
@@ -818,58 +948,33 @@ struct
         true
       else
         false
-    in
-    let increment ?init_mode:(init_mode=false) x =
-      if is_zero x
-      then
-        Ode_loggers.associate ~init_mode logger (Ode_loggers.Init x)
-      else
-        Ode_loggers.increment ~init_mode logger (Ode_loggers.Init x)
-    in
-    let affect_var ?init_mode:(init_mode=false) decl =
-      match decl with
-      | Dummy_decl -> ()
-      | Init_expr (id',_comment, expr, list) ->
-        begin
-          match list with
-          | [] -> ()
-          | [a] ->
-            let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network a)
-            in
-            let expr =
-              if n = 1
-              then
-                expr
-              else
-                Location.dummy_annot (Ast.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
-            in
-            increment ~init_mode a expr handler_expr
-          | _ ->
-            let () = Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id') expr handler_expr in
-            List.iter
-              (fun id ->
-                 let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network id)
-                 in
-                 let expr = Location.dummy_annot (Ast.OBS_VAR id') in
-                 let expr =
-                   if n = 1
-                   then
-                     expr
-                   else
-                     Location.dummy_annot (Ast.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
-                 in
-                 increment ~init_mode id expr handler_init)
-              list
-        end
-      | Var (id,_comment,expr) ->
-        Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
-    in
+    in is_zero
 
+  let declare_rates_global logger network =
+    let do_it f =
+      Ode_loggers.declare_global logger (f network.n_rules)
+    in
+    let () = do_it (fun x -> Ode_loggers.Rate x) in
+    let () = do_it (fun x -> Ode_loggers.Rated x) in
+    let () = do_it (fun x -> Ode_loggers.Rateun x) in
+    let () = do_it (fun x -> Ode_loggers.Rateund x) in
+    let () = Loggers.print_newline logger in
+    ()
 
+  let export_main logger compil network split =
+    let is_zero = fresh_is_zero network in
+    let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
     let () = Ode_loggers.print_ode_preamble logger () in
     let () = Loggers.print_newline logger in
-    let () = Ode_loggers.associate logger Ode_loggers.Tinit (Location.dummy_annot (Ast.CONST Nbr.zero)) handler_expr in
+    let t_init =
+      match
+        I.get_t_init compil
+      with
+      | None -> 0.
+      | Some f -> f
+    in
+    let () = Ode_loggers.associate logger Ode_loggers.Tinit (alg_of_float t_init) handler_expr in
     let () =
       Ode_loggers.associate logger Ode_loggers.Tend
         (alg_of_float
@@ -906,6 +1011,13 @@ struct
     let () =
       Ode_loggers.associate
         logger
+        Ode_loggers.N_var
+        (alg_of_int (network.fresh_var_id -1))
+        handler_expr
+    in
+    let () =
+      Ode_loggers.associate
+        logger
         Ode_loggers.N_obs
         (alg_of_int network.n_obs)
         handler_expr in
@@ -919,32 +1031,25 @@ struct
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.declare_global logger (Ode_loggers.Expr network.fresh_var_id) in
     let () = Ode_loggers.initialize logger (Ode_loggers.Expr network.fresh_var_id) in
+    let () = Ode_loggers.declare_global logger (Ode_loggers.Init network.fresh_ode_var_id) in
+    let () = Ode_loggers.initialize logger (Ode_loggers.Init network.fresh_ode_var_id) in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.start_time logger t_init in
     let () = Loggers.print_newline logger in
     let () =
       List.iter
-        (affect_var ~init_mode:true)
+        (affect_var is_zero logger ~init_mode:true network)
         network.var_declaration
     in
     let () = Loggers.print_newline logger in
-    let constvarset, var_declaration = var_declaration network.var_declaration in
-    let do_it f =
-      let () = Ode_loggers.declare_global logger (f network.n_rules) in
-      let () = Ode_loggers.initialize logger (f  (network.n_rules)) in
-      ()
-    in
-    let () = do_it (fun x -> Ode_loggers.Rate x) in
-    let () = do_it (fun x -> Ode_loggers.Rated x) in
-    let () = do_it (fun x -> Ode_loggers.Rateun x) in
-    let () = do_it (fun x -> Ode_loggers.Rateund x) in
-    let () = Loggers.print_newline logger in
-    let sorted_rules = split_rules constvarset network in
+    let () = declare_rates_global logger network in
     let () =
       List.iter
         (fun (id,_rule,mode,rate) ->
            Ode_loggers.associate
              logger
              (var_rate (id,mode,rate)) rate handler_expr)
-        sorted_rules.const_rate
+        split.const_rate
     in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.print_license_check logger in
@@ -964,28 +1069,28 @@ struct
     let () = Loggers.print_newline logger in
     let () = Loggers.print_newline logger in
     let () = Loggers.print_newline logger in
+    ()
+
+  let export_dydt logger compil network split =
+    let is_zero = fresh_is_zero network in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
     let () = Loggers.print_newline logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers.N_ode_var
     in
-    let do_it f =
-      Ode_loggers.declare_global logger (f network.n_rules)
+    let () =
+      Ode_loggers.declare_global logger (Ode_loggers.Expr 1)
     in
-    let () = do_it (fun x -> Ode_loggers.Rate x) in
-    let () = do_it (fun x -> Ode_loggers.Rated x) in
-    let () = do_it (fun x -> Ode_loggers.Rateun x) in
-    let () = do_it (fun x -> Ode_loggers.Rateund x) in
-    let () = Loggers.print_newline logger in
-    let () = List.iter (affect_var ~init_mode:false) var_declaration in
+    let () = declare_rates_global logger network in
+    let () = List.iter (affect_var is_zero logger ~init_mode:false network) split.var_decl in
     let () = Loggers.print_newline logger in
     let () =
       List.iter
         (fun (id,_rule,mode,rate) ->
            Ode_loggers.associate
              logger
-             (var_rate (id,mode,rate)) rate handler_expr)
-        sorted_rules.var_rate
+             (var_rate (id,mode,rate)) rate (handler_expr network))
+        split.var_rate
     in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.initialize logger (Ode_loggers.Deriv 1) in
@@ -1010,15 +1115,83 @@ struct
            let () =
              List.iter
                (fun (expr,(token,_loc)) ->
-                  Ode_loggers.update_token logger (Ode_loggers.Deriv token) ~nauto_in_lhs (var_of_rule enriched_rule) (convert_alg_expr expr network) reactants' handler_expr)
+                  Ode_loggers.update_token
+                    logger
+                    (Ode_loggers.Deriv token) ~nauto_in_lhs (var_of_rule enriched_rule)
+                    (convert_alg_expr expr network) reactants' (handler_expr network))
                token_vector
            in ()
         )
         network.reactions
     in
+    let () = Loggers.print_newline logger in
     let () = Ode_loggers.close_procedure logger in
     let () = Loggers.print_newline logger in
     let () = Loggers.print_newline logger in
+    ()
+
+  let export_init logger network =
+    let () = Ode_loggers.open_procedure logger "Init" "ode_init" [] in
+    let () = Loggers.print_newline logger in
+    let () =
+      Ode_loggers.declare_global logger Ode_loggers.N_ode_var
+    in
+    let () =
+      Ode_loggers.declare_global logger (Ode_loggers.Expr ((get_fresh_var_id network)-1))
+    in
+    let () =
+      Ode_loggers.declare_global logger (Ode_loggers.Init ((get_fresh_ode_var_id network)-1))
+    in
+    let () = Ode_loggers.initialize logger (Ode_loggers.Initbis ((get_fresh_ode_var_id network)-1)) in
+    let () = Loggers.print_newline logger in
+    let rec aux k =
+      if
+        k >= get_fresh_ode_var_id network
+      then
+        ()
+      else
+        let () = Ode_loggers.declare_init logger k in
+        aux (next_id k)
+    in
+    let () = aux fst_id in
+    let () = Ode_loggers.close_procedure logger in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.print_newline logger in
+    ()
+
+  let export_obs logger compil network split =
+    let is_zero = fresh_is_zero network in
+    let () = Ode_loggers.open_procedure logger "obs" "ode_obs" ["t";"y"] in
+    let () = Loggers.print_newline logger in
+    let () =
+      Ode_loggers.declare_global logger Ode_loggers.N_obs
+    in
+    let () =
+      Ode_loggers.declare_global logger (Ode_loggers.Expr 1)
+    in
+    let () =
+      Ode_loggers.initialize logger (Ode_loggers.Obs (network.n_obs))
+    in
+    let () = Loggers.print_newline logger in
+    let () = List.iter (affect_var is_zero logger ~init_mode:false network) split.var_decl in
+    let () = Loggers.print_newline logger in
+    let () =
+      List.iter
+        (fun (id,expr) -> Ode_loggers.associate logger (Ode_loggers.Obs id) expr (handler_expr network))
+        network.obs
+    in
+    let () = Loggers.print_newline logger in
+    let () = Ode_loggers.close_procedure logger in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.print_newline logger in
+    ()
+
+  let export_network logger compil network =
+    let sorted_rules_and_decl = split_rules_and_decl network in
+    let () = export_main logger compil network sorted_rules_and_decl in
+    let () = export_dydt logger compil network sorted_rules_and_decl in
+    let () = export_init logger network in
+    let () = export_obs logger compil network sorted_rules_and_decl in
     ()
 
   let get_reactions network =
