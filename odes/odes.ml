@@ -1178,9 +1178,6 @@ struct
       Ode_loggers.declare_global logger (Ode_loggers.Expr 1)
     in
     let () =
-      Ode_loggers.declare_global logger (Ode_loggers.N_rows)
-    in
-    let () =
       Ode_loggers.initialize logger (Ode_loggers.Obs (network.n_obs))
     in
     let () = Loggers.print_newline logger in

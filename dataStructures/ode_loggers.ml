@@ -225,6 +225,44 @@ let initialize logger variable =
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+type bin_op_pos = PREFIX | INFIX | POSTFIX
+
+let _ = POSTFIX
+
+let bin_op_pos _logger op =
+  match op with
+  | Operator.MULT | Operator.POW | Operator.MINUS | Operator.SUM | Operator.DIV  -> INFIX
+  | Operator.MIN | Operator.MODULO | Operator.MAX -> PREFIX
+
+let string_of_bin_op _logger op =
+  match op with
+  | Operator.MULT -> "*"
+  | Operator.POW -> "**"
+  | Operator.MINUS -> "-"
+  | Operator.SUM -> "+"
+  | Operator.DIV -> "/"
+  | Operator.MIN -> "min"
+  | Operator.MODULO -> "mod"
+  | Operator.MAX -> "max"
+
+let is_fun _logger op =
+  match op with
+  | Operator.UMINUS -> false
+  | Operator.LOG | Operator.SQRT | Operator.EXP
+  | Operator.SINUS | Operator.COSINUS | Operator.TAN
+  | Operator.INT-> true
+
+let string_of_un_op _logger op =
+  match op with
+  | Operator.UMINUS-> "-"
+  | Operator.LOG -> "log"
+  | Operator.SQRT -> "sqrt"
+  | Operator.EXP -> "exp"
+  | Operator.SINUS -> "sin"
+  | Operator.COSINUS -> "cos"
+  | Operator.TAN -> "tan"
+  | Operator.INT -> "floor"
+
 let rec print_alg_expr
     ?init_mode:(init_mode=false)
     logger  alg_expr network
@@ -251,24 +289,42 @@ let rec print_alg_expr
       | Ast.STATE_ALG_OP (Operator.PLOTNUM) -> Loggers.fprintf logger "num_t_point"
       | Ast.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
       | Ast.BIN_ALG_OP (op, a, b) ->
-        let () = Loggers.fprintf logger "(" in
-        let () = print_alg_expr logger a network in
-        let string_op =
-          match op with
-            _ -> "todo"
-        in
-        let () = Loggers.fprintf logger "%s" string_op in
-        let () = print_alg_expr logger b network in
-        let () = Loggers.fprintf logger ")" in
-        ()
+        begin
+          let string_op = string_of_bin_op logger op in
+          match bin_op_pos logger op
+          with
+          | INFIX ->
+            let () = Loggers.fprintf logger "(" in
+            let () = print_alg_expr logger a network in
+            let () = Loggers.fprintf logger "%s" string_op in
+            let () = print_alg_expr logger b network in
+            let () = Loggers.fprintf logger ")" in
+            ()
+          | PREFIX ->
+            let () = Loggers.fprintf logger "%s" string_op in
+            let () = Loggers.fprintf logger "(" in
+            let () = print_alg_expr logger a network in
+            let () = Loggers.fprintf logger "," in
+            let () = print_alg_expr logger b network in
+            let () = Loggers.fprintf logger ")" in
+            ()
+          | POSTFIX ->
+            let () = Loggers.fprintf logger "(" in
+            let () = print_alg_expr logger a network in
+            let () = Loggers.fprintf logger "," in
+            let () = print_alg_expr logger b network in
+            let () = Loggers.fprintf logger ")" in
+            let () = Loggers.fprintf logger "%s" string_op in
+            ()
+        end
+
       | Ast.UN_ALG_OP (op, a) ->
         let () = Loggers.fprintf logger "(" in
-        let string_op =
-          match op with
-            _ -> "todo"
-        in
+        let string_op = string_of_un_op logger op in
         let () = Loggers.fprintf logger "%s" string_op in
+        let () = if is_fun logger op then Loggers.fprintf logger "(" in
         let () = print_alg_expr logger a network in
+        let () = if is_fun logger op then Loggers.fprintf logger ")" in
         let () = Loggers.fprintf logger ")" in
         ()
     end
@@ -350,57 +406,57 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-  let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
-    match
-      Loggers.get_encoding_format logger
-    with
-    | Loggers.Matlab  | Loggers.Octave ->
-      begin
-        let var = string_of_variable var_species in
-        let () = Loggers.fprintf logger "%s=%s%s" var var string in
-        let bool =
-          if nauto_in_species = 1
-          then false
-          else
-            let () = Loggers.fprintf logger "%i" nauto_in_species in
-            true
-        in
-        let bool =
-          if nauto_in_lhs =1
-          then
-            bool
-          else
-            let () =
-              if bool
-              then
-                Loggers.fprintf logger "/%i" nauto_in_lhs
-              else
-                Loggers.fprintf logger "1/%i" nauto_in_lhs
-            in
-            true
-        in
-        let () =
-          if bool
-          then
-            Loggers.fprintf logger "*"
-        in
-        let () = Loggers.fprintf logger "%s" (string_of_variable var_rate) in
-        let () =
-          List.iter
-            (fun var -> Loggers.fprintf logger "*%s" (string_of_variable var))
-                var_list
-        in
-        let () = Loggers.fprintf logger ";" in
-        let () = Loggers.print_newline logger in
-        ()
-      end
-    | Loggers.Maple -> ()
-    | Loggers.DOT
-    | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab  | Loggers.Octave ->
+    begin
+      let var = string_of_variable var_species in
+      let () = Loggers.fprintf logger "%s=%s%s" var var string in
+      let bool =
+        if nauto_in_species = 1
+        then false
+        else
+          let () = Loggers.fprintf logger "%i" nauto_in_species in
+          true
+      in
+      let bool =
+        if nauto_in_lhs =1
+        then
+          bool
+        else
+          let () =
+            if bool
+            then
+              Loggers.fprintf logger "/%i" nauto_in_lhs
+            else
+              Loggers.fprintf logger "1/%i" nauto_in_lhs
+          in
+          true
+      in
+      let () =
+        if bool
+        then
+          Loggers.fprintf logger "*"
+      in
+      let () = Loggers.fprintf logger "%s" (string_of_variable var_rate) in
+      let () =
+        List.iter
+          (fun var -> Loggers.fprintf logger "*%s" (string_of_variable var))
+          var_list
+      in
+      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.print_newline logger in
+      ()
+    end
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
-  let consume = gen "-"
-  let produce = gen "+"
+let consume = gen "-"
+let produce = gen "+"
 
 let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
   match
@@ -416,7 +472,7 @@ let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
           false
         else
           let () =
-              Loggers.fprintf logger "1/%i" nauto_in_lhs
+            Loggers.fprintf logger "1/%i" nauto_in_lhs
           in
           true
       in
