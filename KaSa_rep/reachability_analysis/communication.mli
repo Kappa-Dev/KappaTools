@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Abstract domain to record live rules
    *
@@ -103,7 +103,8 @@ val refine_information_about_state_of_site:
 
 val get_potential_partner:
   precondition ->
-  (Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> Ckappa_sig.c_state -> precondition *
+  (Exception.method_handler -> Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> Ckappa_sig.c_state ->
+   Exception.method_handler * precondition *
    (((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) Usual_domains.flat_lattice)))
 
 val fold_over_potential_partners:
@@ -123,9 +124,10 @@ val overwrite_potential_partners_map:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   precondition ->
-  (Ckappa_sig.c_agent_name ->
+  (Exception.method_handler -> Ckappa_sig.c_agent_name ->
    Ckappa_sig.c_site_name ->
    Ckappa_sig.c_state ->
+   Exception.method_handler * 
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) Usual_domains.flat_lattice)
   -> prefold ->
   Exception.method_handler * precondition

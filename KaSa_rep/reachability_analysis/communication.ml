@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Abstract domain to record live rules
    *
@@ -112,8 +112,10 @@ type precondition =
       Analyzer_headers.global_dynamic_information *
       Ckappa_sig.c_state list Usual_domains.flat_lattice;
     cache_state_of_site: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
-    partner_map: Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
-      Ckappa_sig.c_state -> (Ckappa_sig.c_agent_name *
+    partner_map:
+      Exception.method_handler  -> Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
+  Ckappa_sig.c_state ->
+  Exception.method_handler * (Ckappa_sig.c_agent_name *
                              Ckappa_sig.c_site_name *
                              Ckappa_sig.c_state) Usual_domains.flat_lattice;
     partner_fold: 'a. 'a fold }
@@ -144,7 +146,7 @@ let dummy_precondition =
     the_rule_is_applied_for_the_first_time = Usual_domains.Maybe;
     state_of_site = (fun error dynamic _ -> error, dynamic, Usual_domains.Any);
     cache_state_of_site = PathMap.empty Usual_domains.Any;
-    partner_map = (fun _ _ _ -> Usual_domains.Any);
+    partner_map = (fun error _ _ _ -> error, Usual_domains.Any);
     partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
 
@@ -193,8 +195,9 @@ let refine_information_about_state_of_site precondition f =
     state_of_site = new_f
   }
 
-let get_potential_partner precondition agent_type site state =
-  precondition, precondition.partner_map agent_type site state
+let get_potential_partner precondition error agent_type site state =
+  let error, rep = precondition.partner_map error agent_type site state in
+  error, precondition, rep
 
 let fold_over_potential_partners parameter error precondition agent_type site f init =
   match

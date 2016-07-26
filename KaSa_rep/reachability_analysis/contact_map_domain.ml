@@ -312,7 +312,7 @@ struct
           parameter
           error
           precondition
-          (fun agent_type site_type state ->
+          (fun error agent_type site_type state ->
              (* Here you should fetch the partner in the dynamic contact
                 map, if defined, *)
              let error, statemap_bottop = (* JF: error should be propagated, Please correct !!! *)
@@ -320,14 +320,24 @@ struct
                  (agent_type, site_type) dynamic.local.bonds_per_site
              in
              match statemap_bottop with
-             | None -> Usual_domains.Val (agent_type, site_type, state) (* I think you should raise an error here *)
+             | None -> error, Usual_domains.Val (agent_type, site_type, state) (* I think you should raise an error here *)
              | Some statemap ->
                (* JF: This does not mean a thing !!! *)
                (* do you want to fetch the association of state, in this maps,  *)
+               (*
                Ckappa_sig.State_map_and_set.Map.fold
                  (fun state (agent_type', site_type', state') _ ->
                     Usual_domains.Val (agent_type', site_type', state')
-                 ) statemap Usual_domains.Any)
+                 ) statemap Usual_domains.Any*)
+
+               match
+               Ckappa_sig.State_map_and_set.Map.find_option
+                 parameter error
+                 state statemap
+               with
+               | error, None -> error, Usual_domains.Undefined
+               | error, Some tuple -> error, Usual_domains.Val tuple)
+
           {
             Communication.fold =
               begin
