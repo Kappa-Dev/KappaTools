@@ -331,9 +331,9 @@ struct
                  ) statemap Usual_domains.Any*)
 
                match
-               Ckappa_sig.State_map_and_set.Map.find_option
-                 parameter error
-                 state statemap
+                 Ckappa_sig.State_map_and_set.Map.find_option
+                   parameter error
+                   state statemap
                with
                | error, None -> error, Usual_domains.Undefined
                | error, Some tuple -> error, Usual_domains.Val tuple)
@@ -350,7 +350,7 @@ struct
                   match statemap_bottop with
                   | None -> error,
                             (Usual_domains.Val
-                               (fun f error init -> error, init))
+                               (fun _f error init -> error, init))
                   | Some statemap ->
                     error,
                     Usual_domains.Val
@@ -417,62 +417,62 @@ struct
   let export _static dynamic error kasa_state =
     error, dynamic, kasa_state
 
-  let print_contact_map_rhs static dynamic error store_result =
+  let print_contact_map_rhs static _dynamic error store_result =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     Loggers.fprintf (Remanent_parameters.get_logger parameter) "Contact map in the rhs:\n";
-    Ckappa_sig.Rule_map_and_set.Map.iter
-      (fun rule_id pair ->
-         let _ =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rule_id pair error ->
+         let () =
            Loggers.fprintf (Remanent_parameters.get_logger parameter)
              "rule_id:%i:\n" (Ckappa_sig.int_of_rule_id rule_id)
          in
-         let _ =
-           Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
-             (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) ->
-                let _ =
-                  let error, agent_type1_string =
-                    try Handler.string_of_agent parameter error kappa_handler agent_type1
-                    with
-                      _ -> warn parameter error (Some "line 479") Exit
-                             (Ckappa_sig.string_of_agent_name agent_type1)
-                  in
-                  let error, site_type1_string =
-                    try
-                      Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
-                    with
-                      _ -> warn parameter error (Some "line 492") Exit
-                             (Ckappa_sig.string_of_site_name site_type1)
-                  in
-                  let error, state1_string =
-                    try
-                      Handler.string_of_state_fully_deciphered parameter error kappa_handler
-                        agent_type1 site_type1 state1
-                    with
-                      _ -> warn parameter error (Some "line 657") Exit
-                             (Ckappa_sig.string_of_state_index state1)
-                  in
-                  let error, agent_type2_string =
-                    try Handler.string_of_agent parameter error kappa_handler agent_type2
-                    with
-                      _ -> warn parameter error (Some "line 479") Exit
-                             (Ckappa_sig.string_of_agent_name agent_type2)
-                  in
-                  let error, site_type2_string =
-                    try
-                      Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
-                    with
-                      _ -> warn parameter error (Some "line 688") Exit
-                             (Ckappa_sig.string_of_site_name site_type2)
-                  in
-                  let error, state2_string =
-                    try
-                      Handler.string_of_state_fully_deciphered parameter error kappa_handler
-                        agent_type2 site_type2 state2
-                    with
-                      _ -> warn parameter error (Some "line 665") Exit
-                             (Ckappa_sig.string_of_state_index state2)
-                  in
+         let error =
+           Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
+             (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) error ->
+                let error, agent_type1_string =
+                  try Handler.string_of_agent parameter error kappa_handler agent_type1
+                  with
+                    _ -> warn parameter error (Some "line 479") Exit
+                           (Ckappa_sig.string_of_agent_name agent_type1)
+                in
+                let error, site_type1_string =
+                  try
+                    Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
+                  with
+                    _ -> warn parameter error (Some "line 492") Exit
+                           (Ckappa_sig.string_of_site_name site_type1)
+                in
+                let error, state1_string =
+                  try
+                    Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                      agent_type1 site_type1 state1
+                  with
+                    _ -> warn parameter error (Some "line 657") Exit
+                           (Ckappa_sig.string_of_state_index state1)
+                in
+                let error, agent_type2_string =
+                  try Handler.string_of_agent parameter error kappa_handler agent_type2
+                  with
+                    _ -> warn parameter error (Some "line 479") Exit
+                           (Ckappa_sig.string_of_agent_name agent_type2)
+                in
+                let error, site_type2_string =
+                  try
+                    Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
+                  with
+                    _ -> warn parameter error (Some "line 688") Exit
+                           (Ckappa_sig.string_of_site_name site_type2)
+                in
+                let error, state2_string =
+                  try
+                    Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                      agent_type2 site_type2 state2
+                  with
+                    _ -> warn parameter error (Some "line 665") Exit
+                           (Ckappa_sig.string_of_state_index state2)
+                in
+                let () =
                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "agent_type1:%s:site_types:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
                     agent_type1_string
@@ -481,64 +481,63 @@ struct
                     agent_type2_string
                     site_type2_string
                     state2_string
-
                 in
-                ()
-             ) pair
+                error
+             ) pair error
          in
-         ()
-      ) store_result
+         error
+      ) store_result error
 
-  let print_contact_map static dynamic error store_result =
+  let print_contact_map static _dynamic error store_result =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     Loggers.fprintf (Remanent_parameters.get_logger parameter) "Contact map:\n";
     let _ =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
-        (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) ->
-           let _ =
-             let error, agent_type1_string =
-               try Handler.string_of_agent parameter error kappa_handler agent_type1
-               with
-                 _ -> warn parameter error (Some "line 479") Exit
-                        (Ckappa_sig.string_of_agent_name agent_type1)
-             in
-             let error, site_type1_string =
-               try
-                 Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
-               with
-                 _ -> warn parameter error (Some "line 492") Exit
-                        (Ckappa_sig.string_of_site_name site_type1)
-             in
-             let error, state1_string =
-               try
-                 Handler.string_of_state_fully_deciphered parameter error kappa_handler
-                   agent_type1 site_type1 state1
-               with
-                 _ -> warn parameter error (Some "line 657") Exit
-                        (Ckappa_sig.string_of_state_index state1)
-             in
-             let error, agent_type2_string =
-               try Handler.string_of_agent parameter error kappa_handler agent_type2
-               with
-                 _ -> warn parameter error (Some "line 479") Exit
-                        (Ckappa_sig.string_of_agent_name agent_type2)
-             in
-             let error, site_type2_string =
-               try
-                 Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
-               with
-                 _ -> warn parameter error (Some "line 688") Exit
-                        (Ckappa_sig.string_of_site_name site_type2)
-             in
-             let error, state2_string =
-               try
-                 Handler.string_of_state_fully_deciphered parameter error kappa_handler
-                   agent_type2 site_type2 state2
-               with
-                 _ -> warn parameter error (Some "line 665") Exit
-                        (Ckappa_sig.string_of_state_index state2)
-             in
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
+        (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) error ->
+           let error, agent_type1_string =
+             try Handler.string_of_agent parameter error kappa_handler agent_type1
+             with
+               _ -> warn parameter error (Some "line 479") Exit
+                      (Ckappa_sig.string_of_agent_name agent_type1)
+           in
+           let error, site_type1_string =
+             try
+               Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
+             with
+               _ -> warn parameter error (Some "line 492") Exit
+                      (Ckappa_sig.string_of_site_name site_type1)
+           in
+           let error, state1_string =
+             try
+               Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                 agent_type1 site_type1 state1
+             with
+               _ -> warn parameter error (Some "line 657") Exit
+                      (Ckappa_sig.string_of_state_index state1)
+           in
+           let error, agent_type2_string =
+             try Handler.string_of_agent parameter error kappa_handler agent_type2
+             with
+               _ -> warn parameter error (Some "line 479") Exit
+                      (Ckappa_sig.string_of_agent_name agent_type2)
+           in
+           let error, site_type2_string =
+             try
+               Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
+             with
+               _ -> warn parameter error (Some "line 688") Exit
+                      (Ckappa_sig.string_of_site_name site_type2)
+           in
+           let error, state2_string =
+             try
+               Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                 agent_type2 site_type2 state2
+             with
+               _ -> warn parameter error (Some "line 665") Exit
+                      (Ckappa_sig.string_of_state_index state2)
+           in
+           let () =
              Loggers.fprintf (Remanent_parameters.get_logger parameter)
                "agent_type1:%s:site_type1:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
                agent_type1_string
@@ -547,22 +546,21 @@ struct
                agent_type2_string
                site_type2_string
                state2_string
-           in
-           ()
-        ) store_result
-    in ()
+           in error
+        ) store_result error
+    in error
 
-  let print static dynamic error loggers =
+  let print _static dynamic error _loggers =
     (*let store_contact_map = get_contact_map_dynamic dynamic in
       let _ =
       print_contact_map static dynamic error store_contact_map
       in*)
     error, dynamic, ()
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable static dynamic error lkappa =
+  let cc_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
 end
