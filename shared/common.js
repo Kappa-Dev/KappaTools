@@ -69,10 +69,10 @@ function spawnProcess(param){
     // log pid
     debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
     if(param.onStdout) {
-	process.stdout.on('data',(data) => { param.onStdout(`${data}`); } );
+	process.stdout.on('data',function (data) { param.onStdout(`${data}`); } );
     }
     if(param.onStderr) {
-	process.stderr.on('data',(data) => { param.onStderr(`${data}`); } );
+	process.stderr.on('data',function (data) { param.onStderr(`${data}`); } );
     }
     if(param.onClose){
 	process.on('close',param.onClose);
