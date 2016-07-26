@@ -35,6 +35,7 @@ type variable =
   | N_ode_var
   | N_var
   | N_obs
+  | N_rows
   | Tmp
   | Current_time
 
@@ -67,9 +68,12 @@ val initialize: Loggers.t -> variable -> unit
 val associate: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val increment: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val associate_nrows: Loggers.t -> unit
-
+val associate_t: Loggers.t -> int -> unit
+val init_time: Loggers.t -> int -> unit 
 val start_time: Loggers.t -> float -> unit
 val declare_init: Loggers.t -> int -> unit
+
+val launch_main: Loggers.t -> unit
 
 val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
 val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit

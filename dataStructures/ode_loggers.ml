@@ -36,6 +36,7 @@ type variable =
   | N_ode_var
   | N_var
   | N_obs
+  | N_rows
   | Tmp
   | Current_time
 
@@ -116,6 +117,7 @@ let string_of_variable var =
   | N_var -> "nvar"
   | N_obs -> "nobs"
   | N_rules -> "nrules"
+  | N_rows -> "nrows"
   | Tmp -> "tmp"
   | Current_time -> "t"
 
@@ -139,6 +141,7 @@ let string_of_array_name var =
   | N_ode_var -> "nodevar"
   | N_var -> "nvar"
   | N_obs -> "nobs"
+  | N_rows -> "nrows"
   | N_rules -> "nrules"
   | Tmp -> "tmp"
   | Current_time -> "t"
@@ -180,13 +183,14 @@ let initialize logger variable =
         | Concentration _ -> Loggers.fprintf logger "y=zeros(nodevar,1)"
         | Deriv _ -> Loggers.fprintf logger "dydt=zeros(nodevar,1);"
         | Jacobian _ -> Loggers.fprintf logger "Jac = sparse(nodevar,nodevar);"
-        | Obs _ -> Loggers.fprintf logger "obs = zeros(nrows,nobs);"
+        | Obs _ -> Loggers.fprintf logger "obs = zeros(nobs,1);"
         | Tinit
         | Tend
         | InitialStep
         | Num_t_points
         | N_ode_var
         | N_var
+        | N_rows
         | N_obs
         | Current_time
         | N_rules -> ()
@@ -207,6 +211,7 @@ let initialize logger variable =
         | Tend
         | InitialStep
         | N_ode_var
+        | N_rows
         | N_var
         | N_obs
         | N_rules
@@ -295,6 +300,32 @@ let associate_nrows logger =
   with
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "nrows = length(soln.x);" in
+    Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let associate_t logger n =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab | Loggers.Octave ->
+    let () = Loggers.fprintf logger "t = y(%i);" n in
+    Loggers.print_newline logger
+  | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let init_time logger n =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab | Loggers.Octave ->
+    let () = Loggers.fprintf logger "y(%i) = t;" n in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
   | Loggers.DOT
@@ -558,8 +589,6 @@ let print_interpolate logger =
       print_list logger
         [
           "t = linspace(tinit, tend, num_t_point+1);";
-          "nrows = length(soln.x);";
-          "tmp = zeros(nvar,1)";
           "obs = zeros(nrows,nobs);";
           "";
           "for j=1:nrows";
@@ -648,15 +677,31 @@ let open_procedure logger name name' arg =
 
 let return _ _  = ()
 let close_procedure logger =
-  let format = Loggers.get_encoding_format logger in
   match
-    format
+    Loggers.get_encoding_format logger
   with
   | Loggers.Matlab
   | Loggers.Octave ->
     let () = Loggers.fprintf logger "end" in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.DOT
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> ()
+
+let launch_main logger =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Octave ->
+    let () = Loggers.fprintf logger "main();" in
+    Loggers.print_newline logger
+  | Loggers.Matlab
+  | Loggers.Maple
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
