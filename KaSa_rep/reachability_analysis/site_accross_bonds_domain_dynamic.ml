@@ -12,7 +12,7 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
+(*
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Site accross domain dynamic information") message exn
     (fun () -> default)
@@ -1006,3 +1006,4 @@ let print_basic_dynamic_information parameter error handler_kappa
     else error
   in
   error
+*)

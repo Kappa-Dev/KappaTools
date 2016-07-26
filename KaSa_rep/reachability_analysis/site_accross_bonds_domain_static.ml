@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -233,7 +233,7 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
 (***************************************************************)
 (*collect rule that can be modified*)
 
-let collect_site_modified parameter error kappa_handler rule_id rule store_result =
+let collect_site_modified parameter error _kappa_handler rule_id rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result->
@@ -345,7 +345,7 @@ let collect_pair_sites_aux parameter error rule_id store_views_rhs =
 
 (*pair (A,x,y, B, z, t) without state information*)
 
-let collect_tuple_pair parameter error kappa_handler rule_id store_pair_rhs store_result =
+let collect_tuple_pair parameter error _kappa_handler rule_id store_pair_rhs store_result =
   let error, store_pair_set =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
@@ -389,11 +389,11 @@ let collect_created_bond_with_potential_pair parameter error rule_id rule store_
     List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
         Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.fold
           (fun (x, y) (error, store_result) ->
-             let (agent_id, agent_type, site_type, _, state) = x in
+             let (agent_id, _agent_type, site_type, _, _state) = x in
              let agent_id1 = site_add1.Cckappa_sig.agent_index in
              let site_type1 = site_add1.Cckappa_sig.site in
              (*second agent*)
-             let (agent_id', agent_type', site_type', _, state') = y in
+             let (agent_id', _agent_type', site_type', _, _state') = y in
              let agent_id2 = site_add2.Cckappa_sig.agent_index in
              let site_type2 = site_add2.Cckappa_sig.site in
              (*if the first site in the pair is the site that created a bound*)
@@ -554,7 +554,7 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
         (**)
         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
           (fun m (error, store_result) ->
-             let (agent_id_m, agent_type_m, site_type_m, state_m) = m in
+             let (agent_id_m, _agent_type_m, site_type_m, state_m) = m in
              let error, agent =
                Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                  parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
@@ -605,7 +605,7 @@ let collect_implicit_static parameter error store_tuple_pair store_question_mark
              (fun x (error, store_set) ->
                 (*an agent with question mark*)
                 (*B.z.t*)
-                let (agent_id, agent_type, site_type, site_type', state') = x in
+                let (_agent_id, _agent_type, site_type, site_type', state') = x in
                 (*fold over tuple pair set*)
                 let error, set =
                   Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.fold
@@ -856,14 +856,14 @@ let collect_bonds_init parameter error init_state =
 (***************************************************************)
 
 let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
-    init_state store_bonds_init store_pair_sites_init store_result =
+    _init_state store_bonds_init store_pair_sites_init store_result =
   (*fold over a set of pair and check the first site whether or not it
     belongs to a set of sites that can be bound*)
   let error, handler, store_result =
     Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
       (fun (x, y) (error, handler, store_result) ->
-         let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
-         let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+         let (agent_id, agent_type, site_type, _site_type2, state, state2) = x in
+         let (agent_id', agent_type', site_type', _site_type2', state', state2') = y in
          (*check the first site belong to the bonds*)
          if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
              ((agent_id, agent_type, site_type, state),
@@ -877,16 +877,16 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
              [(Ckappa_sig.site_name_of_int 1, state2);
               (Ckappa_sig.site_name_of_int 2, state2')]
            in
-           let new_pair_list =
+           let _new_pair_list =
              List.fold_left (fun current_list (x, y) ->
                  (x, y) :: current_list
                ) [] pair_list
            in
-           let prefix = Remanent_parameters.get_prefix parameter in
+           let _prefix = Remanent_parameters.get_prefix parameter in
            (*test*)
            let pair = Site_accross_bonds_domain_type.project2 (x, y) in
-           let ((agent_type, site_type, site_type', state, state'),
-                (agent_type1, site_type1, site_type1', state1, state1')) = pair
+           let ((_agent_type, _site_type, _site_type', _state, _state'),
+                (_agent_type1, _site_type1, _site_type1', _state1, _state1')) = pair
            in
            (*-----------------------------------------------------------*)
            let error, handler, mvbdu =
@@ -904,7 +904,7 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
   in
   error, handler, store_result
 
-let collect_pair_tuple_init'' parameter error init_state
+let collect_pair_tuple_init'' parameter error _init_state
     store_bonds_init store_pair_sites_init
     store_result =
   (*fold over a set of pair and check the first site whether or not it
@@ -912,8 +912,8 @@ let collect_pair_tuple_init'' parameter error init_state
   let error, store_result =
     Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->
-         let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
-         let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+         let (agent_id, agent_type, _site_type, site_type2, _state, state2) = x in
+         let (agent_id', agent_type', _site_type', site_type2', _state', state2') = y in
          if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
               ((agent_id, agent_type, site_type2, state2),
                (agent_id', agent_type', site_type2', state2'))
