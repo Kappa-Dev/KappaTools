@@ -19,7 +19,7 @@ module Reachability_analysis =
     (Composite_domain.Make
        (Product.Product
           (Parallel_bonds.Domain)
-          (Product.Product
+  (Product.Product
              (Site_accross_bonds_domain.Domain)
              (Product.Product
                 (Views_domain.Domain)
@@ -27,4 +27,4 @@ module Reachability_analysis =
                    (Contact_map_domain.Domain)
                    (Product.Product
                       (Agents_domain.Domain)
-                      (Rules_domain.Domain)))))))
+                      (Rules_domain.Domain))))))  ) 

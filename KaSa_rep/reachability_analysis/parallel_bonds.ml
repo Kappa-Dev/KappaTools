@@ -17,7 +17,7 @@
 
 (** Abstract domain to over-approximate the set of reachable views *)
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Rule domain") message exn
+  Exception.warn parameters mh (Some "Parallel_bonds") message exn
     (fun () -> default)
 
 let local_trace = false

@@ -15,7 +15,7 @@
 
 
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Rule domain") message exn
+  Exception.warn parameters mh (Some "Site_accross_bonds_domain") message exn
     (fun () -> default)
 
 let local_trace = false
@@ -724,6 +724,7 @@ struct
                      [(Ckappa_sig.site_name_of_int 1, state');
                       (Ckappa_sig.site_name_of_int 2, state1')]
                    in
+                   let handler = get_mvbdu_handler dynamic in
                    let error, handler, mvbdu =
                      Ckappa_sig.Views_bdu.mvbdu_of_association_list
                        parameter handler error pair_list
@@ -935,7 +936,7 @@ struct
     let handler = get_mvbdu_handler dynamic in
     let log = loggers in
     (*--------------------------------------------------------*)
-    let error =
+    let error, handler =
       if Remanent_parameters.get_dump_reachability_analysis_result parameter
       then
         let () =
@@ -979,19 +980,20 @@ struct
         (*--------------------------------------------------------*)
         (*to do*)
         let store_value = get_value dynamic in
-          let error =
+        let error, handler =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.fold
-            (fun tuple mvbdu error ->
+            (fun tuple mvbdu (error, handler) ->
                Site_accross_bonds_domain_type.print_site_accross_domain
                  ~verbose:true
                  ~sparse:true
                  ~final_resul:true
                  ~dump_any:true parameter error kappa_handler handler tuple mvbdu
-            ) store_value error
+            ) store_value (error, handler)
           in
-          error
-      else error
+          error, handler
+      else error, handler
     in
+    let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

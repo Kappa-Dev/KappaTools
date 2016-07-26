@@ -31,14 +31,8 @@ Reachability analysis...
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
           A.x and B.x is equal to u,u when A.x is connected to B.x
-         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-         	A(x!free,~)
-
 
           B.x and A.x is equal to u,u when B.x is connected to A.x
-         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-         	B(x~u,~)
-
 
 
 	Applying rule 0:
@@ -47,24 +41,12 @@ Reachability analysis...
 		rule 0 is applied for the first time
 
                           A.x and B.x is equal to u,u when A.x is connected to B.x
-                         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	A(x!free,~)
-
 
                           B.x and A.x is equal to u,u when B.x is connected to A.x
-                         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	B(x~u,~)
-
 
                           A.x and B.x is equal to u,p when A.x is connected to B.x
-                         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	A(x!free,~)
-
 
                           B.x and A.x is equal to p,u when B.x is connected to A.x
-                         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	B(x~p,~)
-
 
 
 	Applying rule 2:
@@ -108,24 +90,12 @@ Reachability analysis...
 	Applying rule 0:
 		the precondition is satisfied
                           A.x and B.x is equal to u,u when A.x is connected to B.x
-                         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	A(x!free,~)
-
 
                           B.x and A.x is equal to u,u when B.x is connected to A.x
-                         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	B(x~u,~)
-
 
                           A.x and B.x is equal to u,p when A.x is connected to B.x
-                         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	A(x!free,~)
-
 
                           B.x and A.x is equal to p,u when B.x is connected to A.x
-                         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	B(x~p,~)
-
 
 
 	Applying rule 1:
@@ -157,24 +127,12 @@ Reachability analysis...
 	Applying rule 0:
 		the precondition is satisfied
                           A.x and B.x is equal to u,u when A.x is connected to B.x
-                         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	A(x!free,~)
-
 
                           B.x and A.x is equal to u,u when B.x is connected to A.x
-                         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	B(x~u,~)
-
 
                           A.x and B.x is equal to u,p when A.x is connected to B.x
-                         In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	A(x!free,~)
-
 
                           B.x and A.x is equal to p,u when B.x is connected to A.x
-                         In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-                         	B(x~p,~)
-
 
 
 	Applying rule 1:
@@ -204,24 +162,12 @@ The binding state of site x in agent B ranges over free and A@x.
 * Site accross bonds domain
 ------------------------------------------------------------
  A.x and B.x is equal to u,u when A.x is connected to B.x
-In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-	A(x!free,~)
-
 
  A.x and B.x is equal to u,p when A.x is connected to B.x
-In agent A, the binding state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-	A(x!free,~)
-
 
  B.x and A.x is equal to u,u when B.x is connected to A.x
-In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-	B(x~u,~)
-
 
  B.x and A.x is equal to p,u when B.x is connected to A.x
-In agent B, the internal state of site x, and the internal state of site , are entangled by the following 2-d relationship:
-	B(x~p,~)
-
 
 ------------------------------------------------------------
 * Parallel bonds domain

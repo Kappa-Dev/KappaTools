@@ -1519,34 +1519,16 @@ The internal state of site x1 in agent C ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
  A.x and C.x1 is equal to B@x,u when A.c is connected to C.x1
-In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
-	A(c!C@x1,~)
-
 
  A.x and C.x1 is equal to free,p when A.c is connected to C.x2
-In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
-	A(c!free,~)
-
 
  A.x and C.x2 is equal to free,u when A.c is connected to C.x2
-In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
-	A(c!free,~)
-
 
  A.x and C.x1 is equal to free,free when A.c is connected to C.x2
-In agent A, the binding state of site c, and the internal state of site , are entangled by the following 2-d relationship:
-	A(c!free,~)
-
 
  C.x1 and A.x is equal to u,B@x when C.x1 is connected to A.c
-In agent C, the internal state of site x2, and the binding state of site x1, are entangled by the following 2-d relationship:
-	C(x2~u,x1!A@c)
-
 
  C.x2 and A.x is equal to u,free when C.x2 is connected to A.c
-In agent C, the internal state of site x2, and the binding state of site x1, are entangled by the following 2-d relationship:
-	C(x2~u,x1!free)
-
 
 ------------------------------------------------------------
 * Parallel bonds domain
