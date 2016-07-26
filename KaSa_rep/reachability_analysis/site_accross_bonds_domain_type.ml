@@ -285,12 +285,12 @@ let project2 (x,y) = (project x,project y)
 let print_site_accross_domain
     ?verbose:(verbose = true)
     ?sparse: (sparse = false)
-    ?final_resul:(final_result = false)
-    ?dump_any:(dump_any = false) parameters error kappa_handler handler tuple mvbdu =
+    ?final_resul:(_final_result = false)
+    ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple _mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let (agent_type, _, _, _, _), (agent_type', _, _, _, _) = tuple in
+  let (_agent_type, _, _, _, _), (_agent_type', _, _, _, _) = tuple in
   (*state1 and state1' are a binding states*)
-  let error, (agent1, site1, site2, state1, state2, agent1', site1', site2', state1', state2') =
+  let error, (agent1, site1, site2, _state1, state2, agent1', site1', site2', _state1', state2') =
     convert_tuple parameters error kappa_handler tuple
   in
   if sparse && compare site1 site2 > 0
@@ -311,7 +311,7 @@ let print_site_accross_domain
             agent1 site1
             agent1' site1'
         in
-        (* this is wrong, please correct 
+        (* this is wrong, please correct
  let error, (handler, translation) =
           Translation_in_natural_language.translate
             parameters handler error (fun _ e i -> e, i) mvbdu

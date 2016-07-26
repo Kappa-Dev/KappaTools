@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -673,9 +673,9 @@ let collect_implicit_dynamic parameter error rule_id store_tuple_pair_init
     Site_accross_bonds_domain_type.PairAgentsSitesState_Sites_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->
          (*B question mark*)
-         let (agent_id, agent_type, site_type, site_type2, state2) =
+         let (_agent_id, _agent_type, _site_type, _site_type2, _state2) =
            x in
-         let (agent_id', agent_type', site_type', site_type2') = y in
+         let (_agent_id', _agent_type', _site_type', _site_type2') = y in
          (*fold over the initial*)
          let error, store_result =
            Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold

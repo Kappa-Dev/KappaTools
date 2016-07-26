@@ -557,24 +557,24 @@ struct
     (*-----------------------------------------------------------*)
     (*a set of rules has parallel bonds on the lhs*)
     let store_rule_has_parallel_bonds_lhs = get_rule_has_parallel_bonds_lhs static in
-    let error, (b, parallel_set) =
+    let error, parallel_set =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
               parameter error rule_id store_rule_has_parallel_bonds_lhs
       with
       | error, None ->
         error,
-        (false, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty)
-      | error, Some (b, s) -> error, (b, s)
+        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty
+      | error, Some (_, s) -> error, s
     in
     (*-----------------------------------------------------------*)
     let store_non_parallel_map = get_rule_has_non_parallel_bonds_lhs static in
-    let error, (b', non_parallel_list) =
+    let error, non_parallel_list =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
           parameter error rule_id store_non_parallel_map
       with
-      | error, None -> error, (false, [])
-      | error, Some (b, l) -> error, (b, l)
+      | error, None -> error, []
+      | error, Some (_, l) -> error, l
     in
     (*-----------------------------------------------------------*)
     let store_value = get_value dynamic in
@@ -625,9 +625,9 @@ struct
             | [] -> error, true
             | (x, y, z, t)::tail ->
             let (_, agent_type, site_type, state) = x in
-            let (_, agent_type1, site_type1, state1) = y in
+            let (_, _agent_type1, site_type1, state1) = y in
             let (_, agent_type', site_type', state') = z in
-            let (_, agent_type1', site_type1', state1') = t in
+            let (_, _agent_type1', site_type1', state1') = t in
             let pair = (agent_type, site_type, site_type1, state, state1),
                        (agent_type', site_type', site_type1', state', state1')
             in
@@ -878,7 +878,7 @@ struct
         (fun (x, y) parallel_list (error, dynamic, precondition, store_result) ->
            let (agent_id, agent_type, site_type, state) = x in
            let (agent_id', agent_type', site_type', state') = y in
-           List.fold_left (fun (error, dynamic, precondtion, store_result) (z, t) ->
+           List.fold_left (fun (error, dynamic, precondition, store_result) (z, t) ->
                let (agent_id1, _, site_type1, _, _, _) = z in
                let (agent_id1', _, site_type1', _, _, _) = t in
                (*to be check agent_type and site_type1*)
