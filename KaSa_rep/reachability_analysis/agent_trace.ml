@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 26 2016>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -391,7 +391,7 @@ let build_support parameter error rules =
                   parameter error
                   (Rule r_id,ag_id) (set_test, asso_test, set_mod, asso_mod) old_map
               in
-              let error, map = Ckappa_sig.Agent_map_and_set.Map.add
+              let error, map = Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
                   parameter error agent_name new_map map
               in
               error, (map, creation))
@@ -736,7 +736,7 @@ let merge_neighbour parameter error concurrent_sites =
                 match a1,a2
                 with
                 | Some a1, Some a2 ->
-                  let error, set = SitePairSet.add parameter error (a1,a2) set in
+                  let error, set = SitePairSet.add_when_not_in parameter error (a1,a2) set in
                   error, set, (label'::list)
                 | None, _ | _, None ->
                   let error, set =
@@ -886,7 +886,7 @@ let print logger parameter compil handler_kappa handler error transition_system 
                  Handler.string_of_rule
                    parameter error handler_kappa compil r
                | Init _ ->
-                 warn parameter error (Some "line 1412") Exit ""
+                 error, ""
              end
            else
              error, ""
@@ -921,7 +921,7 @@ let print logger parameter compil handler_kappa handler error transition_system 
                | Rule r ->
                  Handler.string_of_rule
                    parameter error handler_kappa compil r
-               | Init _ -> warn parameter error (Some "line 1412") Exit ""
+               | Init _ ->  error, ""
              end
            else
              error, ""
