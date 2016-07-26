@@ -13,6 +13,10 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
+let warn parameters mh message exn default =
+  Exception.warn parameters mh (Some "views_domain") message exn
+    (fun () -> default)
+
 module PairStates_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -235,6 +239,8 @@ let convert_pair_without_state parameters error kappa_handler pair =
   let error, agent' = Handler.translate_agent parameters error kappa_handler agent' in
   error, (agent, site, site1, agent', site', site1')
 
+let project_single (_, b, c, d) = (b, c, d)
+
 let convert_single parameters error kappa_handler single =
   let (agent, site, state) = single in
   let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
@@ -281,100 +287,122 @@ let convert_tuple parameters error kappa_handler tuple =
 let project (_,b,c,d,e,f) = (b,c,d,e,f)
 let project2 (x,y) = (project x,project y)
 
+(*convert a site int to string without using information from the agent in
+  handler*)
+
 (*todo*)
-let print_site_accross_domain
+(*let print_site_accross_domain
     ?verbose:(verbose = true)
     ?sparse: (sparse = false)
     ?final_resul:(final_result = false)
-    ?dump_any:(dump_any = false) parameters error kappa_handler handler tuple mvbdu =
+    ?dump_any:(dump_any = false) parameters error kappa_handler handler tuple mvbdu1 mvbdu2 =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let (agent_type, _, _, _, _), (agent_type', _, _, _, _) = tuple in
-  (*state1 and state1' are a binding states*)
-   let error, (agent1, site1, site2, state1, state2, agent1', site1', site2', state1', state2') =
+  let (agent_type, site_type, site_type', state_b, state'),
+      (agent_type1, site_type1, site_type1', state_b1, state1') = tuple in
+  let error, (agent, site, site', state, state',
+              agent1, site1, site1', state1, state1') =
     convert_tuple parameters error kappa_handler tuple
   in
-  if sparse && compare site1 site2 > 0
+  (*state and state1 are a binding states*)
+  if sparse && compare site site' > 0
   then error
   else
     let () =
       if verbose
       then
+        let _ =
+          Loggers.print_newline
+            (Remanent_parameters.get_logger parameters)
+        in
+        let error, handler, list1 =
+          Ckappa_sig.Views_bdu.extensional_of_mvbdu
+            parameters handler error mvbdu1
+        in
+        let error, handler, list2 =
+          Ckappa_sig.Views_bdu.extensional_of_mvbdu
+            parameters handler error mvbdu2
+        in
+        let error =
+          List.fold_left (fun error l ->
+              List.fold_left (fun  error (x, y) (*A*)->
+              let error, (agentx, sitex, statex) =
+                convert_single
+                  parameters error kappa_handler
+                  (agent_type, x, y)
+              in
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "%s (%s: %s, %s:%s) -> %s (%s:%s, %s:%s) : %s:%s:%s\n"
+                  agent site state site' state'
+                  agent1 site1 state1 site1' state1'
+                  agentx sitex statex
+              in
+              error
+                ) error l
+            ) error list1
+        in
         let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameters)
-            "%s %s.%s and %s.%s is equal to %s,%s \
-            when %s.%s is connected to %s.%s\n"
-            prefix
-            (*internal sites are site2*)
-            agent1 site2  agent1' site2'
-            (*its internal states are*)
-            state2 state2'
-            (*when its binding sites*)
-            agent1 site1
-            agent1' site1'
+          if list1 = []
+          then ()
+          else Loggers.print_newline
+              (Remanent_parameters.get_logger parameters)
         in
-        let error, (handler, translation) =
-          Translation_in_natural_language.translate
-            parameters handler error (fun _ e i -> e, i) mvbdu
-        in
-        let error =
-          Translation_in_natural_language.print
-            ~show_dep_with_dimmension_higher_than:1 parameters
-            kappa_handler error agent1 agent_type translation
-        in
-        (*Loggers.print_newline (Remanent_parameters.get_logger parameters);
-        let error =
-          Translation_in_natural_language.print
-            ~show_dep_with_dimmension_higher_than:1 parameters
-            kappa_handler error agent1' agent_type' translation
-        in*)
-        Loggers.print_newline (Remanent_parameters.get_logger parameters)
+        ()
       else
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
           "test\n";
       Loggers.print_newline (Remanent_parameters.get_logger parameters)
     in
-    error
+    error*)
 
-let add_link parameter error bdu_false handler kappa_handler pair mvbdu
-    store_result =
-  let error, bdu_old =
+let add_link parameter error bdu_false handler kappa_handler pair
+    (mvbdu1, mvbdu2) store_result =
+  let error, (bdu_old1, bdu_old2) =
     match
       PairAgentSitesStates_map_and_set.Map.find_option_without_logs
         parameter error
         pair
         store_result
     with
-     | error, None -> error, bdu_false
-     | error, Some bdu -> error, bdu
+    | error, None -> error, (bdu_false, bdu_false)
+     | error, Some (bdu1, bdu2) -> error, (bdu1, bdu2)
    in
    (*-----------------------------------------------------------*)
    (*new bdu, union*)
-   let error, handler, new_bdu =
+   let error, handler, new_bdu1 =
       Ckappa_sig.Views_bdu.mvbdu_or
-        parameter handler error bdu_old mvbdu
+        parameter handler error bdu_old1 mvbdu1
    in
-   (*TODO: print each step*)
-   let error =
+   let error, handler, new_bdu2 =
+   Ckappa_sig.Views_bdu.mvbdu_or
+     parameter handler error bdu_old2 mvbdu2
+    in
+   (*print each step*)
+    (*let error =
      if Remanent_parameters.get_dump_reachability_analysis_diff parameter
      then
-       let parameter = Remanent_parameters.update_prefix parameter "         "
+       let parameter =
+         Remanent_parameters.update_prefix parameter "         "
        in
        print_site_accross_domain
          ~verbose:true
-         ~dump_any:true parameter error kappa_handler handler pair mvbdu
+         ~dump_any:true parameter error kappa_handler handler pair
+         new_bdu1
+         new_bdu2
      else error
-   in
+    in*)
    let error, store_result =
      PairAgentSitesStates_map_and_set.Map.add_or_overwrite
        parameter error
        pair
-       new_bdu
+       (new_bdu1, new_bdu2)
        store_result
    in
    error, handler, store_result
 
 
-let swap_sites_in_tuple (a, b, s, s') = (a, b, s', s)
+let swap_sites_in_tuple (a, b, s, s', st, st') = (a, b, s', s, st, st')
 
 let add_symmetric_tuple_pair f parameter error (x, y) remanent =
   let x' = swap_sites_in_tuple x in
