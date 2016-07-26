@@ -17,7 +17,7 @@ let model_max_events, set_model_max_events =
 let model_max_time, set_model_max_time =
   React.S.create None
 let model_nb_plot, set_model_nb_plot =
-  React.S.create 150
+  React.S.create 250
 let opened_filename, set_opened_filename =
   React.S.create "model.ka"
 let model_runtime_state , set_model_runtime_state =
