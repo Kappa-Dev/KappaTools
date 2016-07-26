@@ -642,7 +642,7 @@ Id=24
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -657,12 +657,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -672,7 +672,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -687,12 +687,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -706,7 +706,7 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -722,12 +722,12 @@ Id=25
 EXTENSIONAL DESCRIPTION:
 The binding state of site t in agent A ranges over free and B@t.
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -738,7 +738,7 @@ Id=27
 EXTENSIONAL DESCRIPTION:
 The binding state of site z in agent A ranges over free and B@z.
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -754,12 +754,12 @@ Id=25
 EXTENSIONAL DESCRIPTION:
 The binding state of site t in agent B ranges over free and A@t.
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 

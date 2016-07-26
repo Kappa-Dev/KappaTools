@@ -566,7 +566,7 @@ struct
     let kappa_handler = get_kappa_handler static in
     (*-----------------------------------------------------------*)
     let parameter = Remanent_parameters.update_prefix parameter "                " in
-    let dump_title () =
+    (*    let dump_title () =
       if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
       then
         let () =
@@ -578,7 +578,7 @@ struct
         Loggers.print_newline (Remanent_parameters.get_logger parameter)
       else
         ()
-    in
+          in*)
     (*-----------------------------------------------------------*)
     (*rule rhs has bound*)
     let store_bonds_rhs = get_bonds_rhs static in
@@ -643,8 +643,8 @@ struct
            let (agent_id, _, site_type_b, _, _, _) = x in
            let (agent_id1, _, site_type_b1, _, _, _) = y in
            let pair = Site_accross_bonds_domain_type.project2 (x, y) in
-           let ((agent_type, site_type, site_type', state, state'),
-                (agent_type1, site_type1, site_type1', state1, state1')) = pair
+           let ((agent_type, _site_type, site_type', _state, state'),
+                (agent_type1, _site_type1, site_type1', _state1, state1')) = pair
            in
            (*----------------------------------------------------------*)
            (*the first site 1 is indicate for the first agent, and the
@@ -703,8 +703,8 @@ struct
            (*check the the first site belongs to bound rhs*)
            let error, dynamic, precondition =
              List.fold_left (fun (error, dynamic, precondition) (x', y') ->
-                 let (agent_id, agent_type, site_type, site_type', state, state') = x' in
-                 let (agent_id1, agent_type1, site_type1, site_type1', state1, state1') = y' in
+                 let (agent_id, agent_type, site_type, _site_type', state, _state') = x' in
+                 let (agent_id1, agent_type1, site_type1, _site_type1', state1, _state1') = y' in
                  let pair_bond =
                    (agent_id, agent_type, site_type, state),
                    (agent_id1, agent_type1, site_type1, state1)
@@ -716,8 +716,8 @@ struct
                  then
                    (*store_the value*)
                    let
-                     ((agent_type, site_type, site_type', state, state'),
-                      (agent_type1, site_type1, site_type1', state1,
+                     ((_agent_type, _site_type, _site_type', _state, state'),
+                      (_agent_type1, _site_type1, _site_type1', _state1,
                        state1')) = pair
                    in
                    let pair_list =
@@ -749,12 +749,11 @@ struct
       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
            let store_result = get_value dynamic in
-           let handler = get_mvbdu_handler dynamic in
            (*site_type, site_type1 are site that created a bound*)
            let (agent_id, agent_type, site_type, site_type', state) = x in
            let (agent_id1, agent_type1, site_type1, site_type1', state1) = y in
            (*get the precondition of site_type', site_type1', the internal state list*)
-           let error, global_dynamic, precondition, state_list =
+           let error, (*global_*)dynamic, precondition, state_list =
              get_state_of_site_in_precondition
                parameter
                error
@@ -764,7 +763,7 @@ struct
                precondition
            in
 
-           let error, global_dynamic, precondition, state_list' =
+           let error, (*global_*)dynamic, precondition, state_list' =
              get_state_of_site_in_precondition
                parameter
                error
@@ -789,10 +788,10 @@ struct
            (*build the pair_list*)
            let error, dynamic, precondition =
              List.fold_left (fun (error, dynamic, precondition) (x', y') ->
-                 let (agent_id, agent_type, site_type, site_type', state,
+                 let (_agent_id, agent_type, site_type, site_type', state,
                       state') = x'
                  in
-                 let (agent_id1, agent_type1, site_type1, site_type1',
+                 let (_agent_id1, agent_type1, site_type1, site_type1',
                       state1, state1') = y'
                  in
                  let pair =
@@ -804,6 +803,7 @@ struct
                    [(Ckappa_sig.site_name_of_int 1, state');
                     (Ckappa_sig.site_name_of_int 2, state1')]
                  in
+                 let handler = get_mvbdu_handler dynamic in
                  let error, handler, mvbdu =
                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
                      parameter handler error pair_list

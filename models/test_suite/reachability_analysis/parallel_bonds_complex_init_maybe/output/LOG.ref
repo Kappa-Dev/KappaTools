@@ -689,19 +689,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=41
+Id=46
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=40
+  Id=45
    Node(site_type:1<2)
-    Id=39
+    Id=44
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=38
+      Id=43
        Node(site_type:2<2)
         Id=15
          Node(site_type:3<1)
@@ -731,19 +731,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=46
+  Id=51
    Node(site_type:1<1)
-    Id=39
+    Id=44
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=38
+      Id=43
        Node(site_type:2<2)
         Id=15
          Node(site_type:3<1)
@@ -788,19 +788,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=57
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=49
    Node(site_type:1<2)
-    Id=43
+    Id=48
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=42
+      Id=47
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<0)
@@ -815,7 +815,7 @@ Id=52
             Id=0
              Leaf False 
 
-        Id=38
+        Id=43
          Node(site_type:2<2)
           Id=15
            Node(site_type:3<1)
@@ -863,12 +863,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=54
+Id=59
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=53
+  Id=58
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -897,20 +897,19 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(~)
-			A(~)
+			A(x~p,z!B@z,t!free)
 
 	Wake-up rules
 		Updating the views for B(x~,z!,t!)
 			
 
 INTENSIONAL DESCRIPTION:
-Id=54
+Id=59
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=53
+  Id=58
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -939,8 +938,7 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(~)
-			B(~)
+			B(x~p,z!A@z,t!free)
 
 	Wake-up rules
 
@@ -981,12 +979,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=81
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=73
+  Id=80
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1025,12 +1023,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=81
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=73
+  Id=80
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1098,35 +1096,4 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 7: r7:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
-Some exceptions have been raisederror: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 598; exception:Exit
-error: file_name: Dictionary; message: negative key are not allowed; exception:Unknown
-error: file_name: Handler; message: line 194; exception:Exit
-error: file_name: Int_storage; message: get, line 88; exception:Exit
-error: file_name: Handler; message: line 206; exception:Exit
-error: file_name: Dictionary; message: missing entry, line 126; exception:Unknown
-error: file_name: Handler; message: line 228; exception:Exit
+execution finished without any exception
