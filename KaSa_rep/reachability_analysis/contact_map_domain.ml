@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Abstract domain to record live rules
    *
@@ -315,13 +315,15 @@ struct
           (fun agent_type site_type state ->
              (* Here you should fetch the partner in the dynamic contact
                 map, if defined, *)
-             let error, statemap_bottop =
+             let error, statemap_bottop = (* JF: error should be propagated, Please correct !!! *)
                Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
                  (agent_type, site_type) dynamic.local.bonds_per_site
              in
              match statemap_bottop with
-             | None -> Usual_domains.Val (agent_type, site_type, state)
+             | None -> Usual_domains.Val (agent_type, site_type, state) (* I think you should raise an error here *)
              | Some statemap ->
+               (* JF: This does not mean a thing !!! *)
+               (* do you want to fetch the association of state, in this maps,  *)
                Ckappa_sig.State_map_and_set.Map.fold
                  (fun state (agent_type', site_type', state') _ ->
                     Usual_domains.Val (agent_type', site_type', state')
@@ -396,11 +398,13 @@ struct
     in
     error, dynamic, (precondition, event_list)
 
-  let rec apply_event_list static dynamic error event_list =
+  let apply_event_list _static dynamic error _event_list =
     let event_list = [] in
     error, dynamic, event_list
 
-  let export static dynamic error kasa_state =
+  let stabilize _static dynamic error = error, dynamic, ()
+
+  let export _static dynamic error kasa_state =
     error, dynamic, kasa_state
 
   let print_contact_map_rhs static dynamic error store_result =

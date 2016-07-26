@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3000,6 +3000,9 @@ struct
     let error, dynamic, () =
       print_fixpoint_result static dynamic error loggers
     in
+    error, dynamic, ()
+
+  let stabilize _static dynamic error =
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable static dynamic error lkappa =

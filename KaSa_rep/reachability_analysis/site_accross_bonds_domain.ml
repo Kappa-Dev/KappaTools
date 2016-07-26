@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 21 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -919,6 +919,9 @@ struct
     let event_list = [] in
 
     error, dynamic, event_list
+
+  let stabilize _static dynamic error =
+    error, dynamic, ()
 
   let export _static dynamic error kasa_state =
     error, dynamic, kasa_state

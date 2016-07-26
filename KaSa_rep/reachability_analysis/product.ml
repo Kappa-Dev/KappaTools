@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 26 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -214,6 +214,27 @@ module Product
         underlying_domain_dynamic_information
         new_domain_dynamic_information,
       event_list
+
+    let stabilize static dynamic error =
+      let error, underlying_domain_dynamic_information, () =
+        Underlying_domain.stabilize
+          static.underlying_domain
+          (underlying_domain_dynamic_information dynamic)
+          error
+      in
+      let error, new_domain_dynamic_information, () =
+        New_domain.stabilize
+          static.new_domain
+          (new_domain_dynamic_information
+             underlying_domain_dynamic_information
+             dynamic)
+          error
+      in
+      error,
+      smash_dynamic
+        underlying_domain_dynamic_information
+        new_domain_dynamic_information,
+      ()
 
     let export static dynamic error kasa_state =
       let error, underlying_domain_dynamic_information, kasa_state =

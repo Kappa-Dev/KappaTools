@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 26 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -56,6 +56,8 @@ sig
   val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
 
   val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition,unit) binary
+
+  val stabilize: unit zeroary
 
   val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
@@ -239,6 +241,13 @@ struct
   (**[lift_unary f static dynamic] is a function lifted of unary type,
      returns information of dynamic information and its output*)
 
+  let lift_zeroary f static dynamic error =
+    let error, domain_dynamic, output =
+      f (get_domain_static_information static) dynamic.domain error
+    in
+    let dynamic = set_domain domain_dynamic dynamic in
+    error, dynamic, output
+
   let lift_unary f static dynamic error a =
     let error, domain_dynamic, output =
       f (get_domain_static_information static) dynamic.domain error a
@@ -339,6 +348,9 @@ struct
         precondition
     in
     apply_event_list static dynamic error event_list
+
+  let stabilize static dynamic error =
+    lift_zeroary Domain.stabilize static dynamic error
 
   let export static dynamic error kasa_state =
     lift_unary Domain.export static dynamic error kasa_state
