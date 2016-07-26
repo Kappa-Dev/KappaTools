@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 26 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -169,8 +169,10 @@ struct
           end
       in aux error dynamic
     in
-    (*print test*)
-    let _ = print static dynamic error log in
+    let error, dynamic, () =
+      Domain.stabilize static dynamic error
+    in
+    let error, dynamic  = print static dynamic error log in
     error, log_info, static, dynamic
 
   let export static dynamic error kasa_state =
