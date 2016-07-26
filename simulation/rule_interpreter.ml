@@ -1,6 +1,7 @@
 type t =
   {
     roots_of_ccs: Mods.IntSet.t Connected_component.Map.t;
+    unary_ccs_of_roots: Connected_component.Set.t Mods.IntMap.t;
     matchings_of_rule:
       (Connected_component.Matching.t * int list) list Mods.IntMap.t;
     unary_candidates: Mods.Int2Set.t Mods.IntMap.t;
@@ -26,6 +27,7 @@ type result = Clash | Success of t | Corrected of t
 let empty ?story_compression ~store_distances env =
   {
     roots_of_ccs = Connected_component.Map.empty;
+    unary_ccs_of_roots = Mods.IntMap.empty;
     matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
     unary_pathes = Mods.Int2Map.empty;
@@ -57,11 +59,22 @@ let print_injections ?sigs pr f roots_of_ccs =
        )
     ) roots_of_ccs
 
-let update_roots is_add map cc root =
+let update_roots is_add unary_ccs (map,rev) cc root =
   let va =
     Connected_component.Map.find_default Mods.IntSet.empty cc map in
   Connected_component.Map.add
-    cc ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) map
+    cc ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) map,
+  if Connected_component.Set.mem cc unary_ccs then
+    let va' =
+      Mods.IntMap.find_default Connected_component.Set.empty root rev in
+    let set =
+      (if is_add
+       then Connected_component.Set.add
+       else Connected_component.Set.remove) cc va' in
+    if Connected_component.Set.is_empty set
+        then Mods.IntMap.remove root rev
+        else Mods.IntMap.add root set rev
+  else rev
 
 let add_path x y p pathes =
   let add pair pathes =
@@ -277,19 +290,9 @@ let store_obs edges roots obs acc = function
          with Not_found -> acc)
       acc obs
 
-let exists_root_of_unary_ccs unary_ccs roots =
-  not @@
-  Connected_component.Set.for_all
-    (fun cc ->
-       Mods.IntSet.is_empty
-         (Connected_component.Map.find_default Mods.IntSet.empty cc roots))
-    unary_ccs
-
-let potential_root_of_unary_ccs unary_ccs state i =
+let potential_root_of_unary_ccs roots (i,_) =
   let ccs =
-    Connected_component.Set.filter
-      (fun cc -> Connected_component.Matching.is_root_of state i cc)
-      unary_ccs in
+    Mods.IntMap.find_default Connected_component.Set.empty i roots in
   if Connected_component.Set.is_empty ccs then None else Some ccs
 
 let remove_unary_instances unaries obs deps =
@@ -325,8 +328,8 @@ let update_edges
       concrete_removed in
   let roots' =
     List.fold_left
-      (fun r' (cc,(root,_)) -> update_roots false r' cc root)
-      state.roots_of_ccs del_obs in
+      (fun r' (cc,(root,_)) -> update_roots false unary_ccs r' cc root)
+      (state.roots_of_ccs,state.unary_ccs_of_roots) del_obs in
   let (side_effects,edges_after_neg) =
     List.fold_left
       apply_negative_transformation ([],state.edges) concrete_removed in
@@ -353,7 +356,7 @@ let update_edges
       concrete_inserted' in
   let roots'' =
     List.fold_left
-      (fun r' (cc,(root,_)) -> update_roots true r' cc root) roots' new_obs in
+      (fun r' (cc,(root,_)) -> update_roots true unary_ccs r' cc root) roots' new_obs in
   (*Positive unary*)
   let unary_cands',no_unary'' =
     if Connected_component.Set.is_empty unary_ccs
@@ -365,12 +368,12 @@ let update_edges
              if Connected_component.Set.mem cc unary_ccs then
                let oths =
                  Edges.paths_of_interest ~looping:((-1,-1),-1)
-                   (potential_root_of_unary_ccs unary_ccs edges'')
+                   (potential_root_of_unary_ccs (snd roots''))
                    sigs edges'' root (Edges.empty_path) in
                (oths,[(Connected_component.Set.singleton cc,fst root),
                       Edges.empty_path])::unary_cands,false
              else acc) (unary_cands,no_unary') new_obs in
-      if path = None && exists_root_of_unary_ccs unary_ccs roots''
+      if path = None && not (Mods.IntMap.is_empty (snd roots''))
       then
         List.fold_left
           (fun (unary_cands,_ as acc) ((n,s),(n',s')) ->
@@ -378,20 +381,20 @@ let update_edges
              let cn' = Agent_place.concretize final_inj2graph n' in
              match
                Edges.paths_of_interest ~looping:(cn',s')
-                 (potential_root_of_unary_ccs unary_ccs edges'')
+                 (potential_root_of_unary_ccs (snd roots''))
                  sigs edges'' cn (Edges.singleton_path cn s cn' s') with
              | [] -> acc
              | l ->
                let l' =
                  Edges.paths_of_interest ~looping:(cn,s)
-                   (potential_root_of_unary_ccs unary_ccs edges'')
+                   (potential_root_of_unary_ccs (snd roots''))
                    sigs edges'' cn' (Edges.singleton_path cn' s' cn s) in
                (l',l) :: unary_cands,false)
           unary_pack rule.Primitives.fresh_bindings
       else unary_pack in
   (*Store event*)
   let new_tracked_obs_instances =
-    store_obs edges'' roots'' new_obs [] state.story_machinery in
+    store_obs edges'' (fst roots'') new_obs [] state.story_machinery in
   let story_machinery' =
     store_event
       counter final_inj2graph new_tracked_obs_instances event_kind
@@ -400,7 +403,8 @@ let update_edges
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
 
-  { roots_of_ccs = roots''; unary_candidates = unary_candidates';
+  { roots_of_ccs = fst roots''; unary_ccs_of_roots = snd roots'';
+    unary_candidates = unary_candidates';
     matchings_of_rule = state.matchings_of_rule;
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
     outdated_elements = (rev_deps,unary_cands',no_unary'');
