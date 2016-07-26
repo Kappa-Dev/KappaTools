@@ -1,0 +1,34 @@
+Parsing initial_state.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+In agent A, the internal state of site y is u whenever the internal state of site x is p.
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+The internal state of site y in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
+The internal state of site x in agent D is always u.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
+execution finished without any exception
