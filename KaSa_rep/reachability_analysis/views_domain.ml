@@ -774,7 +774,7 @@ struct
               event_list
           ) (error, event_list) updates_list
       in
-      error, is_new_views, dynamic, event_list
+      error, dynamic, event_list
     else
       (*let () =
         let () =
@@ -784,7 +784,7 @@ struct
         let () = Loggers.print_newline log in
         ()
         in*)
-      error, is_new_views, dynamic, event_list
+      error, dynamic, event_list
 
   (***************************************************************************)
   (*get map restriction from covering classes*)
@@ -890,7 +890,7 @@ struct
                            pair_list
                        in
                        (*----------------------------------------------------------------*)
-                       let error, _is_new_views, dynamic, event_list =
+                       let error, dynamic, event_list =
                          add_link
                            ~title:"Views in initial state"
                            error
@@ -959,7 +959,7 @@ struct
     intersection of bdu_test and bdu_X*)
 
   let collect_bdu_enabled parameter error dynamic bdu_false fixpoint_result proj_bdu_test_restriction =
-    let error, dynamic, map =
+    let error, dynamic, _ =
       Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
            (*------------------------------------------------------*)
@@ -994,7 +994,7 @@ struct
         ) proj_bdu_test_restriction
         (error, dynamic, Covering_classes_type.AgentIDCV_map_and_set.Map.empty)
     in
-    error, dynamic, map
+    error, dynamic
 
   (*****************************************************************)
 
@@ -1406,7 +1406,8 @@ struct
               Misc_sa.const_unit
               state_dic
           with
-          | error, None -> (*inconsistent*) error, (dynamic, Usual_domains.Undefined)
+          | error, None -> (*inconsistent*)
+            error, (dynamic, Usual_domains.Undefined)
           | error, Some (state, _, _, _) -> (*state of t is B@w*)
             (*for each covering class containing D@v, if t in covering class,
               take the state of v knowing that t has type B@w*)
@@ -1436,10 +1437,11 @@ struct
             in
             (*---------------------------------------------------*)
             let error, dynamic, bdu =
-              List.fold_left (fun (error, dynamic, bdu) cv_id ->
+              List.fold_left
+                (fun (error, dynamic, bdu) cv_id ->
                   (*FIX ME: check whether or not t is in this covering class*)
                   let error, b =
-                    List.fold_left (fun (error, bool) (h, list, set)  ->
+                    List.fold_left (fun (error, bool) (h, _list, _set)  ->
                         if h = cv_id
                         then
                           error, true
@@ -1490,7 +1492,8 @@ struct
                     let error, handler, new_bdu =
                       List.fold_left (fun (error, handler, bdu) pair_list ->
                           let error, new_pair_list =
-                            List.fold_left (fun (error, current_list) (site, state') ->
+                            List.fold_left
+                              (fun (error, current_list) (site, _) ->
                                 error, (site, state) :: current_list
                               ) (error, []) pair_list
                           in
@@ -1502,7 +1505,15 @@ struct
                               error
                               new_pair_list
                           in
-                          error, handler, new_bdu
+                          let error, handler, conj_bdu =
+                            Ckappa_sig.Views_bdu.mvbdu_and
+                              parameter
+                              handler
+                              error
+                              bdu
+                              new_bdu
+                          in
+                          error, handler, conj_bdu
                         ) (error, handler, bdu_true) list (*CHECK ME: start from bdu_false*)
                     in
                     (*to the conjunction between bdu_X and new_bdu*)
@@ -1607,7 +1618,6 @@ struct
                         bdu_proj
                         new_site_name_1
                     in
-                    (*CHECK ME: conjunction between bdu and bdu_proj*)
                     let error, handler, bdu =
                       Ckappa_sig.Views_bdu.mvbdu_and
                         parameter
@@ -1617,7 +1627,7 @@ struct
                         bdu_renamed
                     in
                     let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
-                    error, dynamic, bdu_renamed
+                    error, dynamic, bdu
                 ) (error, dynamic, bdu_true) cv_list
             in
             (*--------------------------------------------------*)
@@ -1650,7 +1660,8 @@ struct
   (*---------------------------------------------------------------*)
   (*inside the pattern*)
 
-  let precondition_inside_pattern parameter error dynamic kappa_handler agent step path aux rule_id rule tl site_correspondence store_covering_classes_id fixpoint_result bdu_false bdu_true =
+  let precondition_inside_pattern parameter error dynamic kappa_handler
+      _agent step path aux _rule_id rule tl site_correspondence store_covering_classes_id fixpoint_result bdu_false bdu_true =
     (*---------------------------------------------------------*)
     (*inside the pattern, check the binding information in the lhs of the current agent*)
     let error, (dynamic, update_answer) =
@@ -1868,7 +1879,7 @@ struct
            error, dynamic,  update_answer
         )
     in
-    precondition
+    error, precondition
 
   (****************************************************************)
 
@@ -1914,7 +1925,8 @@ struct
     try
       (*check the condition whether or not the bdu is enabled, do the
         intersection of bdu_test and bdu_X.*)
-      let error, dynamic, map =
+      (* JF: You do not use the result, of this function, I comment the function call *)
+      let error, dynamic =
         collect_bdu_enabled
           parameter
           error
@@ -1922,10 +1934,10 @@ struct
           bdu_false
           fixpoint_result
           proj_bdu_test_restriction
-      in
+          in
       (*-----------------------------------------------------*)
       (*get a set of sites in a covering class: later with state list*)
-      let precondition =
+      let error, precondition =
         compute_precondition_enable parameter error kappa_handler rule rule_id
           precondition bdu_false bdu_true dual_contact_map store_agent_name
           site_correspondence store_covering_classes_id fixpoint_result
@@ -2030,8 +2042,6 @@ struct
         (fun (agent_id, agent_type, cv_id) _ (error, dynamic, event_list) ->
            let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
            let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
-           let error, store_remanent_triple = get_store_remanent_triple static dynamic error
-           in
            let error, store_modif_list_restriction_map =
              get_store_modif_list_restriction_map static dynamic error
            in
@@ -2084,7 +2094,7 @@ struct
                in
                error, dynamic, bdu_update
            in
-           let error, is_new_views, dynamic, event_list =
+           let error, dynamic, event_list =
              add_link
                ~title:"\t\t"
                error
@@ -2130,7 +2140,7 @@ struct
            let error, dynamic, bdu_update =
              compute_bdu_update_creation static dynamic error bdu_creation bdu_X
            in
-           let error, is_new_views, dynamic, event_list =
+           let error, dynamic, event_list =
              add_link
                ~title:"Dealing with creation"
                error
@@ -2163,7 +2173,7 @@ struct
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
       Covering_classes_type.AgentSiteCV_setmap.Map.fold
-        (fun (agent_type, new_site_id, cv_id)(bdu_test, list)
+        (fun (agent_type, _new_site_id, cv_id) (bdu_test, list)
           (error, dynamic, event_list) ->
           let fixpoint_result = get_fixpoint_result dynamic in
           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -2177,7 +2187,7 @@ struct
           let error, dynamic, bdu_update =
             compute_bdu_update_side_effects static dynamic error bdu_test list bdu_X
           in
-          let error, is_new_views, dynamic, event_list =
+          let error, dynamic, event_list =
             add_link
               ~title:"Dealing with side effects"
               error
@@ -2269,8 +2279,8 @@ struct
     let store_update = get_store_update dynamic in
     let (half_break, remove) = side_effects in
     match event with
-    | Communication.See_a_new_bond ((agent_type, site_type, state),
-                                    (agent_type', site_type', state')) ->
+    | Communication.See_a_new_bond ((agent_type, site_type, _state),
+                                    (_agent_type', _site_type', state')) ->
       (*-----------------------------------------------------------------------*)
       (* get the pairs (r, state) compatible with the second site:half_break *)
       let error, pair_list =
@@ -2387,7 +2397,7 @@ struct
       let store_update = get_store_update dynamic in
       let event_list =
         Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) rule_id_set event_list ->
+          (fun _ rule_id_set event_list ->
              Ckappa_sig.Rule_map_and_set.Set.fold
                (fun rule_id event_list ->
                   (Communication.Check_rule rule_id) :: event_list
@@ -2395,7 +2405,7 @@ struct
           ) store_update event_list
       in
       error, dynamic, event_list
-    | _ -> error, dynamic, event_list
+    | Communication.Dummy | Communication.Check_rule _ -> error, dynamic, event_list
 
   (**************************************************************************)
 
@@ -2511,8 +2521,8 @@ struct
   (************************************************************************************)
 
   let smash_map decomposition
-      ~show_dep_with_dimmension_higher_than:dim_min
-      parameter handler error handler_kappa site_correspondence result =
+      ~show_dep_with_dimmension_higher_than:_dim_min
+      parameter handler error _handler_kappa site_correspondence result =
     let error,handler,mvbdu_true =
       Ckappa_sig.Views_bdu.mvbdu_true
         parameter handler error
@@ -2539,7 +2549,7 @@ struct
              | _ :: tail -> aux tail
            in aux site_correspondence
          in
-         let error, (map1, map2) =
+         let error, (_map1, map2) =
            Bdu_static_views.new_index_pair_map parameter error site_correspondence
          in
          let rename_site parameter error site_type =
@@ -2634,11 +2644,7 @@ struct
 
   let print_bdu_update_map_gen_decomposition decomposition
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-      parameter handler error handler_kappa site_correspondence (static:static_information) result =
-    let error,handler,mvbdu_true =
-      Ckappa_sig.Views_bdu.mvbdu_true
-        parameter handler error
-    in
+      parameter handler error handler_kappa site_correspondence (_static:static_information) result =
     if
       smash
     then
@@ -2751,7 +2757,7 @@ struct
                in aux site_correspondence
              in
              (*-----------------------------------------------------------------------*)
-             let error,(map1, map2) =
+             let error,(_, map2) =
                Bdu_static_views.new_index_pair_map parameter error site_correspondence
              in
              (*-----------------------------------------------------------------------*)
@@ -2931,7 +2937,7 @@ struct
 
   (************************************************************************************)
 
-  let print_fixpoint_result static dynamic error loggers =
+  let print_fixpoint_result static dynamic error _loggers =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
@@ -2979,11 +2985,10 @@ struct
       then
         let handler_kappa = get_kappa_handler static in
         let handler = get_mvbdu_handler dynamic in
-        let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true parameter handler error in
         let compil = get_compil static in
-        let errpr, site_correspondence =  get_store_remanent_triple static dynamic error in
+        let error, site_correspondence =  get_store_remanent_triple static dynamic error in
         let error, handler, output = smash_map
-            (fun parameter handler error a -> error, handler, [a])
+            (fun _parameter handler error a -> error, handler, [a])
             parameter handler error
             ~show_dep_with_dimmension_higher_than:1
             handler_kappa
@@ -3005,10 +3010,10 @@ struct
   let stabilize _static dynamic error =
     error, dynamic, ()
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable static dynamic error ccmixture =
+  let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
 end

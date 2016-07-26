@@ -4,7 +4,7 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2015, the 23th of Feburary
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Jul 26 2016>
  *
  * Compute the side effect
  *
@@ -13,7 +13,7 @@
  * under the terms of the GNU Library General Public License *)
 
 (* DEAD CODE ? *)
-open Int_storage
+(*open Int_storage
 open Cckappa_sig
 open Printf
 
@@ -437,4 +437,4 @@ let side_effect parameter error handler cc_compil =
   let error, result =
     scan_rule_set parameter error handler cc_compil.rules in
   let _ = print_result parameter error result in
-  error, result
+  error, result*)
