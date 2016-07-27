@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaSa site_accross_bonds_domain_2.ka  --debugging-mode --output-directory output || exit 0 
+
+#checking initial state with the constant 0 should be ignored.
+
