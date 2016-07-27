@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Jul 27 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -48,7 +48,6 @@ struct
 
   type local_dynamic_information =
     {
-      dead_rule       : bool array;
       fixpoint_result : Ckappa_sig.Views_bdu.mvbdu AgentCV_map_and_set.Map.t;
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
     }
@@ -139,14 +138,6 @@ struct
   let set_local_dynamic_information local dynamic =
     {
       dynamic with local = local
-    }
-
-  (** dead rule local dynamic information*)
-  let get_dead_rule dynamic = dynamic.dead_rule
-
-  let set_dead_rule dead_rule dynamic =
-    {
-      dynamic with dead_rule = dead_rule
     }
 
   (** fixpoint result local dynamic information*)
@@ -316,7 +307,6 @@ struct
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let nrules = Handler.nrules parameter error kappa_handler in
-    let init_dead_rule_array = Array.make nrules false in
     let init_fixpoint = AgentCV_map_and_set.Map.empty in
     let init_bdu_analysis_dynamic = Bdu_dynamic_views.init_bdu_analysis_dynamic
     in
@@ -324,7 +314,7 @@ struct
       {
         global = dynamic;
         local =
-          { dead_rule = init_dead_rule_array;
+          {
             fixpoint_result = init_fixpoint;
             domain_dynamic_information = init_bdu_analysis_dynamic;
           }}
@@ -2259,9 +2249,6 @@ struct
     error, dynamic, event_list
 
   (**************************************************************)
-  (*  let dead_rule_array = dynamic.dead_rule in
-      to be pushed in apply_rule in the rule domain
-      (when we will split the domain concept-wise) *)
 
   let apply_rule static dynamic error rule_id precondition =
     let error, dynamic, event_list =
