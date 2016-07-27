@@ -124,6 +124,26 @@ let of_string x =
   try I (int_of_string x)
   with Failure _ -> F (float_of_string x)
 
+let to_json = function
+  | I x -> `Int x
+  | I64 x -> `String (Int64.to_string x)
+  | F x ->
+    match classify_float x with
+    | FP_zero | FP_normal | FP_subnormal -> `Float x
+    | FP_infinite | FP_nan -> `String (string_of_float x)
+
+let of_json = function
+  | `Int x -> I x
+  | `Float x -> F x
+  | `String n as x ->
+    begin
+      try I64 (Int64.of_string n)
+      with Failure _ -> try F (float_of_string n)
+        with Failure _ ->
+          raise (Yojson.Basic.Util.Type_error ("Not an Nbr",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not an Nbr",x))
+
 let of_bin_alg_op = function
   | Operator.MULT -> mult
   | Operator.SUM -> add

@@ -25,6 +25,47 @@ let print_agent compact link sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type
     (print_intf compact link sigs ag.a_type) (ag.a_ports,ag.a_ints)
 
+let print ~compact sigs f mix =
+  Pp.list Pp.comma (print_agent compact true sigs) f mix
+
+let agent_to_json a =
+  `Assoc
+    [("type",`Int a.a_type);
+     ("sites", `List
+        (Array.fold_right (fun x acc ->
+             (match x with FREE -> `Null|VAL i -> `Int i)::acc) a.a_ports []));
+     ("internals", `List
+        (Array.fold_right (fun x acc ->
+             (match x with None -> `Null|Some i -> `Int i)::acc) a.a_ints []))]
+let agent_of_json = function
+  | (`Assoc [("type",`Int t);("sites",`List s);("internals",`List i)] |
+     `Assoc [("type",`Int t);("internals",`List i);("sites",`List s)] |
+     `Assoc [("internals",`List i);("type",`Int t);("sites",`List s)] |
+     `Assoc [("internals",`List i);("sites",`List s);("type",`Int t)] |
+     `Assoc [("sites",`List s);("internals",`List i);("type",`Int t)] |
+     `Assoc [("sites",`List s);("type",`Int t);("internals",`List i)]) ->
+    { a_type = t;
+      a_ports =
+        Tools.array_map_of_list (function
+            | `Null -> FREE
+            | `Int p -> VAL p
+            | x ->
+              raise (Yojson.Basic.Util.Type_error ("Invalid site link",x)))
+          s;
+      a_ints =
+        Tools.array_map_of_list (function
+            | `Null -> None
+            | `Int p -> Some p
+            | x ->
+              raise (Yojson.Basic.Util.Type_error ("Invalid internal state",x)))
+          i}
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid raw_agent",x))
+
+let to_json m = `List (List.map agent_to_json m)
+let of_json = function
+  | `List l -> List.map agent_of_json l
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid raw_mixture",x))
+
 let get_color =
   let store = Hashtbl.create 10 in
   fun i ->
@@ -64,9 +105,6 @@ let print_dot sigs nb_cc f mix =
            acc ag.a_ports in
        (succ a,acc'))
     (0,Mods.IntMap.empty) mix
-
-let print ~compact sigs f mix =
-  Pp.list Pp.comma (print_agent compact true sigs) f mix
 
 let get_destination_of i l =
   let get_port_linked_on i ports =

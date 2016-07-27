@@ -7,6 +7,33 @@ type t =
   | TOKEN_ID of int
   | CONST of Nbr.t
 
+let rec to_json = function
+  | BIN_ALG_OP (op,(a,_),(b,_)) ->
+    `List [Operator.bin_alg_op_to_json op;to_json a;to_json b]
+  | UN_ALG_OP (op,(a,_)) ->
+    `List [Operator.un_alg_op_to_json op;to_json a]
+  | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
+  | ALG_VAR i -> `List [`String "VAR";`Int i]
+  | KAPPA_INSTANCE _ -> failwith "to_json KAPPA_INSTANCE _ not implemented"
+  | TOKEN_ID i -> `List [`String "TOKEN";`Int i]
+  | CONST n -> Nbr.to_json n
+
+let rec of_json = function
+  | `List [op;a;b] ->
+    BIN_ALG_OP
+      (Operator.bin_alg_op_of_json op,
+       Location.dummy_annot (of_json a),Location.dummy_annot (of_json b))
+  | `List [`String "VAR";`Int i] -> ALG_VAR i
+  | `List [`String "TOKEN";`Int i] -> TOKEN_ID i
+  | `List [op;a] ->
+    UN_ALG_OP (Operator.un_alg_op_of_json op,Location.dummy_annot (of_json a))
+  | x ->
+    try STATE_ALG_OP (Operator.state_alg_op_of_json x)
+    with Yojson.Basic.Util.Type_error _ ->
+    try  CONST (Nbr.of_json x)
+    with Yojson.Basic.Util.Type_error _ ->
+      raise (Yojson.Basic.Util.Type_error ("Invalid Alg_expr",x))
+
 let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
   | UN_ALG_OP (_, a), _ -> add_dep x d a

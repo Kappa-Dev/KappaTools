@@ -36,6 +36,28 @@ module Simulation_info = struct
     let () = Counter.inc_stories c in
     current c
 
+  let to_json f x =
+    `Assoc [
+      ("id",`Int x.story_id);
+      ("time",`Float x.story_time);
+      ("event",`Int x.story_event);
+      ("profiling",f x.profiling_info)]
+
+  let of_json f = function
+    | `Assoc l as x when List.length l = 4 ->
+      begin
+        try
+          { story_id =
+              (match List.assoc "id" l with `Int i -> i | _ -> raise Not_found);
+            story_time = (match List.assoc "time" l
+                          with `Float i -> i | _ -> raise Not_found);
+            story_event = (match List.assoc "event" l
+                           with `Int i -> i | _ -> raise Not_found);
+            profiling_info = f (List.assoc "profiling" l)}
+        with Not_found ->
+          raise (Yojson.Basic.Util.Type_error ("Not a simulation_info",x))
+      end
+    | x -> raise (Yojson.Basic.Util.Type_error ("Not a simulation_info",x))
 end
 
 type event_kind =
@@ -62,6 +84,19 @@ let print_event_kind ?env f x =
       Format.fprintf
         f "Intro @[<h>%a@]"
         (Pp.list Pp.comma (Environment.print_agent ~env)) s
+
+let event_kind_to_json = function
+  | OBS s -> `List [`String "OBS"; `String s]
+  | RULE i -> `List [`String "RULE"; `Int i]
+  | INIT l -> `List [`String "INIT"; `List (List.map (fun x -> `Int x) l)]
+  | PERT s -> `List [`String "PERT"; `String s]
+let event_kind_of_json = function
+  | `List [`String "OBS"; `String s] -> OBS s
+  | `List [`String "RULE"; `Int i] -> RULE i
+  | `List [`String "INIT"; `List l] ->
+    INIT (List.map Yojson.Basic.Util.to_int l)
+  | `List [`String "PERT"; `String s] -> PERT s
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid event_kind",x))
 
 let print_event_kind_dot_annot env f = function
   | RULE r_id  ->
@@ -164,6 +199,43 @@ let print_step ?(compact=false) ?env f = function
   | Init a -> print_init ~compact ?env f a
   | Obs a -> print_obs ~compact ?env f a
   | Dummy _  -> ()
+
+let step_to_json = function
+  | Subs (a,b) -> `List [`String "Subs"; `Int a; `Int b]
+  | Event (x,y,z) ->
+    `List [`String "Event";
+           event_kind_to_json x;
+           Instantiation.event_to_json Edges.agent_to_json y;
+           Simulation_info.to_json (fun () -> `Null) z]
+  | Init a ->
+    `List
+      [`String "Init";
+       `List (List.map (Instantiation.action_to_json Edges.agent_to_json) a)]
+  | Obs (x,y,z) ->
+    `List [`String "Obs";
+           event_kind_to_json x;
+           `List (List.map (Instantiation.test_to_json Edges.agent_to_json) y);
+           Simulation_info.to_json (fun () -> `Null) z]
+  | Dummy _ -> `Null
+let step_of_json = function
+  | `List [`String "Subs"; `Int a; `Int b] -> Subs (a,b)
+  | `List [`String "Event";x;y;z] ->
+    Event (event_kind_of_json x,
+           Instantiation.event_of_json Edges.agent_of_json y,
+           Simulation_info.of_json (function _ -> ()) z)
+  | `List [`String "Init"; `List l ] ->
+    Init (List.map (Instantiation.action_of_json Edges.agent_of_json) l)
+  | `List [`String "Obs"; x; `List l; z] ->
+    Obs (event_kind_of_json x,
+         List.map (Instantiation.test_of_json Edges.agent_of_json) l,
+         Simulation_info.of_json (function _ -> ()) z)
+  | `Null -> Dummy ""
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect trace step",x))
+
+let to_json t = `List (List.map step_to_json t)
+let of_json = function
+  | `List l -> List.map step_of_json l
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a trace",x))
 
 let step_is_obs = function
   | Obs _ -> true

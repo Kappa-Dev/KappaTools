@@ -38,7 +38,7 @@ val get_token_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_always_outdated : t -> Operator.DepSet.t
 val all_dependencies :
   t -> (Operator.DepSet.t * Operator.DepSet.t *
-	  Operator.DepSet.t array * Operator.DepSet.t array)
+        Operator.DepSet.t array * Operator.DepSet.t array)
 
 val num_of_agent : string Location.annot -> t -> int
 val num_of_alg : string Location.annot -> t -> int
@@ -56,6 +56,9 @@ val print :
   (t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
+
+val to_json : t -> Yojson.Basic.json
+val of_json : Yojson.Basic.json -> t
 
 val propagate_constant : int list -> Counter.t -> t -> t
 (** [propagate_constant updated_vars counter env] *)

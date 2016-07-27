@@ -17,6 +17,9 @@ module Simulation_info : sig
 
   val event : 'a t -> int
   val story_id : 'a t -> int
+
+  val to_json : ('a -> Yojson.Basic.json) -> 'a t -> Yojson.Basic.json
+  val of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a t
 end
 
 type event_kind =
@@ -70,6 +73,9 @@ val creation_of_step : step -> int list
 
 val print_step:
   ?compact:bool -> ?env:Environment.t -> Format.formatter -> step -> unit
+
+val to_json : t -> Yojson.Basic.json
+val of_json : Yojson.Basic.json -> t
 
 val store_event:
   Counter.t -> (event_kind * Instantiation.concrete Instantiation.event) ->

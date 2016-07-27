@@ -7,6 +7,9 @@ type t =
   | TOKEN_ID of int
   | CONST of Nbr.t
 
+val to_json : t -> Yojson.Basic.json
+val of_json : Yojson.Basic.json -> t
+
 (** depend in time, depend in event number, depend in given var *)
 val add_dep :
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->

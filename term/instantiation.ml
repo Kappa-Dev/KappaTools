@@ -272,3 +272,116 @@ let print_concrete_binding_state ?sigs f = function
       (match sigs with
        | Some sigs -> Signature.print_site sigs ag
        | None -> Format.pp_print_int) s
+
+let binding_type_to_json (ty,s) = `Assoc ["type", `Int ty; "site", `Int s]
+let binding_type_of_json = function
+  | `Assoc ["type", `Int ty; "site", `Int s]
+  | `Assoc ["site", `Int s; "type", `Int ty] -> (ty,s)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a binding_type",x))
+
+let quark_to_json f (ag,s) = `Assoc ["agent", f ag; "site", `Int s]
+let quark_of_json f = function
+  | `Assoc ["agent", ag; "site", `Int s]
+  | `Assoc ["site", `Int s; "agent", ag] -> (f ag,s)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect quark",x))
+
+let test_to_json f = function
+  | Is_Here a -> `List [`String "Is_Here"; f a]
+  | Has_Internal (s,i) ->
+    `List [`String "Has_Internal"; quark_to_json f s; `Int i]
+  | Is_Free s -> `List [`String "Is_Free"; quark_to_json f s]
+  | Is_Bound s -> `List [`String "Is_Bound"; quark_to_json f s]
+  | Has_Binding_type (s,b) ->
+    `List [`String "Has_Binding_type";quark_to_json f s;binding_type_to_json b]
+  | Is_Bound_to (s1,s2) ->
+    `List [`String "Is_Bound_to"; quark_to_json f s1; quark_to_json f s2]
+let test_of_json f = function
+  | `List [`String "Is_Here"; a] -> Is_Here (f a)
+  | `List [`String "Has_Internal"; s; `Int i] ->
+    Has_Internal (quark_of_json f s,i)
+  | `List [`String "Is_Free"; s] -> Is_Free (quark_of_json f s)
+  | `List [`String "Is_Bound"; s] -> Is_Bound (quark_of_json f s)
+  | `List [`String "Has_Binding_type"; s; b] ->
+    Has_Binding_type (quark_of_json f s, binding_type_of_json b)
+  | `List [`String "Is_Bound_to"; s1; s2] ->
+    Is_Bound_to (quark_of_json f s1, quark_of_json f s2)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Wrong test",x))
+
+let action_to_json f = function
+  | Create (ag,info) ->
+    `List [`String "Create"; f ag;
+           `List (List.map (fun (s,i) ->
+               `List (`Int s ::
+                      (match i with None -> [] | Some i -> [`Int i]))) info)]
+  | Mod_internal (s,i) ->
+    `List [`String "Mod_internal"; quark_to_json f s; `Int i]
+  | Bind (s1,s2) ->
+    `List [`String "Bind"; quark_to_json f s1; quark_to_json f s2]
+  | Bind_to (s1,s2) ->
+    `List [`String "Bind_to"; quark_to_json f s1; quark_to_json f s2]
+  | Free s -> `List [`String "Free"; quark_to_json f s]
+  | Remove a -> `List [`String "Remove"; f a]
+let action_of_json f = function
+  | `List [`String "Create"; ag; `List info] ->
+    Create (f ag,
+            List.map (function
+                | `List [ `Int s ] -> (s,None)
+                | `List [ `Int s; `Int i ] -> (s, Some i)
+                | x -> raise (Yojson.Basic.Util.Type_error
+                                ("Invalid action info",x))
+              ) info)
+  | `List [`String "Mod_internal"; s; `Int i] ->
+    Mod_internal (quark_of_json f s, i)
+  | `List [`String "Bind"; s1; s2] ->
+    Bind (quark_of_json f s1, quark_of_json f s2)
+  | `List [`String "Bind_to"; s1; s2] ->
+    Bind_to (quark_of_json f s1, quark_of_json f s2)
+  | `List [`String "Free"; s] -> Free (quark_of_json f s)
+  | `List [`String "Remove"; a] -> Remove (f a)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Wrong action",x))
+
+let binding_state_to_json f = function
+  | ANY -> `String "ANY"
+  | FREE -> `String "FREE"
+  | BOUND -> `String "BOUND"
+  | BOUND_TYPE b -> binding_type_to_json b
+  | BOUND_to s -> quark_to_json f s
+let binding_state_of_json f = function
+  | `String "ANY" -> ANY
+  | `String "FREE" -> FREE
+  | `String "BOUND" -> BOUND
+  | `Assoc ["type", `Int ty; "site", `Int s]
+  | `Assoc ["site", `Int s; "type", `Int ty] -> BOUND_TYPE (ty,s)
+  | `Assoc ["agent", ag; "site", `Int s]
+  | `Assoc ["site", `Int s; "agent", ag] -> BOUND_to (f ag,s)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect binding_state",x))
+
+let event_to_json f (tests,(actions,side_origin,side_dst)) =
+  `Assoc [
+    "tests", `List (List.map (test_to_json f) tests);
+    "actions", `List (List.map (action_to_json f) actions);
+    "side_effect_origins",
+    `List (List.map
+             (fun (s,b) -> `List [quark_to_json f s; binding_state_to_json f b])
+             side_origin);
+    "side_effect_destinations", `List (List.map (quark_to_json f) side_dst)
+  ]
+let event_of_json f = function
+  | `Assoc l as x when List.length l = 4 ->
+    begin
+      try
+        ((match List.assoc "tests" l
+          with `List l -> List.map (test_of_json f) l | _ -> raise Not_found),
+         ((match List.assoc "actions" l
+           with `List l -> List.map (action_of_json f) l | _ -> raise Not_found),
+          (match List.assoc "side_effect_origins" l with
+           | `List l -> List.map (function
+               | `List [s;b] -> (quark_of_json f s, binding_state_of_json f b)
+               | _ -> raise Not_found) l
+           | _ -> raise Not_found),
+          (match List.assoc "side_effect_destinations" l
+           with `List l -> List.map (quark_of_json f) l | _ -> raise Not_found)))
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error ("Incorrect event",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect event",x))

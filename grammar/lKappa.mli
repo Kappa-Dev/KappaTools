@@ -54,6 +54,9 @@ val print_rule :
   (Format.formatter -> int -> unit) -> (Format.formatter -> int -> unit) ->
   Format.formatter -> rule -> unit
 
+val rule_to_json : rule -> Yojson.Basic.json
+val rule_of_json : Yojson.Basic.json -> rule
+
 val bool_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)

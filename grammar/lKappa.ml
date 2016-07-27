@@ -234,6 +234,20 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
     r.r_add_tokens
     (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
 
+let rule_to_json _ = `Null
+let rule_of_json = function
+  | `Null ->
+    {
+      r_mix = [];
+      r_created = [];
+      r_rm_tokens = [];
+      r_add_tokens = [];
+      r_rate = Location.dummy_annot (Ast.CONST (Nbr.zero));
+      r_un_rate = None;
+    }
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rule",x))
+
+
 let build_l_type sigs pos dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
   let p_id = Signature.id_of_site dst_ty dst_p sigs in

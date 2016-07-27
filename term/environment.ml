@@ -165,3 +165,64 @@ let propagate_constant updated_vars counter x =
     algs_reverse_dependencies = x.algs_reverse_dependencies;
     tokens_reverse_dependencies = x.tokens_reverse_dependencies;
   }
+
+let to_json env =
+  `Assoc [
+    "signatures", Signature.to_json env.signatures;
+    "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
+    "algs", NamedDecls.to_json (fun (x,_) -> Alg_expr.to_json x) env.algs;
+    "observables",
+    `List (Array.fold_right
+             (fun (x,_) l -> Alg_expr.to_json x :: l) env.observables []);
+    "ast_rules",
+    `List
+      (Array.fold_right (fun (n,(r,_)) l ->
+           `List [(match n with None -> `Null | Some (n,_) -> `String n);
+              LKappa.rule_to_json r]::l) env.ast_rules []);
+    (* rules : Primitives.elementary_rule array;
+       cc_of_unaries : Connected_component.Set.t;
+       perturbations : Primitives.perturbation array;
+       dependencies_in_time : Operator.DepSet.t;
+       dependencies_in_event : Operator.DepSet.t;
+       need_update_each_loop : Operator.DepSet.t; (*union of 2 above for perf*)
+       algs_reverse_dependencies : Operator.DepSet.t array;
+       tokens_reverse_dependencies : Operator.DepSet.t array;*)
+  ]
+let of_json = function
+  | `Assoc l as x when List.length l = 5 ->
+    begin
+      try
+        { signatures = Signature.of_json (List.assoc "signatures" l);
+          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
+          algs = NamedDecls.of_json
+              (fun x -> Location.dummy_annot (Alg_expr.of_json x))
+              (List.assoc "algs" l);
+          observables = (match List.assoc "observables" l with
+              | `List o ->
+                Tools.array_map_of_list
+                  (fun x -> Location.dummy_annot (Alg_expr.of_json x)) o
+              | _ -> raise Not_found);
+          ast_rules = (match List.assoc "ast_rules" l with
+              | `List o ->
+                Tools.array_map_of_list
+                  (function
+                    | `List [`Null;r]->
+                      (None, Location.dummy_annot (LKappa.rule_of_json r))
+                    | `List [`String n;r]->
+                      (Some (Location.dummy_annot n),
+                       Location.dummy_annot (LKappa.rule_of_json r))
+                    | _ -> raise Not_found) o
+              | _ -> raise Not_found);
+          rules = [||];
+          cc_of_unaries = Connected_component.Set.empty;
+          perturbations = [||];
+          dependencies_in_time = Operator.DepSet.empty;
+          dependencies_in_event = Operator.DepSet.empty;
+          need_update_each_loop = Operator.DepSet.empty;
+          algs_reverse_dependencies = [||];
+          tokens_reverse_dependencies = [||];
+        }
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error ("Not a correct envirronment",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct_environment",x))

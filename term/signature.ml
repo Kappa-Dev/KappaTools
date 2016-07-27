@@ -72,6 +72,19 @@ let print_one f sign =
           Format.fprintf f "%s%t" name pp_int))
     sign
 
+let one_to_json =
+  NamedDecls.to_json
+    (function
+      | None -> `Null
+      | Some x -> NamedDecls.to_json (fun () -> `Null) x)
+
+let one_of_json =
+  NamedDecls.of_json
+    (Yojson.Basic.Util.to_option
+       (NamedDecls.of_json (function
+            | `Null -> ()
+            | x -> raise (Yojson.Basic.Util.Type_error
+                            ("Problematic agent signature",x)))))
 type s = t NamedDecls.t
 
 let size sigs = NamedDecls.size sigs
@@ -142,3 +155,6 @@ let print f sigs =
     (NamedDecls.print ~sep:Pp.space
        (fun _ n f si -> Format.fprintf f "%s(%a)" n print_one si))
     sigs
+
+let to_json = NamedDecls.to_json one_to_json
+let of_json = NamedDecls.of_json one_of_json

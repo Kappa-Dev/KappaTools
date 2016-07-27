@@ -5,6 +5,8 @@ type agent = int * int
 
 val print_agent :
   ?sigs:Signature.s -> Format.formatter -> agent -> unit
+val agent_to_json : agent -> Yojson.Basic.json
+val agent_of_json : Yojson.Basic.json -> agent
 
 type t
 

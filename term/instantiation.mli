@@ -89,3 +89,10 @@ val print_concrete_action :
   ?sigs:Signature.s -> Format.formatter -> concrete action -> unit
 val print_concrete_binding_state :
   ?sigs:Signature.s -> Format.formatter -> concrete binding_state -> unit
+
+val test_to_json : ('a -> Yojson.Basic.json) -> 'a test -> Yojson.Basic.json
+val test_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a test
+val action_to_json : ('a -> Yojson.Basic.json) -> 'a action -> Yojson.Basic.json
+val action_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a action
+val event_to_json : ('a -> Yojson.Basic.json) -> 'a event -> Yojson.Basic.json
+val event_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a event

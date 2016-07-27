@@ -6,6 +6,12 @@ let print_agent ?sigs f (id,ty) =
   | None -> Format.pp_print_int f id
   | Some sigs -> Format.fprintf f "%a_%i" (Signature.print_agent sigs) ty id
 
+let agent_to_json (id,ty) = `Assoc ["id", `Int id; "type", `Int ty]
+let agent_of_json = function
+  | `Assoc ["id", `Int id; "type", `Int ty]
+  | `Assoc ["type", `Int ty; "id", `Int id] -> (id,ty)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
+
 module Edge = struct
   type t = agent * int
   (** agent * site *)

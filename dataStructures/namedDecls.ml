@@ -40,3 +40,25 @@ let fold f acc nd =
   Tools.array_fold_lefti
     (fun i acc ((na,_),x) -> f i na acc x)
     acc nd.decls
+
+let to_json aux nd =
+  `List
+    (Array.fold_right
+       (fun ((x,_),a) acc -> `Assoc ([("name",`String x);("decl",aux a)]):: acc)
+       nd.decls
+       [])
+
+let of_json aux = function
+  | `List l ->
+    let decls =
+      Tools.array_map_of_list
+        (function
+          | (`Assoc ([("name",`String x);("decl",a)]) |
+             `Assoc ([("decl",a);("name",`String x)])) ->
+            (Location.dummy_annot x, aux a)
+          | x ->
+            raise (Yojson.Basic.Util.Type_error
+                     ("Not a valid NamedDecl element",x)))
+        l in
+    create decls
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a valid NamedDecl",x))

@@ -7,3 +7,6 @@ type t = agent list
 val equal : Signature.s -> t -> t -> bool
 val print : compact:bool -> Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> int -> Format.formatter -> t -> unit
+
+val to_json : t -> Yojson.Basic.json
+val of_json : Yojson.Basic.json -> t

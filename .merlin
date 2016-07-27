@@ -1,4 +1,5 @@
 FLG -w +a -strict-formats -safe-string
+PKG yojson
 
 S cflow
 S dataStructures

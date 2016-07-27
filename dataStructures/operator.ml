@@ -20,6 +20,18 @@ let bin_alg_op_to_string = function
 let print_bin_alg_op f op =
   Format.fprintf f "%s" (bin_alg_op_to_string op)
 
+let bin_alg_op_to_json op = `String (bin_alg_op_to_string op)
+let bin_alg_op_of_json = function
+  | `String "*" -> MULT
+  | `String "+" -> SUM
+  | `String "/" -> DIV
+  | `String "-" -> MINUS
+  | `String "^" -> POW
+  | `String "[mod]" -> MODULO
+  | `String "[min]" -> MIN
+  | `String "[max]" -> MAX
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect bin_alg_op",x))
+
 let un_alg_op_to_string = function
   | COSINUS -> "[cos]"
   | SINUS -> "[sin]"
@@ -33,6 +45,18 @@ let un_alg_op_to_string = function
 let print_un_alg_op f op =
   Format.pp_print_string f (un_alg_op_to_string op)
 
+let un_alg_op_to_json op = `String (un_alg_op_to_string op)
+let un_alg_op_of_json = function
+  | `String "[cos]" -> COSINUS
+  | `String "[sin]" -> SINUS
+  | `String "[tan]" -> TAN
+  | `String "[exp]" -> EXP
+  | `String "[sqrt]" -> SQRT
+  | `String "[int]" -> INT
+  | `String "[log]" -> LOG
+  | `String "-" -> UMINUS
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect un_alg_op",x))
+
 let state_alg_op_to_string = function
   | CPUTIME -> "[Tsim]"
   | TIME_VAR -> "[T]"
@@ -45,12 +69,29 @@ let state_alg_op_to_string = function
 let print_state_alg_op f op =
   Format.pp_print_string f (state_alg_op_to_string op)
 
+let state_alg_op_to_json op = `String (state_alg_op_to_string op)
+let state_alg_op_of_json = function
+  | `String "[Tsim]" -> CPUTIME
+  | `String "[T]" -> TIME_VAR
+  | `String "[E]" -> EVENT_VAR
+  | `String "[E-]" ->  NULL_EVENT_VAR
+  | `String "[Tmax]" -> TMAX_VAR
+  | `String "[Emax]" -> EMAX_VAR
+  | `String "[p]" -> PLOTNUM
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect state_alg_op",x))
+
 let bool_op_to_string = function
   | AND -> "&&"
   | OR -> "||"
 
 let print_bool_op f op =
   Format.pp_print_string f (bool_op_to_string op)
+
+let bool_op_to_json op = `String (bool_op_to_string op)
+let bool_op_of_json = function
+  | `String "&&" -> AND
+  | `String "||" -> OR
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect boolean op",x))
 
 let compare_op_to_string = function
   | GREATER -> ">"
@@ -60,6 +101,14 @@ let compare_op_to_string = function
 
 let print_compare_op f op =
   Format.pp_print_string f (compare_op_to_string op)
+
+let compare_op_to_json op = `String (compare_op_to_string op)
+let compare_op_of_json = function
+  | `String ">" -> GREATER
+  | `String "<" -> SMALLER
+  | `String "=" -> EQUAL
+  | `String "!=" -> DIFF
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect compare_op",x))
 
 let print_rev_dep f = function
   | RULE id ->
