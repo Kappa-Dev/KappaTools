@@ -6,53 +6,53 @@ let cast_bin_op ~op_f ?op_i ?op_i64 x y =
   | (I x, F y) -> F (op_f (float_of_int x) y)
   | (F x, I y) -> F (op_f x (float_of_int y))
   | (I x, I y) ->
-     begin
-       match op_i with
-       | None -> F (op_f (float_of_int x) (float_of_int y))
-       | Some op_i -> I (op_i x y)
-     end
+    begin
+      match op_i with
+      | None -> F (op_f (float_of_int x) (float_of_int y))
+      | Some op_i -> I (op_i x y)
+    end
   | (I x, I64 y) ->
-     begin
-       match op_i64 with
-       | None -> F (op_f (float_of_int x) (Int64.to_float y))
-       | Some op_i64 -> I64 (op_i64 (Int64.of_int x) y)
-     end
+    begin
+      match op_i64 with
+      | None -> F (op_f (float_of_int x) (Int64.to_float y))
+      | Some op_i64 -> I64 (op_i64 (Int64.of_int x) y)
+    end
   | (I64 x, I y) ->
-     begin
-       match op_i64 with
-       | None -> F (op_f (Int64.to_float x) (float_of_int y))
-       | Some op_i64 -> I64 (op_i64 x (Int64.of_int y))
-     end
+    begin
+      match op_i64 with
+      | None -> F (op_f (Int64.to_float x) (float_of_int y))
+      | Some op_i64 -> I64 (op_i64 x (Int64.of_int y))
+    end
   | (I64 x, I64 y) ->
-     begin
-       match op_i64 with
-       | None -> F (op_f (Int64.to_float x) (Int64.to_float y))
-       | Some op_i64 -> I64 (op_i64 x y)
-     end
+    begin
+      match op_i64 with
+      | None -> F (op_f (Int64.to_float x) (Int64.to_float y))
+      | Some op_i64 -> I64 (op_i64 x y)
+    end
   | (F x, I64 y) -> F (op_f x (Int64.to_float y))
   | (I64 x, F y) -> F (op_f (Int64.to_float x) y)
 
 let cast_un_op ?op_f ?op_i ?op_i64 x =
   match x with
   | F x ->
-     begin
-       match op_f with
-       | Some op_f -> F (op_f x)
-       | None -> match op_i with None -> invalid_arg "cast_un"
-			       | Some op_i -> I (op_i (int_of_float x))
-     end
+    begin
+      match op_f with
+      | Some op_f -> F (op_f x)
+      | None -> match op_i with None -> invalid_arg "cast_un"
+                              | Some op_i -> I (op_i (int_of_float x))
+    end
   | I64 x ->
-     begin
-       match op_i64 with
-       | Some op_i64 -> I64 (op_i64 x)
-       | None -> match op_f with None -> invalid_arg "cast_un_op"
-			       | Some op_f -> F (op_f (Int64.to_float x))
-     end
+    begin
+      match op_i64 with
+      | Some op_i64 -> I64 (op_i64 x)
+      | None -> match op_f with None -> invalid_arg "cast_un_op"
+                              | Some op_f -> F (op_f (Int64.to_float x))
+    end
   | I x ->
-     match op_i with
-     | Some op_i -> I (op_i x)
-     | None -> match op_f with None -> invalid_arg "cast_un_op"
-			     | Some op_f -> F (op_f (float_of_int x))
+    match op_i with
+    | Some op_i -> I (op_i x)
+    | None -> match op_f with None -> invalid_arg "cast_un_op"
+                            | Some op_f -> F (op_f (float_of_int x))
 
 let compare n1 n2 =
   match n1,n2 with
@@ -97,8 +97,8 @@ let is_zero = function
   | I64 x -> x = Int64.zero
   | I x -> x = 0
   | F x -> match classify_float x with
-	   | FP_zero -> true
-	   | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
+    | FP_zero -> true
+    | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
 
 let one = I 1
 
@@ -130,17 +130,17 @@ let of_bin_alg_op = function
   | Operator.DIV -> fun x y -> cast_bin_op ~op_f:(/.) x y
   | Operator.MINUS -> sub
   | Operator.POW ->
-     fun x n ->
-     let f =
-       cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
-     if is_zero n || is_strictly_positive n
-     then f x n
-     else f (F (1. /. to_float x)) (neg n)
+    fun x n ->
+      let f =
+        cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
+      if is_zero n || is_strictly_positive n
+      then f x n
+      else f (F (1. /. to_float x)) (neg n)
   | Operator.MODULO ->
-     cast_bin_op ~op_i:(mod)  ~op_i64:Int64.rem
-		 ~op_f:(fun a b ->
-			float_of_int
-			  (int_of_float a mod int_of_float b))
+    cast_bin_op ~op_i:(mod)  ~op_i64:Int64.rem
+      ~op_f:(fun a b ->
+          float_of_int
+            (int_of_float a mod int_of_float b))
   | Operator.MIN -> min
   | Operator.MAX -> max
 
@@ -152,7 +152,7 @@ let of_un_alg_op = function
   | Operator.COSINUS -> fun x -> cast_un_op ~op_f:cos x
   | Operator.TAN -> fun x -> cast_un_op ~op_f:tan x
   | Operator.INT ->
-     fun x -> cast_un_op ~op_i:(fun n -> n) ~op_i64:(fun n -> n) x
+    fun x -> cast_un_op ~op_i:(fun n -> n) ~op_i64:(fun n -> n) x
   | Operator.UMINUS -> neg
 
 let of_compare_op = function

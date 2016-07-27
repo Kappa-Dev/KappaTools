@@ -20,10 +20,10 @@ let num_of_internal_state site_id (_,pos as state) sign =
     let (na,_),values_opt = sign.NamedDecls.decls.(site_id) in
     match values_opt with
     | None ->
-       raise (ExceptionDefn.Malformed_Decl
-		("Site "^na^" has no declared internal state.",pos))
+      raise (ExceptionDefn.Malformed_Decl
+               ("Site "^na^" has no declared internal state.",pos))
     | Some nd ->
-       NamedDecls.elt_id ~kind:("internal state for site "^na) nd state
+      NamedDecls.elt_id ~kind:("internal state for site "^na) nd state
   with
   | Invalid_argument _ -> raise Not_found
 
@@ -40,19 +40,19 @@ let create_t ast_intf =
   NamedDecls.create (
     Tools.array_map_of_list
       (fun p ->
-       match p.Ast.port_lnk with
-       | (Ast.FREE,_) ->
-	  (p.Ast.port_nme,
-	   match p.Ast.port_int with
-	   | [] -> None
-	   | l ->
-	      Some (NamedDecls.create
-		      (Tools.array_map_of_list (fun x -> (x,())) l))
-	  )
-       | ((Ast.LNK_SOME | Ast.LNK_ANY |
-	   Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
-	  raise (ExceptionDefn.Malformed_Decl
-		("Link status inside a definition of signature", pos))
+         match p.Ast.port_lnk with
+         | (Ast.FREE,_) ->
+           (p.Ast.port_nme,
+            match p.Ast.port_int with
+            | [] -> None
+            | l ->
+              Some (NamedDecls.create
+                      (Tools.array_map_of_list (fun x -> (x,())) l))
+           )
+         | ((Ast.LNK_SOME | Ast.LNK_ANY |
+             Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
+           raise (ExceptionDefn.Malformed_Decl
+                    ("Link status inside a definition of signature", pos))
       ) ast_intf)
 
 let print_one f sign =
@@ -61,15 +61,15 @@ let print_one f sign =
     (NamedDecls.print
        ~sep:(fun f -> Format.fprintf f ",@,")
        (fun _ name f ints ->
-	let pp_int f =
-	  match ints with
-	  | None -> ()
-	  | Some nd ->
-	     NamedDecls.print
-	       ~sep:(fun _ -> ())
-	       (fun _ na f () -> Format.fprintf f "~%s" na) f nd
-	in
-	Format.fprintf f "%s%t" name pp_int))
+          let pp_int f =
+            match ints with
+            | None -> ()
+            | Some nd ->
+              NamedDecls.print
+                ~sep:(fun _ -> ())
+                (fun _ na f () -> Format.fprintf f "~%s" na) f nd
+          in
+          Format.fprintf f "%s%t" name pp_int))
     sign
 
 type s = t NamedDecls.t
@@ -117,28 +117,28 @@ let default_internal_state agent_id site_id sigs =
     | _, Some _ -> Some 0
   with
   | Invalid_argument _ ->
-     invalid_arg "Signature.default_num_value: invalid site identifier"
+    invalid_arg "Signature.default_num_value: invalid site identifier"
 
 let create l =
   NamedDecls.create (Tools.array_map_of_list
-		       (fun (name,intf) -> (name,create_t intf))
-		       l)
+                       (fun (name,intf) -> (name,create_t intf))
+                       l)
 
 let print_agent sigs f ag_ty =
- Format.pp_print_string f @@ agent_of_num ag_ty sigs
+  Format.pp_print_string f @@ agent_of_num ag_ty sigs
 let print_site sigs ag_ty f id =
- Format.pp_print_string f @@ site_of_id ag_ty id sigs
+  Format.pp_print_string f @@ site_of_id ag_ty id sigs
 let print_internal_state sigs ag_ty site f id =
   Format.pp_print_string f @@ internal_state_of_id ag_ty site id sigs
 let print_site_internal_state sigs ag_ty site f = function
   | None -> print_site sigs ag_ty f site
   | Some id ->
-     Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
-		    (internal_state_of_id ag_ty site id sigs)
+    Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
+      (internal_state_of_id ag_ty site id sigs)
 
 let print f sigs =
   Format.fprintf
     f "@[<v>%a@]"
     (NamedDecls.print ~sep:Pp.space
-		      (fun _ n f si -> Format.fprintf f "%s(%a)" n print_one si))
+       (fun _ n f si -> Format.fprintf f "%s(%a)" n print_one si))
     sigs

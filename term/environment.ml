@@ -15,7 +15,7 @@ type t = {
 }
 
 let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
-	 (ast_rules,rules,cc_of_unaries) obs perts =
+    (ast_rules,rules,cc_of_unaries) obs perts =
   { signatures = sigs; tokens = tokens; ast_rules = ast_rules;
     rules = rules; cc_of_unaries = cc_of_unaries; algs = algs;
     observables = obs; perturbations = perts;
@@ -41,9 +41,9 @@ let nb_rules env = Array.length env.rules
 let nums_of_rule name env =
   fold_rules
     (fun i acc r ->
-      match env.ast_rules.(pred r.Primitives.syntactic_rule) with
-      | Some (x,_), _ -> if x = name then i::acc else acc
-      | None, _ -> acc)
+       match env.ast_rules.(pred r.Primitives.syntactic_rule) with
+       | Some (x,_), _ -> if x = name then i::acc else acc
+       | None, _ -> acc)
     [] env
 
 let nb_syntactic_rules env = Array.length env.ast_rules
@@ -71,35 +71,35 @@ let print_agent ?env f i =
   match env with
   | None -> Format.fprintf f "__agent_%i" i
   | Some env ->
-     Signature.print_agent env.signatures f i
+    Signature.print_agent env.signatures f i
 let print_alg ?env f id =
   match env with
   | None -> Format.fprintf f "'__alg_%i'" id
   | Some env ->
-     Format.fprintf f "'%s'" (NamedDecls.elt_name env.algs id)
+    Format.fprintf f "'%s'" (NamedDecls.elt_name env.algs id)
 let print_token ?env f id =
-    match env with
-    | None -> Format.fprintf f "__token_%i" id
-    | Some env ->
-     Format.fprintf f "%s" (NamedDecls.elt_name env.tokens id)
+  match env with
+  | None -> Format.fprintf f "__token_%i" id
+  | Some env ->
+    Format.fprintf f "%s" (NamedDecls.elt_name env.tokens id)
 
 let print_ast_rule ?env f i =
   match env with
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
-     let sigs = env.signatures in
-     if i = 0 then Format.pp_print_string f "Perturbations"
-     else
-       match env.ast_rules.(pred i) with
-       | (Some (na,_),_) -> Format.pp_print_string f na
-       | (None,(r,_)) ->
-	  LKappa.print_rule ~ltypes:false ~rates:false sigs
-			    (print_token ~env) (print_alg ~env) f r
+    let sigs = env.signatures in
+    if i = 0 then Format.pp_print_string f "Perturbations"
+    else
+      match env.ast_rules.(pred i) with
+      | (Some (na,_),_) -> Format.pp_print_string f na
+      | (None,(r,_)) ->
+        LKappa.print_rule ~ltypes:false ~rates:false sigs
+          (print_token ~env) (print_alg ~env) f r
 
 let print_rule ?env f id =
-    match env with
-    | None -> Format.fprintf f "__rule_%i" id
-    | Some env -> print_ast_rule ~env f env.rules.(id).Primitives.syntactic_rule
+  match env with
+  | None -> Format.fprintf f "__rule_%i" id
+  | Some env -> print_ast_rule ~env f env.rules.(id).Primitives.syntactic_rule
 
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
@@ -115,8 +115,8 @@ let print pr_alg pr_rule pr_pert f env =
     Format.fprintf
       f "@[<v 2>Alg_expr:@,%a@]@,@[<2>Plot:@ %a@]@,"
       (NamedDecls.print
-	 ~sep:Pp.space
-	 (fun i n f (e,_) -> Format.fprintf f "@[<2>%i:%s:@ %a@]" i n (pr_alg env) e))
+         ~sep:Pp.space
+         (fun i n f (e,_) -> Format.fprintf f "@[<2>%i:%s:@ %a@]" i n (pr_alg env) e))
       env.algs
       (Pp.array Pp.space (fun _ f (e,_) -> pr_alg env f e))
       env.observables in
@@ -126,7 +126,7 @@ let print pr_alg pr_rule pr_pert f env =
        (fun i f r -> Format.fprintf f "@[<2>%i:@ %a@]" i (pr_rule env) r))
     env.rules
     (Pp.array Pp.space (fun i f p ->
-			Format.fprintf f "@[<2>/*%i*/%a@]" i (pr_pert env) p))
+         Format.fprintf f "@[<2>/*%i*/%a@]" i (pr_pert env) p))
     env.perturbations
 (*
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
@@ -137,8 +137,8 @@ let propagate_constant updated_vars counter x =
   let () =
     Array.iteri
       (fun i (na,v) ->
-       algs'.(i) <-
-	 (na,Alg_expr.propagate_constant updated_vars counter algs' v))
+         algs'.(i) <-
+           (na,Alg_expr.propagate_constant updated_vars counter algs' v))
       algs' in
   {
     signatures = x.signatures;
@@ -146,19 +146,19 @@ let propagate_constant updated_vars counter x =
     algs = NamedDecls.create algs';
     observables =
       Array.map
-	(Alg_expr.propagate_constant updated_vars counter algs') x.observables;
+        (Alg_expr.propagate_constant updated_vars counter algs') x.observables;
     ast_rules = x.ast_rules;
     rules =
       Array.map
-	(Primitives.map_expr_rule
-	   (Alg_expr.propagate_constant updated_vars counter algs')) x.rules;
+        (Primitives.map_expr_rule
+           (Alg_expr.propagate_constant updated_vars counter algs')) x.rules;
     cc_of_unaries = x.cc_of_unaries;
     perturbations =
       Array.map
-	(Primitives.map_expr_perturbation
-	   (Alg_expr.propagate_constant updated_vars counter algs')
-	   (Alg_expr.propagate_constant_bool updated_vars counter algs'))
-	x.perturbations;
+        (Primitives.map_expr_perturbation
+           (Alg_expr.propagate_constant updated_vars counter algs')
+           (Alg_expr.propagate_constant_bool updated_vars counter algs'))
+        x.perturbations;
     need_update_each_loop = x.need_update_each_loop;
     dependencies_in_time = x.dependencies_in_time;
     dependencies_in_event = x.dependencies_in_event;
