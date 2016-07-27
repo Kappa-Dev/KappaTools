@@ -2470,14 +2470,9 @@ The internal state of site x in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and C.x is equal to p,p when A.x is connected to C.x
-
- A.y and C.y is equal to p,p when A.y is connected to C.y
-
- C.x and A.x is equal to p,p when C.x is connected to A.x
-
- C.y and A.y is equal to p,p when C.y is connected to A.y
-
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, A@x
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, B@x
+Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: p, B@x
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

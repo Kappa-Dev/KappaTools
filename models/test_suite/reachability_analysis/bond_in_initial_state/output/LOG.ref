@@ -30,23 +30,11 @@ Reachability analysis...
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
-          A.x and B.x is equal to u,u when A.x is connected to B.x
-
-          B.x and A.x is equal to u,u when B.x is connected to A.x
-
 
 	Applying rule 0:
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-
-                          A.x and B.x is equal to u,u when A.x is connected to B.x
-
-                          B.x and A.x is equal to u,u when B.x is connected to A.x
-
-                          A.x and B.x is equal to u,p when A.x is connected to B.x
-
-                          B.x and A.x is equal to p,u when B.x is connected to A.x
 
 
 	Applying rule 2:
@@ -89,14 +77,6 @@ Reachability analysis...
 
 	Applying rule 0:
 		the precondition is satisfied
-                          A.x and B.x is equal to u,u when A.x is connected to B.x
-
-                          B.x and A.x is equal to u,u when B.x is connected to A.x
-
-                          A.x and B.x is equal to u,p when A.x is connected to B.x
-
-                          B.x and A.x is equal to p,u when B.x is connected to A.x
-
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -126,14 +106,6 @@ Reachability analysis...
 
 	Applying rule 0:
 		the precondition is satisfied
-                          A.x and B.x is equal to u,u when A.x is connected to B.x
-
-                          B.x and A.x is equal to u,u when B.x is connected to A.x
-
-                          A.x and B.x is equal to u,p when A.x is connected to B.x
-
-                          B.x and A.x is equal to p,u when B.x is connected to A.x
-
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -161,14 +133,8 @@ The binding state of site x in agent B ranges over free and A@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and B.x is equal to u,u when A.x is connected to B.x
-
- A.x and B.x is equal to u,p when A.x is connected to B.x
-
- B.x and A.x is equal to u,u when B.x is connected to A.x
-
- B.x and A.x is equal to p,u when B.x is connected to A.x
-
+Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, 
+Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, 
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

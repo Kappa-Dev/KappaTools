@@ -1518,18 +1518,13 @@ The internal state of site x1 in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and C.x1 is equal to B@x,u when A.c is connected to C.x1
-
- A.x and C.x1 is equal to free,p when A.c is connected to C.x2
-
- A.x and C.x2 is equal to free,u when A.c is connected to C.x2
-
- A.x and C.x1 is equal to free,free when A.c is connected to C.x2
-
- C.x1 and A.x is equal to u,B@x when C.x1 is connected to A.c
-
- C.x2 and A.x is equal to u,free when C.x2 is connected to A.c
-
+Whenever the site c of A and the site x1 of C are bound together, then the site x of A and x1 of C can have the following respective states: C@x1, free
+Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, A@c
+Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, free
+Whenever the site x1 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: u, 
+Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: p, 
+Whenever the site x2 of C and the site c of A are bound together, then the site x2 of C and x of A can have the following respective states: u, 
+Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: u, 
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -1085,12 +1085,11 @@ The internal state of site z in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- B.z and A.t is equal to u,u when B.z is connected to A.z
-
- B.z and A.t is equal to p,u when B.z is connected to A.z
-
- B.z and A.t is equal to p,p when B.z is connected to A.z
-
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, u
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

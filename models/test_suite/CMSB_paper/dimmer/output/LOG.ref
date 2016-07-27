@@ -36,24 +36,21 @@ The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- R.x and R.x is equal to E@x,E@x when R.c is connected to R.c
-
- R.cr and R.cr is equal to R@n,R@n when R.c is connected to R.c
-
- R.cr and R.n is equal to R@n,R@cr when R.c is connected to R.c
-
- R.n and R.cr is equal to R@cr,R@n when R.c is connected to R.c
-
- R.n and R.n is equal to R@cr,R@cr when R.c is connected to R.c
-
- R.n and R.c is equal to free,R@c when R.cr is connected to R.n
-
- R.n and R.cr is equal to free,free when R.cr is connected to R.n
-
- R.n and R.c is equal to free,R@c when R.cr is connected to R.n
-
- R.n and R.cr is equal to free,free when R.cr is connected to R.n
-
+Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: R@c, R@n
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: R@c, R@n
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: R@c, R@n
+Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: R@c, R@n
+Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: R@c, R@n
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@n
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
+Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
+Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@n
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
+Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
+Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

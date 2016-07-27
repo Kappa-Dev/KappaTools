@@ -1885,26 +1885,16 @@ The internal state of site x in agent E ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
- A.x and C.x is equal to p,p when A.x is connected to C.x
-
- A.x and C.x is equal to u,u when A.x is connected to C.x
-
- A.x and C.x is equal to p,p when A.x is connected to C.x
-
- C.x and A.x is equal to u,u when C.x is connected to A.x
-
- C.x and A.x is equal to p,p when C.x is connected to A.x
-
- C.x and A.x is equal to p,p when C.x is connected to A.x
-
- D.x and E.x is equal to u,u when D.x is connected to E.x
-
- D.x and E.x is equal to p,p when D.x is connected to E.x
-
- E.x and D.x is equal to u,u when E.x is connected to D.x
-
- E.x and D.x is equal to p,p when E.x is connected to D.x
-
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: B@x, 
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: free, 
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: B@x, 
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: free, 
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: A@x, 
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: A@x, 
+Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: free, 
+Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: E@x, 
+Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: free, 
+Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: D@x, 
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
