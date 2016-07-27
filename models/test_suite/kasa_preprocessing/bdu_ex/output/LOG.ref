@@ -291,12 +291,12 @@ Id=20
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=24
+  Id=26
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -311,7 +311,7 @@ Id=25
         Id=0
          Leaf False 
 
-    Id=23
+    Id=25
      Node(site_type:0<2)
       Id=21
        Node(site_type:1<0)
@@ -350,14 +350,13 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=23
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=22
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -366,6 +365,7 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

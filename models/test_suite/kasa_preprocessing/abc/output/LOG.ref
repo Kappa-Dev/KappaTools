@@ -1345,7 +1345,7 @@ Id=190
 
             Id=146
              Node(site_type:2<1)
-              Id=130
+              Id=118
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1418,7 +1418,6 @@ Id=113
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site c in agent A ranges over free, C@x1, and C@x2.
 INTENSIONAL DESCRIPTION:
 Id=111
  Node(site_type:0<0)
@@ -1434,7 +1433,6 @@ Id=111
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over free and B@x.
 INTENSIONAL DESCRIPTION:
 Id=111
  Node(site_type:0<0)
@@ -1450,7 +1448,6 @@ Id=111
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent B ranges over free and A@x.
 INTENSIONAL DESCRIPTION:
 Id=45
  Node(site_type:1<0)
@@ -1466,7 +1463,6 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x2 in agent C ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=48
  Node(site_type:2<0)
@@ -1482,9 +1478,8 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x1 in agent C ranges over free and A@c.
 INTENSIONAL DESCRIPTION:
-Id=130
+Id=118
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1498,7 +1493,6 @@ Id=130
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x2 in agent C ranges over free and A@c.
 INTENSIONAL DESCRIPTION:
 Id=111
  Node(site_type:0<0)
@@ -1514,6 +1508,12 @@ Id=111
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+The binding state of site c in agent A ranges over free, C@x1, and C@x2.
+The binding state of site x in agent A ranges over free and B@x.
+The binding state of site x in agent B ranges over free and A@x.
+The internal state of site x2 in agent C ranges over u and p.
+The binding state of site x1 in agent C ranges over free and A@c.
+The binding state of site x2 in agent C ranges over free and A@c.
 The internal state of site x1 in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -97,6 +97,11 @@ type reachability_result =
   Domain_selection.Reachability_analysis.static_information
   * Domain_selection.Reachability_analysis.dynamic_information
 
+type subviews_info = unit
+type dead_rules = unit
+type dead_agents = unit
+
+
 type flow =
   Ckappa_sig.Site_union_find.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
@@ -122,6 +127,9 @@ type state =
     signature     : Signature.s option;
     bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
     reachability_state: reachability_result option ;
+    subviews_info: subviews_info option ;
+    dead_rules:  dead_rules option ;
+    dead_agents: dead_agents option ;
     ode_flow: Ode_fragmentation_type.ode_frag option ;
     ctmc_flow: flow option ;
     errors        : Exception.method_handler ;
@@ -155,6 +163,9 @@ let create_state ?errors parameters init =
     ode_flow = None ;
     ctmc_flow = None ;
     reachability_state = None ;
+    subviews_info = None ;
+    dead_rules = None ;
+    dead_agents = None ;
     errors = error ;
     }
 
@@ -218,6 +229,15 @@ let get_internal_contact_map accuracy state =
 let get_reachability_result state = state.reachability_state
 let set_reachability_result reachability_state state =
   {state with reachability_state = Some reachability_state}
+let get_dead_rules state = state.dead_rules
+let set_dead_rules dead_rules state =
+  {state with dead_rules = Some dead_rules}
+let get_dead_agents state = state.dead_agents
+let set_dead_agents dead_agents state =
+  {state with dead_agents = Some dead_agents}
+let get_subviews_info state = state.subviews_info
+let set_subviews_info subviews state =
+  {state with subviews_info = Some subviews}
 let set_bdu_handler bdu_handler state =
   {state with bdu_handler = bdu_handler}
 let get_bdu_handler state = state.bdu_handler

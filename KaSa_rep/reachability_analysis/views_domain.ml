@@ -50,6 +50,8 @@ struct
     {
       fixpoint_result : Ckappa_sig.Views_bdu.mvbdu AgentCV_map_and_set.Map.t;
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
+      subviews: unit option ;
+      ranges: unit option ;
     }
 
 
@@ -305,8 +307,6 @@ struct
         domain_static_information = init_bdu_analysis_static
       }
     in
-    let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let nrules = Handler.nrules parameter error kappa_handler in
     let init_fixpoint = AgentCV_map_and_set.Map.empty in
     let init_bdu_analysis_dynamic = Bdu_dynamic_views.init_bdu_analysis_dynamic
     in
@@ -317,6 +317,8 @@ struct
           {
             fixpoint_result = init_fixpoint;
             domain_dynamic_information = init_bdu_analysis_dynamic;
+            subviews = None ;
+            ranges = None ;
           }}
     in
     let error, init_static, init_dynamic =
@@ -2629,9 +2631,10 @@ struct
 
   (**************************************************************************)
 
-  let print_bdu_update_map_gen_decomposition decomposition
+  let stabilise_bdu_update_map_gen_decomposition decomposition
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-      parameter handler error handler_kappa site_correspondence (_static:static_information) result =
+      parameter handler error handler_kappa site_correspondence
+      result =
     if
       smash
     then
@@ -2641,11 +2644,11 @@ struct
           ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
           handler_kappa site_correspondence result
       in
-      let error, handler =
+      let error, (handler, list) =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameter
           error
-          (fun parameter error agent_type map (handler:Ckappa_sig.Views_bdu.handler) ->
+          (fun parameter error agent_type map (handler,list) ->
              let error', agent_string =
                try
                  Handler.string_of_agent parameter error handler_kappa agent_type
@@ -2656,7 +2659,7 @@ struct
              let error = Exception.check warn parameter error error' (Some "line 2659") Exit in
              (*-----------------------------------------------------------------------*)
              Wrapped_modules.LoggedIntMap.fold
-               (fun _ mvbdu (error,handler)
+               (fun _ mvbdu (error,(handler,list))
                  ->
                    let error, handler =
                      if local_trace || Remanent_parameters.get_trace parameter
@@ -2686,22 +2689,17 @@ struct
                        parameter handler error (fun _ e i -> e, i) mvbdu
                    in
                    (*-----------------------------------------------------------------------*)
-                   let error =
-                     Translation_in_natural_language.print
-                       ~show_dep_with_dimmension_higher_than:dim_min parameter
-                       handler_kappa error agent_string agent_type translation
-                   in
-                   error, handler
+                   error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
                )
                map
-               (error, handler))
-          output handler
+               (error, (handler,list)))
+          output (handler,[])
       in
-      error, handler
+      error, handler, List.rev list
     else
       begin
-        Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) bdu_update (error,handler) ->
+        let error, (handler, list) = Covering_classes_type.AgentCV_map_and_set.Map.fold
+          (fun (agent_type, cv_id) bdu_update (error,(handler,list)) ->
              let error', agent_string =
                try
                  Handler.string_of_agent parameter error handler_kappa agent_type
@@ -2748,13 +2746,13 @@ struct
                Bdu_static_views.new_index_pair_map parameter error site_correspondence
              in
              (*-----------------------------------------------------------------------*)
-             let error, handler, list =
+             let error, handler, list' =
                decomposition parameter handler error bdu_update
              in
              (*-----------------------------------------------------------------------*)
-             let error, handler =
+             let error, (handler, list) =
                List.fold_left
-                 (fun (error, handler) mvbdu ->
+                 (fun (error, (handler, list)) mvbdu ->
                     let error, handler =
                       if local_trace || Remanent_parameters.get_trace parameter
                       then
@@ -2798,33 +2796,49 @@ struct
                         mvbdu
                     in
                     (*--------------------------------------------------------------------*)
-                    let error =
-                      Translation_in_natural_language.print
-                        ~show_dep_with_dimmension_higher_than:dim_min parameter
-                        handler_kappa error agent_string agent_type translation
-                    in error, handler
+                    error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
                  )
-                 (error, handler)
-                 list
+                 (error, (handler,list))
+                 list'
              in
-             error, handler)
-          result (error, handler)
+             error, (handler,list))
+          result (error, (handler,[]))
+        in error, handler, (List.rev list)
       end
+
+  let print_bdu_update_map_gen_decomposition decomposition
+      ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
+      parameter handler error handler_kappa site_correspondence  result =
+    let error, handler, list = stabilise_bdu_update_map_gen_decomposition decomposition
+        ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
+        parameter handler error handler_kappa site_correspondence  result
+    in
+    let error =
+      List.fold_left
+        (fun error (agent_string, agent_type, _, translation) ->
+                     Translation_in_natural_language.print
+                       ~show_dep_with_dimmension_higher_than:dim_min parameter
+                       handler_kappa error agent_string agent_type translation
+               )
+               error
+               list
+    in
+    error, handler
 
   (****************************************************************)
   (*non relational properties*)
 
-  let print_bdu_update_map_cartesian_abstraction a b c d e =
+  let print_bdu_update_map_cartesian_abstraction a b c d =
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-      a b c d e
+      a b c d
 
   (*****************************************************************)
   (*relational properties*)
 
-  let print_bdu_update_map_cartesian_decomposition a b c d e =
+  let print_bdu_update_map_cartesian_decomposition a b c d =
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:
@@ -2833,7 +2847,7 @@ struct
          else 1
         )
       Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
-      a b c d e
+      a b c d
 
   (*****************************************************************)
 
@@ -2891,7 +2905,6 @@ struct
           error
           handler_kappa
           site_correspondence
-          static
           result
       in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
@@ -2916,7 +2929,6 @@ struct
           error
           handler_kappa
           site_correspondence
-          static
           result
       in
       error, handler
@@ -2994,8 +3006,20 @@ struct
     in
     error, dynamic, ()
 
-  let stabilize _static dynamic error =
-    error, dynamic, ()
+  let stabilize static dynamic error =
+    let dim_min = 2 in
+    let parameter = get_parameter static in
+    let handler = get_mvbdu_handler dynamic in
+    let handler_kappa = get_kappa_handler static in
+    let result = get_fixpoint_result dynamic in
+    let error, site_correspondence =  get_store_remanent_triple static dynamic error in
+    let error, handler, _array =
+      smash_map
+        Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
+    ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
+    handler_kappa site_correspondence result
+    in
+    error, set_mvbdu_handler handler dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)

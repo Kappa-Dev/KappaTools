@@ -30,9 +30,9 @@ In agent A, the internal state of site x, the internal state of site y, and the 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site z in agent A ranges over u and q.
 The internal state of site y in agent A ranges over u, p, and q.
 The internal state of site x in agent A ranges over u, p, 0, and q.
+The internal state of site z in agent A ranges over u and q.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -59,6 +59,10 @@ type reachability_result =
   Domain_selection.Reachability_analysis.static_information
   * Domain_selection.Reachability_analysis.dynamic_information
 
+type subviews_info = unit
+type dead_rules = unit
+type dead_agents = unit
+
 type flow =
     Ckappa_sig.Site_union_find.t
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
@@ -106,6 +110,12 @@ val get_bdu_handler: state -> Mvbdu_wrapper.Mvbdu.handler
 val set_bdu_handler: Mvbdu_wrapper.Mvbdu.handler -> state -> state
 val set_reachability_result: reachability_result -> state -> state
 val get_reachability_result: state -> reachability_result option
+val get_subviews_info: state -> subviews_info option
+val set_subviews_info: subviews_info -> state -> state
+val get_dead_rules: state -> dead_rules option
+val set_dead_rules: dead_rules -> state -> state
+val get_dead_agents: state -> dead_agents option
+val set_dead_agents: dead_agents -> state -> state
 val get_influence_map_map: state -> influence_map AccuracyMap.t
 val get_contact_map_map: state -> contact_map AccuracyMap.t
 val get_internal_influence_map_map: state -> internal_influence_map AccuracyMap.t

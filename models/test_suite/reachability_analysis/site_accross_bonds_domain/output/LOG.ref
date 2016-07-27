@@ -1017,7 +1017,6 @@ Id=64
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site t in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=65
  Node(site_type:0<0)
@@ -1033,7 +1032,6 @@ Id=65
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site z in agent A ranges over free and B@z.
 INTENSIONAL DESCRIPTION:
 Id=64
  Node(site_type:1<0)
@@ -1049,7 +1047,6 @@ Id=64
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site z in agent B ranges over free and A@z.
 INTENSIONAL DESCRIPTION:
 Id=39
  Node(site_type:2<0)
@@ -1065,7 +1062,6 @@ Id=39
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site t in agent B ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=65
  Node(site_type:0<0)
@@ -1081,6 +1077,10 @@ Id=65
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+The internal state of site t in agent A ranges over u and p.
+The binding state of site z in agent A ranges over free and B@z.
+The binding state of site z in agent B ranges over free and A@z.
+The internal state of site t in agent B ranges over u and p.
 The internal state of site z in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

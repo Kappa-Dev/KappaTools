@@ -266,17 +266,17 @@ In agent A, the internal state of site a1, the internal state of site a2, the in
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site g in agent A ranges over u and p.
-The internal state of site e2 in agent A ranges over u and p.
-The internal state of site e1 in agent A ranges over u and p.
-The internal state of site d2 in agent A ranges over u and p.
-The internal state of site d1 in agent A ranges over u and p.
-The internal state of site c2 in agent A ranges over u and p.
-The internal state of site c1 in agent A ranges over u and p.
-The internal state of site b2 in agent A ranges over u and p.
-The internal state of site b1 in agent A ranges over u and p.
 The internal state of site a2 in agent A ranges over u and p.
 The internal state of site a1 in agent A ranges over u and p.
+The internal state of site b1 in agent A ranges over u and p.
+The internal state of site b2 in agent A ranges over u and p.
+The internal state of site c1 in agent A ranges over u and p.
+The internal state of site c2 in agent A ranges over u and p.
+The internal state of site d1 in agent A ranges over u and p.
+The internal state of site d2 in agent A ranges over u and p.
+The internal state of site e1 in agent A ranges over u and p.
+The internal state of site e2 in agent A ranges over u and p.
+The internal state of site g in agent A ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -552,17 +552,17 @@ In agent A, the internal state of site a1, the internal state of site a2, the in
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site g in agent A ranges over u and p.
-The internal state of site e2 in agent A ranges over u and p.
-The internal state of site e1 in agent A ranges over u and p.
-The internal state of site d2 in agent A ranges over u and p.
-The internal state of site d1 in agent A ranges over u and p.
-The internal state of site c2 in agent A ranges over u and p.
-The internal state of site c1 in agent A ranges over u and p.
-The internal state of site b2 in agent A ranges over u and p.
-The internal state of site b1 in agent A ranges over u and p.
 The internal state of site a2 in agent A ranges over u and p.
 The internal state of site a1 in agent A ranges over u and p.
+The internal state of site b1 in agent A ranges over u and p.
+The internal state of site b2 in agent A ranges over u and p.
+The internal state of site c1 in agent A ranges over u and p.
+The internal state of site c2 in agent A ranges over u and p.
+The internal state of site d1 in agent A ranges over u and p.
+The internal state of site d2 in agent A ranges over u and p.
+The internal state of site e1 in agent A ranges over u and p.
+The internal state of site e2 in agent A ranges over u and p.
+The internal state of site g in agent A ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

@@ -35,11 +35,11 @@ In agent P, the internal state of site a1, the internal state of site a2, the in
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The binding state of site g in agent P ranges over free and K@x.
-The internal state of site b2 in agent P ranges over u and p.
-The internal state of site b1 in agent P ranges over u and p.
 The internal state of site a2 in agent P ranges over u and p.
 The internal state of site a1 in agent P ranges over u and p.
+The internal state of site b1 in agent P ranges over u and p.
+The internal state of site b2 in agent P ranges over u and p.
+The binding state of site g in agent P ranges over free and K@x.
 The binding state of site x in agent K ranges over free and P@g.
 ------------------------------------------------------------
 * Site accross bonds domain
@@ -85,11 +85,11 @@ In agent P, the internal state of site a1, the internal state of site a2, the in
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The binding state of site g in agent P ranges over free and K@x.
-The internal state of site b2 in agent P ranges over u and p.
-The internal state of site b1 in agent P ranges over u and p.
 The internal state of site a2 in agent P ranges over u and p.
 The internal state of site a1 in agent P ranges over u and p.
+The internal state of site b1 in agent P ranges over u and p.
+The internal state of site b2 in agent P ranges over u and p.
+The binding state of site g in agent P ranges over free and K@x.
 The binding state of site x in agent K ranges over free and P@g.
 ------------------------------------------------------------
 * Site accross bonds domain

@@ -1594,7 +1594,6 @@ Id=58
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
 INTENSIONAL DESCRIPTION:
 Id=61
  Node(site_type:0<0)
@@ -1635,88 +1634,89 @@ Id=61
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=58
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=57
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=56
+     Node(site_type:0<2)
+      Id=51
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=12
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=58
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=57
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=56
+     Node(site_type:0<2)
+      Id=51
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=12
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
 In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
-INTENSIONAL DESCRIPTION:
-Id=58
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=57
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=56
-     Node(site_type:0<2)
-      Id=51
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 In agent D, the internal state of site x is p whenever the binding state of site x is E@x.
-INTENSIONAL DESCRIPTION:
-Id=58
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=57
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=56
-     Node(site_type:0<2)
-      Id=51
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 In agent E, the internal state of site x is p whenever the binding state of site x is D@x.
 
 ------------------------------------------------------------
@@ -1737,150 +1737,150 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=53
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=52
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=51
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=53
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=52
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=51
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=53
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=52
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=51
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=53
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=52
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=51
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=53
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=52
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent A ranges over free, B@x, and C@x.
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A ranges over u and p.
-INTENSIONAL DESCRIPTION:
-Id=51
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent B ranges over free and A@x.
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent B ranges over u and p.
-INTENSIONAL DESCRIPTION:
-Id=51
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent C ranges over free and A@x.
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent C ranges over u and p.
-INTENSIONAL DESCRIPTION:
-Id=51
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent D ranges over free and E@x.
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D ranges over u and p.
-INTENSIONAL DESCRIPTION:
-Id=51
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent E ranges over free and D@x.
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent E ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

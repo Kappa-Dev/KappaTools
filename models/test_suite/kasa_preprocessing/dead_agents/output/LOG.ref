@@ -737,7 +737,6 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A is always free.
 INTENSIONAL DESCRIPTION:
 Id=24
  Node(site_type:0<0)
@@ -763,7 +762,6 @@ Id=24
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=26
  Node(site_type:0<0)
@@ -779,6 +777,8 @@ Id=26
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+The binding state of site x in agent A is always free.
+The internal state of site x in agent A ranges over u and p.
 The internal state of site x in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

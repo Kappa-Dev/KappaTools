@@ -618,7 +618,6 @@ Id=8
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=8
  Node(site_type:0<0)
@@ -634,6 +633,7 @@ Id=8
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+The internal state of site x in agent A ranges over u and p.
 The internal state of site x in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

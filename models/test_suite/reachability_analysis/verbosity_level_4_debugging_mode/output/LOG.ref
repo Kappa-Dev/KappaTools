@@ -879,19 +879,19 @@ Id=80
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=133
+Id=136
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=132
+  Id=135
    Node(site_type:0<1)
-    Id=121
+    Id=124
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=120
+      Id=123
        Node(site_type:1<1)
         Id=5
          Node(site_type:2<0)
@@ -909,9 +909,9 @@ Id=133
         Id=0
          Leaf False 
 
-    Id=131
+    Id=134
      Node(site_type:0<2)
-      Id=122
+      Id=125
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -934,14 +934,14 @@ Id=133
           Id=0
            Leaf False 
 
-      Id=130
+      Id=133
        Node(site_type:0<3)
-        Id=124
+        Id=127
          Node(site_type:1<1)
           Id=0
            Leaf False 
 
-          Id=123
+          Id=126
            Node(site_type:1<2)
             Id=17
              Node(site_type:2<1)
@@ -959,14 +959,14 @@ Id=133
             Id=0
              Leaf False 
 
-        Id=129
+        Id=132
          Node(site_type:0<4)
-          Id=128
+          Id=131
            Node(site_type:1<0)
             Id=0
              Leaf False 
 
-            Id=127
+            Id=130
              Node(site_type:1<1)
               Id=5
                Node(site_type:2<0)
@@ -981,14 +981,14 @@ Id=133
                   Id=0
                    Leaf False 
 
-              Id=126
+              Id=129
                Node(site_type:1<2)
                 Id=0
                  Leaf False 
 
-                Id=125
+                Id=128
                  Node(site_type:1<3)
-                  Id=101
+                  Id=91
                    Node(site_type:2<0)
                     Id=0
                      Leaf False 
@@ -1021,23 +1021,7 @@ In agent A, the internal state of site x, the internal state of site y, and the 
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=101
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=16
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-The internal state of site z in agent A ranges over u and q.
-INTENSIONAL DESCRIPTION:
-Id=174
+Id=90
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1051,14 +1035,13 @@ Id=174
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u, p, and q.
 INTENSIONAL DESCRIPTION:
-Id=140
+Id=89
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=139
+  Id=88
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1067,7 +1050,24 @@ Id=140
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=91
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The internal state of site y in agent A ranges over u, p, and q.
 The internal state of site x in agent A ranges over u, p, 0, and q.
+The internal state of site z in agent A ranges over u and q.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
