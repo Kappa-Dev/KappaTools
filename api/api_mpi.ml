@@ -214,3 +214,5 @@ class virtual runtime ?(timeout : float = 10.) ()
       )
 
   end
+
+let message_delimter = "\x1e" (* "\t" *)

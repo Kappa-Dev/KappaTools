@@ -113,7 +113,7 @@ else
 	cat js/use-cdn.html | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 endif
 	cp shared/*.js site
-	cp -f js/*.js js/*.css js/favicon.ico site
+	cp -f js/*.js js/*.css js/favicon.ico js/package.json site
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \

@@ -68,3 +68,5 @@ let onload () =
   let () = Tab_distances.onload () in
   let () = Tab_log.onload () in
   ()
+
+let onunload () = ()

@@ -160,11 +160,12 @@ let configuration_xml =
     ~a:[ Html.a_id configuration_id
        ; Tyxml_js.R.Html.a_class (React.S.bind
                                     UIState.model_is_running
-                                    (fun is_running -> React.S.const (if is_running then
-                                                                        ["hidden"]
-                                                                      else
-                                                                        ["visible"]
-                                                                     )
+                                    (fun is_running ->
+                                       React.S.const (if is_running then
+                                                        ["hidden"]
+                                                      else
+                                                        ["visible"]
+                                                     )
                                     )
                                  )
        ]

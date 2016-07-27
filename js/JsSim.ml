@@ -29,9 +29,6 @@ let dev _ =
       []
       ~onClose:(Some (fun () -> Common.debug "close"))
   in
-  let process : JsNode.process Js.t = JsNode.spawn_process configuration in
-  let () = process##write(Js.string "hello") in
-  let () = process##kill in
   let%html main_container = {|<div class="row">
                             |}[Panel_editor.xml;
                                Panel_tab.xml]{|
@@ -43,9 +40,19 @@ let dev _ =
   in
   let skeleton = Tyxml_js.To_dom.of_div main_container in
   let () = Dom.appendChild main skeleton in
-  let _ = Panel_editor.onload ();
+  let _ =
+    Panel_editor.onload ();
     Panel_tab.onload ()
   in Js._true
+
+let onunload _ =
+  let () = Panel_editor.onunload () in
+  let () = Panel_tab.onunload () in
+  Js._true
+
+let _ = Dom_html.window##.onbeforeunload :=
+    Dom_html.handler
+      onunload
 
 let _ = Dom_html.window##.onload :=
     Dom_html.handler

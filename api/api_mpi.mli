@@ -21,3 +21,5 @@ class virtual runtime : ?timeout:float -> unit -> object
       unit ApiTypes_j.result Lwt.t
 
   end
+
+val message_delimter : string

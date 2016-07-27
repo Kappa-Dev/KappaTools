@@ -23,9 +23,13 @@ let opened_filename, set_opened_filename =
 let model_runtime_state , set_model_runtime_state =
   React.S.create (None : ApiTypes.state option)
 
+type cli = { url : string;
+             command : string;
+             args : string list }
 type protocol = | HTTP of string
-                | CLI of string * string list
-type remote = { label : string ; protocol : protocol ; }
+                | CLI of cli
+type remote = { label : string ;
+                protocol : protocol ; }
 type runtime = | WebWorker
                | Embedded
                | Remote of remote
@@ -40,8 +44,12 @@ let runtime_value runtime =
   match runtime with
   | WebWorker -> "WebWorker"
   | Embedded -> "Embedded"
-  | Remote { label = _ ; protocol = HTTP http } -> http
-  | Remote { label = _ ; protocol = CLI (file,_) } -> file
+  | Remote { label = _ ;
+             protocol = HTTP http } -> http
+  | Remote { label = _ ;
+             protocol = CLI { url = url ;
+                              command = _;
+                              args = _ } } -> url
 
 class embedded_runtime ()  = object
   method yield = Lwt_js.yield
@@ -77,7 +85,9 @@ let parse_remote url : remote option =
       match parsed with
       | Url.Http http -> HTTP ("http://"^(cleaned_url http))
       | Url.Https https -> HTTP ("https://"^(cleaned_url https))
-      | Url.File file -> CLI (file.Url.fu_path_string,[])
+      | Url.File file -> CLI { url = "file://"^file.Url.fu_path_string ;
+                               command = file.Url.fu_path_string ;
+                               args = [] }
     in
     let label =
       try
@@ -145,10 +155,20 @@ let set_runtime_url
 		let () = continuation is_valid_server in
 		Lwt.return_unit
              )
-     )
-      | Some { label = _ ; protocol = CLI (host,args) } ->
-        runtime_state :=
-          Some (new JsNode.runtime host ("--stdio"::args) :> Api_v1.runtime)
+	  )
+      | Some { label = _ ;
+               protocol = CLI { url = _ ;
+                                command = command;
+                                args = _ } } ->
+        let () = Common.debug ("set_runtime_url:"^url) in
+        let js_node_runtime = new JsNode.runtime command ["--stdio"] in
+        if js_node_runtime#is_running () then
+          let () = Common.debug (Js.string "sucess") in
+          let () = runtime_state :=  Some (js_node_runtime :> Api_v1.runtime) in
+          continuation true
+        else
+          let () = Common.debug (Js.string "failure") in
+          continuation false
       | None -> continuation false
   with _ -> continuation false
 

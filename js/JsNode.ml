@@ -17,6 +17,7 @@ let create_process_configuration
     ?(onStdout : (Js.js_string Js.t -> unit) option = None)
     ?(onStderr : (Js.js_string Js.t -> unit) option = None)
     ?(onClose : (unit -> unit) option = None)
+    ?(onError : (unit -> unit) option = None)
     (command : string)
     (args : string list)
   : process_configuration Js.t  =
@@ -38,6 +39,10 @@ let create_process_configuration
      | Some onClose -> (Js.Unsafe.coerce configuration)##.onClose := onClose
      | None -> ()
     );
+    (match onError with
+     | Some onError -> (Js.Unsafe.coerce configuration)##.onError := onError
+     | None -> ()
+    );
     ()
   in configuration
 
@@ -47,7 +52,7 @@ class type process =
     method kill : unit Js.meth
   end
 
-let spawn_process (configuration : process_configuration  Js.t) : process Js.t =
+let spawn_process (configuration : process_configuration  Js.t) : process Js.t Js.opt =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "spawnProcess")
     [| Js.Unsafe.inject configuration |]
@@ -61,29 +66,35 @@ class runtime
     (args : string list) =
   object(self)
     val mutable process : process Js.t option = None
+    val mutable process_is_running : bool = false
     initializer
 
       let configuration : process_configuration Js.t  =
         create_process_configuration
           ~onStdout:(Some (fun msg -> self#receive (Js.to_string msg)))
+          ~onClose:(Some (fun () -> process_is_running <- true))
+          ~onError:(Some (fun () -> process_is_running <- true))
           command
           args
       in
-      let () = (Js.Unsafe.coerce configuration)##.onError :=
-          (fun () ->
-             failwith
-               (Format.sprintf
-                  "failed to start process : %s"
-                  command)
-          )
-      in
-      let p : process Js.t = spawn_process configuration in
-      let () = process <- Some p in
+      let p : process Js.t Js.opt = spawn_process configuration in
+      let () = process <- Js.Opt.to_option p in
       ()
     method sleep timeout = Lwt_js.sleep timeout
     method private post_message (message_text : string) : unit =
       match process with
       | None -> ()
-      | Some process -> process##write(Js.string message_text)
+      | Some process -> process##write
+                          (Js.string
+                             (Format.sprintf
+                                "%s\n%s\n"
+                                message_text
+                                Api_mpi.message_delimter))
+
+    method is_running () : bool =
+      match process with
+      | Some _ -> true
+      | None -> false
+
     inherit Api_mpi.runtime ~timeout:timeout ()
   end

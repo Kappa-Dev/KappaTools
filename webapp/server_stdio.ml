@@ -28,12 +28,12 @@ let process_comand (text_message : string) : unit Lwt.t =
   in Lwt.return_unit
 
 (*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
-
 let rec serve ?(buffer = "") () : unit Lwt.t =
+
   (Lwt_io.read_line Lwt_io.stdin)
   >>=
   (fun line ->
-     if line = "\x1e" then
+     if line = Api_mpi.message_delimter then
        (process_comand buffer) >>=
        (fun _ -> serve ())
      else

@@ -67,22 +67,42 @@ function spawnProcess(param){
     const spawn = require('child_process').spawn;
     const process = spawn(param.command, param.args);
     // log pid
-    debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
-    if(param.onStdout) {
-	process.stdout.on('data',function (data) { param.onStdout(`${data}`); } );
+    function failure(param,message){
+	if(param.onError){
+	    debug(message);
+	    param.onError();
+	}
+	return null;
     }
-    if(param.onStderr) {
-	process.stderr.on('data',function (data) { param.onStderr(`${data}`); } );
+    try {
+	debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
+	if(param.onStdout) {
+	    process.stdout.on('data',
+			      function (data) {
+				  debug(data);
+				  param.onStdout(`${data}`); } );
+	}
+	if(param.onStderr) {
+	    process.stderr.on('data',function (data) { param.onStderr(`${data}`); } );
+	}
+	if(param.onClose){
+	    process.on('close',param.onClose);
+	}
+	if(param.onError){
+	    process.on('error',param.onError);
+	}
+	if(process && process.pid) {
+	    return { write : function(data){ debug(data);
+					     process.stdin.write(data); } ,
+		     kill : function(){ process.kill(); }
+		   };
+	} else {
+	    return failure(param,
+			  `spawned failed ${param.command} ${param.args} pid ${process.pid}`);
+	}
+    } catch(err){
+	return failure(param,err.message);
     }
-    if(param.onClose){
-	process.on('close',param.onClose);
-    }
-    if(param.onError){
-	process.on('error',param.onError);
-    }
-    return { write : function(data){ process.stdin.write(data); } ,
-	     kill : function(){ process.kill(); }
-    };
 }
 
 function jqueryOn(selector,event,handler){
