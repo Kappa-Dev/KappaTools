@@ -158,15 +158,18 @@ architecture by yourself.
 
 To do so, download the source code from
 \url{https://github.com/Kappa-Dev/KaSim}, make sure you have a recent
-OCaml compiler (\KaSim/\KaSa~currently requires Ocaml 4.01.0 to
-compile) and the findlib library installed.
+OCaml compiler (\KaSim/\KaSa~currently requires Ocaml 4.02.3 to
+compile) as well as the libraries \ttt{findlib} and \ttt{yojson} installed.
 
 You can check if it is the case from a terminal window by typing
-\ttt{ocamlfind ocamlopt -v}. If it fails or prints a version number
+first \ttt{ocamlfind ocamlopt -v}. If it fails or prints a version number
 too old, then you need to install Ocaml Native compiler that can be
 downloaded from \url{http://caml.inria.fr/download.en.html} and/or
 findlib available at
 \url{http://projects.camlcity.org/projects/findlib.html}.
+
+Then, type \ttt{ocamlfind query yojson}. The answer should be a
+path. If it is not, install yojson using a package manager.
 
 \section{Compilation}
 Once OCaml is safely installed, untar \KaSim~archive and compile following these
@@ -187,10 +190,12 @@ compiler by doing \ttt{make OCAMLBINPATH='the\_correct\_dir' bin/KaSim}.
 
 \section{Compilation of KaSa~graphical interface}
 
-The graphical interface of \KaSa~requires \href{http://www.tcl.tk/}{tk-dev} and
-\href{https://forge.ocamlcore.org/projects/labltk/}{labltk}. By default, the graphical interface is not compiled. The compilation of this interface can be toggled on by using the following script: \ITE{
-\item[\$]\ttt{cd Kappa}
-\item[\$]\ttt{make USE\_TK=1 bin/KaSa}}
+The graphical interface of \KaSa~requires
+\href{http://www.tcl.tk/}{tk-dev} and
+\href{https://forge.ocamlcore.org/projects/labltk/}{labltk}. By
+default, the graphical interface is not compiled. The compilation of
+this interface can be toggled on by using the following command:
+\ttt{make USE\_TK=1 bin/KaSa}
 
 Common compilation errors are the following:
 \begin{enumerate}
