@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Jul 27 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -566,19 +566,6 @@ struct
     let kappa_handler = get_kappa_handler static in
     (*-----------------------------------------------------------*)
     let parameter = Remanent_parameters.update_prefix parameter "                " in
-    (*    let dump_title () =
-      if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
-      then
-        let () =
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameter)
-            "%sUpdate information about site accross domain"
-            (Remanent_parameters.get_prefix parameter)
-        in
-        Loggers.print_newline (Remanent_parameters.get_logger parameter)
-      else
-        ()
-          in*)
     (*-----------------------------------------------------------*)
     (*rule rhs has bound*)
     let store_bonds_rhs = get_bonds_rhs static in
@@ -652,7 +639,7 @@ struct
            let pair_list = [(Ckappa_sig.site_name_of_int 1, state');
                             (Ckappa_sig.site_name_of_int 2, state1')]
            in
-           (*-----------------------------------------------------------*)
+           (*--------------------------------------------------------*)
            let error, handler, mvbdu =
              Ckappa_sig.Views_bdu.mvbdu_of_association_list
                parameter handler error pair_list
@@ -947,50 +934,64 @@ struct
             "------------------------------------------------------------\n"
         in
         (*--------------------------------------------------------*)
-        (*test*)
-        (*let store_created_bonds = get_modified_internal_state_and_bond static in
-          let error =
-          Ckappa_sig.Rule_map_and_set.Map.fold
-            (fun rule_id set error ->
-               Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
-                 (fun (x, y) error ->
-                     let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
-                     let (agent_id1, agent_type1, site_type1, site_type2', state', state2') = y in
-                     let new_pair =
-                       (agent_type, site_type, site_type2, state, state2),
-                       (agent_type1, site_type1, site_type2', state', state2')
-                     in
-                     let error, (agent, site, site1, state, state1, agent', site', site1', state', state1') =
-                       Site_accross_bonds_domain_type.convert_tuple
-                         parameter error
-                         kappa_handler
-                         new_pair
-                     in
-                     let _ =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                         "rule_id:%i %s(%s:%s, %s:%s); %s(%s:%s, %s:%s)\n"
-                         (Ckappa_sig.int_of_rule_id rule_id)
-                         agent site state site1 state1
-                         agent' site' state' site1' state1'
-                     in
-                     error
-                 ) set error
-            ) store_created_bonds error
-          in*)
-        (*--------------------------------------------------------*)
-        (*to do*)
+        (*print result*)
         let store_value = get_value dynamic in
         let error, handler =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.fold
-            (fun tuple mvbdu (error, handler) ->
-               Site_accross_bonds_domain_type.print_site_accross_domain
-                 ~verbose:true
-                 ~sparse:true
-                 ~final_resul:true
-                 ~dump_any:true parameter error kappa_handler handler tuple mvbdu
+            (fun (x, y) mvbdu (error, handler) ->
+               let (agent_type, _, _, _, _) = x in
+               let (agent_type1, _, site_type1, stateb1, _) = y in
+               let error,
+                   (agent, site, site', state, state', (*A,x,y*)
+                    agent1, site1, site1', state1, state1') =
+                 Site_accross_bonds_domain_type.convert_tuple
+                   parameter error kappa_handler
+                   (x,y)
+               in
+               let error, handler, pair_list =
+                 Ckappa_sig.Views_bdu.extensional_of_mvbdu
+                   parameter handler error mvbdu
+               in
+               let error =
+                 List.fold_left (fun error l ->
+                     let rec aux acc =
+                       match acc with
+                       | []
+                       | (_, _) :: [] -> error (*check*)
+                       | (sitex, statex) :: (sitey, statey) :: tl ->
+                         (*do not print free and binding state*)
+                         if sitex = site_type1 && statex = stateb1 ||
+                            sitex = site_type1 &&
+                            (Ckappa_sig.int_of_state_index statex) = 0
+                         then error
+                         else
+                         (*the first one for agent, the second element for agent1*)
+                         let error, (agentx, sitex, statex) =
+                           Site_accross_bonds_domain_type.convert_single
+                             parameter error kappa_handler
+                             (agent_type, sitex, statex)
+                         in
+                         (**)
+                         let error, (agenty, sitey, statey) =
+                           Site_accross_bonds_domain_type.convert_single
+                             parameter error kappa_handler
+                             (agent_type1, sitey, statey)
+                         in
+                         let () =
+                           Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                             "Whenever the site %s of %s and the site %s of %s are bound together, then the site %s of %s and %s of %s can have the following respective states: %s, %s\n"
+                             site agent site1 agent1
+                             site' agent site1' agent1
+                             statex statey
+                         in
+                         aux tl
+                     in aux l
+                   ) error pair_list
+               in
+               error, handler
             ) store_value (error, handler)
-          in
-          error, handler
+        in
+        error, handler
       else error, handler
     in
     let dynamic = set_mvbdu_handler handler dynamic in

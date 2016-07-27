@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Jul 27 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -360,7 +360,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       parameter handler error bdu_old mvbdu
   in
   (*TODO: print each step*)
-  let error, handler =
+  (*let error, handler =
     if Remanent_parameters.get_dump_reachability_analysis_diff parameter
     then
       let parameter = Remanent_parameters.update_prefix parameter "         "
@@ -369,7 +369,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
         ~verbose:true
         ~dump_any:true parameter error kappa_handler handler pair mvbdu
     else error, handler
-  in
+  in*)
   let error, store_result =
     PairAgentSitesStates_map_and_set.Map.add_or_overwrite
       parameter error
