@@ -872,6 +872,42 @@ let get_reachability_analysis =
     compute_reachability_result
 
 
+let compute_dead_rules _show_title state =
+  let state,_ = get_reachability_analysis state in
+  match
+    Remanent_state.get_dead_rules state
+  with
+  | Some map -> state, map
+  | None -> assert false
+
+
+let get_dead_rules  =
+  get_gen
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Detecting which rules may be triggered during simulations"
+    (*  ~dump:dump_raw_internal_contact_map *)
+    Remanent_state.get_dead_rules
+    compute_dead_rules
+
+
+let compute_dead_agents _show_title state =
+  let state,_ = get_reachability_analysis state in
+  match
+    Remanent_state.get_dead_agents state
+  with
+  | Some map -> state, map
+  | None -> assert false
+
+
+let get_dead_agents  =
+  get_gen
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Detecting which agents may occur during simulations"
+    (*  ~dump:dump_raw_internal_contact_map *)
+    Remanent_state.get_dead_agents
+    compute_dead_agents
+
+
 let compute_intermediary_internal_contact_map _show_title state =
   let state,_ = get_reachability_analysis state in
   match

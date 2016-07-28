@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Jul 28 2016>
    *
    * Abstract domain to record live rules
    *
@@ -35,7 +35,8 @@ struct
   (* array that indicates whether an agent type is already discovered, or
      not: from the beginning everything will be set to false*)
 
-  type local_dynamic_information = bool array
+  type local_dynamic_information =
+    bool Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
 
   type dynamic_information =
     {
@@ -267,8 +268,11 @@ struct
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let nagents = Ckappa_sig.int_of_agent_name (Handler.nagents parameter error kappa_handler) in
-    let init_seen_agents_array = Array.make (nagents+1) false in
+    let nagents = Ckappa_sig.int_of_agent_name (Handler.nagents parameter error kappa_handler) - 1 in
+    let error, init_seen_agents_array =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init
+        parameter error nagents
+        (fun _ error _ -> error, false) in
     let init_global_dynamic_information =
       {
         global = dynamic;
@@ -298,12 +302,14 @@ struct
     let parameter = get_parameter static in
     let map = get_agents_without_interface static in
     let local = get_seen_agent dynamic in
-    let bool = Array.get local (Ckappa_sig.int_of_agent_name agent_type) in
-    if not bool
-    then
-      let local =
-        local.((Ckappa_sig.int_of_agent_name agent_type)) <- true;
-        local
+    let error, bool =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameter error agent_type local in
+    match
+      bool
+    with
+    | Some false  ->
+      let error, local =
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set parameter error agent_type true local
       in
       let dynamic = set_seen_agent local dynamic in
       let error, rule_id_list =
@@ -322,8 +328,10 @@ struct
           ) event_list rule_id_list
       in
       error, (dynamic, event_list)
-    else
+    | Some true ->
       error, (dynamic, event_list)
+    | None ->
+      warn parameter error (Some "line 334") Exit (dynamic, event_list)
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
@@ -393,11 +401,16 @@ struct
       List.fold_left
         (fun (error, dynamic, s) agent_type ->
            let local = get_seen_agent dynamic in
-           let bool = Array.get local (Ckappa_sig.int_of_agent_name agent_type) in
-           if bool
-           then
+           let error, bool = Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameter error agent_type local in
+           match
+             bool
+           with
+           | Some true ->
              error, dynamic, s
-           else
+           | Some false ->
+             error, dynamic, None
+           | None ->
+             let error, () = warn parameter error (Some "line 413") Exit () in
              error, dynamic, None
         )
         (error, dynamic, Some precondition) l
@@ -448,15 +461,26 @@ struct
     let event_list' = [] in
     error, dynamic, event_list'
 
-  let export _static dynamic error kasa_state =
-    error, dynamic, kasa_state
+  let export static dynamic error kasa_state =
+    let parameter = get_parameter static in
+    let array = get_seen_agent dynamic in
+    let error, list =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
+        parameter
+        error
+        (fun _parameter error i bool list ->
+           error, if not bool then i::list else list
+        )
+        array []
+    in
+    error, dynamic, Remanent_state.set_dead_agents list kasa_state
 
   (**************************************************************************)
   let stabilize _static dynamic error = error, dynamic, ()
 
   let print_dead_agent loggers static dynamic error =
     let parameter = get_parameter static in
-    let local = get_seen_agent dynamic in
+    let result = get_seen_agent dynamic in
     let handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
@@ -477,33 +501,30 @@ struct
           "------------------------------------------------------------"
       in
       let () = Loggers.print_newline loggers in
-      let size = Array.length local in
-      let rec aux k error =
-        if k = size then error
-        else
-          let bool = Array.get local k in
-          let error =
-            if bool
-            then
-              error
-            else
-              let error', agent_string =
-                try
-                  Handler.string_of_agent parameter error handler
-                    (Ckappa_sig.agent_name_of_int k)
-                with
-                  _ -> warn parameter error (Some "line 238") Exit (string_of_int k)
-              in
-              let error =
-                Exception.check warn parameter error error' (Some "line 234") Exit
-              in
-              let () = Loggers.fprintf loggers
-                  "%s is a dead agent." agent_string
-              in
-              let () = Loggers.print_newline loggers in
-              error
-          in aux (k + 1) error
-      in aux 0 error
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter
+        parameter
+        error
+        (fun parameter error k bool ->
+           if bool
+           then
+             error
+           else
+             let error', agent_string =
+               try
+                 Handler.string_of_agent parameter error handler
+                   k
+               with
+                 _ -> warn parameter error (Some "line 506") Exit (Ckappa_sig.string_of_agent_name k)
+             in
+             let error =
+               Exception.check warn parameter error error' (Some "line 509") Exit
+             in
+             let () = Loggers.fprintf loggers
+                 "%s is a dead agent." agent_string
+             in
+             let () = Loggers.print_newline loggers in
+             error)
+        result
     else
       error
 

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Jul 28 2016>
    *
    * Abstract domain to record live rules
    *
@@ -35,7 +35,8 @@ struct
   (*--------------------------------------------------------------------*)
   (* this array indicates whether a rule has already be applied, or not *)
 
-  type local_dynamic_information = bool array
+  type local_dynamic_information =
+    bool Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
 
   type dynamic_information =
     {
@@ -108,7 +109,11 @@ struct
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let parameter = Analyzer_headers.get_parameter static in
     let nrules = Handler.nrules parameter error kappa_handler in
-    let init_dead_rule_array = Array.make nrules false in
+    let error, init_dead_rule_array =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.init
+        parameter error (nrules-1)
+        (fun _ error _ -> error, false)
+    in
     let init_global_dynamic_information =
       {
         global = dynamic;
@@ -117,7 +122,7 @@ struct
     in
     error, init_global_static_information, init_global_dynamic_information
 
-  let add_initial_state static dynamic error species =
+  let add_initial_state _static dynamic error _species =
     let event_list = [] in
     error, dynamic, event_list
 
@@ -131,10 +136,14 @@ struct
     }
   *)
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
+    let parameter = get_parameter static in
     let bool_array = get_dead_rule dynamic in
-    let bool = Array.get bool_array (Ckappa_sig.int_of_rule_id rule_id) in
-    if not bool
-    then
+    let error, bool =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get parameter error
+        rule_id bool_array
+    in
+    match bool with
+    | Some false | None ->
       let error, precondition =
         Communication.the_rule_is_applied_for_the_first_time
           (get_parameter static)
@@ -142,7 +151,7 @@ struct
           precondition
       in
       error, dynamic, Some precondition
-    else
+    | Some true ->
       let error, precondition =
         Communication.the_rule_is_not_applied_for_the_first_time
           (get_parameter static)
@@ -165,13 +174,19 @@ struct
         _ -> warn parameter error (Some "line 165") Exit (Ckappa_sig.string_of_rule_id rule_id)
     in
     (*print*)
-    let dynamic =
-      let bool = Array.get dead_rule_array (Ckappa_sig.int_of_rule_id rule_id) in
-      if not bool
-      then
-        let dead_rule_array =
-          dead_rule_array.((Ckappa_sig.int_of_rule_id rule_id)) <- true;
-          dead_rule_array
+    let error, dynamic =
+      match
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+          parameter error
+          rule_id dead_rule_array
+      with
+      | error, Some false ->
+        let error, dead_rule_array =
+          Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
+            parameter error
+            rule_id
+            true
+            dead_rule_array
         in
         let dynamic =
           let log = Remanent_parameters.get_logger parameter in
@@ -185,13 +200,15 @@ struct
             in
             let () = Loggers.print_newline log in
             let () = Loggers.print_newline log in
-            let dynamic = set_dead_rule dead_rule_array dynamic in
-            dynamic
+              dynamic
           else
             dynamic
         in
-        dynamic
-      else dynamic
+        let dynamic = set_dead_rule dead_rule_array dynamic in
+        error, dynamic
+      | error, Some true -> error, dynamic
+      | error, None ->
+        warn parameter error (Some "line 208") Exit dynamic
     in
     error, dynamic, (precondition, event_list)
 
@@ -205,8 +222,19 @@ struct
   let stabilize _static dynamic error =
     error, dynamic, ()
 
-  let export _static dynamic error kasa_state =
-    error, dynamic, kasa_state
+  let export static dynamic error kasa_state =
+    let parameter = get_parameter static in
+    let array = get_dead_rule dynamic in
+    let error, list =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+        parameter
+        error
+        (fun _parameter error i bool list ->
+           error, if not bool then i::list else list
+        )
+        array []
+    in
+    error, dynamic, Remanent_state.set_dead_rules list kasa_state
 
   (**************************************************************************)
 
@@ -234,39 +262,34 @@ struct
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "------------------------------------------------------------" in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let size = Array.length result in
-      let rec aux k error =
-        if (Ckappa_sig.int_of_rule_id k) = size then error
-        else
-          let bool = Array.get result (Ckappa_sig.int_of_rule_id k) in
-          let error =
-            if bool
-            then
-              error
-            else
-              let error', rule_string =
-                try
-                  Handler.string_of_rule parameter error handler compiled k
-                with
-                  _ -> warn parameter error (Some "line 249") Exit (Ckappa_sig.string_of_rule_id k)
-              in
-              let error =
-                Exception.check warn parameter error error' (Some "line 252") Exit
-              in
-              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                  "%s will never be applied." rule_string
-              in
-              let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-              error
-          in
-          aux
-            (Ckappa_sig.rule_id_of_int ((Ckappa_sig.int_of_rule_id k) + 1))
-            error
-      in aux Ckappa_sig.dummy_rule_id error
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.iter
+        parameter
+        error
+        (fun parameter error k bool ->
+           if bool
+           then
+             error
+           else
+             let error', rule_string =
+               try
+                 Handler.string_of_rule parameter error handler compiled k
+               with
+                 _ ->
+                 warn parameter error (Some "line 249") Exit (Ckappa_sig.string_of_rule_id k)
+             in
+             let error =
+               Exception.check warn parameter error error' (Some "line 252") Exit
+             in
+             let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "%s will never be applied." rule_string
+             in
+             let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+             error)
+        result
     else
       error
 
-  let print static dynamic error loggers =
+  let print static dynamic error _loggers =
     let error =
       print_dead_rule
         static
@@ -275,10 +298,10 @@ struct
     in
     error, dynamic, ()
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let cc_mixture_is_reachable static dynamic error ccmixture =
+  let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
 end

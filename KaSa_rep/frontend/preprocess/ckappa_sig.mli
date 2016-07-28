@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Jul 28 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -69,6 +69,7 @@ val next_rule_id: c_rule_id -> c_rule_id
 val next_site_name: c_site_name -> c_site_name
 val next_state_index: c_state -> c_state
 val pred_site_name: c_site_name -> c_site_name
+val pred_agent_name: c_agent_name -> c_agent_name
 val compare_agent_id: c_agent_id -> c_agent_id -> int
 val compare_rule_id: c_rule_id -> c_rule_id -> int
 val compare_site_name: c_site_name -> c_site_name -> int
@@ -147,6 +148,10 @@ module Agent_id_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_agent_id
    and type dimension = int
 
+module Rule_id_quick_nearly_Inf_Int_storage_Imperatif:
+  Int_storage.Storage
+  with type key = c_rule_id
+   and type dimension = int
 (****************************************************************************************)
 
 module Agent_map_and_set: Map_wrapper.S_with_logs

@@ -96,8 +96,8 @@ type internal_contact_map =
 type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
-type dead_rules = unit
-type dead_agents = unit
+type dead_rules = Ckappa_sig.c_rule_id list
+type dead_agents = Ckappa_sig.c_agent_name list 
 
 
 type flow =

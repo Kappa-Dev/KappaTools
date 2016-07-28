@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Jul 28 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -90,6 +90,19 @@ module Agent_type_quick_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Quick_key_list (Agent_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
     with type key = c_agent_name
+     and type dimension = int
+  )
+
+module Rule_id_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = c_rule_id
+     and type dimension = int
+  )
+module Rule_id_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Rule_id_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_rule_id
      and type dimension = int
   )
 
@@ -613,6 +626,7 @@ type c_compil =
 let lift to_int from_int p =
   fun a i -> from_int (p (to_int a) i)
 let pred_site_name = pred
+let pred_agent_name = pred
 let gen_rule_id = lift int_of_rule_id rule_id_of_int
 let sub_rule_id = gen_rule_id (fun a b -> a - b)
 let add_rule_id = gen_rule_id (fun a b -> a + b)
