@@ -22,4 +22,4 @@ class virtual runtime : ?timeout:float -> unit -> object
 
   end
 
-val message_delimter : string
+val message_delimter : char

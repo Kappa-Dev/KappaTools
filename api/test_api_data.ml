@@ -55,18 +55,8 @@ let api_plot_tsv_sample_plot test_ctxt =
       with Api_types.observables =
              [List.hd sample_plot.Api_types.observables] }
   in
-  let expected = Api_data.plot_tsv sample_plot in
-  let actual =
-    "time,'AB','Cuu','Cpu','Cpp',0,'snapshots'\n"
-    ^"9.000000e+01"
-    ^",7.210000e+02"
-    ^",0.000000e+00"
-    ^",0.000000e+00"
-    ^",1.000000e+01"
-    ^",0.000000e+00"
-    ^",1.400000e+01"
-  in
-  let actual = Api_data.plot_tsv sample_plot in
+  let expected = Api_data.plot_values sample_plot in
+  let actual = Api_data.plot_values sample_plot in
   assert_equal
     ~pp_diff:pp_diff_string
     expected actual;;

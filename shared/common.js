@@ -83,7 +83,9 @@ function spawnProcess(param){
 				  param.onStdout(`${data}`); } );
 	}
 	if(param.onStderr) {
-	    process.stderr.on('data',function (data) { param.onStderr(`${data}`); } );
+	    process.stderr.on('data',function (data) {
+		param.onStderr(`${data}`);
+	    } );
 	}
 	if(param.onClose){
 	    process.on('close',param.onClose);

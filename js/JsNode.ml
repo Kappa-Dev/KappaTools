@@ -67,11 +67,11 @@ class runtime
   object(self)
     val mutable process : process Js.t option = None
     val mutable process_is_running : bool = false
+    val mutable buffer : string = ""
     initializer
-
       let configuration : process_configuration Js.t  =
         create_process_configuration
-          ~onStdout:(Some (fun msg -> self#receive (Js.to_string msg)))
+          ~onStdout:(Some (fun msg -> self#onStdout (Js.to_string msg)))
           ~onClose:(Some (fun () -> process_is_running <- true))
           ~onError:(Some (fun () -> process_is_running <- true))
           command
@@ -80,21 +80,40 @@ class runtime
       let p : process Js.t Js.opt = spawn_process configuration in
       let () = process <- Js.Opt.to_option p in
       ()
+
+    method private onStdout (msg : string) : unit =
+      let () = Common.debug (Js.string msg) in
+      match Utility.split msg Api_mpi.message_delimter with
+      | (prefix,None) ->
+        ignore(Common.debug (Js.string "onStdout:none"));
+        buffer <- buffer^prefix
+      | (prefix,Some suffix) ->
+        ignore(Common.debug (Js.string "onStdout:some"));
+        self#receive (buffer^prefix);
+        buffer <- "";
+        self#onStdout suffix
+
     method sleep timeout = Lwt_js.sleep timeout
     method private post_message (message_text : string) : unit =
       match process with
       | None -> ()
-      | Some process -> process##write
-                          (Js.string
-                             (Format.sprintf
-                                "%s\n%s\n"
-                                message_text
-                                Api_mpi.message_delimter))
+      | Some process ->
+        process##write
+          (Js.string
+             (Format.sprintf
+                "%s%c"
+                message_text
+                Api_mpi.message_delimter))
 
     method is_running () : bool =
       match process with
       | Some _ -> true
       | None -> false
+
+    method shutdown () : unit =
+      match process with
+      | Some process -> process##kill
+      | None -> ()
 
     inherit Api_mpi.runtime ~timeout:timeout ()
   end

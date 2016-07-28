@@ -23,21 +23,23 @@ let process_comand (text_message : string) : unit Lwt.t =
       runtime
       (fun message ->
          Lwt.async
-           (fun () -> Lwt_io.write Lwt_io.stdout message))
+           (fun () ->
+              Lwt_io.write
+                Lwt_io.stdout
+                (Format.sprintf "%s%c" message Api_mpi.message_delimter)))
       text_message
   in Lwt.return_unit
 
 (*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
 let rec serve ?(buffer = "") () : unit Lwt.t =
-
-  (Lwt_io.read_line Lwt_io.stdin)
+  (Lwt_io.read_char Lwt_io.stdin)
   >>=
-  (fun line ->
-     if line = Api_mpi.message_delimter then
+  (fun (char : char) ->
+     if char = Api_mpi.message_delimter then
        (process_comand buffer) >>=
        (fun _ -> serve ())
      else
        serve
-         ~buffer:(Format.sprintf "%s\n%s" buffer line)
+         ~buffer:(Format.sprintf "%s%c" buffer char)
          ()
   )

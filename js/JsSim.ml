@@ -21,14 +21,6 @@ let prod _ =
   in Js._true
 
 let dev _ =
-  let configuration =
-    JsNode.create_process_configuration
-      ~onStdout:(Some (fun msg -> Common.debug msg))
-      ~onStderr:(Some (fun msg -> Common.debug msg))
-      "cat"
-      []
-      ~onClose:(Some (fun () -> Common.debug "close"))
-  in
   let%html main_container = {|<div class="row">
                             |}[Panel_editor.xml;
                                Panel_tab.xml]{|
