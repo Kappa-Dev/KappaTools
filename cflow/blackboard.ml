@@ -107,7 +107,7 @@ sig
   val n_unresolved_events: case_address
   val n_unresolved_events_in_column_at_level: event_case_address -> Priority.level -> case_address
   val n_unresolved_events_in_column: event_case_address -> case_address
-  val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list
+  val forced_events: blackboard -> (PB.step_id list * unit Trace.Simulation_info.t option) list
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
   val cut: (blackboard,PB.step_id list,blackboard * PB.step_id list) PB.CI.Po.K.H.binary
   val tick: StoryProfiling.StoryStats.log_info -> bool * StoryProfiling.StoryStats.log_info (* to do: move to the module StoryProfiling.StoryStats*)
@@ -350,7 +350,7 @@ module Blackboard =
          {
            event: Trace.step PB.A.t;
            pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
-           forced_events: (int list * unit Mods.simulation_info option) list;
+           forced_events: (int list * unit Trace.Simulation_info.t option) list;
            n_predicate_id: int ;
            n_eid:int;
            n_seid: int PB.A.t;

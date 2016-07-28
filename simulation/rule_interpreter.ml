@@ -256,17 +256,11 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
       | Some path ->
         add_path_to_tests path ctests,cactions in
     let steps' =
-      Trace.store_event
-        (event_kind,full_concrete_event,Counter.current_story counter)
-        steps in
+      Trace.store_event counter (event_kind,full_concrete_event) steps in
     let steps'' =
       List.fold_left
-        (fun steps (ev,obs_tests) ->
-           let obs =
-             (ev,
-              obs_tests,
-              Counter.next_story counter) in
-           Trace.store_obs obs steps)
+        (fun steps x ->
+           Trace.store_obs counter x steps)
         steps' new_tracked_obs_instances
     in
     Some (compressions,x,steps'')

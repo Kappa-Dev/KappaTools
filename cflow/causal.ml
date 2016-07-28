@@ -607,7 +607,8 @@ let pretty_print
            let av_t,ids,n =
              List.fold_left
                (fun (av_t,ids,n) info ->
-                  (av_t +. info.Mods.story_time,info.Mods.story_id::ids,n+1)
+                  (av_t +. info.Trace.Simulation_info.story_time,
+                   info.Trace.Simulation_info.story_id::ids,n+1)
                )
                (0.,[],0) (List.rev stories)
            in
@@ -660,8 +661,8 @@ let pretty_print
                   let size = enriched_config.size in
                   List.iter
                     (fun info  ->
-                       let time = info.Mods.story_time in
-                       let event = info.Mods.story_event in
+                       let time = info.Trace.Simulation_info.story_time in
+                       let event = info.Trace.Simulation_info.story_event in
                        Format.fprintf f "%i\t%i\t%E\t%i\t%i\t@,"
                          cpt event time depth size
                     ) story) form story_list in

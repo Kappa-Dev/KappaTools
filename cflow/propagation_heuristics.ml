@@ -32,7 +32,7 @@ module type Blackboard_with_heuristic =
     type propagation_check
 
     val dummy_update_order: update_order
-    val forced_events: (B.blackboard,(update_order list * B.PB.step_id list * unit Mods.simulation_info option) list) B.PB.CI.Po.K.H.unary
+    val forced_events: (B.blackboard,(update_order list * B.PB.step_id list * unit Trace.Simulation_info.t option) list) B.PB.CI.Po.K.H.unary
     val forbidden_events: (B.PB.step_id list,update_order list) B.PB.CI.Po.K.H.unary
     val next_choice: (B.blackboard,update_order list) B.PB.CI.Po.K.H.unary
     val apply_instruction: (B.blackboard,update_order,update_order list,propagation_check list,B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.quaternary

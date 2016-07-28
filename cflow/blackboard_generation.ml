@@ -68,7 +68,7 @@ sig
   val n_predicates: (pre_blackboard, int) CI.Po.K.H.unary
   val n_events_per_predicate: (pre_blackboard, int, predicate_id) CI.Po.K.H.binary
   val event_list_of_predicate: (pre_blackboard, predicate_id,  (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.binary
-  val mandatory_events: (pre_blackboard, ((int list * unit Mods.simulation_info option) list)) CI.Po.K.H.unary
+  val mandatory_events: (pre_blackboard, ((int list * unit Trace.Simulation_info.t option) list)) CI.Po.K.H.unary
   val get_pre_event: (pre_blackboard,  Trace.step A.t) CI.Po.K.H.unary
   val get_side_effect: (pre_blackboard,  CI.Po.K.side_effect A.t) CI.Po.K.H.unary
   val get_fictitious_observable: (pre_blackboard,  int option) CI.Po.K.H.unary
@@ -186,7 +186,7 @@ module Preblackboard =
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
            history_of_predicate_values_to_predicate_id: C.t A.t; (* maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
            history_of_agent_ids_of_type: (CI.Po.K.agent_id list) A.t;
-           pre_observable_list: (step_id list * unit Mods.simulation_info option) list ;
+           pre_observable_list: (step_id list * unit Trace.Simulation_info.t option) list ;
            pre_side_effect_of_event: CI.Po.K.side_effect A.t;
            pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *)
            pre_level_of_event: Priority.level A.t;

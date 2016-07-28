@@ -35,7 +35,7 @@ type trace =
     pretrace: step list ;
     with_potential_ambiguity: bool
   }
-type trace_runtime_info = profiling_info Mods.simulation_info
+type trace_runtime_info = profiling_info Trace.Simulation_info.t
 
 type do_we_log = (parameter -> bool)
 type 'a with_handlers =
@@ -265,7 +265,7 @@ let remove_obs_before parameter handler log_info error last_eid trace =
           match Trace.simulation_info_of_step t
           with None -> aux q score (t::output)
              | Some x ->
-               if Mods.story_id_of_simulation_info x >= last_eid
+               if Trace.Simulation_info.story_id x >= last_eid
                then
                  List.rev (List.fold_left
                              (fun list a -> a::list) output l),
@@ -295,7 +295,7 @@ let remove_obs_before parameter ?shall_we_compute:(shall_we_compute=we_shall)  ?
     let last =
       List.fold_left
         (fun result x ->
-           let last_eid = Mods.story_id_of_simulation_info x in
+           let last_eid = Trace.Simulation_info.story_id x in
            max result last_eid)
         0 l
     in
@@ -348,7 +348,7 @@ type observable_hit =
   {
     list_of_actions: S.PH.update_order list ;
     list_of_events: step_id  list ;
-    runtime_info:  unit Mods.simulation_info option}
+    runtime_info:  unit Trace.Simulation_info.t option}
 
 let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info
@@ -501,7 +501,7 @@ let store_trace
   let computation_info  = P.set_grid_generation  computation_info in
   let story_info =
     List.rev_map
-      (Mods.update_profiling_info (P.copy computation_info))
+      (Trace.Simulation_info.update_profiling_info (P.copy computation_info))
       (List.rev obs_info)
   in
   let error,computation_info,story_list = D.add_story parameter handler computation_info error grid pretrace story_info story_table.story_list in
@@ -762,8 +762,10 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
              with
              | None -> []
              | Some info ->
-               let info = {info with Mods.story_id = counter} in
-               let info = Mods.update_profiling_info log_info  info
+               let info =
+                 {info with Trace.Simulation_info.story_id = counter} in
+               let info =
+                 Trace.Simulation_info.update_profiling_info log_info  info
                in
                [info]
            in

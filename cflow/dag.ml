@@ -29,13 +29,13 @@ sig
   type table
 
   val fold_table:
-    ((Trace.t,StoryProfiling.StoryStats.log_info Mods.simulation_info list,'a,'a) S.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) S.PH.B.PB.CI.Po.K.H.ternary
+    ((Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,'a,'a) S.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) S.PH.B.PB.CI.Po.K.H.ternary
   val init_table: table S.PH.B.PB.CI.Po.K.H.zeroary
   val count_stories: table -> int
-  val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Mods.simulation_info list,table,table) S.PH.B.PB.CI.Po.K.H.quaternary
+  val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,table,table) S.PH.B.PB.CI.Po.K.H.quaternary
   val hash_list: (table, table) S.PH.B.PB.CI.Po.K.H.unary
 
-  val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.unary
+  val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) S.PH.B.PB.CI.Po.K.H.unary
 end
 
 module H=S.PH.B.PB.CI.Po.K.H
@@ -82,9 +82,9 @@ let print_story_info logger parameter story_info_list =
         Loggers.fprintf
           logger
           "id:%i, time:%f, event:%i"
-          story_info.Mods.story_id
-          story_info.Mods.story_time
-          story_info.Mods.story_event
+          story_info.Trace.Simulation_info.story_id
+          story_info.Trace.Simulation_info.story_time
+          story_info.Trace.Simulation_info.story_event
       in
       Loggers.print_newline logger
     )
@@ -494,7 +494,7 @@ let canonicalize parameter handler log_info error graph =
 module ListTable =
   (
   struct
-    type table = (prehash * (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) list
+    type table = (prehash * (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) list
 
     let init_table parameter handler log_info error =
       error,log_info,[]
@@ -579,7 +579,9 @@ module ListTable =
                 (error,log_info,[]) list
             in
             let error,list' =
-              hash_inner parameter handler error Mods.compare_profiling_info list'
+              hash_inner parameter handler error
+                Trace.Simulation_info.compare_by_story_id
+                list'
             in
             visit2 q log_info error ((t,list')::acc)
       in
@@ -600,7 +602,8 @@ module ListTable =
                list_out list)
           [] list
       in
-      let compare_pair (a,_,_) (c,_,_) = Mods.compare_profiling_info a c in
+      let compare_pair (a,_,_) (c,_,_) =
+        Trace.Simulation_info.compare_by_story_id a c in
       let flat_list = List.sort compare_pair flat_list in
       error, log_info, List.rev_map (fun (a,b,c) -> b,c) (List.rev flat_list)
 
@@ -652,7 +655,7 @@ module BucketTable =
     type table =
       {
         tree: outer_tree;
-        array: (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Mods.simulation_info list)  Int_storage.Nearly_inf_Imperatif.t;
+        array: (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list)  Int_storage.Nearly_inf_Imperatif.t;
         fresh_id: story_id
       }
 
@@ -1006,7 +1009,7 @@ module BucketTable =
              Int_storage.Nearly_inf_Imperatif.set
                parameter' error
                i
-               (a,b,c,d,List.sort Mods.compare_profiling_info e)
+               (a,b,c,d,List.sort Trace.Simulation_info.compare_by_story_id e)
                array)
           table.array
           table.array

@@ -111,8 +111,10 @@ module Cflow_linker =
       | None -> None
       | Some a -> Some (f a)
 
-    let get_time_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_time) x
-    let get_id_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_event) x
+    let get_time_of_refined_step x =
+      get_gen_of_refined_step (fun x -> x.Trace.Simulation_info.story_time) x
+    let get_id_of_refined_step x =
+      get_gen_of_refined_step (fun x -> x.Trace.Simulation_info.story_event) x
 
     let build_grid list bool handler =
       let env = handler.H.env in

@@ -56,7 +56,7 @@ val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) 
 type trace
 
 (** Runtime information about a trace provided by the simulator*)
-type trace_runtime_info = profiling_info Mods.simulation_info
+type trace_runtime_info = profiling_info Trace.Simulation_info.t
 
 val size_of_pretrace: trace -> int
 
@@ -199,7 +199,7 @@ type musical_grid
 type observable_hit
 
 val get_runtime_info_from_observable_hit:
-  observable_hit -> unit  Mods.simulation_info option
+  observable_hit -> unit Trace.Simulation_info.t option
 (** Musical processing *)
 val convert_trace_into_musical_notation:
   (trace,musical_grid) unary

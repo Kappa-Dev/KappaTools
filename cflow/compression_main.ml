@@ -236,8 +236,11 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
                       with
                       | None -> []
                       | Some info ->
-                        let info = {info with Mods.story_id = U.get_counter story_list} in
-                        let info = Mods.update_profiling_info log_info info in
+                        let info =
+                          {info with Trace.Simulation_info.story_id =
+                                       U.get_counter story_list} in
+                        let info = Trace.Simulation_info.update_profiling_info
+                            log_info info in
                         [info]
                     in
                     let error,log_info,causal_story_array =

@@ -32,14 +32,13 @@ module type StoryTable =
     type table
 
     val fold_table:
-      ((Trace.t,StoryProfiling.StoryStats.log_info Mods.simulation_info list,'a,'a) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary
+      ((Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,'a,'a) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.ternary
     val init_table: table Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.zeroary
     val count_stories: table -> int
-    val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Mods.simulation_info list,table,table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.quaternary
+    val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,table,table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.quaternary
     val hash_list: (table, table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
 
-    val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
+    val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
   end
 
 module StoryTable:StoryTable
-

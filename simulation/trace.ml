@@ -1,3 +1,43 @@
+module Simulation_info = struct
+  type 'a t =
+    {
+      story_id: int ;
+      story_time: float ;
+      story_event: int ;
+      profiling_info: 'a;
+    }
+  (* type of data to be given with observables for story compression
+     (such as date when the obs is triggered*)
+
+  let update_profiling_info a info =
+    {
+      story_id = info.story_id ;
+      story_time = info.story_time ;
+      story_event = info.story_event ;
+      profiling_info = a
+    }
+
+  let event a = a.story_event
+  let story_id a = a.story_id
+
+  let compare_by_story_id x y = Mods.int_compare x.story_id y.story_id
+
+  let dummy a = {
+    story_id = 0 ; story_time = 0. ;
+    story_event = 0 ; profiling_info = a;
+  }
+
+  let current c =
+  { story_id = Counter.current_story c;
+    story_time = Counter.current_time c;
+    story_event = Counter.current_event c;
+    profiling_info = (); }
+  let next_story c =
+    let () = Counter.inc_stories c in
+    current c
+
+end
+
 type event_kind =
   | OBS of string
   | RULE of int
@@ -43,11 +83,11 @@ let print_event_kind_dot_annot env f = function
 type event =
   event_kind *
   Instantiation.concrete Instantiation.event *
-  unit Mods.simulation_info
+  unit Simulation_info.t
 type obs =
   event_kind *
   Instantiation.concrete Instantiation.test list *
-  unit Mods.simulation_info
+  unit Simulation_info.t
 type step =
   | Subs of int * int
   | Event of event
@@ -138,13 +178,9 @@ let step_is_event = function
   | Event _ -> true
   | Init _ | Subs _ | Dummy _ | Obs _ -> false
 
-let dummy = {
-  Mods.story_id = 0 ; Mods.story_time = 0. ;
-  Mods.story_event = 0 ; Mods.profiling_info = ();
-}
 let simulation_info_of_step = function
   | Obs (_,_,info) | Event (_,_,info) -> Some info
-  | Init _ -> Some dummy
+  | Init _ -> Some (Simulation_info.dummy ())
   | Subs _ | Dummy _ -> None
 
 let creation_of_actions op actions =
@@ -173,9 +209,11 @@ let actions_of_step = function
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
 
-let store_event event step_list =
+let store_event counter event step_list =
   match event with
-  | INIT _,(_,(actions,_,_)),_ -> (Init actions)::step_list
-  | OBS _,_,_ -> assert false
-  | (RULE _ | PERT _ as k),x,info -> (Event (k,x,info))::step_list
-let store_obs (i,x,c) step_list = Obs(i,x,c)::step_list
+  | INIT _,(_,(actions,_,_)) -> (Init actions)::step_list
+  | OBS _,_ -> assert false
+  | (RULE _ | PERT _ as k),x ->
+    (Event (k,x,Simulation_info.current counter))::step_list
+let store_obs counter (i,x) step_list =
+  Obs(i,x,Simulation_info.next_story counter)::step_list

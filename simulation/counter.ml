@@ -78,12 +78,13 @@ type t = {
   }
 
 let inc_tick c = c.ticks <- c.ticks + 1
+let current_story c = c.stories
 let current_time c = c.time
 let current_event c = c.events
 let nb_null_event c = Stat_null_events.nb c.stat_null
 let consecutive_null_event c = Stat_null_events.nb_consecutive c.stat_null
 let inc_time c dt = c.time <- (c.time +. dt)
-let inc_stories c =c.stories <- (c.stories + 1)
+let inc_stories c = c.stories <- (c.stories + 1)
 let inc_events c =c.events <- (c.events + 1)
 let check_time c =
   match c.max_time with None -> true | Some max -> c.time < max
@@ -113,12 +114,6 @@ let one_time_correction_event c ti =
   let () = c.stat_null <- Stat_null_events.incr_time_correction c.stat_null in
   check_time c && check_events c
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
-let current_story c =
-   { Mods.story_id = c.stories; Mods.story_time = current_time c;
-     Mods.story_event = current_event c; Mods.profiling_info = (); }
-let next_story c =
-  let () = inc_stories c in
-  current_story c
 let max_time c = c.max_time
 let max_events c = c.max_events
 let plot_points c = c.plot_points

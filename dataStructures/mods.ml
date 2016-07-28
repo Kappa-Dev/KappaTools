@@ -31,17 +31,6 @@ module CharMap = CharSetMap.Map
 
 module DynArray = DynamicArray.DynArray(LargeArray)
 
-type 'a simulation_info = (* type of data to be given with observables for story compression (such as date when the obs is triggered*)
-    {
-      story_id: int ;
-      story_time: float ;
-      story_event: int ;
-      profiling_info: 'a;
-    }
-
-let event_of_simulation_info a = a.story_event
-let story_id_of_simulation_info a = a.story_id
-
 module Palette:
 	sig
 	  type t
@@ -66,12 +55,3 @@ module Palette:
 	  let grey d = if d > 16 then "black" else ("gray"^(string_of_int (100-6*d)))
 	  let string_of_color (r,g,b) = String.concat "," (List.rev_map string_of_float [b;g;r])
 	end
-
-let update_profiling_info a info =
-  {
-    story_id = info.story_id ;
-    story_time = info.story_time ;
-    story_event = info.story_event ;
-    profiling_info = a}
-
-let compare_profiling_info info1 info2 = compare info1.story_id info2.story_id

@@ -405,8 +405,8 @@ let loop ~outputs ~dotCflows form env domain counter graph state =
             "would you like to record the current state? (y/N)***@." in
         let () =
           if not !Parameter.batchmode then
-            match String.lowercase (Tools.read_input ()) with
-            | ("y" | "yes") ->
+            match Tools.read_input () with
+            | ("y" | "yes" | "Y" | "Yes" | "YES") ->
               outputs
                 (Data.Snapshot
                    (Rule_interpreter.snapshot env counter "dump.ka" graph))
