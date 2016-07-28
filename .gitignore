@@ -9,6 +9,7 @@ KaSim.docdir
 KaSim
 KaStor
 KaSa
+KaDE
 sanity_test
 bin/
 *~
@@ -61,3 +62,6 @@ site
 
 # python
 *.pyc
+
+\#*#
+.\#*

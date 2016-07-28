@@ -11,6 +11,7 @@ S siteGraphs
 S Error
 S odes
 S main
+S util
 
 S KaSa_rep/export
 S KaSa_rep/tools

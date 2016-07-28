@@ -8,6 +8,7 @@
 "Error" : include
 "odes" : include
 "generated" : include
+"util" : include
 "main" : include
 "KaSa_rep" : include
 "KaSa_rep/pipeline" : include
