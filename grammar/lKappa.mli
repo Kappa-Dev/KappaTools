@@ -16,7 +16,7 @@ type rule_agent =
     ra_ports: ((int,int*int) Ast.link Location.annot * switching) array;
     ra_ints: rule_internal array;
     ra_syntax: (((int,int*int) Ast.link Location.annot * switching) array *
-		  rule_internal array) option;
+                rule_internal array) option;
   }
 (** A representation of 'left-hand-side' agent that stores how
  everything is transformed. In an observable (a mixture in an alg_expr),
@@ -46,7 +46,7 @@ type rule =
       ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
     r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
     r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot
-		 * int Location.annot option) option;
+                 * int Location.annot option) option;
   }
 
 val print_rule :
@@ -62,13 +62,14 @@ val bool_expr_of_ast :
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
-  Ast.modif_expr -> int list -> (rule_agent list, int) Ast.modif_expr * int list
+    Ast.modif_expr -> int list ->
+  (rule_agent list, int) Ast.modif_expr * int list
 
 val compil_of_ast :
   (string * Nbr.t) list ->
   (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil ->
   Signature.s * unit NamedDecls.t * int list *
-    (Ast.agent, rule_agent list, int, rule) Ast.compil
+  (Ast.agent, rule_agent list, int, rule) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
 @return the signature of agent, the signature of tokens and an

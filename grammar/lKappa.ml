@@ -304,7 +304,9 @@ let to_erased sigs x =
                | None -> I_ANY) r.ra_ints in
        { ra_type = r.ra_type; ra_erased = true; ra_ports = ports; ra_ints =ints;
          ra_syntax =
-           match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
+           match r.ra_syntax with
+           | None -> None
+           | Some _ -> Some (Array.copy ports,Array.copy ints);})
     x
 
 let to_maintained x =
