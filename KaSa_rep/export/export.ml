@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jul 27 2016>
+  * Last modification: Time-stamp: <Jul 28 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -18,12 +18,19 @@ let warn parameters mh message exn default =
 
 (*******************************************************************************)
 (*module signatures*)
-type state = Remanent_state.state
+type state =
+  (Domain_selection.Reachability_analysis.static_information,
+   Domain_selection.Reachability_analysis.dynamic_information)
+    Remanent_state.state
 type contact_map = Remanent_state.contact_map
 type ctmc_flow = Remanent_state.flow
 type ode_flow = Ode_fragmentation_type.ode_frag
 type c_compilation = Cckappa_sig.compil
-type reachability_analysis = Remanent_state.reachability_result
+type reachability_analysis =
+  (Domain_selection.Reachability_analysis.static_information,
+   Domain_selection.Reachability_analysis.dynamic_information)
+    Remanent_state.reachability_result
+
 type parameters = Remanent_parameters_sig.parameters
 type errors = Exception.method_handler
 type internal_contact_map = Remanent_state.internal_contact_map
@@ -165,7 +172,7 @@ let compute_show_title do_we_show_title log_title =
            if title_only_in_kasa parameters
            then title^"..."
            else
-              "+ "^title
+             "+ "^title
          in
          let () =
            Loggers.fprintf
@@ -499,6 +506,7 @@ let get_raw_contact_map =
     (Remanent_state.get_contact_map Remanent_state.Low)
     compute_raw_contact_map
 
+
 let convert_label a =
   if a<0 then Remanent_state.Side_effect (-(a+1))
   else Remanent_state.Direct a
@@ -787,27 +795,12 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   Remanent_state.set_errors error state, (wake_up_map, inhibition_map)
 
-let get_intermediary_internal_influence_map =
-  get_gen
-    ~log_prefix:"Influence_map:"
-    ~log_title:"Refining the influence map"
-    ~phase:(StoryProfiling.Internal_influence_map "medium")
-    (Remanent_state.get_internal_influence_map Remanent_state.Medium)
-    compute_intermediary_internal_influence_map
-
-let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
-  match
-    accuracy_level
-  with
-  | Remanent_state.Low
-  | Remanent_state.Medium
-  | Remanent_state.High
-  | Remanent_state.Full -> get_raw_internal_contact_map state
-
 let get_map_gen
     (get: ?accuracy_level:Remanent_state.accuracy_level ->
-     Remanent_state.state ->
-     Remanent_state.state * 'a )
+     (Domain_selection.Reachability_analysis.static_information,
+      Domain_selection.Reachability_analysis.dynamic_information) Remanent_state.state ->
+     (Domain_selection.Reachability_analysis.static_information,
+      Domain_selection.Reachability_analysis.dynamic_information) Remanent_state.state * 'a )
     convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
     ?do_we_show_title:(do_we_show_title=(fun _ -> true))
     ?log_title
@@ -824,20 +817,15 @@ let get_map_gen
   in
   convert (fun _ -> ()) state internal
 
-let get_contact_map =
-  get_map_gen
-    ~do_we_show_title:(fun _ -> true)
-    ~log_title:(fun x ->
-        match
-          x
-        with
-        | Remanent_state.Low ->
-          Some "Compute the contact map"
-        | Remanent_state.Medium
-        | Remanent_state.High | Remanent_state.Full ->
-          Some "Refine the contact map")
-    get_internal_contact_map
-    convert_contact_map
+let get_intermediary_internal_influence_map =
+  get_gen
+    ~log_prefix:"Influence_map:"
+    ~log_title:"Refining the influence map"
+    ~phase:(StoryProfiling.Internal_influence_map "medium")
+    (Remanent_state.get_internal_influence_map Remanent_state.Medium)
+    compute_intermediary_internal_influence_map
+
+
 
 let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =
@@ -853,6 +841,78 @@ let get_influence_map =
   get_map_gen
     get_internal_influence_map
     convert_influence_map
+
+
+
+let compute_reachability_result show_title state =
+  let state, c_compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let () = show_title state in
+  let bdu_handler = Remanent_state.get_bdu_handler state in
+  let log_info = Remanent_state.get_log_info state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error, log_info, static, dynamic =
+    Domain_selection.Reachability_analysis.main
+      parameters log_info error bdu_handler c_compil handler
+  in
+  let error, dynamic, state =
+    Domain_selection.Reachability_analysis.export static dynamic
+      error state in
+  let state = Remanent_state.set_errors error state in
+  let state = Remanent_state.set_log_info log_info state in
+  let state = Remanent_state.set_bdu_handler bdu_handler state in
+  let state = Remanent_state.set_reachability_result (static, dynamic) state in
+  state, (static, dynamic)
+
+let get_reachability_analysis =
+  get_gen
+    ~log_title:"Reachability analysis"
+    (Remanent_state.get_reachability_result)
+    compute_reachability_result
+
+
+let compute_intermediary_internal_contact_map _show_title state =
+  let state,_ = get_reachability_analysis state in
+  match
+    Remanent_state.get_internal_contact_map Remanent_state.Medium state
+  with
+  | Some map -> state, map
+  | None -> assert false
+
+
+let get_intermediary_internal_contact_map =
+  get_gen
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Generating the intermediary contact map"
+    (*  ~dump:dump_raw_internal_contact_map *)
+    (Remanent_state.get_internal_contact_map Remanent_state.Medium)
+    compute_intermediary_internal_contact_map
+
+let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+  match
+    accuracy_level
+  with
+  | Remanent_state.Low -> get_raw_internal_contact_map state
+  | Remanent_state.Medium
+  | Remanent_state.High
+  | Remanent_state.Full -> get_intermediary_internal_contact_map state
+
+
+let get_contact_map =
+  get_map_gen
+    ~do_we_show_title:(fun _ -> true)
+    ~log_title:(fun x ->
+        match
+          x
+        with
+        | Remanent_state.Low ->
+          Some "Compute the contact map"
+        | Remanent_state.Medium
+        | Remanent_state.High | Remanent_state.Full ->
+          Some "Refine the contact map")
+    get_internal_contact_map
+    convert_contact_map
 
 let compute_signature show_title state =
   let state,l = get_contact_map state in
@@ -880,30 +940,6 @@ let get_signature =
   get_gen
     Remanent_state.get_signature
     compute_signature
-
-let compute_reachability_result show_title state =
-  let state, c_compil = get_c_compilation state in
-  let state, handler = get_handler state in
-  let () = show_title state in
-  let bdu_handler = Remanent_state.get_bdu_handler state in
-  let log_info = Remanent_state.get_log_info state in
-  let parameters = Remanent_state.get_parameters state in
-  let error = Remanent_state.get_errors state in
-  let error, log_info, static, dynamic =
-    Domain_selection.Reachability_analysis.main
-      parameters log_info error bdu_handler c_compil handler
-  in
-  let state = Remanent_state.set_errors error state in
-  let state = Remanent_state.set_log_info log_info state in
-  let state = Remanent_state.set_bdu_handler bdu_handler state in
-  let state = Remanent_state.set_reachability_result (static, dynamic) state in
-  state, (static, dynamic)
-
-let get_reachability_analysis =
-  get_gen
-    ~log_title:"Reachability analysis"
-    (Remanent_state.get_reachability_result)
-    compute_reachability_result
 
 let compute_ctmc_flow show_title state =
   let state, c_compil = get_c_compilation state in

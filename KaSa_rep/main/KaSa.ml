@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Jul 28 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -16,9 +16,22 @@ let main () =
   let state = Export_to_KaSa.init () in
   let parameters = Export_to_KaSa.get_parameters state in
   let state =
-    if (Remanent_parameters.get_do_contact_map parameters)
-    then
-        Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Low state
+    let bool, state  =
+      if (Remanent_parameters.get_do_contact_map parameters)
+      then
+        match Remanent_parameters.get_contact_map_accuracy_level parameters
+        with
+        | Remanent_parameters_sig.None
+        | Remanent_parameters_sig.Low ->
+          true,
+          Export_to_KaSa.output_contact_map
+            ~accuracy_level:Remanent_state.Low state
+        | Remanent_parameters_sig.Medium
+        | Remanent_parameters_sig.High
+        | Remanent_parameters_sig.Full -> false, state
+      else false, state
+    in
+    if bool then state
     else
     if Remanent_parameters.get_trace parameters || Print_cckappa.trace
     then
@@ -34,8 +47,8 @@ let main () =
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then
-        Export_to_KaSa.output_influence_map
-          ~accuracy_level:(match
+      Export_to_KaSa.output_influence_map
+        ~accuracy_level:(match
                            Remanent_parameters.get_influence_map_accuracy_level parameters
                          with
                          | Remanent_parameters_sig.None
@@ -57,6 +70,19 @@ let main () =
       state, Some output
     else
       state, None
+  in
+  let state =
+    if (Remanent_parameters.get_do_contact_map parameters)
+    then
+      match Remanent_parameters.get_contact_map_accuracy_level parameters
+      with
+      | Remanent_parameters_sig.Medium
+      | Remanent_parameters_sig.High
+      | Remanent_parameters_sig.Full ->
+        Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Medium state
+      | Remanent_parameters_sig.None
+      | Remanent_parameters_sig.Low -> state
+    else state
   in
 
   (*-----------------------------------------------------------------------*)

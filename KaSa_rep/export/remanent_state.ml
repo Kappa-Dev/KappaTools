@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 27 2016>
+  * Last modification: Time-stamp: <Jul 28 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -93,9 +93,7 @@ type internal_contact_map =
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
-type reachability_result =
-  Domain_selection.Reachability_analysis.static_information
-  * Domain_selection.Reachability_analysis.dynamic_information
+type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
 type dead_rules = unit
@@ -106,7 +104,7 @@ type flow =
   Ckappa_sig.Site_union_find.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
-type state =
+type ('static,'dynamic) state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
     log_info : StoryProfiling.StoryStats.log_info ;
@@ -126,7 +124,7 @@ type state =
     contact_map   : contact_map AccuracyMap.t ;
     signature     : Signature.s option;
     bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
-    reachability_state: reachability_result option ;
+    reachability_state: ('static, 'dynamic) reachability_result option ;
     subviews_info: subviews_info option ;
     dead_rules:  dead_rules option ;
     dead_agents: dead_agents option ;
@@ -180,8 +178,8 @@ let do_event_gen f phase n state =
   in
   {state with errors = error ; log_info = log_info}
 
-let add_event = do_event_gen StoryProfiling.StoryStats.add_event
-let close_event = do_event_gen StoryProfiling.StoryStats.close_event
+let add_event x y = do_event_gen StoryProfiling.StoryStats.add_event x y
+let close_event x y = do_event_gen StoryProfiling.StoryStats.close_event x y
 
 let set_parameters parameters state = {state with parameters = parameters}
 let get_parameters state = state.parameters

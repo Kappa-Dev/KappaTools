@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Jul 28 2016>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -1814,8 +1814,9 @@ let add_internal_state_in_contact_map parameters error (a,b) c sol =
   Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters error
     a  sol'_a sol
 
+let init_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty
 let export_contact_map parameters error handler =
-  let sol = Ckappa_sig.Agent_map_and_set.Map.empty in
+  let sol = init_contact_map in
   (*----------------------------------------------------------------*)
   let error, sol =
     Ckappa_sig.Dictionary_of_agents.fold

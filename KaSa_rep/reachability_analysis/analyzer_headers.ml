@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 28 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -36,8 +36,11 @@ type global_dynamic_information =
 type event =
   | Dummy
   | Check_rule of Ckappa_sig.c_rule_id
-  | See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-                       * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+  | See_a_new_bond of
+      (
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+       * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+      )
 
 type 'a bot_or_not =
   | Bot
@@ -86,7 +89,7 @@ module PathMap =
 
   end:PathMap)
 
-type kasa_state = unit
+type ('static, 'dynamic) kasa_state = ('static, 'dynamic) Remanent_state.state
 
 type initial_state = Cckappa_sig.enriched_init
 

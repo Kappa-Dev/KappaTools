@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Jul 28 2016>
   * *
   * primitive to parse command-line options
   *
@@ -226,7 +226,7 @@ let options =
         "--contact-map-accuracy-level",
         (Choice
            (["Low","Collect info from rhs of rules and initial state";
-             (*    "High","Only consider reachable rules";*)
+             "High","Only consider reachable rules";
              ],
             Config.contact_map_accuracy_level)),
         "Tune the accuracy level of the contact map",

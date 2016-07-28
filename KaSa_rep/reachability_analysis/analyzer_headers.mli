@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 13 2016>
+  * Last modification: Time-stamp: <Jul 28 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -28,7 +28,8 @@ type compilation_result
 type global_static_information
 type global_dynamic_information
 
-type kasa_state = unit
+type ('static,'dynamic) kasa_state =
+  ('static,'dynamic) Remanent_state.state
 
 (** This is the type of the encoding of a chemical mixture as a result of
     compilation *)

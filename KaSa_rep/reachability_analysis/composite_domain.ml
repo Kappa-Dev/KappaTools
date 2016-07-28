@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 26 2016>
+  * Last modification: Time-stamp: <Jul 28 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -59,7 +59,12 @@ sig
 
   val stabilize: unit zeroary
 
-  val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
+  val export:
+    (
+      ('static, 'dynamic) Analyzer_headers.kasa_state,
+      ('static, 'dynamic) Analyzer_headers.kasa_state
+    )
+      unary
 
   val print: (Loggers.t, unit) unary
 

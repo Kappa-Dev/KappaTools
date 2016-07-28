@@ -1,0 +1,3 @@
+#Command-line:
+"${KAPPABIN}"KaSa ../contact_map.ka --contact-map-accuracy-level Low --output-directory output || exit 0 
+
