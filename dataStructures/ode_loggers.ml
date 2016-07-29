@@ -672,7 +672,7 @@ let print_interpolate logger =
   | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
 
-let print_dump_plots logger  =
+let print_dump_plots ~data_file ~command_line ~titles logger  =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -682,14 +682,27 @@ let print_dump_plots logger  =
     let () =
       print_list logger
         [
-          "filename = 'matlab_kappa.data';";
+          "filename = '"^data_file^"';";
           "fid = fopen (filename,'w');";
+          "fprintf(fid,'# "^command_line^"\\n')";
+          "fprintf(fid,'# t')"]
+    in
+    let () =
+      print_list logger
+        (List.rev_map
+           (fun x -> "fprintf(fid,' "^x^"')")
+           (List.rev titles))
+    in
+    let () =
+      print_list logger
+        [
+          "fprintf(fid,'\\n')";
           "for j=1:num_t_point+1";
           "    fprintf(fid,'%f',t(j));";
           "    for i=1:nobs";
           "        fprintf(fid,' %f',y(j,i));";
           "    end";
-          "    fprintf(fid,'\n');";
+          "    fprintf(fid,'\\n');";
           "end";
           "fclose(fid);"]
     in Loggers.print_newline logger

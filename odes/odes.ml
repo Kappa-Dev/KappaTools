@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jul 26 2016>
+  * Last modification: Time-stamp: <Jul 29 2016>
 *)
 
 
@@ -144,7 +144,6 @@ struct
       b a
 
   let get_compil = I.get_compil
-  let get_input_files = I.get_files
   let init () =
     {
       rules = [] ;
@@ -195,7 +194,7 @@ struct
   let add_new_token token network =
     let network, id = add_new_var (Token token) network in
     {network with tokenmap = Mods.StringMap.add token id network.tokenmap},
-      id
+    id
 
   let enrich_rule rule mode id =
     let lhs = I.lhs rule mode in
@@ -441,13 +440,13 @@ struct
     in
     aux to_be_visited network store
 
-    let convert_tokens compil network =
-      let tokens = I.get_tokens compil in
-      List.fold_left
-        (fun network (a,_) ->
-           snd (fst (translate_token a ([],network))))
-        network
-        tokens
+  let convert_tokens compil network =
+    let tokens = I.get_tokens compil in
+    List.fold_left
+      (fun network (a,_) ->
+         snd (fst (translate_token a ([],network))))
+      network
+      tokens
 
   let translate_species species network =
     snd (translate_species species ([],network))
@@ -891,7 +890,7 @@ struct
       Ode_loggers.int_of_obs = (fun string  -> Mods.StringMap.find_default 0 string network.varmap) ;
       Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
       Ode_loggers.int_of_token_id = (fun string ->
-              Mods.StringMap.find_default 0 string network.tokenmap) ;
+          Mods.StringMap.find_default 0 string network.tokenmap) ;
     }
 
 
@@ -963,28 +962,23 @@ struct
     let () = Loggers.print_newline logger in
     ()
 
-  let export_main logger compil network split =
+  let export_main
+      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
+      logger compil network split =
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
+    let () = Loggers.fprintf logger "%%%% command line: " in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "%%" in
+    let () = Ode_loggers.print_comment logger ("     "^command_line_quotes) in
+    let () = Loggers.print_newline logger in
     let () = Ode_loggers.print_ode_preamble logger () in
     let () = Loggers.print_newline logger in
-    let t_init =
-      match
-        I.get_t_init compil
-      with
-      | None -> 0.
-      | Some f -> f
-    in
-    let () = Ode_loggers.associate logger Ode_loggers.Tinit (alg_of_float t_init) handler_expr in
+    let () = Ode_loggers.associate logger Ode_loggers.Tinit (alg_of_float init_t) handler_expr in
     let () =
       Ode_loggers.associate logger Ode_loggers.Tend
-        (alg_of_float
-           (match
-              I.get_t_end compil
-            with
-            | None -> 1.
-            | Some f -> f))
+        (alg_of_float max_t)
         handler_expr
     in
     let () =
@@ -993,12 +987,8 @@ struct
     in
     let () =
       Ode_loggers.associate logger Ode_loggers.Num_t_points
-        (alg_of_int
-           (match
-              I.get_n_points compil with
-           | None -> 100
-           | Some i -> i))
-        handler_expr in
+        (alg_of_int nb_points) handler_expr
+    in
     let () = Loggers.print_newline logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers.N_ode_var
@@ -1036,7 +1026,7 @@ struct
     let () = Ode_loggers.declare_global logger (Ode_loggers.Init network.fresh_ode_var_id) in
     let () = Ode_loggers.initialize logger (Ode_loggers.Init network.fresh_ode_var_id) in
     let () = Loggers.print_newline logger in
-    let () = Ode_loggers.start_time logger t_init in
+    let () = Ode_loggers.start_time logger init_t in
     let () = Loggers.print_newline logger in
     let () =
       Ode_loggers.associate logger
@@ -1059,6 +1049,7 @@ struct
              (var_rate (id,mode,rate)) rate handler_expr)
         split.const_rate
     in
+    let titles = I.get_obs_titles compil in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.print_license_check logger in
     let () = Loggers.print_newline logger in
@@ -1071,7 +1062,7 @@ struct
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.print_interpolate logger in
     let () = Loggers.print_newline logger in
-    let () = Ode_loggers.print_dump_plots logger in
+    let () = Ode_loggers.print_dump_plots ~data_file ~command_line ~titles logger in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.close_procedure logger in
     let () = Loggers.print_newline logger in
@@ -1195,11 +1186,19 @@ struct
     let () = Loggers.print_newline logger in
     ()
 
-  let export_network logger compil network =
+  let export_network
+      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
+      logger compil network =
     (* add a spurious variable for time *)
     let network = inc_fresh_ode_var_id network in
-    let sorted_rules_and_decl = split_rules_and_decl network in
-    let () = export_main logger compil network sorted_rules_and_decl in
+    let sorted_rules_and_decl =
+      split_rules_and_decl network
+    in
+    let () =
+      export_main
+        ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
+        logger compil network sorted_rules_and_decl
+    in
     let () = export_dydt logger network sorted_rules_and_decl in
     let () = export_init logger network in
     let () = export_obs logger network sorted_rules_and_decl in
@@ -1212,5 +1211,4 @@ struct
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
 
-  let get_m_output_file = I.get_m_output_file
 end

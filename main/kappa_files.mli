@@ -2,10 +2,13 @@
 val open_out : string -> out_channel
 val mk_dir_r : string -> unit
 val setCheckFileExists : batchmode:bool -> unit
-
+val setCheckFileExistsODE : batchmode:bool -> unit
 val set_dir : string -> unit
 val set_data : string -> unit
 val get_data : unit -> string
+
+val set_ode : string -> unit
+val get_ode : unit -> string
 
 val set_distances : string -> unit
 val get_distances : unit -> string

@@ -6,6 +6,7 @@ let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
 let influenceFileName = ref ""
+let odeFileName = ref "ode.m"
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
 let distancesFileName = ref "distances"
@@ -67,6 +68,7 @@ let setOutputName () =
   set influenceFileName (Some "dot") ;
   set ccFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
+  set odeFileName (Some "m") ;
   set marshalizedOutFile None;
   set outputDataName None
 
@@ -88,6 +90,22 @@ let setCheckFileExists ~batchmode =
   check !fluxFileName ;
   check !marshalizedOutFile ;
   check !outputDataName
+
+let setCheckFileExistsODE ~batchmode =
+    let check file =
+      match file with
+      | "" -> ()
+      | file ->
+         let file = path file in
+         if not batchmode && Sys.file_exists file then
+  	 let () =
+  	   Format.eprintf
+  	     "File '%s' already exists do you want to erase (y/N)?@." file in
+  	 let answer = Tools.read_input () in
+  	 if answer<>"y" then exit 1
+    in
+    let () = setOutputName () in
+    check !odeFileName
 
 let with_channel str f =
   if str <> ""  then
@@ -114,6 +132,9 @@ let set_dir s =
 
 let set_data f = outputDataName := f
 let get_data () = !outputDataName
+
+let set_ode f = odeFileName := f
+let get_ode () = !odeFileName
 
 let set_distances f = distancesFileName := f
 let get_distances () = !distancesFileName

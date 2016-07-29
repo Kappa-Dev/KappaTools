@@ -62,14 +62,14 @@ val print_options: Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
 val print_integrate: Loggers.t -> unit
 val print_interpolate: Loggers.t -> unit
-val print_dump_plots: Loggers.t -> unit
+val print_dump_plots: data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
 
 val initialize: Loggers.t -> variable -> unit
 val associate: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val increment: ?init_mode:bool -> Loggers.t -> variable -> ('a,'b) Ast.ast_alg_expr Location.annot -> ('a,'b) network_handler -> unit
 val associate_nrows: Loggers.t -> unit
 val associate_t: Loggers.t -> int -> unit
-val init_time: Loggers.t -> int -> unit 
+val init_time: Loggers.t -> int -> unit
 val start_time: Loggers.t -> float -> unit
 val declare_init: Loggers.t -> int -> unit
 

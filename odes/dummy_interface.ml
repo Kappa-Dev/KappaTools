@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 25 2016>
+  * Last modification: Time-stamp: <Jul 29 2016>
 *)
 
 module Interface =
@@ -107,10 +107,7 @@ struct
   let get_variables compil = compil.Ast.variables
   let get_obs compil = compil.Ast.observables
   let get_tokens compil = compil.Ast.tokens
-  let get_t_init _compil = Some 0.
-  let get_t_end _compil = Some 1.
-  let get_n_points _compil = Some 1000
-  let get_files () = ["essai.ka"]
-  let get_m_output_file _compil = "ode.m"
-  let get_data_output_file _compil = "data.out"
+  
+  let get_obs_titles _compil =
+    ["Obs1";"Obs2";"..."]
 end

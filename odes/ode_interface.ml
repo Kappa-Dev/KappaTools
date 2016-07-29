@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 20/07/2016
-  * Last modification: Time-stamp: <Jul 25 2016>
+  * Last modification: Time-stamp: <Jul 29 2016>
 *)
 
 module type Interface =
@@ -68,12 +68,8 @@ sig
      (mixture,string) Ast.init_t Location.annot) list
   val get_variables: compil -> (pattern,string) Ast.variable_def list
   val get_obs: compil -> (pattern,string) Ast.ast_alg_expr Location.annot list
-  val get_tokens: compil -> string Location.annot list 
+  val get_tokens: compil -> string Location.annot list
 
-  val get_t_init: compil -> float option
-  val get_t_end: compil -> float option
-  val get_n_points: compil -> int option
-  val get_files: unit -> string list
-  val get_m_output_file: compil -> string
-  val get_data_output_file: compil -> string
+  
+  val get_obs_titles: compil -> string list
 end
