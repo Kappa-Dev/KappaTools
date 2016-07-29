@@ -13,7 +13,7 @@ let unsome opt default =
 let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE [-i] input_file [-t-init time] [-t time] [-p points] [-o output_file]\n"
+    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave] [-t-init time] [-t time] [-p points] [-o output_file]\n"
   in
   let kasim_args = Kasim_args.default in
   let ode_args = Ode_args.default in
@@ -36,8 +36,8 @@ let main () =
         Kappa_files.set_marshalized marshalizeOutFile
         in*)
     (*  let () = match kasim_args.Kasim_args.domainOutputFile with
-      | None -> ()
-      | Some domainOutputFile ->
+        | None -> ()
+        | Some domainOutputFile ->
         Kappa_files.set_ccFile domainOutputFile
         in*)
     (*  let () = match kasim_args.Kasim_args.traceFile with
@@ -51,8 +51,19 @@ let main () =
     (*let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in*)
     let () = Parameter.batchmode := kasim_args.Kasim_args.batchmode in
     (*let () = Parameter.time_independent := common_args.Common_args.timeIndependent*)
-
-
+    let backend =
+      match ode_args.Ode_args.backend with
+      | "Octave" | "OCTAVE" | "octave" -> Loggers.Octave
+      | "Matlab" | "MATLAB" | "matlab" -> Loggers.Matlab
+      | s ->
+        begin
+          Arg.usage options usage_msg;
+          Debug.tag
+            Format.std_formatter
+            ("Wrong option "^s^".\nOnly matlab and octave backends are supported.");
+          exit 0
+        end
+    in
     let abort =
       match kasim_args.Kasim_args.inputKappaFileNames with
       | [] -> kasim_args.Kasim_args.marshalizedInFile = ""
@@ -84,7 +95,7 @@ let main () =
       A.network_from_compil compil
     in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
-    let logger = Loggers.open_logger_from_channel ~mode:Loggers.Octave out_channel in
+    let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
     let () = A.export_network
         ~command_line
         ~command_line_quotes
