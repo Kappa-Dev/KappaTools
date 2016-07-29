@@ -288,8 +288,8 @@ let print_site_accross_domain
     ?final_resul:(_final_result = false)
     ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let (agent_type, site_type, _, _, _),
-      (agent_type', site_type', _, _, _) = tuple in
+  let (agent_type, _site_type, _, _, _),
+      (agent_type', _site_type', _, _, _) = tuple in
   (*state1 and state1' are a binding states*)
   let error, (agent1, site1, site2, _state1, state2,
               agent1', site1', site2', _state1', state2') =
@@ -351,7 +351,7 @@ let print_site_accross_domain
                     Loggers.fprintf (Remanent_parameters.get_logger parameters)
                       "Whenever the site %s of %s and the site %s of %s are bound together, then the site %s of %s and %s of %s can have the following respective states: %s, %s\n"
                       site1 agent1 site1' agent1'
-                      site2 agent1' site2' agent1'
+                      site2 agent1 site2' agent1'
                       statex statey
                   in
                   error

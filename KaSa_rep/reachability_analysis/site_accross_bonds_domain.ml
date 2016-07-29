@@ -543,6 +543,7 @@ struct
 
   (****************************************************************)
 
+  (*
   let print_result prefix parameter error kappa_handler handler
       (x,y) mvbdu =
     let (agent_type, _, _, _, _) = x in
@@ -593,6 +594,7 @@ struct
             aux tl
         in aux l
       ) (error, handler) pair_list
+    *)
 
   let get_state_of_site_in_precondition parameter error dynamic agent_id
       site_type precondition =
@@ -627,7 +629,6 @@ struct
     (*-----------------------------------------------------------*)
     let parameter =
       Remanent_parameters.update_prefix parameter "                " in
-    let prefix = Remanent_parameters.get_prefix parameter in
     (*-----------------------------------------------------------*)
     (*rule rhs has bound*)
     let store_bonds_rhs = get_bonds_rhs static in
@@ -1149,7 +1150,7 @@ struct
         (*--------------------------------------------------------*)
         (*print result*)
         let store_value = get_value dynamic in
-        let error, handler =
+        (*let error, handler =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
                Site_accross_bonds_domain_type.print_site_accross_domain
@@ -1158,8 +1159,7 @@ struct
                  ~final_resul:true
                  ~dump_any:true parameter error kappa_handler handler (x, y) mvbdu
             ) store_value (error, handler)
-        in
-        (*
+        in*)
         let error, handler =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
@@ -1217,7 +1217,7 @@ struct
                in
                error, handler
             ) store_value (error, handler)
-        in*)
+        in
         error, handler
       else error, handler
     in
