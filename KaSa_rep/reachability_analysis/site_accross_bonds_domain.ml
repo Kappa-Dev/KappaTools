@@ -143,6 +143,17 @@ struct
         Site_accross_bonds_domain_static.store_bonds_rhs = r
       } static
 
+  let get_bonds_lhs static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_bonds_lhs
+
+  let set_bonds_lhs r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_bonds_lhs = r
+      } static
+
   let get_bonds_rhs_set static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_bonds_rhs_set
@@ -313,6 +324,14 @@ struct
         parameter error rule_id rule store_bonds_rhs
     in
     let static = set_bonds_rhs store_bonds_rhs static in
+    (*------------------------------------------------------------*)
+    (*bonds on the left hand side*)
+    let store_bonds_lhs = get_bonds_lhs static in
+    let error, store_bonds_lhs =
+      Site_accross_bonds_domain_static.collect_bonds_lhs
+        parameter error rule_id rule store_bonds_lhs
+    in
+    let static = set_bonds_lhs store_bonds_lhs static in
     (*------------------------------------------------------------*)
     (*bonds set without rule_id*)
     let store_bonds_rhs_set = get_bonds_rhs_set static in
@@ -539,6 +558,26 @@ struct
   (* check for each bond that occur in the lhs, whether
      the constraints in the lhs are consistent *)
   let is_enabled _static dynamic error (_rule_id:Ckappa_sig.c_rule_id) precondition =
+    (*let parameter = get_parameter static in
+    let store_bonds_lhs = get_bonds_lhs static in
+    let error, bonds_lhs_set =
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+              parameter error rule_id store_bonds_lhs
+      with
+      | error, None ->
+        error,
+        Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    let store_value = get_value dynamic in
+    let error, bool =
+      if
+        Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.elements
+        bonds_lhs_set
+
+    in
+    *)
+
     error, dynamic, Some precondition
 
   (****************************************************************)
@@ -988,7 +1027,6 @@ struct
                    [(Ckappa_sig.site_name_of_int 1, state');
                     (Ckappa_sig.site_name_of_int 2, state1')]
                  in
-                 let handler = get_mvbdu_handler dynamic in
                  let error, handler, mvbdu =
                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
                      parameter handler error pair_list

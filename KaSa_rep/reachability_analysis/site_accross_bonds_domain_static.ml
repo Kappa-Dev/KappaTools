@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Jul 28 2016>
+   * Last modification: Time-stamp: <Jul 29 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -28,6 +28,9 @@ type basic_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_rhs: Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    store_bonds_lhs :
+    Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
     (*a set of site that are bonds on the rhs without rule_id§*)
     store_bonds_rhs_set :
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t;
@@ -39,7 +42,7 @@ type basic_static_information =
       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     (**)
-    store_modified_internal_state_and_bond :
+    store_modified_internal_state_and_bond : (*REMOVE*)
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_question_marks_rhs :
@@ -58,6 +61,7 @@ let init_basic_static_information =
   {
     store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_rhs_set= Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty;
     store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_tuple_pair =
@@ -158,7 +162,7 @@ let collect_agent_type_state parameter error agent site_type =
     in
     error, (agent_type1, state1)
 
-let collect_bonds_rhs parameter error rule_id rule store_result =
+let collect_bonds parameter error rule_id views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter error
     (fun parameter error agent_id bonds_map store_result ->
@@ -169,13 +173,15 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
             let error, agent_source =
               match
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                  parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+                  parameter error agent_id
+                (*rule.Cckappa_sig.rule_rhs.Cckappa_sig.views*) views
               with
-              | error, None -> warn parameter error (Some "line 332") Exit Cckappa_sig.Ghost
+              | error, None -> warn parameter error (Some "line 332") Exit
+                                 Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
-            (*----------------------------------------------------*)
-            (*the first pair*)
+                (*----------------------------------------------------*)
+                (*the first pair*)
             let error, (agent_type1, state1) =
               collect_agent_type_state
                 parameter
@@ -183,14 +189,16 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
                 agent_source
                 site_type_source
             in
-            (*----------------------------------------------------*)
-            (*the second pair*)
+                (*----------------------------------------------------*)
+                (*the second pair*)
             let error, agent_target =
               match
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                  parameter error agent_id_target rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+                  parameter error agent_id_target
+                (*rule.Cckappa_sig.rule_rhs.Cckappa_sig.views*)views
               with
-              | error, None -> warn parameter error (Some "line 350") Exit Cckappa_sig.Ghost
+              | error, None -> warn parameter error (Some "line 350") Exit
+                                 Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
             let error, (agent_type2, state2) =
@@ -207,7 +215,8 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
                       parameter error rule_id store_result
               with
               | error, None ->
-                error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+                error,
+                Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
               | error, Some p -> error, p
             in
             let error', new_set =
@@ -217,7 +226,8 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
                  (agent_id_target, agent_type2, site_type_target, state2))
                 old_set
             in
-            let error = Exception.check warn parameter error error' (Some "line 197") Exit in
+            let error =
+              Exception.check warn parameter error error' (Some "line 197") Exit in
             let error, store_result =
               Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
                 parameter
@@ -228,8 +238,19 @@ let collect_bonds_rhs parameter error rule_id rule store_result =
             in
             error, store_result
          ) bonds_map (error, store_result)
-    ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds store_result
+    ) bonds (*rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds*) store_result
 
+let collect_bonds_rhs parameter error rule_id rule store_result =
+  collect_bonds parameter error rule_id
+    rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+    rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds
+    store_result
+
+let collect_bonds_lhs parameter error rule_id rule store_result =
+  collect_bonds parameter error rule_id
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
+    store_result
 
 let collect_bonds_rhs_set parameter error rule store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
