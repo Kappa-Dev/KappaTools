@@ -234,7 +234,11 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
     r.r_add_tokens
     (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
 
-let rule_to_json _ = `Null
+let rule_to_json _ =
+  let () =
+    ExceptionDefn.warning
+      (fun f -> Format.pp_print_string f "Fake LKappa.rule_to_json") in
+  `Null
 let rule_of_json = function
   | `Null ->
     {

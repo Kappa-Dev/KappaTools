@@ -167,6 +167,9 @@ let propagate_constant updated_vars counter x =
   }
 
 let to_json env =
+  let () =
+    ExceptionDefn.warning
+      (fun f -> Format.pp_print_string f "Environment.to_json is partial") in
   `Assoc [
     "signatures", Signature.to_json env.signatures;
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;

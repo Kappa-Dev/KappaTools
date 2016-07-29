@@ -14,11 +14,17 @@ let rec to_json = function
     `List [Operator.un_alg_op_to_json op;to_json a]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [`String "VAR";`Int i]
-  | KAPPA_INSTANCE _ -> failwith "to_json KAPPA_INSTANCE _ not implemented"
+  | KAPPA_INSTANCE _ ->
+      let () =
+    ExceptionDefn.warning
+      (fun f -> Format.pp_print_string
+          f "KAPPA_INSTANCE not translated in json") in
+      `Null
   | TOKEN_ID i -> `List [`String "TOKEN";`Int i]
   | CONST n -> Nbr.to_json n
 
 let rec of_json = function
+  | `Null -> KAPPA_INSTANCE []
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
