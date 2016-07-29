@@ -16,8 +16,10 @@ let main () =
     "Usage is KaDE [-i] input_file [-t-init time] [-t time] [-p points] [-o output_file]\n"
   in
   let kasim_args = Kasim_args.default in
+  let ode_args = Ode_args.default in
   let options =
     Kasim_args.options kasim_args
+    @ Ode_args.options ode_args
   in
   try
     Arg.parse
@@ -87,7 +89,7 @@ let main () =
         ~command_line
         ~command_line_quotes
         ~data_file:(Kappa_files.get_data ())
-        ~init_t:0.
+        ~init_t:ode_args.Ode_args.minTimeValue
         ~max_t:(unsome kasim_args.Kasim_args.maxTimeValue 1.)
         ~nb_points:kasim_args.Kasim_args.pointNumberValue
         logger compil network
