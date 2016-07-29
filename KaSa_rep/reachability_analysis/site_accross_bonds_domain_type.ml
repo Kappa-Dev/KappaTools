@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 27 2016>
+   * Last modification: Time-stamp: <Jul 29 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -286,11 +286,13 @@ let print_site_accross_domain
     ?verbose:(verbose = true)
     ?sparse: (sparse = false)
     ?final_resul:(_final_result = false)
-    ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple _mvbdu =
+    ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let (_agent_type, _, _, _, _), (_agent_type', _, _, _, _) = tuple in
+  let (agent_type, site_type, _, _, _),
+      (agent_type', site_type', _, _, _) = tuple in
   (*state1 and state1' are a binding states*)
-  let error, (agent1, site1, site2, _state1, state2, agent1', site1', site2', _state1', state2') =
+  let error, (agent1, site1, site2, _state1, state2,
+              agent1', site1', site2', _state1', state2') =
     convert_tuple parameters error kappa_handler tuple
   in
   if sparse && compare site1 site2 > 0
@@ -311,22 +313,53 @@ let print_site_accross_domain
             agent1 site1
             agent1' site1'
         in
-        (* this is wrong, please correct
- let error, (handler, translation) =
-          Translation_in_natural_language.translate
-            parameters handler error (fun _ e i -> e, i) mvbdu
+        let error, handler, pair_list =
+          Ckappa_sig.Views_bdu.extensional_of_mvbdu
+            parameters handler error mvbdu
+        in
+        let l = List.flatten pair_list in
+        let error, list1 =
+          List.fold_left (fun (error, current_list) (x, y) ->
+              let error, (agentx, sitex, statex) =
+                convert_single
+                  parameters error kappa_handler
+                  (agent_type, x, y)
+              in
+              let list1 =
+                (agentx, sitex, statex) :: current_list
+              in
+              error, list1
+            ) (error, []) l
+        in
+        let error, list2 =
+          List.fold_left (fun (error, current_list) (x, y) ->
+              let error, (agentx, sitex, statex) =
+                convert_single
+                  parameters error kappa_handler
+                  (agent_type', x, y)
+              in
+              let list2 =
+                (agentx, sitex, statex) :: current_list
+              in
+              error, list2
+            ) (error, []) l
         in
         let error =
-          Translation_in_natural_language.print
-            ~show_dep_with_dimmension_higher_than:1 parameters
-            kappa_handler error agent1 agent_type translation
-            in*)
-        (*Loggers.print_newline (Remanent_parameters.get_logger parameters);
-          let error =
-          Translation_in_natural_language.print
-            ~show_dep_with_dimmension_higher_than:1 parameters
-            kappa_handler error agent1' agent_type' translation
-          in*)
+          List.fold_left (fun error (agentx, sitex, statex) ->
+              List.fold_left (fun error (agenty, sitey, statey) ->
+                  let () =
+                    Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                      "Whenever the site %s of %s and the site %s of %s are bound together, then the site %s of %s and %s of %s can have the following respective states: %s, %s\n"
+                      site1 agent1 site1' agent1'
+                      site2 agent1' site2' agent1'
+                      statex statey
+                  in
+                  error
+
+                ) error list2
+            ) error list1
+        in
+
         let () =
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         in
