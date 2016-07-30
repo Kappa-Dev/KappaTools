@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Aug 01 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -19,12 +19,12 @@ module Reachability_analysis =
     (Composite_domain.Make
        (Product.Product
           (Parallel_bonds.Domain)
-                                      (*(Product.Product
-                                               (Site_accross_bonds_domain.Domain) *)
+          (Product.Product
+             (Site_accross_bonds_domain.Domain)
              (Product.Product
                 (Views_domain.Domain)
                 (Product.Product
                    (Contact_map_domain.Domain)
                    (Product.Product
                       (Agents_domain.Domain)
-                      (Rules_domain.Domain))))))  (* ) *) 
+                      (Rules_domain.Domain)))))))
