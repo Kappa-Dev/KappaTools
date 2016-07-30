@@ -34,8 +34,7 @@ type basic_static_information =
     (*a set of site that are bonds on the rhs without rule_id§*)
     store_bonds_rhs_set : (* JF: it does not make sense *)
       (* agent_ids makes sense only in the contact of a given rule *)
-
-      Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t;
+      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.t;
     store_modified_map :
       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -66,7 +65,7 @@ let init_basic_static_information =
     store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_bonds_rhs_set= Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty;
+    store_bonds_rhs_set= Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty;
     store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_tuple_pair =
       Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.empty;
@@ -301,10 +300,10 @@ let collect_bonds_rhs_set parameter error rule store_result =
             (*-----------------------------------------------------*)
             (*get old set*)
             let error, store_result =
-              Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+              Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.add_when_not_in
                 parameter error
-                ((agent_id, agent_type1, site_type_source, state1),
-                 (agent_id_target, agent_type2, site_type_target, state2))
+                ((agent_type1, site_type_source, state1),
+                 (agent_type2, site_type_target, state2))
                 store_result
             in
             error, store_result
@@ -1014,32 +1013,3 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
       ) store_pair_sites_init (error, handler, store_result)
   in
   error, handler, store_result
-
-let collect_pair_tuple_init'' parameter error _init_state
-    store_bonds_init store_pair_sites_init
-    store_result =
-  (*fold over a set of pair and check the first site whether or not it
-    belongs to a set of sites that can be bound*)
-  let error, store_result =
-    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
-      (fun (x, y) (error, store_result) ->
-         let (agent_id, agent_type, _site_type, site_type2, _state, state2) = x in
-         let (agent_id', agent_type', _site_type', site_type2', _state', state2') = y in
-         if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
-              ((agent_id, agent_type, site_type2, state2),
-               (agent_id', agent_type', site_type2', state2'))
-              store_bonds_init
-         then
-           let pair = Site_accross_bonds_domain_type.project2 (x, y) in
-           let error, store_result =
-             Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
-               parameter error
-               pair
-               store_result
-           in
-           error, store_result
-         else
-           error, store_result
-      ) store_pair_sites_init (error, store_result)
-  in
-  error, store_result

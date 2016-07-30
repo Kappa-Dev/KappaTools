@@ -769,7 +769,7 @@ struct
       (*fold over a set of modified sites*)
       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
         (fun m (error, dynamic, precondition) ->
-           let (agent_id_m, _, site_type_m, state_m) = m in
+           let (agent_id_m, agent_type_m, site_type_m, state_m) = m in
            (*fold over a tuple pair*)
            Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.fold
              (fun (x, y) (error, dynamic, precondition) ->
@@ -807,9 +807,9 @@ struct
                           (* JF: this test must be done much earlier *)
                           (* JF: the predicate depends neither on pre_state nor on pre_state' *)
 
-                        if agent_id = agent_id_m && site_type' = site_type_m
+                        if agent_type = agent_type_m && site_type' = site_type_m
                              ||
-                             agent_id1 = agent_id_m && site_type1' = site_type_m
+                             agent_type1 = agent_type_m && site_type1' = site_type_m
                           then
                             let potential_list =
                               ((agent_id, agent_type, site_type, site_type', pre_state, state_m),
@@ -827,13 +827,13 @@ struct
                       let store_result = get_value dynamic in
                       let (agent_id, agent_type, site_type, _, state, state') = t in
                       let (agent_id1, agent_type1, site_type1, _, state1, state1') = u in
-                      let pair_bond = (agent_id, agent_type, site_type, state),
-                                      (agent_id1, agent_type1, site_type1, state1)
+                      let pair_bond = (agent_type, site_type, state),
+                                      (agent_type1, site_type1, state1)
                       in
                       (*----------------------------------------------------*)
                       (*check if the first site is bound*)
                       if
-                        Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
+                        Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.mem
                           pair_bond
                           store_bonds_rhs_set
                       then
