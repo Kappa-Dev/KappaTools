@@ -396,7 +396,7 @@ struct
       Site_accross_bonds_domain_static.collect_pair_sites_aux
         parameter error rule_id store_views_rhs
     in
-    let store_tuple_pair = get_tuple_pair static in
+    let store_tuple_pair = get_tuple_pair static in (*REMOVE this*)
     let error, store_tuple_pair =
       Site_accross_bonds_domain_static.collect_tuple_pair
         parameter error
@@ -406,6 +406,40 @@ struct
         store_tuple_pair
     in
     let static = set_tuple_pair store_tuple_pair static in
+    (*TODO*)
+    let store_tuple_pair_rule = get_tuple_pair_rule static in
+    let error, store_tuple_pair_rule =
+      Site_accross_bonds_domain_static.collect_tuple_pair_rule
+        parameter
+        error
+        kappa_handler
+        rule_id
+        store_test
+        store_tuple_pair_rule
+    in
+    let static = set_tuple_pair_rule store_tuple_pair_rule static in
+    (**)
+    let store_agent_id_list_from_tuple =
+      get_agent_id_list_from_tuple static in
+    let error, store_agent_id_list_from_tuple =
+      Site_accross_bonds_domain_static.collect_agent_id_list_from_tuple
+        parameter error
+        rule_id
+        store_tuple_pair_rule
+        store_agent_id_list_from_tuple
+    in
+    let static = set_agent_id_list_from_tuple store_agent_id_list_from_tuple
+        static in
+    (**)
+    let store_pair_tuple_set = get_pair_tuple_set static in (*Use it*)
+    let error, store_pair_tuple_set =
+      Site_accross_bonds_domain_static.collect_pair_tuple_set
+        parameter error
+        store_tuple_pair_rule
+        rule_id
+        store_pair_tuple_set
+    in
+    let static = set_pair_tuple_set store_pair_tuple_set static in
     (*------------------------------------------------------------*)
     (*modification*)
     let store_modified_map = get_modified_map static in
@@ -715,8 +749,6 @@ struct
     " agent_id "^(Ckappa_sig.string_of_agent_id agent_id)^
     " site_type "^(Ckappa_sig.string_of_site_name site_type)
 
-
-
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
     let kappa_handler = get_kappa_handler static in
@@ -798,7 +830,150 @@ struct
         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
+    (*pair list of agent_id*)
+    let store_agent_id_list_from_tuple =
+      get_agent_id_list_from_tuple static
+    in
+    let error, pair_agent_id_list =
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+              parameter error rule_id store_agent_id_list_from_tuple
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let store_pair_tuple_set = get_pair_tuple_set static in
     (*-----------------------------------------------------------*)
+    (*FIXME*)
+    let error, new_pair_set =
+    (*fold over a set of modified sites*)
+    Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+      (fun m (error, store_result) ->
+         let (_, agent_type_m, site_type_m, state_m) = m in
+         (*fold over a set of tuple pair without agent_id*)
+         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
+           (fun (x, y) (error, store_result) ->
+              let (agent_type, site_type, site_type', _) = x in
+              let (agent_type1, site_type1, site_type1', _) = y in
+              (*check if the second site belong to modified set*)
+              if agent_type = agent_type_m && site_type' = site_type_m ||
+                 agent_type1 = agent_type_m && site_type1' = site_type_m
+              then
+                let new_pair = (agent_type, site_type, site_type', state_m),
+                               (agent_type1, site_type1, site_type1', state_m)
+                in
+                let error, store_result =
+                  Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.add_when_not_in
+                    parameter error
+                    new_pair
+                    store_result
+                in
+                error, store_result
+              else
+                error, store_result
+           ) store_pair_tuple_set (error, store_result)
+      )
+      modified_set
+      (error,
+       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty)
+    in
+    let error, dynamic, precondition =
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
+        (fun (x, y) (error, dynamic, precondition) ->
+           let (agent_type, site_type, site_type', state) = x in
+           let (agent_type1, site_type1, site_type1', state1) = y in
+           List.fold_left (fun (error, dynamic, precondition) (agent_id, agent_id1) ->
+               (*get a list of state in the precondition of the first site*)
+               let error', dynamic, precondition, state_list =
+                 get_state_of_site_in_precondition
+                   parameter error
+                   dynamic
+                   agent_id
+                   site_type
+                   precondition
+               in
+               let error = Exception.check warn parameter error error'
+                   (Some (context 766 rule_id agent_id site_type)) Exit
+               in
+               let error', dynamic, precondition, state_list' =
+                 get_state_of_site_in_precondition
+                   parameter error
+                   dynamic
+                   agent_id1
+                   site_type1
+                   precondition
+               in
+               let error = Exception.check warn parameter error error'
+                   (Some (context 775 rule_id agent_id1 site_type1)) Exit
+               in
+               let error, potential_list =
+                 List.fold_left (fun (error, current_list) pre_state ->
+                     List.fold_left (fun (error, current_list) pre_state' ->
+                         let potential_list =
+                           ((agent_id, agent_type, site_type, site_type', state, pre_state),
+                            (agent_id1, agent_type1, site_type1, site_type1', state1, pre_state')) :: current_list
+                         in
+                         error, potential_list
+                       ) (error, current_list) state_list'
+                   ) (error, []) state_list
+               in
+               let error, dynamic, precondition =
+                 List.fold_left (fun (error, dynamic, precondition) (t, u) ->
+                     let store_result = get_value dynamic in
+                     let handler = get_mvbdu_handler dynamic in
+                     let (agent_id, agent_type, site_type, _, state, state') = t in
+                     let (agent_id1, agent_type1, site_type1, _, state1, state1') = u in
+                     let pair_bond = (agent_type, site_type, state),
+                                     (agent_type1, site_type1, state1)
+                     in
+                     (*----------------------------------------------------*)
+                     (*check if the first site is bound*)
+                     if
+                       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.mem
+                         pair_bond
+                         store_bonds_rhs_set
+                     then
+                       let pair_list =
+                         [(Ckappa_sig.fst_site, state');
+                          (Ckappa_sig.snd_site, state1')]
+                       in
+                       let pair_list =
+                         [
+                           Ckappa_sig.fst_site, state';
+                           Ckappa_sig.snd_site, state1'
+                         ]
+                       in
+                       let error, handler, mvbdu =
+                         Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                           parameter handler error pair_list
+                       in
+                       let pair =
+                         Site_accross_bonds_domain_type.project2 (t, u)
+                       in
+                     (*----------------------------------------------------*)
+                     (*PRINT*)
+                     (*let error, handler =
+                       print_result prefix parameter error
+                         kappa_handler handler
+                         pair
+                         mvbdu
+                     in*)
+                       let error, handler, store_result =
+                         Site_accross_bonds_domain_type.add_link
+                           parameter error bdu_false handler
+                           kappa_handler pair mvbdu store_result
+                       in
+                       let dynamic = set_value store_result dynamic in
+                       let dynamic = set_mvbdu_handler handler dynamic in
+                       error, dynamic, precondition
+                     else error, dynamic, precondition
+                   ) (error, dynamic, precondition) potential_list
+               in
+               error, dynamic, precondition
+             ) (error, dynamic, precondition) pair_agent_id_list
+        ) new_pair_set (error, dynamic, precondition)
+    in
+    (*REMOVE*)
+    (*
     let error, dynamic, precondition =
       (*1. the second site in a rule can be modified, then check its first site whether or not it can be bound.*)
       (*fold over a set of modified sites*)
@@ -907,7 +1082,7 @@ struct
                 error, dynamic, precondition
              ) store_tuple_pair (error, dynamic, precondition)
         ) modified_set (error, dynamic, precondition)
-    in
+    in*)
     (*-----------------------------------------------------------*)
     (*1.a fold over a pair where the first site is bound and the second site is modified*)
     (*

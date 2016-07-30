@@ -430,7 +430,7 @@ let collect_pair_sites_aux parameter error rule_id store_views_rhs =
 
 (*pair (A,x,y, B, z, t) without state information*)
 
-let collect_tuple_pair' parameter error _kappa_handler rule_id
+    (*let collect_tuple_pair' parameter error _kappa_handler rule_id
     store_pair_rhs store_result =
   let error, store_pair_set =
     match
@@ -466,7 +466,7 @@ let collect_tuple_pair' parameter error _kappa_handler rule_id
          error, pair_set
       ) store_pair_set (error, store_result)
   in
-  error, store_result
+  error, store_result*)
 
 let collect_tuple_pair parameter error _kappa_handler rule_id store_pair_rhs store_result =
   let error, store_pair_set =
