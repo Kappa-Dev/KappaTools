@@ -30,9 +30,6 @@ The internal state of site y in agent A ranges over u and p.
 The binding state of site z in agent A is always free.
 The binding state of site y in agent A is always free.
 ------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
