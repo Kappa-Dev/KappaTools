@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 29 2016>
+   * Last modification: Time-stamp: <Jul 30 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -661,6 +661,13 @@ struct
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
+  let context line rule_id agent_id site_type =
+    "line: "^(string_of_int line)^
+    " rule "^(Ckappa_sig.string_of_rule_id rule_id)^
+    " agent_id "^(Ckappa_sig.string_of_agent_id agent_id)^
+    " site_type "^(Ckappa_sig.string_of_site_name site_type)
+
+
 
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
@@ -745,10 +752,12 @@ struct
            (*fold over a tuple pair*)
            Site_accross_bonds_domain_type.PairAgentsSitesState_map_and_set.Set.fold
              (fun (x, y) (error, dynamic, precondition) ->
+                (* JF: the list of the good tuple, should be stored in a map in static *)
+                (* JF: Iterating over the full set of tuples, and filtering afterward is costly *)
                 let (agent_id, agent_type, site_type, site_type', _) = x in
                 let (agent_id1, agent_type1, site_type1, site_type1', _) = y in
                 (*get the list of state in the precondition of the first site*)
-                let error, dynamic, precondition, state_list =
+                let error', dynamic, precondition, state_list =
                   get_state_of_site_in_precondition
                     parameter error
                     dynamic
@@ -756,7 +765,8 @@ struct
                     site_type
                     precondition
                 in
-                let error, dynamic, precondition, state_list' =
+                let error = Exception.check warn parameter error error' (Some (context 766 rule_id agent_id site_type)) Exit in
+                let error', dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition
                     parameter error
                     dynamic
@@ -764,12 +774,17 @@ struct
                     site_type1
                     precondition
                 in
+                let error = Exception.check warn parameter error error' (Some (context 775 rule_id agent_id1 site_type1)) Exit in
                 (*----------------------------------------------------*)
                 let error, potential_list =
                   List.fold_left (fun (error, current_list) pre_state ->
                       List.fold_left (fun (error, current_list) pre_state' ->
                           (*check if the second site belong to modif site*)
-                          if agent_id = agent_id_m && site_type' = site_type_m
+
+                          (* JF: this test must be done much earlier *)
+                          (* JF: the predicate depends neither on pre_state nor on pre_state' *)
+
+                        if agent_id = agent_id_m && site_type' = site_type_m
                              ||
                              agent_id1 = agent_id_m && site_type1' = site_type_m
                           then
@@ -800,8 +815,8 @@ struct
                           store_bonds_rhs_set
                       then
                         let pair_list =
-                          [(Ckappa_sig.site_name_of_int 1, state');
-                           (Ckappa_sig.site_name_of_int 2, state1')]
+                          [(Ckappa_sig.fst_site, state');
+                           (Ckappa_sig.snd_site, state1')]
                         in
                         let error, handler, mvbdu =
                           Ckappa_sig.Views_bdu.mvbdu_of_association_list
@@ -975,7 +990,7 @@ struct
            let (agent_id, agent_type, site_type, site_type', state) = x in
            let (agent_id1, agent_type1, site_type1, site_type1', state1) = y in
            (*get the precondition of site_type', site_type1', the internal state list*)
-           let error, dynamic, precondition, state_list =
+           let error', dynamic, precondition, state_list =
              get_state_of_site_in_precondition
                parameter
                error
@@ -984,7 +999,8 @@ struct
                site_type' (*y*)
                precondition
            in
-           let error, dynamic, precondition, state_list' =
+           let error = Exception.check warn parameter error error' (Some (context 995 rule_id agent_id site_type')) Exit in
+           let error', dynamic, precondition, state_list' =
              get_state_of_site_in_precondition
                parameter
                error
@@ -993,6 +1009,7 @@ struct
                site_type1' (*y*)
                precondition
            in
+           let error = Exception.check warn parameter error error' (Some (context 1006 rule_id agent_id1 site_type1')) Exit in
            (*------------------------------------------------------*)
            (*return the pre_state*)
            let error, potential_list =
@@ -1024,8 +1041,10 @@ struct
                      state1'))
                  in
                  let pair_list =
-                   [(Ckappa_sig.site_name_of_int 1, state');
-                    (Ckappa_sig.site_name_of_int 2, state1')]
+                   [
+                     Ckappa_sig.fst_site, state';
+                     Ckappa_sig.snd_site, state1'
+                   ]
                  in
                  let error, handler, mvbdu =
                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
@@ -1063,7 +1082,7 @@ struct
              y
            in
            (*get a list of state of the first site in the precondition*)
-           let error, dynamic, precondition, state_list =
+           let error', dynamic, precondition, state_list =
              get_state_of_site_in_precondition
                parameter error
                dynamic
@@ -1071,6 +1090,7 @@ struct
                site_type (*x*)
                precondition
            in
+           let error = Exception.check warn parameter error error' (Some (context 1085 rule_id agent_id site_type)) Exit in
            let error, dynamic, precondition, state_list' =
              get_state_of_site_in_precondition
                parameter error
@@ -1079,6 +1099,7 @@ struct
                site_type1 (*x*)
                precondition
            in
+           let error = Exception.check warn parameter error error' (Some (context 1094 rule_id agent_id1 site_type1)) Exit in
            let error, potential_list =
              List.fold_left (fun (error, current_list) pre_state ->
                  List.fold_left (fun (error, current_list) pre_state' ->
@@ -1116,8 +1137,10 @@ struct
                      (agent_type1, site_type1, site_type1', state1, state1')
                    in
                    let pair_list =
-                     [(Ckappa_sig.site_name_of_int 1, state');
-                      (Ckappa_sig.site_name_of_int 2, state1')]
+                     [
+                       Ckappa_sig.fst_site, state';
+                       Ckappa_sig.snd_site, state1'
+                     ]
                    in
                    let error, handler, mvbdu =
                      Ckappa_sig.Views_bdu.mvbdu_of_association_list
@@ -1201,11 +1224,11 @@ struct
         let error, handler =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
-               let (agent_type, _, site_type, stateb, _) = x in
-               let (agent_type1, _, site_type1, stateb1, _) = y in
+               let (agent_type, _, site_type, _stateb, _) = x in
+               let (agent_type1, _, site_type1, _stateb1, _) = y in
                let error,
-                   (agent, site, site', state, state', (*A,x,y*)
-                    agent1, site1, site1', state1, state1') =
+                   (agent, site, site', _state, _state', (*A,x,y*)
+                    agent1, site1, site1', _state1, _state1') =
                  Site_accross_bonds_domain_type.convert_tuple
                    parameter error kappa_handler
                    (x,y)
@@ -1219,28 +1242,33 @@ struct
                else
                let error =
                  List.fold_left (fun error l ->
-                     let rec aux acc =
-                       match acc with
-                       | []
-                       | (_, _) :: [] -> error (*check*)
-                       | (sitex, statex) :: (sitey, statey) :: tl ->
-                         (*do not print free and binding state*)
+                     (* JF: l is an association list
+                        fst_site -> state of site_type
+                        snd_site -> state of site_type1 *)
+                     match
+                       l
+                     with
+                     | [siteone, statex ; sitetwo, statey]
+                       when siteone == Ckappa_sig.fst_site
+                         && sitetwo == Ckappa_sig.snd_site
+                       ->
+                          (*do not print free and binding state*)
                          (*if sitex = site_type1 && statex = stateb1 ||
                             sitex = site_type1 &&
                             (Ckappa_sig.int_of_state_index statex) = 0
                          then error
                            else*)
                          (*the first one for agent, the second element for agent1*)
-                         let error, (agentx, sitex, statex) =
+                         let error, (_agentx, _sitex, statex) =
                            Site_accross_bonds_domain_type.convert_single
                              parameter error kappa_handler
-                             (agent_type, sitex, statex)
+                             (agent_type, site_type, statex)
                          in
                          (**)
-                         let error, (agenty, sitey, statey) =
+                         let error, (_agenty, _sitey, statey) =
                            Site_accross_bonds_domain_type.convert_single
                              parameter error kappa_handler
-                             (agent_type1, sitey, statey)
+                             (agent_type1, site_type1, statey)
                          in
                          let () =
                            Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -1249,8 +1277,12 @@ struct
                              site' agent site1' agent1
                              statex statey
                          in
-                         aux tl
-                     in aux l
+                         error
+                     | [] | _::_ ->
+                       let error, () =
+                         warn parameter error (Some "1282") Exit ()
+                       in
+                       error
                    ) error pair_list
                in
                error, handler
