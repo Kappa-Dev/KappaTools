@@ -278,6 +278,9 @@ The internal state of site e1 in agent A ranges over u and p.
 The internal state of site e2 in agent A ranges over u and p.
 The internal state of site g in agent A ranges over u and p.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
@@ -560,6 +563,9 @@ The internal state of site d2 in agent A ranges over u and p.
 The internal state of site e1 in agent A ranges over u and p.
 The internal state of site e2 in agent A ranges over u and p.
 The internal state of site g in agent A ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

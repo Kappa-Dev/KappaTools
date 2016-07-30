@@ -716,6 +716,9 @@ The internal state of site x in agent B is always u.
 The internal state of site y in agent D is always u.
 The internal state of site x in agent D is always u.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

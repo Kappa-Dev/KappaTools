@@ -1051,6 +1051,9 @@ The internal state of site x in agent A is always u.
 The binding state of site x in agent B ranges over free and A@x.
 The binding state of site x in agent C ranges over free and A@y.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

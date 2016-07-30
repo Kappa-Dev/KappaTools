@@ -423,12 +423,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=23
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=22
+  Id=24
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -457,12 +457,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=23
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=22
+  Id=24
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -510,7 +510,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=24
+Id=26
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -534,7 +534,7 @@ Id=24
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=24
+Id=26
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -562,7 +562,7 @@ Id=24
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -577,12 +577,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -592,7 +592,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -607,12 +607,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -626,7 +626,7 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -641,12 +641,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -656,7 +656,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -671,12 +671,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -689,6 +689,19 @@ The binding state of site t in agent A ranges over free and B@t.
 The binding state of site z in agent A ranges over free and B@z.
 The binding state of site t in agent B ranges over free and A@t.
 The binding state of site z in agent B ranges over free and A@z.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
+Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
+Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
+Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
+Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
+Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
+Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

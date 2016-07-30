@@ -477,7 +477,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -544,7 +544,7 @@ Id=23
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -559,12 +559,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=31
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -574,14 +574,14 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=35
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=32
+  Id=34
    Node(site_type:0<1)
-    Id=28
+    Id=30
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -594,7 +594,7 @@ Id=33
         Id=0
          Leaf False 
 
-    Id=31
+    Id=33
      Node(site_type:0<2)
       Id=3
        Node(site_type:1<0)
@@ -619,7 +619,7 @@ In agent B, the binding state of site t is free whenever the binding state of si
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -634,12 +634,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=31
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -649,7 +649,7 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -664,12 +664,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=31
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -682,6 +682,15 @@ The binding state of site t in agent A ranges over free and B@t.
 The binding state of site z in agent A ranges over free and B@z.
 The binding state of site t in agent B ranges over free and A@t.
 The binding state of site z in agent B ranges over free and A@z.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
+Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
+Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
+Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
+Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

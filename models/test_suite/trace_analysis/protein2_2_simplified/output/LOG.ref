@@ -42,6 +42,9 @@ The internal state of site b2 in agent P ranges over u and p.
 The binding state of site g in agent P ranges over free and K@x.
 The binding state of site x in agent K ranges over free and P@g.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
@@ -88,6 +91,9 @@ The internal state of site b1 in agent P ranges over u and p.
 The internal state of site b2 in agent P ranges over u and p.
 The binding state of site g in agent P ranges over free and K@x.
 The binding state of site x in agent K ranges over free and P@g.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

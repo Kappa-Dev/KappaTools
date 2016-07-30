@@ -372,6 +372,9 @@ The internal state of site z in agent A ranges over u and p.
 The internal state of site w in agent A ranges over u and p.
 The internal state of site t in agent A ranges over u and p.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
@@ -412,6 +415,9 @@ The internal state of site x in agent A ranges over u and p.
 The internal state of site z in agent A ranges over u and p.
 The internal state of site w in agent A ranges over u and p.
 The internal state of site t in agent A ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

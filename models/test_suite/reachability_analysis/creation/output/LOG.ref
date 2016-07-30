@@ -577,6 +577,9 @@ The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 The internal state of site x in agent D ranges over u and p.
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

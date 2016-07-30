@@ -825,12 +825,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=21
+Id=23
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=20
+  Id=22
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -1175,12 +1175,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=34
+Id=39
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=33
+  Id=38
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1341,14 +1341,14 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=46
+Id=55
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=54
    Node(site_type:1<2)
-    Id=30
+    Id=35
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1365,12 +1365,12 @@ Id=46
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=29
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=31
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1385,9 +1385,9 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=30
      Node(site_type:1<2)
-      Id=22
+      Id=24
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1404,12 +1404,12 @@ Id=29
        Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=26
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=27
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1443,12 +1443,12 @@ Id=26
        Leaf False 
 
 agent_type:3:D:cv_id:0
-Id=29
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=31
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1463,9 +1463,9 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=30
      Node(site_type:1<2)
-      Id=22
+      Id=24
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1482,12 +1482,12 @@ Id=29
        Leaf False 
 
 agent_type:4:E:cv_id:0
-Id=29
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=31
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1502,9 +1502,9 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=30
      Node(site_type:1<2)
-      Id=22
+      Id=24
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1525,12 +1525,12 @@ Id=29
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=42
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1540,12 +1540,12 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=52
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1555,12 +1555,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=59
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=58
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1575,9 +1575,9 @@ Id=55
         Id=0
          Leaf False 
 
-    Id=53
+    Id=57
      Node(site_type:0<2)
-      Id=47
+      Id=29
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1595,12 +1595,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=58
+Id=62
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=57
+  Id=61
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1615,7 +1615,7 @@ Id=58
         Id=0
          Leaf False 
 
-    Id=56
+    Id=60
      Node(site_type:0<2)
       Id=13
        Node(site_type:1<1)
@@ -1635,12 +1635,12 @@ Id=58
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=59
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=58
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1655,9 +1655,9 @@ Id=55
         Id=0
          Leaf False 
 
-    Id=53
+    Id=57
      Node(site_type:0<2)
-      Id=47
+      Id=29
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1675,12 +1675,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=59
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=58
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1695,9 +1695,9 @@ Id=55
         Id=0
          Leaf False 
 
-    Id=53
+    Id=57
      Node(site_type:0<2)
-      Id=47
+      Id=29
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1723,12 +1723,12 @@ In agent E, the internal state of site x is p whenever the binding state of site
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=42
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1738,12 +1738,12 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=52
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1753,7 +1753,7 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1768,12 +1768,12 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=52
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1783,7 +1783,7 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1798,12 +1798,12 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=52
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1813,7 +1813,7 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1828,12 +1828,12 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=52
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1843,7 +1843,7 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=47
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1858,12 +1858,12 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=52
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1882,6 +1882,15 @@ The binding state of site x in agent D ranges over free and E@x.
 The internal state of site x in agent D ranges over u and p.
 The binding state of site x in agent E ranges over free and D@x.
 The internal state of site x in agent E ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, u
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, u
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
+Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: u, u
+Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: u, u
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
