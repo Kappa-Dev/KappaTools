@@ -203,6 +203,41 @@ struct
         Site_accross_bonds_domain_static.store_tuple_pair = r
       } static
 
+(*TODO*)
+
+  let get_tuple_pair_rule static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_tuple_pair_rule
+
+  let set_tuple_pair_rule r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_tuple_pair_rule = r
+      } static
+
+  let get_agent_id_list_from_tuple static =
+      (get_basic_static_information
+         static).Site_accross_bonds_domain_static.store_agent_id_list_from_tuple
+
+  let set_agent_id_list_from_tuple r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_agent_id_list_from_tuple = r
+      } static
+
+  let get_pair_tuple_set static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_pair_tuple_set
+
+  let set_pair_tuple_set r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_pair_tuple_set = r
+      } static
+
   (*rule that can created a bond *)
 
   let get_created_bond_with_potential_pair static =
