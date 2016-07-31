@@ -52,11 +52,37 @@ let print_rule_internal sigs ag_ty site f = function
     Format.fprintf
       f "~%a--" (Signature.print_internal_state sigs ag_ty site) i
 
+let rule_internal_to_json = function
+  | I_ANY -> `Null
+  | I_ANY_CHANGED j -> `List [`String "ANY"; `Int j]
+  | I_ANY_ERASED -> `String "ERASED"
+  | I_VAL_CHANGED (i,j) -> `List [`Int i; `Int j]
+  | I_VAL_ERASED i -> `List [ `Int i; `String "ERASED"]
+let rule_internal_of_json = function
+  | `Null -> I_ANY
+  | `List [`String "ANY"; `Int j] -> I_ANY_CHANGED j
+  | `String "ERASED" -> I_ANY_ERASED
+  | `List [`Int i; `Int j] -> I_VAL_CHANGED (i,j)
+  | `List [ `Int i; `String "ERASED"] -> I_VAL_ERASED i
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rule_internal",x))
+
 let print_switching f = function
   | Linked (i,_) -> Format.fprintf f ">>%i" i
   | Freed -> Format.fprintf f ">>%t" Pp.bottom
   | Maintained -> ()
   | Erased -> Format.fprintf f "--"
+
+let switching_to_json = function
+  | Freed -> `String "Freed"
+  | Maintained -> `String "Maintained"
+  | Erased -> `String "Erased"
+  | Linked (i,_) -> `Int i
+let switching_of_json = function
+  | `String "Freed" -> Freed
+  | `String "Maintained" -> Maintained
+  | `String "Erased"-> Erased
+  | `Int i -> Linked (Location.dummy_annot i)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Switching",x))
 
 let print_rule_link sigs f ((e,_),s) =
   Format.fprintf
@@ -234,21 +260,90 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
     r.r_add_tokens
     (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
 
-let rule_to_json _ =
+let rule_agent_to_json a =
+  `Assoc [
+    "type", `Int a.ra_type;
+    "bindings",
+    `List (Array.fold_right
+             (fun ((e,_),s) c ->
+                (`List [Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
+                          (fun (s,a) -> [`Int s;`Int a]) e;
+                        switching_to_json s])::c)
+             a.ra_ports []);
+    "states",
+    `List (Array.fold_right
+             (fun x c -> rule_internal_to_json x :: c) a.ra_ints []);
+    "erased", `Bool a.ra_erased;
+  ]
+let rule_agent_of_json = function
+  | `Assoc l as x when List.length l = 4 ->
+    begin
+      try
+        let ports =
+          match List.assoc "bindings" l with
+          | `List s ->
+            Tools.array_map_of_list
+              (function
+                | `List [e;s] ->
+                  (Location.dummy_annot
+                     (Ast.link_of_json
+                        (fun _ -> Yojson.Basic.Util.to_int)
+                        Yojson.Basic.Util.to_int
+                        (function
+                          | [`Int s; `Int a] -> (s,a)
+                          | _ -> raise Not_found) e),
+                  switching_of_json s)
+                | _ -> raise Not_found) s
+          | _ -> raise Not_found in
+        let ints =
+          match List.assoc "states" l with
+          | `List s ->
+            Tools.array_map_of_list rule_internal_of_json s
+          | _ -> raise Not_found in
+        {
+          ra_type = Yojson.Basic.Util.to_int (List.assoc "type" l);
+          ra_ports = ports;
+          ra_ints = ints;
+          ra_erased = Yojson.Basic.Util.to_bool (List.assoc "erased" l);
+          ra_syntax = Some (ports,ints)
+        }
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error ("Invalid rule_agent",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid rule_agent",x))
+
+let rule_to_json r =
   let () =
     ExceptionDefn.warning
       (fun f -> Format.pp_print_string f "Fake LKappa.rule_to_json") in
-  `Null
+  `Assoc
+    [
+      "mixture",
+      `List (List.map rule_agent_to_json r.r_mix);
+      "created", `List [];
+      "rm_tokens", `List [];
+      "add_tokens", `List [];
+      "rate", `Null;
+      "unary_rate", `Null
+    ]
 let rule_of_json = function
-  | `Null ->
-    {
-      r_mix = [];
-      r_created = [];
-      r_rm_tokens = [];
-      r_add_tokens = [];
-      r_rate = Location.dummy_annot (Ast.CONST (Nbr.zero));
-      r_un_rate = None;
-    }
+  | `Assoc l as x when List.length l < 7 ->
+    begin
+      try
+        {
+          r_mix =
+            (match List.assoc "mixture" l with
+             | `List a -> List.map rule_agent_of_json a
+             | _ -> raise Not_found);
+          r_created = [];
+          r_rm_tokens = [];
+          r_add_tokens = [];
+          r_rate = Location.dummy_annot (Ast.CONST (Nbr.zero));
+          r_un_rate = None;
+        }
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error ("Uncorrect rule",x))
+    end
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rule",x))
 
 

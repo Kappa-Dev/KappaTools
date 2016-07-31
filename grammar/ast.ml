@@ -199,6 +199,20 @@ let print_link pr_port pr_type pr_annot f = function
   | LNK_SOME -> Format.fprintf f "!_"
   | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
 
+let link_to_json port_to_json type_to_json annot_to_json = function
+  | FREE -> `String "FREE"
+  | LNK_TYPE (p, a) -> `List [port_to_json a p; type_to_json a]
+  | LNK_ANY -> `Null
+  | LNK_SOME -> `String "SOME"
+  | LNK_VALUE (i,a) -> `List (`Int i :: annot_to_json a)
+let link_of_json port_of_json type_of_json annot_of_json = function
+  | `String "FREE" -> FREE
+  | `List [p; a] -> let x = type_of_json a in LNK_TYPE (port_of_json x p, x)
+  | `Null -> LNK_ANY
+  | `String "SOME" -> LNK_SOME
+  | `List (`Int i :: ( [] | _::_::_ as a)) -> LNK_VALUE (i,annot_of_json a)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link",x))
+
 let print_ast_link =
   print_link
     (fun _ f (x,_) -> Format.pp_print_string f x)
