@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'side-effects.ka' '-seed' '501792230' '-e' '199' '-d' 'output' '-dump-trace' '/tmp/KaSim-test-blob-side-effects3'
++ Command line to rerun is: 'KaSim' '-i' 'side-effects.ka' '-seed' '501792230' '-e' '199' '-d' 'output' '-dump-trace' 'trace.json'
 Parsing side-effects.ka...
 done
 + Sanity checks

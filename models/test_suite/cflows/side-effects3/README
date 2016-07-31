@@ -1,9 +1,7 @@
 #!/bin/sh
 
-BLOB=/tmp/KaSim-test-blob-$(basename $PWD)
-
-"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -e 199 -d output -dump-trace ${BLOB} || exit 0
-"${KAPPABIN}"KaStor -d output --none --weak --time-independent ${BLOB} || exit 0
+"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -e 199 -d output -dump-trace trace.json || exit 0
+"${KAPPABIN}"KaStor -d output --none --weak --time-independent output/trace.json || exit 0
 
 #Test KaStor
 
