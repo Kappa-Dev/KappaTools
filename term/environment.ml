@@ -226,6 +226,6 @@ let of_json = function
           tokens_reverse_dependencies = [||];
         }
       with Not_found ->
-        raise (Yojson.Basic.Util.Type_error ("Not a correct envirronment",x))
+        raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
     end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct_environment",x))
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
