@@ -26,18 +26,20 @@ type
 
 ## Installation
 
-To compile KaSim, you need the OCaml native compiler version 4.02.3 or above as
-well as the libraries _findlib_ and _Yojson_. To check whether you have them,
-type
+To compile KaSim, you need the OCaml native compiler version 4.02.3 or
+above as well as _ocamlbuild_, _findlib_ and
+_Yojson_ library. To check whether you have them, type
 
 `ocamlfind ocamlopt -version`
 ` ocamlfind query yojson`
 
-If you use a package manager (or opam, the OCaml package manager), OCaml
-compilers and findlib are really likely provided by it. Else, OCaml native
-compilers can be downloaded on [INRIA's website](http://caml.inria.fr/). The
-Windows bundle contains findlib. Findlib sources are available on
-[camlcity.org](http://projects.camlcity.org/projects/findlib.html).
+If you use a package manager (or opam, the OCaml package manager),
+OCaml compilers, ocamlbuild and findlib are really likely provided by
+it. Else, OCaml native compilers can be downloaded on [INRIA's
+website](http://caml.inria.fr/). The Windows bundle contains
+ocamlbuild and findlib. Findlib sources are available on
+[camlcity.org](http://projects.camlcity.org/projects/findlib.html). Ocamlbuild
+is on [github](https://github.com/ocaml/ocamlbuild).
 
 If you don't have any easier way to install it (opam, apt, rpm,
 cygwin, ...), Yojson sources are available
