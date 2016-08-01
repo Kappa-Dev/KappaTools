@@ -87,8 +87,6 @@ struct
       kappa expressions from a value of type static_information. Kappa
       handler is static and thus it should never updated. *)
 
-
-
   let get_global_static_information static = static.global_static_information
 
   let lift f x = f (get_global_static_information x)
@@ -109,6 +107,7 @@ struct
         compil.Cckappa_sig.rules
     in
     error, rule
+
   (*-------------------------------------------------------------*)
   (*static information*)
   (*-------------------------------------------------------------*)
@@ -818,6 +817,7 @@ struct
       | error, Some s -> error, s
     in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    (*-----------------------------------------------------------*)
     let store_tuple_pair = get_tuple_pair static in
     let store_modif = get_modified_map static in
     let error, modified_set =
@@ -830,6 +830,7 @@ struct
         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
+    (*-----------------------------------------------------------*)
     (*pair list of agent_id*)
     let store_agent_id_list_from_tuple =
       get_agent_id_list_from_tuple static
@@ -876,6 +877,7 @@ struct
       (error,
        Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty)
     in
+    (*-----------------------------------------------------------*)
     let error, dynamic, precondition =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
@@ -887,6 +889,7 @@ struct
                  get_state_of_site_in_precondition
                    parameter error
                    dynamic
+                   rule
                    agent_id
                    site_type
                    precondition
@@ -898,6 +901,7 @@ struct
                  get_state_of_site_in_precondition
                    parameter error
                    dynamic
+                   rule
                    agent_id1
                    site_type1
                    precondition
@@ -905,6 +909,7 @@ struct
                let error = Exception.check warn parameter error error'
                    (Some (context 775 rule_id agent_id1 site_type1)) Exit
                in
+               (*-----------------------------------------------------------*)
                let error, potential_list =
                  List.fold_left (fun (error, current_list) pre_state ->
                      List.fold_left (fun (error, current_list) pre_state' ->
@@ -916,6 +921,7 @@ struct
                        ) (error, current_list) state_list'
                    ) (error, []) state_list
                in
+               (*-----------------------------------------------------------*)
                let error, dynamic, precondition =
                  List.fold_left (fun (error, dynamic, precondition) (t, u) ->
                      let store_result = get_value dynamic in
@@ -932,10 +938,6 @@ struct
                          pair_bond
                          store_bonds_rhs_set
                      then
-                       let pair_list =
-                         [(Ckappa_sig.fst_site, state');
-                          (Ckappa_sig.snd_site, state1')]
-                       in
                        let pair_list =
                          [
                            Ckappa_sig.fst_site, state';
@@ -972,6 +974,7 @@ struct
              ) (error, dynamic, precondition) pair_agent_id_list
         ) new_pair_set (error, dynamic, precondition)
     in
+    (*-----------------------------------------------------------*)
     (*REMOVE*)
     (*
     let error, dynamic, precondition =
@@ -1233,7 +1236,9 @@ struct
                site_type' (*y*)
                precondition
            in
-           let error = Exception.check warn parameter error error' (Some (context 995 rule_id agent_id site_type')) Exit in
+           let error =
+             Exception.check warn parameter error error' (Some (context 995 rule_id agent_id site_type')) Exit
+           in
            let error', dynamic, precondition, state_list' =
              get_state_of_site_in_precondition
                parameter
