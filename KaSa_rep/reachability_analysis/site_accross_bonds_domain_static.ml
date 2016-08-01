@@ -199,8 +199,8 @@ let collect_bonds parameter error rule_id views bonds store_result =
                                  Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
-                (*----------------------------------------------------*)
-                (*the first pair*)
+            (*----------------------------------------------------*)
+            (*the first pair*)
             let error, (agent_type1, state1) =
               collect_agent_type_state
                 parameter
@@ -208,13 +208,12 @@ let collect_bonds parameter error rule_id views bonds store_result =
                 agent_source
                 site_type_source
             in
-                (*----------------------------------------------------*)
-                (*the second pair*)
+            (*----------------------------------------------------*)
+            (*the second pair*)
             let error, agent_target =
               match
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                  parameter error agent_id_target
-                (*rule.Cckappa_sig.rule_rhs.Cckappa_sig.views*)views
+                  parameter error agent_id_target views
               with
               | error, None -> warn parameter error (Some "line 350") Exit
                                  Cckappa_sig.Ghost
@@ -257,7 +256,7 @@ let collect_bonds parameter error rule_id views bonds store_result =
             in
             error, store_result
          ) bonds_map (error, store_result)
-    ) bonds (*rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds*) store_result
+    ) bonds store_result
 
 let collect_bonds_rhs parameter error rule_id rule store_result =
   collect_bonds parameter error rule_id
@@ -468,6 +467,7 @@ let collect_pair_sites_aux parameter error rule_id store_views_rhs =
   in
   error, store_result*)
 
+(*REMOVE*)
 let collect_tuple_pair parameter error _kappa_handler rule_id store_pair_rhs store_result =
   let error, store_pair_set =
     match
@@ -503,6 +503,8 @@ let collect_tuple_pair parameter error _kappa_handler rule_id store_pair_rhs sto
       ) store_pair_set (error, store_result)
   in
   error, store_result
+
+(*KEEP*)
 
 let collect_tuple_pair_rule parameter error _kappa_handler rule_id store_pair_rhs store_result =
   let error, store_pair_set =
@@ -957,7 +959,6 @@ let collect_views_init parameter error init_state =
     ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
     Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
 
-
 (***************************************************************)
 (*return an agent in the initial state that has two sites different*)
 
@@ -1124,9 +1125,6 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
            let _prefix = Remanent_parameters.get_prefix parameter in
            (*test*)
            let pair = Site_accross_bonds_domain_type.project2 (x, y) in
-           let ((_agent_type, _site_type, _site_type', _state, _state'),
-                (_agent_type1, _site_type1, _site_type1', _state1, _state1')) = pair
-           in
            (*-----------------------------------------------------------*)
            let error, handler, mvbdu =
              Ckappa_sig.Views_bdu.mvbdu_of_association_list
