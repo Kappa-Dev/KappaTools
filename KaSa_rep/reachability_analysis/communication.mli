@@ -14,8 +14,9 @@
    * under the terms of the GNU Library General Public License *)
 
 type path_defined_in =
-  | LHS of Cckappa_sig.enriched_rule 
+  | LHS of Cckappa_sig.enriched_rule
   | RHS of Cckappa_sig.enriched_rule
+  | Pattern
 
 type event =
 | Dummy (* to avoid compilation warning *)

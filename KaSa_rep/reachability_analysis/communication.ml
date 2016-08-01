@@ -16,6 +16,7 @@
 type path_defined_in =
      | LHS of Cckappa_sig.enriched_rule
      | RHS of Cckappa_sig.enriched_rule
+     | Pattern 
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "communication") message exn
