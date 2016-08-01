@@ -69,14 +69,14 @@ let concretize_action inj2graph = function
   | Remove pl -> Remove (Agent_place.concretize inj2graph pl)
 
 let concretize_event inj2graph (tests,(actions,kasa_side,kasim_side)) =
-  (List.map (concretize_test inj2graph) tests,
-   (List.map (concretize_action inj2graph) actions,
-    List.map
+  (List.rev_map (concretize_test inj2graph) tests,
+   (List.rev_map (concretize_action inj2graph) actions,
+    List.rev_map
       (fun ((pl,s),b) ->
          ((Agent_place.concretize inj2graph pl,s),
           concretize_binding_state inj2graph b))
       kasa_side,
-    List.map
+    List.rev_map
       (fun (pl,s) -> (Agent_place.concretize inj2graph pl,s)) kasim_side))
 
 let subst_map_concrete_agent f (id,na as agent) =

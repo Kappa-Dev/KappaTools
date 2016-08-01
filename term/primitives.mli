@@ -11,7 +11,7 @@ sig
     | Linked of 'a Instantiation.site * 'a Instantiation.site
     | NegativeWhatEver of 'a Instantiation.site
     | PositiveInternalized of
-	'a * Instantiation.site_name * Instantiation.internal_state
+        'a * Instantiation.site_name * Instantiation.internal_state
     | NegativeInternalized of 'a Instantiation.site
 
   val rename :
@@ -26,7 +26,8 @@ sig
 
   val fresh_bindings :
     short_branch_agents:int list -> Instantiation.abstract t list ->
-    (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list
+    (Instantiation.abstract Instantiation.site *
+     Instantiation.abstract Instantiation.site) list
 end
 
 type elementary_rule = {
@@ -42,33 +43,35 @@ type elementary_rule = {
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
+  (** In the reverse order on purpose so that we rev_map when we
+      concretize *)
 }
 
 type modification =
-    ITER_RULE of Alg_expr.t Location.annot * elementary_rule
+  | ITER_RULE of Alg_expr.t Location.annot * elementary_rule
   | UPDATE of int * Alg_expr.t Location.annot
   | SNAPSHOT of Alg_expr.t Ast.print_expr list
   | STOP of Alg_expr.t Ast.print_expr list
   | CFLOW of string option * Connected_component.t array *
-	       Instantiation.abstract Instantiation.test list
+             Instantiation.abstract Instantiation.test list
   | FLUX of bool * Alg_expr.t Ast.print_expr list
   | FLUXOFF of Alg_expr.t Ast.print_expr list
   | CFLOWOFF of Connected_component.t array
   | PLOTENTRY
   | PRINT of
       (Alg_expr.t Ast.print_expr list *
-	 Alg_expr.t Ast.print_expr list)
+       Alg_expr.t Ast.print_expr list)
 
 type perturbation =
-    { precondition: Alg_expr.t Ast.bool_expr Location.annot;
-      effect : modification list;
-      abort : Alg_expr.t Ast.bool_expr Location.annot option;
-    }
+  { precondition: Alg_expr.t Ast.bool_expr Location.annot;
+    effect : modification list;
+    abort : Alg_expr.t Ast.bool_expr Location.annot option;
+  }
 
 val exists_modification : (modification -> bool) -> perturbation list -> bool
 
 val map_expr_rule : (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
-		    elementary_rule -> elementary_rule
+  elementary_rule -> elementary_rule
 val map_expr_perturbation :
   (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
   (Alg_expr.t Ast.bool_expr Location.annot ->
@@ -77,5 +80,5 @@ val map_expr_perturbation :
 
 val stops_of_perturbation :
   (Operator.DepSet.t * Operator.DepSet.t *
-     Operator.DepSet.t array * Operator.DepSet.t array) ->
+   Operator.DepSet.t array * Operator.DepSet.t array) ->
   perturbation -> Nbr.t list

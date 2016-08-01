@@ -290,12 +290,8 @@ let make_instantiation
      (actions,side_sites,add_extra_side_effects side_effects place ref_ports))
   | Some (ports, ints) ->
     let rec aux site_id tests actions side_sites side_effects links =
-      if site_id < 0
-      then (Instantiation.Is_Here place :: tests,
-            ((if is_erased
-              then Instantiation.Remove place :: actions
-              else actions),
-             side_sites,side_effects))
+      if site_id >= Array.length ports
+      then (tests,(actions,side_sites,side_effects))
       else
         let tests',actions' =
           match ints.(site_id) with
@@ -351,8 +347,11 @@ let make_instantiation
             | None ->
               tests', add_instantiation_free actions' place site_id s,
               side_sites, side_effects, links in
-        aux (pred site_id) tests'' actions'' side_sites' side_effects' links' in
-    aux (pred (Array.length ports)) tests actions side_sites side_effects links
+        aux (succ site_id) tests'' actions'' side_sites' side_effects' links' in
+    aux 0 (Instantiation.Is_Here place :: tests)
+      (if is_erased
+       then Instantiation.Remove place :: actions
+       else actions) side_sites side_effects links
 
 let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
     links_transf instantiations remains =
@@ -486,7 +485,7 @@ let rec complete_with_creation
   function
   | [] ->
     begin match Mods.IntMap.root links_transf with
-      | None -> List.rev_append create_actions actions,
+      | None -> List.rev_append actions create_actions,
                 (List.rev removed, List.rev added)
       | Some (i,_) -> link_occurence_failure i Location.dummy
     end
