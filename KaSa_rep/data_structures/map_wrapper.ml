@@ -1,4 +1,7 @@
-(** Time-stamp: <Jul 02 2016> *)
+(**
+   Time-stamp: <Aug 01 2016>
+*)
+
 module type Set_with_logs =
 sig
   type elt
@@ -242,6 +245,7 @@ module type Projection = sig
   type elt_b
   type 'a map_a
   type 'a map_b
+  type set_a
 
   val monadic_proj:
     (Remanent_parameters_sig.parameters -> Exception.method_handler ->
@@ -252,22 +256,27 @@ module type Projection = sig
      Exception.method_handler * 'b) ->
     'a map_a -> Exception.method_handler * 'b map_b
 
-    val monadic_proji:
-      (Remanent_parameters_sig.parameters -> Exception.method_handler ->
-       elt_a -> Exception.method_handler * elt_b) ->
-      Remanent_parameters_sig.parameters -> Exception.method_handler ->
-      'b ->
-      (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> elt_a -> 'a ->
-       Exception.method_handler * 'b) ->
-      'a map_a -> Exception.method_handler * 'b map_b
+  val monadic_proji:
+    (Remanent_parameters_sig.parameters -> Exception.method_handler ->
+     elt_a -> Exception.method_handler * elt_b) ->
+    Remanent_parameters_sig.parameters -> Exception.method_handler ->
+    'b ->
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> elt_a -> 'a ->
+     Exception.method_handler * 'b) ->
+    'a map_a -> Exception.method_handler * 'b map_b
 
   val proj:
     (elt_a -> elt_b) ->
     Remanent_parameters_sig.parameters -> Exception.method_handler ->
-  'b ->
+    'b ->
     ('b -> 'a -> 'b) ->
     'a map_a ->
     Exception.method_handler * 'b map_b
+
+  val proj_set:
+    (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+  val monadic_proj_set:
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
 
 end
 
@@ -275,8 +284,10 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
   (struct
     module MA=A.Map
     module MB=B.Map
+    module SA=A.Set
     type elt_a = MA.elt
     type elt_b = MB.elt
+    type set_a = SA.t
     type 'a map_a = 'a MA.t
     type 'a map_b = 'a MB.t
 
@@ -316,11 +327,45 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
            merge parameter error old data_a)
         map
 
+    let proj_set f parameter error set =
+      SA.fold
+        (fun key_a (error,map_b) ->
+           let key_b = f key_a in
+           match
+             MB.find_option_without_logs parameter error key_b map_b
+           with
+           | error,None ->
+             MB.add parameter error key_b (SA.singleton key_a) map_b
+           | error,Some old ->
+             let error, newset = SA.add parameter error key_a old in
+             MB.overwrite parameter error key_b newset map_b
+        )
+        set
+        (error,MB.empty)
+
+    let monadic_proj_set f parameter error set =
+      SA.fold
+        (fun key_a (error,map_b) ->
+           let error,key_b = f parameter error key_a in
+           match
+             MB.find_option_without_logs parameter error key_b map_b
+           with
+           | error,None ->
+             let error,data' = error, SA.singleton key_a in
+             MB.add parameter error key_b data' map_b
+           | error,Some old ->
+             let error,data' = SA.add parameter error key_a old in
+             MB.overwrite parameter error key_b data' map_b
+        )
+        set
+        (error,MB.empty)
+
   end: Projection
   with type elt_a = A.elt
    and type elt_b = B.elt
    and type 'a map_a = 'a A.Map.t
-   and type 'a map_b = 'a B.Map.t )
+   and type 'a map_b = 'a B.Map.t
+   and type set_a = A.Set.t)
 
 module type Projection2 = sig
   type elt_a

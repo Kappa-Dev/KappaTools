@@ -1,4 +1,6 @@
-(** Time-stamp: <Jul 02 2016> *)
+(**
+   Time-stamp: <Aug 01 2016>
+*)
 
 module type Set_with_logs =
   sig
@@ -105,11 +107,18 @@ module type Projection = sig
 
     type elt_a
     type elt_b
+    type set_a
     type 'a map_a
     type 'a map_b
     val monadic_proj: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> 'a -> Exception.method_handler * 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
     val monadic_proji: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> elt_a -> 'a -> Exception.method_handler * 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
     val proj: (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
+
+    val proj_set:
+      (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+    val monadic_proj_set:
+      (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+
   end
 
 module Proj(A:S_with_logs)(B:S_with_logs) : Projection
