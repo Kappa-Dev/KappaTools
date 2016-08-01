@@ -26,4 +26,4 @@ val debug_print :
 val to_json : ('a -> Yojson.Basic.json) -> 'a t -> Yojson.Basic.json
 
 val of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a t
-(** @raise Yojson.Basic.Util.Type_error *)
+(** @raise Yojson.Basic.Util.Type_error if it fails *)

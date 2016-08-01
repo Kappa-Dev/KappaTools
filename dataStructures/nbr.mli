@@ -30,7 +30,8 @@ val of_string : string -> t
 (** @raise Failure "float_of_string" *)
 
 val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t (** @raise Yojson.Basic.Util.Type_error *)
+val of_json : Yojson.Basic.json -> t
+(** @raise Yojson.Basic.Util.Type_error if incorrect *)
 
 val of_un_alg_op : Operator.un_alg_op -> t -> t
 val of_bin_alg_op : Operator.bin_alg_op -> t -> t -> t
