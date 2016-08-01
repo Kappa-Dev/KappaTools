@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 26 2016>
+  * Last modification: Time-stamp: <Aug 01 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -91,6 +91,17 @@ struct
       static with
       local_static_information = local
     }
+
+  let get_rule parameter error static r_id =
+    let compil = get_compil static in
+    let error, rule  =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+        parameter
+        error
+        r_id
+        compil.Cckappa_sig.rules
+    in
+    error, rule
 
   let get_action_binding static =
     (get_local_static_information
@@ -594,20 +605,20 @@ struct
           with
           | [] -> error, true
           | head::tail ->
-             let pair = Parallel_bonds_type.project2 head in
-             let error, value =
-               match
-                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                   parameter error
-                   pair
-                   store_value
-               with
-               | error, None -> error, Usual_domains.Undefined
-               | error, Some v -> error, v
-             in
-             match value with
-             | Usual_domains.Undefined | Usual_domains.Val false -> error, false
-             | Usual_domains.Val true | Usual_domains.Any -> scan tail error
+            let pair = Parallel_bonds_type.project2 head in
+            let error, value =
+              match
+                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
+                  parameter error
+                  pair
+                  store_value
+              with
+              | error, None -> error, Usual_domains.Undefined
+              | error, Some v -> error, v
+            in
+            match value with
+            | Usual_domains.Undefined | Usual_domains.Val false -> error, false
+            | Usual_domains.Val true | Usual_domains.Any -> scan tail error
         in
         let error, bool1 =
           scan
@@ -624,26 +635,26 @@ struct
             with
             | [] -> error, true
             | (x, y, z, t)::tail ->
-            let (_, agent_type, site_type, state) = x in
-            let (_, _agent_type1, site_type1, state1) = y in
-            let (_, agent_type', site_type', state') = z in
-            let (_, _agent_type1', site_type1', state1') = t in
-            let pair = (agent_type, site_type, site_type1, state, state1),
-                       (agent_type', site_type', site_type1', state', state1')
-            in
-            let error, value =
-              match
-                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                  parameter error
-                  pair
-                  store_value
-              with
-              | error, None -> error, Usual_domains.Undefined
-              | error, Some v -> error, v
-            in
-            match value with
-            | Usual_domains.Undefined | Usual_domains.Val true -> error, false
-            | Usual_domains.Val false | Usual_domains.Any -> scan tail error
+              let (_, agent_type, site_type, state) = x in
+              let (_, _agent_type1, site_type1, state1) = y in
+              let (_, agent_type', site_type', state') = z in
+              let (_, _agent_type1', site_type1', state1') = t in
+              let pair = (agent_type, site_type, site_type1, state, state1),
+                         (agent_type', site_type', site_type1', state', state1')
+              in
+              let error, value =
+                match
+                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
+                    parameter error
+                    pair
+                    store_value
+                with
+                | error, None -> error, Usual_domains.Undefined
+                | error, Some v -> error, v
+              in
+              match value with
+              | Usual_domains.Undefined | Usual_domains.Val true -> error, false
+              | Usual_domains.Val false | Usual_domains.Any -> scan tail error
           in
           scan non_parallel_list error
       end
@@ -659,12 +670,13 @@ struct
      agents, whether they cannot be bound to the same agent, whether we cannot
      know, and deal with accordingly *)
 
-  let get_state_of_site_in_precondition parameter error dynamic agent_id site_type precondition =
+  let get_state_of_site_in_precondition parameter error dynamic rule_id agent_id site_type precondition =
     (*binding action: A.x.B.z -> parallel bonds: A.x.y.B.z.t, B.z.t.A.x.y
       (first bound)*)
     (*build a path for the second site in this bound. A.y*)
     let path =
       {
+        Communication.defined_in = Communication.LHS rule_id;
         Communication.agent_id = agent_id;
         Communication.relative_address = [];
         Communication.site = site_type;
@@ -694,6 +706,14 @@ struct
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     (*-----------------------------------------------------------*)
+    let error, rule = get_rule parameter error static rule_id in
+    match
+      rule
+    with
+    | None ->
+      let error, () = warn parameter error (Some "line 713") Exit () in
+      error, dynamic, (precondition, event_list)
+    | Some rule ->
     let parameter = Remanent_parameters.update_prefix parameter "                " in
     let dump_title () =
       if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
@@ -755,6 +775,7 @@ struct
                    get_state_of_site_in_precondition
                      parameter error
                      dynamic
+                     rule
                      agent_id1 (*A*)
                      site_type2
                      precondition
@@ -763,6 +784,7 @@ struct
                    get_state_of_site_in_precondition
                      parameter error
                      dynamic
+                     rule
                      agent_id1' (*B*)
                      site_type2'
                      precondition
@@ -795,8 +817,8 @@ struct
                        then
                          begin
                            (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
-                           if Ckappa_sig.int_of_state_index pre_state2 = 0 (*||
-                                                                             Ckappa_sig.int_of_state_index pre_state2' = 0*)
+                           if Ckappa_sig.int_of_state_index pre_state2 = 0
+                           (*|| Ckappa_sig.int_of_state_index pre_state2' = 0*)
                            then
                              (*answer of question 1: the second site is free*)
                              let new_value = Usual_domains.lub value Usual_domains.Undefined in
@@ -897,6 +919,7 @@ struct
                  get_state_of_site_in_precondition
                    parameter error
                    dynamic
+                   rule
                    agent_id1
                    site_type1
                    precondition
@@ -905,6 +928,7 @@ struct
                  get_state_of_site_in_precondition
                    parameter error
                    dynamic
+                   rule
                    agent_id1'
                    site_type1'
                    precondition

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 28 2016>
+   * Last modification: Time-stamp: <Aug 01 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1716,9 +1716,9 @@ struct
               (*recursively apply to #i tail*)
               let next_path =
                 {
+                  path with
                   Communication.agent_id = site_add.Cckappa_sig.agent_index;
                   Communication.relative_address = tl;
-                  Communication.site = path.Communication.site
                 }
               in
               let error, dynamic, new_answer = aux dynamic next_path in

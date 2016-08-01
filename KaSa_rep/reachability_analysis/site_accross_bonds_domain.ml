@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 30 2016>
+   * Last modification: Time-stamp: <Aug 01 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -87,6 +87,8 @@ struct
       kappa expressions from a value of type static_information. Kappa
       handler is static and thus it should never updated. *)
 
+
+
   let get_global_static_information static = static.global_static_information
 
   let lift f x = f (get_global_static_information x)
@@ -97,6 +99,16 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  let get_rule parameter error static r_id =
+    let compil = get_compil static in
+    let error, rule  =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+        parameter
+        error
+        r_id
+        compil.Cckappa_sig.rules
+    in
+    error, rule
   (*-------------------------------------------------------------*)
   (*static information*)
   (*-------------------------------------------------------------*)
@@ -635,10 +647,11 @@ struct
       ) (error, handler) pair_list
     *)
 
-  let get_state_of_site_in_precondition parameter error dynamic agent_id
+  let get_state_of_site_in_precondition parameter error dynamic rule agent_id
       site_type precondition =
     let path =
       {
+        Communication.defined_in = Communication.LHS rule ;
         Communication.agent_id = agent_id;
         Communication.relative_address = [];
         Communication.site = site_type;
@@ -673,6 +686,14 @@ struct
     let parameter  = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     (*-----------------------------------------------------------*)
+    let error, rule = get_rule parameter error static rule_id in
+    match
+      rule
+    with
+    | None ->
+      let error, () = warn parameter error (Some "line 713") Exit () in
+      error, dynamic, (precondition, [])
+    | Some rule ->
     let parameter =
       Remanent_parameters.update_prefix parameter "                " in
     (*-----------------------------------------------------------*)
@@ -761,6 +782,7 @@ struct
                   get_state_of_site_in_precondition
                     parameter error
                     dynamic
+                    rule
                     agent_id
                     site_type
                     precondition
@@ -770,6 +792,7 @@ struct
                   get_state_of_site_in_precondition
                     parameter error
                     dynamic
+                    rule
                     agent_id1
                     site_type1
                     precondition
@@ -995,6 +1018,7 @@ struct
                parameter
                error
                dynamic
+               rule
                agent_id (*A*)
                site_type' (*y*)
                precondition
@@ -1005,6 +1029,7 @@ struct
                parameter
                error
                dynamic
+               rule
                agent_id1 (*B*)
                site_type1' (*y*)
                precondition
@@ -1086,6 +1111,7 @@ struct
              get_state_of_site_in_precondition
                parameter error
                dynamic
+               rule
                agent_id (*B*)
                site_type (*x*)
                precondition
@@ -1095,6 +1121,7 @@ struct
              get_state_of_site_in_precondition
                parameter error
                dynamic
+               rule
                agent_id1 (*A*)
                site_type1 (*x*)
                precondition

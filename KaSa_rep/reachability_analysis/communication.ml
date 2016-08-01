@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Aug 01 2016>
    *
    * Abstract domain to record live rules
    *
@@ -12,6 +12,10 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
+
+type path_defined_in =
+     | LHS of Cckappa_sig.enriched_rule
+     | RHS of Cckappa_sig.enriched_rule
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "communication") message exn
@@ -56,6 +60,7 @@ type step =
 
 type path =
   {
+    defined_in: path_defined_in;
     agent_id: Ckappa_sig.c_agent_id;
     relative_address: step list;
     site: Ckappa_sig.c_site_name;
@@ -229,3 +234,6 @@ let overwrite_potential_partners_map
       (fun parameters error agent_type site_type ->
          fold.fold parameters error agent_type site_type)
   }
+
+let post_condition _parameters error _rule _precondition dynamic _path =
+  error, dynamic, Usual_domains.Any
