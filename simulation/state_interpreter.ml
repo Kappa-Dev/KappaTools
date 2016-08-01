@@ -381,13 +381,15 @@ let finalize ~outputs ~called_from dotFormat form env counter graph state =
           ~called_from ~dotFormat ~none ~weak ~strong
           env (Compression_main.init_secret_log_info ()) trace in
     if dump then Kappa_files.with_traceFile
-        (fun c -> Yojson.Basic.to_channel c
-            (`Assoc [
-                "none", `Bool none;
-                "weak", `Bool weak;
-                "strong", `Bool strong;
-                "env", Environment.to_json env;
-                "trace", Trace.to_json trace]))
+        (fun c ->
+           let () = Yojson.Basic.to_channel c
+               (`Assoc [
+                   "none", `Bool none;
+                   "weak", `Bool weak;
+                   "strong", `Bool strong;
+                   "env", Environment.to_json env;
+                   "trace", Trace.to_json trace]) in
+           output_char c '\n')
   | None -> ()
 
 let loop ~outputs ~dotCflows form env domain counter graph state =
