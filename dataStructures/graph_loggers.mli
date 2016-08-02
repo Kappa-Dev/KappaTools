@@ -16,26 +16,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-
-type direction = Direct | Reverse | Undirected | Both
-type shape = Invisible | House | Rect | Ellipse | Circle
-type headkind = Normal | Vee | Tee | No_head
-type linestyle = Plain | Dotted | Dashed
-
-type color = Red | Green | White | Blue | Black | LightSkyBlue | PaleGreen
-
-  type options =
-    | Color of color
-    | FillColor of color
-    | Label of string
-    | Width of int (*pixel*)
-    | Height of int (*pixel*)
-    | Direction of direction
-    | Shape of shape
-    | ArrowHead of headkind
-    | ArrowTail of headkind
-    | LineStyle of linestyle
-
 val print_graph_preamble:
   Loggers.t ->
   ?filter_in:Loggers.encoding list option ->
@@ -53,6 +33,6 @@ val print_comment:
 val open_asso: Loggers.t -> unit
 val close_asso: Loggers.t -> unit
 val print_asso: Loggers.t -> string -> string -> unit
-val print_node: Loggers.t -> ?directives:options list -> string -> unit
-val print_edge: Loggers.t -> ?directives:options list -> ?prefix:string -> string -> string -> unit
-val print_one_to_n_relation: Loggers.t -> ?directives:options list -> ?style_one:linestyle -> ?style_n:linestyle -> string -> string list -> unit
+val print_node: Loggers.t -> ?directives:Graph_loggers_options.options list -> string -> unit
+val print_edge: Loggers.t -> ?directives:Graph_loggers_options.options list -> ?prefix:string -> string -> string -> unit
+val print_one_to_n_relation: Loggers.t -> ?directives:Graph_loggers_options.options list -> ?style_one:Graph_loggers_options.linestyle -> ?style_n:Graph_loggers_options.linestyle -> string -> string list -> unit

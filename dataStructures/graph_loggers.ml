@@ -16,66 +16,48 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type direction = Direct | Reverse | Undirected | Both
-type shape = Invisible | House | Rect | Ellipse | Circle
-type headkind = Normal | Vee | Tee | No_head
-type linestyle = Plain | Dotted | Dashed
-type color = Red | Green | White | Blue | Black | LightSkyBlue | PaleGreen
-
 let dot_color_encoding x =
   match
     x
   with
-  | Red -> "red"
-  | Green -> "green"
-  | White -> "white"
-  | Blue -> "blue"
-  | Black -> "black"
-  | LightSkyBlue -> "#87ceeb"
-  | PaleGreen -> "#98fb98"
+  | Graph_loggers_options.Red -> "red"
+  | Graph_loggers_options.Green -> "green"
+  | Graph_loggers_options.White -> "white"
+  | Graph_loggers_options.Blue -> "blue"
+  | Graph_loggers_options.Black -> "black"
+  | Graph_loggers_options.LightSkyBlue -> "#87ceeb"
+  | Graph_loggers_options.PaleGreen -> "#98fb98"
 
 let svg_color_encoding x =
   match
     x
   with
-  | Red -> "#f00"
-  | Green -> "#0f0"
-  | White -> "#fff"
-  | Blue -> "#00f"
-  | Black -> "#000"
-  | LightSkyBlue -> "#8ce"
-  | PaleGreen -> "#9f9"
-
-type options =
-  | Color of color
-  | FillColor of color
-  | Label of string
-  | Width of int (*pixel*)
-  | Height of int (*pixel*)
-  | Direction of direction
-  | Shape of shape
-  | ArrowHead of headkind
-  | ArrowTail of headkind
-  | LineStyle of linestyle
+  | Graph_loggers_options.Red -> "#f00"
+  | Graph_loggers_options.Green -> "#0f0"
+  | Graph_loggers_options.White -> "#fff"
+  | Graph_loggers_options.Blue -> "#00f"
+  | Graph_loggers_options.Black -> "#000"
+  | Graph_loggers_options.LightSkyBlue -> "#8ce"
+  | Graph_loggers_options.PaleGreen -> "#9f9"
 
 type node_attribute =
   {
-    node_color: color option;
-    node_fillcolor: color option;
+    node_color: Graph_loggers_options.color option;
+    node_fillcolor: Graph_loggers_options.color option;
     node_label: string option ;
     node_width: int option ;
     node_height: int option ;
-    node_shape: shape option ;
+    node_shape: Graph_loggers_options.shape option ;
   }
 
 type edge_attribute =
   {
-    edge_color: color option;
+    edge_color: Graph_loggers_options.color option;
     edge_label: string option ;
-    edge_style: linestyle ;
-    edge_direction: direction ;
-    edge_arrowhead: headkind ;
-    edge_arrowtail: headkind
+    edge_style: Graph_loggers_options.linestyle ;
+    edge_direction: Graph_loggers_options.direction ;
+    edge_arrowhead: Graph_loggers_options.headkind ;
+    edge_arrowtail: Graph_loggers_options.headkind
   }
 
 let dummy_node =
@@ -92,10 +74,10 @@ let dummy_edge =
   {
     edge_color = None ;
     edge_label = None ;
-    edge_style = Plain ;
-    edge_direction = Direct ;
-    edge_arrowhead = Normal ;
-    edge_arrowtail = Normal ;
+    edge_style = Graph_loggers_options.Plain ;
+    edge_direction = Graph_loggers_options.Direct ;
+    edge_arrowhead = Graph_loggers_options.Normal ;
+    edge_arrowtail = Graph_loggers_options.Normal ;
   }
 
 let is_no_node_attributes node_attribute = node_attribute = dummy_node
@@ -103,9 +85,9 @@ let is_no_edge_attributes edge_attribute =
   dummy_edge =
   {
     edge_attribute
-    with edge_direction = Direct ;
-         edge_arrowhead = Normal ;
-         edge_arrowtail = Normal  }
+    with edge_direction = Graph_loggers_options.Direct ;
+         edge_arrowhead = Graph_loggers_options.Normal ;
+         edge_arrowtail = Graph_loggers_options.Normal  }
 
 let between_attributes_in_dot logger bool =
   if bool then
@@ -205,7 +187,7 @@ let print_graph_preamble
             Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
           ()
       end
-    | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+      | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_graph_foot logger =
   match
@@ -243,6 +225,9 @@ let print_graph_foot logger =
         ()
     end
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Json ->
+    let graph = Loggers.graph_of_logger logger in
+    ()
 
 let print_comment
     logger
@@ -278,21 +263,21 @@ let shape_in_dot shape =
   match
     shape
   with
-  | Invisible -> "style=\"invis\""
-  | House -> "shape=\"house\""
-  | Rect -> "shape=\"box\""
-  | Ellipse -> "shape=\"ellipse\""
-  | Circle -> "shape=\"circle\""
+  | Graph_loggers_options.Invisible -> "style=\"invis\""
+  | Graph_loggers_options.House -> "shape=\"house\""
+  | Graph_loggers_options.Rect -> "shape=\"box\""
+  | Graph_loggers_options.Ellipse -> "shape=\"ellipse\""
+  | Graph_loggers_options.Circle -> "shape=\"circle\""
 
 let shape_in_html shape =
   match
     shape
   with
-  | Invisible -> Some "style: \"visibility:hidden\""
-  | House -> Some "shape: \"house\""
-  | Rect -> Some "shape: \"rect\""
-  | Ellipse -> Some "shape: \"ellipse\""
-  | Circle -> Some "shape: \"ellipse\""
+  | Graph_loggers_options.Invisible -> Some "style: \"visibility:hidden\""
+  | Graph_loggers_options.House -> Some "shape: \"house\""
+  | Graph_loggers_options.Rect -> Some "shape: \"rect\""
+  | Graph_loggers_options.Ellipse -> Some "shape: \"ellipse\""
+  | Graph_loggers_options.Circle -> Some "shape: \"ellipse\""
 
 let string_one_of_linestyle_in_dot _ = "-"
 let string_two_of_linestyle_in_dot _ = "--"
@@ -301,37 +286,37 @@ let string_of_arrow_head_in_dot style =
   match
     style
   with
-  | Normal -> ">"
-  | Vee -> "|>"
-  | Tee -> "|"
-  | No_head -> ""
+  | Graph_loggers_options.Normal -> ">"
+  | Graph_loggers_options.Vee -> "|>"
+  | Graph_loggers_options.Tee -> "|"
+  | Graph_loggers_options.No_head -> ""
 
 let string_of_arrow_tail_in_dot style =
   match
     style
   with
-  | Normal -> "<"
-  | Vee -> "<|"
-  | Tee -> "|"
-  | No_head -> ""
+  | Graph_loggers_options.Normal -> "<"
+  | Graph_loggers_options.Vee -> "<|"
+  | Graph_loggers_options.Tee -> "|"
+  | Graph_loggers_options.No_head -> ""
 
 let string_of_arrow_in_html logger bool title style =
   match style
   with
-  | Tee | Normal -> bool
+  | Graph_loggers_options.Tee | Graph_loggers_options.Normal -> bool
   (*| Tee ->
         let () = between_attributes_in_html logger bool in
         let () =
           Loggers.fprintf logger "%s: \"tee\"" title
         in
         true*)
-  | Vee ->
+  | Graph_loggers_options.Vee ->
     let () = between_attributes_in_html logger bool in
     let () =
       Loggers.fprintf logger "%s: \"vee\"" title
     in
     true
-  | No_head ->
+  | Graph_loggers_options.No_head ->
     (*  let () = between_attributes_in_html logger bool in
         let () =
         Loggers.fprintf logger "%s: \"none\"" title
@@ -348,13 +333,16 @@ let print_node logger ?directives:(directives=[]) id =
            match
              option
            with
-           | Label s -> {attributes with node_label = Some s }
-           | Color s -> {attributes with node_color = Some s }
-           | FillColor s -> {attributes with node_fillcolor = Some s}
-           | Width i -> {attributes with node_width = Some i}
-           | Height i -> {attributes with node_height = Some i}
-           | Shape s -> {attributes with node_shape = Some s}
-           | LineStyle _ | Direction _ | ArrowTail _ | ArrowHead _ -> attributes
+           | Graph_loggers_options.Label s -> {attributes with node_label = Some s }
+           | Graph_loggers_options.Color s -> {attributes with node_color = Some s }
+           | Graph_loggers_options.FillColor s -> {attributes with node_fillcolor = Some s}
+           | Graph_loggers_options.Width i -> {attributes with node_width = Some i}
+           | Graph_loggers_options.Height i -> {attributes with node_height = Some i}
+           | Graph_loggers_options.Shape s -> {attributes with node_shape = Some s}
+           | Graph_loggers_options.LineStyle _
+           | Graph_loggers_options.Direction _
+           | Graph_loggers_options.ArrowTail _
+           | Graph_loggers_options.ArrowHead _ -> attributes
         )
         attributes
         directives
@@ -563,13 +551,16 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
            match
              option
            with
-           | Label s -> {attributes with edge_label = Some s }
-           | Color s -> {attributes with edge_color = Some s }
-           | LineStyle s -> {attributes with edge_style = s}
-           | Direction s -> {attributes with edge_direction = s}
-           | ArrowTail s -> {attributes with edge_arrowtail = s}
-           | ArrowHead s -> {attributes with edge_arrowhead = s}
-           | Shape _ | Width _ | Height _ | FillColor _ -> attributes
+           | Graph_loggers_options.Label s -> {attributes with edge_label = Some s }
+           | Graph_loggers_options.Color s -> {attributes with edge_color = Some s }
+           | Graph_loggers_options.LineStyle s -> {attributes with edge_style = s}
+           | Graph_loggers_options.Direction s -> {attributes with edge_direction = s}
+           | Graph_loggers_options.ArrowTail s -> {attributes with edge_arrowtail = s}
+           | Graph_loggers_options.ArrowHead s -> {attributes with edge_arrowhead = s}
+           | Graph_loggers_options.Shape _
+           | Graph_loggers_options.Width _
+           | Graph_loggers_options.Height _
+           | Graph_loggers_options.FillColor _ -> attributes
         )
         attributes
         directives
@@ -582,12 +573,12 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
       let direction =
         match attributes.edge_direction
         with
-        | Direct ->
-          (string_one_of_linestyle_in_dot attributes.edge_style)^(string_of_arrow_head_in_dot Normal)
-        | Undirected -> (string_two_of_linestyle_in_dot attributes.edge_style)
-        | Both -> (string_of_arrow_tail_in_dot  Normal)^(string_one_of_linestyle_in_dot                                      attributes.edge_style)^(string_of_arrow_head_in_dot Normal)
-        | Reverse -> (string_of_arrow_tail_in_dot
-                        Normal)^(string_one_of_linestyle_in_dot
+        | Graph_loggers_options.Direct ->
+          (string_one_of_linestyle_in_dot attributes.edge_style)^(string_of_arrow_head_in_dot Graph_loggers_options.Normal)
+        | Graph_loggers_options.Undirected -> (string_two_of_linestyle_in_dot attributes.edge_style)
+        | Graph_loggers_options.Both -> (string_of_arrow_tail_in_dot  Graph_loggers_options.Normal)^(string_one_of_linestyle_in_dot                                      attributes.edge_style)^(string_of_arrow_head_in_dot Graph_loggers_options.Normal)
+        | Graph_loggers_options.Reverse -> (string_of_arrow_tail_in_dot
+                        Graph_loggers_options.Normal)^(string_one_of_linestyle_in_dot
                                    attributes.edge_style)
       in
       let () = Loggers.fprintf logger "\"%s\" %s \"%s\"" id1 direction id2 in
@@ -609,11 +600,11 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
           let bool =
             match attributes.edge_style
             with
-            | Plain -> bool
-            | Dotted ->
+            | Graph_loggers_options.Plain -> bool
+            | Graph_loggers_options.Dotted ->
               let () = Loggers.fprintf logger "style=\"dotted\"" in
               true
-            | Dashed ->
+            | Graph_loggers_options.Dashed ->
               let () = Loggers.fprintf logger "style=\"dashed\"" in
               true
           in
@@ -632,20 +623,20 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
           let bool =
             match attributes.edge_arrowhead
             with
-            | Normal -> bool
-            | Tee ->
+            | Graph_loggers_options.Normal -> bool
+            | Graph_loggers_options.Tee ->
               let () = between_attributes_in_dot logger bool in
               let () =
                 Loggers.fprintf logger "arrowhead=\"tee\""
               in
               true
-            | Vee ->
+            | Graph_loggers_options.Vee ->
               let () = between_attributes_in_dot logger bool in
               let () =
                 Loggers.fprintf logger "arrowhead=\"vee\""
               in
               true
-            | No_head ->
+            | Graph_loggers_options.No_head ->
               let () = between_attributes_in_dot logger bool in
               let () =
                 Loggers.fprintf logger "arrowhead=\"none\""
@@ -655,20 +646,20 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
           let bool =
             match attributes.edge_arrowtail
             with
-            | Normal -> bool
-            | Tee ->
+            | Graph_loggers_options.Normal -> bool
+            | Graph_loggers_options.Tee ->
               let () = between_attributes_in_dot logger bool in
               let () =
                 Loggers.fprintf logger "arrowtail=\"tee\""
               in
               true
-            | Vee ->
+            | Graph_loggers_options.Vee ->
               let () = between_attributes_in_dot logger bool in
               let () =
                 Loggers.fprintf logger "arrowtail=\"vee\""
               in
               true
-            | No_head ->
+            | Graph_loggers_options.No_head ->
               let () = between_attributes_in_dot logger bool in
               let () =
                 Loggers.fprintf logger "arrowtail=\"none\""
@@ -688,10 +679,10 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let attributes =
       match attributes.edge_direction
       with
-      | Undirected -> {attributes with edge_arrowhead=No_head ; edge_arrowtail=No_head}
-      | Direct -> {attributes with edge_arrowtail=No_head}
-      | Reverse -> {attributes with edge_arrowhead=No_head}
-      | Both -> attributes
+      | Graph_loggers_options.Undirected -> {attributes with edge_arrowhead=Graph_loggers_options.No_head ; edge_arrowtail=Graph_loggers_options.No_head}
+      | Graph_loggers_options.Direct -> {attributes with edge_arrowtail=Graph_loggers_options.No_head}
+      | Graph_loggers_options.Reverse -> {attributes with edge_arrowhead=Graph_loggers_options.No_head}
+      | Graph_loggers_options.Both -> attributes
     in
     let bool = false in
     let bool =
@@ -733,9 +724,9 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
       match
         attributes.edge_arrowhead
       with
-      | No_head -> "--"
-      | Normal | Vee  -> "->"
-      | Tee -> "-|"
+      | Graph_loggers_options.No_head -> "--"
+      | Graph_loggers_options.Normal | Graph_loggers_options.Vee  -> "->"
+      | Graph_loggers_options.Tee -> "-|"
     in
     let () = Loggers.fprintf logger "%s%s %s %s%s" prefix id1 arrow id2 label in
     let () = Loggers.print_newline logger in
@@ -744,8 +735,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
 
 let print_one_to_n_relation
     logger ?directives:(directives=[])
-    ?style_one:(style_one=Plain)
-    ?style_n:(style_n=Plain) id idlist
+    ?style_one:(style_one=Graph_loggers_options.Plain)
+    ?style_n:(style_n=Graph_loggers_options.Plain) id idlist
   =
   let fictitious = "Fictitious_"^id in
   let directives_fict =
@@ -753,23 +744,23 @@ let print_one_to_n_relation
       Loggers.get_encoding_format logger
     with
     | Loggers.HTML_Graph ->
-      List.rev ((Label "")::(Shape Circle)::(Width 0)::(Height 0)::(FillColor Black)::(List.rev directives))
-    | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS ->
-      List.rev ((Label "")::(Shape Invisible)::(Width 0)::(Height 0)::(List.rev directives))
+      List.rev ((Graph_loggers_options.Label "")::(Graph_loggers_options.Shape Graph_loggers_options.Circle)::(Graph_loggers_options.Width 0)::(Graph_loggers_options.Height 0)::(Graph_loggers_options.FillColor Graph_loggers_options.Black)::(List.rev directives))
+    | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS ->
+      List.rev ((Graph_loggers_options.Label "")::(Graph_loggers_options.Shape Graph_loggers_options.Invisible)::(Graph_loggers_options.Width 0)::(Graph_loggers_options.Height 0)::(List.rev directives))
   in
   let directives_one =
-    if style_one = Plain
+    if style_one = Graph_loggers_options.Plain
     then
       directives
     else
-      List.rev ((LineStyle style_one)::(List.rev directives))
+      List.rev ((Graph_loggers_options.LineStyle style_one)::(List.rev directives))
   in
   let directives_n =
-    if style_n = Plain
+    if style_n = Graph_loggers_options.Plain
     then
       directives
     else
-      List.rev ((LineStyle style_n)::(List.rev directives))
+      List.rev ((Graph_loggers_options.LineStyle style_n)::(List.rev directives))
   in
   let _ = print_node logger fictitious ~directives:directives_fict in
   let _ = print_edge logger ~directives:directives_one fictitious id in

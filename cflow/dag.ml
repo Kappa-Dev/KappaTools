@@ -74,7 +74,7 @@ type prehash = (node*int) list
 let dummy_cannonical_form = []
 let dummy_prehash = []
 
-let print_story_info logger parameter story_info_list =
+let print_story_info logger _parameter story_info_list =
   List.iter
     (fun
       story_info ->
@@ -90,7 +90,7 @@ let print_story_info logger parameter story_info_list =
     )
     story_info_list
 
-let print_graph logger parameter handler error graph =
+let print_graph logger _parameter _handler error graph =
   let () = Loggers.refresh_id logger in
   let () = Loggers.fprintf logger "****" in
   let () = Loggers.print_newline logger in
@@ -105,7 +105,7 @@ let print_graph logger parameter handler error graph =
          else
            Graph_loggers.print_node
              logger
-             ~directives:[Graph_loggers.Label j]
+             ~directives:[Graph_loggers_options.Label j]
              (string_of_int i)
       )
       graph.labels
@@ -127,7 +127,7 @@ let print_graph logger parameter handler error graph =
            (fun j ->
               Graph_loggers.print_edge
                 logger
-                ~directives:[Graph_loggers.ArrowHead Graph_loggers.Tee]
+                ~directives:[Graph_loggers_options.ArrowHead Graph_loggers_options.Tee]
                 (string_of_int j)
                 (string_of_int i)
            )
@@ -153,7 +153,7 @@ let print_elt log elt =
     let () = Loggers.fprintf log "Event %s" s in
     Loggers.print_newline log
 
-let print_canonical_form parameter handler error dag =
+let print_canonical_form parameter _handler error dag =
   let _ =
     List.iter
       (print_elt (H.get_debugging_channel parameter))
@@ -162,7 +162,7 @@ let print_canonical_form parameter handler error dag =
   let _ = Loggers.print_newline (H.get_debugging_channel parameter) in
   error
 
-let print_prehash parameter handler error representation =
+let print_prehash parameter _handler error representation =
   let _ =
     List.iter
       (fun ((_,b),i) -> Loggers.fprintf (H.get_debugging_channel parameter) "%s:%i," b i)
@@ -293,7 +293,7 @@ let smash l =
   | [] -> []
   | (t,wt)::q -> aux q t wt []
 
-let prehash parameter handler error graph =
+let prehash _parameter _handler error graph =
   error,
   smash
     (List.sort
@@ -308,7 +308,7 @@ let prehash parameter handler error graph =
         in
         !l))
 
-let canonicalize parameter handler log_info error graph =
+let canonicalize parameter _handler log_info error graph =
   let asso = Mods.IntMap.empty in
   let label i =
     try
@@ -496,7 +496,7 @@ module ListTable =
   struct
     type table = (prehash * (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) list
 
-    let init_table parameter handler log_info error =
+    let init_table _parameter _handler log_info error =
       error,log_info,[]
 
     let add_story parameter handler log_info error grid pretrace info table =
@@ -513,7 +513,7 @@ module ListTable =
       let compare (_,_,a,_,_) (_,_,b,_,_) = compare_canonic_opt a b in
       List.sort compare
 
-    let hash_inner parameter handler error cmp list =
+    let hash_inner _parameter _handler error cmp list =
       let list = sort_inner list in
       let rec visit elements_to_store stored_elements last_element last_element_occurrences =
         match elements_to_store,last_element
@@ -591,10 +591,10 @@ module ListTable =
     let project_tuple (grid,_,_,_,list) =
       List.hd list,grid,list
 
-    let sort_list parameter handler log_info error list =
+    let sort_list _parameter _handler log_info error list =
       let flat_list =
         List.fold_left
-          (fun list_out (prehash,list) ->
+          (fun list_out (_prehash,list) ->
              List.fold_left
                (fun list_out tuple ->
                   (project_tuple tuple)::list_out
@@ -605,7 +605,7 @@ module ListTable =
       let compare_pair (a,_,_) (c,_,_) =
         Trace.Simulation_info.compare_by_story_id a c in
       let flat_list = List.sort compare_pair flat_list in
-      error, log_info, List.rev_map (fun (a,b,c) -> b,c) (List.rev flat_list)
+      error, log_info, List.rev_map (fun (_a,b,c) -> b,c) (List.rev flat_list)
 
     let count_stories list =
       List.fold_left
@@ -628,7 +628,6 @@ module ListTable =
 module BucketTable =
   (struct
     type story_id = int
-    let first_story_id = 0
     let succ_story_id = succ
     type prehash_elt = node * int
 
@@ -660,7 +659,7 @@ module BucketTable =
       }
 
 
-    let init_table parameters handler log_info error=
+    let init_table parameters _handler log_info error=
       let error,array =  Int_storage.Nearly_inf_Imperatif.create (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameters) error 0 in
       error,log_info,{
         tree= Empty;
@@ -890,7 +889,7 @@ module BucketTable =
               let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in
               let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
               error,log_info,table,To_inner (map,  inner)
-            | Outer_leave (q,id') ->
+            | Outer_leave (_q,id') ->
               let error,table = add_story_info error story_info id' table in
               error,log_info,table,outer_tree
             | To_inner (map,inner) ->
@@ -930,7 +929,7 @@ module BucketTable =
               error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
             | Outer_leave (l',id') ->
               aux_outer2 log_info error suffix l' id' table
-            | To_inner (map,inner) ->
+            | To_inner (_map,inner) ->
               let error,log_info,id,table = add_story error assoc table in
               error,log_info,table, To_inner (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t (Outer_leave (q,id)) PreHashMap.empty),inner)
           end
@@ -938,8 +937,8 @@ module BucketTable =
       let error,log_info,table,tree = aux_outer log_info error (grid,graph,None,pretrace,story_info) story_info prehash table.tree table in
       error,log_info,{table with tree = tree}
 
-    let rec print_inner_tree parameter handler error prefix inner_tree =
-      (*match
+        (*    let rec print_inner_tree parameter handler error prefix inner_tree =
+      match
         inner_tree
         with
         | Inner_node (map,assoc') ->
@@ -960,11 +959,12 @@ module BucketTable =
         map
         | Inner_leave (l,id)  ->
         let () = Format.fprintf parameter.H.out_channel "%sLEAVE:\n" prefix in
-        let _ = print_canonical_form parameter handler error l in*)
-      ()
+        let _ = print_canonical_form parameter handler error l in
+              ()*)
 
-    let rec print_outer_tree parameter handler error prefix outer_tree =
-      (*	match
+                                                                     (*
+let rec print_outer_tree parameter handler error prefix outer_tree =
+      	match
         outer_tree
         with
         | Empty ->
@@ -998,7 +998,7 @@ module BucketTable =
         print_outer_tree parameter handler error prefix' map)
         map
         in
-        print_inner_tree parameter handler error prefix' inner*) ()
+        print_inner_tree parameter handler error prefix' inner *)
 
     let hash_list parameter _  log_info error table =
       let error,array =
@@ -1021,7 +1021,7 @@ module BucketTable =
         Int_storage.Nearly_inf_Imperatif.fold
           (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
           error
-          (fun parameter error _ (a,b,c,d,e) l -> error,(a,e)::l)
+          (fun _parameter error _ (a,_b,_c,_d,e) l -> error,(a,e)::l)
           table.array
           []
       in error,log_info,l

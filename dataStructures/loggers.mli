@@ -18,7 +18,7 @@
 
 type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
-  | Matlab | Maple
+  | Matlab | Maple | Json
 type t
 
 val refresh_id: t -> unit
@@ -42,3 +42,7 @@ val redirect: t -> Format.formatter -> t
 val formatter_of_logger: t -> Format.formatter option
 val flush_buffer: t -> Format.formatter -> unit
 val int_of_string_id: t -> string -> int
+
+val graph_of_logger: t ->
+  (string * Graph_loggers_options.options list) list
+  *  (string * string * Graph_loggers_options.options list) list

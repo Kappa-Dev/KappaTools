@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Jul 25 2016>
+  * Last modification: Time-stamp: <Aug 02 2016>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -37,14 +37,14 @@ let link_mode = ref Remanent_parameters_sig.Bound_indices
 
 (** influence map *)
 let do_influence_map = ref true
-let rule_shape = ref Graph_loggers.Rect
-let rule_color = ref Graph_loggers.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
-let variable_shape = ref Graph_loggers.Ellipse
-let variable_color = ref Graph_loggers.PaleGreen (* "#98fb98" (*Pale green*)*)
-let wake_up_color = ref Graph_loggers.Green (*"#00ff00" (*Green *)*)
-let inhibition_color = ref Graph_loggers.Red (*"#ff0000" (*red*)*)
-let wake_up_arrow = ref Graph_loggers.Normal
-let inhibition_arrow = ref Graph_loggers.Tee
+let rule_shape = ref Graph_loggers_options.Rect
+let rule_color = ref Graph_loggers_options.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
+let variable_shape = ref Graph_loggers_options.Ellipse
+let variable_color = ref Graph_loggers_options.PaleGreen (* "#98fb98" (*Pale green*)*)
+let wake_up_color = ref Graph_loggers_options.Green (*"#00ff00" (*Green *)*)
+let inhibition_color = ref Graph_loggers_options.Red (*"#ff0000" (*red*)*)
+let wake_up_arrow = ref Graph_loggers_options.Normal
+let inhibition_arrow = ref Graph_loggers_options.Tee
 let influence_map_file = ref "influence"
 let influence_map_format = ref "DOT"
 let prompt_full_var_def = ref false

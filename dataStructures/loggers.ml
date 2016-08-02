@@ -19,7 +19,7 @@
 module StringMap = Map.Make (struct type t = string let compare = compare end)
 type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
-  | Matlab | Maple
+  | Matlab | Maple | Json
 
 type token =
   | String of string
@@ -36,7 +36,7 @@ let breakable x =
     x
   with
   | HTML_Tabular | HTML | HTML_Graph | TXT -> true
-  | Matlab | Octave | Maple | DOT | TXT_Tabular | XLS -> false
+  | Json | Matlab | Octave | Maple | DOT | TXT_Tabular | XLS -> false
 
 type t =
   {
@@ -45,6 +45,8 @@ type t =
     id_map: int StringMap.t ref ;
     fresh_id: int ref ;
     mutable current_line: token list;
+    nodes: (string * Graph_loggers_options.options list) list ref ;
+    edges: (string * string * Graph_loggers_options.options list) list ref ;
   }
 
 let refresh_id t =
@@ -60,7 +62,9 @@ let dummy_html_logger =
     fresh_id = ref 1 ;
     encoding = HTML;
     logger = DEVNUL;
-    current_line = [];}
+    current_line = [];
+    nodes = ref [];
+    edges = ref []}
 
 let dummy_txt_logger =
   {
@@ -68,7 +72,9 @@ let dummy_txt_logger =
     id_map = ref StringMap.empty;
     encoding = TXT;
     logger = DEVNUL;
-    current_line = []
+    current_line = [];
+    nodes = ref [];
+    edges = ref []
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -135,7 +141,7 @@ let end_of_line_symbol logger =
   with
   | HTML | HTML_Graph -> "<Br>"
   | Matlab | Octave | Maple
-  | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
+  | Json | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
 
 let dump_token f x =
@@ -202,7 +208,7 @@ let print_cell logger s =
     with
     | HTML_Tabular -> "<TD>","</TD>"
     | TXT_Tabular -> "","\t"
-    | Matlab | Octave | Maple | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
+    | Json | Matlab | Octave | Maple | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
@@ -224,7 +230,7 @@ let close_logger logger =
       fprintf logger "</div>\n</body>\n"
     | HTML_Tabular ->
       fprintf logger "</TABLE>\n</div>\n</body>"
-    | Matlab | Octave | Maple  | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
+    | Json | Matlab | Octave | Maple  | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
   in
   let () = flush_logger logger in
   ()
@@ -237,7 +243,7 @@ let print_preamble logger =
     fprintf logger "<body>\n<div>\n"
   | HTML_Tabular ->
     fprintf logger "<body>\n<div>\n<TABLE>\n"
-  | Matlab | Octave | Maple | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
+  | Json | Matlab | Octave | Maple | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
@@ -247,7 +253,9 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       fresh_id = ref 1;
       logger = Formatter formatter;
       encoding = mode;
-      current_line = []
+      current_line = [];
+      nodes = ref [];
+      edges = ref [];
     }
   in
   let () = print_preamble logger in
@@ -260,7 +268,9 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       fresh_id = ref 1;
       logger = Formatter formatter;
       encoding = mode;
-      current_line = []
+      current_line = [];
+      nodes = ref [];
+      edges = ref [];
     }
   in
   let () = print_preamble logger in
@@ -273,6 +283,8 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     encoding = mode;
     current_line = [];
+    nodes = ref [];
+    edges = ref [];
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
@@ -283,6 +295,8 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
       encoding = mode;
       current_line = [];
+      nodes = ref [];
+      edges = ref [];
     }
   in
   let () = print_preamble logger in
@@ -293,14 +307,14 @@ let open_row logger =
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>"
-  | Matlab | Octave | Maple | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
+  | Json | Matlab | Octave | Maple | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
   match
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>@."
-  | Matlab | Octave | Maple | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+  | Json | Matlab | Octave | Maple | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =
   match
@@ -340,3 +354,5 @@ let int_of_string_id logger string =
     let i = fresh_id logger in
     let () = logger.id_map := StringMap.add string i !(logger.id_map) in
     i
+
+let graph_of_logger logger = !(logger.nodes), !(logger.edges)

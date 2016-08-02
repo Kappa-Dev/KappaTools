@@ -92,6 +92,7 @@ let print_ode_preamble
         ()
       end
     | Loggers.Maple -> ()
+    | Loggers.Json
     | Loggers.DOT
     | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -159,6 +160,7 @@ let declare_global logger string =
       ()
     end
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -220,6 +222,7 @@ let initialize logger variable =
       in
       ()
     end
+  | Loggers.Json
   | Loggers.Maple -> ()
   | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
@@ -329,6 +332,7 @@ let rec print_alg_expr
         ()
     end
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -347,6 +351,7 @@ let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
       ()
     end
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -358,6 +363,7 @@ let associate_nrows logger =
     let () = Loggers.fprintf logger "nrows = length(soln.x);" in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
@@ -371,6 +377,7 @@ let associate_t logger n =
     let () = Loggers.fprintf logger "t = y(%i);" n in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
@@ -384,6 +391,7 @@ let init_time logger n =
     let () = Loggers.fprintf logger "y(%i) = t;" n in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
@@ -403,6 +411,7 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
       ()
     end
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -451,6 +460,7 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
       ()
     end
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -494,6 +504,7 @@ let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
       ()
     end
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let print_comment
@@ -510,6 +521,7 @@ let print_comment
     | Loggers.Matlab
     | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
     | Loggers.Maple -> ()
+    | Loggers.Json
     | Loggers.DOT
     | Loggers.HTML_Graph
     | Loggers.HTML
@@ -539,6 +551,7 @@ let print_options logger =
     let () = Loggers.print_newline logger in
     ()
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -563,6 +576,7 @@ let declare_init logger i =
     in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -599,6 +613,7 @@ let print_license_check logger =
         ]
     in Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -627,6 +642,7 @@ let print_integrate logger =
     let () = Loggers.print_newline logger in
     ()
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -664,6 +680,7 @@ let print_interpolate logger =
         ]
     in Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -707,6 +724,7 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
           "fclose(fid);"]
     in Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -736,6 +754,7 @@ let open_procedure logger name name' arg =
     let () = Loggers.fprintf logger ")" in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -754,6 +773,7 @@ let close_procedure logger =
     let () = Loggers.fprintf logger "end" in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML
@@ -771,6 +791,7 @@ let launch_main logger =
     Loggers.print_newline logger
   | Loggers.Matlab
   | Loggers.Maple
+  | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
   | Loggers.HTML

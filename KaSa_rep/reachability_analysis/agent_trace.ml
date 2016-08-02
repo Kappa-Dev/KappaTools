@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Jul 26 2016>
+  * Last modification: Time-stamp: <Aug 02 2016>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -176,7 +176,8 @@ let dump_edge logger parameter error handler_kappa compil key key' label =
     else error,""
   in
   let () =
-    Graph_loggers.print_edge logger ("Node_"^key) ("Node_"^key') ~directives:[Graph_loggers.Label rule_name] in
+    Graph_loggers.print_edge logger
+      ("Node_"^key) ("Node_"^key') ~directives:[Graph_loggers_options.Label rule_name] in
   error
 
 
@@ -221,7 +222,7 @@ let dump_mvbdu logger parameter error handler_kappa transition_system mvbdu =
   let key = string_key_of_asso list in
   let error,label = string_label_of_asso parameter error handler_kappa transition_system list in
   let () = Graph_loggers.print_node logger key
-      ~directives:([Graph_loggers.Label label])
+      ~directives:([Graph_loggers_options.Label label])
   in
   error
 
@@ -849,10 +850,10 @@ let print logger parameter compil handler_kappa handler error transition_system 
              ("Init_"^(string_of_int key))
              ~directives:
                [
-                 Graph_loggers.Width 0;
-                 Graph_loggers.Height 0;
-                 Graph_loggers.Shape Graph_loggers.Invisible;
-                 Graph_loggers.Label ""
+                 Graph_loggers_options.Width 0;
+                 Graph_loggers_options.Height 0;
+                 Graph_loggers_options.Shape Graph_loggers_options.Invisible;
+                 Graph_loggers_options.Label ""
                ]
          in
          error, handler)
@@ -876,7 +877,7 @@ let print logger parameter compil handler_kappa handler error transition_system 
          in
          let error, key' = hash_of_mvbdu parameter error q' in
          let error, rule_name =
-           if  Remanent_parameters.get_show_rule_names_in_local_traces parameter
+           if Remanent_parameters.get_show_rule_names_in_local_traces parameter
            then
              begin
                match
@@ -898,7 +899,7 @@ let print logger parameter compil handler_kappa handler error transition_system 
              ("Node_"^(string_of_int key'))
              ~directives:
                [
-                 Graph_loggers.Label rule_name
+                 Graph_loggers_options.Label rule_name
                ]
          in
          error,handler)
@@ -933,7 +934,7 @@ let print logger parameter compil handler_kappa handler error transition_system 
              ("Node_"^(string_of_int key))
              ~directives:
                [
-                 Graph_loggers.Label rule_name ;
+                 Graph_loggers_options.Label rule_name ;
                ]
          in
          error, handler)
@@ -949,7 +950,7 @@ let print logger parameter compil handler_kappa handler error transition_system 
          else
            let k = "Node_"^(string_of_int key) in
            let l = List.rev (Mods.IntSet.fold (fun i list -> ("Node_"^(string_of_int i))::list) l []) in
-           Graph_loggers.print_one_to_n_relation logger ~style_one:Graph_loggers.Dotted ~style_n:Graph_loggers.Dashed k l)
+           Graph_loggers.print_one_to_n_relation logger ~style_one:Graph_loggers_options.Dotted ~style_n:Graph_loggers_options.Dashed k l)
       transition_system.subframe
   in
   let () = Graph_loggers.print_graph_foot logger in
