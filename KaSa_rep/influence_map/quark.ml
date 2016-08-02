@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 02 2016>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -692,8 +692,8 @@ let scan_var parameter error handler var_id var quarks =
     | Ast.TOKEN_ID _
     | Ast.STATE_ALG_OP _
     | Ast.OBS_VAR _
-     ->
-     begin (* to do *)
+      ->
+      begin (* to do *)
         error,list_pos,list_neg
       end
   in
@@ -713,6 +713,31 @@ let scan_var parameter error handler var_id var quarks =
       list_neg
   in
   error, quarks
+
+let is_tested_and_not_question_mark parameter error agent_id site views =
+  let error, agent_opt =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameter error agent_id views
+  in
+  match agent_opt with
+  | None
+  | Some Cckappa_sig.Ghost
+  | Some Cckappa_sig.Dead_agent _
+  | Some Cckappa_sig.Unknown_agent _
+    -> error, false
+  | Some Cckappa_sig.Agent agent ->
+    let error, port_opt =
+      Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+        parameter error site agent.Cckappa_sig.agent_interface
+    in
+    match port_opt with
+    | None -> error, false
+    | Some port ->
+      let interval = port.Cckappa_sig.site_state in
+      let min = Ckappa_sig.int_of_state_index interval.Cckappa_sig.min in
+      let max = Ckappa_sig.int_of_state_index interval.Cckappa_sig.max in
+      if max = 0 || min > 0
+      then error, true
+      else error, false
 
 let scan_rule parameter error handler rule_id rule quarks =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
@@ -841,7 +866,7 @@ let scan_rule parameter error handler rule_id rule quarks =
   let _ = Misc_sa.trace parameter (fun () -> "REMOVAL\n") in
   let error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus) = (*the agents that are removed *)
     List.fold_left
-      (fun (error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus)) (_agent_id,agent,list) ->
+      (fun (error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus)) (agent_id,agent,list) ->
          let agent_type = agent.Cckappa_sig.agent_name in
          let error,kasim_id =
            Quark_type.Labels.label_of_int parameter error
@@ -856,39 +881,51 @@ let scan_rule parameter error handler rule_id rule quarks =
          let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) =
            List.fold_left
              (fun (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) site ->
-                let error,is_binding = Handler.is_binding_site parameter error handler agent_type site in
+                let error,is_binding =
+                  Handler.is_binding_site
+                    parameter error handler agent_type site
+                in
                 if is_binding
                 then
                   begin
-                    let error,state_dic =
-                      Misc_sa.unsome
-                        (
-                          Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-                            parameter
-                            error
-                            (agent_type, site)
-                            handler.Cckappa_sig.states_dic)
-                        (fun error -> warn parameter error (Some "line 152") Exit
-                            (Ckappa_sig.Dictionary_of_States.init ()))
+                    let error, is_tested_and_not_question_mark =
+                      is_tested_and_not_question_mark
+                        parameter error agent_id site viewslhs
                     in
-                    let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in
-                    let rec aux k (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) =
-                      if  k > last_entry
-                      then
-                        (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
-                      else
-                        let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) =
-                          add_half_bond_breaking
-                            parameter error handler rule_id mkasim_id agent_type site k
-                            (site_modif_plus,site_modif_minus,site_bound_modif_minus)
-                        in
-                        aux (Ckappa_sig.next_state_index k)
-                        (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
-                    in
-                    aux (Ckappa_sig.dummy_state_index_1) (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
+                    if not is_tested_and_not_question_mark
+                    then
+                      let error,state_dic =
+                        Misc_sa.unsome
+                          (
+                            Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                              parameter
+                              error
+                              (agent_type, site)
+                              handler.Cckappa_sig.states_dic)
+                          (fun error -> warn parameter error (Some "line 152") Exit
+                              (Ckappa_sig.Dictionary_of_States.init ()))
+                      in
+                      let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in
+                      let rec aux k (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) =
+                        if  k > last_entry
+                        then
+                          (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
+                        else
+                          let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) =
+                            add_half_bond_breaking
+                              parameter error handler rule_id mkasim_id agent_type site k
+                              (site_modif_plus,site_modif_minus,site_bound_modif_minus)
+                          in
+                          aux (Ckappa_sig.next_state_index k)
+                            (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
+                      in
+                      aux (Ckappa_sig.dummy_state_index_1) (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
+                    else
+                      error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)
                   end
                 else
-                  error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)
+                  error,
+                  (site_modif_plus,site_modif_minus,site_bound_modif_minus)
              )
              (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
              list
