@@ -12,6 +12,9 @@ type t
 
 val empty : unit -> t
 
+val copy : t -> t
+(** You'd better NOT use that on the state of a simulation *)
+
 val add_agent : Signature.s -> int -> t -> int * t
 (** [add_agent sigs agent_type graph] *)
 

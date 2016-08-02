@@ -63,6 +63,20 @@ let empty () =
     free_id =(0,[]);
   }
 
+let copy graph =
+  let () = assert (not graph.outdated) in
+  let () = assert (Mods.Int2Set.is_empty graph.missings) in
+  {
+    outdated = false;
+    connect = Mods.DynArray.map Array.copy graph.connect;
+    missings = Mods.Int2Set.empty;
+    state = Mods.DynArray.map Array.copy graph.state;
+    sort = Mods.DynArray.copy graph.sort;
+    cache = Cache.create ();
+    free_id = graph.free_id;
+  }
+
+
 let add_agent sigs ty graph =
   let ar = Signature.arity sigs ty in
   let al = Array.make ar None in

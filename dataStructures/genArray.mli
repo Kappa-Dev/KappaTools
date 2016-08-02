@@ -20,6 +20,7 @@ module type GenArray = sig
     val blit: 'a t -> int -> 'a t -> int -> int -> unit
     val fold_lefti: (int -> 'b -> 'a -> 'b) -> 'b -> 'a t -> 'b
     val fold_righti: (int -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val map: ('a -> 'b) -> 'a t -> 'b t
     val print:
       ?trailing:(Format.formatter -> unit) -> (Format.formatter -> unit) ->
       (int -> Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
