@@ -100,3 +100,61 @@ let of_json = function
         raise (Yojson.Basic.Util.Type_error ("Not a correct story computation",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct story computation",x))
+
+type phase =
+  | Start
+  | Inprogress
+  | Success
+  | Faillure
+
+type status =
+  {
+    phase: phase;
+    message: string;
+  }
+
+let start = "starting computation"
+let inprogress = "computation in progress"
+let success = "computation completed successfully"
+let faillure = "computation (partially) failed"
+let phase_to_json = function
+  | Start -> `String start
+  | Inprogress -> `String inprogress
+  | Success -> `String success
+  | Faillure -> `String faillure
+
+let phase_of_json = function
+  | `String s when s = start -> Start
+  | `String s when s = inprogress -> Inprogress
+  | `String s when s = success -> Success
+  | `String s when s = faillure -> Faillure
+  | x ->  raise (Yojson.Basic.Util.Type_error ("Not a correct phase",x))
+
+let status_to_json status =
+  `Assoc
+    [
+      "phase", phase_to_json status.phase;
+      "message", `String status.message ;
+    ]
+
+
+let status_of_json = function
+  | `Assoc l as x when List.length l = 2 ->
+    begin
+      try
+        {
+          phase = phase_of_json (List.assoc "phase" l);
+          message =
+            begin
+              match List.assoc "message" l
+              with
+              | `String s -> s
+              | _y ->
+                raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
+            end
+          ;
+        }
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))

@@ -775,22 +775,9 @@ module BucketTable =
                   Story_json.story = Story_json.Same_as id
                 }
               in
-              let channel_opt = Loggers.channel_of_logger
-                  (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-              in
-              let () =
-                begin
-                  match channel_opt
-                  with
-                  | None -> ()
-                  | Some channel ->
-                    let () =
-                      Yojson.Basic.to_channel channel
-                        (Story_json.to_json result) in
-                    ()
-                end
-              in
-              ()
+              Loggers.dump_json
+                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                (Story_json.to_json result)
           in
           let error,array = Int_storage.Nearly_inf_Imperatif.set
               (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id

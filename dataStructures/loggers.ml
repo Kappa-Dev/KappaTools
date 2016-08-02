@@ -368,3 +368,17 @@ let channel_of_logger logger = logger.channel_opt
 let add_node t s d = t.nodes:= (s,d)::(!(t.nodes))
 let add_edge t s1 s2 d = t.edges:= (s1,s2,d)::(!(t.edges))
 let graph_of_logger logger = List.rev !(logger.nodes), List.rev !(logger.edges)
+
+let dump_json logger json =
+  let channel_opt = channel_of_logger logger in
+  let () =
+    match channel_opt
+    with
+    | None -> ()
+    | Some channel ->
+      let () =
+        Yojson.Basic.to_channel channel json
+      in
+      ()
+  in
+  ()

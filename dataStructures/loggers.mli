@@ -49,3 +49,4 @@ val graph_of_logger: t ->
   *  (string * string * Graph_loggers_sig.options list) list
 val add_node: t -> string -> Graph_loggers_sig.options list -> unit
 val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
+val dump_json: t -> Yojson.Basic.json -> unit

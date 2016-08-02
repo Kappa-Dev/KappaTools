@@ -16,3 +16,18 @@ type one_compression =
 
 val to_json: one_compression -> Yojson.Basic.json
 val of_json: Yojson.Basic.json -> one_compression
+
+type phase =
+  | Start
+  | Inprogress
+  | Success
+  | Faillure
+
+type status =
+       {
+         phase: phase;
+         message: string;
+       }
+
+val status_to_json: status -> Yojson.Basic.json
+val status_of_json: Yojson.Basic.json -> status

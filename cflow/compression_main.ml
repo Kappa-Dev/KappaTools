@@ -47,7 +47,7 @@ let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 let compress_and_print ~called_from ~dotFormat ?js_interface
     ~none ~weak ~strong env log_info step_list =
-  (*let called_from = Remanent_parameters_sig.Server in*)
+  (*  let called_from = Remanent_parameters_sig.Server in*)
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter
       ~called_from ~none ~weak ~strong in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
@@ -218,12 +218,15 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
                     let () =
                       if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
                       then
-                        let () =
-                          Loggers.fprintf
-                            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                            "Start collecting one new trace"
+                        let status =
+                          {
+                            Story_json.phase=Story_json.Inprogress;
+                            Story_json.message="Start collecting one new trace"
+                          }
                         in
-                        Loggers.print_newline (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                        Loggers.dump_json
+                            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                            (Story_json.status_to_json status)
                     in
                     let error,log_info,trace_before_compression =
                       U.causal_prefix_of_an_observable_hit
