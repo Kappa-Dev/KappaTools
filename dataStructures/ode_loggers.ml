@@ -278,20 +278,22 @@ let rec print_alg_expr
   | Loggers.Matlab  | Loggers.Octave ->
     begin
       match fst alg_expr with
-      | Ast.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
-      | Ast.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
-      | Ast.CONST (Nbr.F f) -> Loggers.fprintf logger "%f" f
-      | Ast.OBS_VAR x -> Loggers.fprintf logger "var(%i)" (network.int_of_obs x)
-      | Ast.KAPPA_INSTANCE x -> Loggers.fprintf logger "%s(%i)" var (network.int_of_kappa_instance x)
-      | Ast.TOKEN_ID x -> Loggers.fprintf logger "%s(%i)" var (network.int_of_token_id x)
-      | Ast.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
-      | Ast.STATE_ALG_OP (Operator.CPUTIME) -> Loggers.fprintf logger "0"
-      | Ast.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
-      | Ast.STATE_ALG_OP (Operator.EVENT_VAR) -> Loggers.fprintf logger "0"
-      | Ast.STATE_ALG_OP (Operator.EMAX_VAR) -> Loggers.fprintf logger "event_max"
-      | Ast.STATE_ALG_OP (Operator.PLOTNUM) -> Loggers.fprintf logger "num_t_point"
-      | Ast.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
-      | Ast.BIN_ALG_OP (op, a, b) ->
+      | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
+      | Alg_expr.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
+      | Alg_expr.CONST (Nbr.F f) -> Loggers.fprintf logger "%f" f
+      | Alg_expr.ALG_VAR x ->
+        Loggers.fprintf logger "var(%i)" (network.int_of_obs x)
+      | Alg_expr.KAPPA_INSTANCE x ->
+        Loggers.fprintf logger "%s(%i)" var (network.int_of_kappa_instance x)
+      | Alg_expr.TOKEN_ID x -> Loggers.fprintf logger "%s(%i)" var (network.int_of_token_id x)
+      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
+      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> Loggers.fprintf logger "0"
+      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
+      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) -> Loggers.fprintf logger "0"
+      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) -> Loggers.fprintf logger "event_max"
+      | Alg_expr.STATE_ALG_OP (Operator.PLOTNUM) -> Loggers.fprintf logger "num_t_point"
+      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
+      | Alg_expr.BIN_ALG_OP (op, a, b) ->
         begin
           let string_op = string_of_bin_op logger op in
           match bin_op_pos logger op
@@ -321,7 +323,7 @@ let rec print_alg_expr
             ()
         end
 
-      | Ast.UN_ALG_OP (op, a) ->
+      | Alg_expr.UN_ALG_OP (op, a) ->
         let () = Loggers.fprintf logger "(" in
         let string_op = string_of_un_op logger op in
         let () = Loggers.fprintf logger "%s" string_op in

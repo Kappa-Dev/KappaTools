@@ -3,4 +3,4 @@
   * Last modification: Time-stamp: <Jul 25 2016>
  *)
 
-module Interface: Ode_interface.Interface with type compil = (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil
+include Ode_interface.Interface

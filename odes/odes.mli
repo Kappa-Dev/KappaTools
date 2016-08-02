@@ -6,15 +6,21 @@
 module Make(I:Ode_interface.Interface) :
 sig
   type ode_var_id
-  type network
-  val get_compil: string list -> I.compil
+  type 'a network
 
-  val network_from_compil: I.compil -> network
+  val get_compil : Common_args.t -> Run_cli_args.t ->
+    Environment.t *
+    (I.connected_component array list Alg_expr.e * I.rule * Location.t) list
+
+  val network_from_compil:
+    Environment.t ->
+    (I.connected_component array list Alg_expr.e * I.rule * Location.t) list ->
+    int network
 
   val get_reactions:
-    network ->
+    'a network ->
     (ode_var_id list * ode_var_id list *
-     ((I.pattern, string) Ast.ast_alg_expr Location.annot *
+     ('a Alg_expr.e Location.annot *
       ode_var_id  Location.annot) list  * I.rule) list
 
   val export_network:
@@ -23,7 +29,7 @@ sig
     data_file:string ->
     init_t:float ->
     max_t:float ->
-    nb_points:int -> Loggers.t -> I.compil -> network -> unit
+    nb_points:int -> Loggers.t -> Environment.t -> int network -> unit
 
-  val species_of_species_id: network -> ode_var_id -> I.chemical_species
+  val species_of_species_id: int network -> ode_var_id -> I.chemical_species
 end

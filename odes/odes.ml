@@ -9,9 +9,9 @@ module Make(I:Ode_interface.Interface) =
 struct
 
   let alg_of_int i =
-    Location.dummy_annot (Ast.CONST (Nbr.I i))
+    Location.dummy_annot (Alg_expr.CONST (Nbr.I i))
   let alg_of_float f =
-    Location.dummy_annot (Ast.CONST (Nbr.F f))
+    Location.dummy_annot (Alg_expr.CONST (Nbr.F f))
   module SpeciesSetMap =
     SetMap.Make
       (struct
@@ -22,22 +22,20 @@ struct
   module SpeciesSet = SpeciesSetMap.Set
   module SpeciesMap = SpeciesSetMap.Map
 
-
   module Store =
     SetMap.Make
       (struct
-        type t =
-          I.rule_id * I.direction * I.connected_component_id
-        let compare = compare
-        let print a (r,dir,cc) =
+        type t = I.rule_id * I.connected_component
+        let compare (a,c) (a',c') =
+          let x = compare a a' in
+          if x <> 0 then x else I.compare_connected_component c c'
+        let print a (r,cc) =
           let () =
             Format.fprintf a
-              "Component_wise:(%s,%a,%a)"
-              (match dir with I.Direct -> "->" | I.Reverse -> "<-")
-              I.print_rule_id r I.print_connected_component_id cc  in
+              "Component_wise:(%a,%a)"
+              I.print_rule_id r I.print_connected_component cc  in
           let () = I.print_rule_id a r in
-          let () = I.print_connected_component_id a cc in
-          ()
+          I.print_connected_component a cc
       end)
 
   module StoreMap = Store.Map
@@ -51,7 +49,7 @@ struct
   let fst_id = 1
   let next_id id = id + 1
 
-  type ode_var = Nembed of I.canonic_species | Token of string | Dummy
+  type ode_var = Nembed of I.canonic_species | Token of int | Dummy
   type lhs_decl = Init_decl | Var_decl of string | Init_value of ode_var
 
 
@@ -63,46 +61,45 @@ struct
         let print log x =
           match x with
           | Nembed x -> I.print_canonic_species log x
-          | Token x -> Format.fprintf log "%s" x
+          | Token x -> Format.fprintf log "%i" x
           | Dummy -> ()
       end)
   module VarSet = VarSetMap.Set
   module VarMap = VarSetMap.Map
 
-  type decl =
-    | Var of (var_id * string Location.annot option * (ode_var_id, string) Ast.ast_alg_expr Location.annot)
-    | Init_expr of var_id * string Location.annot option  * (ode_var_id, string) Ast.ast_alg_expr Location.annot * ode_var_id list
+  type 'a decl =
+    | Var of var_id * string Location.annot option * 'a Alg_expr.e Location.annot
+    | Init_expr of var_id  * 'a Alg_expr.e Location.annot * ode_var_id list
     | Dummy_decl
 
   let var_id_of_decl decl =
     match decl with
     | Var (a,_,_) -> a
-    | Init_expr (a,_,_,_) -> a
+    | Init_expr (a,_,_) -> a
     | Dummy_decl -> fst_id
 
   type enriched_rule =
     {
       rule_id: rule_id ;
       rule: I.rule ;
-      mode: I.rule_mode ;
+      mode: I.arity ;
       lhs: I.pattern ;
-      lhs_cc:
-        (I.connected_component_id * I.connected_component) list ;
+      lhs_cc: I.connected_component list ;
       divide_rate_by: int
     }
 
   let var_of_rule rule =
     match rule.mode with
-    | I.Direct, I.Usual -> Ode_loggers.Rate rule.rule_id
-    | I.Direct, I.Unary -> Ode_loggers.Rateun rule.rule_id
-    | I.Reverse, I.Usual -> Ode_loggers.Rated rule.rule_id
-    | I.Reverse, I.Unary -> Ode_loggers.Rateund rule.rule_id
+    | I.Usual -> Ode_loggers.Rate rule.rule_id
+    | I.Unary -> Ode_loggers.Rateun rule.rule_id
 
-  type network =
+  type 'a network =
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
-      reactions: (id list * id list * ((I.pattern,string) Ast.ast_alg_expr Location.annot * id Location.annot) list * enriched_rule) list ;
+      reactions:
+        (id list * id list * ('a Alg_expr.e Location.annot*id Location.annot) list
+         * enriched_rule) list ;
 
       ode_vars_tab: ode_var Mods.DynArray.t ;
       id_of_ode_var: ode_var_id VarMap.t ;
@@ -110,15 +107,15 @@ struct
 
       species_tab: I.chemical_species Mods.DynArray.t ;
 
-      varmap: var_id Mods.StringMap.t ;
-      tokenmap: ode_var_id Mods.StringMap.t ;
+      varmap: var_id Mods.IntMap.t ;
+      tokenmap: ode_var_id Mods.IntMap.t ;
 
       fresh_var_id: var_id ;
-      var_declaration: decl list ;
+      var_declaration: 'a decl list ;
 
       n_rules: int ;
 
-      obs: (obs_id * (ode_var_id,string) Ast.ast_alg_expr Location.annot) list ;
+      obs: (obs_id * 'a Alg_expr.e Location.annot) list ;
       n_obs: int ;
 
     }
@@ -144,18 +141,18 @@ struct
       b a
 
   let get_compil = I.get_compil
-  let init () =
+  let init sigs =
     {
       rules = [] ;
       reactions = [] ;
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
       id_of_ode_var = VarMap.empty ;
-      species_tab = Mods.DynArray.create 0 I.dummy_chemical_species ;
+      species_tab = Mods.DynArray.create 0 (I.dummy_chemical_species sigs) ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
-      varmap = Mods.StringMap.empty ;
-      tokenmap = Mods.StringMap.empty ;
+      varmap = Mods.IntMap.empty ;
+      tokenmap = Mods.IntMap.empty ;
       var_declaration = [];
       n_rules = 0 ;
       obs = [] ;
@@ -193,11 +190,11 @@ struct
 
   let add_new_token token network =
     let network, id = add_new_var (Token token) network in
-    {network with tokenmap = Mods.StringMap.add token id network.tokenmap},
+    {network with tokenmap = Mods.IntMap.add token id network.tokenmap},
     id
 
   let enrich_rule rule mode id =
-    let lhs = I.lhs rule mode in
+    let lhs = I.lhs rule in
     let lhs_cc = I.connected_components_of_patterns lhs in
     {
       rule_id = id ;
@@ -272,8 +269,8 @@ struct
       l
       (remanent,[])
 
-  let petrify_mixture mixture =
-    petrify_species_list (I.connected_components_of_mixture mixture)
+  let petrify_mixture sigs mixture =
+    petrify_species_list (I.connected_components_of_mixture sigs mixture)
 
   let add_to_prefix_list connected_component key prefix_list store acc =
     let list_embeddings =
@@ -289,36 +286,101 @@ struct
       )
       acc prefix_list
 
-  let add_reaction enriched_rule mode embedding_forest mixture remanent =
+  let convert_cc connected_component network =
+    VarMap.fold
+      (fun vars id alg ->
+         match vars with
+         | Token _ | Dummy -> alg
+         | Nembed _ ->
+           let species = Mods.DynArray.get network.species_tab id in
+           let n_embs =
+             List.length
+               (I.find_embeddings connected_component species) in
+           if n_embs = 0 then alg
+           else
+             let species = Alg_expr.KAPPA_INSTANCE id in
+             let term =
+               if n_embs = 1 then species
+               else
+                 Alg_expr.BIN_ALG_OP
+                   (Operator.MULT,
+                    alg_of_int n_embs,
+                    Location.dummy_annot species)
+             in
+             if alg = Alg_expr.CONST (Nbr.zero) then term
+             else
+               Alg_expr.BIN_ALG_OP
+                 (Operator.SUM,
+                  Location.dummy_annot alg,
+                  Location.dummy_annot term)
+      )
+      network.id_of_ode_var
+      (Alg_expr.CONST (Nbr.zero))
+
+  let rec convert_alg_expr alg network =
+    match
+      alg
+    with
+    | Alg_expr.BIN_ALG_OP (op, arg1, arg2 ),loc ->
+      Alg_expr.BIN_ALG_OP
+        (op, convert_alg_expr arg1 network, convert_alg_expr arg2 network),loc
+    | Alg_expr.UN_ALG_OP (op, arg),loc ->
+      Alg_expr.UN_ALG_OP (op, convert_alg_expr arg network),loc
+    | Alg_expr.KAPPA_INSTANCE cc, loc ->
+      List.fold_left
+        (fun acc l ->
+           Alg_expr.BIN_ALG_OP
+             (Operator.SUM,
+              Location.dummy_annot acc,
+              Location.dummy_annot @@
+              Array.fold_left
+                    (fun expr h ->
+                    Alg_expr.BIN_ALG_OP
+                      (Operator.MULT,
+                       Location.dummy_annot expr,
+                       Location.dummy_annot (convert_cc h network)))
+                    (Alg_expr.CONST Nbr.one)
+                    l))
+        (Alg_expr.CONST Nbr.zero)
+        cc, loc
+    | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
+      |Alg_expr.STATE_ALG_OP _),_ as a -> a
+
+  let add_reaction sigs enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
-    let remanent, reactants = petrify_mixture mixture remanent in
-    let products = I.apply rule mode embedding_forest mixture in
-    let tokens = I.token_vector rule mode in
-    let remanent, products = petrify_mixture products remanent in
+    let remanent, reactants =
+      petrify_mixture sigs mixture remanent in
+    let products = I.apply sigs rule embedding_forest mixture in
+    let tokens = I.token_vector rule in
+    let remanent, products =
+      petrify_mixture sigs products remanent in
     let remanent, tokens =
       List.fold_left
-        (fun (remanent, tokens) (a,(b,c)) ->
+        (fun (remanent, tokens) (a,b) ->
            let remanent, id = translate_token b remanent in
-           remanent,(a,(id,c))::tokens)
+           let a' = convert_alg_expr a (snd remanent) in
+           remanent,(a',(Location.dummy_annot id))::tokens)
         (remanent,[])
         tokens
     in
     let to_be_visited, network = remanent in
     let network =
       {
-        network
-        with reactions = (List.rev reactants, List.rev products, List.rev tokens, enriched_rule)::network.reactions
+        network with
+        reactions =
+          (List.rev reactants, List.rev products, List.rev tokens,
+           enriched_rule)::network.reactions
       }
     in
     to_be_visited, network
 
-  let initial_network initial_states =
+  let initial_network sigs initial_states =
     List.fold_left
       (fun remanent species -> fst (translate_species species remanent))
-      ([], init ())
+      ([], init sigs)
       initial_states
 
-  let compute_reactions rules initial_states =
+  let compute_reactions sigs rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let _,rules =
@@ -332,7 +394,7 @@ struct
              list modes)
         (fst_id,[]) rules
     in
-    let to_be_visited, network = initial_network initial_states in
+    let to_be_visited, network = initial_network sigs initial_states in
     let network =
       {network
        with n_rules = pred n_rules;
@@ -355,17 +417,16 @@ struct
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
               (*  (rule_id,rule,mode,lhs,lhs_cc)*)
               (* regular application of tules, we store the embeddings*)
-              let direction,arity = enriched_rule.mode in
+              let arity = enriched_rule.mode in
               match arity with
               | I.Usual ->
                 begin
                   let store_new_embeddings =
                     List.fold_left
-                      (fun store (cc_id, cc) ->
+                      (fun store cc ->
                          let lembed = I.find_embeddings cc new_species in
                          add_embedding_list
-                           (enriched_rule.rule_id,direction,
-                            cc_id)
+                           (enriched_rule.rule_id,cc)
                            (List.rev_map (fun a -> a,new_species) (List.rev lembed))
                            store
                       )
@@ -389,16 +450,16 @@ struct
                   (* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
                   let _,new_embedding_list =
                     List.fold_left
-                      (fun (partial_emb_list,partial_emb_list_with_new_species) (cc_id,cc) ->
+                      (fun (partial_emb_list,partial_emb_list_with_new_species) cc ->
                          (* First case, we complete with an embedding towards the new_species *)
                          let partial_emb_list =
-                           add_to_prefix_list cc (enriched_rule.rule_id,direction,cc_id) partial_emb_list store_old_embeddings []
+                           add_to_prefix_list cc (enriched_rule.rule_id,cc) partial_emb_list store_old_embeddings []
                          in
                          let partial_emb_list_with_new_species =
-                           add_to_prefix_list cc (enriched_rule.rule_id,direction,cc_id)
+                           add_to_prefix_list cc (enriched_rule.rule_id,cc)
                              partial_emb_list
                              store_new_embeddings
-                             (add_to_prefix_list cc (enriched_rule.rule_id,direction,cc_id) partial_emb_list_with_new_species
+                             (add_to_prefix_list cc (enriched_rule.rule_id,cc) partial_emb_list_with_new_species
                                 store_all_embeddings [])
                          in
                          partial_emb_list, partial_emb_list_with_new_species
@@ -410,8 +471,8 @@ struct
                   let to_be_visited, network =
                     List.fold_left
                       (fun remanent list ->
-                         let _,embed,mixture = I.disjoint_union list in
-                         add_reaction enriched_rule (I.Direct,I.Usual) embed mixture remanent)
+                         let _,embed,mixture = I.disjoint_union sigs list in
+                         add_reaction sigs enriched_rule embed mixture remanent)
                       (to_be_visited,network)
                       new_embedding_list
                   in
@@ -425,8 +486,8 @@ struct
                     let lembed = I.find_embeddings_unary_binary enriched_rule.lhs new_species in
                     fold_left_swap
                       (fun embed ->
-                         add_reaction enriched_rule enriched_rule.mode embed
-                           (I.lift_species new_species))
+                         add_reaction sigs enriched_rule embed
+                           (I.lift_species sigs new_species))
                       lembed
                       (to_be_visited, network)
                   in
@@ -440,13 +501,12 @@ struct
     in
     aux to_be_visited network store
 
-  let convert_tokens compil network =
-    let tokens = I.get_tokens compil in
-    List.fold_left
-      (fun network (a,_) ->
+  let convert_tokens env network =
+    Tools.recti
+      (fun network a ->
          snd (fst (translate_token a ([],network))))
       network
-      tokens
+      (Environment.nb_tokens env)
 
   let translate_species species network =
     snd (translate_species species ([],network))
@@ -454,125 +514,42 @@ struct
   let translate_token token network =
     snd (translate_token token ([],network))
 
-  let convert_cc connected_component network =
-    VarMap.fold
-      (fun vars id alg ->
-         match vars with
-         | Nembed _ ->
-           begin
-             let species = Mods.DynArray.get network.species_tab id in
-             let n_embs =
-               List.length
-                 (I.find_embeddings connected_component species)
-             in
-             if n_embs = 0
-             then
-               alg
-             else
-               let species = Ast.KAPPA_INSTANCE id in
-               let term =
-                 if n_embs = 1
-                 then
-                   species
-                 else
-                   Ast.BIN_ALG_OP
-                     (
-                       Operator.MULT,
-                       alg_of_int n_embs,
-                       Location.dummy_annot species)
-               in
-               if alg = Ast.CONST (Nbr.zero) then term
-               else
-                 Ast.BIN_ALG_OP
-                   (
-                     Operator.SUM,
-                     Location.dummy_annot alg,
-                     Location.dummy_annot term)
-           end
-         | Token _ | Dummy ->
-           alg
-
-      )
-      network.id_of_ode_var
-      (Ast.CONST (Nbr.zero))
-
   let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
   let get_reactions network = network.reactions
 
-  let rec convert_alg_expr alg network =
-    match
-      alg
-    with
-    | Ast.BIN_ALG_OP (op, arg1, arg2 ),loc ->
-      Ast.BIN_ALG_OP (op, convert_alg_expr arg1 network, convert_alg_expr arg2 network),loc
-    | Ast.UN_ALG_OP (op, arg),loc ->
-      Ast.UN_ALG_OP (op, convert_alg_expr arg network),loc
-    | Ast.KAPPA_INSTANCE pattern, loc ->
-      let cc = I.connected_components_of_patterns pattern in
-      begin
-        match cc with
-        | [] ->
-          Ast.CONST Nbr.zero
-        | (_,h)::t ->
-          List.fold_left
-            (fun expr (_,h) ->
-               Ast.BIN_ALG_OP
-                 (Operator.MULT,
-                  Location.dummy_annot expr,
-                  Location.dummy_annot (convert_cc h network)))
-            (convert_cc h network)
-            t
-      end, loc
-    | Ast.TOKEN_ID a, loc ->
-      Ast.TOKEN_ID a, loc
-    | Ast.OBS_VAR a, loc ->
-      Ast.OBS_VAR a, loc
-    | Ast.CONST a , loc ->
-      Ast.CONST a, loc
-    | Ast.STATE_ALG_OP op,loc ->
-      Ast.STATE_ALG_OP op,loc
-
-  let convert_initial_state intro network =
-    let a,b,c = intro in
-    a,
-    convert_alg_expr ((*Location.dummy_annot*) b) network,
-    match
-      fst c
-    with
-    | Ast.INIT_MIX m ->
-      begin
-        let cc = I.connected_components_of_mixture m in
-        let list =
-          List.rev_map
-            (fun x -> translate_species x network)
-            (List.rev cc)
-        in
-        list
-      end
-    | Ast.INIT_TOK token ->
-      [translate_token
-         token
-         network]
-
+  let convert_initial_state sigs intro network =
+    let b,c,a = intro in
+    convert_alg_expr (b,a) network,
+    match I.token_vector c with
+    | [] ->
+      let _,emb,m = I.disjoint_union sigs [] in
+      let m = I.apply sigs c emb m in
+      let cc = I.connected_components_of_mixture sigs m in
+      List.rev_map
+        (fun x -> translate_species x network)
+        (List.rev cc)
+    | l ->
+      List.map (fun (_,token) -> translate_token token network) l
 
   let convert_var_def variable_def network =
     let a,b = variable_def in
     a,convert_alg_expr b network
 
-  let convert_var_defs compil network =
-    let list_var = I.get_variables compil in
+  let convert_var_defs env init network =
+    let list_var = I.get_variables env in
     let list, network =
-      List.fold_left
-        (fun (list,network) def ->
+      Tools.array_fold_lefti
+        (fun i (list,network) def ->
            let a,b = convert_var_def def network in
            (Var (get_fresh_var_id network,Some a,b))::list,
            inc_fresh_var_id
-             {network with varmap = Mods.StringMap.add (fst a) (get_fresh_var_id network) network.varmap})
+             {network with
+              varmap =
+                Mods.IntMap.add i (get_fresh_var_id network) network.varmap})
         ([],network)
         list_var
     in
-    let list_init = I.get_initial_state compil in
     let init_tab =
       Mods.DynArray.make (get_fresh_ode_var_id network) []
     in
@@ -585,17 +562,18 @@ struct
     let list, network =
       List.fold_left
         (fun (list,network) def ->
-           let a,b,c = convert_initial_state def network in
+           let b,c =
+             convert_initial_state (Environment.signatures env) def network in
            let () =
              List.iter
                (fun id -> add id (get_fresh_var_id network))
                c
            in
-           (Init_expr (network.fresh_var_id,a,b,c))::list,
+           (Init_expr (network.fresh_var_id,b,c))::list,
            (inc_fresh_var_id network)
         )
         (list,network)
-        list_init
+        init
     in
     let size = List.length list in
     let npred =
@@ -606,12 +584,31 @@ struct
     in
     let dec_tab =
       Mods.DynArray.create network.fresh_var_id
-        (Dummy_decl,None,Location.dummy_annot (Ast.CONST Nbr.zero))
+        (Dummy_decl,None,Location.dummy_annot (Alg_expr.CONST Nbr.zero))
     in
     let add_succ i j =
       let () = Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
       let () = Mods.DynArray.set lsucc i (j::(Mods.DynArray.get lsucc i)) in
       ()
+    in
+    let rec aux id expr =
+      match expr with
+      | Alg_expr.CONST _,_ -> ()
+      | Alg_expr.BIN_ALG_OP (_,a,b),_ -> (aux id a;aux id b)
+      | Alg_expr.UN_ALG_OP (_,a),_ -> aux id a
+      | Alg_expr.STATE_ALG_OP _,_ -> ()
+      | Alg_expr.TOKEN_ID s,_ ->
+        let id' = translate_token s network in
+        let list = Mods.DynArray.get init_tab id' in
+        List.iter (fun id' -> add_succ id id') list
+      | Alg_expr.KAPPA_INSTANCE id',_ ->
+          let list = Mods.DynArray.get init_tab id' in
+          List.iter (fun id'' -> add_succ id' id'') list
+      | Alg_expr.ALG_VAR id,_ ->
+        let id' = Mods.IntMap.find_option id network.varmap in
+        match id' with
+        | Some id' -> add_succ id id'
+        | None -> ()
     in
     let () =
       List.iter
@@ -619,48 +616,10 @@ struct
            match decl
            with
            | Dummy_decl -> ()
-           | Init_expr (id,a,b,_)
+           | Init_expr (id,b,_) -> aux id b
            | Var (id,a,b) ->
-             begin
                let () = Mods.DynArray.set dec_tab id (decl,a,b) in
-               let rec aux expr =
-                 match expr with
-                 | Ast.CONST _,_ -> ()
-                 | Ast.BIN_ALG_OP (_,a,b),_ -> (aux a;aux b)
-                 | Ast.UN_ALG_OP (_,a),_ -> aux a
-                 | Ast.STATE_ALG_OP _,_ -> ()
-                 | Ast.OBS_VAR string,_ ->
-                   let id' =
-                     Mods.StringMap.find_option string
-                       network.varmap in
-                   begin
-                     match id' with
-                     | Some id' ->
-                       add_succ id id'
-                     | None ->
-                       ()
-                   end
-                 | Ast.TOKEN_ID s,_ ->
-                   let id' = translate_token s network in
-                   let list =
-                     Mods.DynArray.get
-                       init_tab
-                       id'
-                   in
-                   List.iter (fun id' -> add_succ id id') list
-                 | Ast.KAPPA_INSTANCE id',_ ->
-                   let list =
-                     Mods.DynArray.get
-                       init_tab
-                       id'
-                   in
-                   List.iter (fun id' -> add_succ id id') list
-               in
-               aux b
-             end
-        )
-        list
-    in
+               aux id b) list in
     let top_sort =
       let clean k to_be_visited =
         let l = Mods.DynArray.get lsucc k in
@@ -717,7 +676,7 @@ struct
            inc_fresh_obs_id
              {network with
               obs = (get_fresh_obs_id network,
-                     convert_alg_expr obs network)
+                     convert_alg_expr (Location.dummy_annot obs) network)
                     ::network.obs})
         network
         list_obs
@@ -727,48 +686,38 @@ struct
      n_obs = network.n_obs - 1}
 
 
-  let species_of_initial_state =
+  let species_of_initial_state sigs =
     List.fold_left
-      (fun list (_,_,(b,_)) ->
-         match b with
-         | Ast.INIT_MIX b ->
-           begin
-             List.fold_left
-               (fun list a -> a::list)
-               list
-               (I.connected_components_of_mixture b)
-           end
-         | Ast.INIT_TOK _ -> list)
+      (fun list (_,r,_) ->
+         let _,emb,m = I.disjoint_union sigs [] in
+         let b = I.apply sigs r emb m in
+         List.rev_append (I.connected_components_of_mixture sigs b) list)
       []
 
-  let rec is_const expr constvarset =
+  let is_const expr = (* constant propagation is already done *)
     match
       expr
     with
-    | Ast.CONST _,_ -> true
-    | Ast.BIN_ALG_OP (_,a,b),_ ->
-      is_const a constvarset && is_const b constvarset
-    | Ast.UN_ALG_OP (_,a),_ -> is_const a constvarset
+    | Alg_expr.CONST _,_ -> true
+    | Alg_expr.BIN_ALG_OP _,_
+    | Alg_expr.UN_ALG_OP _,_
+    | Alg_expr.ALG_VAR _,_
+    | Alg_expr.STATE_ALG_OP _,_
+    | Alg_expr.TOKEN_ID _,_
+    | Alg_expr.KAPPA_INSTANCE _,_ -> false
 
-    | Ast.OBS_VAR string,_ ->
-      Mods.StringSet.mem string constvarset
-    | Ast.STATE_ALG_OP _,_
-    | Ast.TOKEN_ID _,_
-    | Ast.KAPPA_INSTANCE _,_ -> false
+  type 'a rate = 'a Alg_expr.e Location.annot
 
-  type rate =
-    (ode_var_id, string) Ast.ast_alg_expr Location.annot
-
-  type sort_rules_and_decl =
+  type 'a sort_rules_and_decl =
     {
       const_decl_set : Mods.StringSet.t ;
-      const_decl: decl list ;
-      var_decl: decl list ;
-      init: decl list ;
+      const_decl: 'a decl list ;
+      var_decl: 'a decl list ;
+      init: 'a decl list ;
       const_rate :
-        (I.rule_id * I.rule * I.rule_mode * rate) list ;
+        (I.rule_id * I.rule * I.arity * 'a rate) list ;
       var_rate :
-        (I.rule_id * I.rule * I.rule_mode * rate) list ;
+        (I.rule_id * I.rule * I.arity * 'a rate) list ;
     }
 
   let init_sort_rules_and_decl =
@@ -783,14 +732,8 @@ struct
 
   let var_rate (id,mode,_) =
     match mode with
-    | I.Direct, I.Usual ->
-      Ode_loggers.Rate id
-    | I.Direct, I.Unary ->
-      Ode_loggers.Rateun id
-    | I.Reverse, I.Usual ->
-      Ode_loggers.Rated id
-    | I.Reverse, I.Unary ->
-      Ode_loggers.Rateund id
+    | I.Usual -> Ode_loggers.Rate id
+    | I.Unary -> Ode_loggers.Rateun id
 
   let split_var_declaration network sort_rules_and_decls =
     let decl =
@@ -805,7 +748,7 @@ struct
                with
                  init = decl::sort_decls.init}
            | Var (_id,Some (a,_),b) ->
-             if is_const b sort_decls.const_decl_set
+             if is_const b
              then
                {
                  sort_decls
@@ -840,7 +783,7 @@ struct
            | Some rate ->
              let rate = convert_alg_expr rate network in
              let sort_rules =
-               if is_const rate sort_rules_and_decls.const_decl_set
+               if is_const rate
                then
                  {
                    sort_rules
@@ -869,13 +812,15 @@ struct
   let split_rules_and_decl network =
     split_rules network (split_var_declaration network init_sort_rules_and_decl)
 
-  let network_from_compil compil =
-    let rules = I.get_rules compil in
-    let initial_state = species_of_initial_state (I.get_initial_state compil) in
-    let network = compute_reactions rules initial_state in
-    let network = convert_tokens compil network in
-    let network = convert_var_defs compil network in
-    let network = convert_obs compil network in
+  let network_from_compil env init =
+    let rules = I.get_rules env in
+    let initial_state =
+      species_of_initial_state (Environment.signatures env) init in
+    let network =
+      compute_reactions (Environment.signatures env) rules initial_state in
+    let network = convert_tokens env network in
+    let network = convert_var_defs env init network in
+    let network = convert_obs env network in
     network
 
   let handler_init =
@@ -887,10 +832,11 @@ struct
 
   let handler_expr network =
     {
-      Ode_loggers.int_of_obs = (fun string  -> Mods.StringMap.find_default 0 string network.varmap) ;
+      Ode_loggers.int_of_obs =
+        (fun s -> Mods.IntMap.find_default 0 s network.varmap) ;
       Ode_loggers.int_of_kappa_instance = (fun i -> i) ;
-      Ode_loggers.int_of_token_id = (fun string ->
-          Mods.StringMap.find_default 0 string network.tokenmap) ;
+      Ode_loggers.int_of_token_id =
+        (fun s -> Mods.IntMap.find_default 0 s network.tokenmap) ;
     }
 
 
@@ -905,7 +851,7 @@ struct
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl -> ()
-    | Init_expr (id',_comment, expr, list) ->
+    | Init_expr (id', expr, list) ->
       begin
         match list with
         | [] -> ()
@@ -917,7 +863,7 @@ struct
             then
               expr
             else
-              Location.dummy_annot (Ast.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
+              Location.dummy_annot (Alg_expr.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
           in
           increment is_zero ~init_mode logger a expr handler_expr
         | _ ->
@@ -926,13 +872,13 @@ struct
             (fun id ->
                let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network id)
                in
-               let expr = Location.dummy_annot (Ast.OBS_VAR id') in
+               let expr = Location.dummy_annot (Alg_expr.ALG_VAR id') in
                let expr =
                  if n = 1
                  then
                    expr
                  else
-                   Location.dummy_annot (Ast.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
+                   Location.dummy_annot (Alg_expr.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
                in
                increment is_zero logger ~init_mode id expr handler_init)
             list
@@ -1031,7 +977,7 @@ struct
     let () =
       Ode_loggers.associate logger
         (Ode_loggers.Init (get_last_ode_var_id network))
-        (Location.dummy_annot (Ast.STATE_ALG_OP Operator.TIME_VAR))
+        (Location.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
         handler_init
     in
     let () =
@@ -1107,7 +1053,8 @@ struct
       List.iter
         (fun (reactants, products, token_vector, enriched_rule) ->
            let nauto_in_lhs = enriched_rule.divide_rate_by in
-           let reactants' = List.rev_map (fun x -> Ode_loggers.Concentration x) (List.rev reactants) in
+           let reactants' =
+             List.rev_map (fun x -> Ode_loggers.Concentration x) (List.rev reactants) in
 
            let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
            let () = do_it Ode_loggers.produce products reactants' enriched_rule in
@@ -1117,7 +1064,7 @@ struct
                   Ode_loggers.update_token
                     logger
                     (Ode_loggers.Deriv token) ~nauto_in_lhs (var_of_rule enriched_rule)
-                    (convert_alg_expr expr network) reactants' (handler_expr network))
+                    expr reactants' (handler_expr network))
                token_vector
            in ()
         )

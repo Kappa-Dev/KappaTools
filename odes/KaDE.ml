@@ -3,18 +3,20 @@
   * Last modification: Time-stamp: <Jul 29 2016>
 *)
 
-module A = Odes.Make (Dummy_interface.Interface)
+module A = Odes.Make (Dummy_interface)
 
 let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave] [-t-init time] [-t time] [-p points] [-o output_file]\n"
+    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave] [-t-init time] [-t time] [-p points] [-o output_file]\n"
   in
   let cli_args = Run_cli_args.default in
+  let common_args = Common_args.default in
   let ode_args = Ode_args.default in
   let options =
     Run_cli_args.options cli_args
     @ Ode_args.options ode_args
+      @ Common_args.options common_args
   in
   try
     Arg.parse
@@ -83,12 +85,8 @@ let main () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
-    let compil =
-      A.get_compil cli_args.Run_cli_args.inputKappaFileNames
-    in
-    let network =
-      A.network_from_compil compil
-    in
+    let (env,init) = A.get_compil common_args cli_args in
+    let network = A.network_from_compil env init in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
     let () = A.export_network
@@ -98,7 +96,7 @@ let main () =
         ~init_t:cli_args.Run_cli_args.minTimeValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxTimeValue)
         ~nb_points:cli_args.Run_cli_args.pointNumberValue
-        logger compil network
+        logger env network
     in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in

@@ -3,111 +3,160 @@
   * Last modification: Time-stamp: <Jul 29 2016>
 *)
 
-module Interface =
-struct
-  type mixture = Ast.mixture          (* not necessarily connected, fully specified *)
-  type chemical_species = Ast.mixture   (* connected, fully specified *)
-  type canonic_species = int (* chemical species in canonic form *)
-  type pattern = Ast.mixture           (* not necessarity connected, maybe partially specified *)
-  type connected_component = Ast.mixture (* connected, maybe partially specified *)
+type mixture = Edges.t(* not necessarily connected, fully specified *)
+type chemical_species = Connected_component.cc
+(* connected, fully specified *)
+type canonic_species = chemical_species (* chemical species in canonic form *)
+type pattern = Connected_component.cc array
+(* not necessarity connected, maybe partially specified *)
+type connected_component = Connected_component.cc
+(* connected, maybe partially specified *)
 
-  let dummy_chemical_species = []
-  let dummy_canonic_species = 0
-  let do_we_divide_rates_by_n_auto_in_lhs = true
-  let print_chemical_species _ _ = ()
-  let print_canonic_species _ _ = ()
+let dummy_chemical_species sigs = Connected_component.empty_cc sigs
 
-  type connected_component_id = int
-  let print_connected_component_id log = Format.fprintf log "%i"
+let do_we_divide_rates_by_n_auto_in_lhs = true
+let print_chemical_species = Connected_component.print ?sigs:None ~with_id:()
+let print_canonic_species = print_chemical_species
 
-  let nbr_automorphisms_in_chemical_species _ = 1
-  let nbr_automorphisms_in_pattern _ = 1
+let nbr_automorphisms_in_chemical_species x =
+  List.length (Connected_component.automorphisms x)
+let nbr_automorphisms_in_pattern a =
+  let a' = Array.copy a in
+  let () = Array.sort Connected_component.compare_canonicals a' in
+  let rec aux i acc n el =
+    if i >= Array.length a' then n * acc else
+      let n' =
+        if Connected_component.is_equal_canonicals a'.(i) el then  n+1 else 1 in
+      aux (succ i) (n *acc) n' a'.(i) in
+  if Array.length a' = 0 then 1 else
+    let acc = Array.fold_left
+        (fun a x -> a*nbr_automorphisms_in_chemical_species x) 1 a' in
+    aux 1 acc 1 a'.(0)
 
-  let canonic_form _ = 1
+let compare_connected_component = Connected_component.compare_canonicals
+let print_connected_component =
+  Connected_component.print ?sigs:None ~with_id:()
 
-  let connected_components_of_patterns _ =[0,[]]
+let canonic_form x = x
 
-  let connected_components_of_mixture _ = [[]]
+let connected_components_of_patterns = Array.to_list
 
-  type embedding = (int * int) list (* the domain is connected *)
-  type embedding_forest = embedding (* the domain may be not connected *)
-  let lift_embedding x = x
-  let find_embeddings _ _ = [[1,1]]
+let connected_components_of_mixture sigs e =
+  let snap = Edges.build_snapshot sigs e in
+  List.fold_left
+    (fun acc (i,m) ->
+       match Snip.connected_components_sum_of_ambiguous_mixture
+               [||] (Connected_component.PreEnv.empty sigs)
+               (LKappa.of_raw_mixture m) with
+       | _,[[|x|],_] -> Tools.recti (fun a _ -> x::a) acc i
+       | _ -> assert false)
+    [] snap
 
-  let find_embeddings_unary_binary _ _ = [[1,1]]
+type embedding = Renaming.t (* the domain is connected *)
+type embedding_forest = Connected_component.Matching.t
+(* the domain may be not connected *)
 
-  let disjoint_union _ = [],[1,1],[]
+let lift_embedding x =
+  Tools.unsome
+    Connected_component.Matching.empty
+    (Connected_component.Matching.add_cc Connected_component.Matching.empty 0 x)
+let find_embeddings = Connected_component.embeddings_to_fully_specified
 
-  type rule = (string Location.annot option * Ast.rule Location.annot)
-  type rule_id = int
-  type direction = Direct | Reverse
-  type arity = Usual | Unary
-  type rule_mode = direction * arity
-  type rule_id_with_mode = rule_id * rule_mode
+let find_embeddings_unary_binary _ _ =
+  [Connected_component.Matching.empty] (*TODO*)
 
-  let add x y list  =
-    match y with
-    | None -> list
-    | Some _ -> x::list
-
-  let valid_modes rule =
-    let rule = fst (snd rule) in
-    (Direct,Usual)::
-    (add (Direct,Unary) rule.Ast.k_un
-      (add (Reverse,Usual) rule.Ast.k_op
-         (add (Reverse,Unary) rule.Ast.k_op_un [])))
-
-  let lift extended_rate =
-    match extended_rate
-    with
-    | None -> None
-    | Some (a,_) -> Some a
-
-  let rate rule mode =
-    let rule = fst (snd rule) in
-    match
-      mode
-    with
-    | Direct,Usual -> Some rule.Ast.k_def
-    | Direct,Unary -> lift rule.Ast.k_un
-    | Reverse,Usual -> rule.Ast.k_op
-    | Reverse,Unary -> lift rule.Ast.k_op_un
-
-  let lhs (_,(a,_)) (dir,_) =
-    match dir with
-    | Direct -> a.Ast.lhs
-    | Reverse -> a.Ast.rhs
-
-  let token_vector (_,(a,_)) (dir,_) =
-    let add,remove  =
-      match dir with
-      | Direct -> a.Ast.add_token,a.Ast.rm_token
-      | Reverse -> a.Ast.rm_token,a.Ast.add_token
-    in
+let disjoint_union sigs l =
+  let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
+  let _,em,mix =
     List.fold_left
-      (fun token_vector (a,b) ->
-         (Location.dummy_annot (Ast.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
-      add remove
+      (fun (i,em,mix) (_,r,cc) ->
+         let (mix',r') =
+           Connected_component.add_fully_specified_to_graph sigs mix cc in
+         let r'' = Renaming.compose false r r' in
+         (succ i,
+          Tools.unsome
+            Connected_component.Matching.empty
+            (Connected_component.Matching.add_cc em i r''),
+          mix'))
+      (0,Connected_component.Matching.empty,Edges.empty ())
+      l in
+  (pat,em,mix)
 
+type rule = Primitives.elementary_rule
+type rule_id = int
+type arity = Usual | Unary
+type rule_id_with_mode = rule_id * arity
 
-  let print_rule_id log = Format.fprintf log "%i"
+let lhs r = r.Primitives.connected_components
 
+let add x y list  =
+  match y with
+  | None -> list
+  | Some _ -> x::list
 
-  let apply _ _ _ _ = []
-  let lift_species _ = []
+let valid_modes rule =
+  Usual::
+  (add Unary rule.Primitives.unary_rate [])
 
+let rate rule mode =
+  match
+    mode
+  with
+  | Usual -> Some rule.Primitives.rate
+  | Unary -> Tools.option_map fst rule.Primitives.unary_rate
 
-  type compil = (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil
-  let get_compil files  =
+let token_vector a =
+  let add,remove  =
+    a.Primitives.injected_tokens,a.Primitives.consumed_tokens
+  in
+  List.fold_left
+    (fun token_vector (a,b) ->
+       (Location.dummy_annot (Alg_expr.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
+    add remove
+
+let print_rule_id log = Format.fprintf log "%i"
+
+let apply sigs rule inj_nodes mix =
+  let concrete_removed =
+    List.map (Primitives.Transformation.concretize
+                (inj_nodes,Mods.IntMap.empty)) rule.Primitives.removed in
+  let (side_effects,edges_after_neg) =
     List.fold_left
-      (KappaLexer.compile Format.std_formatter) Ast.empty_compil
-      files
-  let get_rules compil = compil.Ast.rules
-  let get_initial_state compil = compil.Ast.init
-  let get_variables compil = compil.Ast.variables
-  let get_obs compil = compil.Ast.observables
-  let get_tokens compil = compil.Ast.tokens
-  
-  let get_obs_titles _compil =
-    ["Obs1";"Obs2";"..."]
-end
+      Rule_interpreter.apply_negative_transformation
+      ([],mix) concrete_removed in
+  let (_,remaining_side_effects,edges'),concrete_inserted =
+    List.fold_left
+      (fun (x,p) h ->
+         let (x', h') =
+           Rule_interpreter.apply_positive_transformation sigs x h in
+         (x',h'::p))
+      (((inj_nodes,Mods.IntMap.empty),side_effects,edges_after_neg),[])
+      rule.Primitives.inserted in
+  let (edges'',_) =
+    List.fold_left
+      (fun (e,i)  ((id,_ as nc),s) ->
+         Edges.add_free id s e,Primitives.Transformation.Freed (nc,s)::i)
+      (edges',concrete_inserted) remaining_side_effects in
+ edges''
+
+let lift_species sigs x =
+  fst @@
+  Connected_component.add_fully_specified_to_graph
+    sigs (Edges.empty ()) x
+
+let get_rules env =
+  Environment.fold_rules (fun _ acc r -> r::acc) [] env
+let get_variables env = Environment.get_algs env
+let get_obs env =
+  Array.to_list @@ Environment.map_observables (fun r -> r) env
+
+let get_obs_titles env =
+  Array.to_list @@
+  Environment.map_observables
+    (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+    env
+
+let get_compil common_args cli_args =
+  let (env,_,_,_,_,_,_,init),_,_ =
+    Cli_init.get_compilation common_args cli_args in
+  env,init
