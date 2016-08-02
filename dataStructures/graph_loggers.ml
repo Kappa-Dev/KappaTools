@@ -224,19 +224,9 @@ let print_graph_foot logger =
         let () = Format.fprintf f "@,</div>@]@,</body>@,</html>@]@." in
         ()
     end
-  | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
-  | Loggers.Json ->
-    let graph = Loggers.graph_of_logger logger in
-    let channel_opt = Loggers.channel_of_logger logger in
-    begin
-      match channel_opt
-      with
-      | None -> ()
-      | Some channel ->
-        let () = Yojson.Basic.to_channel channel (Graph_json.to_json graph) in
-        ()
-    end
-
+  | Loggers.Json  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  
 let print_comment
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
@@ -361,7 +351,8 @@ let print_node logger ?directives:(directives=[]) id =
         )
         attributes
         directives
-    | Loggers.Json  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+    | Loggers.Json
+    | Loggers.Maple | Loggers.Matlab | Loggers.Octave
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML
       -> attributes
   in
@@ -555,7 +546,8 @@ let print_node logger ?directives:(directives=[]) id =
         let () = Loggers.print_newline logger in
         ()
     end
-  | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Json -> Loggers.add_node logger id directives
+  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
@@ -748,7 +740,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let () = Loggers.fprintf logger "%s%s %s %s%s" prefix id1 arrow id2 label in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Json -> Loggers.add_edge logger id1 id2 directives
+  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
   | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_one_to_n_relation

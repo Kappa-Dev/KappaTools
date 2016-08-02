@@ -170,7 +170,7 @@ module Cflow_handler =
         with
         | Remanent_parameters_sig.Server ->
           true,
-          Loggers.open_logger_from_channel stdout,
+          Loggers.open_logger_from_channel ~mode:Loggers.Json stdout,
           Loggers.dummy_html_logger,
           Loggers.dummy_html_logger,
           Loggers.dummy_html_logger,

@@ -53,6 +53,10 @@ type graph =
     conflict_pred: int list A.t;
   }
 
+type compression_result =
+  | New_story of StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list * graph
+  | Old_story of StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list * int
+
 let dummy_graph =
   {
     root = 0 ;
@@ -74,8 +78,23 @@ type prehash = (node*int) list
 let dummy_cannonical_form = []
 let dummy_prehash = []
 
-let print_story_info logger _parameter story_info_list =
-  List.iter
+let story_info_list_to_json list =
+  `List (List.rev_map (Trace.Simulation_info.to_json (fun _ -> `List [])) (List.rev list))
+
+let story_info_list_of_json json =
+  match json
+  with
+  | `List l as x ->
+    begin
+      try
+        List.rev_map (Trace.Simulation_info.of_json (fun _ -> ())) (List.rev l)
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (("Not a correct list of story information"),x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error (("Not a correct list of story_information"),x))
+
+let print_story_info logger _parameter json =
+  (*List.iter
     (fun
       story_info ->
       let () =
@@ -89,12 +108,24 @@ let print_story_info logger _parameter story_info_list =
       Loggers.print_newline logger
     )
     story_info_list
+  *)
+  let channel_opt = Loggers.channel_of_logger logger in
+  let () =
+    begin
+      match channel_opt
+      with
+      | None -> ()
+      | Some channel ->
+        let () = Yojson.Basic.to_channel channel json in
+        ()
+    end
+  in
+  let () = Loggers.print_newline logger in
+  ()
 
 let print_graph logger _parameter _handler error graph =
   let () = Loggers.refresh_id logger in
   let () = Loggers.fprintf logger "****" in
-  let () = Loggers.print_newline logger in
-  let () = Loggers.fprintf logger "Root: %i" graph.root in
   let () = Loggers.print_newline logger in
   let () = Graph_loggers.print_graph_preamble logger "story" in
   let () =
@@ -136,7 +167,19 @@ let print_graph logger _parameter _handler error graph =
       )
       graph.conflict_pred
   in
-  let () = Graph_loggers.print_graph_foot logger in
+  let graph_json = Graph_json.to_json (Loggers.graph_of_logger logger) in
+  let channel_opt = Loggers.channel_of_logger logger in
+  let () =
+    begin
+      match channel_opt
+      with
+      | None -> ()
+      | Some channel ->
+        let () = Yojson.Basic.to_channel channel graph_json in
+        ()
+    end
+  in
+  let () = Loggers.print_newline logger in
   let () = Loggers.fprintf logger "****" in
   let () = Loggers.print_newline logger in
   error
@@ -702,11 +745,12 @@ module BucketTable =
         let log_info =
           if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
           then
+            let json = story_info_list_to_json story_info in
             let () =
               print_story_info
                 (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
                 parameter
-                story_info
+                json
             in
             let () =
               Loggers.fprintf
@@ -744,11 +788,12 @@ module BucketTable =
           let () =
             if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
             then
+              let json = story_info_list_to_json story_info in
               let () =
                 print_story_info
                   (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
                   parameter
-                  story_info
+                  json
               in
               let () =
                 Loggers.fprintf
@@ -939,34 +984,34 @@ module BucketTable =
       let error,log_info,table,tree = aux_outer log_info error (grid,graph,None,pretrace,story_info) story_info prehash table.tree table in
       error,log_info,{table with tree = tree}
 
-        (*    let rec print_inner_tree parameter handler error prefix inner_tree =
-      match
-        inner_tree
-        with
-        | Inner_node (map,assoc') ->
-        let () =
-        match
-        assoc'
-        with
-        | None ->
-        Format.fprintf parameter.H.out_channel "%sUnfilled Node\n" prefix
-        | Some (id)  ->
-        Format.fprintf parameter.H.out_channel "%sFilled Node: %i\n" prefix id
-        in
-        let prefix' = prefix^" " in
-        KeyMap.iter
-        (fun elt map ->
-        print_elt parameter.H.out_channel elt;
-        print_inner_tree parameter handler error prefix' map)
-        map
-        | Inner_leave (l,id)  ->
-        let () = Format.fprintf parameter.H.out_channel "%sLEAVE:\n" prefix in
-        let _ = print_canonical_form parameter handler error l in
-              ()*)
+    (*    let rec print_inner_tree parameter handler error prefix inner_tree =
+          match
+          inner_tree
+          with
+          | Inner_node (map,assoc') ->
+          let () =
+          match
+          assoc'
+          with
+          | None ->
+          Format.fprintf parameter.H.out_channel "%sUnfilled Node\n" prefix
+          | Some (id)  ->
+          Format.fprintf parameter.H.out_channel "%sFilled Node: %i\n" prefix id
+          in
+          let prefix' = prefix^" " in
+          KeyMap.iter
+          (fun elt map ->
+          print_elt parameter.H.out_channel elt;
+          print_inner_tree parameter handler error prefix' map)
+          map
+          | Inner_leave (l,id)  ->
+          let () = Format.fprintf parameter.H.out_channel "%sLEAVE:\n" prefix in
+          let _ = print_canonical_form parameter handler error l in
+          ()*)
 
                                                                      (*
 let rec print_outer_tree parameter handler error prefix outer_tree =
-      	match
+      match
         outer_tree
         with
         | Empty ->
