@@ -97,6 +97,7 @@ module type Cflow_handler =
     val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
     val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
     val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
+    val dump_json: parameter -> Yojson.Basic.json -> unit
   end
 
 module Cflow_handler:Cflow_handler

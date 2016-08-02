@@ -119,6 +119,7 @@ sig
   val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
   val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
   val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
+  val dump_json: parameter -> Yojson.Basic.json -> unit
 end
 
 module Cflow_handler =
@@ -315,20 +316,25 @@ module Cflow_handler =
     let save_current_phase_title parameter x =
       parameter.kasa.Remanent_parameters_sig.save_current_phase_title x
 
+    let dump_json parameter json =
+      if
+        is_server_mode parameter
+      then
+        let () =
+          Loggers.dump_json
+          (get_server_channel parameter)
+          json in
+        Loggers.print_newline (get_server_channel parameter)
+
+
     let save_progress_bar parameter x  =
+      let (b,i,_j,n_stories) = x in
       let () =
-        if is_server_mode parameter
-        then
-          let (b,i,j,n_stories) = x in
-          let () =
-            Loggers.fprintf
-              (get_server_channel parameter)
-              "Progress bar: (%s,%i,%i)"
-              (if b then "true" else "false")
-              i
-              n_stories
-          in
-          Loggers.print_newline (get_server_channel parameter)
+        dump_json parameter
+          (Story_json.progress_bar_to_json
+             { Story_json.bool = (if b then "true" else "false");
+               Story_json.current = i;
+               Story_json.total = n_stories })
       in
       parameter.kasa.Remanent_parameters_sig.save_progress_bar x
     let reset_progress_bar parameter = parameter.kasa.Remanent_parameters_sig.reset_progress_bar ()
@@ -357,5 +363,7 @@ module Cflow_handler =
        with kasa =
               {parameter.kasa
                with Remanent_parameters_sig.save_error_list = f}}
+
+
 
   end:Cflow_handler)

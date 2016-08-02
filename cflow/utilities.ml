@@ -533,14 +533,12 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
   | None -> error,log_info,[trace]
   | Some S.PH.B.PB.CI.Po.K.H.Causal ->
     let () =
-      if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
-      then
-        let () =
-          Loggers.fprintf
-            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-            "Start one causal compression"
-        in
-        Loggers.print_newline (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+      S.PH.B.PB.CI.Po.K.H.dump_json
+        parameter
+        (Story_json.status_to_json
+           {
+             Story_json.phase=Story_json.Inprogress ;
+             Story_json.message="Start one causal compression" })
     in
     let error,log_info,trace = cut parameter ~shall_we_compute:always handler log_info error trace
     in error,log_info,[trace]
@@ -551,15 +549,12 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
          | _ -> StoryProfiling.Strong_compression,"Start one string compression"
     in
     let () =
-      if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
-      then
-        let () =
-          Loggers.fprintf
-            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-            "%s"
-            s
-        in
-        Loggers.print_newline (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+      S.PH.B.PB.CI.Po.K.H.dump_json
+        parameter
+        (Story_json.status_to_json
+           {
+             Story_json.phase=Story_json.Inprogress ;
+             Story_json.message=s })
     in
     let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in
     let event_list = get_pretrace_of_trace trace in

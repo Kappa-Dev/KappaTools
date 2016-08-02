@@ -14,6 +14,18 @@ type one_compression =
     story: story
   }
 
+let string_of_json = function
+  | `String s -> s
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct string",x))
+
+let int_of_json = function
+  | `Int s -> s
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct int",x))
+
+let float_of_json = function
+  | `Float s -> s
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct float",x))
+
 let new_story_to_json new_story =
   `Assoc
     [
@@ -26,16 +38,8 @@ let new_story_of_json = function
     begin
       try
         {
-          id =
-            begin
-              match List.assoc "id" l
-              with
-                `Int int -> int
-              | _y ->
-                raise (Yojson.Basic.Util.Type_error ("Not a correct new story",x))
-            end;
-          graph =
-            Graph_json.of_json (List.assoc "graph" l)
+          id = int_of_json (List.assoc "id" l);
+          graph = Graph_json.of_json (List.assoc "graph" l)
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct new story",x))
@@ -144,17 +148,42 @@ let status_of_json = function
       try
         {
           phase = phase_of_json (List.assoc "phase" l);
-          message =
-            begin
-              match List.assoc "message" l
-              with
-              | `String s -> s
-              | _y ->
-                raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
-            end
-          ;
+          message = string_of_json (List.assoc "message" l);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct status",x))
+
+type progress_bar =
+  {
+    bool: string;
+    current: int;
+    total: int
+  }
+
+let progress_bar_to_json progress_bar =
+  `Assoc ["progress_bar",
+          `Assoc ["bool",`String progress_bar.bool;
+                  "current",`Int progress_bar.current;
+                  "total",`Int progress_bar.total]
+         ]
+
+let progress_bar_of_json = function
+  | `Assoc l as x when List.length l = 1 ->
+    begin
+      match List.assoc "progress_bar" l with
+      | `Assoc l as x when List.length l = 3 ->
+        begin
+          try
+            {
+              bool = string_of_json (List.assoc "bool" l);
+              current = int_of_json (List.assoc "current" l);
+              total = int_of_json (List.assoc "total" l)
+            }
+          with Not_found ->
+            raise (Yojson.Basic.Util.Type_error ("Not a correct progress bar",x))
+        end
+      | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct progress bar",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct progress bar",x))

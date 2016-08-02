@@ -31,3 +31,13 @@ type status =
 
 val status_to_json: status -> Yojson.Basic.json
 val status_of_json: Yojson.Basic.json -> status
+
+type progress_bar =
+  {
+    bool: string;
+    current: int;
+    total: int
+  }
+
+val progress_bar_to_json: progress_bar -> Yojson.Basic.json
+val progress_bar_of_json: Yojson.Basic.json -> progress_bar

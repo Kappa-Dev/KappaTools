@@ -108,10 +108,8 @@ let print_story_info logger _parameter json =
   let () = Loggers.print_newline logger in
   ()
 
-let print_graph logger _parameter _handler error id story_info graph =
+let print_graph logger parameter _handler error id story_info graph =
   let () = Loggers.refresh_id logger in
-  let () = Loggers.fprintf logger "****" in
-  let () = Loggers.print_newline logger in
   let () = Graph_loggers.print_graph_preamble logger "story" in
   let () =
     A.iteri
@@ -163,20 +161,7 @@ let print_graph logger _parameter _handler error id story_info graph =
             Story_json.id = id
           }}
   in
-  let channel_opt = Loggers.channel_of_logger logger in
-  let () =
-    begin
-      match channel_opt
-      with
-      | None -> ()
-      | Some channel ->
-        let () =
-          Yojson.Basic.to_channel channel
-            (Story_json.to_json result) in
-        ()
-    end
-  in
-  let () = Loggers.print_newline logger in
+  let () = H.dump_json parameter (Story_json.to_json result) in
   error
 
 let print_elt log elt =
@@ -766,18 +751,16 @@ module BucketTable =
         with
         | None -> warn parameter error (Some "add_story_info, line 800, Unknown story id") (Failure "Unknown story id") table
         | Some (grid,graph,canonic,trace,info) ->
+          let result =
+            {
+              Story_json.log_info = story_info ;
+              Story_json.story = Story_json.Same_as id
+            }
+          in
           let () =
-            if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
-            then
-              let result =
-                {
-                  Story_json.log_info = story_info ;
-                  Story_json.story = Story_json.Same_as id
-                }
-              in
-              Loggers.dump_json
-                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                (Story_json.to_json result)
+            S.PH.B.PB.CI.Po.K.H.dump_json
+              parameter
+              (Story_json.to_json result)
           in
           let error,array = Int_storage.Nearly_inf_Imperatif.set
               (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id
