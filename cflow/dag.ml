@@ -775,7 +775,6 @@ module BucketTable =
                   Story_json.story = Story_json.Same_as id
                 }
               in
-              let json = Story_json.to_json result in
               let channel_opt = Loggers.channel_of_logger
                   (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
               in
