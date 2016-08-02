@@ -33,6 +33,6 @@ val print_comment:
 val open_asso: Loggers.t -> unit
 val close_asso: Loggers.t -> unit
 val print_asso: Loggers.t -> string -> string -> unit
-val print_node: Loggers.t -> ?directives:Graph_loggers_options.options list -> string -> unit
-val print_edge: Loggers.t -> ?directives:Graph_loggers_options.options list -> ?prefix:string -> string -> string -> unit
-val print_one_to_n_relation: Loggers.t -> ?directives:Graph_loggers_options.options list -> ?style_one:Graph_loggers_options.linestyle -> ?style_n:Graph_loggers_options.linestyle -> string -> string list -> unit
+val print_node: Loggers.t -> ?directives:Graph_loggers_sig.options list -> string -> unit
+val print_edge: Loggers.t -> ?directives:Graph_loggers_sig.options list -> ?prefix:string -> string -> string -> unit
+val print_one_to_n_relation: Loggers.t -> ?directives:Graph_loggers_sig.options list -> ?style_one:Graph_loggers_sig.linestyle -> ?style_n:Graph_loggers_sig.linestyle -> string -> string list -> unit

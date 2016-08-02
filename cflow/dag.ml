@@ -96,6 +96,7 @@ let print_graph logger _parameter _handler error graph =
   let () = Loggers.print_newline logger in
   let () = Loggers.fprintf logger "Root: %i" graph.root in
   let () = Loggers.print_newline logger in
+  let () = Graph_loggers.print_graph_preamble logger "story" in
   let () =
     A.iteri
       (fun i (_,j) ->
@@ -105,7 +106,7 @@ let print_graph logger _parameter _handler error graph =
          else
            Graph_loggers.print_node
              logger
-             ~directives:[Graph_loggers_options.Label j]
+             ~directives:[Graph_loggers_sig.Label j]
              (string_of_int i)
       )
       graph.labels
@@ -127,7 +128,7 @@ let print_graph logger _parameter _handler error graph =
            (fun j ->
               Graph_loggers.print_edge
                 logger
-                ~directives:[Graph_loggers_options.ArrowHead Graph_loggers_options.Tee]
+                ~directives:[Graph_loggers_sig.ArrowHead Graph_loggers_sig.Tee]
                 (string_of_int j)
                 (string_of_int i)
            )
@@ -135,6 +136,7 @@ let print_graph logger _parameter _handler error graph =
       )
       graph.conflict_pred
   in
+  let () = Graph_loggers.print_graph_foot logger in
   let () = Loggers.fprintf logger "****" in
   let () = Loggers.print_newline logger in
   error

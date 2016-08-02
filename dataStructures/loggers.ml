@@ -42,16 +42,19 @@ type t =
   {
     encoding:encoding;
     logger: logger;
+    channel_opt: out_channel option;
     id_map: int StringMap.t ref ;
     fresh_id: int ref ;
     mutable current_line: token list;
-    nodes: (string * Graph_loggers_options.options list) list ref ;
-    edges: (string * string * Graph_loggers_options.options list) list ref ;
+    nodes: (string * Graph_loggers_sig.options list) list ref ;
+    edges: (string * string * Graph_loggers_sig.options list) list ref ;
   }
 
 let refresh_id t =
   let () = t.id_map:=StringMap.empty in
   let () = t.fresh_id:= 1 in
+  let () = t.nodes := [] in
+  let () = t.edges := [] in
   ()
 
 let get_encoding_format t = t.encoding
@@ -62,6 +65,7 @@ let dummy_html_logger =
     fresh_id = ref 1 ;
     encoding = HTML;
     logger = DEVNUL;
+    channel_opt = None;
     current_line = [];
     nodes = ref [];
     edges = ref []}
@@ -71,6 +75,7 @@ let dummy_txt_logger =
     fresh_id = ref 1;
     id_map = ref StringMap.empty;
     encoding = TXT;
+    channel_opt = None;
     logger = DEVNUL;
     current_line = [];
     nodes = ref [];
@@ -252,6 +257,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       id_map = ref StringMap.empty;
       fresh_id = ref 1;
       logger = Formatter formatter;
+      channel_opt = Some channel;
       encoding = mode;
       current_line = [];
       nodes = ref [];
@@ -267,6 +273,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       id_map = ref StringMap.empty;
       fresh_id = ref 1;
       logger = Formatter formatter;
+      channel_opt = None;
       encoding = mode;
       current_line = [];
       nodes = ref [];
@@ -281,6 +288,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     id_map = ref StringMap.empty;
     fresh_id = ref 1;
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
+    channel_opt = None;
     encoding = mode;
     current_line = [];
     nodes = ref [];
@@ -293,6 +301,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       id_map = ref StringMap.empty;
       fresh_id = ref 1;
       logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
+      channel_opt = None;
       encoding = mode;
       current_line = [];
       nodes = ref [];
@@ -354,5 +363,8 @@ let int_of_string_id logger string =
     let i = fresh_id logger in
     let () = logger.id_map := StringMap.add string i !(logger.id_map) in
     i
+let channel_of_logger logger = logger.channel_opt
 
-let graph_of_logger logger = !(logger.nodes), !(logger.edges)
+let add_node t s d = t.nodes:= (s,d)::(!(t.nodes))
+let add_edge t s1 s2 d = t.edges:= (s1,s2,d)::(!(t.edges))
+let graph_of_logger logger = List.rev !(logger.nodes), List.rev !(logger.edges)

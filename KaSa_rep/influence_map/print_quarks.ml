@@ -253,7 +253,7 @@ let print_maps ?directives:(directives=[]) parameters logger error handler
            let s = Buffer.contents s in
            error, s
          in
-         let directives = (Graph_loggers_options.Label s3)::directives in
+         let directives = (Graph_loggers_sig.Label s3)::directives in
          let () = Graph_loggers.print_edge logger ~directives ~prefix s1 s2 in
          error
       )
@@ -310,8 +310,8 @@ let dot_of_influence_map ?loggers parameters error handler compilation (wake_up_
                   s
                   ~directives:
                     [
-                      Graph_loggers_options.Shape (Remanent_parameters.get_rule_shape parameters_dot);
-                      Graph_loggers_options.FillColor (Remanent_parameters.get_rule_color parameters_dot)
+                      Graph_loggers_sig.Shape (Remanent_parameters.get_rule_shape parameters_dot);
+                      Graph_loggers_sig.FillColor (Remanent_parameters.get_rule_color parameters_dot)
                     ]
               in
               ()
@@ -346,8 +346,8 @@ let dot_of_influence_map ?loggers parameters error handler compilation (wake_up_
                   s
                   ~directives:
                     [
-                      Graph_loggers_options.Shape (Remanent_parameters.get_variable_shape parameters_dot);
-                      Graph_loggers_options.FillColor (Remanent_parameters.get_variable_color parameters_dot)
+                      Graph_loggers_sig.Shape (Remanent_parameters.get_variable_shape parameters_dot);
+                      Graph_loggers_sig.FillColor (Remanent_parameters.get_variable_color parameters_dot)
                     ]
               in
               ()
@@ -372,8 +372,8 @@ let dot_of_influence_map ?loggers parameters error handler compilation (wake_up_
       (*      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in*)
       let error =
         print_maps
-          ~directives:[Graph_loggers_options.Color (Remanent_parameters.get_wake_up_color parameters_dot);
-                       Graph_loggers_options.ArrowHead (Remanent_parameters.get_wake_up_arrow parameters_dot);
+          ~directives:[Graph_loggers_sig.Color (Remanent_parameters.get_wake_up_color parameters_dot);
+                       Graph_loggers_sig.ArrowHead (Remanent_parameters.get_wake_up_arrow parameters_dot);
                       ]
           parameters_dot logger error handler compilation
           Handler.print_rule_dot Handler.print_var_dot
@@ -400,8 +400,8 @@ let dot_of_influence_map ?loggers parameters error handler compilation (wake_up_
       (*  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in*)
       let error =
         print_maps
-          ~directives:[Graph_loggers_options.Color (Remanent_parameters.get_inhibition_color parameters_dot);
-                       Graph_loggers_options.ArrowHead (Remanent_parameters.get_inhibition_arrow parameters_dot);
+          ~directives:[Graph_loggers_sig.Color (Remanent_parameters.get_inhibition_color parameters_dot);
+                       Graph_loggers_sig.ArrowHead (Remanent_parameters.get_inhibition_arrow parameters_dot);
                       ]
           parameters_dot logger error handler compilation
           Handler.print_rule_dot Handler.print_var_dot

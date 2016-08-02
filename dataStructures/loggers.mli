@@ -40,9 +40,12 @@ val dummy_txt_logger: t
 val dummy_html_logger: t
 val redirect: t -> Format.formatter -> t
 val formatter_of_logger: t -> Format.formatter option
+val channel_of_logger: t -> out_channel option
 val flush_buffer: t -> Format.formatter -> unit
 val int_of_string_id: t -> string -> int
 
 val graph_of_logger: t ->
-  (string * Graph_loggers_options.options list) list
-  *  (string * string * Graph_loggers_options.options list) list
+  (string * Graph_loggers_sig.options list) list
+  *  (string * string * Graph_loggers_sig.options list) list
+val add_node: t -> string -> Graph_loggers_sig.options list -> unit
+val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit

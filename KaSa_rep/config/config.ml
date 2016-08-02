@@ -37,14 +37,14 @@ let link_mode = ref Remanent_parameters_sig.Bound_indices
 
 (** influence map *)
 let do_influence_map = ref true
-let rule_shape = ref Graph_loggers_options.Rect
-let rule_color = ref Graph_loggers_options.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
-let variable_shape = ref Graph_loggers_options.Ellipse
-let variable_color = ref Graph_loggers_options.PaleGreen (* "#98fb98" (*Pale green*)*)
-let wake_up_color = ref Graph_loggers_options.Green (*"#00ff00" (*Green *)*)
-let inhibition_color = ref Graph_loggers_options.Red (*"#ff0000" (*red*)*)
-let wake_up_arrow = ref Graph_loggers_options.Normal
-let inhibition_arrow = ref Graph_loggers_options.Tee
+let rule_shape = ref Graph_loggers_sig.Rect
+let rule_color = ref Graph_loggers_sig.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
+let variable_shape = ref Graph_loggers_sig.Ellipse
+let variable_color = ref Graph_loggers_sig.PaleGreen (* "#98fb98" (*Pale green*)*)
+let wake_up_color = ref Graph_loggers_sig.Green (*"#00ff00" (*Green *)*)
+let inhibition_color = ref Graph_loggers_sig.Red (*"#ff0000" (*red*)*)
+let wake_up_arrow = ref Graph_loggers_sig.Normal
+let inhibition_arrow = ref Graph_loggers_sig.Tee
 let influence_map_file = ref "influence"
 let influence_map_format = ref "DOT"
 let prompt_full_var_def = ref false
