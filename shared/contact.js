@@ -486,9 +486,9 @@ function Render(id,contactMap){
     //{ that.color = d3.scale.category10().domain(agentNames); }
 
     if(that.contactMap.nodeCount && that.contactMap.nodeCount <= 10){
-	that.color = hashColor;
-    } else {
 	that.color = d3.scale.category10().domain(agentNames);
+    } else {
+	that.color = hashColor;
     }
     /* given a node return the fill color */
     that.fill = function(node){

@@ -41,7 +41,6 @@ let save_button =
        ; Html.a_class ["btn";"btn-default";"pull-right"]
        ]
     [ Html.cdata "save" ]
-
 let file_selector =
   Html.input
     ~a:[ Html.a_id "file-selector" ;
@@ -71,8 +70,7 @@ let xml =
                 </div>
 
                 <div class="panel-body">
-                   <textarea id="code-mirror">
-                   </textarea>
+                   <textarea id="code-mirror"> </textarea>
                 </div>
 
                 <div id="configuration-panel">
@@ -209,6 +207,7 @@ let onload () : unit =
     Codemirror.fromTextArea
       textarea
       configuration in
+  let () = codemirror##setValue(Js.string "") in
   let () = setup_lint codemirror update_linting in
   let _ = Lwt_js_events.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
