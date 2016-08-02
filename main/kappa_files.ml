@@ -22,14 +22,14 @@ let open_out f =
 
 let find_available_name name facultative ext =
   let base = try Filename.chop_extension name
-	     with Invalid_argument _ -> name in
+      with Invalid_argument _ -> name in
   if Sys.file_exists (base^"."^ext) then
     let base' = if facultative <> "" then base^"_"^facultative else base in
     if Sys.file_exists (base'^"."^ext) then
       let v = ref 0 in
       let () =
-	while Sys.file_exists (base'^"~"^(string_of_int !v)^"."^ext)
-	do incr v; done
+ while Sys.file_exists (base'^"~"^(string_of_int !v)^"."^ext)
+ do incr v; done
       in base'^"~"^(string_of_int !v)^"."^ext
     else base'^"."^ext
   else base^"."^ext
@@ -37,7 +37,7 @@ let find_available_name name facultative ext =
 let get_fresh_filename base_name concat_list facultative ext =
   let tmp_name =
     path (try Filename.chop_extension base_name
-		with Invalid_argument _ -> base_name) in
+  with Invalid_argument _ -> base_name) in
   let base_name = String.concat "_" (tmp_name::concat_list) in
   find_available_name base_name facultative ext
 
@@ -57,9 +57,9 @@ let set name ext_opt =
       match ext_opt with
       | None -> !name
       | Some ext ->
-	 if (Filename.check_suffix !name ext) then !name
-	 else
-	   (!name^"."^ext)
+  if (Filename.check_suffix !name ext) then !name
+  else
+    (!name^"."^ext)
     in
     name:=fname
 
@@ -79,11 +79,11 @@ let setCheckFileExists ~batchmode =
     | file ->
        let file = path file in
        if not batchmode && Sys.file_exists file then
-	 let () =
-	   Format.eprintf
-	     "File '%s' already exists do you want to erase (y/N)?@." file in
-	 let answer = Tools.read_input () in
-	 if answer<>"y" then exit 1
+  let () =
+    Format.eprintf
+      "File '%s' already exists do you want to erase (y/N)?@." file in
+  let answer = Tools.read_input () in
+  if answer<>"y" then exit 1
   in
   let () = setOutputName () in
   check !influenceFileName ;
@@ -98,11 +98,11 @@ let setCheckFileExistsODE ~batchmode =
       | file ->
          let file = path file in
          if not batchmode && Sys.file_exists file then
-  	 let () =
-  	   Format.eprintf
-  	     "File '%s' already exists do you want to erase (y/N)?@." file in
-  	 let answer = Tools.read_input () in
-  	 if answer<>"y" then exit 1
+    let () =
+      Format.eprintf
+        "File '%s' already exists do you want to erase (y/N)?@." file in
+    let answer = Tools.read_input () in
+    if answer<>"y" then exit 1
     in
     let () = setOutputName () in
     check !odeFileName
