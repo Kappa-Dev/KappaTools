@@ -78,21 +78,6 @@ type prehash = (node*int) list
 let dummy_cannonical_form = []
 let dummy_prehash = []
 
-let story_info_list_to_json list =
-  `List (List.rev_map (Trace.Simulation_info.to_json (fun _ -> `List [])) (List.rev list))
-
-let story_info_list_of_json json =
-  match json
-  with
-  | `List l as x ->
-    begin
-      try
-        List.rev_map (Trace.Simulation_info.of_json (fun _ -> ())) (List.rev l)
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error (("Not a correct list of story information"),x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error (("Not a correct list of story_information"),x))
-
 let print_story_info logger _parameter json =
   (*List.iter
     (fun
@@ -123,7 +108,7 @@ let print_story_info logger _parameter json =
   let () = Loggers.print_newline logger in
   ()
 
-let print_graph logger _parameter _handler error graph =
+let print_graph logger _parameter _handler error id story_info graph =
   let () = Loggers.refresh_id logger in
   let () = Loggers.fprintf logger "****" in
   let () = Loggers.print_newline logger in
@@ -167,7 +152,17 @@ let print_graph logger _parameter _handler error graph =
       )
       graph.conflict_pred
   in
-  let graph_json = Graph_json.to_json (Loggers.graph_of_logger logger) in
+  let
+    result =
+    {
+      Story_json.log_info = story_info ;
+      Story_json.story =
+        Story_json.New
+          {
+            Story_json.graph = Loggers.graph_of_logger logger ;
+            Story_json.id = id
+          }}
+  in
   let channel_opt = Loggers.channel_of_logger logger in
   let () =
     begin
@@ -175,12 +170,12 @@ let print_graph logger _parameter _handler error graph =
       with
       | None -> ()
       | Some channel ->
-        let () = Yojson.Basic.to_channel channel graph_json in
+        let () =
+          Yojson.Basic.to_channel channel
+            (Story_json.to_json result) in
         ()
     end
   in
-  let () = Loggers.print_newline logger in
-  let () = Loggers.fprintf logger "****" in
   let () = Loggers.print_newline logger in
   error
 
@@ -742,35 +737,21 @@ module BucketTable =
           Int_storage.Nearly_inf_Imperatif.set
             (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
             error table.fresh_id x table.array in
-        let log_info =
+        let error =
           if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
           then
-            let json = story_info_list_to_json story_info in
-            let () =
-              print_story_info
-                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                parameter
-                json
-            in
-            let () =
-              Loggers.fprintf
-                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                "New_story: %i" table.fresh_id
-            in
-            let () =
-              Loggers.print_newline
-                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-            in
-            let log_info =
+            let error =
               print_graph
                 (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
                 parameter
                 handler
-                log_info
+                error
+                table.fresh_id
+                story_info
                 graph
-            in log_info
+            in error
           else
-            log_info
+            error
         in
         error,log_info,table.fresh_id,
         {table
@@ -788,20 +769,29 @@ module BucketTable =
           let () =
             if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
             then
-              let json = story_info_list_to_json story_info in
-              let () =
-                print_story_info
+              let result =
+                {
+                  Story_json.log_info = story_info ;
+                  Story_json.story = Story_json.Same_as id
+                }
+              in
+              let json = Story_json.to_json result in
+              let channel_opt = Loggers.channel_of_logger
                   (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                  parameter
-                  json
               in
               let () =
-                Loggers.fprintf
-                  (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                  "Same as: %i" id
+                begin
+                  match channel_opt
+                  with
+                  | None -> ()
+                  | Some channel ->
+                    let () =
+                      Yojson.Basic.to_channel channel
+                        (Story_json.to_json result) in
+                    ()
+                end
               in
-              Loggers.print_newline
-                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+              ()
           in
           let error,array = Int_storage.Nearly_inf_Imperatif.set
               (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id

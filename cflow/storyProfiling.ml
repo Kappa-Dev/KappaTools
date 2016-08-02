@@ -120,7 +120,8 @@ module type StoryStats =
 
     val inc_removed_events: log_info -> log_info
     val inc_selected_events: log_info -> log_info
-
+    val log_info_to_json: log_info -> Yojson.Basic.json
+    val log_info_of_json: Yojson.Basic.json -> log_info
     val inc_cut_events: log_info -> log_info
     val inc_k_cut_events: int -> log_info -> log_info
     val reset_cut_events: log_info -> log_info
@@ -453,6 +454,57 @@ module StoryStats =
            stack = [] ;
            last_tick = 0.;
          }
+
+       let log_info_to_json log_info =
+         `Assoc
+           [
+             "global_time", `Float log_info.global_time ;
+             "story_time", `Float log_info.story_time;
+             "step_time", `Float log_info.step_time;
+             "next_depth", `Int log_info.next_depth;
+             "branch", `Int log_info.branch;
+             "cut", `Int log_info.cut;
+           ]
+
+       let float_of_json = function
+         | `Float f -> f
+         | x -> raise
+             (Yojson.Basic.Util.Type_error ("Not a correct float",x))
+
+       let int_of_json = function
+         | `Int f -> f
+         | x -> raise
+                  (Yojson.Basic.Util.Type_error ("Not a correct float",x))
+
+       let log_info_of_json x =
+         let init = init_log_info () in
+         match x with
+         | `Assoc l when List.length l = 6 ->
+           begin
+             try
+               {init with
+                global_time =
+                  float_of_json (List.assoc "global_time" l);
+                story_time =
+                  float_of_json (List.assoc "story_time" l);
+                step_time =
+                  float_of_json (List.assoc "step_time" l);
+                next_depth =
+                  int_of_json (List.assoc "next_depth" l);
+                branch =
+                  int_of_json (List.assoc "branch" l);
+                cut =
+                  int_of_json (List.assoc "cut" l)
+               }
+             with
+             | Not_found ->
+               raise
+                 (Yojson.Basic.Util.Type_error ("Not a correct log_info",x))
+           end
+         | x -> raise
+                  (Yojson.Basic.Util.Type_error ("Not a correct log_info",x))
+
+
 
        let dump_short_log parameter log_info =
          let _ = Loggers.fprintf
