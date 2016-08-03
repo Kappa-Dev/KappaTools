@@ -212,6 +212,8 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
+	rm -f KaDE bin/KaDE
+	rm -rf KappaBin
 	rm -rf site generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
@@ -227,12 +229,16 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
 	rm -f grammar/kappaLexer.ml grammar/kappaParser.ml grammar/kappaParser.mli
 
-on_linux_for_windows:
-	$(MAKE) clean
-	$(MAKE) OCAMLFIND_CONF=/etc/x86_64-w64-mingw32-ocamlfind.conf KaSim.native KaSa.native KaStor.native
-	mv _build/main/KaSim.native KaSim.exe
-	mv _build/KaSa_rep/main/KaSa.native KaSa.exe
-	mv _build/cflow/KaStor.native KaStor.exe
+KappaBin.zip:
+	+$(MAKE) clean
+	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native
+	mkdir KappaBin
+	mv _build/main/KaSim.native KappaBin/KaSim.exe
+	mv _build/KaSa_rep/main/KaSa.native KappaBin/KaSa.exe
+	mv _build/cflow/KaStor.native KappaBin/KaStor.exe
+	mv _build/odes/KaDE.native KappaBin/KaDE.exe
+	zip $@ KappaBin/*.exe
+	rm -r KappaBin
 
 full:
 	$(MAKE) clean
