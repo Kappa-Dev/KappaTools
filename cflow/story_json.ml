@@ -173,7 +173,7 @@ let progress_bar_of_json = function
   | `Assoc l as x when List.length l = 1 ->
     begin
       match List.assoc "progress_bar" l with
-      | `Assoc l as x when List.length l = 3 ->
+      | `Assoc l when List.length l = 3 ->
         begin
           try
             {

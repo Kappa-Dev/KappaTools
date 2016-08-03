@@ -238,16 +238,29 @@ module type Projection = sig
   type 'a map_a
   type 'a map_b
   type set_a
+  type set_b
 
-  val proj: (elt_a -> elt_b) -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_b
-  val proj_monadic:
+  (** proj_map f init merge map is a map mapping each element b
+      to the result of the itteration of the function merge over the image in map of the element a in f such that f(a)=b, starting with the element init. *)
+  val proj_map: (elt_a -> elt_b) -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_b
+  val proj_map_monadic:
     'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'b ->
     ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
     'a map_a -> 'method_handler * 'b map_b
 
+  (** proj_set f set is the set \{f(a) | a\in S\} *)
   val proj_set:
-    (elt_a -> elt_b) -> set_a -> set_a map_b
+    (elt_a -> elt_b) -> set_a -> set_b
+
   val proj_set_monadic:
+    'parameters -> 'method_handler -> ('parameters -> 'method_handler -> elt_a -> 'method_handler * elt_b) -> set_a -> 'method_handler * set_b
+
+
+  (** partition_set f set is the map mapping any element b with an antecedent for f in the set set, into the set of its antecedents, ie
+      to the set \{a\in set | f(a)=b\}. *)
+  val partition_set:
+    (elt_a -> elt_b) -> set_a -> set_a map_b
+  val partition_set_monadic:
     'parameters -> 'method_handler -> ('parameters -> 'method_handler -> elt_a -> 'method_handler * elt_b) -> set_a ->
     'method_handler * set_a map_b
 

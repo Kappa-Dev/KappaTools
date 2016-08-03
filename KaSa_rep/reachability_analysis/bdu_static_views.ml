@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 03 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -108,7 +108,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
 (*update of the views due to modification without agent_id*)
 
 let collect_modif_map parameter error store_modification_sites =
-  Covering_classes_type.Project2_modif.monadic_proj
+  Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameter error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type))
     parameter
@@ -171,7 +171,7 @@ let collect_test_sites parameter error rule_id viewslhs
 (*valuations of the views that are created without agent_id*)
 
 let collect_test_map parameter error store_test_sites =
-  Covering_classes_type.Project2_modif.monadic_proj
+  Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameter error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type))
     parameter
@@ -240,7 +240,7 @@ let collect_test_modification_sites
 (*valuations of the views that are created without agent_id*)
 
 let collect_test_modif_map parameter error store_test_modification_sites =
-  Covering_classes_type.Project2_modif.monadic_proj
+  Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameter error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type)
     )

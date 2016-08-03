@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Aug 03 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -663,13 +663,13 @@ let convert_contact_map show_title state  contact_map =
   let error = Remanent_state.get_errors state in
   let () = show_title state in
   let error, contact_map =
-    AgentProj.monadic_proji
+    AgentProj.monadic_proj_map_i
       (fun parameters error (ag:Ckappa_sig.c_agent_name) ->
          (Handler.translate_agent parameters error handler ag:Exception.method_handler * Ckappa_sig.agent_name))
       parameters error
       Mods.StringMap.empty
       (fun parameters error _ ag sitemap->
-         SiteProj.monadic_proji
+         SiteProj.monadic_proj_map_i
            (fun parameters errors site ->
               let error, site = Handler.translate_site parameters errors handler ag (site:Ckappa_sig.c_site_name) in
               error, Handler.print_site_contact_map site)

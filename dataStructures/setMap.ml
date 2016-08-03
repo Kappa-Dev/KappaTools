@@ -1826,16 +1826,24 @@ module type Projection = sig
   type 'a map_a
   type 'a map_b
   type set_a
+  type set_b
 
-  val proj: (elt_a -> elt_b) -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_b
-  val proj_monadic:
+  val proj_map: (elt_a -> elt_b) -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> 'b map_b
+  val proj_map_monadic:
     'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'b ->
     ('parameters -> 'method_handler -> 'b -> 'a -> 'method_handler * 'b) ->
     'a map_a -> 'method_handler * 'b map_b
 
   val proj_set:
-    (elt_a -> elt_b) -> set_a -> set_a map_b
+    (elt_a -> elt_b) -> set_a -> set_b
+
   val proj_set_monadic:
+    'parameters -> 'method_handler -> ('parameters -> 'method_handler -> elt_a -> 'method_handler * elt_b) -> set_a -> 'method_handler * set_b
+
+
+  val partition_set:
+    (elt_a -> elt_b) -> set_a -> set_a map_b
+  val partition_set_monadic:
     'parameters -> 'method_handler -> ('parameters -> 'method_handler -> elt_a -> 'method_handler * elt_b) -> set_a ->
     'method_handler * set_a map_b
 
@@ -1846,13 +1854,15 @@ struct
   module MA=A.Map
   module MB=B.Map
   module SA=A.Set
+  module SB=B.Set
   type elt_a = MA.elt
   type elt_b = MB.elt
   type set_a = SA.t
+  type set_b = SB.t
   type 'a map_a = 'a MA.t
   type 'a map_b = 'a MB.t
 
-  let proj f identity_elt merge map =
+  let proj_map f identity_elt merge map =
     MA.fold
       (fun key_a data_a map_b ->
          let key_b = f key_a in
@@ -1861,7 +1871,7 @@ struct
       map
       MB.empty
 
-  let proj_monadic parameter handler f identity_elt monadic_merge map  =
+  let proj_map_monadic parameter handler f identity_elt monadic_merge map  =
     MA.fold
       (fun key_a data_a (handler,map_b) ->
          let key_b = f key_a in
@@ -1875,20 +1885,34 @@ struct
       map
       (handler,MB.empty)
 
-  let proj_set f set =
+  let proj_set f set_a =
+    SA.fold
+      (fun key_a ->
+         SB.add (f key_a))
+      set_a SB.empty
+
+  let proj_set_monadic parameter handler f set_a =
+    SA.fold
+      (fun key_a (handler, set_b) ->
+         let handler, key_b = f parameter handler key_a in
+         handler, SB.add key_b set_b)
+      set_a
+      (handler,SB.empty)
+
+  let partition_set f set_a =
     SA.fold
       (fun key_a map_b ->
          let key_b = f key_a in
          MB.add key_b (SA.add key_a (MB.find_default SA.empty key_b map_b)) map_b)
-      set
+      set_a
       MB.empty
 
-  let proj_set_monadic parameter handler f set =
+  let partition_set_monadic parameter handler f set_a =
     SA.fold
       (fun key_a (handler, map_b)  ->
          let handler, key_b = f parameter handler key_a in
          handler, MB.add key_b (SA.add key_a (MB.find_default SA.empty key_b map_b)) map_b)
-      set
+      set_a
       (handler, MB.empty)
 
 end

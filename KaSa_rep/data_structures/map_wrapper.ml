@@ -1,5 +1,5 @@
 (**
-   Time-stamp: <Aug 01 2016>
+   Time-stamp: <Aug 03 2016>
 *)
 
 module type Set_with_logs =
@@ -175,8 +175,8 @@ module Make (S_both: (SetMap.S)): S_with_logs
         let mem = S_both.Map.mem
         let find_option a b c d = lift S_both.Map.find_option_with_logs a b c d
         let find_default a b c d = lift S_both.Map.find_default_with_logs a b c d
-        let find_option_without_logs a b c d = b,S_both.Map.find_option c d
-        let find_default_without_logs a b c d e = b,S_both.Map.find_default c d e
+        let find_option_without_logs _a b c d = b,S_both.Map.find_option c d
+        let find_default_without_logs _a b c d e = b,S_both.Map.find_default c d e
         let add a b c d = lift S_both.Map.add_with_logs a b c d
         let overwrite parameter error c d e =
           let error, bool, map =
@@ -246,8 +246,18 @@ module type Projection = sig
   type 'a map_a
   type 'a map_b
   type set_a
+  type set_b
 
-  val monadic_proj:
+
+  val proj_map:
+    (elt_a -> elt_b) ->
+    Remanent_parameters_sig.parameters -> Exception.method_handler ->
+    'b ->
+    ('b -> 'a -> 'b) ->
+    'a map_a ->
+    Exception.method_handler * 'b map_b
+
+  val monadic_proj_map:
     (Remanent_parameters_sig.parameters -> Exception.method_handler ->
      elt_a -> Exception.method_handler * elt_b) ->
     Remanent_parameters_sig.parameters -> Exception.method_handler ->
@@ -256,7 +266,7 @@ module type Projection = sig
      Exception.method_handler * 'b) ->
     'a map_a -> Exception.method_handler * 'b map_b
 
-  val monadic_proji:
+  val monadic_proj_map_i:
     (Remanent_parameters_sig.parameters -> Exception.method_handler ->
      elt_a -> Exception.method_handler * elt_b) ->
     Remanent_parameters_sig.parameters -> Exception.method_handler ->
@@ -265,17 +275,16 @@ module type Projection = sig
      Exception.method_handler * 'b) ->
     'a map_a -> Exception.method_handler * 'b map_b
 
-  val proj:
-    (elt_a -> elt_b) ->
-    Remanent_parameters_sig.parameters -> Exception.method_handler ->
-    'b ->
-    ('b -> 'a -> 'b) ->
-    'a map_a ->
-    Exception.method_handler * 'b map_b
 
   val proj_set:
-    (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+    (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_b
+
   val monadic_proj_set:
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_b
+
+  val partition_set:
+    (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+  val monadic_partition_set:
     (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
 
 end
@@ -285,13 +294,15 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
     module MA=A.Map
     module MB=B.Map
     module SA=A.Set
+    module SB=B.Set
     type elt_a = MA.elt
     type elt_b = MB.elt
     type set_a = SA.t
+    type set_b = SB.t
     type 'a map_a = 'a MA.t
     type 'a map_b = 'a MB.t
 
-    let proj f parameter error identity_elt merge map =
+    let proj_map f parameter error identity_elt merge map =
       MA.fold
         (fun key_a data_a (error,map_b) ->
            let key_b = f key_a in
@@ -304,7 +315,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         map
         (error,MB.empty)
 
-    let monadic_proji f parameter error identity_elt merge map =
+    let monadic_proj_map_i f parameter error identity_elt merge map =
       MA.fold
         (fun key_a data_a (error,map_b) ->
            let error,key_b = f parameter error key_a in
@@ -321,13 +332,13 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         map
         (error,MB.empty)
 
-    let monadic_proj f parameter error identity_elt merge map =
-      monadic_proji f parameter error identity_elt
+    let monadic_proj_map f parameter error identity_elt merge map =
+      monadic_proj_map_i f parameter error identity_elt
         (fun parameter error old _ data_a ->
            merge parameter error old data_a)
         map
 
-    let proj_set f parameter error set =
+    let partition_set f parameter error set =
       SA.fold
         (fun key_a (error,map_b) ->
            let key_b = f key_a in
@@ -343,7 +354,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         set
         (error,MB.empty)
 
-    let monadic_proj_set f parameter error set =
+    let monadic_partition_set f parameter error set =
       SA.fold
         (fun key_a (error,map_b) ->
            let error,key_b = f parameter error key_a in
@@ -359,6 +370,22 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         )
         set
         (error,MB.empty)
+
+    let proj_set f parameter error set_a =
+      SA.fold
+        (fun key_a (error,set_b) ->
+           SB.add parameter error
+             (f key_a) set_b)
+        set_a
+        (error, SB.empty)
+
+    let monadic_proj_set f parameter error set_a =
+      SA.fold
+        (fun key_a (error,set_b) ->
+           let error, key_b = f parameter error key_a in
+           SB.add parameter error key_b set_b)
+        set_a
+        (error, SB.empty)
 
   end: Projection
   with type elt_a = A.elt
@@ -382,7 +409,7 @@ module type Projection2 = sig
     'b ->
     (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> 'a -> 'b) ->
     'a map_a ->
-    'b map_c map_b
+    Exception.method_handler * 'b map_c map_b
 
   val proj2_monadic:
     Remanent_parameters_sig.parameters -> Exception.method_handler ->
@@ -409,7 +436,7 @@ module Proj2(A:S_with_logs)(B:S_with_logs)(C:S_with_logs) =
 
     let proj2 parameter error f g identity_elt merge map =
       MA.fold
-        (fun key_a data_a map_b ->
+        (fun key_a data_a (error, map_b) ->
            let key_b = f key_a in
            let key_c = g key_a in
            let error, submap =
@@ -429,13 +456,10 @@ module Proj2(A:S_with_logs)(B:S_with_logs)(C:S_with_logs) =
                   submap)*) data_a)
                submap
            in
-           let error, add =
-             MB.add_or_overwrite parameter error key_b submap map_b
-           in
-           add
+           MB.add_or_overwrite parameter error key_b submap map_b
         )
         map
-        MB.empty
+        (error, MB.empty)
 
     let proj2_monadic parameter handler mvbdu_handler f g identity_elt merge map =
       MA.fold
