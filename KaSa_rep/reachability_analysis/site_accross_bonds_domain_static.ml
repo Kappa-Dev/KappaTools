@@ -105,7 +105,7 @@ type basic_static_information =
    nor for AgentSite_map_and_set (type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name )
 
    To compute this four maps, you have to use the function partition_set.
-   )
+*)
 (****************************************************************)
 (*Init*)
 (****************************************************************)
