@@ -122,10 +122,6 @@ let edge_to_json (id1, id2, directives) =
 let nodes_to_json = list_to_json node_to_json
 let edges_to_json = list_to_json edge_to_json
 
-let edges_to_json edges =
-  `List
-    (List.rev_map edge_to_json (List.rev edges))
-
 let to_json graph =
   (`Assoc [
     "nodes", nodes_to_json (fst graph);
@@ -185,10 +181,8 @@ let directive_of_json =
     Graph_loggers_sig.LineStyle (linestyle_of_json linestyle)
   | (_,x) -> raise (Yojson.Basic.Util.Type_error ("Not a correct directive",x))
 
-let directives_of_json = function
-  | `Assoc l  ->
-    List.rev_map directive_of_json (List.rev l)
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct directive list",x))
+let directives_of_json directives =
+    json_to_assoc "directive list" directive_of_json directives
 
 let id_of_json = function
   | `String string -> string
