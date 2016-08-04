@@ -3,18 +3,20 @@ let usage_msg =
   "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
 
 let () =
+  let cli_args = Run_cli_args.default in
   let kasim_args = Kasim_args.default in
   let common_args = Common_args.default in
   let options =
+    Run_cli_args.options cli_args @
     Kasim_args.options kasim_args @ Common_args.options common_args in
   try
     Arg.parse
       options
-      (fun fic -> kasim_args.Kasim_args.inputKappaFileNames <-
-          fic::(kasim_args.Kasim_args.inputKappaFileNames))
+      (fun fic -> cli_args.Run_cli_args.inputKappaFileNames <-
+          fic::(cli_args.Run_cli_args.inputKappaFileNames))
       usage_msg;
-    let () = Kappa_files.set_data kasim_args.Kasim_args.outputDataFile in
-    let () = Kappa_files.set_dir kasim_args.Kasim_args.outputDirectory in
+    let () = Kappa_files.set_data cli_args.Run_cli_args.outputDataFile in
+    let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
     let () = match kasim_args.Kasim_args.marshalizeOutFile with
       | None -> ()
       | Some marshalizeOutFile ->
@@ -34,13 +36,13 @@ let () =
     let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in
     let () = Parameter.emacsMode := kasim_args.Kasim_args.emacsMode in
     let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in
-    let () = Parameter.batchmode := kasim_args.Kasim_args.batchmode in
+    let () = Parameter.batchmode := cli_args.Run_cli_args.batchmode in
     let () =
       Parameter.time_independent := common_args.Common_args.timeIndependent in
 
     let abort =
-      match kasim_args.Kasim_args.inputKappaFileNames with
-      | [] -> kasim_args.Kasim_args.marshalizedInFile = ""
+      match cli_args.Run_cli_args.inputKappaFileNames with
+      | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
       | _ -> false in
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
@@ -70,19 +72,19 @@ let () =
 
     let result =
       List.fold_left (KappaLexer.compile Format.std_formatter)
-        Ast.empty_compil kasim_args.Kasim_args.inputKappaFileNames in
+        Ast.empty_compil cli_args.Run_cli_args.inputKappaFileNames in
 
     let counter =
       Counter.create
-        ~init_t:0.
+        ~init_t:cli_args.Run_cli_args.minTimeValue
         ~init_e:0
-        ?max_t:kasim_args.Kasim_args.maxTimeValue
+        ?max_t:cli_args.Run_cli_args.maxTimeValue
         ?max_e:kasim_args.Kasim_args.maxEventValue
-        ~nb_points:kasim_args.Kasim_args.pointNumberValue in
+        ~nb_points:cli_args.Run_cli_args.pointNumberValue in
     let (env_store, cc_env, contact_map, updated_vars, story_compression,
          unary_distances, dotCflows, init_l as init_result),
         alg_overwrite =
-      match kasim_args.Kasim_args.marshalizedInFile with
+      match cli_args.Run_cli_args.marshalizedInFile with
       | "" ->
         let result =
           if common_args.Common_args.implicitSignature then
@@ -91,7 +93,7 @@ let () =
             result in
         let () = Format.printf "+ Sanity checks@." in
         let (sigs_nd,tk_nd,updated_vars,result') =
-          LKappa.compil_of_ast kasim_args.Kasim_args.alg_var_overwrite result in
+          LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in
         let () = Format.printf "+ KaSa tools initialization@." in
         let contact_map,_kasa_state =
           Eval.init_kasa Remanent_parameters_sig.KaSim sigs_nd result in
@@ -100,7 +102,7 @@ let () =
           Eval.compile
             ~pause:(fun f -> f ())
             ~return:(fun x -> x)
-            ?rescale_init:kasim_args.Kasim_args.rescale
+            ?rescale_init:cli_args.Run_cli_args.rescale
             ~outputs:(Outputs.go (Signature.create []))
             sigs_nd tk_nd contact_map counter result' in
         (env, cc_env, contact_map, updated_vars, story_compression,
@@ -109,7 +111,7 @@ let () =
         try
           let d = open_in_bin marshalized_file in
           let () =
-            if kasim_args.Kasim_args.inputKappaFileNames <> [] then
+            if cli_args.Run_cli_args.inputKappaFileNames <> [] then
               ExceptionDefn.warning
                 (fun f ->
                    Format.pp_print_string
@@ -128,7 +130,7 @@ let () =
               (fun (s,v) ->
                  Environment.num_of_alg (Location.dummy_annot s) env,
                  Alg_expr.CONST v)
-              kasim_args.Kasim_args.alg_var_overwrite in
+              cli_args.Run_cli_args.alg_var_overwrite in
           let updated_vars' =
             List.fold_left
               (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
@@ -178,13 +180,13 @@ let () =
         Environment.map_observables
           (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
           env in
-      if kasim_args.Kasim_args.pointNumberValue > 0 || head <> [||] then
+      if cli_args.Run_cli_args.pointNumberValue > 0 || head <> [||] then
         let title = "Output of " ^ command_line in
         Outputs.create_plot
           (Kappa_files.get_data (),title,head)
           (match unary_distances with Some x -> x | None -> false) in
     let () =
-      if kasim_args.Kasim_args.pointNumberValue > 0 then
+      if cli_args.Run_cli_args.pointNumberValue > 0 then
         Outputs.go (Environment.signatures env)
           (Data.Plot
              (Counter.current_time counter,
