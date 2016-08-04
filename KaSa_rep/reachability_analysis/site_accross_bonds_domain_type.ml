@@ -164,6 +164,35 @@ module PairAgentsSitesStates_map_and_set =
        end))
 
 (***************************************************************)
+(*Projection*)
+
+module Proj_agent_id_away =
+  Map_wrapper.Proj
+    (PairAgentsSiteState_map_and_set) (*set_a*)
+    (PairAgentSiteState_map_and_set) (*set_b*)
+
+module PairAgentIDSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_id * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_get_agent_id_snd_site =
+  Map_wrapper.Proj
+    (PairAgentsSitesStates_map_and_set)
+    (PairAgentIDSite_map_and_set)
+
+module Proj_get_agents_sites =
+  Map_wrapper.Proj
+    (PairAgentsSitesStates_map_and_set)
+    (PairAgentSiteState_map_and_set)
+
+(***************************************************************)
 
 let convert_single_without_state parameters error kappa_handler single =
   let (agent, site) = single in

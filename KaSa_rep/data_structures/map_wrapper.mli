@@ -1,5 +1,5 @@
 (**
-   Time-stamp: <Aug 03 2016>
+   Time-stamp: <Aug 04 2016>
 *)
 
 module type Set_with_logs =
@@ -118,9 +118,8 @@ module type Projection = sig
   val proj_map: (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> ('b -> 'a -> 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
 
   val monadic_proj_map: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> 'a -> Exception.method_handler * 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
+
   val monadic_proj_map_i: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'b -> elt_a -> 'a -> Exception.method_handler * 'b) -> 'a map_a -> Exception.method_handler * 'b map_b
-
-
 
   (** proj_set f set is the set \{f(a) | a\in S\} *)
   val proj_set:
@@ -133,6 +132,7 @@ module type Projection = sig
       to the set \{a\in set | f(a)=b\}. *)
   val partition_set:
     (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+
   val monadic_partition_set:
     (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
 
@@ -141,6 +141,8 @@ end
 module Proj(A:S_with_logs)(B:S_with_logs) : Projection
   with type elt_a = A.elt
    and type elt_b = B.elt
+   and type set_a = A.Set.t
+   and type set_b = B.Set.t
    and type 'a map_a = 'a A.Map.t
    and type 'a map_b = 'a B.Map.t
 

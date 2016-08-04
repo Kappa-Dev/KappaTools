@@ -393,7 +393,8 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
    and type elt_b = B.elt
    and type 'a map_a = 'a A.Map.t
    and type 'a map_b = 'a B.Map.t
-   and type set_a = A.Set.t)
+   and type set_a = A.Set.t
+   and type set_b = B.Set.t)
 
 module type Projection2 = sig
   type elt_a

@@ -4,7 +4,11 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2015, the 23th of Feburary
+<<<<<<< 9d19502c910420cc42bf5de36ec1126ff169633c
  * Last modification: Time-stamp: <Aug 06 2016>
+=======
+ * Last modification: Time-stamp: <Aug 04 2016>
+>>>>>>> continue to use project in apply rule
  *
  * Type definitions for the covering classes relations between the left hand site of a rule and its sites.
  *
