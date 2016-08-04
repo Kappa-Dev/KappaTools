@@ -36,8 +36,7 @@ type basic_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     (*a set of site that are bonds on the rhs without rule_id§*)
     (*------------------------------------------------------------------*)
-    store_bonds_rhs_set : (* JF: it does not make sense *)
-      (* agent_ids makes sense only in the contact of a given rule *)
+    store_bonds_rhs_set :
       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
     store_modified_map :
@@ -82,6 +81,31 @@ type basic_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t; (*TODO: do I need state?*)*)
   }
 
+
+(* JF: I do not see the information that you need to perform computations in the abstract domain *)
+(* You need (at least) four maps :
+   PairAgentSites_map_and_set.Set.t PairAgentSite_map_and_set.Map.t
+   this Map maps the pair ((ag,site),(ag',site')) to the set of tuples of interest of the form:
+   ((ag,site,_,_,_),(ag',site',_,_,_))
+
+   PairAgentSites_map_and_set.Set.t PairAgentSite_map_and_set.Map.t
+   maps the pair ((ag,site),(ag',site')) to the set of tuples of interest of the form:
+   ((ag',site',_,_,_),(ag,site,_,_,_))
+
+   PairAgentSites_map_and_set.Set.t AgentSite_map_and_set.Map.t
+   maps the pair (ag,site) to the set of tuples of interest of the form:
+   ((ag',_,site',_,_),_)
+
+   PairAgentSites_map_and_set.Set.t AgentSite_map_and_set.Map.t
+   maps the pair (ag,site) to the set of tuples of interest of the form:
+   (_,(ag,_,site,_,_))
+
+   I have not found the module declaration for PairAgentSite_map_and_set (type t = (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) )
+
+   nor for AgentSite_map_and_set (type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name )
+
+   To compute this four maps, you have to use the function partition_set.
+   )
 (****************************************************************)
 (*Init*)
 (****************************************************************)
