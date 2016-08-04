@@ -30,6 +30,8 @@ Reachability analysis...
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
+         Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
+         Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -134,9 +136,7 @@ The binding state of site x in agent B ranges over free and A@x.
 * Site accross bonds domain
 ------------------------------------------------------------
 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
 Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

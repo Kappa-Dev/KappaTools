@@ -703,12 +703,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=47
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=46
    Node(site_type:1<2)
     Id=19
      Node(site_type:2<1)
@@ -734,26 +734,26 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=57
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=56
    Node(site_type:1<1)
-    Id=59
+    Id=55
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=58
+      Id=54
        Node(site_type:2<1)
-        Id=57
+        Id=53
          Node(site_type:3<1)
           Id=0
            Leaf False 
 
-          Id=56
+          Id=52
            Node(site_type:3<2)
             Id=23
              Node(site_type:4<0)
@@ -938,19 +938,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=90
+Id=84
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=89
+  Id=83
    Node(site_type:1<2)
-    Id=88
+    Id=82
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=87
+      Id=81
        Node(site_type:2<2)
         Id=25
          Node(site_type:3<0)
@@ -992,12 +992,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=107
+Id=99
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=106
+  Id=98
    Node(site_type:1<2)
     Id=31
      Node(site_type:2<2)
@@ -1027,12 +1027,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=105
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=104
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<1)
@@ -1098,14 +1098,14 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=113
+Id=103
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=103
+  Id=95
    Node(site_type:1<2)
-    Id=102
+    Id=94
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1136,26 +1136,26 @@ Id=45
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=95
+Id=89
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=94
+  Id=88
    Node(site_type:1<1)
-    Id=64
+    Id=60
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=63
+      Id=59
        Node(site_type:2<1)
-        Id=62
+        Id=58
          Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=56
+          Id=52
            Node(site_type:3<2)
             Id=23
              Node(site_type:4<0)
@@ -1176,23 +1176,23 @@ Id=95
         Id=0
          Leaf False 
 
-    Id=93
+    Id=87
      Node(site_type:1<2)
-      Id=92
+      Id=86
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=91
+        Id=85
          Node(site_type:2<1)
-          Id=79
+          Id=73
            Node(site_type:3<0)
             Id=0
              Leaf False 
 
-            Id=78
+            Id=72
              Node(site_type:3<1)
-              Id=77
+              Id=71
                Node(site_type:4<0)
                 Id=0
                  Leaf False 
@@ -1208,7 +1208,7 @@ Id=95
               Id=0
                Leaf False 
 
-          Id=87
+          Id=81
            Node(site_type:2<2)
             Id=25
              Node(site_type:3<0)
@@ -1244,12 +1244,12 @@ Id=95
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=114
+Id=110
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=96
+  Id=109
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1259,12 +1259,12 @@ Id=114
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=116
+Id=108
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=107
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1274,12 +1274,12 @@ Id=116
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=116
+Id=108
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=107
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1289,26 +1289,26 @@ Id=116
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=193
+Id=187
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=192
+  Id=186
    Node(site_type:0<1)
-    Id=185
+    Id=179
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=184
+      Id=178
        Node(site_type:1<1)
-        Id=152
+        Id=146
          Node(site_type:2<0)
           Id=0
            Leaf False 
 
-          Id=151
+          Id=145
            Node(site_type:2<2)
             Id=11
              Node(site_type:3<0)
@@ -1329,23 +1329,23 @@ Id=193
         Id=0
          Leaf False 
 
-    Id=191
+    Id=185
      Node(site_type:0<2)
-      Id=190
+      Id=184
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=189
+        Id=183
          Node(site_type:1<1)
-          Id=150
+          Id=144
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=149
+            Id=143
              Node(site_type:2<1)
-              Id=121
+              Id=115
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1361,14 +1361,14 @@ Id=193
               Id=0
                Leaf False 
 
-          Id=188
+          Id=182
            Node(site_type:1<2)
-            Id=187
+            Id=181
              Node(site_type:2<0)
               Id=0
                Leaf False 
 
-              Id=186
+              Id=180
                Node(site_type:2<1)
                 Id=11
                  Node(site_type:3<0)
@@ -1404,12 +1404,12 @@ In agent C, the internal state of site x1, the internal state of site x2, the bi
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=114
+Id=110
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=96
+  Id=109
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1419,12 +1419,12 @@ Id=114
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=116
+Id=108
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=107
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1434,12 +1434,12 @@ Id=116
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=116
+Id=108
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=107
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1464,7 +1464,22 @@ Id=45
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=108
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=107
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=48
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1479,7 +1494,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=121
+Id=115
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1493,107 +1508,20 @@ Id=121
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=116
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=48
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The binding state of site c in agent A ranges over free, C@x1, and C@x2.
 The binding state of site x in agent A ranges over free and B@x.
 The binding state of site x in agent B ranges over free and A@x.
 The internal state of site x2 in agent C ranges over u and p.
+The internal state of site x1 in agent C ranges over u and p.
 The binding state of site x1 in agent C ranges over free and A@c.
 The binding state of site x2 in agent C ranges over free and A@c.
-The internal state of site x1 in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
-Whenever the site c of A and the site x1 of C are bound together, then the site x of A and x1 of C can have the following respective states: B@x, u
-Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, p
-Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x2 of C can have the following respective states: free, u
-Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, free
-Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x2 of C can have the following respective states: B@x, p
-Whenever the site x1 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: u, B@x
-Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: p, free
-Whenever the site x2 of C and the site c of A are bound together, then the site x2 of C and x of A can have the following respective states: u, free
-Whenever the site x2 of C and the site c of A are bound together, then the site x2 of C and x of A can have the following respective states: p, B@x
-Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-Some exceptions have been raisederror: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 3 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 3 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 3 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 3 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 3; exception:Exit
+Some exceptions have been raisederror: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)

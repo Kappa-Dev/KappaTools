@@ -691,19 +691,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=59
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=58
    Node(site_type:1<1)
-    Id=59
+    Id=57
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=58
+      Id=56
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<1)
@@ -738,19 +738,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=67
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=68
+  Id=66
    Node(site_type:1<2)
-    Id=63
+    Id=61
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=62
+      Id=60
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -826,7 +826,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=51
+Id=55
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -850,19 +850,19 @@ Id=51
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=73
+Id=71
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=72
+  Id=70
    Node(site_type:1<1)
-    Id=63
+    Id=61
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=62
+      Id=60
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -880,9 +880,9 @@ Id=73
         Id=0
          Leaf False 
 
-    Id=71
+    Id=69
      Node(site_type:1<2)
-      Id=70
+      Id=68
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -913,7 +913,7 @@ Id=73
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=54
+Id=72
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -928,12 +928,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=74
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=73
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -958,12 +958,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=79
+Id=80
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=78
+  Id=79
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -978,9 +978,9 @@ Id=79
         Id=0
          Leaf False 
 
-    Id=77
+    Id=78
      Node(site_type:0<2)
-      Id=54
+      Id=72
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1003,7 +1003,7 @@ In agent B, the internal state of site z is p whenever the binding state of site
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=54
+Id=72
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1018,12 +1018,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=74
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=73
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1033,13 +1033,28 @@ Id=56
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=54
+Id=72
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
   Id=12
    Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=74
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=73
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1062,60 +1077,24 @@ Id=39
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=56
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=55
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 The internal state of site t in agent A ranges over u and p.
 The binding state of site z in agent A ranges over free and B@z.
 The binding state of site z in agent B ranges over free and A@z.
-The internal state of site t in agent B ranges over u and p.
 The internal state of site z in agent B ranges over u and p.
+The internal state of site t in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
-Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, u
-Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: u, u
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-Some exceptions have been raisederror: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 3 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 4 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 0 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 1 agent_id 1 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 775 rule 3 agent_id 1 site_type 2; exception:Exit
+Some exceptions have been raisederror: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)

@@ -25,8 +25,8 @@ In agent A, the internal state of site y is p, if and only if, the internal stat
 * Non relational properties:
 ------------------------------------------------------------
 The internal state of site z in agent A ranges over u and p.
-The binding state of site z in agent A is always free.
 The internal state of site y in agent A ranges over u and p.
+The binding state of site z in agent A is always free.
 The binding state of site y in agent A is always free.
 ------------------------------------------------------------
 * Site accross bonds domain

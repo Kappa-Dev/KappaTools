@@ -617,12 +617,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<0)
@@ -658,12 +658,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<0)
@@ -705,19 +705,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=45
+Id=41
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=40
    Node(site_type:1<1)
-    Id=43
+    Id=39
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=42
+      Id=38
        Node(site_type:2<2)
         Id=17
          Node(site_type:3<1)
@@ -746,19 +746,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=45
+Id=41
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=40
    Node(site_type:1<1)
-    Id=43
+    Id=39
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=42
+      Id=38
        Node(site_type:2<2)
         Id=17
          Node(site_type:3<1)
@@ -803,21 +803,21 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=62
+Id=49
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=61
+  Id=48
    Node(site_type:1<2)
-    Id=47
+    Id=43
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=46
+      Id=42
        Node(site_type:2<1)
-        Id=33
+        Id=31
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -830,7 +830,7 @@ Id=62
             Id=0
              Leaf False 
 
-        Id=42
+        Id=38
          Node(site_type:2<2)
           Id=17
            Node(site_type:3<1)
@@ -871,19 +871,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=66
+Id=53
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=65
+  Id=52
    Node(site_type:1<2)
-    Id=64
+    Id=51
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=42
+      Id=38
        Node(site_type:2<2)
         Id=17
          Node(site_type:3<1)
@@ -919,12 +919,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=55
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=54
    Node(site_type:1<2)
     Id=23
      Node(site_type:2<1)
@@ -960,12 +960,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=55
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=54
    Node(site_type:1<2)
     Id=23
      Node(site_type:2<1)
@@ -1039,12 +1039,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=86
+Id=73
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=85
+  Id=72
    Node(site_type:1<1)
     Id=23
      Node(site_type:2<1)
@@ -1104,4 +1104,11 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 7: r7:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
-execution finished without any exception
+Some exceptions have been raisederror: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)

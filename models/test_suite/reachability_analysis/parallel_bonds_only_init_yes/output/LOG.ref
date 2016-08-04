@@ -335,6 +335,10 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
+         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
+         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
+         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
+         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
          B(t!1,t!2),A(z!1,z!2)
          B(z!1,z!2),A(t!1,t!2)
          A(t!1,t!2),B(z!1,z!2)
@@ -692,15 +696,9 @@ The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
 Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
-Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
 ------------------------------------------------------------
 * Parallel bonds domain

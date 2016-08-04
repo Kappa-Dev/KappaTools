@@ -29,76 +29,26 @@ In agent R, the binding state of site x, the binding state of site c, the bindin
 * Non relational properties:
 ------------------------------------------------------------
 The binding state of site x in agent E ranges over free and R@x.
-The binding state of site c in agent R ranges over free and R@c.
-The binding state of site cr in agent R ranges over free and R@n.
 The binding state of site n in agent R ranges over free and R@cr.
+The binding state of site cr in agent R ranges over free and R@n.
+The binding state of site c in agent R ranges over free and R@c.
 The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
-Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: E@x, E@x
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: R@n, R@n
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: R@n, R@cr
-Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: R@cr, R@n
-Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: R@cr, R@cr
-Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
-Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
-Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
-Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
-Whenever the site cr of R and the site n of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c
-Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
-Whenever the site cr of R and the site n of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c
-Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
-Whenever the site n of R and the site cr of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
-Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
-Whenever the site n of R and the site cr of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
-Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
-Whenever the site n of R and the site cr of R are bound together, then the site cr of R and c of R can have the following respective states: free, R@c
-Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
-Whenever the site n of R and the site cr of R are bound together, then the site cr of R and c of R can have the following respective states: free, R@c
-Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 When the agent R has its site c bound to the site c of a R, and its site cr bound to the site n of a R, then both instances of R are necessarily the same.
 When the agent R has its site c bound to the site c of a R, and its site n bound to the site cr of a R, then both instances of R are necessarily the same.
-Some exceptions have been raisederror: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 0 agent_id 0 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 0 agent_id 0 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 1 agent_id 0 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 1 agent_id 0 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 1 agent_id 0 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 0 agent_id 0 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 0 agent_id 0 site_type 3; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 1 agent_id 0 site_type 1; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 1 agent_id 0 site_type 2; exception:Exit
-error: file_name: views_domain; message: line 1133; exception:Exit
-error: file_name: views_domain; message: state is empty, line 1086; exception:Exit
-error: file_name: Site_accross_bonds_domain; message: line: 766 rule 1 agent_id 0 site_type 3; exception:Exit
+Some exceptions have been raisederror: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
