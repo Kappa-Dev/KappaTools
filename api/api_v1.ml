@@ -215,21 +215,19 @@ end = struct
                              ~outputs:(outputs (Signature.create []))
                              sig_nd tk_nd contact_map
                              simulation.counter result >>=
-                           (fun (env_store,domain,has_tracking,
+                           (fun (env,domain,has_tracking,
                                  store_distances,_,init_l) ->
                              let story_compression =
                                Tools.option_map
                                  (fun  _ -> ((false,false,false),true))
                                  has_tracking
                              in
-                             let (env,graph_state) =
-                               Eval.build_initial_state
-                                 ~bind:(fun x f ->
-                                     (self#time_yield ()) >>= (fun () -> x >>= f))
-                                 ~return:Lwt.return [] simulation.counter
-                                 env_store domain story_compression
-                                 store_distances updated_vars init_l in
-                             graph_state >>=
+                             Eval.build_initial_state
+                               ~bind:(fun x f ->
+                                   (self#time_yield ()) >>= (fun () -> x >>= f))
+                               ~return:Lwt.return [] simulation.counter
+                               env domain story_compression
+                               store_distances init_l >>=
                              (fun (graph,state) ->
                                 let () = ExceptionDefn.flush_warning log_form in
                                 let sigs = Environment.signatures env in

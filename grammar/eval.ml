@@ -613,8 +613,7 @@ let compile ~outputs ~pause ~return
 
 let build_initial_state
     ~bind ~return alg_overwrite counter env cc_env
-    story_compression store_distances updated_vars init_l =
-  let env = Environment.propagate_constant updated_vars counter env in
+    story_compression store_distances init_l =
   let stops = Environment.fold_perturbations
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation
@@ -623,5 +622,5 @@ let build_initial_state
       [] env in
   let graph0 = Rule_interpreter.empty ?story_compression ~store_distances env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
-  (env,State_interpreter.initialize
-     ~bind ~return env cc_env counter graph0 state0 init_l)
+  State_interpreter.initialize
+    ~bind ~return env cc_env counter graph0 state0 init_l

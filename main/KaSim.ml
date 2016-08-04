@@ -70,80 +70,11 @@ let () =
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
-    let result =
-      List.fold_left (KappaLexer.compile Format.std_formatter)
-        Ast.empty_compil cli_args.Run_cli_args.inputKappaFileNames in
-
-    let counter =
-      Counter.create
-        ~init_t:cli_args.Run_cli_args.minTimeValue
-        ~init_e:0
-        ?max_t:cli_args.Run_cli_args.maxTimeValue
-        ?max_e:kasim_args.Kasim_args.maxEventValue
-        ~nb_points:cli_args.Run_cli_args.pointNumberValue in
-    let (env_store, cc_env, contact_map, updated_vars, story_compression,
+    let (env, cc_env, contact_map, _, story_compression,
          unary_distances, dotCflows, init_l as init_result),
-        alg_overwrite =
-      match cli_args.Run_cli_args.marshalizedInFile with
-      | "" ->
-        let result =
-          if common_args.Common_args.implicitSignature then
-            Ast.implicit_signature result
-          else
-            result in
-        let () = Format.printf "+ Sanity checks@." in
-        let (sigs_nd,tk_nd,updated_vars,result') =
-          LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in
-        let () = Format.printf "+ KaSa tools initialization@." in
-        let contact_map,_kasa_state =
-          Eval.init_kasa Remanent_parameters_sig.KaSim sigs_nd result in
-        let () = Format.printf "+ Compiling...@." in
-        let (env, cc_env, story_compression, unary_distances, dotCflow, init_l)=
-          Eval.compile
-            ~pause:(fun f -> f ())
-            ~return:(fun x -> x)
-            ?rescale_init:cli_args.Run_cli_args.rescale
-            ~outputs:(Outputs.go (Signature.create []))
-            sigs_nd tk_nd contact_map counter result' in
-        (env, cc_env, contact_map, updated_vars, story_compression,
-         unary_distances, dotCflow, init_l),[]
-      | marshalized_file ->
-        try
-          let d = open_in_bin marshalized_file in
-          let () =
-            if cli_args.Run_cli_args.inputKappaFileNames <> [] then
-              ExceptionDefn.warning
-                (fun f ->
-                   Format.pp_print_string
-                     f "Simulation package loaded, all kappa files are ignored") in
-          let () = Format.printf "+ Loading simulation package %s...@."
-              marshalized_file in
-          let env,cc_env,contact_map,updated_vars,story_compression,
-              unary_distances,dotCflow,init_l =
-            (Marshal.from_channel d :
-               Environment.t*Connected_component.Env.t*Primitives.contact_map*
-               int list* (bool*bool*bool) option*bool option*bool*
-               (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
-          let () = Pervasives.close_in d  in
-          let alg_overwrite =
-            List.map
-              (fun (s,v) ->
-                 Environment.num_of_alg (Location.dummy_annot s) env,
-                 Alg_expr.CONST v)
-              cli_args.Run_cli_args.alg_var_overwrite in
-          let updated_vars' =
-            List.fold_left
-              (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-          (env,cc_env,contact_map,updated_vars',story_compression,
-           unary_distances,dotCflow,init_l),
-          alg_overwrite
-        with
-        | ExceptionDefn.Malformed_Decl _ as e -> raise e
-        | _exn ->
-          Debug.tag
-            Format.std_formatter
-            "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
-          exit 1 in
+        counter,alg_overwrite = Cli_init.get_compilation
+        ?max_e:kasim_args.Kasim_args.maxEventValue common_args cli_args in
+
     let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in
@@ -155,11 +86,11 @@ let () =
         then Some ((false,false,false),true)
         else None
       | Some x -> Some (x,Kappa_files.has_traceFile ()) in
-    let (env,(graph,state)) =
+    let (graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
-        alg_overwrite counter env_store cc_env
-        story_compression unary_distances updated_vars init_l in
+        alg_overwrite counter env cc_env
+        story_compression unary_distances init_l in
     let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
