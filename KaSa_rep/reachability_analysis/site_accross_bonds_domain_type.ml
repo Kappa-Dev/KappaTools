@@ -101,7 +101,7 @@ module PairAgentSitesState_map_and_set =
          let print _ _ = ()
        end))
 
-module PairAgentSitesStates_map_and_set = (*REMOVE*)
+module PairAgentSitesStates_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
@@ -166,10 +166,15 @@ module PairAgentsSitesStates_map_and_set =
 (***************************************************************)
 (*Projection*)
 
-module Proj_agent_id_away =
+module Proj_agent_id_away1 =
   Map_wrapper.Proj
     (PairAgentsSiteState_map_and_set) (*set_a*)
     (PairAgentSiteState_map_and_set) (*set_b*)
+
+module Proj_agent_id_away2 =
+  Map_wrapper.Proj
+    (PairAgentsSitesStates_map_and_set) (*set_a*)
+    (PairAgentSitesStates_map_and_set) (*set_b*)
 
 module PairAgentIDSite_map_and_set =
   Map_wrapper.Make
@@ -191,6 +196,39 @@ module Proj_get_agents_sites =
   Map_wrapper.Proj
     (PairAgentsSitesStates_map_and_set)
     (PairAgentSiteState_map_and_set)
+
+(*project map*)
+
+module PairAgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_map1 =
+  Map_wrapper.Proj
+    (PairAgentSitesStates_map_and_set)
+    (PairAgentSite_map_and_set)
+
+module AgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_map2 =
+  Map_wrapper.Proj
+    (PairAgentSitesStates_map_and_set)
+    (AgentSite_map_and_set)
 
 (***************************************************************)
 

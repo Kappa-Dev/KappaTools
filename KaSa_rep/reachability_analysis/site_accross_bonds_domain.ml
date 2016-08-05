@@ -4,7 +4,11 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
+<<<<<<< eb2e346a2c9cc1bb042a7d7d5dae3a19b2641126
    * Last modification: Time-stamp: <Aug 06 2016>
+=======
+   * Last modification: Time-stamp: <Aug 05 2016>
+>>>>>>> add new partition_map
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -202,6 +206,17 @@ struct
         Site_accross_bonds_domain_static.store_potential_tuple_pair = r
       } static
 
+  let get_potential_tuple_pair_set static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_potential_tuple_pair_set
+
+  let set_potential_tuple_pair_set r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_potential_tuple_pair_set = r
+      } static
+
   let get_created_bonds static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_created_bonds
@@ -246,6 +261,52 @@ let set_potential_tuple_pair_created_bonds_proj2 r static =
     {
       (get_basic_static_information static) with
       Site_accross_bonds_domain_static.store_potential_tuple_pair_created_bonds_proj2 = r
+    } static
+
+(*projection map*)
+
+let get_proj_map1 static =
+  (get_basic_static_information
+     static).Site_accross_bonds_domain_static.store_proj_map1
+
+let set_proj_map1 r static =
+  set_basic_static_information
+    {
+      (get_basic_static_information static) with
+      Site_accross_bonds_domain_static.store_proj_map1 = r
+    } static
+
+let get_proj_reverse_map1 static =
+  (get_basic_static_information
+     static).Site_accross_bonds_domain_static.store_proj_reverse_map1
+
+let set_proj_reverse_map1 r static =
+  set_basic_static_information
+    {
+      (get_basic_static_information static) with
+      Site_accross_bonds_domain_static.store_proj_reverse_map1 = r
+    } static
+
+let get_proj_map2 static =
+  (get_basic_static_information
+     static).Site_accross_bonds_domain_static.store_proj_map2
+
+let set_proj_map2 r static =
+  set_basic_static_information
+    {
+      (get_basic_static_information static) with
+      Site_accross_bonds_domain_static.store_proj_map2 = r
+    } static
+
+let get_proj_reverse_map2 static =
+  (get_basic_static_information
+     static).Site_accross_bonds_domain_static.store_proj_reverse_map2
+
+let set_proj_reverse_map2 r static =
+  set_basic_static_information
+    {
+      (get_basic_static_information static) with
+      Site_accross_bonds_domain_static.store_proj_reverse_map2 = r
     } static
 
   (*rule that can created a bond *)
@@ -418,6 +479,17 @@ let set_potential_tuple_pair_created_bonds_proj2 r static =
     in
     let static = set_potential_tuple_pair store_potential_tuple_pair static in
     (*------------------------------------------------------------*)
+    let store_potential_tuple_pair = get_potential_tuple_pair static in
+    let error, store_potential_tuple_pair_set =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
+        parameter error
+        rule_id
+        store_potential_tuple_pair
+    in
+    let static =
+      set_potential_tuple_pair_set store_potential_tuple_pair_set static
+    in
+    (*------------------------------------------------------------*)
     (*created a bond*)
     let store_created_bonds = get_created_bonds static in
     let error, store_created_bonds =
@@ -432,7 +504,6 @@ let set_potential_tuple_pair_created_bonds_proj2 r static =
     (*------------------------------------------------------------*)
     (*potential tuple pair and created bonds*)
     let store_created_bonds = get_created_bonds static in
-    let store_potential_tuple_pair = get_potential_tuple_pair static in
     let store_potential_tuple_pair_created_bonds =
       get_potential_tuple_pair_created_bonds static
     in
@@ -450,7 +521,7 @@ let set_potential_tuple_pair_created_bonds_proj2 r static =
         static
     in
     (*------------------------------------------------------------*)
-    (*projection*)
+    (*projection set*)
     let store_potential_tuple_pair_created_bonds =
       get_potential_tuple_pair_created_bonds static
     in
@@ -555,6 +626,36 @@ let set_potential_tuple_pair_created_bonds_proj2 r static =
            error, static
         ) compil.Cckappa_sig.rules static
     in
+    (*------------------------------------------------------------*)
+    (*project map*)
+    let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
+    let error, store_proj_map1 =
+      Site_accross_bonds_domain_static.collect_proj_map1
+        parameter error
+        store_potential_tuple_pair_set
+    in
+    let static = set_proj_map1 store_proj_map1 static in
+    (*------------------------------------------------------------*)
+    let error, store_proj_reverse_map1 =
+      Site_accross_bonds_domain_static.collect_proj_reverse_map1
+        parameter error
+        store_potential_tuple_pair_set
+    in
+    let static = set_proj_reverse_map1 store_proj_reverse_map1 static in
+    (*------------------------------------------------------------*)
+    let error, store_proj_map2 =
+      Site_accross_bonds_domain_static.collect_proj_map2
+        parameter error
+        store_potential_tuple_pair_set
+    in
+    let static = set_proj_map2 store_proj_map2 static in
+    (*------------------------------------------------------------*)
+    let error, store_proj_reverse_map2 =
+      Site_accross_bonds_domain_static.collect_proj_reverse_map2
+        parameter error
+        store_potential_tuple_pair_set
+    in
+    let static = set_proj_map2 store_proj_reverse_map2 static in
     (*------------------------------------------------------------*)
     (*implicit static information*)
     (*  let kappa_handler = get_kappa_handler static in*)
