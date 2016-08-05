@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 07/10/2010
-    * Last modification: Time-stamp: <Jul 02 2016>
+    * Last modification: Time-stamp: <Aug 05 2016>
     * *
     * Printing primitives
     *
@@ -97,7 +97,7 @@ let dump_state log prefix print_handler state =
   let _ = Printf.fprintf log "%s To be visited:\n" prefix  in
   let _ =
     List.iter
-       (fun (hole,species,holeset,hole_multiset) ->
+       (fun (hole,species,holeset,_hole_multiset) ->
          let _ = Printf.fprintf log "%s  * element\n" prefix in
          let _ = Printf.fprintf log "%s    - hole " prefix in
          let _ = print_handler.print_hole log hole in

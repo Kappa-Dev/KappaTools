@@ -1,5 +1,5 @@
 (**
-   Time-stamp: <Aug 03 2016>
+   Time-stamp: <Aug 05 2016>
 *)
 
 module type Set_with_logs =
@@ -184,8 +184,9 @@ module Make (S_both: (SetMap.S)): S_with_logs
           in
           if bool
           then
-            Exception.warn parameter error (Some "Map_wrapper.ml")
-              (Some ("Map_wrapper line 148"^": attempt to overwrite an association that does not exist"))
+            let file,line,_,_ = __POS__ in
+            Exception.warn parameter error (Some file)
+              (Some ("line "^(string_of_int line)^": attempt to overwrite an association that does not exist"))
               (Failure "Attempt to overwrite an association that does not exist")
               (fun () -> map)
           else

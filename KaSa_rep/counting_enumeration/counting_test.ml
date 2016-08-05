@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 06/10/2010
-    * Last modification: Time-stamp: <Jul 02 2016>
+    * Last modification: Time-stamp: <Aug 05 2016>
     * *
     * Test suite for the counting engine
     *
@@ -17,7 +17,8 @@ module D = Counting_engine.Count(Counting_algebrae.Counting)
 
 
 let f parameters dual dual_and_self interface_of_brick init =
-  let error_handler,kappa_handler = List_tokens.empty_handler parameters Exception.empty_error_handler in
+  let _error_handler,kappa_handler =
+    List_tokens.empty_handler parameters Exception.empty_error_handler in
   let i =
     C.count
       parameters

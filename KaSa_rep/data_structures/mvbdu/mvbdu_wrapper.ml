@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -250,7 +250,7 @@ module Make (M:Nul)  =
           !used
         with
         | Some a ->
-          Exception.warn parameter error (Some "Mvbdu_wrapper.ml") (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)
+          Exception.warn parameter error (Some __FILE__) (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)
         | None ->
           begin
             let error,handler = Boolean_mvbdu.init_remanent parameter error in
@@ -262,86 +262,83 @@ module Make (M:Nul)  =
       in
       init,is_init
 
+    let warn parameters error (file,line,_,_) exc f =
+      Exception.warn
+        parameters error (Some file) (Some ("line"^(string_of_int line))) exc f
+
     let equal = Mvbdu_core.mvbdu_equal
-    let equal_with_logs p h e a b = e,h,equal a b
-    let lift0 string f parameters handler error =
+    let equal_with_logs _p h e a b = e,h,equal a b
+    let lift0 pos f parameters handler error =
       match
         f parameters handler error parameters
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun _ -> failwith "Cannot recover from bugs in constant initilization") in
+          warn
+            parameters error pos Exit
+            (fun _ ->
+               failwith "Cannot recover from bugs in constant initilization")
+        in
         error, handler, a
 
     let last_entry parameters handler error () =
       let error,int = Boolean_mvbdu.last_entry parameters handler error in
       error,handler,int
 
-    let mvbdu_true = lift0 "line 55, bdd_true" Boolean_mvbdu.boolean_mvbdu_true
-    let mvbdu_false = lift0 "line 56, bdd_false" Boolean_mvbdu.boolean_mvbdu_false
+    let mvbdu_true = lift0 __POS__ Boolean_mvbdu.boolean_mvbdu_true
+    let mvbdu_false = lift0 __POS__ Boolean_mvbdu.boolean_mvbdu_false
 
-    let lift1 string f parameters handler error a =
+    let lift1 pos f parameters handler error a =
       match
         f parameters handler error parameters a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos  Exit a
         in
         error, handler, a
 
-    let lift1four string f parameters handler error a =
-      match
-        f parameters error handler a
-      with
-      | error,(handler,Some a) -> error,handler,a
-      | error,(handler,None) ->
-        let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
-        in
-        error, handler, a
-
-    let lift1bis string f parameters handler error a =
+    let lift1bis _string f parameters handler error a =
       let a,(b,c) =
         f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a
       in a,b,c
 
-    let lift1ter string f parameters handler error a =
+    let lift1ter _string f parameters handler error a =
       let a,(b,c) =
         f (Boolean_mvbdu.association_list_allocate parameters) parameters error handler a
       in a,b,c
 
-    let liftvbis string f parameters handler error a =
+    let liftvbis _string f parameters handler error a =
       let a,(b,c) =
         f (Boolean_mvbdu.variables_list_allocate parameters) error parameters handler (List.rev_map (fun x -> (x,())) a)
       in a,b,c
 
-    let liftvter string f parameters handler error a =
+    let liftvter _string f parameters handler error a =
       let a,(b,c) =
         f (Boolean_mvbdu.variables_list_allocate parameters) parameters error handler (List.rev_map (fun x -> (x,())) a)
       in a,b,c
 
-    let lift1_ string f parameters handler error a =
+    let lift1_ pos f parameters handler error a =
       match
         f parameters handler error a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos  Exit a
         in
         error, handler, a
 
-    let lift1__ string f parameters handler error a =
+    let lift1__ _string f parameters handler error a =
       match
         f parameters handler error a
       with
       | error,(handler,a) -> error,handler,a
 
 
-    let lift1four buildlist string f parameters handler error a =
+    let lift1four buildlist pos f parameters handler error a =
       match
         f parameters error handler a
       with
@@ -351,115 +348,117 @@ module Make (M:Nul)  =
           buildlist parameters handler error []
         in
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> list)
+          Exception.warn_pos parameters error pos Exit list
         in
         error, handler, (a:unit List_sig.list)
 
-    let lift1five string f parameters handler error a =
+    let lift1five pos f parameters handler error a =
       match
         f parameters error parameters handler a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> [])
+          Exception.warn_pos parameters error pos Exit []
         in
         error, handler, a
 
-    let lift1_seven string f parameters handler error a =
+    let lift1_seven _string f parameters handler error a =
       match
         f parameters error handler a
       with
       | error,(handler,int) -> error,handler,int
 
-    let lift2 string f parameters handler error a b =
+    let lift2 pos f parameters handler error a b =
       match
         f parameters handler error parameters a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos Exit a
         in
         error, handler, a
 
-    let lift2bis string f parameters handler error a b =
+    let lift2bis pos f parameters handler error a b =
       match
         f parameters error  parameters handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos Exit a
         in
         error, handler, a
 
-    let lift2ter string f parameters handler error a b =
+    let lift2ter pos f parameters handler error a b =
       match
         f parameters error  parameters handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos Exit a
         in
         error, handler, a
 
-    let lift2four string f parameters handler error a b =
+    let lift2four pos f parameters handler error a b =
       match
         f parameters error handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos Exit a
         in
         error, handler, a
 
-    let lift2five string f parameters handler error a b =
+    let lift2five pos f parameters handler error a b =
       match
         f parameters error handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
+          Exception.warn_pos parameters error pos Exit a
         in
         error, handler, a
 
-    let (mvbdu_not: (mvbdu,mvbdu) unary) = lift1 "line 80, bdd_not" Boolean_mvbdu.boolean_mvbdu_not
+    let (mvbdu_not: (mvbdu,mvbdu) unary) = lift1 __POS__ Boolean_mvbdu.boolean_mvbdu_not
 
-    let mvbdu_id parameters handler error a = error, handler, a
+    let mvbdu_id _parameters handler error a = error, handler, a
 
     let mvbdu_unary_true parameters handler error _ =  mvbdu_true parameters handler error
     let mvbdu_unary_false parameters handler error _ = mvbdu_false parameters handler error
 
-    let mvbdu_and = lift2 "line_86, bdd_and" Boolean_mvbdu.boolean_mvbdu_and
-    let mvbdu_or = lift2 "line 87, bdd_or" Boolean_mvbdu.boolean_mvbdu_or
-    let mvbdu_xor = lift2 "line 88, bdd_false" Boolean_mvbdu.boolean_mvbdu_xor
-    let mvbdu_nand = lift2 "line 89, bdd_nand" Boolean_mvbdu.boolean_mvbdu_nand
-    let mvbdu_nor =  lift2 "line 90, bdd_nor" Boolean_mvbdu.boolean_mvbdu_nor
-    let mvbdu_imply =  lift2 "line 91, bdd_imply" Boolean_mvbdu.boolean_mvbdu_imply
-    let mvbdu_rev_imply =  lift2 "line 92, bdd_imply" Boolean_mvbdu.boolean_mvbdu_is_implied
-    let mvbdu_equiv =  lift2 "line 93, bdd_equiv" Boolean_mvbdu.boolean_mvbdu_equiv
-    let mvbdu_nimply = lift2 "line 94, bdd_nimply" Boolean_mvbdu.boolean_mvbdu_nimply
-    let mvbdu_nrev_imply = lift2 "line 95, bdd_nrev_imply" Boolean_mvbdu.boolean_mvbdu_nis_implied
-    let mvbdu_bi_true = lift2 "line 96, bdd_bi_true" Boolean_mvbdu.boolean_constant_bi_true
-    let mvbdu_bi_false = lift2 "line 97, bdd_bi_false" Boolean_mvbdu.boolean_constant_bi_false
-    let mvbdu_fst parameters handler error a b = error,handler,a
-    let mvbdu_snd parameters handler error a b = error,handler,b
-    let mvbdu_nfst = lift2 "line 100, bdd_nfst" Boolean_mvbdu.boolean_mvbdu_nfst
-    let mvbdu_nsnd = lift2 "line 101, bdd_nsnd" Boolean_mvbdu.boolean_mvbdu_nsnd
-    let mvbdu_redefine = lift2bis "line 102, bdd_redefine" Boolean_mvbdu.redefine
-    let mvbdu_rename = lift2bis "line 389, bdd rename" Boolean_mvbdu.monotonicaly_rename
-    let mvbdu_project_keep_only = lift2ter "line 246, bdd_project_keep_only" Boolean_mvbdu.project_keep_only
-    let mvbdu_project_abstract_away = lift2ter "line 247, bdd_project_abstract_away" Boolean_mvbdu.project_abstract_away
+    let mvbdu_and = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_and
+    let mvbdu_or = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_or
+    let mvbdu_xor = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_xor
+    let mvbdu_nand = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nand
+    let mvbdu_nor =  lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nor
+    let mvbdu_imply =  lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_imply
+    let mvbdu_rev_imply =  lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_is_implied
+    let mvbdu_equiv =  lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_equiv
+    let mvbdu_nimply = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nimply
+    let mvbdu_nrev_imply = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nis_implied
+    let mvbdu_bi_true = lift2 __POS__ Boolean_mvbdu.boolean_constant_bi_true
+    let mvbdu_bi_false = lift2 __POS__ Boolean_mvbdu.boolean_constant_bi_false
+    let mvbdu_fst _parameters handler error a _b = error,handler,a
+    let mvbdu_snd _parameters handler error _a b = error,handler,b
+    let mvbdu_nfst = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nfst
+    let mvbdu_nsnd = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nsnd
+    let mvbdu_redefine = lift2bis __POS__ Boolean_mvbdu.redefine
+    let mvbdu_rename = lift2bis __POS__ Boolean_mvbdu.monotonicaly_rename
+    let mvbdu_project_keep_only = lift2ter __POS__ Boolean_mvbdu.project_keep_only
+    let mvbdu_project_abstract_away = lift2ter __POS__ Boolean_mvbdu.project_abstract_away
 
-    let build_association_list = lift1bis "line 181, build_list" List_algebra.build_list
+    let build_association_list = lift1bis __POS__ List_algebra.build_list
 
-    let build_sorted_association_list = lift1ter "line 181, build_list" List_algebra.build_sorted_list
+    let build_sorted_association_list =
+      lift1ter __POS__ List_algebra.build_sorted_list
 
-    let build_reverse_sorted_association_list = lift1ter "line 181, build_list" List_algebra.build_reversed_sorted_list
+    let build_reverse_sorted_association_list =
+      lift1ter __POS__ List_algebra.build_reversed_sorted_list
 
     let empty_association_list parameter handler error = build_association_list parameter handler error []
 
@@ -498,28 +497,31 @@ module Make (M:Nul)  =
     let variables_list_of_mvbdu parameter handler error mvbdu =
       lift1four
         build_sorted_variables_list
-        "line 331, variables_list_of"
+        __POS__
         Boolean_mvbdu.variables_of_mvbdu
         parameter handler error mvbdu
 
     let extensional_of_association_list parameters handler error l =
-      lift1five "line 347"
+      lift1five
+        __POS__
         Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
 
     let extensional_of_variables_list parameters handler error l =
-      lift1five "line 361"
+      lift1five
+        __POS__
         Boolean_mvbdu.extensional_description_of_variables_list parameters handler error l
 
     let extensional_of_mvbdu parameters handler error mvbdu =
-      lift1__ "line 383"
+      lift1__ __POS__
         Boolean_mvbdu.extensional_description_of_mvbdu parameters handler error mvbdu
 
     let print = Boolean_mvbdu.print_mvbdu
     let print_association_list = List_algebra.print_association_list
     let print_variables_list = List_algebra.print_variables_list
 
-    let mvbdu_clean_head = lift1_ "line 216, bdd_clean_head" Boolean_mvbdu.clean_head
-    let mvbdu_keep_head_only = lift1_ "line 217, bdd_keep_head_only" Boolean_mvbdu.keep_head_only
+    let mvbdu_clean_head =
+      lift1_ __POS__ Boolean_mvbdu.clean_head
+    let mvbdu_keep_head_only = lift1_ __POS__ Boolean_mvbdu.keep_head_only
 
     let mvbdu_cartesian_abstraction parameters handler error bdu =
       let error,handler,bdd_true = mvbdu_true parameters handler error in
@@ -548,10 +550,10 @@ module Make (M:Nul)  =
       | Some bdu -> error,handler,bdu::list
 
     let merge_variables_lists parameters handler error l1 l2 =
-      lift2four "line 533" Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
+      lift2four __POS__ Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
 
     let overwrite_association_lists parameters handler error l1 l2 =
-      lift2five "line 536" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
+      lift2five __POS__ Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
 
     let nbr_variables parameter handler error l =
       lift1_seven "line 539" Boolean_mvbdu.length parameter handler error l
@@ -616,17 +618,20 @@ module Internalize(M:Mvbdu
       match !handler with
       | None ->
         Exception.warn !parameter error
-          (Some "Mvbdu_wrapper.ml") (Some "export_handler")  Exit (fun () -> None)
-      | Some h -> error, !handler
+          (Some __FILE__) (Some "export_handler")  Exit (fun () -> None)
+      | Some _ -> error, !handler
 
-    let check s error error' handler' =
+    let check (file,line,_,_) error error' handler' =
       let () = handler:= Some handler' in
       if error'== error
       then
         ()
       else
         let error',() =
-          Exception.warn !parameter error (Some "Mvbdu_wrapper.ml") (Some s)  Exit (fun () -> ())
+          Exception.warn
+            !parameter error
+            (Some file) (Some ("line "^(string_of_int line))) Exit
+            (fun () -> ())
         in
         Exception.print !parameter error'
 
@@ -634,17 +639,18 @@ module Internalize(M:Mvbdu
       let error = Exception.empty_error_handler in
       let error',output = M.init parameters error in
       let () = parameter := parameters in
-      check "line 194, init" error error' output
+      check __POS__ error error' output
 
     let is_init () = None != !handler
     let equal = M.equal
-    let get_handler s error =
+    let get_handler (file, line, _, _) error =
       match
         !handler
       with
       | None ->
         let () = init !parameter in
-        let error',() = Exception.warn !parameter error (Some "Mvbdu_wrapper.ml") (Some (s^" uninitialised mvbdu"))  Exit (fun () -> ())  in
+        let error',() = Exception.warn !parameter error (Some file)
+            (Some ("line "^(string_of_int line)^" uninitialised mvbdu"))  Exit (fun () -> ())  in
         begin
           match !handler with
           | None -> failwith "unrecoverable errors in bdu get_handler"
@@ -657,8 +663,8 @@ module Internalize(M:Mvbdu
       let error',handler,mvbdu = f !parameter handler error' in
       let _ = check s error error' handler in
       mvbdu
-    let mvbdu_true ()  = lift_const "line 218, mvbdu_true" M.mvbdu_true
-    let mvbdu_false () = lift_const "line 219, mvbdu_false" M.mvbdu_false
+    let mvbdu_true ()  = lift_const __POS__ M.mvbdu_true
+    let mvbdu_false () = lift_const __POS__ M.mvbdu_false
 
     let lift_unary s f x =
       let error = Exception.empty_error_handler in
@@ -668,8 +674,8 @@ module Internalize(M:Mvbdu
       mvbdu
 
 
-    let mvbdu_id = lift_unary "line 228, mvbdu_id" M.mvbdu_id
-    let mvbdu_not = lift_unary "line 229, mvbdu_not" M.mvbdu_not
+    let mvbdu_id = lift_unary __POS__ M.mvbdu_id
+    let mvbdu_not = lift_unary __POS__ M.mvbdu_not
 
     let mvbdu_unary_true _ = mvbdu_true ()
     let mvbdu_unary_false _ = mvbdu_false ()
@@ -677,18 +683,6 @@ module Internalize(M:Mvbdu
     let mvbdu_bi_false _ _ = mvbdu_false ()
 
     let lift_binary s f x y =
-      let error = Exception.empty_error_handler in
-      let error',handler = get_handler s error in
-      let error',handler,mvbdu = f !parameter handler error' x y in
-      let _ = check s error error' handler in
-      mvbdu
-    let lift_binary' s f x y =
-      let error = Exception.empty_error_handler in
-      let error',handler = get_handler s error in
-      let error',handler,mvbdu = f !parameter handler error' x y in
-      let _ = check s error error' handler in
-      mvbdu
-    let lift_binary'' s f x y =
       let error = Exception.empty_error_handler in
       let error',handler = get_handler s error in
       let error',handler,mvbdu = f !parameter handler error' x y in
@@ -709,42 +703,43 @@ module Internalize(M:Mvbdu
       let _ = check s error error' handler in
       mvbdu
 
-    let mvbdu_and = lift_binary "line 243, mvbdu_and" M.mvbdu_and
-    let mvbdu_or  = lift_binary "line 244, mvbdu_or" M.mvbdu_or
-    let mvbdu_nand = lift_binary "line 245, mvbdu_nand" M.mvbdu_nand
-    let mvbdu_nor = lift_binary "line 246, mvbdu_nor" M.mvbdu_nor
+    let mvbdu_and = lift_binary __POS__ M.mvbdu_and
+    let mvbdu_or  = lift_binary __POS__ M.mvbdu_or
+    let mvbdu_nand = lift_binary __POS__ M.mvbdu_nand
     let mvbdu_snd _ b = b
     let mvbdu_nsnd _ b = mvbdu_not b
     let mvbdu_fst a _ = a
     let mvbdu_nfst a _ = mvbdu_not a
-    let mvbdu_xor = lift_binary "line 251, mvbdu_xor" M.mvbdu_xor
-    let mvbdu_nor = lift_binary "line 252, mvbdu_nor" M.mvbdu_nor
-    let mvbdu_imply = lift_binary "line 253, mvbdu_imply" M.mvbdu_imply
-    let mvbdu_nimply = lift_binary "line 254, mvbdu_nimply" M.mvbdu_nimply
-    let mvbdu_rev_imply = lift_binary "line 255, mvbdu_imply" M.mvbdu_rev_imply
-    let mvbdu_nrev_imply = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_nrev_imply
-    let mvbdu_equiv = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_equiv
-    let mvbdu_redefine = lift_binary "line 258, mvbdu_redefine" M.mvbdu_redefine
-    let mvbdu_rename = lift_binary "line 624, mvbdu_rename" Mvbdu.mvbdu_rename
-    let mvbdu_project_keep_only = lift_binary "line 380, mvbdu_project_keep_only" M.mvbdu_project_keep_only
-    let mvbdu_project_abstract_away = lift_binary "line 381, mvbdu_project_abstract_away" M.mvbdu_project_abstract_away
+    let mvbdu_xor = lift_binary __POS__ M.mvbdu_xor
+    let mvbdu_nor = lift_binary __POS__ M.mvbdu_nor
+    let mvbdu_imply = lift_binary __POS__ M.mvbdu_imply
+    let mvbdu_nimply = lift_binary __POS__ M.mvbdu_nimply
+    let mvbdu_rev_imply = lift_binary __POS__ M.mvbdu_rev_imply
+    let mvbdu_nrev_imply = lift_binary __POS__ M.mvbdu_nrev_imply
+    let mvbdu_equiv = lift_binary __POS__ M.mvbdu_equiv
+    let mvbdu_redefine = lift_binary __POS__ M.mvbdu_redefine
+    let mvbdu_rename = lift_binary __POS__ Mvbdu.mvbdu_rename
+    let mvbdu_project_keep_only = lift_binary __POS__ M.mvbdu_project_keep_only
+    let mvbdu_project_abstract_away =
+      lift_binary __POS__ M.mvbdu_project_abstract_away
 
-    let build_association_list = lift_unary "line 297" M.build_association_list
-    let build_sorted_association_list = lift_unary "line 298" M.build_sorted_association_list
-    let build_reverse_sorted_association_list = lift_unary "line 299" M.build_reverse_sorted_association_list
+    let build_association_list = lift_unary __POS__ M.build_association_list
+    let build_sorted_association_list =
+      lift_unary __POS__ M.build_sorted_association_list
+    let build_reverse_sorted_association_list =
+      lift_unary __POS__ M.build_reverse_sorted_association_list
     let empty_association_list () = build_association_list []
 
-    let build_renaming_list = lift_unary "line 297" M.build_renaming_list
-    let build_sorted_renaming_list = lift_unary "line 298" M.build_sorted_renaming_list
-    let build_reverse_sorted_renaming_list = lift_unary "line 299" M.build_reverse_sorted_renaming_list
+    let build_renaming_list = lift_unary __POS__ M.build_renaming_list
+    let build_sorted_renaming_list =
+      lift_unary __POS__ M.build_sorted_renaming_list
+    let build_reverse_sorted_renaming_list =
+      lift_unary __POS__ M.build_reverse_sorted_renaming_list
     let empty_renaming_list () = build_renaming_list []
 
 
     let mvbdu_subseteq mvbdu1 mvbdu2 =
       equal (mvbdu_or mvbdu1 mvbdu2) mvbdu2
-
-    let mvbdu_of_hconsed_asso asso =
-      mvbdu_redefine (mvbdu_true ()) asso
 
     let mvbdu_of_asso_gen f asso =
       mvbdu_redefine (mvbdu_true ()) (f asso)
@@ -752,36 +747,41 @@ module Internalize(M:Mvbdu
     let mvbdu_of_association_list = mvbdu_of_asso_gen (build_association_list)
     let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen (build_sorted_association_list)
     let mvbdu_of_reverse_sorted_association_list = mvbdu_of_asso_gen (build_reverse_sorted_association_list)
-    let build_variables_list = lift_unary "line 297" M.build_variables_list
-    let build_sorted_variables_list = lift_unary "line 298" M.build_sorted_variables_list
-    let build_reverse_sorted_variables_list = lift_unary "line 299" M.build_reverse_sorted_variables_list
+    let build_variables_list = lift_unary __POS__ M.build_variables_list
+    let build_sorted_variables_list =
+      lift_unary __POS__ M.build_sorted_variables_list
+    let build_reverse_sorted_variables_list =
+      lift_unary __POS__ M.build_reverse_sorted_variables_list
     let empty_variables_list () = build_variables_list []
 
     let merge_variables_lists l1 l2 =
-      lift_binary''' "line 749"
+      lift_binary''' __POS__
         M.merge_variables_lists
         l1 l2
 
-    let nbr_variables l = lift_unary "line 753" M.nbr_variables l
+    let nbr_variables l = lift_unary __POS__ M.nbr_variables l
 
     let overwrite_association_lists l1 l2 =
-      lift_binary'''' "line 475" M.overwrite_association_lists l1 l2
+      lift_binary'''' __POS__ M.overwrite_association_lists l1 l2
 
     let variables_list_of_mvbdu l =
-      lift_unary "line 541" M.variables_list_of_mvbdu l
+      lift_unary __POS__ M.variables_list_of_mvbdu l
 
-    let mvbdu_cartesian_abstraction = lift_unary "line 349" M.mvbdu_cartesian_abstraction
+    let mvbdu_cartesian_abstraction =
+      lift_unary __POS__ M.mvbdu_cartesian_abstraction
 
     let extensional_of_association_list l =
-      lift_unary "line 509" M.extensional_of_association_list l
+      lift_unary __POS__ M.extensional_of_association_list l
     let extensional_of_variables_list l =
-      lift_unary "line 511" M.extensional_of_variables_list l
+      lift_unary __POS__ M.extensional_of_variables_list l
 
     let extensional_of_mvbdu mvbdu =
-      lift_unary "line 576" M.extensional_of_mvbdu mvbdu
+      lift_unary __POS__ M.extensional_of_mvbdu mvbdu
 
-    let mvbdu_full_cartesian_decomposition = lift_unary "line 569" M.mvbdu_full_cartesian_decomposition
-    let mvbdu_cartesian_decomposition_depth = lift_binary "line 570" M.mvbdu_cartesian_decomposition_depth
+    let mvbdu_full_cartesian_decomposition =
+      lift_unary __POS__ M.mvbdu_full_cartesian_decomposition
+    let mvbdu_cartesian_decomposition_depth =
+      lift_binary __POS__ M.mvbdu_cartesian_decomposition_depth
 
     let print = M.print
     let print_association_list = M.print_association_list

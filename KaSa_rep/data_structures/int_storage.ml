@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -46,8 +46,8 @@ sig
 
 end
 
-let invalid_arg parameters mh message exn value  =
-  Exception.warn parameters mh (Some "Int_storage") message exn (fun () -> value )
+let invalid_arg parameters mh pos exn value  =
+  Exception.warn_pos parameters mh pos exn value
 
 module Int_storage_imperatif =
   (struct
@@ -76,7 +76,7 @@ module Int_storage_imperatif =
       if size < 0
       then
         let error,array = create parameters error 0 in
-        invalid_arg parameters error (Some "create, line 60") Exit array
+        invalid_arg parameters error __POS__ Exit array
       else
         error,
         {
@@ -99,16 +99,16 @@ module Int_storage_imperatif =
     let set parameters error key value array =
       if key>array.size || key<0
       then
-        invalid_arg parameters error (Some "set, line 81") Exit array
+        invalid_arg parameters error __POS__ Exit array
       else
         let _ = array.array.(key)<-Some value in
-        error,array
+        error, array
 
     let rec init parameters error size f =
       if size < 0
       then
         let error,array = init parameters error 0 f in
-        invalid_arg parameters error (Some "create, line 60") Exit array
+        invalid_arg parameters error __POS__ Exit array
       else
         let error, array = create parameters error size in
         let rec aux k error array =
@@ -122,10 +122,10 @@ module Int_storage_imperatif =
 
     let get parameters error key array =
       if key>array.size || key<0 then
-        invalid_arg parameters error (Some "get, line 88") Exit None
+        invalid_arg parameters error __POS__ Exit None
       else
         match array.array.(key) with
-        | None -> invalid_arg parameters error (Some "get, line 92") Exit None
+        | None -> invalid_arg parameters error __POS__ Exit None
         | a -> error,a
 
     let unsafe_get _parameters error key array =
@@ -242,7 +242,7 @@ module Nearly_infinite_arrays =
         let error,old_dimension = dimension parameters error array in
         if old_dimension = Sys.max_array_length
         then
-          invalid_arg parameters error (Some "expand, line 170") Exit array
+          invalid_arg parameters error __POS__ Exit array
         else
           Basic.expand_and_copy parameters error array
             (max 1 (min Sys.max_array_length (2*old_dimension)))
@@ -259,7 +259,7 @@ module Nearly_infinite_arrays =
           let error,array' = expand parameters error array in
           if array == array'
           then
-            invalid_arg parameters error (Some "set, line 185") Exit array
+            invalid_arg parameters error __POS__ Exit array
           else
             set parameters error key value array'
         else
@@ -313,7 +313,7 @@ module Extend =
           (fun (error,list) key ->
              let error,t2 = Extension.get parameters error key t.matrix in
              match t2 with
-             | None -> invalid_arg parameters error (Some "key_list, line 184") Exit list
+             | None -> invalid_arg parameters error __POS__ Exit list
              | Some t2 ->
                let error,l2 = Underlying.key_list parameters error t2 in
                error,
@@ -325,7 +325,7 @@ module Extend =
           (List.rev ext_list)
 
       let expand_and_copy parameters error array _dimension =
-        invalid_arg parameters error (Some "expand_and_copy, line 196") Exit array
+        invalid_arg parameters error __POS__ Exit array
 
       let init parameters error dim  f =
         let error, array =
@@ -355,7 +355,7 @@ module Extend =
         let error,underlying = Extension.get parameters error i array.matrix in
         match underlying with
         | Some underlying -> Underlying.get parameters error j underlying
-        | None ->  invalid_arg parameters error (Some "get, line 298") Exit None
+        | None ->  invalid_arg parameters error __POS__ Exit None
 
       let unsafe_get parameters error (i,j) array =
         let error,underlying = Extension.unsafe_get parameters error i array.matrix in
@@ -499,7 +499,7 @@ module Quick_key_list =
              let error,im = get parameters error k a in
              match im with
              | None ->
-               let error,_ = invalid_arg parameters error (Some "fold, line 391")
+               let error,_ = invalid_arg parameters error __POS__
                    Exit () in error
              | Some im -> f parameters error k im)
           error (List.rev list)
@@ -510,7 +510,7 @@ module Quick_key_list =
           (fun (error,b) k ->
              let error,im = get parameters error k a in
              match im with
-             | None -> invalid_arg parameters error (Some "fold, line 391") Exit b
+             | None -> invalid_arg parameters error __POS__ Exit b
              | Some im -> f parameters error k im b)
           (error,b)
           (List.rev list)
@@ -529,7 +529,7 @@ module Quick_key_list =
                 let b = snd output in
                 match im with
                 | None ->
-                  Some (invalid_arg parameters error (Some "fold, line 391") Exit b)
+                  Some (invalid_arg parameters error __POS__ Exit b)
                 | Some im -> Some (f parameters error head im b)
               with Sys.Break -> None
             in

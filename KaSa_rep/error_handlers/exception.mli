@@ -16,7 +16,7 @@ val print_for_KaSim : Remanent_parameters_sig.parameters -> method_handler -> un
 val wrap : Remanent_parameters_sig.parameters ->
   method_handler -> string -> string option -> exn -> method_handler
 val check :
-  (Remanent_parameters_sig.parameters -> method_handler -> string option ->
+  (Remanent_parameters_sig.parameters -> method_handler -> 'a ->
    exn -> unit -> method_handler * unit) ->
   Remanent_parameters_sig.parameters -> method_handler -> method_handler ->
-  string option -> exn -> method_handler
+  'a -> exn -> method_handler

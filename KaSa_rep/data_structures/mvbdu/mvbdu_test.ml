@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -66,7 +66,7 @@ let bdu_test remanent parameters =
   in
   let a_val = Mvbdu_sig.Leaf true in
   let b_val = Mvbdu_sig.Leaf false in
-  let error,(handler:('b,'a,'c,'d,bool,int) Memo_sig.handler),a',(a'_id:int),a'',a''_id =
+  let error,(handler:('b,'a,'c,'d,bool,int) Memo_sig.handler),a',(a'_id:int),a'',_a''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -74,7 +74,7 @@ let bdu_test remanent parameters =
       a_val
       a_val
   in
-  let error,handler,b',b'_id,b'',b''_id =
+  let error,handler,b',b'_id,b'',_b''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -100,7 +100,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 2
       }
   in
-  let error,handler,c',c'_id,c'',c''_id =
+  let error,handler,c',c'_id,c'',_c''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -126,7 +126,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 2
       }
   in
-  let error,handler,d',d'_id,d'',d''_id =
+  let error,handler,d',_d'_id,d'',_d''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -152,7 +152,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 2
       }
   in
-  let error,handler,e',e'_id,e'',e''_id =
+  let error,handler,e',_e'_id,e'',_e''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -179,7 +179,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 1
       }
   in
-  let error,handler,f',f'_id,f'',f''_id =
+  let error,handler,f',_f'_id,f'',_f''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -205,7 +205,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 1
       }
   in
-  let error,handler,g',g'_id,g'',g''_id =
+  let error,handler,g',_g'_id,g'',_g''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -232,7 +232,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 3
       }
   in
-  let error,handler,h',h'_id,h'',h''_id =
+  let error,handler,h',_h'_id,h'',_h''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -258,7 +258,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 0
       }
   in
-  let error,handler,i',i'_id,i'',i''_id =
+  let error,handler,i',_i'_id,i'',_i''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -284,7 +284,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 2
       }
   in
-  let error,handler,j',j'_id,j'',j''_id =
+  let error,handler,j',_j'_id,j'',_j''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -310,7 +310,7 @@ let bdu_test remanent parameters =
         Mvbdu_sig.upper_bound = 0
       }
   in
-  let error,handler,k',k'_id,k'',k''_id =
+  let error,handler,k',_k'_id,k'',_k''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -349,10 +349,10 @@ let bdu_test remanent parameters =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn parameters error (Some "") (Some "")  Exit (fun _ -> a') in
+          Exception.warn_pos parameters error __POS__ Exit a' in
         error, handler, a
   in
-  let error, handler, l', l'_id, l'', l''_id =
+  let error, handler, l', _l'_id, l'', _l''_id =
     build_without_and_with_compressing
       allocate
       error
@@ -720,9 +720,9 @@ let bdu_test remanent parameters =
 
   (* WRAPPED MVBDU ORIGINAL *)
   let b0 = Mvbdu_wrapper.Mvbdu.is_init () in
-  let error', handler = Mvbdu_wrapper.Mvbdu.init parameters error in
+  let error', _handler = Mvbdu_wrapper.Mvbdu.init parameters error in
   let b1 = Mvbdu_wrapper.Mvbdu.is_init () in
-  let error'',handler = Mvbdu_wrapper.Mvbdu.init parameters error' in
+  let error'', _handler = Mvbdu_wrapper.Mvbdu.init parameters error' in
   let b2,b3 = error==error',error'==error'' in
   let error = error'' in
   let error,handler,bmvbdu_true0' = Mvbdu_wrapper.Mvbdu.mvbdu_true parameters handler error in
@@ -796,12 +796,12 @@ let bdu_test remanent parameters =
   let error,handler,list__a = Mvbdu_wrapper.Mvbdu.build_association_list parameters handler error list in
   let error,handler,list__c = Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list parameters handler error list in
   let error,handler,list__a' =Mvbdu_wrapper.Mvbdu.build_association_list parameters handler error list' in
-  let error,handler,list__b' = Mvbdu_wrapper.Mvbdu.build_sorted_association_list parameters handler error list' in
-  let error,handler,mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0' list__a in
+  let error,handler,_list__b' = Mvbdu_wrapper.Mvbdu.build_sorted_association_list parameters handler error list' in
+  let error,_handler,_mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0' list__a in
 
  (* WRAPPED MVBDU OPTIMIZED *)
   let b0' = Mvbdu_wrapper.Optimized_Mvbdu.is_init () in
-  let error_', handler = Mvbdu_wrapper.Optimized_Mvbdu.init parameters error in
+  let error_', _handler = Mvbdu_wrapper.Optimized_Mvbdu.init parameters error in
   let b1' = Mvbdu_wrapper.Optimized_Mvbdu.is_init () in
   let error_'',handler = Mvbdu_wrapper.Optimized_Mvbdu.init parameters error_' in
   let b2',b3' = error==error_',error_'==error_'' in
@@ -875,12 +875,12 @@ let bdu_test remanent parameters =
   let list = [4,1; 2,2; 1,3] in
   let list' = [2,2; 4,1; 1,3] in
   let error,handler,list___a = Mvbdu_wrapper.Optimized_Mvbdu.build_association_list parameters handler error list in
-  let error,handler,list___b = Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_association_list parameters handler error list in
+  let error,handler,_list___b = Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_association_list parameters handler error list in
   let error,handler,list___c = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_association_list parameters handler error list in
   let error,handler,list___a' =Mvbdu_wrapper.Optimized_Mvbdu.build_association_list parameters handler error list' in
-  let error,handler,list___b' =Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_association_list parameters handler error list' in
-  let error,handler,list___c' = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_association_list parameters handler error list' in
-  let error,handler,mvbdu = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0'' list___a in
+  let error,handler,_list___b' =Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_association_list parameters handler error list' in
+  let error,handler,_list___c' = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_association_list parameters handler error list' in
+  let error,_handler,_mvbdu = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0'' list___a in
 
  (* WRAPPED MVBDU INTERNALIZED *)
   let b0'' = Mvbdu_wrapper.IntMvbdu.is_init () in

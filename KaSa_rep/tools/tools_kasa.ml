@@ -1,5 +1,3 @@
-let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "Tools") message exn (fun () -> default)
 
 let fst_option x =
   match x
@@ -28,9 +26,6 @@ let escape_label_in_dot s =
 				  | "\"" -> "\\\""
 				  | "\\" -> "\\\\"
 				  | _ -> assert false) s
-
-(*let make_id_compatible_with_dot_format parameters error string =
-  error,escape_label_in_dot string*)
 
 let make_id_compatible_with_dot_format parameters error string =
   let tab =

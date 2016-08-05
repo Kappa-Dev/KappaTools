@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th of March
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -15,10 +15,6 @@
 
 let sanity_check = true
 let test_workbench = false
-
-
-let invalid_arg parameters mh message exn value =
-  Exception.warn parameters mh (Some "Mvbdu_core") message exn (fun () -> value)
 
 let get_hash_key mvbdu = mvbdu.Mvbdu_sig.id
 
@@ -51,7 +47,7 @@ let build_already_compressed_cell (allocate: ('a,'b,'c,'d) Sanity_test_sig.f)
 
 let compress_node (allocate:('a,'b,'c,'d) Sanity_test_sig.f) error handler cell =
   match cell with
-    | Mvbdu_sig.Leaf a as x ->
+    | Mvbdu_sig.Leaf _a as x ->
       build_already_compressed_cell
         allocate
         error
@@ -77,7 +73,7 @@ let compress_node (allocate:('a,'b,'c,'d) Sanity_test_sig.f) error handler cell 
                          branch_false.Mvbdu_sig.value,
                          branch_false,
                          handler)
-          | _ ->
+          | Mvbdu_sig.Node _ | Mvbdu_sig.Leaf _ ->
             (build_already_compressed_cell
                allocate
                error

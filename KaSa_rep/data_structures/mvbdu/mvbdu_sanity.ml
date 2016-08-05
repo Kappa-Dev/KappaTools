@@ -4,16 +4,13 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides primitives to check that set of finite maps are well-formed
    *
    * Copyright 2010 Institut National de Recherche en Informatique et
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let invalid_arg parameters mh message exn value =
-  Exception.warn parameters mh (Some "Mvbdu_sanity") message exn (fun () -> value)
 
 let rec safety_equal_mvbdu_working_list working_list mvbdu_x mvbdu_y  =
   match mvbdu_x.Mvbdu_sig.value, mvbdu_y.Mvbdu_sig.value  with
@@ -30,7 +27,7 @@ let rec safety_equal_mvbdu_working_list working_list mvbdu_x mvbdu_y  =
       ((x.Mvbdu_sig.branch_false, y.Mvbdu_sig.branch_false) :: working_list)
       x.Mvbdu_sig.branch_true
       y.Mvbdu_sig.branch_true
-    | _ -> false
+    | Mvbdu_sig.Leaf _,_ | _,Mvbdu_sig.Leaf _ -> false
 
 let safety_equal_mvbdu a b = safety_equal_mvbdu_working_list [] a b
 
@@ -41,7 +38,7 @@ let rec safety_equal_list list_x list_y  =
       x.List_sig.variable = y.List_sig.variable &&
       x.List_sig.association = y.List_sig.association &&
       safety_equal_list x.List_sig.tail y.List_sig.tail
-    | _ -> false
+    | List_sig.Empty,_ | _,List_sig.Empty -> false
 
 let rec safety_compare_nodes_working_list working_list =
   match working_list with [] -> 0
@@ -54,7 +51,7 @@ let rec safety_compare_nodes_working_list working_list =
         cmp1
     | (Mvbdu_sig.Leaf _ , _)::_ -> 1
     | (_ , Mvbdu_sig.Leaf _)::_ -> -1
-    | (Mvbdu_sig.Node x,Mvbdu_sig.Node y)::tail ->
+    | (Mvbdu_sig.Node x,Mvbdu_sig.Node y)::_ ->
       let cmp2 = compare x.Mvbdu_sig.variable y.Mvbdu_sig.variable in
       if cmp2=0
       then
@@ -95,7 +92,7 @@ let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c,'
       in
       match output with
         | None -> error,false,handler
-        | Some (i, asso, asso_id, handler) ->
+        | Some (_i, _asso, _asso_id, handler) ->
           begin
             match mvbdu.Mvbdu_sig.value with
               | Mvbdu_sig.Leaf _ ->
@@ -187,7 +184,9 @@ let print_flag log bool =
   then Printf.fprintf log "Yes"
   else Printf.fprintf log "No"
 
-let sanity_check (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.f) error log handler mvbdu =
+let sanity_check
+    (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.f) error _log
+    handler mvbdu =
   let error,bool1 = safety_check_increasing_nodes error mvbdu in
   let error,bool2,dictionary =
     safety_check_maximal_sharing allocate_uniquely error mvbdu handler in

@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 18/10/2010
-    * Last modification: Time-stamp: <Jul 02 2016>
+    * Last modification: Time-stamp: <Aug 05 2016>
     * *
     * This library provides signature for hash tables and several implementations
     * *
@@ -49,7 +49,9 @@ module Hash =
       let find_option parameter error a b  =
 	let error',output = Map.Map.find_option parameter error a b in
 	if error==error' then error',output
-	else  Exception.warn parameter error' (Some "Hash.ml") (Some ("find_option line 52"^": attempt to read an unexisting association")) Not_found  (fun () -> output)
+ else
+   let file,line,_,_ = __POS__ in
+   Exception.warn parameter error' (Some file) (Some ("line "^(string_of_int line)^": attempt to read an unexisting association")) Not_found  (fun () -> output)
 
       let find_option_without_logs = Map.Map.find_option_without_logs
 

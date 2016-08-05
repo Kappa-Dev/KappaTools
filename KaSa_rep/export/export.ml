@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 03 2016>
+  * Last modification: Time-stamp: <Aug 05 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -12,9 +12,8 @@
   * under the terms of the GNU Library General Public License *)
 
 
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Export")
-    message exn (fun () -> default)
+let warn parameters mh pos exn default =
+  Exception.warn_pos parameters mh pos exn default
 
 (*******************************************************************************)
 (*module signatures*)
@@ -683,7 +682,7 @@ let convert_contact_map show_title state  contact_map =
                      match state with
                      | Ckappa_sig.Internal state -> error, state::list
                      | Ckappa_sig.Binding _ ->
-                       warn parameters error (Some "line 645") Exit list)
+                       warn parameters error __POS__ Exit list)
                   (error, list_a) (List.rev list_a')
               in
               let error, list_b'' =
