@@ -67,7 +67,7 @@ type basic_static_information =
       Site_accross_bonds_domain_type.PairAgentIDSite_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
     store_potential_tuple_pair_created_bonds_proj2 :
-      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.t;
+      Site_accross_bonds_domain_type.AgentSiteState_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
     (*project map*)
     store_proj_map1 :
@@ -146,7 +146,7 @@ let init_basic_static_information =
     store_potential_tuple_pair_created_bonds_proj1 =
       Site_accross_bonds_domain_type.PairAgentIDSite_map_and_set.Set.empty;
     store_potential_tuple_pair_created_bonds_proj2 =
-      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty;
+      Site_accross_bonds_domain_type.AgentSiteState_map_and_set.Set.empty;
     (*-------------------------------------------------------*)
     (*project map*)
     store_proj_map1 =
@@ -677,6 +677,17 @@ let collect_potential_tuple_pair_created_bonds_proj1 parameter error rule_id
   let error, new_set =
     Site_accross_bonds_domain_type.Proj_get_agent_id_snd_site.monadic_proj_set
       (fun _parameter error (x, y) ->
+         (*let (agent_id, site_type1), (agent_id1, site_type1') =
+           proj x, proj y
+         in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "rule_id:%i:%i:%i; %i:%i\n"
+          (Ckappa_sig.int_of_rule_id rule_id)
+          (Ckappa_sig.int_of_agent_id agent_id)
+          (Ckappa_sig.int_of_site_name site_type1)
+          (Ckappa_sig.int_of_agent_id agent_id1)
+          (Ckappa_sig.int_of_site_name site_type1')
+         in*)
          error,
          (proj x, proj y)
       )
@@ -689,8 +700,8 @@ let collect_potential_tuple_pair_created_bonds_proj1 parameter error rule_id
 (*-------------------------------------------------------*)
 (*project the tuple pair return in the result*)
 
-let collect_potential_tuple_pair_created_bonds_proj2 parameter error rule_id
-    store_potential_tuple_pair_created_bonds =
+let collect_potential_tuple_pair_created_bonds_proj2 parameter error kappa_handler
+    rule_id store_potential_tuple_pair_created_bonds =
   let error, potential_tuple_pair_created_bonds_set =
     get_set parameter error
       rule_id
@@ -700,8 +711,22 @@ let collect_potential_tuple_pair_created_bonds_proj2 parameter error rule_id
   let proj (_, b, c, _, e, _) = (b, c, e) in
   let error, new_set =
     Site_accross_bonds_domain_type.Proj_get_agents_sites.monadic_proj_set
-      (fun _parameter error (x, y) ->
-         error, (proj x, proj y)
+      (fun _parameter error (x, _) ->
+         (*) let error, (agent, site, state) =
+           Site_accross_bonds_domain_type.convert_single
+             parameter error kappa_handler (proj x)
+         in
+         let error, (agent1, site1, state1) =
+         Site_accross_bonds_domain_type.convert_single
+           parameter error kappa_handler (proj y)
+       in
+         let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+             "rule_id:%i:%s(%s:%s); %s(%s:%s)\n"
+             (Ckappa_sig.int_of_rule_id rule_id)
+             agent site state
+             agent1 site1 state1
+       in*)
+         error, proj x
       )
       parameter
       error

@@ -192,10 +192,20 @@ module Proj_get_agent_id_snd_site =
     (PairAgentsSitesStates_map_and_set)
     (PairAgentIDSite_map_and_set)
 
+module AgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
 module Proj_get_agents_sites =
   Map_wrapper.Proj
     (PairAgentsSitesStates_map_and_set)
-    (PairAgentSiteState_map_and_set)
+    (AgentSiteState_map_and_set)
 
 (*project map*)
 
