@@ -190,6 +190,15 @@ let equal a b =
          | None -> are_compatible h1 a.links a.internals ag b.links b.internals)
       None ags
 
+let automorphisms a =
+  match Array.fold_left
+          (fun acc x -> Tools.min_pos_int_not_zero acc (List.length x,x))
+          (0,[]) a.nodes_by_type with
+  | _,[] -> [Renaming.empty]
+  | _,(h::_ as l) -> List.fold_left (fun acc ag ->
+        match are_compatible h a.links a.internals ag a.links a.internals with
+        | None -> acc
+        | Some r -> r::acc) [] l
 
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =

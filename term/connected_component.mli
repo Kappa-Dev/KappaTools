@@ -64,6 +64,8 @@ val print_dot : Signature.s -> Format.formatter -> t -> unit
 
 val find_root_type : t -> int option
 
+val automorphisms : t -> Renaming.t list
+
 module Matching : sig
   type t
   val empty : t
