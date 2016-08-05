@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides primitives to check consistency of accociation lists
    *
@@ -13,9 +13,6 @@
    * under the terms of the GNU Library General Public License *)
 
 
-let invalid_arg parameters mh message exn value =
-  Exception.warn parameters mh (Some "List_sanity") message exn (fun () -> value)
-
 let rec safety_equal_list list_x list_y  =
   match list_x.List_sig.value, list_y.List_sig.value with
     | List_sig.Empty, List_sig.Empty -> true
@@ -23,7 +20,7 @@ let rec safety_equal_list list_x list_y  =
       x.List_sig.variable = y.List_sig.variable
       && x.List_sig.association = y.List_sig.association
         && safety_equal_list x.List_sig.tail y.List_sig.tail
-    | _ -> false
+    | List_sig.Empty,_ | _,List_sig.Empty -> false
 
 
 let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g)
@@ -31,7 +28,7 @@ let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d) Sanity_tes
   let list_val = list.List_sig.value in
   match list_val with
     | List_sig.Empty -> error,true,handler
-    | List_sig.Cons x ->
+    | List_sig.Cons _ ->
       (** check that list is uniquely represented in memory *)
       let error,output = allocate_uniquely
         error
@@ -43,7 +40,7 @@ let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d) Sanity_tes
       in
       match output with
         | None -> error,false,handler
-        | Some (i,asso,asso_id,handler) ->
+        | Some (_i,_asso,_asso_id,handler) ->
           begin
             match list_val with
               | List_sig.Empty -> error,true,handler
@@ -86,7 +83,7 @@ let print_flag log bool =
   then Printf.fprintf log "Yes"
   else Printf.fprintf log "No"
 
-let sanity_check (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g) error log handler mvbdu =
+let sanity_check (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g) error _log handler mvbdu =
   let error,bool1 =
     safety_check_increasing_nodes
       error

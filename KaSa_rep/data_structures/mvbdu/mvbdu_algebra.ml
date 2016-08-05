@@ -4,16 +4,13 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th or March
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
    * Copyright 2010 Institut National de Recherche en Informatique et
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let invalid_arg parameters mh message exn value =
-  Exception.warn parameters mh (Some "Mvbdu_algebra") message exn (fun () -> value)
 
 (*TEST*)
 (*let test_print_boolean_mvbdu (error:Exception.method_handler) =
@@ -25,7 +22,7 @@ let invalid_arg parameters mh message exn value =
           (if a then "true" else "false")
       in
       let _ =
-	Loggers.print_newline (Remanent_parameters.get_logger parameters)
+  Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
       error)
     (fun i -> "x" ^ (string_of_int i))*)
@@ -33,17 +30,17 @@ let invalid_arg parameters mh message exn value =
 let downgrade parameters mh message value mvbdu =
   match mvbdu with
   | Some x -> mh,x
-  | None -> invalid_arg parameters mh message Exit (value ())
+  | None -> Exception.warn_pos parameters mh message Exit (value ())
 
-let rec generic_zeroary allocate handler f error parameters  =
+let generic_zeroary allocate handler f error parameters  =
   let error,cell = f error in
   let error,output =
     Mvbdu_core.build_already_compressed_cell
       allocate error handler (Mvbdu_core.get_skeleton cell) cell
   in
   match output with
-  | None -> invalid_arg parameters error (Some "line 28") Exit (handler,None)
-  | Some (key,cell,mvbdu,handler) -> error,(handler,Some mvbdu)
+  | None -> Exception.warn_pos parameters error __POS__ Exit (handler,None)
+  | Some (_key,_cell,mvbdu,handler) -> error,(handler,Some mvbdu)
 
 let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.unary_memoized_fun)
     handler error parameters mvbdu_input =
@@ -60,27 +57,27 @@ let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.una
         | Mvbdu_sig.Node x ->
           begin
             match generic_unary
-              allocate memoized_fun handler error parameters
-              x.Mvbdu_sig.branch_true
+                    allocate memoized_fun handler error parameters
+                    x.Mvbdu_sig.branch_true
             with
             | error,(handler,None) -> error,(handler,None)
             | error,(handler,Some(mvbdu_true)) ->
               begin
                 match generic_unary
-                  allocate memoized_fun handler error parameters
-                  x.Mvbdu_sig.branch_false
+                        allocate memoized_fun handler error parameters
+                        x.Mvbdu_sig.branch_false
                 with
                 | error,(handler,None) -> error,(handler,None)
                 | error,(handler,Some(mvbdu_false)) ->
                   begin
                     match Mvbdu_core.compress_node allocate error handler
-                      (Mvbdu_sig.Node
-                         {x with
-                           Mvbdu_sig.branch_true = mvbdu_true;
-                           Mvbdu_sig.branch_false = mvbdu_false})
+                            (Mvbdu_sig.Node
+                               {x with
+                                Mvbdu_sig.branch_true = mvbdu_true;
+                                Mvbdu_sig.branch_false = mvbdu_false})
                     with
                     | error,None -> error, (handler, None)
-                    | error, Some(id, cell, mvbdu, handler) -> error, (handler, Some(mvbdu))
+                    | error, Some(_id, _cell, mvbdu, handler) -> error, (handler, Some(mvbdu))
                   end
               end
           end
@@ -101,12 +98,12 @@ let less parameters error x y =
   match compare x.Mvbdu_sig.variable y.Mvbdu_sig.variable with
   | 0 -> error, compare x.Mvbdu_sig.upper_bound y.Mvbdu_sig.upper_bound
   | 1 | -1 as x-> error, x
-  | _ ->  invalid_arg parameters error (Some "line 81") Exit 0
+  | _ ->  Exception.warn_pos parameters error __POS__ Exit 0
 
 let cut x t1  =
   match t1.Mvbdu_sig.value with
   | Mvbdu_sig.Node y when compare x y.Mvbdu_sig.variable = 0 -> y.Mvbdu_sig.branch_true
-  | _ -> t1
+  | Mvbdu_sig.Leaf _ | Mvbdu_sig.Node _ -> t1
 
 let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.binary_memoized_fun) handler error parameters mvbdu_a mvbdu_b =
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_a,mvbdu_b) with
@@ -158,32 +155,32 @@ let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.bi
               y,
               cut y.Mvbdu_sig.variable mvbdu_a,
               mvbdu_a,
-	      y.Mvbdu_sig.branch_true,
+              y.Mvbdu_sig.branch_true,
               y.Mvbdu_sig.branch_false
           in
           begin
             match generic_binary
-              allocate memoized_fun handler error parameters x_true y_true
+                    allocate memoized_fun handler error parameters x_true y_true
             with
             | error,(handler,None) -> error,(handler,None)
             | error,(handler,Some(mvbdu_true)) ->
               begin
                 match generic_binary
-                  allocate memoized_fun handler error parameters x_false y_false
+                        allocate memoized_fun handler error parameters x_false y_false
                 with
                 | error,(handler,None) ->
                   error,(handler,None)
                 | error,(handler,Some(mvbdu_false)) ->
                   begin
                     match Mvbdu_core.compress_node allocate error handler
-                      (Mvbdu_sig.Node
-                         {cell with
-                           Mvbdu_sig.branch_true = mvbdu_true ;
-                           Mvbdu_sig.branch_false = mvbdu_false})
+                            (Mvbdu_sig.Node
+                               {cell with
+                                Mvbdu_sig.branch_true = mvbdu_true ;
+                                Mvbdu_sig.branch_false = mvbdu_false})
                     with
                     | error,None ->
                       error,(handler,None)
-                    | error,Some(id,cell,mvbdu,handler) ->
+                    | error,Some(_id,_cell,mvbdu,handler) ->
                       error,(handler,Some(mvbdu))
                   end
               end
@@ -204,7 +201,7 @@ let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.bi
     end
 
 let rec generic_unary_other allocate memoized_fun handler error parameters other mvbdu_input
-    =
+  =
   match memoized_fun.Memo_sig.get parameters error handler (other,mvbdu_input) with
   | error,(handler,Some output) -> error,(handler,Some output)
   | error,(handler,None) ->
@@ -224,24 +221,24 @@ let rec generic_unary_other allocate memoized_fun handler error parameters other
         | Mvbdu_sig.Node x ->
           begin
             match generic_unary_other allocate memoized_fun handler error parameters
-              x.Mvbdu_sig.branch_true other
+                    x.Mvbdu_sig.branch_true other
             with
             | error,(handler,None) -> error,(handler,None)
             | error,(handler,Some(mvbdu_true)) ->
               begin
                 match generic_unary_other allocate memoized_fun handler error
-                  parameters x.Mvbdu_sig.branch_false other
+                        parameters x.Mvbdu_sig.branch_false other
                 with
                 | error,(handler,None) -> error,(handler,None)
                 | error,(handler,Some(mvbdu_false)) ->
                   begin
                     match Mvbdu_core.compress_node allocate error handler
-                      (Mvbdu_sig.Node
-                         {x with Mvbdu_sig.branch_true = mvbdu_true;
-                           Mvbdu_sig.branch_false = mvbdu_false})
+                            (Mvbdu_sig.Node
+                               {x with Mvbdu_sig.branch_true = mvbdu_true;
+                                       Mvbdu_sig.branch_false = mvbdu_false})
                     with
                     | error,None -> error,(handler,None)
-                    | error,Some(id,cell,mvbdu,handler) ->
+                    | error,Some(_id,_cell,mvbdu,handler) ->
                       error,(handler,Some(mvbdu))
                   end
               end
@@ -261,15 +258,15 @@ let rec generic_unary_other allocate memoized_fun handler error parameters other
         error, (handler,Some mvbdu_output)
     end
 
-let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_input:'mvbdu)
-    =
+let clean_head _allocate memoized_fun union handler error parameters (mvbdu_input:'mvbdu)
+  =
   match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with
   | error,(handler,Some output) -> error,(handler,Some output)
   | error,(handler,None) ->
     begin
       let error,(handler,mvbdu_output) =
         match mvbdu_input.Mvbdu_sig.value with
-        | Mvbdu_sig.Leaf a ->
+        | Mvbdu_sig.Leaf _a ->
           error,(handler,Some mvbdu_input)
         | Mvbdu_sig.Node x ->
           let var_ref = x.Mvbdu_sig.variable in
@@ -295,8 +292,8 @@ let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_i
                       begin
                         match output with
                         |  None ->
-                          invalid_arg parameters error (Some "line 227") Exit
-                            (handler,None)
+                          Exception.warn_pos
+                            parameters error __POS__ Exit (handler,None)
                         | Some a ->
                           aux handler error q (Some (a:'mvbdu))
                       end
@@ -317,13 +314,13 @@ let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_i
       end
     end
 
-let rec keep_head_only allocate memoized_fun bdu_true handler error parameters (mvbdu_input:'mvbdu) =
+let keep_head_only allocate memoized_fun bdu_true handler error parameters (mvbdu_input:'mvbdu) =
   match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with
   | error, (handler, Some output) -> error, (handler, Some output)
   | error, (handler, None) ->
     begin
       match mvbdu_input.Mvbdu_sig.value with
-      | Mvbdu_sig.Leaf a ->
+      | Mvbdu_sig.Leaf _ ->
         error, (handler, Some mvbdu_input)
       | Mvbdu_sig.Node x ->
         let var_ref = x.Mvbdu_sig.variable in
@@ -332,41 +329,42 @@ let rec keep_head_only allocate memoized_fun bdu_true handler error parameters (
             match mvbdu.Mvbdu_sig.value with
             | Mvbdu_sig.Node x when x.Mvbdu_sig.variable = var_ref ->
               begin
-		let error, (handler, b_true) =
+                let error, (handler, b_true) =
                   aux handler error x.Mvbdu_sig.branch_true
                 in
-		let error, (handler, b_false) =
+                let error, (handler, b_false) =
                   aux handler error x.Mvbdu_sig.branch_false
                 in
-		match b_true, b_false with
+                match b_true, b_false with
                 | Some b_true, Some b_false ->
-		  begin
-		    match Mvbdu_core.compress_node allocate error handler
-		      (Mvbdu_sig.Node
-                         {x with
-			   Mvbdu_sig.branch_true = b_true;
-			   Mvbdu_sig.branch_false = b_false})
-		    with
-		    | error, None ->
-		      invalid_arg parameters error (Some "line 342") Exit (handler, None)
-		    | error, Some (_, _, bdu, handler) -> error, (handler, Some bdu)
-		  end
-		| None, _ | _, None -> error, (handler, None)
-	      end
+                  begin
+                    match Mvbdu_core.compress_node allocate error handler
+                            (Mvbdu_sig.Node
+                               {x with
+                                Mvbdu_sig.branch_true = b_true;
+                                Mvbdu_sig.branch_false = b_false})
+                    with
+                    | error, None ->
+                      Exception.warn_pos parameters error __POS__ Exit (handler, None)
+                    | error, Some (_, _, bdu, handler) -> error, (handler, Some bdu)
+                  end
+                | None, _ | _, None -> error, (handler, None)
+              end
             | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu)
-	    | Mvbdu_sig.Node _ ->
-	      let error, (handler, output) =
+            | Mvbdu_sig.Node _ ->
+              let error, (handler, output) =
                 bdu_true parameters handler error parameters
               in
               begin
                 match output with
                 |  None ->
-                  invalid_arg parameters error (Some "line 357") Exit (handler, None)
+                  Exception.warn_pos
+                    parameters error __POS__ Exit (handler, None)
                 | Some a -> error, (handler, Some a)
               end
-	  end
-	in
-	aux handler error mvbdu_input
+          end
+        in
+        aux handler error mvbdu_input
     end
 
 let rec redefine allocate memoized_fun error parameters handler mvbdu_input list_input =
@@ -407,7 +405,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                 downgrade
                   parameters
                   error
-                  (Some "line 266")
+                  __POS__
                   (fun () -> mvbdu.Mvbdu_sig.branch_true)
                   b_true
               in
@@ -425,25 +423,26 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                 downgrade
                   parameters
                   error
-                  (Some "line 268")
+                  __POS__
                   (fun () -> mvbdu.Mvbdu_sig.branch_false)
                   b_false
               in
               begin
                 match Mvbdu_core.compress_node
-                  allocate
-                  error
-                  handler
-                  (Mvbdu_sig.Node
-                     {mvbdu with Mvbdu_sig.branch_true = mvbdu_true;
-                       Mvbdu_sig.branch_false = mvbdu_false})
+                        allocate
+                        error
+                        handler
+                        (Mvbdu_sig.Node
+                           {mvbdu with Mvbdu_sig.branch_true = mvbdu_true;
+                                       Mvbdu_sig.branch_false = mvbdu_false})
                 with
                 | error, None ->
                   error, (handler, None)
-                | error, Some(id, cell, mvbdu, handler) ->
+                | error, Some(_id, _cell, mvbdu, handler) ->
                   error, (handler, Some(mvbdu))
               end
-            | _ ->
+            | Mvbdu_sig.Node _
+            | Mvbdu_sig.Leaf _  ->
               begin
                 let error, (handler, branch_true) =
                   match mvbdu_input.Mvbdu_sig.value with
@@ -461,13 +460,14 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                       error
                       parameters
                       mvbdu_input
-                  | _ -> error, (handler,Some mvbdu_input)
+                  | Mvbdu_sig.Node _ | Mvbdu_sig.Leaf _  ->
+                    error, (handler,Some mvbdu_input)
                 in
                 let error,branch_true =
                   downgrade
                     parameters
                     error
-                    (Some "line 286")
+                    __POS__
                     (fun () -> mvbdu_input)
                     branch_true
                 in
@@ -488,7 +488,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                   downgrade
                     parameters
                     error
-                    (Some "line 289")
+                    __POS__
                     (fun () -> mvbdu_input)
                     branch_false
                 in
@@ -511,7 +511,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                   downgrade
                     parameters
                     error
-                    (Some "line 295")
+                    __POS__
                     (fun () -> mvbdu_input)
                     enriched_branch_true
                 in
@@ -534,7 +534,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                   downgrade
                     parameters
                     error
-                    (Some "line 300")
+                    __POS__
                     (fun () -> mvbdu_input)
                     rep
                 in
@@ -572,28 +572,28 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
     begin
       let error, (handler,output) =
         match mvbdu_input.Mvbdu_sig.value with
-	| Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
+        | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
         | Mvbdu_sig.Node mvbdu ->
-	  begin
-	    match list_input.List_sig.value with
-	    | List_sig.Empty ->
-	      begin
-		invalid_arg parameters error (Some "line 584") Exit (handler, None)
-	      end
-	    | List_sig.Cons(list) ->
-	      begin
-		let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
-		if cmp < 0
-		then
-		  monotonicaly_rename
+          begin
+            match list_input.List_sig.value with
+            | List_sig.Empty ->
+              begin
+                Exception.warn_pos parameters error __POS__ Exit (handler, None)
+              end
+            | List_sig.Cons(list) ->
+              begin
+                let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
+                if cmp < 0
+                then
+                  monotonicaly_rename
                     allocate
                     memoized_fun error parameters handler
                     mvbdu_input
                     list.List_sig.tail
-		else if cmp = 0
-		then
-		  let error, (handler,b_true) =
-		    monotonicaly_rename
+                else if cmp = 0
+                then
+                  let error, (handler,b_true) =
+                    monotonicaly_rename
                       allocate
                       memoized_fun
                       error
@@ -603,15 +603,15 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
                       list_input
                   in
                   let error, mvbdu_true =
-		    downgrade
+                    downgrade
                       parameters
                       error
-                      (Some "line 266")
+                      __POS__
                       (fun () -> mvbdu.Mvbdu_sig.branch_true)
                       b_true
                   in
                   let error, (handler,b_false) =
-		    monotonicaly_rename
+                    monotonicaly_rename
                       allocate
                       memoized_fun
                       error
@@ -621,33 +621,34 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
                       list_input
                   in
                   let error, mvbdu_false =
-		    downgrade
+                    downgrade
                       parameters
                       error
-                      (Some "line 268")
+                      __POS__
                       (fun () -> mvbdu.Mvbdu_sig.branch_false)
                       b_false
                   in
-		  begin
-		    match Mvbdu_core.compress_node
-                      allocate
-                      error
-                      handler
-                      (Mvbdu_sig.Node
-                         {mvbdu with
-			   Mvbdu_sig.variable = list.List_sig.association ;
-			   Mvbdu_sig.branch_true = mvbdu_true;
-                           Mvbdu_sig.branch_false = mvbdu_false})
-		    with
+                  begin
+                    match Mvbdu_core.compress_node
+                            allocate
+                            error
+                            handler
+                            (Mvbdu_sig.Node
+                               {mvbdu with
+                                Mvbdu_sig.variable = list.List_sig.association ;
+                                Mvbdu_sig.branch_true = mvbdu_true;
+                                Mvbdu_sig.branch_false = mvbdu_false})
+                    with
                     | error, None ->
                       error, (handler, None)
-                    | error, Some(id, cell, mvbdu, handler) ->
+                    | error, Some(_id, _cell, mvbdu, handler) ->
                       error, (handler, Some(mvbdu))
                   end
-		else
-		  invalid_arg parameters error (Some "line 631") Exit (handler,None)
-  	      end
-	  end
+                else
+                  Exception.warn_pos
+                    parameters error __POS__ Exit (handler,None)
+              end
+          end
       in
       match output with
       | None -> error, (handler, None)
@@ -672,118 +673,118 @@ let rec project_keep_only allocate memoized_fun bdu_true error parameters handle
       let error, (handler,output) =
         match list_input.List_sig.value with
         | List_sig.Empty ->
-          let error,depreciated =
+          let error,_depreciated =
             (memoized_fun.Memo_sig.f parameters error).Memo_sig.empty_association_list
           in
-	  begin
-	    match mvbdu_input.Mvbdu_sig.value with
-	    | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
-	    | Mvbdu_sig.Node _ ->
-	      bdu_true parameters handler error parameters
-	  end
+          begin
+            match mvbdu_input.Mvbdu_sig.value with
+            | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
+            | Mvbdu_sig.Node _ ->
+              bdu_true parameters handler error parameters
+          end
         | List_sig.Cons(list) ->
           begin
             match mvbdu_input.Mvbdu_sig.value with
-	    | Mvbdu_sig.Leaf a ->
-	      error, (handler, Some mvbdu_input)
-	    | Mvbdu_sig.Node mvbdu ->
-	      let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
-	      if cmp > 0
-	      then
-		let error, depreciated =
+            | Mvbdu_sig.Leaf _ ->
+              error, (handler, Some mvbdu_input)
+            | Mvbdu_sig.Node mvbdu ->
+              let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
+              if cmp > 0
+              then
+                let error, depreciated =
                   (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
                 in
                 let error, (handler, output) =
-		  generic_unary
+                  generic_unary
                     allocate
                     depreciated
                     handler
                     error
                     parameters
                     mvbdu_input
-		in
-		let error, mvbdu =
+                in
+                let error, mvbdu =
                   downgrade
                     parameters
                     error
-                    (Some "line 607")
+                    __POS__
                     (fun () -> mvbdu_input)
                     output
                 in
-		project_keep_only
-		  allocate
-		  memoized_fun
-		  bdu_true
-		  error
-		  parameters
-		  handler
-		  mvbdu
-		  list_input
-	      else if cmp = 0
-	      then  let error, (handler,b_true) =
-		      project_keep_only
+                project_keep_only
+                  allocate
+                  memoized_fun
+                  bdu_true
+                  error
+                  parameters
+                  handler
+                  mvbdu
+                  list_input
+              else if cmp = 0
+              then  let error, (handler,b_true) =
+                      project_keep_only
                         allocate
                         memoized_fun
-			bdu_true
+                        bdu_true
                         error
                         parameters
                         handler
                         mvbdu.Mvbdu_sig.branch_true
                         list_input
-		    in
-		    let error, mvbdu_true =
-		      downgrade
-                        parameters
-                        error
-                        (Some "line 266")
-                        (fun () -> mvbdu.Mvbdu_sig.branch_true)
-                        b_true
-                    in
-                    let error, (handler,b_false) =
-                      project_keep_only
-                        allocate
-                        memoized_fun
-			bdu_true
-                        error
-                        parameters
-                        handler
-                        mvbdu.Mvbdu_sig.branch_false
-                        list_input
-                    in
-                    let error, mvbdu_false =
-                      downgrade
-                        parameters
-                        error
-                        (Some "line 268")
-                        (fun () -> mvbdu.Mvbdu_sig.branch_false)
-                        b_false
-                    in
-                    begin
-                      match Mvbdu_core.compress_node
-                        allocate
-                        error
-                        handler
-                        (Mvbdu_sig.Node
-			   {mvbdu with Mvbdu_sig.branch_true = mvbdu_true;
-			     Mvbdu_sig.branch_false = mvbdu_false})
-                      with
-                      | error, None ->
-                        error, (handler, None)
-                      | error, Some(id, cell, mvbdu, handler) ->
-                        error, (handler, Some(mvbdu))
-                    end
+                in
+                let error, mvbdu_true =
+                  downgrade
+                    parameters
+                    error
+                    __POS__
+                    (fun () -> mvbdu.Mvbdu_sig.branch_true)
+                    b_true
+                in
+                let error, (handler,b_false) =
+                  project_keep_only
+                    allocate
+                    memoized_fun
+                    bdu_true
+                    error
+                    parameters
+                    handler
+                    mvbdu.Mvbdu_sig.branch_false
+                    list_input
+                in
+                let error, mvbdu_false =
+                  downgrade
+                    parameters
+                    error
+                    __POS__
+                    (fun () -> mvbdu.Mvbdu_sig.branch_false)
+                    b_false
+                in
+                begin
+                  match Mvbdu_core.compress_node
+                          allocate
+                          error
+                          handler
+                          (Mvbdu_sig.Node
+                             {mvbdu with Mvbdu_sig.branch_true = mvbdu_true;
+                                         Mvbdu_sig.branch_false = mvbdu_false})
+                  with
+                  | error, None ->
+                    error, (handler, None)
+                  | error, Some(_id, _cell, mvbdu, handler) ->
+                    error, (handler, Some(mvbdu))
+                end
 
-	      else
-		project_keep_only
-		  allocate
-		  memoized_fun
-		  bdu_true
-		  error
-		  parameters
-		  handler
-		  mvbdu_input
-		  list.List_sig.tail
-	  end
+              else
+                project_keep_only
+                  allocate
+                  memoized_fun
+                  bdu_true
+                  error
+                  parameters
+                  handler
+                  mvbdu_input
+                  list.List_sig.tail
+          end
       in
       match output with
       | None -> error, (handler, None)
@@ -808,7 +809,7 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
       let error, (handler, output) =
         match list_input.List_sig.value with
         | List_sig.Empty ->
-	  let error, depreciated =
+          let error, depreciated =
             (memoized_fun.Memo_sig.f parameters error).Memo_sig.empty_association_list
           in
           generic_unary
@@ -821,12 +822,12 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
         | List_sig.Cons(list) ->
           begin
             match mvbdu_input.Mvbdu_sig.value with
-	    | Mvbdu_sig.Leaf a -> error, (handler, Some mvbdu_input)
-	    | Mvbdu_sig.Node mvbdu ->
-	      let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
-	      if cmp > 0
-	      then
-		let error, (handler, b_true) =
+            | Mvbdu_sig.Leaf _ -> error, (handler, Some mvbdu_input)
+            | Mvbdu_sig.Node mvbdu ->
+              let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
+              if cmp > 0
+              then
+                let error, (handler, b_true) =
                   project_abstract_away
                     allocate
                     memoized_fun
@@ -840,7 +841,7 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
                   downgrade
                     parameters
                     error
-                    (Some "line 266")
+                    __POS__
                     (fun () -> mvbdu.Mvbdu_sig.branch_true)
                     b_true
                 in
@@ -858,65 +859,65 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
                   downgrade
                     parameters
                     error
-                    (Some "line 268")
+                    __POS__
                     (fun () -> mvbdu.Mvbdu_sig.branch_false)
                     b_false
                 in
                 begin
                   match Mvbdu_core.compress_node
-                    allocate
-                    error
-                    handler
-                    (Mvbdu_sig.Node
-		       {mvbdu with Mvbdu_sig.branch_true = mvbdu_true;
-			 Mvbdu_sig.branch_false = mvbdu_false})
+                          allocate
+                          error
+                          handler
+                          (Mvbdu_sig.Node
+                             {mvbdu with Mvbdu_sig.branch_true = mvbdu_true;
+                                         Mvbdu_sig.branch_false = mvbdu_false})
                   with
                   | error, None ->
                     error, (handler, None)
-                  | error, Some(id, cell, mvbdu, handler) ->
+                  | error, Some(_id, _cell, mvbdu, handler) ->
                     error, (handler, Some (mvbdu))
                 end
-	      else
-                if cmp = 0
-	        then
-		  let error, depreciated =
-                    (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
-                  in
-                  let error, (handler, output) =
-		    generic_unary
-                      allocate
-                      depreciated
-                      handler
-                      error
-                      parameters
-                      mvbdu_input
-		  in
-		  let error, mvbdu =
-                    downgrade
-                      parameters
-                      error
-                      (Some "line 794")
-                      (fun () -> mvbdu_input)
-                      output
-                  in
-		  project_abstract_away
-		    allocate
-		    memoized_fun
-		    error
-		    parameters
-		    handler
-		    mvbdu
-		    list_input
-	        else
-		  project_abstract_away
-		    allocate
-		    memoized_fun
-		    error
-		    parameters
-		    handler
-		    mvbdu_input
-		    list.List_sig.tail
-	  end
+              else
+              if cmp = 0
+              then
+                let error, depreciated =
+                  (memoized_fun.Memo_sig.f parameters error).Memo_sig.clean_head
+                in
+                let error, (handler, output) =
+                  generic_unary
+                    allocate
+                    depreciated
+                    handler
+                    error
+                    parameters
+                    mvbdu_input
+                in
+                let error, mvbdu =
+                  downgrade
+                    parameters
+                    error
+                    __POS__
+                    (fun () -> mvbdu_input)
+                    output
+                in
+                project_abstract_away
+                  allocate
+                  memoized_fun
+                  error
+                  parameters
+                  handler
+                  mvbdu
+                  list_input
+              else
+                project_abstract_away
+                  allocate
+                  memoized_fun
+                  error
+                  parameters
+                  handler
+                  mvbdu_input
+                  list.List_sig.tail
+          end
       in
       match output with
       | None ->
@@ -933,34 +934,34 @@ let rec project_abstract_away allocate memoized_fun error parameters handler mvb
         error, (handler, Some (mvbdu_output:'mvbdu))
     end
 
-let mvbdu_identity handler parameters error mvbdu = error, (handler,Some mvbdu)
-let mvbdu_constant a handler parameters error _   = error, (handler,Some a)
+let mvbdu_identity handler _parameters error mvbdu = error, (handler,Some mvbdu)
+let mvbdu_constant a handler _parameters error _   = error, (handler,Some a)
 
 let recursive_memoize f get_handler update_handler get_storage set_storage  =
   {
     Memo_sig.f = f ;
     Memo_sig.store =
       (fun parameters error handler key value ->
-        let storage = get_handler handler in
-        let error, storage' = set_storage parameters error handler key value storage in
-        let handler' =
-          if storage' == storage
-          then handler
-          else update_handler storage' handler
-        in
-        error, handler');
+         let storage = get_handler handler in
+         let error, storage' = set_storage parameters error handler key value storage in
+         let handler' =
+           if storage' == storage
+           then handler
+           else update_handler storage' handler
+         in
+         error, handler');
     Memo_sig.get =
       (fun parameters error handler key ->
-        let storage = get_handler handler in
-        let a, (handler, b) = get_storage parameters error handler key storage
-        in a, (handler, b))
+         let storage = get_handler handler in
+         let a, (handler, b) = get_storage parameters error handler key storage
+         in a, (handler, b))
   }
 
 let recursive_not_memoize f =
   {
     Memo_sig.f = f;
-    Memo_sig.store = (fun parameters error handler _ _  -> error, handler);
-    Memo_sig.get = (fun paramters error handler _ -> error, (handler,None))
+    Memo_sig.store = (fun _parameters error handler _ _  -> error, handler);
+    Memo_sig.get = (fun _paramters error handler _ -> error, (handler,None))
   }
 
 let memoize_no_fun a b c d =
@@ -973,23 +974,23 @@ let memoize_binary_no_fun a b c d =
 
 let not_recursive_not_memoize_unary  f g allocate =
   { Memo_sig.f = g;
-    Memo_sig.store = (fun parameters error handler _ _ -> error,handler);
+    Memo_sig.store = (fun _parameters error handler _ _ -> error,handler);
     Memo_sig.get = (fun parameters error handler x ->
-      let error,output_wo_id,output = f error x in
-      match output with
-      | None ->
-        (match allocate
-            parameters
-            error
-            compare
-            (Mvbdu_core.get_skeleton output_wo_id)
-            output_wo_id
-            (fun key -> {Mvbdu_sig.id=key; Mvbdu_sig.value =output_wo_id})
-            handler
-         with
-         | error,None -> (raise Exit)
-         | error,Some (i,a,b,handler) -> error, (handler,Some b))
-      | Some _ -> error,(handler,output))}
+        let error,output_wo_id,output = f error x in
+        match output with
+        | None ->
+          (match allocate
+                   parameters
+                   error
+                   compare
+                   (Mvbdu_core.get_skeleton output_wo_id)
+                   output_wo_id
+                   (fun key -> {Mvbdu_sig.id=key; Mvbdu_sig.value =output_wo_id})
+                   handler
+           with
+           | _error,None -> (raise Exit)
+           | error,Some (_i,_a,b,handler) -> error, (handler,Some b))
+        | Some _ -> error,(handler,output))}
 
 let not_recursive_memoize_unary
     f
@@ -1001,45 +1002,45 @@ let not_recursive_memoize_unary
     (set_storage    :
        Exception.method_handler -> 'c -> 'd -> 'b -> Exception.method_handler * 'b)
     allocate =
-  let store = (fun parameters error handler key value ->
-    let storage = get_handler handler in
-    let error, storage' = set_storage error key value storage in
-    let handler' =
-      if storage' == storage
-      then handler
-      else update_handler storage' handler
-    in
-    error, handler')
+  let store = (fun _parameters error handler key value ->
+      let storage = get_handler handler in
+      let error, storage' = set_storage error key value storage in
+      let handler' =
+        if storage' == storage
+        then handler
+        else update_handler storage' handler
+      in
+      error, handler')
   in
   {
     Memo_sig.f     = g ;
     Memo_sig.store = store;
     Memo_sig.get   =
-      (fun parameters error handler key ->
-        let storage = get_handler handler in
-        let a, b = get_storage error key storage in
-        match b with
-        | Some x -> a, (handler,b)
-        | None ->
-          begin
-            (
-              let error, handler, output_wo_id, output = f error handler key in
-              match output with
-              | None ->
-                (match allocate
-                    error
-                    compare
-                    (Mvbdu_core.get_skeleton output_wo_id)
-                    output_wo_id
-                    (fun key -> {Mvbdu_sig.id=key;Mvbdu_sig.value =output_wo_id})
-                    handler
-                 with
-                 | error,None -> (raise Exit)
-                 | error,Some (i,a,b,handler) ->
-                   let error,handler = storage error handler key b in
-                   error,(handler,Some b))
-              | Some _ -> error,(handler,output))
-          end)
+      (fun _parameters error handler key ->
+         let storage = get_handler handler in
+         let a, b = get_storage error key storage in
+         match b with
+         | Some _ -> a, (handler,b)
+         | None ->
+           begin
+             (
+               let error, handler, output_wo_id, output = f error handler key in
+               match output with
+               | None ->
+                 (match allocate
+                          error
+                          compare
+                          (Mvbdu_core.get_skeleton output_wo_id)
+                          output_wo_id
+                          (fun key -> {Mvbdu_sig.id=key;Mvbdu_sig.value =output_wo_id})
+                          handler
+                  with
+                  | _error,None -> (raise Exit)
+                  | error,Some (_i,_a,b,handler) ->
+                    let error,handler = storage error handler key b in
+                    error,(handler,Some b))
+               | Some _ -> error,(handler,output))
+           end)
   }
 
 let a = (not_recursive_memoize_unary: (Exception.method_handler -> 'handler -> 'g) ->
@@ -1052,21 +1053,21 @@ let a = (not_recursive_memoize_unary: (Exception.method_handler -> 'handler -> '
 
 let not_recursive_binary f g allocate =
   { Memo_sig.f     = g;
-    Memo_sig.store = (fun parameters error handler _ _ -> error,handler);
-    Memo_sig.get   = (fun parameters error handler (x,y) ->
-      let error, output_wo_id, output = f error x y in
-      match output with
-      | None ->
-        (match allocate
-            error
-            compare
-            (Mvbdu_core.get_skeleton output_wo_id)
-            output_wo_id
-            (fun key -> {Mvbdu_sig.id = key ; Mvbdu_sig.value = output_wo_id})
-            handler
-         with
-         | error,None -> (raise Exit)
-         | error,Some (i,a,b,handler) -> error, (handler,Some b))
-      | Some _ -> error, (handler,output))}
+    Memo_sig.store = (fun _parameters error handler _ _ -> error,handler);
+    Memo_sig.get   = (fun _parameters error handler (x,y) ->
+        let error, output_wo_id, output = f error x y in
+        match output with
+        | None ->
+          (match allocate
+                   error
+                   compare
+                   (Mvbdu_core.get_skeleton output_wo_id)
+                   output_wo_id
+                   (fun key -> {Mvbdu_sig.id = key ; Mvbdu_sig.value = output_wo_id})
+                   handler
+           with
+           | _error,None -> (raise Exit)
+           | error,Some (_i,_a,b,handler) -> error, (handler,Some b))
+        | Some _ -> error, (handler,output))}
 
 let id_of_mvbdu x = x.Mvbdu_sig.id

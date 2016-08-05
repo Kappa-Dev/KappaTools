@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 08/03/2010
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 05 2016>
  * *
  * This library declares exceptions
  *
@@ -39,6 +39,12 @@ let warn parameters error_handler file message exn default =
   in
   let () = Remanent_parameters.save_error_list parameters error in
   error,dft
+
+let warn_pos parameters error_handler (file,line,_,_) exn default =
+  warn
+    parameters error_handler
+    (Some file) (Some ("line "^(string_of_int line)))
+    exn (fun _ -> default)
 
 let print_for_KaSim parameters handlers =
   let parameters = Remanent_parameters.update_prefix parameters "error: " in

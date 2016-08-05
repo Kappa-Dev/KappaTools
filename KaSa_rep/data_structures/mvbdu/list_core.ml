@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/03/2010
-    * Last modification: Time-stamp: <Jul 02 2016>
+    * Last modification: Time-stamp: <Aug 05 2016>
     * *
     * This library provides primitives to deal associations list
     *
@@ -15,9 +15,6 @@
 
 let sanity_check = true
 let test_workbench = false
-
-let invalid_arg parameters mh message exn value =
-  Exception.warn parameters mh (Some "Mvbdu") message exn (fun () -> value)
 
 let get_hash_key list = list.List_sig.id
 

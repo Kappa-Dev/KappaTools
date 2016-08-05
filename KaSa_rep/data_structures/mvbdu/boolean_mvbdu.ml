@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 11th of March
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 05 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -16,9 +16,6 @@
 let sanity_check = false
 let test_workbench = false
 let trace_mvbdu_allocation = false
-
-let invalid_arg parameters mh message exn value =
-  Exception.warn parameters mh (Some "Mvbdu_bool") message exn (fun () -> value)
 
 module Mvbdu_Skeleton =
 struct
@@ -367,9 +364,13 @@ let memo_identity =
   Mvbdu_algebra.not_recursive_not_memoize_unary
     (fun error x -> error, x.Mvbdu_sig.value, Some x)
     (fun parameters error ->
-       (fun bool -> error,
-                    (fun error -> Exception.warn parameters error (Some "Boolean_mvbdu")
-                        (Some "line 109") Exit (fun () -> Mvbdu_sig.Leaf bool))))
+       (fun bool ->
+          error,
+          (fun error ->
+             Exception.warn_pos
+               parameters error __POS__ Exit
+               (Mvbdu_sig.Leaf bool)
+          )))
     mvbdu_allocate
 
 let memo_not =
@@ -388,18 +389,24 @@ let memo_constant_true  =
   Mvbdu_algebra.not_recursive_not_memoize_unary
     (fun error _ -> error, Mvbdu_sig.Leaf true,None)
     (fun parameters error ->
-       (fun _bool -> error,
-                     (fun error -> Exception.warn parameters error (Some "Boolean_mvbdu")
-                         (Some "line 109") Exit (fun () -> Mvbdu_sig.Leaf true))))
+       (fun _bool ->
+          error,
+          (fun error ->
+             Exception.warn_pos
+               parameters error __POS__ Exit
+               (Mvbdu_sig.Leaf true))))
     mvbdu_allocate
 
 let memo_constant_false =
   Mvbdu_algebra.not_recursive_not_memoize_unary
     (fun error _ -> error, Mvbdu_sig.Leaf false,None)
     (fun parameters error ->
-       (fun _bool -> error,
-                     (fun error -> Exception.warn parameters error (Some "Boolean_mvbdu")
-                         (Some "line 109") Exit (fun () -> Mvbdu_sig.Leaf false))))
+       (fun _bool ->
+          error,
+          (fun error ->
+             Exception.warn_pos
+               parameters error __POS__ Exit
+               (Mvbdu_sig.Leaf false))))
     mvbdu_allocate
 
 let boolean_mvbdu_true parameters handler =
@@ -553,8 +560,7 @@ let boolean_constant_bi_true parameters =
        (fun error _ _ -> error,Mvbdu_sig.Leaf true, None)
        (fun parameters error ->
           let g (_:bool) =
-            Exception.warn parameters error (Some "Boolean_mvbdu")
-              (Some "line 361") Exit (fun () -> memo_identity)
+            Exception.warn_pos parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -566,8 +572,7 @@ let boolean_constant_bi_false parameters =
        (fun error _ _ -> error,Mvbdu_sig.Leaf false, None)
        (fun _parameters error ->
           let g (_:bool) =
-            Exception.warn parameters error (Some "Boolean_mvbdu")
-              (Some "line 373") Exit (fun () -> memo_identity)
+            Exception.warn_pos parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -579,8 +584,7 @@ let boolean_mvbdu_fst parameters =
        (fun error x _ -> error,x.Mvbdu_sig.value,Some x)
        (fun parameters error ->
           let g (_:bool) =
-            Exception.warn parameters error (Some "Boolean_mvbdu")
-              (Some "line 385") Exit (fun () -> memo_identity)
+            Exception.warn_pos parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -592,8 +596,7 @@ let boolean_mvbdu_snd parameters =
        (fun error x y -> error,x.Mvbdu_sig.value,Some y)
        (fun parameters error ->
           let g (_:bool) =
-            Exception.warn parameters error (Some "Boolean_mvbdu")
-              (Some "line 397") Exit (fun () -> memo_identity)
+            Exception.warn_pos parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -1023,14 +1026,12 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
                       singleton
                       list_s
                   | None ->
-                    Exception.warn parameters error (Some "Boolean_mvbdu")
-                      (Some "line 854") Exit (fun () -> handler,None)
+                    Exception.warn_pos parameters error __POS__ Exit (handler,None)
                 in
                 error, (handler, output)
               end
             | None,_ | _,None ->
-              Exception.warn parameters error (Some "Boolean_mvbdu")
-                (Some "line 863") Exit (fun () -> handler,None)
+              Exception.warn_pos parameters error __POS__ Exit (handler,None)
           end
       in
       match output with
@@ -1049,8 +1050,7 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
                          }
         }, Some output)
       | None ->
-        Exception.warn parameters error (Some "Boolean_mvbdu")
-          (Some "line 874") Exit (fun () -> (handler, None))
+        Exception.warn_pos parameters error __POS__ Exit (handler, None)
     end
 
 let mvbdu_cartesian_decomposition_depth
@@ -1170,8 +1170,7 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
             match remanent, branch_true with
             | _, [] -> error, (handler, output)
             | None, _ ->
-              Exception.warn parameters error (Some "Boolean_mvbdu")
-                (Some "line 947") Exit (fun () -> handler,[])
+              Exception.warn_pos parameters error __POS__ Exit (handler,[])
             | Some (var, lower_bound), list ->
               let head_list =
                 let rec aux k res =
