@@ -41,14 +41,4 @@ The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 When the agent R has its site c bound to the site c of a R, and its site cr bound to the site n of a R, then both instances of R are necessarily the same.
 When the agent R has its site c bound to the site c of a R, and its site n bound to the site cr of a R, then both instances of R are necessarily the same.
-Some exceptions have been raisederror: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
-error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+execution finished without any exception

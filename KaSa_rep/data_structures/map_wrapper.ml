@@ -310,8 +310,8 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
            match
              MB.find_option_without_logs parameter error key_b map_b
            with
-           | error,None -> MB.add parameter error key_b (merge identity_elt data_a) map_b
-           | error,Some old -> MB.overwrite parameter error key_b (merge old data_a) map_b
+           | error,None -> MB.add_or_overwrite parameter error key_b (merge identity_elt data_a) map_b
+           | error,Some old -> MB.add_or_overwrite parameter error key_b (merge old data_a) map_b
         )
         map
         (error,MB.empty)
@@ -325,10 +325,10 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
            with
            | error,None ->
              let error,data' = merge parameter error identity_elt key_a data_a in
-             MB.add parameter error key_b data' map_b
+             MB.add_or_overwrite parameter error key_b data' map_b
            | error,Some old ->
              let error,data' = merge parameter error old key_a data_a in
-             MB.overwrite parameter error key_b data' map_b
+             MB.add_or_overwrite parameter error key_b data' map_b
         )
         map
         (error,MB.empty)
@@ -347,10 +347,10 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
              MB.find_option_without_logs parameter error key_b map_b
            with
            | error,None ->
-             MB.add parameter error key_b (SA.singleton key_a) map_b
+             MB.add_or_overwrite parameter error key_b (SA.singleton key_a) map_b
            | error,Some old ->
              let error, newset = SA.add parameter error key_a old in
-             MB.overwrite parameter error key_b newset map_b
+             MB.add_or_overwrite parameter error key_b newset map_b
         )
         set
         (error,MB.empty)
@@ -364,10 +364,10 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
            with
            | error,None ->
              let error,data' = error, SA.singleton key_a in
-             MB.add parameter error key_b data' map_b
+             MB.add_or_overwrite parameter error key_b data' map_b
            | error,Some old ->
-             let error,data' = SA.add parameter error key_a old in
-             MB.overwrite parameter error key_b data' map_b
+             let error,data' = SA.add_when_not_in parameter error key_a old in
+             MB.add_or_overwrite parameter error key_b data' map_b
         )
         set
         (error,MB.empty)
@@ -375,7 +375,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
     let proj_set f parameter error set_a =
       SA.fold
         (fun key_a (error,set_b) ->
-           SB.add parameter error
+           SB.add_when_not_in parameter error
              (f key_a) set_b)
         set_a
         (error, SB.empty)
@@ -384,7 +384,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
       SA.fold
         (fun key_a (error,set_b) ->
            let error, key_b = f parameter error key_a in
-           SB.add parameter error key_b set_b)
+           SB.add_when_not_in parameter error key_b set_b)
         set_a
         (error, SB.empty)
 

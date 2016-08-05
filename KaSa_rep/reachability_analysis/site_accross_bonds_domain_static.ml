@@ -577,15 +577,6 @@ let collect_created_bonds parameter error rule rule_id store_result =
           Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
           store_result
       in
-      (*let error, old_set =
-        match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id store_result
-        with
-        | error, None ->
-          error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
-        | error, Some s -> error, s
-      in*)
       let pair =
         (agent_id, agent_type, site_type, state),
         (agent_id1, agent_type1, site_type1, state1)

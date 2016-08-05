@@ -1030,6 +1030,7 @@ EXTENSIONAL DESCRIPTION:
 Some exceptions have been raisederror: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 24: Label 'r3' is already used; exception:Exit
 =======
 Some exceptions have been raisederror: file_name: Prepreprocess.ml; message: Label 'r3' is already used; exception:Exit
+<<<<<<< 2ad1af000a30c8559d28f2ff57c3c9476c9e352a
 error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
 error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
 error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
@@ -1090,3 +1091,5 @@ error: file_name: setMap.ml; message: SetMap line 300 an already elt has been ad
 error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
 error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
 >>>>>>> test-suite
+=======
+>>>>>>> change add of set to add_when_not_in and overwrite to add_or_overwrite
