@@ -9,7 +9,7 @@ let strip_nonalpha = String.map (fun c -> if List.mem c alpha then (Char.lowerca
 let read_file filename =
     let ic = open_in filename in
     let n = in_channel_length ic in
-    let s = String.create n in
+    let s = Bytes.create n in
         really_input ic s 0 n;
         close_in ic;
         (s)
@@ -17,7 +17,7 @@ let read_file filename =
 let () =
 for i = 1 to Array.length Sys.argv - 1 do
     let file_name : string = Sys.argv.(i) in
-    let file_content : string = String.escaped (read_file file_name) in
-    let variable_name : string = (strip_nonalpha (Filename.basename file_name)) in
-    printf "let %s = \"%s\";;\n" variable_name file_content
+    let file_content = Bytes.escaped (read_file file_name) in
+    let variable_name = (strip_nonalpha (Filename.basename file_name)) in
+    printf "let %s = \"%s\";;\n" variable_name (Bytes.to_string file_content)
 done;;
