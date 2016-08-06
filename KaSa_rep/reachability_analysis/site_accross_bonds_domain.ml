@@ -4,11 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-<<<<<<< eb2e346a2c9cc1bb042a7d7d5dae3a19b2641126
    * Last modification: Time-stamp: <Aug 06 2016>
-=======
-   * Last modification: Time-stamp: <Aug 05 2016>
->>>>>>> add new partition_map
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -16,11 +12,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Site_accross_bonds_domain") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -823,13 +814,12 @@ let set_proj_reverse_map2 r static =
       match state_list_lattice with
       | Usual_domains.Val l -> error, l
       | Usual_domains.Any | Usual_domains.Undefined ->
-        warn parameter error (Some "line 512") Exit []
+        Exception.warn_pos parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
-  let context line rule_id agent_id site_type =
-    "line: "^(string_of_int line)^
+  let context rule_id agent_id site_type =
     " rule "^(Ckappa_sig.string_of_rule_id rule_id)^
     " agent_id "^(Ckappa_sig.string_of_agent_id agent_id)^
     " site_type "^(Ckappa_sig.string_of_site_name site_type)
@@ -842,7 +832,9 @@ let set_proj_reverse_map2 r static =
     let error, rule = get_rule parameter error static rule_id in
     match rule with
     | None ->
-      let error, () = warn parameter error (Some "line 713") Exit () in
+      let error, () =
+        Exception.warn_pos  parameter error __POS__ Exit ()
+      in
       error, dynamic, (precondition, [])
     | Some rule ->
     let parameter =
@@ -867,8 +859,10 @@ let set_proj_reverse_map2 r static =
                site_type'
                precondition
            in
-           let error = Exception.check warn parameter error error'
-               (Some (context 867 rule_id agent_id site_type')) Exit
+           let error =
+             Exception.check_pos
+               Exception.warn_pos parameter error error'
+               __POS__ ~message:(context rule_id agent_id site_type') Exit
            in
            let error', dynamic, precondition, state_list' =
              get_state_of_site_in_precondition
@@ -879,8 +873,10 @@ let set_proj_reverse_map2 r static =
                site_type1'
                precondition
            in
-           let error = Exception.check warn parameter error error'
-               (Some (context 879 rule_id agent_id1 site_type1')) Exit
+           let error =
+             Exception.check_pos
+               Exception.warn_pos parameter error error' __POS__
+               ~message:(context rule_id agent_id1 site_type1') Exit
            in
            let error, potential_list =
              List.fold_left (fun (error, current_list) pre_state' ->
@@ -947,8 +943,8 @@ let set_proj_reverse_map2 r static =
                       List.fold_left (fun (error, dynamic, precondition) (t, u) ->
                           let store_result = get_value dynamic in
                           let handler = get_mvbdu_handler dynamic in
-                          let (site_type', pre_state') = t in
-                          let (site_type1', pre_state1') = u in
+                          let (_site_type', pre_state') = t in
+                          let (_site_type1', pre_state1') = u in
                           let pair_list =
                             [(Ckappa_sig.fst_site, pre_state');
                              (Ckappa_sig.snd_site, pre_state1')
@@ -1000,7 +996,7 @@ let set_proj_reverse_map2 r static =
     let error, rule = get_rule parameter error static rule_id in
     match rule with
     | None ->
-      let error, () = warn parameter error (Some "line 713") Exit () in
+      let error, () = Exception.warn_pos parameter error __POS__ Exit () in
       error, dynamic, (precondition, [])
     | Some rule ->
       let parameter =
@@ -1124,8 +1120,9 @@ let set_proj_reverse_map2 r static =
                      site_type
                      precondition
                  in
-                 let error = Exception.check warn parameter error error'
-                     (Some (context 898 rule_id agent_id site_type)) Exit
+                 let error =
+                      Exception.check
+                        Exception.warn_pos parameter error error' __POS__ ~message:(context rule_id agent_id site_type) Exit
                  in
                  let error', dynamic, precondition, state_list' =
                    get_state_of_site_in_precondition
@@ -1136,8 +1133,9 @@ let set_proj_reverse_map2 r static =
                      site_type1
                      precondition
                  in
-                 let error = Exception.check warn parameter error error'
-                     (Some (context 910 rule_id agent_id1 site_type1)) Exit
+                 let error =
+                   Exception.check_pos Exception.warn_pos parameter error error'
+                     __POS__ ~message:(context rule_id agent_id1 site_type1) Exit
                  in
                  (*-----------------------------------------------------------*)
                  let error, potential_list =
@@ -1227,7 +1225,10 @@ let set_proj_reverse_map2 r static =
                       site_type
                       precondition
                   in
-                  let error = Exception.check warn parameter error error' (Some (context 766 rule_id agent_id site_type)) Exit in
+                  let error =
+Exception.check_warn
+ Exception.warn_pos parameter error error' __POS__ ~message:(context rule_id agent_id site_type) Exit
+in
                   let error', dynamic, precondition, state_list' =
                     get_state_of_site_in_precondition
                       parameter error
@@ -1237,7 +1238,7 @@ let set_proj_reverse_map2 r static =
                       site_type1
                       precondition
                   in
-                  let error = Exception.check warn parameter error error' (Some (context 775 rule_id agent_id1 site_type1)) Exit in
+                  let error = Exception.check Exception.warn_pos  parameter error error' (Some (context 775 rule_id agent_id1 site_type1)) Exit in
                   (*----------------------------------------------------*)
                   let error, potential_list =
                     List.fold_left (fun (error, current_list) pre_state ->
@@ -1464,7 +1465,8 @@ let set_proj_reverse_map2 r static =
                  precondition
              in
              let error =
-               Exception.check warn parameter error error' (Some (context 1240 rule_id agent_id site_type')) Exit
+               Exception.check_warn
+Exception.warn_pos parameter error error' __POS__ ~message:(context rule_id agent_id site_type') Exit
              in
              let error', dynamic, precondition, state_list' =
                get_state_of_site_in_precondition
@@ -1476,7 +1478,7 @@ let set_proj_reverse_map2 r static =
                  site_type1' (*y*)
                  precondition
              in
-             let error = Exception.check warn parameter error error' (Some (context 1252 rule_id agent_id1 site_type1')) Exit in
+             let error = Exception.check Exception.warn_pos  parameter error error' (Some (context 1252 rule_id agent_id1 site_type1')) Exit in
              (*------------------------------------------------------*)
              (*return the pre_state*)
              let error, potential_list =
@@ -1554,8 +1556,7 @@ let set_proj_reverse_map2 r static =
                  site_type (*x*)
                  precondition
              in
-             let error = Exception.check warn parameter error error'
-                 (Some (context 1253 rule_id agent_id site_type)) Exit in
+             let error = Exception.check_pos Exception.warn_pos parameter error error' __POS__ ~message:(context rule_id agent_id site_type) Exit in
              let error, dynamic, precondition, state_list' =
                get_state_of_site_in_precondition
                  parameter error
@@ -1565,7 +1566,7 @@ let set_proj_reverse_map2 r static =
                  site_type1 (*x*)
                  precondition
              in
-             let error = Exception.check warn parameter error error'
+             let error = Exception.check Exception.warn_pos  parameter error error'
                  (Some (context 1264 rule_id agent_id1 site_type1)) Exit in
              (*-----------------------------------------------------*)
              let error, potential_list =
@@ -1690,7 +1691,6 @@ let set_proj_reverse_map2 r static =
           Site_accross_bonds_domain_type.PairAgentSites_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
                Site_accross_bonds_domain_type.print_site_accross_domain
-                 ~verbose:true
                  ~sparse:true
                  ~final_resul:true
                  ~dump_any:true parameter error kappa_handler handler (x, y) mvbdu
@@ -1756,7 +1756,7 @@ let set_proj_reverse_map2 r static =
                          error
                      | [] | _::_ ->
                        let error, () =
-                         warn parameter error (Some "1282") Exit ()
+                         Exception.warn_pos parameter error __POS__ Exit ()
                        in
                        error
                    ) error pair_list

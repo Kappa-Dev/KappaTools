@@ -13,10 +13,6 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Site_accross_bonds_domain_type") message exn
-    (fun () -> default)
-
 module AgentsSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -304,7 +300,6 @@ let project2 (x,y) = (project x,project y)
 
 (*todo*)
 let print_site_accross_domain
-    ?verbose:(verbose = true)
     ?sparse: (sparse = false)
     ?final_resul:(_final_result = false)
     ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
@@ -349,7 +344,7 @@ let print_site_accross_domain
           error, handler
         | [] | _::_ ->
           let error, () =
-            warn parameters error (Some "233") Exit ()
+            Exception.warn_pos parameters error __POS__ Exit ()
           in
           error, handler
       ) (error, handler) pair_list
@@ -379,7 +374,6 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       let parameter = Remanent_parameters.update_prefix parameter "         "
       in
       print_site_accross_domain
-        ~verbose:true
         ~dump_any:true parameter error kappa_handler handler pair mvbdu
     else error, handler
   in
