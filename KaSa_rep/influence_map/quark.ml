@@ -4,16 +4,13 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Aug 02 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  *
  * Compute the influence relations between rules and sites.
  *
  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Quark") message exn (fun () -> default)
 
 let local_trace = false
 
@@ -852,7 +849,8 @@ let scan_rule parameter error handler rule_id rule quarks =
              parameter error agent_id viewsrhs
          in
          match agent with
-         | None -> warn parameter error (Some "line 111") Exit agent_modif_plus
+         | None ->
+           Exception.warn_pos parameter error __POS__ Exit agent_modif_plus
          | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Ghost -> error,agent_modif_plus
          | Some Cckappa_sig.Dead_agent (agent,_,_,_) | Some Cckappa_sig.Agent agent ->
            let error,kasim_id =
@@ -902,7 +900,8 @@ let scan_rule parameter error handler rule_id rule quarks =
                               error
                               (agent_type, site)
                               handler.Cckappa_sig.states_dic)
-                          (fun error -> warn parameter error (Some "line 152") Exit
+                          (fun error ->
+                             Exception.warn_pos parameter error __POS__  Exit
                               (Ckappa_sig.Dictionary_of_States.init ()))
                       in
                       let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in
@@ -1059,7 +1058,8 @@ let scan_rule parameter error handler rule_id rule quarks =
                        error
                        (agent_type, site)
                        handler.Cckappa_sig.states_dic)
-                   (fun error -> warn parameter error (Some "line 152") Exit
+                   (fun error ->
+                      Exception.warn_pos parameter error __POS__ Exit
                        (Ckappa_sig.Dictionary_of_States.init ()))
                in
                let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in

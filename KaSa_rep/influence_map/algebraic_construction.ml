@@ -4,16 +4,13 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * algebraic check for the influence map.
    *
    * Copyright 2015 Institut National de Recherche en Informatique et
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "algebraic_construction.sig") message exn (fun () -> default)
 
 exception False of Exception.method_handler
 
@@ -146,20 +143,27 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
         ag1,ag2
       with
       | None,_ | _,None ->
-        warn parameters error (Some ("Should not scan empty agents...")) Exit (true,(to_do,already_done))
+        Exception.warn_pos
+          parameters error __POS__
+          ~message:"Should not scan empty agents..." Exit (true,(to_do,already_done))
       | Some ag1,Some ag2 ->
         begin
           match ag1
           with
           | Cckappa_sig.Ghost->
-            warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+            Exception.warn_pos
+              parameters error __POS__
+              ~message:"Should not scan ghost agents..." Exit (true,(to_do,already_done))
           | Cckappa_sig.Unknown_agent _ -> raise (False error)
           | Cckappa_sig.Dead_agent (ag1,_,l11,l12) ->
             begin
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
-              | Cckappa_sig.Ghost -> warn parameters error
-                                       (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+              | Cckappa_sig.Ghost ->
+                Exception.warn_pos
+                  parameters error __POS__
+                  ~message:"Should not scan ghost agents..."
+                  Exit (true,(to_do,already_done))
               | Cckappa_sig.Dead_agent (ag2,_s2,l21,l22) ->
                 begin
                   let error,(_bool,(to_do,already_done)) =
@@ -207,8 +211,11 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
             begin
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
-              | Cckappa_sig.Ghost -> warn parameters error
-                                       (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+              | Cckappa_sig.Ghost ->
+                Exception.warn_pos
+                  parameters error __POS__
+                  ~message:"Should not scan ghost agents..."
+                  Exit (true,(to_do,already_done))
               | Cckappa_sig.Dead_agent (ag2,_,l21,l22) ->
                 begin
                   begin
@@ -273,7 +280,11 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
   in
   match ouput
   with
-    None -> warn parameters error (Some "Missing rule") Exit (false)
+    None ->
+    Exception.warn_pos
+      parameters error __POS__
+      ~message:"Missing rule"
+      Exit false
   | Some(_,inj1,inj2) -> check_agent error [i,j] (inj1,inj2)
 
 exception Pass of Exception.method_handler
@@ -291,7 +302,11 @@ let filter_influence parameters error handler compilation map bool =
     | Ast.OBS_VAR _,_
     | Ast.TOKEN_ID _,_
     | Ast.CONST _,_     ->
-      let error,() = warn parameters error (Some "Composite observable") Exit ()
+      let error,() =
+        Exception.warn_pos
+          parameters error __POS__
+          ~message:"Composite observable"
+          Exit ()
       in raise (Pass error)
   in
   let get_lhs r =
@@ -339,17 +354,17 @@ let filter_influence parameters error handler compilation map bool =
              match rule1
              with
              | None ->
-               let error,() = warn parameters error (Some "Missing rule") Exit ()
+               let error,() =
+                 Exception.warn_pos
+                   parameters error __POS__
+                   ~message:"Missing rule"
+                   Exit ()
                in raise (Pass error)
              | Some r -> error,r
            in
            let error,mixt =
              if
-               Ckappa_sig.compare_rule_id
-                 b
-                 (Ckappa_sig.rule_id_of_int nrules)
-               <
-               0
+               Ckappa_sig.compare_rule_id b (Ckappa_sig.rule_id_of_int nrules) < 0
              then
                begin
                  let error,rule2 =
@@ -361,8 +376,11 @@ let filter_influence parameters error handler compilation map bool =
                  in
                  match rule2 with
                  | None ->
-                   let error,() = warn parameters error
-                       (Some ("Missing rule"^ (Ckappa_sig.string_of_rule_id b))) Exit ()
+                   let error,() =
+                     Exception.warn_pos
+                       parameters error __POS__
+                       ~message:("Missing rule"^ (Ckappa_sig.string_of_rule_id b))
+                       Exit ()
                    in raise (Pass error)
                  | Some r -> error, get_lhs r
                end
@@ -378,8 +396,9 @@ let filter_influence parameters error handler compilation map bool =
                  match var with
                  | None ->
                    let error,() =
-                     warn parameters error
-                       (Some ("Missing var" ^(Ckappa_sig.string_of_rule_id b)))
+                     Exception.warn_pos
+                       parameters error __POS__
+                       ~message:("Missing var" ^(Ckappa_sig.string_of_rule_id b))
                        Exit ()
                    in raise (Pass error)
                  | Some v -> get_var v

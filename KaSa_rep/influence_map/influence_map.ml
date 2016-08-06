@@ -4,16 +4,13 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March the 10th of 2011
- * Last modification: Time-stamp: <Jul 28 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  *
  * Compute the influence relations between rules and sites.
  *
  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Influence_map") message exn (fun () -> default)
 
 let local_trace = false
 

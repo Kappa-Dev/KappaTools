@@ -4,16 +4,13 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Type definitions for the influence relations between rules and sites.
   *
   * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-     Exception.warn parameters mh (Some "Quark_type") message exn (fun () -> default)
 
 let local_trace = false
 

@@ -4,16 +4,13 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 7th 2011
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  * Labels to be associated with influence relations
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Influence_labels") message exn (fun () -> default)
 
 module type Labels =
 sig
