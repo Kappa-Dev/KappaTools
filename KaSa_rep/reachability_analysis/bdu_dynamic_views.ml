@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -12,10 +12,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -43,7 +39,8 @@ let add_link parameter error (agent_type, cv_id) rule_id_set store_result =
     Ckappa_sig.Rule_map_and_set.Set.union parameter error rule_id_set old_set
   in
   let error =
-    Exception.check warn parameter error error' (Some "line 46") Exit
+    Exception.check_pos
+      Exception.warn_pos parameter error error' __POS__ Exit
   in
   let error, store_result =
     Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
@@ -284,12 +281,14 @@ let collect_dual_map parameter error handler store_result =
             (agent_type', site_type', state')
             Ckappa_sig.AgentSiteState_map_and_set.Set.empty
         in
-        let error = Exception.check warn parameter error error' (Some "line 1109") Exit
+        let error =
+          Exception.check_pos Exception.warn_pos parameter error error' __POS__ Exit
         in
         let error', new_set =
           Ckappa_sig.AgentSiteState_map_and_set.Set.union parameter error set old_set
         in
-        let error = Exception.check warn parameter error error' (Some "line 1115") Exit
+        let error =
+          Exception.check_pos Exception.warn_pos parameter error error' __POS__ Exit
         in
         let error, store_result =
           Ckappa_sig.AgentSiteState_map_and_set.Map.add_or_overwrite

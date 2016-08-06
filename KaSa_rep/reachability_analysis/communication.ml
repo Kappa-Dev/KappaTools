@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 01 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Abstract domain to record live rules
    *
@@ -16,11 +16,7 @@
 type path_defined_in =
      | LHS of Cckappa_sig.enriched_rule
      | RHS of Cckappa_sig.enriched_rule
-     | Pattern 
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "communication") message exn
-    (fun () -> default)
+     | Pattern
 
 type event =
   | Dummy (* to avoid compilation warning *)
@@ -137,8 +133,11 @@ let the_rule_is_or_not_applied_for_the_first_time bool parameter error precondit
                              the_rule_is_applied_for_the_first_time = Usual_domains.Sure_value bool
                            }
   | Usual_domains.Sure_value b when b = bool -> error, precondition
-  | Usual_domains.Sure_value _ -> warn parameter error
-                                    (Some "inconsistent computation in three-value logic") Exit precondition
+  | Usual_domains.Sure_value _ ->
+    Exception.warn_pos
+      parameter error __POS__
+      ~message:"inconsistent computation in three-value logic"
+      Exit precondition
 
 let the_rule_is_applied_for_the_first_time p e wp =
   the_rule_is_or_not_applied_for_the_first_time true p e wp
@@ -214,7 +213,8 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
     (* In theory, this could happen, but it would be worth being warned
        about it *)
     let error, () =
-      warn parameter error (Some "line 192, bottom propagation") Exit ()
+      Exception.warn_pos
+        parameter error __POS__ ~message:"bottom propagation" Exit ()
     in
     error, precondition, Usual_domains.Not_top init
   | error, Usual_domains.Val v ->

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 01 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -16,10 +16,6 @@
   * under the terms of the GNU Library General Public License *)
 
 (** Abstract domain to over-approximate the set of reachable views *)
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Parallel_bonds") message exn
-    (fun () -> default)
-
 let local_trace = false
 
 module Domain =
@@ -694,7 +690,8 @@ struct
       match state_list_lattice with
       | Usual_domains.Val l -> error, l
       | Usual_domains.Any | Usual_domains.Undefined ->
-        warn parameter error (Some "line 512") Exit []
+        Exception.warn_pos
+          parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
@@ -711,7 +708,9 @@ struct
       rule
     with
     | None ->
-      let error, () = warn parameter error (Some "line 713") Exit () in
+      let error, () =
+        Exception.warn_pos parameter error __POS__ Exit ()
+      in
       error, dynamic, (precondition, event_list)
     | Some rule ->
     let parameter = Remanent_parameters.update_prefix parameter "                " in

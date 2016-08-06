@@ -4,17 +4,13 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 13th of March
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Compute the relations between sites in an agent.
   *
   * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Stochastic_classes") message exn
-    (fun () -> default)
 
 let trace = false
 
@@ -135,8 +131,10 @@ let get_nsites parameter error key handler =
   in
   let error, sites_dic =
     match get_nsites with
-    | None -> warn parameter error (Some "line 143") Exit
-                (Ckappa_sig.Dictionary_of_sites.init())
+    | None ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.Dictionary_of_sites.init())
     | Some dic -> error, dic
   in
   let error, nsites =
@@ -240,8 +238,10 @@ let sprintf_array parameter error handler agent_type array =
            try
              Handler.string_of_site parameter error handler agent_type site_type
            with
-             _ -> warn parameter error (Some "line 231") Exit
-                    (Ckappa_sig.string_of_site_name site_type)
+           | _ ->
+             Exception.warn_pos
+               parameter error __POS__ Exit
+               (Ckappa_sig.string_of_site_name site_type)
          in
          let _ =
            acc := !acc ^ (* avoid this, this is very slow, Use Printf.fprintf directly *)
@@ -283,8 +283,10 @@ let print_stochastic_class parameter error handler result =
                    try
                      Handler.string_of_agent parameter error handler agent_type
                    with
-                     _ -> warn parameter error (Some "line 263") Exit
-                            (Ckappa_sig.string_of_agent_name agent_type)
+                   | _ ->
+                     Exception.warn_pos
+                       parameter error __POS__ Exit
+                       (Ckappa_sig.string_of_agent_name agent_type)
                  in
                  let _ =
                    Printf.fprintf stdout "agent_type:%s:%s\n"

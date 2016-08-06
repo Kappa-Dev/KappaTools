@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 05 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1001,7 +1001,8 @@ let compute_ode_flow show_title state =
   let () = show_title state in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  let error, output = Ode_fragmentation_main.ode_fragmentation
+  let error, output =
+    Ode_fragmentation.scan_rule_set
       parameters error handler c_compil
   in
   Remanent_state.set_errors

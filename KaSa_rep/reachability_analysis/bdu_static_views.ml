@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Aug 03 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -13,11 +13,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Bdu_static_views") message exn
-    (fun () -> default)
-
-let local_trace = true
+let local_trace = false
 
 type pre_static =
   {
@@ -72,7 +68,11 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
         rule_id
         Ckappa_sig.Rule_map_and_set.Set.empty
     in
-    let error = Exception.check warn parameter error error' (Some "line 65") Exit in
+    let error =
+      Exception.check_pos
+        Exception.warn_pos parameter error error'
+        __POS__ Exit
+    in
     let error, result =
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite parameter error
         (agent_id, agent_type, site_type)
@@ -115,8 +115,13 @@ let collect_modif_map parameter error store_modification_sites =
     error
     Ckappa_sig.Rule_map_and_set.Set.empty
     (fun parameter error s1 s2 ->
-       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
+       let error', new_set =
+         Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
+       in
+       let error =
+         Exception.check_pos
+           Exception.warn_pos parameter error error' __POS__ Exit
+       in
        error, new_set
     ) store_modification_sites
 
@@ -133,7 +138,10 @@ let collect_test_sites parameter error rule_id viewslhs
         rule_id
         Ckappa_sig.Rule_map_and_set.Set.empty
     in
-    let error = Exception.check warn parameter error error' (Some "line 137") Exit in
+    let error =
+      Exception.check_pos
+        Exception.warn_pos parameter error error' __POS__ Exit
+    in
     let error, result =
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
         parameter error
@@ -178,8 +186,13 @@ let collect_test_map parameter error store_test_sites =
     error
     (Ckappa_sig.Rule_map_and_set.Set.empty)
     (fun parameter error s1 s2 ->
-       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
+       let error', new_set =
+         Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
+       in
+       let error =
+         Exception.check_pos
+           Exception.warn_pos parameter error error' __POS__ Exit
+       in
        error, ( new_set)
     ) store_test_sites
 
@@ -229,8 +242,13 @@ let collect_test_modification_sites
     )
     (*exists in both*)
     (fun parameter error (agent_id, agent_type, site_type) s1 s2 store_result ->
-       let error',union = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-       let error = Exception.check warn parameter error error' (Some "line 212") Exit in
+       let error',union =
+         Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
+       in
+       let error =
+         Exception.check_pos
+           Exception.warn_pos parameter error error' __POS__ Exit
+       in
        let error, store_result =
          add_link error (agent_id, agent_type, site_type) union store_result
        in
@@ -247,8 +265,13 @@ let collect_test_modif_map parameter error store_test_modification_sites =
     parameter error
     (Ckappa_sig.Rule_map_and_set.Set.empty)
     (fun parameter error s1 s2 ->
-       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
-       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
+       let error', new_set =
+         Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
+       in
+       let error =
+         Exception.check_pos
+           Exception.warn_pos parameter error error' __POS__ Exit
+       in
        error, (new_set)
     )
     store_test_modification_sites
@@ -391,7 +414,10 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
       Ckappa_sig.Site_map_and_set.Map.empty
       Ckappa_sig.Site_map_and_set.Map.empty error
   in
-  let error = Exception.check warn parameter error error' (Some "line 49") Exit in
+  let error =
+    Exception.check_pos
+      Exception.warn_pos parameter error error' __POS__ Exit
+  in
   error,(map1,map2)
 
 (*****************************************************************)
@@ -403,7 +429,10 @@ let list2set parameter error list =
         Ckappa_sig.Site_map_and_set.Set.add parameter error elt current_set
       ) (error, Ckappa_sig.Site_map_and_set.Set.empty) list
   in
-  let error = Exception.check warn parameter error error' (Some "line 509") Exit in
+  let error =
+    Exception.check_pos
+      Exception.warn_pos parameter error error' __POS__ Exit
+  in
   error, set
 
 (*******************************************************************)
@@ -501,7 +530,9 @@ let collect_bdu_creation_restriction_map parameter handler error
            match agent with
            | Some Cckappa_sig.Unknown_agent _
            | Some Cckappa_sig.Dead_agent _
-           | None -> warn parameter error (Some "168") Exit (handler,store_result)
+           | None ->
+             Exception.warn_pos
+               parameter error __POS__ Exit (handler,store_result)
            | Some Cckappa_sig.Ghost -> error, (handler,store_result)
            | Some Cckappa_sig.Agent agent ->
              if agent_type' = agent_type
@@ -522,8 +553,10 @@ let collect_bdu_creation_restriction_map parameter handler error
                                  site
                                  map_new_index_forward
                          with
-                         | error, None -> warn parameter error (Some "282") Exit
-                                            Ckappa_sig.dummy_site_name
+                         | error, None ->
+                           Exception.warn_pos
+                             parameter error __POS__ Exit
+                             Ckappa_sig.dummy_site_name
                          | error, Some s -> error, s
                        in
                        Ckappa_sig.Site_map_and_set.Map.add parameter error
@@ -542,7 +575,9 @@ let collect_bdu_creation_restriction_map parameter handler error
                          Ckappa_sig.Site_map_and_set.Map.empty
                      in
                      let error =
-                       Exception.check warn parameter error error' (Some "line 212") Exit
+                       Exception.check_pos
+                         Exception.warn_pos parameter error error'
+                         __POS__  Exit
                      in
                      error, (cv_id, map_res) :: current_list)
                    (error, []) triple_list
@@ -650,7 +685,8 @@ let collect_modif_list_restriction_map
                agent_type
                store_remanent_triple
            with
-           | error, None -> warn parameter error (Some "Line 476") Exit []
+           | error, None ->
+             Exception.warn_pos parameter error __POS__ Exit []
            | error, Some x -> error, x
          in
          (*-----------------------------------------------------------------*)
@@ -684,7 +720,10 @@ let collect_modif_list_restriction_map
                       error, map_res
                    ) set agent_modif.Cckappa_sig.agent_interface Ckappa_sig.Site_map_and_set.Map.empty
                in
-               let error = Exception.check warn parameter error error' (Some "line 293") Exit
+               let error =
+                 Exception.check_pos
+                   Exception.warn_pos parameter error error'
+                   __POS__ Exit
                in
                error, (cv_id, map_res) :: current_list
              ) (error, []) triple_list
@@ -796,7 +835,9 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
                     in
                     (*-----------------------------------------------------------------*)
                     let error =
-                      Exception.check warn parameter error error' (Some "line 630") Exit
+                      Exception.check_pos
+                        Exception.warn_pos parameter error error'
+                        __POS__ Exit
                     in
                     error,
                     Ckappa_sig.Site_map_and_set.Map.fold (fun site' list_state list ->
@@ -854,7 +895,8 @@ let store_bdu_potential_effect_restriction_map parameter handler error
       store_result
   in
   let error =
-    Exception.check warn parameter error error' (Some "line 675") Exit
+    Exception.check_pos
+      Exception.warn_pos parameter error error' __POS__ Exit
   in
   error, (handler, store_result)
 
@@ -982,8 +1024,10 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
                     ) set agent.Cckappa_sig.agent_interface
                     Ckappa_sig.Site_map_and_set.Map.empty
                 in
-                let error = Exception.check warn parameter error error'
-                    (Some "line 178") Exit
+                let error =
+                  Exception.check_pos
+                    Exception.warn_pos parameter error error'
+                    __POS__ Exit
                 in
                 error, (cv_id, map_res) :: current_list)
              (error, []) triple_list

@@ -4,7 +4,7 @@
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 2015, the 9th of Apirl
-    * Last modification: Time-stamp: <Jul 02 2016>
+    * Last modification: Time-stamp: <Aug 06 2016>
     * *
     * ODE fragmentation
     *
@@ -12,10 +12,6 @@
     * Copyright 2010,2011 Institut National de Recherche en Informatique et
     * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
-
-let warn parameter mh message exn default =
-  Exception.warn parameter mh (Some "ODE fragmentation") message exn
-    (fun () -> default)
 
 let trace = false
 
@@ -61,8 +57,10 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                  try
                    Handler.string_of_agent parameter error handler_kappa agent_type
                  with
-                   _ -> warn parameter error (Some "line 67") Exit
-                          (Ckappa_sig.string_of_agent_name agent_type)
+                 | _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_agent_name agent_type)
                in
                let _ =
                  Printf.fprintf stdout "\tagent_type:%s:%s\n"
@@ -76,8 +74,10 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                         Handler.string_of_site parameter error handler_kappa agent_type
                           site_type
                       with
-                        _ -> warn parameter error (Some "line 79") Exit
-                               (Ckappa_sig.string_of_site_name site_type)
+                      | _ ->
+                        Exception.warn_pos
+                          parameter error __POS__ Exit
+                          (Ckappa_sig.string_of_site_name site_type)
                     in
                     let () = Loggers.fprintf
                         (Remanent_parameters.get_logger parameter)
@@ -173,8 +173,10 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
             try
               Handler.string_of_agent parameter error handler_kappa agent_type1
             with
-              _ -> warn parameter error (Some "line 158") Exit
-                     ((Ckappa_sig.string_of_agent_name agent_type1))
+              _ ->
+              Exception.warn_pos
+                parameter error __POS__ Exit
+                ((Ckappa_sig.string_of_agent_name agent_type1))
           in
           let () =
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -192,8 +194,10 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
                    Handler.string_of_site parameter error handler_kappa agent_type1
                      site_type
                  with
-                   _ -> warn parameter error (Some "line 169") Exit
-                          (Ckappa_sig.string_of_site_name site_type)
+                 | _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_site_name site_type)
                in
                let () =
                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -259,8 +263,10 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
             try
               Handler.string_of_agent parameter error handler_kappa agent_type2
             with
-              _ -> warn parameter error (Some "line 223") Exit
-                     ((Ckappa_sig.string_of_agent_name agent_type2))
+            | _ ->
+              Exception.warn_pos
+                parameter error __POS__ Exit
+                ((Ckappa_sig.string_of_agent_name agent_type2))
           in
           let () =
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -277,8 +283,10 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
                   Handler.string_of_site parameter error handler_kappa agent_type2
                     site_type
                 with
-                  _ -> warn parameter error (Some "line 234") Exit
-                         (Ckappa_sig.string_of_site_name site_type)
+                | _ ->
+                  Exception.warn_pos
+                    parameter error __POS__ Exit
+                    (Ckappa_sig.string_of_site_name site_type)
               in
               let () =
                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -597,8 +605,10 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                try
                  Handler.string_of_agent parameter error handler_kappa agent_type
                with
-                 _ -> warn parameter error (Some "line 510") Exit
-                        (Ckappa_sig.string_of_agent_name agent_type)
+               | _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit
+                   (Ckappa_sig.string_of_agent_name agent_type)
              in
              let () =
                Loggers.fprintf
@@ -617,8 +627,10 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                       Handler.string_of_site parameter error handler_kappa agent_type
                         site_type
                     with
-                      _ -> warn parameter error (Some "line 522") Exit
-                             (Ckappa_sig.string_of_site_name site_type)
+                    | _ ->
+                      Exception.warn_pos
+                        parameter error __POS__ Exit
+                        (Ckappa_sig.string_of_site_name site_type)
                   in
                   let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                       "\t\tsite_type:%s:%s"
@@ -737,16 +749,20 @@ let collect_internal_flow parameter error handler_kappa rule
                      try
                        Handler.string_of_agent parameter error handler_kappa agent_type
                      with
-                       _ -> warn parameter error (Some "line 631") Exit
-                              (Ckappa_sig.string_of_agent_name agent_type)
+                     | _ ->
+                       Exception.warn_pos
+                         parameter error __POS__ Exit
+                         (Ckappa_sig.string_of_agent_name agent_type)
                    in
                    let error, site_string =
                      try
                        Handler.string_of_site parameter error handler_kappa agent_type
                          site_type
                      with
-                       _ -> warn parameter error (Some "line 639") Exit
-                              (Ckappa_sig.string_of_site_name site_type)
+                     | _ ->
+                       Exception.warn_pos
+                         parameter error __POS__ Exit
+                         (Ckappa_sig.string_of_site_name site_type)
                    in
                    let error, site_modif_string =
                      Handler.string_of_site parameter error handler_kappa agent_type
@@ -796,24 +812,30 @@ let collect_internal_flow parameter error handler_kappa rule
                      try
                        Handler.string_of_agent parameter error handler_kappa agent_type
                      with
-                       _ -> warn parameter error (Some "line 678") Exit
-                              (Ckappa_sig.string_of_agent_name agent_type)
+                     | _ ->
+                       Exception.warn_pos
+                         parameter error __POS__ Exit
+                         (Ckappa_sig.string_of_agent_name agent_type)
                    in
                    let error, site_string =
                      try
                        Handler.string_of_site parameter error handler_kappa agent_type
                          site_type
                      with
-                       _ -> warn parameter error (Some "line 687") Exit
-                              (Ckappa_sig.string_of_site_name site_type)
+                     | _ ->
+                       Exception.warn_pos
+                         parameter error __POS__ Exit
+                         (Ckappa_sig.string_of_site_name site_type)
                    in
                    let error, site_anchor_string =
                      try
                        Handler.string_of_site parameter error handler_kappa agent_type
                          site_anchor
                      with
-                       _ -> warn parameter error (Some "line 695") Exit
-                              (Ckappa_sig.string_of_site_name site_anchor)
+                     | _ ->
+                       Exception.warn_pos
+                         parameter error __POS__ Exit
+                         (Ckappa_sig.string_of_site_name site_anchor)
                    in
                    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:Internal flow\n-agent_type:%s:%s:site_type:%s:%s -> agent_type:%s:%s:site_type_anchor:%s:%s"
                        (Ckappa_sig.string_of_agent_name agent_type)
@@ -965,31 +987,39 @@ let collect_external_flow parameter error handler_kappa rule
                  try
                    Handler.string_of_agent parameter error handler_kappa agent_type
                  with
-                   _ -> warn parameter error (Some "line 835") Exit
-                          (Ckappa_sig.string_of_agent_name agent_type)
+                   _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_agent_name agent_type)
                in
                let error, agent_string' =
                  try
                    Handler.string_of_agent parameter error handler_kappa agent_type'
                  with
-                   _ -> warn parameter error (Some "line 841") Exit
-                          (Ckappa_sig.string_of_agent_name agent_type')
+                 | _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_agent_name agent_type')
                in
                let error, anchor_site_type_string =
                  try
                    Handler.string_of_site parameter error handler_kappa agent_type
                      anchor_site_type
                  with
-                   _ -> warn parameter error (Some "line 848") Exit
-                          (Ckappa_sig.string_of_site_name anchor_site_type)
+                 | _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_site_name anchor_site_type)
                in
                let error, site_modif_string =
                  try
                    Handler.string_of_site parameter error handler_kappa agent_type'
                      site_modif
                  with
-                   _ -> warn parameter error (Some "line 856") Exit
-                          (Ckappa_sig.string_of_site_name site_modif)
+                 | _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_site_name site_modif)
                in
                let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:External flow:\n-agent-type:%s:%s:site_type_anchor:%s:%s -> agent_type:%s:%s:site_type_modified:%s:%s"
                    (Ckappa_sig.string_of_agent_name agent_type)
@@ -1153,7 +1183,10 @@ let scan_rule_set parameter error handler_kappa compiled =
                try
                  Handler.string_of_rule parameter error handler_kappa compiled rule_id
                with
-                 _ -> warn parameter error (Some "line 1010") Exit (Ckappa_sig.string_of_rule_id rule_id)
+               | _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit
+                   (Ckappa_sig.string_of_rule_id rule_id)
              in
              let () = Printf.fprintf stdout "%s\n" rule_string in
              error

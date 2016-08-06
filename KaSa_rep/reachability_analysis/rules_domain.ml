@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 28 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Abstract domain to record live rules
    *
@@ -12,11 +12,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Rule domain") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -171,7 +166,9 @@ struct
     let error, rule_id_string =
       try Handler.string_of_rule parameter error kappa_handler compil rule_id
       with
-        _ -> warn parameter error (Some "line 165") Exit (Ckappa_sig.string_of_rule_id rule_id)
+      | _ ->
+        Exception.warn_pos
+          parameter error __POS__ Exit (Ckappa_sig.string_of_rule_id rule_id)
     in
     (*print*)
     let error, dynamic =
@@ -208,7 +205,7 @@ struct
         error, dynamic
       | error, Some true -> error, dynamic
       | error, None ->
-        warn parameter error (Some "line 208") Exit dynamic
+        Exception.warn_pos parameter error __POS__ Exit dynamic
     in
     error, dynamic, (precondition, event_list)
 
@@ -274,11 +271,13 @@ struct
                try
                  Handler.string_of_rule parameter error handler compiled k
                with
-                 _ ->
-                 warn parameter error (Some "line 249") Exit (Ckappa_sig.string_of_rule_id k)
+               | _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit (Ckappa_sig.string_of_rule_id k)
              in
              let error =
-               Exception.check warn parameter error error' (Some "line 252") Exit
+               Exception.check_pos
+                 Exception.warn_pos parameter error error' __POS__ Exit
              in
              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                  "%s will never be applied." rule_string

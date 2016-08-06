@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -12,9 +12,6 @@
   * en Informatique et en Automatique.
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "BDU side effects") message exn (fun () -> default)
 
 let trace = false
 
@@ -111,8 +108,10 @@ let half_break_action parameter error handler rule_id half_break store_result =
                       error
                       (agent_type, site_type)
                       handler.Cckappa_sig.states_dic)
-                  (fun error -> warn parameter error (Some "line 84") Exit
-                      (Ckappa_sig.Dictionary_of_States.init()))
+                  (fun error ->
+                     Exception.warn_pos
+                       parameter error __POS__ Exit
+                       (Ckappa_sig.Dictionary_of_States.init()))
               in
               let error, last_entry =
                 Ckappa_sig.Dictionary_of_States.last_entry parameter error state_value in
@@ -217,8 +216,10 @@ let store_potential_half_break parameter error handler rule_id half_break store_
                     error
                     (agent_type, site_type)
                     handler.Cckappa_sig.states_dic)
-                 (fun error -> warn parameter error (Some "line 109") Exit
-                     (Ckappa_sig.Dictionary_of_States.init()))
+                 (fun error ->
+                    Exception.warn_pos
+                      parameter error __POS__ Exit
+                      (Ckappa_sig.Dictionary_of_States.init()))
              in
              let error, last_entry =
                Ckappa_sig.Dictionary_of_States.last_entry parameter error state_value
@@ -304,8 +305,10 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                        error
                        (agent_type, site)
                        handler.Cckappa_sig.states_dic)
-                    (fun error -> warn parameter error (Some "line 196") Exit
-                        (Ckappa_sig.Dictionary_of_States.init()))
+                    (fun error ->
+                       Exception.warn_pos
+                         parameter error __POS__ Exit
+                         (Ckappa_sig.Dictionary_of_States.init()))
                 in
                 let error, last_entry =
                   Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic
@@ -560,7 +563,7 @@ let collect_agent_type_state parameter error agent site_type =
   | Cckappa_sig.Ghost
   | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
   | Cckappa_sig.Dead_agent _ ->
-    warn parameter error (Some "line 127") Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+    Exception.warn_pos parameter error __POS__ Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
   | Cckappa_sig.Agent agent1 ->
     let agent_type1 = agent1.Cckappa_sig.agent_name in
     let error, state1 =
@@ -571,14 +574,16 @@ let collect_agent_type_state parameter error agent site_type =
               agent1.Cckappa_sig.agent_interface
       with
       | error, None ->
-        warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
+        Exception.warn_pos
+          parameter error __POS__ Exit Ckappa_sig.dummy_state_index
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
         if Ckappa_sig.compare_state_index state Ckappa_sig.dummy_state_index > 0
         then
           error, state
         else
-          warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
+          Exception.warn_pos
+            parameter error __POS__ Exit Ckappa_sig.dummy_state_index
     in
     error, (agent_type1, state1)
 
@@ -598,11 +603,17 @@ let add_link_set parameter error rule_id (x, y) store_result =
       (x, y)
       old_set
   in
-  let error = Exception.check warn parameter error error' (Some "line 611") Exit in
+  let error =
+    Exception.check_pos
+      Exception.warn_pos parameter error error' __POS__ Exit
+  in
   let error'', union_set =
     Ckappa_sig.PairAgentSiteState_map_and_set.Set.union parameter error set old_set
   in
-  let error = Exception.check warn parameter error error'' (Some "line 615") Exit in
+  let error =
+    Exception.check_pos
+      Exception.warn_pos parameter error error'' __POS__ Exit
+  in
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
   in
@@ -619,7 +630,9 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_id views
       with
-      | error, None -> warn parameter error (Some "line 632") Exit Cckappa_sig.Ghost
+      | error, None ->
+        Exception.warn_pos
+          parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, agent_target =
@@ -627,7 +640,8 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_index_target views
       with
-      | error, None -> warn parameter error (Some "line 640") Exit Cckappa_sig.Ghost
+      | error, None ->
+        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
@@ -721,7 +735,8 @@ let collect_action_binding parameter error rule_id rule store_result =
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
-        | error, None -> warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
+        | error, None ->
+          Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       (*get pair agent_type, state*)
@@ -739,7 +754,8 @@ let collect_action_binding parameter error rule_id rule store_result =
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
-        | error, None -> warn parameter error (Some "line 275") Exit Cckappa_sig.Ghost
+        | error, None ->
+          Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       let error, (agent_type2, state2) =
@@ -768,7 +784,10 @@ let collect_action_binding parameter error rule_id rule store_result =
           ((agent_id1, agent_type1, site_type1, state1), (agent_id2, agent_type2, site_type2, state2))
           old_set
       in
-      let error = Exception.check warn parameter error error' (Some "line 358") Exit in
+      let error =
+        Exception.check_pos
+          Exception.warn_pos parameter error error' __POS__ Exit 
+      in
       let error, store_result =
         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
           parameter

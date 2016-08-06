@@ -4,13 +4,12 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 05 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
-
 
 let main () =
   let state = Export_to_KaSa.init () in

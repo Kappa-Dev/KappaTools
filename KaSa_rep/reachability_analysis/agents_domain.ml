@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 28 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Abstract domain to record live rules
    *
@@ -12,10 +12,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Rule domain") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -331,7 +327,7 @@ struct
     | Some true ->
       error, (dynamic, event_list)
     | None ->
-      warn parameter error (Some "line 334") Exit (dynamic, event_list)
+      Exception.warn_pos parameter error __POS__ Exit (dynamic, event_list)
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
@@ -347,7 +343,8 @@ struct
            | Cckappa_sig.Unknown_agent _
            | Cckappa_sig.Ghost
            | Cckappa_sig.Dead_agent _ ->
-             warn parameter error (Some "line 339") Exit (dynamic, event_list)
+             Exception.warn_pos
+               parameter error __POS__ Exit (dynamic, event_list)
            | Cckappa_sig.Agent agent ->
              let agent_type = agent.Cckappa_sig.agent_name in
              let error, (dynamic, event_list) =
@@ -410,7 +407,10 @@ struct
            | Some false ->
              error, dynamic, None
            | None ->
-             let error, () = warn parameter error (Some "line 413") Exit () in
+             let error, () =
+               Exception.warn_pos
+                 parameter error __POS__ Exit ()
+             in
              error, dynamic, None
         )
         (error, dynamic, Some precondition) l
@@ -514,10 +514,13 @@ struct
                  Handler.string_of_agent parameter error handler
                    k
                with
-                 _ -> warn parameter error (Some "line 506") Exit (Ckappa_sig.string_of_agent_name k)
+                 _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit (Ckappa_sig.string_of_agent_name k)
              in
              let error =
-               Exception.check warn parameter error error' (Some "line 509") Exit
+               Exception.check_pos
+                 Exception.warn_pos parameter error error' __POS__ Exit
              in
              let () = Loggers.fprintf loggers
                  "%s is a dead agent." agent_string

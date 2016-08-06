@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 01 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -20,9 +20,6 @@ let direct_computation = false
 let new_computation = false
 
 let domain_name = "View domain"
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "views_domain") message exn
-    (fun () -> default)
 
 let local_trace = false
 (*  let compute_local_trace = false*)
@@ -397,8 +394,10 @@ struct
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 56") Exit
-                 (Ckappa_sig.string_of_agent_name agent_type)
+        | _ ->
+          Exception.warn_pos
+            parameter error __POS__ Exit
+            (Ckappa_sig.string_of_agent_name agent_type)
       in
       (*--------------------------------------------------------*)
       let error, site_correspondence =
@@ -407,14 +406,14 @@ struct
       in
       let error, site_correspondence =
         match site_correspondence with
-        | None -> warn parameter error (Some "line 187") Exit []
+        | None -> Exception.warn_pos parameter error __POS__ Exit []
         | Some a -> error, a
       in
       (*get a list of sites in a covering class *)
       let error, site_correspondence =
         let rec aux list =
           match list with
-          | [] -> warn parameter error (Some "line 195") Exit []
+          | [] -> Exception.warn_pos  parameter error __POS__ Exit []
           | (h, list, _) :: _ when h = cv_id -> error, list
           | _ :: tail -> aux tail
         in aux site_correspondence
@@ -428,8 +427,10 @@ struct
                  Handler.string_of_site parameter error handler_kappa
                    agent_type site_type
                with
-                 _ -> warn parameter error (Some "line 210") Exit
-                        (Ckappa_sig.string_of_site_name site_type)
+               | _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit
+                   (Ckappa_sig.string_of_site_name site_type)
              in
              let () =
                Loggers.fprintf log "%s%s" (if bool then "," else "") site_string
@@ -476,8 +477,8 @@ struct
             try
               Handler.string_of_agent parameter error kappa_handler agent_type
             with
-              _ -> warn
-                     parameter error (Some "line 460") Exit
+            | _ -> Exception.warn_pos
+                     parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type)
           in
           (*-----------------------------------------------------------------------*)
@@ -506,8 +507,10 @@ struct
                     Handler.string_of_rule parameter error kappa_handler
                       compiled rule_id
                   with
-                    _ -> warn parameter error (Some "line 250") Exit
-                           (Ckappa_sig.string_of_rule_id rule_id)
+                  | _ ->
+                    Exception.warn_pos
+                      parameter error __POS__ Exit
+                      (Ckappa_sig.string_of_rule_id rule_id)
                 in
                 let tab =
                   if title = "" then "\t" else "\t\t"
@@ -555,8 +558,10 @@ struct
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 56") Exit
-                 (Ckappa_sig.string_of_agent_name agent_type)
+        | _ ->
+          Exception.warn_pos
+            parameter error __POS__ Exit
+            (Ckappa_sig.string_of_agent_name agent_type)
       in
       (*-----------------------------------------------------------------------*)
       (*list of sites in a covering class*)
@@ -564,13 +569,16 @@ struct
         match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get parameter
                 error agent_type site_correspondence
         with
-        | error, None -> warn parameter error (Some "73") Exit []
+        | error, None ->
+          Exception.warn_pos
+            parameter error __POS__ Exit []
         | error, Some a -> error, a
       in
       let error, site_correspondence =
         let rec aux list =
           match list with
-          | [] -> warn parameter error (Some "line 68") Exit []
+          | [] ->
+            Exception.warn_pos parameter error __POS__ Exit []
           | (h, list, _) :: _ when h = cv_id -> error, list
           | _ :: tail -> aux tail
         in aux site_correspondence
@@ -633,8 +641,10 @@ struct
                       match Ckappa_sig.Site_map_and_set.Map.find_option
                               parameter error site_type map2
                       with
-                      | error, None -> warn parameter error (Some "line 598") Exit
-                                         (Ckappa_sig.site_name_of_int (-1))
+                      | error, None ->
+                        Exception.warn_pos
+                          parameter error __POS__ Exit
+                          Ckappa_sig.dummy_site_name
                       | error, Some i -> error, i
                     in
                     (*-----------------------------------------------------------------------*)
@@ -643,16 +653,19 @@ struct
                         Handler.string_of_site parameter error handler_kappa
                           agent_type site_type
                       with
-                      | _ -> warn parameter error (Some "line 609")
-                               Exit (Ckappa_sig.string_of_site_name site_type)
+                      | _ ->
+                        Exception.warn_pos
+                          parameter error __POS__ Exit (Ckappa_sig.string_of_site_name site_type)
                     in
                     let error, state_string =
                       try
                         Handler.string_of_state_fully_deciphered parameter error
                           handler_kappa agent_type site_type state
                       with
-                      | _ -> warn parameter error (Some "line 595") Exit
-                               (Ckappa_sig.string_of_state_index state)
+                      | _ ->
+                        Exception.warn_pos
+                          parameter error __POS__ Exit
+                          (Ckappa_sig.string_of_state_index state)
                     in
                     (*-----------------------------------------------------------------------*)
                     let () =
@@ -810,8 +823,10 @@ struct
                 Ckappa_sig.Site_map_and_set.Map.find_option
                   parameter error site map_new_index_forward
               with
-              | error, None -> warn parameter error (Some "770") Exit
-                                 Ckappa_sig.dummy_site_name
+              | error, None ->
+                Exception.warn_pos
+                  parameter error __POS__ Exit
+                  Ckappa_sig.dummy_site_name
               | error, Some s -> error, s
             in
             Ckappa_sig.Site_map_and_set.Map.add
@@ -829,8 +844,10 @@ struct
               agent.Cckappa_sig.agent_interface
               Ckappa_sig.Site_map_and_set.Map.empty
           in
-          let error = Exception.check warn parameter error error'
-              (Some "line 786") Exit
+          let error =
+            Exception.check_pos
+              Exception.warn_pos  parameter error error'
+              __POS__ Exit
           in
           error, ((cv_id, map_res) :: current_list)
         ) (error, []) triple_list
@@ -867,7 +884,8 @@ struct
            | Cckappa_sig.Unknown_agent _
            | Cckappa_sig.Ghost -> error, (dynamic, event_list)
            | Cckappa_sig.Dead_agent _ ->
-             warn parameter error (Some "line 810") Exit (dynamic, event_list)
+             Exception.warn_pos
+               parameter error __POS__ Exit (dynamic, event_list)
            | Cckappa_sig.Agent agent ->
              let agent_type = agent.Cckappa_sig.agent_name in
              (*----------------------------------------------------------------*)
@@ -1007,7 +1025,8 @@ struct
     let error, site_correspondence =
       let rec aux list =
         match list with
-        | [] -> warn parameter error (Some "line 906") Exit []
+        | [] ->
+          Exception.warn_pos parameter error __POS__ Exit []
         | (h, list, _) :: _ when h = cv_id -> error, list
         | _ :: tail -> aux tail
       in
@@ -1027,8 +1046,10 @@ struct
           site_name
           map1
       with
-      | error, None -> warn parameter error (Some "line 926") Exit
-                         (Ckappa_sig.site_name_of_int (-1))
+      | error, None ->
+        Exception.warn_pos
+          parameter error __POS__ Exit
+          Ckappa_sig.dummy_site_name
       | error, Some i -> error, i
     in
     error, new_site_name
@@ -1050,8 +1071,10 @@ struct
                Handler.string_of_site parameter error kappa_handler
                  agent_type site_name
              with
-               _ -> warn parameter error (Some "line 1096") Exit
-                      (Ckappa_sig.string_of_site_name site_name)
+             | _ ->
+               Exception.warn_pos
+                 parameter error __POS__ Exit
+                 (Ckappa_sig.string_of_site_name site_name)
            in
            (*print for test*)
            (*let _ =
@@ -1164,16 +1187,20 @@ struct
                  Handler.string_of_site parameter error kappa_handler
                    agent_type site_name
                with
-                 _ -> warn parameter error (Some "line 1088") Exit
-                        (Ckappa_sig.string_of_site_name site_name)
+               | _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit
+                   (Ckappa_sig.string_of_site_name site_name)
              in
              let error, _state_string =
                try
                  Handler.string_of_state_fully_deciphered parameter error kappa_handler
                    agent_type site_name state
                with
-                 _ -> warn parameter error (Some "line 1103") Exit
-                        (Ckappa_sig.string_of_state_index state)
+               | _ ->
+                 Exception.warn_pos
+                   parameter error __POS__ Exit
+                   (Ckappa_sig.string_of_state_index state)
              in
              (*let _ =
                Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -1187,7 +1214,9 @@ struct
                  state_string
                in*)
              error, state :: output
-           | _ -> warn parameter error (Some "state is empty, line 1086") Exit output)
+           | _ ->
+             Exception.warn_pos
+               parameter error __POS__ ~message:"state is empty" Exit output)
         (error, []) list
     in
     error, dynamic, Usual_domains.Val (List.rev state_list)
@@ -1215,7 +1244,8 @@ struct
               agent_type
               site_correspondence
       with
-      | error, None -> warn parameter error (Some "line 922") Exit []
+      | error, None ->
+        Exception.warn_pos  parameter error __POS__ Exit []
       | error, Some l -> error, l
     in
     (* compute the list of cv_id documenting site_name *)
@@ -1226,7 +1256,8 @@ struct
               (agent_type, path.Communication.site) (*site:v*)
               store_covering_classes_id
       with
-      | error, None -> warn parameter error (Some "line 1133") Exit []
+      | error, None ->
+        Exception.warn_pos  parameter error __POS__ Exit []
       | error, Some l -> error, l
     in
     (*---------------------------------------------------------------------*)
@@ -1295,7 +1326,8 @@ struct
                (agent_type, step.Communication.site_out) (*A.x*)
                kappa_handler.Cckappa_sig.states_dic)
             (fun error ->
-               warn parameter error (Some "line 1248") Exit (Ckappa_sig.Dictionary_of_States.init()))
+               Exception.warn_pos
+                 parameter error __POS__ Exit (Ckappa_sig.Dictionary_of_States.init()))
         in
         (*---------------------------------------------------------*)
         (*Binding state: B.y*)
@@ -1383,7 +1415,8 @@ struct
              (last_agent, last_site) (*D.t*)
              kappa_handler.Cckappa_sig.states_dic)
           (fun error ->
-             warn parameter error (Some "line 1294") Exit
+             Exception.warn_pos
+               parameter error __POS__ Exit
                (Ckappa_sig.Dictionary_of_States.init()))
       in
       (*the state of site t is B.w*)
@@ -1425,7 +1458,8 @@ struct
                   (last_agent, path.Communication.site) (*D@v*)
                   store_covering_classes_id
               with
-              | error, None -> warn parameter error (Some "line 1332") Exit []
+              | error, None ->
+                Exception.warn_pos parameter error __POS__ Exit []
               | error, Some l -> error, l
             in
             (*get a triple (cv_id, list, set) of the last agent that containing t*)
@@ -1437,7 +1471,8 @@ struct
                   last_agent (*D*)
                   site_correspondence
               with
-              | error, None -> warn parameter error (Some "line 1345") Exit []
+              | error, None ->
+                Exception.warn_pos parameter error __POS__ Exit []
               | error, Some l -> error, l
             in
             (*---------------------------------------------------*)
@@ -1650,7 +1685,8 @@ struct
               List.fold_left (fun (error, output) list ->
                   match list with
                   | [_, state] -> error, state :: output
-                  | _ -> warn parameter error (Some "line 1575") Exit output
+                  | _ -> Exception.warn_pos
+                           parameter error __POS__ Exit output
                 ) (error, []) list
             in
             error, (dynamic, Usual_domains.Val (List.rev state_list))
@@ -1755,7 +1791,8 @@ struct
           path.Communication.agent_id (*#1:A*)
           rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       with
-      | error, None -> warn parameter error (Some "line 1427") Exit Cckappa_sig.Ghost
+      | error, None ->
+        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some a -> error, a
     in
     let error, (dynamic, new_answer) =
@@ -1763,7 +1800,8 @@ struct
       | Cckappa_sig.Ghost
       | Cckappa_sig.Unknown_agent _
       | Cckappa_sig.Dead_agent _ ->
-        warn parameter error (Some "line 1435") Exit (dynamic, Usual_domains.Undefined)
+        Exception.warn_pos
+          parameter error __POS__ Exit (dynamic, Usual_domains.Undefined)
       | Cckappa_sig.Agent agent ->
         (*search inside the pattern, check whether or not it is out
           of the pattern or in the pattern.*)
@@ -2378,8 +2416,9 @@ struct
              let error', union_set =
                Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
              in
-             let error = Exception.check warn parameter error error' (Some "line 1515")
-                 Exit
+             let error =
+               Exception.check_pos
+                 Exception.warn_pos  parameter error error' __POS__ Exit
              in
              let error, store_result =
                Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
@@ -2470,7 +2509,8 @@ struct
                                    parameters error
                                    (ag_type,site_type) state contact_map
                                | [] | _::_ ->
-                                 warn parameters error (Some "line 2468") Exit
+                                 Exception.warn_pos
+                                   parameters error __POS__ Exit
                                    contact_map)
                             (error, contact_map) list_of_states
                         in
@@ -2495,7 +2535,8 @@ struct
                                        dual
                                      with
                                      | None ->
-                                       warn parameters error (Some "line 2498") Exit contact_map
+                                       Exception.warn_pos
+                                         parameters error __POS__ Exit contact_map
                                      | Some (ag_type', site_type', _ ) ->
                                        Preprocess.add_link_in_contact_map
                                          parameters error
@@ -2503,637 +2544,650 @@ struct
                                          contact_map
                                    end
                                | [] | _::_ ->
-                                 warn parameters error (Some "line 2507") Exit
+                                 Exception.warn_pos
+                                   parameters error __POS__ Exit
                                    contact_map)
                             (error, contact_map) list_of_states
                         in
                         error, (handler, contact_map)
                     end
-           | _::_ ->
-             warn parameters error (Some "line 2457") Exit (handler, contact_map)
+                  | _::_ ->
+                    Exception.warn_pos
+                      parameters error __POS__ Exit (handler, contact_map)
+               )
+               site_map
+               (error, (handler, contact_map))
           )
-          site_map
-          (error, (handler, contact_map))
-)
-ranges
-  (handler, contact_map)
-in
-let dynamic = set_mvbdu_handler handler dynamic in
-let kasa_state = Remanent_state.set_internal_contact_map Remanent_state.Medium contact_map kasa_state in
-error, dynamic, kasa_state
-
-(**************************************************************************)
-
-(*let print_static_information static dynamic error loggers =
-  let parameter = get_parameter static in
-  let log = Remanent_parameters.get_logger parameter in
-  let kappa_handler = get_kappa_handler static in
-  let compiled = get_compil static in
-  let error, result = get_bdu_analysis_static static dynamic error in
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
-  let error =
-    if local_trace
-      || Remanent_parameters.get_trace parameter
-      || Remanent_parameters.get_dump_reachability_analysis_static parameter
-    then
-        (*List.fold_left (fun error log ->*)
-      let _ = Loggers.print_newline log in
-      let _ = Loggers.fprintf log
-        "Reachability analysis static information module...."
+          ranges
+          (handler, contact_map)
       in
-      let _ = Loggers.print_newline log in
-      let parameters_cv = Remanent_parameters.update_prefix parameter "" in
-      begin
-        if (Remanent_parameters.get_trace parameters_cv)
-        then
-  let _ =
-            Loggers.print_newline log
-  in
-  let error =
-            Print_static_views.print_result_static
-              parameter
-              error
-              kappa_handler
-              compiled
-              result
-          in error
-        else error
-      end
-    (* ) error loggers*)
-    else
-      error
-  in
-  error, dynamic, ()*)
+      let dynamic = set_mvbdu_handler handler dynamic in
+      let kasa_state = Remanent_state.set_internal_contact_map Remanent_state.Medium contact_map kasa_state in
+      error, dynamic, kasa_state
 
-(**************************************************************************)
+  (**************************************************************************)
 
-(*let print_dynamic_information static dynamic error loggers =
-  let parameter = get_parameter static in
-  let log = Remanent_parameters.get_logger parameter in
-  let kappa_handler = get_kappa_handler static in
-  let compiled = get_compil static in
-  let error, result = get_bdu_analysis_dynamic static dynamic error in
-  let error =
-      (*List.fold_left (fun error log ->*)
-    let () = Loggers.print_newline log in
+  (*let print_static_information static dynamic error loggers =
+    let parameter = get_parameter static in
+    let log = Remanent_parameters.get_logger parameter in
+    let kappa_handler = get_kappa_handler static in
+    let compiled = get_compil static in
+    let error, result = get_bdu_analysis_static static dynamic error in
+    let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      if local_trace
+        || Remanent_parameters.get_trace parameter
+        || Remanent_parameters.get_dump_reachability_analysis_static parameter
+      then
+          (*List.fold_left (fun error log ->*)
+        let _ = Loggers.print_newline log in
+        let _ = Loggers.fprintf log
+          "Reachability analysis static information module...."
+        in
+        let _ = Loggers.print_newline log in
+        let parameters_cv = Remanent_parameters.update_prefix parameter "" in
+        begin
+          if (Remanent_parameters.get_trace parameters_cv)
+          then
     let _ =
-      Print_bdu_analysis_dynamic.print_result_dynamic
-        parameter
-        error
-        kappa_handler
-        compiled
-        result
+              Loggers.print_newline log
     in
-    error
-  (* ) error loggers*)
-  in
-  error, set_domain_dynamic_information result dynamic, ()*)
+    let error =
+              Print_static_views.print_result_static
+                parameter
+                error
+                kappa_handler
+                compiled
+                result
+            in error
+          else error
+        end
+      (* ) error loggers*)
+      else
+        error
+    in
+    error, dynamic, ()*)
 
-(************************************************************************************)
-(*main print of fixpoint*)
+  (**************************************************************************)
 
-let print_bdu_update_map parameter error handler_kappa result =
-  AgentCV_map_and_set.Map.fold (fun (agent_type, cv_id) bdu_update error ->
-      let error', agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+  (*let print_dynamic_information static dynamic error loggers =
+    let parameter = get_parameter static in
+    let log = Remanent_parameters.get_logger parameter in
+    let kappa_handler = get_kappa_handler static in
+    let compiled = get_compil static in
+    let error, result = get_bdu_analysis_dynamic static dynamic error in
+    let error =
+        (*List.fold_left (fun error log ->*)
+      let () = Loggers.print_newline log in
+      let _ =
+        Print_bdu_analysis_dynamic.print_result_dynamic
+          parameter
+          error
+          kappa_handler
+          compiled
+          result
       in
-      let error = Exception.check warn parameter error error' (Some "line 1651") Exit in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_type:%i:%s:cv_id:%i"
-          (Ckappa_sig.int_of_agent_name agent_type)
-          agent_string
-          (Covering_classes_type.int_of_cv_id cv_id)
-      in
-      let () =
-        Loggers.print_newline (Remanent_parameters.get_logger parameter)
-      in
-      let () =
-        Ckappa_sig.Views_bdu.print
-          parameter bdu_update
-      in
-      error)
-    result error
+      error
+    (* ) error loggers*)
+    in
+    error, set_domain_dynamic_information result dynamic, ()*)
 
-(************************************************************************************)
+  (************************************************************************************)
+  (*main print of fixpoint*)
 
-let smash_map decomposition
-    ~show_dep_with_dimmension_higher_than:_dim_min
-    parameter handler error _handler_kappa site_correspondence result =
-  let error,handler,mvbdu_true =
-    Ckappa_sig.Views_bdu.mvbdu_true
-      parameter handler error
-  in
-  Covering_classes_type.AgentCV_map_and_set.Map.fold
-    (fun (agent_type, cv_id) bdu (error,handler,output) ->
-       let error, handler, list =
-         decomposition parameter handler error bdu
-       in
-       let error, site_correspondence =
-         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
-           parameter error agent_type site_correspondence
-       in
-       let error, site_correspondence =
-         match site_correspondence with
-         | None -> warn parameter error (Some "line 2527") Exit []
-         | Some a -> error, a
-       in
-       let error, site_correspondence =
-         let rec aux list =
-           match list with
-           | [] -> warn parameter error (Some "line 2533") Exit []
-           | (h, list, _) :: _ when h = cv_id -> error, list
-           | _ :: tail -> aux tail
-         in aux site_correspondence
-       in
-       let error, (_map1, map2) =
-         Bdu_static_views.new_index_pair_map parameter error site_correspondence
-       in
-       let rename_site parameter error site_type =
-         let error, site_type =
-           match Ckappa_sig.Site_map_and_set.Map.find_option
-                   parameter error site_type map2
-           with
-           | error, None -> warn parameter error (Some "line 2546") Exit
-                              Ckappa_sig.dummy_site_name_minus1
-           | error, Some i -> error, i
+  let print_bdu_update_map parameter error handler_kappa result =
+    AgentCV_map_and_set.Map.fold (fun (agent_type, cv_id) bdu_update error ->
+        let error', agent_string =
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        in
+        let error =
+          Exception.check_pos Exception.warn_pos
+            parameter error error' __POS__ Exit in
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "agent_type:%i:%s:cv_id:%i"
+            (Ckappa_sig.int_of_agent_name agent_type)
+            agent_string
+            (Covering_classes_type.int_of_cv_id cv_id)
+        in
+        let () =
+          Loggers.print_newline (Remanent_parameters.get_logger parameter)
+        in
+        let () =
+          Ckappa_sig.Views_bdu.print
+            parameter bdu_update
+        in
+        error)
+      result error
+
+  (************************************************************************************)
+
+  let smash_map decomposition
+      ~show_dep_with_dimmension_higher_than:_dim_min
+      parameter handler error _handler_kappa site_correspondence result =
+    let error,handler,mvbdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true
+        parameter handler error
+    in
+    Covering_classes_type.AgentCV_map_and_set.Map.fold
+      (fun (agent_type, cv_id) bdu (error,handler,output) ->
+         let error, handler, list =
+           decomposition parameter handler error bdu
          in
-         error, site_type
-       in
-       List.fold_left
-         (fun (error, handler, output) bdu ->
-            begin
-              let error, handler, lvar =
-                Ckappa_sig.Views_bdu.variables_list_of_mvbdu
-                  parameter handler error
-                  bdu
-              in
-              (*list: ckappa_sig.c_site_name list*)
-              let error, handler, list =
-                Ckappa_sig.Views_bdu.extensional_of_variables_list
-                  parameter handler error
-                  lvar
-              in
-              (*asso take (key * key) list *)
-              let error, asso =
-                List.fold_left
-                  (fun (error, list) i ->
-                     let error, new_name =
-                       rename_site parameter error i
-                     in
-                     error,(i, new_name) :: list)
-                  (error, [])
-                  (List.rev list)
-              in
-              let error,handler,hconsed_asso =
-                Ckappa_sig.Views_bdu.build_renaming_list
-                  parameter handler error asso
-              in
-              let error,handler,renamed_mvbdu =
-                Ckappa_sig.Views_bdu.mvbdu_rename
-                  parameter handler error bdu hconsed_asso
-              in
-              let error,handler,hconsed_vars =
-                Ckappa_sig.Views_bdu.variables_list_of_mvbdu
-                  parameter handler error renamed_mvbdu
-              in
-              let error, cv_map_opt =
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                  parameter error agent_type output
-              in
-              let error,cv_map =
-                match
-                  cv_map_opt
-                with
-                | None ->
-                  error, Wrapped_modules.LoggedIntMap.empty
-                | Some map -> error, map
-              in
-              let error, handler, cv_map' =
-                Ckappa_sig.Views_bdu.store_by_variables_list
-                  Wrapped_modules.LoggedIntMap.find_default_without_logs
-                  Wrapped_modules.LoggedIntMap.add_or_overwrite
-                  mvbdu_true
-                  Ckappa_sig.Views_bdu.mvbdu_and
-                  parameter
-                  handler
-                  error
-                  hconsed_vars
-                  renamed_mvbdu
-                  cv_map
-              in
-              let error,output =
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-                  parameter error agent_type cv_map'
-                  output
-              in
-              error, handler, output
-            end)
-         (error, handler, output)
-         list)
-    result
-    (let error, agent_map =
-       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
-     in
-     (error, handler, agent_map))
-
-(**************************************************************************)
-
-let stabilise_bdu_update_map_gen_decomposition decomposition
-    ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-    parameter handler error handler_kappa site_correspondence
-    result =
-  if
-    smash
-  then
-    let error,handler,output =
-      smash_map
-        decomposition
-        ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
-        handler_kappa site_correspondence result
-    in
-    let error, (handler, list) =
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-        parameter
-        error
-        (fun parameter error agent_type map (handler,list) ->
-           let error', agent_string =
-             try
-               Handler.string_of_agent parameter error handler_kappa agent_type
+         let error, site_correspondence =
+           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+             parameter error agent_type site_correspondence
+         in
+         let error, site_correspondence =
+           match site_correspondence with
+           | None -> Exception.warn_pos parameter error __POS__ Exit []
+           | Some a -> error, a
+         in
+         let error, site_correspondence =
+           let rec aux list =
+             match list with
+             | [] -> Exception.warn_pos parameter error __POS__ Exit []
+             | (h, list, _) :: _ when h = cv_id -> error, list
+             | _ :: tail -> aux tail
+           in aux site_correspondence
+         in
+         let error, (_map1, map2) =
+           Bdu_static_views.new_index_pair_map parameter error site_correspondence
+         in
+         let rename_site parameter error site_type =
+           let error, site_type =
+             match Ckappa_sig.Site_map_and_set.Map.find_option
+                     parameter error site_type map2
              with
-               _ -> warn parameter error (Some "line 2656") Exit
-                      (Ckappa_sig.string_of_agent_name agent_type)
+             | error, None -> Exception.warn_pos  parameter error __POS__ Exit
+                                Ckappa_sig.dummy_site_name_minus1
+             | error, Some i -> error, i
            in
-           let error = Exception.check warn parameter error error' (Some "line 2659") Exit in
-           (*-----------------------------------------------------------------------*)
-           Wrapped_modules.LoggedIntMap.fold
-             (fun _ mvbdu (error,(handler,list))
-               ->
-                 let error, handler =
-                   if local_trace || Remanent_parameters.get_trace parameter
-                   then
-                     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                         "INTENSIONAL DESCRIPTION:"
-                     in
-                     let () = Loggers.print_newline
-                         (Remanent_parameters.get_logger parameter)
-                     in
-                     let () =
-                       Ckappa_sig.Views_bdu.print
-                         parameter mvbdu
-                     in
-                     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                         "EXTENSIONAL DESCRIPTION:"
-                     in
-                     let () = Loggers.print_newline
-                         (Remanent_parameters.get_logger parameter)
-                     in
-                     error, handler
-                   else
-                     error, handler
-                 in
-                 let error, (handler, translation) =
-                   Translation_in_natural_language.translate
-                     parameter handler error (fun _ e i -> e, i) mvbdu
-                 in
-                 (*-----------------------------------------------------------------------*)
-                 error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
-             )
-             map
-             (error, (handler,list)))
-        output (handler,[])
-    in
-    error, handler, List.rev list
-  else
-    begin
-      let error, (handler, list) = Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) bdu_update (error,(handler,list)) ->
+           error, site_type
+         in
+         List.fold_left
+           (fun (error, handler, output) bdu ->
+              begin
+                let error, handler, lvar =
+                  Ckappa_sig.Views_bdu.variables_list_of_mvbdu
+                    parameter handler error
+                    bdu
+                in
+                (*list: ckappa_sig.c_site_name list*)
+                let error, handler, list =
+                  Ckappa_sig.Views_bdu.extensional_of_variables_list
+                    parameter handler error
+                    lvar
+                in
+                (*asso take (key * key) list *)
+                let error, asso =
+                  List.fold_left
+                    (fun (error, list) i ->
+                       let error, new_name =
+                         rename_site parameter error i
+                       in
+                       error,(i, new_name) :: list)
+                    (error, [])
+                    (List.rev list)
+                in
+                let error,handler,hconsed_asso =
+                  Ckappa_sig.Views_bdu.build_renaming_list
+                    parameter handler error asso
+                in
+                let error,handler,renamed_mvbdu =
+                  Ckappa_sig.Views_bdu.mvbdu_rename
+                    parameter handler error bdu hconsed_asso
+                in
+                let error,handler,hconsed_vars =
+                  Ckappa_sig.Views_bdu.variables_list_of_mvbdu
+                    parameter handler error renamed_mvbdu
+                in
+                let error, cv_map_opt =
+                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                    parameter error agent_type output
+                in
+                let error,cv_map =
+                  match
+                    cv_map_opt
+                  with
+                  | None ->
+                    error, Wrapped_modules.LoggedIntMap.empty
+                  | Some map -> error, map
+                in
+                let error, handler, cv_map' =
+                  Ckappa_sig.Views_bdu.store_by_variables_list
+                    Wrapped_modules.LoggedIntMap.find_default_without_logs
+                    Wrapped_modules.LoggedIntMap.add_or_overwrite
+                    mvbdu_true
+                    Ckappa_sig.Views_bdu.mvbdu_and
+                    parameter
+                    handler
+                    error
+                    hconsed_vars
+                    renamed_mvbdu
+                    cv_map
+                in
+                let error,output =
+                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+                    parameter error agent_type cv_map'
+                    output
+                in
+                error, handler, output
+              end)
+           (error, handler, output)
+           list)
+      result
+      (let error, agent_map =
+         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
+       in
+       (error, handler, agent_map))
+
+  (**************************************************************************)
+
+  let stabilise_bdu_update_map_gen_decomposition decomposition
+      ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
+      parameter handler error handler_kappa site_correspondence
+      result =
+    if
+      smash
+    then
+      let error,handler,output =
+        smash_map
+          decomposition
+          ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
+          handler_kappa site_correspondence result
+      in
+      let error, (handler, list) =
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+          parameter
+          error
+          (fun parameter error agent_type map (handler,list) ->
              let error', agent_string =
                try
                  Handler.string_of_agent parameter error handler_kappa agent_type
                with
-                 _ -> warn parameter error (Some "line 2726") Exit
+               | _ -> Exception.warn_pos parameter error __POS__  Exit
                         (Ckappa_sig.string_of_agent_name agent_type)
              in
-             let error = Exception.check warn parameter error error'
-                 (Some "line 2730") Exit
+             let error =
+               Exception.check_pos
+                 Exception.warn_pos  parameter error error' __POS__ Exit
              in
              (*-----------------------------------------------------------------------*)
-             let () =
-               if local_trace || Remanent_parameters.get_trace parameter
-               then
-                 let () =
-                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                     "agent_type:%i:%s:cv_id:%i"
-                     (Ckappa_sig.int_of_agent_name agent_type)
-                     agent_string
-                     (Covering_classes_type.int_of_cv_id cv_id)
-                 in
-                 Loggers.print_newline (Remanent_parameters.get_logger parameter)
-             in
-             (*-----------------------------------------------------------------------*)
-             let error, site_correspondence =
-               Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
-                 parameter error agent_type site_correspondence
-             in
-             let error, site_correspondence =
-               match site_correspondence with
-               | None -> warn parameter error (Some "line 2752") Exit []
-               | Some a -> error, a
-             in
-             let error, site_correspondence =
-               let rec aux list =
-                 match list with
-                 | [] -> warn parameter error (Some "line 2758") Exit []
-                 | (h, list, _) :: _ when h = cv_id -> error, list
-                 | _ :: tail -> aux tail
-               in aux site_correspondence
-             in
-             (*-----------------------------------------------------------------------*)
-             let error,(_, map2) =
-               Bdu_static_views.new_index_pair_map parameter error site_correspondence
-             in
-             (*-----------------------------------------------------------------------*)
-             let error, handler, list' =
-               decomposition parameter handler error bdu_update
-             in
-             (*-----------------------------------------------------------------------*)
-             let error, (handler, list) =
-               List.fold_left
-                 (fun (error, (handler, list)) mvbdu ->
-                    let error, handler =
-                      if local_trace || Remanent_parameters.get_trace parameter
-                      then
-                        let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                            "INTENSIONAL DESCRIPTION:" in
-                        let () = Loggers.print_newline
-                            (Remanent_parameters.get_logger parameter)
-                        in
-                        let () =
-                          Ckappa_sig.Views_bdu.print
-                            parameter mvbdu
-                        in
-                        let () = Loggers.fprintf
-                            (Remanent_parameters.get_logger parameter)
-                            "EXTENSIONAL DESCRIPTION:"
-                        in
-                        let () = Loggers.print_newline
-                            (Remanent_parameters.get_logger parameter)
-                        in
-                        error, handler
-                      else
-                        error, handler
-                    in
-                    let rename_site parameter error site_type =
-                      let error, site_type =
-                        match Ckappa_sig.Site_map_and_set.Map.find_option
-                                parameter error site_type map2
-                        with
-                        | error, None -> warn parameter error (Some "line 2803") Exit
-                                           Ckappa_sig.dummy_site_name_minus1
-                        | error, Some i -> error, i
+             Wrapped_modules.LoggedIntMap.fold
+               (fun _ mvbdu (error,(handler,list))
+                 ->
+                   let error, handler =
+                     if local_trace || Remanent_parameters.get_trace parameter
+                     then
+                       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                           "INTENSIONAL DESCRIPTION:"
+                       in
+                       let () = Loggers.print_newline
+                           (Remanent_parameters.get_logger parameter)
+                       in
+                       let () =
+                         Ckappa_sig.Views_bdu.print
+                           parameter mvbdu
+                       in
+                       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                           "EXTENSIONAL DESCRIPTION:"
+                       in
+                       let () = Loggers.print_newline
+                           (Remanent_parameters.get_logger parameter)
+                       in
+                       error, handler
+                     else
+                       error, handler
+                   in
+                   let error, (handler, translation) =
+                     Translation_in_natural_language.translate
+                       parameter handler error (fun _ e i -> e, i) mvbdu
+                   in
+                   (*-----------------------------------------------------------------------*)
+                   error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
+               )
+               map
+               (error, (handler,list)))
+          output (handler,[])
+      in
+      error, handler, List.rev list
+    else
+      begin
+        let error, (handler, list) = Covering_classes_type.AgentCV_map_and_set.Map.fold
+            (fun (agent_type, cv_id) bdu_update (error,(handler,list)) ->
+               let error', agent_string =
+                 try
+                   Handler.string_of_agent parameter error handler_kappa agent_type
+                 with
+                 | _ ->
+                   Exception.warn_pos
+                     parameter error __POS__ Exit
+                     (Ckappa_sig.string_of_agent_name agent_type)
+               in
+               let error =
+                 Exception.check_pos
+                   Exception.warn_pos  parameter error error'
+                   __POS__ Exit
+               in
+               (*-----------------------------------------------------------------------*)
+               let () =
+                 if local_trace || Remanent_parameters.get_trace parameter
+                 then
+                   let () =
+                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                       "agent_type:%i:%s:cv_id:%i"
+                       (Ckappa_sig.int_of_agent_name agent_type)
+                       agent_string
+                       (Covering_classes_type.int_of_cv_id cv_id)
+                   in
+                   Loggers.print_newline (Remanent_parameters.get_logger parameter)
+               in
+               (*-----------------------------------------------------------------------*)
+               let error, site_correspondence =
+                 Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                   parameter error agent_type site_correspondence
+               in
+               let error, site_correspondence =
+                 match site_correspondence with
+                 | None -> Exception.warn_pos  parameter error __POS__ Exit []
+                 | Some a -> error, a
+               in
+               let error, site_correspondence =
+                 let rec aux list =
+                   match list with
+                   | [] -> Exception.warn_pos  parameter error __POS__ Exit []
+                   | (h, list, _) :: _ when h = cv_id -> error, list
+                   | _ :: tail -> aux tail
+                 in aux site_correspondence
+               in
+               (*-----------------------------------------------------------------------*)
+               let error,(_, map2) =
+                 Bdu_static_views.new_index_pair_map parameter error site_correspondence
+               in
+               (*-----------------------------------------------------------------------*)
+               let error, handler, list' =
+                 decomposition parameter handler error bdu_update
+               in
+               (*-----------------------------------------------------------------------*)
+               let error, (handler, list) =
+                 List.fold_left
+                   (fun (error, (handler, list)) mvbdu ->
+                      let error, handler =
+                        if local_trace || Remanent_parameters.get_trace parameter
+                        then
+                          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                              "INTENSIONAL DESCRIPTION:" in
+                          let () = Loggers.print_newline
+                              (Remanent_parameters.get_logger parameter)
+                          in
+                          let () =
+                            Ckappa_sig.Views_bdu.print
+                              parameter mvbdu
+                          in
+                          let () = Loggers.fprintf
+                              (Remanent_parameters.get_logger parameter)
+                              "EXTENSIONAL DESCRIPTION:"
+                          in
+                          let () = Loggers.print_newline
+                              (Remanent_parameters.get_logger parameter)
+                          in
+                          error, handler
+                        else
+                          error, handler
                       in
-                      error, site_type
-                    in
-                    let error, (handler, translation) =
-                      Translation_in_natural_language.translate
-                        parameter
-                        handler
-                        error
-                        rename_site
-                        mvbdu
-                    in
-                    (*--------------------------------------------------------------------*)
-                    error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
-                 )
-                 (error, (handler,list))
-                 list'
-             in
-             error, (handler,list))
-          result (error, (handler,[]))
-      in error, handler, (List.rev list)
-    end
+                      let rename_site parameter error site_type =
+                        let error, site_type =
+                          match Ckappa_sig.Site_map_and_set.Map.find_option
+                                  parameter error site_type map2
+                          with
+                          | error, None ->
+                            Exception.warn_pos
+                              parameter error __POS__ Exit
+                              Ckappa_sig.dummy_site_name_minus1
+                          | error, Some i -> error, i
+                        in
+                        error, site_type
+                      in
+                      let error, (handler, translation) =
+                        Translation_in_natural_language.translate
+                          parameter
+                          handler
+                          error
+                          rename_site
+                          mvbdu
+                      in
+                      (*--------------------------------------------------------------------*)
+                      error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
+                   )
+                   (error, (handler,list))
+                   list'
+               in
+               error, (handler,list))
+            result (error, (handler,[]))
+        in error, handler, (List.rev list)
+      end
 
-let print_bdu_update_map_gen_decomposition decomposition
-    ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-    parameter handler error handler_kappa site_correspondence  result =
-  let error, handler, list = stabilise_bdu_update_map_gen_decomposition decomposition
+  let print_bdu_update_map_gen_decomposition decomposition
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-      parameter handler error handler_kappa site_correspondence  result
-  in
-  let error =
-    List.fold_left
-      (fun error (agent_string, agent_type, _, translation) ->
-         Translation_in_natural_language.print
-           ~show_dep_with_dimmension_higher_than:dim_min parameter
-           handler_kappa error agent_string agent_type translation
-      )
-      error
-      list
-  in
-  error, handler
-
-(****************************************************************)
-(*non relational properties*)
-
-let print_bdu_update_map_cartesian_abstraction a b c d =
-  print_bdu_update_map_gen_decomposition
-    ~smash:true
-    ~show_dep_with_dimmension_higher_than:1
-    Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-    a b c d
-
-(*****************************************************************)
-(*relational properties*)
-
-let print_bdu_update_map_cartesian_decomposition a b c d =
-  print_bdu_update_map_gen_decomposition
-    ~smash:true
-    ~show_dep_with_dimmension_higher_than:
-      (if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a
-       then 2
-       else 1
-      )
-    Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
-    a b c d
-
-(*****************************************************************)
-
-let print_result_fixpoint_aux
-    parameter handler error handler_kappa site_correspondence result (_static:static_information) =
-  if Remanent_parameters.get_dump_reachability_analysis_result parameter
-  then
+      parameter handler error handler_kappa site_correspondence  result =
+    let error, handler, list = stabilise_bdu_update_map_gen_decomposition decomposition
+        ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
+        parameter handler error handler_kappa site_correspondence  result
+    in
     let error =
-      if local_trace
-      || (Remanent_parameters.get_trace parameter)
-      then
-        begin
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "" in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-          let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameter)
-              "------------------------------------------------------------" in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-              "* Fixpoint iteration :"
-          in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-              "------------------------------------------------------------"
-          in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-          let error =
-            print_bdu_update_map
-              parameter
-              error
-              handler_kappa
-              result
-          in
-          error
-        end
-      else error
-    in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "------------------------------------------------------------" in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "* Relational properties:"
-    in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "------------------------------------------------------------"
-    in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let error, handler =
-      print_bdu_update_map_cartesian_decomposition
-        parameter
-        handler
+      List.fold_left
+        (fun error (agent_string, agent_type, _, translation) ->
+           Translation_in_natural_language.print
+             ~show_dep_with_dimmension_higher_than:dim_min parameter
+             handler_kappa error agent_string agent_type translation
+        )
         error
-        handler_kappa
-        site_correspondence
-        result
-    in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "------------------------------------------------------------" in
-    let () =
-      Loggers.print_newline (Remanent_parameters.get_logger parameter)
-    in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "* Non relational properties:"
-    in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "------------------------------------------------------------"
-    in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let error, handler =
-      print_bdu_update_map_cartesian_abstraction
-        parameter
-        handler
-        error
-        handler_kappa
-        site_correspondence
-        result
+        list
     in
     error, handler
-  else error, handler
 
-(************************************************************************************)
+  (****************************************************************)
+  (*non relational properties*)
 
-let print_fixpoint_result static dynamic error _loggers =
-  let parameter = get_parameter static in
-  let kappa_handler = get_kappa_handler static in
-  let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
-  let fixpoint_result = get_fixpoint_result dynamic in
-  let handler = get_mvbdu_handler dynamic in
-  let error, handler =
-    if local_trace
-    || Remanent_parameters.get_dump_reachability_analysis_result parameter
+  let print_bdu_update_map_cartesian_abstraction a b c d =
+    print_bdu_update_map_gen_decomposition
+      ~smash:true
+      ~show_dep_with_dimmension_higher_than:1
+      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
+      a b c d
+
+  (*****************************************************************)
+  (*relational properties*)
+
+  let print_bdu_update_map_cartesian_decomposition a b c d =
+    print_bdu_update_map_gen_decomposition
+      ~smash:true
+      ~show_dep_with_dimmension_higher_than:
+        (if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a
+         then 2
+         else 1
+        )
+      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
+      a b c d
+
+  (*****************************************************************)
+
+  let print_result_fixpoint_aux
+      parameter handler error handler_kappa site_correspondence result (_static:static_information) =
+    if Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       let error =
-        let _ =
-          print_result_fixpoint_aux
-            parameter
-            handler
+        if local_trace
+        || (Remanent_parameters.get_trace parameter)
+        then
+          begin
+            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "" in
+            let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                "------------------------------------------------------------" in
+            let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                "* Fixpoint iteration :"
+            in
+            let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                "------------------------------------------------------------"
+            in
+            let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+            let error =
+              print_bdu_update_map
+                parameter
+                error
+                handler_kappa
+                result
+            in
             error
-            kappa_handler
-            store_remanent_triple
-            fixpoint_result
-            static
-        in
-        error
+          end
+        else error
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------" in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "* Relational properties:"
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------"
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let error, handler =
+        print_bdu_update_map_cartesian_decomposition
+          parameter
+          handler
+          error
+          handler_kappa
+          site_correspondence
+          result
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------" in
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "* Non relational properties:"
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------"
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let error, handler =
+        print_bdu_update_map_cartesian_abstraction
+          parameter
+          handler
+          error
+          handler_kappa
+          site_correspondence
+          result
       in
       error, handler
     else error, handler
-  in
-  let dynamic = set_mvbdu_handler handler dynamic in
-  error, dynamic, ()
 
-(**************************************************************************)
+  (************************************************************************************)
 
-let print static dynamic error loggers =
-  (*print static information*)
-  (*let error, dynamic, () =
-    print_static_information static dynamic error loggers
+  let print_fixpoint_result static dynamic error _loggers =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    let handler = get_mvbdu_handler dynamic in
+    let error, handler =
+      if local_trace
+      || Remanent_parameters.get_dump_reachability_analysis_result parameter
+      then
+        let error =
+          let _ =
+            print_result_fixpoint_aux
+              parameter
+              handler
+              error
+              kappa_handler
+              store_remanent_triple
+              fixpoint_result
+              static
+          in
+          error
+        in
+        error, handler
+      else error, handler
     in
-    (*print dynamic information*)
+    let dynamic = set_mvbdu_handler handler dynamic in
+    error, dynamic, ()
+
+  (**************************************************************************)
+
+  let print static dynamic error loggers =
+    (*print static information*)
+    (*let error, dynamic, () =
+      print_static_information static dynamic error loggers
+      in
+      (*print dynamic information*)
+      let error, dynamic, () =
+      print_dynamic_information static dynamic error loggers
+      in*)
+    (*print fixpoint result*)
+    let parameter = get_parameter static in
+    let error, dynamic =
+      (* local traces *)
+      if Remanent_parameters.get_compute_local_traces parameter
+      then
+        let handler_kappa = get_kappa_handler static in
+        let handler = get_mvbdu_handler dynamic in
+        let compil = get_compil static in
+        let error, site_correspondence =  get_store_remanent_triple static dynamic error in
+        let error, handler, output = smash_map
+            (fun _parameter handler error a -> error, handler, [a])
+            parameter handler error
+            ~show_dep_with_dimmension_higher_than:1
+            handler_kappa
+            site_correspondence
+            (get_fixpoint_result dynamic)
+        in
+        let error, log_info, handler =
+          Agent_trace.agent_trace parameter (get_log_info dynamic) error handler handler_kappa compil output
+        in
+        error, set_mvbdu_handler handler (set_log_info log_info dynamic)
+      else
+        error, dynamic
+    in
     let error, dynamic, () =
-    print_dynamic_information static dynamic error loggers
-    in*)
-  (*print fixpoint result*)
-  let parameter = get_parameter static in
-  let error, dynamic =
-    (* local traces *)
-    if Remanent_parameters.get_compute_local_traces parameter
-    then
-      let handler_kappa = get_kappa_handler static in
-      let handler = get_mvbdu_handler dynamic in
-      let compil = get_compil static in
-      let error, site_correspondence =  get_store_remanent_triple static dynamic error in
-      let error, handler, output = smash_map
-          (fun _parameter handler error a -> error, handler, [a])
-          parameter handler error
-          ~show_dep_with_dimmension_higher_than:1
-          handler_kappa
-          site_correspondence
-          (get_fixpoint_result dynamic)
-      in
-      let error, log_info, handler =
-        Agent_trace.agent_trace parameter (get_log_info dynamic) error handler handler_kappa compil output
-      in
-      error, set_mvbdu_handler handler (set_log_info log_info dynamic)
-    else
-      error, dynamic
-  in
-  let error, dynamic, () =
-    print_fixpoint_result static dynamic error loggers
-  in
-  error, dynamic, ()
+      print_fixpoint_result static dynamic error loggers
+    in
+    error, dynamic, ()
 
-let stabilize static dynamic error =
-  let dim_min = 2 in
-  let parameter = get_parameter static in
-  let handler = get_mvbdu_handler dynamic in
-  let handler_kappa = get_kappa_handler static in
-  let result = get_fixpoint_result dynamic in
-  let error, site_correspondence =  get_store_remanent_triple static dynamic error in
-  let error, handler, ranges =
-    smash_map
-      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-      ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
-      handler_kappa site_correspondence result
-  in
-  let dynamic = set_ranges ranges dynamic in
-  error, set_mvbdu_handler handler dynamic, ()
+  let stabilize static dynamic error =
+    let dim_min = 2 in
+    let parameter = get_parameter static in
+    let handler = get_mvbdu_handler dynamic in
+    let handler_kappa = get_kappa_handler static in
+    let result = get_fixpoint_result dynamic in
+    let error, site_correspondence =  get_store_remanent_triple static dynamic error in
+    let error, handler, ranges =
+      smash_map
+        Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
+        ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
+        handler_kappa site_correspondence result
+    in
+    let dynamic = set_ranges ranges dynamic in
+    error, set_mvbdu_handler handler dynamic, ()
 
-let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-  error, dynamic, Usual_domains.Maybe (* to do *)
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do *)
 
-let cc_mixture_is_reachable _static dynamic error _ccmixture =
-  error, dynamic, Usual_domains.Maybe (* to do *)
+  let cc_mixture_is_reachable _static dynamic error _ccmixture =
+    error, dynamic, Usual_domains.Maybe (* to do *)
 
 end

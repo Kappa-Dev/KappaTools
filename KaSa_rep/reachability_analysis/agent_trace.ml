@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Aug 02 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -14,10 +14,6 @@
   * de Recherche en Informatique et en Automatique.
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Agent_trace_even_sparser.ml") message exn (fun () -> default)
 
 type fst_label =
   | Rule of Ckappa_sig.c_rule_id
@@ -125,7 +121,7 @@ let build_asso_of_mvbdu parameter error mvbdu =
     end
   | _ ->
     let error, list =
-      warn parameter error (Some "line 385") Exit []
+      Exception.warn_pos parameter error __POS__ Exit []
     in
     error, list
 
@@ -206,8 +202,8 @@ let string_label_of_asso parameter error handler_kappa transition_system list =
              handler_kappa transition_system.agent_type site_type state
          in
          let error =
-           Exception.check warn parameter error error'
-             (Some "line 240") Exit
+           Exception.check_pos
+             Exception.warn_pos parameter error error' __POS__ Exit
          in
          error,
          string^site_string^state_string,
@@ -270,7 +266,7 @@ let asso_of_view_in_list parameter error view =
          then
            error, (site,lub)::list
          else
-           warn parameter error (Some "line 350") Exit list
+           Exception.warn_pos parameter error __POS__ Exit list
       )
       (error, [])
       view
@@ -378,9 +374,7 @@ let build_support parameter error rules =
               in
               error, (map, creation)
             | error, Some _, Some _ ->
-              warn
-                parameter error (Some "line 326") Exit
-                (map, creation)
+              Exception.warn_pos parameter error __POS__ Exit (map, creation)
             | error,
               Some (agent_name, set_test, asso_test, set_mod, asso_mod), None ->
               let error, old_map =
@@ -741,7 +735,7 @@ let merge_neighbour parameter error concurrent_sites =
                   error, set, (label'::list)
                 | None, _ | _, None ->
                   let error, set =
-                    warn parameter error (Some "line 477") Exit set
+                    Exception.warn_pos parameter error __POS__ Exit set
                   in
                   error, set, list
               else
@@ -755,7 +749,7 @@ let merge_neighbour parameter error concurrent_sites =
            match SitePairSet.min_elt set
            with
            | None ->
-             warn parameter error (Some "line 494") Exit map
+             Exception.warn_pos parameter error __POS__ Exit map
            | Some (a1,_a2) ->
              let error, sites_in_conflict = SiteSet.remove parameter error a1 sites_in_conflict in
              let ext_list = SiteSet.elements sites_in_conflict in
@@ -992,7 +986,7 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
               | Cckappa_sig.Ghost
               | Cckappa_sig.Dead_agent _
               | Cckappa_sig.Unknown_agent _ ->
-                warn parameter error (Some "line 948") Exit init_map
+                Exception.warn_pos parameter error __POS__ Exit init_map
            )
            mixture.Cckappa_sig.views
            init_map)
@@ -1013,11 +1007,12 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
            try
              Handler.string_of_agent parameter error handler_kappa agent_type
            with
-           | _ -> warn parameter error (Some "line 111") Exit
+           | _ -> Exception.warn_pos parameter error __POS__ Exit
                     (Ckappa_sig.string_of_agent_name agent_type)
          in
          let error =
-           Exception.check warn parameter error error' (Some "line 1917") Exit
+           Exception.check_pos
+             Exception.warn_pos parameter error error' __POS__ Exit
          in
          Wrapped_modules.LoggedIntMap.fold
            (fun _ mvbdu (error, log_info) ->
@@ -1232,5 +1227,6 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
   with
   | error, Some h -> error, log_info, h
   | error, None ->
-    let error, h = warn parameter error (Some "line 813") Exit handler in
+    let error, h =
+      Exception.warn_pos parameter error __POS__ Exit handler in
     error, log_info, h

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -12,10 +12,6 @@
   * en Informatique et en Automatique.
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Composite domain") message exn
-    (fun () -> default)
 
 module type Composite_domain =
 sig
@@ -179,7 +175,7 @@ struct
   let push_rule_creation static dynamic error rule_id rule =
     let parameter = get_parameter static in
     let error, dynamic =
-      List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
+      List.fold_left (fun (error, dynamic) (agent_id, _agent_type) ->
           let error, agent =
             Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
               parameter
@@ -190,7 +186,8 @@ struct
           match agent with
           | Some Cckappa_sig.Dead_agent _
           | Some Cckappa_sig.Ghost -> error, dynamic
-          | None -> warn parameter error (Some "line 156") Exit dynamic
+          | None ->
+            Exception.warn_pos parameter error __POS__ Exit dynamic
           | Some Cckappa_sig.Unknown_agent _
           | Some Cckappa_sig.Agent _ ->
             let error, dynamic =
@@ -208,7 +205,7 @@ struct
     let error, dynamic =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
-        (fun parameter error rule_id rule dynamic ->
+        (fun _parameter error rule_id rule dynamic ->
            let error, dynamic =
              push_rule_creation
                static
@@ -322,7 +319,8 @@ struct
                 dynamic
                 error
                 rule_id
-            | _ -> error, dynamic
+            | Communication.See_a_new_bond _ | Communication.Dummy ->
+              error, dynamic
           )(error, dynamic) event_list
       in
       apply_event_list static dynamic error event_list'
@@ -364,16 +362,16 @@ struct
     lift_unary Domain.print static dynamic error loggers
 
 
-  let lkappa_mixture_is_reachable static dynamic error lkappa =
+  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do, via domains.ml *)
 
-  let cc_mixture_is_reachable static dynamic error lkappa =
+  let cc_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do, via domains.ml  *)
 
-  let c_mixture_is_reachable static dynamic error lkappa =
+  let c_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do via cc_is_reachable *)
 
-  let ast_mixture_is_reachable static dynamic error lkappa =
+  let ast_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do via c_is_reachable *)
 
   let get_global_dynamic_information dynamic = Domain.get_global_dynamic_information dynamic.domain

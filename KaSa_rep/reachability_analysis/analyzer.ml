@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -12,10 +12,6 @@
   * en Informatique et en Automatique.
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -124,8 +120,10 @@ struct
                   Handler.string_of_rule parameter error kappa_handler
                     compil rule_id
                 with
-                  _ -> warn parameter error (Some "line 99") Exit
-                         (Ckappa_sig.string_of_rule_id rule_id)
+                  _ ->
+                  Exception.warn_pos
+                    parameter error __POS__ Exit
+                    (Ckappa_sig.string_of_rule_id rule_id)
               in
               let () = Loggers.print_newline log in
               let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in

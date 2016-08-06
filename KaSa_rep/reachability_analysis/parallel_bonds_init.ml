@@ -4,7 +4,7 @@
      * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
      *
      * Creation: 2016, the 31th of March
-     * Last modification: Time-stamp: <Jul 02 2016>
+     * Last modification: Time-stamp: <Aug 06 2016>
      *
      * Abstract domain to detect whether when two sites of an agent are bound,
      * they must be bound to the same agent.
@@ -13,10 +13,6 @@
      * en Informatique et en Automatique.
      * All rights reserved.  This file is distributed
      * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Rule domain") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -33,7 +29,8 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_id views
       with
-      | error, None -> warn parameter error (Some "line 36") Exit Cckappa_sig.Ghost
+      | error, None ->
+        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, agent_target =
@@ -41,7 +38,8 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_index_target views
       with
-      | error, None -> warn parameter error (Some "line 43") Exit Cckappa_sig.Ghost
+      | error, None ->
+        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
@@ -141,7 +139,11 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
                               site_type_target, site_type', state_target, state'))
                             store_result
                         in
-                        let error = Exception.check warn parameter error error' (Some "line 872") Exit in
+                        let error =
+                          Exception.check_pos
+                            Exception.warn_pos parameter error error'
+                            __POS__ Exit
+                        in
                         error, store_result
                       else
                         error, store_result
@@ -214,18 +216,18 @@ let collect_non_parallel_init parameter store_bonds_init store_site_pair_list er
                            match Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
                                    parameter error agent_type' store_result
                            with
-                           | error, None -> error, []                                      
-                           | error, Some l -> error, l                          
+                           | error, None -> error, []
+                           | error, Some l -> error, l
                          in
                          (*A.x.y, B.z.t*)
                          let new_list =
-                           ((agent_id, agent_type, site_type, state), (*A.x*)  
-                            (agent_id1, agent_type, site_type1, state1), (*A.y*)      
+                           ((agent_id, agent_type, site_type, state), (*A.x*)
+                            (agent_id1, agent_type, site_type1, state1), (*A.y*)
                             (agent_id', agent_type', site_type', state'), (*B.z*)
-                            (agent_id1', agent_type', site_type1', state1')) :: old_list   
+                            (agent_id1', agent_type', site_type1', state1')) :: old_list
                          in
                          Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
-                           parameter error          
+                           parameter error
                            agent_type'
                            new_list
                            store_result
@@ -242,11 +244,11 @@ let collect_non_parallel_init parameter store_bonds_init store_site_pair_list er
       ) store_bonds_init (error, Ckappa_sig.Agent_map_and_set.Map.empty)
   in
   error, store_result
-  
+
 (********************************************************************)
 (*collect result of parallel bonds in the intitial state*)
-  
-let collect_value_parallel_bonds parameter store_parallel_bonds_init 
+
+let collect_value_parallel_bonds parameter store_parallel_bonds_init
     error kappa_handler store_result =
   let error, parallel_list =
     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold

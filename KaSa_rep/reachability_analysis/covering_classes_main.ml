@@ -4,17 +4,13 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 23th of Feburary
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Compute the relations between the left hand site of a rule and its sites.
   *
   * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Covering classes") message exn
-    (fun () -> default)
 
 let trace = false
 
@@ -47,7 +43,10 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
              site_modif.Cckappa_sig.agent_interface
              (error, Ckappa_sig.Site_map_and_set.Map.empty)
          in
-         let error = Exception.check warn parameter error error' (Some "line 47") Exit in
+         let error =
+           Exception.check_pos
+             Exception.warn_pos parameter error error' __POS__ Exit
+         in
          (*compute site_map*)
          let error, old_map =
            match
@@ -76,8 +75,10 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
              final_map
              store_modified_map
          in
-         let error = Exception.check warn parameter error error' (Some "line 75") Exit in
-
+         let error =
+           Exception.check_pos
+             Exception.warn_pos parameter error error' __POS__ Exit
+         in
          error, store_modified_map
     ) diff_reverse
     store_modified_map
@@ -274,8 +275,10 @@ let store_remanent parameter error covering_class _modified_map remanent =
   let error, (cv_id, store_dic) =
     match output with
     | Some (id, _, _, dic) -> error, (id, dic)
-    | None -> warn parameter error (Some "line 105") Exit
-                (Covering_classes_type.dummy_cv_id, good_covering_class)
+    | None ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Covering_classes_type.dummy_cv_id, good_covering_class)
   in
   (*------------------------------------------------------------------------------*)
   (*store pointer backward*)
@@ -299,7 +302,10 @@ let store_remanent parameter error covering_class _modified_map remanent =
             cv_id
             old_cv_set
         in
-        let error = Exception.check warn parameter error error' (Some "line 394") Exit in
+        let error =
+          Exception.check_pos
+            Exception.warn_pos parameter error error' __POS__ Exit
+        in
         let error, pointer_backward =
           Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
             parameter
@@ -395,10 +401,13 @@ let clean_classes parameter error covering_classes modified_map =
                 potential_supersets
                 potential_supersets'
             in
-            let error = Exception.check warn parameter error error'
-                (Some "line 407") Exit
+            let error =
+              Exception.check_pos
+                Exception.warn_pos parameter error error'
+                __POS__ Exit
             in
-            if Covering_classes_type.CV_map_and_set.Set.is_empty potential_superset
+            if
+              Covering_classes_type.CV_map_and_set.Set.is_empty potential_superset
             then
               let error, result_covering_dic =
                 store_remanent
@@ -513,8 +522,8 @@ let scan_rule_set_remanent parameter error handler rules =
                           in
                           let () =
                             Printf.fprintf stdout "site_type:%i:%s\n"
-                            (Ckappa_sig.int_of_site_name site_type)
-                            site_string
+                              (Ckappa_sig.int_of_site_name site_type)
+                              site_string
                           in
                           error
                         ) error site_type_list
@@ -609,7 +618,7 @@ error, (List.rev list_index, List.rev list_set)
              try
                Handler.string_of_agent parameter error handler_kappa agent_type
              with
-               _ -> warn parameter error (Some "line 118") Exit
+               _ -> Exception.warn_pos parameter error (Some "line 118") Exit
                  (Ckappa_sig.string_of_agent_name agent_type)
            in
            List.iter (fun id ->
@@ -627,7 +636,7 @@ error, (List.rev list_index, List.rev list_set)
                      Handler.string_of_site parameter error handler_kappa
                        agent_type site_type
                    with
-                     _ -> warn parameter error (Some "line 132") Exit
+                     _ -> Exception.warn_pos parameter error (Some "line 132") Exit
                        (string_of_int site_type)
                  in
                  Printf.fprintf stdout "site_type:%i:%s\n" site_type site_string
@@ -651,7 +660,7 @@ error, (List.rev list_index, List.rev list_set)
                 Handler.string_of_agent parameter error handler_kappa
                   agent_type
               with
-                _ -> warn parameter error (Some "line 155") Exit
+                _ -> Exception.warn_pos parameter error (Some "line 155") Exit
                   ((Ckappa_sig.string_of_agent_name agent_type))
             in
             List.iter (fun id ->
@@ -671,7 +680,7 @@ error, (List.rev list_index, List.rev list_set)
                           Handler.string_of_site parameter error handler_kappa
                             agent_type site
                         with
-                          _ -> warn parameter error (Some "line 172") Exit
+                          _ -> Exception.warn_pos parameter error (Some "line 172") Exit
                             (string_of_int site)
                       in
                       Printf.fprintf stdout
@@ -685,7 +694,7 @@ error, (List.rev list_index, List.rev list_set)
                       try
                         Handler.string_of_site parameter error handler_kappa agent_type site
                       with
-                        _ -> warn parameter error (Some "line 186") Exit
+                        _ -> Exception.warn_pos parameter error (Some "line 186") Exit
                           (string_of_int site)
                     in
                     Printf.fprintf stdout

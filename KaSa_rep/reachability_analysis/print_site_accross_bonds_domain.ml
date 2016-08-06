@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -12,9 +12,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Site accross bonds") message exn (fun () -> default)
 
 let local_trace = false
 
@@ -27,22 +24,29 @@ let print_agents_site_state parameter error handler_kappa x =
     try
       Handler.string_of_agent parameter error handler_kappa agent_type
     with
-      _ -> warn parameter error (Some "line 23") Exit (Ckappa_sig.string_of_agent_name agent_type)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_agent_name agent_type)
   in
   let error, site_string =
     try
       Handler.string_of_site parameter error handler_kappa
         agent_type site_type
     with
-      _ -> warn parameter error (Some "line 30") Exit
-             (Ckappa_sig.string_of_site_name site_type)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_site_name site_type)
   in
   let error, state_string =
     try
       Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type site_type state
     with
-      _ -> warn parameter error (Some "line 38") Exit
-             (Ckappa_sig.string_of_state_index state)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_state_index state)
   in
   error, (agent_string, site_string, state_string)
 
@@ -64,15 +68,20 @@ let print_agents_site parameter error handler_kappa x =
     try
       Handler.string_of_agent parameter error handler_kappa agent_type
     with
-      _ -> warn parameter error (Some "line 23") Exit (Ckappa_sig.string_of_agent_name agent_type)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_agent_name agent_type)
   in
   let error, site_string =
     try
       Handler.string_of_site parameter error handler_kappa
         agent_type site_type
     with
-      _ -> warn parameter error (Some "line 30") Exit
-             (Ckappa_sig.string_of_site_name site_type)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_site_name site_type)
   in
   error, (agent_string, site_string)
 
@@ -102,16 +111,20 @@ let print_pair_agents_sites parameter error handler_kappa _log (x, y) =
       Handler.string_of_site parameter error handler_kappa
         agent_type site_type2
     with
-      _ -> warn parameter error (Some "line 30") Exit
-             (Ckappa_sig.string_of_site_name site_type2)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_site_name site_type2)
   in
   let error, site_string2' =
     try
       Handler.string_of_site parameter error handler_kappa
         agent_type' site_type2'
     with
-      _ -> warn parameter error (Some "line 30") Exit
-             (Ckappa_sig.string_of_site_name site_type2')
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_site_name site_type2')
   in
   error, ((agent_string, site_string, site_string2),(agent_string', site_string', site_string2'))
 
@@ -130,30 +143,38 @@ let print_pair_agents_sites_states parameter error handler_kappa _log (x, y) =
       Handler.string_of_site parameter error handler_kappa
         agent_type site_type2
     with
-      _ -> warn parameter error (Some "line 30") Exit
-             (Ckappa_sig.string_of_site_name site_type2)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_site_name site_type2)
   in
   let error, state_string2 =
     try
       Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type site_type2 state2
     with
-      _ -> warn parameter error (Some "line 38") Exit
-             (Ckappa_sig.string_of_state_index state2)
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_state_index state2)
   in
   let error, site_string2' =
     try
       Handler.string_of_site parameter error handler_kappa
         agent_type' site_type2'
     with
-      _ -> warn parameter error (Some "line 30") Exit
-             (Ckappa_sig.string_of_site_name site_type2')
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_site_name site_type2')
   in
   let error, state_string2' =
     try
       Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type' site_type2' state2'
     with
-      _ -> warn parameter error (Some "line 38") Exit
-             (Ckappa_sig.string_of_state_index state2')
+    | _ ->
+      Exception.warn_pos
+        parameter error __POS__ Exit
+        (Ckappa_sig.string_of_state_index state2')
   in
   error, ((agent_string, site_string, site_string2, state_string, state_string2),(agent_string', site_string', site_string2', state_string', state_string2'))
 
@@ -255,29 +276,37 @@ let print_pair_sites parameter error handler_kappa log store_result =
                             Handler.string_of_site parameter error handler_kappa
                               agent_type site_type'
                           with
-                            _ -> warn parameter error (Some "line 30") Exit
-                                   (Ckappa_sig.string_of_site_name site_type')
+                          | _ ->
+                            Exception.warn_pos
+                              parameter error __POS__ Exit
+                              (Ckappa_sig.string_of_site_name site_type')
                         in
                         let error, state_string' =
                           try
                             Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type site_type' state'
                           with
-                            _ -> warn parameter error (Some "line 38") Exit
-                                   (Ckappa_sig.string_of_state_index state')
+                          | _ ->
+                            Exception.warn_pos
+                              parameter error __POS__ Exit
+                              (Ckappa_sig.string_of_state_index state')
                         in
                         let error, site_string1' =
                           try
                             Handler.string_of_site parameter error handler_kappa
                               agent_type1 site_type1'
                           with
-                            _ -> warn parameter error (Some "line 30") Exit
-                                   (Ckappa_sig.string_of_site_name site_type1')
+                          | _ ->
+                            Exception.warn_pos
+                              parameter error __POS__ Exit
+                              (Ckappa_sig.string_of_site_name site_type1')
                         in
                         let error, state_string1' =
                           try
                             Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type1 site_type1' state1'
                           with
-                            _ -> warn parameter error (Some "line 38") Exit
+                          | _ ->
+                            Exception.warn_pos
+                              parameter error __POS__ Exit
                                    (Ckappa_sig.string_of_state_index state1')
                         in
                         let () =
@@ -433,7 +462,7 @@ let print_tuple_pair_internal_state_aux parameter error handler_kappa log store_
               Handler.string_of_site parameter error handler_kappa
                 agent_type site_type
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type)
           in
           let () =
@@ -461,7 +490,7 @@ let print_tuple_pair_internal_state_aux parameter error handler_kappa log store_
               Handler.string_of_site parameter error handler_kappa
                 agent_type' site_type'
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type')
           in
           let () =
@@ -503,7 +532,7 @@ let print_tuple_pair_internal_state parameter error handler_kappa log store_resu
               Handler.string_of_site parameter error handler_kappa
                 agent_type site_type
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type)
           in
           let error, site_string' =
@@ -511,7 +540,7 @@ let print_tuple_pair_internal_state parameter error handler_kappa log store_resu
               Handler.string_of_site parameter error handler_kappa
                 agent_type' site_type'
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type')
           in
           let () =
@@ -598,7 +627,7 @@ let print_tuple_pair_question_marks_state_aux parameter error handler_kappa log 
               Handler.string_of_site parameter error handler_kappa
                 agent_type site_type
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type)
           in
           (**)
@@ -611,7 +640,7 @@ let print_tuple_pair_question_marks_state_aux parameter error handler_kappa log 
               Handler.string_of_site parameter error handler_kappa
                 agent_type1 site_type2'
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type2')
           in
           let () =
@@ -645,7 +674,7 @@ let print_tuple_pair_question_marks_state_aux parameter error handler_kappa log 
               Handler.string_of_site parameter error handler_kappa
                 agent_type' site_type'
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type')
           in
           (**)
@@ -658,7 +687,7 @@ let print_tuple_pair_question_marks_state_aux parameter error handler_kappa log 
               Handler.string_of_site parameter error handler_kappa
                 agent_type1 site_type2
             with
-              _ -> warn parameter error (Some "line 30") Exit
+              _ -> Exception.warn_pos parameter error (Some "line 30") Exit
                      (Ckappa_sig.string_of_site_name site_type2)
           in
           let () =
