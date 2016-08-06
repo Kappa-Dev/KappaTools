@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 07 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -269,6 +269,25 @@ let convert_tuple parameters error kappa_handler tuple =
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
   let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
   error, (agent,site,site', agent'',site'',site''')
+
+let convert_tuple_full parameters error kappa_handler tuple =
+  let (agent,site,site',state,state'),(agent'',site'',site''',state'',state''') =
+    tuple
+  in
+  let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
+  let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in
+  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
+  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
+  (**)
+  let error, state'' =
+    Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
+  let error, state''' =
+    Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site''' state''' in
+  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
+  let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
+  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  error, (agent,site,site',state, state', agent'',site'',site''', state'', state''')
 
 (*
 let convert_tuple parameters error kappa_handler tuple =
