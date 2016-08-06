@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jul 12 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -13,10 +13,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Parallel bonds static") message exn
-    (fun () -> default)
 
 let local_trace = false
 
@@ -31,7 +27,7 @@ type local_static_information =
     store_bonds_rhs_full :
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-     store_parallel_bonds_rhs:
+    store_parallel_bonds_rhs:
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
     store_rule_has_parallel_bonds_rhs:
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
@@ -80,16 +76,16 @@ type local_static_information =
     (*rule has non parallel bonds on the lhs*)
     store_rule_has_non_parallel_bonds_lhs:
       (bool *
-      ((Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
-        Ckappa_sig.c_agent_name * Ckappa_sig.Site_map_and_set.Map.elt *
-        Ckappa_sig.c_state) *
-       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
-        Ckappa_sig.Site_map_and_set.Map.elt * Ckappa_sig.c_state) *
-       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
-        Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-       (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
-        Ckappa_sig.c_site_name * Ckappa_sig.c_state))
-        list)
+       ((Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
+         Ckappa_sig.c_agent_name * Ckappa_sig.Site_map_and_set.Map.elt *
+         Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+         Ckappa_sig.Site_map_and_set.Map.elt * Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+         Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
+         Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+         list)
         Ckappa_sig.Rule_map_and_set.Map.t;
   }
 
@@ -122,8 +118,8 @@ let collect_agent_type_state parameter error agent site_type =
   | Cckappa_sig.Ghost
   | Cckappa_sig.Unknown_agent _ -> error,(dummy_agent, dummy_state)
   | Cckappa_sig.Dead_agent _ ->
-    warn parameter error (Some "line 127") Exit
-      (dummy_agent, dummy_state)
+    Exception.warn_pos
+      parameter error __POS__ Exit (dummy_agent, dummy_state)
   | Cckappa_sig.Agent agent1 ->
     let agent_type1 = agent1.Cckappa_sig.agent_name in
     let error, state1 =
@@ -135,14 +131,14 @@ let collect_agent_type_state parameter error agent site_type =
           agent1.Cckappa_sig.agent_interface
       with
       | error, None ->
-        warn parameter error (Some "line 228") Exit dummy_state
+        Exception.warn_pos parameter error __POS__ Exit dummy_state
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
         if Ckappa_sig.compare_state_index state dummy_state > 0
         then
           error, state
         else
-          warn parameter error (Some "line 196") Exit dummy_state
+          Exception.warn_pos parameter error __POS__ Exit dummy_state
     in
     error, (agent_type1, state1)
 
@@ -163,7 +159,7 @@ let collect_action_binding parameter error rule_id rule store_result =
             parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
         | error, None ->
-          warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
+          Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       (*get pair agent_type, state*)
@@ -181,7 +177,7 @@ let collect_action_binding parameter error rule_id rule store_result =
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
-        | error, None -> warn parameter error (Some "line 275") Exit Cckappa_sig.Ghost
+        | error, None -> Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       let error, (agent_type2, state2) =
@@ -218,7 +214,10 @@ let collect_action_binding parameter error rule_id rule store_result =
            (agent_id1, agent_type1, site_type1, state1))
           set
       in
-      let error = Exception.check warn parameter error error' (Some "line 358") Exit in
+      let error =
+        Exception.check_pos
+          Exception.warn_pos parameter error error' __POS__ Exit
+      in
       let error, store_result =
         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
           parameter
@@ -248,7 +247,9 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                   parameter error agent_id views
               with
-              | error, None -> warn parameter error (Some "line 269") Exit Cckappa_sig.Ghost
+              | error, None ->
+                Exception.warn_pos
+                  parameter error __POS__ Exit Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
             (*get the first pair (agent_type, state)*)
@@ -266,7 +267,9 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                   parameter error agent_id_target views
               with
-              | error, None -> warn parameter error (Some "line 287") Exit Cckappa_sig.Ghost
+              | error, None ->
+                Exception.warn_pos
+                  parameter error __POS__ Exit Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
             let error, (agent_type2, state2) =
@@ -292,7 +295,10 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                  (agent_id_target, agent_type2, site_type_target, state2))
                 old_set
             in
-            let error = Exception.check warn parameter error error' (Some "line 312") Exit in
+            let error =
+              Exception.check_pos
+                Exception.warn_pos parameter error error' __POS__ Exit
+            in
             let error, store_result =
               Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
                 parameter
@@ -361,7 +367,9 @@ let collect_rule_has_parallel_bonds parameter error rule_id
                   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_id_source views
                 with
-                | error, None -> warn parameter error (Some "line 335") Exit Cckappa_sig.Ghost
+                | error, None ->
+                  Exception.warn_pos
+                    parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
               let error, (agent_type_source, state_source) =
@@ -378,7 +386,9 @@ let collect_rule_has_parallel_bonds parameter error rule_id
                   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_id_target views
                 with
-                | error, None -> warn parameter error (Some "line 352") Exit Cckappa_sig.Ghost
+                | error, None ->
+                  Exception.warn_pos
+                    parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
               let error, (agent_type_target, state_target) =
@@ -420,7 +430,11 @@ let collect_rule_has_parallel_bonds parameter error rule_id
                           site_type_target, site_type', state_target,state'))
                         old_parallel_set
                     in
-                    let error = Exception.check warn parameter error error' (Some "line 393") Exit in
+                    let error =
+                      Exception.check_pos
+                        Exception.warn_pos parameter error error'
+                        __POS__ Exit
+                    in
                     let error, store_result =
                       Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error
                         rule_id
@@ -453,7 +467,7 @@ let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full
   in
   error, store_result
 
-let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full 
+  let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
     error rule_id rule store_result =
   let error, store_result1 =
     collect_rule_has_parallel_bonds
@@ -465,11 +479,13 @@ let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
       store_bonds_lhs_full
       Ckappa_sig.Rule_map_and_set.Map.empty
   in
-  let store_result =
-    Ckappa_sig.Rule_map_and_set.Map.map
-      (fun set ->
-         (true, set)
-      ) store_result1    
+  let error, store_result =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rid set (error, map)->
+         Ckappa_sig.Rule_map_and_set.Map.add
+           parameter error
+           rid (true,set) map)
+      store_result1 (error, store_result)
   in
   error, store_result
 
@@ -511,7 +527,8 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                     parameter error agent_id_source views
                 with
                 | error, None ->
-                  warn parameter error (Some "line 335") Exit Cckappa_sig.Ghost
+                  Exception.warn_pos
+                    parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
               let error, (agent_type_source, state_source) =
@@ -529,7 +546,7 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                     parameter error agent_id_target views
                 with
                 | error, None ->
-                  warn parameter error (Some "line 677") Exit Cckappa_sig.Ghost
+                  Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
               let error, (agent_type_target, state_target) =
@@ -596,7 +613,7 @@ let collect_rule_has_non_parallel_bonds_rhs parameter error rule_id rule
   in
   error, store_result
 
-let collect_rule_has_non_parallel_bonds_lhs parameter error rule_id rule 
+(*let collect_rule_has_non_parallel_bonds_lhs parameter error rule_id rule
     store_bonds_lhs_full store_result =
   let error, store_result1 =
     collect_rule_has_non_parallel_bonds
@@ -612,9 +629,9 @@ let collect_rule_has_non_parallel_bonds_lhs parameter error rule_id rule
     Ckappa_sig.Rule_map_and_set.Map.map
       (fun set ->
          (false, set)
-      ) store_result1    
+      ) store_result1
   in
-  error, store_result
+  error, store_result*)
 
 (**************************************************************************)
 (*A set of potential parallel bonds on the rhs*)
@@ -683,8 +700,10 @@ let collect_views_rhs parameter error rule_id rule store_result =
                ) agent.Cckappa_sig.agent_interface
                (error, old_set)
            in
-           let error = Exception.check warn parameter error error'
-               (Some "line 549") Exit
+           let error =
+             Exception.check_pos
+               Exception.warn_pos parameter error error'
+               __POS__ Exit
            in
            let error, store_result =
              Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
@@ -767,10 +786,10 @@ let collect_fst_site_create_parallel_bonds parameter error store_action_binding 
 (*in the rhs*)
 
 let collect_fst_site_create_parallel_bonds_rhs parameter error store_action_binding store_parallel_bonds  =
-    collect_fst_site_create_parallel_bonds
-      parameter error
-      store_action_binding
-      store_parallel_bonds
+  collect_fst_site_create_parallel_bonds
+    parameter error
+    store_action_binding
+    store_parallel_bonds
 
 (**************************************************************************)
 (*the second map (A,x,y, B,z,t) -> A.y.t.B*)
