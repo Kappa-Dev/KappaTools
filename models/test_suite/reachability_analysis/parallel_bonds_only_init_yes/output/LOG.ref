@@ -417,22 +417,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -443,12 +427,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=23
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=24
+  Id=22
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -477,12 +461,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=23
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=24
+  Id=22
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -507,64 +491,16 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 
 ------------------------------------------------------------
 * Dead rules :
@@ -578,7 +514,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=26
+Id=24
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -602,7 +538,7 @@ Id=26
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=26
+Id=24
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -630,7 +566,7 @@ Id=26
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -645,12 +581,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -660,7 +596,7 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -675,12 +611,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -694,7 +630,7 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -709,12 +645,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -724,7 +660,7 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -739,12 +675,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -760,14 +696,18 @@ The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
+At rule_id:1 there is an action binding between the site t of A and the site t of B. A:(t:B@t); B:(t:A@t)
+
+rule_id:0 A(z:B@z, t:free); B(z:A@z, t:free)
+rule_id:0 B(z:A@z, t:free); A(z:B@z, t:free)
+rule_id:1 A(t:B@t, z:free); B(t:A@t, z:free)
+rule_id:1 B(t:A@t, z:free); A(t:B@t, z:free)
+
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
 Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
-Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
 Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
-Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

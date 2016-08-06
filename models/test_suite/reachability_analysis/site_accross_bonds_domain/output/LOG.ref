@@ -1085,6 +1085,13 @@ The internal state of site t in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:2 there is an action binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
+
+rule_id:2 A(z:B@z, t:u); B(z:A@z, z:p)
+rule_id:2 A(z:B@z, t:u); B(z:A@z, t:u)
+rule_id:2 B(z:A@z, z:p); A(z:B@z, t:u)
+rule_id:2 B(z:A@z, t:u); A(z:B@z, t:u)
+
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p

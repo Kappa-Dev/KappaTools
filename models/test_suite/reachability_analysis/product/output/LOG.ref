@@ -707,19 +707,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=42
+Id=36
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=41
+  Id=35
    Node(site_type:1<1)
-    Id=40
+    Id=34
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=39
+      Id=33
        Node(site_type:2<2)
         Id=19
          Node(site_type:3<0)
@@ -803,19 +803,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=46
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=45
    Node(site_type:1<2)
-    Id=40
+    Id=34
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=39
+      Id=33
        Node(site_type:2<2)
         Id=19
          Node(site_type:3<0)

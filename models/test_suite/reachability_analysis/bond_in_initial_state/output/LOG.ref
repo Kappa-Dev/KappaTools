@@ -135,6 +135,11 @@ The binding state of site x in agent B ranges over free and A@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
+
+rule_id:0 A(x:B@x, x:u); B(x:A@x, x:u)
+rule_id:0 B(x:A@x, x:u); A(x:B@x, x:u)
+
 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
 Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
 ------------------------------------------------------------

@@ -255,6 +255,13 @@ B is a dead agent.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
+At rule_id:1 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
+At rule_id:2 there is an action binding between the site y of A and the site y of B. A:(y:B@y); B:(y:A@y)
+
+rule_id:0 A(x:B@x, y:free); B(x:A@x, y:free)
+rule_id:0 B(x:A@x, y:free); A(x:B@x, y:free)
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

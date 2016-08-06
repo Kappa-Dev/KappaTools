@@ -36,6 +36,21 @@ The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site x of E and the site x of R. E:(x:R@x); R:(x:E@x)
+At rule_id:2 there is an action binding between the site c of R and the site c of R. R:(c:R@c); R:(c:R@c)
+At rule_id:4 there is an action binding between the site cr of R and the site n of R. R:(cr:R@n); R:(n:R@cr)
+
+rule_id:2 R(c:R@c, x:E@x); R(c:R@c, x:E@x)
+rule_id:2 R(c:R@c, x:E@x); R(c:R@c, x:E@x)
+rule_id:4 R(cr:R@n, c:R@c); R(n:R@cr, c:R@c)
+rule_id:4 R(cr:R@n, c:R@c); R(n:R@cr, cr:free)
+rule_id:4 R(cr:R@n, n:free); R(n:R@cr, c:R@c)
+rule_id:4 R(cr:R@n, n:free); R(n:R@cr, cr:free)
+rule_id:4 R(n:R@cr, c:R@c); R(cr:R@n, c:R@c)
+rule_id:4 R(n:R@cr, c:R@c); R(cr:R@n, n:free)
+rule_id:4 R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
+rule_id:4 R(n:R@cr, cr:free); R(cr:R@n, n:free)
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

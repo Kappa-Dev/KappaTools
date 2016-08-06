@@ -1518,6 +1518,19 @@ The binding state of site x2 in agent C ranges over free and A@c.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
+At rule_id:2 there is an action binding between the site c of A and the site x1 of C. A:(c:C@x1); C:(x1:A@c)
+At rule_id:4 there is an action binding between the site c of A and the site x2 of C. A:(c:C@x2); C:(x2:A@c)
+
+rule_id:2 A(c:C@x1, x:B@x); C(x1:A@c, x1:u)
+rule_id:2 C(x1:A@c, x1:u); A(c:C@x1, x:B@x)
+rule_id:4 A(c:C@x2, x:free); C(x2:A@c, x1:p)
+rule_id:4 A(c:C@x2, x:free); C(x2:A@c, x2:u)
+rule_id:4 A(c:C@x2, x:free); C(x2:A@c, x1:free)
+rule_id:4 C(x2:A@c, x1:p); A(c:C@x2, x:free)
+rule_id:4 C(x2:A@c, x2:u); A(c:C@x2, x:free)
+rule_id:4 C(x2:A@c, x1:free); A(c:C@x2, x:free)
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -477,7 +477,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=29
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -544,7 +544,7 @@ Id=23
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -559,12 +559,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -574,14 +574,14 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=33
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=34
+  Id=32
    Node(site_type:0<1)
-    Id=30
+    Id=28
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -594,7 +594,7 @@ Id=35
         Id=0
          Leaf False 
 
-    Id=33
+    Id=31
      Node(site_type:0<2)
       Id=3
        Node(site_type:1<0)
@@ -619,7 +619,7 @@ In agent B, the binding state of site t is free whenever the binding state of si
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -634,12 +634,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -649,7 +649,7 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -664,12 +664,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -685,6 +685,14 @@ The binding state of site z in agent B ranges over free and A@z.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
+At rule_id:1 there is an action binding between the site t of A and the site t of B. A:(t:B@t); B:(t:A@t)
+
+rule_id:0 A(z:B@z, t:free); B(z:A@z, t:free)
+rule_id:0 B(z:A@z, t:free); A(z:B@z, t:free)
+rule_id:1 A(t:B@t, z:free); B(t:A@t, z:free)
+rule_id:1 B(t:A@t, z:free); A(t:B@t, z:free)
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

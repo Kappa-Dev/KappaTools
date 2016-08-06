@@ -314,6 +314,11 @@ C is a dead agent.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:0 there is an action binding between the site y of A and the site y of C. A:(y:C@y); C:(y:A@y)
+At rule_id:1 there is an action binding between the site y of A and the site y of C. A:(y:C@y); C:(y:A@y)
+At rule_id:2 there is an action binding between the site y of A and the site y of C. A:(y:C@y); C:(y:A@y)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

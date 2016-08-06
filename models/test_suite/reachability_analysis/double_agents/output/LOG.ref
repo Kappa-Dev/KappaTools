@@ -1430,6 +1430,10 @@ The binding state of site x in agent C ranges over free and B@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+At rule_id:3 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
+At rule_id:6 there is an action binding between the site x of C and the site x of B. C:(x:B@x); B:(x:C@x)
+
+
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
