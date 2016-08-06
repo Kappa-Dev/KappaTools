@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Jul 02 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -12,10 +12,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default =
-     Exception.warn parameters mh (Some "cckappa.sig") message exn (fun () -> default)
-
-(****************************************************************************************)
 
 type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 

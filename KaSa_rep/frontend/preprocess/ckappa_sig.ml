@@ -4,16 +4,13 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 30 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
-
-(*let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) *)
 
 module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 

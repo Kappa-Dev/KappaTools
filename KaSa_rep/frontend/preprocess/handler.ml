@@ -4,16 +4,13 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Jul 28 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * Primitives to use a kappa handler
    *
    * Copyright 2010,2011,2012,2013,2014,2015 Institut National de Recherche en Informatique et
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Handler") message exn (fun () -> default)
 
 let local_trace = true
 
@@ -30,7 +27,8 @@ let translate_agent parameter error handler ag =
          error
          ag
          handler.Cckappa_sig.agents_dic)
-      (fun error -> warn parameter error (Some "line 36") Exit ("",(),()))
+      (fun error ->
+         Exception.warn_pos parameter error __POS__ Exit ("",(),()))
   in
   error, a
 
@@ -42,14 +40,16 @@ let translate_site parameter error handler agent_name site =
          error
          agent_name
          handler.Cckappa_sig.sites)
-      (fun error -> warn parameter error (Some "line 44") Exit
-          (Ckappa_sig.Dictionary_of_sites.init ()))
+      (fun error ->
+         Exception.warn_pos parameter error __POS__ Exit
+           (Ckappa_sig.Dictionary_of_sites.init ()))
   in
   let error, (a, _, _) =
     Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_sites.translate parameter error site dic)
       (fun error ->
-         warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "", (), ()))
+         Exception.warn_pos parameter error __POS__ Exit
+           (Ckappa_sig.Internal "", (), ()))
   in
   error, a
 
@@ -61,14 +61,14 @@ let translate_state parameter error handler agent site state =
          error
          (agent, site)
          handler.Cckappa_sig.states_dic)
-      (fun error -> warn parameter error (Some "line 44") Exit
+      (fun error -> Exception.warn_pos parameter error __POS__ Exit
           (Ckappa_sig.Dictionary_of_States.init ()))
   in
   let error, (a, _, _) =
     Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_States.translate parameter error state dic)
       (fun error ->
-         warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "",(),()))
+         Exception.warn_pos parameter error __POS__ Exit (Ckappa_sig.Internal "",(),()))
   in
   error, a
 
@@ -100,7 +100,7 @@ let complementary_interface parameters error handler agent_name interface =
           error
           agent_name
           handler.Cckappa_sig.sites)
-      (fun error -> warn parameters error (Some "line 89") Exit
+      (fun error -> Exception.warn_pos parameters error __POS__ Exit
           (Ckappa_sig.Dictionary_of_sites.init ()))
   in
   let error, last_entry =
@@ -136,7 +136,7 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
       in
       match rule
       with
-      | None -> warn parameters error (Some "line 103") Exit ""
+      | None -> Exception.warn_pos parameters error __POS__ Exit ""
       | Some rule ->
         let label = rule.Cckappa_sig.e_rule_label in
         let error, (m1, _) = Misc_sa.unsome (error,label)
@@ -168,13 +168,13 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
       in
       match var
       with
-      | None  -> warn parameters error (Some "line 12299") Exit
+      | None  -> Exception.warn_pos parameters error __POS__ Exit
                    ("VAR " ^ (Ckappa_sig.string_of_rule_id var_id))
       | Some _ ->
         (*TO DO*)
         error,"ALG"
     (*
-      warn parameters error (Some "line 122") Exit "ALG"*)
+      Exception.warn_pos parameters error (Some "line 122") Exit "ALG"*)
         (* | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) -> let m1 = b in let m2 =
            string_of_int var_id in let m = m1^m2 in error,(if m="" then
            ("var"^(string_of_int var_id)) else ("var"^(string_of_int
@@ -194,7 +194,7 @@ let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent
       agents_dic
   in
   match output with
-  | None -> warn parameter error (Some "line 162") Exit ""
+  | None -> Exception.warn_pos parameter error __POS__ Exit ""
   | Some (agent_name, _, _) -> error, agent_name
 
 (*mapping site of type int to string*)
@@ -212,7 +212,7 @@ let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckapp
         agent_name
         handler_kappa.Cckappa_sig.sites
     with
-    | error, None -> warn parameter error (Some "line 171") Exit
+    | error, None -> Exception.warn_pos parameter error __POS__ Exit
                        (Ckappa_sig.Dictionary_of_sites.init())
     | error, Some i -> error, i
   in
@@ -224,7 +224,7 @@ let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckapp
         site_int
         sites_dic
     with
-    | error, None -> warn parameter error (Some "line 194") Exit (Ckappa_sig.Internal "")
+    | error, None -> Exception.warn_pos parameter error __POS__ Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value
   in
   error, site_type
@@ -298,7 +298,7 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
         (agent_name, site_name)
         handler_kappa.Cckappa_sig.states_dic
     with
-    | error, None -> warn parameter error (Some "line 206") Exit
+    | error, None -> Exception.warn_pos parameter error __POS__ Exit
                        (Ckappa_sig.Dictionary_of_States.init())
     | error, Some i -> error, i
   in
@@ -310,7 +310,7 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
         state
         state_dic
     with
-    | error, None -> warn parameter error (Some "line 228") Exit (Ckappa_sig.Internal "")
+    | error, None -> Exception.warn_pos parameter error __POS__ Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value
   in
   print_state parameter error handler_kappa value
@@ -398,7 +398,7 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
       match rule
       with
       | None ->
-        let a,b = warn parameters error (Some "line 103") Exit () in
+        let a,b = Exception.warn_pos parameters error __POS__ Exit () in
         a,false,b
       | Some rule ->
         let error,label = get_label_of_rule parameters error rule in
@@ -436,7 +436,7 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
       match var
       with
       | None  ->
-        let a,b = warn parameters error (Some "line 122") Exit ()
+        let a,b = Exception.warn_pos parameters error __POS__ Exit ()
         in a,false,b
       | Some var ->
         let b = var.Cckappa_sig.c_variable in

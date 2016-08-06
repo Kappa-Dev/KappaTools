@@ -4,26 +4,13 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Jul 28 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
    * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
    * en Automatique.  All riGhoghts reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh ?pos:(pos=None) message exn default =
-  let message =
-    match
-      message,pos
-    with
-    | _,None -> message
-    | None,Some pos -> Some (Location.to_string pos)
-    | Some m,Some p -> Some (m^(Location.to_string p))
-  in
-  Exception.warn parameters mh (Some "Preprocess") message exn (fun () -> default)
-
-let check ?pos:(pos=None) = Exception.check (warn ~pos:pos)
 
 let local_trace = false
 
@@ -99,12 +86,14 @@ let rename_rule_rlhs handler error id_agent tab =
   let error,agent =
     Misc_sa.unsome
       (Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get handler error id_agent tab)
-      (fun error -> warn handler error (Some "line 51") Exit Cckappa_sig.Ghost)
+      (fun error ->
+         Exception.warn_pos handler error __POS__ Exit Cckappa_sig.Ghost)
   in
   match agent with
   | Cckappa_sig.Unknown_agent _
   | Cckappa_sig.Ghost
-  | Cckappa_sig.Dead_agent _ -> warn handler error (Some "line 51") Exit Ckappa_sig.dummy_agent_id
+  | Cckappa_sig.Dead_agent _ ->
+    Exception.warn_pos handler error __POS__ Exit Ckappa_sig.dummy_agent_id
   | Cckappa_sig.Agent ag -> error,ag.Cckappa_sig.agent_kasim_id
 
 let rename_rule_rhs handler error id_agent rule =
@@ -146,7 +135,10 @@ let add_bond parameters error _i id_agent _agent site id_agent' agent' site' bon
         Cckappa_sig.site = site'
       } old
   in
-  let error = check parameters error error' (Some "line 106, add_bond") Exit  in
+  let error =
+    Exception.check_pos
+      Exception.warn_pos parameters error error' __POS__ Exit
+  in
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
     parameters
     error
@@ -168,7 +160,7 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
   let error, agent_name =
     match bool, output with
     | _ , None
-    | true, _  -> warn parameters error (Some "line 45") Exit Ckappa_sig.dummy_agent_name
+    | true, _  -> Exception.warn_pos parameters error __POS__ Exit Ckappa_sig.dummy_agent_name
     | _ , Some (i, _, _, _) ->
       error, i
   in
@@ -181,7 +173,9 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
         handler.Cckappa_sig.sites
     with
     | error,None ->
-      warn parameters error (Some "line 52") Exit (Ckappa_sig.Dictionary_of_sites.init ())
+      Exception.warn_pos
+        parameters error __POS__ Exit
+        (Ckappa_sig.Dictionary_of_sites.init ())
     | error, Some i -> error, i
   in
   let error, c_interface = error, Ckappa_sig.Site_map_and_set.Map.empty in
@@ -207,11 +201,11 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
           let error, site_name =
             match bool, output with
             | _ , None
-            | true, _  -> warn parameters error
-                            (Some ("line 123"^
-                                   agent.Ckappa_sig.ag_nme ^
+            | true, _  -> Exception.warn_pos parameters error
+                            __POS__
+                            ~message:(agent.Ckappa_sig.ag_nme ^
                                    " " ^
-                                   port.Ckappa_sig.port_nme))
+                                      port.Ckappa_sig.port_nme)
                             Exit (Ckappa_sig.dummy_site_name)
             | _ , Some (i, _, _, _) -> error, i
           in
@@ -222,7 +216,8 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
                  error
                  (agent_name, site_name)
                  handler.Cckappa_sig.states_dic)
-              (fun error ->  warn parameters error (Some "line 129") Exit
+              (fun error ->
+                 Exception.warn_pos parameters error __POS__ Exit
                   (Ckappa_sig.Dictionary_of_States.init ()))
           in
           let error, internal_list =
@@ -241,7 +236,8 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
                  let error, internal  =
                    match bool, output with
                    | _ , None
-                   | true, _  -> warn parameters error (Some "line 137") Exit Ckappa_sig.dummy_state_index
+                   | true, _  -> Exception.warn_pos
+                                   parameters error __POS__ Exit Ckappa_sig.dummy_state_index
                    | _ , Some (i, _, _, _) ->
                      error, i
                  in
@@ -260,13 +256,14 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
                 Cckappa_sig.site_free = port.Ckappa_sig.port_free
               } c_interface
           in
-          let error = check parameters error error'
-              (Some "line 170, translate_agent_sig") Exit  in
+          let error =
+            Exception.check_pos Exception.warn_pos parameters error error' __POS__ Exit  in
           error, c_interface
       in
       let error, c_interface =
         match port.Ckappa_sig.port_lnk with
-        | Ckappa_sig.LNK_ANY _ -> warn parameters error (Some "line 107") Exit c_interface
+        | Ckappa_sig.LNK_ANY _ ->
+          Exception.warn_pos parameters error __POS__ Exit c_interface
         | Ckappa_sig.FREE ->
           begin
             let error, (bool, output) =
@@ -294,17 +291,20 @@ let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_ag
                   }
                   c_interface
               in
-              let error = check parameters error error' (Some "line 192") Exit
+              let error =
+                Exception.check_pos
+                  Exception.warn_pos parameters error error' __POS__ Exit
               in
               error, c_interface
 
           end
-        | Ckappa_sig.LNK_SOME _pos -> warn parameters error (Some "line 124") Exit
-                                        c_interface
+        | Ckappa_sig.LNK_SOME _pos ->
+          Exception.warn_pos
+            parameters error __POS__ Exit c_interface
         | Ckappa_sig.LNK_VALUE (_i, _agent', _site', _id_agent', _pos) ->
-          warn parameters error (Some "line 287") Exit c_interface
+          Exception.warn_pos parameters error __POS__ Exit c_interface
         | Ckappa_sig.LNK_TYPE (_agent',_site')  ->
-          warn parameters error (Some "line 289") Exit c_interface
+          Exception.warn_pos parameters error __POS__ Exit c_interface
       in aux interface error c_interface
   in
   let error,c_interface = aux agent.Ckappa_sig.ag_intf error c_interface in
@@ -331,7 +331,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
   match bool, output with
   | _ , None ->
     let error, ag =
-      warn parameters error (Some "line 143") Exit
+      Exception.warn_pos parameters error __POS__ Exit
         (Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme, kasim_id))
     in
     error, bond_list, question_marks, ag
@@ -349,7 +349,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             handler.Cckappa_sig.sites
         with
         | error,None ->
-          warn parameters error (Some "line 150") Exit
+          Exception.warn_pos parameters error __POS__ Exit
             (Ckappa_sig.Dictionary_of_sites.init ())
         | error,Some i -> error,i
       in
@@ -377,10 +377,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                     site_dic
                 in
                 match bool, output with
-                | _, None -> warn parameters error
-                               (Some ("Preprocess line 227" ^
-                                      agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme))
-                               Exit (c_interface, dead_sites, dead_state_sites)
+                | _, None ->
+                  Exception.warn_pos parameters error __POS__
+                    ~message:(                                   agent.Ckappa_sig.ag_nme ^ " " ^ port.Ckappa_sig.port_nme)
+                    Exit (c_interface, dead_sites, dead_state_sites)
                 | true, _ ->
                   let error, dead_sites =
                     Cckappa_sig.KaSim_Site_map_and_set.Set.add
@@ -400,9 +400,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                             error
                             (agent_name, site_name)
                             handler.Cckappa_sig.states_dic)
-                        (fun error -> warn parameters error
-                            (Some ("line 224"^agent.Ckappa_sig.ag_nme ^ " " ^
-                                   port.Ckappa_sig.port_nme)) Exit
+                        (fun error ->
+                           Exception.warn_pos parameters error __POS__
+                            ~message:(agent.Ckappa_sig.ag_nme ^ " " ^
+                                   port.Ckappa_sig.port_nme) Exit
                             (Ckappa_sig.Dictionary_of_States.init ()))
                     in
                     let error,(bool,output) =
@@ -426,8 +427,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           (Ckappa_sig.Internal state)
                           dead_state_sites
                       in
-                      check parameters error error'
-                        (Some "line 254, a site even dead should occur only once in an interface") Exit,
+                      Exception.check_pos
+                        Exception.warn_pos parameters error error' __POS__
+                        ~message:"a site even dead should occur only once in an interface"
+                        Exit,
                       (c_interface, dead_sites, dead_state_sites)
                     | _ , Some (internal, _, _, _) ->
                       let error',c_interface =
@@ -445,14 +448,17 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                                 Cckappa_sig.max = internal
                               };
                           } c_interface in
-                      let error = check parameters error error'
-                          (Some "line 272, a site should occur only once in an interface")
+                      let error =
+                        Exception.check_pos
+                          Exception.warn_pos  parameters error error' __POS__
+                          ~message:"a site should occur only once in an interface"
                           Exit
                       in
                       error, (c_interface, dead_sites, dead_state_sites)
                   end
               end
-            | _ -> warn parameters error (Some "line 199") Exit
+            | _ -> Exception.warn_pos
+                     parameters error __POS__ Exit
                      (c_interface,dead_sites,dead_state_sites)
           in
           let error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites) =
@@ -475,7 +481,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                     error,
                     (c_interface, bond_list, question_marks, dead_sites, dead_link_sites)
                   (* OK if question marks in a site that is never bound *)
-                  | _, None -> warn parameters error (Some "line 266") Exit
+                  | _, None -> Exception.warn_pos
+                                 parameters error __POS__ Exit
                                  (c_interface, bond_list, question_marks, dead_sites, dead_link_sites)
                   | _ , Some (site_name, _, _, _) ->
                     let error,state_dic =
@@ -485,8 +492,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                            error
                            (agent_name, site_name)
                            handler.Cckappa_sig.states_dic)
-                        (fun error -> warn parameters error
-                            (Some "Preprocess line 272") Exit
+                        (fun error ->
+                           Exception.warn_pos parameters error
+                            __POS__ Exit
                             (Ckappa_sig.Dictionary_of_States.init ()))
                     in
                     let error, max =
@@ -514,7 +522,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         }
                         c_interface
                     in
-                    let error = check parameters error error' (Some "line 192") Exit  in
+                    let error =
+                      Exception.check_pos
+                        Exception.warn_pos parameters error error'
+                        __POS__ Exit  in
                     error, (c_interface, bond_list,
                             (k, site_name) :: question_marks, dead_sites, dead_link_sites)
                 end
@@ -551,7 +562,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                       }
                       c_interface
                   in
-                  let error = check parameters error error' (Some "line 192") Exit  in
+                  let error =
+                    Exception.check_pos
+                      Exception.warn_pos parameters error error' __POS__ Exit
+                  in
                   error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
               end
             | Ckappa_sig.LNK_SOME pos ->
@@ -568,13 +582,13 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 in
                 match bool,output with
                 | _ , None ->
-                  warn parameters error
-                    (Some ("Preprocess line 333"^"," ^
-                           (Location.to_string pos) ^
-                           ", this site cannot be bound, " ^
+                  Exception.warn_pos parameters error __POS__
+                    ~message:(
+                           "this site cannot be bound, " ^
                            agent.Ckappa_sig.ag_nme ^
                            " " ^
-                           port.Ckappa_sig.port_nme)) Exit
+                           port.Ckappa_sig.port_nme)
+                    ~pos:(Some pos) Exit
                     (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
                 | true, _  ->
                   let error, dead_sites =
@@ -602,8 +616,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           port.Ckappa_sig.port_lnk
                           dead_link_sites
                       in
-                      check parameters error error'
-                        (Some "line 350, a site even dead should occur only once in an interface") Exit,
+                      Exception.check_pos
+                        Exception.warn_pos parameters error error' __POS__
+                        ~message:"a site even dead should occur only once in an interface"
+                        ~pos:(Some pos)
+                        Exit,
                       (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
                     | error,Some state_dic ->
                       let error,max = Ckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in
@@ -612,7 +629,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         let error',dead_link_sites =
                           Ckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
                         in
-                        check parameters error error' (Some "line 357, a site even dead should occur only once in an interface") Exit,
+                        Exception.check_pos
+                          Exception.warn_pos parameters error error' __POS__
+                          ~message:"a site even dead should occur only once in an interface"
+                          ~pos:(Some pos)
+                          Exit,
                         (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
                       else
                         let state_min =
@@ -639,7 +660,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                             }
                             c_interface
                         in
-                        let error = check parameters error error' (Some "line 192") Exit  in
+                        let error =
+                          Exception.check_pos
+                            Exception.warn_pos
+                            parameters error error' __POS__ ~pos:(Some pos) Exit
+                        in
                         error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
                   end
               end
@@ -656,7 +681,12 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                     site_dic
                 in
                 match bool,output with
-                | _ , None  -> warn parameters error (Some ("Preprocess line 341"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+                | _ , None  ->
+                  Exception.warn_pos
+                    parameters error __POS__
+                    ~message:("this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)
+                    ~pos:(Some pos)
+                    Exit (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
                 | true, _ ->
                   let error,dead_sites =
                     Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error (Ckappa_sig.Binding port.Ckappa_sig.port_nme) dead_sites in
@@ -676,8 +706,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         Ckappa_sig.Site_map_and_set.Map.add parameters error
                           site_name port.Ckappa_sig.port_lnk dead_link_sites
                       in
-                      check parameters error error'
-                        (Some "line 395, a site even dead should occur only once in an interface") Exit,
+                      Exception.check_pos Exception.warn_pos
+                        parameters error error' __POS__
+                        ~message:"a site even dead should occur only once in an interface"
+                        ~pos:(Some pos)
+                        Exit,
                       (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
                     | error,Some state_dic ->
                       begin
@@ -694,8 +727,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         let error,agent_name' =
                           match bool,output with
                           | _ , None
-                          | true, _  -> warn parameters error (Some "line 285")
-                                          Exit Ckappa_sig.dummy_agent_name
+                          | true, _  ->
+                            Exception.warn_pos
+                              parameters error __POS__ ~pos:(Some pos)
+                              Exit Ckappa_sig.dummy_agent_name
                           | _ , Some (i,_,_,_) -> error, i
                         in
                         let error, site_dic' =
@@ -707,8 +742,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                               handler.Cckappa_sig.sites
                           with
                           | error, None ->
-                            warn parameters error (Some "line 291") Exit
-                              (Ckappa_sig.Dictionary_of_sites.init ())
+                            Exception.warn_pos parameters error __POS__ ~pos:(Some pos)
+                              Exit (Ckappa_sig.Dictionary_of_sites.init ())
                           | error, Some i -> error, i
                         in
                         let error,(bool,output) =
@@ -723,8 +758,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         let error, site_name' =
                           match bool,output with
                           | _ , None
-                          | true, _  -> warn parameters error (Some "line 298") Exit
-                                          Ckappa_sig.dummy_site_name
+                          | true, _  ->
+                            Exception.warn_pos parameters error
+                              __POS__ ~pos:(Some pos) Exit Ckappa_sig.dummy_site_name
                           | _ , Some (i, _, _, _) ->
                             error,i
                         in
@@ -756,8 +792,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           match bool, output with
                           | _ , None
                           | true, _ ->
-                            warn parameters error
-                              (Some "line 308, this link can never be formed, ")
+                            Exception.warn_pos parameters error
+                              __POS__ ~message:"this link can never be formed"
                               ~pos:(Some pos) Exit c_interface
                           | _ , Some (i, _, _, _) ->
                             let error', c_interface =
@@ -774,8 +810,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                                 }
                                 c_interface
                             in
-                            let error = check parameters error error'
-                                (Some "line 416") Exit
+                            let error =
+                              Exception.check_pos
+                                Exception.warn_pos  parameters error error'
+                                __POS__ ~pos:(Some pos)Exit
                             in
                             error, c_interface
                         in
@@ -800,8 +838,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 let error, site_name =
                   match bool, output with
                   | _ , None
-                  | true, _ -> warn parameters error (Some "line 264") Exit
-                                 Ckappa_sig.dummy_site_name
+                  | true, _ ->
+                    Exception.warn_pos
+                      parameters error __POS__  Exit Ckappa_sig.dummy_site_name
                   | _ , Some (i, _, _, _) -> error, i
                 in
                 let error, (bool, output) =
@@ -817,8 +856,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 let error, agent_name' =
                   match bool, output with
                   | _ , None
-                  | true, _  -> warn parameters error (Some "line 349")
-                                  Exit Ckappa_sig.dummy_agent_name
+                  | true, _  ->
+                    Exception.warn_pos
+                      parameters error __POS__ Exit Ckappa_sig.dummy_agent_name
                   | _ , Some (i, _, _, _) -> error, i
                 in
                 let error, site_dic' =
@@ -829,8 +869,10 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                       agent_name'
                       handler.Cckappa_sig.sites
                   with
-                  | error, None -> warn parameters error (Some "line 355") Exit
-                                     (Ckappa_sig.Dictionary_of_sites.init ())
+                  | error, None ->
+                    Exception.warn_pos
+                      parameters error __POS__ Exit
+                      (Ckappa_sig.Dictionary_of_sites.init ())
                   | error, Some i -> error, i
                 in
                 let error,(bool, output) =
@@ -846,8 +888,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 let error, site_name' =
                   match bool, output with
                   | _ , None
-                  | true, _  -> warn parameters error (Some "line 298") Exit
-                                  Ckappa_sig.dummy_site_name
+                  | true, _  ->
+                    Exception.warn_pos
+                      parameters error __POS__ Exit Ckappa_sig.dummy_site_name
                   | _ , Some (i, _, _, _) -> error, i
                 in
                 let state = Ckappa_sig.C_Lnk_type (agent_name', site_name') in
@@ -859,10 +902,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         error
                         (agent_name, site_name)
                         handler.Cckappa_sig.states_dic)
-                    (fun error -> warn parameters error
-                        (Some ("line 792" ^
-                               (Ckappa_sig.string_of_agent_name agent_name') ^
-                               (Ckappa_sig.string_of_site_name site_name')))
+                    (fun error ->
+                       Exception.warn_pos parameters error __POS__
+                        ~message:
+                          ((Ckappa_sig.string_of_agent_name agent_name') ^
+                           (Ckappa_sig.string_of_site_name site_name'))
                         Exit
                         (Ckappa_sig.Dictionary_of_States.init ()))
                 in
@@ -879,7 +923,8 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                 let error, c_interface =
                   match bool, output with
                   | _ , None
-                  | true, _ -> warn parameters error (Some "line 369") Exit c_interface
+                  | true, _ ->
+                    Exception.warn_pos parameters error __POS__ Exit c_interface
                   | _ , Some (i, _, _, _) ->
                     let error', c_interface =
                       Ckappa_sig.Site_map_and_set.Map.add
@@ -895,7 +940,11 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         }
                         c_interface
                     in
-                    let error = check parameters error error' (Some "line 192") Exit  in
+                    let error =
+                      Exception.check_pos
+                        Exception.warn_pos parameters error error'
+                        __POS__ Exit
+                    in
                     error,c_interface
                 in
                 error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
@@ -1103,7 +1152,10 @@ let set_bound_sites parameters error k ag set =
                Cckappa_sig.site = site}
              set
          in
-         let error = check parameters error error' (Some "line 192") Exit  in
+         let error =
+           Exception.check_pos
+             Exception.warn_pos  parameters error error' __POS__ Exit
+         in
          error,set)
     ag.Cckappa_sig.agent_interface
     (error,set)
@@ -1111,7 +1163,7 @@ let set_bound_sites parameters error k ag set =
 let set_released_sites parameters error k ag ag' set =
   Ckappa_sig.Site_map_and_set.Map.fold2 parameters error
     (fun parameters error _site _state _ ->
-       warn parameters error (Some "line 514") Exit set)
+       Exception.warn_pos parameters error __POS__ Exit set)
     (fun parameters error site state set ->
        if state.Cckappa_sig.site_free = Some true
        then
@@ -1123,7 +1175,10 @@ let set_released_sites parameters error k ag ag' set =
                Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
                Cckappa_sig.site = site} set
          in
-         let error = check parameters error error' (Some "line 576") Exit  in
+         let error =
+           Exception.check_pos
+             Exception.warn_pos  parameters error error' __POS__ Exit
+         in
          error,set
        else error,set)
     (fun parameters error site state state' set ->
@@ -1142,7 +1197,10 @@ let set_released_sites parameters error k ag ag' set =
              }
              set
          in
-         let error = check parameters error error' (Some "line 593") Exit in
+         let error =
+           Exception.check_pos
+             Exception.warn_pos  parameters error error' __POS__ Exit
+         in
          error,set)
     ag.Cckappa_sig.agent_interface ag'.Cckappa_sig.agent_interface set
 
@@ -1165,14 +1223,24 @@ let clean_question_marks parameters error l mixture =
         let error,agent =
           match agent
           with
-          | Some Cckappa_sig.Unknown_agent _ | None | Some Cckappa_sig.Ghost -> warn parameters error (Some ("Preprocess line 557"^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)
+          | Some Cckappa_sig.Unknown_agent _ | None | Some Cckappa_sig.Ghost ->
+            Exception.warn_pos
+              parameters error __POS__
+              ~message:"question marks should not appear on the rhs or in introduction"
+              Exit (Cckappa_sig.Ghost)
           | Some Cckappa_sig.Dead_agent (ag,set,l,l') ->
             let error',interface = Ckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
-            let error = check parameters error error' (Some "line 617") Exit in
+            let error =
+              Exception.check_pos
+                Exception.warn_pos  parameters error error' __POS__ Exit
+            in
             error,Cckappa_sig.Dead_agent ({ag with Cckappa_sig.agent_interface = interface},set,l,l')
           | Some Cckappa_sig.Agent ag ->
             let error',interface = Ckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
-            let error = check parameters error error' (Some "line 617") Exit in
+            let error =
+              Exception.check_pos
+                Exception.warn_pos  parameters error error' __POS__ Exit
+            in
             error,Cckappa_sig.Agent {ag with Cckappa_sig.agent_interface = interface}
         in
         let error,views =
@@ -1197,10 +1265,15 @@ let filter parameters error l mixture =
       let error,keep =
         match agent
         with
-        | None -> warn parameters error (Some "line 581, missing agent") Exit false
+        | None ->
+          Exception.warn_pos parameters error __POS__ Exit false
         | Some Cckappa_sig.Ghost -> error,true
         | Some Cckappa_sig.Unknown_agent _
-        | Some Cckappa_sig.Dead_agent _ -> warn parameters error (Some "line 642, there should be no dead agent in rhs") Exit false
+        | Some Cckappa_sig.Dead_agent _ ->
+          Exception.warn_pos
+            parameters error __POS__
+            ~message:"there should be no dead agent in rhs"
+            Exit false
         | Some Cckappa_sig.Agent _ -> error,false
       in
       aux error t (if keep then ((k,s)::output) else output)
@@ -1216,7 +1289,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
   match lhsk
   with
   | None | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Dead_agent _ ->
-    warn parameters error (Some "Preprocess line 1201") Exit half_release_set
+    Exception.warn_pos parameters error __POS__ Exit half_release_set
   | Some Cckappa_sig.Ghost ->
     error, half_release_set
   | Some Cckappa_sig.Agent lagk ->
@@ -1229,8 +1302,8 @@ let check_freeness parameters lhs source (error, half_release_set) =
           lagk.Cckappa_sig.agent_interface
       in
       match port_opt with
-      | None -> warn parameters error (Some "Preprocess line 1213") Exit
-                  half_release_set
+      | None ->
+        Exception.warn_pos parameters error __POS__ Exit half_release_set
       | Some port ->
         (match port.Cckappa_sig.site_free with
          | Some true ->
@@ -1368,7 +1441,7 @@ let translate_rule parameters error handler rule =
             end
           | Some Cckappa_sig.Agent lagk,Some Cckappa_sig.Agent ragk
           | Some Cckappa_sig.Dead_agent (lagk,_,_,_), Some Cckappa_sig.Agent ragk ->
-            (* TO DO check what happen if one site is dead *)
+            (* TO DO Exception.check_pos Exception.warn_pos  what happen if one site is dead *)
             let agent_type = lagk.Cckappa_sig.agent_name in
             let error',ldiff,rdiff =
               Ckappa_sig.Site_map_and_set.Map.diff_pred
@@ -1378,7 +1451,10 @@ let translate_rule parameters error handler rule =
                 lagk.Cckappa_sig.agent_interface
                 ragk.Cckappa_sig.agent_interface
             in
-            let error = check parameters error error' (Some "line 617") Exit in
+            let error =
+              Exception.check_pos
+                Exception.warn_pos parameters error error' __POS__ Exit
+            in
             let error,lbondk =
               Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                 parameters
@@ -1428,12 +1504,20 @@ let translate_rule parameters error handler rule =
           | _,Some Cckappa_sig.Dead_agent _ | None,_ | _,None ->
             (print_string (Ckappa_sig.string_of_agent_id k);
              print_newline ();
-             warn parameters error (Some "line 542") Exit
-               (direct,reverse,actions,half_release_set,None,
+             Exception.warn_pos
+               parameters error __POS__ Exit
+               (direct,
+                reverse,
+                actions,
+                half_release_set,
+                None,
                 Ckappa_sig.Site_map_and_set.Map.empty, Ckappa_sig.Site_map_and_set.Map.empty,true))
         in
         let error',bond_l,bond_r = Ckappa_sig.Site_map_and_set.Map.diff parameters error lbondk rbondk in
-        let error = check parameters error error' (Some "line 746") Exit in
+        let error =
+          Exception.check_pos
+            Exception.warn_pos parameters error error' __POS__ Exit
+        in
         let release = actions.Cckappa_sig.release in
         let error,(full_release_set,release) =
           match agent_type
@@ -1447,7 +1531,10 @@ let translate_rule parameters error handler rule =
                    Cckappa_sig.Address_map_and_set.Set.add parameters error
                      source full_release_set
                  in
-                 let error = check parameters error error' (Some "line 753") Exit in
+                 let error =
+                   Exception.check_pos
+                     Exception.warn_pos parameters error error' __POS__ Exit
+                 in
                  let release =
                    if compare source target < 0
                    then (source,target)::release
@@ -1497,7 +1584,10 @@ let translate_rule parameters error handler rule =
   let error',half_release_set =
     Cckappa_sig.Address_map_and_set.Set.minus parameters error half_release_set full_release_set
   in
-  let error = check parameters error error' (Some "line 753") Exit in
+  let error =
+    Exception.check_pos
+      Exception.warn_pos parameters error error' __POS__  Exit
+  in
   let list = Cckappa_sig.Address_map_and_set.Set.elements half_release_set in
   let error,list =
     List.fold_left
@@ -1508,7 +1598,8 @@ let translate_rule parameters error handler rule =
          in
          match ag
          with
-         | None | Some Cckappa_sig.Ghost -> warn parameters error (Some "line 623") Exit ((add,None)::list)
+         | None | Some Cckappa_sig.Ghost ->
+           Exception.warn_pos parameters error __POS__ Exit ((add,None)::list)
          | Some (Cckappa_sig.Unknown_agent _) -> error,list
          | Some (Cckappa_sig.Dead_agent (ag,_,_,l')) ->
            let interface = ag.Cckappa_sig.agent_interface in
@@ -1524,15 +1615,16 @@ let translate_rule parameters error handler rule =
                  with
                  | error,None ->
                    begin
-                     Exception.warn parameters error
-                       (Some "Preprocess") (Some "line 829, dead site")
-                       Not_found (fun () -> (add,None)::list)
+                     Exception.warn_pos
+                       parameters error __POS__ ~message:"dead site"
+                       Not_found ((add,None)::list)
                    end
                  | error,Some _ ->
                    error,(add,None)::list
                end
              | error',Some state ->
-               check parameters error error' (Some "line 799") Exit,
+               Exception.check_pos
+                 Exception.warn_pos parameters error error' __POS__ Exit,
                (add,Some state.Cckappa_sig.site_state)::list
            end
          | Some (Cckappa_sig.Agent ag) ->
@@ -1541,11 +1633,13 @@ let translate_rule parameters error handler rule =
                    parameters error add.Cckappa_sig.site interface
            with
            | error',None ->
-             Exception.warn parameters (check parameters error error' (Some "line 799") Exit)
-               (Some "Preprocess") (Some "find_map, line 405")
-               Not_found (fun () -> (add,None)::list)
+             Exception.warn_pos parameters
+               (Exception.check_pos Exception.warn_pos parameters error error' __POS__ Exit)
+               __POS__
+               Not_found ((add,None)::list)
            | error',Some state ->
-             check parameters error error' (Some "line 799") Exit,
+             Exception.check_pos
+               Exception.warn_pos parameters error error' __POS__ Exit,
              (add,Some state.Cckappa_sig.site_state)::list)
       (error,[])
       (List.rev list)
@@ -1634,7 +1728,9 @@ let translate_init parameters error handler (a,(alg,_),init_t) =
      Cckappa_sig.e_init_string_pos = a}
      | Ast.INIT_TOK _,_ -> (*TO DO*)
        let error,dft = Cckappa_sig.dummy_init parameters error in
-       warn parameters error (Some "line 710, token are not supported yet") Exit dft
+       Exception.warn_pos
+         parameters error __POS__
+         ~message:"token are not supported yet" Exit dft
 
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 

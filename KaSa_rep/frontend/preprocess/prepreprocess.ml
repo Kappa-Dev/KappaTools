@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -13,10 +13,6 @@
  * All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Prepreprocess.ml") message exn (fun () -> default)
-
-
 let local_trace = false
 
 let check_freshness parameters error str id id_set =
@@ -24,7 +20,8 @@ let check_freshness parameters error str id id_set =
     if Mods.StringSet.mem id id_set
     then
       begin
-        warn parameters error (Some (str^" '"^id^"' is already used")) Exit id_set
+        Exception.warn_pos
+          parameters error __POS__ ~message:(str^" '"^id^"' is already used") Exit id_set
       end
     else
       error,Mods.StringSet.add id id_set
@@ -82,8 +79,15 @@ let pop_entry parameters error id (map,set) =
           id
           map
       in
-      warn parameters error (Some "line 55, dandling bond detected\n") Exit (None,map)
-    | Some [] ->  warn parameters error (Some "line 56, internal bug, link id is ignored") Exit (None,map)
+      Exception.warn_pos
+        parameters error __POS__
+        ~message:"dandling bond detected"
+        Exit (None,map)
+    | Some [] ->
+      Exception.warn_pos
+        parameters error __POS__
+        ~message:"internal bug, link id is ignored"
+        Exit (None,map)
     | Some (_::t) ->
       let error,map =
         Ckappa_sig.Agent_id_map_and_set.Map.overwrite
@@ -93,9 +97,15 @@ let pop_entry parameters error id (map,set) =
           t
           map
       in
-      warn parameters error (Some "line 57, internal bug, link id is ignored") Exit (None,map)
+      Exception.warn_pos
+        parameters error __POS__
+        ~message:"internal bug, link id is ignored"
+        Exit (None,map)
     | None ->
-      warn parameters error (Some "line 58, internal bug, link id is ignored") Exit (None,map)
+      Exception.warn_pos
+        parameters error __POS__
+        ~message:"internal bug, link id is ignored"
+        Exit (None,map)
   else
     match list with
     | Some [a] ->
@@ -126,10 +136,17 @@ let pop_entry parameters error id (map,set) =
           t
           map
       in
-      warn parameters error
-        (Some "line 69, too many instances of a link identifier, ignore them") Exit (None,map)
-    | Some [] -> warn parameters error (Some "line 70, internal bug, link identifier") Exit (None,map)
-    | None -> warn parameters error (Some "line 70, internal bug, link identifier") Exit (None,map)
+      Exception.warn_pos
+        parameters error __POS__
+        ~message:"too many instances of a link identifier, ignore them"
+        Exit (None,map)
+    | Some [] ->
+      Exception.warn_pos
+        parameters error __POS__
+        ~message:"internal bug, link identifier"
+        Exit (None,map)
+    | None ->
+      Exception.warn_pos parameters error __POS__ Exit (None,map)
 
 let rec scan_interface parameters k agent interface remanent =
   match interface with
@@ -196,7 +213,10 @@ let collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanen
              x
              set
          in
-         warn parameters error (Some "line 100, dangling bond detected") Exit (map,set)
+         Exception.warn_pos
+           parameters error __POS__
+           ~message:"dangling bond detected"
+           Exit (map,set)
        else
          (error,(map,set)))
     map
@@ -220,10 +240,8 @@ let translate_lnk_state parameters lnk_state remanent =
       | None ->
         let site = Ckappa_sig.LNK_SOME position in
         let remanent =
-          warn parameters error
-            (Some ("line 116... " ^
-                   (Location.to_string position) ^
-                   "one dandling bond has been replaced by a wild card"))
+          Exception.warn_pos parameters error __POS__
+            ~message:((Location.to_string position) ^"one dandling bond has been replaced by a wild card")
             Exit
             remanent
         in
@@ -233,7 +251,7 @@ let translate_lnk_state parameters lnk_state remanent =
         then
           let site = Ckappa_sig.LNK_SOME position in
           let remanent =
-            warn parameters error (Some "line 119") Exit remanent
+            Exception.warn_pos parameters error __POS__ Exit remanent
           in
           site,remanent
         else
@@ -442,7 +460,7 @@ let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mix
        Ckappa_sig.Agent_id_map_and_set.Map.empty
       )
   in
-  let mixture,(error,map) =
+  let mixture,(error,_map) =
     translate_mixture_in_rule
       parameters
       mixture
@@ -464,7 +482,7 @@ let refine_mixture parameters error mixture =
        Ckappa_sig.Agent_id_map_and_set.Map.empty
       )
   in
-  let mixture,(error,map) = translate_mixture parameters mixture remanent in
+  let mixture,(error,_map) = translate_mixture parameters mixture remanent in
   error, mixture
 
 
@@ -487,7 +505,7 @@ let rec alg_map f error alg =
     error,Ast.KAPPA_INSTANCE mixture'
   | Ast.CONST x -> error,Ast.CONST x
 
-let rec print_expr_map  f error alg =
+let print_expr_map  f error alg =
   match
     alg
   with
@@ -534,7 +552,7 @@ let rec bool_map f error alg =
     let error,m2' = alg_map f error m2 in
     error,Ast.COMPARE_OP(Operator.DIFF,(m1',pos1),(m2',pos2))
 
-let rec modif_map f_forbidding_question_marks f_allowing_question_marks error alg =
+let modif_map f_forbidding_question_marks f_allowing_question_marks error alg =
   match
     alg
   with
@@ -627,7 +645,11 @@ let bool_with_pos_with_option_map = with_option_map bool_with_pos_map
 
 let refine_token parameters error token =
   let error,token =
-    warn parameters error (Some ("Line 431: Token are not implemented in KaSa yet")) Exit token in
+    Exception.warn_pos
+      parameters error __POS__
+      ~message:"Tokens are not implemented in KaSa yet"
+      Exit token
+  in
   error,token
 
 let refine_init_t parameters error = function
@@ -650,7 +672,7 @@ let refine_agent parameters error agent_set agent =
       )
   in
 
-  let agent,(error,map) =
+  let agent,(error,_map) =
     translate_agent
       parameters agent
       (error, (map,
@@ -677,7 +699,7 @@ let translate_compil parameters error compil =
       (error,id_set,[])
       compil.Ast.variables
   in
-  let error,agent_set,signatures_rev =
+  let error,_agent_set,signatures_rev =
     List.fold_left
       (fun  (error,agent_set,list) agent->
          let error,agent_set,agent = refine_agent parameters error agent_set agent in
@@ -693,7 +715,7 @@ let translate_compil parameters error compil =
       (error,[])
       compil.Ast.observables
   in
-  let error,id_set,rules_rev =
+  let error,_id_set,rules_rev =
     List.fold_left
       (fun (error,id_set,list) (id,(rule,p)) ->
          let error,id_set =
@@ -790,7 +812,10 @@ let translate_compil parameters error compil =
                       (error,[]) (List.rev l)
                   in
                   error,(Ast.SNAPSHOT l')::list
-                | _ -> error,list (*to do*))
+                | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.FLUX _
+                | Ast.FLUXOFF _ | Ast.CFLOWMIX _ | Ast.PLOTENTRY
+                | Ast.CFLOWLABEL _ ->
+                  error,list (*to do*))
              (error,[])
              m
          in

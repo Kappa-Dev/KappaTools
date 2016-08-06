@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 17th of January
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  * Pretty printing of Ckappa handler
  *
@@ -12,9 +12,6 @@
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
-
-let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Print_handler") message exn (fun () -> default)
 
 let trace = false
 let local_trace = false
@@ -217,8 +214,10 @@ let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) hand
                  error
                  i
                  handler.Cckappa_sig.sites)
-             (fun error -> warn parameters_dot error
-                 (Some "line 103") Exit (Ckappa_sig.Dictionary_of_sites.init ()))
+             (fun error ->
+                Exception.warn_pos
+                  parameters_dot error __POS__
+                  Exit (Ckappa_sig.Dictionary_of_sites.init ()))
          in
          let error =
            Ckappa_sig.Dictionary_of_sites.iter

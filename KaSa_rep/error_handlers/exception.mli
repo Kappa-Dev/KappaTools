@@ -7,7 +7,9 @@ val warn :
   Remanent_parameters_sig.parameters -> method_handler -> string option ->
   string option -> exn -> (unit -> 'a) -> method_handler * 'a
 val warn_pos:
-  Remanent_parameters_sig.parameters -> method_handler -> string * int * int * int  -> exn -> 'a -> method_handler * 'a
+  Remanent_parameters_sig.parameters -> method_handler ->
+  string * int * int * int  -> ?message:string -> ?pos:Location.t option ->
+  exn -> 'a -> method_handler * 'a
 
 val print : Remanent_parameters_sig.parameters -> method_handler -> unit
 val print_errors_light_for_kasim : Remanent_parameters_sig.parameters -> method_handler -> unit
@@ -20,3 +22,9 @@ val check :
    exn -> unit -> method_handler * unit) ->
   Remanent_parameters_sig.parameters -> method_handler -> method_handler ->
   'a -> exn -> method_handler
+
+val check_pos :
+  (Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t option ->
+   exn -> unit -> method_handler * unit) ->
+  Remanent_parameters_sig.parameters -> method_handler -> method_handler ->
+  'a -> ?message:string -> ?pos:Location.t option -> exn -> method_handler

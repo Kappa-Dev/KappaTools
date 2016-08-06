@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 08/03/2010
- * Last modification: Time-stamp: <Aug 05 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  * This library declares exceptions
  *
@@ -40,10 +40,16 @@ let warn parameters error_handler file message exn default =
   let () = Remanent_parameters.save_error_list parameters error in
   error,dft
 
-let warn_pos parameters error_handler (file,line,_,_) exn default =
+let warn_pos parameters error_handler (file,line,_,_) ?message:(message="") ?pos:(pos=None) exn default =
+  let liaison = if message = "" && pos = None then "" else ": " in
+  let pos =
+    match pos with
+    | None -> ""
+    | Some s -> ", "^Location.to_string s
+  in
   warn
     parameters error_handler
-    (Some file) (Some ("line "^(string_of_int line)))
+    (Some file) (Some ("line "^(string_of_int line)^pos^liaison^message))
     exn (fun _ -> default)
 
 let print_for_KaSim parameters handlers =
@@ -103,4 +109,13 @@ let check warn parameter error error' s exn =
   then error
   else
     let error,() = warn parameter error' s exn () in
+    error
+
+let check_pos (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t option ->
+               exn -> unit -> method_handler * unit)
+    parameter error error' s ?message:(message="") ?pos:(pos=(None:Location.t option)) exn =
+  if error==error'
+  then error
+  else
+    let error,() = warn parameter error' s ~message ~pos exn () in
     error
