@@ -579,8 +579,10 @@ The internal state of site x in agent D ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+* Static information
 
 
+* Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

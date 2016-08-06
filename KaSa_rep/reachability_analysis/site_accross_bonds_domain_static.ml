@@ -614,7 +614,7 @@ let collect_created_bonds parameter error rule rule_id store_result =
 
 (***************************************************************)
 (*collect rule that created bond*)
-
+(*
 let collect_potential_tuple_pair_created_bonds' parameter error rule_id
     store_created_bonds store_potential_tuple_pair store_result =
   let error, created_bonds_set =
@@ -676,6 +676,7 @@ let collect_potential_tuple_pair_created_bonds' parameter error rule_id
        else
          error, store_result
     ) potential_tuple_pair_set (error, store_result)
+  *)
 
 let collect_potential_tuple_pair_created_bonds parameter error rule_id
     store_created_bonds store_potential_tuple_pair store_result =

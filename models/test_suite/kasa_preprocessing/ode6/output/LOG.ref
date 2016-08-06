@@ -481,25 +481,27 @@ E is a dead agent.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+* Static information
 At rule_id:0 there is an action binding between the site x of Sh and the site x of ab. Sh:(x:ab@x); ab:(x:Sh@x)
 At rule_id:1 there is an action binding between the site y of Sh and the site z of R. Sh:(y:R@z); R:(z:Sh@y)
 At rule_id:2 there is an action binding between the site y of R and the site k of R. R:(y:R@k); R:(k:R@y)
 At rule_id:3 there is an action binding between the site t of R and the site y of E. R:(t:E@y); E:(y:R@t)
 At rule_id:4 there is an action binding between the site x of R and the site x of E. R:(x:E@x); E:(x:R@x)
 
-rule_id:1 Sh(y:R@z, x:p); R(z:Sh@y, y:free)
-rule_id:1 Sh(y:R@z, x:p); R(z:Sh@y, x:free)
-rule_id:1 Sh(y:R@z, x:free); R(z:Sh@y, y:free)
-rule_id:1 Sh(y:R@z, x:free); R(z:Sh@y, x:free)
-rule_id:1 R(z:Sh@y, y:free); Sh(y:R@z, x:p)
-rule_id:1 R(z:Sh@y, y:free); Sh(y:R@z, x:free)
-rule_id:1 R(z:Sh@y, x:free); Sh(y:R@z, x:p)
-rule_id:1 R(z:Sh@y, x:free); Sh(y:R@z, x:free)
-rule_id:2 R(y:R@k, z:free); R(k:R@y, t:free)
-rule_id:2 R(y:R@k, x:free); R(k:R@y, t:free)
-rule_id:2 R(k:R@y, t:free); R(y:R@k, z:free)
-rule_id:2 R(k:R@y, t:free); R(y:R@k, x:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, x:free)
+The potential tuple pair when there is an action binding between the site z of R and the site y of Sh is: R(z:Sh@y, y:free); Sh(y:R@z, x:p)
+The potential tuple pair when there is an action binding between the site z of R and the site y of Sh is: R(z:Sh@y, y:free); Sh(y:R@z, x:free)
+The potential tuple pair when there is an action binding between the site z of R and the site y of Sh is: R(z:Sh@y, x:free); Sh(y:R@z, x:p)
+The potential tuple pair when there is an action binding between the site z of R and the site y of Sh is: R(z:Sh@y, x:free); Sh(y:R@z, x:free)
+The potential tuple pair when there is an action binding between the site y of R and the site k of R is: R(y:R@k, z:free); R(k:R@y, t:free)
+The potential tuple pair when there is an action binding between the site y of R and the site k of R is: R(y:R@k, x:free); R(k:R@y, t:free)
+The potential tuple pair when there is an action binding between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, z:free)
+The potential tuple pair when there is an action binding between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
 
+* Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -466,21 +466,23 @@ D is a dead agent.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+* Static information
 At rule_id:0 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
 At rule_id:1 there is an action binding between the site y of A and the site x of C. A:(y:C@x); C:(x:A@y)
 At rule_id:2 there is an action binding between the site y of B and the site x of D. B:(y:D@x); D:(x:B@y)
 At rule_id:3 there is an action binding between the site y of C and the site y of D. C:(y:D@y); D:(y:C@y)
 At rule_id:4 there is an action binding between the site z of D and the site z of A. D:(z:A@z); A:(z:D@z)
 
-rule_id:4 D(z:A@z, x:B@y); A(z:D@z, x:B@x)
-rule_id:4 D(z:A@z, x:B@y); A(z:D@z, y:C@x)
-rule_id:4 D(z:A@z, y:C@y); A(z:D@z, x:B@x)
-rule_id:4 D(z:A@z, y:C@y); A(z:D@z, y:C@x)
-rule_id:4 A(z:D@z, x:B@x); D(z:A@z, x:B@y)
-rule_id:4 A(z:D@z, x:B@x); D(z:A@z, y:C@y)
-rule_id:4 A(z:D@z, y:C@x); D(z:A@z, x:B@y)
-rule_id:4 A(z:D@z, y:C@x); D(z:A@z, y:C@y)
+The potential tuple pair when there is an action binding between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, x:B@x)
+The potential tuple pair when there is an action binding between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, y:C@x)
+The potential tuple pair when there is an action binding between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, x:B@x)
+The potential tuple pair when there is an action binding between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, y:C@x)
+The potential tuple pair when there is an action binding between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, x:B@y)
+The potential tuple pair when there is an action binding between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, y:C@y)
+The potential tuple pair when there is an action binding between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, x:B@y)
+The potential tuple pair when there is an action binding between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, y:C@y)
 
+* Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

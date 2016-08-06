@@ -29,28 +29,39 @@ In agent R, the binding state of site x, the binding state of site c, the bindin
 * Non relational properties:
 ------------------------------------------------------------
 The binding state of site x in agent E ranges over free and R@x.
+The binding state of site c in agent R ranges over free and R@c.
 The binding state of site n in agent R ranges over free and R@cr.
 The binding state of site cr in agent R ranges over free and R@n.
-The binding state of site c in agent R ranges over free and R@c.
 The binding state of site x in agent R ranges over free and E@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
+* Static information
 At rule_id:0 there is an action binding between the site x of E and the site x of R. E:(x:R@x); R:(x:E@x)
 At rule_id:2 there is an action binding between the site c of R and the site c of R. R:(c:R@c); R:(c:R@c)
 At rule_id:4 there is an action binding between the site cr of R and the site n of R. R:(cr:R@n); R:(n:R@cr)
 
-rule_id:2 R(c:R@c, x:E@x); R(c:R@c, x:E@x)
-rule_id:2 R(c:R@c, x:E@x); R(c:R@c, x:E@x)
-rule_id:4 R(cr:R@n, c:R@c); R(n:R@cr, c:R@c)
-rule_id:4 R(cr:R@n, c:R@c); R(n:R@cr, cr:free)
-rule_id:4 R(cr:R@n, n:free); R(n:R@cr, c:R@c)
-rule_id:4 R(cr:R@n, n:free); R(n:R@cr, cr:free)
-rule_id:4 R(n:R@cr, c:R@c); R(cr:R@n, c:R@c)
-rule_id:4 R(n:R@cr, c:R@c); R(cr:R@n, n:free)
-rule_id:4 R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
-rule_id:4 R(n:R@cr, cr:free); R(cr:R@n, n:free)
+The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
+The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
+The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, c:R@c)
+The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, cr:free)
+The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, c:R@c)
+The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, cr:free)
+The potential tuple pair when there is an action binding between the site n of R and the site cr of R is: R(n:R@cr, c:R@c); R(cr:R@n, c:R@c)
+The potential tuple pair when there is an action binding between the site n of R and the site cr of R is: R(n:R@cr, c:R@c); R(cr:R@n, n:free)
+The potential tuple pair when there is an action binding between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
+The potential tuple pair when there is an action binding between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, n:free)
 
+* Dynamic information
+Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: E@x, E@x
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
+Whenever the site cr of R and the site n of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c
+Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
+Whenever the site n of R and the site cr of R are bound together, then the site cr of R and c of R can have the following respective states: free, R@c
+Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

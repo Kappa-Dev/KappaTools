@@ -1,19 +1,19 @@
 digraph G{
-"Init_26" [label="" style="invis" width="0px" height="0px"];
-"Node_35" [label="R(x!E@x,c!R@c,cr!free,n!R@cr)"];
-"Node_32" [label="R(x!E@x,c!R@c,cr!R@n,n!free)"];
-"Node_29" [label="R(x!E@x,c!R@c,cr!free,n!free)"];
-"Node_27" [label="R(x!E@x,c!free,cr!free,n!free)"];
-"Node_26" [label="R(x!free,c!free,cr!free,n!free)"];
-"Node_35" -> "Node_29" [label="rule 5: R/int"];
-"Node_32" -> "Node_29" [label="rule 5: R/int"];
-"Node_29" -> "Node_35" [label="rule 4: R.int"];
-"Node_29" -> "Node_32" [label="rule 4: R.int"];
-"Node_29" -> "Node_27" [label="rule 3: R/R"];
-"Node_29" -> "Node_27" [label="rule 3: R/R"];
-"Node_27" -> "Node_29" [label="rule 2: R.R"];
-"Node_27" -> "Node_29" [label="rule 2: R.R"];
-"Node_27" -> "Node_26" [label="rule 1: E/R"];
-"Node_26" -> "Node_27" [label="rule 0: E.R"];
-"Init_26" -> "Node_26" [label=""];
+"Init_29" [label="" style="invis" width="0px" height="0px"];
+"Node_38" [label="R(x!E@x,c!R@c,cr!free,n!R@cr)"];
+"Node_35" [label="R(x!E@x,c!R@c,cr!R@n,n!free)"];
+"Node_32" [label="R(x!E@x,c!R@c,cr!free,n!free)"];
+"Node_30" [label="R(x!E@x,c!free,cr!free,n!free)"];
+"Node_29" [label="R(x!free,c!free,cr!free,n!free)"];
+"Node_38" -> "Node_32" [label="rule 5: R/int"];
+"Node_35" -> "Node_32" [label="rule 5: R/int"];
+"Node_32" -> "Node_38" [label="rule 4: R.int"];
+"Node_32" -> "Node_35" [label="rule 4: R.int"];
+"Node_32" -> "Node_30" [label="rule 3: R/R"];
+"Node_32" -> "Node_30" [label="rule 3: R/R"];
+"Node_30" -> "Node_32" [label="rule 2: R.R"];
+"Node_30" -> "Node_32" [label="rule 2: R.R"];
+"Node_30" -> "Node_29" [label="rule 1: E/R"];
+"Node_29" -> "Node_30" [label="rule 0: E.R"];
+"Init_29" -> "Node_29" [label=""];
 }
