@@ -45,7 +45,6 @@ The binding state of site x in agent K ranges over free and P@g.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:8 there is an action binding between the site g of P and the site x of K. P:(g:K@x); K:(x:P@g)
 
 
 * Dynamic information

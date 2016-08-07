@@ -213,8 +213,6 @@ C is a dead agent.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:0 there is an action binding between the site y of A and the site x of B. A:(y:B@x); B:(x:A@y)
-At rule_id:1 there is an action binding between the site y of B and the site x of C. B:(y:C@x); C:(x:B@y)
 
 
 * Dynamic information

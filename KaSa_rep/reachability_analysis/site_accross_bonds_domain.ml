@@ -230,6 +230,17 @@ struct
         Site_accross_bonds_domain_static.store_potential_tuple_pair_created_bonds = r
       } static
 
+  let get_potential_tuple_pair_bonds_rhs static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_potential_tuple_pair_bonds_rhs
+
+  let set_potential_tuple_pair_bonds_rhs r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_potential_tuple_pair_bonds_rhs = r
+      } static
+
 (*projection*)
 
   (*let get_potential_tuple_pair_created_bonds_proj1 static =
@@ -509,6 +520,25 @@ let set_proj_reverse_map2 r static =
     in
     let static =
       set_potential_tuple_pair_created_bonds store_potential_tuple_pair_created_bonds
+        static
+    in
+    (*------------------------------------------------------------*)
+    (*1.b bonds on the rhs*)
+    let store_bonds_rhs = get_bonds_rhs static in
+    let store_potential_tuple_pair_bonds_rhs =
+      get_potential_tuple_pair_bonds_rhs static
+    in
+    let error, store_potential_tuple_pair_bonds_rhs =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair_bonds_rhs
+        parameter error
+        rule_id
+        store_bonds_rhs
+        store_potential_tuple_pair
+        store_potential_tuple_pair_bonds_rhs
+    in
+    let static =
+      set_potential_tuple_pair_bonds_rhs
+        store_potential_tuple_pair_bonds_rhs
         static
     in
     (*------------------------------------------------------------*)
@@ -943,6 +973,7 @@ let set_proj_reverse_map2 r static =
            error, dynamic, precondition
         ) potential_tuple_pair_created_bonds_set (error, dynamic, precondition)
     in
+
     (*------------------------------------------------------*)
     let event_list = [] in
     error, dynamic, (precondition, event_list)
@@ -983,7 +1014,7 @@ let set_proj_reverse_map2 r static =
         in
         (*--------------------------------------------------------*)
         (*print created bonds*)
-        let store_created_bonds = get_created_bonds static in
+        (*let store_created_bonds = get_created_bonds static in
         let proj (_, b, c, e) = (b, c, e) in
         let error =
           Ckappa_sig.Rule_map_and_set.Map.fold
@@ -1019,7 +1050,7 @@ let set_proj_reverse_map2 r static =
                  ) set error
             ) store_created_bonds error
         in
-        let () = Loggers.print_newline log in
+        let () = Loggers.print_newline log in*)
         (*--------------------------------------------------------*)
         (*tuple pair where the first site belongs to the created bond*)
         let store_potential_tuple_pair_created_bonds =
@@ -1039,7 +1070,8 @@ let set_proj_reverse_map2 r static =
                     in
                     let () =
                       Loggers.fprintf log
-                        "The potential tuple pair when there is an action binding between the site %s of %s and the site %s of %s is: %s(%s:%s, %s:%s); %s(%s:%s, %s:%s)\n"
+                        "At rule_id:%i, the potential tuple pair when there is an action binding between the site %s of %s and the site %s of %s is: %s(%s:%s, %s:%s); %s(%s:%s, %s:%s)\n"
+                        (Ckappa_sig.int_of_rule_id rule_id)
                         site agent site1 agent1
                         agent site state site' state'
                         agent1 site1 state1 site1' state1'
@@ -1047,6 +1079,36 @@ let set_proj_reverse_map2 r static =
                     error
                  ) set error
             ) store_potential_tuple_pair_created_bonds error
+        in
+        let () = Loggers.print_newline log in
+        (*--------------------------------------------------------*)
+        (*t1.b uple pair where the first site belongs to a bond on rhs§*)
+        let store_potential_tuple_pair_bonds_rhs =
+          get_potential_tuple_pair_bonds_rhs static
+        in
+        let proj (_, b, c, d, e, f) = (b,c, d, e, f) in
+        let error =
+          Ckappa_sig.Rule_map_and_set.Map.fold
+            (fun rule_id set error ->
+               Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
+                 (fun (x, y) error ->
+                    let error,
+                        (agent, site, site', state, state',
+                         agent1, site1, site1', state1, state1') =
+                      Site_accross_bonds_domain_type.convert_tuple_full
+                        parameter error kappa_handler (proj x, proj y)
+                    in
+                    let () =
+                      Loggers.fprintf log
+                        "At rule_id:%i: the potential tuple pair when there is a bond on the rhs between the site %s of %s and the site %s of %s is: %s(%s:%s, %s:%s); %s(%s:%s, %s:%s)\n"
+                        (Ckappa_sig.int_of_rule_id rule_id)
+                        site agent site1 agent1
+                        agent site state site' state'
+                        agent1 site1 state1 site1' state1'
+                    in
+                    error
+                 ) set error
+            ) store_potential_tuple_pair_bonds_rhs error
         in
         let () = Loggers.print_newline log in
         (*--------------------------------------------------------*)

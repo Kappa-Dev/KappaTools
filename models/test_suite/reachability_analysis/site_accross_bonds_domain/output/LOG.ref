@@ -1086,12 +1086,19 @@ The internal state of site z in agent B ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:2 there is an action binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
+At rule_id:2, the potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
+At rule_id:2, the potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
+At rule_id:2, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
+At rule_id:2, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
 
-The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
-The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
-The potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
-The potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
+At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
+At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
+At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
+At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
+At rule_id:5: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
+At rule_id:5: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:p); A(z:B@z, t:p)
+At rule_id:6: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
+At rule_id:6: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
 
 * Dynamic information
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p

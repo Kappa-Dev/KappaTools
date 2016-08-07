@@ -1886,12 +1886,13 @@ The internal state of site x in agent E ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:6 there is an action binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
-At rule_id:7 there is an action binding between the site x of A and the site x of C. A:(x:C@x); C:(x:A@x)
-At rule_id:10 there is an action binding between the site x of D and the site x of E. D:(x:E@x); E:(x:D@x)
+At rule_id:10, the potential tuple pair when there is an action binding between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
+At rule_id:10, the potential tuple pair when there is an action binding between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
 
-The potential tuple pair when there is an action binding between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
-The potential tuple pair when there is an action binding between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
+At rule_id:8: the potential tuple pair when there is a bond on the rhs between the site x of C and the site x of A is: C(x:A@x, x:p); A(x:C@x, x:p)
+At rule_id:8: the potential tuple pair when there is a bond on the rhs between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
+At rule_id:10: the potential tuple pair when there is a bond on the rhs between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
+At rule_id:10: the potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
 
 * Dynamic information
 Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: u, u
