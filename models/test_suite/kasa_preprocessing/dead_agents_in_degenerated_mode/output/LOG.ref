@@ -642,6 +642,18 @@ The internal state of site x in agent B ranges over u and p.
 
 
 
+At rule_id:0, there is a modification of the site x of A. A(x:u)
+At rule_id:0, there is a modification of the site x of B. B(x:p)
+At rule_id:1, there is a modification of the site x of B. B(x:p)
+At rule_id:2, there is a modification of the site x of B. B(x:u)
+At rule_id:3, there is a modification of the site x of A. A(x:p)
+At rule_id:4, there is a modification of the site x of A. A(x:u)
+At rule_id:5, there is a modification of the site x of A. A(x:p)
+At rule_id:6, there is a modification of the site x of A. A(x:p)
+At rule_id:7, there is a modification of the site x of A. A(x:p)
+At rule_id:8, there is a modification of the site x of A. A(x:u)
+At rule_id:9, there is a modification of the site x of A. A(x:u)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

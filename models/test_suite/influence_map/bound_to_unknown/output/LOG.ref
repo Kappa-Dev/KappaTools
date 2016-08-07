@@ -319,6 +319,15 @@ B is a dead agent.
 
 
 
+At rule_id:0, there is a modification of the site x of A. A(x:p)
+At rule_id:1, there is a modification of the site x of A. A(x:A@x)
+At rule_id:1, there is a modification of the site x of A. A(x:A@x)
+At rule_id:2, there is a modification of the site x of A. A(x:free)
+At rule_id:2, there is a modification of the site x of A. A(x:free)
+At rule_id:3, there is a modification of the site x of A. A(x:B@x)
+At rule_id:3, there is a modification of the site x of B. B(x:A@x)
+At rule_id:4, there is a modification of the site x of A. A(x:free)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

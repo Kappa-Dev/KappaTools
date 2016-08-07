@@ -39,6 +39,17 @@ At rule_id:2: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
 
 
+At rule_id:0, there is a modification of the site y of A. A(y:p)
+At rule_id:0, there is a modification of the site z of A. A(z:p)
+At rule_id:1, there is a modification of the site y of A. A(y:u)
+At rule_id:1, there is a modification of the site z of A. A(z:u)
+At rule_id:2, there is a modification of the site x of C. C(x:u)
+At rule_id:2, there is a modification of the site y of C. C(y:C@y)
+At rule_id:2, there is a modification of the site x of C. C(x:p)
+At rule_id:2, there is a modification of the site y of C. C(y:C@y)
+At rule_id:3, there is a modification of the site z of A. A(z:A@y)
+At rule_id:3, there is a modification of the site y of A. A(y:A@z)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

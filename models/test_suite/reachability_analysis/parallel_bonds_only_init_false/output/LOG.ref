@@ -713,6 +713,11 @@ At rule_id:1: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
 
 
+At rule_id:0, there is a modification of the site z of A. A(z:B@z)
+At rule_id:0, there is a modification of the site z of B. B(z:A@z)
+At rule_id:1, there is a modification of the site t of A. A(t:B@t)
+At rule_id:1, there is a modification of the site t of B. B(t:A@t)
+
 * Dynamic information
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
 Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free

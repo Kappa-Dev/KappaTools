@@ -2478,6 +2478,33 @@ At rule_id:11: the potential tuple pair when there is a bond on the rhs between 
 At rule_id:11: the potential tuple pair when there is a bond on the rhs between the site y of A and the site y of C is: A(y:C@y, y:p); C(y:A@y, y:p)
 
 
+At rule_id:0, there is a modification of the site x of A. A(x:u)
+At rule_id:0, there is a modification of the site y of A. A(y:u)
+At rule_id:0, there is a modification of the site x of A. A(x:free)
+At rule_id:0, there is a modification of the site y of A. A(y:free)
+At rule_id:1, there is a modification of the site x of B. B(x:u)
+At rule_id:1, there is a modification of the site y of B. B(y:u)
+At rule_id:1, there is a modification of the site x of B. B(x:free)
+At rule_id:1, there is a modification of the site y of B. B(y:free)
+At rule_id:2, there is a modification of the site x of C. C(x:u)
+At rule_id:2, there is a modification of the site y of C. C(y:u)
+At rule_id:2, there is a modification of the site x of C. C(x:free)
+At rule_id:2, there is a modification of the site y of C. C(y:free)
+At rule_id:4, there is a modification of the site x of A. A(x:B@x)
+At rule_id:4, there is a modification of the site x of B. B(x:p)
+At rule_id:4, there is a modification of the site x of B. B(x:A@x)
+At rule_id:5, there is a modification of the site x of A. A(x:C@x)
+At rule_id:5, there is a modification of the site x of C. C(x:p)
+At rule_id:5, there is a modification of the site x of C. C(x:A@x)
+At rule_id:6, there is a modification of the site x of A. A(x:p)
+At rule_id:9, there is a modification of the site y of A. A(y:B@y)
+At rule_id:9, there is a modification of the site y of B. B(y:p)
+At rule_id:9, there is a modification of the site y of B. B(y:A@y)
+At rule_id:10, there is a modification of the site y of A. A(y:C@y)
+At rule_id:10, there is a modification of the site y of C. C(y:p)
+At rule_id:10, there is a modification of the site y of C. C(y:A@y)
+At rule_id:11, there is a modification of the site y of A. A(y:p)
+
 * Dynamic information
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
 Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: p, p

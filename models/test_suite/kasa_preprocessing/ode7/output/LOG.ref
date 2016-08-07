@@ -207,6 +207,12 @@ C is a dead agent.
 
 
 
+At rule_id:0, there is a modification of the site x of A. A(x:p)
+At rule_id:0, there is a modification of the site y of A. A(y:free)
+At rule_id:0, there is a modification of the site x of B. B(x:free)
+At rule_id:1, there is a modification of the site x of B. B(x:free)
+At rule_id:1, there is a modification of the site x of C. C(x:free)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

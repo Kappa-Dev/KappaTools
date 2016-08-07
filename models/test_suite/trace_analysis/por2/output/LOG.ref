@@ -378,6 +378,17 @@ The internal state of site t in agent A ranges over u and p.
 
 
 
+At rule_id:0, there is a modification of the site x of A. A(x:p)
+At rule_id:1, there is a modification of the site y of A. A(y:p)
+At rule_id:2, there is a modification of the site z of A. A(z:p)
+At rule_id:3, there is a modification of the site w of A. A(w:p)
+At rule_id:4, there is a modification of the site t of A. A(t:p)
+At rule_id:5, there is a modification of the site x of A. A(x:u)
+At rule_id:6, there is a modification of the site y of A. A(y:u)
+At rule_id:7, there is a modification of the site z of A. A(z:u)
+At rule_id:8, there is a modification of the site w of A. A(w:u)
+At rule_id:9, there is a modification of the site t of A. A(t:u)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
@@ -426,6 +437,17 @@ The internal state of site t in agent A ranges over u and p.
 * Static information
 
 
+
+At rule_id:0, there is a modification of the site x of A. A(x:p)
+At rule_id:1, there is a modification of the site y of A. A(y:p)
+At rule_id:2, there is a modification of the site z of A. A(z:p)
+At rule_id:3, there is a modification of the site w of A. A(w:p)
+At rule_id:4, there is a modification of the site t of A. A(t:p)
+At rule_id:5, there is a modification of the site x of A. A(x:u)
+At rule_id:6, there is a modification of the site y of A. A(y:u)
+At rule_id:7, there is a modification of the site z of A. A(z:u)
+At rule_id:8, there is a modification of the site w of A. A(w:u)
+At rule_id:9, there is a modification of the site t of A. A(t:u)
 
 * Dynamic information
 ------------------------------------------------------------

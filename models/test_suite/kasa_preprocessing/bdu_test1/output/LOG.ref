@@ -142,6 +142,10 @@ A is a dead agent.
 
 
 
+At rule_id:0, there is a modification of the site x of A. A(x:p)
+At rule_id:0, there is a modification of the site y of A. A(y:p)
+At rule_id:1, there is a modification of the site y of A. A(y:p)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

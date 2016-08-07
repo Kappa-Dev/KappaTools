@@ -1091,8 +1091,21 @@ let set_question_marks_rhs r static =
     in
     (*-----------------------------------------------------------*)
     (*2. modified*)
-
-
+    let store_modified_map = get_modified_map static in
+    let error, modified_set =
+      Site_accross_bonds_domain_static.get_set parameter
+        error rule_id
+        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+        store_modified_map
+    in
+    let potential_tuple_pair_set = get_potential_tuple_pair_set static in
+    let error, dynamic, precondition =
+      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+        (fun x (error, dynamic, precondition) -> (*TODO*)
+           let (agent_id_m, agent_type_m, site_type_m, state_m) = x in
+           error, dynamic, precondition
+        ) modified_set (error, dynamic, precondition)
+    in
     (*-----------------------------------------------------------*)
     let event_list = [] in
     error, dynamic, (precondition, event_list)
@@ -1259,6 +1272,31 @@ let set_question_marks_rhs r static =
                     error
                  ) set error
             ) store_question_marks_rhs error
+        in
+        let () = Loggers.print_newline log in
+        (*--------------------------------------------------------*)
+        let store_modified_map = get_modified_map static in
+        let error =
+          Ckappa_sig.Rule_map_and_set.Map.fold
+            (fun rule_id set error ->
+               Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+                 (fun x error ->
+                    let (_, agent_type, site_type, state) = x in
+                    let error, (agent, site, state) =
+                      Site_accross_bonds_domain_type.convert_single
+                        parameter error kappa_handler
+                        (agent_type, site_type, state)
+                    in
+                    let () =
+                      Loggers.fprintf log
+                        "At rule_id:%i, there is a modification of the site %s of %s. %s(%s:%s)\n"
+                        (Ckappa_sig.int_of_rule_id rule_id)
+                        site agent
+                        agent site state
+                    in
+                    error
+                 ) set error
+            ) store_modified_map error
         in
         let () = Loggers.print_newline log in
         (*--------------------------------------------------------*)

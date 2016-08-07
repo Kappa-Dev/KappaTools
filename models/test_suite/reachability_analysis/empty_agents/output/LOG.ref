@@ -302,6 +302,9 @@ The internal state of site x in agent D is always u.
 
 
 
+At rule_id:3, there is a modification of the site x of D. D(x:u)
+At rule_id:4, there is a modification of the site x of F. F(x:u)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
