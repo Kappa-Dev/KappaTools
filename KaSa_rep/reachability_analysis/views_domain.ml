@@ -395,7 +395,7 @@ struct
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
         | _ ->
-          Exception.warn_pos
+          Exception.warn
             parameter error __POS__ Exit
             (Ckappa_sig.string_of_agent_name agent_type)
       in
@@ -406,14 +406,14 @@ struct
       in
       let error, site_correspondence =
         match site_correspondence with
-        | None -> Exception.warn_pos parameter error __POS__ Exit []
+        | None -> Exception.warn parameter error __POS__ Exit []
         | Some a -> error, a
       in
       (*get a list of sites in a covering class *)
       let error, site_correspondence =
         let rec aux list =
           match list with
-          | [] -> Exception.warn_pos  parameter error __POS__ Exit []
+          | [] -> Exception.warn  parameter error __POS__ Exit []
           | (h, list, _) :: _ when h = cv_id -> error, list
           | _ :: tail -> aux tail
         in aux site_correspondence
@@ -428,7 +428,7 @@ struct
                    agent_type site_type
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit
                    (Ckappa_sig.string_of_site_name site_type)
              in
@@ -477,7 +477,7 @@ struct
             try
               Handler.string_of_agent parameter error kappa_handler agent_type
             with
-            | _ -> Exception.warn_pos
+            | _ -> Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type)
           in
@@ -508,7 +508,7 @@ struct
                       compiled rule_id
                   with
                   | _ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.string_of_rule_id rule_id)
                 in
@@ -559,7 +559,7 @@ struct
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
         | _ ->
-          Exception.warn_pos
+          Exception.warn
             parameter error __POS__ Exit
             (Ckappa_sig.string_of_agent_name agent_type)
       in
@@ -570,7 +570,7 @@ struct
                 error agent_type site_correspondence
         with
         | error, None ->
-          Exception.warn_pos
+          Exception.warn
             parameter error __POS__ Exit []
         | error, Some a -> error, a
       in
@@ -578,7 +578,7 @@ struct
         let rec aux list =
           match list with
           | [] ->
-            Exception.warn_pos parameter error __POS__ Exit []
+            Exception.warn parameter error __POS__ Exit []
           | (h, list, _) :: _ when h = cv_id -> error, list
           | _ :: tail -> aux tail
         in aux site_correspondence
@@ -642,7 +642,7 @@ struct
                               parameter error site_type map2
                       with
                       | error, None ->
-                        Exception.warn_pos
+                        Exception.warn
                           parameter error __POS__ Exit
                           Ckappa_sig.dummy_site_name
                       | error, Some i -> error, i
@@ -654,7 +654,7 @@ struct
                           agent_type site_type
                       with
                       | _ ->
-                        Exception.warn_pos
+                        Exception.warn
                           parameter error __POS__ Exit (Ckappa_sig.string_of_site_name site_type)
                     in
                     let error, state_string =
@@ -663,7 +663,7 @@ struct
                           handler_kappa agent_type site_type state
                       with
                       | _ ->
-                        Exception.warn_pos
+                        Exception.warn
                           parameter error __POS__ Exit
                           (Ckappa_sig.string_of_state_index state)
                     in
@@ -824,7 +824,7 @@ struct
                   parameter error site map_new_index_forward
               with
               | error, None ->
-                Exception.warn_pos
+                Exception.warn
                   parameter error __POS__ Exit
                   Ckappa_sig.dummy_site_name
               | error, Some s -> error, s
@@ -845,8 +845,8 @@ struct
               Ckappa_sig.Site_map_and_set.Map.empty
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos  parameter error error'
+            Exception.check_point
+              Exception.warn  parameter error error'
               __POS__ Exit
           in
           error, ((cv_id, map_res) :: current_list)
@@ -884,7 +884,7 @@ struct
            | Cckappa_sig.Unknown_agent _
            | Cckappa_sig.Ghost -> error, (dynamic, event_list)
            | Cckappa_sig.Dead_agent _ ->
-             Exception.warn_pos
+             Exception.warn
                parameter error __POS__ Exit (dynamic, event_list)
            | Cckappa_sig.Agent agent ->
              let agent_type = agent.Cckappa_sig.agent_name in
@@ -1026,7 +1026,7 @@ struct
       let rec aux list =
         match list with
         | [] ->
-          Exception.warn_pos parameter error __POS__ Exit []
+          Exception.warn parameter error __POS__ Exit []
         | (h, list, _) :: _ when h = cv_id -> error, list
         | _ :: tail -> aux tail
       in
@@ -1047,7 +1047,7 @@ struct
           map1
       with
       | error, None ->
-        Exception.warn_pos
+        Exception.warn
           parameter error __POS__ Exit
           Ckappa_sig.dummy_site_name
       | error, Some i -> error, i
@@ -1072,7 +1072,7 @@ struct
                  agent_type site_name
              with
              | _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_site_name site_name)
            in
@@ -1188,7 +1188,7 @@ struct
                    agent_type site_name
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit
                    (Ckappa_sig.string_of_site_name site_name)
              in
@@ -1198,7 +1198,7 @@ struct
                    agent_type site_name state
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit
                    (Ckappa_sig.string_of_state_index state)
              in
@@ -1215,7 +1215,7 @@ struct
                in*)
              error, state :: output
            | _ ->
-             Exception.warn_pos
+             Exception.warn
                parameter error __POS__ ~message:"state is empty" Exit output)
         (error, []) list
     in
@@ -1245,7 +1245,7 @@ struct
               site_correspondence
       with
       | error, None ->
-        Exception.warn_pos  parameter error __POS__ Exit []
+        Exception.warn  parameter error __POS__ Exit []
       | error, Some l -> error, l
     in
     (* compute the list of cv_id documenting site_name *)
@@ -1257,7 +1257,7 @@ struct
               store_covering_classes_id
       with
       | error, None ->
-        Exception.warn_pos  parameter error __POS__ Exit []
+        Exception.warn  parameter error __POS__ Exit []
       | error, Some l -> error, l
     in
     (*---------------------------------------------------------------------*)
@@ -1326,7 +1326,7 @@ struct
                (agent_type, step.Communication.site_out) (*A.x*)
                kappa_handler.Cckappa_sig.states_dic)
             (fun error ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit (Ckappa_sig.Dictionary_of_States.init()))
         in
         (*---------------------------------------------------------*)
@@ -1415,7 +1415,7 @@ struct
              (last_agent, last_site) (*D.t*)
              kappa_handler.Cckappa_sig.states_dic)
           (fun error ->
-             Exception.warn_pos
+             Exception.warn
                parameter error __POS__ Exit
                (Ckappa_sig.Dictionary_of_States.init()))
       in
@@ -1459,7 +1459,7 @@ struct
                   store_covering_classes_id
               with
               | error, None ->
-                Exception.warn_pos parameter error __POS__ Exit []
+                Exception.warn parameter error __POS__ Exit []
               | error, Some l -> error, l
             in
             (*get a triple (cv_id, list, set) of the last agent that containing t*)
@@ -1472,7 +1472,7 @@ struct
                   site_correspondence
               with
               | error, None ->
-                Exception.warn_pos parameter error __POS__ Exit []
+                Exception.warn parameter error __POS__ Exit []
               | error, Some l -> error, l
             in
             (*---------------------------------------------------*)
@@ -1685,7 +1685,7 @@ struct
               List.fold_left (fun (error, output) list ->
                   match list with
                   | [_, state] -> error, state :: output
-                  | _ -> Exception.warn_pos
+                  | _ -> Exception.warn
                            parameter error __POS__ Exit output
                 ) (error, []) list
             in
@@ -1792,7 +1792,7 @@ struct
           rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       with
       | error, None ->
-        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+        Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some a -> error, a
     in
     let error, (dynamic, new_answer) =
@@ -1800,7 +1800,7 @@ struct
       | Cckappa_sig.Ghost
       | Cckappa_sig.Unknown_agent _
       | Cckappa_sig.Dead_agent _ ->
-        Exception.warn_pos
+        Exception.warn
           parameter error __POS__ Exit (dynamic, Usual_domains.Undefined)
       | Cckappa_sig.Agent agent ->
         (*search inside the pattern, check whether or not it is out
@@ -2417,8 +2417,8 @@ struct
                Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
              in
              let error =
-               Exception.check_pos
-                 Exception.warn_pos  parameter error error' __POS__ Exit
+               Exception.check_point
+                 Exception.warn  parameter error error' __POS__ Exit
              in
              let error, store_result =
                Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
@@ -2509,7 +2509,7 @@ struct
                                    parameters error
                                    (ag_type,site_type) state contact_map
                                | [] | _::_ ->
-                                 Exception.warn_pos
+                                 Exception.warn
                                    parameters error __POS__ Exit
                                    contact_map)
                             (error, contact_map) list_of_states
@@ -2535,7 +2535,7 @@ struct
                                        dual
                                      with
                                      | None ->
-                                       Exception.warn_pos
+                                       Exception.warn
                                          parameters error __POS__ Exit contact_map
                                      | Some (ag_type', site_type', _ ) ->
                                        Preprocess.add_link_in_contact_map
@@ -2544,7 +2544,7 @@ struct
                                          contact_map
                                    end
                                | [] | _::_ ->
-                                 Exception.warn_pos
+                                 Exception.warn
                                    parameters error __POS__ Exit
                                    contact_map)
                             (error, contact_map) list_of_states
@@ -2552,7 +2552,7 @@ struct
                         error, (handler, contact_map)
                     end
                   | _::_ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameters error __POS__ Exit (handler, contact_map)
                )
                site_map
@@ -2641,7 +2641,7 @@ struct
           Handler.string_of_agent parameter error handler_kappa agent_type
         in
         let error =
-          Exception.check_pos Exception.warn_pos
+          Exception.check_point Exception.warn
             parameter error error' __POS__ Exit in
         let () =
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -2680,13 +2680,13 @@ struct
          in
          let error, site_correspondence =
            match site_correspondence with
-           | None -> Exception.warn_pos parameter error __POS__ Exit []
+           | None -> Exception.warn parameter error __POS__ Exit []
            | Some a -> error, a
          in
          let error, site_correspondence =
            let rec aux list =
              match list with
-             | [] -> Exception.warn_pos parameter error __POS__ Exit []
+             | [] -> Exception.warn parameter error __POS__ Exit []
              | (h, list, _) :: _ when h = cv_id -> error, list
              | _ :: tail -> aux tail
            in aux site_correspondence
@@ -2699,7 +2699,7 @@ struct
              match Ckappa_sig.Site_map_and_set.Map.find_option
                      parameter error site_type map2
              with
-             | error, None -> Exception.warn_pos  parameter error __POS__ Exit
+             | error, None -> Exception.warn  parameter error __POS__ Exit
                                 Ckappa_sig.dummy_site_name_minus1
              | error, Some i -> error, i
            in
@@ -2806,12 +2806,12 @@ struct
                try
                  Handler.string_of_agent parameter error handler_kappa agent_type
                with
-               | _ -> Exception.warn_pos parameter error __POS__  Exit
+               | _ -> Exception.warn parameter error __POS__  Exit
                         (Ckappa_sig.string_of_agent_name agent_type)
              in
              let error =
-               Exception.check_pos
-                 Exception.warn_pos  parameter error error' __POS__ Exit
+               Exception.check_point
+                 Exception.warn  parameter error error' __POS__ Exit
              in
              (*-----------------------------------------------------------------------*)
              Wrapped_modules.LoggedIntMap.fold
@@ -2861,13 +2861,13 @@ struct
                    Handler.string_of_agent parameter error handler_kappa agent_type
                  with
                  | _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type)
                in
                let error =
-                 Exception.check_pos
-                   Exception.warn_pos  parameter error error'
+                 Exception.check_point
+                   Exception.warn  parameter error error'
                    __POS__ Exit
                in
                (*-----------------------------------------------------------------------*)
@@ -2890,13 +2890,13 @@ struct
                in
                let error, site_correspondence =
                  match site_correspondence with
-                 | None -> Exception.warn_pos  parameter error __POS__ Exit []
+                 | None -> Exception.warn  parameter error __POS__ Exit []
                  | Some a -> error, a
                in
                let error, site_correspondence =
                  let rec aux list =
                    match list with
-                   | [] -> Exception.warn_pos  parameter error __POS__ Exit []
+                   | [] -> Exception.warn  parameter error __POS__ Exit []
                    | (h, list, _) :: _ when h = cv_id -> error, list
                    | _ :: tail -> aux tail
                  in aux site_correspondence
@@ -2942,7 +2942,7 @@ struct
                                   parameter error site_type map2
                           with
                           | error, None ->
-                            Exception.warn_pos
+                            Exception.warn
                               parameter error __POS__ Exit
                               Ckappa_sig.dummy_site_name_minus1
                           | error, Some i -> error, i

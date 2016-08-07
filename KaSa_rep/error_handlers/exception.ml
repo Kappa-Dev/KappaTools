@@ -31,7 +31,7 @@ let unsafe_warn _parameters error_handler file message exn default =
   let uncaught = Exception_without_parameter.build_uncaught_exception file message exn in
   Exception_without_parameter.add_uncaught_error uncaught error_handler, default ()
 
-let warn parameters error_handler file message exn default =
+let warn_aux parameters error_handler file message exn default =
   let error,dft =
     if Remanent_parameters.get_unsafe parameters
     then unsafe_warn parameters error_handler file message exn default
@@ -40,17 +40,20 @@ let warn parameters error_handler file message exn default =
   let () = Remanent_parameters.save_error_list parameters error in
   error,dft
 
-let warn_pos parameters error_handler (file,line,_,_) ?message:(message="") ?pos:(pos=None) exn default =
+let warn_with_exn parameters error_handler (file,line,_,_) ?message:(message="") ?pos:(pos=None) exn default =
   let liaison = if message = "" && pos = None then "" else ": " in
   let pos =
     match pos with
     | None -> ""
     | Some s -> ", "^Location.to_string s
   in
-  warn
+  warn_aux
     parameters error_handler
     (Some file) (Some ("line "^(string_of_int line)^pos^liaison^message))
-    exn (fun _ -> default)
+    exn default
+
+let warn parameters error_handler file_line ?message:(message="") ?pos:(pos=None) exn default =
+  warn_with_exn parameters error_handler file_line ~message ~pos exn (fun () -> default)
 
 let print_for_KaSim parameters handlers =
   let parameters = Remanent_parameters.update_prefix parameters "error: " in
@@ -100,19 +103,18 @@ let print_errors_light_for_kasim parameters handlers =
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     ()
 
-let wrap = (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
+let wrap =
+  (fun parameters error string string_opt exn ->
+     fst (warn_aux parameters error (Some string) string_opt exn (fun  () -> ())))
 
-let lift_error_logs_for_KaSa f = f (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
+let lift_error_logs_for_KaSa f =
+  f
+    (fun parameters error string string_opt exn ->
+       fst (warn_aux parameters error (Some string)
+              string_opt exn (fun  () -> ())))
 
-let check warn parameter error error' s exn =
-  if error==error'
-  then error
-  else
-    let error,() = warn parameter error' s exn () in
-    error
-
-let check_pos (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t option ->
-               exn -> unit -> method_handler * unit)
+let check_point (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t option ->
+                 exn -> unit -> method_handler * unit)
     parameter error error' s ?message:(message="") ?pos:(pos=(None:Location.t option)) exn =
   if error==error'
   then error

@@ -132,7 +132,7 @@ let get_nsites parameter error key handler =
   let error, sites_dic =
     match get_nsites with
     | None ->
-      Exception.warn_pos
+      Exception.warn
         parameter error __POS__ Exit
         (Ckappa_sig.Dictionary_of_sites.init())
     | Some dic -> error, dic
@@ -239,7 +239,7 @@ let sprintf_array parameter error handler agent_type array =
              Handler.string_of_site parameter error handler agent_type site_type
            with
            | _ ->
-             Exception.warn_pos
+             Exception.warn
                parameter error __POS__ Exit
                (Ckappa_sig.string_of_site_name site_type)
          in
@@ -284,7 +284,7 @@ let print_stochastic_class parameter error handler result =
                      Handler.string_of_agent parameter error handler agent_type
                    with
                    | _ ->
-                     Exception.warn_pos
+                     Exception.warn
                        parameter error __POS__ Exit
                        (Ckappa_sig.string_of_agent_name agent_type)
                  in

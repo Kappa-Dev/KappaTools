@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -250,7 +250,9 @@ module Make (M:Nul)  =
           !used
         with
         | Some a ->
-          Exception.warn parameter error (Some __FILE__) (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)
+          Exception.warn
+            parameter error __POS__
+            ~message:"MVBDU should be initialised once only"  Exit a
         | None ->
           begin
             let error,handler = Boolean_mvbdu.init_remanent parameter error in
@@ -262,10 +264,6 @@ module Make (M:Nul)  =
       in
       init,is_init
 
-    let warn parameters error (file,line,_,_) exc f =
-      Exception.warn
-        parameters error (Some file) (Some ("line"^(string_of_int line))) exc f
-
     let equal = Mvbdu_core.mvbdu_equal
     let equal_with_logs _p h e a b = e,h,equal a b
     let lift0 pos f parameters handler error =
@@ -275,7 +273,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          warn
+          Exception.warn_with_exn
             parameters error pos Exit
             (fun _ ->
                failwith "Cannot recover from bugs in constant initilization")
@@ -296,7 +294,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos  Exit a
+          Exception.warn parameters error pos  Exit a
         in
         error, handler, a
 
@@ -327,7 +325,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos  Exit a
+          Exception.warn parameters error pos  Exit a
         in
         error, handler, a
 
@@ -348,7 +346,7 @@ module Make (M:Nul)  =
           buildlist parameters handler error []
         in
         let error, a =
-          Exception.warn_pos parameters error pos Exit list
+          Exception.warn parameters error pos Exit list
         in
         error, handler, (a:unit List_sig.list)
 
@@ -359,7 +357,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos Exit []
+          Exception.warn parameters error pos Exit []
         in
         error, handler, a
 
@@ -376,7 +374,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos Exit a
+          Exception.warn parameters error pos Exit a
         in
         error, handler, a
 
@@ -387,7 +385,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos Exit a
+          Exception.warn parameters error pos Exit a
         in
         error, handler, a
 
@@ -398,7 +396,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos Exit a
+          Exception.warn parameters error pos Exit a
         in
         error, handler, a
 
@@ -409,7 +407,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos Exit a
+          Exception.warn parameters error pos Exit a
         in
         error, handler, a
 
@@ -420,7 +418,7 @@ module Make (M:Nul)  =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error pos Exit a
+          Exception.warn parameters error pos Exit a
         in
         error, handler, a
 
@@ -617,21 +615,17 @@ module Internalize(M:Mvbdu
     let export_handler error =
       match !handler with
       | None ->
-        Exception.warn !parameter error
-          (Some __FILE__) (Some "export_handler")  Exit (fun () -> None)
+        Exception.warn !parameter error __POS__ Exit None
       | Some _ -> error, !handler
 
-    let check (file,line,_,_) error error' handler' =
+    let check pos error error' handler' =
       let () = handler:= Some handler' in
       if error'== error
       then
         ()
       else
         let error',() =
-          Exception.warn
-            !parameter error
-            (Some file) (Some ("line "^(string_of_int line))) Exit
-            (fun () -> ())
+          Exception.warn !parameter error pos Exit ()
         in
         Exception.print !parameter error'
 
@@ -643,14 +637,16 @@ module Internalize(M:Mvbdu
 
     let is_init () = None != !handler
     let equal = M.equal
-    let get_handler (file, line, _, _) error =
+    let get_handler pos error =
       match
         !handler
       with
       | None ->
         let () = init !parameter in
-        let error',() = Exception.warn !parameter error (Some file)
-            (Some ("line "^(string_of_int line)^" uninitialised mvbdu"))  Exit (fun () -> ())  in
+        let error',() =
+          Exception.warn !parameter error pos
+            ~message:" uninitialised mvbdu"  Exit ()
+        in
         begin
           match !handler with
           | None -> failwith "unrecoverable errors in bdu get_handler"

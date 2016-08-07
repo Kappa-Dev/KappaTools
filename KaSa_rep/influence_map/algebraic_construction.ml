@@ -143,7 +143,7 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
         ag1,ag2
       with
       | None,_ | _,None ->
-        Exception.warn_pos
+        Exception.warn
           parameters error __POS__
           ~message:"Should not scan empty agents..." Exit (true,(to_do,already_done))
       | Some ag1,Some ag2 ->
@@ -151,7 +151,7 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
           match ag1
           with
           | Cckappa_sig.Ghost->
-            Exception.warn_pos
+            Exception.warn
               parameters error __POS__
               ~message:"Should not scan ghost agents..." Exit (true,(to_do,already_done))
           | Cckappa_sig.Unknown_agent _ -> raise (False error)
@@ -160,7 +160,7 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
               | Cckappa_sig.Ghost ->
-                Exception.warn_pos
+                Exception.warn
                   parameters error __POS__
                   ~message:"Should not scan ghost agents..."
                   Exit (true,(to_do,already_done))
@@ -212,7 +212,7 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
               | Cckappa_sig.Ghost ->
-                Exception.warn_pos
+                Exception.warn
                   parameters error __POS__
                   ~message:"Should not scan ghost agents..."
                   Exit (true,(to_do,already_done))
@@ -281,7 +281,7 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
   match ouput
   with
     None ->
-    Exception.warn_pos
+    Exception.warn
       parameters error __POS__
       ~message:"Missing rule"
       Exit false
@@ -303,7 +303,7 @@ let filter_influence parameters error handler compilation map bool =
     | Ast.TOKEN_ID _,_
     | Ast.CONST _,_     ->
       let error,() =
-        Exception.warn_pos
+        Exception.warn
           parameters error __POS__
           ~message:"Composite observable"
           Exit ()
@@ -355,7 +355,7 @@ let filter_influence parameters error handler compilation map bool =
              with
              | None ->
                let error,() =
-                 Exception.warn_pos
+                 Exception.warn
                    parameters error __POS__
                    ~message:"Missing rule"
                    Exit ()
@@ -377,7 +377,7 @@ let filter_influence parameters error handler compilation map bool =
                  match rule2 with
                  | None ->
                    let error,() =
-                     Exception.warn_pos
+                     Exception.warn
                        parameters error __POS__
                        ~message:("Missing rule"^ (Ckappa_sig.string_of_rule_id b))
                        Exit ()
@@ -396,7 +396,7 @@ let filter_influence parameters error handler compilation map bool =
                  match var with
                  | None ->
                    let error,() =
-                     Exception.warn_pos
+                     Exception.warn
                        parameters error __POS__
                        ~message:("Missing var" ^(Ckappa_sig.string_of_rule_id b))
                        Exit ()

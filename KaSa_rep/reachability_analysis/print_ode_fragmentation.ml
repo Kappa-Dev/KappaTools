@@ -26,7 +26,7 @@ let print_sites_modified_set parameter error handler_kappa result =
            Handler.string_of_agent parameter error handler_kappa agent_type
          with
          | _ ->
-           Exception.warn_pos
+           Exception.warn
              parameter error __POS__ Exit
              (Ckappa_sig.string_of_agent_name agent_type)
        in
@@ -46,7 +46,7 @@ let print_sites_modified_set parameter error handler_kappa result =
                  Handler.string_of_site parameter error handler_kappa agent_type site_type
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit
                    (Ckappa_sig.string_of_site_name site_type)
              in

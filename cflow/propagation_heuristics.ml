@@ -44,8 +44,10 @@ module Propagation_heuristic =
 
     module B=(Blackboard.Blackboard:Blackboard.Blackboard)
 
-    let warn parameter error option exn default =
-       Exception.warn (B.PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "propagation_heuristic.ml") option exn (fun () -> default)
+    let warn parameter error pos ?message:(message="") exn default =
+      Exception.warn
+        (B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
+        pos ~message exn default
 
     type update_order =
       | Keep_event of B.PB.step_id
@@ -172,14 +174,23 @@ module Propagation_heuristic =
           B.PB.CI.Po.K.H.get_priorities parameter
         with
         | Some x -> error,x
-        | None -> warn parameter error (Some "next_choice, line 147, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.causal
+        | None ->
+          warn
+            parameter error __POS__
+            ~message:"Compression mode has to been selected"
+            (Failure "Compression mode has not been selected")
+            Priority.causal
       in
       let n_p_id = B.get_npredicate_id blackboard in
       let error,() =
         match
           priority.Priority.candidate_set_of_events
         with
-        | Priority.All_remaining_events -> warn parameter error (Some "All_remaining_events strategy is not implemented yet") (Failure "All remaining events strategy is not implemented yet") ()
+        | Priority.All_remaining_events ->
+          warn
+            parameter error __POS__
+            ~message:"All_remaining_events strategy is not implemented yet" (Failure "All remaining events strategy is not implemented yet")
+            ()
         | Priority.Wire_with_the_least_number_of_events -> error,()
         | Priority.Wire_with_the_most_number_of_events -> error,()
       in
@@ -251,9 +262,12 @@ module Propagation_heuristic =
                 | None ->
                   let log = B.PB.CI.Po.K.H.get_debugging_channel parameter in
 
-                  let error,() = warn parameter error
-                      (Some ("next_choice, line 249, An empty wire has been selected"^(string_of_int n)))
-                      (Failure "An empty wire has been selected") () in
+                  let error,() =
+                    warn
+                      parameter error __POS__
+                      ~message:("An empty wire has been selected"^(string_of_int n))
+                      (Failure "An empty wire has been selected") ()
+                  in
                   let () =
                     Loggers.fprintf log "ERROR 249: %s\n" (Priority.string_of_level level)
                   in
@@ -299,7 +313,10 @@ module Propagation_heuristic =
                       (* The blackboard is inconsistent: *)
                       (* Pointers should not point to removed events.*)
                     let error,() =
-                      warn parameter error (Some "propagate_down, line 154, inconsistent pointers in blackboard") (Failure "inconsistent pointers in blackboard") ()
+                      warn
+                        parameter error __POS__
+                        ~message:"inconsistent pointers in blackboard"
+                        (Failure "inconsistent pointers in blackboard") ()
                     in
                     error,
                     log_info,

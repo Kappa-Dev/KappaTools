@@ -215,7 +215,7 @@ let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) hand
                  i
                  handler.Cckappa_sig.sites)
              (fun error ->
-                Exception.warn_pos
+                Exception.warn
                   parameters_dot error __POS__
                   Exit (Ckappa_sig.Dictionary_of_sites.init ()))
          in

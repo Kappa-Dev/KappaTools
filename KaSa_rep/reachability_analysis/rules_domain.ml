@@ -167,7 +167,7 @@ struct
       try Handler.string_of_rule parameter error kappa_handler compil rule_id
       with
       | _ ->
-        Exception.warn_pos
+        Exception.warn
           parameter error __POS__ Exit (Ckappa_sig.string_of_rule_id rule_id)
     in
     (*print*)
@@ -205,7 +205,7 @@ struct
         error, dynamic
       | error, Some true -> error, dynamic
       | error, None ->
-        Exception.warn_pos parameter error __POS__ Exit dynamic
+        Exception.warn parameter error __POS__ Exit dynamic
     in
     error, dynamic, (precondition, event_list)
 
@@ -272,12 +272,12 @@ struct
                  Handler.string_of_rule parameter error handler compiled k
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit (Ckappa_sig.string_of_rule_id k)
              in
              let error =
-               Exception.check_pos
-                 Exception.warn_pos parameter error error' __POS__ Exit
+               Exception.check_point
+                 Exception.warn parameter error error' __POS__ Exit
              in
              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                  "%s will never be applied." rule_string

@@ -187,7 +187,7 @@ struct
           | Some Cckappa_sig.Dead_agent _
           | Some Cckappa_sig.Ghost -> error, dynamic
           | None ->
-            Exception.warn_pos parameter error __POS__ Exit dynamic
+            Exception.warn parameter error __POS__ Exit dynamic
           | Some Cckappa_sig.Unknown_agent _
           | Some Cckappa_sig.Agent _ ->
             let error, dynamic =

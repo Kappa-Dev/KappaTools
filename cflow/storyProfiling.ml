@@ -19,10 +19,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-let warn parameter error option exn default =
-       Exception.warn parameter error (Some "storyProfiling.ml") option exn (fun () -> default)
-
-
 type step_kind =
   | Dummy
   | Beginning
@@ -187,7 +183,7 @@ module StoryStats =
          }
 
 
-       let k_first parameter k l =
+       let k_first _parameter k l =
          let rec aux k l output =
            if k=0 then [],List.rev output
            else
@@ -269,7 +265,11 @@ module StoryStats =
        let add_event parameter error step_kind f log_info =
          if is_dummy step_kind
          then
-           let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, add_event should not be called with a dummy event")  (Failure "Dummy event in add_event") ()
+           let error,() =
+             Exception.warn
+               parameter error __POS__
+               ~message:"Inconsistent profiling information, add_event should not be called with a dummy event"
+               (Failure "Dummy event in add_event") ()
            in
            error,log_info
          else
@@ -303,7 +303,10 @@ module StoryStats =
 
        let close_event parameter error step_kind f log_info =
          if is_dummy step_kind then
-           let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, close_event should not be called with a dummy event")
+           let error,() =
+             Exception.warn
+               parameter error __POS__
+               ~message:"Inconsistent profiling information, close_event should not be called with a dummy event"
                (Failure "Dummy event in close_event") ()
            in
            error,log_info
@@ -313,7 +316,9 @@ module StoryStats =
              let error,() =
                if next_depth = 1
                then
-                 warn  parameter error (Some "line 146, Inconsistent profiling information, depth should not be equal to 1 when closing an event")
+                 Exception.warn
+                   parameter error __POS__
+                   ~message:"Inconsistent profiling information, depth should not be equal to 1 when closing an event"
                    (Failure "Depth=1 in close_event") ()
                else
                  error,()
@@ -322,7 +327,9 @@ module StoryStats =
                log_info.current_task
              with
              | [] ->
-               warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
+               Exception.warn parameter error __POS__
+                 ~message:"Inconsistent profiling information, no current task when closing an event"
+                 (Failure "No current tasks in close_event") log_info
              | current_task::tail when current_task.tag = step_kind ->
                begin
                  let size_after =
@@ -600,7 +607,7 @@ module StoryStats =
        let inc_n_side_events log = log
        let inc_n_init_events log = log
        let inc_cut_events log = log
-       let inc_k_cut_events k log = log
+       let inc_k_cut_events _k log = log
        let reset_cut_events log = log
        let inc_selected_events log = log
        let inc_removed_events log = log
@@ -647,7 +654,7 @@ module StoryStats =
          else
            false,log_info
 
-       let set_global_cut n log_info = log_info
-       let set_pseudo_inv n log_info = log_info
+       let set_global_cut _n log_info = log_info
+       let set_pseudo_inv _n log_info = log_info
 
      end:StoryStats)

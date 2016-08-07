@@ -89,7 +89,7 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
             aux2 tail (error, (i :: output))
           | _ :: tail ->
             aux2 tail
-              (Exception.warn_pos parameter error __POS__ Exit output)
+              (Exception.warn parameter error __POS__ Exit output)
         in aux2 list_asso (error, [])
       in
       let rec aux3 list (error,handler,output) =
@@ -157,7 +157,7 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
                          match var_list_opt with
                          | None ->
                            let error, () =
-                             Exception.warn_pos
+                             Exception.warn
                                parameter error __POS__ Exit ()
                            in
                            error, handler, list
@@ -237,7 +237,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
                match elt with
                | [a, b] when a = x -> error, b :: list
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit list)
             (error, [])
             list
@@ -247,7 +247,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
         begin
           match list with
           | [] | [_] ->
-            Exception.warn_pos
+            Exception.warn
               parameter error __POS__ Exit
               (handler, No_known_translation list)
           | [[site1,state1; site2,state2]; [site1',state1'; site2',state2']] ->
@@ -260,7 +260,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
                 else
                   error, (handler, Equiv ((site1, state1'), (site2, state2')))
               else
-                Exception.warn_pos
+                Exception.warn
                   parameter error __POS__ Exit
                   (handler, No_known_translation list)
             end
@@ -306,7 +306,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
                                     , (site1, state1')))
                 else error, (handler, No_known_translation list)
               else
-                Exception.warn_pos
+                Exception.warn
                   parameter error __POS__ Exit
                   (handler, No_known_translation list)
             end
@@ -378,14 +378,14 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               site_type
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn parameter error error' __POS__ Exit
           in
           let rec aux list error =
             match list
             with
             | [] ->
-              Exception.warn_pos parameter error __POS__ Exit ()
+              Exception.warn parameter error __POS__ Exit ()
             | [state] ->
               let error', state_string =
                 Handler.string_of_state_fully_deciphered parameter error
@@ -394,8 +394,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                   state
               in
               let error =
-                Exception.check_pos
-                  Exception.warn_pos parameter error error'
+                Exception.check_point
+                  Exception.warn parameter error error'
                   __POS__ Exit
               in
               error, Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -408,8 +408,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                   state
               in
               let error =
-                Exception.check_pos
-                  Exception.warn_pos  parameter error error'
+                Exception.check_point
+                  Exception.warn  parameter error error'
                   __POS__ Exit
               in
               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -420,7 +420,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
           match
             state_list
           with
-          | [] -> Exception.warn_pos  parameter error __POS__ Exit ()
+          | [] -> Exception.warn  parameter error __POS__ Exit ()
           | [state] ->
             let error', state_string =
               Handler.string_of_state_fully_deciphered parameter error
@@ -429,8 +429,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                 state
             in
             let error =
-              Exception.check_pos
-                Exception.warn_pos  parameter error error'
+              Exception.check_point
+                Exception.warn  parameter error error'
                 __POS__ Exit
             in
             error,
@@ -447,8 +447,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                 state1
             in
             let error =
-              Exception.check_pos
-                Exception.warn_pos  parameter error error'
+              Exception.check_point
+                Exception.warn  parameter error error'
                 __POS__ Exit
             in
             let error', state_string2 =
@@ -458,8 +458,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                 state2
             in
             let error =
-              Exception.check_pos
-                Exception.warn_pos parameter error error' __POS__ Exit
+              Exception.check_point
+                Exception.warn parameter error error' __POS__ Exit
             in
             error, Loggers.fprintf (Remanent_parameters.get_logger parameter)
               "%s%s %sranges over %s and %s.%s"
@@ -485,8 +485,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               site1
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn parameter error error' __POS__ Exit
           in
           let error', state_string1 =
             Handler.string_of_state_fully_deciphered parameter error
@@ -495,8 +495,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               state1
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos  parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn  parameter error error' __POS__ Exit
           in
           let error', site_string2 =
             Handler.string_of_site_in_natural_language
@@ -504,8 +504,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               agent_type site2
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos  parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn  parameter error error' __POS__ Exit
           in
           let error', state_string2 =
             Handler.string_of_state_fully_deciphered parameter error
@@ -514,8 +514,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               state2
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos parameter error error' __POS__ Exit in
+            Exception.check_point
+              Exception.warn parameter error error' __POS__ Exit in
           error,
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
             "%s%s%s is %s, if and only if, %s is %s.%s"
@@ -535,8 +535,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               site1
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos  parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn  parameter error error' __POS__ Exit
           in
           let error', state_string1 =
             Handler.string_of_state_fully_deciphered parameter error
@@ -545,8 +545,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               state1
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn parameter error error' __POS__ Exit
           in
           let error', site_string2 =
             Handler.string_of_site_in_natural_language
@@ -554,8 +554,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               site2
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn parameter error error' __POS__ Exit
           in
           let error', state_string2 =
             Handler.string_of_state_fully_deciphered parameter error
@@ -564,8 +564,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               state2
           in
           let error =
-            Exception.check_pos
-              Exception.warn_pos parameter error error' __POS__ Exit
+            Exception.check_point
+              Exception.warn parameter error error' __POS__ Exit
           in
           error,
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -662,7 +662,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                   in
                   error,()
                 | [] ->
-                  Exception.warn_pos parameter error __POS__ Exit ()
+                  Exception.warn parameter error __POS__ Exit ()
                 | (a, _) :: b ->
                   let error, string =
                     Handler.string_of_site_in_natural_language
@@ -678,7 +678,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                 head
               with
               | [] | [_] ->
-                Exception.warn_pos parameter error __POS__ Exit ()
+                Exception.warn parameter error __POS__ Exit ()
               | (a , _) :: b ->
                 let error, string =
                   Handler.string_of_site_in_natural_language
@@ -706,8 +706,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                             agent_type site_type
                         in
                         let error =
-                          Exception.check_pos
-                            Exception.warn_pos  parameter error error'
+                          Exception.check_point
+                            Exception.warn  parameter error error'
                             __POS__ Exit
                         in
                         let error', state_string =
@@ -715,8 +715,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                             handler_kappa agent_type site_type state
                         in
                         let error =
-                          Exception.check_pos
-                            Exception.warn_pos  parameter error error'
+                          Exception.check_point
+                            Exception.warn  parameter error error'
                             __POS__ Exit in
                         (*-----------------------------------------------------------*)
                         let () =

@@ -20,7 +20,7 @@ let check_freshness parameters error str id id_set =
     if Mods.StringSet.mem id id_set
     then
       begin
-        Exception.warn_pos
+        Exception.warn
           parameters error __POS__ ~message:(str^" '"^id^"' is already used") Exit id_set
       end
     else
@@ -79,12 +79,12 @@ let pop_entry parameters error id (map,set) =
           id
           map
       in
-      Exception.warn_pos
+      Exception.warn
         parameters error __POS__
         ~message:"dandling bond detected"
         Exit (None,map)
     | Some [] ->
-      Exception.warn_pos
+      Exception.warn
         parameters error __POS__
         ~message:"internal bug, link id is ignored"
         Exit (None,map)
@@ -97,12 +97,12 @@ let pop_entry parameters error id (map,set) =
           t
           map
       in
-      Exception.warn_pos
+      Exception.warn
         parameters error __POS__
         ~message:"internal bug, link id is ignored"
         Exit (None,map)
     | None ->
-      Exception.warn_pos
+      Exception.warn
         parameters error __POS__
         ~message:"internal bug, link id is ignored"
         Exit (None,map)
@@ -136,17 +136,17 @@ let pop_entry parameters error id (map,set) =
           t
           map
       in
-      Exception.warn_pos
+      Exception.warn
         parameters error __POS__
         ~message:"too many instances of a link identifier, ignore them"
         Exit (None,map)
     | Some [] ->
-      Exception.warn_pos
+      Exception.warn
         parameters error __POS__
         ~message:"internal bug, link identifier"
         Exit (None,map)
     | None ->
-      Exception.warn_pos parameters error __POS__ Exit (None,map)
+      Exception.warn parameters error __POS__ Exit (None,map)
 
 let rec scan_interface parameters k agent interface remanent =
   match interface with
@@ -213,7 +213,7 @@ let collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanen
              x
              set
          in
-         Exception.warn_pos
+         Exception.warn
            parameters error __POS__
            ~message:"dangling bond detected"
            Exit (map,set)
@@ -240,7 +240,7 @@ let translate_lnk_state parameters lnk_state remanent =
       | None ->
         let site = Ckappa_sig.LNK_SOME position in
         let remanent =
-          Exception.warn_pos parameters error __POS__
+          Exception.warn parameters error __POS__
             ~message:((Location.to_string position) ^"one dandling bond has been replaced by a wild card")
             Exit
             remanent
@@ -251,7 +251,7 @@ let translate_lnk_state parameters lnk_state remanent =
         then
           let site = Ckappa_sig.LNK_SOME position in
           let remanent =
-            Exception.warn_pos parameters error __POS__ Exit remanent
+            Exception.warn parameters error __POS__ Exit remanent
           in
           site,remanent
         else
@@ -645,7 +645,7 @@ let bool_with_pos_with_option_map = with_option_map bool_with_pos_map
 
 let refine_token parameters error token =
   let error,token =
-    Exception.warn_pos
+    Exception.warn
       parameters error __POS__
       ~message:"Tokens are not implemented in KaSa yet"
       Exit token

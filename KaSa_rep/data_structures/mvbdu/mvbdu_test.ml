@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -349,7 +349,7 @@ let bdu_test remanent parameters =
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
-          Exception.warn_pos parameters error __POS__ Exit a' in
+          Exception.warn parameters error __POS__ Exit a' in
         error, handler, a
   in
   let error, handler, l', _l'_id, l'', _l''_id =

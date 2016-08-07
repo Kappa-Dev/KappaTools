@@ -58,7 +58,7 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                    Handler.string_of_agent parameter error handler_kappa agent_type
                  with
                  | _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type)
                in
@@ -75,7 +75,7 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                           site_type
                       with
                       | _ ->
-                        Exception.warn_pos
+                        Exception.warn
                           parameter error __POS__ Exit
                           (Ckappa_sig.string_of_site_name site_type)
                     in
@@ -174,7 +174,7 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
               Handler.string_of_agent parameter error handler_kappa agent_type1
             with
               _ ->
-              Exception.warn_pos
+              Exception.warn
                 parameter error __POS__ Exit
                 ((Ckappa_sig.string_of_agent_name agent_type1))
           in
@@ -195,7 +195,7 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
                      site_type
                  with
                  | _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_site_name site_type)
                in
@@ -264,7 +264,7 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
               Handler.string_of_agent parameter error handler_kappa agent_type2
             with
             | _ ->
-              Exception.warn_pos
+              Exception.warn
                 parameter error __POS__ Exit
                 ((Ckappa_sig.string_of_agent_name agent_type2))
           in
@@ -284,7 +284,7 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
                     site_type
                 with
                 | _ ->
-                  Exception.warn_pos
+                  Exception.warn
                     parameter error __POS__ Exit
                     (Ckappa_sig.string_of_site_name site_type)
               in
@@ -606,7 +606,7 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                  Handler.string_of_agent parameter error handler_kappa agent_type
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit
                    (Ckappa_sig.string_of_agent_name agent_type)
              in
@@ -628,7 +628,7 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                         site_type
                     with
                     | _ ->
-                      Exception.warn_pos
+                      Exception.warn
                         parameter error __POS__ Exit
                         (Ckappa_sig.string_of_site_name site_type)
                   in
@@ -750,7 +750,7 @@ let collect_internal_flow parameter error handler_kappa rule
                        Handler.string_of_agent parameter error handler_kappa agent_type
                      with
                      | _ ->
-                       Exception.warn_pos
+                       Exception.warn
                          parameter error __POS__ Exit
                          (Ckappa_sig.string_of_agent_name agent_type)
                    in
@@ -760,7 +760,7 @@ let collect_internal_flow parameter error handler_kappa rule
                          site_type
                      with
                      | _ ->
-                       Exception.warn_pos
+                       Exception.warn
                          parameter error __POS__ Exit
                          (Ckappa_sig.string_of_site_name site_type)
                    in
@@ -813,7 +813,7 @@ let collect_internal_flow parameter error handler_kappa rule
                        Handler.string_of_agent parameter error handler_kappa agent_type
                      with
                      | _ ->
-                       Exception.warn_pos
+                       Exception.warn
                          parameter error __POS__ Exit
                          (Ckappa_sig.string_of_agent_name agent_type)
                    in
@@ -823,7 +823,7 @@ let collect_internal_flow parameter error handler_kappa rule
                          site_type
                      with
                      | _ ->
-                       Exception.warn_pos
+                       Exception.warn
                          parameter error __POS__ Exit
                          (Ckappa_sig.string_of_site_name site_type)
                    in
@@ -833,7 +833,7 @@ let collect_internal_flow parameter error handler_kappa rule
                          site_anchor
                      with
                      | _ ->
-                       Exception.warn_pos
+                       Exception.warn
                          parameter error __POS__ Exit
                          (Ckappa_sig.string_of_site_name site_anchor)
                    in
@@ -988,7 +988,7 @@ let collect_external_flow parameter error handler_kappa rule
                    Handler.string_of_agent parameter error handler_kappa agent_type
                  with
                    _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type)
                in
@@ -997,7 +997,7 @@ let collect_external_flow parameter error handler_kappa rule
                    Handler.string_of_agent parameter error handler_kappa agent_type'
                  with
                  | _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type')
                in
@@ -1007,7 +1007,7 @@ let collect_external_flow parameter error handler_kappa rule
                      anchor_site_type
                  with
                  | _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_site_name anchor_site_type)
                in
@@ -1017,7 +1017,7 @@ let collect_external_flow parameter error handler_kappa rule
                      site_modif
                  with
                  | _ ->
-                   Exception.warn_pos
+                   Exception.warn
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_site_name site_modif)
                in
@@ -1184,7 +1184,7 @@ let scan_rule_set parameter error handler_kappa compiled =
                  Handler.string_of_rule parameter error handler_kappa compiled rule_id
                with
                | _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit
                    (Ckappa_sig.string_of_rule_id rule_id)
              in

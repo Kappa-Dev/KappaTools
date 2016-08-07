@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2010, the 18th of October
- * Last modification: Time-stamp: <Aug 05 2016>
+ * Last modification: Time-stamp: <Aug 06 2016>
  * *
  * This library provides primitives to deal indexed set of values
  * During the construction membership, tranduction, and new key can
@@ -85,8 +85,8 @@ module Dictionary =
            in_construction:('a,'b) in_construction
          }
 
-       let invalid x parameters mh (file, line, _, _) message exn =
-         Exception.warn parameters mh (Some file) (Some ("line "^(string_of_int line^" "^message))) exn (fun () -> x)
+       let invalid x parameters mh __POS__ message exn =
+         Exception.warn parameters mh __POS__ ~message exn x
 
        let invalid_arg = invalid None
 

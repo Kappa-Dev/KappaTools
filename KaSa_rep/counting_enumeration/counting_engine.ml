@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 01/10/2010
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 07 2016>
    * *
    * A generic module to count or enumerate the shapes that we can do with puzzle pieces
    *
@@ -104,12 +104,11 @@ module Count =
        let error_handler,k = Interfaces.Map.find_option parameters error_handler (interface_other,self) species in
        match k with
        | None ->
-         let file,line,_,_ = __POS__ in
          let error_handler,state =
            Exception.warn
-             parameters state.error_handler
-             (Some file) (Some ("line "^(string_of_int line)^", unknown interface in remove_species"))
-             Exit (fun () -> state)
+             parameters state.error_handler __POS__
+             ~message:"unknown interface in remove_species"
+             Exit state
          in
          error_handler,state,(E.nil,Puzzle_hole_map_and_set.Set.empty)
        | Some k ->
@@ -154,11 +153,11 @@ module Count =
                      (fun _ i -> i<>0) interface_other in
                  match hole with
                  | None ->
-                   let file,line,_,_ = __POS__ in
                    let error_handler,state =
-                     Exception.warn parameters state.error_handler
-                       (Some file) (Some ("line "^(string_of_int line)))
-                       Exit (fun () -> state) in
+                     Exception.warn
+                       parameters state.error_handler __POS__
+                       Exit state
+                   in
                    {state with error_handler = error_handler }
                  | Some (hole,_) ->
                    {

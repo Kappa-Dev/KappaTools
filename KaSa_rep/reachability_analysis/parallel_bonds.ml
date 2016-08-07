@@ -690,7 +690,7 @@ struct
       match state_list_lattice with
       | Usual_domains.Val l -> error, l
       | Usual_domains.Any | Usual_domains.Undefined ->
-        Exception.warn_pos
+        Exception.warn
           parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
@@ -709,7 +709,7 @@ struct
     with
     | None ->
       let error, () =
-        Exception.warn_pos parameter error __POS__ Exit ()
+        Exception.warn parameter error __POS__ Exit ()
       in
       error, dynamic, (precondition, event_list)
     | Some rule ->

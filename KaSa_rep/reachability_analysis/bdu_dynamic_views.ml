@@ -39,8 +39,8 @@ let add_link parameter error (agent_type, cv_id) rule_id_set store_result =
     Ckappa_sig.Rule_map_and_set.Set.union parameter error rule_id_set old_set
   in
   let error =
-    Exception.check_pos
-      Exception.warn_pos parameter error error' __POS__ Exit
+    Exception.check_point
+      Exception.warn parameter error error' __POS__ Exit
   in
   let error, store_result =
     Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
@@ -282,13 +282,13 @@ let collect_dual_map parameter error handler store_result =
             Ckappa_sig.AgentSiteState_map_and_set.Set.empty
         in
         let error =
-          Exception.check_pos Exception.warn_pos parameter error error' __POS__ Exit
+          Exception.check_point Exception.warn parameter error error' __POS__ Exit
         in
         let error', new_set =
           Ckappa_sig.AgentSiteState_map_and_set.Set.union parameter error set old_set
         in
         let error =
-          Exception.check_pos Exception.warn_pos parameter error error' __POS__ Exit
+          Exception.check_point Exception.warn parameter error error' __POS__ Exit
         in
         let error, store_result =
           Ckappa_sig.AgentSiteState_map_and_set.Map.add_or_overwrite

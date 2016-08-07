@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 8th or March
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -30,7 +30,7 @@
 let downgrade parameters mh message value mvbdu =
   match mvbdu with
   | Some x -> mh,x
-  | None -> Exception.warn_pos parameters mh message Exit (value ())
+  | None -> Exception.warn parameters mh message Exit (value ())
 
 let generic_zeroary allocate handler f error parameters  =
   let error,cell = f error in
@@ -39,7 +39,7 @@ let generic_zeroary allocate handler f error parameters  =
       allocate error handler (Mvbdu_core.get_skeleton cell) cell
   in
   match output with
-  | None -> Exception.warn_pos parameters error __POS__ Exit (handler,None)
+  | None -> Exception.warn parameters error __POS__ Exit (handler,None)
   | Some (_key,_cell,mvbdu,handler) -> error,(handler,Some mvbdu)
 
 let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.unary_memoized_fun)
@@ -98,7 +98,7 @@ let less parameters error x y =
   match compare x.Mvbdu_sig.variable y.Mvbdu_sig.variable with
   | 0 -> error, compare x.Mvbdu_sig.upper_bound y.Mvbdu_sig.upper_bound
   | 1 | -1 as x-> error, x
-  | _ ->  Exception.warn_pos parameters error __POS__ Exit 0
+  | _ ->  Exception.warn parameters error __POS__ Exit 0
 
 let cut x t1  =
   match t1.Mvbdu_sig.value with
@@ -292,7 +292,7 @@ let clean_head _allocate memoized_fun union handler error parameters (mvbdu_inpu
                       begin
                         match output with
                         |  None ->
-                          Exception.warn_pos
+                          Exception.warn
                             parameters error __POS__ Exit (handler,None)
                         | Some a ->
                           aux handler error q (Some (a:'mvbdu))
@@ -345,7 +345,7 @@ let keep_head_only allocate memoized_fun bdu_true handler error parameters (mvbd
                                 Mvbdu_sig.branch_false = b_false})
                     with
                     | error, None ->
-                      Exception.warn_pos parameters error __POS__ Exit (handler, None)
+                      Exception.warn parameters error __POS__ Exit (handler, None)
                     | error, Some (_, _, bdu, handler) -> error, (handler, Some bdu)
                   end
                 | None, _ | _, None -> error, (handler, None)
@@ -358,7 +358,7 @@ let keep_head_only allocate memoized_fun bdu_true handler error parameters (mvbd
               begin
                 match output with
                 |  None ->
-                  Exception.warn_pos
+                  Exception.warn
                     parameters error __POS__ Exit (handler, None)
                 | Some a -> error, (handler, Some a)
               end
@@ -578,7 +578,7 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
             match list_input.List_sig.value with
             | List_sig.Empty ->
               begin
-                Exception.warn_pos parameters error __POS__ Exit (handler, None)
+                Exception.warn parameters error __POS__ Exit (handler, None)
               end
             | List_sig.Cons(list) ->
               begin
@@ -645,7 +645,7 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
                       error, (handler, Some(mvbdu))
                   end
                 else
-                  Exception.warn_pos
+                  Exception.warn
                     parameters error __POS__ Exit (handler,None)
               end
           end

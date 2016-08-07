@@ -850,7 +850,7 @@ let scan_rule parameter error handler rule_id rule quarks =
          in
          match agent with
          | None ->
-           Exception.warn_pos parameter error __POS__ Exit agent_modif_plus
+           Exception.warn parameter error __POS__ Exit agent_modif_plus
          | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Ghost -> error,agent_modif_plus
          | Some Cckappa_sig.Dead_agent (agent,_,_,_) | Some Cckappa_sig.Agent agent ->
            let error,kasim_id =
@@ -901,7 +901,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                               (agent_type, site)
                               handler.Cckappa_sig.states_dic)
                           (fun error ->
-                             Exception.warn_pos parameter error __POS__  Exit
+                             Exception.warn parameter error __POS__  Exit
                               (Ckappa_sig.Dictionary_of_States.init ()))
                       in
                       let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in
@@ -1059,7 +1059,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                        (agent_type, site)
                        handler.Cckappa_sig.states_dic)
                    (fun error ->
-                      Exception.warn_pos parameter error __POS__ Exit
+                      Exception.warn parameter error __POS__ Exit
                        (Ckappa_sig.Dictionary_of_States.init ()))
                in
                let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in

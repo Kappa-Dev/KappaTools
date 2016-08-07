@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 27th of July
-  * Last modification: Time-stamp: <Aug 05 2016>
+  * Last modification: Time-stamp: <Aug 06 2016>
   *
   * Work list - FIFO
   *
@@ -13,9 +13,6 @@
   * under the terms of the GNU Library General Public License *)
 
 open SetMap
-
-let warn parameters mh pos exn default =
-  Exception.warn_pos parameters mh pos  exn default
 
 let local_trace = false
 
@@ -54,7 +51,7 @@ module WlMake (Ord: OrderedType with type t = int) =
         error, x
       else
         let error', add_elt = WSet.add parameter error e pool in
-        let error = Exception.check warn parameter error error' __POS__  Exit in
+        let error = Exception.check_point Exception.warn parameter error error' __POS__  Exit in
         error, ((e :: in_list), out_list, add_elt)
 
     let fold_left f acc x =

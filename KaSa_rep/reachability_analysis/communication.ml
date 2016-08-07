@@ -134,7 +134,7 @@ let the_rule_is_or_not_applied_for_the_first_time bool parameter error precondit
                            }
   | Usual_domains.Sure_value b when b = bool -> error, precondition
   | Usual_domains.Sure_value _ ->
-    Exception.warn_pos
+    Exception.warn
       parameter error __POS__
       ~message:"inconsistent computation in three-value logic"
       Exit precondition
@@ -213,7 +213,7 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
     (* In theory, this could happen, but it would be worth being warned
        about it *)
     let error, () =
-      Exception.warn_pos
+      Exception.warn
         parameter error __POS__ ~message:"bottom propagation" Exit ()
     in
     error, precondition, Usual_domains.Not_top init

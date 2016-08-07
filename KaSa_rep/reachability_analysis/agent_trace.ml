@@ -121,7 +121,7 @@ let build_asso_of_mvbdu parameter error mvbdu =
     end
   | _ ->
     let error, list =
-      Exception.warn_pos parameter error __POS__ Exit []
+      Exception.warn parameter error __POS__ Exit []
     in
     error, list
 
@@ -202,8 +202,8 @@ let string_label_of_asso parameter error handler_kappa transition_system list =
              handler_kappa transition_system.agent_type site_type state
          in
          let error =
-           Exception.check_pos
-             Exception.warn_pos parameter error error' __POS__ Exit
+           Exception.check_point
+             Exception.warn parameter error error' __POS__ Exit
          in
          error,
          string^site_string^state_string,
@@ -266,7 +266,7 @@ let asso_of_view_in_list parameter error view =
          then
            error, (site,lub)::list
          else
-           Exception.warn_pos parameter error __POS__ Exit list
+           Exception.warn parameter error __POS__ Exit list
       )
       (error, [])
       view
@@ -374,7 +374,7 @@ let build_support parameter error rules =
               in
               error, (map, creation)
             | error, Some _, Some _ ->
-              Exception.warn_pos parameter error __POS__ Exit (map, creation)
+              Exception.warn parameter error __POS__ Exit (map, creation)
             | error,
               Some (agent_name, set_test, asso_test, set_mod, asso_mod), None ->
               let error, old_map =
@@ -735,7 +735,7 @@ let merge_neighbour parameter error concurrent_sites =
                   error, set, (label'::list)
                 | None, _ | _, None ->
                   let error, set =
-                    Exception.warn_pos parameter error __POS__ Exit set
+                    Exception.warn parameter error __POS__ Exit set
                   in
                   error, set, list
               else
@@ -749,7 +749,7 @@ let merge_neighbour parameter error concurrent_sites =
            match SitePairSet.min_elt set
            with
            | None ->
-             Exception.warn_pos parameter error __POS__ Exit map
+             Exception.warn parameter error __POS__ Exit map
            | Some (a1,_a2) ->
              let error, sites_in_conflict = SiteSet.remove parameter error a1 sites_in_conflict in
              let ext_list = SiteSet.elements sites_in_conflict in
@@ -986,7 +986,7 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
               | Cckappa_sig.Ghost
               | Cckappa_sig.Dead_agent _
               | Cckappa_sig.Unknown_agent _ ->
-                Exception.warn_pos parameter error __POS__ Exit init_map
+                Exception.warn parameter error __POS__ Exit init_map
            )
            mixture.Cckappa_sig.views
            init_map)
@@ -1007,12 +1007,12 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
            try
              Handler.string_of_agent parameter error handler_kappa agent_type
            with
-           | _ -> Exception.warn_pos parameter error __POS__ Exit
+           | _ -> Exception.warn parameter error __POS__ Exit
                     (Ckappa_sig.string_of_agent_name agent_type)
          in
          let error =
-           Exception.check_pos
-             Exception.warn_pos parameter error error' __POS__ Exit
+           Exception.check_point
+             Exception.warn parameter error error' __POS__ Exit
          in
          Wrapped_modules.LoggedIntMap.fold
            (fun _ mvbdu (error, log_info) ->
@@ -1228,5 +1228,5 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
   | error, Some h -> error, log_info, h
   | error, None ->
     let error, h =
-      Exception.warn_pos parameter error __POS__ Exit handler in
+      Exception.warn parameter error __POS__ Exit handler in
     error, log_info, h

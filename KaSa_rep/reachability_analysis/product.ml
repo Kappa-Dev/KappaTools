@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 26 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -44,8 +44,8 @@ module Product
     let get_global_dynamic_information dynamic = dynamic.global
     let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
 
-    let warn static mh message exn default =
-      Exception.warn (get_parameter static) mh (Some "product_domain") message exn (fun () -> default)
+    let warn static mh pos message exn default =
+      Exception.warn (get_parameter static) mh pos ~message exn default
 
     let smash_dynamic underlying_domain new_domain =
       {
@@ -310,7 +310,7 @@ module Product
           else
             warn
               static error
-              (Some "line 289, inconsistent computation in three-values logic")
+              __POS__ "inconsistent computation in three-values logic"
               Exit (Usual_domains.Sure_value false)
       in
       error,

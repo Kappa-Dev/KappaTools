@@ -13,7 +13,7 @@
 
 
 let warn parameters mh pos exn default =
-  Exception.warn_pos parameters mh pos exn default
+  Exception.warn parameters mh pos exn default
 
 (*******************************************************************************)
 (*module signatures*)

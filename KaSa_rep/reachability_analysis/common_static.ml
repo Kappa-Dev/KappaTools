@@ -109,7 +109,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
                       (agent_type, site_type)
                       handler.Cckappa_sig.states_dic)
                   (fun error ->
-                     Exception.warn_pos
+                     Exception.warn
                        parameter error __POS__ Exit
                        (Ckappa_sig.Dictionary_of_States.init()))
               in
@@ -217,7 +217,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
                     (agent_type, site_type)
                     handler.Cckappa_sig.states_dic)
                  (fun error ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.Dictionary_of_States.init()))
              in
@@ -306,7 +306,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                        (agent_type, site)
                        handler.Cckappa_sig.states_dic)
                     (fun error ->
-                       Exception.warn_pos
+                       Exception.warn
                          parameter error __POS__ Exit
                          (Ckappa_sig.Dictionary_of_States.init()))
                 in
@@ -563,7 +563,7 @@ let collect_agent_type_state parameter error agent site_type =
   | Cckappa_sig.Ghost
   | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
   | Cckappa_sig.Dead_agent _ ->
-    Exception.warn_pos parameter error __POS__ Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+    Exception.warn parameter error __POS__ Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
   | Cckappa_sig.Agent agent1 ->
     let agent_type1 = agent1.Cckappa_sig.agent_name in
     let error, state1 =
@@ -574,7 +574,7 @@ let collect_agent_type_state parameter error agent site_type =
               agent1.Cckappa_sig.agent_interface
       with
       | error, None ->
-        Exception.warn_pos
+        Exception.warn
           parameter error __POS__ Exit Ckappa_sig.dummy_state_index
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
@@ -582,7 +582,7 @@ let collect_agent_type_state parameter error agent site_type =
         then
           error, state
         else
-          Exception.warn_pos
+          Exception.warn
             parameter error __POS__ Exit Ckappa_sig.dummy_state_index
     in
     error, (agent_type1, state1)
@@ -604,15 +604,15 @@ let add_link_set parameter error rule_id (x, y) store_result =
       old_set
   in
   let error =
-    Exception.check_pos
-      Exception.warn_pos parameter error error' __POS__ Exit
+    Exception.check_point
+      Exception.warn parameter error error' __POS__ Exit
   in
   let error'', union_set =
     Ckappa_sig.PairAgentSiteState_map_and_set.Set.union parameter error set old_set
   in
   let error =
-    Exception.check_pos
-      Exception.warn_pos parameter error error'' __POS__ Exit
+    Exception.check_point
+      Exception.warn parameter error error'' __POS__ Exit
   in
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
@@ -631,7 +631,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
           parameter error agent_id views
       with
       | error, None ->
-        Exception.warn_pos
+        Exception.warn
           parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
@@ -641,7 +641,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
           parameter error agent_index_target views
       with
       | error, None ->
-        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+        Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
@@ -736,7 +736,7 @@ let collect_action_binding parameter error rule_id rule store_result =
             parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
         | error, None ->
-          Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+          Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       (*get pair agent_type, state*)
@@ -755,7 +755,7 @@ let collect_action_binding parameter error rule_id rule store_result =
             parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
         | error, None ->
-          Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+          Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       let error, (agent_type2, state2) =
@@ -785,8 +785,8 @@ let collect_action_binding parameter error rule_id rule store_result =
           old_set
       in
       let error =
-        Exception.check_pos
-          Exception.warn_pos parameter error error' __POS__ Exit 
+        Exception.check_point
+          Exception.warn parameter error error' __POS__ Exit
       in
       let error, store_result =
         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite

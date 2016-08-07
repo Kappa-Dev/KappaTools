@@ -121,7 +121,7 @@ struct
                     compil rule_id
                 with
                   _ ->
-                  Exception.warn_pos
+                  Exception.warn
                     parameter error __POS__ Exit
                     (Ckappa_sig.string_of_rule_id rule_id)
               in

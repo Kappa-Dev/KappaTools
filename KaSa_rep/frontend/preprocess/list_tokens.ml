@@ -93,7 +93,7 @@ let declare_agent parameters error handler agent_name =
       agents_dic
   in
   match output with
-  | None -> Exception.warn_pos parameters error __POS__
+  | None -> Exception.warn parameters error __POS__
               Exit (handler, Ckappa_sig.dummy_agent_name)
   | Some (k, _, _, dic) ->
     if bool
@@ -143,7 +143,7 @@ let declare_site create parameters make_site make_state (error, handler)
       handler.Cckappa_sig.sites
   in
   match sites with
-  | None  -> Exception.warn_pos parameters error __POS__ Exit
+  | None  -> Exception.warn parameters error __POS__ Exit
                (handler, [], Ckappa_sig.dummy_site_name)
   | Some sites ->
     let error, (bool, output) =
@@ -158,7 +158,7 @@ let declare_site create parameters make_site make_state (error, handler)
     in
     begin
       match output with
-      | None -> Exception.warn_pos parameters error __POS__ Exit
+      | None -> Exception.warn parameters error __POS__ Exit
                   (handler, [], Ckappa_sig.dummy_site_name)
       | Some (k, _, _, sites) ->
         let error, (states_dic, dic_states, handler) =
@@ -196,7 +196,7 @@ let declare_site create parameters make_site make_state (error, handler)
             with
             | error, None ->
               let error, dic = create parameters error in
-              Exception.warn_pos parameters error __POS__ Exit (states_dic, dic, handler)
+              Exception.warn parameters error __POS__ Exit (states_dic, dic, handler)
             | error, Some _u ->
               let error, dic_states =
                 match
@@ -208,7 +208,7 @@ let declare_site create parameters make_site make_state (error, handler)
                 with
                 | error, None ->
                   let error, dic_states = (create parameters error) in
-                  Exception.warn_pos parameters error __POS__ Exit dic_states
+                  Exception.warn parameters error __POS__ Exit dic_states
                 | error, Some dic_states -> error, dic_states
               in
               error, (states_dic, dic_states, handler)
@@ -230,7 +230,7 @@ let declare_site create parameters make_site make_state (error, handler)
                begin
                  match output with
                  | None ->
-                   Exception.warn_pos parameters error __POS__ Exit (dic_states, l, bool2)
+                   Exception.warn parameters error __POS__ Exit (dic_states, l, bool2)
                  | Some (state_id, _, _, dic) ->
                    let l = (agent_name, k, state_id) :: l in
                    if bool2
@@ -382,7 +382,7 @@ let scan_agent parameters (error, handler) agent =
                    agent_id2
                    site_id2
                    state_id2
-               | _ -> Exception.warn_pos parameters error __POS__ Exit handler
+               | _ -> Exception.warn parameters error __POS__ Exit handler
              end
            in
            error, handler)
@@ -411,11 +411,11 @@ let rec scan_mixture parameters remanent mixture =
 
 let scan_token parameters remanent _alg = (*TO DO*)
   let error,remanent = remanent in
-  let (file, line, _, _) = __POS__ in
   let error,remanent =
-    Exception.warn parameters error (Some file)
-      (Some ("line "^(string_of_int line)^", scan_token is not implemented yet"))
-      Exit (fun () -> remanent)
+    Exception.warn
+      parameters error __POS__
+      ~message:"scan_token is not implemented yet"
+      Exit remanent
   in
   error,remanent
 

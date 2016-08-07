@@ -30,7 +30,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
           parameter error agent_id views
       with
       | error, None ->
-        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+        Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, agent_target =
@@ -39,7 +39,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
           parameter error agent_index_target views
       with
       | error, None ->
-        Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+        Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
@@ -140,8 +140,8 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
                             store_result
                         in
                         let error =
-                          Exception.check_pos
-                            Exception.warn_pos parameter error error'
+                          Exception.check_point
+                            Exception.warn parameter error error'
                             __POS__ Exit
                         in
                         error, store_result

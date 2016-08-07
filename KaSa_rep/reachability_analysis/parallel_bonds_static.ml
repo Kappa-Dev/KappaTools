@@ -118,7 +118,7 @@ let collect_agent_type_state parameter error agent site_type =
   | Cckappa_sig.Ghost
   | Cckappa_sig.Unknown_agent _ -> error,(dummy_agent, dummy_state)
   | Cckappa_sig.Dead_agent _ ->
-    Exception.warn_pos
+    Exception.warn
       parameter error __POS__ Exit (dummy_agent, dummy_state)
   | Cckappa_sig.Agent agent1 ->
     let agent_type1 = agent1.Cckappa_sig.agent_name in
@@ -131,14 +131,14 @@ let collect_agent_type_state parameter error agent site_type =
           agent1.Cckappa_sig.agent_interface
       with
       | error, None ->
-        Exception.warn_pos parameter error __POS__ Exit dummy_state
+        Exception.warn parameter error __POS__ Exit dummy_state
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
         if Ckappa_sig.compare_state_index state dummy_state > 0
         then
           error, state
         else
-          Exception.warn_pos parameter error __POS__ Exit dummy_state
+          Exception.warn parameter error __POS__ Exit dummy_state
     in
     error, (agent_type1, state1)
 
@@ -159,7 +159,7 @@ let collect_action_binding parameter error rule_id rule store_result =
             parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
         | error, None ->
-          Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+          Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       (*get pair agent_type, state*)
@@ -177,7 +177,7 @@ let collect_action_binding parameter error rule_id rule store_result =
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
-        | error, None -> Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+        | error, None -> Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
         | error, Some agent -> error, agent
       in
       let error, (agent_type2, state2) =
@@ -215,8 +215,8 @@ let collect_action_binding parameter error rule_id rule store_result =
           set
       in
       let error =
-        Exception.check_pos
-          Exception.warn_pos parameter error error' __POS__ Exit
+        Exception.check_point
+          Exception.warn parameter error error' __POS__ Exit
       in
       let error, store_result =
         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
@@ -248,7 +248,7 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                   parameter error agent_id views
               with
               | error, None ->
-                Exception.warn_pos
+                Exception.warn
                   parameter error __POS__ Exit Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
@@ -268,7 +268,7 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                   parameter error agent_id_target views
               with
               | error, None ->
-                Exception.warn_pos
+                Exception.warn
                   parameter error __POS__ Exit Cckappa_sig.Ghost
               | error, Some agent -> error, agent
             in
@@ -296,8 +296,8 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                 old_set
             in
             let error =
-              Exception.check_pos
-                Exception.warn_pos parameter error error' __POS__ Exit
+              Exception.check_point
+                Exception.warn parameter error error' __POS__ Exit
             in
             let error, store_result =
               Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
@@ -368,7 +368,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id
                     parameter error agent_id_source views
                 with
                 | error, None ->
-                  Exception.warn_pos
+                  Exception.warn
                     parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
@@ -387,7 +387,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id
                     parameter error agent_id_target views
                 with
                 | error, None ->
-                  Exception.warn_pos
+                  Exception.warn
                     parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
@@ -431,8 +431,8 @@ let collect_rule_has_parallel_bonds parameter error rule_id
                         old_parallel_set
                     in
                     let error =
-                      Exception.check_pos
-                        Exception.warn_pos parameter error error'
+                      Exception.check_point
+                        Exception.warn parameter error error'
                         __POS__ Exit
                     in
                     let error, store_result =
@@ -527,7 +527,7 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                     parameter error agent_id_source views
                 with
                 | error, None ->
-                  Exception.warn_pos
+                  Exception.warn
                     parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
@@ -546,7 +546,7 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                     parameter error agent_id_target views
                 with
                 | error, None ->
-                  Exception.warn_pos parameter error __POS__ Exit Cckappa_sig.Ghost
+                  Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
                 | error, Some agent -> error, agent
               in
               let error, (agent_type_target, state_target) =
@@ -701,8 +701,8 @@ let collect_views_rhs parameter error rule_id rule store_result =
                (error, old_set)
            in
            let error =
-             Exception.check_pos
-               Exception.warn_pos parameter error error'
+             Exception.check_point
+               Exception.warn parameter error error'
                __POS__ Exit
            in
            let error, store_result =

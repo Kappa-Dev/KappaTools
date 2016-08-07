@@ -21,8 +21,10 @@
 
 module S = Generic_branch_and_cut_solver.Solver
 
-let warn parameter error option exn default =
-  Exception.warn (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "dag.ml") option exn (fun () -> default)
+let warn parameter error pos ?message:(message="") exn default =
+  Exception.warn
+    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error pos
+    ~message exn default
 
 module type StoryTable =
 sig
@@ -702,7 +704,13 @@ module BucketTable =
       match assoc
       with
         None ->
-        let error,a = warn parameter error (Some "get_cannonical_form, line 767, unknown story id") (Failure "Inconsistent story id") (table,[]) in
+        let error,a =
+          warn
+            parameter error __POS__
+            ~message:"unknown story id"
+            (Failure "Inconsistent story id")
+            (table,[])
+        in
         error,log_info,a
       | Some (_,_,Some cannonic,_,_) ->
         error,log_info,(table,cannonic)
@@ -749,7 +757,12 @@ module BucketTable =
         match
           asso_opt
         with
-        | None -> warn parameter error (Some "add_story_info, line 800, Unknown story id") (Failure "Unknown story id") table
+        | None ->
+          warn
+            parameter error __POS__
+            ~message:"Unknown story id"
+            (Failure "Unknown story id")
+            table
         | Some (grid,graph,canonic,trace,info) ->
           let result =
             {
@@ -774,7 +787,11 @@ module BucketTable =
         with
         | (grid,graph,None,trace,info) -> error,(grid,graph,Some canonic_form,trace,info)
         | (_,_,Some _,_,_) ->
-          warn parameter error (Some "update_assoc, line 812, the canonical form of this story should not have been computed yet") (Failure "the canonical form of stories  should not have been computed yet") assoc
+          warn
+            parameter error __POS__
+            ~message:"the canonical form of this story should not have been computed yet"
+            (Failure "the canonical form of stories  should not have been computed yet")
+            assoc
       in
       let rec aux_inner2 log_info error canonic_form canonic_form' id' assoc table =
         match canonic_form,canonic_form'
@@ -888,7 +905,11 @@ module BucketTable =
                 with
                 |	(_,graph,None,_,_) -> error,graph
                 | (_,graph,Some _,_,_) ->
-                  warn parameter error (Some "add_story, line 878, the canonical form of stories in the outer tree should not have been computed yet") (Failure "the canonical form of stories in the outer tree should not have been computed yet") graph
+                  warn
+                    parameter error __POS__
+                    ~message:"the canonical form of stories in the outer tree should not have been computed yet"
+                    (Failure
+                       "the canonical form of stories in the outer tree should not have been compute yet")                                                        graph
               in
               let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
               let error,assoc = update_assoc error cannonic_form assoc in

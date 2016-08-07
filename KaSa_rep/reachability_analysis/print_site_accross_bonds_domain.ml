@@ -307,7 +307,7 @@ let print_pair_sites parameter error handler_kappa log store_result =
                           | _ ->
                             Exception.warn_pos
                               parameter error __POS__ Exit
-                                   (Ckappa_sig.string_of_state_index state1')
+                              (Ckappa_sig.string_of_state_index state1')
                         in
                         let () =
                           Loggers.fprintf log

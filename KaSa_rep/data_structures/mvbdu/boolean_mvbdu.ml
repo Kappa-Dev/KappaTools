@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 11th of March
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -367,7 +367,7 @@ let memo_identity =
        (fun bool ->
           error,
           (fun error ->
-             Exception.warn_pos
+             Exception.warn
                parameters error __POS__ Exit
                (Mvbdu_sig.Leaf bool)
           )))
@@ -392,7 +392,7 @@ let memo_constant_true  =
        (fun _bool ->
           error,
           (fun error ->
-             Exception.warn_pos
+             Exception.warn
                parameters error __POS__ Exit
                (Mvbdu_sig.Leaf true))))
     mvbdu_allocate
@@ -404,7 +404,7 @@ let memo_constant_false =
        (fun _bool ->
           error,
           (fun error ->
-             Exception.warn_pos
+             Exception.warn
                parameters error __POS__ Exit
                (Mvbdu_sig.Leaf false))))
     mvbdu_allocate
@@ -560,7 +560,7 @@ let boolean_constant_bi_true parameters =
        (fun error _ _ -> error,Mvbdu_sig.Leaf true, None)
        (fun parameters error ->
           let g (_:bool) =
-            Exception.warn_pos parameters error __POS__ Exit memo_identity
+            Exception.warn parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -572,7 +572,7 @@ let boolean_constant_bi_false parameters =
        (fun error _ _ -> error,Mvbdu_sig.Leaf false, None)
        (fun _parameters error ->
           let g (_:bool) =
-            Exception.warn_pos parameters error __POS__ Exit memo_identity
+            Exception.warn parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -584,7 +584,7 @@ let boolean_mvbdu_fst parameters =
        (fun error x _ -> error,x.Mvbdu_sig.value,Some x)
        (fun parameters error ->
           let g (_:bool) =
-            Exception.warn_pos parameters error __POS__ Exit memo_identity
+            Exception.warn parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -596,7 +596,7 @@ let boolean_mvbdu_snd parameters =
        (fun error x y -> error,x.Mvbdu_sig.value,Some y)
        (fun parameters error ->
           let g (_:bool) =
-            Exception.warn_pos parameters error __POS__ Exit memo_identity
+            Exception.warn parameters error __POS__ Exit memo_identity
           in
           (g,g))
        (mvbdu_allocate parameters))
@@ -1026,12 +1026,12 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
                       singleton
                       list_s
                   | None ->
-                    Exception.warn_pos parameters error __POS__ Exit (handler,None)
+                    Exception.warn parameters error __POS__ Exit (handler,None)
                 in
                 error, (handler, output)
               end
             | None,_ | _,None ->
-              Exception.warn_pos parameters error __POS__ Exit (handler,None)
+              Exception.warn parameters error __POS__ Exit (handler,None)
           end
       in
       match output with
@@ -1050,7 +1050,7 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
                          }
         }, Some output)
       | None ->
-        Exception.warn_pos parameters error __POS__ Exit (handler, None)
+        Exception.warn parameters error __POS__ Exit (handler, None)
     end
 
 let mvbdu_cartesian_decomposition_depth
@@ -1170,7 +1170,7 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
             match remanent, branch_true with
             | _, [] -> error, (handler, output)
             | None, _ ->
-              Exception.warn_pos parameters error __POS__ Exit (handler,[])
+              Exception.warn parameters error __POS__ Exit (handler,[])
             | Some (var, lower_bound), list ->
               let head_list =
                 let rec aux k res =

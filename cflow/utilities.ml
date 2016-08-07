@@ -585,10 +585,10 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
         Exception.warn
           (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
           error
-          (Some "utilities.ml")
-          (Some "One compression has failed")
+          __POS__
+          ~message:"One compression has failed"
           Exit
-          (fun () -> ())
+          ()
       else
         error, ()
     in

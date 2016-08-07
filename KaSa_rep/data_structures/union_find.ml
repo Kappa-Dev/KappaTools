@@ -4,7 +4,7 @@
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 2015, the 11th of March
-    * Last modification: Time-stamp: <Aug 05 2016>
+    * Last modification: Time-stamp: <Aug 06 2016>
     * *
     * This library provides primitives to deal with union find algorithm with
     * path compression
@@ -12,9 +12,6 @@
     * Copyright 2010,2011 Institut National de Recherche en Informatique et
     * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
-
-let warn parameters mh (file,line,_,_) title exn default =
-  Exception.warn parameters mh (Some file) (Some ("line "^(string_of_int line)^" : "^title)) exn (fun () -> default)
 
 module type Union_find =
 sig
@@ -77,7 +74,10 @@ module Make =
           match parent
           with
           | None ->
-            warn parameter error __POS__ "Error, missing association" Exit (t,None)
+            Exception.warn
+              parameter error __POS__
+              ~message:"Error, missing association"
+              Exit (t,None)
           | Some p when p <> e ->
             helper parameter error p (e::l) t
           | Some p ->
@@ -99,7 +99,11 @@ module Make =
         match
           root_x,root_y
         with
-        | None, _ | _, None -> warn parameter error __POS__ "missing_association" Exit t
+        | None, _ | _, None ->
+          Exception.warn
+            parameter error __POS__
+            ~message:"missing_association"
+            Exit t
         | Some a,Some b ->
           Storage.set parameter error a b t
 

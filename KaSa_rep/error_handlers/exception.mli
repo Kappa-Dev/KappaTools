@@ -3,10 +3,13 @@
 type method_handler = Exception_without_parameter.method_handler
 
 val empty_error_handler : method_handler
+
+val warn_with_exn :
+  Remanent_parameters_sig.parameters -> method_handler ->
+  string * int * int * int  -> ?message:string -> ?pos:Location.t option ->
+  exn -> (unit -> 'a) -> method_handler * 'a
+
 val warn :
-  Remanent_parameters_sig.parameters -> method_handler -> string option ->
-  string option -> exn -> (unit -> 'a) -> method_handler * 'a
-val warn_pos:
   Remanent_parameters_sig.parameters -> method_handler ->
   string * int * int * int  -> ?message:string -> ?pos:Location.t option ->
   exn -> 'a -> method_handler * 'a
@@ -17,13 +20,8 @@ val print_for_KaSim : Remanent_parameters_sig.parameters -> method_handler -> un
 
 val wrap : Remanent_parameters_sig.parameters ->
   method_handler -> string -> string option -> exn -> method_handler
-val check :
-  (Remanent_parameters_sig.parameters -> method_handler -> 'a ->
-   exn -> unit -> method_handler * unit) ->
-  Remanent_parameters_sig.parameters -> method_handler -> method_handler ->
-  'a -> exn -> method_handler
 
-val check_pos :
+val check_point :
   (Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t option ->
    exn -> unit -> method_handler * unit) ->
   Remanent_parameters_sig.parameters -> method_handler -> method_handler ->

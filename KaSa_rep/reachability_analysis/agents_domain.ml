@@ -327,7 +327,7 @@ struct
     | Some true ->
       error, (dynamic, event_list)
     | None ->
-      Exception.warn_pos parameter error __POS__ Exit (dynamic, event_list)
+      Exception.warn parameter error __POS__ Exit (dynamic, event_list)
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
@@ -343,7 +343,7 @@ struct
            | Cckappa_sig.Unknown_agent _
            | Cckappa_sig.Ghost
            | Cckappa_sig.Dead_agent _ ->
-             Exception.warn_pos
+             Exception.warn
                parameter error __POS__ Exit (dynamic, event_list)
            | Cckappa_sig.Agent agent ->
              let agent_type = agent.Cckappa_sig.agent_name in
@@ -408,7 +408,7 @@ struct
              error, dynamic, None
            | None ->
              let error, () =
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit ()
              in
              error, dynamic, None
@@ -515,12 +515,12 @@ struct
                    k
                with
                  _ ->
-                 Exception.warn_pos
+                 Exception.warn
                    parameter error __POS__ Exit (Ckappa_sig.string_of_agent_name k)
              in
              let error =
-               Exception.check_pos
-                 Exception.warn_pos parameter error error' __POS__ Exit
+               Exception.check_point
+                 Exception.warn parameter error error' __POS__ Exit
              in
              let () = Loggers.fprintf loggers
                  "%s is a dead agent." agent_string

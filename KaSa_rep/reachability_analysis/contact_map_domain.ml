@@ -104,7 +104,7 @@ struct
     | Cckappa_sig.Ghost
     | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
     | Cckappa_sig.Dead_agent _ ->
-      Exception.warn_pos
+      Exception.warn
         parameter error __POS__ Exit
         (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
     | Cckappa_sig.Agent agent1 ->
@@ -117,14 +117,14 @@ struct
                 agent1.Cckappa_sig.agent_interface
         with
         | error, None ->
-          Exception.warn_pos
+          Exception.warn
             parameter error __POS__ Exit Ckappa_sig.dummy_state_index
         | error, Some port ->
           let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
           if (Ckappa_sig.int_of_state_index state) > 0
           then error, state
           else
-            Exception.warn_pos
+            Exception.warn
               parameter error __POS__ Exit Ckappa_sig.dummy_state_index
       in
       error, (agent_type1, state1)
@@ -387,8 +387,8 @@ struct
         parameter error contact_map bond_rhs_set
     in
     let error =
-      Exception.check_pos
-        Exception.warn_pos parameter error error' __POS__ Exit
+      Exception.check_point
+        Exception.warn parameter error error' __POS__ Exit
     in
     let dynamic = set_contact_map_dynamic union dynamic in
     let new_contact_map = get_contact_map_dynamic dynamic in
@@ -397,8 +397,8 @@ struct
         parameter error new_contact_map contact_map
     in
     let error =
-      Exception.check_pos
-        Exception.warn_pos parameter error error' __POS__ Exit
+      Exception.check_point
+        Exception.warn parameter error error' __POS__ Exit
     in
     (*update the second field*)
     let error, dynamic =
@@ -442,7 +442,7 @@ struct
                   try Handler.string_of_agent parameter error kappa_handler agent_type1
                   with
                   | _ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.string_of_agent_name agent_type1)
                 in
@@ -451,7 +451,7 @@ struct
                     Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
                   with
                     _ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.string_of_site_name site_type1)
                 in
@@ -461,7 +461,7 @@ struct
                       agent_type1 site_type1 state1
                   with
                     _ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.string_of_state_index state1)
                 in
@@ -469,7 +469,7 @@ struct
                   try Handler.string_of_agent parameter error kappa_handler agent_type2
                   with
                     _ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.string_of_agent_name agent_type2)
                 in
@@ -478,7 +478,7 @@ struct
                     Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
                   with
                     _ ->
-                    Exception.warn_pos
+                    Exception.warn
                       parameter error __POS__ Exit
                       (Ckappa_sig.string_of_site_name site_type2)
                 in
@@ -487,7 +487,7 @@ struct
                     Handler.string_of_state_fully_deciphered parameter error kappa_handler
                       agent_type2 site_type2 state2
                   with
-                    _ -> Exception.warn_pos
+                    _ -> Exception.warn
                            parameter error __POS__ Exit
                            (Ckappa_sig.string_of_state_index state2)
                 in
@@ -518,7 +518,7 @@ struct
              try Handler.string_of_agent parameter error kappa_handler agent_type1
              with
              | _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_agent_name agent_type1)
            in
@@ -527,7 +527,7 @@ struct
                Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
              with
              | _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_site_name site_type1)
            in
@@ -537,7 +537,7 @@ struct
                  agent_type1 site_type1 state1
              with
                _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_state_index state1)
            in
@@ -545,7 +545,7 @@ struct
              try Handler.string_of_agent parameter error kappa_handler agent_type2
              with
              | _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_agent_name agent_type2)
            in
@@ -554,7 +554,7 @@ struct
                Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
              with
                _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_site_name site_type2)
            in
@@ -564,7 +564,7 @@ struct
                  agent_type2 site_type2 state2
              with
                _ ->
-               Exception.warn_pos
+               Exception.warn
                  parameter error __POS__ Exit
                  (Ckappa_sig.string_of_state_index state2)
            in

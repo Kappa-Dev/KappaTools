@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -35,7 +35,7 @@ let build_reversed_sorted_list_aux allocate parameters error handler list alread
        in
        match output with
        | Some (_key,_cell,list,handler) -> error,(handler,list)
-       | None -> Exception.warn_pos
+       | None -> Exception.warn
                    parameters error __POS__ Exit (handler,already)
     )
     (error, (handler, already))
@@ -60,7 +60,7 @@ let build_reversed_sorted_list allocate parameters error handler  list =
       list
       empty_list
   | None ->
-    Exception.warn_pos parameters error __POS__ Exit
+    Exception.warn parameters error __POS__ Exit
       (handler,
        {List_sig.id = 0;
         List_sig.value = List_sig.Empty})
@@ -139,7 +139,7 @@ let rec extensional_gen f get set error parameters handler list =
           let error,handler = set parameters error handler list output in
           error, (handler, Some output)
         | None ->
-          Exception.warn_pos
+          Exception.warn
             parameters error __POS__ Exit
             (handler,Some [])
     end
@@ -230,14 +230,14 @@ let rec overwrite allocate get set error parameters handler list1 list2 =
               match output with
               | Some (_key,_cell,list,handler) -> error,(handler,list)
               | None ->
-                Exception.warn_pos
+                Exception.warn
                   parameters error __POS__ Exit
                   (handler,
                    {List_sig.id = 0;
                     List_sig.value = List_sig.Empty})
             end
           | None ->
-            Exception.warn_pos parameters error __POS__ Exit
+            Exception.warn parameters error __POS__ Exit
               (handler,
                {List_sig.id = 0;
                 List_sig.value = List_sig.Empty})

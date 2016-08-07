@@ -43,8 +43,10 @@ struct
   module PH= Propagation_heuristics.Propagation_heuristic
 (*Blackboard_with_heuristic*)
 
-  let warn parameter error option exn default =
-       Exception.warn (PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "generic_branch_and_cut_solver.ml") option exn (fun () -> default)
+  let warn parameter error pos ?message:(message="") exn default =
+    Exception.warn
+      (PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error  pos
+      ~message exn default
 
   let combine_output o1 o2 =
     if PH.B.is_ignored o2 then o1 else o2
@@ -87,12 +89,15 @@ struct
 
   let branch_choice_list choice_list = {current = [] ; stack = choice_list.current::choice_list.stack}
   let update_current choice_list list = {choice_list with current = list}
-  let pop_next_choice parameter handler error stack =
+  let pop_next_choice parameter _handler error stack =
     match stack.current
     with
       | t::q -> error,(t,{stack with current=q})
       | [] ->
-	 warn parameter error (Some "cut_choice_list, line 107, Empty choice stack") (Failure "Empty choice list in pop_next_choice") (PH.dummy_update_order,stack)
+        warn
+          parameter error __POS__
+          ~message:"Empty choice stack"
+          (Failure "Empty choice list in pop_next_choice") (PH.dummy_update_order,stack)
 
   let no_more_choice stack =
     match stack.current
@@ -160,7 +165,10 @@ struct
 	   let error,() =
 	     if choice_list.current <> []
 	     then
-		warn parameter error (Some "iter, line 166, In case of success, the current list of choices should be empty") (Failure "In case of success, the current list of choices should be empty") ()
+        warn
+          parameter error __POS__
+          ~message:"In case of success, the current list of choices should be empty"
+          (Failure "In case of success, the current list of choices should be empty") ()
 	     else
 	       error,()
 	   in

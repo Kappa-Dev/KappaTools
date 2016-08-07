@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Aug 06 2016>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -47,7 +47,7 @@ sig
 end
 
 let invalid_arg parameters mh pos exn value  =
-  Exception.warn_pos parameters mh pos exn value
+  Exception.warn parameters mh pos exn value
 
 module Int_storage_imperatif =
   (struct
