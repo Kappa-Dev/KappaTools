@@ -729,6 +729,10 @@ let collect_potential_tuple_pair_created_bonds parameter error rule_id
        else error, store_result
     ) potential_tuple_pair_set (error, store_result)
 
+(*
+let collect_potential_tuple_pair_modified parameter error rule_id
+    store_modified_map store_potential_tuple_pair
+    *)
 (*-------------------------------------------------------*)
 (*project the agent_id and second site in the pair,
   this will be used to get a list of state in the precondition*)

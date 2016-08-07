@@ -914,7 +914,7 @@ let set_question_marks_rhs r static =
     let error, dynamic, precondition =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
-           let proj (a, _, _, d, _, _) = (a, d) in
+           (* let proj (a, _, _, d, _, _) = (a, d) in
            (*get a list of state in the second site*)
            let ((agent_id, site_type'),
                 (agent_id1, site_type1')) = proj x, proj y
@@ -958,45 +958,39 @@ let set_question_marks_rhs r static =
                      error, potential_list
                    ) (error, current_list) state_list'
                ) (error, []) state_list
-           in
+           in*)
            (*------------------------------------------------------*)
-           let error, dynamic, precondition =
-             List.fold_left
-               (fun (error, dynamic, precondition) (t, u) ->
-                  let handler = get_mvbdu_handler dynamic in
-                  let store_result = get_value dynamic in
-                  let (site_type', pre_state') = t in
-                  let (site_type1', pre_state1') = u in
-                  let pair_list =
-                    [Ckappa_sig.fst_site, pre_state';
-                     Ckappa_sig.snd_site, pre_state1']
-                  in
-                  let proj1 (_, a, b, _, _, _) = (a, b) in
-                  let ((agent_type, site_type),
-                       (agent_type1, site_type1)) = proj1 x, proj1 y
-                  in
-                  let pair =
-                    (agent_type, site_type, site_type'),
-                    (agent_type1, site_type1, site_type1')
-                  in
-                  let error, handler, mvbdu =
-                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                      parameter handler error pair_list
-                  in
-                  (*----------------------------------------------------*)
-                  let error, handler, store_result =
-                    Site_accross_bonds_domain_type.add_link
-                      parameter error bdu_false handler
-                      kappa_handler
-                      pair
-                      mvbdu
-                      store_result
-                  in
-                  let dynamic = set_value store_result dynamic in
-                  let dynamic = set_mvbdu_handler handler dynamic in
-                  error, dynamic, precondition
-               ) (error, dynamic, precondition) potential_list
+           let handler = get_mvbdu_handler dynamic in
+           let store_result = get_value dynamic in
+           (*get the internal state of the second site*)
+           let proj (_, a, b, c, _, f) = (a, b, c, f) in
+           let ((agent_type, site_type, site_type', state'),
+                (agent_type1, site_type1, site_type1', state1')) =
+             proj x, proj y
            in
+           let pair_list =
+             [Ckappa_sig.fst_site, state';
+              Ckappa_sig.snd_site, state1']
+           in
+           let pair =
+             (agent_type, site_type, site_type'),
+             (agent_type1, site_type1, site_type1')
+           in
+           let error, handler, mvbdu =
+             Ckappa_sig.Views_bdu.mvbdu_of_association_list
+               parameter handler error pair_list
+           in
+           (*----------------------------------------------------*)
+           let error, handler, store_result =
+             Site_accross_bonds_domain_type.add_link
+               parameter error bdu_false handler
+               kappa_handler
+               pair
+               mvbdu
+               store_result
+           in
+           let dynamic = set_value store_result dynamic in
+           let dynamic = set_mvbdu_handler handler dynamic in
            error, dynamic, precondition
         ) potential_tuple_pair_created_bonds_set (error, dynamic, precondition)
     in
@@ -1015,7 +1009,7 @@ let set_question_marks_rhs r static =
     let error, dynamic, precondition =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
-           let proj (a, _, _, d, _, _) = (a, d) in
+           (*let proj (a, _, _, d, _, _) = (a, d) in
            (*get a list of state of the second site in the precondition*)
            let ((agent_id, site_type'),
                 (agent_id1, site_type1')) = proj x, proj y
@@ -1059,49 +1053,47 @@ let set_question_marks_rhs r static =
                      error, potential_list
                    ) (error, current_list) state_list'
                ) (error, []) state_list
-           in
+           in*)
            (*------------------------------------------------------*)
-           let error, dynamic, precondition =
-             List.fold_left
-               (fun (error, dynamic, precondition) (t, u) ->
-                  let handler = get_mvbdu_handler dynamic in
-                  let store_result = get_value dynamic in
-                  let (site_type', pre_state') = t in
-                  let (site_type1', pre_state1') = u in
-                  let pair_list =
-                    [Ckappa_sig.fst_site, pre_state';
-                     Ckappa_sig.snd_site, pre_state1']
-                  in
-                  let proj1 (_, a, b, _, _, _) = (a, b) in
-                  let ((agent_type, site_type),
-                       (agent_type1, site_type1)) = proj1 x, proj1 y
-                  in
-                  let pair =
-                    (agent_type, site_type, site_type'),
-                    (agent_type1, site_type1, site_type1')
-                  in
-                  let error, handler, mvbdu =
-                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                      parameter handler error pair_list
-                  in
-                  (*----------------------------------------------------*)
-                  let error, handler, store_result =
-                    Site_accross_bonds_domain_type.add_link
-                      parameter error bdu_false handler
-                      kappa_handler
-                      pair
-                      mvbdu
-                      store_result
-                  in
-                  let dynamic = set_value store_result dynamic in
-                  let dynamic = set_mvbdu_handler handler dynamic in
-                  error, dynamic, precondition
-               ) (error, dynamic, precondition) potential_list
+           let handler = get_mvbdu_handler dynamic in
+           let store_result = get_value dynamic in
+           let proj1 (_, a, b, c, _, f) = (a, b,c,f) in
+           let ((agent_type, site_type, site_type', state'),
+                (agent_type1, site_type1, site_type1', state1')) =
+             proj1 x, proj1 y
            in
+           (*internal state of second site*)
+           let pair_list =
+             [Ckappa_sig.fst_site, state';
+              Ckappa_sig.snd_site, state1']
+           in
+           let pair =
+             (agent_type, site_type, site_type'),
+             (agent_type1, site_type1, site_type1')
+           in
+           let error, handler, mvbdu =
+             Ckappa_sig.Views_bdu.mvbdu_of_association_list
+               parameter handler error pair_list
+           in
+           (*----------------------------------------------------*)
+           let error, handler, store_result =
+             Site_accross_bonds_domain_type.add_link
+               parameter error bdu_false handler
+               kappa_handler
+               pair
+               mvbdu
+               store_result
+           in
+           let dynamic = set_value store_result dynamic in
+           let dynamic = set_mvbdu_handler handler dynamic in
            error, dynamic, precondition
         ) tuple_pair_bonds_rhs_set (error, dynamic, precondition)
     in
-    (*------------------------------------------------------*)
+    (*-----------------------------------------------------------*)
+    (*2. modified*)
+
+
+    (*-----------------------------------------------------------*)
     let event_list = [] in
     error, dynamic, (precondition, event_list)
 

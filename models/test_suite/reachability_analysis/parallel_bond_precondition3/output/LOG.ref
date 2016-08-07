@@ -618,12 +618,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=26
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=27
    Node(site_type:1<1)
     Id=13
      Node(site_type:2<1)
@@ -648,12 +648,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=26
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=27
    Node(site_type:1<1)
     Id=13
      Node(site_type:2<1)
