@@ -363,7 +363,7 @@ let print_site_accross_domain
           error, handler
         | [] | _::_ ->
           let error, () =
-            Exception.warn_pos parameters error __POS__ Exit ()
+            Exception.warn parameters error __POS__ Exit ()
           in
           error, handler
       ) (error, handler) pair_list

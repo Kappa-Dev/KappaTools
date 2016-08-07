@@ -814,7 +814,7 @@ let set_proj_reverse_map2 r static =
       match state_list_lattice with
       | Usual_domains.Val l -> error, l
       | Usual_domains.Any | Usual_domains.Undefined ->
-        Exception.warn_pos parameter error __POS__ Exit []
+        Exception.warn parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
@@ -833,7 +833,7 @@ let set_proj_reverse_map2 r static =
     match rule with
     | None ->
       let error, () =
-        Exception.warn_pos  parameter error __POS__ Exit ()
+        Exception.warn  parameter error __POS__ Exit ()
       in
       error, dynamic, (precondition, [])
     | Some rule ->
@@ -872,8 +872,8 @@ let set_proj_reverse_map2 r static =
                precondition
            in
            let error =
-           Exception.check_pos
-             Exception.warn_pos parameter error error'
+           Exception.check_point
+             Exception.warn parameter error error'
             __POS__ Exit
            in
            let error', dynamic, precondition, state_list' =
@@ -886,8 +886,8 @@ let set_proj_reverse_map2 r static =
                precondition
            in
            let error =
-             Exception.check_pos
-               Exception.warn_pos parameter error error'
+             Exception.check_point
+               Exception.warn parameter error error'
                __POS__ Exit
            in
            (*------------------------------------------------------*)
