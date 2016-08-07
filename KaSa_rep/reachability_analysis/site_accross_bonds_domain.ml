@@ -914,51 +914,6 @@ let set_question_marks_rhs r static =
     let error, dynamic, precondition =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
-           (* let proj (a, _, _, d, _, _) = (a, d) in
-           (*get a list of state in the second site*)
-           let ((agent_id, site_type'),
-                (agent_id1, site_type1')) = proj x, proj y
-           in
-           let error', dynamic, precondition, state_list =
-             get_state_of_site_in_precondition
-               parameter error
-               dynamic
-               rule
-               agent_id
-               site_type'
-               precondition
-           in
-           let error =
-           Exception.check_point
-             Exception.warn parameter error error'
-            __POS__ Exit
-           in
-           let error', dynamic, precondition, state_list' =
-             get_state_of_site_in_precondition
-               parameter error
-               dynamic
-               rule
-               agent_id1
-               site_type1'
-               precondition
-           in
-           let error =
-             Exception.check_point
-               Exception.warn parameter error error'
-               __POS__ Exit
-           in
-           (*------------------------------------------------------*)
-           let error, potential_list =
-             List.fold_left (fun (error, current_list) pre_state' ->
-                 List.fold_left (fun (error, current_list) pre_state1' ->
-                     let potential_list =
-                       ((site_type', pre_state'),
-                        (site_type1', pre_state1')) :: current_list
-                     in
-                     error, potential_list
-                   ) (error, current_list) state_list'
-               ) (error, []) state_list
-           in*)
            (*------------------------------------------------------*)
            let handler = get_mvbdu_handler dynamic in
            let store_result = get_value dynamic in
@@ -1009,51 +964,6 @@ let set_question_marks_rhs r static =
     let error, dynamic, precondition =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
         (fun (x, y) (error, dynamic, precondition) ->
-           (*let proj (a, _, _, d, _, _) = (a, d) in
-           (*get a list of state of the second site in the precondition*)
-           let ((agent_id, site_type'),
-                (agent_id1, site_type1')) = proj x, proj y
-           in
-           let error', dynamic, precondition, state_list =
-             get_state_of_site_in_precondition
-               parameter error
-               dynamic
-               rule
-               agent_id
-               site_type'
-               precondition
-           in
-           let error =
-           Exception.check_point
-             Exception.warn parameter error error'
-            __POS__ Exit
-           in
-           let error', dynamic, precondition, state_list' =
-             get_state_of_site_in_precondition
-               parameter error
-               dynamic
-               rule
-               agent_id1
-               site_type1'
-               precondition
-           in
-           let error =
-             Exception.check_point
-               Exception.warn parameter error error'
-               __POS__ Exit
-           in
-           (*------------------------------------------------------*)
-           let error, potential_list =
-             List.fold_left (fun (error, current_list) pre_state' ->
-                 List.fold_left (fun (error, current_list) pre_state1' ->
-                     let potential_list =
-                       ((site_type', pre_state'),
-                        (site_type1', pre_state1')) :: current_list
-                     in
-                     error, potential_list
-                   ) (error, current_list) state_list'
-               ) (error, []) state_list
-           in*)
            (*------------------------------------------------------*)
            let handler = get_mvbdu_handler dynamic in
            let store_result = get_value dynamic in

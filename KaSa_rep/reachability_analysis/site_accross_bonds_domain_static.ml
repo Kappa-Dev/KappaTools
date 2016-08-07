@@ -1381,8 +1381,8 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
            (*use the number 1 to indicate for the first agent, and number 2
              for the second agent*)
            let pair_list =
-             [(Ckappa_sig.site_name_of_int 1, state2);
-              (Ckappa_sig.site_name_of_int 2, state2')]
+             [(Ckappa_sig.fst_site, state2);
+              (Ckappa_sig.snd_site, state2')]
            in
            let _new_pair_list =
              List.fold_left (fun current_list (x, y) ->
