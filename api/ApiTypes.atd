@@ -38,7 +38,7 @@ type ('r) result = (errors,'r) either
 type observable = { time : float; values : float list }
 
 type plot = { legend: string list;
-              observables : observable list }
+      	      time_series : observable list }
 
 type distance = {rule_dist : string; time_dist : float; dist : int}
 

@@ -1,3 +1,3 @@
 { "name": "Kappa",
-  "main": "index.html?level=debug&host=file%3A%2F%2F..%2FWebSim.native%3Flabel%3DLocal"
+  "main": "index.html?level=debug&host=file%3A%2F%2F..%2FStdSim.native%3Flabel%3DLocal"
 }

@@ -87,7 +87,7 @@ let create_observable ~(observable : ApiTypes.observable)
 class type plot_data =
   object
     val legend : Js.js_string Js.js_array Js.t Js.prop
-    val observables : (plot_observable Js.t) Js.js_array Js.t Js.prop
+    val timeSeries : (plot_observable Js.t) Js.js_array Js.t Js.prop
   end
 let constructor_data : plot_data Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_data ~(plot : ApiTypes.plot)
@@ -98,9 +98,9 @@ let create_data ~(plot : ApiTypes.plot)
 	(Array.map
            (fun l -> Js.string l)
            (Array.of_list plot.ApiTypes.legend));
-    (Js.Unsafe.coerce configuration)##.observables := Js.array
+    (Js.Unsafe.coerce configuration)##.timeSeries := Js.array
 	(Array.map (fun o -> create_observable ~observable:o)
-           (Array.of_list plot.ApiTypes.observables));
+           (Array.of_list plot.ApiTypes.time_series));
     ()
   in configuration
 

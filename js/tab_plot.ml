@@ -15,7 +15,7 @@ let state_plot state =
   | Some state ->
     (match state.ApiTypes.plot with
      (* ignore empty plots for now *)
-     | Some { ApiTypes.observables = [] ; _ } -> None
+     | Some { ApiTypes.time_series = [] ; _ } -> None
      | _ -> state.ApiTypes.plot
     )
 

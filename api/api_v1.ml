@@ -132,7 +132,7 @@ end = struct
           let current_id = self#new_id () in
           let plot : ApiTypes.plot ref =
             ref { ApiTypes.legend = []
-                ; ApiTypes.observables = [] }
+                ; ApiTypes.time_series = [] }
           in
           let distances : ApiTypes.distances ref = ref [] in
           let error_messages : ApiTypes.errors ref = ref [] in
@@ -171,10 +171,10 @@ end = struct
               let new_values =
                 List.map (fun nbr -> Nbr.to_float nbr)
                   (Array.to_list new_observables) in
-              plot := {!plot with ApiTypes.observables =
+              plot := {!plot with ApiTypes.time_series =
                                     { ApiTypes.time = time ;
                                       values = new_values }
-                                    :: !plot.ApiTypes.observables }
+                                    :: !plot.ApiTypes.time_series }
             | Data.Print file_line ->
               files := ((Api_data.api_file_line file_line)::!files)
             | Data.Snapshot snapshot ->

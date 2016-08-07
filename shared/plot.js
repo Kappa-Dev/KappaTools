@@ -74,9 +74,9 @@ function observable_plot(configuration){
     this.getObservable = function(index){
         return this.state[index];
     }
-    /* Get all observables.
+    /* Get all time series.
      */
-    this.getObservables = function(){
+    this.getTimeSeries = function(){
         return this.state.filter(function(obs)
 				 { return obs.mode != that.modes.XAXIS });
     }
@@ -117,7 +117,7 @@ function observable_plot(configuration){
         var time_values = []; // store the times values
 
         /* Initialize new state element with the corresponding
-         * observables.
+         * time series.
          */
         legend.forEach(function(legend,i){
             var old_observable = that.getObservable(i);
@@ -161,8 +161,8 @@ function observable_plot(configuration){
 
         //that.start_time = null;
         //that.end_time = null;
-        // Populate observables from data.
-        plot.observables.forEach(function(observable){
+        // Populate timeSeries from data.
+        plot.timeSeries.forEach(function(observable){
 	    first_time = first_time || observable.time;
 	    last_time = observable.time;
             //that.start_time = that.start_time || observable.time;
@@ -321,9 +321,9 @@ function observable_plot(configuration){
             current = y(current);
             return current;
         };
-        var observables =
+        var timeSeries =
             svg.selectAll(".observable")
-            .data(that.getObservables())
+            .data(that.getTimeSeries())
             .enter().append("g")
             .attr("class", "plot-observable")
             .each(function(d)
@@ -402,7 +402,7 @@ function observable_plot(configuration){
         var legendRectSize = 12;
         var legendSpacing = 4;
         var legend = svg.selectAll('.legend')
-            .data(that.getObservables())
+            .data(that.getTimeSeries())
             .enter()
             .append('g')
             .attr('class', 'plot-legend')
@@ -626,13 +626,13 @@ function observable_plot(configuration){
     this.setPlotName = function(plotName){ that.plotName = plotName; }
     this.handlePlotTSV = function(){
         var rawData = that.getRawData();
-        var observables = rawData.observables;
+        var timeSeries = rawData.timeSeries;
         var legend = rawData.legend;
         var header = "'time'\t"+legend.join("\t");
-        var body = observables.map(function(d)
-                                   { var row = [d["time"]];
-                                     row = row.concat(d["values"]);
-                                     return row.join("\t") })
+        var body = timeSeries.map(function(d)
+                                  { var row = [d["time"]];
+                                    row = row.concat(d["values"]);
+                                    return row.join("\t") })
                               .join("\n");
         var tsv = header+"\n"+body;
         saveFile(tsv,"text/tab-separated-values",that.getPlotName(".tsv"));

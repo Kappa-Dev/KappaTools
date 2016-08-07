@@ -26,7 +26,7 @@ let configuration : Widget_export.configuration =
         (fun model_parse ->
            match model_parse with
            | None -> false
-           | Some _ -> true
+           | Some data -> Array.length data.ApiTypes.contact_map > 0
         )
         UIState.model_parse
   }
@@ -56,13 +56,16 @@ let onload () =
          match data with
          | None -> (contactmap##clearData)
          | Some data ->
-           let json : string =
-             ApiTypes_j.string_of_site_graph data.ApiTypes.contact_map
-           in
-           (contactmap##setData
-              (Js.string json)
-              (Js.Opt.option (Ui_state.agent_count ()))
-           )
+           if Array.length data.ApiTypes.contact_map > 0 then
+             let json : string =
+               ApiTypes_j.string_of_site_graph data.ApiTypes.contact_map
+             in
+             (contactmap##setData
+                (Js.string json)
+                (Js.Opt.option (Ui_state.agent_count ()))
+             )
+           else
+             contactmap##clearData
       )
       UIState.model_parse
   in

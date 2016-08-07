@@ -74,110 +74,26 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
      (fun _ -> Lwt.return (response,body))
   )
 
-type api_version = V1 | V2;;
 let server =
-  let parameter_backtrace : bool ref = ref false in
-  let parameter_seed_value : int option ref = ref None in
-  let parameter_port : int ref = ref 8080 in
-  let parameter_cert_dir : string option ref = ref None in
-  let parameter_shutdown_key : string option ref = ref None in
-  let parameter_api : api_version ref = ref V1 in
-  let parameter_stdio : bool ref = ref false in
-  let options  : (string * Arg.spec * string) list =
-    [ ("--stdio",
-       Arg.Unit
-         (fun () -> parameter_stdio := true),
-       "communicate over stdio instead of http");
-      ("--development",
-       Arg.Unit
-	 (fun () ->
-	    let () =
-	      Lwt.async
-		(fun () ->
-		   Lwt_log_core.log
-		     ~level:Lwt_log_core.Warning
-		     "development features - not for public use or comment")
-	    in
-	    parameter_api := V2),
-       "enable experimental api - not intended for public use or comment");
-      ("--version",
-       Arg.Unit
-         (fun () ->
-            Format.print_string Version.version_msg ;
-	    Format.print_newline () ;
-            exit 0),
-       "display KaSim version");
-      ("--backtrace",
-       Arg.Set parameter_backtrace,
-       "Backtracing exceptions") ;
-      ("-seed",
-       Arg.Int
-         (fun i -> parameter_seed_value := Some i),
-       "Seed for the random number generator") ;
-      ("--gluttony",
-       Arg.Unit
-         (fun () -> Gc.set { (Gc.get()) with
-			     Gc.space_overhead = 500 (*default 80*) } ;),
-       "Lower gc activity for a faster but memory intensive simulation") ;
-      ("--port",
-       Arg.Int
-         (fun port -> parameter_port := port),
-       "port to serve on");
-      ("--shutdown-key",
-       Arg.String
-         (fun key -> parameter_shutdown_key := Some key),
-       "key to shutdown server");
-      ("--cert-dir",
-       Arg.String
-         (fun key -> parameter_cert_dir := Some key),
-       "Directory where to find cert.pem and privkey.pem");
-      ("--log",
-       Arg.String
-	 (fun file_name ->
-	    if file_name = "-" then
-              let _ =
-		Lwt_log.channel
-		  ~close_mode:(`Keep)
-		  ~channel:(Lwt_io.stderr) ()
-              in
-              ()
-            else
-              let _ =
-		Lwt_log.file
-		  ?mode:(Some `Append)
-		  ~file_name:file_name ()
-              in
-              ()
-	 ),
-       "path to log file path '-' logs to stdout");
-      ("--level",
-       Arg.String
-         (fun level ->
-            Lwt_log_core.append_rule "*"
-              (match level with
-               | "debug" -> Lwt_log_core.Debug
-               | "info" -> Lwt_log_core.Info
-               | "notice" -> Lwt_log_core.Notice
-               | "warning" -> Lwt_log_core.Warning
-               | "error" -> Lwt_log_core.Error
-               | "fatal" -> Lwt_log_core.Fatal
-               | level -> raise (Arg.Bad ("\""^level^"\" is not a valid level"))
-              )),
-       "levels : debug,info,notice,warning,error,fatal"
-      )
-    ] in
-  let usage : string = "WebSim --port port --shutdown-key key\n" in
-  let () = Arg.parse options (fun _ -> ()) usage in
-  let () = Printexc.record_backtrace !parameter_backtrace in
+  let common_args = Common_args.default in
+  let app_args = App_args.default in
+  let websim_args = Websim_args.default in
+  let options = App_args.options app_args @
+                Websim_args.options websim_args @
+                Common_args.options common_args
+  in
+  let usage_msg : string = "kappa webservice" in
+  let () = Arg.parse options (fun _ -> ()) usage_msg in
+  let () = Printexc.record_backtrace common_args.Common_args.backtrace in
   let theSeed =
-    match !parameter_seed_value with
+    match app_args.App_args.seed_value with
     | Some seed -> seed
     | None ->
       begin
         unit_of_lwt
 	  (Lwt_log_core.log
-	     ~level:Lwt_log_core.Info
-	     "+ Self seeding...@.");
+      ~level:Lwt_log_core.Info
+      "+ Self seeding...@.");
         Random.self_init() ;
         Random.bits ()
       end
@@ -192,35 +108,32 @@ let server =
             theSeed)
       )
   in
-  let mode = match !parameter_cert_dir with
-    | None -> `TCP (`Port !parameter_port)
+  let mode = match websim_args.Websim_args.cert_dir with
+    | None -> `TCP (`Port websim_args.Websim_args.port)
     | Some dir ->
       `TLS (`Crt_file_path (dir^"cert.pem"),
 	    `Key_file_path (dir^"privkey.pem"),
             `No_password,
-	    `Port !parameter_port) in
+	    `Port websim_args.Websim_args.port) in
   let route_handler :
     Cohttp_lwt_unix.Server.conn ->
     Cohttp.Request.t ->
     Cohttp_lwt_body.t ->
     (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
     = Webapp.route_handler
-      ~shutdown_key:!parameter_shutdown_key
+      ~shutdown_key:websim_args.Websim_args.shutdown_key
       ()
   in
-  if !parameter_stdio then
-    Server_stdio.serve ()
-  else
-    Server.create
-      ~mode
-      (Server.make
-	 (logger
-            (match !parameter_api with
-	     | V1 -> Webapp_v1.handler
-		       ~shutdown_key:!parameter_shutdown_key
-	     | V2 -> route_handler
-	    )
-	 )
-	 ()
-      )
+  Server.create
+    ~mode
+    (Server.make
+       (logger
+          (match websim_args.Websim_args.api with
+	   | Websim_args.V1 -> Webapp_v1.handler
+	      ~shutdown_key:websim_args.Websim_args.shutdown_key
+           | Websim_args.V2 -> route_handler
+	  )
+       )
+       ()
+    )
 let () = ignore (Lwt_main.run server)
