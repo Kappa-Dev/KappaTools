@@ -359,6 +359,8 @@ A is a dead agent.
 * Static information
 
 
+At rule_id:0, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(x, x:b)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

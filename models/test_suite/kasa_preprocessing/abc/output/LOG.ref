@@ -1537,6 +1537,7 @@ At rule_id:4: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x2:u); A(c:C@x2, x:free)
 At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x1:free); A(c:C@x2, x:free)
 
+
 * Dynamic information
 Whenever the site c of A and the site x1 of C are bound together, then the site x of A and x1 of C can have the following respective states: B@x, u
 Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, p

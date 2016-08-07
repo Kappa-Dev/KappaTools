@@ -67,8 +67,13 @@ At rule_id:4: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
 At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, n:free)
 
+
 * Dynamic information
 Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: E@x, E@x
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: free, free
 Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
 Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
 Whenever the site cr of R and the site n of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c

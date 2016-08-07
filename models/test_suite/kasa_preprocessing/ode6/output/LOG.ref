@@ -508,6 +508,7 @@ At rule_id:2: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, z:free)
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
 
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain

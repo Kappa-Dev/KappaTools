@@ -1100,6 +1100,8 @@ At rule_id:5: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:6: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
 At rule_id:6: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
 
+At rule_id:1, there is a binding with a question mark of the site z of B. The potential tuple pair is: B(z, t:p)
+
 * Dynamic information
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p

@@ -534,6 +534,7 @@ At rule_id:2: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of B is: C(y:B@y, y:p); B(y:C@y, x:C@x)
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of B is: C(y:B@y, x:B@x); B(y:C@y, x:C@x)
 
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
