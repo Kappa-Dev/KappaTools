@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 07 2016>
+   * Last modification: Time-stamp: <Aug 08 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -162,6 +162,21 @@ module PairAgentsSitesStates_map_and_set =
 (***************************************************************)
 (*Projection*)
 
+module AgentSites_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_question_mark =
+  Map_wrapper.Proj
+    (AgentsSitesState_map_and_set) (*set_a*)
+    (AgentSites_map_and_set) (*set_b*)
+
 module Proj_agent_id_away1 =
   Map_wrapper.Proj
     (PairAgentsSiteState_map_and_set) (*set_a*)
@@ -171,6 +186,11 @@ module Proj_agent_id_away2 =
   Map_wrapper.Proj
     (PairAgentsSitesStates_map_and_set) (*set_a*)
     (PairAgentSitesStates_map_and_set) (*set_b*)
+
+module Proj_agent_id_away3 =
+  Map_wrapper.Proj
+    (PairAgentsSitesStates_map_and_set) (*set_a*)
+    (PairAgentSites_map_and_set) (*set_b*)
 
 module PairAgentIDSite_map_and_set =
   Map_wrapper.Make
@@ -261,7 +281,7 @@ let convert_double parameters error kappa_handler double =
   error, (agent, site, site', state, state')
 
 let convert_tuple parameters error kappa_handler tuple =
-  let (agent,site,site'),(agent'',site'',site''') = tuple in
+  let (agent,site,site',_),(agent'',site'',site''',_) = tuple in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
   let error, agent = Handler.translate_agent parameters error kappa_handler agent in
@@ -323,7 +343,7 @@ let print_site_accross_domain
     ?final_resul:(_final_result = false)
     ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let (agent_type, _, site_type), (agent_type1, _, site_type1) = tuple in
+  let (agent_type, _, site_type, _), (agent_type1, _, site_type1, _) = tuple in
   (*----------------------------------------------------*)
   (*state1 and state1' are a binding states*)
   let error, (agent, site, site', agent1, site1, site1') =
@@ -372,7 +392,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
     store_result =
   let error, bdu_old =
     match
-      PairAgentSites_map_and_set.Map.find_option_without_logs
+      PairAgentSitesState_map_and_set.Map.find_option_without_logs
         parameter error
         pair
         store_result
@@ -397,7 +417,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
     else error, handler
   in
   let error, store_result =
-    PairAgentSites_map_and_set.Map.add_or_overwrite
+    PairAgentSitesState_map_and_set.Map.add_or_overwrite
       parameter error
       pair
       new_bdu

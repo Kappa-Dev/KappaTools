@@ -415,6 +415,9 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(3):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Reachability analysis...
+Question mark: A(1:x, 0:x) 
+Question mark: A(1:x, 0:x) 
+Question mark: A(1:x, 0:x) 
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -786,9 +789,9 @@ The internal state of site x in agent B ranges over u and p.
 * Static information
 
 
-At rule_id:3, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(x, x:p)
-At rule_id:4, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(x, x:u)
-At rule_id:5, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(x, x:p)
+At rule_id:3, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(:1:x, x:p)
+At rule_id:4, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(:1:x, x:u)
+At rule_id:5, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(:1:x, x:p)
 
 At rule_id:0, there is a modification of the site x of A. A(x:u)
 At rule_id:0, there is a modification of the site x of B. B(x:p)

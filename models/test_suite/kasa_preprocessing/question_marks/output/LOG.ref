@@ -325,6 +325,7 @@ Influence_map:Inhibition_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(2):'' 
 Influence_map:Inhibition_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(4):'' A(x~b)->A(x~a)[0->0];[1->0]
 Influence_map:Inhibition_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->1]
 Reachability analysis...
+Question mark: A(1:x, 0:x) 
 
 ------------------------------------------------------------
 * Dead rules :
@@ -359,7 +360,7 @@ A is a dead agent.
 * Static information
 
 
-At rule_id:0, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(x, x:b)
+At rule_id:0, there is a binding with a question mark of the site x of A. The potential tuple pair is: A(:1:x, x:b)
 
 At rule_id:0, there is a modification of the site x of A. A(x:b)
 At rule_id:1, there is a modification of the site x of A. A(x:free)
