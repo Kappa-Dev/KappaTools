@@ -317,7 +317,10 @@ At rule_id:2 there is a binding between the site x of C and the site x of A. C:(
 
 potential tuple pair set is empty
 
-bonds_rhs set is empty
+The site of x of agent A is bound to the site of x of agent B. A(x:B@x) , B(x:A@x)
+The site of x of agent A is bound to the site of x of agent C. A(x:C@x) , C(x:A@x)
+The site of x of agent B is bound to the site of x of agent A. B(x:A@x) , A(x:B@x)
+The site of x of agent C is bound to the site of x of agent A. C(x:A@x) , A(x:C@x)
 
 
 

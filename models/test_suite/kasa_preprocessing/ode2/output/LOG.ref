@@ -215,6 +215,8 @@ At rule_id:1 there is a binding between the site x of C and the site y of B. C:(
 
 potential tuple pair set is empty
 
+The site of y of agent A is bound to the site of x of agent B. A(y:B@x) , B(x:A@y)
+The site of x of agent B is bound to the site of y of agent A. B(x:A@y) , A(y:B@x)
 The site of y of agent B is bound to the site of x of agent C. B(y:C@x) , C(x:B@y)
 The site of x of agent C is bound to the site of y of agent B. C(x:B@y) , B(y:C@x)
 

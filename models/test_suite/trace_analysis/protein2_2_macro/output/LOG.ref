@@ -50,7 +50,8 @@ At rule_id:8 there is a binding between the site x of K and the site g of P. K:(
 
 potential tuple pair set is empty
 
-bonds_rhs set is empty
+The site of g of agent P is bound to the site of x of agent K. P(g:K@x) , K(x:P@g)
+The site of x of agent K is bound to the site of g of agent P. K(x:P@g) , P(g:K@x)
 
 
 

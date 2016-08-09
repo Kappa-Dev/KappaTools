@@ -1,5 +1,5 @@
 (**
-   Time-stamp: <Aug 05 2016>
+   Time-stamp: <Aug 09 2016>
 *)
 
 module type Set_with_logs =
@@ -126,7 +126,7 @@ module type Projection = sig
     (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_b
 
   val monadic_proj_set:
-    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_b
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> set_b -> Exception.method_handler * set_b
 
   (** partition_set f set is the map mapping any element b with an antecedent for f in the set set, into the set of its antecedents, ie
       to the set \{a\in set | f(a)=b\}. *)

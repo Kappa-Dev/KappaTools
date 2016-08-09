@@ -38,10 +38,19 @@ At rule_id:2 there is a binding between the site y of C and the site z of A. C:(
 At rule_id:3 there is a binding between the site z of A and the site y of A. A:(z:A@y); A:(y:A@z)
 At rule_id:3 there is a binding between the site y of A and the site z of A. A:(y:A@z); A:(z:A@y)
 
-potential tuple pair set is empty
+The potential tuple pair set has the site x and the site y of agent C, and the site x and y of agent C. C(x, y); C(x, y)
+The potential tuple pair set has the site x and the site y of agent C, and the site y and x of agent C. C(x, y); C(y, x)
+The potential tuple pair set has the site x and the site y of agent C, and the site x and y of agent C. C(x, y); C(x, y)
+The potential tuple pair set has the site x and the site y of agent C, and the site y and x of agent C. C(x, y); C(y, x)
+The potential tuple pair set has the site y and the site x of agent C, and the site x and y of agent C. C(y, x); C(x, y)
+The potential tuple pair set has the site y and the site x of agent C, and the site y and x of agent C. C(y, x); C(y, x)
+The potential tuple pair set has the site y and the site x of agent C, and the site x and y of agent C. C(y, x); C(x, y)
+The potential tuple pair set has the site y and the site x of agent C, and the site y and x of agent C. C(y, x); C(y, x)
 
 The site of z of agent A is bound to the site of y of agent A. A(z:A@y) , A(y:A@z)
 The site of y of agent A is bound to the site of z of agent A. A(y:A@z) , A(z:A@y)
+The site of y of agent C is bound to the site of z of agent A. C(y:C@y) , A(z:u)
+The site of y of agent C is bound to the site of y of agent C. C(y:C@y) , C(y:C@y)
 
 At rule_id:2, the potential tuple pair when there is an action binding between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
 At rule_id:2, the potential tuple pair when there is an action binding between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)

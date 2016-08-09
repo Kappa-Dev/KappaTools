@@ -505,11 +505,13 @@ let set_proj_question_marks_rhs r static =
     (*------------------------------------------------------------*)
     (*bonds set without rule_id*)
     let store_bonds_rhs = get_bonds_rhs static in
+    let store_bonds_rhs_set = get_bonds_rhs_set static in
     let error, store_bonds_rhs_set =
       Site_accross_bonds_domain_static.collect_bonds_rhs_set
         parameter error
         rule_id
         store_bonds_rhs
+        store_bonds_rhs_set
     in
     let static = set_bonds_rhs_set store_bonds_rhs_set static in
     (*------------------------------------------------------------*)
@@ -531,11 +533,13 @@ let set_proj_question_marks_rhs r static =
     let static = set_potential_tuple_pair store_potential_tuple_pair static in
     (*------------------------------------------------------------*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
+    let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
     let error, store_potential_tuple_pair_set =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
         parameter error
         rule_id
         store_potential_tuple_pair
+        store_potential_tuple_pair_set
     in
     let static =
       set_potential_tuple_pair_set store_potential_tuple_pair_set static
@@ -677,11 +681,13 @@ let set_proj_question_marks_rhs r static =
     let static = set_question_marks_rhs store_question_marks_rhs static in
     (*------------------------------------------------------------*)
     let store_question_marks_rhs = get_question_marks_rhs static in
+    let store_proj_question_marks_rhs = get_proj_question_marks_rhs static in
     let error, store_proj_question_marks_rhs =
       Site_accross_bonds_domain_static.collect_proj_question_marks_rhs
         parameter error rule_id
         kappa_handler
         store_question_marks_rhs
+        store_proj_question_marks_rhs
     in
     let static = set_proj_question_marks_rhs store_proj_question_marks_rhs static in
     (*------------------------------------------------------------*)

@@ -358,7 +358,31 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
 (***************************************************************)
 (*use the projection of set*)
 
-let collect_bonds_rhs_set parameter error rule_id store_bonds_rhs =
+(*let collect_bonds_rhs_set parameter error rule_id store_bonds_rhs store_result =
+  let error, bonds_rhs_set =
+    get_set parameter error rule_id
+      Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+      store_bonds_rhs
+  in
+  (*using project_set*)
+  let proj (_, b, c, d) = (b, c, d) in
+  let error, new_set =
+    Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+      (fun (x ,y ) (error, store_result) ->
+         let error, new_set =
+           Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.add_when_not_in
+             parameter error
+             (proj x, proj y)
+             store_result
+         in
+         error, new_set
+      )
+      bonds_rhs_set (error, store_result)
+  in
+  error, new_set*)
+
+(*CHECK ME*)
+let collect_bonds_rhs_set parameter error rule_id store_bonds_rhs store_result =
   let error, bonds_rhs_set =
     get_set parameter error rule_id
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
@@ -374,6 +398,7 @@ let collect_bonds_rhs_set parameter error rule_id store_bonds_rhs =
       parameter
       error
       bonds_rhs_set (*set_a*)
+      store_result
   in
   error, new_set
 
@@ -521,7 +546,7 @@ let collect_potential_tuple_pair parameter error _kappa_handler rule_id store_pa
   in
   error, store_result
 
-let collect_potential_tuple_pair_set parameter error rule_id store_potential_tuple_pair =
+let collect_potential_tuple_pair_set parameter error rule_id store_potential_tuple_pair store_result =
   let error,  potential_tuple_pair_set =
     get_set parameter error
       rule_id
@@ -538,6 +563,7 @@ let collect_potential_tuple_pair_set parameter error rule_id store_potential_tup
       parameter
       error
       potential_tuple_pair_set
+      store_result
   in
   error, new_set
 
@@ -846,7 +872,8 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
   in
   error, store_result
 
-let collect_proj_question_marks_rhs parameter error rule_id kappa_handler store_question_marks_rhs =
+let collect_proj_question_marks_rhs parameter error rule_id kappa_handler
+    store_question_marks_rhs store_result =
   let error, set =
     get_set parameter error rule_id
       Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.empty
@@ -861,6 +888,7 @@ let collect_proj_question_marks_rhs parameter error rule_id kappa_handler store_
       parameter
       error
       set
+      store_result
   in
   error, new_set
 

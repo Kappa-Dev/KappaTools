@@ -551,7 +551,15 @@ The potential tuple pair set has the site z and the site y of agent D, and the s
 The potential tuple pair set has the site z and the site y of agent D, and the site z and x of agent A. D(z, y); A(z, x)
 The potential tuple pair set has the site z and the site y of agent D, and the site z and y of agent A. D(z, y); A(z, y)
 
+The site of x of agent A is bound to the site of x of agent B. A(x:B@x) , B(x:A@x)
+The site of y of agent A is bound to the site of x of agent C. A(y:C@x) , C(x:A@y)
 The site of z of agent A is bound to the site of z of agent D. A(z:D@z) , D(z:A@z)
+The site of x of agent B is bound to the site of x of agent A. B(x:A@x) , A(x:B@x)
+The site of y of agent B is bound to the site of x of agent D. B(y:D@x) , D(x:B@y)
+The site of x of agent C is bound to the site of y of agent A. C(x:A@y) , A(y:C@x)
+The site of y of agent C is bound to the site of y of agent D. C(y:D@y) , D(y:C@y)
+The site of x of agent D is bound to the site of y of agent B. D(x:B@y) , B(y:D@x)
+The site of y of agent D is bound to the site of y of agent C. D(y:C@y) , C(y:D@y)
 The site of z of agent D is bound to the site of z of agent A. D(z:A@z) , A(z:D@z)
 
 At rule_id:4, the potential tuple pair when there is an action binding between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, x:B@x)
