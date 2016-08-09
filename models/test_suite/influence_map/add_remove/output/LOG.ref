@@ -32,8 +32,6 @@ B is a dead agent.
 ------------------------------------------------------------
 * Static information
 
-potential tuple pair set is empty
-
 bonds_rhs set is empty
 
 
@@ -82,8 +80,6 @@ B is a dead agent.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-
-potential tuple pair set is empty
 
 bonds_rhs set is empty
 

@@ -213,8 +213,6 @@ At rule_id:0 there is a binding between the site x of B and the site x of A. B:(
 At rule_id:1 there is a binding between the site y of A and the site x of C. A:(y:C@x); C:(x:A@y)
 At rule_id:1 there is a binding between the site x of C and the site y of A. C:(x:A@y); A:(y:C@x)
 
-potential tuple pair set is empty
-
 The site of x of agent A is bound to the site of x of agent B. A(x:B@x) , B(x:A@x)
 The site of y of agent A is bound to the site of x of agent C. A(y:C@x) , C(x:A@y)
 The site of x of agent B is bound to the site of x of agent A. B(x:A@x) , A(x:B@x)

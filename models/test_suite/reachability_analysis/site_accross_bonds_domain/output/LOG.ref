@@ -1033,21 +1033,6 @@ Id=74
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=72
  Node(site_type:1<0)
   Id=0
@@ -1077,11 +1062,26 @@ Id=74
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=39
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 The internal state of site t in agent A ranges over u and p.
 The binding state of site z in agent A ranges over free and B@z.
-The internal state of site t in agent B ranges over u and p.
 The binding state of site z in agent B ranges over free and A@z.
 The internal state of site z in agent B ranges over u and p.
+The internal state of site t in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -1092,39 +1092,6 @@ At rule_id:5 there is a binding between the site z of A and the site z of B. A:(
 At rule_id:5 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
 At rule_id:6 there is a binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
 At rule_id:6 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
-
-The potential tuple pair set has the site z and the site t of agent A, and the site z and z of agent B. A(z, t); B(z, z)
-The potential tuple pair set has the site z and the site t of agent A, and the site z and t of agent B. A(z, t); B(z, t)
-The potential tuple pair set has the site z and the site t of agent A, and the site z and z of agent B. A(z, t); B(z, z)
-The potential tuple pair set has the site z and the site t of agent A, and the site z and t of agent B. A(z, t); B(z, t)
-The potential tuple pair set has the site z and the site t of agent A, and the site t and z of agent B. A(z, t); B(t, z)
-The potential tuple pair set has the site z and the site t of agent A, and the site t and z of agent B. A(z, t); B(t, z)
-The potential tuple pair set has the site z and the site t of agent A, and the site z and t of agent B. A(z, t); B(z, t)
-The potential tuple pair set has the site z and the site t of agent A, and the site t and z of agent B. A(z, t); B(t, z)
-The potential tuple pair set has the site t and the site z of agent A, and the site z and z of agent B. A(t, z); B(z, z)
-The potential tuple pair set has the site t and the site z of agent A, and the site z and t of agent B. A(t, z); B(z, t)
-The potential tuple pair set has the site t and the site z of agent A, and the site z and z of agent B. A(t, z); B(z, z)
-The potential tuple pair set has the site t and the site z of agent A, and the site z and t of agent B. A(t, z); B(z, t)
-The potential tuple pair set has the site t and the site z of agent A, and the site t and z of agent B. A(t, z); B(t, z)
-The potential tuple pair set has the site t and the site z of agent A, and the site t and z of agent B. A(t, z); B(t, z)
-The potential tuple pair set has the site t and the site z of agent A, and the site z and t of agent B. A(t, z); B(z, t)
-The potential tuple pair set has the site t and the site z of agent A, and the site t and z of agent B. A(t, z); B(t, z)
-The potential tuple pair set has the site z and the site z of agent B, and the site z and t of agent A. B(z, z); A(z, t)
-The potential tuple pair set has the site z and the site z of agent B, and the site t and z of agent A. B(z, z); A(t, z)
-The potential tuple pair set has the site z and the site t of agent B, and the site z and t of agent A. B(z, t); A(z, t)
-The potential tuple pair set has the site z and the site t of agent B, and the site t and z of agent A. B(z, t); A(t, z)
-The potential tuple pair set has the site z and the site z of agent B, and the site z and t of agent A. B(z, z); A(z, t)
-The potential tuple pair set has the site z and the site z of agent B, and the site t and z of agent A. B(z, z); A(t, z)
-The potential tuple pair set has the site z and the site t of agent B, and the site z and t of agent A. B(z, t); A(z, t)
-The potential tuple pair set has the site z and the site t of agent B, and the site t and z of agent A. B(z, t); A(t, z)
-The potential tuple pair set has the site z and the site t of agent B, and the site z and t of agent A. B(z, t); A(z, t)
-The potential tuple pair set has the site z and the site t of agent B, and the site t and z of agent A. B(z, t); A(t, z)
-The potential tuple pair set has the site t and the site z of agent B, and the site z and t of agent A. B(t, z); A(z, t)
-The potential tuple pair set has the site t and the site z of agent B, and the site t and z of agent A. B(t, z); A(t, z)
-The potential tuple pair set has the site t and the site z of agent B, and the site z and t of agent A. B(t, z); A(z, t)
-The potential tuple pair set has the site t and the site z of agent B, and the site t and z of agent A. B(t, z); A(t, z)
-The potential tuple pair set has the site t and the site z of agent B, and the site z and t of agent A. B(t, z); A(z, t)
-The potential tuple pair set has the site t and the site z of agent B, and the site t and z of agent A. B(t, z); A(t, z)
 
 The site of z of agent A is bound to the site of z of agent B. A(z:B@z) , B(z:A@z)
 The site of z of agent B is bound to the site of z of agent A. B(z:A@z) , A(z:B@z)

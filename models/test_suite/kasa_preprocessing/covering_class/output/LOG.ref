@@ -263,15 +263,6 @@ At rule_id:1 there is a binding between the site x of B and the site x of A. B:(
 At rule_id:2 there is a binding between the site y of A and the site y of B. A:(y:B@y); B:(y:A@y)
 At rule_id:2 there is a binding between the site y of B and the site y of A. B:(y:A@y); A:(y:B@y)
 
-The potential tuple pair set has the site x and the site y of agent A, and the site x and y of agent B. A(x, y); B(x, y)
-The potential tuple pair set has the site x and the site y of agent A, and the site y and x of agent B. A(x, y); B(y, x)
-The potential tuple pair set has the site y and the site x of agent A, and the site x and y of agent B. A(y, x); B(x, y)
-The potential tuple pair set has the site y and the site x of agent A, and the site y and x of agent B. A(y, x); B(y, x)
-The potential tuple pair set has the site x and the site y of agent B, and the site x and y of agent A. B(x, y); A(x, y)
-The potential tuple pair set has the site x and the site y of agent B, and the site y and x of agent A. B(x, y); A(y, x)
-The potential tuple pair set has the site y and the site x of agent B, and the site x and y of agent A. B(y, x); A(x, y)
-The potential tuple pair set has the site y and the site x of agent B, and the site y and x of agent A. B(y, x); A(y, x)
-
 The site of x of agent A is bound to the site of x of agent B. A(x:B@x) , B(x:A@x)
 The site of y of agent A is bound to the site of y of agent B. A(y:B@y) , B(y:A@y)
 The site of x of agent B is bound to the site of x of agent A. B(x:A@x) , A(x:B@x)

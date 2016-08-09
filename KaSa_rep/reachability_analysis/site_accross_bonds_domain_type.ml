@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 08 2016>
+   * Last modification: Time-stamp: <Aug 09 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -238,7 +238,7 @@ module PairAgentSite_map_and_set =
 
 module Proj_map1 =
   Map_wrapper.Proj
-    (PairAgentSitesStates_map_and_set)
+    (PairAgentsSitesStates_map_and_set)
     (PairAgentSite_map_and_set)
 
 module AgentSite_map_and_set =

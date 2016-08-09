@@ -372,8 +372,6 @@ The internal state of site x in agent A ranges over u and p.
 ------------------------------------------------------------
 * Static information
 
-potential tuple pair set is empty
-
 bonds_rhs set is empty
 
 
