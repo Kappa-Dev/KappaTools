@@ -14,7 +14,7 @@
    * under the terms of the GNU Library General Public License *)
 
 let local_trace = false
-  
+
 module Domain =
 struct
 
@@ -160,7 +160,7 @@ struct
         Site_accross_bonds_domain_static.store_bonds_lhs = r
       } static
 
-(*sites that can be modified*)
+  (*sites that can be modified*)
 
   let get_modified_map static =
     (get_basic_static_information
@@ -255,65 +255,65 @@ struct
         Site_accross_bonds_domain_static.store_potential_tuple_pair_bonds_rhs = r
       } static
 
-(*projection map*)
+  (*projection map*)
 
-let get_proj_map1 static =
-  (get_basic_static_information
-     static).Site_accross_bonds_domain_static.store_proj_map1
+  let get_proj_map1 static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_proj_map1
 
-let set_proj_map1 r static =
-  set_basic_static_information
-    {
-      (get_basic_static_information static) with
-      Site_accross_bonds_domain_static.store_proj_map1 = r
-    } static
+  let set_proj_map1 r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_proj_map1 = r
+      } static
 
-let get_proj_reverse_map1 static =
-  (get_basic_static_information
-     static).Site_accross_bonds_domain_static.store_proj_reverse_map1
+  let get_proj_reverse_map1 static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_proj_reverse_map1
 
-let set_proj_reverse_map1 r static =
-  set_basic_static_information
-    {
-      (get_basic_static_information static) with
-      Site_accross_bonds_domain_static.store_proj_reverse_map1 = r
-    } static
+  let set_proj_reverse_map1 r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_proj_reverse_map1 = r
+      } static
 
-let get_proj_map2 static =
-  (get_basic_static_information
-     static).Site_accross_bonds_domain_static.store_proj_map2
+  let get_proj_map2 static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_proj_map2
 
-let set_proj_map2 r static =
-  set_basic_static_information
-    {
-      (get_basic_static_information static) with
-      Site_accross_bonds_domain_static.store_proj_map2 = r
-    } static
+  let set_proj_map2 r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_proj_map2 = r
+      } static
 
-let get_proj_reverse_map2 static =
-  (get_basic_static_information
-     static).Site_accross_bonds_domain_static.store_proj_reverse_map2
+  let get_proj_reverse_map2 static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_proj_reverse_map2
 
-let set_proj_reverse_map2 r static =
-  set_basic_static_information
-    {
-      (get_basic_static_information static) with
-      Site_accross_bonds_domain_static.store_proj_reverse_map2 = r
-    } static
+  let set_proj_reverse_map2 r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_proj_reverse_map2 = r
+      } static
 
-(*question marks on the rhs*)
+  (*question marks on the rhs*)
 
 
-let get_proj_question_marks_rhs static =
-  (get_basic_static_information
-     static).Site_accross_bonds_domain_static.store_proj_question_marks_rhs
+  let get_proj_question_marks_rhs static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_proj_question_marks_rhs
 
-let set_proj_question_marks_rhs r static =
-  set_basic_static_information
-    {
-      (get_basic_static_information static) with
-      Site_accross_bonds_domain_static.store_proj_question_marks_rhs = r
-    } static
+  let set_proj_question_marks_rhs r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_proj_question_marks_rhs = r
+      } static
 
   (*------------------------------------------------------------*)
   (** dynamic information*)
@@ -408,13 +408,13 @@ let set_proj_question_marks_rhs r static =
     (*bonds set without rule_id*)
     let store_bonds_rhs = get_bonds_rhs static in
     let store_bonds_rhs_set = get_bonds_rhs_set static in
-  (*  let error, store_bonds_rhs_set =
-      Site_accross_bonds_domain_static.collect_bonds_rhs_set
-        parameter error
-        rule_id
-        store_bonds_rhs
-        store_bonds_rhs_set
-    in*)
+    (*  let error, store_bonds_rhs_set =
+        Site_accross_bonds_domain_static.collect_bonds_rhs_set
+          parameter error
+          rule_id
+          store_bonds_rhs
+          store_bonds_rhs_set
+        in*)
     (*let static = set_bonds_rhs_set store_bonds_rhs_set static in*)
     (*------------------------------------------------------------*)
     (*tuple pair*)
@@ -434,18 +434,18 @@ let set_proj_question_marks_rhs r static =
     in
     let static = set_potential_tuple_pair store_potential_tuple_pair static in
     (*------------------------------------------------------------*)
-  (*  let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
-    let error, store_potential_tuple_pair_set =
-      Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
-        parameter error
-        rule_id
-        store_potential_tuple_pair
-        store_potential_tuple_pair_set
-    in
-    let static =
-      set_potential_tuple_pair_set store_potential_tuple_pair_set static
-    in*)
+    (*  let store_potential_tuple_pair = get_potential_tuple_pair static in
+        let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
+        let error, store_potential_tuple_pair_set =
+        Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
+          parameter error
+          rule_id
+          store_potential_tuple_pair
+          store_potential_tuple_pair_set
+        in
+        let static =
+        set_potential_tuple_pair_set store_potential_tuple_pair_set static
+        in*)
     (*------------------------------------------------------------*)
     (*created a bond*)
     let store_created_bonds = get_created_bonds static in
@@ -522,40 +522,40 @@ let set_proj_question_marks_rhs r static =
     in
     let static = set_question_marks_rhs store_question_marks_rhs static in
     (*------------------------------------------------------------*)
-  (*  let store_question_marks_rhs = get_question_marks_rhs static in
-    let store_proj_question_marks_rhs = get_proj_question_marks_rhs static in
-    let error, store_proj_question_marks_rhs =
-      Site_accross_bonds_domain_static.collect_proj_question_marks_rhs
-        parameter error rule_id
-        kappa_handler
-        store_question_marks_rhs
-        store_proj_question_marks_rhs
-    in
-    let static = set_proj_question_marks_rhs store_proj_question_marks_rhs static in*)
+    (*  let store_question_marks_rhs = get_question_marks_rhs static in
+        let store_proj_question_marks_rhs = get_proj_question_marks_rhs static in
+        let error, store_proj_question_marks_rhs =
+        Site_accross_bonds_domain_static.collect_proj_question_marks_rhs
+          parameter error rule_id
+          kappa_handler
+          store_question_marks_rhs
+          store_proj_question_marks_rhs
+        in
+        let static = set_proj_question_marks_rhs store_proj_question_marks_rhs static in*)
     (*------------------------------------------------------------*)
     (*  let store_potential_tuple_pair_created_bonds =
-      get_potential_tuple_pair_created_bonds static
+        get_potential_tuple_pair_created_bonds static
         in*)
-  (*  let error, potential_tuple_pair_set =
-      Site_accross_bonds_domain_static.get_set parameter error
-        rule_id
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
-        store_potential_tuple_pair_created_bonds
-    in
-    let store_proj_map1 = get_proj_map1 static in
-    let error, store_proj_map1 =
-      Site_accross_bonds_domain_static.collect_proj_map1
-        parameter error
-        potential_tuple_pair_set
-        store_proj_map1
-    in
-    let static = set_proj_map1 store_proj_map1 static in*)
+    (*  let error, potential_tuple_pair_set =
+        Site_accross_bonds_domain_static.get_set parameter error
+          rule_id
+          Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
+          store_potential_tuple_pair_created_bonds
+        in
+        let store_proj_map1 = get_proj_map1 static in
+        let error, store_proj_map1 =
+        Site_accross_bonds_domain_static.collect_proj_map1
+          parameter error
+          potential_tuple_pair_set
+          store_proj_map1
+        in
+        let static = set_proj_map1 store_proj_map1 static in*)
     error, static
 
   (****************************************************************)
 
   let scan_rules static dynamic error =
-let kappa_handler = get_kappa_handler static in
+    let kappa_handler = get_kappa_handler static in
     let parameter = get_parameter static in
     let compil = get_compil static in
     let error, static =
@@ -580,44 +580,44 @@ let kappa_handler = get_kappa_handler static in
     in
     let static = set_bonds_rhs_set store_bonds_rhs_set static in
     let store_potential_tuple_pair = get_potential_tuple_pair static in
-     let error, store_potential_tuple_pair_set =
-       Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
-         parameter error
-         store_potential_tuple_pair
-     in
-     let static =
-       set_potential_tuple_pair_set store_potential_tuple_pair_set static
-     in
-     let store_question_marks_rhs = get_question_marks_rhs static in
-     let error, store_proj_question_marks_rhs =
-       Site_accross_bonds_domain_static.collect_proj_question_marks_rhs
-         parameter error
-         store_question_marks_rhs
-     in
-     let static = set_proj_question_marks_rhs store_proj_question_marks_rhs static in
-     let store_potential_tuple_pair_created_bonds =
-       get_potential_tuple_pair_created_bonds static
-     in
-     let error, potential_tuple_pair_set =
-       Ckappa_sig.Rule_map_and_set.Map.fold
-         (fun _ set1 (error,output) ->
-            let error, set1' = error, set1 in
-            Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.union
-parameter error set1' output)
+    let error, store_potential_tuple_pair_set =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
+        parameter error
+        store_potential_tuple_pair
+    in
+    let static =
+      set_potential_tuple_pair_set store_potential_tuple_pair_set static
+    in
+    let store_question_marks_rhs = get_question_marks_rhs static in
+    let error, store_proj_question_marks_rhs =
+      Site_accross_bonds_domain_static.collect_proj_question_marks_rhs
+        parameter error
+        store_question_marks_rhs
+    in
+    let static = set_proj_question_marks_rhs store_proj_question_marks_rhs static in
+    let store_potential_tuple_pair_created_bonds =
+      get_potential_tuple_pair_created_bonds static
+    in
+    let error, potential_tuple_pair_set =
+      Ckappa_sig.Rule_map_and_set.Map.fold
+        (fun _ set1 (error,output) ->
+           let error, set1' = error, set1 in
+           Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.union
+             parameter error set1' output)
 
-         store_potential_tuple_pair_created_bonds
-         (error,
-          Site_accross_bonds_domain_type.PairAgents SitesStates_map_and_set.Set.empty)
+        store_potential_tuple_pair_created_bonds
+        (error,
+         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty)
 
-       in
-       let error, store_proj_map1 =
-         Site_accross_bonds_domain_static.collect_proj_map1
-           parameter error
-           potential_tuple_pair_set
-       in
-       let static = set_proj_map1 store_proj_map1 static in
+    in
+    let error, store_proj_map1 =
+      Site_accross_bonds_domain_static.collect_proj_map1
+        parameter error
+        potential_tuple_pair_set
+    in
+    let static = set_proj_map1 store_proj_map1 static in
 
-  (*project map, where the tuple set is the created bonds combine with tuple pair*)
+    (*project map, where the tuple set is the created bonds combine with tuple pair*)
     (*------------------------------------------------------------*)
     (*TODO*)
     (*
@@ -746,8 +746,8 @@ parameter error set1' output)
      the constraints in the lhs are consistent *)
   let is_enabled _static dynamic error (_rule_id:Ckappa_sig.c_rule_id) precondition =
     (*let parameter = get_parameter static in
-    let store_bonds_lhs = get_bonds_lhs static in
-    let error, bonds_lhs_set =
+      let store_bonds_lhs = get_bonds_lhs static in
+      let error, bonds_lhs_set =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
               parameter error rule_id store_bonds_lhs
       with
@@ -755,14 +755,14 @@ parameter error set1' output)
         error,
         Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
-    in
-    let store_value = get_value dynamic in
-    let error, bool =
+      in
+      let store_value = get_value dynamic in
+      let error, bool =
       if
         Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.elements
         bonds_lhs_set
 
-    in
+      in
     *)
     error, dynamic, Some precondition
 
@@ -809,73 +809,73 @@ parameter error set1' output)
     then
       error, dynamic, precondition
     else
-    Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.fold
-      (fun t (error, dynamic, precondition) ->
-         let (agent_type, site_type, site_type', state) = x in
-         let (agent_id_q, agent_type_q, site_type_q, site_type_q', state_q') = t in
-         if agent_type = agent_type_q && site_type = site_type_q &&
-            site_type' = site_type_q' (*REMOVE?*)
-         (*-----------------------------------------------------------*)
-         then
-           (*get a list of state in precondition of B(z~?)*)
-           let error, dynamic, precondition, state_list =
-             get_state_of_site_in_precondition
-               parameter error
-               dynamic
-               rule
-               agent_id_q (*B*)
-               site_type_q (*~z*)
-               precondition
-           in
-           (*-----------------------------------------------------------*)
-           let error, dynamic, precondition =
-             List.fold_left (fun (error, dynamic, precondition) pre_state (*free*) ->
-                 let handler = get_mvbdu_handler dynamic in
-                 let store_result = get_value dynamic in
-                 let pair_bond =
-                   (agent_type, site_type, state),
-                   (agent_type_q, site_type_q, pre_state)
-                 in
-                 (*if the first site belongs to bonds rhs*)
-                 if Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.mem
-                     pair_bond
-                     bonds_rhs_set
-                 then
-                   (*-----------------------------------------------------------*)
-                   let pair =
-                     (agent_type, site_type, site_type', state),
-                     (agent_type_q, site_type_q, site_type_q', pre_state)
+      Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.fold
+        (fun t (error, dynamic, precondition) ->
+           let (agent_type, site_type, site_type', state) = x in
+           let (agent_id_q, agent_type_q, site_type_q, site_type_q', state_q') = t in
+           if agent_type = agent_type_q && site_type = site_type_q &&
+              site_type' = site_type_q' (*REMOVE?*)
+              (*-----------------------------------------------------------*)
+           then
+             (*get a list of state in precondition of B(z~?)*)
+             let error, dynamic, precondition, state_list =
+               get_state_of_site_in_precondition
+                 parameter error
+                 dynamic
+                 rule
+                 agent_id_q (*B*)
+                 site_type_q (*~z*)
+                 precondition
+             in
+             (*-----------------------------------------------------------*)
+             let error, dynamic, precondition =
+               List.fold_left (fun (error, dynamic, precondition) pre_state (*free*) ->
+                   let handler = get_mvbdu_handler dynamic in
+                   let store_result = get_value dynamic in
+                   let pair_bond =
+                     (agent_type, site_type, state),
+                     (agent_type_q, site_type_q, pre_state)
                    in
-                   let pair_list = (*CHECK ME*)
-                     [Ckappa_sig.snd_site, state_q']
-                   in
-                   let error, handler, mvbdu =
-                     Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                       parameter handler error pair_list
-                   in
-                   let error, handler, new_mvbdu =
-                     Ckappa_sig.Views_bdu.mvbdu_or
-                       parameter handler error mvbdu old_mvbdu
-                   in
-                   let error, handler, store_result =
-                     Site_accross_bonds_domain_type.add_link
-                       parameter error bdu_false handler
-                       kappa_handler
-                       pair
-                       new_mvbdu
-                       store_result
-                   in
-                   let dynamic = set_mvbdu_handler handler dynamic in
-                   let dynamic = set_value store_result dynamic in
-                   error, dynamic, precondition
-                 else
-                   error, dynamic, precondition
-               ) (error, dynamic, precondition) state_list
-           in
-           error, dynamic, precondition
-         (*-----------------------------------------------------------*)
-         else error, dynamic, precondition
-      ) question_marks_set (error, dynamic, precondition)
+                   (*if the first site belongs to bonds rhs*)
+                   if Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.mem
+                       pair_bond
+                       bonds_rhs_set
+                   then
+                     (*-----------------------------------------------------------*)
+                     let pair =
+                       (agent_type, site_type, site_type', state),
+                       (agent_type_q, site_type_q, site_type_q', pre_state)
+                     in
+                     let pair_list = (*CHECK ME*)
+                       [Ckappa_sig.snd_site, state_q']
+                     in
+                     let error, handler, mvbdu =
+                       Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                         parameter handler error pair_list
+                     in
+                     let error, handler, new_mvbdu =
+                       Ckappa_sig.Views_bdu.mvbdu_or
+                         parameter handler error mvbdu old_mvbdu
+                     in
+                     let error, handler, store_result =
+                       Site_accross_bonds_domain_type.add_link
+                         parameter error bdu_false handler
+                         kappa_handler
+                         pair
+                         new_mvbdu
+                         store_result
+                     in
+                     let dynamic = set_mvbdu_handler handler dynamic in
+                     let dynamic = set_value store_result dynamic in
+                     error, dynamic, precondition
+                   else
+                     error, dynamic, precondition
+                 ) (error, dynamic, precondition) state_list
+             in
+             error, dynamic, precondition
+             (*-----------------------------------------------------------*)
+           else error, dynamic, precondition
+        ) question_marks_set (error, dynamic, precondition)
 
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
@@ -961,42 +961,42 @@ parameter error set1' output)
         then
           error, dynamic, precondition
         else
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
-          (fun (x, y) (error, dynamic, precondition) ->
-             (*------------------------------------------------------*)
-             let handler = get_mvbdu_handler dynamic in
-             let store_result = get_value dynamic in
-             let proj1 (_, a, b, c, d, f) = (a, b,c,d,f) in
-             let ((agent_type, site_type, site_type', state, state'),
-                  (agent_type1, site_type1, site_type1', state1, state1')) =
-               proj1 x, proj1 y
-             in
-             (*internal state of second site*)
-             let pair_list =
-               [Ckappa_sig.fst_site, state';
-                Ckappa_sig.snd_site, state1']
-             in
-             let pair =
-               (agent_type, site_type, site_type', state),
-               (agent_type1, site_type1, site_type1', state1)
-             in
-             let error, handler, mvbdu =
-               Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                 parameter handler error pair_list
-             in
-             (*----------------------------------------------------*)
-             let error, handler, store_result =
-               Site_accross_bonds_domain_type.add_link
-                 parameter error bdu_false handler
-                 kappa_handler
-                 pair
-                 mvbdu
-                 store_result
-             in
-             let dynamic = set_value store_result dynamic in
-             let dynamic = set_mvbdu_handler handler dynamic in
-             error, dynamic, precondition
-          ) tuple_pair_bonds_rhs_set (error, dynamic, precondition)
+          Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
+            (fun (x, y) (error, dynamic, precondition) ->
+               (*------------------------------------------------------*)
+               let handler = get_mvbdu_handler dynamic in
+               let store_result = get_value dynamic in
+               let proj1 (_, a, b, c, d, f) = (a, b,c,d,f) in
+               let ((agent_type, site_type, site_type', state, state'),
+                    (agent_type1, site_type1, site_type1', state1, state1')) =
+                 proj1 x, proj1 y
+               in
+               (*internal state of second site*)
+               let pair_list =
+                 [Ckappa_sig.fst_site, state';
+                  Ckappa_sig.snd_site, state1']
+               in
+               let pair =
+                 (agent_type, site_type, site_type', state),
+                 (agent_type1, site_type1, site_type1', state1)
+               in
+               let error, handler, mvbdu =
+                 Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                   parameter handler error pair_list
+               in
+               (*----------------------------------------------------*)
+               let error, handler, store_result =
+                 Site_accross_bonds_domain_type.add_link
+                   parameter error bdu_false handler
+                   kappa_handler
+                   pair
+                   mvbdu
+                   store_result
+               in
+               let dynamic = set_value store_result dynamic in
+               let dynamic = set_mvbdu_handler handler dynamic in
+               error, dynamic, precondition
+            ) tuple_pair_bonds_rhs_set (error, dynamic, precondition)
       in
       (*-----------------------------------------------------------*)
       (*2. question marks *)
@@ -1031,15 +1031,15 @@ parameter error set1' output)
         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
           (fun (_, y) old_mvbdu (error, dynamic, precondition) ->
              let error, dynamic, precondition =
-             apply_question_mark parameter error dynamic
-               precondition
-               kappa_handler
-               bdu_false
-               rule
-               y
-               old_mvbdu
-               question_marks_set
-               bonds_rhs_set
+               apply_question_mark parameter error dynamic
+                 precondition
+                 kappa_handler
+                 bdu_false
+                 rule
+                 y
+                 old_mvbdu
+                 question_marks_set
+                 bonds_rhs_set
              in
              error, dynamic, precondition
           ) store_value (error, dynamic, precondition)
@@ -1088,29 +1088,29 @@ parameter error set1' output)
                                | [siteone, statex; sitetwo, statey]
                                  when siteone == Ckappa_sig.fst_site
                                    && sitetwo = Ckappa_sig.snd_site ->
-                                  let pair_list =
-                                     [Ckappa_sig.fst_site, state_m; (*state t of A*)
-                                      Ckappa_sig.snd_site, statey] (*state t of B*)
-                                  in
-                                  let error, handler, mvbdu =
-                                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                                      parameter handler error pair_list
-                                  in
-                                  let error, handler, new_mvbdu =
-                                    Ckappa_sig.Views_bdu.mvbdu_or
-                                      parameter handler error mvbdu old_mvbdu
-                                  in
-                                  let error, handler, store_result =
-                                    Site_accross_bonds_domain_type.add_link
-                                      parameter error bdu_false handler
-                                      kappa_handler
-                                      (x, y)
-                                      new_mvbdu
-                                      store_result
-                                  in
-                                  let dynamic = set_mvbdu_handler handler dynamic in
-                                  let dynamic = set_value store_result dynamic in
-                                  error, dynamic, precondition
+                                 let pair_list =
+                                   [Ckappa_sig.fst_site, state_m; (*state t of A*)
+                                    Ckappa_sig.snd_site, statey] (*state t of B*)
+                                 in
+                                 let error, handler, mvbdu =
+                                   Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                                     parameter handler error pair_list
+                                 in
+                                 let error, handler, new_mvbdu =
+                                   Ckappa_sig.Views_bdu.mvbdu_or
+                                     parameter handler error mvbdu old_mvbdu
+                                 in
+                                 let error, handler, store_result =
+                                   Site_accross_bonds_domain_type.add_link
+                                     parameter error bdu_false handler
+                                     kappa_handler
+                                     (x, y)
+                                     new_mvbdu
+                                     store_result
+                                 in
+                                 let dynamic = set_mvbdu_handler handler dynamic in
+                                 let dynamic = set_value store_result dynamic in
+                                 error, dynamic, precondition
                                | [] | _::_ ->
                                  let error, () =
                                    Exception.warn parameter error __POS__ Exit ()
@@ -1436,8 +1436,8 @@ parameter error set1' output)
     error, dynamic, (precondition, event_list)
                     *)
 
-(* events enable communication between domains. At this moment, the
-     global domain does not collect information *)
+  (* events enable communication between domains. At this moment, the
+       global domain does not collect information *)
 
   let apply_event_list _static dynamic error _event_list =
     let event_list = [] in
@@ -1512,7 +1512,7 @@ parameter error set1' output)
         (*--------------------------------------------------------*)
         (*print a list of agent_id*)
         (*let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
-        let error =
+          let error =
           if
             Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.is_empty
               store_potential_tuple_pair_set
@@ -1537,8 +1537,8 @@ parameter error set1' output)
                  in
                  error
               ) store_potential_tuple_pair_set error
-        in
-        let () = Loggers.print_newline log in*)
+          in
+          let () = Loggers.print_newline log in*)
         (*--------------------------------------------------------*)
         (*bonds_rhs set*)
         let bonds_rhs_set = get_bonds_rhs_set static in
@@ -1551,26 +1551,26 @@ parameter error set1' output)
             in
             error
           else
-          Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.fold
-            (fun (x, y) error ->
-               let error, (agent, site, state) =
-                 Site_accross_bonds_domain_type.convert_single
-                   parameter error kappa_handler
-                   x
-               in
-               let error, (agent1, site1, state1) =
-                 Site_accross_bonds_domain_type.convert_single
-                   parameter error kappa_handler
-                   y
-               in
-               let () =
-                 Loggers.fprintf log
-                   "The site of %s of agent %s is bound to the site of %s of agent %s. %s(%s:%s) , %s(%s:%s)\n"
-                   site agent site1 agent1
-                   agent site state agent1 site1 state1
-               in
-               error
-            ) bonds_rhs_set error
+            Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.fold
+              (fun (x, y) error ->
+                 let error, (agent, site, state) =
+                   Site_accross_bonds_domain_type.convert_single
+                     parameter error kappa_handler
+                     x
+                 in
+                 let error, (agent1, site1, state1) =
+                   Site_accross_bonds_domain_type.convert_single
+                     parameter error kappa_handler
+                     y
+                 in
+                 let () =
+                   Loggers.fprintf log
+                     "The site of %s of agent %s is bound to the site of %s of agent %s. %s(%s:%s) , %s(%s:%s)\n"
+                     site agent site1 agent1
+                     agent site state agent1 site1 state1
+                 in
+                 error
+              ) bonds_rhs_set error
         in
         let () = Loggers.print_newline log in
         (*--------------------------------------------------------*)
