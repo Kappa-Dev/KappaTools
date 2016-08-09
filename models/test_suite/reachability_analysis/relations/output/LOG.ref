@@ -965,6 +965,11 @@ The internal state of site z in agent A ranges over u and q.
 ------------------------------------------------------------
 * Static information
 
+potential tuple pair set is empty
+
+bonds_rhs set is empty
+
+
 
 
 At rule_id:0, there is a modification of the site x of A. A(x:u)

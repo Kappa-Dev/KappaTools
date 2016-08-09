@@ -713,6 +713,23 @@ The binding state of site z in agent B ranges over free and A@z.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+At rule_id:0 there is a binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
+At rule_id:0 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
+At rule_id:1 there is a binding between the site t of A and the site t of B. A:(t:B@t); B:(t:A@t)
+At rule_id:1 there is a binding between the site t of B and the site t of A. B:(t:A@t); A:(t:B@t)
+
+The potential tuple pair set has the site z and the site t of agent A, and the site z and t of agent B. A(z, t); B(z, t)
+The potential tuple pair set has the site z and the site t of agent A, and the site t and z of agent B. A(z, t); B(t, z)
+The potential tuple pair set has the site t and the site z of agent A, and the site z and t of agent B. A(t, z); B(z, t)
+The potential tuple pair set has the site t and the site z of agent A, and the site t and z of agent B. A(t, z); B(t, z)
+The potential tuple pair set has the site z and the site t of agent B, and the site z and t of agent A. B(z, t); A(z, t)
+The potential tuple pair set has the site z and the site t of agent B, and the site t and z of agent A. B(z, t); A(t, z)
+The potential tuple pair set has the site t and the site z of agent B, and the site z and t of agent A. B(t, z); A(z, t)
+The potential tuple pair set has the site t and the site z of agent B, and the site t and z of agent A. B(t, z); A(t, z)
+
+The site of t of agent A is bound to the site of t of agent B. A(t:B@t) , B(t:A@t)
+The site of t of agent B is bound to the site of t of agent A. B(t:A@t) , A(t:B@t)
+
 At rule_id:0, the potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:free); B(z:A@z, t:free)
 At rule_id:0, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
 At rule_id:1, the potential tuple pair when there is an action binding between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)

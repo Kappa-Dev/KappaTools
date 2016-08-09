@@ -163,6 +163,18 @@ C is a dead agent.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+At rule_id:0 there is a binding between the site x of A and the site x of B. A:(x:B@x); B:(x:A@x)
+At rule_id:0 there is a binding between the site y of A and the site y of C. A:(y:C@y); C:(y:A@y)
+At rule_id:0 there is a binding between the site x of B and the site x of A. B:(x:A@x); A:(x:B@x)
+At rule_id:0 there is a binding between the site y of C and the site y of A. C:(y:A@y); A:(y:C@y)
+
+potential tuple pair set is empty
+
+The site of x of agent A is bound to the site of x of agent B. A(x:B@x) , B(x:A@x)
+The site of y of agent A is bound to the site of y of agent C. A(y:C@y) , C(y:A@y)
+The site of x of agent B is bound to the site of x of agent A. B(x:A@x) , A(x:B@x)
+The site of y of agent C is bound to the site of y of agent A. C(y:A@y) , A(y:C@y)
+
 
 
 

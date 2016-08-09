@@ -282,6 +282,11 @@ The internal state of site g in agent A ranges over u and p.
 ------------------------------------------------------------
 * Static information
 
+potential tuple pair set is empty
+
+bonds_rhs set is empty
+
+
 
 
 At rule_id:1, there is a modification of the site a1 of A. A(a1:p)
@@ -595,6 +600,11 @@ The internal state of site g in agent A ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+
+potential tuple pair set is empty
+
+bonds_rhs set is empty
+
 
 
 

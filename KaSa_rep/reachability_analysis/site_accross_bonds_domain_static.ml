@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 08 2016>
+   * Last modification: Time-stamp: <Aug 09 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -51,12 +51,6 @@ type basic_static_information =
     (*store_potential_tuple_pair set*)
     store_potential_tuple_pair_set :
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
-    (*store_potential_tuple_pair_set2 : (*TODO*)
-      Site_accross_bonds_domain_type.PairAgentSites_map_and_set.Set.t;
-    (*first agent has the second site can be modified*)
-    store_fst_agent_id_list_snd_site_modif :
-      (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
-        Ckappa_sig.Rule_map_and_set.Map.t;*)
     (*------------------------------------------------------------------*)
     (*potential tuple pair has the first site belongs to rule has a site
       can created a bond *)
@@ -75,13 +69,6 @@ type basic_static_information =
       Ckappa_sig.Rule_map_and_set.Map.t;
     store_proj_question_marks_rhs :
       Site_accross_bonds_domain_type.AgentSites_map_and_set.Set.t;
-    (*------------------------------------------------------------------*)
-    (*projection the agent_id and second site*)
-    (*store_potential_tuple_pair_created_bonds_proj1 :
-      Site_accross_bonds_domain_type.PairAgentIDSite_map_and_set.Set.t;
-    (*------------------------------------------------------------------*)
-    store_potential_tuple_pair_created_bonds_proj2 :
-      Site_accross_bonds_domain_type.AgentSiteState_map_and_set.Set.t;*)
     (*------------------------------------------------------------------*)
     (*project map*)
     store_proj_map1 :
@@ -154,10 +141,6 @@ let init_basic_static_information =
     store_potential_tuple_pair = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_potential_tuple_pair_set =
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
-    (*store_potential_tuple_pair_set2 =
-      Site_accross_bonds_domain_type.PairAgentSites_map_and_set.Set.empty;
-    store_fst_agent_id_list_snd_site_modif =
-      Ckappa_sig.Rule_map_and_set.Map.empty;*)
     (*-------------------------------------------------------*)
     store_potential_tuple_pair_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_potential_tuple_pair_bonds_rhs =
@@ -165,10 +148,6 @@ let init_basic_static_information =
     (*-------------------------------------------------------*)
     store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_proj_question_marks_rhs = Site_accross_bonds_domain_type.AgentSites_map_and_set.Set.empty;
-    (*store_potential_tuple_pair_created_bonds_proj1 =
-      Site_accross_bonds_domain_type.PairAgentIDSite_map_and_set.Set.empty;
-    store_potential_tuple_pair_created_bonds_proj2 =
-      Site_accross_bonds_domain_type.AgentSiteState_map_and_set.Set.empty;*)
     (*-------------------------------------------------------*)
     (*project map*)
     store_proj_map1 =
@@ -562,64 +541,6 @@ let collect_potential_tuple_pair_set parameter error rule_id store_potential_tup
   in
   error, new_set
 
-(*TODO*)
-(*
-  let collect_potential_tuple_pair_set2 parameter error rule_id store_potential_tuple_pair =
-    let error,  potential_tuple_pair_set =
-      get_set parameter error
-        rule_id
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
-        store_potential_tuple_pair
-    in
-    let proj (_,b, c, d, e, f) = (b, c, d) in
-    let error, new_set =
-      Site_accross_bonds_domain_type.Proj_agent_id_away3.monadic_proj_set
-        (fun _parameter error (x, y) ->
-           error,
-           (proj x, proj y)
-        )
-        parameter
-        error
-        potential_tuple_pair_set
-    in
-    error, new_set
-
-(*modification and tuple pair *)
-
-let collect_fst_agent_id_list_snd_site_modif parameter error rule_id store_modified_map
-    store_potential_tuple_pair store_result =
-  let error, modif_set =
-    get_set parameter error rule_id
-      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
-      store_modified_map
-  in
-  let error, potential_tuple_pair_set =
-    get_set parameter error rule_id
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
-      store_potential_tuple_pair
-  in
-  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
-    (fun (t, _) (error, store_result) ->
-       (*return agent_id of t when (y) belongs to modif*)
-       let proj (a, b, _, d, _, f) = (a, b, d, f) in
-       if Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.mem
-           (proj t)
-           modif_set
-       then
-         let proj1 (a, b, _, d, _, _) = (a, b, d) in
-         let error, old_list =
-           get_set parameter error rule_id [] store_result in
-         let error, store_result =
-           Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-             parameter error
-             rule_id
-             (proj1 t :: old_list)
-             store_result
-         in
-         error, store_result
-       else error, store_result
-    ) potential_tuple_pair_set (error, store_result)*)
-
 (***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)
 
@@ -800,86 +721,6 @@ let collect_potential_tuple_pair_created_bonds parameter error rule_id
        else error, store_result
     ) potential_tuple_pair_set (error, store_result)
 
-(*
-let collect_potential_tuple_pair_modified parameter error rule_id
-    store_modified_map store_potential_tuple_pair
-    *)
-(*-------------------------------------------------------*)
-(*project the agent_id and second site in the pair,
-  this will be used to get a list of state in the precondition*)
-
-(*
-let collect_potential_tuple_pair_created_bonds_proj1 parameter error rule_id
-    store_potential_tuple_pair_created_bonds =
-  let error, potential_tuple_pair_created_bonds_set =
-    get_set parameter error
-      rule_id
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
-      store_potential_tuple_pair_created_bonds
-  in
-  let proj (a, _, _, d, _, _) = (a, d) in
-  let error, new_set =
-    Site_accross_bonds_domain_type.Proj_get_agent_id_snd_site.monadic_proj_set
-      (fun _parameter error (x, y) ->
-         (*let (agent_id, site_type1), (agent_id1, site_type1') =
-           proj x, proj y
-           in
-           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-           "rule_id:%i:%i:%i; %i:%i\n"
-           (Ckappa_sig.int_of_rule_id rule_id)
-           (Ckappa_sig.int_of_agent_id agent_id)
-           (Ckappa_sig.int_of_site_name site_type1)
-           (Ckappa_sig.int_of_agent_id agent_id1)
-           (Ckappa_sig.int_of_site_name site_type1')
-           in*)
-         error,
-         (proj x, proj y)
-      )
-      parameter
-      error
-      potential_tuple_pair_created_bonds_set
-  in
-  error, new_set
-
-(*-------------------------------------------------------*)
-(*project the tuple pair return in the result*)
-
-let collect_potential_tuple_pair_created_bonds_proj2
-    parameter error _kappa_handler
-    rule_id store_potential_tuple_pair_created_bonds =
-  let error, potential_tuple_pair_created_bonds_set =
-    get_set parameter error
-      rule_id
-      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty
-      store_potential_tuple_pair_created_bonds
-  in
-  let proj (_, b, c, _, e, _) = (b, c, e) in
-  let error, new_set =
-    Site_accross_bonds_domain_type.Proj_get_agents_sites.monadic_proj_set
-      (fun _parameter error (x, _) ->
-         (*  let error, (agent, site, state) =
-             Site_accross_bonds_domain_type.convert_single
-             parameter error kappa_handler (proj x)
-             in
-             let error, (agent1, site1, state1) =
-             Site_accross_bonds_domain_type.convert_single
-             parameter error kappa_handler (proj y)
-             in
-             let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-             "rule_id:%i:%s(%s:%s); %s(%s:%s)\n"
-             (Ckappa_sig.int_of_rule_id rule_id)
-             agent site state
-             agent1 site1 state1
-             in*)
-         error, proj x
-      )
-      parameter
-      error
-      potential_tuple_pair_created_bonds_set
-  in
-  error, new_set
-         *)
-
 (****************************************************************)
 (*project map*)
 
@@ -1015,26 +856,6 @@ let collect_proj_question_marks_rhs parameter error rule_id kappa_handler store_
   let error, new_set =
     Site_accross_bonds_domain_type.Proj_question_mark.monadic_proj_set
       (fun _parameter error x ->
-         let (agent_type, site_type, site_type') = proj x in
-         let error, (agent, site) =
-           Site_accross_bonds_domain_type.convert_single_without_state
-             parameter error kappa_handler
-             (agent_type, site_type)
-         in
-         let error, (_, site') =
-           Site_accross_bonds_domain_type.convert_single_without_state
-             parameter error kappa_handler
-             (agent_type, site_type')
-         in
-         let () =
-           Loggers.fprintf (Remanent_parameters.get_logger parameter)
-             "Question mark: %s(%i:%s, %i:%s) \n"
-             agent
-             (Ckappa_sig.int_of_site_name site_type)
-             site
-             (Ckappa_sig.int_of_site_name site_type')
-             site'
-         in
          error, proj x
       )
       parameter
