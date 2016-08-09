@@ -50,8 +50,8 @@ type basic_static_information =
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_potential_tuple_pair_bonds_rhs :
-    Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t
-      Ckappa_sig.Rule_map_and_set.Map.t;
+      Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
     store_proj_question_marks_rhs :
       Site_accross_bonds_domain_type.AgentSites_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
@@ -347,15 +347,15 @@ let collect_bonds_rhs_set parameter error store_bonds_rhs =
   let proj2 (x,y) = (proj x,proj y) in
   Ckappa_sig.Rule_map_and_set.Map.fold
     (fun _ set1 (error,output) ->
-      let error, set1' =  Site_accross_bonds_domain_type.Proj_agent_id_away1.proj_set
-      proj2
-      parameter
-      error
-      set1 in
-Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.union
-parameter error set1' output)
-store_bonds_rhs
-(error,Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty)
+       let error, set1' =  Site_accross_bonds_domain_type.Proj_agent_id_away1.proj_set
+           proj2
+           parameter
+           error
+           set1 in
+       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.union
+         parameter error set1' output)
+    store_bonds_rhs
+    (error,Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty)
 
 
 (***************************************************************)
@@ -525,20 +525,20 @@ let collect_potential_tuple_pair_set parameter error rule_id store_potential_tup
   error, new_set
 *)
 
-  let collect_potential_tuple_pair_set parameter error  store_potential_tuple_pair  =
-    let proj (_,b,c,d,e,f) = b,c,d,e,f in
-    let proj2 (x,y) = (proj x,proj y) in
-    Ckappa_sig.Rule_map_and_set.Map.fold
-      (fun _ set1 (error,output) ->
-        let error, set1' =  Site_accross_bonds_domain_type.Proj_agent_id_away2.proj_set
-        proj2
-        parameter
-        error
-        set1 in
-  Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.union
-  parameter error set1' output)
-  store_potential_tuple_pair
-  (error,Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
+let collect_potential_tuple_pair_set parameter error  store_potential_tuple_pair  =
+  let proj (_,b,c,d,e,f) = b,c,d,e,f in
+  let proj2 (x,y) = (proj x,proj y) in
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun _ set1 (error,output) ->
+       let error, set1' =  Site_accross_bonds_domain_type.Proj_agent_id_away2.proj_set
+           proj2
+           parameter
+           error
+           set1 in
+       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.union
+         parameter error set1' output)
+    store_potential_tuple_pair
+    (error,Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
 
 
 (***************************************************************)
@@ -707,8 +707,8 @@ let collect_potential_tuple_pair_created_bonds parameter error rule_id
              old_set
          in
          let error =
-         Exception.check_point
-           Exception.warn parameter error error' __POS__ Exit
+           Exception.check_point
+             Exception.warn parameter error error' __POS__ Exit
          in
          let error, store_result =
            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
@@ -827,7 +827,7 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
                (*let site_type' =
                  Ckappa_sig.site_name_of_int
                    (Ckappa_sig.int_of_site_name site_type )
-               in*)
+                 in*)
                (*check if agent of question mark is also the agent that can
                  be modified*)
                if agent_id_m = agent_id
@@ -871,7 +871,7 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
 let collect_proj_question_marks_rhs parameter error
     store_question_marks_rhs =
   let proj (_,b,c,d,_) = b,c,d in
-Ckappa_sig.Rule_map_and_set.Map.fold
+  Ckappa_sig.Rule_map_and_set.Map.fold
     (fun _ set1 (error,output) ->
        let error, set1' =  Site_accross_bonds_domain_type.Proj_question_mark.proj_set
            proj
