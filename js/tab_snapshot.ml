@@ -43,6 +43,20 @@ let configuration : Widget_export.configuration =
 		~mime:"application/json"
 		~filename:filename
         }
+      ; { Widget_export.suffix = "dot"
+        ; Widget_export.label = "dot"
+        ; Widget_export.export =
+	    fun (filename : string) ->
+              let data = match
+		  (React.S.value current_snapshot : ApiTypes.snapshot option) with
+              | None -> ""
+              | Some s -> Api_data.api_snapshot_dot s
+              in
+              Common.saveFile
+		~data:data
+		~mime:"text/vnd.graphviz"
+		~filename:filename
+        }
       ];
     show = React.S.map
         (fun state ->
