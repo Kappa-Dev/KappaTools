@@ -281,13 +281,13 @@ module type Projection = sig
     (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_b
 
   val monadic_proj_set:
-    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> set_b -> Exception.method_handler * set_b
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_b
 
   val partition_set:
     (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
 
   val monadic_partition_set:
-    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> set_a map_b -> Exception.method_handler * set_a map_b
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a ->  Exception.method_handler * set_a map_b
 
 end
 
@@ -356,7 +356,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         set
         (error,MB.empty)
 
-    let monadic_partition_set f parameter error set map_b =
+    let monadic_partition_set f parameter error set =
       SA.fold
         (fun key_a (error,map_b) ->
            let error,key_b = f parameter error key_a in
@@ -371,7 +371,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
              MB.add_or_overwrite parameter error key_b data' map_b
         )
         set
-        (error,map_b)
+        (error,MB.empty)
 
     let proj_set f parameter error set_a =
       SA.fold
@@ -381,13 +381,13 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         set_a
         (error, SB.empty)
 
-    let monadic_proj_set f parameter error set_a set_b =
+    let monadic_proj_set f parameter error set_a =
       SA.fold
         (fun key_a (error,set_b) ->
            let error, key_b = f parameter error key_a in
            SB.add_when_not_in parameter error key_b set_b)
         set_a
-        (error, set_b)
+        (error, SB.empty)
 
   end: Projection
   with type elt_a = A.elt
