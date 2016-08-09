@@ -358,30 +358,6 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
 (***************************************************************)
 (*use the projection of set*)
 
-(*let collect_bonds_rhs_set parameter error rule_id store_bonds_rhs store_result =
-  let error, bonds_rhs_set =
-    get_set parameter error rule_id
-      Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
-      store_bonds_rhs
-  in
-  (*using project_set*)
-  let proj (_, b, c, d) = (b, c, d) in
-  let error, new_set =
-    Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
-      (fun (x ,y ) (error, store_result) ->
-         let error, new_set =
-           Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.add_when_not_in
-             parameter error
-             (proj x, proj y)
-             store_result
-         in
-         error, new_set
-      )
-      bonds_rhs_set (error, store_result)
-  in
-  error, new_set*)
-
-(*CHECK ME*)
 let collect_bonds_rhs_set parameter error rule_id store_bonds_rhs store_result =
   let error, bonds_rhs_set =
     get_set parameter error rule_id
@@ -750,7 +726,7 @@ let collect_potential_tuple_pair_created_bonds parameter error rule_id
 (****************************************************************)
 (*project map*)
 
-let collect_proj_map1 parameter error store_potential_tuple_pair_set =
+let collect_proj_map1 parameter error store_potential_tuple_pair_set store_result =
   let proj (b, c, _, _, _) = (b,c) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Proj_map1.monadic_partition_set
@@ -761,10 +737,11 @@ let collect_proj_map1 parameter error store_potential_tuple_pair_set =
     parameter
     error
     store_potential_tuple_pair_set (*set_a*)
+    store_result
 
 (*-------------------------------------------------------*)
 
-let collect_proj_reverse_map1 parameter error store_potential_tuple_pair_set =
+let collect_proj_reverse_map1 parameter error store_potential_tuple_pair_set store_result =
   let proj (b, c, _, _, _) = (b,c) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Proj_map1.monadic_partition_set
@@ -775,10 +752,11 @@ let collect_proj_reverse_map1 parameter error store_potential_tuple_pair_set =
     parameter
     error
     store_potential_tuple_pair_set (*set_a*)
+    store_result
 
 (*-------------------------------------------------------*)
 
-let collect_proj_map2 parameter error store_potential_tuple_pair_set =
+let collect_proj_map2 parameter error store_potential_tuple_pair_set store_result =
   let proj (b, _, d, _, _) = (b,d) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Proj_map2.monadic_partition_set
@@ -789,10 +767,11 @@ let collect_proj_map2 parameter error store_potential_tuple_pair_set =
     parameter
     error
     store_potential_tuple_pair_set (*set_a*)
+    store_result
 
 (*-------------------------------------------------------*)
 
-let collect_proj_reverse_map2 parameter error store_potential_tuple_pair_set =
+let collect_proj_reverse_map2 parameter error store_potential_tuple_pair_set store_result =
   let proj (b, _, d, _, _) = (b,d) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Proj_map2.monadic_partition_set
@@ -803,6 +782,7 @@ let collect_proj_reverse_map2 parameter error store_potential_tuple_pair_set =
     parameter
     error
     store_potential_tuple_pair_set (*set_a*)
+    store_result
 
 (***************************************************************)
 (*collect rule that has question marks on the right hand side*)

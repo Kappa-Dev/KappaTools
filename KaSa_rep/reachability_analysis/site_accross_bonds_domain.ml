@@ -760,31 +760,39 @@ let set_proj_question_marks_rhs r static =
     (*------------------------------------------------------------*)
     (*project map*)
     let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
+    let store_proj_map1 = get_proj_map1 static in
     let error, store_proj_map1 =
       Site_accross_bonds_domain_static.collect_proj_map1
         parameter error
         store_potential_tuple_pair_set
+        store_proj_map1
     in
     let static = set_proj_map1 store_proj_map1 static in
     (*------------------------------------------------------------*)
+    let store_proj_reverse_map1 = get_proj_reverse_map1 static in
     let error, store_proj_reverse_map1 =
       Site_accross_bonds_domain_static.collect_proj_reverse_map1
         parameter error
         store_potential_tuple_pair_set
+        store_proj_reverse_map1
     in
     let static = set_proj_reverse_map1 store_proj_reverse_map1 static in
     (*------------------------------------------------------------*)
+    let store_proj_map2 = get_proj_map2 static in
     let error, store_proj_map2 =
       Site_accross_bonds_domain_static.collect_proj_map2
         parameter error
         store_potential_tuple_pair_set
+        store_proj_map2
     in
     let static = set_proj_map2 store_proj_map2 static in
     (*------------------------------------------------------------*)
+    let store_proj_reverse_map2 = get_proj_reverse_map2 static in
     let error, store_proj_reverse_map2 =
       Site_accross_bonds_domain_static.collect_proj_reverse_map2
         parameter error
         store_potential_tuple_pair_set
+        store_proj_reverse_map2
     in
     let static = set_proj_map2 store_proj_reverse_map2 static in
     (*------------------------------------------------------------*)

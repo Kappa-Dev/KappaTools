@@ -287,7 +287,7 @@ module type Projection = sig
     (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
 
   val monadic_partition_set:
-    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> Exception.method_handler * set_a map_b
+    (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> set_a -> set_a map_b -> Exception.method_handler * set_a map_b
 
 end
 
@@ -356,7 +356,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
         set
         (error,MB.empty)
 
-    let monadic_partition_set f parameter error set =
+    let monadic_partition_set f parameter error set map_b =
       SA.fold
         (fun key_a (error,map_b) ->
            let error,key_b = f parameter error key_a in
@@ -371,7 +371,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
              MB.add_or_overwrite parameter error key_b data' map_b
         )
         set
-        (error,MB.empty)
+        (error,map_b)
 
     let proj_set f parameter error set_a =
       SA.fold
