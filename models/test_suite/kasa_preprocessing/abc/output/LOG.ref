@@ -938,19 +938,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=86
+Id=87
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=85
+  Id=86
    Node(site_type:1<2)
-    Id=84
+    Id=85
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=83
+      Id=84
        Node(site_type:2<2)
         Id=25
          Node(site_type:3<0)
@@ -992,12 +992,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=101
+Id=104
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=100
+  Id=103
    Node(site_type:1<2)
     Id=31
      Node(site_type:2<2)
@@ -1098,14 +1098,14 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=105
+Id=110
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=97
+  Id=100
    Node(site_type:1<2)
-    Id=96
+    Id=99
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1136,12 +1136,12 @@ Id=45
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=91
+Id=92
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=90
+  Id=91
    Node(site_type:1<1)
     Id=60
      Node(site_type:2<0)
@@ -1176,23 +1176,23 @@ Id=91
         Id=0
          Leaf False 
 
-    Id=89
+    Id=90
      Node(site_type:1<2)
-      Id=88
+      Id=89
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=87
+        Id=88
          Node(site_type:2<1)
-          Id=75
+          Id=76
            Node(site_type:3<0)
             Id=0
              Leaf False 
 
-            Id=74
+            Id=75
              Node(site_type:3<1)
-              Id=73
+              Id=74
                Node(site_type:4<0)
                 Id=0
                  Leaf False 
@@ -1208,7 +1208,7 @@ Id=91
               Id=0
                Leaf False 
 
-          Id=83
+          Id=84
            Node(site_type:2<2)
             Id=25
              Node(site_type:3<0)
@@ -1244,12 +1244,12 @@ Id=91
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=110
+Id=111
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=109
+  Id=93
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1259,12 +1259,12 @@ Id=110
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=108
+Id=113
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=107
+  Id=112
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1274,12 +1274,12 @@ Id=108
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=108
+Id=113
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=107
+  Id=112
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1289,26 +1289,26 @@ Id=108
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=187
+Id=190
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=186
+  Id=189
    Node(site_type:0<1)
-    Id=179
+    Id=182
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=178
+      Id=181
        Node(site_type:1<1)
-        Id=146
+        Id=149
          Node(site_type:2<0)
           Id=0
            Leaf False 
 
-          Id=145
+          Id=148
            Node(site_type:2<2)
             Id=11
              Node(site_type:3<0)
@@ -1329,23 +1329,23 @@ Id=187
         Id=0
          Leaf False 
 
-    Id=185
+    Id=188
      Node(site_type:0<2)
-      Id=184
+      Id=187
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=183
+        Id=186
          Node(site_type:1<1)
-          Id=144
+          Id=147
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=143
+            Id=146
              Node(site_type:2<1)
-              Id=115
+              Id=118
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1361,14 +1361,14 @@ Id=187
               Id=0
                Leaf False 
 
-          Id=182
+          Id=185
            Node(site_type:1<2)
-            Id=181
+            Id=184
              Node(site_type:2<0)
               Id=0
                Leaf False 
 
-              Id=180
+              Id=183
                Node(site_type:2<1)
                 Id=11
                  Node(site_type:3<0)
@@ -1404,12 +1404,12 @@ In agent C, the internal state of site x1, the internal state of site x2, the bi
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=110
+Id=111
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=109
+  Id=93
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1419,12 +1419,12 @@ Id=110
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=108
+Id=113
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=107
+  Id=112
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1434,42 +1434,12 @@ Id=108
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=108
+Id=113
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=107
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=108
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=107
+  Id=112
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1494,7 +1464,7 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=115
+Id=118
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1508,13 +1478,43 @@ Id=115
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=45
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=113
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=112
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 The binding state of site c in agent A ranges over free, C@x1, and C@x2.
 The binding state of site x in agent A ranges over free and B@x.
 The binding state of site x in agent B ranges over free and A@x.
-The internal state of site x2 in agent C ranges over u and p.
-The internal state of site x1 in agent C ranges over u and p.
 The binding state of site x1 in agent C ranges over free and A@c.
 The binding state of site x2 in agent C ranges over free and A@c.
+The internal state of site x2 in agent C ranges over u and p.
+The internal state of site x1 in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -1569,14 +1569,89 @@ At rule_id:5, there is a modification of the site x2 of C. C(x2:free)
 
 * Dynamic information
 Whenever the site c of A and the site x1 of C are bound together, then the site x of A and x1 of C can have the following respective states: B@x, u
+Whenever the site c of A and the site x1 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, u
+Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: B@x, p
 Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, p
+Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x2 of C can have the following respective states: B@x, u
 Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x2 of C can have the following respective states: free, u
+Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: B@x, free
 Whenever the site c of A and the site x2 of C are bound together, then the site x of A and x1 of C can have the following respective states: free, free
+Whenever the site x1 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: p, B@x
 Whenever the site x1 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: u, B@x
 Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: p, free
+Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: u, free
+Whenever the site x2 of C and the site c of A are bound together, then the site x2 of C and x of A can have the following respective states: p, free
 Whenever the site x2 of C and the site c of A are bound together, then the site x2 of C and x of A can have the following respective states: u, free
+Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: A@c, free
 Whenever the site x2 of C and the site c of A are bound together, then the site x1 of C and x of A can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit

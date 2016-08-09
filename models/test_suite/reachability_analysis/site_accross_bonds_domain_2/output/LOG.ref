@@ -614,19 +614,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=60
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=59
    Node(site_type:1<2)
-    Id=54
+    Id=58
      Node(site_type:2<2)
       Id=0
        Leaf False 
 
-      Id=53
+      Id=57
        Node(site_type:2<3)
         Id=1
          Leaf True 
@@ -703,114 +703,62 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t~)
 		Updating the views for B(z~,z!,t~)
+			
 
-	Applying rule 3: r3:
-		the precondition is satisfied
-		Updating the views for A(z!,t~)
-		Updating the views for B(z~,z!,t~)
-
-	Applying rule 4: r4:
-		the precondition is satisfied
-		Updating the views for A(z!,t~)
-		Updating the views for B(z~,z!,t~)
-
-	Applying rule 5: r5:
-		the precondition is satisfied
-		Updating the views for A(z!,t~)
-
-	Applying rule 1: r1:
-		the precondition is satisfied
-		Updating the views for B(z~,z!,t~)
-
-------------------------------------------------------------
-* Dead rules :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-agent_type:0:A:cv_id:0
-Id=60
- Node(site_type:1<0)
+INTENSIONAL DESCRIPTION:
+Id=83
+ Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=59
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=58
-     Node(site_type:1<2)
-      Id=57
+  Id=82
+   Node(site_type:1<2)
+    Id=81
+     Node(site_type:1<3)
+      Id=80
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=53
-         Node(site_type:2<3)
-          Id=1
-           Leaf True 
+        Id=79
+         Node(site_type:2<1)
+          Id=11
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
 
-          Id=0
-           Leaf False 
+            Id=10
+             Node(site_type:3<1)
+              Id=1
+               Leaf True 
 
-      Id=0
-       Leaf False 
+              Id=0
+               Leaf False 
 
-agent_type:1:B:cv_id:0
-Id=65
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
+          Id=78
+           Node(site_type:2<2)
+            Id=77
+             Node(site_type:3<0)
+              Id=1
+               Leaf True 
 
-  Id=64
-   Node(site_type:1<1)
-    Id=13
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
+              Id=76
+               Node(site_type:3<2)
+                Id=0
+                 Leaf False 
 
-      Id=12
-       Node(site_type:2<1)
-        Id=11
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=10
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
+                Id=1
+                 Leaf True 
 
             Id=0
              Leaf False 
 
-        Id=0
-         Leaf False 
-
-    Id=63
-     Node(site_type:1<2)
-      Id=62
+      Id=67
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=61
+        Id=66
          Node(site_type:2<1)
           Id=11
            Node(site_type:3<0)
@@ -843,6 +791,947 @@ Id=65
             Id=0
              Leaf False 
 
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z~p,z!free,t~u)
+			B(z~p,z!A@z,t~p)
+			B(z~p,z!A@z,t~u)
+
+	Wake-up rules
+
+	Applying rule 3: r3:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	Wake-up rules
+
+	Applying rule 4: r4:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 5: r5:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+
+	Applying rule 1: r1:
+		the precondition is satisfied
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=13
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<1)
+        Id=11
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=10
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z~p,z!free,t~u)
+
+	Wake-up rules
+
+	Applying rule 0: r0:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=140
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=139
+   Node(site_type:1<2)
+    Id=138
+     Node(site_type:1<3)
+      Id=137
+       Node(site_type:1<0)
+        Id=116
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=115
+           Node(site_type:2<1)
+            Id=11
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=10
+               Node(site_type:3<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=18
+             Node(site_type:2<2)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+        Id=136
+         Node(site_type:1<1)
+          Id=133
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=132
+             Node(site_type:2<1)
+              Id=131
+               Node(site_type:3<0)
+                Id=1
+                 Leaf True 
+
+                Id=130
+                 Node(site_type:3<1)
+                  Id=0
+                   Leaf False 
+
+                  Id=1
+                   Leaf True 
+
+              Id=18
+               Node(site_type:2<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+          Id=135
+           Node(site_type:1<0)
+            Id=116
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=115
+               Node(site_type:2<1)
+                Id=11
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=10
+                   Node(site_type:3<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=18
+                 Node(site_type:2<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+            Id=134
+             Node(site_type:1<3)
+              Id=13
+               Node(site_type:2<0)
+                Id=0
+                 Leaf False 
+
+                Id=12
+                 Node(site_type:2<1)
+                  Id=11
+                   Node(site_type:3<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=10
+                     Node(site_type:3<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=116
+               Node(site_type:2<0)
+                Id=0
+                 Leaf False 
+
+                Id=115
+                 Node(site_type:2<1)
+                  Id=11
+                   Node(site_type:3<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=10
+                     Node(site_type:3<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=18
+                   Node(site_type:2<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+      Id=21
+       Node(site_type:2<1)
+        Id=0
+         Leaf False 
+
+        Id=20
+         Node(site_type:2<2)
+          Id=11
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=10
+             Node(site_type:3<1)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z~p,z!A@z,t~u)
+
+	Wake-up rules
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=164
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=163
+   Node(site_type:1<1)
+    Id=159
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=158
+       Node(site_type:2<1)
+        Id=131
+         Node(site_type:3<0)
+          Id=1
+           Leaf True 
+
+          Id=130
+           Node(site_type:3<1)
+            Id=0
+             Leaf False 
+
+            Id=1
+             Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=162
+     Node(site_type:1<2)
+      Id=161
+       Node(site_type:1<3)
+        Id=160
+         Node(site_type:1<0)
+          Id=5
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=4
+             Node(site_type:2<1)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+        Id=0
+         Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z~u,z!free)
+
+	Wake-up rules
+
+	Applying rule 3: r3:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=194
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=193
+   Node(site_type:1<2)
+    Id=192
+     Node(site_type:1<3)
+      Id=191
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=190
+         Node(site_type:1<0)
+          Id=27
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=26
+             Node(site_type:2<2)
+              Id=25
+               Node(site_type:3<1)
+                Id=0
+                 Leaf False 
+
+                Id=24
+                 Node(site_type:3<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=27
+       Node(site_type:2<1)
+        Id=0
+         Leaf False 
+
+        Id=26
+         Node(site_type:2<2)
+          Id=25
+           Node(site_type:3<1)
+            Id=0
+             Leaf False 
+
+            Id=24
+             Node(site_type:3<2)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z~p,z!A@z,t~p)
+
+	Wake-up rules
+
+	Applying rule 1: r1:
+		the precondition is satisfied
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=224
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=223
+   Node(site_type:1<2)
+    Id=222
+     Node(site_type:1<3)
+      Id=221
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=220
+         Node(site_type:1<1)
+          Id=216
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=215
+             Node(site_type:2<2)
+              Id=214
+               Node(site_type:3<1)
+                Id=1
+                 Leaf True 
+
+                Id=76
+                 Node(site_type:3<2)
+                  Id=0
+                   Leaf False 
+
+                  Id=1
+                   Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=219
+           Node(site_type:1<0)
+            Id=218
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=217
+               Node(site_type:2<1)
+                Id=1
+                 Leaf True 
+
+                Id=215
+                 Node(site_type:2<2)
+                  Id=214
+                   Node(site_type:3<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=76
+                     Node(site_type:3<2)
+                      Id=0
+                       Leaf False 
+
+                      Id=1
+                       Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+            Id=5
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=4
+               Node(site_type:2<1)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+      Id=159
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=158
+         Node(site_type:2<1)
+          Id=131
+           Node(site_type:3<0)
+            Id=1
+             Leaf True 
+
+            Id=130
+             Node(site_type:3<1)
+              Id=0
+               Leaf False 
+
+              Id=1
+               Leaf True 
+
+          Id=0
+           Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z~p,z!free)
+
+	Wake-up rules
+
+	Applying rule 4: r4:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=235
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=234
+   Node(site_type:1<2)
+    Id=233
+     Node(site_type:1<3)
+      Id=232
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=231
+         Node(site_type:1<0)
+          Id=21
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=20
+             Node(site_type:2<2)
+              Id=11
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=10
+                 Node(site_type:3<1)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	Wake-up rules
+
+	Applying rule 0: r0:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=92
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=91
+   Node(site_type:1<2)
+    Id=90
+     Node(site_type:1<3)
+      Id=21
+       Node(site_type:2<1)
+        Id=0
+         Leaf False 
+
+        Id=20
+         Node(site_type:2<2)
+          Id=11
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=10
+             Node(site_type:3<1)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	Wake-up rules
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 3: r3:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=258
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=257
+   Node(site_type:1<2)
+    Id=256
+     Node(site_type:1<3)
+      Id=255
+       Node(site_type:1<0)
+        Id=27
+         Node(site_type:2<1)
+          Id=0
+           Leaf False 
+
+          Id=26
+           Node(site_type:2<2)
+            Id=25
+             Node(site_type:3<1)
+              Id=0
+               Leaf False 
+
+              Id=24
+               Node(site_type:3<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=254
+         Node(site_type:1<0)
+          Id=253
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=78
+             Node(site_type:2<2)
+              Id=77
+               Node(site_type:3<0)
+                Id=1
+                 Leaf True 
+
+                Id=76
+                 Node(site_type:3<2)
+                  Id=0
+                   Leaf False 
+
+                  Id=1
+                   Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=27
+           Node(site_type:2<1)
+            Id=0
+             Leaf False 
+
+            Id=26
+             Node(site_type:2<2)
+              Id=25
+               Node(site_type:3<1)
+                Id=0
+                 Leaf False 
+
+                Id=24
+                 Node(site_type:3<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+      Id=0
+       Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	Wake-up rules
+
+	Applying rule 1: r1:
+		the precondition is satisfied
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 4: r4:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 0: r0:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 3: r3:
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=64
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=63
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=62
+     Node(site_type:1<2)
+      Id=61
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=57
+         Node(site_type:2<3)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+agent_type:1:B:cv_id:0
+Id=252
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=251
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=250
+     Node(site_type:1<2)
+      Id=249
+       Node(site_type:1<3)
+        Id=248
+         Node(site_type:1<0)
+          Id=209
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=208
+             Node(site_type:2<1)
+              Id=1
+               Leaf True 
+
+              Id=44
+               Node(site_type:2<2)
+                Id=43
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=24
+                   Node(site_type:3<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+          Id=247
+           Node(site_type:1<3)
+            Id=37
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=18
+               Node(site_type:2<2)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=209
+             Node(site_type:2<0)
+              Id=0
+               Leaf False 
+
+              Id=208
+               Node(site_type:2<1)
+                Id=1
+                 Leaf True 
+
+                Id=44
+                 Node(site_type:2<2)
+                  Id=43
+                   Node(site_type:3<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=24
+                     Node(site_type:3<2)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+        Id=209
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=208
+           Node(site_type:2<1)
+            Id=1
+             Leaf True 
+
+            Id=44
+             Node(site_type:2<2)
+              Id=43
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=24
+                 Node(site_type:3<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
       Id=0
        Leaf False 
 
@@ -851,12 +1740,12 @@ Id=65
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=264
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=73
+  Id=263
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -871,14 +1760,14 @@ Id=74
         Id=0
          Leaf False 
 
-    Id=72
+    Id=262
      Node(site_type:0<2)
-      Id=70
+      Id=197
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=69
+        Id=105
          Node(site_type:1<3)
           Id=1
            Leaf True 
@@ -891,75 +1780,130 @@ Id=74
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=90
+Id=273
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=89
+  Id=272
    Node(site_type:0<1)
-    Id=7
+    Id=3
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=6
+      Id=2
        Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
+        Id=1
+         Leaf True 
 
         Id=0
          Leaf False 
 
-    Id=88
+    Id=271
      Node(site_type:0<2)
-      Id=40
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=39
-         Node(site_type:1<1)
-          Id=5
-           Node(site_type:2<0)
+      Id=270
+       Node(site_type:0<3)
+        Id=269
+         Node(site_type:0<0)
+          Id=267
+           Node(site_type:1<0)
             Id=0
              Leaf False 
 
-            Id=4
-             Node(site_type:2<1)
+            Id=266
+             Node(site_type:1<1)
               Id=1
                Leaf True 
 
+              Id=38
+               Node(site_type:1<2)
+                Id=37
+                 Node(site_type:2<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=18
+                   Node(site_type:2<2)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+          Id=268
+           Node(site_type:0<3)
+            Id=259
+             Node(site_type:1<0)
               Id=0
                Leaf False 
 
-          Id=38
-           Node(site_type:1<2)
-            Id=37
-             Node(site_type:2<0)
-              Id=0
-               Leaf False 
-
-              Id=18
-               Node(site_type:2<2)
+              Id=8
+               Node(site_type:1<2)
                 Id=1
                  Leaf True 
 
                 Id=0
                  Leaf False 
 
-            Id=0
-             Leaf False 
+            Id=267
+             Node(site_type:1<0)
+              Id=0
+               Leaf False 
+
+              Id=266
+               Node(site_type:1<1)
+                Id=1
+                 Leaf True 
+
+                Id=38
+                 Node(site_type:1<2)
+                  Id=37
+                   Node(site_type:2<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=18
+                     Node(site_type:2<2)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+        Id=267
+         Node(site_type:1<0)
+          Id=0
+           Leaf False 
+
+          Id=266
+           Node(site_type:1<1)
+            Id=1
+             Leaf True 
+
+            Id=38
+             Node(site_type:1<2)
+              Id=37
+               Node(site_type:2<0)
+                Id=0
+                 Leaf False 
+
+                Id=18
+                 Node(site_type:2<2)
+                  Id=1
+                   Leaf True 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
 
       Id=0
        Leaf False 
@@ -969,23 +1913,17 @@ In agent A:
 	when the binding state of site z is equal to free, then:
 		+ the internal state of site t is always u.
 In agent B: 
-	when the binding state of site z is equal to A@z, then:
-		+ the internal state of site z is always p.
-		+ the internal state of site t ranges over u and p.
-	when the binding state of site z is equal to free, then:
-		+ the internal state of site z ranges over u and p.
-		+ the internal state of site t is always u.
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=197
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=69
+  Id=105
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -995,12 +1933,12 @@ Id=70
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=260
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1010,7 +1948,7 @@ Id=68
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=66
+Id=259
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1025,28 +1963,13 @@ Id=66
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=260
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=53
    Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=37
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -1058,7 +1981,6 @@ The internal state of site t in agent A ranges over u, p, and q.
 The binding state of site z in agent A ranges over free and B@z.
 The binding state of site z in agent B ranges over free and A@z.
 The internal state of site z in agent B ranges over u and p.
-The internal state of site t in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -1099,15 +2021,266 @@ At rule_id:4, there is a modification of the site t of B. B(t:u)
 At rule_id:5, there is a modification of the site t of A. A(t:q)
 
 * Dynamic information
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: q, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: q, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, p
+Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: , u
+Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: , p
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
+Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: u, p
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: , u
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1070; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/mvbdu/boolean_mvbdu.ml; message: line 1173; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1070; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1070; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1070; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1070; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 205: wrong association (several images for the same key); exception:Unknown
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 433; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain_type.ml; message: line 386; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
