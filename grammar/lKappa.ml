@@ -465,6 +465,29 @@ let to_raw_mixture sigs x =
          Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; })
     x
 
+let of_raw_mixture x =
+  List.map
+    (fun r ->
+       let internals =
+         Array.map
+           (function
+             | Some i -> I_VAL_CHANGED (i,i)
+             | None -> I_ANY)
+           r.Raw_mixture.a_ints in
+       let ports =
+         Array.map
+           (function
+             | Raw_mixture.VAL i ->
+                 (Location.dummy_annot (Ast.LNK_VALUE (i,(-1,-1))), Maintained)
+             | Raw_mixture.FREE ->
+               (Location.dummy_annot Ast.FREE, Maintained)
+           )
+           r.Raw_mixture.a_ports in
+       { ra_type = r.Raw_mixture.a_type; ra_erased = false;
+         ra_ports = ports; ra_ints = internals;
+       ra_syntax = Some (Array.copy ports, Array.copy internals); })
+    x
+
 let rec ast_alg_has_mix = function
   | Ast.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
   | Ast.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
