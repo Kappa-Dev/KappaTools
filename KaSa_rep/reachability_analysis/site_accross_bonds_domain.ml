@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 09 2016>
+   * Last modification: Time-stamp: <Aug 10 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -406,8 +406,8 @@ struct
     let static = set_bonds_lhs store_bonds_lhs static in
     (*------------------------------------------------------------*)
     (*bonds set without rule_id*)
-    let store_bonds_rhs = get_bonds_rhs static in
-    let store_bonds_rhs_set = get_bonds_rhs_set static in
+    (*  let store_bonds_rhs = get_bonds_rhs static in
+        let store_bonds_rhs_set = get_bonds_rhs_set static in*)
     (*  let error, store_bonds_rhs_set =
         Site_accross_bonds_domain_static.collect_bonds_rhs_set
           parameter error
@@ -555,7 +555,6 @@ struct
   (****************************************************************)
 
   let scan_rules static dynamic error =
-    let kappa_handler = get_kappa_handler static in
     let parameter = get_parameter static in
     let compil = get_compil static in
     let error, static =
