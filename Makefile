@@ -43,9 +43,8 @@ GENERATED=$(VERSION) \
 	  generated/api_types_t.ml generated/api_types_j.ml \
 	  generated/mpi_message_t.ml generated/mpi_message_j.ml
 
-RESOURCES_HTML=$(wildcard js/*.js) \
-               $(wildcard shared/*.js) \
-               $(wildcard js/*.css) js/favicon.ico
+RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
+		$(wildcard js/*.css) js/favicon.ico js/package.json
 
 ifeq ($(NO_CDN),1)
 SITE_EXTRAS= site/external site/external/bootstrap-3.3.5-dist site/external/codemirror-5.14.2 site/external/d3 site/external/jquery
@@ -86,10 +85,9 @@ $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 %.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
-site: site/JsSim.js site/WebWorker.js $(RESOURCES_HTML)
-	mkdir -p site ;\
-	cp shared/*.js site
-	cp -f js/*.js js/*.css js/favicon.ico js/package.json site
+site: $(RESOURCES_HTML)
+	mkdir -p $@
+	cp $^ site
 
 site/external:
 	mkdir -p $@
@@ -97,11 +95,11 @@ site/external:
 site/external/bootstrap-3.3.5-dist:
 	curl -LsS -o $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
 	unzip -d site/external $(TEMPDIR)/bootstrap.zip
- 
+
 site/external/codemirror-5.14.2:
 	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror-5.14.2.zip ;\
 	unzip -d site/external $(TEMPDIR)/codemirror.zip
-	
+
 site/external/d3:
 	mkdir -p $@ ;\
 	curl -LsS -o $@/d3.v3.min.js http://d3js.org/d3.v3.min.js
@@ -110,10 +108,10 @@ site/external/jquery:
 	mkdir -p $@ ;\
 	curl -LsS -o site/external/jquery/jquery.js https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js
 
-site/JsSim.js: JsSim.byte
-	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@ ;\
+site/JsSim.js: JsSim.byte site
+	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
 
-site/WebWorker.js: WebWorker.byte
+site/WebWorker.js: WebWorker.byte site
 	js_of_ocaml --debuginfo --pretty "+nat.js" _build/js/$< -o $@
 
 ounit: TestJsSim TestWebSim
@@ -123,8 +121,8 @@ TestJsSim: TestJsSim.byte
 TestWebSim: TestWebSim.byte
 	./TestWebSim.byte -runner sequential
 
-site/index.html: site $(INDEX_HTML) $(SITE_EXTRAS)
-	cat $(INDEX_HTML) | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
+site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js
+	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > $@
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
