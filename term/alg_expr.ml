@@ -1,42 +1,41 @@
-type t =
-    BIN_ALG_OP of Operator.bin_alg_op * t Location.annot * t Location.annot
-  | UN_ALG_OP of Operator.un_alg_op * t Location.annot
+type 'a e =
+    BIN_ALG_OP of
+      Operator.bin_alg_op * 'a e Location.annot * 'a e Location.annot
+  | UN_ALG_OP of Operator.un_alg_op * 'a e Location.annot
   | STATE_ALG_OP of Operator.state_alg_op
   | ALG_VAR of int
-  | KAPPA_INSTANCE of Connected_component.cc array list
+  | KAPPA_INSTANCE of 'a
   | TOKEN_ID of int
   | CONST of Nbr.t
 
-let rec to_json = function
+type t = Connected_component.cc array list e
+
+let rec to_json f = function
   | BIN_ALG_OP (op,(a,_),(b,_)) ->
-    `List [Operator.bin_alg_op_to_json op;to_json a;to_json b]
+    `List [Operator.bin_alg_op_to_json op;to_json f a;to_json f b]
   | UN_ALG_OP (op,(a,_)) ->
-    `List [Operator.un_alg_op_to_json op;to_json a]
+    `List [Operator.un_alg_op_to_json op;to_json f a]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [`String "VAR";`Int i]
-  | KAPPA_INSTANCE _ ->
-      let () =
-    ExceptionDefn.warning
-      (fun f -> Format.pp_print_string
-          f "KAPPA_INSTANCE not translated in json") in
-      `Null
+  | KAPPA_INSTANCE cc -> f cc
   | TOKEN_ID i -> `List [`String "TOKEN";`Int i]
   | CONST n -> Nbr.to_json n
 
-let rec of_json = function
-  | `Null -> KAPPA_INSTANCE []
+let rec of_json f = function
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
-       Location.dummy_annot (of_json a),Location.dummy_annot (of_json b))
+       Location.dummy_annot (of_json f a),Location.dummy_annot (of_json f b))
   | `List [`String "VAR";`Int i] -> ALG_VAR i
   | `List [`String "TOKEN";`Int i] -> TOKEN_ID i
   | `List [op;a] ->
-    UN_ALG_OP (Operator.un_alg_op_of_json op,Location.dummy_annot (of_json a))
+    UN_ALG_OP (Operator.un_alg_op_of_json op,Location.dummy_annot (of_json f a))
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
     try  CONST (Nbr.of_json x)
+    with Yojson.Basic.Util.Type_error _ ->
+    try KAPPA_INSTANCE (f x)
     with Yojson.Basic.Util.Type_error _ ->
       raise (Yojson.Basic.Util.Type_error ("Invalid Alg_expr",x))
 

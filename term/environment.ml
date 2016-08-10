@@ -166,6 +166,13 @@ let propagate_constant updated_vars counter x =
     tokens_reverse_dependencies = x.tokens_reverse_dependencies;
   }
 
+let dummy_kappa_instance _ =
+  let () =
+    ExceptionDefn.warning
+      (fun f -> Format.pp_print_string
+          f "KAPPA_INSTANCE not translated in json") in
+  `Null
+
 let to_json env =
   let () =
     ExceptionDefn.warning
@@ -173,10 +180,12 @@ let to_json env =
   `Assoc [
     "signatures", Signature.to_json env.signatures;
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
-    "algs", NamedDecls.to_json (fun (x,_) -> Alg_expr.to_json x) env.algs;
+    "algs", NamedDecls.to_json
+      (fun (x,_) -> Alg_expr.to_json dummy_kappa_instance x) env.algs;
     "observables",
     `List (Array.fold_right
-             (fun (x,_) l -> Alg_expr.to_json x :: l) env.observables []);
+             (fun (x,_) l -> Alg_expr.to_json dummy_kappa_instance x :: l)
+             env.observables []);
     "ast_rules",
     `List
       (Array.fold_right (fun (n,(r,_)) l ->
@@ -191,6 +200,11 @@ let to_json env =
        algs_reverse_dependencies : Operator.DepSet.t array;
        tokens_reverse_dependencies : Operator.DepSet.t array;*)
   ]
+
+let kappa_instance_of_dummy = function
+  | `Null -> []
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct kappa instance",x))
+
 let of_json = function
   | `Assoc l as x when List.length l = 5 ->
     begin
@@ -198,12 +212,14 @@ let of_json = function
         { signatures = Signature.of_json (List.assoc "signatures" l);
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
-              (fun x -> Location.dummy_annot (Alg_expr.of_json x))
+              (fun x -> Location.dummy_annot
+                  (Alg_expr.of_json kappa_instance_of_dummy x))
               (List.assoc "algs" l);
           observables = (match List.assoc "observables" l with
               | `List o ->
                 Tools.array_map_of_list
-                  (fun x -> Location.dummy_annot (Alg_expr.of_json x)) o
+                  (fun x -> Location.dummy_annot
+                      (Alg_expr.of_json kappa_instance_of_dummy x)) o
               | _ -> raise Not_found);
           ast_rules = (match List.assoc "ast_rules" l with
               | `List o ->
