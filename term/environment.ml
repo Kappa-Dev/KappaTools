@@ -52,6 +52,7 @@ let connected_components_of_unary_rules env = env.cc_of_unaries
 
 let num_of_alg s env = NamedDecls.elt_id ~kind:"variable" env.algs s
 let get_alg env i = fst @@ snd env.algs.NamedDecls.decls.(i)
+let get_algs env = env.algs.NamedDecls.decls
 let nb_algs env = NamedDecls.size env.algs
 
 let num_of_token str env = NamedDecls.elt_id ~kind:"token" env.tokens str

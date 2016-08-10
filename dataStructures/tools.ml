@@ -28,6 +28,10 @@ let read_input () =
 	with
 		| Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
 
+let unsome default = function
+  | None -> default
+  | Some a -> a
+
 let option_map f = function
   | Some x -> Some (f x)
   | None -> None

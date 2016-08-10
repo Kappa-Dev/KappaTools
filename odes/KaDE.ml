@@ -5,11 +5,6 @@
 
 module A = Odes.Make (Dummy_interface.Interface)
 
-let unsome opt default =
-  match opt with
-  | None -> default
-  | Some a -> a
-
 let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
@@ -101,7 +96,7 @@ let main () =
         ~command_line_quotes
         ~data_file:(Kappa_files.get_data ())
         ~init_t:cli_args.Run_cli_args.minTimeValue
-        ~max_t:(unsome cli_args.Run_cli_args.maxTimeValue 1.)
+        ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxTimeValue)
         ~nb_points:cli_args.Run_cli_args.pointNumberValue
         logger compil network
     in

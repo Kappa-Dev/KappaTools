@@ -86,3 +86,17 @@ val print_injections :
   ?sigs:Signature.s -> (Format.formatter -> int -> unit) -> Format.formatter ->
   Mods.IntSet.t Connected_component.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit
+
+(** {6 Internals } *)
+val apply_negative_transformation :
+  (Instantiation.concrete Instantiation.site) list * Edges.t ->
+  Instantiation.concrete Primitives.Transformation.t ->
+  (Instantiation.concrete Instantiation.site) list * Edges.t
+val apply_positive_transformation :
+  Signature.s ->
+  (Connected_component.Matching.t * int Mods.IntMap.t) *
+  (Instantiation.concrete Instantiation.site) list * Edges.t ->
+  Instantiation.abstract Primitives.Transformation.t ->
+  ((Connected_component.Matching.t * int Mods.IntMap.t) *
+   (Instantiation.concrete Instantiation.site) list * Edges.t) *
+  Instantiation.concrete Primitives.Transformation.t

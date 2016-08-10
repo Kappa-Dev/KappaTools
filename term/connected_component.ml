@@ -79,6 +79,11 @@ module ContentAgent = struct
     | None -> Format.fprintf f "cc%in%is%i~%i" cc i site id
 end
 
+let empty_cc sigs =
+  let nbt = Array.make (Signature.size sigs) [] in
+  {id = 0; nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
+   links = Mods.IntMap.empty; internals = Mods.IntMap.empty;}
+
 let raw_find_ty tys id =
   let rec aux i =
     assert (i >= 0);
@@ -202,6 +207,16 @@ let automorphisms a =
               ~strict:true h a.links a.internals ag a.links a.internals with
       | None -> acc
       | Some r -> r::acc) [] l
+
+let embeddings_to_fully_specified a b =
+  match find_root a with
+  | None -> [Renaming.empty]
+  | Some (h,ty) ->
+    List.fold_left (fun acc ag ->
+      match are_compatible
+              ~strict:false h a.links a.internals ag b.links b.internals with
+      | None -> acc
+      | Some r -> r::acc) [] b.nodes_by_type.(ty)
 
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =
@@ -391,6 +406,37 @@ let print_point_dot sigs f (id,point) =
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
     point.content.id (print ~sigs  ?with_id:None) point.content
     style (print_sons_dot sigs id point.content) point.sons
+
+let add_fully_specified_to_graph sigs graph cc =
+  let e,g =
+    Tools.array_fold_lefti
+      (fun ty ->
+         List.fold_left
+           (fun (emb,g) x ->
+              let a, g' = Edges.add_agent sigs ty g in
+              let emb' = Mods.IntMap.add x (a,ty) emb in
+              let g'' =
+                Tools.array_fold_lefti
+                  (fun s acc i ->
+                     if i <> -1 then Edges.add_internal a s i acc else acc)
+                  g' (Mods.IntMap.find_default [||] x cc.internals) in
+              let g''' =
+                Tools.array_fold_lefti
+                  (fun s acc -> function
+                     | UnSpec -> assert false
+                     | Free -> Edges.add_free a s acc
+                     | Link (x',s') ->
+                       match Mods.IntMap.find_option x' emb' with
+                       | None -> acc
+                       | Some ag' -> Edges.add_link (a,ty) s ag' s' acc)
+                  g'' (Mods.IntMap.find_default [||] x cc.links) in
+              (emb',g''')))
+      (Mods.IntMap.empty,graph) cc.nodes_by_type in
+  let r =
+    Mods.IntMap.fold
+      (fun i (a,_) r -> Tools.unsome Renaming.empty (Renaming.add i a r))
+      e Renaming.empty  in
+  (g,r)
 
 module Env : sig
   type t = {
@@ -865,11 +911,7 @@ end = struct
   let sigs env = env.sig_decl
 
   let empty_point sigs =
-    let nbt = Array.make (Signature.size sigs) [] in
-    let empty_cc =
-      {id = 0; nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
-       links = Mods.IntMap.empty; internals = Mods.IntMap.empty;} in
-    {content = empty_cc; is_obs_of = None; fathers = []; sons = [];}
+    {content = empty_cc sigs; is_obs_of = None; fathers = []; sons = [];}
 
   let rec remove_from_sons level1 todos set rfathers cc_id = function
     | [] -> todos,rfathers,set
@@ -1122,6 +1164,12 @@ module Matching = struct
       set:codomain of current matching *)
 
   let empty = (Mods.IntMap.empty, Mods.IntSet.empty)
+
+  let add_cc (inj,co) id r =
+    let c = Renaming.image r in
+    match Mods.IntSet.disjoint_union co c with
+    | Some co' -> Some (Mods.IntMap.add id r inj, co')
+    | None -> None
 
   let debug_print f (m,_co) =
     Format.fprintf

@@ -38,6 +38,8 @@ module PreEnv : sig
   end
 (** {6 Create a connected component} *)
 
+val empty_cc : Signature.s -> cc
+
 val begin_new : PreEnv.t -> work
 (** Starts creation *)
 
@@ -56,6 +58,7 @@ val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*t)
 
 (** {6 Use a connected component } *)
 
+val compare_canonicals : t -> t -> int
 val is_equal_canonicals : t -> t -> bool
 val print : ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
 (** [print ~sigs ?with_id:None form cc] *)
@@ -73,6 +76,8 @@ module Matching : sig
   val get : (ContentAgent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
   (** [reconstruct graph matching_of_previous_cc cc_id_in_rule cc root ]*)
+
+  val add_cc : t -> int -> Renaming.t -> t option
 
   val is_root_of : Edges.t -> Edges.agent -> cc -> bool
 
@@ -110,6 +115,12 @@ module Matching : sig
     (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
 end
+
+
+val embeddings_to_fully_specified : cc -> cc -> Renaming.t list
+
+val add_fully_specified_to_graph :
+  Signature.s -> Edges.t -> cc -> Edges.t * Renaming.t
 
 module Set : SetMap.Set with type elt=t
 module Map : SetMap.Map with type elt=t
