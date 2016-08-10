@@ -1058,6 +1058,16 @@ struct
           store_modified_map
       in
       let error, dynamic, precondition =
+        (* JF: This is wrong *)
+        (* You miss the relation between (x,y) and t *)
+        (* I think you should first fold over modif_set *)
+        (* Then do something only with the tuple (x,y)
+           of the form ((agent_type_m,_,site_type_m,_),_)
+           or (_,(agent_type_m,_,site_type_m,_)) *)
+        (* You shall access directly to these two lists of tuple
+           by using the appropriate field in the struct static *)
+        (* Otherwise, you request the state of site in a wrong agent type *)
+        (* and get a collection of warnings *)
         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
           (fun (x, y) old_mvbdu (error, dynamic, precondition) ->
              let (agent_type, site_type, site_type', state) = x in
