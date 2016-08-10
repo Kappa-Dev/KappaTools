@@ -720,9 +720,9 @@ struct
     (*collect the first site bound, and the second site different than the
       first site, return the information of its state, result*)
     let store_result = get_value dynamic in
-    let handler = get_mvbdu_handler dynamic in
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let handler = get_mvbdu_handler dynamic in
     let error, handler, store_result =
       Site_accross_bonds_domain_static.collect_pair_tuple_init
         parameter
@@ -817,7 +817,7 @@ struct
               (*-----------------------------------------------------------*)
            then
              (*get a list of state in precondition of B(z~?)*)
-             let error, dynamic, precondition, state_list =
+             let error', dynamic, precondition, state_list =
                get_state_of_site_in_precondition
                  parameter error
                  dynamic
@@ -826,10 +826,13 @@ struct
                  site_type_q (*~z*)
                  precondition
              in
+             let error =
+               Exception.check_point
+                 Exception.warn
+                 parameter error error' __POS__ Exit in
              (*-----------------------------------------------------------*)
              let error, dynamic, precondition =
                List.fold_left (fun (error, dynamic, precondition) pre_state (*free*) ->
-                   let handler = get_mvbdu_handler dynamic in
                    let store_result = get_value dynamic in
                    let pair_bond =
                      (agent_type, site_type, state),
@@ -848,6 +851,7 @@ struct
                      let pair_list = (*CHECK ME*)
                        [Ckappa_sig.snd_site, state_q']
                      in
+                     let handler = get_mvbdu_handler dynamic in
                      let error, handler, mvbdu =
                        Ckappa_sig.Views_bdu.mvbdu_of_association_list
                          parameter handler error pair_list
@@ -1062,7 +1066,7 @@ struct
                (fun t (error, dynamic, precondition) ->
                   let (agent_id_m, agent_type_m, site_type_m, state_m) = t in
                   (*get the list of state of the first site*)
-                  let error, dynamic, precondition, state_list =
+                  let error', dynamic, precondition, state_list =
                     get_state_of_site_in_precondition
                       parameter error
                       dynamic
@@ -1071,16 +1075,21 @@ struct
                       site_type (*z*)
                       precondition
                   in
+                  let error =
+                    Exception.check_point
+                      Exception.warn
+                      parameter error error' __POS__ Exit in
                   let error, dynamic, precondition =
                     List.fold_left (fun (error, dynamic, precondition) pre_state ->
-                        let handler = get_mvbdu_handler dynamic in
                         let store_result = get_value dynamic in
                         if pre_state = state || pre_state = state1
                         then
+                          let handler = get_mvbdu_handler dynamic in
                           let error, handler, old_pair_list =
                             Ckappa_sig.Views_bdu.extensional_of_mvbdu
                               parameter handler error old_mvbdu
                           in
+                          let dynamic = set_mvbdu_handler handler dynamic in
                           List.fold_left
                             (fun (error, dynamic, precondition) l ->
                                match l with
@@ -1091,6 +1100,7 @@ struct
                                    [Ckappa_sig.fst_site, state_m; (*state t of A*)
                                     Ckappa_sig.snd_site, statey] (*state t of B*)
                                  in
+                                 let handler = get_mvbdu_handler dynamic in
                                  let error, handler, mvbdu =
                                    Ckappa_sig.Views_bdu.mvbdu_of_association_list
                                      parameter handler error pair_list
