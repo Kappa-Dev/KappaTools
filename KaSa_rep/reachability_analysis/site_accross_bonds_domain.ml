@@ -530,8 +530,6 @@ struct
     in
     let static = set_modified_map store_modified_map static in
     (*------------------------------------------------------------*)
-    let store_potential_tuple_pair = get_potential_tuple_pair static in
-    (*------------------------------------------------------------*)
     (*modification*)
     let store_modified_map = get_modified_map static in
     let error, store_proj_modif_set =
@@ -553,8 +551,6 @@ struct
     let store_modified_map = get_modified_map static in
     let store_modified_set = get_proj_modif_set static in
     (*let store_bonds_rhs_set = get_bonds_rhs_set static in*)
-    let store_potential_tuple_pair =
-      get_potential_tuple_pair static in
     let store_proj_potential_tuple_pair_bonds =
       get_proj_potential_tuple_pair_bonds static in
     (*TODO*)
@@ -878,7 +874,7 @@ struct
     | Some rule ->
       let parameter =
         Remanent_parameters.update_prefix parameter "                " in
-      let log = Remanent_parameters.get_logger parameter in
+      let _log = Remanent_parameters.get_logger parameter in
       (*------------------------------------------------------*)
       (*1. created bonds*)
       let store_potential_tuple_pair_created_bonds =
