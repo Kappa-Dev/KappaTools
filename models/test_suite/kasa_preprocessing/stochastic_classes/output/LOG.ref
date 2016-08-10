@@ -726,24 +726,6 @@ bonds_rhs set is empty
 
 
 
-At rule_id:0, there is a modification of the site x of A. A(x:p)
-At rule_id:0, there is a modification of the site y of A. A(y:p)
-At rule_id:1, there is a modification of the site x of B. B(x:u)
-At rule_id:1, there is a modification of the site y of B. B(y:u)
-At rule_id:2, there is a modification of the site x of C. C(x:p)
-At rule_id:3, there is a modification of the site x of D. D(x:u)
-At rule_id:3, there is a modification of the site y of D. D(y:u)
-At rule_id:8, there is a modification of the site z of A. A(z:p)
-
-
-A(x:p)
-A(y:p)
-A(z:p)
-B(x:u)
-B(y:u)
-C(x:p)
-D(x:u)
-D(y:u)
 
 * Dynamic information
 ------------------------------------------------------------

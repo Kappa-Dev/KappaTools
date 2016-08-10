@@ -222,7 +222,7 @@ struct
         Site_accross_bonds_domain_static.store_potential_tuple_pair = r
       } static
 
-  let get_potential_tuple_pair_set static =
+  (*let get_potential_tuple_pair_set static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_potential_tuple_pair_set
 
@@ -231,7 +231,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_potential_tuple_pair_set = r
-      } static
+      } static*)
 
   let get_potential_tuple_pair_created_bonds static =
     (get_basic_static_information
@@ -531,14 +531,6 @@ struct
     let static = set_modified_map store_modified_map static in
     (*------------------------------------------------------------*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let error, store_potential_tuple_pair_set = (*REMOVE*)
-      Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
-        parameter error
-        store_potential_tuple_pair
-    in
-    let static =
-      set_potential_tuple_pair_set store_potential_tuple_pair_set static
-    in
     (*------------------------------------------------------------*)
     (*modification*)
     let store_modified_map = get_modified_map static in
@@ -558,11 +550,9 @@ struct
     (*------------------------------------------------------------*)
     let store_potential_tuple_pair_modification =
       get_potential_tuple_pair_modification static in
-    let store_modified_map = get_modified_map static in
+    (*let store_modified_map = get_modified_map static in*)
     let store_modified_set = get_proj_modif_set static in
-    let store_bonds_rhs_set = get_bonds_rhs_set static in
-    let store_potential_tuple_pair_set =
-      get_potential_tuple_pair_set static in
+    (*let store_bonds_rhs_set = get_bonds_rhs_set static in*)
     let store_potential_tuple_pair =
       get_potential_tuple_pair static in
     let store_proj_potential_tuple_pair_bonds =
@@ -613,17 +603,6 @@ struct
         ) compil.Cckappa_sig.rules static
     in
     (*------------------------------------------------------------*)
-
-
-    (*let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let error, store_potential_tuple_pair_set =
-      Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
-        parameter error
-        store_potential_tuple_pair
-    in
-    let static =
-      set_potential_tuple_pair_set store_potential_tuple_pair_set static
-    in*)
     let store_question_marks_rhs = get_question_marks_rhs static in
     let error, store_proj_question_marks_rhs =
       Site_accross_bonds_domain_static.collect_proj_question_marks_rhs
@@ -640,11 +619,9 @@ struct
            let error, set1' = error, set1 in
            Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.union
              parameter error set1' output)
-
         store_potential_tuple_pair_created_bonds
         (error,
          Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty)
-
     in
     let error, store_proj_map1 =
       Site_accross_bonds_domain_static.collect_proj_map1
@@ -652,38 +629,6 @@ struct
         potential_tuple_pair_set
     in
     let static = set_proj_map1 store_proj_map1 static in
-
-    (*project map, where the tuple set is the created bonds combine with tuple pair*)
-    (*------------------------------------------------------------*)
-    (*TODO*)
-    (*
-    let store_proj_reverse_map1 = get_proj_reverse_map1 static in
-    let error, store_proj_reverse_map1 =
-      Site_accross_bonds_domain_static.collect_proj_reverse_map1
-        parameter error
-        store_potential_tuple_pair_set
-        store_proj_reverse_map1
-    in
-    let static = set_proj_reverse_map1 store_proj_reverse_map1 static in
-    (*------------------------------------------------------------*)
-    let store_proj_map2 = get_proj_map2 static in
-    let error, store_proj_map2 =
-      Site_accross_bonds_domain_static.collect_proj_map2
-        parameter error
-        store_potential_tuple_pair_set
-        store_proj_map2
-    in
-    let static = set_proj_map2 store_proj_map2 static in
-    (*------------------------------------------------------------*)
-    let store_proj_reverse_map2 = get_proj_reverse_map2 static in
-    let error, store_proj_reverse_map2 =
-      Site_accross_bonds_domain_static.collect_proj_reverse_map2
-        parameter error
-        store_potential_tuple_pair_set
-        store_proj_reverse_map2
-    in
-    let static = set_proj_map2 store_proj_reverse_map2 static in*)
-    (*------------------------------------------------------------*)
     error, static, dynamic
 
   (****************************************************************)
@@ -1617,36 +1562,6 @@ struct
         in
         let () = Loggers.print_newline log in
         (*--------------------------------------------------------*)
-        (*print a list of agent_id*)
-        (*let store_potential_tuple_pair_set = get_potential_tuple_pair_set static in
-          let error =
-          if
-            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.is_empty
-              store_potential_tuple_pair_set
-          then
-            let () = Loggers.fprintf log "potential tuple pair set is empty\n" in
-            error
-          else
-            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
-              (fun (t, u) error ->
-                 let error, (agent, site, site', _, _, agent1, site1, site1', _, _) =
-                   Site_accross_bonds_domain_type.convert_tuple_full
-                     parameter error kappa_handler
-                     (t, u)
-                 in
-                 let () =
-                   Loggers.fprintf log
-                     "The potential tuple pair set has the site %s and the site %s of agent %s, and the site %s and %s of agent %s. %s(%s, %s); %s(%s, %s)\n"
-                     site site' agent
-                     site1 site1' agent1
-                     agent site site'
-                     agent1 site1 site1'
-                 in
-                 error
-              ) store_potential_tuple_pair_set error
-          in
-          let () = Loggers.print_newline log in*)
-        (*--------------------------------------------------------*)
         (*bonds_rhs set*)
         let bonds_rhs_set = get_bonds_rhs_set static in
         let error =
@@ -1798,31 +1713,6 @@ struct
         in
         let () = Loggers.print_newline log in
         (*--------------------------------------------------------*)
-        let store_modified_map = get_modified_map static in
-        let error =
-          Ckappa_sig.Rule_map_and_set.Map.fold
-            (fun rule_id set error ->
-               Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
-                 (fun x error ->
-                    let (_, agent_type, site_type, state) = x in
-                    let error, (agent, site, state) =
-                      Site_accross_bonds_domain_type.convert_single
-                        parameter error kappa_handler
-                        (agent_type, site_type, state)
-                    in
-                    let () =
-                      Loggers.fprintf log
-                        "At rule_id:%i, there is a modification of the site %s of %s. %s(%s:%s)\n"
-                        (Ckappa_sig.int_of_rule_id rule_id)
-                        site agent
-                        agent site state
-                    in
-                    error
-                 ) set error
-            ) store_modified_map error
-        in
-        let () = Loggers.print_newline log in
-        (*--------------------------------------------------------*)
         let store_potential_tuple_pair_modification =
           get_potential_tuple_pair_modification static in
         let error =
@@ -1839,7 +1729,7 @@ struct
                     in
                     let () =
                       Loggers.fprintf log
-                        "At there is a modification of the site %s of agent %s. The potential tuple pair is: %s(%s:%s, %s:%s); %s(%s:%s, %s:%s) \n"
+                        "There is a modification of the site %s of agent %s. The potential tuple pair is: %s(%s:%s, %s:%s); %s(%s:%s, %s:%s) \n"
                         site' agent
                         agent site state site' state'
                         agent1 site1 state1 site1' state1'
@@ -1847,24 +1737,6 @@ struct
                     error
                     (* set error*)
             ) store_potential_tuple_pair_modification error
-        in
-        let () = Loggers.print_newline log in
-        (*--------------------------------------------------------*)
-        let store_proj_modif_set = get_proj_modif_set static in
-        let error =
-          Site_accross_bonds_domain_type.AgentSiteState_map_and_set.Set.fold
-            (fun x error ->
-               let error, (agent, site, state) =
-                 Site_accross_bonds_domain_type.convert_single
-                   parameter error kappa_handler x
-               in
-               let () =
-                 Loggers.fprintf log
-                   "%s(%s:%s)\n"
-                   agent site state
-               in
-               error
-            ) store_proj_modif_set error
         in
         let () = Loggers.print_newline log in
         (*--------------------------------------------------------*)

@@ -44,8 +44,6 @@ type basic_static_information =
     store_potential_tuple_pair :
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_potential_tuple_pair_set : (*REMOVE*)
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
     store_potential_tuple_pair_created_bonds :
       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -119,8 +117,6 @@ let init_basic_static_information =
     store_bonds_rhs_set =
       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty;
     store_potential_tuple_pair = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_potential_tuple_pair_set =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_potential_tuple_pair_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_potential_tuple_pair_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_proj_potential_tuple_pair_bonds = (**)
@@ -354,7 +350,6 @@ let collect_bonds_rhs_set parameter error store_bonds_rhs =
     (error,
      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty)
 
-
 (***************************************************************)
 (*collect rule that can be modified*)
 
@@ -517,26 +512,6 @@ let collect_potential_tuple_pair parameter error _kappa_handler rule_id store_pa
       ) store_pair_set (error, store_result)
   in
   error, store_result
-
-let collect_potential_tuple_pair_set parameter error  store_potential_tuple_pair  =
-  let proj (_,b,c,d,e,f) = b,c,d,e,f in
-  let proj2 (x,y) = (proj x,proj y) in
-  Ckappa_sig.Rule_map_and_set.Map.fold
-    (fun _ set1 (error,output) ->
-       let error, set1' =
-         Site_accross_bonds_domain_type.Proj_agent_id_away2.proj_set
-           proj2
-           parameter
-           error
-           set1
-       in
-       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.union
-         parameter error set1' output
-    )
-    store_potential_tuple_pair
-    (error,
-     Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
-
 
 (***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)
@@ -759,7 +734,7 @@ let collect_potential_tuple_pair_created_bonds parameter error rule_id
 (*project map*)
 
 let collect_proj_map1 parameter error store_potential_tuple_pair_set =
-  let proj (_, b, c, _, _, _) = (b,c) in (*get the agent_name, and the first site_name*)
+  let proj (_, b, c, _, _, _) = (b,c) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Proj_map1.monadic_partition_set
     (fun _parameter error (x, y) ->
@@ -1141,52 +1116,6 @@ let collect_implicit_static parameter error store_tuple_pair store_question_mark
   in
   store_result
   *)
-
-(***************************************************************)
-(*Explicit static information*)
-(***************************************************************)
-
-(*let collect_explicit_static parameter error store_created_bond
-    store_modified_internal_state_and_bond store_result =
-  let add_link parameter error rule_id set store_result =
-    let error, old_set =
-      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-              parameter error rule_id store_result with
-      | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
-      | error, Some s -> error, s
-    in
-    let error', new_set =
-      Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union parameter error set old_set
-    in
-    let error = Exception.check_point_point Exception.warn parameter error error' (Some "line 706") Exit in
-    let error, store_result =
-      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
-    in
-    error, store_result
-  in
-  Ckappa_sig.Rule_map_and_set.Map.fold2 parameter error
-    (fun parameter error rule_id set store_result ->
-       let error, store_result =
-         add_link parameter error rule_id set store_result
-       in
-       error, store_result)
-    (fun parameter error rule_id set store_result ->
-       let error, store_result =
-         add_link parameter error rule_id set store_result
-       in
-       error, store_result
-    )
-    (fun parameter error rule_id set1 set2 store_result ->
-       let error, new_set =
-         Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union
-           parameter error set1 set2
-       in
-       let error, store_result =
-         add_link parameter error rule_id new_set store_result
-       in
-       error, store_result
-    )
-    store_created_bond store_modified_internal_state_and_bond store_result*)
 
 (***************************************************************)
 (*Initial state*)

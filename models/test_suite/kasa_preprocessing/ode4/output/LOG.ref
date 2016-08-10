@@ -237,23 +237,11 @@ The potential tuple pair when there is a bond on the rhs between the site y of A
 The potential tuple pair when there is a bond on the rhs between the site x of B and the site y of A is: B(x:A@y, y:free); A(y:B@x, x:p)
 
 
-At rule_id:0, there is a modification of the site x of A. A(x:p)
-At rule_id:0, there is a modification of the site y of A. A(y:B@x)
-At rule_id:0, there is a modification of the site x of B. B(x:A@y)
-At rule_id:1, there is a modification of the site y of B. B(y:C@x)
-At rule_id:1, there is a modification of the site x of C. C(x:B@y)
-
-At there is a modification of the site x of agent A. The potential tuple pair is: A(y:B@x, x:p); B(x:A@y, y:free) 
-At there is a modification of the site y of agent A. The potential tuple pair is: A(y:B@x, y:B@x); B(x:A@y, y:free) 
-At there is a modification of the site x of agent B. The potential tuple pair is: B(y:C@x, x:A@y); B(x:A@y, y:free) 
-At there is a modification of the site y of agent B. The potential tuple pair is: B(y:C@x, y:C@x); B(x:A@y, y:free) 
-At there is a modification of the site x of agent C. The potential tuple pair is: C(:, x:B@y); B(x:A@y, y:free) 
-
-A(x:p)
-A(y:B@x)
-B(x:A@y)
-B(y:C@x)
-C(x:B@y)
+There is a modification of the site x of agent A. The potential tuple pair is: A(y:B@x, x:p); B(x:A@y, y:free) 
+There is a modification of the site y of agent A. The potential tuple pair is: A(y:B@x, y:B@x); B(x:A@y, y:free) 
+There is a modification of the site x of agent B. The potential tuple pair is: B(y:C@x, x:A@y); B(x:A@y, y:free) 
+There is a modification of the site y of agent B. The potential tuple pair is: B(y:C@x, y:C@x); B(x:A@y, y:free) 
+There is a modification of the site x of agent C. The potential tuple pair is: C(:, x:B@y); B(x:A@y, y:free) 
 
 * Dynamic information
 ------------------------------------------------------------

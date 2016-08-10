@@ -184,12 +184,6 @@ The site of x of agent B is bound to the site of x of agent A. B(x:A@x) , A(x:B@
 
 
 
-At rule_id:0, there is a modification of the site x of A. A(x:B@x)
-At rule_id:0, there is a modification of the site x of B. B(x:A@x)
-
-
-A(x:B@x)
-B(x:A@x)
 
 * Dynamic information
 ------------------------------------------------------------

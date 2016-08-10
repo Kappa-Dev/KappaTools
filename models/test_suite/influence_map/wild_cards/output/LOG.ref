@@ -177,12 +177,6 @@ The site of y of agent C is bound to the site of y of agent A. C(y:A@y) , A(y:C@
 
 
 
-At rule_id:0, there is a modification of the site y of A. A(y:C@y)
-At rule_id:0, there is a modification of the site y of C. C(y:A@y)
-
-
-A(y:C@y)
-C(y:A@y)
 
 * Dynamic information
 ------------------------------------------------------------
