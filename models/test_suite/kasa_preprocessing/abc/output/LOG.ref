@@ -1587,105 +1587,105 @@ Whenever the site x2 of C and the site c of A are bound together, then the site 
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1091; exception:Exit

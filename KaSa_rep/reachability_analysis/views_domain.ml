@@ -1257,7 +1257,9 @@ struct
               store_covering_classes_id
       with
       | error, None ->
-        Exception.warn  parameter error __POS__ Exit []
+        Exception.warn  parameter error __POS__
+              ~message:"the site does not belong to the last agent type of a path"
+              Exit []
       | error, Some l -> error, l
     in
     (*---------------------------------------------------------------------*)
