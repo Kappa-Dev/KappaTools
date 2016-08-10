@@ -233,6 +233,9 @@ At rule_id:0, the potential tuple pair when there is an action binding between t
 At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site y of A and the site x of B is: A(y:B@x, x:p); B(x:A@y, y:free)
 At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site x of B and the site y of A is: B(x:A@y, y:free); A(y:B@x, x:p)
 
+The potential tuple pair when there is a bond on the rhs between the site y of A and the site x of B is: A(y:B@x, x:p); B(x:A@y, y:free)
+The potential tuple pair when there is a bond on the rhs between the site x of B and the site y of A is: B(x:A@y, y:free); A(y:B@x, x:p)
+
 
 At rule_id:0, there is a modification of the site x of A. A(x:p)
 At rule_id:0, there is a modification of the site y of A. A(y:B@x)
@@ -240,8 +243,25 @@ At rule_id:0, there is a modification of the site x of B. B(x:A@y)
 At rule_id:1, there is a modification of the site y of B. B(y:C@x)
 At rule_id:1, there is a modification of the site x of C. C(x:B@y)
 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(y:B@x, x:p); B(x:A@y, y:free) 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(y:B@x, y:B@x); B(x:A@y, y:free) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(y:C@x, x:A@y); B(x:A@y, y:free) 
+At there is a modification of the site y of agent B. The potential tuple pair is: B(y:C@x, y:C@x); B(x:A@y, y:free) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(:, x:B@y); B(x:A@y, y:free) 
+
+A(x:p)
+A(y:B@x)
+B(x:A@y)
+B(y:C@x)
+C(x:B@y)
+
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 128; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit

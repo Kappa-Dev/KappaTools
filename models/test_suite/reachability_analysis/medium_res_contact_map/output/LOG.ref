@@ -48,6 +48,9 @@ At rule_id:2, the potential tuple pair when there is an action binding between t
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
 At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
 
+The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
+The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
+
 
 At rule_id:0, there is a modification of the site y of A. A(y:p)
 At rule_id:0, there is a modification of the site z of A. A(z:p)
@@ -60,7 +63,42 @@ At rule_id:2, there is a modification of the site y of C. C(y:C@y)
 At rule_id:3, there is a modification of the site z of A. A(z:A@y)
 At rule_id:3, there is a modification of the site y of A. A(y:A@z)
 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(z:p, y:u); C(y:C@y, x:u) 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(z:p, y:u); C(y:C@y, x:p) 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(z:p, y:p); C(y:C@y, x:u) 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(z:p, y:p); C(y:C@y, x:p) 
+At there is a modification of the site z of agent A. The potential tuple pair is: A(z:p, z:u); C(y:C@y, x:u) 
+At there is a modification of the site z of agent A. The potential tuple pair is: A(z:p, z:u); C(y:C@y, x:p) 
+At there is a modification of the site z of agent A. The potential tuple pair is: A(z:p, z:p); C(y:C@y, x:u) 
+At there is a modification of the site z of agent A. The potential tuple pair is: A(z:p, z:p); C(y:C@y, x:p) 
+At there is a modification of the site z of agent A. The potential tuple pair is: A(z:p, z:A@y); C(y:C@y, x:u) 
+At there is a modification of the site z of agent A. The potential tuple pair is: A(z:p, z:A@y); C(y:C@y, x:p) 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(z:p, y:A@z); C(y:C@y, x:u) 
+At there is a modification of the site y of agent A. The potential tuple pair is: A(z:p, y:A@z); C(y:C@y, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(y:C@y, x:u); C(y:C@y, x:u) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(y:C@y, x:u); C(y:C@y, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(y:C@y, x:p); C(y:C@y, x:u) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(y:C@y, x:p); C(y:C@y, x:p) 
+At there is a modification of the site y of agent C. The potential tuple pair is: C(y:C@y, y:C@y); C(y:C@y, x:u) 
+At there is a modification of the site y of agent C. The potential tuple pair is: C(y:C@y, y:C@y); C(y:C@y, x:p) 
+
+A(y:u)
+A(y:p)
+A(z:u)
+A(z:p)
+A(z:A@y)
+A(y:A@z)
+C(x:u)
+C(x:p)
+C(y:C@y)
+
 * Dynamic information
+Whenever the site y of C and the site y of C are bound together, then the site x of C and x of C can have the following respective states: p, u
+Whenever the site y of C and the site y of C are bound together, then the site x of C and x of C can have the following respective states: p, p
+Whenever the site y of C and the site y of C are bound together, then the site x of C and x of C can have the following respective states: u, u
+Whenever the site y of C and the site y of C are bound together, then the site x of C and x of C can have the following respective states: u, p
+Whenever the site y of C and the site y of C are bound together, then the site y of C and x of C can have the following respective states: C@y, u
+Whenever the site y of C and the site y of C are bound together, then the site y of C and x of C can have the following respective states: C@y, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

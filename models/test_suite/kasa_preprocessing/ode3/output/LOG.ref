@@ -221,11 +221,19 @@ The site of x of agent C is bound to the site of y of agent A. C(x:A@y) , A(y:C@
 
 
 
+
 At rule_id:0, there is a modification of the site x of A. A(x:p)
 At rule_id:0, there is a modification of the site x of A. A(x:B@x)
 At rule_id:0, there is a modification of the site x of B. B(x:A@x)
 At rule_id:1, there is a modification of the site y of A. A(y:C@x)
 At rule_id:1, there is a modification of the site x of C. C(x:A@y)
+
+
+A(x:p)
+A(x:B@x)
+A(y:C@x)
+B(x:A@x)
+C(x:A@y)
 
 * Dynamic information
 ------------------------------------------------------------

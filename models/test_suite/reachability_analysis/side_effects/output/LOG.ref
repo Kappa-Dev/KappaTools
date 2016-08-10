@@ -1175,12 +1175,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=36
+Id=40
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=35
+  Id=39
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1341,14 +1341,14 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=50
+Id=51
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=50
    Node(site_type:1<2)
-    Id=32
+    Id=36
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1365,12 +1365,12 @@ Id=50
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=29
+Id=35
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=34
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1385,9 +1385,9 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=33
      Node(site_type:1<2)
-      Id=22
+      Id=28
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1404,12 +1404,12 @@ Id=29
        Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=26
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=31
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1443,12 +1443,12 @@ Id=26
        Leaf False 
 
 agent_type:3:D:cv_id:0
-Id=29
+Id=35
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=34
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1463,9 +1463,9 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=33
      Node(site_type:1<2)
-      Id=22
+      Id=28
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1482,12 +1482,12 @@ Id=29
        Leaf False 
 
 agent_type:4:E:cv_id:0
-Id=29
+Id=35
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=34
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1502,9 +1502,9 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=33
      Node(site_type:1<2)
-      Id=22
+      Id=28
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1525,12 +1525,12 @@ Id=29
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=23
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1540,12 +1540,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1555,12 +1555,12 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=59
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=58
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1575,9 +1575,89 @@ Id=56
         Id=0
          Leaf False 
 
-    Id=54
+    Id=57
      Node(site_type:0<2)
-      Id=31
+      Id=52
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=12
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=62
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=61
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=60
+     Node(site_type:0<2)
+      Id=13
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=12
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=59
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=58
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=57
+     Node(site_type:0<2)
+      Id=52
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1617,87 +1697,7 @@ Id=59
 
     Id=57
      Node(site_type:0<2)
-      Id=13
-       Node(site_type:1<1)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=56
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=55
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=54
-     Node(site_type:0<2)
-      Id=31
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=12
-         Node(site_type:1<2)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=56
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=55
-   Node(site_type:0<1)
-    Id=3
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=2
-       Node(site_type:1<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=54
-     Node(site_type:0<2)
-      Id=31
+      Id=52
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1723,12 +1723,12 @@ In agent E, the internal state of site x is p whenever the binding state of site
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=23
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1738,12 +1738,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1753,7 +1753,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=31
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1768,12 +1768,12 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1783,7 +1783,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=31
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1798,12 +1798,12 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1813,7 +1813,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=31
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1828,12 +1828,12 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1843,7 +1843,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=31
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1858,12 +1858,12 @@ Id=31
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=54
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1910,6 +1910,11 @@ At rule_id:8: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:10: the potential tuple pair when there is a bond on the rhs between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
 At rule_id:10: the potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
 
+The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
+The potential tuple pair when there is a bond on the rhs between the site x of C and the site x of A is: C(x:A@x, x:p); A(x:C@x, x:p)
+The potential tuple pair when there is a bond on the rhs between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
+The potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
+
 
 At rule_id:0, there is a modification of the site x of A. A(x:u)
 At rule_id:0, there is a modification of the site x of A. A(x:free)
@@ -1934,16 +1939,163 @@ At rule_id:10, there is a modification of the site x of E. E(x:p)
 At rule_id:10, there is a modification of the site x of E. E(x:D@x)
 At rule_id:11, there is a modification of the site x of D. D(x:free)
 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:u); A(x:C@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:u); D(x:E@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:u); E(x:D@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:p); A(x:C@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:p); D(x:E@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:p); E(x:D@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:C@x, x:u); C(x:A@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:C@x, x:p); C(x:A@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:free); A(x:C@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:free); D(x:E@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:free); E(x:D@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:B@x); A(x:C@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:B@x); D(x:E@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:B@x); E(x:D@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:C@x); A(x:C@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:C@x); D(x:E@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:B@x, x:C@x); E(x:D@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:C@x, x:free); C(x:A@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:C@x, x:B@x); C(x:A@x, x:p) 
+At there is a modification of the site x of agent A. The potential tuple pair is: A(x:C@x, x:C@x); C(x:A@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:u); A(x:C@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:u); D(x:E@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:u); E(x:D@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:p); A(x:C@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:p); D(x:E@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:p); E(x:D@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:, x:u); C(x:A@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:, x:p); C(x:A@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:free); A(x:C@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:free); D(x:E@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:free); E(x:D@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:A@x); A(x:C@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:A@x); D(x:E@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:A@x, x:A@x); E(x:D@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:, x:free); C(x:A@x, x:p) 
+At there is a modification of the site x of agent B. The potential tuple pair is: B(x:, x:A@x); C(x:A@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:u); A(x:C@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:u); D(x:E@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:u); E(x:D@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:p); A(x:C@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:p); D(x:E@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:p); E(x:D@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:, x:u); C(x:A@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:, x:p); C(x:A@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:free); A(x:C@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:free); D(x:E@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:free); E(x:D@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:A@x); A(x:C@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:A@x); D(x:E@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:A@x, x:A@x); E(x:D@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:, x:free); C(x:A@x, x:p) 
+At there is a modification of the site x of agent C. The potential tuple pair is: C(x:, x:A@x); C(x:A@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:u); A(x:C@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:u); D(x:E@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:u); E(x:D@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:p); A(x:C@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:p); D(x:E@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:p); E(x:D@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:, x:u); C(x:A@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:, x:p); C(x:A@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:free); A(x:C@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:free); D(x:E@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:free); E(x:D@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:E@x); A(x:C@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:E@x); D(x:E@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:E@x, x:E@x); E(x:D@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:, x:free); C(x:A@x, x:p) 
+At there is a modification of the site x of agent D. The potential tuple pair is: D(x:, x:E@x); C(x:A@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:u); A(x:C@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:u); D(x:E@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:u); E(x:D@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:p); A(x:C@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:p); D(x:E@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:p); E(x:D@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:, x:u); C(x:A@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:, x:p); C(x:A@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:free); A(x:C@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:free); D(x:E@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:free); E(x:D@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:D@x); A(x:C@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:D@x); D(x:E@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:D@x, x:D@x); E(x:D@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:, x:free); C(x:A@x, x:p) 
+At there is a modification of the site x of agent E. The potential tuple pair is: E(x:, x:D@x); C(x:A@x, x:p) 
+
+A(x:u)
+A(x:p)
+A(x:free)
+A(x:B@x)
+A(x:C@x)
+B(x:u)
+B(x:p)
+B(x:free)
+B(x:A@x)
+C(x:u)
+C(x:p)
+C(x:free)
+C(x:A@x)
+D(x:u)
+D(x:p)
+D(x:free)
+D(x:E@x)
+E(x:u)
+E(x:p)
+E(x:free)
+E(x:D@x)
+
 * Dynamic information
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: C@x, p
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: B@x, p
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: free, p
 Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
 Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, p
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: A@x, p
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: free, p
 Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: p, p
 Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: u, p
+Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: E@x, p
+Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: free, p
 Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: p, p
 Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: u, p
+Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: D@x, p
+Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: free, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
+error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
+error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit

@@ -54,6 +54,7 @@ The site of x of agent K is bound to the site of g of agent P. K(x:P@g) , P(g:K@
 
 
 
+
 At rule_id:0, there is a modification of the site a1 of P. P(a1:p)
 At rule_id:1, there is a modification of the site b1 of P. P(b1:p)
 At rule_id:2, there is a modification of the site a1 of P. P(a1:u)
@@ -66,6 +67,20 @@ At rule_id:8, there is a modification of the site g of P. P(g:K@x)
 At rule_id:8, there is a modification of the site x of K. K(x:P@g)
 At rule_id:9, there is a modification of the site g of P. P(g:free)
 At rule_id:9, there is a modification of the site x of K. K(x:free)
+
+
+P(a1:u)
+P(a1:p)
+P(a2:u)
+P(a2:p)
+P(b1:u)
+P(b1:p)
+P(b2:u)
+P(b2:p)
+P(g:free)
+P(g:K@x)
+K(x:free)
+K(x:P@g)
 
 * Dynamic information
 ------------------------------------------------------------
@@ -128,6 +143,7 @@ The site of x of agent K is bound to the site of g of agent P. K(x:P@g) , P(g:K@
 
 
 
+
 At rule_id:0, there is a modification of the site a1 of P. P(a1:p)
 At rule_id:1, there is a modification of the site b1 of P. P(b1:p)
 At rule_id:2, there is a modification of the site a1 of P. P(a1:u)
@@ -140,6 +156,20 @@ At rule_id:8, there is a modification of the site g of P. P(g:K@x)
 At rule_id:8, there is a modification of the site x of K. K(x:P@g)
 At rule_id:9, there is a modification of the site g of P. P(g:free)
 At rule_id:9, there is a modification of the site x of K. K(x:free)
+
+
+P(a1:u)
+P(a1:p)
+P(a2:u)
+P(a2:p)
+P(b1:u)
+P(b1:p)
+P(b2:u)
+P(b2:p)
+P(g:free)
+P(g:K@x)
+K(x:free)
+K(x:P@g)
 
 * Dynamic information
 ------------------------------------------------------------

@@ -287,6 +287,7 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:1, there is a modification of the site a1 of A. A(a1:p)
 At rule_id:2, there is a modification of the site a2 of A. A(a2:p)
 At rule_id:3, there is a modification of the site a1 of A. A(a1:u)
@@ -309,6 +310,30 @@ At rule_id:19, there is a modification of the site e1 of A. A(e1:u)
 At rule_id:20, there is a modification of the site e2 of A. A(e2:u)
 At rule_id:21, there is a modification of the site g of A. A(g:p)
 At rule_id:22, there is a modification of the site g of A. A(g:u)
+
+
+A(a1:u)
+A(a1:p)
+A(a2:u)
+A(a2:p)
+A(b1:u)
+A(b1:p)
+A(b2:u)
+A(b2:p)
+A(c1:u)
+A(c1:p)
+A(c2:u)
+A(c2:p)
+A(d1:u)
+A(d1:p)
+A(d2:u)
+A(d2:p)
+A(e1:u)
+A(e1:p)
+A(e2:u)
+A(e2:p)
+A(g:u)
+A(g:p)
 
 * Dynamic information
 ------------------------------------------------------------
@@ -604,6 +629,7 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:1, there is a modification of the site a1 of A. A(a1:p)
 At rule_id:2, there is a modification of the site a2 of A. A(a2:p)
 At rule_id:3, there is a modification of the site a1 of A. A(a1:u)
@@ -626,6 +652,30 @@ At rule_id:19, there is a modification of the site e1 of A. A(e1:u)
 At rule_id:20, there is a modification of the site e2 of A. A(e2:u)
 At rule_id:21, there is a modification of the site g of A. A(g:p)
 At rule_id:22, there is a modification of the site g of A. A(g:u)
+
+
+A(a1:u)
+A(a1:p)
+A(a2:u)
+A(a2:p)
+A(b1:u)
+A(b1:p)
+A(b2:u)
+A(b2:p)
+A(c1:u)
+A(c1:p)
+A(c2:u)
+A(c2:p)
+A(d1:u)
+A(d1:p)
+A(d2:u)
+A(d2:p)
+A(e1:u)
+A(e1:p)
+A(e2:u)
+A(e2:p)
+A(g:u)
+A(g:p)
 
 * Dynamic information
 ------------------------------------------------------------

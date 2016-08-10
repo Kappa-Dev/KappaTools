@@ -431,12 +431,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=23
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=24
+  Id=22
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -465,12 +465,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=23
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=24
+  Id=22
    Node(site_type:1<1)
     Id=11
      Node(site_type:2<1)
@@ -530,7 +530,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=26
+Id=24
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -554,7 +554,7 @@ Id=26
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=26
+Id=24
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -582,7 +582,7 @@ Id=26
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -597,12 +597,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -612,7 +612,7 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -627,12 +627,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -646,7 +646,7 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -661,12 +661,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -676,7 +676,7 @@ Id=29
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -691,12 +691,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=27
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=26
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -733,11 +733,22 @@ At rule_id:0: the potential tuple pair when there is a bond on the rhs between t
 At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
 At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
 
+The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:free); B(z:A@z, t:free)
+The potential tuple pair when there is a bond on the rhs between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
+The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
+The potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
+
 
 At rule_id:0, there is a modification of the site z of A. A(z:B@z)
 At rule_id:0, there is a modification of the site z of B. B(z:A@z)
 At rule_id:1, there is a modification of the site t of A. A(t:B@t)
 At rule_id:1, there is a modification of the site t of B. B(t:A@t)
+
+
+A(z:B@z)
+A(t:B@t)
+B(z:A@z)
+B(t:A@t)
 
 * Dynamic information
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t

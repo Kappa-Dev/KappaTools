@@ -274,6 +274,9 @@ At rule_id:0, the potential tuple pair when there is an action binding between t
 At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site x of A and the site x of B is: A(x:B@x, y:free); B(x:A@x, y:free)
 At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site x of B and the site x of A is: B(x:A@x, y:free); A(x:B@x, y:free)
 
+The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of B is: A(x:B@x, y:free); B(x:A@x, y:free)
+The potential tuple pair when there is a bond on the rhs between the site x of B and the site x of A is: B(x:A@x, y:free); A(x:B@x, y:free)
+
 
 At rule_id:0, there is a modification of the site x of A. A(x:B@x)
 At rule_id:0, there is a modification of the site x of B. B(x:A@x)
@@ -281,6 +284,12 @@ At rule_id:1, there is a modification of the site x of A. A(x:B@x)
 At rule_id:1, there is a modification of the site x of B. B(x:A@x)
 At rule_id:2, there is a modification of the site y of A. A(y:B@y)
 At rule_id:2, there is a modification of the site y of B. B(y:A@y)
+
+
+A(x:B@x)
+A(y:B@y)
+B(x:A@x)
+B(y:A@y)
 
 * Dynamic information
 ------------------------------------------------------------

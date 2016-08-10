@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 09 2016>
+   * Last modification: Time-stamp: <Aug 10 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -12,6 +12,20 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
+
+module AgentSitesStates_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name *
+            Ckappa_sig.c_site_name *
+            Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state *
+           Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
 
 module AgentsSiteState_map_and_set =
   Map_wrapper.Make
@@ -192,6 +206,22 @@ module Proj_agent_id_away3 =
     (PairAgentsSitesStates_map_and_set) (*set_a*)
     (PairAgentSites_map_and_set) (*set_b*)
 
+module AgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_agent_id_away4 =
+  Map_wrapper.Proj
+    (AgentsSiteState_map_and_set) (*set_a*)
+    (AgentSiteState_map_and_set) (*set_b*)
+
 module PairAgentIDSite_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -207,16 +237,6 @@ module Proj_get_agent_id_snd_site =
   Map_wrapper.Proj
     (PairAgentsSitesStates_map_and_set)
     (PairAgentIDSite_map_and_set)
-
-module AgentSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
 
 module Proj_get_agents_sites =
   Map_wrapper.Proj

@@ -1015,6 +1015,7 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:0, there is a modification of the site x of A. A(x:u)
 At rule_id:0, there is a modification of the site y of A. A(y:u)
 At rule_id:0, there is a modification of the site z of A. A(z:u)
@@ -1027,6 +1028,19 @@ At rule_id:5, there is a modification of the site y of A. A(y:q)
 At rule_id:6, there is a modification of the site z of A. A(z:q)
 At rule_id:7, there is a modification of the site x of A. A(x:1)
 At rule_id:7, there is a modification of the site y of A. A(y:0)
+
+
+A(x:u)
+A(x:p)
+A(x:0)
+A(x:q)
+A(x:1)
+A(y:u)
+A(y:p)
+A(y:q)
+A(y:0)
+A(z:u)
+A(z:q)
 
 * Dynamic information
 ------------------------------------------------------------

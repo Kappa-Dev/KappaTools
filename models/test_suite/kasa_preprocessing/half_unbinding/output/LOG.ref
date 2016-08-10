@@ -145,7 +145,11 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:1, there is a modification of the site x of A. A(x:free)
+
+
+A(x:free)
 
 * Dynamic information
 ------------------------------------------------------------

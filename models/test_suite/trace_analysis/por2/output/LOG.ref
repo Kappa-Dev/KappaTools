@@ -381,6 +381,7 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:0, there is a modification of the site x of A. A(x:p)
 At rule_id:1, there is a modification of the site y of A. A(y:p)
 At rule_id:2, there is a modification of the site z of A. A(z:p)
@@ -391,6 +392,18 @@ At rule_id:6, there is a modification of the site y of A. A(y:u)
 At rule_id:7, there is a modification of the site z of A. A(z:u)
 At rule_id:8, there is a modification of the site w of A. A(w:u)
 At rule_id:9, there is a modification of the site t of A. A(t:u)
+
+
+A(x:u)
+A(x:p)
+A(y:u)
+A(y:p)
+A(z:u)
+A(z:p)
+A(w:u)
+A(w:p)
+A(t:u)
+A(t:p)
 
 * Dynamic information
 ------------------------------------------------------------
@@ -444,6 +457,7 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:0, there is a modification of the site x of A. A(x:p)
 At rule_id:1, there is a modification of the site y of A. A(y:p)
 At rule_id:2, there is a modification of the site z of A. A(z:p)
@@ -454,6 +468,18 @@ At rule_id:6, there is a modification of the site y of A. A(y:u)
 At rule_id:7, there is a modification of the site z of A. A(z:u)
 At rule_id:8, there is a modification of the site w of A. A(w:u)
 At rule_id:9, there is a modification of the site t of A. A(t:u)
+
+
+A(x:u)
+A(x:p)
+A(y:u)
+A(y:p)
+A(z:u)
+A(z:p)
+A(w:u)
+A(w:p)
+A(t:u)
+A(t:p)
 
 * Dynamic information
 ------------------------------------------------------------

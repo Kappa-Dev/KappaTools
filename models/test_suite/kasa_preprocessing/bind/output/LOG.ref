@@ -323,6 +323,7 @@ The site of x of agent C is bound to the site of x of agent A. C(x:A@x) , A(x:C@
 
 
 
+
 At rule_id:0, there is a modification of the site x of A. A(x:B@x)
 At rule_id:0, there is a modification of the site x of B. B(x:A@x)
 At rule_id:1, there is a modification of the site x of A. A(x:free)
@@ -330,6 +331,15 @@ At rule_id:1, there is a modification of the site x of B. B(x:free)
 At rule_id:2, there is a modification of the site x of A. A(x:C@x)
 At rule_id:2, there is a modification of the site x of C. C(x:A@x)
 At rule_id:3, there is a modification of the site x of B. B(x:u)
+
+
+A(x:free)
+A(x:B@x)
+A(x:C@x)
+B(x:u)
+B(x:free)
+B(x:A@x)
+C(x:A@x)
 
 * Dynamic information
 ------------------------------------------------------------

@@ -645,6 +645,7 @@ bonds_rhs set is empty
 
 
 
+
 At rule_id:0, there is a modification of the site x of A. A(x:u)
 At rule_id:0, there is a modification of the site x of B. B(x:p)
 At rule_id:1, there is a modification of the site x of B. B(x:p)
@@ -656,6 +657,12 @@ At rule_id:6, there is a modification of the site x of A. A(x:p)
 At rule_id:7, there is a modification of the site x of A. A(x:p)
 At rule_id:8, there is a modification of the site x of A. A(x:u)
 At rule_id:9, there is a modification of the site x of A. A(x:u)
+
+
+A(x:u)
+A(x:p)
+B(x:u)
+B(x:p)
 
 * Dynamic information
 ------------------------------------------------------------
