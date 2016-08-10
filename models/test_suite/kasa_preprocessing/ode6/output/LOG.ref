@@ -482,28 +482,6 @@ E is a dead agent.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:0 there is a binding between the site x of Sh and the site x of ab. Sh:(x:ab@x); ab:(x:Sh@x)
-At rule_id:0 there is a binding between the site x of ab and the site x of Sh. ab:(x:Sh@x); Sh:(x:ab@x)
-At rule_id:1 there is a binding between the site y of Sh and the site z of R. Sh:(y:R@z); R:(z:Sh@y)
-At rule_id:1 there is a binding between the site z of R and the site y of Sh. R:(z:Sh@y); Sh:(y:R@z)
-At rule_id:2 there is a binding between the site y of R and the site k of R. R:(y:R@k); R:(k:R@y)
-At rule_id:2 there is a binding between the site k of R and the site y of R. R:(k:R@y); R:(y:R@k)
-At rule_id:3 there is a binding between the site t of R and the site y of E. R:(t:E@y); E:(y:R@t)
-At rule_id:3 there is a binding between the site y of E and the site t of R. E:(y:R@t); R:(t:E@y)
-At rule_id:4 there is a binding between the site x of R and the site x of E. R:(x:E@x); E:(x:R@x)
-At rule_id:4 there is a binding between the site x of E and the site x of R. E:(x:R@x); R:(x:E@x)
-
-The site of x of agent ab is bound to the site of x of agent Sh. ab(x:Sh@x) , Sh(x:ab@x)
-The site of x of agent Sh is bound to the site of x of agent ab. Sh(x:ab@x) , ab(x:Sh@x)
-The site of y of agent Sh is bound to the site of z of agent R. Sh(y:R@z) , R(z:Sh@y)
-The site of z of agent R is bound to the site of y of agent Sh. R(z:Sh@y) , Sh(y:R@z)
-The site of y of agent R is bound to the site of k of agent R. R(y:R@k) , R(k:R@y)
-The site of k of agent R is bound to the site of y of agent R. R(k:R@y) , R(y:R@k)
-The site of t of agent R is bound to the site of y of agent E. R(t:E@y) , E(y:R@t)
-The site of x of agent R is bound to the site of x of agent E. R(x:E@x) , E(x:R@x)
-The site of y of agent E is bound to the site of t of agent R. E(y:R@t) , R(t:E@y)
-The site of x of agent E is bound to the site of x of agent R. E(x:R@x) , R(x:E@x)
-
 At rule_id:1, the potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
 At rule_id:1, the potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
 At rule_id:1, the potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)
@@ -544,66 +522,8 @@ The potential tuple pair when there is a bond on the rhs between the site k of R
 The potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
 
 
-There is a modification of the site x of agent ab. The potential tuple pair is: ab(:, x:Sh@x); R(z:Sh@y, y:free) 
-There is a modification of the site x of agent ab. The potential tuple pair is: ab(:, x:Sh@x); R(z:Sh@y, x:free) 
-There is a modification of the site x of agent Sh. The potential tuple pair is: Sh(y:R@z, x:p); R(z:Sh@y, y:free) 
-There is a modification of the site x of agent Sh. The potential tuple pair is: Sh(y:R@z, x:p); R(z:Sh@y, x:free) 
-There is a modification of the site x of agent Sh. The potential tuple pair is: Sh(y:R@z, x:ab@x); R(z:Sh@y, y:free) 
-There is a modification of the site x of agent Sh. The potential tuple pair is: Sh(y:R@z, x:ab@x); R(z:Sh@y, x:free) 
-There is a modification of the site y of agent Sh. The potential tuple pair is: Sh(y:R@z, y:R@z); R(z:Sh@y, y:free) 
-There is a modification of the site y of agent Sh. The potential tuple pair is: Sh(y:R@z, y:R@z); R(z:Sh@y, x:free) 
-There is a modification of the site z of agent R. The potential tuple pair is: R(k:R@y, z:Sh@y); R(z:Sh@y, y:free) 
-There is a modification of the site z of agent R. The potential tuple pair is: R(k:R@y, z:Sh@y); R(z:Sh@y, x:free) 
-There is a modification of the site y of agent R. The potential tuple pair is: R(k:R@y, y:R@k); R(z:Sh@y, y:free) 
-There is a modification of the site y of agent R. The potential tuple pair is: R(k:R@y, y:R@k); R(z:Sh@y, x:free) 
-There is a modification of the site k of agent R. The potential tuple pair is: R(k:R@y, k:R@y); R(z:Sh@y, y:free) 
-There is a modification of the site k of agent R. The potential tuple pair is: R(k:R@y, k:R@y); R(z:Sh@y, x:free) 
-There is a modification of the site t of agent R. The potential tuple pair is: R(k:R@y, t:E@y); R(z:Sh@y, y:free) 
-There is a modification of the site t of agent R. The potential tuple pair is: R(k:R@y, t:E@y); R(z:Sh@y, x:free) 
-There is a modification of the site x of agent R. The potential tuple pair is: R(k:R@y, x:E@x); R(z:Sh@y, y:free) 
-There is a modification of the site x of agent R. The potential tuple pair is: R(k:R@y, x:E@x); R(z:Sh@y, x:free) 
-There is a modification of the site y of agent E. The potential tuple pair is: E(:, y:R@t); R(z:Sh@y, y:free) 
-There is a modification of the site y of agent E. The potential tuple pair is: E(:, y:R@t); R(z:Sh@y, x:free) 
-There is a modification of the site x of agent E. The potential tuple pair is: E(:, x:R@x); R(z:Sh@y, y:free) 
-There is a modification of the site x of agent E. The potential tuple pair is: E(:, x:R@x); R(z:Sh@y, x:free) 
-
 * Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 125; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit
-error: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 125; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit
-error: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 128; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit
-error: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 128; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit
-error: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 128; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit
-error: file_name: KaSa_rep/data_structures/int_storage.ml; message: line 128; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 301; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 313; exception:Exit
-error: file_name: KaSa_rep/data_structures/dictionary.ml; message: line 126: missing entry; exception:Unknown
-error: file_name: KaSa_rep/frontend/preprocess/handler.ml; message: line 227; exception:Exit
+execution finished without any exception

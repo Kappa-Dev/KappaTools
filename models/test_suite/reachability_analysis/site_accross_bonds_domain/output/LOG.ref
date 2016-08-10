@@ -691,19 +691,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=63
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=62
    Node(site_type:1<1)
-    Id=59
+    Id=61
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=58
+      Id=60
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<1)
@@ -738,19 +738,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=71
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=68
+  Id=70
    Node(site_type:1<2)
-    Id=63
+    Id=65
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=62
+      Id=64
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -850,19 +850,19 @@ Id=55
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=73
+Id=75
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=72
+  Id=74
    Node(site_type:1<1)
-    Id=63
+    Id=65
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=62
+      Id=64
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -880,9 +880,9 @@ Id=73
         Id=0
          Leaf False 
 
-    Id=71
+    Id=73
      Node(site_type:1<2)
-      Id=70
+      Id=72
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -913,7 +913,7 @@ Id=73
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=76
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -928,12 +928,12 @@ Id=74
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=76
+Id=77
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=75
+  Id=58
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -958,12 +958,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=82
+Id=83
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=81
+  Id=82
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -978,9 +978,9 @@ Id=82
         Id=0
          Leaf False 
 
-    Id=80
+    Id=81
      Node(site_type:0<2)
-      Id=74
+      Id=76
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1003,7 +1003,7 @@ In agent B, the internal state of site z is p whenever the binding state of site
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=76
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1018,13 +1018,28 @@ Id=74
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=76
+Id=77
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=75
+  Id=58
    Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=76
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1048,27 +1063,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=74
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=76
+Id=77
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=75
+  Id=58
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1079,23 +1079,13 @@ Id=76
 EXTENSIONAL DESCRIPTION:
 The internal state of site t in agent A ranges over u and p.
 The binding state of site z in agent A ranges over free and B@z.
-The internal state of site t in agent B ranges over u and p.
 The binding state of site z in agent B ranges over free and A@z.
+The internal state of site t in agent B ranges over u and p.
 The internal state of site z in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:2 there is a binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
-At rule_id:2 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
-At rule_id:5 there is a binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
-At rule_id:5 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
-At rule_id:6 there is a binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
-At rule_id:6 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
-
-The site of z of agent A is bound to the site of z of agent B. A(z:B@z) , B(z:A@z)
-The site of z of agent B is bound to the site of z of agent A. B(z:A@z) , A(z:B@z)
-
 At rule_id:2, the potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
 At rule_id:2, the potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
 At rule_id:2, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
@@ -1119,51 +1109,7 @@ The potential tuple pair when there is a bond on the rhs between the site z of B
 
 At rule_id:1, there is a binding with a question mark of the site z of B. The potential tuple pair is: B(:1:z, t:p)
 
-There is a modification of the site z of agent A. The potential tuple pair is: A(z:B@z, z:B@z); B(z:A@z, z:p) 
-There is a modification of the site z of agent A. The potential tuple pair is: A(z:B@z, z:B@z); B(z:A@z, t:u) 
-There is a modification of the site z of agent A. The potential tuple pair is: A(z:B@z, z:B@z); B(z:A@z, t:p) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(z:B@z, t:u); B(z:A@z, z:p) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(z:B@z, t:u); B(z:A@z, t:u) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(z:B@z, t:u); B(z:A@z, t:p) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(z:B@z, t:p); B(z:A@z, z:p) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(z:B@z, t:p); B(z:A@z, t:u) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(z:B@z, t:p); B(z:A@z, t:p) 
-There is a modification of the site z of agent A. The potential tuple pair is: A(t:p, z:B@z); A(z:B@z, t:u) 
-There is a modification of the site z of agent A. The potential tuple pair is: A(t:p, z:B@z); A(z:B@z, t:p) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(t:p, t:u); A(z:B@z, t:u) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(t:p, t:u); A(z:B@z, t:p) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(t:p, t:p); A(z:B@z, t:u) 
-There is a modification of the site t of agent A. The potential tuple pair is: A(t:p, t:p); A(z:B@z, t:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:u); B(z:A@z, z:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:u); B(z:A@z, t:u) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:u); B(z:A@z, t:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:p); B(z:A@z, z:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:p); B(z:A@z, t:u) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:p); B(z:A@z, t:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:A@z); B(z:A@z, z:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:A@z); B(z:A@z, t:u) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:p, z:A@z); B(z:A@z, t:p) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:p, t:u); B(z:A@z, z:p) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:p, t:u); B(z:A@z, t:u) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:p, t:u); B(z:A@z, t:p) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:p, t:p); B(z:A@z, z:p) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:p, t:p); B(z:A@z, t:u) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:p, t:p); B(z:A@z, t:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:A@z, z:u); A(z:B@z, t:u) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:A@z, z:u); A(z:B@z, t:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:A@z, z:p); A(z:B@z, t:u) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:A@z, z:p); A(z:B@z, t:p) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:A@z, z:A@z); A(z:B@z, t:u) 
-There is a modification of the site z of agent B. The potential tuple pair is: B(z:A@z, z:A@z); A(z:B@z, t:p) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:A@z, t:u); A(z:B@z, t:u) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:A@z, t:u); A(z:B@z, t:p) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:A@z, t:p); A(z:B@z, t:u) 
-There is a modification of the site t of agent B. The potential tuple pair is: B(z:A@z, t:p); A(z:B@z, t:p) 
-
 * Dynamic information
-Whenever the site z of A and the site z of B are bound together, then the site z of A and z of B can have the following respective states: B@z, p
-Whenever the site z of A and the site z of B are bound together, then the site z of A and t of B can have the following respective states: B@z, u
-Whenever the site z of A and the site z of B are bound together, then the site z of A and t of B can have the following respective states: B@z, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, u
@@ -1172,10 +1118,6 @@ Whenever the site z of A and the site z of B are bound together, then the site t
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, p
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: u, u
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: u, p
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: A@z, u
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: A@z, p
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u

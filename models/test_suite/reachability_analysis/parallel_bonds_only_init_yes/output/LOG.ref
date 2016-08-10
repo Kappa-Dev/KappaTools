@@ -713,16 +713,6 @@ The binding state of site z in agent B ranges over free and A@z.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-At rule_id:0 there is a binding between the site z of A and the site z of B. A:(z:B@z); B:(z:A@z)
-At rule_id:0 there is a binding between the site z of B and the site z of A. B:(z:A@z); A:(z:B@z)
-At rule_id:1 there is a binding between the site t of A and the site t of B. A:(t:B@t); B:(t:A@t)
-At rule_id:1 there is a binding between the site t of B and the site t of A. B:(t:A@t); A:(t:B@t)
-
-The site of z of agent A is bound to the site of z of agent B. A(z:B@z) , B(z:A@z)
-The site of t of agent A is bound to the site of t of agent B. A(t:B@t) , B(t:A@t)
-The site of z of agent B is bound to the site of z of agent A. B(z:A@z) , A(z:B@z)
-The site of t of agent B is bound to the site of t of agent A. B(t:A@t) , A(t:B@t)
-
 At rule_id:0, the potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:free); B(z:A@z, t:free)
 At rule_id:0, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
 At rule_id:1, the potential tuple pair when there is an action binding between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
@@ -737,7 +727,6 @@ The potential tuple pair when there is a bond on the rhs between the site z of A
 The potential tuple pair when there is a bond on the rhs between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
 The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
 The potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
-
 
 
 * Dynamic information
