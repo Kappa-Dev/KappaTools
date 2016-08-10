@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 10 2016>
+   * Last modification: Time-stamp: <Aug 11 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -297,6 +297,13 @@ let collect_bonds parameter error rule_id views bonds store_result =
                 parameter error
                 ((agent_id, agent_type1, site_type_source, state1),
                  (agent_id_target, agent_type2, site_type_target, state2))
+                old_set
+            in
+            let error', new_set =
+              Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+                parameter error
+                ((agent_id_target, agent_type2, site_type_target, state2),
+                 (agent_id, agent_type1, site_type_source, state1))
                 old_set
             in
             let error =
@@ -873,6 +880,13 @@ let collect_proj_question_marks_rhs parameter error
 
 (*modification*)
 
+(* the following function is wrong *)
+(* You miss the relation between t and x *)
+(* Also, you should have only two nested fold *)
+(* You should use an appropriate map in static to avoid one fold *)
+(* Also this function should not be called in scan_rule, but in scan_rules *)
+(* since you fold over all the rules in this function *)
+(* You focus on x, there should be a symmetric function for dealing with y *)
 let collect_potential_tuple_pair_modification parameter error kappa_handler
 (*the second site in a potential tuple pair belongs to modification*)
     store_modified_map  store_modif_set store_proj_potential_tuple_pair_bonds store_result =
@@ -1301,6 +1315,13 @@ let collect_bonds_init parameter error init_state =
                   parameter
                   error
                   pair
+                  store_result
+              in
+              let error, store_result =
+                Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+                  parameter
+                  error
+                  ((fun (x,y) -> (y,x)) pair)
                   store_result
               in
               error, store_result

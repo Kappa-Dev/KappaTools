@@ -43,6 +43,10 @@ The potential tuple pair when there is a bond on the rhs between the site y of C
 
 
 * Dynamic information
+Whenever the site z of A and the site y of C are bound together, then the site y of A and x of C can have the following respective states: p, u
+Whenever the site z of A and the site y of C are bound together, then the site y of A and x of C can have the following respective states: p, p
+Whenever the site z of A and the site y of C are bound together, then the site z of A and x of C can have the following respective states: p, u
+Whenever the site z of A and the site y of C are bound together, then the site z of A and x of C can have the following respective states: p, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
