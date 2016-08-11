@@ -731,6 +731,55 @@ let collect_created_bonds parameter error rule rule_id store_result =
 (***************************************************************)
 
 let collect_potential_tuple_pair_bonds_rhs parameter error
+    store_bonds_rhs bonds_rhs_set store_partition_bonds_rhs_map3 store_result =
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun _ store_bonds_rhs_set (error, store_result) ->
+       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+         (fun (x, y) (error, store_result) ->
+            let project (_, b, c, d) = b, c, d in
+            let error, potential_tuple_pair_set =
+              match
+                Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.find_option_without_logs
+                  parameter error
+                  (project x, project y)
+                  store_partition_bonds_rhs_map3
+              with
+              | error, None ->
+                error,
+                Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty
+              | error, Some s -> error, s
+            in
+            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
+              (fun (x', y') (error, store_result) ->
+                 let proj (b, c, _, e, _) = (b, c, e) in
+                 if
+                   Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.mem
+                     (proj x', proj y')
+                     bonds_rhs_set
+                   ||
+                   Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.mem
+                     (proj y', proj x')
+                     bonds_rhs_set
+                 then
+                   let error', store_result =
+                     Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
+                      parameter error
+                      (x', y')
+                      store_result
+                   in
+                   let error =
+                     Exception.check_point
+                       Exception.warn parameter error error' __POS__ Exit
+                   in
+                   error, store_result
+                 else
+                   error, store_result
+              ) potential_tuple_pair_set (error, store_result)
+         ) store_bonds_rhs_set (error, store_result)
+    ) store_bonds_rhs (error, store_result)
+
+(*
+let collect_potential_tuple_pair_bonds_rhs parameter error
     store_bonds_rhs_set store_partition_bonds_rhs_map3 store_result =
   Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
@@ -773,7 +822,7 @@ let collect_potential_tuple_pair_bonds_rhs parameter error
               error, store_result
          ) potential_tuple_pair_set (error, store_result)
     ) store_bonds_rhs_set (error, store_result)
-
+  *)
 let collect_proj_potential_tuple_pair_bonds
     parameter error rule_id
     store_bonds_rhs store_potential_tuple_pair store_result = (*FIX*)

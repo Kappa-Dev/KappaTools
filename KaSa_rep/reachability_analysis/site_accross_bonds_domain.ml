@@ -638,6 +638,7 @@ struct
     in
     (*+++++++++++++++++++++++++++++++++++++++++*)
     let store_bonds_rhs_set = get_bonds_rhs_set static in
+    let store_bonds_rhs = get_bonds_rhs static in
     let store_partition_bonds_rhs_map3 =
       get_partition_bonds_rhs_map3 static
     in
@@ -648,6 +649,7 @@ struct
       Site_accross_bonds_domain_static.collect_potential_tuple_pair_bonds_rhs
         parameter
         error
+        store_bonds_rhs
         store_bonds_rhs_set
         store_partition_bonds_rhs_map3
         store_potential_tuple_pair_bonds_rhs
