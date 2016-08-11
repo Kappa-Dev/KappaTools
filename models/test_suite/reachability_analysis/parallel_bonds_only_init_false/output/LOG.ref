@@ -415,8 +415,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
                          Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
                          Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -460,8 +458,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
                          Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
                          Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -469,15 +465,11 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
                          Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
                          Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
-                         Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
-                         Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-                         Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
-                         Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
                          Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
                          Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
 
@@ -493,7 +485,7 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -560,7 +552,7 @@ Id=23
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -575,12 +567,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=31
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -590,14 +582,14 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=35
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=32
+  Id=34
    Node(site_type:0<1)
-    Id=28
+    Id=30
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -610,7 +602,7 @@ Id=33
         Id=0
          Leaf False 
 
-    Id=31
+    Id=33
      Node(site_type:0<2)
       Id=3
        Node(site_type:1<0)
@@ -635,7 +627,7 @@ In agent B, the binding state of site t is free whenever the binding state of si
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -650,12 +642,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=31
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -665,7 +657,7 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -680,12 +672,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=31
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -707,15 +699,11 @@ At rule_id:0, the potential tuple pair when there is an action binding between t
 At rule_id:1, the potential tuple pair when there is an action binding between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
 At rule_id:1, the potential tuple pair when there is an action binding between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
 
-At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:free); B(z:A@z, t:free)
-At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
-
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:free); B(z:A@z, t:free)
 The potential tuple pair when there is a bond on the rhs between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
 The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
 The potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
+
 
 
 * Dynamic information

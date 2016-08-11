@@ -476,15 +476,6 @@ At rule_id:4, the potential tuple pair when there is an action binding between t
 At rule_id:4, the potential tuple pair when there is an action binding between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, x:B@y)
 At rule_id:4, the potential tuple pair when there is an action binding between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, y:C@y)
 
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, x:B@x)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, y:C@x)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, x:B@x)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, y:C@x)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, x:B@y)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, y:C@y)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, x:B@y)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, y:C@y)
-
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, x:B@y)
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, y:C@y)
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, x:B@y)
@@ -493,6 +484,7 @@ The potential tuple pair when there is a bond on the rhs between the site z of D
 The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, y:C@x)
 The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, x:B@x)
 The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, y:C@x)
+
 
 
 * Dynamic information

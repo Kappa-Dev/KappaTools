@@ -48,25 +48,6 @@ At rule_id:4, the potential tuple pair when there is an action binding between t
 At rule_id:4, the potential tuple pair when there is an action binding between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
 At rule_id:4, the potential tuple pair when there is an action binding between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, n:free)
 
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:R@n); R(c:R@c, cr:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:R@n); R(c:R@c, n:R@cr)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:free); R(c:R@c, cr:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:free); R(c:R@c, n:R@cr)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, c:R@c)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, cr:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, c:R@c)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, cr:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, cr:R@n)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, n:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:R@cr); R(c:R@c, cr:R@n)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:R@cr); R(c:R@c, n:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, c:R@c); R(cr:R@n, c:R@c)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, c:R@c); R(cr:R@n, n:free)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
-At rule_id:4: the potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, n:free)
-
 The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
 The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, cr:R@n)
 The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, n:free)
@@ -86,45 +67,25 @@ The potential tuple pair when there is a bond on the rhs between the site n of R
 The potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, n:free)
 
 
+
 * Dynamic information
 Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: E@x, E@x
-Whenever the site c of R and the site c of R are bound together, then the site c of R and x of R can have the following respective states: free, E@x
-Whenever the site c of R and the site c of R are bound together, then the site c of R and cr of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site c of R and cr of R can have the following respective states: free, R@n
-Whenever the site c of R and the site c of R are bound together, then the site c of R and n of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site c of R and n of R can have the following respective states: free, R@cr
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and x of R can have the following respective states: R@n, E@x
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and x of R can have the following respective states: free, E@x
 Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: R@n, free
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: R@n, R@n
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, free
 Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, R@n
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: R@n, free
 Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: R@n, R@cr
 Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: free, R@cr
-Whenever the site c of R and the site c of R are bound together, then the site n of R and x of R can have the following respective states: R@cr, E@x
-Whenever the site c of R and the site c of R are bound together, then the site n of R and x of R can have the following respective states: free, E@x
-Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: R@cr, free
 Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: R@cr, R@n
 Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
-Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: free, R@n
 Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: R@cr, free
-Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: R@cr, R@cr
-Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: free, free
 Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: free, R@cr
 Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
 Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
-Whenever the site cr of R and the site n of R are bound together, then the site cr of R and c of R can have the following respective states: free, R@c
-Whenever the site cr of R and the site n of R are bound together, then the site cr of R and cr of R can have the following respective states: free, free
 Whenever the site cr of R and the site n of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c
 Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
 Whenever the site n of R and the site cr of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
 Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
 Whenever the site n of R and the site cr of R are bound together, then the site cr of R and c of R can have the following respective states: free, R@c
 Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
-Whenever the site n of R and the site cr of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c
-Whenever the site n of R and the site cr of R are bound together, then the site n of R and n of R can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
@@ -132,37 +93,19 @@ When the agent R has its site c bound to the site c of a R, and its site cr boun
 When the agent R has its site c bound to the site c of a R, and its site n bound to the site cr of a R, then both instances of R are necessarily the same.
 Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :0 agent_id: 0 site: 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1051: rule :0 agent_id: 0 site: 1; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :0 agent_id: 0 site: 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1051: rule :0 agent_id: 0 site: 2; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :0 agent_id: 0 site: 3; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1051: rule :0 agent_id: 0 site: 3; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :1 agent_id: 0 site: 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1051: rule :0 agent_id: 0 site: 1; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :1 agent_id: 0 site: 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1051: rule :0 agent_id: 0 site: 2; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :1 agent_id: 0 site: 3; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :0 agent_id: 0 site: 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :0 agent_id: 0 site: 2; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :0 agent_id: 0 site: 3; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :1 agent_id: 0 site: 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :1 agent_id: 0 site: 2; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1260: the site does not belong to the last agent type of a path; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1219: state is empty; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1073: rule :1 agent_id: 0 site: 3; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1051: rule :0 agent_id: 0 site: 3; exception:Exit

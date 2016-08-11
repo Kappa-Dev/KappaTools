@@ -1175,12 +1175,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=36
+Id=34
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=35
+  Id=33
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1341,14 +1341,14 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=47
    Node(site_type:1<2)
-    Id=32
+    Id=30
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1365,12 +1365,12 @@ Id=50
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=31
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=28
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1385,7 +1385,7 @@ Id=31
         Id=0
          Leaf False 
 
-    Id=29
+    Id=27
      Node(site_type:1<2)
       Id=22
        Node(site_type:2<0)
@@ -1443,12 +1443,12 @@ Id=26
        Leaf False 
 
 agent_type:3:D:cv_id:0
-Id=31
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=28
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1463,7 +1463,7 @@ Id=31
         Id=0
          Leaf False 
 
-    Id=29
+    Id=27
      Node(site_type:1<2)
       Id=22
        Node(site_type:2<0)
@@ -1482,12 +1482,12 @@ Id=31
        Leaf False 
 
 agent_type:4:E:cv_id:0
-Id=31
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=30
+  Id=28
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1502,7 +1502,7 @@ Id=31
         Id=0
          Leaf False 
 
-    Id=29
+    Id=27
      Node(site_type:1<2)
       Id=22
        Node(site_type:2<0)
@@ -1525,12 +1525,12 @@ Id=31
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=37
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1540,12 +1540,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=50
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1577,7 +1577,7 @@ Id=56
 
     Id=54
      Node(site_type:0<2)
-      Id=27
+      Id=49
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1657,7 +1657,7 @@ Id=56
 
     Id=54
      Node(site_type:0<2)
-      Id=27
+      Id=49
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1697,7 +1697,7 @@ Id=56
 
     Id=54
      Node(site_type:0<2)
-      Id=27
+      Id=49
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1723,12 +1723,12 @@ In agent E, the internal state of site x is p whenever the binding state of site
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=37
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1738,12 +1738,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=50
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1753,7 +1753,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1768,12 +1768,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=50
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1783,7 +1783,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1798,12 +1798,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=50
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1813,7 +1813,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1828,12 +1828,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=50
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1843,7 +1843,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1858,12 +1858,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=50
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1889,31 +1889,18 @@ The internal state of site x in agent E ranges over u and p.
 At rule_id:10, the potential tuple pair when there is an action binding between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
 At rule_id:10, the potential tuple pair when there is an action binding between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
 
-At rule_id:8: the potential tuple pair when there is a bond on the rhs between the site x of C and the site x of A is: C(x:A@x, x:p); A(x:C@x, x:p)
-At rule_id:8: the potential tuple pair when there is a bond on the rhs between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
-At rule_id:10: the potential tuple pair when there is a bond on the rhs between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
-At rule_id:10: the potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
-
 The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
 The potential tuple pair when there is a bond on the rhs between the site x of C and the site x of A is: C(x:A@x, x:p); A(x:C@x, x:p)
 The potential tuple pair when there is a bond on the rhs between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
 The potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
 
 
+
 * Dynamic information
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: free, p
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, p
 Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: free, p
 Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: p, p
-Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: u, p
-Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: free, p
 Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: p, p
-Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: u, p
-Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: free, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

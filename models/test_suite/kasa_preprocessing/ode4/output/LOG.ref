@@ -220,11 +220,9 @@ C is a dead agent.
 At rule_id:0, the potential tuple pair when there is an action binding between the site y of A and the site x of B is: A(y:B@x, x:p); B(x:A@y, y:free)
 At rule_id:0, the potential tuple pair when there is an action binding between the site x of B and the site y of A is: B(x:A@y, y:free); A(y:B@x, x:p)
 
-At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site y of A and the site x of B is: A(y:B@x, x:p); B(x:A@y, y:free)
-At rule_id:0: the potential tuple pair when there is a bond on the rhs between the site x of B and the site y of A is: B(x:A@y, y:free); A(y:B@x, x:p)
-
 The potential tuple pair when there is a bond on the rhs between the site y of A and the site x of B is: A(y:B@x, x:p); B(x:A@y, y:free)
 The potential tuple pair when there is a bond on the rhs between the site x of B and the site y of A is: B(x:A@y, y:free); A(y:B@x, x:p)
+
 
 
 * Dynamic information

@@ -691,19 +691,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=63
+Id=61
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=62
+  Id=60
    Node(site_type:1<1)
-    Id=61
+    Id=59
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=60
+      Id=58
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<1)
@@ -738,19 +738,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=69
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=70
+  Id=68
    Node(site_type:1<2)
-    Id=65
+    Id=63
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=64
+      Id=62
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -850,19 +850,19 @@ Id=55
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=75
+Id=73
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=74
+  Id=72
    Node(site_type:1<1)
-    Id=65
+    Id=63
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=64
+      Id=62
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -880,9 +880,9 @@ Id=75
         Id=0
          Leaf False 
 
-    Id=73
+    Id=71
      Node(site_type:1<2)
-      Id=72
+      Id=70
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -933,7 +933,7 @@ Id=77
   Id=0
    Leaf False 
 
-  Id=58
+  Id=56
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1023,7 +1023,7 @@ Id=77
   Id=0
    Leaf False 
 
-  Id=58
+  Id=56
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1068,7 +1068,7 @@ Id=77
   Id=0
    Leaf False 
 
-  Id=58
+  Id=56
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1091,15 +1091,6 @@ At rule_id:2, the potential tuple pair when there is an action binding between t
 At rule_id:2, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
 At rule_id:2, the potential tuple pair when there is an action binding between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
 
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
-At rule_id:5: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
-At rule_id:5: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:p); A(z:B@z, t:p)
-At rule_id:6: the potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
-At rule_id:6: the potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
-
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
@@ -1107,21 +1098,18 @@ The potential tuple pair when there is a bond on the rhs between the site z of B
 The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
 The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:p); A(z:B@z, t:p)
 
+
 At rule_id:1, there is a binding with a question mark of the site z of B. The potential tuple pair is: B(:1:z, t:p)
 
 * Dynamic information
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, u
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, p
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, u
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

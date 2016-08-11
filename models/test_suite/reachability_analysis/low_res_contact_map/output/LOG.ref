@@ -25,9 +25,9 @@ In agent A, the internal state of site y is p, if and only if, the internal stat
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The binding state of site z in agent A is always free.
 The internal state of site z in agent A ranges over u and p.
 The internal state of site y in agent A ranges over u and p.
+The binding state of site z in agent A is always free.
 The binding state of site y in agent A is always free.
 ------------------------------------------------------------
 * Site accross bonds domain
@@ -36,18 +36,12 @@ The binding state of site y in agent A is always free.
 At rule_id:2, the potential tuple pair when there is an action binding between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
 At rule_id:2, the potential tuple pair when there is an action binding between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
 
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
-
 The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
 The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
 
 
+
 * Dynamic information
-Whenever the site z of A and the site y of C are bound together, then the site y of A and x of C can have the following respective states: p, u
-Whenever the site z of A and the site y of C are bound together, then the site y of A and x of C can have the following respective states: p, p
-Whenever the site z of A and the site y of C are bound together, then the site z of A and x of C can have the following respective states: p, u
-Whenever the site z of A and the site y of C are bound together, then the site z of A and x of C can have the following respective states: p, p
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

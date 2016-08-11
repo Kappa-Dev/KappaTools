@@ -495,19 +495,6 @@ At rule_id:2, the potential tuple pair when there is an action binding between t
 At rule_id:2, the potential tuple pair when there is an action binding between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, z:free)
 At rule_id:2, the potential tuple pair when there is an action binding between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
 
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, x:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, y:free); Sh(y:R@z, x:p)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, y:free); Sh(y:R@z, x:free)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, x:free); Sh(y:R@z, x:p)
-At rule_id:1: the potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, x:free); Sh(y:R@z, x:free)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of R and the site k of R is: R(y:R@k, z:free); R(k:R@y, t:free)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site y of R and the site k of R is: R(y:R@k, x:free); R(k:R@y, t:free)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, z:free)
-At rule_id:2: the potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
-
 The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
 The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
 The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)
@@ -520,6 +507,7 @@ The potential tuple pair when there is a bond on the rhs between the site y of R
 The potential tuple pair when there is a bond on the rhs between the site y of R and the site k of R is: R(y:R@k, x:free); R(k:R@y, t:free)
 The potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, z:free)
 The potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
+
 
 
 * Dynamic information
