@@ -242,7 +242,7 @@ type output =
   | Located of Ckappa_sig.c_agent_id
 
 
-let may_get_free_by_side_effect parameters kappa_handler error rule path =
+let may_get_free_by_side_effect parameters kappa_handler error precondition rule path =
   let error, agent_name =
     match
       List.rev path.relative_address
@@ -284,9 +284,79 @@ let may_get_free_by_side_effect parameters kappa_handler error rule path =
   in
   if is_binding_site
   then
-    if true (* TO DO: may agent_name, site_name be released by side-effect in rule *)
-    then error, true
-    else error, false
+    begin
+      let list = rule.Cckappa_sig.actions.Cckappa_sig.half_break in
+      let rec aux1 error list =
+        match list
+        with
+        | [] -> error, false
+        | (site, site_state_opt)::tail ->
+          begin
+            let error, site_state_list =
+              match site_state_opt
+              with
+              | Some l ->
+                begin
+                  error,
+                  let rec aux3 k output =
+                    if Ckappa_sig.compare_state_index k l.Cckappa_sig.min < 0
+                    then output
+                    else aux3 (Ckappa_sig.pred_state_index k) (k::output)
+                  in
+                  aux3 l.Cckappa_sig.max []
+                end
+              | None ->
+                begin
+                  let error, partner =
+                    precondition.partner_fold  parameters
+                      error site.Cckappa_sig.agent_type
+                      site.Cckappa_sig.site
+                  in
+                  match partner with
+                  | Usual_domains.Undefined ->
+                    Exception.warn parameters error __POS__ Exit
+                      []
+                  | Usual_domains.Val f ->
+                    f
+                      (fun _parameter state _ (error,list) ->
+                         error, state::list)
+                      error
+                      []
+                  | Usual_domains.Any ->
+                    Exception.warn parameters error __POS__ Exit
+                      []
+
+                end
+            in
+            let rec aux2 error state_list =
+              match state_list with
+              | [] -> error, false
+              | state::tail ->
+                  let error, opt =
+                  Handler.dual
+                    parameters error kappa_handler site.Cckappa_sig.agent_type
+                    site.Cckappa_sig.site state
+                in
+                match opt with
+                | None ->
+                  Exception.warn parameters error __POS__ Exit true
+                | Some (agent',site_name', _)
+                  when agent_name = agent' && site_name = site_name'
+                  -> error, true
+                | Some _ ->
+                  aux2 error tail
+            in
+            let error, output = aux2 error site_state_list in
+            if output
+            then
+              error, output
+            else
+              aux1 error tail
+          end
+
+      in
+      aux1 error list
+    end
   else error, false
 
 
@@ -405,7 +475,7 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
         precondition.state_of_site error dynamic path
       in
       let error, bool =
-        may_get_free_by_side_effect parameters kappa_handler error rule path in
+        may_get_free_by_side_effect parameters kappa_handler error precondition rule path in
       if bool
       then
         match values with
