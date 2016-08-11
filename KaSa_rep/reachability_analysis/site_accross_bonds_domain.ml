@@ -848,6 +848,105 @@ struct
     in
     error, dynamic, precondition
 
+  let apply_rule_created_bonds static dynamic error rule_id rule precondition =
+    let parameter  = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let store_potential_tuple_pair_created_bonds =
+      get_potential_tuple_pair_created_bonds static
+    in
+    let store_created_bonds = get_created_bonds static in
+    let error, created_bonds_set =
+      Site_accross_bonds_domain_static.get_set parameter error
+        rule_id
+        Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+        store_created_bonds
+    in
+    (*------------------------------------------------------*)
+    let error, dynamic, precondition =
+      Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+        (fun (t, u) (error, dynamic, precondition) ->
+           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
+             (fun (x, y) (error, dynamic, precondition) ->
+                let (agent_type, site_type, site_type', state, state') = x in
+                let (agent_type1, site_type1, site_type1', state1, state1') = y
+                in
+                let (agent_id, _, site_type_t, _) = t in
+                let (agent_id1, _, site_type_u, _) = u in
+                let error', dynamic, precondition, state_list =
+                  get_state_of_site_in_precondition
+                    parameter error
+                    dynamic
+                    rule
+                    agent_id
+                    site_type_t
+                    precondition
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameter error error'
+                    ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id)^" site: "^(Ckappa_sig.string_of_site_name site_type_t))
+                    __POS__ Exit
+                in
+                let error', dynamic, precondition, state_list' =
+                  get_state_of_site_in_postcondition
+                    parameter error
+                    dynamic
+                    rule
+                    agent_id1
+                    site_type_u
+                    precondition
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameter error error'
+                    ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id1)^" site: "^(Ckappa_sig.string_of_site_name site_type_u))
+                    __POS__ Exit
+                in
+                (*------------------------------------------------------*)
+                let error, dynamic, precondition =
+                  List.fold_left (fun (error, dynamic, precondition) pre_state ->
+                      List.fold_left
+                        (fun (error, dynamic, precondition) pre_state1 ->
+                           let store_result = get_value dynamic in
+                           if pre_state = state && pre_state1 = state1
+                           then
+                             let pair_list =
+                               [Ckappa_sig.fst_site, state';
+                                Ckappa_sig.snd_site, state1']
+                             in
+                             let pair =
+                               (agent_type, site_type, site_type', state),
+                               (agent_type1, site_type1, site_type1', state1)
+                             in
+                             let handler = get_mvbdu_handler dynamic in
+                             let error, handler, mvbdu =
+                               Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                                 parameter handler error pair_list
+                             in
+                             let error, handler, store_result =
+                               Site_accross_bonds_domain_type.add_link
+                                 parameter error bdu_false handler
+                                 kappa_handler
+                                 pair
+                                 mvbdu
+                                 store_result
+                             in
+                             let dynamic = set_value store_result dynamic in
+                             let dynamic = set_mvbdu_handler handler dynamic in
+                             error, dynamic, precondition
+                           else error, dynamic, precondition
+                        ) (error, dynamic, precondition) state_list'
+                    ) (error, dynamic, precondition) state_list
+                in
+                error, dynamic, precondition
+             ) store_potential_tuple_pair_created_bonds
+             (error, dynamic, precondition)
+        ) created_bonds_set (error, dynamic, precondition)
+    in
+    error, dynamic, precondition
 
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
@@ -870,6 +969,13 @@ struct
       (*------------------------------------------------------*)
       let error, dynamic, precondition =
         apply_rule_bonds_rhs
+          static dynamic error rule_id rule precondition
+      in
+      (*------------------------------------------------------*)
+      (*1.b created bonds *)
+      (*------------------------------------------------------*)
+      let error, dynamic, precondition =
+        apply_rule_created_bonds
           static dynamic error rule_id rule precondition
       in
       (*-----------------------------------------------------------*)
