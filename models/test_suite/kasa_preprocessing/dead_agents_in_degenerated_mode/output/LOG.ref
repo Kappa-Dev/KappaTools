@@ -636,15 +636,6 @@ EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A ranges over u and p.
 The internal state of site x in agent B ranges over u and p.
 ------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-
-
-
-
-* Dynamic information
-------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

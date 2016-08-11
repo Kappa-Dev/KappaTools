@@ -26,15 +26,6 @@ The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 The internal state of site x in agent D is always u.
 ------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-
-
-
-
-* Dynamic information
-------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
