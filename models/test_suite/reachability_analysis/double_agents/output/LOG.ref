@@ -1444,6 +1444,7 @@ The binding state of site x in agent C ranges over free and B@x.
 ------------------------------------------------------------
 * Static information
 
+
 * Dynamic information
 >>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------

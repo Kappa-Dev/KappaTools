@@ -1601,6 +1601,11 @@ The internal state of site x1 in agent C ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+The potential tuple pair when there is an action binding between the site c of A and the site x1 of C is: A(c:C@x1, x:B@x); C(x1:A@c, x1:u)
+The potential tuple pair when there is an action binding between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:p)
+The potential tuple pair when there is an action binding between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x2:u)
+The potential tuple pair when there is an action binding between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:free)
+
 The potential tuple pair when there is a bond on the rhs between the site c of A and the site x1 of C is: A(c:C@x1, x:B@x); C(x1:A@c, x1:u)
 The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:p)
 The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x2:u)

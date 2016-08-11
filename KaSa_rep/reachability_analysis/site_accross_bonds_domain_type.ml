@@ -192,6 +192,11 @@ module PairAgentsSitesStates_map_and_set =
 (***************************************************************)
 (*Projection*)
 
+module Proj_potential_tuple_pair =
+  Map_wrapper.Proj
+    (PairAgentsSitesStates_map_and_set) (*potential tuple pair set*)
+    (PairAgentSitesStates_map_and_set) (*use to search the set in bonds rhs*)
+
 module Proj_bonds_rhs_set =
   Map_wrapper.Proj
     (PairAgentsSiteState_map_and_set) (*set_a*)
@@ -199,13 +204,18 @@ module Proj_bonds_rhs_set =
 
 module Partition_bonds_rhs_map =
   Map_wrapper.Proj
-    (PairAgentSitesStates_map_and_set) (*potential tuple pair set*)
-    (PairAgentSiteState_map_and_set) (*use to search the set in bonds rhs*)
+    (PairAgentSitesStates_map_and_set)
+    (PairAgentSiteState_map_and_set)
 
-module Proj_potential_tuple_pair =
+module Proj_created_bonds_set =
   Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set) (*potential tuple pair set*)
-    (PairAgentSitesStates_map_and_set) (*use to search the set in bonds rhs*)
+    (PairAgentsSiteState_map_and_set) (*set_a*)
+    (PairAgentSiteState_map_and_set) (*set_b*)
+
+module Partition_created_bonds_map =
+  Map_wrapper.Proj
+    (PairAgentSitesStates_map_and_set)
+    (PairAgentSiteState_map_and_set)
 
 (***************************************************************)
 

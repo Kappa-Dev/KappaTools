@@ -39,6 +39,9 @@ The binding state of site y in agent A is always free.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+The potential tuple pair when there is an action binding between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
+The potential tuple pair when there is an action binding between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
+
 The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:u); C(y:C@y, x:p)
 The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of C is: C(y:C@y, x:p); C(y:C@y, x:u)
 

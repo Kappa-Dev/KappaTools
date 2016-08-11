@@ -484,6 +484,13 @@ E is a dead agent.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)
+The potential tuple pair when there is an action binding between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, x:free)
+The potential tuple pair when there is an action binding between the site y of R and the site k of R is: R(y:R@k, z:free); R(k:R@y, t:free)
+The potential tuple pair when there is an action binding between the site y of R and the site k of R is: R(y:R@k, x:free); R(k:R@y, t:free)
+
 The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
 The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
 The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)

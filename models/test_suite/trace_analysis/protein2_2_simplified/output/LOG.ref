@@ -57,6 +57,7 @@ The binding state of site x in agent K ranges over free and P@g.
 ------------------------------------------------------------
 * Static information
 
+
 * Dynamic information
 >>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
@@ -121,6 +122,7 @@ The binding state of site x in agent K ranges over free and P@g.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+
 
 * Dynamic information
 >>>>>>> 730b98f... clean code, will add the mission functions back

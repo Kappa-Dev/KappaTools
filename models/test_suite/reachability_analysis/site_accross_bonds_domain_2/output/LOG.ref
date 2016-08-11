@@ -1067,6 +1067,10 @@ The internal state of site z in agent B ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
+The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
+The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
+The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
+
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
 The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
