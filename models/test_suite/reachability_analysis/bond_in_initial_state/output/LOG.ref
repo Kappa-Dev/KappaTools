@@ -126,10 +126,27 @@ Reachability analysis...
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
 A() => [ A(x!B.x) ]
 A() => [ A(x~u?) ]
 B() => [ B(x~u?) v B(x~p?) ]
 B() => [ B(x) v B(x!A.x) ]
+=======
+The binding state of site x in agent A is always B@x.
+The internal state of site x in agent A is always u.
+The internal state of site x in agent B ranges over u and p.
+The binding state of site x in agent B ranges over free and A@x.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of B is: A(x:B@x, x:u); B(x:A@x, x:u)
+The potential tuple pair when there is a bond on the rhs between the site x of B and the site x of A is: B(x:A@x, x:u); A(x:B@x, x:u)
+
+* Dynamic information
+Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
+Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

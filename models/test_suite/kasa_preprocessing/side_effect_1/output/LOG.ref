@@ -358,6 +358,15 @@ C is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+
+* Dynamic information
+------------------------------------------------------------
+>>>>>>> 730b98f... clean code, will add the mission functions back
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

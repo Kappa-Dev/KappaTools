@@ -479,6 +479,27 @@ E is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, y:free)
+The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:p); R(z:Sh@y, x:free)
+The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, y:free)
+The potential tuple pair when there is a bond on the rhs between the site y of Sh and the site z of R is: Sh(y:R@z, x:free); R(z:Sh@y, x:free)
+The potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, y:free); Sh(y:R@z, x:p)
+The potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, y:free); Sh(y:R@z, x:free)
+The potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, x:free); Sh(y:R@z, x:p)
+The potential tuple pair when there is a bond on the rhs between the site z of R and the site y of Sh is: R(z:Sh@y, x:free); Sh(y:R@z, x:free)
+The potential tuple pair when there is a bond on the rhs between the site y of R and the site k of R is: R(y:R@k, z:free); R(k:R@y, t:free)
+The potential tuple pair when there is a bond on the rhs between the site y of R and the site k of R is: R(y:R@k, x:free); R(k:R@y, t:free)
+The potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, z:free)
+The potential tuple pair when there is a bond on the rhs between the site k of R and the site y of R is: R(k:R@y, t:free); R(y:R@k, x:free)
+
+* Dynamic information
+------------------------------------------------------------
+>>>>>>> 730b98f... clean code, will add the mission functions back
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

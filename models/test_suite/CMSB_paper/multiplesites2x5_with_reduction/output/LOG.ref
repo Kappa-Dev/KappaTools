@@ -269,6 +269,7 @@ A() =>
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
 A() => [ A(a2~u) v A(a2~p) ]
 A() => [ A(a1~u) v A(a1~p) ]
 A() => [ A(b1~u) v A(b1~p) ]
@@ -280,6 +281,25 @@ A() => [ A(d2~u) v A(d2~p) ]
 A() => [ A(e1~u) v A(e1~p) ]
 A() => [ A(e2~u) v A(e2~p) ]
 A() => [ A(g~u) v A(g~p) ]
+=======
+The internal state of site a2 in agent A ranges over u and p.
+The internal state of site a1 in agent A ranges over u and p.
+The internal state of site b1 in agent A ranges over u and p.
+The internal state of site b2 in agent A ranges over u and p.
+The internal state of site c1 in agent A ranges over u and p.
+The internal state of site c2 in agent A ranges over u and p.
+The internal state of site d1 in agent A ranges over u and p.
+The internal state of site d2 in agent A ranges over u and p.
+The internal state of site e1 in agent A ranges over u and p.
+The internal state of site e2 in agent A ranges over u and p.
+The internal state of site g in agent A ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+
+* Dynamic information
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
@@ -555,6 +575,7 @@ A() =>
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
 A() => [ A(a2~u) v A(a2~p) ]
 A() => [ A(a1~u) v A(a1~p) ]
 A() => [ A(b1~u) v A(b1~p) ]
@@ -566,6 +587,25 @@ A() => [ A(d2~u) v A(d2~p) ]
 A() => [ A(e1~u) v A(e1~p) ]
 A() => [ A(e2~u) v A(e2~p) ]
 A() => [ A(g~u) v A(g~p) ]
+=======
+The internal state of site a2 in agent A ranges over u and p.
+The internal state of site a1 in agent A ranges over u and p.
+The internal state of site b1 in agent A ranges over u and p.
+The internal state of site b2 in agent A ranges over u and p.
+The internal state of site c1 in agent A ranges over u and p.
+The internal state of site c2 in agent A ranges over u and p.
+The internal state of site d1 in agent A ranges over u and p.
+The internal state of site d2 in agent A ranges over u and p.
+The internal state of site e1 in agent A ranges over u and p.
+The internal state of site e2 in agent A ranges over u and p.
+The internal state of site g in agent A ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+
+* Dynamic information
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

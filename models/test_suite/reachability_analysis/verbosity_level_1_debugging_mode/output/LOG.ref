@@ -1005,9 +1005,21 @@ Id=91
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A() => [ A(y~u) v A(y~p) v A(y~q) ]
 A() => [ A(x~u) v A(x~p) v A(x~0) v A(x~q) ]
 A() => [ A(z~u) v A(z~q) ]
+=======
+The internal state of site y in agent A ranges over u, p, and q.
+The internal state of site x in agent A ranges over u, p, 0, and q.
+The internal state of site z in agent A ranges over u and q.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+
+* Dynamic information
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

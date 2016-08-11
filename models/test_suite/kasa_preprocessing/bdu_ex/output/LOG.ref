@@ -585,6 +585,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 INTENSIONAL DESCRIPTION:
 Id=46
  Node(site_type:2<0)
@@ -603,6 +604,16 @@ EXTENSIONAL DESCRIPTION:
 A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u?) v A(x~p?) ]
 A() => [ A(x) v A(x!A.x) ]
+=======
+The internal state of site y in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+
+* Dynamic information
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

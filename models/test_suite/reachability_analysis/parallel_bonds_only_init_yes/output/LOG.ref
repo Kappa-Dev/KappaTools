@@ -685,10 +685,31 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A() => [ A(t) v A(t!B.t) ]
 A() => [ A(z) v A(z!B.z) ]
 B() => [ B(t) v B(t!A.t) ]
 B() => [ B(z) v B(z!A.z) ]
+=======
+The binding state of site t in agent A ranges over free and B@t.
+The binding state of site z in agent A ranges over free and B@z.
+The binding state of site t in agent B ranges over free and A@t.
+The binding state of site z in agent B ranges over free and A@z.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:free); B(z:A@z, t:free)
+The potential tuple pair when there is a bond on the rhs between the site t of A and the site t of B is: A(t:B@t, z:free); B(t:A@t, z:free)
+The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:free); A(z:B@z, t:free)
+The potential tuple pair when there is a bond on the rhs between the site t of B and the site t of A is: B(t:A@t, z:free); A(t:B@t, z:free)
+
+* Dynamic information
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: B@t, A@t
+Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: B@z, A@z
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: A@t, B@t
+Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: A@z, B@z
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

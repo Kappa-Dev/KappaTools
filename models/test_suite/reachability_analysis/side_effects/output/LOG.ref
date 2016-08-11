@@ -1872,6 +1872,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
 A() => [ A(x~u?) v A(x~p?) ]
 B() => [ B(x) v B(x!A.x) ]
@@ -1882,6 +1883,30 @@ D() => [ D(x) v D(x!E.x) ]
 D() => [ D(x~u?) v D(x~p?) ]
 E() => [ E(x) v E(x!D.x) ]
 E() => [ E(x~u?) v E(x~p?) ]
+=======
+The binding state of site x in agent A ranges over free, B@x, and C@x.
+The internal state of site x in agent A ranges over u and p.
+The binding state of site x in agent B ranges over free and A@x.
+The internal state of site x in agent B ranges over u and p.
+The binding state of site x in agent C ranges over free and A@x.
+The internal state of site x in agent C ranges over u and p.
+The binding state of site x in agent D ranges over free and E@x.
+The internal state of site x in agent D ranges over u and p.
+The binding state of site x in agent E ranges over free and D@x.
+The internal state of site x in agent E ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
+The potential tuple pair when there is a bond on the rhs between the site x of C and the site x of A is: C(x:A@x, x:p); A(x:C@x, x:p)
+The potential tuple pair when there is a bond on the rhs between the site x of D and the site x of E is: D(x:E@x, x:p); E(x:D@x, x:p)
+The potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
+
+* Dynamic information
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -711,10 +711,23 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 B() => [ B(y~u) ]
 B() => [ B(x~u) ]
 D() => [ D(y~u) ]
 D() => [ D(x~u) ]
+=======
+The internal state of site y in agent B is always u.
+The internal state of site x in agent B is always u.
+The internal state of site y in agent D is always u.
+The internal state of site x in agent D is always u.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+
+* Dynamic information
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

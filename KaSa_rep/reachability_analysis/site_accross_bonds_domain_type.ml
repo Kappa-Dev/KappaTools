@@ -22,7 +22,7 @@ module AgentSitesStates_map_and_set =
             Ckappa_sig.c_site_name *
             Ckappa_sig.c_site_name *
             Ckappa_sig.c_state *
-           Ckappa_sig.c_state)
+            Ckappa_sig.c_state)
          let compare = compare
          let print _ _ = ()
        end))
@@ -192,116 +192,20 @@ module PairAgentsSitesStates_map_and_set =
 (***************************************************************)
 (*Projection*)
 
-module AgentSites_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Proj_question_mark =
-  Map_wrapper.Proj
-    (AgentsSitesState_map_and_set) (*set_a*)
-    (AgentSites_map_and_set) (*set_b*)
-
-module Proj_agent_id_away1 =
+module Proj_bonds_rhs_set =
   Map_wrapper.Proj
     (PairAgentsSiteState_map_and_set) (*set_a*)
     (PairAgentSiteState_map_and_set) (*set_b*)
 
-module Proj_agent_id_away2 =
+module Partition_bonds_rhs_map =
   Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set) (*set_a*)
-    (PairAgentSitesStates_map_and_set) (*set_b*)
-
-module Proj_agent_id_away3 =
-  Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set) (*set_a*)
-    (PairAgentSites_map_and_set) (*set_b*)
-
-module AgentSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-            Ckappa_sig.c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Proj_agent_id_away4 =
-  Map_wrapper.Proj
-    (AgentsSiteState_map_and_set) (*set_a*)
-    (AgentSiteState_map_and_set) (*set_b*)
-
-module PairAgentIDSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Proj_get_agent_id_snd_site =
-  Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set)
-    (PairAgentIDSite_map_and_set)
-
-module Proj_get_agents_sites =
-  Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set)
-    (AgentSiteState_map_and_set)
-
-(****************************************************************)
-(*project map*)
-
-module PairAgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Proj_map1 =
-  Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set)
-    (PairAgentSite_map_and_set)
-
-module AgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Proj_map2 =
-  Map_wrapper.Proj
-    (PairAgentSitesStates_map_and_set)
-    (AgentSite_map_and_set)
+    (PairAgentSitesStates_map_and_set) (*potential tuple pair set*)
+    (PairAgentSiteState_map_and_set) (*use to search the set in bonds rhs*)
 
 module Proj_potential_tuple_pair =
   Map_wrapper.Proj
     (PairAgentsSitesStates_map_and_set) (*potential tuple pair set*)
     (PairAgentSitesStates_map_and_set) (*use to search the set in bonds rhs*)
-
-module Partition_map3 =
-  Map_wrapper.Proj
-    (PairAgentSitesStates_map_and_set) (*potential tuple pair set*)
-    (PairAgentSiteState_map_and_set) (*use to search the set in bonds rhs*)
 
 (***************************************************************)
 

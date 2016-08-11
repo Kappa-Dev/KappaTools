@@ -938,19 +938,33 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=84
+=======
+Id=86
+>>>>>>> 730b98f... clean code, will add the mission functions back
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=83
    Node(site_type:1<2)
     Id=82
+=======
+  Id=85
+   Node(site_type:1<2)
+    Id=84
+>>>>>>> 730b98f... clean code, will add the mission functions back
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=81
+=======
+      Id=83
+>>>>>>> 730b98f... clean code, will add the mission functions back
        Node(site_type:2<2)
         Id=25
          Node(site_type:3<0)
@@ -992,12 +1006,20 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=99
+=======
+Id=101
+>>>>>>> 730b98f... clean code, will add the mission functions back
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=98
+=======
+  Id=100
+>>>>>>> 730b98f... clean code, will add the mission functions back
    Node(site_type:1<2)
     Id=31
      Node(site_type:2<2)
@@ -1027,12 +1049,20 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=105
+=======
+Id=107
+>>>>>>> 730b98f... clean code, will add the mission functions back
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=104
+=======
+  Id=106
+>>>>>>> 730b98f... clean code, will add the mission functions back
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<1)
@@ -1098,14 +1128,24 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+<<<<<<< HEAD
 Id=103
+=======
+Id=105
+>>>>>>> 730b98f... clean code, will add the mission functions back
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=95
    Node(site_type:1<2)
     Id=94
+=======
+  Id=97
+   Node(site_type:1<2)
+    Id=96
+>>>>>>> 730b98f... clean code, will add the mission functions back
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1136,12 +1176,20 @@ Id=45
      Leaf False 
 
 agent_type:2:C:cv_id:0
+<<<<<<< HEAD
 Id=89
+=======
+Id=91
+>>>>>>> 730b98f... clean code, will add the mission functions back
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=88
+=======
+  Id=90
+>>>>>>> 730b98f... clean code, will add the mission functions back
    Node(site_type:1<1)
     Id=60
      Node(site_type:2<0)
@@ -1176,23 +1224,41 @@ Id=89
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=87
      Node(site_type:1<2)
       Id=86
+=======
+    Id=89
+     Node(site_type:1<2)
+      Id=88
+>>>>>>> 730b98f... clean code, will add the mission functions back
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=85
          Node(site_type:2<1)
           Id=73
+=======
+        Id=87
+         Node(site_type:2<1)
+          Id=75
+>>>>>>> 730b98f... clean code, will add the mission functions back
            Node(site_type:3<0)
             Id=0
              Leaf False 
 
+<<<<<<< HEAD
             Id=72
              Node(site_type:3<1)
               Id=71
+=======
+            Id=74
+             Node(site_type:3<1)
+              Id=73
+>>>>>>> 730b98f... clean code, will add the mission functions back
                Node(site_type:4<0)
                 Id=0
                  Leaf False 
@@ -1208,7 +1274,11 @@ Id=89
               Id=0
                Leaf False 
 
+<<<<<<< HEAD
           Id=81
+=======
+          Id=83
+>>>>>>> 730b98f... clean code, will add the mission functions back
            Node(site_type:2<2)
             Id=25
              Node(site_type:3<0)
@@ -1511,6 +1581,7 @@ Id=115
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A() => [ A(c) v A(c!C.x1) v A(c!C.x2) ]
 A() => [ A(x) v A(x!B.x) ]
 B() => [ B(x) v B(x!A.x) ]
@@ -1518,6 +1589,29 @@ C() => [ C(x2~u?) v C(x2~p?) ]
 C() => [ C(x1~u?) v C(x1~p?) ]
 C() => [ C(x1) v C(x1!A.c) ]
 C() => [ C(x2) v C(x2!A.c) ]
+=======
+The binding state of site c in agent A ranges over free, C@x1, and C@x2.
+The binding state of site x in agent A ranges over free and B@x.
+The binding state of site x in agent B ranges over free and A@x.
+The internal state of site x2 in agent C ranges over u and p.
+The binding state of site x1 in agent C ranges over free and A@c.
+The binding state of site x2 in agent C ranges over free and A@c.
+The internal state of site x1 in agent C ranges over u and p.
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+The potential tuple pair when there is a bond on the rhs between the site c of A and the site x1 of C is: A(c:C@x1, x:B@x); C(x1:A@c, x1:u)
+The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:p)
+The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x2:u)
+The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:free)
+The potential tuple pair when there is a bond on the rhs between the site x1 of C and the site c of A is: C(x1:A@c, x1:u); A(c:C@x1, x:B@x)
+The potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x1:p); A(c:C@x2, x:free)
+The potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x2:u); A(c:C@x2, x:free)
+The potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x1:free); A(c:C@x2, x:free)
+
+* Dynamic information
+>>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -464,6 +464,23 @@ D is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, x:B@y)
+The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, x:B@x); D(z:A@z, y:C@y)
+The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, x:B@y)
+The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of D is: A(z:D@z, y:C@x); D(z:A@z, y:C@y)
+The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, x:B@x)
+The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, x:B@y); A(z:D@z, y:C@x)
+The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, x:B@x)
+The potential tuple pair when there is a bond on the rhs between the site z of D and the site z of A is: D(z:A@z, y:C@y); A(z:D@z, y:C@x)
+
+* Dynamic information
+------------------------------------------------------------
+>>>>>>> 730b98f... clean code, will add the mission functions back
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
