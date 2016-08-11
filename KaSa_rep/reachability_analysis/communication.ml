@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 11 2016>
    *
    * Abstract domain to record live rules
    *
@@ -14,9 +14,9 @@
    * under the terms of the GNU Library General Public License *)
 
 type path_defined_in =
-     | LHS of Cckappa_sig.enriched_rule
-     | RHS of Cckappa_sig.enriched_rule
-     | Pattern
+  | LHS of Cckappa_sig.enriched_rule
+  | RHS of Cckappa_sig.enriched_rule
+  | Pattern
 
 type event =
   | Dummy (* to avoid compilation warning *)
@@ -116,10 +116,10 @@ type precondition =
     cache_state_of_site: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
     partner_map:
       Exception.method_handler  -> Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
-  Ckappa_sig.c_state ->
-  Exception.method_handler * (Ckappa_sig.c_agent_name *
-                             Ckappa_sig.c_site_name *
-                             Ckappa_sig.c_state) Usual_domains.flat_lattice;
+      Ckappa_sig.c_state ->
+      Exception.method_handler * (Ckappa_sig.c_agent_name *
+                                  Ckappa_sig.c_site_name *
+                                  Ckappa_sig.c_state) Usual_domains.flat_lattice;
     partner_fold: 'a. 'a fold }
 
 let is_the_rule_applied_for_the_first_time precondition =
@@ -161,11 +161,11 @@ let get_state_of_site error dynamic precondition path =
   with
   | Some output ->
     (*  let _ =
-      match output with
-      | Usual_domains.Val l ->
+        match output with
+        | Usual_domains.Val l ->
         List.iter
           (fun i -> Printf.fprintf stdout "state:%s\n" (Ckappa_sig.string_of_state_index i)) l
-      | Usual_domains.Any | Usual_domains.Undefined -> ()
+        | Usual_domains.Any | Usual_domains.Undefined -> ()
         in*)
     error, dynamic, precondition, output
   | None ->
@@ -236,5 +236,194 @@ let overwrite_potential_partners_map
          fold.fold parameters error agent_type site_type)
   }
 
-let post_condition _parameters error _rule _precondition dynamic _path =
-  error, dynamic, Usual_domains.Any
+type output =
+  | Cannot_exist
+  | May_exist
+  | Located of Ckappa_sig.c_agent_id
+
+
+let may_get_free_by_side_effect parameters kappa_handler error rule path =
+  let error, agent_name =
+    match
+      List.rev path.relative_address
+    with
+    | [] ->
+      begin
+        let agent =
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+            parameters
+            error
+            path.agent_id (*A*)
+            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+        in
+        match agent
+        with
+        | error, None ->
+          Exception.warn
+            parameters error __POS__ Exit Ckappa_sig.dummy_agent_name
+        | error, Some agent ->
+          begin
+            match agent with
+            | Cckappa_sig.Ghost
+            | Cckappa_sig.Dead_agent _
+            | Cckappa_sig.Unknown_agent _ ->
+              Exception.warn
+                parameters error __POS__ Exit
+                Ckappa_sig.dummy_agent_name
+            | Cckappa_sig.Agent proper_agent ->
+              error,
+              proper_agent.Cckappa_sig.agent_name
+          end
+      end
+    | head::_ ->
+      error, head.agent_type_in
+  in
+  let site_name = path.site in
+  let error, is_binding_site =
+    Handler.is_binding_site parameters error kappa_handler agent_name site_name
+  in
+  if is_binding_site
+  then
+    if true (* TO DO: may agent_name, site_name be released by side-effect in rule *)
+    then error, true
+    else error, false
+  else error, false
+
+
+let post_condition parameters kappa_handler error rule precondition dynamic path =
+  let cc = rule.Cckappa_sig.rule_rhs in
+  (*---------------------------------------------------------*)
+  (*inside the pattern, check the binding information in the lhs of the current agent*)
+  let rec aux error path =
+    match
+      path.relative_address
+    with
+    | [] -> error, Located path.agent_id
+    | head::tail ->
+      begin
+        match
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+            parameters
+            error
+            path.agent_id (*A*)
+            cc.Cckappa_sig.bonds
+        with
+        | error, None -> error, May_exist
+        | error, Some map ->
+          begin
+            match
+              Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                parameters
+                error
+                head.site_out (*A.x*)
+                map
+            with
+            | error, None -> error, May_exist
+            | error, Some site_add ->
+              (*-----------------------------------------------*)
+              (*A.x is bound to something*)
+              let agent_type' = site_add.Cckappa_sig.agent_type in
+              let site_type' = site_add.Cckappa_sig.site in
+              (*check that A.x is bound to B.y*)
+              if agent_type' = head.agent_type_in
+              && site_type' = head.site_in
+              then
+                (*recursively apply to #i tail*)
+                let next_path =
+                  {
+                    path with
+                    agent_id = site_add.Cckappa_sig.agent_index;
+                    relative_address = tail;
+                  }
+                in
+                aux error next_path
+              else
+                error, Cannot_exist
+          end
+      end
+  in
+  let error, potential_values =
+    match aux error path
+    with
+    | error, Cannot_exist -> error, Usual_domains.Undefined
+    | error, May_exist -> error, Usual_domains.Any
+    | error, Located agent_id ->
+      begin
+        let agent =
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+            parameters
+            error
+            agent_id (*A*)
+            cc.Cckappa_sig.views
+        in
+        match agent
+        with
+        | error, None ->
+          Exception.warn
+            parameters error __POS__ Exit Usual_domains.Undefined
+        | error, Some agent ->
+          begin
+            match agent with
+            | Cckappa_sig.Ghost
+            | Cckappa_sig.Dead_agent _
+            | Cckappa_sig.Unknown_agent _ ->
+              Exception.warn
+                parameters error __POS__ Exit Usual_domains.Undefined
+
+            | Cckappa_sig.Agent proper_agent ->
+              let error, state_opt =
+                Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                  parameters
+                  error
+                  path.site
+                  proper_agent.Cckappa_sig.agent_interface
+              in
+              begin
+                match state_opt with
+                | None -> error, Usual_domains.Any
+                | Some interval ->
+                  let interval = interval.Cckappa_sig.site_state in
+                  let list =
+                    let rec aux k output =
+                      if Ckappa_sig.compare_state_index k interval.Cckappa_sig.min < 0
+                      then output
+                      else aux (Ckappa_sig.pred_state_index k) (k::output)
+                    in
+                    aux interval.Cckappa_sig.max []
+                  in
+                  error, Usual_domains.Val list
+              end
+          end
+      end
+  in
+  match potential_values with
+  | Usual_domains.Undefined | Usual_domains.Val _
+    -> error, dynamic, potential_values
+  | Usual_domains.Any ->
+    begin
+      let error, dynamic, values =
+        precondition.state_of_site error dynamic path
+      in
+      let error, bool =
+        may_get_free_by_side_effect parameters kappa_handler error rule path in
+      if bool
+      then
+        match values with
+        | Usual_domains.Val l ->
+          error, dynamic,
+          (Usual_domains.Val
+             ((Ckappa_sig.state_index_of_int 0)::l))
+        | Usual_domains.Undefined | Usual_domains.Any ->
+          error, dynamic, values
+      else
+        error, dynamic, values
+    end
+
+let get_state_of_sites_in_pre_post_condition parameters kappa_handler error rule precondition dynamic path =
+  match path.defined_in with
+  | LHS _ | Pattern ->
+    precondition.state_of_site error dynamic path
+  | RHS rule ->
+    post_condition
+      parameters kappa_handler error
+      rule.Cckappa_sig.e_rule_c_rule precondition dynamic path

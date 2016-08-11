@@ -16,3 +16,4 @@ type 'a flat_lattice =
   | Undefined
 
 val lub : 'a flat_lattice -> 'a flat_lattice -> 'a flat_lattice
+val glb_list : 'a list flat_lattice -> 'a list flat_lattice -> 'a list flat_lattice 

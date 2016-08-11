@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Aug 11 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -627,6 +627,7 @@ let lift to_int from_int p =
   fun a i -> from_int (p (to_int a) i)
 let pred_site_name = pred
 let pred_agent_name = pred
+let pred_state_index = pred
 let gen_rule_id = lift int_of_rule_id rule_id_of_int
 let sub_rule_id = gen_rule_id (fun a b -> a - b)
 let add_rule_id = gen_rule_id (fun a b -> a + b)

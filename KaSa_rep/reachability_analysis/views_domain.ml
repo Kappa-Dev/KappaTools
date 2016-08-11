@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 11 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1377,25 +1377,6 @@ struct
     aux step_list error
 
   (*-----------------------------------------------------------*)
-  (*intersection:
-    - Undefined, _ -> Undefined
-    - Any, a -> a
-    - Val l, Val l' -> combine l l'
-  *)
-
-  let inter error contact_answer update_answer =
-    match contact_answer, update_answer with
-    | Usual_domains.Undefined, _
-    | _, Usual_domains.Undefined -> error, Usual_domains.Undefined
-    | Usual_domains.Any, Usual_domains.Val l
-    | Usual_domains.Val l, Usual_domains.Any ->  error, Usual_domains.Val l
-    | Usual_domains.Any, Usual_domains.Any -> error, Usual_domains.Any
-    | Usual_domains.Val l, Usual_domains.Val l' ->
-      (*get the intersection of list*)
-      let l = Misc_sa.inter_list (fun a b -> compare a b) l l' in
-      error, Usual_domains.Val l
-
-  (*---------------------------------------------------------------*)
   (*outside the pattern*)
 
   let precondition_outside_pattern parameter error dynamic kappa_handler path step tl
@@ -1896,7 +1877,8 @@ struct
                      rule rule_id step tl bdu_false bdu_true site_correspondence
                      store_covering_classes_id fixpoint_result
                  in
-                 let error, update_answer = inter error new_answer former_answer in
+                 let update_answer =
+                   Usual_domains.glb_list new_answer former_answer in
                  error, dynamic, update_answer
                (*--------------------------------------------------*)
                (*empty relative_adress*)
@@ -1912,13 +1894,15 @@ struct
                      "-Pattern is empty\n";
                    in*)
                  (*do I need to do the intersection with former answer?*)
-                 let error, update_answer = inter error new_answer former_answer in
+                 let update_answer =
+                   Usual_domains.glb_list new_answer former_answer in
                  error, dynamic, update_answer
              in
              aux dynamic current_path
            in
            (*final intersection with contact map*)
-           let error, update_answer = inter error answer_contact_map new_answer in
+           let update_answer =
+             Usual_domains.glb_list answer_contact_map new_answer in
            error, dynamic,  update_answer
         )
     in

@@ -24,3 +24,15 @@ let lub a b =
   | Any, _ | _,Any -> Any
   | Val x,Val y when x=y -> a
   | Val _,Val _ -> Any
+
+let glb_list a b =
+    match a, b  with
+    | Undefined, _
+    | _, Undefined -> Undefined
+    | Any, Val l
+    | Val l, Any ->  Val l
+    | Any, Any -> Any
+    | Val l, Val l' ->
+      (*get the intersection of list*)
+      let l = Misc_sa.inter_list (fun a b -> compare a b) l l' in
+      Val l
