@@ -142,8 +142,7 @@ val get_state_of_sites_in_pre_post_condition:
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
-  Ckappa_sig.c_rule ->
-  precondition ->
+precondition ->
   Analyzer_headers.global_dynamic_information ->
   path ->
   Exception.method_handler * Analyzer_headers.global_dynamic_information *

@@ -419,7 +419,8 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
         error, dynamic, values
     end
 
-let get_state_of_sites_in_pre_post_condition parameters kappa_handler error rule precondition dynamic path =
+let get_state_of_sites_in_pre_post_condition
+    parameters kappa_handler error precondition dynamic path =
   match path.defined_in with
   | LHS _ | Pattern ->
     precondition.state_of_site error dynamic path

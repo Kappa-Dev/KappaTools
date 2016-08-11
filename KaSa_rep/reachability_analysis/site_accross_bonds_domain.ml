@@ -828,11 +828,12 @@ struct
 
   (****************************************************************)
 
-  let get_state_of_site_in_precondition parameter error dynamic rule agent_id
-      site_type precondition =
+  let get_state_of_site_in_pre_post_condition
+      parameter error dynamic rule agent_id
+      site_type defined_in precondition =
     let path =
       {
-        Communication.defined_in = Communication.LHS rule ;
+        Communication.defined_in = defined_in ;
         Communication.agent_id = agent_id;
         Communication.relative_address = [];
         Communication.site = site_type;
@@ -855,49 +856,21 @@ struct
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
+  let get_state_of_site_in_precondition
+      parameter error dynamic rule agent_id site_type precondition
+    =
+    let defined_in = Communication.LHS rule in
+    get_state_of_site_in_pre_post_condition
+        parameter error dynamic rule agent_id
+        site_type defined_in precondition
+
   let get_state_of_site_in_postcondition
       parameter error dynamic rule agent_id site_type precondition =
-    let is_modified = None (* TO DO *) in
-    (* is_modified -> None if the site cannot modified in the rule (we ignore side-effects *)
-    (* is_modified -> Some new_state otherwise *)
-    match is_modified with
-    | Some state -> error, dynamic, precondition, [state]
-    | None ->
-      let path =
-        {
-          Communication.defined_in = Communication.LHS rule ;
-          Communication.agent_id = agent_id;
-          Communication.relative_address = [];
-          Communication.site = site_type;
-        }
-      in
-      (*get a list of site_type2 state in the precondition*)
-      let error, global_dynamic, precondition, state_list_lattice =
-        Communication.get_state_of_site
-          error
-          (get_global_dynamic_information dynamic)
-          precondition
-          path
-      in
-      let error, state_list =
-        match state_list_lattice with
-        | Usual_domains.Val l -> error, l
-        | Usual_domains.Any | Usual_domains.Undefined ->
-          Exception.warn parameter error __POS__ Exit []
-      in
-      let dynamic = set_global_dynamic_information global_dynamic dynamic in
-      let site_may_be_freed_by_side_effects = false (* to do *) in
-      (* if the site occurs in the lhs, false *)
-      (* if the site does occur but the rule has the capability to free this type of sites *)
-      let state_list =
-        if site_may_be_freed_by_side_effects
-        then (Ckappa_sig.state_index_of_int 0)::state_list
-        else
-          state_list
-      in
-      error, dynamic, precondition, state_list
-
-
+      let defined_in = Communication.RHS rule in
+      get_state_of_site_in_pre_post_condition
+          parameter error dynamic rule agent_id
+          site_type defined_in precondition
+    
 
   let context rule_id agent_id site_type =
     " rule "^(Ckappa_sig.string_of_rule_id rule_id)^
