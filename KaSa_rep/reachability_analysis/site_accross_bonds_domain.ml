@@ -1036,22 +1036,22 @@ struct
                let (agent_type, site_type, site_type', state, state') = x in
                let (agent_type1, site_type1, site_type1', state1, state1') = y
                in
-               let (agent_id, _, _, _) = t in
-               let (agent_id1, _, _, _) = u in
+               let (agent_id, _, site_type_t, _) = t in
+               let (agent_id1, _, site_type_u, _) = u in
                let error', dynamic, precondition, state_list =
                  get_state_of_site_in_precondition
                    parameter error
                    dynamic
                    rule
                    agent_id
-                   site_type
+                   site_type_t
                    precondition
                in
                let error =
                  Exception.check_point
                    Exception.warn
                    parameter error error'
-                   ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id)^" site: "^(Ckappa_sig.string_of_site_name site_type))
+                   ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id)^" site: "^(Ckappa_sig.string_of_site_name site_type_t))
                    __POS__ Exit
                in
                let error', dynamic, precondition, state_list' =
@@ -1060,14 +1060,14 @@ struct
                    dynamic
                    rule
                    agent_id1
-                   site_type1
+                   site_type_u
                    precondition
                in
                let error =
                  Exception.check_point
                    Exception.warn
                    parameter error error'
-                   ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id1)^" site: "^(Ckappa_sig.string_of_site_name site_type1))
+                   ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id1)^" site: "^(Ckappa_sig.string_of_site_name site_type_u))
                    __POS__ Exit
                in
                (*------------------------------------------------------*)
