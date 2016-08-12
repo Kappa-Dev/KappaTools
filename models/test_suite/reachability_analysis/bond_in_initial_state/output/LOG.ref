@@ -43,6 +43,7 @@ Reachability analysis...
 
                 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
                 Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
 
 	Applying rule 2:
 		the precondition is not satisfied yet
@@ -86,6 +87,7 @@ Reachability analysis...
 		the precondition is satisfied
                 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
                 Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -117,6 +119,7 @@ Reachability analysis...
 		the precondition is satisfied
                 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
                 Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
 
 	Applying rule 1:
 		the precondition is satisfied

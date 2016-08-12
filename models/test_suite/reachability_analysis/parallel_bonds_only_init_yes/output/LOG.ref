@@ -426,6 +426,7 @@ EXTENSIONAL DESCRIPTION:
 		(rule 1: r1) should be investigated 
                 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
                 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
+                Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -502,6 +503,7 @@ EXTENSIONAL DESCRIPTION:
 		(rule 1: r1) should be investigated 
                 Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
                 Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
+                Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -509,6 +511,7 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
                 Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
                 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: free, free
+                Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: free, free
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -516,6 +519,7 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
                 Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
                 Whenever the site t of B and the site t of A are bound together, then the site z of B and z of A can have the following respective states: free, free
+                Whenever the site t of A and the site t of B are bound together, then the site z of A and z of B can have the following respective states: free, free
 
 ------------------------------------------------------------
 * Dead rules :
