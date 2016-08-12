@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 11 2016>
+   * Last modification: Time-stamp: <Aug 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -305,10 +305,10 @@ let collect_bonds parameter error rule_id views bonds store_result =
             in
             let error', new_set =
               Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-                parameter error
+                parameter error'
                 ((agent_id_target, agent_type2, site_type_target, state2),
                  (agent_id, agent_type1, site_type_source, state1))
-                old_set
+                new_set
             in
             let error =
               Exception.check_point
@@ -583,7 +583,7 @@ let collect_proj_potential_tuple_pair_bonds
             bonds_rhs_set
        then
          let proj2 (_, b, c, d, e, f) = (b, c, d, e, f) in
-         let error', store_result =
+         let error, store_result =
            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
              parameter error
              (proj2 x, proj2 y)
