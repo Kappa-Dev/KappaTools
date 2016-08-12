@@ -30,14 +30,19 @@ Reachability analysis...
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
+<<<<<<< HEAD
+=======
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
+                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
 
 	Applying rule 0:
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
 
-         Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-         Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
+                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
 
 	Applying rule 2:
 		the precondition is not satisfied yet
@@ -79,8 +84,8 @@ Reachability analysis...
 
 	Applying rule 0:
 		the precondition is satisfied
-         Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-         Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
+                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -110,8 +115,8 @@ Reachability analysis...
 
 	Applying rule 0:
 		the precondition is satisfied
-         Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-         Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
+                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
+                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -146,11 +151,6 @@ The binding state of site x in agent B ranges over free and A@x.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-The potential tuple pair when there is an action binding between the site x of A and the site x of B is: A(x:B@x, x:u); B(x:A@x, x:u)
-
-The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of B is: A(x:B@x, x:u); B(x:A@x, x:u)
-The potential tuple pair when there is a bond on the rhs between the site x of B and the site x of A is: B(x:A@x, x:u); A(x:B@x, x:u)
-
 * Dynamic information
 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
 Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p

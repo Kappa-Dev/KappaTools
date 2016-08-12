@@ -913,7 +913,11 @@ Id=67
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=68
+=======
+Id=74
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -928,7 +932,11 @@ Id=68
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=70
+=======
+Id=75
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -958,12 +966,20 @@ Id=37
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=76
+=======
+Id=81
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=75
+=======
+  Id=80
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -978,9 +994,15 @@ Id=76
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=74
      Node(site_type:0<2)
       Id=68
+=======
+    Id=79
+     Node(site_type:0<2)
+      Id=74
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1003,7 +1025,11 @@ B(z!A.z) => B(z~p!A.z)
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=68
+=======
+Id=74
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1018,7 +1044,11 @@ Id=68
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=70
+=======
+Id=75
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1054,6 +1084,7 @@ Id=39
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=70
  Node(site_type:0<0)
   Id=0
@@ -1063,6 +1094,9 @@ Id=70
    Node(site_type:0<2)
 =======
 Id=76
+=======
+Id=74
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1078,8 +1112,13 @@ Id=76
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=37
  Node(site_type:2<0)
+=======
+Id=75
+ Node(site_type:0<0)
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
   Id=0
    Leaf False 
 
@@ -1108,17 +1147,6 @@ The internal state of site z in agent B ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
-The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
-The potential tuple pair when there is an action binding between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
-
-The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, z:p)
-The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:u); B(z:A@z, t:u)
-The potential tuple pair when there is a bond on the rhs between the site z of A and the site z of B is: A(z:B@z, t:p); B(z:A@z, t:p)
-The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, z:p); A(z:B@z, t:u)
-The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:u); A(z:B@z, t:u)
-The potential tuple pair when there is a bond on the rhs between the site z of B and the site z of A is: B(z:A@z, t:p); A(z:B@z, t:p)
-
 * Dynamic information
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
 Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p

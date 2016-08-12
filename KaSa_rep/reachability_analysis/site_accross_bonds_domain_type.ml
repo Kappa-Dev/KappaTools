@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 11 2016>
+   * Last modification: Time-stamp: <Aug 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -192,10 +192,21 @@ module PairAgentsSitesStates_map_and_set =
 (***************************************************************)
 (*Projection*)
 
-module Proj_potential_tuple_pair =
+module PairSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_site_name *
+            Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_potential_tuple_pair_set =
   Map_wrapper.Proj
-    (PairAgentsSitesStates_map_and_set) (*potential tuple pair set*)
-    (PairAgentSitesStates_map_and_set) (*use to search the set in bonds rhs*)
+    (PairAgentSitesState_map_and_set) (*potential tuple pair set*)
+    (PairSite_map_and_set) (*use to search the set in bonds rhs*)
 
 module Proj_bonds_rhs_set =
   Map_wrapper.Proj
@@ -204,10 +215,10 @@ module Proj_bonds_rhs_set =
 
 module Partition_bonds_rhs_map =
   Map_wrapper.Proj
-    (PairAgentSitesStates_map_and_set)
+    (PairAgentSitesState_map_and_set)
     (PairAgentSiteState_map_and_set)
 
-module Proj_created_bonds_set =
+(*module Proj_created_bonds_set =
   Map_wrapper.Proj
     (PairAgentsSiteState_map_and_set) (*set_a*)
     (PairAgentSiteState_map_and_set) (*set_b*)
@@ -215,7 +226,7 @@ module Proj_created_bonds_set =
 module Partition_created_bonds_map =
   Map_wrapper.Proj
     (PairAgentSitesStates_map_and_set)
-    (PairAgentSiteState_map_and_set)
+    (PairAgentSiteState_map_and_set)*)
 
 (***************************************************************)
 
@@ -242,14 +253,16 @@ let convert_double parameters error kappa_handler double =
   error, (agent, site, site', state, state')
 
 let convert_tuple parameters error kappa_handler tuple =
-  let (agent,site,site',_),(agent'',site'',site''',_) = tuple in
+  let (agent,site,site',state),(agent'',site'',site''',state'') = tuple in
+  let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
+  let error, state'' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
   let error, agent = Handler.translate_agent parameters error kappa_handler agent in
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
   let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
-  error, (agent,site,site', agent'',site'',site''')
+  error, (agent,site,site', state, agent'',site'',site''', state'')
 
 let convert_tuple_full parameters error kappa_handler tuple =
   let (agent,site,site',state,state'),(agent'',site'',site''',state'',state''') =
@@ -307,7 +320,7 @@ let print_site_accross_domain
   let (agent_type, _, site_type, _), (agent_type1, _, site_type1, _) = tuple in
   (*----------------------------------------------------*)
   (*state1 and state1' are a binding states*)
-  let error, (agent, site, site', agent1, site1, site1') =
+  let error, (agent, site, site',_, agent1, site1, site1', _) =
     convert_tuple parameters error kappa_handler tuple
   in
   (*----------------------------------------------------*)
@@ -371,7 +384,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
   let error, handler =
     if Remanent_parameters.get_dump_reachability_analysis_diff parameter
     then
-      let parameter = Remanent_parameters.update_prefix parameter "         "
+      let parameter = Remanent_parameters.update_prefix parameter "                "
       in
       print_site_accross_domain
         ~dump_any:true parameter error kappa_handler handler pair mvbdu

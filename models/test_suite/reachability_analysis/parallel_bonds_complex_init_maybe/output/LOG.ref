@@ -789,10 +789,14 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=48
 =======
 Id=66
 >>>>>>> 1834413... test suite
+=======
+Id=68
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<1)
   Id=0
    Leaf False 
@@ -868,19 +872,27 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=50
 =======
 Id=68
 >>>>>>> 1834413... test suite
+=======
+Id=70
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=49
 =======
   Id=67
 >>>>>>> 1834413... test suite
+=======
+  Id=69
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -917,19 +929,27 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=50
 =======
 Id=68
 >>>>>>> 1834413... test suite
+=======
+Id=70
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=49
 =======
   Id=67
 >>>>>>> 1834413... test suite
+=======
+  Id=69
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -1000,19 +1020,27 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=72
 =======
 Id=97
 >>>>>>> 1834413... test suite
+=======
+Id=101
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=71
 =======
   Id=96
 >>>>>>> 1834413... test suite
+=======
+  Id=100
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1052,19 +1080,27 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=72
 =======
 Id=97
 >>>>>>> 1834413... test suite
+=======
+Id=101
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=71
 =======
   Id=96
 >>>>>>> 1834413... test suite
+=======
+  Id=100
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)

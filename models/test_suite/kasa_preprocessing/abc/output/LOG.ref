@@ -1417,10 +1417,14 @@ Id=111
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=107
 =======
   Id=65
 >>>>>>> 1834413... test suite
+=======
+  Id=63
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1440,10 +1444,14 @@ Id=111
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=107
 =======
   Id=65
 >>>>>>> 1834413... test suite
+=======
+  Id=63
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1652,10 +1660,14 @@ Id=111
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=107
 =======
   Id=65
 >>>>>>> 1834413... test suite
+=======
+  Id=63
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1675,10 +1687,14 @@ Id=111
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=107
 =======
   Id=65
 >>>>>>> 1834413... test suite
+=======
+  Id=63
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1703,8 +1719,13 @@ Id=45
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=108
  Node(site_type:0<0)
+=======
+Id=48
+ Node(site_type:2<0)
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
   Id=0
    Leaf False 
 
@@ -1752,7 +1773,7 @@ Id=111
   Id=0
    Leaf False 
 
-  Id=65
+  Id=63
    Node(site_type:0<2)
 >>>>>>> 1834413... test suite
     Id=1
@@ -1782,20 +1803,6 @@ The internal state of site x1 in agent C ranges over u and p.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-The potential tuple pair when there is an action binding between the site c of A and the site x1 of C is: A(c:C@x1, x:B@x); C(x1:A@c, x1:u)
-The potential tuple pair when there is an action binding between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:p)
-The potential tuple pair when there is an action binding between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x2:u)
-The potential tuple pair when there is an action binding between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:free)
-
-The potential tuple pair when there is a bond on the rhs between the site c of A and the site x1 of C is: A(c:C@x1, x:B@x); C(x1:A@c, x1:u)
-The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:p)
-The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x2:u)
-The potential tuple pair when there is a bond on the rhs between the site c of A and the site x2 of C is: A(c:C@x2, x:free); C(x2:A@c, x1:free)
-The potential tuple pair when there is a bond on the rhs between the site x1 of C and the site c of A is: C(x1:A@c, x1:u); A(c:C@x1, x:B@x)
-The potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x1:p); A(c:C@x2, x:free)
-The potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x2:u); A(c:C@x2, x:free)
-The potential tuple pair when there is a bond on the rhs between the site x2 of C and the site c of A is: C(x2:A@c, x1:free); A(c:C@x2, x:free)
-
 * Dynamic information
 <<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back

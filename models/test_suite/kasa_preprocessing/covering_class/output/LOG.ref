@@ -258,11 +258,6 @@ B is a dead agent.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-The potential tuple pair when there is an action binding between the site x of A and the site x of B is: A(x:B@x, y:free); B(x:A@x, y:free)
-
-The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of B is: A(x:B@x, y:free); B(x:A@x, y:free)
-The potential tuple pair when there is a bond on the rhs between the site x of B and the site x of A is: B(x:A@x, y:free); A(x:B@x, y:free)
-
 * Dynamic information
 ------------------------------------------------------------
 >>>>>>> 730b98f... clean code, will add the mission functions back

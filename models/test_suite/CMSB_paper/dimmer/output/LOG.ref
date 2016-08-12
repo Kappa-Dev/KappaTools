@@ -47,38 +47,6 @@ The binding state of site x in agent R ranges over free and E@x.
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, cr:R@n)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, n:free)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, cr:R@n); R(c:R@c, cr:free)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, cr:R@n); R(c:R@c, n:R@cr)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, n:free); R(c:R@c, cr:free)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, n:free); R(c:R@c, n:R@cr)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, n:R@cr); R(c:R@c, cr:R@n)
-The potential tuple pair when there is an action binding between the site c of R and the site c of R is: R(c:R@c, n:R@cr); R(c:R@c, n:free)
-The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, c:R@c)
-The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, cr:free)
-The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, c:R@c)
-The potential tuple pair when there is an action binding between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, cr:free)
-
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, x:E@x); R(c:R@c, x:E@x)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, cr:R@n)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:free); R(c:R@c, n:free)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:R@n); R(c:R@c, cr:free)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, cr:R@n); R(c:R@c, n:R@cr)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:free); R(c:R@c, cr:free)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:free); R(c:R@c, n:R@cr)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:R@cr); R(c:R@c, cr:R@n)
-The potential tuple pair when there is a bond on the rhs between the site c of R and the site c of R is: R(c:R@c, n:R@cr); R(c:R@c, n:free)
-The potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, c:R@c)
-The potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, c:R@c); R(n:R@cr, cr:free)
-The potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, c:R@c)
-The potential tuple pair when there is a bond on the rhs between the site cr of R and the site n of R is: R(cr:R@n, n:free); R(n:R@cr, cr:free)
-The potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, c:R@c); R(cr:R@n, c:R@c)
-The potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, c:R@c); R(cr:R@n, n:free)
-The potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, c:R@c)
-The potential tuple pair when there is a bond on the rhs between the site n of R and the site cr of R is: R(n:R@cr, cr:free); R(cr:R@n, n:free)
-
 * Dynamic information
 Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: E@x, E@x
 Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, free

@@ -1385,19 +1385,27 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=34
 =======
 Id=38
 >>>>>>> 1834413... test suite
+=======
+Id=36
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=33
 =======
   Id=37
 >>>>>>> 1834413... test suite
+=======
+  Id=35
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1630,19 +1638,27 @@ EXTENSIONAL DESCRIPTION:
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=34
 =======
 Id=38
 >>>>>>> 1834413... test suite
+=======
+Id=36
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=33
 =======
   Id=37
 >>>>>>> 1834413... test suite
+=======
+  Id=35
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1857,19 +1873,27 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=46
 =======
 Id=52
 >>>>>>> 1834413... test suite
+=======
+Id=50
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=45
 =======
   Id=51
 >>>>>>> 1834413... test suite
+=======
+  Id=49
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -1889,19 +1913,27 @@ Id=52
 
 agent_type:0:A:cv_id:1
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=46
 =======
 Id=52
 >>>>>>> 1834413... test suite
+=======
+Id=50
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=45
 =======
   Id=51
 >>>>>>> 1834413... test suite
+=======
+  Id=49
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -2080,7 +2112,11 @@ Id=29
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2111,19 +2147,27 @@ Id=30
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=49
 =======
 Id=58
 >>>>>>> 1834413... test suite
+=======
+Id=56
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=48
 =======
   Id=57
 >>>>>>> 1834413... test suite
+=======
+  Id=55
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:3<3)
     Id=1
      Leaf True 
@@ -2134,19 +2178,27 @@ Id=58
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=51
 =======
 Id=54
 >>>>>>> 1834413... test suite
+=======
+Id=52
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=50
 =======
   Id=41
 >>>>>>> 1834413... test suite
+=======
+  Id=39
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2171,12 +2223,20 @@ Id=64
   Id=63
 >>>>>>> 1834413... test suite
    Node(site_type:1<1)
+<<<<<<< HEAD
     Id=56
+=======
+    Id=61
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
      Node(site_type:3<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=55
+=======
+      Id=60
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
        Node(site_type:3<1)
         Id=1
          Leaf True 
@@ -2191,17 +2251,25 @@ Id=64
 =======
     Id=62
      Node(site_type:1<2)
+<<<<<<< HEAD
       Id=60
 >>>>>>> 1834413... test suite
+=======
+      Id=58
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
        Node(site_type:3<0)
         Id=0
          Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         Id=52
 =======
         Id=59
 >>>>>>> 1834413... test suite
+=======
+        Id=57
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
          Node(site_type:3<2)
           Id=1
            Leaf True 
@@ -2281,12 +2349,20 @@ Id=64
   Id=63
 >>>>>>> 1834413... test suite
    Node(site_type:1<1)
+<<<<<<< HEAD
     Id=56
+=======
+    Id=61
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
      Node(site_type:3<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=55
+=======
+      Id=60
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
        Node(site_type:3<1)
         Id=1
          Leaf True 
@@ -2301,17 +2377,25 @@ Id=64
 =======
     Id=62
      Node(site_type:1<2)
+<<<<<<< HEAD
       Id=60
 >>>>>>> 1834413... test suite
+=======
+      Id=58
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
        Node(site_type:3<0)
         Id=0
          Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         Id=52
 =======
         Id=59
 >>>>>>> 1834413... test suite
+=======
+        Id=57
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
          Node(site_type:3<2)
           Id=1
            Leaf True 
@@ -2384,7 +2468,11 @@ C(x!A.x) => C(x~p!A.x)
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2415,19 +2503,27 @@ Id=30
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=49
 =======
 Id=58
 >>>>>>> 1834413... test suite
+=======
+Id=56
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=48
 =======
   Id=57
 >>>>>>> 1834413... test suite
+=======
+  Id=55
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:3<3)
     Id=1
      Leaf True 
@@ -2438,19 +2534,27 @@ Id=58
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=51
 =======
 Id=54
 >>>>>>> 1834413... test suite
+=======
+Id=52
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=50
 =======
   Id=41
 >>>>>>> 1834413... test suite
+=======
+  Id=39
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2460,7 +2564,11 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2491,19 +2599,27 @@ Id=22
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=53
 =======
 Id=60
 >>>>>>> 1834413... test suite
+=======
+Id=58
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=52
 =======
   Id=59
 >>>>>>> 1834413... test suite
+=======
+  Id=57
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -2514,19 +2630,27 @@ Id=60
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=51
 =======
 Id=54
 >>>>>>> 1834413... test suite
+=======
+Id=52
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=50
 =======
   Id=41
 >>>>>>> 1834413... test suite
+=======
+  Id=39
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2536,7 +2660,11 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2567,19 +2695,27 @@ Id=22
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=53
 =======
 Id=60
 >>>>>>> 1834413... test suite
+=======
+Id=58
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=52
 =======
   Id=59
 >>>>>>> 1834413... test suite
+=======
+  Id=57
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -2590,19 +2726,27 @@ Id=60
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=51
 =======
 Id=54
 >>>>>>> 1834413... test suite
+=======
+Id=52
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=50
 =======
   Id=41
 >>>>>>> 1834413... test suite
+=======
+  Id=39
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2611,6 +2755,7 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 <<<<<<< HEAD
 A() => [ A(y~u?) v A(y~p?) ]
 A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
@@ -2626,30 +2771,26 @@ C() => [ C(y) v C(y!A.y) ]
 C() => [ C(x~u?) v C(x~p?) ]
 =======
 The binding state of site x in agent A ranges over free, B@x, and C@x.
+=======
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
 The internal state of site y in agent A ranges over u and p.
+The binding state of site x in agent A ranges over free, B@x, and C@x.
 The binding state of site y in agent A ranges over free, B@y, and C@y.
 The internal state of site x in agent A ranges over u and p.
-The binding state of site x in agent B ranges over free and A@x.
 The internal state of site y in agent B ranges over u and p.
+The binding state of site x in agent B ranges over free and A@x.
 The binding state of site y in agent B ranges over free and A@y.
 The internal state of site x in agent B ranges over u and p.
-The binding state of site x in agent C ranges over free and A@x.
 The internal state of site y in agent C ranges over u and p.
+The binding state of site x in agent C ranges over free and A@x.
 The binding state of site y in agent C ranges over free and A@y.
 The internal state of site x in agent C ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
 * Static information
-The potential tuple pair when there is an action binding between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
-The potential tuple pair when there is an action binding between the site y of A and the site y of C is: A(y:C@y, y:p); C(y:A@y, y:p)
-
-The potential tuple pair when there is a bond on the rhs between the site x of A and the site x of C is: A(x:C@x, x:p); C(x:A@x, x:p)
-The potential tuple pair when there is a bond on the rhs between the site y of A and the site y of C is: A(y:C@y, y:p); C(y:A@y, y:p)
-The potential tuple pair when there is a bond on the rhs between the site x of C and the site x of A is: C(x:A@x, x:p); A(x:C@x, x:p)
-The potential tuple pair when there is a bond on the rhs between the site y of C and the site y of A is: C(y:A@y, y:p); A(y:C@y, y:p)
-
 * Dynamic information
+<<<<<<< HEAD
 <<<<<<< HEAD
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
 Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: p, p
@@ -2657,8 +2798,12 @@ Whenever the site x of C and the site x of A are bound together, then the site x
 Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: p, p
 >>>>>>> 730b98f... clean code, will add the mission functions back
 =======
+=======
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, u
+>>>>>>> 1441500... use partition set, to be removed all the functions that are not use
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, u
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
+Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: p, u
 Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: u, u
 Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: u, p
 Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, u
