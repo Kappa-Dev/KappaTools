@@ -1033,13 +1033,18 @@ Id=70
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=68
  Node(site_type:1<0)
+=======
+Id=39
+ Node(site_type:2<0)
+>>>>>>> 1834413... test suite
   Id=0
    Leaf False 
 
-  Id=12
-   Node(site_type:1<2)
+  Id=20
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -1048,6 +1053,7 @@ Id=68
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=70
  Node(site_type:0<0)
   Id=0
@@ -1055,6 +1061,15 @@ Id=70
 
   Id=69
    Node(site_type:0<2)
+=======
+Id=76
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+>>>>>>> 1834413... test suite
     Id=1
      Leaf True 
 
@@ -1086,8 +1101,8 @@ B() => [ B(t~u) v B(t~p) ]
 =======
 The internal state of site t in agent A ranges over u and p.
 The binding state of site z in agent A ranges over free and B@z.
-The binding state of site z in agent B ranges over free and A@z.
 The internal state of site t in agent B ranges over u and p.
+The binding state of site z in agent B ranges over free and A@z.
 The internal state of site z in agent B ranges over u and p.
 ------------------------------------------------------------
 * Site accross bonds domain

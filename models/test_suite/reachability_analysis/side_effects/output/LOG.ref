@@ -1175,12 +1175,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=34
+Id=36
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=33
+  Id=35
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1341,14 +1341,22 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+<<<<<<< HEAD
 Id=46
+=======
+Id=50
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=45
+=======
+  Id=49
+>>>>>>> 1834413... test suite
    Node(site_type:1<2)
-    Id=30
+    Id=32
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1365,12 +1373,12 @@ Id=46
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=29
+Id=31
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1385,7 +1393,7 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=29
      Node(site_type:1<2)
       Id=22
        Node(site_type:2<0)
@@ -1443,12 +1451,12 @@ Id=26
        Leaf False 
 
 agent_type:3:D:cv_id:0
-Id=29
+Id=31
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1463,7 +1471,7 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=29
      Node(site_type:1<2)
       Id=22
        Node(site_type:2<0)
@@ -1482,12 +1490,12 @@ Id=29
        Leaf False 
 
 agent_type:4:E:cv_id:0
-Id=29
+Id=31
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1502,7 +1510,7 @@ Id=29
         Id=0
          Leaf False 
 
-    Id=27
+    Id=29
      Node(site_type:1<2)
       Id=22
        Node(site_type:2<0)
@@ -1525,12 +1533,20 @@ Id=29
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=51
+=======
+Id=56
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=50
+=======
+  Id=55
+>>>>>>> 1834413... test suite
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1540,12 +1556,20 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=49
+=======
+Id=52
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=48
+=======
+  Id=39
+>>>>>>> 1834413... test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1555,12 +1579,20 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=55
+=======
+Id=60
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=54
+=======
+  Id=59
+>>>>>>> 1834413... test suite
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1575,9 +1607,15 @@ Id=55
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=53
      Node(site_type:0<2)
       Id=47
+=======
+    Id=58
+     Node(site_type:0<2)
+      Id=51
+>>>>>>> 1834413... test suite
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1595,12 +1633,20 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=58
+=======
+Id=63
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=57
+=======
+  Id=62
+>>>>>>> 1834413... test suite
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1615,7 +1661,11 @@ Id=58
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=56
+=======
+    Id=61
+>>>>>>> 1834413... test suite
      Node(site_type:0<2)
       Id=13
        Node(site_type:1<1)
@@ -1635,12 +1685,20 @@ Id=58
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=55
+=======
+Id=60
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=54
+=======
+  Id=59
+>>>>>>> 1834413... test suite
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1655,9 +1713,15 @@ Id=55
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=53
      Node(site_type:0<2)
       Id=47
+=======
+    Id=58
+     Node(site_type:0<2)
+      Id=51
+>>>>>>> 1834413... test suite
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1675,12 +1739,20 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=55
+=======
+Id=60
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=54
+=======
+  Id=59
+>>>>>>> 1834413... test suite
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1695,9 +1767,15 @@ Id=55
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=53
      Node(site_type:0<2)
       Id=47
+=======
+    Id=58
+     Node(site_type:0<2)
+      Id=51
+>>>>>>> 1834413... test suite
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1723,12 +1801,20 @@ E(x!D.x) => E(x~p!D.x)
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=51
+=======
+Id=56
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=50
+=======
+  Id=55
+>>>>>>> 1834413... test suite
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -1738,12 +1824,20 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=49
+=======
+Id=52
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=48
+=======
+  Id=39
+>>>>>>> 1834413... test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1753,7 +1847,11 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1768,12 +1866,20 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=49
+=======
+Id=52
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=48
+=======
+  Id=39
+>>>>>>> 1834413... test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1783,7 +1889,11 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1798,12 +1908,20 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=49
+=======
+Id=52
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=48
+=======
+  Id=39
+>>>>>>> 1834413... test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1813,7 +1931,11 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1828,12 +1950,20 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=49
+=======
+Id=52
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=48
+=======
+  Id=39
+>>>>>>> 1834413... test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1843,7 +1973,11 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=47
+=======
+Id=51
+>>>>>>> 1834413... test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1858,12 +1992,20 @@ Id=47
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=49
+=======
+Id=52
+>>>>>>> 1834413... test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=48
+=======
+  Id=39
+>>>>>>> 1834413... test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1907,9 +2049,19 @@ The potential tuple pair when there is a bond on the rhs between the site x of D
 The potential tuple pair when there is a bond on the rhs between the site x of E and the site x of D is: E(x:D@x, x:p); D(x:E@x, x:p)
 
 * Dynamic information
+<<<<<<< HEAD
 Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
 Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
 >>>>>>> 730b98f... clean code, will add the mission functions back
+=======
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, u
+Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, u
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, u
+Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, p
+Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: u, u
+Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: u, u
+>>>>>>> 1834413... test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
