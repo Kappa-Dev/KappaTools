@@ -62,8 +62,18 @@ let lift_embedding x =
     (Connected_component.Matching.add_cc Connected_component.Matching.empty 0 x)
 let find_embeddings = Connected_component.embeddings_to_fully_specified
 
-let find_embeddings_unary_binary _ _ =
-  [Connected_component.Matching.empty] (*TODO*)
+let find_embeddings_unary_binary p x =
+  Tools.array_fold_lefti
+    (fun i acc cc ->
+       let em = find_embeddings cc x in
+       Tools.list_map_flatten
+         (fun m ->
+            Tools.list_map_option
+              (fun r -> Connected_component.Matching.add_cc m i r)
+              em)
+         acc)
+    [Connected_component.Matching.empty]
+    p
 
 let disjoint_union sigs l =
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
