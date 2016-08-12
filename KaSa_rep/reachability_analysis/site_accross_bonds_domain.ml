@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 11 2016>
+   * Last modification: Time-stamp: <Aug 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -696,7 +696,7 @@ struct
   (****************************************************************)
 
   let get_state_of_site_in_pre_post_condition
-      parameter error dynamic rule agent_id
+      parameter error dynamic agent_id
       site_type defined_in precondition =
     let path =
       {
@@ -728,15 +728,15 @@ struct
     =
     let defined_in = Communication.LHS rule in
     get_state_of_site_in_pre_post_condition
-        parameter error dynamic rule agent_id
-        site_type defined_in precondition
+      parameter error dynamic agent_id
+      site_type defined_in precondition
 
   let get_state_of_site_in_postcondition
       parameter error dynamic rule agent_id site_type precondition =
-      let defined_in = Communication.RHS rule in
-      get_state_of_site_in_pre_post_condition
-          parameter error dynamic rule agent_id
-          site_type defined_in precondition
+    let defined_in = Communication.RHS rule in
+    get_state_of_site_in_pre_post_condition
+      parameter error dynamic agent_id
+      site_type defined_in precondition
 
   let context rule_id agent_id site_type =
     " rule "^(Ckappa_sig.string_of_rule_id rule_id)^
@@ -749,12 +749,13 @@ struct
   (* agent_type = agent_type_q && site_type = site_type_q && site_type' = site_type_q'*)
 
   let apply_rule_bonds_rhs static dynamic error rule_id rule precondition =
-  let parameter  = get_parameter static in
-  let kappa_handler = get_kappa_handler static in
-  let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    (* there is a bond in the domain of a rule *)
+    let parameter  = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store_potential_tuple_pair_bonds_rhs =
       get_potential_tuple_pair_bonds_rhs static
-    in
+    in (* this set is to big *)
     let store_bonds_rhs = get_bonds_rhs static in
     let error, bonds_rhs_set =
       Site_accross_bonds_domain_static.get_set parameter error
@@ -762,64 +763,97 @@ struct
         Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
         store_bonds_rhs
     in
-   (*------------------------------------------------------*)
+    (*------------------------------------------------------*)
     let error, dynamic, precondition =
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
         (fun (t, u) (error, dynamic, precondition) ->
+        let (agent_id_t, agent_type_t, site_type_t, state_t) = t in
+        let (agent_id_u, agent_type_u, site_type_u, state_u) = u in
+           (* once t and u are fixed, you should apply the appropriate map *)
+           (* to get the set of potential tuple pairs *)
+           (* ((agent_type_x, site_type_x, site_type'_x, state_x, state'_x),
+            (agent_type_y, site_type_y, site_type'_y, state_y, state'_y)) *)
+           (* such that
+                   agent_type_x = agent_type_t &&
+                    site_type_x = site_type_t &&
+                        state_x = state_t &&
+                   agent_type_y = agent_type_u &&
+                    site_type_y = site_type_u &&
+                        state_y = state_u *)
+           (* If you do not have this function, add it the struct static *)
+           (* and compute it in your scan_rules function, after the iteration over all the rules, thanks to the partioning function *)
+        (* then fold over this set instead of the full one *)
            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
              (fun (x, y) (error, dynamic, precondition) ->
-                let (agent_type, site_type, site_type', state, state') = x in
-                let (agent_type1, site_type1, site_type1', state1, state1') = y
+                let (_agent_type_x, _site_type_x, site_type'_x, _state_x, _state'_x) = x in (* I do not understand what is _state'_x *)
+                let (_agent_type_y, _site_type_y, site_type'_y, _state_y, _state'_y) = y    (* I do not understand what is _state'_y *)
                 in
-                let (agent_id, _, site_type_t, _) = t in
-                let (agent_id1, _, site_type_u, _) = u in
-                let error', dynamic, precondition, state_list =
-                  get_state_of_site_in_precondition
-                    parameter error
-                    dynamic
-                    rule
-                    agent_id
-                    site_type_t
-                    precondition
-                in
-                let error =
-                  Exception.check_point
-                    Exception.warn
-                    parameter error error'
-                    ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id)^" site: "^(Ckappa_sig.string_of_site_name site_type_t))
-                  __POS__ Exit
-                in
-                let error', dynamic, precondition, state_list' =
+                (* the following test is temporary, it will disapear when the fold will be done directly on the subset that satsifies these constraints *)
+                if _agent_type_x = agent_type_t &&
+                   _site_type_x = site_type_t &&
+                  _state_x = state_t &&
+                _agent_type_y = agent_type_u &&
+                 _site_type_y = site_type_u &&
+                   _state_y = state_u
+                then
+                let error', dynamic, precondition, state'_list_x =
                   get_state_of_site_in_postcondition
                     parameter error
                     dynamic
                     rule
-                    agent_id1
-                    site_type_u
+                    agent_id_t
+                    site_type'_x
                     precondition
                 in
                 let error =
                   Exception.check_point
                     Exception.warn
                     parameter error error'
-                    ~message:("rule :"^(Ckappa_sig.string_of_rule_id rule_id)^" agent_id: "^(Ckappa_sig.string_of_agent_id agent_id1)^" site: "^(Ckappa_sig.string_of_site_name site_type_u))
-                  __POS__ Exit
+                    ~message:(context rule_id agent_id_t site_type'_x)
+                    __POS__ Exit
+                in
+                let error', dynamic, precondition, state'_list_y =
+                  get_state_of_site_in_postcondition
+                    parameter error
+                    dynamic
+                    rule
+                    agent_id_u
+                    site_type'_y
+                    precondition
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameter error error'
+                    ~message:(context rule_id agent_id_u site_type'_y)
+                    __POS__ Exit
                 in
                 (*------------------------------------------------------*)
                 let error, dynamic, precondition =
-                  List.fold_left (fun (error, dynamic, precondition) pre_state ->
+                  match state'_list_x, state'_list_x with
+                  | _::_::_, _::_::_ ->
+                    error, dynamic, precondition (* we know for sure that none of the two sites have been modified *)
+                  | [], _ | _, [] ->
+                    let error, () =
+                      Exception.warn
+                        parameter error __POS__
+                        ~message:"empty list in potential states in post condition"
+                        Exit ()
+                    in
+                    error, dynamic, precondition
+                  | [_],_ | _,[_] -> (* general case *)
+                  List.fold_left (fun (error, dynamic, precondition) state'_x ->
                       List.fold_left
-                        (fun (error, dynamic, precondition) pre_state1 ->
+                        (fun (error, dynamic, precondition) state'_y ->
                            let store_result = get_value dynamic in
-                           if pre_state = state && pre_state1 = state1
-                           then
                              let pair_list =
-                               [Ckappa_sig.fst_site, state';
-                                Ckappa_sig.snd_site, state1']
+                               [Ckappa_sig.fst_site, state'_x;
+                                Ckappa_sig.snd_site, state'_y]
                              in
                              let pair =
-                               (agent_type, site_type, site_type', state),
-                               (agent_type1, site_type1, site_type1', state1)
+                               (agent_type_t, site_type_t, site_type'_x, state_t),
+                               (agent_type_u, site_type_u, site_type'_y,
+                                state_u)
                              in
                              let handler = get_mvbdu_handler dynamic in
                              let error, handler, mvbdu =
@@ -837,11 +871,11 @@ struct
                              let dynamic = set_value store_result dynamic in
                              let dynamic = set_mvbdu_handler handler dynamic in
                              error, dynamic, precondition
-                           else error, dynamic, precondition
-                        ) (error, dynamic, precondition) state_list'
-                    ) (error, dynamic, precondition) state_list
+                        ) (error, dynamic, precondition) state'_list_y
+                    ) (error, dynamic, precondition) state'_list_x
                 in
                 error, dynamic, precondition
+                else error, dynamic, precondition
              ) store_potential_tuple_pair_bonds_rhs
              (error, dynamic, precondition)
         ) bonds_rhs_set (error, dynamic, precondition)
@@ -951,7 +985,7 @@ struct
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
     (*let kappa_handler = get_kappa_handler static in
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in*)
+      let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in*)
     (*-----------------------------------------------------------*)
     let error, rule = get_rule parameter error static rule_id in
     match rule with
@@ -965,7 +999,8 @@ struct
         Remanent_parameters.update_prefix parameter "                " in
       let _log = Remanent_parameters.get_logger parameter in
       (*------------------------------------------------------*)
-      (*1.a bonds on the rhs *)
+      (*1.a bonds on the rhs: not sure you need this test, it will be
+        covered by 1.c and 1.d *)
       (*------------------------------------------------------*)
       let error, dynamic, precondition =
         apply_rule_bonds_rhs
@@ -978,6 +1013,8 @@ struct
         apply_rule_created_bonds
           static dynamic error rule_id rule precondition
       in
+      (*1.c a site is modified (explicitly) *)
+      (*1.d a site is modified by side effect *)
       (*-----------------------------------------------------------*)
       let event_list = [] in
       error, dynamic, (precondition, event_list)
@@ -1070,8 +1107,8 @@ struct
         (**)
         (*let store_proj_potential_tuple_pair_bonds =
           get_proj_potential_tuple_pair_bonds static
-        in
-        let error =
+          in
+          let error =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
             (fun (x, y) error ->
                let error,
@@ -1089,12 +1126,12 @@ struct
                in
                error
             ) store_proj_potential_tuple_pair_bonds error
-        in
-        let () = Loggers.print_newline log in*)
+          in
+          let () = Loggers.print_newline log in*)
         (*--------------------------------------------------------*)
         (*question mark on the rhs*)
         (*let store_question_marks_rhs = get_question_marks_rhs static in
-        let error =
+          let error =
           Ckappa_sig.Rule_map_and_set.Map.fold
             (fun rule_id set error ->
                Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.fold
@@ -1120,8 +1157,8 @@ struct
                     error
                  ) set error
             ) store_question_marks_rhs error
-        in
-        let () = Loggers.print_newline log in*)
+          in
+          let () = Loggers.print_newline log in*)
         (*--------------------------------------------------------*)
         (*let store_potential_tuple_pair_modification =
           get_potential_tuple_pair_modification static
