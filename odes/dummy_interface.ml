@@ -41,12 +41,12 @@ let canonic_form x = x
 
 let connected_components_of_patterns = Array.to_list
 
-let connected_components_of_mixture sigs e =
+let connected_components_of_mixture sigs contact_map e =
   let snap = Edges.build_snapshot sigs e in
   List.fold_left
     (fun acc (i,m) ->
        match Snip.connected_components_sum_of_ambiguous_mixture
-               [||] (Connected_component.PreEnv.empty sigs)
+               contact_map (Connected_component.PreEnv.empty sigs)
                (LKappa.of_raw_mixture m) with
        | _,[[|x|],_] -> Tools.recti (fun a _ -> x::a) acc i
        | _ -> assert false)
@@ -80,15 +80,16 @@ let disjoint_union sigs l =
   let _,em,mix =
     List.fold_left
       (fun (i,em,mix) (_,r,cc) ->
+         let i = pred i in
          let (mix',r') =
            Connected_component.add_fully_specified_to_graph sigs mix cc in
          let r'' = Renaming.compose false r r' in
-         (succ i,
+         (i,
           Tools.unsome
             Connected_component.Matching.empty
             (Connected_component.Matching.add_cc em i r''),
           mix'))
-      (0,Connected_component.Matching.empty,Edges.empty ())
+      (List.length l,Connected_component.Matching.empty,Edges.empty ())
       l in
   (pat,em,mix)
 
@@ -167,6 +168,6 @@ let get_obs_titles env =
     env
 
 let get_compil common_args cli_args =
-  let (env,_,_,_,_,_,_,init),_,_ =
+  let (env,_,contact_map,_,_,_,_,init),_,_ =
     Cli_init.get_compilation common_args cli_args in
-  env,init
+  env,contact_map,init

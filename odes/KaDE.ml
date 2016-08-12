@@ -87,8 +87,8 @@ let main () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
-    let (env,init) = A.get_compil common_args cli_args in
-    let network = A.network_from_compil env init in
+    let (env,contact_map,init) = A.get_compil common_args cli_args in
+    let network = A.network_from_compil env contact_map init in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
     let () = A.export_network

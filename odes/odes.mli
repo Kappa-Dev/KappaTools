@@ -9,11 +9,11 @@ sig
   type 'a network
 
   val get_compil : Common_args.t -> Run_cli_args.t ->
-    Environment.t *
+    Environment.t * Primitives.contact_map *
     (I.connected_component array list Alg_expr.e * I.rule * Location.t) list
 
   val network_from_compil:
-    Environment.t ->
+    Environment.t -> Primitives.contact_map ->
     (I.connected_component array list Alg_expr.e * I.rule * Location.t) list ->
     int network
 

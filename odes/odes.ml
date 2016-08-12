@@ -269,8 +269,9 @@ struct
       l
       (remanent,[])
 
-  let petrify_mixture sigs mixture =
-    petrify_species_list (I.connected_components_of_mixture sigs mixture)
+  let petrify_mixture sigs contact_map mixture =
+    petrify_species_list
+      (I.connected_components_of_mixture sigs contact_map mixture)
 
   let add_to_prefix_list connected_component key prefix_list store acc =
     let list_embeddings =
@@ -346,14 +347,15 @@ struct
     | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
       |Alg_expr.STATE_ALG_OP _),_ as a -> a
 
-  let add_reaction sigs enriched_rule embedding_forest mixture remanent =
+  let add_reaction
+      sigs contact_map enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
     let remanent, reactants =
-      petrify_mixture sigs mixture remanent in
+      petrify_mixture sigs contact_map mixture remanent in
     let products = I.apply sigs rule embedding_forest mixture in
     let tokens = I.token_vector rule in
     let remanent, products =
-      petrify_mixture sigs products remanent in
+      petrify_mixture sigs contact_map products remanent in
     let remanent, tokens =
       List.fold_left
         (fun (remanent, tokens) (a,b) ->
@@ -380,7 +382,7 @@ struct
       ([], init sigs)
       initial_states
 
-  let compute_reactions sigs rules initial_states =
+  let compute_reactions sigs contact_map rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let _,rules =
@@ -453,7 +455,8 @@ struct
                       (fun (partial_emb_list,partial_emb_list_with_new_species) cc ->
                          (* First case, we complete with an embedding towards the new_species *)
                          let partial_emb_list =
-                           add_to_prefix_list cc (enriched_rule.rule_id,cc) partial_emb_list store_old_embeddings []
+                           add_to_prefix_list cc
+                             (enriched_rule.rule_id,cc) partial_emb_list store_old_embeddings []
                          in
                          let partial_emb_list_with_new_species =
                            add_to_prefix_list cc (enriched_rule.rule_id,cc)
@@ -472,7 +475,7 @@ struct
                     List.fold_left
                       (fun remanent list ->
                          let _,embed,mixture = I.disjoint_union sigs list in
-                         add_reaction sigs enriched_rule embed mixture remanent)
+                         add_reaction sigs contact_map enriched_rule embed mixture remanent)
                       (to_be_visited,network)
                       new_embedding_list
                   in
@@ -486,7 +489,7 @@ struct
                     let lembed = I.find_embeddings_unary_binary enriched_rule.lhs new_species in
                     fold_left_swap
                       (fun embed ->
-                         add_reaction sigs enriched_rule embed
+                         add_reaction sigs contact_map enriched_rule embed
                            (I.lift_species sigs new_species))
                       lembed
                       (to_be_visited, network)
@@ -518,14 +521,14 @@ struct
     (fun i -> Mods.DynArray.get network.species_tab i)
   let get_reactions network = network.reactions
 
-  let convert_initial_state sigs intro network =
+  let convert_initial_state sigs contact_map intro network =
     let b,c,a = intro in
     convert_alg_expr (b,a) network,
     match I.token_vector c with
     | [] ->
       let _,emb,m = I.disjoint_union sigs [] in
       let m = I.apply sigs c emb m in
-      let cc = I.connected_components_of_mixture sigs m in
+      let cc = I.connected_components_of_mixture sigs contact_map m in
       List.rev_map
         (fun x -> translate_species x network)
         (List.rev cc)
@@ -536,7 +539,7 @@ struct
     let a,b = variable_def in
     a,convert_alg_expr b network
 
-  let convert_var_defs env init network =
+  let convert_var_defs env contact_map init network =
     let list_var = I.get_variables env in
     let list, network =
       Tools.array_fold_lefti
@@ -563,7 +566,7 @@ struct
       List.fold_left
         (fun (list,network) def ->
            let b,c =
-             convert_initial_state (Environment.signatures env) def network in
+             convert_initial_state (Environment.signatures env) contact_map def network in
            let () =
              List.iter
                (fun id -> add id (get_fresh_var_id network))
@@ -686,12 +689,13 @@ struct
      n_obs = network.n_obs - 1}
 
 
-  let species_of_initial_state sigs =
+  let species_of_initial_state sigs contact_map =
     List.fold_left
       (fun list (_,r,_) ->
          let _,emb,m = I.disjoint_union sigs [] in
          let b = I.apply sigs r emb m in
-         List.rev_append (I.connected_components_of_mixture sigs b) list)
+         List.rev_append
+           (I.connected_components_of_mixture sigs contact_map b) list)
       []
 
   let is_const expr = (* constant propagation is already done *)
@@ -812,14 +816,15 @@ struct
   let split_rules_and_decl network =
     split_rules network (split_var_declaration network init_sort_rules_and_decl)
 
-  let network_from_compil env init =
+  let network_from_compil env contact_map init =
     let rules = I.get_rules env in
     let initial_state =
-      species_of_initial_state (Environment.signatures env) init in
+      species_of_initial_state (Environment.signatures env) contact_map init in
     let network =
-      compute_reactions (Environment.signatures env) rules initial_state in
+      compute_reactions
+        (Environment.signatures env) contact_map rules initial_state in
     let network = convert_tokens env network in
-    let network = convert_var_defs env init network in
+    let network = convert_var_defs env contact_map init network in
     let network = convert_obs env network in
     network
 
