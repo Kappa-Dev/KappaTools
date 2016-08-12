@@ -47,7 +47,8 @@ let main () =
     (*let () = Parameter.emacsMode := kasim_args.Kasim_args.emacsMode in*)
     (*let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in*)
     let () = Parameter.batchmode := cli_args.Run_cli_args.batchmode in
-    (*let () = Parameter.time_independent := common_args.Common_args.timeIndependent*)
+    (*let () =
+      Parameter.time_independent := common_args.Common_args.timeIndependent*)
     let backend =
       match ode_args.Ode_args.backend with
       | "Octave" | "OCTAVE" | "octave" -> Loggers.Octave
@@ -68,7 +69,8 @@ let main () =
     in
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
-    let () = Kappa_files.setCheckFileExistsODE ~batchmode:!Parameter.batchmode in
+    let () =
+      Kappa_files.setCheckFileExistsODE ~batchmode:!Parameter.batchmode in
     let command_line =
       Format.asprintf "%a"
         (Pp.array (fun f -> Format.fprintf f " ")
@@ -102,12 +104,15 @@ let main () =
     let () = close_out out_channel in
     ()
   with
-  | ExceptionDefn.Malformed_Decl _ as e -> raise e
-  | _exn ->
-    Debug.tag
-      Format.std_formatter
-      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
-    exit 1
-
+  | ExceptionDefn.Malformed_Decl er ->
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let () = Kappa_files.close_all_out_desc () in
+    let () = Pp.error Format.pp_print_string er in
+    exit 2
+  | Sys_error msg ->
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let () = Kappa_files.close_all_out_desc () in
+    let () = Format.eprintf "%s@." msg in
+    exit 2
 
 let () = main ()
