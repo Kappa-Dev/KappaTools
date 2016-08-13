@@ -365,6 +365,20 @@ struct
       Site_accross_bonds_domain_static.collect_pair_sites_aux
         parameter error rule_id store_views_rhs
     in
+    (* store_potential_tuple_pair is completely wrong *)
+    (* Let me recall you the definition.
+       this set should contain the pairs
+       (id_t, A_t, site_t, site'_t),(id_u, A_u, site_u, site'_u)
+       For any bond
+        (between the agent of type A_t, id id_t, site site_t
+             and the agent of type A_u, id id_u, site site_u)
+       such that the site site'_t of agent id_t occurs in the rhs
+            and the site site'_y of agent id_u occurs in the rhs *)
+    (* please collect that set by enumerating the bonds on the rhs, then on the list of other sites that occur in A_t,
+       then on the list of other sites that occur in A_u *)
+    (* Currently, I do not understand your definition *)
+    (* but some sites site_t, site_u are not even binding sites !!! *)    
+
     let store_potential_tuple_pair = get_potential_tuple_pair static in
     let error, store_potential_tuple_pair =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair
@@ -435,6 +449,24 @@ struct
     (*partition map with key is the pair in bonds rhs*)
     (*------------------------------------------------------------*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
+    let _ =
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.iter
+        (fun ((a,b,c,d),(e,f,g,h)) ->
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameter)
+             "%i %i %i (%i) | %i %i %i (%i) \n"
+             (Ckappa_sig.int_of_agent_name a)
+             (Ckappa_sig.int_of_site_name b)
+             (Ckappa_sig.int_of_site_name c)
+             (Ckappa_sig.int_of_state_index d)
+             (Ckappa_sig.int_of_agent_name e)
+             (Ckappa_sig.int_of_site_name f)
+             (Ckappa_sig.int_of_site_name g)
+             (Ckappa_sig.int_of_state_index h))
+        store_potential_tuple_pair
+    in
+
+
     let error, store_partition_bonds_rhs_map =
       Site_accross_bonds_domain_static.collect_partition_bonds_rhs_map
         parameter error
