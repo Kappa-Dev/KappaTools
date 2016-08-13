@@ -1126,10 +1126,10 @@ struct
       in
       (*-----------------------------------------------------------*)
       (*1.c a site is modified (explicitly) *) (*FIX ME*)
-      (*let error, dynamic, precondition =
+      let error, dynamic, precondition =
         apply_rule_modified_explicity
           static dynamic error rule_id rule precondition
-      in*)
+      in
       (*1.d a site is modified by side effect *)
       (*-----------------------------------------------------------*)
       let event_list = [] in
