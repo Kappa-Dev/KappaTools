@@ -3,6 +3,11 @@
   * Last modification: Time-stamp: <Aug 13 2016>
 *)
 
+let local_trace = false
+let debug s =
+  if local_trace then
+    Format.eprintf "%s\n" s
+
 module Make(I:Ode_interface.Interface) =
 struct
 
@@ -409,6 +414,17 @@ struct
       | []   -> network
 
       | new_species::to_be_visited ->
+        let () = debug "test for a new species" in
+        let () =
+          if local_trace
+          then
+            let () =
+              I.print_chemical_species
+                Format.err_formatter new_species
+            in
+            let () = Format.eprintf "\n" in
+            ()
+        in
         (* add in store the embeddings from cc of lhs to new_species,
            for unary application of binary rule, the dictionary of species is updated, and the reaction entered directly *)
         let store, to_be_visited, network  =
@@ -417,13 +433,16 @@ struct
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
               (*  (rule_id,rule,mode,lhs,lhs_cc)*)
               (* regular application of tules, we store the embeddings*)
+              let () = debug (Format.sprintf "\t test for rule %i" enriched_rule.rule_id) in
               let arity = enriched_rule.mode in
               match arity with
               | I.Usual ->
                 begin
+                  let () = debug (Format.sprintf "\t\t regular case") in
                   let store_new_embeddings =
                     List.fold_left
                       (fun store cc ->
+                         let () = debug (Format.sprintf "\t\t\t find embeddings") in
                          let lembed = I.find_embeddings cc new_species in
                          add_embedding_list
                            (enriched_rule.rule_id,cc)
@@ -472,7 +491,19 @@ struct
                   let to_be_visited, network =
                     List.fold_left
                       (fun remanent list ->
+                         let () = debug "\t\t\t compute one refinement" in
+                         let () = debug "\t\t\t disjoint union" in
+                         let () =
+                           if local_trace
+                           then
+                             List.iter
+                               (fun (_,_,s) ->
+                                  let () = I.print_chemical_species Format.err_formatter s in
+                                  Format.eprintf "\n")
+                               list
+                         in
                          let _,embed,mixture = I.disjoint_union sigs list in
+                         let () = debug "\t\t\t add new reaction" in
                          add_reaction sigs contact_map enriched_rule embed mixture remanent)
                       (to_be_visited,network)
                       new_embedding_list
@@ -483,6 +514,8 @@ struct
               | I.Unary ->
                 begin
                   (* unary application of binary rules *)
+                  let () = debug "\t\t unary case" in
+
                   let to_be_visited, network =
                     let lembed = I.find_embeddings_unary_binary enriched_rule.lhs new_species in
                     fold_left_swap

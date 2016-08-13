@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 29 2016>
+  * Last modification: Time-stamp: <Aug 13 2016>
 *)
 
 type mixture = Edges.t(* not necessarily connected, fully specified *)
@@ -82,7 +82,7 @@ let disjoint_union sigs l =
       (fun (i,em,mix) (_,r,cc) ->
          let i = pred i in
          let (mix',r') =
-           Connected_component.add_fully_specified_to_graph sigs mix cc in
+           Connected_component.add_fully_specified_to_graph sigs mix cc  in
          let r'' = Renaming.compose false r r' in
          (i,
           Tools.unsome
