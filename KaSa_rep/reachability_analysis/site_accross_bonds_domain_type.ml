@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 12 2016>
+   * Last modification: Time-stamp: <Aug 13 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -208,6 +208,26 @@ module Proj_potential_tuple_pair_set =
     (PairAgentSitesState_map_and_set) (*potential tuple pair set*)
     (PairSite_map_and_set) (*use to search the set in bonds rhs*)
 
+module PairSitesState_AgentSitesState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state)
+           *
+            (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+             Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Proj_potential_tuple_pair_set_modified =
+  Map_wrapper.Proj
+    (PairAgentSitesState_map_and_set) (*potential tuple pair set*)
+    (PairSitesState_AgentSitesState_map_and_set) (*use to search the set in bonds rhs*)
+
 module Proj_bonds_rhs_set =
   Map_wrapper.Proj
     (PairAgentsSiteState_map_and_set) (*set_a*)
@@ -222,6 +242,21 @@ module Partition_created_bonds_map =
   Map_wrapper.Proj
     (PairAgentSitesState_map_and_set)
     (PairAgentSiteState_map_and_set)
+
+module AgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Partition_modified_map =
+  Map_wrapper.Proj
+    (PairAgentSitesState_map_and_set)
+    (AgentSite_map_and_set)
 
 (***************************************************************)
 

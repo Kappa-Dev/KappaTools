@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 11 2016>
+   * Last modification: Time-stamp: <Aug 13 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1381,10 +1381,17 @@ struct
   (*-----------------------------------------------------------*)
   (*outside the pattern*)
 
-  let precondition_outside_pattern parameter error dynamic kappa_handler path step tl
-      bdu_false bdu_true site_correspondence store_covering_classes_id fixpoint_result =
+  let last = function
+    | x::xs -> List.fold_left (fun _ y -> y) x xs
+    | []    -> failwith "no element"
+
+  let precondition_outside_pattern parameter error dynamic kappa_handler path
+      step tl
+      bdu_false bdu_true site_correspondence store_covering_classes_id
+      fixpoint_result = (*CHECK ME*)
     let error, (dynamic, new_answer) =
-      let last_step = List.hd (List.rev tl) in
+      (*return the last element in the relative_address*)
+      let last_step = last tl in
       let last_agent = last_step.Communication.agent_type_in in
       let last_site = last_step.Communication.site_in in (*D.t*)
       let step_agent = step.Communication.agent_type_in in
@@ -1685,7 +1692,8 @@ struct
   (*inside the pattern*)
 
   let precondition_inside_pattern parameter error dynamic kappa_handler
-      _agent step path aux _rule_id rule tl site_correspondence store_covering_classes_id fixpoint_result bdu_false bdu_true =
+      step path aux rule tl site_correspondence store_covering_classes_id
+      fixpoint_result bdu_false bdu_true =
     (*---------------------------------------------------------*)
     (*inside the pattern, check the binding information in the lhs of the current agent*)
     let error, (dynamic, update_answer) =
@@ -1701,7 +1709,8 @@ struct
         (* this agent has no bound. As in the case outside the pattern.*)
         let error, (dynamic, new_answer) =
           precondition_outside_pattern
-            parameter error dynamic kappa_handler path step tl bdu_false bdu_true
+            parameter error dynamic kappa_handler path step tl bdu_false
+            bdu_true
             site_correspondence store_covering_classes_id fixpoint_result
         in
         error, (dynamic, new_answer)
@@ -1721,7 +1730,8 @@ struct
             (*out of the pattern*)
             let error, (dynamic, new_answer) =
               precondition_outside_pattern
-                parameter error dynamic kappa_handler path step tl bdu_false bdu_true
+                parameter error dynamic kappa_handler path step tl bdu_false
+                bdu_true
                 site_correspondence store_covering_classes_id fixpoint_result
             in
             error, (dynamic, new_answer)
@@ -1802,10 +1812,10 @@ struct
               relative_address, if one can take the agent type of the
               target, take site and collect the information one has about
               the potential state of this site in agents of this type. *)
-            let _ =
+            (*let _ =
               Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "-outsite pattern:\n"
-            in
+            in*)
             let error, (dynamic, new_answer) =
               precondition_outside_pattern
                 parameter error dynamic kappa_handler path step tl bdu_false bdu_true
@@ -1820,14 +1830,14 @@ struct
               match port.Cckappa_sig.site_free with
               | None | Some false ->
                 (*it is not free, inside the pattern*)
-                let _ =
+                (*let _ =
                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "-inside pattern:\n"
-                in
+                in*)
                 let error, (dynamic, new_answer) =
                   precondition_inside_pattern
-                    parameter error dynamic kappa_handler agent step
-                    path aux rule_id rule tl site_correspondence store_covering_classes_id
+                    parameter error dynamic kappa_handler step
+                    path aux rule tl site_correspondence store_covering_classes_id
                     fixpoint_result bdu_false bdu_true
                 in
                 error, (dynamic, new_answer)

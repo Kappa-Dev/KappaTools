@@ -43,14 +43,18 @@ type basic_static_information =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
     (*projection or combination*)
-    (*store_bonds_rhs_set :
-      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.t;*)
     store_partition_bonds_rhs_map :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;
     store_partition_created_bonds_map :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;
+    store_partition_modified_map_1 :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+        Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
+    store_partition_modified_map_2 :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+        Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
   }
 
 (****************************************************************)
@@ -70,12 +74,14 @@ let init_basic_static_information =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
     (*-------------------------------------------------------*)
     (*projection or combination*)
-    (*store_bonds_rhs_set =
-      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Set.empty;*)
     store_partition_bonds_rhs_map =
       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;
     store_partition_created_bonds_map =
       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;
+    store_partition_modified_map_1 =
+      Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
+    store_partition_modified_map_2 =
+      Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
 
   }
 
@@ -393,7 +399,8 @@ let collect_bonds_rhs_set parameter error store_bonds_rhs = (*REMOVE?*)
 
 let collect_partition_bonds_rhs_map parameter error
     store_potential_tuple_pair_set =
-  let proj (b, c, _, e) = (b,c,e) in
+  (*agent_type, site_type, site_type', state*)
+  let proj (b, c, _, e) = (b, c, e) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Partition_bonds_rhs_map.monadic_partition_set
     (fun _parameter error (x, y) ->
@@ -481,7 +488,8 @@ let collect_created_bonds parameter error rule rule_id store_result =
 
 let collect_partition_created_bonds_map parameter error
     store_potential_tuple_pair_set =
-  let proj (b, c, _, e) = (b,c,e) in
+  (*agent_type, site_type, site_type', state*)
+  let proj (b, c, _, e) = (b, c, e) in
   (*set_a map_b*)
   Site_accross_bonds_domain_type.Partition_created_bonds_map.monadic_partition_set
     (fun _parameter error (x, y) ->
@@ -540,6 +548,34 @@ let collect_site_modified parameter error rule_id rule store_result =
       ) rule.Cckappa_sig.diff_direct store_result
   in
   error, store_result
+
+(***************************************************************)
+
+let collect_partition_modified_map_1 parameter error
+    store_potential_tuple_pair_set =
+  (*agent_type, site_type, site_type', state*)
+  let proj (b, _, d, _) = b, d in
+  Site_accross_bonds_domain_type.Partition_modified_map.monadic_partition_set
+    (fun _ error (x, _y) ->
+       (*get the first site*)
+       error, proj x
+    )
+    parameter
+    error
+    store_potential_tuple_pair_set
+
+let collect_partition_modified_map_2 parameter error
+    store_potential_tuple_pair_set =
+  (*agent_type, site_type, site_type', state*)
+  let proj (b, _, d, _) = b, d in
+  Site_accross_bonds_domain_type.Partition_modified_map.monadic_partition_set
+    (fun _ error (_x, y) ->
+       (*get the second site *)
+       error, proj y
+    )
+    parameter
+    error
+    store_potential_tuple_pair_set
 
 (***************************************************************)
 (*collect rule that has question marks on the right hand side*)

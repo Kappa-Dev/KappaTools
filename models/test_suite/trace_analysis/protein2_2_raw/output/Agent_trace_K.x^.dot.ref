@@ -1,8 +1,0 @@
-digraph G{
-"Init_35" [label="" style="invis" width="0px" height="0px"];
-"Node_34" [label="K(x!P@g)"];
-"Node_35" [label="K(x!free)"];
-"Node_34" -> "Node_35" [label="rule 9: P/K"];
-"Node_35" -> "Node_34" [label="rule 8: P.K"];
-"Init_35" -> "Node_35" [label=""];
-}
