@@ -848,7 +848,7 @@ struct
                       let () =
                         Loggers.fprintf
                           (Remanent_parameters.get_logger parameter)
-                          "\nAgent: %i:%s Site_b %i:%s Site %i:%s\n"
+                          "\n%i:%s: (Site_b %i:%s Site %i:%s)\n"
                           (Ckappa_sig.int_of_agent_id agent_id_t)
                           agent
                           (Ckappa_sig.int_of_site_name site_type_t)
@@ -865,7 +865,8 @@ struct
                       (fun i ->
                          Loggers.fprintf
                            (Remanent_parameters.get_logger parameter)
-                           "%i, " (Ckappa_sig.int_of_state_index i))
+                           "%i, " (Ckappa_sig.int_of_state_index i)
+                      )
                       state'_list_x
                   in
                   let error, (agent1, site1) =
@@ -883,7 +884,7 @@ struct
                   let () =
                     Loggers.fprintf
                       (Remanent_parameters.get_logger parameter)
-                      "\nAgent: %i:%s Site_b %i:%s Site %i:%s\n"
+                      "\n%i:%s (Site_b %i:%s, Site %i:%s)\n"
                       (Ckappa_sig.int_of_agent_id agent_id_u)
                       agent1
                       (Ckappa_sig.int_of_site_name site_type_u)
@@ -1273,7 +1274,7 @@ struct
                   if error' == error then ()
                   else
                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                      "WRONG TUPLE: !!! \n Rule %i agent_id_t: %i:%s site_type_x: %i:%s agent_type_y:%i:%s site_type_y:%i:%s \n"
+                      "WRONG TUPLE: !!! \n Rule %i agent_id_t: %i:%s( site_type_x: %i:%s), agent_type_y:%i:%s: (site_type_y:%i:%s) \n"
                       (Ckappa_sig.int_of_rule_id rule_id)
                       (Ckappa_sig.int_of_agent_id agent_id_t)
                       agent_t
