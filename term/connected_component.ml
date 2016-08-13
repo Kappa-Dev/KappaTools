@@ -423,8 +423,7 @@ let add_fully_specified_to_graph sigs graph cc =
               let g''' =
                 Tools.array_fold_lefti
                   (fun s acc -> function
-                     | UnSpec -> assert false
-                     | Free -> Edges.add_free a s acc
+                     | UnSpec | Free -> Edges.add_free a s acc
                      | Link (x',s') ->
                        match Mods.IntMap.find_option x' emb' with
                        | None -> acc
