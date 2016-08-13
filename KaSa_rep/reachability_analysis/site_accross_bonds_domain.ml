@@ -221,7 +221,7 @@ struct
         Site_accross_bonds_domain_static.store_partition_created_bonds_map = r
       } static
 
-(*------------------------------------------------------------*)
+  (*------------------------------------------------------------*)
 
   let get_modified_map static =
     (get_basic_static_information
@@ -633,7 +633,7 @@ struct
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
-(*use this function before apply a rule, like in is_enabled*)
+  (*use this function before apply a rule, like in is_enabled*)
 
   let get_state_of_site_in_precondition
       parameter error dynamic rule agent_id site_type precondition =
@@ -742,9 +742,56 @@ struct
                       modified*)
                     error, dynamic, precondition
                   | [], _ | _, [] ->
+
+                      let () =
+                        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                          "APPLY BONDS RHS RULE %i"
+                          (Ckappa_sig.int_of_rule_id rule_id)
+                      in
+                      let () =
+                        Loggers.fprintf
+                          (Remanent_parameters.get_logger parameter)
+                          "\nAgent: %i Site_b %i Site %i\n"
+                          (Ckappa_sig.int_of_agent_id agent_id_t)
+                          (Ckappa_sig.int_of_site_name site_type_t)
+                          (Ckappa_sig.int_of_site_name                          site_type'_x)
+                      in
+                    let () = Loggers.fprintf
+                      (Remanent_parameters.get_logger parameter)
+                      "state'_x: "
+                  in
+                  let () =
+                    List.iter
+                      (fun i ->
+                         Loggers.fprintf
+                           (Remanent_parameters.get_logger parameter)
+                           "%i, " (Ckappa_sig.int_of_state_index i))
+                      state'_list_x
+                  in
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameter)
+                      "\nAgent: %i Site_b %i Site %i\n"
+                      (Ckappa_sig.int_of_agent_id agent_id_u)
+                      (Ckappa_sig.int_of_site_name site_type_u)
+                      (Ckappa_sig.int_of_site_name                      site_type'_y)
+                  in
+                  let () = Loggers.fprintf
+                      (Remanent_parameters.get_logger parameter)
+                      "\nstate'_y: "
+                  in
+                  let () =
+                    List.iter
+                      (fun i ->
+                         Loggers.fprintf
+                           (Remanent_parameters.get_logger parameter)
+                           "%i, " (Ckappa_sig.int_of_state_index i))
+                      state'_list_y
+                  in
+                  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
                     let error, () =
                       Exception.warn parameter error __POS__
-                        ~message: "empty list in potential states in post condition" Exit ()
+                        ~message:((context rule_id agent_id_t site_type'_x)^(context rule_id agent_id_u site_type'_y)^"\nempty list in potential states in post condition") Exit ()
                     in
                     error, dynamic, precondition
                   | [_], _ | _, [_] -> (*general case*)
@@ -873,8 +920,8 @@ struct
                 let error, dynamic, precondition =
                   match state'_list_x, state'_list_y with
                   | _::_::_, _::_::_ ->
-                 (*we know for sure that none of the two sites have been
-                   modified*)
+                    (*we know for sure that none of the two sites have been
+                      modified*)
                     error, dynamic, precondition
                   | [], _ | _, [] ->
                     let error, () =
@@ -927,8 +974,8 @@ struct
   (*a site is modified (explicitly)*)
 
 
-(*build a new path *)
-  let get_state_of_site_in_pre_post_condition_2 parameter error dynamic
+  (*build a new path *)
+  let get_state_of_site_in_pre_post_condition_2 parameter error dynamic rule_id
       agent_id_t
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
@@ -959,36 +1006,76 @@ struct
       match state_list_lattice with
       | Usual_domains.Val l -> error, l
       | Usual_domains.Any | Usual_domains.Undefined ->
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "RULE GET STATE OF SITE RULE %i\n"
+          (Ckappa_sig.int_of_rule_id rule_id)
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameter)
+          "Agent: %i Site_b %i \n"
+          (Ckappa_sig.int_of_agent_id agent_id_t)
+          (Ckappa_sig.int_of_site_name site_type_x)
+
+      in
+
+    let () =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameter)
+      "\nAgent_type: %i Site_b %i Site %i\n"
+      (Ckappa_sig.int_of_agent_name agent_type_y)
+      (Ckappa_sig.int_of_site_name site_type_y)
+      (Ckappa_sig.int_of_site_name                      site_type'_y)
+    in
+    let () = Loggers.fprintf
+      (Remanent_parameters.get_logger parameter)
+      "\nstate'_y: %s"
+      (match state_list_lattice with
+         Usual_domains.Any -> "ANY"
+       | Usual_domains.Undefined -> "BOTTOM"
+       | _ -> "")
+    in
+    (*  let () =
+    List.iter
+      (fun i ->
+         Loggers.fprintf
+           (Remanent_parameters.get_logger parameter)
+           "%i, " (Ckappa_sig.int_of_state_index i))
+      state_list
+        in*)
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+
         Exception.warn parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
-    let get_state_of_site_in_precondition_2
-        parameter error dynamic rule agent_id
-        (site_type_x, agent_type_y, site_type_y)
-        site_type'_y
-        precondition =
-      let defined_in = Communication.LHS rule in
-      get_state_of_site_in_pre_post_condition_2
-        parameter error dynamic
-        agent_id
-        (site_type_x, agent_type_y, site_type_y)
-        site_type'_y
-        defined_in
-        precondition
+  let get_state_of_site_in_precondition_2
+      parameter error dynamic rule_id rule agent_id
+      (site_type_x, agent_type_y, site_type_y)
+      site_type'_y
+      precondition =
+    let defined_in = Communication.LHS rule in
+    get_state_of_site_in_pre_post_condition_2
+      parameter error dynamic
+      rule_id agent_id
+      (site_type_x, agent_type_y, site_type_y)
+      site_type'_y
+      defined_in
+      precondition
 
-    let get_state_of_site_in_postcondition_2
-        parameter error dynamic rule agent_id
-        (site_type_x, agent_type_y, site_type_y) site_type'_y
-        precondition =
-      let defined_in = Communication.RHS rule in
-      get_state_of_site_in_pre_post_condition_2
-        parameter error dynamic
-        agent_id
-        (site_type_x, agent_type_y, site_type_y)
-        site_type'_y
-        defined_in precondition
+  let get_state_of_site_in_postcondition_2
+      parameter error dynamic rule_id rule agent_id
+      (site_type_x, agent_type_y, site_type_y) site_type'_y
+      precondition =
+    let defined_in = Communication.RHS rule in
+    get_state_of_site_in_pre_post_condition_2
+      parameter error dynamic
+      rule_id agent_id
+      (site_type_x, agent_type_y, site_type_y)
+      site_type'_y
+      defined_in precondition
 
   let apply_rule_modified_explicity static dynamic error rule_id
       rule precondition = (*CHECK ME*)
@@ -997,11 +1084,11 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store_modified_map = get_modified_map static in
     let error, modified_set =
-        Site_accross_bonds_domain_static.get_set parameter
-          error
-          rule_id
-          Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
-          store_modified_map
+      Site_accross_bonds_domain_static.get_set parameter
+        error
+        rule_id
+        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+        store_modified_map
     in
     let store_partition_modified_map_1 = get_partition_modified_map_1 static in
     (*------------------------------------------------------*)
@@ -1029,11 +1116,22 @@ struct
                 let error', dynamic, precondition, state'_list_y =
                   get_state_of_site_in_postcondition_2
                     parameter error dynamic
-                    rule
+                    rule_id rule
                     agent_id_t
                     (site_type_x, agent_type_y, site_type_y)
                     site_type'_y
                     precondition
+                in
+                let () =
+                  if error' == error then ()
+                  else
+                    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      "WRONG TUPLE: !!! \n Rule %i agent_id_t: %i site_type_x: %i agent_type_y:%i site_type_y:%i \n"
+                      (Ckappa_sig.int_of_rule_id rule_id)
+                      (Ckappa_sig.int_of_agent_id agent_id_t)
+                      (Ckappa_sig.int_of_site_name site_type_x)
+                      (Ckappa_sig.int_of_agent_name agent_type_y)
+                      (Ckappa_sig.int_of_site_name site_type_y)
                 in
                 let error =
                   Exception.check_point
@@ -1046,8 +1144,8 @@ struct
                 let error, dynamic, precondition =
                   match state'_list_y with
                   | _::_::_ ->
-                 (*we know for sure that none of the two sites have been
-                   modified*)
+                    (*we know for sure that none of the two sites have been
+                      modified*)
                     error, dynamic, precondition
                   | [] ->
                     let error, () =
@@ -1173,8 +1271,8 @@ struct
         (*tuple pair where the first site belongs to the created bond*)
         (*let store_potential_tuple_pair_created_bonds =
           get_potential_tuple_pair_created_bonds static
-        in
-        let error =
+          in
+          let error =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
             (fun (x, y) error ->
                let error,
@@ -1192,14 +1290,14 @@ struct
                in
                error
             ) store_potential_tuple_pair_created_bonds error
-        in
-        let () = Loggers.print_newline log in
-        (*--------------------------------------------------------*)
-        (*1.a uple pair where the first site belongs to a bond on rhs§*)
-        let store_potential_tuple_pair_bonds_rhs =
+          in
+          let () = Loggers.print_newline log in
+          (*--------------------------------------------------------*)
+          (*1.a uple pair where the first site belongs to a bond on rhs§*)
+          let store_potential_tuple_pair_bonds_rhs =
           get_potential_tuple_pair_bonds_rhs static
-        in
-        let error =
+          in
+          let error =
           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
             (fun (x, y) error ->
                let error,
@@ -1217,12 +1315,12 @@ struct
                in
                error
             ) store_potential_tuple_pair_bonds_rhs error
-        in
-        let () = Loggers.print_newline log in*)
+          in
+          let () = Loggers.print_newline log in*)
         (*--------------------------------------------------------*)
         (**)
         (*let store_potential_tuple_pair = get_potential_tuple_pair static in
-        let error =
+          let error =
           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
             (fun (x, y) error ->
                let error, (agent, site, site', state,

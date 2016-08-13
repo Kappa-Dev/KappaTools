@@ -399,6 +399,7 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
                 in
                 aux error next_path
               else
+                let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WRONG TARGET\n" in
                 error, Cannot_exist
           end
       end
@@ -462,6 +463,12 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
     -> error, dynamic, potential_values
   | Usual_domains.Any ->
     begin
+      let path =
+        match path.defined_in with
+        | RHS r ->
+          { path with defined_in = LHS r}
+        | LHS _ | Pattern -> path
+      in
       let error, dynamic, values =
         precondition.state_of_site error dynamic path
       in
@@ -480,25 +487,25 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
         error, dynamic, values
     end
 
-(* TO DO: repair the cache *)
 let get_state_of_site_in_pre_post_condition
     parameters kappa_handler error precondition dynamic path =
-    begin
-      match path.defined_in with
-      | LHS _ | Pattern ->
-        let error, dynamic, range = precondition.state_of_site error dynamic path
-        in
-        error, dynamic, precondition, range
-      | RHS rule ->
-        let error, dynamic, range =
-          post_condition
-            parameters kappa_handler error
-            rule.Cckappa_sig.e_rule_c_rule precondition dynamic path
-        in
-        error, dynamic, precondition,  range
-    end
+  begin
+    match path.defined_in with
+    | LHS _ | Pattern ->
+      let error, dynamic, range = precondition.state_of_site error dynamic path
+      in
+      error, dynamic, precondition, range
+    | RHS rule ->
+      let error, dynamic, range =
+        post_condition
+          parameters kappa_handler error
+          rule.Cckappa_sig.e_rule_c_rule precondition dynamic path
+      in
+      error, dynamic, precondition,  range
+  end
 
-let refine_information_about_state_of_site parameters kappa_handler precondition f =
+let refine_information_about_state_of_site
+    parameters kappa_handler precondition f =
   let new_f error dynamic path =
     let error, dynamic, _ ,old_output = get_state_of_site_in_pre_post_condition
         parameters kappa_handler error precondition dynamic path in

@@ -1903,6 +1903,10 @@ struct
         (fun error dynamic current_path former_answer ->
            (*-----------------------------------------------------*)
            (*typing*)
+           match current_path.Communication.defined_in with
+           | Communication.RHS _ -> error, dynamic, former_answer
+           | Communication.LHS _
+           | Communication.Pattern ->
            let error, answer_contact_map =
              precondition_typing
                parameter error kappa_handler rule_id

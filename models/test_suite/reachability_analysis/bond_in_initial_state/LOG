@@ -1,5 +1,5 @@
-Kappa Static Analyzer (DomainBased-1858-gacb6cfb-dirty) (without Tk interface)
-Analysis launched at 2016/08/13 16:44:51 (GMT+2) on applecell.home
+Kappa Static Analyzer (DomainBased-1859-gddc88d4-dirty) (without Tk interface)
+Analysis launched at 2016/08/13 18:47:41 (GMT+2) on applecell.home
 Parsing initial_state.ka...
 done
 Compiling...
@@ -7,6 +7,626 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0 site_type_x: 0 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 0 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:0 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 1 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: ANY
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 1 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
+WRONG TARGET
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 0 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:0 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 0 Site 1
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:0 
+RULE GET STATE OF SITE RULE 0
+Agent: 1 Site_b 0 
+
+Agent_type: 1 Site_b 1 Site 0
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 1 site_type_x: 0 agent_type_y:1 site_type_y:1 
 
 ------------------------------------------------------------
 * Dead rules :
@@ -37,302 +657,231 @@ Whenever the site x of B and the site x of A are bound together, then the site x
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 746: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 746: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 881: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 746: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 746: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 881: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 2 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 3 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 746: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 746: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 881: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1832; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 962; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1043:  rule 0 agent_id 1 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1054: empty list in potential states in post condition; exception:Exit
+Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 2 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 3 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1049; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1141:  rule 0 agent_id 1 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1152: empty list in potential states in post condition; exception:Exit
