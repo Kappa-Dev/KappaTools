@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 11 2016>
+   * Last modification: Time-stamp: <Aug 13 2016>
    *
    * Abstract domain to record live rules
    *
@@ -98,7 +98,9 @@ type prefold = { fold: 'a. 'a fold}
   precondition*)
 
 val refine_information_about_state_of_site:
-  precondition ->
+  Remanent_parameters_sig.parameters ->
+  Cckappa_sig.kappa_handler ->
+    precondition ->
   (Exception.method_handler ->
    Analyzer_headers.global_dynamic_information ->
    path ->
@@ -138,12 +140,13 @@ val overwrite_potential_partners_map:
   -> prefold ->
   Exception.method_handler * precondition
 
-val get_state_of_sites_in_pre_post_condition:
+val get_state_of_site_in_pre_post_condition:
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
-precondition ->
+  precondition ->
   Analyzer_headers.global_dynamic_information ->
   path ->
   Exception.method_handler * Analyzer_headers.global_dynamic_information *
+  precondition *
   Ckappa_sig.c_state list Usual_domains.flat_lattice

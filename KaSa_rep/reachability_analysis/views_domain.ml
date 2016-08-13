@@ -1809,7 +1809,7 @@ struct
 
   let compute_pattern_navigation
       parameter error kappa_handler
-      aux dynamic path rule rule_id step tl bdu_false bdu_true site_correspondence
+      aux dynamic path rule step tl bdu_false bdu_true site_correspondence
       store_covering_classes_id fixpoint_result =
     let error, agent =
       match
@@ -1899,7 +1899,7 @@ struct
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
       Communication.refine_information_about_state_of_site
-        precondition
+        parameter kappa_handler precondition
         (fun error dynamic current_path former_answer ->
            (*-----------------------------------------------------*)
            (*typing*)
@@ -1927,7 +1927,7 @@ struct
                  let error, (dynamic, new_answer) =
                    compute_pattern_navigation
                      parameter error kappa_handler aux dynamic path
-                     rule rule_id step tl bdu_false bdu_true site_correspondence
+                     rule step tl bdu_false bdu_true site_correspondence
                      store_covering_classes_id fixpoint_result
                  in
                  let update_answer =

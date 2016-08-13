@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 06 2016>
+  * Last modification: Time-stamp: <Aug 13 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -666,7 +666,9 @@ struct
      agents, whether they cannot be bound to the same agent, whether we cannot
      know, and deal with accordingly *)
 
-  let get_state_of_site_in_precondition parameter error dynamic rule_id agent_id site_type precondition =
+  let get_state_of_site_in_precondition
+      parameter error dynamic rule_id agent_id site_type precondition
+    =
     (*binding action: A.x.B.z -> parallel bonds: A.x.y.B.z.t, B.z.t.A.x.y
       (first bound)*)
     (*build a path for the second site in this bound. A.y*)

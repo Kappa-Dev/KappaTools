@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 11 2016>
+   * Last modification: Time-stamp: <Aug 13 2016>
    *
    * Abstract domain to record live rules
    *
@@ -155,7 +155,7 @@ let dummy_precondition =
     partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
 
-let get_state_of_site error dynamic precondition path =
+(*let get_state_of_site error dynamic precondition path =
   match
     PathMap.find path precondition.cache_state_of_site
   with
@@ -187,18 +187,9 @@ let get_state_of_site error dynamic precondition path =
         }
       in
       error, dynamic, precondition, output
-    end
+    end*)
 
-let refine_information_about_state_of_site precondition f =
-  let new_f error dynamic path =
-    let error, dynamic, _ ,old_output = get_state_of_site error dynamic precondition path in
-    f error dynamic path old_output
-  in
-  {
-    precondition with
-    cache_state_of_site = PathMap.empty Usual_domains.Any;
-    state_of_site = new_f
-  }
+
 
 let get_potential_partner precondition error agent_type site state =
   let error, rep = precondition.partner_map error agent_type site state in
@@ -332,7 +323,7 @@ let may_get_free_by_side_effect parameters kappa_handler error precondition rule
               match state_list with
               | [] -> error, false
               | state::tail ->
-                  let error, opt =
+                let error, opt =
                   Handler.dual
                     parameters error kappa_handler site.Cckappa_sig.agent_type
                     site.Cckappa_sig.site state
@@ -489,12 +480,53 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
         error, dynamic, values
     end
 
-let get_state_of_sites_in_pre_post_condition
+(* TO DO: repair the cache *)
+let get_state_of_site_in_pre_post_condition
     parameters kappa_handler error precondition dynamic path =
-  match path.defined_in with
-  | LHS _ | Pattern ->
-    precondition.state_of_site error dynamic path
-  | RHS rule ->
-    post_condition
-      parameters kappa_handler error
-      rule.Cckappa_sig.e_rule_c_rule precondition dynamic path
+    begin
+      match path.defined_in with
+      | LHS _ | Pattern ->
+        let error, dynamic, range = precondition.state_of_site error dynamic path
+        in
+        error, dynamic, precondition, range
+      | RHS rule ->
+        let error, dynamic, range =
+          post_condition
+            parameters kappa_handler error
+            rule.Cckappa_sig.e_rule_c_rule precondition dynamic path
+        in
+        error, dynamic, precondition,  range
+    end
+
+let refine_information_about_state_of_site parameters kappa_handler precondition f =
+  let new_f error dynamic path =
+    let error, dynamic, _ ,old_output = get_state_of_site_in_pre_post_condition
+        parameters kappa_handler error precondition dynamic path in
+    f error dynamic path old_output
+  in
+  {
+    precondition with
+    cache_state_of_site = PathMap.empty Usual_domains.Any;
+    state_of_site = new_f
+  }
+
+let get_state_of_site error dynamic precondition path =
+  match
+    PathMap.find path precondition.cache_state_of_site
+  with
+  | Some output ->
+    error, dynamic, precondition, output
+  | None ->
+    begin
+      let error, dynamic, output =
+        precondition.state_of_site error dynamic path
+      in
+      let precondition =
+        {
+          precondition with
+          cache_state_of_site =
+            PathMap.add path output precondition.cache_state_of_site
+        }
+      in
+      error, dynamic, precondition, output
+    end
