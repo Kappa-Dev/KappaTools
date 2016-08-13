@@ -1,9 +1,7 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jul 29 2016>
+  * Last modification: Time-stamp: <Aug 13 2016>
 *)
-
-
 
 module Make(I:Ode_interface.Interface) =
 struct
@@ -335,13 +333,13 @@ struct
               Location.dummy_annot acc,
               Location.dummy_annot @@
               Array.fold_left
-                    (fun expr h ->
-                    Alg_expr.BIN_ALG_OP
-                      (Operator.MULT,
-                       Location.dummy_annot expr,
-                       Location.dummy_annot (convert_cc h network)))
-                    (Alg_expr.CONST Nbr.one)
-                    l))
+                (fun expr h ->
+                   Alg_expr.BIN_ALG_OP
+                     (Operator.MULT,
+                      Location.dummy_annot expr,
+                      Location.dummy_annot (convert_cc h network)))
+                (Alg_expr.CONST Nbr.one)
+                l))
         (Alg_expr.CONST Nbr.zero)
         cc, loc
     | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
@@ -605,8 +603,8 @@ struct
         let list = Mods.DynArray.get init_tab id' in
         List.iter (fun id' -> add_succ id id') list
       | Alg_expr.KAPPA_INSTANCE id',_ ->
-          let list = Mods.DynArray.get init_tab id' in
-          List.iter (fun id'' -> add_succ id' id'') list
+        let list = Mods.DynArray.get init_tab id' in
+        List.iter (fun id'' -> add_succ id' id'') list
       | Alg_expr.ALG_VAR id,_ ->
         let id' = Mods.IntMap.find_option id network.varmap in
         match id' with
@@ -621,8 +619,8 @@ struct
            | Dummy_decl -> ()
            | Init_expr (id,b,_) -> aux id b
            | Var (id,a,b) ->
-               let () = Mods.DynArray.set dec_tab id (decl,a,b) in
-               aux id b) list in
+             let () = Mods.DynArray.set dec_tab id (decl,a,b) in
+             aux id b) list in
     let top_sort =
       let clean k to_be_visited =
         let l = Mods.DynArray.get lsucc k in
@@ -817,14 +815,20 @@ struct
     split_rules network (split_var_declaration network init_sort_rules_and_decl)
 
   let network_from_compil env contact_map init =
+    let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules env in
+    let () = Format.printf "\t -initial states @." in
     let initial_state =
       species_of_initial_state (Environment.signatures env) contact_map init in
+    let () = Format.printf "\t -saturating the set of molecular species @." in
     let network =
       compute_reactions
         (Environment.signatures env) contact_map rules initial_state in
+    let () = Format.printf "\t -tokens @." in
     let network = convert_tokens env network in
+    let () = Format.printf "\t -variables @." in
     let network = convert_var_defs env contact_map init network in
+    let () = Format.printf "\t -observables @." in
     let network = convert_obs env network in
     network
 
@@ -1146,13 +1150,19 @@ struct
     let sorted_rules_and_decl =
       split_rules_and_decl network
     in
+    let () = Format.printf "+ exporting the network... @." in
+    let () = Format.printf "\t -main function @." in
     let () =
       export_main
         ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
         logger compil network sorted_rules_and_decl
     in
+    let () = Format.printf "\t -ode system @." in
     let () = export_dydt logger network sorted_rules_and_decl in
+    let () = Format.printf "\t -initial state @." in
+
     let () = export_init logger network in
+    let () = Format.printf "\t -rates @." in
     let () = export_obs logger network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in
     ()
