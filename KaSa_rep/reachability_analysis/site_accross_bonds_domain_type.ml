@@ -274,13 +274,13 @@ let convert_single parameters error kappa_handler single =
   error, (agent, site, state)
 
 let convert_double parameters error kappa_handler double =
-  let (agent, site, site', state, state') = double in
+  let (agent, site, site', state) = double in
   let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
-  let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in
+  (*let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in*)
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
   let error, agent = Handler.translate_agent parameters error kappa_handler agent in
-  error, (agent, site, site', state, state')
+  error, (agent, site, site', state)
 
 let convert_tuple parameters error kappa_handler tuple =
   let (agent,site,site',state),(agent'',site'',site''',state'') = tuple in

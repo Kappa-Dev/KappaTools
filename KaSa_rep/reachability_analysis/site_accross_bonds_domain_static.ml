@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 12 2016>
+   * Last modification: Time-stamp: <Aug 13 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -41,6 +41,8 @@ type basic_static_information =
     (*------------------------------------------------------------------*)
     store_potential_tuple_pair :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
+    (*store_potential_tuple_pair_set:
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;*)
     (*------------------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map :
@@ -72,6 +74,8 @@ let init_basic_static_information =
     (*-------------------------------------------------------*)
     store_potential_tuple_pair =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
+    (*store_potential_tuple_pair_set =
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;*)
     (*-------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map =
@@ -286,7 +290,80 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
 (***************************************************************)
 (*collect a set of tuple pair (A.x.y, B.z.t)*)
 
-let collect_pair_sites_aux parameter error rule_id store_views_rhs =
+let collect_potential_tuple_pair parameter error
+    rule_id store_bonds_rhs store_views_rhs kappa_handler store_result =
+  let error, bonds_rhs_set =
+    get_set parameter error rule_id
+      Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+      store_bonds_rhs
+  in
+  let error, views_rhs_set =
+    get_set parameter error rule_id
+      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+      store_views_rhs
+  in
+  Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+    (fun (x, y) (error, store_result) ->
+       let (agent_id, agent_type, site_type, state) = x in
+       let (agent_id1, agent_type1, site_type1, state1) = y in
+       let error, fst_list =
+       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (fun v (error, current_list) ->
+            let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
+            if agent_id = agent_id_v &&
+               agent_type = agent_type_v && site_type <> site_type_v
+            then
+              let fst_list =
+                (agent_type, site_type, site_type_v, state) ::
+                current_list
+              in
+              error, fst_list
+            else error, current_list
+         ) views_rhs_set (error, [])
+       in
+       let error, snd_list =
+       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (fun v (error, current_list) ->
+            let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
+            if agent_id1 = agent_id_v &&
+               agent_type1 = agent_type_v && site_type1 <> site_type_v
+            then
+              let snd_list =
+                (agent_type1, site_type1, site_type_v, state1) ::
+                current_list
+              in
+              error, snd_list
+            else error, current_list
+         ) views_rhs_set (error, [])
+       in
+       let error, store_result =
+         List.fold_left (fun (error, store_result) x ->
+             List.fold_left (fun (error, store_result) y ->
+                 let error, (agent, site, site', state_x,
+                             agent1, site1, site1', state1_x) =
+                   Site_accross_bonds_domain_type.convert_tuple
+                     parameter error kappa_handler
+                     (x, y)
+                 in
+                 let () =
+                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                     "%s:(%s:%s, %s); %s:(%s:%s, %s)\n"
+                     agent site state_x site' agent1 site1 state1_x site1'
+                 in
+                 let error, store_result =
+                   Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.add_when_not_in
+                     parameter error
+                     (x, y)
+                     store_result
+                 in
+                 error, store_result
+               ) (error, store_result) snd_list
+           ) (error, store_result) fst_list
+       in
+       error, store_result
+    ) bonds_rhs_set (error, store_result)
+
+(*let collect_pair_sites_aux parameter error rule_id store_views_rhs =
   let error, views_rhs_set =
     get_set parameter error rule_id
       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
@@ -366,7 +443,7 @@ let collect_potential_tuple_pair parameter error rule_id
       ) store_pair_set (error, store_result)
   in
   error, store_result
-
+         *)
 (***************************************************************)
 (*use the projection of set*)
 (*

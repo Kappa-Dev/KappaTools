@@ -172,6 +172,17 @@ struct
         Site_accross_bonds_domain_static.store_potential_tuple_pair = r
       } static
 
+  (*let get_potential_tuple_pair_set static =
+    (get_basic_static_information
+       static).Site_accross_bonds_domain_static.store_potential_tuple_pair_set
+
+  let set_potential_tuple_pair_set r static =
+    set_basic_static_information
+      {
+        (get_basic_static_information static) with
+        Site_accross_bonds_domain_static.store_potential_tuple_pair_set = r
+      } static*)
+
   (*-------------------------------------------------------------*)
   (*
   let get_bonds_rhs_set static =
@@ -361,10 +372,37 @@ struct
     (*------------------------------------------------------------*)
     (*tuple pair*)
     let store_views_rhs = get_views_rhs static in
+    let store_bonds_rhs = get_bonds_rhs static in
+    let store_potential_tuple_pair = get_potential_tuple_pair static in
+    let error, store_potential_tuple_pair =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair
+        parameter error
+        rule_id store_bonds_rhs store_views_rhs
+        kappa_handler
+        store_potential_tuple_pair
+    in
+    let static = set_potential_tuple_pair store_potential_tuple_pair
+        static in
+
+    (*let store_views_rhs = get_views_rhs static in
+    let store_bonds_rhs = get_bonds_rhs static in
+    let store_potential_tuple_pair_set =
+      get_potential_tuple_pair_set static in
+    let error, store_potential_tuple_pair_set =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
+        parameter error
+        rule_id store_bonds_rhs
+        store_views_rhs
+        kappa_handler
+        store_potential_tuple_pair_set
+    in
+    let static = set_potential_tuple_pair_set store_potential_tuple_pair_set
+        static in
+    (**)
     let error, store_test =
       Site_accross_bonds_domain_static.collect_pair_sites_aux
         parameter error rule_id store_views_rhs
-    in
+    in*)
     (* store_potential_tuple_pair is completely wrong *)
     (* Let me recall you the definition.
        this set should contain the pairs
@@ -377,9 +415,9 @@ struct
     (* please collect that set by enumerating the bonds on the rhs, then on the list of other sites that occur in A_t,
        then on the list of other sites that occur in A_u *)
     (* Currently, I do not understand your definition *)
-    (* but some sites site_t, site_u are not even binding sites !!! *)    
+    (* but some sites site_t, site_u are not even binding sites !!! *)
 
-    let store_potential_tuple_pair = get_potential_tuple_pair static in
+    (*let store_potential_tuple_pair = get_potential_tuple_pair static in
     let error, store_potential_tuple_pair =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair
         parameter error
@@ -387,7 +425,7 @@ struct
         store_test
         store_potential_tuple_pair
     in
-    let static = set_potential_tuple_pair store_potential_tuple_pair static in
+    let static = set_potential_tuple_pair store_potential_tuple_pair static in*)
     (*------------------------------------------------------------*)
     (*created a bond*)
     let store_created_bonds = get_created_bonds static in
@@ -432,6 +470,7 @@ struct
   let scan_rules static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
+    let kappa_handler = get_kappa_handler static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter
@@ -452,17 +491,32 @@ struct
     let _ =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.iter
         (fun ((a,b,c,d),(e,f,g,h)) ->
+           let error, (agent, site, site', state,
+                       agent1, site1, site1', state1) =
+             Site_accross_bonds_domain_type.convert_tuple
+               parameter error kappa_handler
+               ((a, b, c, d), (e, f, g, h))
+           in
            Loggers.fprintf
              (Remanent_parameters.get_logger parameter)
-             "%i %i %i (%i) | %i %i %i (%i) \n"
+             "%i:%s %i:%s %i:%s (%i:%s) | %i:%s %i:%s %i:%s (%i:%s) \n"
              (Ckappa_sig.int_of_agent_name a)
+             agent
              (Ckappa_sig.int_of_site_name b)
+             site
              (Ckappa_sig.int_of_site_name c)
+             site'
              (Ckappa_sig.int_of_state_index d)
+             state
              (Ckappa_sig.int_of_agent_name e)
+             agent1
              (Ckappa_sig.int_of_site_name f)
+             site1
              (Ckappa_sig.int_of_site_name g)
-             (Ckappa_sig.int_of_state_index h))
+             site1'
+             (Ckappa_sig.int_of_state_index h)
+             state1
+        )
         store_potential_tuple_pair
     in
 
@@ -774,19 +828,33 @@ struct
                       modified*)
                     error, dynamic, precondition
                   | [], _ | _, [] ->
-
                       let () =
                         Loggers.fprintf (Remanent_parameters.get_logger parameter)
                           "APPLY BONDS RHS RULE %i"
                           (Ckappa_sig.int_of_rule_id rule_id)
                       in
+                      let error, (agent, site) =
+                        Site_accross_bonds_domain_type.convert_single_without_state
+                          parameter error
+                          kappa_handler
+                          (agent_type_t, site_type_t)
+                      in
+                      let error, (_, site') =
+                        Site_accross_bonds_domain_type.convert_single_without_state
+                          parameter error
+                          kappa_handler
+                          (agent_type_t, site_type'_x)
+                      in
                       let () =
                         Loggers.fprintf
                           (Remanent_parameters.get_logger parameter)
-                          "\nAgent: %i Site_b %i Site %i\n"
+                          "\nAgent: %i:%s Site_b %i:%s Site %i:%s\n"
                           (Ckappa_sig.int_of_agent_id agent_id_t)
+                          agent
                           (Ckappa_sig.int_of_site_name site_type_t)
+                          site
                           (Ckappa_sig.int_of_site_name                          site_type'_x)
+                          site'
                       in
                     let () = Loggers.fprintf
                       (Remanent_parameters.get_logger parameter)
@@ -800,13 +868,28 @@ struct
                            "%i, " (Ckappa_sig.int_of_state_index i))
                       state'_list_x
                   in
+                  let error, (agent1, site1) =
+                    Site_accross_bonds_domain_type.convert_single_without_state
+                      parameter error
+                      kappa_handler
+                      (agent_type_u, site_type_u)
+                  in
+                  let error, (_, site1') =
+                    Site_accross_bonds_domain_type.convert_single_without_state
+                      parameter error
+                      kappa_handler
+                      (agent_type_u, site_type'_y)
+                  in
                   let () =
                     Loggers.fprintf
                       (Remanent_parameters.get_logger parameter)
-                      "\nAgent: %i Site_b %i Site %i\n"
+                      "\nAgent: %i:%s Site_b %i:%s Site %i:%s\n"
                       (Ckappa_sig.int_of_agent_id agent_id_u)
+                      agent1
                       (Ckappa_sig.int_of_site_name site_type_u)
+                      site1
                       (Ckappa_sig.int_of_site_name                      site_type'_y)
+                      site1'
                   in
                   let () = Loggers.fprintf
                       (Remanent_parameters.get_logger parameter)
@@ -1007,7 +1090,10 @@ struct
 
 
   (*build a new path *)
-  let get_state_of_site_in_pre_post_condition_2 parameter error dynamic rule_id
+  let get_state_of_site_in_pre_post_condition_2
+      kappa_handler
+      parameter error
+      dynamic rule_id
       agent_id_t
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
@@ -1051,23 +1137,37 @@ struct
           (Ckappa_sig.int_of_site_name site_type_x)
 
       in
-
-    let () =
-    Loggers.fprintf
-      (Remanent_parameters.get_logger parameter)
-      "\nAgent_type: %i Site_b %i Site %i\n"
-      (Ckappa_sig.int_of_agent_name agent_type_y)
-      (Ckappa_sig.int_of_site_name site_type_y)
-      (Ckappa_sig.int_of_site_name                      site_type'_y)
-    in
-    let () = Loggers.fprintf
-      (Remanent_parameters.get_logger parameter)
-      "\nstate'_y: %s"
-      (match state_list_lattice with
-         Usual_domains.Any -> "ANY"
-       | Usual_domains.Undefined -> "BOTTOM"
-       | _ -> "")
-    in
+      let error, (agent, site) =
+        Site_accross_bonds_domain_type.convert_single_without_state
+          parameter error
+          kappa_handler
+          (agent_type_y, site_type_y)
+      in
+      let error, (_, site') =
+        Site_accross_bonds_domain_type.convert_single_without_state
+          parameter error
+          kappa_handler
+          (agent_type_y, site_type'_y)
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameter)
+          "\nAgent_type: %i:%s Site_b %i:%s Site %i:%s\n"
+          (Ckappa_sig.int_of_agent_name agent_type_y)
+          agent
+          (Ckappa_sig.int_of_site_name site_type_y)
+          site
+          (Ckappa_sig.int_of_site_name site_type'_y)
+          site'
+      in
+      let () = Loggers.fprintf
+          (Remanent_parameters.get_logger parameter)
+          "\nstate'_y: %s"
+          (match state_list_lattice with
+             Usual_domains.Any -> "ANY"
+           | Usual_domains.Undefined -> "BOTTOM"
+           | _ -> "")
+      in
     (*  let () =
     List.iter
       (fun i ->
@@ -1076,20 +1176,21 @@ struct
            "%i, " (Ckappa_sig.int_of_state_index i))
       state_list
         in*)
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-
-        Exception.warn parameter error __POS__ Exit []
+      let () =
+        Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      Exception.warn parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
-  let get_state_of_site_in_precondition_2
+  let get_state_of_site_in_precondition_2 kappa_handler
       parameter error dynamic rule_id rule agent_id
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
       precondition =
     let defined_in = Communication.LHS rule in
     get_state_of_site_in_pre_post_condition_2
+      kappa_handler
       parameter error dynamic
       rule_id agent_id
       (site_type_x, agent_type_y, site_type_y)
@@ -1097,12 +1198,13 @@ struct
       defined_in
       precondition
 
-  let get_state_of_site_in_postcondition_2
+  let get_state_of_site_in_postcondition_2 kappa_handler
       parameter error dynamic rule_id rule agent_id
       (site_type_x, agent_type_y, site_type_y) site_type'_y
       precondition =
     let defined_in = Communication.RHS rule in
     get_state_of_site_in_pre_post_condition_2
+      kappa_handler
       parameter error dynamic
       rule_id agent_id
       (site_type_x, agent_type_y, site_type_y)
@@ -1147,6 +1249,7 @@ struct
                 let (agent_type_y, site_type_y, site_type'_y, state_y) = y in
                 let error', dynamic, precondition, state'_list_y =
                   get_state_of_site_in_postcondition_2
+                    kappa_handler
                     parameter error dynamic
                     rule_id rule
                     agent_id_t
@@ -1154,22 +1257,38 @@ struct
                     site_type'_y
                     precondition
                 in
+                let error, (agent_y, site_y) =
+                  Site_accross_bonds_domain_type.convert_single_without_state
+                    parameter error
+                    kappa_handler
+                    (agent_type_y, site_type_y)
+                in
+                let error, (agent_t, site_x) =
+                  Site_accross_bonds_domain_type.convert_single_without_state
+                    parameter error
+                    kappa_handler
+                    (agent_type_t, site_type_x)
+                in
                 let () =
                   if error' == error then ()
                   else
                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                      "WRONG TUPLE: !!! \n Rule %i agent_id_t: %i site_type_x: %i agent_type_y:%i site_type_y:%i \n"
+                      "WRONG TUPLE: !!! \n Rule %i agent_id_t: %i:%s site_type_x: %i:%s agent_type_y:%i:%s site_type_y:%i:%s \n"
                       (Ckappa_sig.int_of_rule_id rule_id)
                       (Ckappa_sig.int_of_agent_id agent_id_t)
+                      agent_t
                       (Ckappa_sig.int_of_site_name site_type_x)
+                      site_x
                       (Ckappa_sig.int_of_agent_name agent_type_y)
+                      agent_y
                       (Ckappa_sig.int_of_site_name site_type_y)
+                      site_y
                 in
                 let error =
                   Exception.check_point
                     Exception.warn
                     parameter error error'
-                    ~message:(context rule_id agent_id_t site_type'_y)
+                    ~message:(context rule_id agent_id_t site_type'_x)
                     __POS__ Exit
                 in
                 (*-----------------------------------------------------------*)
