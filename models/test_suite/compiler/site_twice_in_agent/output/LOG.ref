@@ -1,0 +1,16 @@
++ Command line to rerun is: 'KaSim' 'lhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
+Parsing lhs.ka...
+done
++ Sanity checks
++ Command line to rerun is: 'KaSim' 'rhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
+Parsing rhs.ka...
+done
++ Sanity checks
++ Command line to rerun is: 'KaSim' 'internal.ka' '-seed' '924556145' '-d' 'output' '--compile'
+Parsing internal.ka...
+done
++ Sanity checks
++ Command line to rerun is: 'KaSim' 'remove.ka' '-seed' '924556145' '-d' 'output' '--compile'
+Parsing remove.ka...
+done
++ Sanity checks

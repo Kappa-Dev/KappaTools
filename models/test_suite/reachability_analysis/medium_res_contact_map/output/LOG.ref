@@ -4,6 +4,336 @@ Compiling...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+<<<<<<< HEAD
+=======
+C:(y:C@y, x); C:(y:C@y, x)
+C:(y:C@y, x); C:(y:C@y, x)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, y)
+A:(z:A@y, z); A:(y:A@z, z)
+A:(z:A@y, z); A:(y:A@z, z)
+A:(z:A@y, z); A:(y:A@z, y)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, y)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, z); A:(z:A@y, z)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, z); A:(z:A@y, z)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, y); A:(z:A@y, y)
+A:(y:A@z, y); A:(z:A@y, z)
+A:(y:A@z, y); A:(z:A@y, y)
+0:A 2:z 0:y (1:A@y) | 0:A 3:y 0:y (1:A@z) 
+0:A 2:z 0:y (1:A@y) | 0:A 3:y 1:z (1:A@z) 
+0:A 2:z 0:y (1:A@y) | 0:A 3:y 2:z (1:A@z) 
+0:A 2:z 1:z (1:A@y) | 0:A 3:y 0:y (1:A@z) 
+0:A 2:z 1:z (1:A@y) | 0:A 3:y 1:z (1:A@z) 
+0:A 2:z 1:z (1:A@y) | 0:A 3:y 2:z (1:A@z) 
+0:A 2:z 3:y (1:A@y) | 0:A 3:y 0:y (1:A@z) 
+0:A 2:z 3:y (1:A@y) | 0:A 3:y 1:z (1:A@z) 
+0:A 2:z 3:y (1:A@y) | 0:A 3:y 2:z (1:A@z) 
+0:A 3:y 0:y (1:A@z) | 0:A 2:z 0:y (1:A@y) 
+0:A 3:y 0:y (1:A@z) | 0:A 2:z 1:z (1:A@y) 
+0:A 3:y 0:y (1:A@z) | 0:A 2:z 3:y (1:A@y) 
+0:A 3:y 1:z (1:A@z) | 0:A 2:z 0:y (1:A@y) 
+0:A 3:y 1:z (1:A@z) | 0:A 2:z 1:z (1:A@y) 
+0:A 3:y 1:z (1:A@z) | 0:A 2:z 3:y (1:A@y) 
+0:A 3:y 2:z (1:A@z) | 0:A 2:z 0:y (1:A@y) 
+0:A 3:y 2:z (1:A@z) | 0:A 2:z 1:z (1:A@y) 
+0:A 3:y 2:z (1:A@z) | 0:A 2:z 3:y (1:A@y) 
+2:C 1:y 0:x (1:C@y) | 2:C 1:y 0:x (1:C@y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 2:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 3:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 2:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 3:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 2:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 3:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 2:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 3:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 2:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 3:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 2 
+
+Agent_type: 0:A Site_b 3:y Site 2:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 2:z), agent_type_y:0:A: (site_type_y:3:y) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 0:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 3 
+
+Agent_type: 0:A Site_b 2:z Site 3:y
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:2:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Dead rules :
@@ -19,17 +349,24 @@ C is a dead agent.
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
 A(y~p?) <=> A(z~p?)
+=======
+In agent A, the internal state of site y is p, if and only if, the internal state of site z is p.
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
 <<<<<<< HEAD
 A() => [ A(z~u?) v A(z~p?) ]
 A() => [ A(y~u?) v A(y~p?) ]
 A() => [ A(z) ]
 A() => [ A(y) ]
 =======
+=======
+>>>>>>> dc62266... please do not erase the test suite
 The internal state of site z in agent A ranges over u and p.
 The internal state of site y in agent A ranges over u and p.
 The binding state of site z in agent A is always free.
@@ -39,8 +376,122 @@ The binding state of site y in agent A is always free.
 ------------------------------------------------------------
 * Static information
 * Dynamic information
+<<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
+=======
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
+Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+>>>>>>> dc62266... please do not erase the test suite

@@ -1,4 +1,5 @@
 digraph G{
+<<<<<<< HEAD
 "Init_26" [label="" style="invis" width="0px" height="0px"];
 "Node_35" [label="R(x!E@x,c!R@c,cr!free,n!R@cr)"];
 "Node_32" [label="R(x!E@x,c!R@c,cr!R@n,n!free)"];
@@ -16,4 +17,23 @@ digraph G{
 "Node_27" -> "Node_26" [label="rule 1: E/R"];
 "Node_26" -> "Node_27" [label="rule 0: E.R"];
 "Init_26" -> "Node_26" [label=""];
+=======
+"Init_31" [label="" style="invis" width="0px" height="0px"];
+"Node_40" [label="R(x!E@x,c!R@c,cr!free,n!R@cr)"];
+"Node_37" [label="R(x!E@x,c!R@c,cr!R@n,n!free)"];
+"Node_34" [label="R(x!E@x,c!R@c,cr!free,n!free)"];
+"Node_32" [label="R(x!E@x,c!free,cr!free,n!free)"];
+"Node_31" [label="R(x!free,c!free,cr!free,n!free)"];
+"Node_40" -> "Node_34" [label="rule 5: R/int"];
+"Node_37" -> "Node_34" [label="rule 5: R/int"];
+"Node_34" -> "Node_40" [label="rule 4: R.int"];
+"Node_34" -> "Node_37" [label="rule 4: R.int"];
+"Node_34" -> "Node_32" [label="rule 3: R/R"];
+"Node_34" -> "Node_32" [label="rule 3: R/R"];
+"Node_32" -> "Node_34" [label="rule 2: R.R"];
+"Node_32" -> "Node_34" [label="rule 2: R.R"];
+"Node_32" -> "Node_31" [label="rule 1: E/R"];
+"Node_31" -> "Node_32" [label="rule 0: E.R"];
+"Init_31" -> "Node_31" [label=""];
+>>>>>>> dc62266... please do not erase the test suite
 }

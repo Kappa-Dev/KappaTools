@@ -1,0 +1,35 @@
++ Command line to rerun is: 'KaSim' '-i' 'side-effects.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '--time-independent'
+Parsing side-effects.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - blackboard generation
+	 - computing causal past of each observed events (8)
+Stats:
+ number of step   : 26
+ longest story    : 5
+ average length   : 4.36363636364
+ geometric mean   : 4.49241785477
+
+	 - causal flow compression (8)
+
+
+	 - weak flow compression (1)
++ Pretty printing 1 flow
++ Pretty printing 1 weakly compressed flow
+Simulation ended

@@ -415,6 +415,21 @@ Influence_map:Inhibition_map:rule(3):'r3' B(z~u)->B(z~p) -> rule(1):'r1' B(z~u?,
 Influence_map:Inhibition_map:rule(4):'r4' B(z~p)->B(z~u) -> rule(2):'r2' A(z,t~u),B(z~p,t~u)->A(z!1,t~u),B(z~p!1,t~u)[0->1]
 Influence_map:Inhibition_map:rule(5):'r5' A(z!1,t~u),B(z!1,t~u)->A(z!1,t~p),B(z!1,t~p) -> rule(1):'r1' B(z~u?,t~u)->B(z~u?,t~p)[1->0]
 Reachability analysis...
+<<<<<<< HEAD
+=======
+A:(z:B@z, t); B:(z:A@z, t)
+A:(z:B@z, t); B:(z:A@z, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(z:A@z, z); A:(z:B@z, t)
+A:(z:B@z, t); B:(z:A@z, t)
+B:(z:A@z, t); A:(z:B@z, t)
+A:(z:B@z, t); B:(z:A@z, t)
+B:(z:A@z, t); A:(z:B@z, t)
+0:A 0:z 1:t (1:B@z) | 1:B 1:z 0:z (1:A@z) 
+0:A 0:z 1:t (1:B@z) | 1:B 1:z 2:t (1:A@z) 
+1:B 1:z 0:z (1:A@z) | 0:A 0:z 1:t (1:B@z) 
+1:B 1:z 2:t (1:A@z) | 0:A 0:z 1:t (1:B@z) 
+>>>>>>> dc62266... please do not erase the test suite
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -588,12 +603,20 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=42
+=======
+Id=44
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=41
+=======
+  Id=43
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=29
      Node(site_type:2<1)
@@ -635,12 +658,20 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=50
+=======
+Id=38
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=49
+=======
+  Id=37
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -662,6 +693,25 @@ EXTENSIONAL DESCRIPTION:
 			A(z!free,t~p)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 0:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2: r2:
 		the precondition is not satisfied yet
@@ -673,6 +723,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t~)
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 5
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 0:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 5 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -681,6 +742,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t~)
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 0:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -691,19 +763,33 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=55
+=======
+Id=61
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=54
    Node(site_type:1<1)
     Id=53
+=======
+  Id=60
+   Node(site_type:1<1)
+    Id=59
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=52
+=======
+      Id=58
+>>>>>>> dc62266... please do not erase the test suite
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<1)
@@ -728,6 +814,17 @@ EXTENSIONAL DESCRIPTION:
 			B(z~u,z!free,t~p)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 0:z Site 1:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -738,21 +835,37 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=63
+=======
+Id=69
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=62
    Node(site_type:1<2)
     Id=57
+=======
+  Id=68
+   Node(site_type:1<2)
+    Id=63
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=56
        Node(site_type:2<1)
         Id=43
+=======
+      Id=62
+       Node(site_type:2<1)
+        Id=45
+>>>>>>> dc62266... please do not erase the test suite
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -776,6 +889,17 @@ EXTENSIONAL DESCRIPTION:
 			B(z~p,z!free,t~u)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 0:z Site 1:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -783,14 +907,55 @@ EXTENSIONAL DESCRIPTION:
 		rule 4: r4 is applied for the first time
 
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 4
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 0:z Site 1:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 4 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 0:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 0:z Site 1:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -804,15 +969,48 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(z!,t~)
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 5
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 0:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 5 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 6: r6:
 		the precondition is satisfied
 		Updating the views for A(z!,t~)
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 0 
+
+Agent_type: 1:B Site_b 1:z Site 0:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 0:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 		Updating the views for B(z~,z!,t~)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 0:z Site 1:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Dead rules :
@@ -826,14 +1024,24 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+<<<<<<< HEAD
 Id=51
+=======
+Id=55
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=38
    Node(site_type:1<2)
     Id=37
+=======
+  Id=40
+   Node(site_type:1<2)
+    Id=39
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -850,21 +1058,37 @@ Id=51
      Leaf False 
 
 agent_type:1:B:cv_id:0
+<<<<<<< HEAD
 Id=67
+=======
+Id=73
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=66
    Node(site_type:1<1)
     Id=57
+=======
+  Id=72
+   Node(site_type:1<1)
+    Id=63
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=56
        Node(site_type:2<1)
         Id=43
+=======
+      Id=62
+       Node(site_type:2<1)
+        Id=45
+>>>>>>> dc62266... please do not erase the test suite
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -880,16 +1104,28 @@ Id=67
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=65
      Node(site_type:1<2)
       Id=64
+=======
+    Id=71
+     Node(site_type:1<2)
+      Id=70
+>>>>>>> dc62266... please do not erase the test suite
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=44
          Node(site_type:2<2)
           Id=43
+=======
+        Id=46
+         Node(site_type:2<2)
+          Id=45
+>>>>>>> dc62266... please do not erase the test suite
            Node(site_type:3<0)
             Id=0
              Leaf False 
@@ -914,10 +1150,14 @@ Id=67
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=68
 =======
 Id=74
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=74
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -933,15 +1173,23 @@ Id=74
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=70
 =======
 Id=75
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=75
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=69
+=======
+  Id=56
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -951,7 +1199,11 @@ Id=75
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=37
+=======
+Id=39
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -967,19 +1219,27 @@ Id=37
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=76
 =======
 Id=81
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=81
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=75
 =======
   Id=80
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+  Id=80
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -995,6 +1255,7 @@ Id=81
          Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     Id=74
      Node(site_type:0<2)
       Id=68
@@ -1003,6 +1264,11 @@ Id=81
      Node(site_type:0<2)
       Id=74
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+    Id=79
+     Node(site_type:0<2)
+      Id=74
+>>>>>>> dc62266... please do not erase the test suite
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1019,17 +1285,25 @@ Id=81
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 B(z!A.z) => B(z~p!A.z)
+=======
+In agent B, the internal state of site z is p whenever the binding state of site z is A@z.
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=68
 =======
 Id=74
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=74
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1045,15 +1319,23 @@ Id=74
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=70
 =======
 Id=75
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=75
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=69
+=======
+  Id=56
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1063,6 +1345,7 @@ Id=75
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 <<<<<<< HEAD
 Id=68
  Node(site_type:1<0)
@@ -1075,6 +1358,15 @@ Id=39
 
   Id=20
    Node(site_type:2<2)
+=======
+Id=74
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+>>>>>>> dc62266... please do not erase the test suite
     Id=1
      Leaf True 
 
@@ -1085,11 +1377,16 @@ EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=70
+=======
+Id=75
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=69
    Node(site_type:0<2)
 =======
@@ -1104,6 +1401,10 @@ Id=74
   Id=12
    Node(site_type:1<2)
 >>>>>>> 1834413... test suite
+=======
+  Id=56
+   Node(site_type:0<2)
+>>>>>>> dc62266... please do not erase the test suite
     Id=1
      Leaf True 
 
@@ -1113,12 +1414,17 @@ Id=74
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=37
  Node(site_type:2<0)
 =======
 Id=75
  Node(site_type:0<0)
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=39
+ Node(site_type:2<0)
+>>>>>>> dc62266... please do not erase the test suite
   Id=0
    Leaf False 
 
@@ -1132,6 +1438,7 @@ Id=75
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 A() => [ A(t~u) v A(t~p) ]
 A() => [ A(z) v A(z!B.z) ]
 B() => [ B(z) v B(z!A.z) ]
@@ -1143,6 +1450,13 @@ The binding state of site z in agent A ranges over free and B@z.
 The internal state of site t in agent B ranges over u and p.
 The binding state of site z in agent B ranges over free and A@z.
 The internal state of site z in agent B ranges over u and p.
+=======
+The internal state of site t in agent A ranges over u and p.
+The binding state of site z in agent A ranges over free and B@z.
+The binding state of site z in agent B ranges over free and A@z.
+The internal state of site z in agent B ranges over u and p.
+The internal state of site t in agent B ranges over u and p.
+>>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -1156,8 +1470,53 @@ Whenever the site z of B and the site z of A are bound together, then the site z
 Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
 Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
+<<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
+=======
+------------------------------------------------------------
+* Parallel bonds domain
+------------------------------------------------------------
+Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 5 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 4 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 5 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+>>>>>>> dc62266... please do not erase the test suite

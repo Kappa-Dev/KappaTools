@@ -460,6 +460,35 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p)->A(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
+<<<<<<< HEAD
+=======
+A:(z:B@z, t); B:(z:A@z, t)
+A:(z:B@z, t); B:(z:A@z, x)
+A:(z:B@z, x); B:(z:A@z, t)
+A:(z:B@z, x); B:(z:A@z, x)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(z:A@z, t); A:(z:B@z, x)
+B:(z:A@z, x); A:(z:B@z, t)
+B:(z:A@z, x); A:(z:B@z, x)
+A:(z:B@z, t); B:(z:A@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(t:A@t, z); A:(t:B@t, z)
+A:(z:B@z, t); B:(z:A@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(t:A@t, z); A:(t:B@t, z)
+0:A 1:z 0:x (1:B@z) | 1:B 1:z 0:x (1:A@z) 
+0:A 1:z 0:x (1:B@z) | 1:B 1:z 2:t (1:A@z) 
+0:A 1:z 2:t (1:B@z) | 1:B 1:z 0:x (1:A@z) 
+0:A 1:z 2:t (1:B@z) | 1:B 1:z 2:t (1:A@z) 
+0:A 2:t 1:z (1:B@t) | 1:B 2:t 1:z (1:A@t) 
+1:B 1:z 0:x (1:A@z) | 0:A 1:z 0:x (1:B@z) 
+1:B 1:z 0:x (1:A@z) | 0:A 1:z 2:t (1:B@z) 
+1:B 1:z 2:t (1:A@z) | 0:A 1:z 0:x (1:B@z) 
+1:B 1:z 2:t (1:A@z) | 0:A 1:z 2:t (1:B@z) 
+1:B 2:t 1:z (1:A@t) | 0:A 2:t 1:z (1:B@t) 
+>>>>>>> dc62266... please do not erase the test suite
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -587,6 +616,25 @@ EXTENSIONAL DESCRIPTION:
 			A(x~p,z!free,t!free)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2: r2:
 		the precondition is not satisfied yet
@@ -679,6 +727,41 @@ EXTENSIONAL DESCRIPTION:
 			B(x~u,z!free,t!A@t)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -778,6 +861,25 @@ EXTENSIONAL DESCRIPTION:
 		rule 6: r6 is applied for the first time
 
 		Updating the views for A(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -790,6 +892,7 @@ EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=48
 =======
 Id=66
@@ -797,6 +900,9 @@ Id=66
 =======
 Id=68
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=70
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
@@ -850,6 +956,25 @@ EXTENSIONAL DESCRIPTION:
 			B(x~p,z!A@z,t!A@t)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -857,10 +982,48 @@ EXTENSIONAL DESCRIPTION:
 		rule 7: r7 is applied for the first time
 
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 7
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 7 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 7
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 7 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -873,6 +1036,7 @@ EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=50
 =======
 Id=68
@@ -880,10 +1044,14 @@ Id=68
 =======
 Id=70
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=72
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   Id=49
@@ -893,6 +1061,9 @@ Id=70
 =======
   Id=69
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+  Id=71
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -930,6 +1101,7 @@ EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=50
 =======
 Id=68
@@ -937,10 +1109,14 @@ Id=68
 =======
 Id=70
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=72
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   Id=49
@@ -950,6 +1126,9 @@ Id=70
 =======
   Id=69
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+  Id=71
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -981,11 +1160,65 @@ EXTENSIONAL DESCRIPTION:
 			B(x~p,z!A@z,t!free)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 2
+Agent: 0 Site_b 2 
+
+Agent_type: 1:B Site_b 2:t Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 0:A( site_type_x: 2:t), agent_type_y:1:B: (site_type_y:2:t) 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 2 
+
+Agent_type: 0:A Site_b 2:t Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1:B( site_type_x: 2:t), agent_type_y:0:A: (site_type_y:2:t) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -995,6 +1228,25 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 5: r5:
 		the precondition is satisfied
@@ -1007,11 +1259,49 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2: r2:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 2
+Agent: 0 Site_b 2 
+
+Agent_type: 1:B Site_b 2:t Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 0:A( site_type_x: 2:t), agent_type_y:1:B: (site_type_y:2:t) 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 2 
+
+Agent_type: 0:A Site_b 2:t Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1:B( site_type_x: 2:t), agent_type_y:0:A: (site_type_y:2:t) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -1021,6 +1311,7 @@ EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=72
 =======
 Id=97
@@ -1028,10 +1319,14 @@ Id=97
 =======
 Id=101
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=101
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   Id=71
@@ -1041,6 +1336,9 @@ Id=101
 =======
   Id=100
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+  Id=100
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1072,6 +1370,25 @@ EXTENSIONAL DESCRIPTION:
 			A(x~u,z!B@z,t!free)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -1081,6 +1398,7 @@ EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=72
 =======
 Id=97
@@ -1088,10 +1406,14 @@ Id=97
 =======
 Id=101
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+Id=101
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   Id=71
@@ -1101,6 +1423,9 @@ Id=101
 =======
   Id=100
 >>>>>>> 1441500... use partition set, to be removed all the functions that are not use
+=======
+  Id=100
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1132,20 +1457,112 @@ EXTENSIONAL DESCRIPTION:
 			B(x~u,z!A@z,t!free)
 
 	Wake-up rules
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 7
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 7 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 7
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 7 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 0
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 0 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2: r2:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 2
+Agent: 0 Site_b 2 
+
+Agent_type: 1:B Site_b 2:t Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 0:A( site_type_x: 2:t), agent_type_y:1:B: (site_type_y:2:t) 
+RULE GET STATE OF SITE RULE 2
+Agent: 1 Site_b 2 
+
+Agent_type: 0:A Site_b 2:t Site 1:z
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 1:B( site_type_x: 2:t), agent_type_y:0:A: (site_type_y:2:t) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 3
+Agent: 1 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 3 agent_id_t: 1:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -1160,12 +1577,201 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 6: r6:
 		the precondition is satisfied
 		Updating the views for A(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 6
+Agent: 0 Site_b 1 
+
+Agent_type: 1:B Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 6 agent_id_t: 0:A( site_type_x: 1:z), agent_type_y:1:B: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
+=======
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 1
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+>>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 7: r7:
 		the precondition is satisfied
 		Updating the views for B(x~,z!,t!)
+<<<<<<< HEAD
 execution finished without any exception
+=======
+RULE GET STATE OF SITE RULE 7
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 0:x
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 7 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+RULE GET STATE OF SITE RULE 7
+Agent: 0 Site_b 1 
+
+Agent_type: 0:A Site_b 1:z Site 2:t
+
+state'_y: BOTTOM
+WRONG TUPLE: !!! 
+ Rule 7 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:1:z) 
+Some exceptions have been raisederror: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 7 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 7 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 7 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 7 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 0 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 2; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 6 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 7 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 7 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+>>>>>>> dc62266... please do not erase the test suite

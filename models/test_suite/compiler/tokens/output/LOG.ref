@@ -1,0 +1,18 @@
++ Command line to rerun is: 'KaSim' 'tokens.ka' '-seed' '580151237' '--compile' '-d' 'output' '-t' '0'
+Parsing tokens.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done

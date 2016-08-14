@@ -9,6 +9,7 @@ digraph G{
 "create" [shape="box" fillcolor="#87ceeb" style=filled];
 "x" [shape="box" fillcolor="#87ceeb" style=filled];
 "y" [shape="box" fillcolor="#87ceeb" style=filled];
+<<<<<<< HEAD
 "bind" [shape="box" fillcolor="#87ceeb" style=filled];
 "create" -> "x" [label="[0->0]" color="green"];
 "create" -> "bind" [label="[0->0];[0->1]" color="green"];
@@ -16,4 +17,8 @@ digraph G{
 "bind" -> "x" [label="[0->0];[1->0]" color="red" arrowhead="tee"];
 "bind" -> "y" [label="[0->0];[1->0]" color="red" arrowhead="tee"];
 "bind" -> "bind" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+=======
+"create" -> "x" [label="[0->0]" color="green"];
+"x" -> "y" [label="[0->0]" color="green"];
+>>>>>>> dc62266... please do not erase the test suite
 }

@@ -712,11 +712,14 @@ Id=11
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 B() => [ B(y~u) ]
 B() => [ B(x~u) ]
 D() => [ D(y~u) ]
 D() => [ D(x~u) ]
 =======
+=======
+>>>>>>> dc62266... please do not erase the test suite
 The internal state of site y in agent B is always u.
 The internal state of site x in agent B is always u.
 The internal state of site y in agent D is always u.
@@ -726,7 +729,10 @@ The internal state of site x in agent D is always u.
 ------------------------------------------------------------
 * Static information
 * Dynamic information
+<<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back
+=======
+>>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

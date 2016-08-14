@@ -1,0 +1,20 @@
+_____(1)
+
+_____(1)
+
+Environment:
+  Signatures:
+    A(x)
+  Tokens: tt
+  Alg_expr:
+    
+  Plot: 
+  Rules:
+    
+  Perturbations:
+    /*0*/%mod: ([E] = 5) do tt <- 22
+Domain:
+  () -> /*cc0*/  -> ()
+Intial graph;
+  
+  %init: tt <- 33

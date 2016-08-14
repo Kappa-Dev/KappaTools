@@ -8,7 +8,10 @@ Signature:sites:
 Signature:sites:0:
 Signature:sites:0:site_type:0->x(internal state)
 Signature:sites:0:site_type:1->y(internal state)
+<<<<<<< HEAD
 Signature:sites:0:site_type:2->x(binding state)
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -17,6 +20,7 @@ Signature:states:0:0:state_id:1->p
 Signature:states:0:1:
 Signature:states:0:1:state_id:0->u
 Signature:states:0:1:state_id:1->p
+<<<<<<< HEAD
 Signature:states:0:2:
 Signature:states:0:2:state_id:0->free
 Signature:states:0:2:state_id:1->agent_type:0@site_type:2
@@ -25,6 +29,9 @@ Signature:duals:0:
 Signature:duals:0:2:
 Signature:duals:0:2:1:
 Signature:duals:0:2:1:agent_type:0,site_type:2,state_id:1
+=======
+Signature:duals: 
+>>>>>>> dc62266... please do not erase the test suite
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:rules:0:
@@ -34,22 +41,34 @@ Compilation:rules:0:lhs:agent_id_0:Ghost
 Compilation:rules:0:rhs:
 Compilation:rules:0:rhs:agent_id_0:
 Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+<<<<<<< HEAD
 Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+=======
+Compilation:rules:0:direct:
+Compilation:rules:0:direct:agent_id_0:
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+>>>>>>> dc62266... please do not erase the test suite
 Compilation:rules:0:reverse:
 Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
 Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+<<<<<<< HEAD
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
 Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+=======
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+>>>>>>> dc62266... please do not erase the test suite
 Compilation:rules:1:direct:
 Compilation:rules:1:direct:agent_id_0:
 Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
@@ -61,18 +80,25 @@ Compilation:rules:2:lhs:
 Compilation:rules:2:lhs:agent_id_0:
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+<<<<<<< HEAD
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Compilation:rules:2:rhs:
 Compilation:rules:2:rhs:agent_id_0:
 Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+<<<<<<< HEAD
 Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
 Compilation:rules:2:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:2:reverse:
 Compilation:rules:2:reverse:agent_id_0:
 Compilation:rules:2:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+<<<<<<< HEAD
 Compilation:rules:3:
 Compilation:rules:3:lhs:
 Compilation:rules:3:lhs:agent_id_0:
@@ -99,6 +125,8 @@ Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_mi
 Compilation:rules:3:reverse:agent_id_1:
 Compilation:rules:3:reverse:agent_id_1:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:3:actions:binding:(agent_id_0,agent_type_0)@site_type_2----(agent_id_1,agent_type_0)@site_type_2
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -108,14 +136,20 @@ Quarks:rule_id:0,agent_type:0
 Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+<<<<<<< HEAD
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
 Quarks:rule_id:1,agent_type:0,site_type:0,state:0
+<<<<<<< HEAD
 Quarks:rule_id:1,agent_type:0,site_type:2,state:0
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -128,7 +162,10 @@ Quarks:TEST
 Quarks:rule_id:2,agent_type:0
 Quarks:rule_id:2,agent_type:0,site_type:0,state:1
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+<<<<<<< HEAD
 Quarks:rule_id:2,agent_type:0,site_type:2,state:0
+=======
+>>>>>>> dc62266... please do not erase the test suite
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -136,6 +173,7 @@ Quarks:rule_id:2,agent_type:0,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+<<<<<<< HEAD
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:0
@@ -157,10 +195,13 @@ Quarks:MODIF PLUS rule_id:3,agent_type:0,site_type:2,state: BOUND
 Quarks:rule_id:3,agent_type:0,site_type:2,state:1
 Quarks:MODIF PLUS rule_id:3,agent_type:0,site_type:2,state: BOUND
 Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+=======
+>>>>>>> dc62266... please do not erase the test suite
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:1->[0]
 Quarks:agent_test**:agent_type:0,rule:2->[0]
+<<<<<<< HEAD
 Quarks:agent_test**:agent_type:0,rule:3->[0;1]
 Quarks:agent_modif+:agent_type:0,rule:0->[0]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:1->[0]
@@ -185,6 +226,21 @@ Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->
 Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(1):'x' A(x~u)->A(x~p)[0->0];[1->0]
 Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0];[1->0]
 Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(3):'bind' A(x),A(x)->A(x!1),A(x!1)[0->1];[1->0]
+=======
+Quarks:agent_modif+:agent_type:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:2->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:1->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(1):'x' A(x~u)->A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
+>>>>>>> dc62266... please do not erase the test suite
 Reachability analysis...
 
 	Applying rule 0: create:
@@ -195,18 +251,29 @@ Reachability analysis...
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=11
+=======
+Id=7
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=10
    Node(site_type:1<1)
     Id=9
+=======
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=8
        Node(site_type:2<1)
         Id=7
@@ -221,6 +288,12 @@ Id=11
 
             Id=0
              Leaf False 
+=======
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+>>>>>>> dc62266... please do not erase the test suite
 
         Id=0
          Leaf False 
@@ -229,7 +302,11 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 			A(x~u,y~u,x!free)
+=======
+			A(x~u,y~u)
+>>>>>>> dc62266... please do not erase the test suite
 
 	Wake-up rules
 
@@ -241,22 +318,37 @@ EXTENSIONAL DESCRIPTION:
 
 		rule 1: x is applied for the first time
 
+<<<<<<< HEAD
 		Updating the views for A(x~,y~,x!)
 			
 
 INTENSIONAL DESCRIPTION:
 Id=17
+=======
+		Updating the views for A(x~,y~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=11
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=16
    Node(site_type:1<2)
     Id=9
+=======
+  Id=10
+   Node(site_type:1<2)
+    Id=5
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=8
        Node(site_type:2<1)
         Id=7
@@ -271,6 +363,12 @@ Id=17
 
             Id=0
              Leaf False 
+=======
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+>>>>>>> dc62266... please do not erase the test suite
 
         Id=0
          Leaf False 
@@ -279,7 +377,11 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 			A(x~p,y~u,x!free)
+=======
+			A(x~p,y~u)
+>>>>>>> dc62266... please do not erase the test suite
 
 	Wake-up rules
 
@@ -288,22 +390,37 @@ EXTENSIONAL DESCRIPTION:
 
 		rule 2: y is applied for the first time
 
+<<<<<<< HEAD
 		Updating the views for A(x~,y~,x!)
 			
 
 INTENSIONAL DESCRIPTION:
 Id=22
+=======
+		Updating the views for A(x~,y~)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=16
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=21
    Node(site_type:1<2)
     Id=20
+=======
+  Id=15
+   Node(site_type:1<2)
+    Id=14
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=19
        Node(site_type:2<2)
         Id=7
@@ -318,6 +435,12 @@ Id=22
 
             Id=0
              Leaf False 
+=======
+      Id=13
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+>>>>>>> dc62266... please do not erase the test suite
 
         Id=0
          Leaf False 
@@ -326,6 +449,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 			A(x~p,y~p,x!free)
 
 	Wake-up rules
@@ -405,11 +529,18 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 		Updating the views for A(x~,y~,x!)
 
+=======
+			A(x~p,y~p)
+
+	Wake-up rules
+
+>>>>>>> dc62266... please do not erase the test suite
 	Applying rule 0: create:
 		the precondition is satisfied
 
 	Applying rule 1: x:
 		the precondition is satisfied
+<<<<<<< HEAD
 		Updating the views for A(x~,y~,x!)
 
 	Applying rule 2: y:
@@ -420,6 +551,13 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,y~,x!)
 		Updating the views for A(x~,y~,x!)
+=======
+		Updating the views for A(x~,y~)
+
+	Applying rule 2: y:
+		the precondition is satisfied
+		Updating the views for A(x~,y~)
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Dead rules :
@@ -433,18 +571,29 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+<<<<<<< HEAD
 Id=43
+=======
+Id=20
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=42
    Node(site_type:1<1)
     Id=38
+=======
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+>>>>>>> dc62266... please do not erase the test suite
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=37
        Node(site_type:2<1)
         Id=36
@@ -459,17 +608,30 @@ Id=43
 
             Id=0
              Leaf False 
+=======
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+>>>>>>> dc62266... please do not erase the test suite
 
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=41
      Node(site_type:1<2)
       Id=40
+=======
+    Id=18
+     Node(site_type:1<2)
+      Id=17
+>>>>>>> dc62266... please do not erase the test suite
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=39
          Node(site_type:2<2)
           Id=36
@@ -484,6 +646,12 @@ Id=43
 
               Id=0
                Leaf False 
+=======
+        Id=13
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+>>>>>>> dc62266... please do not erase the test suite
 
           Id=0
            Leaf False 
@@ -496,6 +664,7 @@ Id=43
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=46
  Node(site_type:2<0)
   Id=0
@@ -512,11 +681,18 @@ Id=46
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=57
+=======
+Id=27
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=56
+=======
+  Id=26
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -531,14 +707,24 @@ Id=57
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=55
      Node(site_type:0<2)
       Id=44
+=======
+    Id=25
+     Node(site_type:0<2)
+      Id=21
+>>>>>>> dc62266... please do not erase the test suite
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=14
+=======
+        Id=8
+>>>>>>> dc62266... please do not erase the test suite
          Node(site_type:1<2)
           Id=1
            Leaf True 
@@ -550,18 +736,30 @@ Id=57
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A(y~p) => A(x~p?,y~p)
+=======
+In agent A, the internal state of site x is p whenever the internal state of site y is p.
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=44
+=======
+Id=21
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=14
+=======
+  Id=8
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -571,12 +769,20 @@ Id=44
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 Id=48
+=======
+Id=23
+>>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=47
+=======
+  Id=22
+>>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -585,6 +791,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 <<<<<<< HEAD
 INTENSIONAL DESCRIPTION:
 Id=46
@@ -605,6 +812,8 @@ A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u?) v A(x~p?) ]
 A() => [ A(x) v A(x!A.x) ]
 =======
+=======
+>>>>>>> dc62266... please do not erase the test suite
 The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 ------------------------------------------------------------
@@ -612,7 +821,10 @@ The internal state of site x in agent A ranges over u and p.
 ------------------------------------------------------------
 * Static information
 * Dynamic information
+<<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back
+=======
+>>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

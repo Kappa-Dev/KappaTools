@@ -1,0 +1,16 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa agent_order.ka --debugging-mode --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"bind" [shape="box" fillcolor="#87ceeb" style=filled];
+"remove" [shape="box" fillcolor="#87ceeb" style=filled];
+"remove" -> "bind" [label="[1->1];[2->0]" color="green"];
+"remove" -> "remove" [label="[2->0];[2->1]" color="green"];
+"bind" -> "remove" [label="[0->0];[0->1]" color="red" arrowhead="tee"];
+"remove" -> "bind" [label="[1->0]" color="red" arrowhead="tee"];
+"remove" -> "remove" [label="[1->0]" color="red" arrowhead="tee"];
+}

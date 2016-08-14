@@ -1045,6 +1045,7 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 A() => [ A(y~u?) ]
 A() => [ A(x) v A(x!B.x) ]
 A() => [ A(y) v A(y!C.x) ]
@@ -1052,6 +1053,8 @@ A() => [ A(x~u?) ]
 B() => [ B(x) v B(x!A.x) ]
 C() => [ C(x) v C(x!A.y) ]
 =======
+=======
+>>>>>>> dc62266... please do not erase the test suite
 The internal state of site y in agent A is always u.
 The binding state of site x in agent A ranges over free and B@x.
 The binding state of site y in agent A ranges over free and C@x.
@@ -1063,7 +1066,10 @@ The binding state of site x in agent C ranges over free and A@y.
 ------------------------------------------------------------
 * Static information
 * Dynamic information
+<<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back
+=======
+>>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -1,0 +1,19 @@
+digraph G{
+"Init_18" [label="" style="invis" width="0px" height="0px"];
+"Node_24" [label="A(x~p,y~p,z~p)"];
+"Node_22" [label="A(x~p,y~p,z~u)"];
+"Node_21" [label="A(x~u,y~p,z~u)"];
+"Node_19" [label="A(x~p,y~u,z~u)"];
+"Node_18" [label="A(x~u,y~u,z~u)"];
+"Node_24" -> "Node_22" [label="rule 5"];
+"Node_21" -> "Node_18" [label="rule 4"];
+"Node_22" -> "Node_19" [label="rule 4"];
+"Node_22" -> "Node_21" [label="rule 3"];
+"Node_19" -> "Node_18" [label="rule 3"];
+"Node_22" -> "Node_24" [label="rule 2"];
+"Node_18" -> "Node_21" [label="rule 1"];
+"Node_19" -> "Node_22" [label="rule 1"];
+"Node_21" -> "Node_22" [label="rule 0"];
+"Node_18" -> "Node_19" [label="rule 0"];
+"Init_18" -> "Node_18" [label=""];
+}

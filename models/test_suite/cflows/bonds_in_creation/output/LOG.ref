@@ -1,0 +1,37 @@
++ Command line to rerun is: 'KaSim' '-i' 'bonds_in_creation.ka' '-t' '40' '-p' '100' '-seed' '611463625' '-d' 'output' '--time-independent'
+Parsing bonds_in_creation.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - blackboard generation
+	 - computing causal past of each observed events (43)
+Stats:
+ number of step   : 770
+ longest story    : 539
+ average length   : 202.440509915
+ geometric mean   : 265.290649845
+
+	 - causal flow compression (43)
+
+
+	 - weak flow compression (13)
+	 - strong flow compression (3)
++ Pretty printing 35 flows
++ Pretty printing 3 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

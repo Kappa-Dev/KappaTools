@@ -945,6 +945,7 @@ Id=136
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A() =>
    [
 	  A(x~q,y~u,z~u)
@@ -956,6 +957,16 @@ A() =>
 	v A(x~u,y~u,z~u)
 
 	]
+=======
+In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:
+	A(x~q,y~u,z~u)
+	A(x~q,y~q,z~q)
+	A(x~q,y~q,z~u)
+	A(x~0,y~p,z~q)
+	A(x~p,y~u,z~u)
+	A(x~p,y~p,z~u)
+	A(x~u,y~u,z~u)
+>>>>>>> dc62266... please do not erase the test suite
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1006,10 +1017,13 @@ Id=91
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 A() => [ A(y~u) v A(y~p) v A(y~q) ]
 A() => [ A(x~u) v A(x~p) v A(x~0) v A(x~q) ]
 A() => [ A(z~u) v A(z~q) ]
 =======
+=======
+>>>>>>> dc62266... please do not erase the test suite
 The internal state of site y in agent A ranges over u, p, and q.
 The internal state of site x in agent A ranges over u, p, 0, and q.
 The internal state of site z in agent A ranges over u and q.
@@ -1018,7 +1032,10 @@ The internal state of site z in agent A ranges over u and q.
 ------------------------------------------------------------
 * Static information
 * Dynamic information
+<<<<<<< HEAD
 >>>>>>> 730b98f... clean code, will add the mission functions back
+=======
+>>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

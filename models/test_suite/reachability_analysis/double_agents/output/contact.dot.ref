@@ -1,0 +1,27 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa double_agents.ka --debugging-mode --output-directory output
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+   0.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
+   0.2 [style = filled label = "x" shape =circle color = yellow size = "5"]
+label =  "A";  shape = rectangle; color = red
+} ; 
+subgraph cluster1 {
+   1.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+   1.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
+   1.2 [style = filled label = "x" shape =circle color = yellow size = "5"]
+label =  "B";  shape = rectangle; color = red
+} ; 
+subgraph cluster2 {
+   2.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
+label =  "C";  shape = rectangle; color = red
+} ; 
+0.2 -- 1.2
+1.2 -- 2.0
+}

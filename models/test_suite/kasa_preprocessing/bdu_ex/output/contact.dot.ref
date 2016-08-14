@@ -9,8 +9,13 @@ graph G{
 subgraph cluster0 {
    0.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
    0.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
+<<<<<<< HEAD
    0.2 [style = filled label = "x" shape =circle color = yellow size = "5"]
 label =  "A";  shape = rectangle; color = red
 } ; 
 0.2 -- 0.2
+=======
+label =  "A";  shape = rectangle; color = red
+} ; 
+>>>>>>> dc62266... please do not erase the test suite
 }
