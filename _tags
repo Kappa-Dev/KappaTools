@@ -11,6 +11,7 @@
 "util" : include
 "main" : include
 "KaSa_rep" : include
+"KaSa_rep/backend" : include
 "KaSa_rep/pipeline" : include
 "KaSa_rep/config" : include
 "KaSa_rep/error_handlers" : include
