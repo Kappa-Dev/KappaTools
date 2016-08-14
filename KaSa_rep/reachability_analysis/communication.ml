@@ -353,7 +353,7 @@ let may_get_free_by_side_effect parameters kappa_handler error precondition rule
   else error, false
 
 
-let post_condition parameters kappa_handler error rule precondition dynamic path =
+let rec post_condition parameters kappa_handler error rule precondition dynamic path =
   let cc = rule.Cckappa_sig.rule_rhs in
   (*---------------------------------------------------------*)
   (*inside the pattern, check the binding information in the lhs of the current agent*)
@@ -471,9 +471,10 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
           { path with defined_in = LHS r}
         | LHS _ | Pattern -> path
       in
-      let error, dynamic, values =
-        precondition.state_of_sites_in_precondition
-          parameters error dynamic path
+      let error, dynamic, precondition, values =
+        get_state_of_site
+          parameters kappa_handler error
+          precondition dynamic path
       in
       let error, bool =
         may_get_free_by_side_effect parameters kappa_handler error precondition rule path in
@@ -489,8 +490,7 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
       else
         error, dynamic, values
     end
-
-let get_state_of_site
+and get_state_of_site
     parameters kappa_handler error precondition dynamic path =
   begin
     match path.defined_in with
