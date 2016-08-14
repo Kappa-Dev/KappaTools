@@ -25,7 +25,6 @@ struct
          (string option * binding_state option)
            Wrapped_modules.LoggedStringMap.t)
           Ckappa_sig.Agent_id_map_and_set.Map.t
-
     }
 
   let empty =
@@ -61,25 +60,12 @@ struct
         ~message:"this agent id is already used"
         Exit
     in
-    let error', string_version =
-      Ckappa_sig.Agent_id_map_and_set.Map.add
-        parameter error
-        agent_id
-        (agent_string, Wrapped_modules.LoggedStringMap.empty)
-        t.string_version
-    in
-    let error =
-      Exception.check_point
-        Exception.warn parameter error error' __POS__
-        ~message:"this agent id is already used"
-        Exit
-    in
     error, t.fresh_agent_id,
-    {t
-     with
-      fresh_agent_id = Ckappa_sig.next_agent_id t.fresh_agent_id ;
-      views = views ;
-      string_version = string_version }
+    check_stability
+      {t
+       with
+        fresh_agent_id = Ckappa_sig.next_agent_id t.fresh_agent_id ;
+        views = views} t
 
   let max_state_index a b =
     if Ckappa_sig.compare_state_index a b <= 0
@@ -104,9 +90,8 @@ struct
         Exit t
     | Some (agent_type, map) ->
       begin
-        let error', site_string =
-          Handler.string_of_site_contact_map
-            parameter error kappa_handler agent_type site
+        let error', _ =
+          Handler.translate_site parameter error kappa_handler agent_type site
         in
         let error =
           Exception.check_point
@@ -303,13 +288,13 @@ struct
             with views = views ;
                  string_version = string_version
           }
+
       end
 
   let add_state parameter error kappa_handler agent_id site
       state t =
     add_state_interv parameter error kappa_handler agent_id site
       state state t
-
 
   let add_bound_to_unknown
       parameter error kappa_handler
@@ -529,6 +514,4 @@ struct
         t.string_version
         false
     in error
-
-
 end

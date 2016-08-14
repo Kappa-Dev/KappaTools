@@ -106,4 +106,9 @@ let main () =
   let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
   ()
 
+<<<<<<< HEAD
 let () = main ()
+=======
+let _ = Ckappa_backend.main ()
+let _ = main ()
+>>>>>>> 417f7bd... Starts KaSa backend to dump kappa syntax.
