@@ -1233,7 +1233,12 @@ struct
               (rule_id, path.Communication.agent_id)
               store_agent_name
       with
-      | error, None -> error, Ckappa_sig.dummy_agent_name
+      | error, None ->
+        Exception.warn
+          parameter error __POS__
+          ~message:"unknown agent type"
+          Exit
+          Ckappa_sig.dummy_agent_name
       | error, Some a -> error, a
     in
     (*------------------------------------------------------------*)
@@ -1301,8 +1306,10 @@ struct
 
   (*typing*)
 
-  let precondition_typing parameter error kappa_handler rule_id step_list path
-      store_agent_name dual_contact_map =
+  let precondition_typing
+      parameter error kappa_handler rule_id step_list path
+      store_agent_name dual_contact_map
+    =
     let rec aux acc error =
       match acc with
       | [] -> error, Usual_domains.Any
@@ -1359,22 +1366,28 @@ struct
                 Misc_sa.const_unit
                 state_dic
             with
-            | error, None -> (*inconsistent*) error, Usual_domains.Undefined
+            | error, None ->
+              Exception.warn
+                parameter error __POS__ Exit  Usual_domains.Undefined
             | error, Some (state, _, _, _) ->
               match
                 Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs
                   parameter
                   error
-                  (agent_type, step.Communication.site_in, state)
+                  (agent_type, step.Communication.site_out, state)
                   dual_contact_map
               with
-              | error, None -> error, Usual_domains.Undefined
+              | error, None ->
+                Exception.warn
+                  parameter error __POS__ Exit Usual_domains.Undefined
               | error, Some _ -> (*recursive call*) aux tl error
           in
           error, answer_contact_map
         else
           (*state is not defined*)
-          error, Usual_domains.Undefined
+          Exception.warn
+            parameter error __POS__ Exit
+            Usual_domains.Undefined
     in
     aux step_list error
 
@@ -1807,6 +1820,29 @@ struct
 
   (*-------------------------------------------------------------*)
 
+  let scan_bot
+      ~also_scan_top:(also_scan_top:bool)
+      pos parameters error elt string
+    =
+    match elt with
+    | Usual_domains.Undefined ->
+      let error, () =
+        Exception.warn
+          parameters error pos
+          ~message:("bot generated while fetching the potential state of a site"^string)
+          Exit ()
+      in error
+    | Usual_domains.Any when also_scan_top ->
+      let error, () =
+        Exception.warn
+          parameters error pos
+          ~message:("top generated while fetching the potential state of a site"^string)
+          Exit ()
+      in error
+    | Usual_domains.Val _
+    | Usual_domains.Any  -> error
+
+
   let compute_pattern_navigation
       parameter error kappa_handler
       aux dynamic path rule step tl bdu_false bdu_true site_correspondence
@@ -1861,6 +1897,13 @@ struct
               Exception.check_point
                 Exception.warn parameter error error' __POS__ Exit
             in
+            let error =
+              scan_bot
+                ~also_scan_top:false __POS__
+                parameter error
+                new_answer
+                " in precondition outside a pattern"
+            in
             error, (dynamic, new_answer)
           (*----------------------------------------------------*)
           (*There is some states, inside the pattern. Check
@@ -1874,16 +1917,35 @@ struct
                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "-inside pattern:\n"
                   in*)
+
+                (* Be careful, you should go on insider the pattern only if the partner is well defined (look into the bonds) *)
+                (* if the site is free -> Undefined *)
+                (* if the site is bound and the partner is known
+                   -> precondition_inside_pattern) *)
+                (* if not precondition_outsite_pattern *)
+
+                (* You may have a look at ~/KaSim/models/test_suite/reachability_analysis/bond_in_initial_state to test your correction *)
+
                 let error, (dynamic, new_answer) =
                   precondition_inside_pattern
                     parameter error dynamic kappa_handler step
                     path aux rule tl site_correspondence store_covering_classes_id
                     fixpoint_result bdu_false bdu_true
                 in
+                let error =
+                  scan_bot
+                    ~also_scan_top:false __POS__
+                    parameter error
+                    new_answer
+                    " in precondition inside a pattern"
+                in
                 error, (dynamic, new_answer)
               (*-------------------------------------------------*)
               (*it is free, inconsistent*)
-              | Some true -> error, (dynamic, Usual_domains.Undefined)
+              | Some true ->
+                Exception.warn
+                  parameter error __POS__ Exit
+                  ~message:"try to navigate through a free site" (dynamic, Usual_domains.Undefined)
             in
             error, (dynamic, new_answer)
         in
@@ -1899,75 +1961,121 @@ struct
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
       Communication.refine_information_about_state_of_sites_in_precondition
-       precondition
+        precondition
         (fun parameters error dynamic current_path former_answer ->
            (*-----------------------------------------------------*)
            (*typing*)
+           let error =
+             scan_bot
+               ~also_scan_top:false
+               __POS__ parameters error
+               former_answer
+               " from overlying domain"
+           in
            match current_path.Communication.defined_in with
-             | Communication.RHS _ ->
-               let error, () =
-                 Exception.warn
-                   parameters error __POS__
-                   ~message:"refinement should be called on LHS or patterns only"
-                   Exit ()
-               in
-                   error, dynamic, former_answer
+           | Communication.RHS _ ->
+             let error, () =
+               Exception.warn
+                 parameters error __POS__
+                 ~message:"refinement should be called on LHS or patterns only"
+                 Exit ()
+             in
+             error, dynamic, former_answer
            | Communication.LHS _
            | Communication.Pattern ->
-           let error, answer_contact_map =
-             precondition_typing
-               parameter error kappa_handler rule_id
-               current_path.Communication.relative_address current_path store_agent_name dual_contact_map
-           in
-           (*-----------------------------------------------------*)
-           (* The output should be more precise than former_answer:
-              If the former_answer is any, do not change anything,
-              If the former_answer is Val l,
-              then the answer must be Val l', with l' a sublist of l *)
-           let error, dynamic, new_answer =
-             let rec aux dynamic path =
-               let step_list = path.Communication.relative_address in
-               match step_list with
-               | step :: tl ->
-                 (*let _ =
-                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                     "Pattern navigation\n"
-                   in*)
-                 (*------------------------------------------------*)
-                 (*pattern navigation*)
-                 let error, (dynamic, new_answer) =
-                   compute_pattern_navigation
-                     parameter error kappa_handler aux dynamic path
-                     rule step tl bdu_false bdu_true site_correspondence
-                     store_covering_classes_id fixpoint_result
-                 in
-                 let update_answer =
-                   Usual_domains.glb_list new_answer former_answer in
-                 error, dynamic, update_answer
-               (*--------------------------------------------------*)
-               (*empty relative_adress*)
-               | [] ->
-                 let error, dynamic, new_answer =
-                   precondition_empty_step_list
-                     kappa_handler parameter error dynamic
-                     rule_id path store_agent_name bdu_false bdu_true store_covering_classes_id
-                     site_correspondence fixpoint_result proj_bdu_test_restriction
-                 in
-                 (*let _ =
-                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                     "-Pattern is empty\n";
-                   in*)
-                 (*do I need to do the intersection with former answer?*)
-                 let update_answer =
-                   Usual_domains.glb_list new_answer former_answer in
-                 error, dynamic, update_answer
+             let error, answer_contact_map =
+               precondition_typing
+                 parameter error kappa_handler rule_id
+                 current_path.Communication.relative_address current_path store_agent_name dual_contact_map
              in
-             aux dynamic current_path
-           in
-           (*final intersection with contact map*)
-           let update_answer =
-             Usual_domains.glb_list answer_contact_map new_answer in
-           error, dynamic,  update_answer
+             let error =
+               scan_bot
+                 ~also_scan_top:false
+                 __POS__ parameters error
+                 answer_contact_map
+                 " in the contact map"
+             in
+             (*-----------------------------------------------------*)
+             (* The output should be more precise than former_answer:
+                If the former_answer is any, do not change anything,
+                If the former_answer is Val l,
+                then the answer must be Val l', with l' a sublist of l *)
+             let error, dynamic, new_answer =
+               let rec aux dynamic path =
+                 let step_list = path.Communication.relative_address in
+                 match step_list with
+                 | step :: tl ->
+                   (*let _ =
+                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                       "Pattern navigation\n"
+                     in*)
+                   (*------------------------------------------------*)
+                   (*pattern navigation*)
+                   let error, (dynamic, new_answer) =
+                     compute_pattern_navigation
+                       parameter error kappa_handler aux dynamic path
+                       rule step tl bdu_false bdu_true site_correspondence
+                       store_covering_classes_id fixpoint_result
+                   in
+                   let error =
+                     scan_bot
+                       ~also_scan_top:false
+                       __POS__ parameters error
+                       new_answer
+                       " while navigating"
+                   in
+                   let update_answer =
+                     Usual_domains.glb_list new_answer former_answer in
+                   error, dynamic, update_answer
+                 (*--------------------------------------------------*)
+                 (*empty relative_adress*)
+                 | [] ->
+                   let error, dynamic, new_answer =
+                     precondition_empty_step_list
+                       kappa_handler parameter error dynamic
+                       rule_id path store_agent_name bdu_false bdu_true store_covering_classes_id
+                       site_correspondence fixpoint_result proj_bdu_test_restriction
+                   in
+                   let error =
+                     scan_bot
+                       ~also_scan_top:false
+                       __POS__ parameters error
+                       new_answer
+                       " while navigating (empty path)"
+                   in
+                   (*let _ =
+                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                       "-Pattern is empty\n";
+                     in*)
+                   (*do I need to do the intersection with former answer?*)
+                   let update_answer =
+                     Usual_domains.glb_list new_answer former_answer in
+                   error, dynamic, update_answer
+               in
+               aux dynamic current_path
+             in
+             (*final intersection with contact map*)
+             let update_answer =
+               Usual_domains.glb_list answer_contact_map new_answer in
+             let error =
+               match update_answer with
+               | Usual_domains.Undefined ->
+                 let error, () =
+                   Exception.warn
+                     parameters error __POS__
+                     ~message:"bot generated while fetching the potential state of a site"
+                     Exit ()
+                 in error
+               | Usual_domains.Any ->
+                 let error, () =
+                   Exception.warn
+                     parameters error __POS__
+                     ~message:"top generated while fetching the potential state of a site"
+                     Exit ()
+                 in error
+               | Usual_domains.Val _  -> error
+             in
+             error, dynamic,  update_answer
         )
     in
     error, precondition
