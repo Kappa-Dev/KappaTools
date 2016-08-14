@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 13 2016>
+   * Last modification: Time-stamp: <Aug 14 2016>
    *
    * Abstract domain to record live rules
    *
@@ -106,14 +106,15 @@ type precondition =
   {
     precondition_dummy: unit (* to avoid compilation warning *);
     the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool ;
-    state_of_site:
+    state_of_sites_in_precondition:
+      Remanent_parameters_sig.parameters ->
       Exception.method_handler ->
       Analyzer_headers.global_dynamic_information ->
       path ->
       Exception.method_handler *
       Analyzer_headers.global_dynamic_information *
       Ckappa_sig.c_state list Usual_domains.flat_lattice;
-    cache_state_of_site: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
+    cache_state_of_sites: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
     partner_map:
       Exception.method_handler  -> Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
       Ckappa_sig.c_state ->
@@ -149,8 +150,9 @@ let dummy_precondition =
   {
     precondition_dummy = ();
     the_rule_is_applied_for_the_first_time = Usual_domains.Maybe;
-    state_of_site = (fun error dynamic _ -> error, dynamic, Usual_domains.Any);
-    cache_state_of_site = PathMap.empty Usual_domains.Any;
+    state_of_sites_in_precondition =
+      (fun _ error dynamic _ -> error, dynamic, Usual_domains.Any);
+    cache_state_of_sites = PathMap.empty Usual_domains.Any;
     partner_map = (fun error _ _ _ -> error, Usual_domains.Any);
     partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
@@ -470,7 +472,8 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
         | LHS _ | Pattern -> path
       in
       let error, dynamic, values =
-        precondition.state_of_site error dynamic path
+        precondition.state_of_sites_in_precondition
+          parameters error dynamic path
       in
       let error, bool =
         may_get_free_by_side_effect parameters kappa_handler error precondition rule path in
@@ -487,12 +490,14 @@ let post_condition parameters kappa_handler error rule precondition dynamic path
         error, dynamic, values
     end
 
-let get_state_of_site_in_pre_post_condition
+let get_state_of_site
     parameters kappa_handler error precondition dynamic path =
   begin
     match path.defined_in with
     | LHS _ | Pattern ->
-      let error, dynamic, range = precondition.state_of_site error dynamic path
+      let error, dynamic, range =
+        precondition.state_of_sites_in_precondition
+          parameters error dynamic path
       in
       error, dynamic, precondition, range
     | RHS rule ->
@@ -504,36 +509,38 @@ let get_state_of_site_in_pre_post_condition
       error, dynamic, precondition,  range
   end
 
-let refine_information_about_state_of_site
-    parameters kappa_handler precondition f =
-  let new_f error dynamic path =
-    let error, dynamic, _ ,old_output = get_state_of_site_in_pre_post_condition
-        parameters kappa_handler error precondition dynamic path in
-    f error dynamic path old_output
+let refine_information_about_state_of_sites_in_precondition
+     precondition f =
+  let new_f parameter error dynamic path =
+    let error, dynamic, old_output =
+      precondition.state_of_sites_in_precondition
+        parameter error dynamic path in
+    f parameter error dynamic path old_output
   in
   {
     precondition with
-    cache_state_of_site = PathMap.empty Usual_domains.Any;
-    state_of_site = new_f
+    cache_state_of_sites = PathMap.empty Usual_domains.Any;
+    state_of_sites_in_precondition = new_f
   }
 
-let get_state_of_site error dynamic precondition path =
+(*let get_state_of_site error dynamic precondition path =
   match
-    PathMap.find path precondition.cache_state_of_site
+    PathMap.find path precondition.cache_state_of_sites
   with
   | Some output ->
     error, dynamic, precondition, output
   | None ->
     begin
       let error, dynamic, output =
-        precondition.state_of_site error dynamic path
+        precondition.state_of_sites_in_precondition
+          error dynamic path
       in
       let precondition =
         {
           precondition with
-          cache_state_of_site =
+          cache_state_of_sites =
             PathMap.add path output precondition.cache_state_of_site
         }
       in
       error, dynamic, precondition, output
-    end
+    end*)

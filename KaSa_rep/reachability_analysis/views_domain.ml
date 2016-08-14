@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 13 2016>
+   * Last modification: Time-stamp: <Aug 14 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1898,13 +1898,20 @@ struct
       bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
-      Communication.refine_information_about_state_of_site
-        parameter kappa_handler precondition
-        (fun error dynamic current_path former_answer ->
+      Communication.refine_information_about_state_of_sites_in_precondition
+       precondition
+        (fun parameters error dynamic current_path former_answer ->
            (*-----------------------------------------------------*)
            (*typing*)
            match current_path.Communication.defined_in with
-           | Communication.RHS _ -> error, dynamic, former_answer
+             | Communication.RHS _ ->
+               let error, () =
+                 Exception.warn
+                   parameters error __POS__
+                   ~message:"refinement should be called on LHS or patterns only"
+                   Exit ()
+               in
+                   error, dynamic, former_answer
            | Communication.LHS _
            | Communication.Pattern ->
            let error, answer_contact_map =

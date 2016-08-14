@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 13 2016>
+  * Last modification: Time-stamp: <Aug 14 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -666,12 +666,15 @@ struct
      agents, whether they cannot be bound to the same agent, whether we cannot
      know, and deal with accordingly *)
 
+(* TODO: provide a polymorphic primitive in communication.ml to do
+   define this function, and the one for postcondition only once *)
   let get_state_of_site_in_precondition
-      parameter error dynamic rule_id agent_id site_type precondition
+      parameter error static dynamic rule_id agent_id site_type precondition
     =
     (*binding action: A.x.B.z -> parallel bonds: A.x.y.B.z.t, B.z.t.A.x.y
       (first bound)*)
     (*build a path for the second site in this bound. A.y*)
+    let kappa_handler = get_kappa_handler static in
     let path =
       {
         Communication.defined_in = Communication.LHS rule_id;
@@ -683,9 +686,9 @@ struct
     (*get a list of site_type2 state in the precondition*)
     let error, global_dynamic, precondition, state_list_lattice =
       Communication.get_state_of_site
-        error
-        (get_global_dynamic_information dynamic)
+        parameter kappa_handler error
         precondition
+        (get_global_dynamic_information dynamic)
         path
     in
     let error, state_list =
@@ -701,6 +704,8 @@ struct
   (***********************************************************)
 
   let apply_rule static dynamic error rule_id precondition =
+    (* change calls to get_state_of_site_in_precondition
+       into get_state_of_site_in_postcondition *)
     let event_list = [] in
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
@@ -775,7 +780,7 @@ struct
                  let error, dynamic, precondition, state_list =
                    get_state_of_site_in_precondition
                      parameter error
-                     dynamic
+                     static dynamic
                      rule
                      agent_id1 (*A*)
                      site_type2
@@ -784,7 +789,7 @@ struct
                  let error, dynamic, precondition, state_list' =
                    get_state_of_site_in_precondition
                      parameter error
-                     dynamic
+                     static dynamic
                      rule
                      agent_id1' (*B*)
                      site_type2'
@@ -919,7 +924,7 @@ struct
                let error, dynamic, precondition, state_list =
                  get_state_of_site_in_precondition
                    parameter error
-                   dynamic
+                   static dynamic
                    rule
                    agent_id1
                    site_type1
@@ -928,7 +933,7 @@ struct
                let error, dynamic, precondition, state_list' =
                  get_state_of_site_in_precondition
                    parameter error
-                   dynamic
+                   static dynamic
                    rule
                    agent_id1'
                    site_type1'

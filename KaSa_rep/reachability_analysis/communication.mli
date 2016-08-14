@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 13 2016>
+   * Last modification: Time-stamp: <Aug 14 2016>
    *
    * Abstract domain to record live rules
    *
@@ -83,13 +83,13 @@ val the_rule_is_not_applied_for_the_first_time:
   precondition ->
   Exception.method_handler * precondition
 
-val get_state_of_site:
+(*val get_state_of_site:
   Exception.method_handler ->
   Analyzer_headers.global_dynamic_information ->
   precondition ->
   path ->
   Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition *
-    Ckappa_sig.c_state list Usual_domains.flat_lattice
+    Ckappa_sig.c_state list Usual_domains.flat_lattice*)
 
 type prefold = { fold: 'a. 'a fold}
 
@@ -97,11 +97,10 @@ type prefold = { fold: 'a. 'a fold}
   precondition, refine, the previous result, and output the new
   precondition*)
 
-val refine_information_about_state_of_site:
-  Remanent_parameters_sig.parameters ->
-  Cckappa_sig.kappa_handler ->
-    precondition ->
-  (Exception.method_handler ->
+val refine_information_about_state_of_sites_in_precondition:
+  precondition ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
    Analyzer_headers.global_dynamic_information ->
    path ->
    Ckappa_sig.c_state list Usual_domains.flat_lattice ->
@@ -140,7 +139,7 @@ val overwrite_potential_partners_map:
   -> prefold ->
   Exception.method_handler * precondition
 
-val get_state_of_site_in_pre_post_condition:
+val get_state_of_site:
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler ->

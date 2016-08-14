@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 13 2016>
+   * Last modification: Time-stamp: <Aug 14 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -488,16 +488,17 @@ struct
     (*partition map with key is the pair in bonds rhs*)
     (*------------------------------------------------------------*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let _ =
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.iter
-        (fun ((a,b,c,d),(e,f,g,h)) ->
+    let error  =
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
+        (fun ((a,b,c,d),(e,f,g,h)) error ->
            let error, (agent, site, site', state,
                        agent1, site1, site1', state1) =
              Site_accross_bonds_domain_type.convert_tuple
                parameter error kappa_handler
                ((a, b, c, d), (e, f, g, h))
            in
-           Loggers.fprintf
+           let () =
+             Loggers.fprintf
              (Remanent_parameters.get_logger parameter)
              "%i:%s %i:%s %i:%s (%i:%s) | %i:%s %i:%s %i:%s (%i:%s) \n"
              (Ckappa_sig.int_of_agent_name a)
@@ -516,8 +517,9 @@ struct
              site1'
              (Ckappa_sig.int_of_state_index h)
              state1
+           in error
         )
-        store_potential_tuple_pair
+        store_potential_tuple_pair error
     in
 
 
@@ -692,8 +694,9 @@ struct
   (****************************************************************)
 
   let get_state_of_site_in_pre_post_condition
-      parameter error dynamic agent_id
+      parameter error static dynamic agent_id
       site_type defined_in precondition =
+    let kappa_handler = get_kappa_handler static in
     let path =
       {
         Communication.defined_in = defined_in ;
@@ -705,10 +708,10 @@ struct
     (*get a list of site_type2 state in the precondition*)
     let error, global_dynamic, precondition, state_list_lattice =
       Communication.get_state_of_site
-        error
-        (get_global_dynamic_information dynamic)
-        precondition
-        path
+      parameter kappa_handler error
+      precondition
+      (get_global_dynamic_information dynamic)
+      path
     in
     let error, state_list =
       match state_list_lattice with
@@ -722,17 +725,17 @@ struct
   (*use this function before apply a rule, like in is_enabled*)
 
   let get_state_of_site_in_precondition
-      parameter error dynamic rule agent_id site_type precondition =
+      parameter error static dynamic rule agent_id site_type precondition =
     let defined_in = Communication.LHS rule in
     get_state_of_site_in_pre_post_condition
-      parameter error dynamic agent_id
+      parameter error static dynamic agent_id
       site_type defined_in precondition
 
   let get_state_of_site_in_postcondition
-      parameter error dynamic rule agent_id site_type precondition =
+      parameter error static dynamic rule agent_id site_type precondition =
     let defined_in = Communication.RHS rule in
     get_state_of_site_in_pre_post_condition
-      parameter error dynamic agent_id
+      parameter error static dynamic agent_id
       site_type defined_in precondition
 
   let context rule_id agent_id site_type =
@@ -791,7 +794,7 @@ struct
              (fun (site_type'_x, site_type'_y) (error, dynamic, precondition) ->
                 let error', dynamic, precondition, state'_list_x =
                   get_state_of_site_in_postcondition
-                    parameter error dynamic
+                    parameter error static dynamic
                     rule
                     agent_id_t
                     site_type'_x
@@ -807,7 +810,7 @@ struct
                 let error', dynamic, precondition, state'_list_y =
                   get_state_of_site_in_postcondition
                     parameter error
-                    dynamic
+                    static dynamic
                     rule
                     agent_id_u
                     site_type'_y
@@ -1003,7 +1006,7 @@ struct
              (fun (site_type'_x, site_type'_y) (error, dynamic, precondition) ->
                 let error', dynamic, precondition, state'_list_x =
                   get_state_of_site_in_postcondition
-                    parameter error dynamic
+                    parameter error static dynamic
                     rule
                     agent_id_t
                     site_type'_x
@@ -1019,7 +1022,7 @@ struct
                 let error', dynamic, precondition, state'_list_y =
                   get_state_of_site_in_postcondition
                     parameter error
-                    dynamic
+                    static dynamic
                     rule
                     agent_id_u
                     site_type'_y
@@ -1116,9 +1119,9 @@ struct
     in
     let error, global_dynamic, precondition, state_list_lattice =
       Communication.get_state_of_site
-        error
-        (get_global_dynamic_information dynamic)
+        parameter kappa_handler error
         precondition
+        (get_global_dynamic_information dynamic)
         path
     in
     let error, state_list =
