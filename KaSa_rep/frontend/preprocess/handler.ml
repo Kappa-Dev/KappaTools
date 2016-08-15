@@ -278,8 +278,11 @@ let print_site_compact site =
   | Ckappa_sig.Internal a -> a ^ "~"
   | Ckappa_sig.Binding a -> a ^ "!"
 
-let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckappa_sig.c_site_name) =
-  let error, sites_dic =
+let string_of_site_aux
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler_kappa agent_name (site_int: Ckappa_sig.c_site_name) =
+  let error', sites_dic =
     match
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
         parameter
@@ -291,18 +294,19 @@ let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckapp
                        (Ckappa_sig.Dictionary_of_sites.init())
     | error, Some i -> error, i
   in
-  let error, site_type =
+  let error', site_type =
     match
       Ckappa_sig.Dictionary_of_sites.translate
         parameter
-        error
+        error'
         site_int
         sites_dic
     with
-    | error, None -> Exception.warn parameter error __POS__ Exit (Ckappa_sig.Internal "")
-    | error, Some (value, _, _) -> error, value
+    | error, None -> Exception.warn parameter error' __POS__ Exit (Ckappa_sig.Internal "")
+    | error, Some (value, _, _) -> error', value
   in
-  error, site_type
+  check_pos parameter ka_pos ml_pos message error error',
+  site_type
 
 let string_of_site parameter error handler_kappa agent_type site_int =
   let error, site_type =
@@ -337,9 +341,14 @@ let print_site_contact_map site =
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding a -> a
 
-let string_of_site_contact_map parameter error handler_kappa agent_name site_int =
+let string_of_site_contact_map
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler_kappa agent_name site_int =
   let error, site_type =
-    string_of_site_aux parameter error handler_kappa agent_name site_int
+    string_of_site_aux
+      ~ml_pos ~ka_pos ~message
+      parameter error handler_kappa agent_name site_int
   in
   error, (print_site_contact_map site_type)
 

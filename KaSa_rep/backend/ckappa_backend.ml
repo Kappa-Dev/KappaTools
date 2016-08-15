@@ -120,35 +120,25 @@ struct
         Exit t
     | Some (agent_type, map) ->
       begin
-        let error', site_string =
+        let error, site_string =
           Handler.string_of_site_contact_map
+            ~ml_pos:(Some __POS__)
+            ~message:"undefined site"
             parameter error kappa_handler agent_type site
         in
-        let error =
-          Exception.check_point
-            Exception.warn parameter error error' __POS__
-            ~message:"undefined site"
-            Exit
-        in
-        let error', _ =
-          Handler.translate_state parameter error kappa_handler agent_type site state_min
-        in
-        let error =
-          Exception.check_point
-            Exception.warn
-            parameter error error' __POS__
+        let error, _ =
+          Handler.translate_state
+            ~ml_pos:(Some __POS__)
             ~message:"undefined site state"
-            Exit
+            parameter error kappa_handler
+            agent_type site state_min
         in
-        let error', _ =
-          Handler.translate_state parameter error kappa_handler agent_type site state_max
-        in
-        let error =
-          Exception.check_point
-            Exception.warn
-            parameter error error' __POS__
+        let error, _ =
+          Handler.translate_state
+            ~ml_pos:(Some __POS__)
             ~message:"undefined site state"
-            Exit
+            parameter error kappa_handler
+            agent_type site state_max
         in
         let error, old_asso =
           Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
