@@ -19,14 +19,16 @@ let nvars _parameter _error handler = handler.Cckappa_sig.nvars
 let nagents _parameter _error handler = handler.Cckappa_sig.nagents
 
 let check_pos parameter ka_pos ml_pos message error error' =
-    match ml_pos with
+  match ml_pos with
   | None -> error'
   | Some ml_pos ->
-      Exception.check_point
-        Exception.warn parameter ~message ~pos:ka_pos error error' ml_pos Exit
+    Exception.check_point
+      Exception.warn parameter ~message ~pos:ka_pos error error' ml_pos Exit
 
 let translate_agent
-    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None) ?message:(message="") parameter error handler ag =
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler ag =
   let error',(a, _, _) =
     Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_agents.translate
@@ -40,8 +42,11 @@ let translate_agent
   check_pos parameter ka_pos ml_pos message error error',
   a
 
-let translate_site parameter error handler agent_name site =
-  let error, dic =
+let translate_site
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler agent_name site =
+  let error', dic =
     Misc_sa.unsome
       (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
          parameter
@@ -52,17 +57,21 @@ let translate_site parameter error handler agent_name site =
          Exception.warn parameter error __POS__ Exit
            (Ckappa_sig.Dictionary_of_sites.init ()))
   in
-  let error, (a, _, _) =
+  let error', (a, _, _) =
     Misc_sa.unsome
-      (Ckappa_sig.Dictionary_of_sites.translate parameter error site dic)
+      (Ckappa_sig.Dictionary_of_sites.translate parameter error' site dic)
       (fun error ->
          Exception.warn parameter error __POS__ Exit
            (Ckappa_sig.Internal "", (), ()))
   in
-  error, a
+  check_pos parameter ka_pos ml_pos message error error',
+  a
 
-let translate_state parameter error handler agent site state =
-  let error, dic =
+let translate_state
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler agent site state =
+  let error', dic =
     Misc_sa.unsome
       (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
          parameter
@@ -72,35 +81,61 @@ let translate_state parameter error handler agent site state =
       (fun error -> Exception.warn parameter error __POS__ Exit
           (Ckappa_sig.Dictionary_of_States.init ()))
   in
-  let error, (a, _, _) =
+  let error', (a, _, _) =
     Misc_sa.unsome
-      (Ckappa_sig.Dictionary_of_States.translate parameter error state dic)
+      (Ckappa_sig.Dictionary_of_States.translate parameter error' state dic)
       (fun error ->
          Exception.warn parameter error __POS__ Exit (Ckappa_sig.Internal "",(),()))
   in
-  error, a
+  check_pos parameter ka_pos ml_pos message error error',
+  a
 
-let dual parameter error handler agent site state =
-  Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.unsafe_get
-    parameter
-    error
-    (agent, (site, state))
-    handler.Cckappa_sig.dual
 
-let is_binding_site parameter error handler agent site =
-  let error,site = translate_site parameter error handler agent site in
+let dual
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler agent site state =
+  let error', a =
+    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.unsafe_get
+      parameter
+      error
+      (agent, (site, state))
+      handler.Cckappa_sig.dual
+  in
+  check_pos parameter ka_pos ml_pos message error error',
+  a
+
+let is_binding_site
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler agent site =
+  let error,site =
+    translate_site
+      ~ml_pos ~ka_pos ~message
+      parameter error handler agent site
+  in
   match site with
   | Ckappa_sig.Internal _ -> error,false
   | Ckappa_sig.Binding _ -> error,true
 
-let is_internal_site parameter error handler agent site =
-  let error,site = translate_site parameter error handler agent site in
+let is_internal_site
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameter error handler agent site =
+  let error,site =
+    translate_site
+      ~ml_pos ~ka_pos ~message
+      parameter error handler agent site
+  in
   match site with
   | Ckappa_sig.Internal _ -> error,true
   | Ckappa_sig.Binding _ -> error,false
 
-let last_site_of_agent parameters error handler agent_name =
-  let error, dic =
+let last_site_of_agent
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameters error handler agent_name =
+  let error', dic =
     Misc_sa.unsome
       (
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
@@ -111,13 +146,17 @@ let last_site_of_agent parameters error handler agent_name =
       (fun error -> Exception.warn parameters error __POS__ Exit
           (Ckappa_sig.Dictionary_of_sites.init ()))
   in
-  let error, last_entry =
-    Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic
+  let error', last_entry =
+    Ckappa_sig.Dictionary_of_sites.last_entry parameters error' dic
   in
-  error, last_entry
+  check_pos parameters ka_pos ml_pos message error error',
+  last_entry
 
-let last_state_of_site parameters error handler agent_name site_name =
-  let error, dic =
+let last_state_of_site
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameters error handler agent_name site_name =
+  let error', dic =
     Misc_sa.unsome
       (
         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
@@ -128,14 +167,19 @@ let last_state_of_site parameters error handler agent_name site_name =
       (fun error -> Exception.warn parameters error __POS__ Exit
           (Ckappa_sig.Dictionary_of_States.init ()))
   in
-  let error, last_entry =
-    Ckappa_sig.Dictionary_of_States.last_entry parameters error dic
+  let error', last_entry =
+    Ckappa_sig.Dictionary_of_States.last_entry parameters error' dic
   in
-  error, last_entry
+  check_pos parameters ka_pos ml_pos message error error',
+  last_entry
 
-let complementary_interface parameters error handler agent_name interface =
+let complementary_interface
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?message:(message="")
+    parameters error handler agent_name interface =
   let error, last_entry =
-    last_site_of_agent parameters error handler agent_name
+    last_site_of_agent
+      ~ml_pos ~ka_pos ~message parameters error handler agent_name
   in
   let l =
     let rec aux k output =
