@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Aug 15 2016>
   * *
   * primitive to parse command-line options
   *
@@ -19,22 +19,22 @@ let options =
     [
       "--do-all",
       Multi(
-	[
-	  "--compute-contact-map";
-	  "--compute-influence-map";
-	  "--compute-ODE-flow-of-information";
-	  "--compute-stochastic-flow-of-information";
-	  "--compute-reachability-analysis";
-	],[]),"launch everything",["0_Actions"],Normal;
+        [
+          "--compute-contact-map";
+          "--compute-influence-map";
+          "--compute-ODE-flow-of-information";
+          "--compute-stochastic-flow-of-information";
+          "--compute-reachability-analysis";
+        ],[]),"launch everything",["0_Actions"],Normal;
       "--reset-all",
       Multi(
-	[
-	  "--no-compute-contact-map";
-	  "--no-compute-influence-map";
-	  "--no-compute-ODE-flow-of-information";
-	  "--no-compute-stochastic-flow-of-information";
-	  "--no-compute-reachability-analysis";
-	],[]),"launch nothing",["0_Actions"],Normal;
+        [
+          "--no-compute-contact-map";
+          "--no-compute-influence-map";
+          "--no-compute-ODE-flow-of-information";
+          "--no-compute-stochastic-flow-of-information";
+          "--no-compute-reachability-analysis";
+        ],[]),"launch nothing",["0_Actions"],Normal;
 
       "--compute-contact-map",
       Bool Config.do_contact_map,
@@ -48,15 +48,15 @@ let options =
       ["0_Actions";"5_Influence_map"],
       Normal;
 
-       "--influence-map-accuracy-level",
-        (Choice
-           (["Low","Ignore relations among site";
-             "Medium","Ignore reachable states";
-(*    "High",""*) ],
-            Config.influence_map_accuracy_level)),
-       "Tune the accuracy level of the influence map",
-       ["5_Influence_map"],
-       Normal;
+      "--influence-map-accuracy-level",
+      (Choice
+         (["Low","Ignore relations among site";
+           "Medium","Ignore reachable states";
+           (*    "High",""*) ],
+          Config.influence_map_accuracy_level)),
+      "Tune the accuracy level of the influence map",
+      ["5_Influence_map"],
+      Normal;
 
       "--compute-ODE-flow-of-information",
       Bool Config.do_ODE_flow_of_information,
@@ -83,7 +83,7 @@ let options =
            (*"Low","Non relational site analysis";*)
            "High","Relational view analysis"],
            Config.view_accuracy_level)),
-        "Tune the accuracy level of the view analysis",
+      "Tune the accuracy level of the view analysis",
       ["2_Reachability_analysis"],
       Expert;
 
@@ -125,9 +125,13 @@ let options =
       ["2_Reachability_analysis"],
       Developper;
 
-      "--use-natural-language",
-      Bool Config.use_natural_language,
-      "translate relations in sentences when it is possible",
+      "--output-mode-for-reachability-analysis",
+      (Choice (["raw","no post-processing";
+                "kappa","kappa mode";
+                "english","natural language"
+               ],
+               Config.use_natural_language)),
+      "post-process relation and output the result in the chosen format",
       ["2_Reachability_analysis"],
       Normal;
 
@@ -168,12 +172,12 @@ let options =
       Hidden;
 
       "--output-directory",
-       MultiExt
-	[
-	  "--output-contact-map-directory","";
-	  "--output-influence-map-directory","";
-	  "--output-local-traces-directory","";
-	  "--output-log-directory",""],
+      MultiExt
+        [
+          "--output-contact-map-directory","";
+          "--output-influence-map-directory","";
+          "--output-local-traces-directory","";
+          "--output-log-directory",""],
       "Default repository for outputs",
       ["1_Output"],
       Normal;
@@ -187,12 +191,12 @@ let options =
       "put the influence map file in this directory",
       ["1_Output";"5_Influence_map"],
       Normal;
-       "--output-local-traces-directory",
+      "--output-local-traces-directory",
       String Config.output_local_trace_directory,
       "put the files about local traces in this directory",
       ["1_Output";"3_Trace_analysis"],
       Normal;
-       "--output-log-directory",
+      "--output-log-directory",
       String Config.output_directory,
       "put the log files in this directory",
       ["1_Output";"7_Debugging_info"],
@@ -200,38 +204,38 @@ let options =
       "--contact-map-format",
       (Choice (["DOT","dot format";
                 (*"HTML","HTML format"*)],
-	       Config.contact_map_format)),
+               Config.contact_map_format)),
       "Tune the output format for the contact map",
       ["1_Output";"4_Contact_map"],
-        Expert;
+      Expert;
       "--influence-map-format",
       (Choice ([
            "DOT","dot format";
            "HTML","HTML format"
          ],
-       Config.influence_map_format)),
+           Config.influence_map_format)),
       "Tune the output format for the influence map",
       ["1_Output";"5_Influence_map"],
-        Expert;
+      Expert;
       "--local-traces-format",
       (Choice (
           [
             "DOT","dot format";
             "HTML","HTML format"
           ],
-       Config.local_trace_format)),
+          Config.local_trace_format)),
       "Tune the output format for the local transition systems",
       ["1_Output";"3_Trace_analysis"],
       Normal;
-        "--contact-map-accuracy-level",
-        (Choice
-           (["Low","Collect info from rhs of rules and initial state";
-             "High","Only consider reachable rules";
-             ],
-            Config.contact_map_accuracy_level)),
-        "Tune the accuracy level of the contact map",
-        ["4_Contact_map"],
-          Expert;
+      "--contact-map-accuracy-level",
+      (Choice
+         (["Low","Collect info from rhs of rules and initial state";
+           "High","Only consider reachable rules";
+          ],
+          Config.contact_map_accuracy_level)),
+      "Tune the accuracy level of the contact map",
+      ["4_Contact_map"],
+      Expert;
 
       "--pure-contact",
       Bool Config.pure_contact,
@@ -266,8 +270,8 @@ let options =
 
 let get_option error =
   let parameters = Remanent_parameters.get_parameters
-		     ~called_from:Remanent_parameters_sig.Internalised () in
+      ~called_from:Remanent_parameters_sig.Internalised () in
   let () = SuperargTk.parse parameters options FileNames.input in
   let parameters = Remanent_parameters.get_parameters
-		     ~called_from:Remanent_parameters_sig.KaSa () in
+      ~called_from:Remanent_parameters_sig.KaSa () in
   error,parameters,!FileNames.input

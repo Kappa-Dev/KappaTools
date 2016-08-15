@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Aug 02 2016>
+  * Last modification: Time-stamp: <Aug 15 2016>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -96,7 +96,7 @@ let dump_reachability_analysis_wl = ref false
 
 let hide_one_d_relations_from_cartesian_decomposition = ref true
 let smash_relations = ref true
-let use_natural_language = ref true
+let use_natural_language = ref "KAPPA"
 let compute_local_traces = ref false
 let show_rule_names_in_local_traces = ref true
 let use_macrotransitions_in_local_traces = ref false

@@ -7,3 +7,4 @@
 'create' -> A(x~u) @1
 'x' A(x~u) -> A(x~p) @1
 'y' A(x~p, y~u) -> A(x~p,y~p) @1
+'bind' A(x),A(x) -> A(x!1),A(x!1) @ 1

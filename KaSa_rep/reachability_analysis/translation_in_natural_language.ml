@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Aug 15 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -209,7 +209,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
       (error, [])
       (List.rev list)
   in
-  if Remanent_parameters.get_use_natural_language parameter
+  if Remanent_parameters.get_post_processing  parameter
   then
     begin
       let error, handler, vars =
@@ -529,50 +529,99 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
       if dim_min <= 2
       then
         begin
-          let error', site_string1 =
-            Handler.string_of_site_in_natural_language
-              parameter error handler_kappa agent_type
-              site1
-          in
-          let error =
-            Exception.check_point
-              Exception.warn  parameter error error' __POS__ Exit
-          in
-          let error', state_string1 =
-            Handler.string_of_state_fully_deciphered parameter error
-              handler_kappa agent_type
-              site1
-              state1
-          in
-          let error =
-            Exception.check_point
-              Exception.warn parameter error error' __POS__ Exit
-          in
-          let error', site_string2 =
-            Handler.string_of_site_in_natural_language
-              parameter error handler_kappa agent_type
-              site2
-          in
-          let error =
-            Exception.check_point
-              Exception.warn parameter error error' __POS__ Exit
-          in
-          let error', state_string2 =
-            Handler.string_of_state_fully_deciphered parameter error
-              handler_kappa agent_type
-              site2
-              state2
-          in
-          let error =
-            Exception.check_point
-              Exception.warn parameter error error' __POS__ Exit
-          in
-          error,
-          Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "%s%s%s is %s whenever %s is %s.%s"
-            (Remanent_parameters.get_prefix parameter)
-            (cap (in_agent_comma agent_string))
-            site_string2 state_string2 site_string1 state_string1 endofline
+          (* *)
+          match Remanent_parameters.get_backend_mode parameter
+          with
+          | Remanent_parameters_sig.Kappa
+          | Remanent_parameters_sig.Raw ->
+            let t = Ckappa_backend.Ckappa_backend.empty in
+            let error, id, t =
+              Ckappa_backend.Ckappa_backend.add_agent
+                parameter error handler_kappa
+                agent_type t
+            in
+            (*  let error, t =
+                Ckappa_backend.Ckappa_backend.add_site
+                parameter error handler_kappa
+                id site1 t
+                in*)
+            let error, t =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameter error handler_kappa
+                id site1 state1 t
+            in
+            (*  let error, t' =
+                Ckappa_backend.Ckappa_backend.add_site
+                parameter error handler_kappa
+                id site2 t'
+                in*)
+            let error, t' =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameter error handler_kappa
+                id site2 state2 t
+            in
+            let error =
+              Ckappa_backend.Ckappa_backend.print
+                (Remanent_parameters.get_logger parameter) parameter error handler_kappa
+                t
+            in
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameter) "=>" in
+            let error =
+              Ckappa_backend.Ckappa_backend.print
+                (Remanent_parameters.get_logger parameter) parameter error handler_kappa
+                t'
+            in
+            let () =
+              Loggers.print_newline (Remanent_parameters.get_logger parameter)
+            in
+            error, ()
+          | Remanent_parameters_sig.Natural_language ->
+            (* *)
+            let error', site_string1 =
+              Handler.string_of_site_in_natural_language
+                parameter error handler_kappa agent_type
+                site1
+            in
+            let error =
+              Exception.check_point
+                Exception.warn  parameter error error' __POS__ Exit
+            in
+            let error', state_string1 =
+              Handler.string_of_state_fully_deciphered parameter error
+                handler_kappa agent_type
+                site1
+                state1
+            in
+            let error =
+              Exception.check_point
+                Exception.warn parameter error error' __POS__ Exit
+            in
+            let error', site_string2 =
+              Handler.string_of_site_in_natural_language
+                parameter error handler_kappa agent_type
+                site2
+            in
+            let error =
+              Exception.check_point
+                Exception.warn parameter error error' __POS__ Exit
+            in
+            let error', state_string2 =
+              Handler.string_of_state_fully_deciphered parameter error
+                handler_kappa agent_type
+                site2
+                state2
+            in
+            let error =
+              Exception.check_point
+                Exception.warn parameter error error' __POS__ Exit
+            in
+            error,
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "%s%s%s is %s whenever %s is %s.%s"
+              (Remanent_parameters.get_prefix parameter)
+              (cap (in_agent_comma agent_string))
+              site_string2 state_string2 site_string1 state_string1 endofline
         end
       else
         error,()

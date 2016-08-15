@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Aug 02 2016>
+  * Last modification:  Time-stamp: <Aug 15 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -21,6 +21,8 @@ type called_from = KaSa | KaSim | Internalised | JS | Server
 type accuracy_level = None | Low | Medium | High | Full
 type link_mode = Bound_indices | Site_address | Bound_type
 type graph_format = DOT | HTML
+
+type reachability_output = Raw | Natural_language | Kappa
 
 type symbol_table =
   {
@@ -99,7 +101,7 @@ type reachability_map_output =
     add_singular_macrostates: bool;
     add_singular_microstates: bool;
     ignore_trivial_losanges: bool;
-    use_natural_language : bool;
+    use_natural_language : reachability_output ;
     trace_prefix: string;
     trace_directory: string;
   }

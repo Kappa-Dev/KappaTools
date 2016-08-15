@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2010, the 18th of October
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Aug 15 2016>
  * *
  * This library provides primitives to deal indexed set of values
  * During the construction membership, tranduction, and new key can

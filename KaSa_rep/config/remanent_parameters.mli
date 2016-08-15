@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Aug 02 2016>
+  * Last modification: Time-stamp: <Aug 15 2016>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -100,7 +100,9 @@ val get_dump_reachability_analysis_diff: Remanent_parameters_sig.parameters -> b
 val get_dump_reachability_analysis_wl: Remanent_parameters_sig.parameters -> bool
 
 (*+ view analysis *)
-val get_use_natural_language: Remanent_parameters_sig.parameters -> bool
+val get_post_processing: Remanent_parameters_sig.parameters -> bool
+val get_backend_mode: Remanent_parameters_sig.parameters ->
+  Remanent_parameters_sig.reachability_output
 val get_hide_one_d_relations_from_cartesian_decomposition: Remanent_parameters_sig.parameters -> bool
 val get_smash_relations: Remanent_parameters_sig.parameters -> bool
 

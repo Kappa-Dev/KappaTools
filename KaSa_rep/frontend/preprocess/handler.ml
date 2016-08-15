@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 15 2016>
    * *
    * Primitives to use a kappa handler
    *
@@ -91,7 +91,7 @@ let is_internal_site parameter error handler agent site =
   | Ckappa_sig.Internal _ -> error,true
   | Ckappa_sig.Binding _ -> error,false
 
-let complementary_interface parameters error handler agent_name interface =
+let last_site_of_agent parameters error handler agent_name =
   let error, dic =
     Misc_sa.unsome
       (
@@ -105,6 +105,29 @@ let complementary_interface parameters error handler agent_name interface =
   in
   let error, last_entry =
     Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic
+  in
+  error, last_entry
+
+let last_state_of_site parameters error handler agent_name site_name =
+  let error, dic =
+    Misc_sa.unsome
+      (
+        Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+          parameters
+          error
+          (agent_name, site_name)
+          handler.Cckappa_sig.states_dic)
+      (fun error -> Exception.warn parameters error __POS__ Exit
+          (Ckappa_sig.Dictionary_of_States.init ()))
+  in
+  let error, last_entry =
+    Ckappa_sig.Dictionary_of_States.last_entry parameters error dic
+  in
+  error, last_entry
+
+let complementary_interface parameters error handler agent_name interface =
+  let error, last_entry =
+    last_site_of_agent parameters error handler agent_name
   in
   let l =
     let rec aux k output =

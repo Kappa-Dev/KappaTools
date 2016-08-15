@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Jul 13 2016>
+  * Last modification: Time-stamp: <Aug 15 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -152,7 +152,8 @@ let reachability_map_0 =
     Remanent_parameters_sig.add_singular_macrostates = false;
     Remanent_parameters_sig.add_singular_microstates = false;
     Remanent_parameters_sig.smash_relations = false;
-    Remanent_parameters_sig.use_natural_language = false;
+    Remanent_parameters_sig.use_natural_language =
+      Remanent_parameters_sig.Kappa;
     Remanent_parameters_sig.format_for_local_traces = Remanent_parameters_sig.DOT ;
     Remanent_parameters_sig.trace_prefix = "Agent_trace_";
     Remanent_parameters_sig.trace_directory =
@@ -178,7 +179,15 @@ let add_debugging_parameters_to_reachability_map reachability =
     with
       Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = !Config.hide_one_d_relations_from_cartesian_decomposition;
       Remanent_parameters_sig.smash_relations = !Config.smash_relations;
-      Remanent_parameters_sig.use_natural_language = !Config.use_natural_language;
+      Remanent_parameters_sig.use_natural_language =
+        begin
+          match !Config.use_natural_language with
+        | "raw" | "RAW" | "Raw" -> Remanent_parameters_sig.Raw
+        | "kappa" | "KAPPA" | "Kappa" -> Remanent_parameters_sig.Kappa
+        | "English" | "ENGLISH" | "english" ->
+          Remanent_parameters_sig.Natural_language
+        | _ -> Remanent_parameters_sig.Kappa
+        end;
       Remanent_parameters_sig.compute_local_traces = !Config.compute_local_traces;
       Remanent_parameters_sig.ignore_trivial_losanges = !Config.do_not_compress_trivial_losanges;
       Remanent_parameters_sig.add_singular_macrostates = !Config.add_singular_macrostates;
@@ -388,7 +397,14 @@ let get_dump_reachability_analysis_diff_1 r = r.Remanent_parameters_sig.dump_rea
 let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_wl
 let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
 let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
-let get_use_natural_language_1 r = r.Remanent_parameters_sig.use_natural_language
+let get_post_processing_1 r =
+  match r.Remanent_parameters_sig.use_natural_language with
+    Remanent_parameters_sig.Raw -> false
+  | Remanent_parameters_sig.Kappa
+  | Remanent_parameters_sig.Natural_language -> true
+let get_backend_mode_1 r =
+  r.Remanent_parameters_sig.use_natural_language
+
 let get_local_trace_format_1 r = r.Remanent_parameters_sig.format_for_local_traces
 let get_compute_local_traces_1 r = r.Remanent_parameters_sig.compute_local_traces
 let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
@@ -550,7 +566,8 @@ let get_dump_reachability_analysis_static = upgrade_from_reachability_map_field 
 let get_dump_reachability_analysis_dynamic = upgrade_from_reachability_map_field get_dump_reachability_analysis_dynamic_1
 let get_dump_reachability_analysis_diff = upgrade_from_reachability_map_field get_dump_reachability_analysis_diff_1
 let get_dump_reachability_analysis_wl = upgrade_from_reachability_map_field get_dump_reachability_analysis_wl_1
-let get_use_natural_language = upgrade_from_reachability_map_field get_use_natural_language_1
+let get_post_processing = upgrade_from_reachability_map_field get_post_processing_1
+let get_backend_mode = upgrade_from_reachability_map_field get_backend_mode_1
 let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachability_map_field get_hide_one_d_relations_from_cartesian_decomposition_1
 let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
 let get_local_trace_format = upgrade_from_reachability_map_field get_local_trace_format_1
