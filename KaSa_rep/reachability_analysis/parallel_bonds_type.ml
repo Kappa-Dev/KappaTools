@@ -136,8 +136,16 @@ let print_parallel_constraint
       parameters error kappa_handler
       agent_id site agent_id'' site'' t_same
   in
-
-
+  let error, agent_id''', t_distinct =
+    Ckappa_backend.Ckappa_backend.add_agent
+      parameters error kappa_handler
+      agent'' t_same
+  in
+  let error, t_distinct =
+    Ckappa_backend.Ckappa_backend.add_bond
+      parameters error kappa_handler
+      agent_id site' agent_id''' site''' t_distinct
+  in
   let error, t_same =
     Ckappa_backend.Ckappa_backend.add_bond
       parameters error kappa_handler
@@ -170,7 +178,8 @@ let print_parallel_constraint
                   error
                 else
                   let () =
-                    Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters)
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters) "%s" prefix
                   in error
               in
               let error =
@@ -194,7 +203,7 @@ let print_parallel_constraint
               let () =
                 Loggers.fprintf
                   (Remanent_parameters.get_logger parameters)
-                  "%s" (Remanent_parameters.get_prefix parameters)
+                  "%s" prefix
               in
               let error =
                 Ckappa_backend.Ckappa_backend.print
@@ -214,50 +223,13 @@ let print_parallel_constraint
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             begin
-              let (agent,site,site',_,_),(agent'',site'',site''',_,_) =
-                tuple
-              in
-              let t = Ckappa_backend.Ckappa_backend.empty in
-              let error, agent_id, t =
-                Ckappa_backend.Ckappa_backend.add_agent
-                  parameters error kappa_handler
-                  agent t in
-              let error, t =
-                Ckappa_backend.Ckappa_backend.add_bond_type
-                  parameters error kappa_handler
-                  agent_id site agent'' site'' t
-              in
-              let error, t =
-                Ckappa_backend.Ckappa_backend.add_bond_type
-                  parameters error kappa_handler
-                  agent_id site' agent'' site''' t
-              in
-              let error, agent_id'', t' =
-                Ckappa_backend.Ckappa_backend.add_agent
-                  parameters error kappa_handler
-                  agent'' t
-              in
-              let error, t' =
-                Ckappa_backend.Ckappa_backend.add_bond
-                  parameters error kappa_handler
-                  agent_id site agent_id'' site'' t'
-              in
-              let error, agent_id''', t' =
-                Ckappa_backend.Ckappa_backend.add_agent
-                  parameters error kappa_handler
-                  agent'' t'
-              in
-              let error, t' =
-                Ckappa_backend.Ckappa_backend.add_bond
-                  parameters error kappa_handler
-                  agent_id site' agent_id''' site''' t'
-              in
+
               let error =
                 if verbose then
                   let error =
                     Ckappa_backend.Ckappa_backend.print
                       (Remanent_parameters.get_logger parameters) parameters error kappa_handler
-                      t
+                      t_precondition
                   in
                   let () =
                     Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
@@ -269,7 +241,7 @@ let print_parallel_constraint
               let error =
                 Ckappa_backend.Ckappa_backend.print
                   (Remanent_parameters.get_logger parameters) parameters error kappa_handler
-                  t'
+                  t_distinct
               in
               let () =
                 Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -277,16 +249,20 @@ let print_parallel_constraint
               error
             end
           | Remanent_parameters_sig.Natural_language ->
-            let () =
+            let error =
               if verbose then
-                Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
-                   and its site %s bound to the site %s of a %s, then both instances of %s %s  different."
-                  prefix string_agent string_site string_site'' string_agent'' string_site' string_site''' string_agent'' string_agent'' modalite
+                let () =
+                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                    "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
+                     and its site %s bound to the site %s of a %s, then both instances of %s %s  different."
+                    prefix string_agent string_site string_site'' string_agent'' string_site' string_site''' string_agent'' string_agent'' modalite
+                in error
               else
-                Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  "%s%s(%s!1,%s!2),%s(%s!1),%s(%s!2)"
-                  prefix string_agent string_site string_site' string_agent'' string_site'' string_agent string_site'''
+                let error =
+                  Ckappa_backend.Ckappa_backend.print
+                    (Remanent_parameters.get_logger parameters) parameters error kappa_handler
+                    t_distinct
+                in error
             in
             let () =
               Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -294,11 +270,12 @@ let print_parallel_constraint
         end
       | Usual_domains.Undefined -> error
       | Usual_domains.Any ->
-        let () =
+        let error =
           if dump_any then
-            let () =
-              if verbose then
-                match Remanent_parameters.get_backend_mode parameters
+            if verbose then
+              let () =
+                match
+                  Remanent_parameters.get_backend_mode parameters
                 with
                 | Remanent_parameters_sig.Kappa
                 | Remanent_parameters_sig.Raw -> ()
@@ -308,24 +285,31 @@ let print_parallel_constraint
                     "%sWhen the agent %s has its site %s bound to the site %s of a %s, \
                      and its site %s bound to the site %s of a %s, then both instances of %s may be  different or not."
                     prefix string_agent string_site string_site'' string_agent'' string_site' string_site''' string_agent'' string_agent''
-              else
-                let () =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                    "%s%s(%s!1,%s!2),%s(%s!1,%s!2)"
-                    prefix string_agent string_site string_site'' string_agent'' string_site' string_site'''
-                in
-                let () =
-                  Loggers.print_newline (Remanent_parameters.get_logger parameters)
-                in
-                let () =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                    "%s%s(%s!1,%s!2),%s(%s!1),%s(%s!2)"
-                    prefix string_agent string_site string_site'' string_agent'' string_site' string_agent string_site'''
-                in
-                ()
-            in
-            Loggers.print_newline
-              (Remanent_parameters.get_logger parameters)
+              in error
+            else
+              let error =
+                Ckappa_backend.Ckappa_backend.print
+                  (Remanent_parameters.get_logger parameters) parameters error kappa_handler
+                  t_same
+              in
+              let () =
+                Loggers.print_newline (Remanent_parameters.get_logger parameters)
+              in
+              let error =
+                Ckappa_backend.Ckappa_backend.print
+                  (Remanent_parameters.get_logger parameters) parameters error kappa_handler
+                  t_distinct
+              in
+              let () =
+                Loggers.print_newline (Remanent_parameters.get_logger parameters)
+              in
+              error
+          else
+            error
+        in
+        let () =
+          Loggers.print_newline
+            (Remanent_parameters.get_logger parameters)
         in error
     in error
 
