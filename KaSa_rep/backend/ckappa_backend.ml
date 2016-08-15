@@ -60,12 +60,25 @@ struct
         ~message:"this agent id is already used"
         Exit
     in
+    let error', string_version =
+      Ckappa_sig.Agent_id_map_and_set.Map.add
+        parameter error
+        agent_id
+        (agent_string, Wrapped_modules.LoggedStringMap.empty)
+        t.string_version
+    in
+    let error =
+      Exception.check_point
+        Exception.warn parameter error error' __POS__
+        ~message:"this agent id is already used"
+        Exit
+    in
     error, t.fresh_agent_id,
-    check_stability
-      {t
-       with
-        fresh_agent_id = Ckappa_sig.next_agent_id t.fresh_agent_id ;
-        views = views} t
+    {t
+     with
+      fresh_agent_id = Ckappa_sig.next_agent_id t.fresh_agent_id ;
+      views = views ;
+      string_version = string_version }
 
   let max_state_index a b =
     if Ckappa_sig.compare_state_index a b <= 0
@@ -90,8 +103,9 @@ struct
         Exit t
     | Some (agent_type, map) ->
       begin
-        let error', _ =
-          Handler.translate_site parameter error kappa_handler agent_type site
+        let error', site_string =
+          Handler.string_of_site_contact_map
+            parameter error kappa_handler agent_type site
         in
         let error =
           Exception.check_point
@@ -288,230 +302,229 @@ struct
             with views = views ;
                  string_version = string_version
           }
+  end
 
-      end
+let add_state parameter error kappa_handler agent_id site
+    state t =
+  add_state_interv parameter error kappa_handler agent_id site
+    state state t
 
-  let add_state parameter error kappa_handler agent_id site
-      state t =
-    add_state_interv parameter error kappa_handler agent_id site
-      state state t
-
-  let add_bound_to_unknown
+let add_bound_to_unknown
+    parameter error kappa_handler
+    agent_id site t =
+  let error, (agent_type, _) =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      parameter error
+      (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
+      agent_id
+      t.views
+  in
+  let error, state_max =
+    Handler.last_state_of_site
       parameter error kappa_handler
-      agent_id site t =
-    let error, (agent_type, _) =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
-        parameter error
-        (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
-        agent_id
-        t.views
-    in
-    let error, state_max =
-      Handler.last_state_of_site
-        parameter error kappa_handler
-        agent_type site
-    in
-    add_state_interv parameter error kappa_handler agent_id site
-      Ckappa_sig.dummy_state_index_1 state_max t
+      agent_type site
+  in
+  add_state_interv parameter error kappa_handler agent_id site
+    Ckappa_sig.dummy_state_index_1 state_max t
 
-  let add_bond_to parameter error kappa_handler agent_id site bond_id t =
-    let error, (agent_type, _) =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
-        parameter error
-        (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
-        agent_id
-        t.views
+let add_bond_to parameter error kappa_handler agent_id site bond_id t =
+  let error, (agent_type, _) =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      parameter error
+      (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
+      agent_id
+      t.views
+  in
+  let error, old_site_map =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default_without_logs
+      parameter error
+      Ckappa_sig.Site_map_and_set.Map.empty
+      agent_id
+      t.bonds
+  in
+  let error, new_site_map =
+    Ckappa_sig.Site_map_and_set.Map.add
+      parameter error
+      site
+      bond_id
+      old_site_map
+  in
+  let error', new_bonds =
+    Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
+      parameter error
+      agent_id
+      new_site_map
+      t.bonds
+  in
+  let error =
+    Exception.check_point
+      Exception.warn
+      parameter error error' __POS__ Exit
+  in
+  let error, (agent_string, old_site_map) =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      parameter error
+      ("",Wrapped_modules.LoggedStringMap.empty)
+      agent_id
+      t.string_version
+  in
+  let error, site_string =
+    Handler.string_of_site_contact_map parameter error kappa_handler agent_type site
+  in
+  let error, (old_internal, old_binding) =
+    Wrapped_modules.LoggedStringMap.find_default_without_logs
+      parameter error
+      (None,None)
+      site_string
+      old_site_map
+  in
+  let error, new_site_map =
+    Wrapped_modules.LoggedStringMap.add_or_overwrite
+      parameter error
+      site_string
+      (None, Some (Bound_to bond_id))
+      old_site_map
+  in
+  let error', string_version =
+    Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+      parameter error
+      agent_id
+      (agent_string, new_site_map)
+      t.string_version
+  in
+  let error =
+    Exception.check_point
+      Exception.warn
+      parameter error error' __POS__ Exit
+  in
+  error,
+  {t with bonds = new_bonds ; string_version = string_version}
+
+let add_bond_type
+    parameter error kappa_handler
+    agent_id site agent_name' site' t =
+  let error, (agent_type, _) =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      parameter error
+      (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
+      agent_id
+      t.views
+  in
+  let error, state_id =
+    Handler.id_of_binding_type
+      parameter error kappa_handler
+      agent_type site agent_name' site'
+  in
+  add_state parameter error kappa_handler
+    agent_id site state_id t
+
+let add_bond
+    parameter error kappa_handler
+    agent_id site agent_id' site' t =
+  let bond_id = t.fresh_bond_id in
+  let error_ref = error in
+  let error, (agent_type, _) =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      parameter error
+      (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
+      agent_id
+      t.views
+  in
+  let error, (agent_type', _) =
+    Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      parameter error
+      (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
+      agent_id'
+      t.views
+  in
+  let error, state_dic =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      parameter error
+      (agent_type,site)
+      kappa_handler.Cckappa_sig.states_dic
+  in
+  let error, state_dic' =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      parameter error
+      (agent_type',site')
+      kappa_handler.Cckappa_sig.states_dic
+  in
+  let error, state_id =
+    Handler.id_of_binding_type
+      parameter error kappa_handler
+      agent_type site agent_type' site'
+  in
+  let error, state_id' =
+    Handler.id_of_binding_type
+      parameter error kappa_handler
+      agent_type' site' agent_type site
+  in
+  let error, t =
+    add_state
+      parameter error kappa_handler agent_id site state_id t
+  in
+  let error, t =
+    add_state
+      parameter error kappa_handler agent_id' site' state_id' t
+  in
+  if error == error_ref
+  then
+    let error, t =
+      add_bond_to parameter error kappa_handler agent_id site bond_id t
     in
-    let error, old_site_map =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default_without_logs
-        parameter error
-        Ckappa_sig.Site_map_and_set.Map.empty
-        agent_id
-        t.bonds
-    in
-    let error, new_site_map =
-      Ckappa_sig.Site_map_and_set.Map.add
-        parameter error
-        site
-        bond_id
-        old_site_map
-    in
-    let error', new_bonds =
-      Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
-        parameter error
-        agent_id
-        new_site_map
-        t.bonds
-    in
-    let error =
-      Exception.check_point
-        Exception.warn
-        parameter error error' __POS__ Exit
-    in
-    let error, (agent_string, old_site_map) =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
-        parameter error
-        ("",Wrapped_modules.LoggedStringMap.empty)
-        agent_id
-        t.string_version
-    in
-    let error, site_string =
-      Handler.string_of_site_contact_map parameter error kappa_handler agent_type site
-    in
-    let error, (old_internal, old_binding) =
-      Wrapped_modules.LoggedStringMap.find_default_without_logs
-        parameter error
-        (None,None)
-        site_string
-        old_site_map
-    in
-    let error, new_site_map =
-      Wrapped_modules.LoggedStringMap.add_or_overwrite
-        parameter error
-        site_string
-        (None, Some (Bound_to bond_id))
-        old_site_map
-    in
-    let error', string_version =
-      Ckappa_sig.Agent_id_map_and_set.Map.overwrite
-        parameter error
-        agent_id
-        (agent_string, new_site_map)
-        t.string_version
-    in
-    let error =
-      Exception.check_point
-        Exception.warn
-        parameter error error' __POS__ Exit
+    let error, t =
+      add_bond_to parameter error kappa_handler agent_id' site' bond_id t
     in
     error,
-    {t with bonds = new_bonds ; string_version = string_version}
-
-  let add_bond_type
-      parameter error kappa_handler
-      agent_id site agent_name' site' t =
-    let error, (agent_type, _) =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
-        parameter error
-        (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
-        agent_id
-        t.views
-    in
-    let error, state_id =
-      Handler.id_of_binding_type
-        parameter error kappa_handler
-        agent_type site agent_name' site'
-    in
-    add_state parameter error kappa_handler
-      agent_id site state_id t
-
-  let add_bond
-      parameter error kappa_handler
-      agent_id site agent_id' site' t =
-    let bond_id = t.fresh_bond_id in
-    let error_ref = error in
-    let error, (agent_type, _) =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
-        parameter error
-        (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
-        agent_id
-        t.views
-    in
-    let error, (agent_type', _) =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
-        parameter error
-        (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
-        agent_id'
-        t.views
-    in
-    let error, state_dic =
-      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-        parameter error
-        (agent_type,site)
-        kappa_handler.Cckappa_sig.states_dic
-    in
-    let error, state_dic' =
-      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-        parameter error
-        (agent_type',site')
-        kappa_handler.Cckappa_sig.states_dic
-    in
-    let error, state_id =
-      Handler.id_of_binding_type
-        parameter error kappa_handler
-        agent_type site agent_type' site'
-    in
-    let error, state_id' =
-      Handler.id_of_binding_type
-        parameter error kappa_handler
-        agent_type' site' agent_type site
-    in
-    let error, t =
-      add_state
-        parameter error kappa_handler agent_id site state_id t
-    in
-    let error, t =
-      add_state
-        parameter error kappa_handler agent_id' site' state_id' t
-    in
-    if error == error_ref
-    then
-      let error, t =
-        add_bond_to parameter error kappa_handler agent_id site bond_id t
-      in
-      let error, t =
-        add_bond_to parameter error kappa_handler agent_id' site' bond_id t
-      in
-      error,
-      {t with fresh_bond_id = t.fresh_bond_id +1 }
-    else
-      Exception.warn
-        parameter error __POS__
-        ~message:"incompatible binding states"
-        Exit t
+    {t with fresh_bond_id = t.fresh_bond_id +1 }
+  else
+    Exception.warn
+      parameter error __POS__
+      ~message:"incompatible binding states"
+      Exit t
 
 
-  let to_json parameter error kappa_handler t =
-    error, `Assoc []
+let to_json parameter error kappa_handler t =
+  error, `Assoc []
 
-  let print logger parameter error kappa_handler t  =
-    let _bool =
-      Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ (agent_string, site_map) bool ->
-           let () =
-             if bool then
-               Loggers.fprintf logger " , "
-           in
-           let () = Loggers.fprintf logger "%s(" agent_string in
-           let _bool =
-             Wrapped_modules.LoggedStringMap.fold
-               (fun site_string (internal,binding) bool ->
-                  let () =
-                    if bool then Loggers.fprintf logger ","
-                  in
-                  let () = Loggers.fprintf logger "%s" site_string in
-                  let () =
-                    match internal with
-                    | None -> ()
-                    | Some s -> Loggers.fprintf logger "%s" s
-                  in
-                  let () =
-                    match binding with
-                    | None | Some Free -> ()
-                    | Some Wildcard -> Loggers.fprintf logger "?"
-                    | Some Bound_to_unknown -> Loggers.fprintf logger "!_"
-                    | Some (Bound_to int) -> Loggers.fprintf logger "!%i" int
-                    | Some (Binding_type (ag,st)) ->
-                      Loggers.fprintf logger "!%s.%s" ag st
-                  in
-                  true)
-               site_map
-               false
-           in
-           let () = Loggers.fprintf logger ")" in
-           true
-        )
-        t.string_version
-        false
-    in error
+let print logger parameter error kappa_handler t  =
+  let _bool =
+    Ckappa_sig.Agent_id_map_and_set.Map.fold
+      (fun _ (agent_string, site_map) bool ->
+         let () =
+           if bool then
+             Loggers.fprintf logger " , "
+         in
+         let () = Loggers.fprintf logger "%s(" agent_string in
+         let _bool =
+           Wrapped_modules.LoggedStringMap.fold
+             (fun site_string (internal,binding) bool ->
+                let () =
+                  if bool then Loggers.fprintf logger ","
+                in
+                let () = Loggers.fprintf logger "%s" site_string in
+                let () =
+                  match internal with
+                  | None -> ()
+                  | Some s -> Loggers.fprintf logger "%s" s
+                in
+                let () =
+                  match binding with
+                  | None | Some Free -> ()
+                  | Some Wildcard -> Loggers.fprintf logger "?"
+                  | Some Bound_to_unknown -> Loggers.fprintf logger "!_"
+                  | Some (Bound_to int) -> Loggers.fprintf logger "!%i" int
+                  | Some (Binding_type (ag,st)) ->
+                    Loggers.fprintf logger "!%s.%s" ag st
+                in
+                true)
+             site_map
+             false
+         in
+         let () = Loggers.fprintf logger ")" in
+         true
+      )
+      t.string_version
+      false
+  in error
 end
