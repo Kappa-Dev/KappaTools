@@ -387,7 +387,8 @@ struct
       ([], init sigs)
       initial_states
 
-  let compute_reactions sigs contact_map rules initial_states =
+  let compute_reactions env contact_map rules initial_states =
+    let sigs =Environment.signatures env in
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let _,rules =
@@ -426,7 +427,8 @@ struct
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
               (*  (rule_id,rule,mode,lhs,lhs_cc)*)
               (* regular application of tules, we store the embeddings*)
-              let () = debug "@[<v 2>test for rule %i" enriched_rule.rule_id in
+              let () = debug "@[<v 2>test for rule @[%a@]"
+                  (I.print_rule ~env) enriched_rule.rule in
               let arity = enriched_rule.mode in
               match arity with
               | I.Usual ->
@@ -848,8 +850,7 @@ struct
       species_of_initial_state (Environment.signatures env) contact_map init in
     let () = Format.printf "\t -saturating the set of molecular species @." in
     let network =
-      compute_reactions
-        (Environment.signatures env) contact_map rules initial_state in
+      compute_reactions env contact_map rules initial_state in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens env network in
     let () = Format.printf "\t -variables @." in

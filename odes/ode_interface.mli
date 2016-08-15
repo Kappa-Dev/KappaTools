@@ -57,6 +57,8 @@ sig
     rule ->
     (connected_component array list Alg_expr.e Location.annot * int) list
   val print_rule_id: Format.formatter -> rule_id -> unit
+  val print_rule:
+      ?env:Environment.t -> Format.formatter -> rule -> unit
   val rate:
     rule -> arity ->
     connected_component array list Alg_expr.e Location.annot option

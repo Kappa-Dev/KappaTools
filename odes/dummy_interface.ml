@@ -126,6 +126,7 @@ let token_vector a =
     add remove
 
 let print_rule_id log = Format.fprintf log "%i"
+let print_rule = Kappa_printer.elementary_rule
 
 let apply sigs rule inj_nodes mix =
   let concrete_removed =
