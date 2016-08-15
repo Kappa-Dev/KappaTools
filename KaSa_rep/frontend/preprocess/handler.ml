@@ -18,9 +18,16 @@ let nrules _parameter _error handler = handler.Cckappa_sig.nrules
 let nvars _parameter _error handler = handler.Cckappa_sig.nvars
 let nagents _parameter _error handler = handler.Cckappa_sig.nagents
 
+let check_pos parameter ka_pos ml_pos message error error' =
+    match ml_pos with
+  | None -> error'
+  | Some ml_pos ->
+      Exception.check_point
+        Exception.warn parameter ~message ~pos:ka_pos error error' ml_pos Exit
 
-let translate_agent parameter error handler ag =
-  let error,(a, _, _) =
+let translate_agent
+    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None) ?message:(message="") parameter error handler ag =
+  let error',(a, _, _) =
     Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_agents.translate
          parameter
@@ -30,7 +37,8 @@ let translate_agent parameter error handler ag =
       (fun error ->
          Exception.warn parameter error __POS__ Exit ("",(),()))
   in
-  error, a
+  check_pos parameter ka_pos ml_pos message error error',
+  a
 
 let translate_site parameter error handler agent_name site =
   let error, dic =

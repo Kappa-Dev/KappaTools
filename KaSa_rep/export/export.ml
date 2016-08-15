@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 06 2016>
+  * Last modification: Time-stamp: <Aug 15 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -448,7 +448,9 @@ let compute_raw_contact_map show_title state =
       parameters error
       (fun parameters error (i,j) s  ->
          let error,ag =
-           Handler.translate_agent parameters error handler i
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters error handler i
          in
          let error,site =
            Handler.translate_site parameters error handler i j
@@ -474,14 +476,18 @@ let compute_raw_contact_map show_title state =
       parameters error
       (fun _parameters error (i, (j , _k)) (i', j', _k') sol ->
          let error, ag_i =
-           Handler.translate_agent parameters error handler i
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters error handler i
          in
          let error, site_j =
            Handler.translate_site parameters error handler i j
          in
          let site_j = simplify_site site_j in
          let error, ag_i' =
-           Handler.translate_agent parameters error handler i'
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters error handler i'
          in
          let error, site_j' =
            Handler.translate_site parameters error handler i' j'
@@ -663,8 +669,10 @@ let convert_contact_map show_title state  contact_map =
   let () = show_title state in
   let error, contact_map =
     AgentProj.monadic_proj_map_i
-      (fun parameters error (ag:Ckappa_sig.c_agent_name) ->
-         (Handler.translate_agent parameters error handler ag:Exception.method_handler * Ckappa_sig.agent_name))
+      (fun parameters error ag ->
+         Handler.translate_agent
+            ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+            parameters error handler ag)
       parameters error
       Mods.StringMap.empty
       (fun parameters error _ ag sitemap->
@@ -688,7 +696,11 @@ let convert_contact_map show_title state  contact_map =
               let error, list_b'' =
                 List.fold_left
                   (fun (error, list) (agent,site) ->
-                     let error, ag = Handler.translate_agent parameters error handler agent in
+                     let error, ag =
+                       Handler.translate_agent
+                         ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+                         parameters error handler agent
+                     in
                      let error, site = Handler.translate_site parameters error handler agent site in
                      let st = Handler.print_site_contact_map site in
                      error, (ag,st)::list)

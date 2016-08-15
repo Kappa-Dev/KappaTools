@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 15 2016>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -2010,7 +2010,11 @@ let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) hand
   let error =
     Ckappa_sig.Agent_map_and_set.Map.fold
       (fun i site_map error ->
-         let error, agent_name = Handler.translate_agent parameters_dot error handler i in
+         let error, agent_name =
+           Handler.translate_agent
+             ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+             parameters_dot error handler i
+         in
          let _ =
            Loggers.fprintf
              (Remanent_parameters.get_logger parameters_dot)

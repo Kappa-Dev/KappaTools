@@ -79,10 +79,18 @@ let convert_tuple parameters error kappa_handler tuple =
   in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  let error, agent'' =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent''
+  in
   error, (agent,site,site',agent'',site'',site''')
 
 let convert_refined_tuple parameters error kappa_handler tuple =
@@ -91,10 +99,18 @@ let convert_refined_tuple parameters error kappa_handler tuple =
   in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  let error, agent'' =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent''
+  in
   error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',
           Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
 

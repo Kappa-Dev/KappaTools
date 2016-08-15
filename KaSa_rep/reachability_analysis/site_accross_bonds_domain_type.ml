@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 13 2016>
+   * Last modification: Time-stamp: <Aug 15 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -263,14 +263,22 @@ module Partition_modified_map =
 let convert_single_without_state parameters error kappa_handler single =
   let (agent, site) = single in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   error, (agent, site)
 
 let convert_single parameters error kappa_handler single =
   let (agent, site, state) = single in
   let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   error, (agent, site, state)
 
 let convert_double parameters error kappa_handler double =
@@ -279,7 +287,11 @@ let convert_double parameters error kappa_handler double =
   (*let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in*)
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   error, (agent, site, site', state)
 
 let convert_tuple parameters error kappa_handler tuple =
@@ -288,10 +300,18 @@ let convert_tuple parameters error kappa_handler tuple =
   let error, state'' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
   let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
   let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  let error, agent'' =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent''
+  in
   error, (agent,site,site', state, agent'',site'',site''', state'')
 
 let convert_tuple_full parameters error kappa_handler tuple =
@@ -307,10 +327,18 @@ let convert_tuple_full parameters error kappa_handler tuple =
     Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
   let error, state''' =
     Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site''' state''' in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  let error, agent'' =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent''
+  in
   error, (agent,site,site',state, state', agent'',site'',site''', state'', state''')
 
 (*
@@ -327,10 +355,12 @@ let convert_tuple parameters error kappa_handler tuple =
     Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
   let error, state''' =
     Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site''' state''' in
-  let error, agent = Handler.translate_agent parameters error kappa_handler agent in
+  let error, agent = Handler.translate_agent
+  ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+parameters error kappa_handler agent in
   let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
   let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' = Handler.translate_agent parameters error kappa_handler agent'' in
+  let error, agent'' = Handler.translate_agent     ~message:"unknown agent type" ~ml_pos:(Some __POS__) parameters error kappa_handler agent'' in
   error, (agent,site,site',state, state', agent'',site'',site''', state'', state''')*)
 
 (*

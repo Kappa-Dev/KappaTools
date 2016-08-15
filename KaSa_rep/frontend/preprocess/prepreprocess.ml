@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Aug 15 2016>
  * *
  * Translation from kASim ast to ckappa representation,
  *

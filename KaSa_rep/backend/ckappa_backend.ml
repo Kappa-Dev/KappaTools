@@ -37,14 +37,9 @@ struct
     }
 
   let add_agent parameter error kappa_handler agent_type t =
-    let error', agent_string =
-      Handler.translate_agent parameter error kappa_handler agent_type
-    in
-    let error =
-      Exception.check_point
-        Exception.warn parameter error error' __POS__
-        ~message:"unknown agent type"
-        Exit
+    let error, agent_string =
+      Handler.translate_agent
+        ~message:"unknown agent type" ~ml_pos:(Some __POS__) parameter error kappa_handler agent_type
     in
     let agent_id = t.fresh_agent_id in
     let error', views =
@@ -238,6 +233,8 @@ struct
                 in
                 let error, agent_string' =
                   Handler.translate_agent
+                    ~message:"unknown agent type"
+                    ~ml_pos:(Some __POS__)
                     parameter error kappa_handler
                     agent_type'
                 in
