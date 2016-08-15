@@ -113,20 +113,6 @@ A is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dc62266... please do not erase the test suite
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-------------------------------------------------------------
-<<<<<<< HEAD
->>>>>>> 730b98f... clean code, will add the mission functions back
-=======
->>>>>>> dc62266... please do not erase the test suite
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

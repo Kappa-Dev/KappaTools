@@ -5,13 +5,6 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-<<<<<<< HEAD
-=======
-A:(x:B@x, x); B:(x:A@x, x)
-B:(x:A@x, x); A:(x:B@x, x)
-0:A 1:x 0:x (1:B@x) | 1:B 0:x 1:x (1:A@x) 
-1:B 0:x 1:x (1:A@x) | 0:A 1:x 0:x (1:B@x) 
->>>>>>> dc62266... please do not erase the test suite
 	Views in initial state
 
 			A(x!B@x)
@@ -37,33 +30,12 @@ B:(x:A@x, x); A:(x:B@x, x)
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 0:
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
 
-<<<<<<< HEAD
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-=======
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 2:
 		the precondition is not satisfied yet
@@ -102,31 +74,9 @@ B:(x:A@x, x); A:(x:B@x, x)
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
-<<<<<<< HEAD
 
 	Applying rule 0:
 		the precondition is satisfied
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-=======
-RULE GET STATE OF SITE RULE 3
-Agent: 1 Site_b 0 
-
-Agent_type: 0:A Site_b 1:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 3 agent_id_t: 1:B( site_type_x: 0:x), agent_type_y:0:A: (site_type_y:1:x) 
-
-	Applying rule 0:
-		the precondition is satisfied
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -148,47 +98,14 @@ WRONG TUPLE: !!!
 		rule 2 is applied for the first time
 
 		Updating the views for B(x!,x~)
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 2
-Agent: 1 Site_b 0 
-
-Agent_type: 0:A Site_b 1:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 1:B( site_type_x: 0:x), agent_type_y:0:A: (site_type_y:1:x) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3:
 		the precondition is satisfied
 		Updating the views for B(x!,x~)
 		Updating the views for B(x!,x~)
-<<<<<<< HEAD
 
 	Applying rule 0:
 		the precondition is satisfied
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-=======
-RULE GET STATE OF SITE RULE 3
-Agent: 1 Site_b 0 
-
-Agent_type: 0:A Site_b 1:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 3 agent_id_t: 1:B( site_type_x: 0:x), agent_type_y:0:A: (site_type_y:1:x) 
-
-	Applying rule 0:
-		the precondition is satisfied
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -209,64 +126,11 @@ WRONG TUPLE: !!!
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(x!B.x) ]
 A() => [ A(x~u?) ]
 B() => [ B(x~u?) v B(x~p?) ]
 B() => [ B(x) v B(x!A.x) ]
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dc62266... please do not erase the test suite
-The binding state of site x in agent A is always B@x.
-The internal state of site x in agent A is always u.
-The internal state of site x in agent B ranges over u and p.
-The binding state of site x in agent B ranges over free and A@x.
-=======
->>>>>>> e5b16d7... Kappa output complete in views domain
-------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-<<<<<<< HEAD
-Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, p
-Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: p, u
-Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
->>>>>>> 730b98f... clean code, will add the mission functions back
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
-=======
-Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-------------------------------------------------------------
-* Parallel bonds domain
-------------------------------------------------------------
-Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1937: bot generated while fetching the potential state of a site in precondition inside a pattern; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1937: bot generated while fetching the potential state of a site in precondition inside a pattern; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
->>>>>>> dc62266... please do not erase the test suite

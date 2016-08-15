@@ -294,26 +294,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 D() => [ D(x~u) ]
-=======
-=======
->>>>>>> dc62266... please do not erase the test suite
-The internal state of site x in agent D is always u.
-=======
-D() => [ D(x~u) ]
->>>>>>> e5b16d7... Kappa output complete in views domain
-------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-<<<<<<< HEAD
->>>>>>> 730b98f... clean code, will add the mission functions back
-=======
->>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

@@ -862,17 +862,6 @@ Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(6):'r6' C(x~p!1),A(
 Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(7):'r7' C(x!_)->[0->0]
 Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0*->1];[0->0]
 Reachability analysis...
-<<<<<<< HEAD
-=======
-C:(x:A@x, x); A:(x:C@x, x)
-A:(x:C@x, x); C:(x:A@x, x)
-C:(y:A@y, y); A:(y:C@y, y)
-A:(y:C@y, y); C:(y:A@y, y)
-0:A 2:x 0:x (2:C@x) | 2:C 2:x 0:x (1:A@x) 
-0:A 3:y 1:y (2:C@y) | 2:C 3:y 1:y (1:A@y) 
-2:C 2:x 0:x (1:A@x) | 0:A 2:x 0:x (2:C@x) 
-2:C 3:y 1:y (1:A@y) | 0:A 3:y 1:y (2:C@y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -939,25 +928,6 @@ EXTENSIONAL DESCRIPTION:
 			A(x~u,x!free)
 
 	Wake-up rules
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 2 
-
-Agent_type: 2:C Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 2:x), agent_type_y:2:C: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 3 
-
-Agent_type: 2:C Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:2:C: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -1090,47 +1060,9 @@ EXTENSIONAL DESCRIPTION:
 			C(x~u,x!free)
 
 	Wake-up rules
-<<<<<<< HEAD
 
 	Applying rule 0: r0:
 		the precondition is satisfied
-=======
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 3 
-
-Agent_type: 0:A Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:3:y) 
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 2 
-
-Agent_type: 2:C Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 2:x), agent_type_y:2:C: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 3 
-
-Agent_type: 2:C Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:2:C: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is not satisfied yet
@@ -1297,47 +1229,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 2: r2:
 		the precondition is satisfied
-<<<<<<< HEAD
 
 	Applying rule 0: r0:
 		the precondition is satisfied
-=======
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 3 
-
-Agent_type: 0:A Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:3:y) 
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 2 
-
-Agent_type: 2:C Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 2:x), agent_type_y:2:C: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 3 
-
-Agent_type: 2:C Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:2:C: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -1479,17 +1373,6 @@ EXTENSIONAL DESCRIPTION:
 			C(x~p,x!A@x)
 
 	Wake-up rules
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 5
-Agent: 2 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 5 agent_id_t: 2:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -1501,36 +1384,12 @@ WRONG TUPLE: !!!
 			
 
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=34
-=======
-Id=38
->>>>>>> 1834413... test suite
-=======
-Id=36
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=36
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=33
-=======
-  Id=37
->>>>>>> 1834413... test suite
-=======
-  Id=35
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=35
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1707,39 +1566,9 @@ EXTENSIONAL DESCRIPTION:
 			C(y~p,y!A@y)
 
 	Wake-up rules
-<<<<<<< HEAD
 
 	Applying rule 0: r0:
 		the precondition is satisfied
-=======
-RULE GET STATE OF SITE RULE 10
-Agent: 2 Site_b 3 
-
-Agent_type: 0:A Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 10 agent_id_t: 2:C( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:3:y) 
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 2 
-
-Agent_type: 2:C Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 2:x), agent_type_y:2:C: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 3 
-
-Agent_type: 2:C Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:2:C: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -1781,17 +1610,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 5
-Agent: 2 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 5 agent_id_t: 2:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 11: r11:
 		the precondition is satisfied
@@ -1803,36 +1621,12 @@ WRONG TUPLE: !!!
 			
 
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=34
-=======
-Id=38
->>>>>>> 1834413... test suite
-=======
-Id=36
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=36
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=33
-=======
-  Id=37
->>>>>>> 1834413... test suite
-=======
-  Id=35
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=35
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=9
      Node(site_type:2<2)
@@ -1894,25 +1688,6 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 2: r2:
 		the precondition is satisfied
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 3 
-
-Agent_type: 0:A Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -2001,42 +1776,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 		Updating the views for C(y~,y!)
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 10
-Agent: 2 Site_b 3 
-
-Agent_type: 0:A Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 10 agent_id_t: 2:C( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 
 	Applying rule 0: r0:
 		the precondition is satisfied
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 2 
-
-Agent_type: 2:C Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 2:x), agent_type_y:2:C: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 0
-Agent: 0 Site_b 3 
-
-Agent_type: 2:C Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 0 agent_id_t: 0:A( site_type_x: 3:y), agent_type_y:2:C: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -2048,17 +1793,6 @@ WRONG TUPLE: !!!
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 5
-Agent: 2 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 5 agent_id_t: 2:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 11: r11:
 		the precondition is satisfied
@@ -2071,25 +1805,6 @@ WRONG TUPLE: !!!
 
 	Applying rule 2: r2:
 		the precondition is satisfied
-<<<<<<< HEAD
-=======
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 2 
-
-Agent_type: 0:A Site_b 2:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 2:x), agent_type_y:0:A: (site_type_y:2:x) 
-RULE GET STATE OF SITE RULE 2
-Agent: 0 Site_b 3 
-
-Agent_type: 0:A Site_b 3:y Site 1:y
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 2 agent_id_t: 0:C( site_type_x: 3:y), agent_type_y:0:A: (site_type_y:3:y) 
->>>>>>> dc62266... please do not erase the test suite
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -2125,36 +1840,12 @@ WRONG TUPLE: !!!
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=46
-=======
-Id=52
->>>>>>> 1834413... test suite
-=======
-Id=50
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=49
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=45
-=======
-  Id=51
->>>>>>> 1834413... test suite
-=======
-  Id=49
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=48
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -2173,36 +1864,12 @@ Id=49
      Leaf False 
 
 agent_type:0:A:cv_id:1
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=46
-=======
-Id=52
->>>>>>> 1834413... test suite
-=======
-Id=50
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=49
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=45
-=======
-  Id=51
->>>>>>> 1834413... test suite
-=======
-  Id=49
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=48
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -2381,15 +2048,7 @@ Id=29
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=47
-=======
-Id=51
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=50
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2419,36 +2078,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=49
-=======
-Id=58
->>>>>>> 1834413... test suite
-=======
-Id=56
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=54
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=48
-=======
-  Id=57
->>>>>>> 1834413... test suite
-=======
-  Id=55
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=53
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:3<3)
     Id=1
      Leaf True 
@@ -2458,36 +2093,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=51
-=======
-Id=54
->>>>>>> 1834413... test suite
-=======
-Id=52
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=52
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=50
-=======
-  Id=41
->>>>>>> 1834413... test suite
-=======
-  Id=39
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=51
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2497,49 +2108,19 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=59
-=======
-Id=64
->>>>>>> 1834413... test suite
-=======
-Id=62
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=58
-=======
-  Id=63
->>>>>>> 1834413... test suite
    Node(site_type:1<1)
-<<<<<<< HEAD
     Id=56
-=======
-    Id=61
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=61
-   Node(site_type:1<1)
-    Id=59
->>>>>>> dc62266... please do not erase the test suite
      Node(site_type:3<0)
       Id=0
        Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
       Id=55
-=======
-      Id=60
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-      Id=58
->>>>>>> dc62266... please do not erase the test suite
        Node(site_type:3<1)
         Id=1
          Leaf True 
@@ -2547,42 +2128,14 @@ Id=62
         Id=0
          Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     Id=57
      Node(site_type:1<2)
       Id=53
-=======
-    Id=62
-     Node(site_type:1<2)
-<<<<<<< HEAD
-      Id=60
->>>>>>> 1834413... test suite
-=======
-      Id=58
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-    Id=60
-     Node(site_type:1<2)
-      Id=56
->>>>>>> dc62266... please do not erase the test suite
        Node(site_type:3<0)
         Id=0
          Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         Id=52
-=======
-        Id=59
->>>>>>> 1834413... test suite
-=======
-        Id=57
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-        Id=55
->>>>>>> dc62266... please do not erase the test suite
          Node(site_type:3<2)
           Id=1
            Leaf True 
@@ -2595,28 +2148,12 @@ Id=62
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=62
-=======
-Id=67
->>>>>>> 1834413... test suite
-=======
-Id=65
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=61
-=======
-  Id=66
->>>>>>> 1834413... test suite
-=======
-  Id=64
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<1)
     Id=5
      Node(site_type:2<0)
@@ -2631,15 +2168,7 @@ Id=65
         Id=0
          Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     Id=60
-=======
-    Id=65
->>>>>>> 1834413... test suite
-=======
-    Id=63
->>>>>>> dc62266... please do not erase the test suite
      Node(site_type:0<2)
       Id=22
        Node(site_type:2<0)
@@ -2659,49 +2188,19 @@ Id=65
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=59
-=======
-Id=64
->>>>>>> 1834413... test suite
-=======
-Id=62
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=58
-=======
-  Id=63
->>>>>>> 1834413... test suite
    Node(site_type:1<1)
-<<<<<<< HEAD
     Id=56
-=======
-    Id=61
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=61
-   Node(site_type:1<1)
-    Id=59
->>>>>>> dc62266... please do not erase the test suite
      Node(site_type:3<0)
       Id=0
        Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
       Id=55
-=======
-      Id=60
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-      Id=58
->>>>>>> dc62266... please do not erase the test suite
        Node(site_type:3<1)
         Id=1
          Leaf True 
@@ -2709,42 +2208,14 @@ Id=62
         Id=0
          Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     Id=57
      Node(site_type:1<2)
       Id=53
-=======
-    Id=62
-     Node(site_type:1<2)
-<<<<<<< HEAD
-      Id=60
->>>>>>> 1834413... test suite
-=======
-      Id=58
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-    Id=60
-     Node(site_type:1<2)
-      Id=56
->>>>>>> dc62266... please do not erase the test suite
        Node(site_type:3<0)
         Id=0
          Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         Id=52
-=======
-        Id=59
->>>>>>> 1834413... test suite
-=======
-        Id=57
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-        Id=55
->>>>>>> dc62266... please do not erase the test suite
          Node(site_type:3<2)
           Id=1
            Leaf True 
@@ -2757,28 +2228,12 @@ Id=62
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=62
-=======
-Id=67
->>>>>>> 1834413... test suite
-=======
-Id=65
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=61
-=======
-  Id=66
->>>>>>> 1834413... test suite
-=======
-  Id=64
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<1)
     Id=5
      Node(site_type:2<0)
@@ -2793,15 +2248,7 @@ Id=65
         Id=0
          Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     Id=60
-=======
-    Id=65
->>>>>>> 1834413... test suite
-=======
-    Id=63
->>>>>>> dc62266... please do not erase the test suite
      Node(site_type:0<2)
       Id=22
        Node(site_type:2<0)
@@ -2820,44 +2267,16 @@ Id=65
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5b16d7... Kappa output complete in views domain
 B(y!A.y) => B(y~p!A.y)
 B(x!A.x) => B(x~p!A.x)
 C(y!A.y) => C(y~p!A.y)
 C(x!A.x) => C(x~p!A.x)
-<<<<<<< HEAD
-=======
-In agent B, the internal state of site y is p whenever the binding state of site y is A@y.
-In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
-In agent C, the internal state of site y is p whenever the binding state of site y is A@y.
-In agent C, the internal state of site x is p whenever the binding state of site x is A@x.
->>>>>>> dc62266... please do not erase the test suite
-=======
-B(y!A.y)=>B(y~p!A.y)
-B(x!A.x)=>B(x~p!A.x)
-C(y!A.y)=>C(y~p!A.y)
-C(x!A.x)=>C(x~p!A.x)
->>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
-=======
->>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=47
-=======
-Id=51
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=50
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2887,36 +2306,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=49
-=======
-Id=58
->>>>>>> 1834413... test suite
-=======
-Id=56
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=54
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=48
-=======
-  Id=57
->>>>>>> 1834413... test suite
-=======
-  Id=55
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=53
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:3<3)
     Id=1
      Leaf True 
@@ -2926,36 +2321,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=51
-=======
-Id=54
->>>>>>> 1834413... test suite
-=======
-Id=52
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=52
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=50
-=======
-  Id=41
->>>>>>> 1834413... test suite
-=======
-  Id=39
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=51
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2965,15 +2336,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=47
-=======
-Id=51
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=50
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -3003,36 +2366,12 @@ Id=22
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=53
-=======
-Id=60
->>>>>>> 1834413... test suite
-=======
-Id=58
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=56
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=52
-=======
-  Id=59
->>>>>>> 1834413... test suite
-=======
-  Id=57
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=55
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -3042,36 +2381,12 @@ Id=56
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=51
-=======
-Id=54
->>>>>>> 1834413... test suite
-=======
-Id=52
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=52
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=50
-=======
-  Id=41
->>>>>>> 1834413... test suite
-=======
-  Id=39
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=51
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -3081,15 +2396,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=47
-=======
-Id=51
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=50
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -3119,36 +2426,12 @@ Id=22
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=53
-=======
-Id=60
->>>>>>> 1834413... test suite
-=======
-Id=58
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=56
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=52
-=======
-  Id=59
->>>>>>> 1834413... test suite
-=======
-  Id=57
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=55
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:3<2)
     Id=1
      Leaf True 
@@ -3158,36 +2441,12 @@ Id=56
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 Id=51
-=======
-Id=54
->>>>>>> 1834413... test suite
-=======
-Id=52
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-Id=52
->>>>>>> dc62266... please do not erase the test suite
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   Id=50
-=======
-  Id=41
->>>>>>> 1834413... test suite
-=======
-  Id=39
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
-  Id=51
->>>>>>> dc62266... please do not erase the test suite
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -3196,12 +2455,6 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(y~u?) v A(y~p?) ]
 A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
 A() => [ A(y) v A(y!B.y) v A(y!C.y) ]
@@ -3214,225 +2467,7 @@ C() => [ C(y~u?) v C(y~p?) ]
 C() => [ C(x) v C(x!A.x) ]
 C() => [ C(y) v C(y!A.y) ]
 C() => [ C(x~u?) v C(x~p?) ]
-<<<<<<< HEAD
-=======
-The binding state of site x in agent A ranges over free, B@x, and C@x.
-=======
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-=======
->>>>>>> dc62266... please do not erase the test suite
-The internal state of site y in agent A ranges over u and p.
-The binding state of site x in agent A ranges over free, B@x, and C@x.
-The binding state of site y in agent A ranges over free, B@y, and C@y.
-The internal state of site x in agent A ranges over u and p.
-The internal state of site y in agent B ranges over u and p.
-The binding state of site x in agent B ranges over free and A@x.
-The binding state of site y in agent B ranges over free and A@y.
-The internal state of site x in agent B ranges over u and p.
-The internal state of site y in agent C ranges over u and p.
-The binding state of site x in agent C ranges over free and A@x.
-The binding state of site y in agent C ranges over free and A@y.
-The internal state of site x in agent C ranges over u and p.
-=======
->>>>>>> e5b16d7... Kappa output complete in views domain
-------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
-Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: p, p
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
-Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: p, p
->>>>>>> 730b98f... clean code, will add the mission functions back
-=======
-=======
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, u
->>>>>>> 1441500... use partition set, to be removed all the functions that are not use
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, u
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
-Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: p, u
-Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: u, u
-Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: u, p
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, u
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, u
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: u, p
-Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: p, u
-Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: u, u
-Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: u, p
->>>>>>> 1834413... test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
-=======
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
-Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: p, p
-Whenever the site y of A and the site y of C are bound together, then the site y of A and y of C can have the following respective states: u, p
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, u
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
-Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: p, u
-Whenever the site y of C and the site y of A are bound together, then the site y of C and y of A can have the following respective states: p, p
-------------------------------------------------------------
-* Parallel bonds domain
-------------------------------------------------------------
-Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1947: try to navigate through a free site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 5 agent_id 2 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1947: try to navigate through a free site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 10 agent_id 2 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1947: try to navigate through a free site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 5 agent_id 2 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1947: try to navigate through a free site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 10 agent_id 2 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 0 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1947: try to navigate through a free site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 5 agent_id 2 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 0; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1994: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1868; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2023: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2065: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 0 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
->>>>>>> dc62266... please do not erase the test suite

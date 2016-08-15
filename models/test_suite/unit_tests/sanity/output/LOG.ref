@@ -299,24 +299,12 @@ Print Hash_5:
 Print Hash_6:
 Print Hash_7:
 Print Hash_8:
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 35e3bad... hint for correcting the next bug
 Some exceptions have been raised
 error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 636; exception:Exit
 Some exceptions have been raised
 error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 636; exception:Exit
 Some exceptions have been raised
 error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 636; exception:Exit
-<<<<<<< HEAD
-=======
-Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 636; exception:Exit
-Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 636; exception:Exit
-Some exceptions have been raisederror: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 636; exception:Exit
->>>>>>> dc62266... please do not erase the test suite
-=======
->>>>>>> 35e3bad... hint for correcting the next bug
 Mvbdu.001: ok
 Mvbdu.002: ok
 Mvbdu.003: ok

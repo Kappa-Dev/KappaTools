@@ -17,49 +17,14 @@ Reachability analysis...
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 A(x~p) => A(x~p,y~u)
-=======
-In agent A, the internal state of site y is u whenever the internal state of site x is p.
->>>>>>> dc62266... please do not erase the test suite
-=======
-A(x~p)=>A(x~p,y~u)
->>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
-=======
-A(x~p) => A(x~p,y~u)
->>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u) v A(x~p) ]
 D() => [ D(x~u) ]
-=======
-=======
->>>>>>> dc62266... please do not erase the test suite
-The internal state of site y in agent A ranges over u and p.
-The internal state of site x in agent A ranges over u and p.
-The internal state of site x in agent D is always u.
-=======
-A() => [ A(y~u) v A(y~p) ]
-A() => [ A(x~u) v A(x~p) ]
-D() => [ D(x~u) ]
->>>>>>> e5b16d7... Kappa output complete in views domain
-------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-<<<<<<< HEAD
->>>>>>> 730b98f... clean code, will add the mission functions back
-=======
->>>>>>> dc62266... please do not erase the test suite
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
