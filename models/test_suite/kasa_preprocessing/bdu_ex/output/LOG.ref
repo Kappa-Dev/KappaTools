@@ -9,9 +9,13 @@ Signature:sites:0:
 Signature:sites:0:site_type:0->x(internal state)
 Signature:sites:0:site_type:1->y(internal state)
 <<<<<<< HEAD
+<<<<<<< HEAD
 Signature:sites:0:site_type:2->x(binding state)
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Signature:sites:0:site_type:2->x(binding state)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -21,6 +25,9 @@ Signature:states:0:1:
 Signature:states:0:1:state_id:0->u
 Signature:states:0:1:state_id:1->p
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Signature:states:0:2:
 Signature:states:0:2:state_id:0->free
 Signature:states:0:2:state_id:1->agent_type:0@site_type:2
@@ -29,9 +36,12 @@ Signature:duals:0:
 Signature:duals:0:2:
 Signature:duals:0:2:1:
 Signature:duals:0:2:1:agent_type:0,site_type:2,state_id:1
+<<<<<<< HEAD
 =======
 Signature:duals: 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compiling...
 Generating the raw contact map...
 Compilation:Compilation:rules:0:
@@ -42,16 +52,22 @@ Compilation:rules:0:rhs:
 Compilation:rules:0:rhs:agent_id_0:
 Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+<<<<<<< HEAD
 =======
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:0:reverse:
 Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
 Compilation:rules:1:
@@ -59,16 +75,22 @@ Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
 Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+<<<<<<< HEAD
 =======
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
 Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:1:direct:
 Compilation:rules:1:direct:agent_id_0:
 Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
@@ -81,17 +103,25 @@ Compilation:rules:2:lhs:agent_id_0:
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 <<<<<<< HEAD
+<<<<<<< HEAD
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:2:rhs:
 Compilation:rules:2:rhs:agent_id_0:
 Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 <<<<<<< HEAD
+<<<<<<< HEAD
 Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
 Compilation:rules:2:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
@@ -99,6 +129,9 @@ Compilation:rules:2:reverse:
 Compilation:rules:2:reverse:agent_id_0:
 Compilation:rules:2:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Compilation:rules:3:
 Compilation:rules:3:lhs:
 Compilation:rules:3:lhs:agent_id_0:
@@ -125,8 +158,11 @@ Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_mi
 Compilation:rules:3:reverse:agent_id_1:
 Compilation:rules:3:reverse:agent_id_1:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:3:actions:binding:(agent_id_0,agent_type_0)@site_type_2----(agent_id_1,agent_type_0)@site_type_2
+<<<<<<< HEAD
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -137,9 +173,13 @@ Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 <<<<<<< HEAD
+<<<<<<< HEAD
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
 Quarks:Rule 1
@@ -147,9 +187,13 @@ Quarks:TEST
 Quarks:rule_id:1,agent_type:0
 Quarks:rule_id:1,agent_type:0,site_type:0,state:0
 <<<<<<< HEAD
+<<<<<<< HEAD
 Quarks:rule_id:1,agent_type:0,site_type:2,state:0
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Quarks:rule_id:1,agent_type:0,site_type:2,state:0
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -163,9 +207,13 @@ Quarks:rule_id:2,agent_type:0
 Quarks:rule_id:2,agent_type:0,site_type:0,state:1
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
 <<<<<<< HEAD
+<<<<<<< HEAD
 Quarks:rule_id:2,agent_type:0,site_type:2,state:0
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Quarks:rule_id:2,agent_type:0,site_type:2,state:0
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -174,6 +222,9 @@ Quarks:MODIFICATION-
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
 Quarks:HALF BOND BREAKING
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:0
@@ -195,12 +246,16 @@ Quarks:MODIF PLUS rule_id:3,agent_type:0,site_type:2,state: BOUND
 Quarks:rule_id:3,agent_type:0,site_type:2,state:1
 Quarks:MODIF PLUS rule_id:3,agent_type:0,site_type:2,state: BOUND
 Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+<<<<<<< HEAD
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:1->[0]
 Quarks:agent_test**:agent_type:0,rule:2->[0]
+<<<<<<< HEAD
 <<<<<<< HEAD
 Quarks:agent_test**:agent_type:0,rule:3->[0;1]
 Quarks:agent_modif+:agent_type:0,rule:0->[0]
@@ -227,20 +282,36 @@ Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(1):
 Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0];[1->0]
 Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(3):'bind' A(x),A(x)->A(x!1),A(x!1)[0->1];[1->0]
 =======
+=======
+Quarks:agent_test**:agent_type:0,rule:3->[0;1]
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Quarks:agent_modif+:agent_type:0,rule:0->[0]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:1->[0]
 Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:1->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:3->[0;1]
 Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:2->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:1->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:3->[0;1]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:1->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:3->[0;1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(1):'x' A(x~u)->A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(3):'bind' A(x),A(x)->A(x!1),A(x!1)[0->0];[0->1]
 Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
+<<<<<<< HEAD
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(1):'x' A(x~u)->A(x~p)[0->0];[1->0]
+Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0];[1->0]
+Influence_map:Inhibition_map:rule(3):'bind' A(x),A(x)->A(x!1),A(x!1) -> rule(3):'bind' A(x),A(x)->A(x!1),A(x!1)[0->1];[1->0]
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Reachability analysis...
 
 	Applying rule 0: create:
@@ -252,14 +323,19 @@ Reachability analysis...
 
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=11
 =======
 Id=7
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Id=11
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   Id=10
    Node(site_type:1<1)
@@ -269,10 +345,16 @@ Id=7
    Node(site_type:1<1)
     Id=5
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=10
+   Node(site_type:1<1)
+    Id=9
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       Id=8
        Node(site_type:2<1)
@@ -294,6 +376,22 @@ Id=7
         Id=1
          Leaf True 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
         Id=0
          Leaf False 
@@ -303,10 +401,14 @@ Id=7
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 			A(x~u,y~u,x!free)
 =======
 			A(x~u,y~u)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+			A(x~u,y~u,x!free)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 	Wake-up rules
 
@@ -318,6 +420,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule 1: x is applied for the first time
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		Updating the views for A(x~,y~,x!)
 			
@@ -331,10 +434,18 @@ Id=17
 INTENSIONAL DESCRIPTION:
 Id=11
 >>>>>>> dc62266... please do not erase the test suite
+=======
+		Updating the views for A(x~,y~,x!)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=17
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   Id=16
    Node(site_type:1<2)
@@ -344,10 +455,16 @@ Id=11
    Node(site_type:1<2)
     Id=5
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=16
+   Node(site_type:1<2)
+    Id=9
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       Id=8
        Node(site_type:2<1)
@@ -369,6 +486,22 @@ Id=11
         Id=1
          Leaf True 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
         Id=0
          Leaf False 
@@ -378,10 +511,14 @@ Id=11
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 			A(x~p,y~u,x!free)
 =======
 			A(x~p,y~u)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+			A(x~p,y~u,x!free)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 	Wake-up rules
 
@@ -390,6 +527,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule 2: y is applied for the first time
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 		Updating the views for A(x~,y~,x!)
 			
@@ -403,10 +541,18 @@ Id=22
 INTENSIONAL DESCRIPTION:
 Id=16
 >>>>>>> dc62266... please do not erase the test suite
+=======
+		Updating the views for A(x~,y~,x!)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=22
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   Id=21
    Node(site_type:1<2)
@@ -416,10 +562,16 @@ Id=16
    Node(site_type:1<2)
     Id=14
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=21
+   Node(site_type:1<2)
+    Id=20
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       Id=19
        Node(site_type:2<2)
@@ -441,6 +593,22 @@ Id=16
         Id=1
          Leaf True 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+      Id=19
+       Node(site_type:2<2)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
         Id=0
          Leaf False 
@@ -449,6 +617,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 <<<<<<< HEAD
 			A(x~p,y~p,x!free)
 
@@ -535,11 +704,93 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+			A(x~p,y~p,x!free)
+
+	Wake-up rules
+
+	Applying rule 3: bind:
+		the precondition is satisfied
+
+		rule 3: bind is applied for the first time
+
+		Updating the views for A(x~,y~,x!)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=35
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=34
+   Node(site_type:1<1)
+    Id=30
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=29
+       Node(site_type:2<1)
+        Id=28
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=27
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=33
+     Node(site_type:1<2)
+      Id=32
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=31
+         Node(site_type:2<2)
+          Id=28
+           Node(site_type:3<1)
+            Id=0
+             Leaf False 
+
+            Id=27
+             Node(site_type:3<2)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			A(x~p,y~u,x!A@x)
+			A(x~p,y~p,x!A@x)
+			A(x~u,y~u,x!A@x)
+
+	Wake-up rules
+		Updating the views for A(x~,y~,x!)
+
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 	Applying rule 0: create:
 		the precondition is satisfied
 
 	Applying rule 1: x:
 		the precondition is satisfied
+<<<<<<< HEAD
 <<<<<<< HEAD
 		Updating the views for A(x~,y~,x!)
 
@@ -558,6 +809,18 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,y~)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+		Updating the views for A(x~,y~,x!)
+
+	Applying rule 2: y:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,x!)
+
+	Applying rule 3: bind:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,x!)
+		Updating the views for A(x~,y~,x!)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 ------------------------------------------------------------
 * Dead rules :
@@ -572,14 +835,19 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=43
 =======
 Id=20
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Id=43
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   Id=42
    Node(site_type:1<1)
@@ -589,10 +857,16 @@ Id=20
    Node(site_type:1<1)
     Id=5
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=42
+   Node(site_type:1<1)
+    Id=38
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       Id=37
        Node(site_type:2<1)
@@ -614,10 +888,27 @@ Id=20
         Id=1
          Leaf True 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+      Id=37
+       Node(site_type:2<1)
+        Id=36
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=27
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     Id=41
      Node(site_type:1<2)
@@ -627,10 +918,16 @@ Id=20
      Node(site_type:1<2)
       Id=17
 >>>>>>> dc62266... please do not erase the test suite
+=======
+    Id=41
+     Node(site_type:1<2)
+      Id=40
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         Id=39
          Node(site_type:2<2)
@@ -652,6 +949,22 @@ Id=20
           Id=1
            Leaf True 
 >>>>>>> dc62266... please do not erase the test suite
+=======
+        Id=39
+         Node(site_type:2<2)
+          Id=36
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=27
+             Node(site_type:3<2)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
           Id=0
            Leaf False 
@@ -665,6 +978,9 @@ Id=20
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 Id=46
  Node(site_type:2<0)
   Id=0
@@ -681,18 +997,25 @@ Id=46
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 Id=57
+<<<<<<< HEAD
 =======
 Id=27
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=56
 =======
   Id=26
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=56
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -708,6 +1031,7 @@ Id=27
          Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     Id=55
      Node(site_type:0<2)
       Id=44
@@ -716,15 +1040,24 @@ Id=27
      Node(site_type:0<2)
       Id=21
 >>>>>>> dc62266... please do not erase the test suite
+=======
+    Id=55
+     Node(site_type:0<2)
+      Id=44
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         Id=14
 =======
         Id=8
 >>>>>>> dc62266... please do not erase the test suite
+=======
+        Id=14
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
          Node(site_type:1<2)
           Id=1
            Leaf True 
@@ -737,29 +1070,41 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 A(y~p) => A(x~p?,y~p)
 =======
 In agent A, the internal state of site x is p whenever the internal state of site y is p.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+A(y~p)=>A(x~p?,y~p)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=44
 =======
 Id=21
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Id=44
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=14
 =======
   Id=8
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=14
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -770,19 +1115,27 @@ Id=21
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 Id=48
 =======
 Id=23
 >>>>>>> dc62266... please do not erase the test suite
+=======
+Id=48
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   Id=47
 =======
   Id=22
 >>>>>>> dc62266... please do not erase the test suite
+=======
+  Id=47
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -793,6 +1146,9 @@ Id=23
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 INTENSIONAL DESCRIPTION:
 Id=46
  Node(site_type:2<0)
@@ -808,14 +1164,18 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+<<<<<<< HEAD
 A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u?) v A(x~p?) ]
 A() => [ A(x) v A(x!A.x) ]
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
+The binding state of site x in agent A ranges over free and A@x.
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

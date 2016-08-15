@@ -2107,6 +2107,7 @@ Id=58
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 B(x!A.x) => B(x~p!A.x)
 C(x~p?) <=> C(x!A.x)
 D(x!E.x) => D(x~p!E.x)
@@ -2117,6 +2118,12 @@ In agent C, the internal state of site x is p, if and only if, the binding state
 In agent D, the internal state of site x is p whenever the binding state of site x is E@x.
 In agent E, the internal state of site x is p whenever the binding state of site x is D@x.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+B(x!A.x)=>B(x~p!A.x)
+In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
+D(x!E.x)=>D(x~p!E.x)
+E(x!D.x)=>E(x~p!D.x)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 ------------------------------------------------------------
 * Non relational properties:

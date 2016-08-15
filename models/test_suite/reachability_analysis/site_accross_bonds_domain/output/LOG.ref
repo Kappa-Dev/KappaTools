@@ -1298,10 +1298,14 @@ Id=81
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 B(z!A.z) => B(z~p!A.z)
 =======
 In agent B, the internal state of site z is p whenever the binding state of site z is A@z.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+B(z!A.z)=>B(z~p!A.z)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 ------------------------------------------------------------
 * Non relational properties:

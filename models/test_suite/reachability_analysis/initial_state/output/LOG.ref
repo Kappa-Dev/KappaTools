@@ -423,10 +423,14 @@ Id=24
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 A(x~p) => A(x~p,y~u)
 =======
 In agent A, the internal state of site y is u whenever the internal state of site x is p.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+A(x~p)=>A(x~p,y~u)
+>>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
 
 ------------------------------------------------------------
 * Non relational properties:
