@@ -421,6 +421,9 @@ rule 6: obs will never be applied.
 * Relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 R() =>
    [
 	  R(c,cr,n,x!E.x)
@@ -430,6 +433,7 @@ R() =>
 	v R(c,cr,n,x)
 
 	]
+<<<<<<< HEAD
 =======
 In agent R, the binding state of site x, the binding state of site c, the binding state of site cr, and the binding state of site n, are entangled by the following 4-d relationship:
 	R(x!E@x,c!free,cr!free,n!free)
@@ -438,10 +442,13 @@ In agent R, the binding state of site x, the binding state of site c, the bindin
 	R(x!E@x,c!R@c,cr!free,n!R@cr)
 	R(x!free,c!free,cr!free,n!free)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 E() => [ E(x) v E(x!R.x) ]
@@ -452,11 +459,20 @@ R() => [ R(x) v R(x!E.x) ]
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 The binding state of site x in agent E ranges over free and R@x.
 The binding state of site c in agent R ranges over free and R@c.
 The binding state of site n in agent R ranges over free and R@cr.
 The binding state of site cr in agent R ranges over free and R@n.
 The binding state of site x in agent R ranges over free and E@x.
+=======
+E() => [ E(x) v E(x!R.x) ]
+R() => [ R(n) v R(n!R.cr) ]
+R() => [ R(cr) v R(cr!R.n) ]
+R() => [ R(c) v R(c!R.c) ]
+R() => [ R(x) v R(x!E.x) ]
+>>>>>>> f88abb0... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

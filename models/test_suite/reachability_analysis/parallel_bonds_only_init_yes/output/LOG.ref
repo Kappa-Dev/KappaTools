@@ -803,10 +803,14 @@ Id=27
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(t) v A(t!B.t) ]
 A() => [ A(z) v A(z!B.z) ]
 B() => [ B(t) v B(t!A.t) ]
 B() => [ B(z) v B(z!A.z) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -814,6 +818,8 @@ The binding state of site t in agent A ranges over free and B@t.
 The binding state of site z in agent A ranges over free and B@z.
 The binding state of site t in agent B ranges over free and A@t.
 The binding state of site z in agent B ranges over free and A@z.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

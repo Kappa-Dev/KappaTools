@@ -2822,10 +2822,14 @@ Id=65
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 B(y!A.y) => B(y~p!A.y)
 B(x!A.x) => B(x~p!A.x)
 C(y!A.y) => C(y~p!A.y)
 C(x!A.x) => C(x~p!A.x)
+<<<<<<< HEAD
 =======
 In agent B, the internal state of site y is p whenever the binding state of site y is A@y.
 In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
@@ -2838,6 +2842,8 @@ B(x!A.x)=>B(x~p!A.x)
 C(y!A.y)=>C(y~p!A.y)
 C(x!A.x)=>C(x~p!A.x)
 >>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -3193,6 +3199,9 @@ EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(y~u?) v A(y~p?) ]
 A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
 A() => [ A(y) v A(y!B.y) v A(y!C.y) ]
@@ -3205,6 +3214,7 @@ C() => [ C(y~u?) v C(y~p?) ]
 C() => [ C(x) v C(x!A.x) ]
 C() => [ C(y) v C(y!A.y) ]
 C() => [ C(x~u?) v C(x~p?) ]
+<<<<<<< HEAD
 =======
 The binding state of site x in agent A ranges over free, B@x, and C@x.
 =======
@@ -3223,6 +3233,8 @@ The internal state of site y in agent C ranges over u and p.
 The binding state of site x in agent C ranges over free and A@x.
 The binding state of site y in agent C ranges over free and A@y.
 The internal state of site x in agent C ranges over u and p.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

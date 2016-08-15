@@ -18,6 +18,9 @@ Reachability analysis...
 * Relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() =>
    [
 	  A(a1~p,a2~u,b1~p,b2~u,c1~p,c2~u,d1~p,d2~u,e1~p,e2~u,g~u)
@@ -266,6 +269,7 @@ A() =>
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)
 
 	]
+<<<<<<< HEAD
 =======
 In agent A, the internal state of site a1, the internal state of site a2, the internal state of site b1, the internal state of site b2, the internal state of site c1, the internal state of site c2, the internal state of site d1, the internal state of site d2, the internal state of site e1, the internal state of site e2, and the internal state of site g, are entangled by the following 11-d relationship:
 	A(a1~p,a2~u,b1~p,b2~u,c1~p,c2~u,d1~p,d2~u,e1~p,e2~u,g~u)
@@ -513,12 +517,17 @@ In agent A, the internal state of site a1, the internal state of site a2, the in
 	A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~p,e2~p,g~u)
 	A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(a2~u) v A(a2~p) ]
 A() => [ A(a1~u) v A(a1~p) ]
 A() => [ A(b1~u) v A(b1~p) ]
@@ -530,6 +539,7 @@ A() => [ A(d2~u) v A(d2~p) ]
 A() => [ A(e1~u) v A(e1~p) ]
 A() => [ A(e2~u) v A(e2~p) ]
 A() => [ A(g~u) v A(g~p) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -544,6 +554,8 @@ The internal state of site d2 in agent A ranges over u and p.
 The internal state of site e1 in agent A ranges over u and p.
 The internal state of site e2 in agent A ranges over u and p.
 The internal state of site g in agent A ranges over u and p.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -577,6 +589,9 @@ Reachability analysis...
 * Relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() =>
    [
 	  A(a1~p,a2~u,b1~p,b2~u,c1~p,c2~u,d1~p,d2~u,e1~p,e2~u,g~u)
@@ -825,6 +840,7 @@ A() =>
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)
 
 	]
+<<<<<<< HEAD
 =======
 In agent A, the internal state of site a1, the internal state of site a2, the internal state of site b1, the internal state of site b2, the internal state of site c1, the internal state of site c2, the internal state of site d1, the internal state of site d2, the internal state of site e1, the internal state of site e2, and the internal state of site g, are entangled by the following 11-d relationship:
 	A(a1~p,a2~u,b1~p,b2~u,c1~p,c2~u,d1~p,d2~u,e1~p,e2~u,g~u)
@@ -1072,12 +1088,17 @@ In agent A, the internal state of site a1, the internal state of site a2, the in
 	A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~p,e2~p,g~u)
 	A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(a2~u) v A(a2~p) ]
 A() => [ A(a1~u) v A(a1~p) ]
 A() => [ A(b1~u) v A(b1~p) ]
@@ -1089,6 +1110,7 @@ A() => [ A(d2~u) v A(d2~p) ]
 A() => [ A(e1~u) v A(e1~p) ]
 A() => [ A(e2~u) v A(e2~p) ]
 A() => [ A(g~u) v A(g~p) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -1103,6 +1125,8 @@ The internal state of site d2 in agent A ranges over u and p.
 The internal state of site e1 in agent A ranges over u and p.
 The internal state of site e2 in agent A ranges over u and p.
 The internal state of site g in agent A ranges over u and p.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

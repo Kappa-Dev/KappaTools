@@ -1245,6 +1245,7 @@ Id=91
 EXTENSIONAL DESCRIPTION:
 In agent A: 
 <<<<<<< HEAD
+<<<<<<< HEAD
 A(z) => [ A(t~u,z) ]
 In agent B: 
 B(z!A.z) => [ B(z~p!A.z) ]
@@ -1262,6 +1263,14 @@ In agent B:
 		+ the internal state of site z ranges over u and p.
 		+ the internal state of site t is always u.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+A(z) => [ A(t~u,z) ]
+In agent B: 
+B(z!A.z) => [ B(z~p!A.z) ]
+B(z!A.z) => [ B(t~u,z!A.z) v B(t~p,z!A.z) ]
+B(z) => [ B(z~u) v B(z~p) ]
+B(z) => [ B(t~u,z) ]
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1419,11 +1428,15 @@ Id=37
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(t~u) v A(t~p) v A(t~q) ]
 A() => [ A(z) v A(z!B.z) ]
 B() => [ B(z) v B(z!A.z) ]
 B() => [ B(z~u?) v B(z~p?) ]
 B() => [ B(t~u) v B(t~p) ]
+<<<<<<< HEAD
 =======
 The internal state of site t in agent A ranges over u, p, and q.
 The binding state of site z in agent A ranges over free and B@z.
@@ -1437,6 +1450,8 @@ The binding state of site z in agent B ranges over free and A@z.
 The internal state of site z in agent B ranges over u and p.
 The internal state of site t in agent B ranges over u and p.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

@@ -2135,6 +2135,9 @@ Id=190
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 C() =>
    [
 	  C(x1~p,x2~u)
@@ -2144,6 +2147,7 @@ C() =>
 	v C(x1~u,x2~u)
 
 	]
+<<<<<<< HEAD
 =======
 In agent C, the internal state of site x1, the internal state of site x2, the binding state of site x1, and the binding state of site x2, are entangled by the following 4-d relationship:
 	C(x1~p,x2~u,x1!free,x2!free)
@@ -2152,6 +2156,8 @@ In agent C, the internal state of site x1, the internal state of site x2, the bi
 	C(x1~u,x2~u,x1!A@c,x2!free)
 	C(x1~u,x2~u,x1!free,x2!free)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -2360,6 +2366,9 @@ Id=111
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(c) v A(c!C.x1) v A(c!C.x2) ]
 A() => [ A(x) v A(x!B.x) ]
 B() => [ B(x) v B(x!A.x) ]
@@ -2367,6 +2376,7 @@ C() => [ C(x2~u?) v C(x2~p?) ]
 C() => [ C(x1~u?) v C(x1~p?) ]
 C() => [ C(x1) v C(x1!A.c) ]
 C() => [ C(x2) v C(x2!A.c) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -2383,6 +2393,8 @@ The internal state of site x1 in agent C ranges over u and p.
 The binding state of site x1 in agent C ranges over free and A@c.
 The binding state of site x2 in agent C ranges over free and A@c.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

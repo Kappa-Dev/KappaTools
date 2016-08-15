@@ -413,7 +413,6 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               in
               error, ()
             | Remanent_parameters_sig.Natural_language ->
-
               let error', site_string =
                 Handler.string_of_site_in_natural_language parameter error handler_kappa
                   agent_type
@@ -710,7 +709,7 @@ end
           state1
       in
       let error =
-        Exception.check_point
+          Exception.check_point
           Exception.warn  parameter error error' __POS__ Exit
       in
       let error', site_string2 =
@@ -866,12 +865,14 @@ end
              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                  "%swhen %s is equal to %s, then:%s%s"
                  (Remanent_parameters.get_prefix parameter)
-                 site_string state_string endofline beginenumeration
+                 site_string state_string endofline beg
              in
-             let parameter =
-               Remanent_parameters.update_prefix parameter (tab ^ beginenum ^ " ")
+             let error, t' =
+               Ckappa_backend.Ckappa_backend.add_state
+                 parameter error handler_kappa
+                 agent_id v a t
              in
-             error, parameter
+               error, parameter
            | Remanent_parameters_sig.Kappa
            | Remanent_parameters_sig.Raw ->
              error, parameter
@@ -1096,7 +1097,7 @@ let print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_age
       agent_type t
   in
   print
-    ~beginning_of_sentence:beggining
-    ~prompt_agent_type ~html_mode
-    ~show_dep_with_dimmension_higher_than:dim_min
-    parameter handler_kappa error agent_string agent_type id translation t
+  ~beginning_of_sentence:beggining
+  ~prompt_agent_type ~html_mode
+  ~show_dep_with_dimmension_higher_than:dim_min
+  parameter handler_kappa error agent_string agent_type id translation t

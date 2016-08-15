@@ -211,10 +211,14 @@ WRONG TUPLE: !!!
 ------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(x!B.x) ]
 A() => [ A(x~u?) ]
 B() => [ B(x~u?) v B(x~p?) ]
 B() => [ B(x) v B(x!A.x) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -222,6 +226,8 @@ The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.
 The internal state of site x in agent B ranges over u and p.
 The binding state of site x in agent B ranges over free and A@x.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

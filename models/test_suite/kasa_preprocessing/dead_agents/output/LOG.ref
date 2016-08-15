@@ -779,6 +779,7 @@ Id=26
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 A() => [ A(x) ]
 A() => [ A(x~u?) v A(x~p?) ]
 B() => [ B(x~u) v B(x~p) ]
@@ -788,6 +789,11 @@ B() => [ B(x~u) v B(x~p) ]
 The binding state of site x in agent A is always free.
 The internal state of site x in agent A ranges over u and p.
 The internal state of site x in agent B ranges over u and p.
+=======
+A() => [ A(x) ]
+A() => [ A(x~u?) v A(x~p?) ]
+B() => [ B(x~u) v B(x~p) ]
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

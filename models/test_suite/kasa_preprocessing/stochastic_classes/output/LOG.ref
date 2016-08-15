@@ -713,10 +713,14 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 B() => [ B(y~u) ]
 B() => [ B(x~u) ]
 D() => [ D(y~u) ]
 D() => [ D(x~u) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -724,6 +728,8 @@ The internal state of site y in agent B is always u.
 The internal state of site x in agent B is always u.
 The internal state of site y in agent D is always u.
 The internal state of site x in agent D is always u.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

@@ -1299,6 +1299,7 @@ Id=81
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 B(z!A.z) => B(z~p!A.z)
 =======
 In agent B, the internal state of site z is p whenever the binding state of site z is A@z.
@@ -1306,6 +1307,9 @@ In agent B, the internal state of site z is p whenever the binding state of site
 =======
 B(z!A.z)=>B(z~p!A.z)
 >>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
+=======
+B(z!A.z) => B(z~p!A.z)
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1455,11 +1459,15 @@ Id=39
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(t~u) v A(t~p) ]
 A() => [ A(z) v A(z!B.z) ]
 B() => [ B(z) v B(z!A.z) ]
 B() => [ B(z~u?) v B(z~p?) ]
 B() => [ B(t~u) v B(t~p) ]
+<<<<<<< HEAD
 =======
 The internal state of site t in agent A ranges over u and p.
 The binding state of site z in agent A ranges over free and B@z.
@@ -1473,6 +1481,8 @@ The binding state of site z in agent B ranges over free and A@z.
 The internal state of site z in agent B ranges over u and p.
 The internal state of site t in agent B ranges over u and p.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

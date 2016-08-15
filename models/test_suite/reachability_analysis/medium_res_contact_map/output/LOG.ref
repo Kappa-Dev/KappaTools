@@ -350,20 +350,28 @@ C is a dead agent.
 * Relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
 A(y~p?) <=> A(z~p?)
 =======
 In agent A, the internal state of site y is p, if and only if, the internal state of site z is p.
 >>>>>>> dc62266... please do not erase the test suite
+=======
+A(y~p?) <=> A(z~p?)
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(z~u?) v A(z~p?) ]
 A() => [ A(y~u?) v A(y~p?) ]
 A() => [ A(z) ]
 A() => [ A(y) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -371,6 +379,8 @@ The internal state of site z in agent A ranges over u and p.
 The internal state of site y in agent A ranges over u and p.
 The binding state of site z in agent A is always free.
 The binding state of site y in agent A is always free.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

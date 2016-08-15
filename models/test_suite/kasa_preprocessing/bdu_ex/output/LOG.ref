@@ -1071,6 +1071,7 @@ Id=27
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 A(y~p) => A(x~p?,y~p)
 =======
 In agent A, the internal state of site x is p whenever the internal state of site y is p.
@@ -1078,6 +1079,9 @@ In agent A, the internal state of site x is p whenever the internal state of sit
 =======
 A(y~p)=>A(x~p?,y~p)
 >>>>>>> ad0bbcd... Implication in views analysis in Kappa mode
+=======
+A(y~p) => A(x~p?,y~p)
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1165,6 +1169,7 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
+<<<<<<< HEAD
 A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u?) v A(x~p?) ]
 A() => [ A(x) v A(x!A.x) ]
@@ -1176,6 +1181,11 @@ A() => [ A(x) v A(x!A.x) ]
 The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 The binding state of site x in agent A ranges over free and A@x.
+=======
+A() => [ A(y~u) v A(y~p) ]
+A() => [ A(x~u?) v A(x~p?) ]
+A() => [ A(x) v A(x!A.x) ]
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

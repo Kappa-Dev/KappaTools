@@ -354,6 +354,9 @@ DISTRIB
 * Relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() =>
    [
 	  A(t~u,w~u,x~p,y~u,z~u)
@@ -366,6 +369,7 @@ A() =>
 	v A(t~u,w~u,x~u,y~p,z~u)
 
 	]
+<<<<<<< HEAD
 =======
 In agent A, the internal state of site x, the internal state of site y, the internal state of site z, the internal state of site w, and the internal state of site t, are entangled by the following 5-d relationship:
 	A(x~p,y~u,z~u,w~u,t~u)
@@ -377,17 +381,23 @@ In agent A, the internal state of site x, the internal state of site y, the inte
 	A(x~u,y~u,z~u,w~u,t~u)
 	A(x~u,y~p,z~u,w~u,t~u)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u) v A(x~p) ]
 A() => [ A(z~u) v A(z~p) ]
 A() => [ A(w~u) v A(w~p) ]
 A() => [ A(t~u) v A(t~p) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -396,6 +406,8 @@ The internal state of site x in agent A ranges over u and p.
 The internal state of site z in agent A ranges over u and p.
 The internal state of site w in agent A ranges over u and p.
 The internal state of site t in agent A ranges over u and p.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
@@ -429,6 +441,9 @@ Reachability analysis...
 * Relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() =>
    [
 	  A(t~u,w~u,x~p,y~u,z~u)
@@ -441,6 +456,7 @@ A() =>
 	v A(t~u,w~u,x~u,y~p,z~u)
 
 	]
+<<<<<<< HEAD
 =======
 In agent A, the internal state of site x, the internal state of site y, the internal state of site z, the internal state of site w, and the internal state of site t, are entangled by the following 5-d relationship:
 	A(x~p,y~u,z~u,w~u,t~u)
@@ -452,17 +468,23 @@ In agent A, the internal state of site x, the internal state of site y, the inte
 	A(x~u,y~u,z~u,w~u,t~u)
 	A(x~u,y~p,z~u,w~u,t~u)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u) v A(x~p) ]
 A() => [ A(z~u) v A(z~p) ]
 A() => [ A(w~u) v A(w~p) ]
 A() => [ A(t~u) v A(t~p) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -471,6 +493,8 @@ The internal state of site x in agent A ranges over u and p.
 The internal state of site z in agent A ranges over u and p.
 The internal state of site w in agent A ranges over u and p.
 The internal state of site t in agent A ranges over u and p.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------

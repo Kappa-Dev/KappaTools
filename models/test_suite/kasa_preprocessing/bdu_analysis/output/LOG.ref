@@ -1046,12 +1046,16 @@ Id=33
 EXTENSIONAL DESCRIPTION:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 A() => [ A(y~u?) ]
 A() => [ A(x) v A(x!B.x) ]
 A() => [ A(y) v A(y!C.x) ]
 A() => [ A(x~u?) ]
 B() => [ B(x) v B(x!A.x) ]
 C() => [ C(x) v C(x!A.y) ]
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> dc62266... please do not erase the test suite
@@ -1061,6 +1065,8 @@ The binding state of site y in agent A ranges over free and C@x.
 The internal state of site x in agent A is always u.
 The binding state of site x in agent B ranges over free and A@x.
 The binding state of site x in agent C ranges over free and A@y.
+=======
+>>>>>>> e5b16d7... Kappa output complete in views domain
 ------------------------------------------------------------
 * Site accross bonds domain
 ------------------------------------------------------------
