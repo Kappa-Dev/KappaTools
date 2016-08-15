@@ -294,7 +294,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent D is always u.
+D() => [ D(x~u) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

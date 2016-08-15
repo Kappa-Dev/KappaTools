@@ -18,21 +18,24 @@ rule 6: obs will never be applied.
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-In agent R, the binding state of site x, the binding state of site c, the binding state of site cr, and the binding state of site n, are entangled by the following 4-d relationship:
-	R(x!E@x,c!free,cr!free,n!free)
-	R(x!E@x,c!R@c,cr!R@n,n!free)
-	R(x!E@x,c!R@c,cr!free,n!free)
-	R(x!E@x,c!R@c,cr!free,n!R@cr)
-	R(x!free,c!free,cr!free,n!free)
+R() =>
+   [
+	  R(c,cr,n,x!E.x)
+	v R(c!R.c,cr!R.n,n,x!E.x)
+	v R(c!R.c,cr,n,x!E.x)
+	v R(c!R.c,cr,n!R.cr,x!E.x)
+	v R(c,cr,n,x)
+
+	]
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The binding state of site x in agent E ranges over free and R@x.
-The binding state of site n in agent R ranges over free and R@cr.
-The binding state of site cr in agent R ranges over free and R@n.
-The binding state of site c in agent R ranges over free and R@c.
-The binding state of site x in agent R ranges over free and E@x.
+E() => [ E(x) v E(x!R.x) ]
+R() => [ R(n) v R(n!R.cr) ]
+R() => [ R(cr) v R(cr!R.n) ]
+R() => [ R(c) v R(c!R.c) ]
+R() => [ R(x) v R(x!E.x) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

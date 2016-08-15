@@ -1307,10 +1307,13 @@ Id=95
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B, the internal state of site x, and the internal state of site y, are entangled by the following 2-d relationship:
-	B(x~u,y~u)
-	B(x~q,y~q)
-	B(x~p,y~p)
+B() =>
+   [
+	  B(x~u?,y~u)
+	v B(x~q?,y~q)
+	v B(x~p?,y~p)
+
+	]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1420,13 +1423,13 @@ Id=95
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over p and u.
-The binding state of site x in agent A ranges over free and B@x.
-The internal state of site x in agent A ranges over u and p.
-The internal state of site y in agent B ranges over u, p, and q.
-The binding state of site x in agent B ranges over free, A@x, and C@x.
-The internal state of site x in agent B ranges over p, q, and u.
-The binding state of site x in agent C ranges over free and B@x.
+A() => [ A(y~p) v A(y~u) ]
+A() => [ A(x) v A(x!B.x) ]
+A() => [ A(x~u?) v A(x~p?) ]
+B() => [ B(y~u) v B(y~p) v B(y~q) ]
+B() => [ B(x) v B(x!A.x) v B(x!C.x) ]
+B() => [ B(x~p?) v B(x~q?) v B(x~u?) ]
+C() => [ C(x) v C(x!B.x) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

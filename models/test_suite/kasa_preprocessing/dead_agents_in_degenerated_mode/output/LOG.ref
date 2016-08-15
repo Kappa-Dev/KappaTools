@@ -633,8 +633,8 @@ Id=8
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
-The internal state of site x in agent B ranges over u and p.
+A() => [ A(x~u) v A(x~p) ]
+B() => [ B(x~u) v B(x~p) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

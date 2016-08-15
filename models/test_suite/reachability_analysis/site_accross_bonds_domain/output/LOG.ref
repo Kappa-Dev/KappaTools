@@ -997,7 +997,7 @@ Id=76
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(z!A.z)=>B(z~p!A.z)
+B(z!A.z) => B(z~p!A.z)
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1077,11 +1077,11 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site t in agent A ranges over u and p.
-The binding state of site z in agent A ranges over free and B@z.
-The binding state of site z in agent B ranges over free and A@z.
-The internal state of site z in agent B ranges over u and p.
-The internal state of site t in agent B ranges over u and p.
+A() => [ A(t~u) v A(t~p) ]
+A() => [ A(z) v A(z!B.z) ]
+B() => [ B(z) v B(z!A.z) ]
+B() => [ B(z~u?) v B(z~p?) ]
+B() => [ B(t~u) v B(t~p) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

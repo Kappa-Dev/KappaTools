@@ -1008,14 +1008,17 @@ Id=136
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:
-	A(x~q,y~u,z~u)
-	A(x~q,y~q,z~q)
-	A(x~q,y~q,z~u)
-	A(x~0,y~p,z~q)
-	A(x~p,y~u,z~u)
-	A(x~p,y~p,z~u)
-	A(x~u,y~u,z~u)
+A() =>
+   [
+	  A(x~q,y~u,z~u)
+	v A(x~q,y~q,z~q)
+	v A(x~q,y~q,z~u)
+	v A(x~0,y~p,z~q)
+	v A(x~p,y~u,z~u)
+	v A(x~p,y~p,z~u)
+	v A(x~u,y~u,z~u)
+
+	]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1065,9 +1068,9 @@ Id=91
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u, p, and q.
-The internal state of site x in agent A ranges over u, p, 0, and q.
-The internal state of site z in agent A ranges over u and q.
+A() => [ A(y~u) v A(y~p) v A(y~q) ]
+A() => [ A(x~u) v A(x~p) v A(x~0) v A(x~q) ]
+A() => [ A(z~u) v A(z~q) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

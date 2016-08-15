@@ -17,30 +17,33 @@ Reachability analysis...
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-In agent P, the internal state of site a1, the internal state of site a2, the internal state of site b1, the internal state of site b2, and the binding state of site g, are entangled by the following 5-d relationship:
-	P(a1~p,a2~u,b1~p,b2~u,g!free)
-	P(a1~p,a2~u,b1~p,b2~p,g!free)
-	P(a1~p,a2~u,b1~u,b2~u,g!free)
-	P(a1~p,a2~u,b1~u,b2~p,g!free)
-	P(a1~p,a2~p,b1~p,b2~u,g!free)
-	P(a1~p,a2~p,b1~p,b2~p,g!K@x)
-	P(a1~p,a2~p,b1~p,b2~p,g!free)
-	P(a1~p,a2~p,b1~u,b2~u,g!free)
-	P(a1~p,a2~p,b1~u,b2~p,g!free)
-	P(a1~u,a2~u,b1~u,b2~u,g!free)
-	P(a1~u,a2~u,b1~u,b2~p,g!free)
-	P(a1~u,a2~p,b1~u,b2~u,g!free)
-	P(a1~u,a2~p,b1~u,b2~p,g!free)
+P() =>
+   [
+	  P(a1~p,a2~u,b1~p,b2~u,g)
+	v P(a1~p,a2~u,b1~p,b2~p,g)
+	v P(a1~p,a2~u,b1~u,b2~u,g)
+	v P(a1~p,a2~u,b1~u,b2~p,g)
+	v P(a1~p,a2~p,b1~p,b2~u,g)
+	v P(a1~p,a2~p,b1~p,b2~p,g!K.x)
+	v P(a1~p,a2~p,b1~p,b2~p,g)
+	v P(a1~p,a2~p,b1~u,b2~u,g)
+	v P(a1~p,a2~p,b1~u,b2~p,g)
+	v P(a1~u,a2~u,b1~u,b2~u,g)
+	v P(a1~u,a2~u,b1~u,b2~p,g)
+	v P(a1~u,a2~p,b1~u,b2~u,g)
+	v P(a1~u,a2~p,b1~u,b2~p,g)
+
+	]
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site a2 in agent P ranges over u and p.
-The internal state of site a1 in agent P ranges over u and p.
-The internal state of site b1 in agent P ranges over u and p.
-The internal state of site b2 in agent P ranges over u and p.
-The binding state of site g in agent P ranges over free and K@x.
-The binding state of site x in agent K ranges over free and P@g.
+P() => [ P(a2~u) v P(a2~p) ]
+P() => [ P(a1~u) v P(a1~p) ]
+P() => [ P(b1~u) v P(b1~p) ]
+P() => [ P(b2~u) v P(b2~p) ]
+P() => [ P(g) v P(g!K.x) ]
+K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
@@ -64,30 +67,33 @@ Reachability analysis...
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-In agent P, the internal state of site a1, the internal state of site a2, the internal state of site b1, the internal state of site b2, and the binding state of site g, are entangled by the following 5-d relationship:
-	P(a1~p,a2~u,b1~p,b2~u,g!free)
-	P(a1~p,a2~u,b1~p,b2~p,g!free)
-	P(a1~p,a2~u,b1~u,b2~u,g!free)
-	P(a1~p,a2~u,b1~u,b2~p,g!free)
-	P(a1~p,a2~p,b1~p,b2~u,g!free)
-	P(a1~p,a2~p,b1~p,b2~p,g!K@x)
-	P(a1~p,a2~p,b1~p,b2~p,g!free)
-	P(a1~p,a2~p,b1~u,b2~u,g!free)
-	P(a1~p,a2~p,b1~u,b2~p,g!free)
-	P(a1~u,a2~u,b1~u,b2~u,g!free)
-	P(a1~u,a2~u,b1~u,b2~p,g!free)
-	P(a1~u,a2~p,b1~u,b2~u,g!free)
-	P(a1~u,a2~p,b1~u,b2~p,g!free)
+P() =>
+   [
+	  P(a1~p,a2~u,b1~p,b2~u,g)
+	v P(a1~p,a2~u,b1~p,b2~p,g)
+	v P(a1~p,a2~u,b1~u,b2~u,g)
+	v P(a1~p,a2~u,b1~u,b2~p,g)
+	v P(a1~p,a2~p,b1~p,b2~u,g)
+	v P(a1~p,a2~p,b1~p,b2~p,g!K.x)
+	v P(a1~p,a2~p,b1~p,b2~p,g)
+	v P(a1~p,a2~p,b1~u,b2~u,g)
+	v P(a1~p,a2~p,b1~u,b2~p,g)
+	v P(a1~u,a2~u,b1~u,b2~u,g)
+	v P(a1~u,a2~u,b1~u,b2~p,g)
+	v P(a1~u,a2~p,b1~u,b2~u,g)
+	v P(a1~u,a2~p,b1~u,b2~p,g)
+
+	]
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site a2 in agent P ranges over u and p.
-The internal state of site a1 in agent P ranges over u and p.
-The internal state of site b1 in agent P ranges over u and p.
-The internal state of site b2 in agent P ranges over u and p.
-The binding state of site g in agent P ranges over free and K@x.
-The binding state of site x in agent K ranges over free and P@g.
+P() => [ P(a2~u) v P(a2~p) ]
+P() => [ P(a1~u) v P(a1~p) ]
+P() => [ P(b1~u) v P(b1~p) ]
+P() => [ P(b2~u) v P(b2~p) ]
+P() => [ P(g) v P(g!K.x) ]
+K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

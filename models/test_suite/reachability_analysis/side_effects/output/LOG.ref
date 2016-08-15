@@ -1714,10 +1714,10 @@ Id=55
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!A.x)=>B(x~p!A.x)
-In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
-D(x!E.x)=>D(x~p!E.x)
-E(x!D.x)=>E(x~p!D.x)
+B(x!A.x) => B(x~p!A.x)
+C(x~p?) <=> C(x!A.x)
+D(x!E.x) => D(x~p!E.x)
+E(x!D.x) => E(x~p!D.x)
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1872,16 +1872,16 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over free, B@x, and C@x.
-The internal state of site x in agent A ranges over u and p.
-The binding state of site x in agent B ranges over free and A@x.
-The internal state of site x in agent B ranges over u and p.
-The binding state of site x in agent C ranges over free and A@x.
-The internal state of site x in agent C ranges over u and p.
-The binding state of site x in agent D ranges over free and E@x.
-The internal state of site x in agent D ranges over u and p.
-The binding state of site x in agent E ranges over free and D@x.
-The internal state of site x in agent E ranges over u and p.
+A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
+A() => [ A(x~u?) v A(x~p?) ]
+B() => [ B(x) v B(x!A.x) ]
+B() => [ B(x~u?) v B(x~p?) ]
+C() => [ C(x) v C(x!A.x) ]
+C() => [ C(x~u?) v C(x~p?) ]
+D() => [ D(x) v D(x!E.x) ]
+D() => [ D(x~u?) v D(x~p?) ]
+E() => [ E(x) v E(x!D.x) ]
+E() => [ E(x~u?) v E(x~p?) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

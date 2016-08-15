@@ -685,10 +685,10 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site t in agent A ranges over free and B@t.
-The binding state of site z in agent A ranges over free and B@z.
-The binding state of site t in agent B ranges over free and A@t.
-The binding state of site z in agent B ranges over free and A@z.
+A() => [ A(t) v A(t!B.t) ]
+A() => [ A(z) v A(z!B.z) ]
+B() => [ B(t) v B(t!A.t) ]
+B() => [ B(z) v B(z!A.z) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

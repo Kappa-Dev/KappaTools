@@ -550,7 +550,7 @@ Id=57
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~p)=>A(x~p?,y~p)
+A(y~p) => A(x~p?,y~p)
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -600,9 +600,9 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u and p.
-The internal state of site x in agent A ranges over u and p.
-The binding state of site x in agent A ranges over free and A@x.
+A() => [ A(y~u) v A(y~p) ]
+A() => [ A(x~u?) v A(x~p?) ]
+A() => [ A(x) v A(x!A.x) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

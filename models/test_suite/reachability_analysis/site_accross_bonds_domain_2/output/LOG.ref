@@ -966,15 +966,12 @@ Id=84
 
 EXTENSIONAL DESCRIPTION:
 In agent A: 
-	when the binding state of site z is equal to free, then:
-		+ the internal state of site t is always u.
+A(z) => [ A(t~u,z) ]
 In agent B: 
-	when the binding state of site z is equal to A@z, then:
-		+ the internal state of site z is always p.
-		+ the internal state of site t ranges over u and p.
-	when the binding state of site z is equal to free, then:
-		+ the internal state of site z ranges over u and p.
-		+ the internal state of site t is always u.
+B(z!A.z) => [ B(z~p!A.z) ]
+B(z!A.z) => [ B(t~u,z!A.z) v B(t~p,z!A.z) ]
+B(z) => [ B(z~u) v B(z~p) ]
+B(z) => [ B(t~u,z) ]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1054,11 +1051,11 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site t in agent A ranges over u, p, and q.
-The binding state of site z in agent A ranges over free and B@z.
-The binding state of site z in agent B ranges over free and A@z.
-The internal state of site z in agent B ranges over u and p.
-The internal state of site t in agent B ranges over u and p.
+A() => [ A(t~u) v A(t~p) v A(t~q) ]
+A() => [ A(z) v A(z!B.z) ]
+B() => [ B(z) v B(z!A.z) ]
+B() => [ B(z~u?) v B(z~p?) ]
+B() => [ B(t~u) v B(t~p) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
