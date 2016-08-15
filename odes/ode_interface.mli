@@ -17,10 +17,12 @@ sig
   val compare_connected_component :
     connected_component -> connected_component -> int
   val print_connected_component :
-    Format.formatter -> connected_component -> unit
+    ?sigs:Signature.s -> Format.formatter -> connected_component -> unit
 
-  val print_chemical_species: Format.formatter -> chemical_species -> unit
-  val print_canonic_species: Format.formatter -> canonic_species -> unit
+  val print_chemical_species:
+    ?sigs:Signature.s -> Format.formatter -> chemical_species -> unit
+  val print_canonic_species:
+    ?sigs:Signature.s -> Format.formatter -> canonic_species -> unit
 
   val do_we_divide_rates_by_n_auto_in_lhs: bool
   val nbr_automorphisms_in_chemical_species: chemical_species -> int

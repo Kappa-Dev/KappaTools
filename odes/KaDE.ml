@@ -42,7 +42,7 @@ let main () =
         | Some traceFile ->
         Kappa_files.set_traceFile traceFile
         in*)
-    (*  let () = Parameter.debugModeOn := common_args.Common_args.debug in*)
+    let () = Parameter.debugModeOn := common_args.Common_args.debug in
     (*  let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in*)
     (*let () = Parameter.emacsMode := kasim_args.Kasim_args.emacsMode in*)
     (*let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in*)
@@ -114,5 +114,7 @@ let main () =
     let () = Kappa_files.close_all_out_desc () in
     let () = Format.eprintf "%s@." msg in
     exit 2
+  | e ->
+    let () = Format.pp_print_flush Format.err_formatter () in raise e
 
 let () = main ()

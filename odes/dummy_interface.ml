@@ -15,7 +15,7 @@ type connected_component = Connected_component.cc
 let dummy_chemical_species sigs = Connected_component.empty_cc sigs
 
 let do_we_divide_rates_by_n_auto_in_lhs = true
-let print_chemical_species = Connected_component.print ?sigs:None ~with_id:()
+let print_chemical_species ?sigs = Connected_component.print ?sigs ?with_id:None
 let print_canonic_species = print_chemical_species
 
 let nbr_automorphisms_in_chemical_species x =
@@ -34,8 +34,8 @@ let nbr_automorphisms_in_pattern a =
     aux 1 acc 1 a'.(0)
 
 let compare_connected_component = Connected_component.compare_canonicals
-let print_connected_component =
-  Connected_component.print ?sigs:None ~with_id:()
+let print_connected_component ?sigs =
+  Connected_component.print ?sigs ?with_id:None
 
 let canonic_form x = x
 
