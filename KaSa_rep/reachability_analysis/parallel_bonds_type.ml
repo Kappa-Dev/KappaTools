@@ -223,7 +223,6 @@ let print_parallel_constraint
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             begin
-
               let error =
                 if verbose then
                   let error =

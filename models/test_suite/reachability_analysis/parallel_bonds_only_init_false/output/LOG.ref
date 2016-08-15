@@ -382,12 +382,17 @@ EXTENSIONAL DESCRIPTION:
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
 <<<<<<< HEAD
+<<<<<<< HEAD
          A(t!2,z!1) , B(z!1) , B(t!2)
          A(t!1,z!2) , B(t!1) , B(z!2)
 =======
          A(z!1,z!2),B(t!1),A(t!2)
          A(t!1,t!2),B(z!1),A(z!2)
 >>>>>>> dc62266... please do not erase the test suite
+=======
+         A(t!2,z!1) , B(z!1) , B(t!2)
+         A(t!1,z!2) , B(t!1) , B(z!2)
+>>>>>>> e897f18... Kappa backend in parallel bond domain.
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -839,6 +844,7 @@ execution finished without any exception
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
+<<<<<<< HEAD
 When the agent A has its site t bound to the site t of a B, and its site z bound to the site z of a B, then both instances of B are necessarily  different.
 Some exceptions have been raised
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1947: try to navigate through a free site; exception:Exit
@@ -889,4 +895,11 @@ error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 1 agent_id 1 site_type 1; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+<<<<<<< HEAD
 >>>>>>> dc62266... please do not erase the test suite
+=======
+=======
+A(t!B.t,z!B.z) => A(t!2,z!1) , B(z!1) , B(t!2)
+execution finished without any exception
+>>>>>>> 7ca528a... Kappa backend in parallel bond domain.
+>>>>>>> e897f18... Kappa backend in parallel bond domain.
