@@ -413,6 +413,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
               in
               error, ()
             | Remanent_parameters_sig.Natural_language ->
+
               let error', site_string =
                 Handler.string_of_site_in_natural_language parameter error handler_kappa
                   agent_type
@@ -678,412 +679,254 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
               "%s%s%s is %s whenever %s is %s.%s"
               (Remanent_parameters.get_prefix parameter)
-              (cap site_string)
-              (in_agent agent_string) state_string1 state_string2 endofline
-          | list ->
-            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "%s%s %sranges over"
-                (Remanent_parameters.get_prefix parameter)
-                (cap site_string)  (in_agent agent_string)
-            in
-            aux list error
-      else error,()
-end
-| Equiv ((site1,state1),(site2,state2)) ->
-  if dim_min <= 2
-  then
-    begin
-      let error', site_string1 =
-        Handler.string_of_site_in_natural_language parameter error handler_kappa
-          agent_type
-          site1
-      in
-      let error =
-        Exception.check_point
-          Exception.warn parameter error error' __POS__ Exit
-      in
-      let error', state_string1 =
-        Handler.string_of_state_fully_deciphered parameter error
-          handler_kappa agent_type
-          site1
-          state1
-      in
-      let error =
-          Exception.check_point
-          Exception.warn  parameter error error' __POS__ Exit
-      in
-      let error', site_string2 =
-        Handler.string_of_site_in_natural_language
-          parameter error handler_kappa
-          agent_type site2
-      in
-      let error =
-        Exception.check_point
-          Exception.warn  parameter error error' __POS__ Exit
-      in
-      let error', state_string2 =
-        Handler.string_of_state_fully_deciphered parameter error
-          handler_kappa agent_type
-          site2
-          state2
-      in
-      let error =
-        Exception.check_point
-          Exception.warn parameter error error' __POS__ Exit in
-      error,
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "%s%s%s is %s, if and only if, %s is %s.%s"
-        (Remanent_parameters.get_prefix parameter)
-        (cap (in_agent_comma agent_string))
-        site_string1 state_string1 site_string2 state_string2 endofline
-    end
-  else
-    error,()
-| Imply ((site1,state1),(site2,state2)) ->
-  if dim_min <= 2
-  then
-    begin
-      (* *)
-      match Remanent_parameters.get_backend_mode parameter
-      with
-      | Remanent_parameters_sig.Kappa
-      | Remanent_parameters_sig.Raw ->
-        let t = Ckappa_backend.Ckappa_backend.empty in
-        let error, id, t =
-          Ckappa_backend.Ckappa_backend.add_agent
-            parameter error handler_kappa
-            agent_type t
-        in
-        (*  let error, t =
-            Ckappa_backend.Ckappa_backend.add_site
-            parameter error handler_kappa
-            id site1 t
-            in*)
-        let error, t =
-          Ckappa_backend.Ckappa_backend.add_state
-            parameter error handler_kappa
-            id site1 state1 t
-        in
-        (*  let error, t' =
-            Ckappa_backend.Ckappa_backend.add_site
-            parameter error handler_kappa
-            id site2 t'
-            in*)
-        let error, t' =
-          Ckappa_backend.Ckappa_backend.add_state
-            parameter error handler_kappa
-            id site2 state2 t
-        in
-        let error =
-          Ckappa_backend.Ckappa_backend.print
-            (Remanent_parameters.get_logger parameter) parameter error handler_kappa
-            t
-        in
-        let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameter) " => " in
-        let error =
-          Ckappa_backend.Ckappa_backend.print
-            (Remanent_parameters.get_logger parameter) parameter error handler_kappa
-            t'
-        in
-        let () =
-          Loggers.print_newline (Remanent_parameters.get_logger parameter)
-        in
-        error, ()
-      | Remanent_parameters_sig.Natural_language ->
-        (* *)
-        let error', site_string1 =
-          Handler.string_of_site_in_natural_language
-            parameter error handler_kappa agent_type
-            site1
-        in
-        let error =
-          Exception.check_point
-            Exception.warn  parameter error error' __POS__ Exit
-        in
-        let error', state_string1 =
-          Handler.string_of_state_fully_deciphered parameter error
-            handler_kappa agent_type
-            site1
-            state1
-        in
-        let error =
-          Exception.check_point
-            Exception.warn parameter error error' __POS__ Exit
-        in
-        let error', site_string2 =
-          Handler.string_of_site_in_natural_language
-            parameter error handler_kappa agent_type
-            site2
-        in
-        let error =
-          Exception.check_point
-            Exception.warn parameter error error' __POS__ Exit
-        in
-        let error', state_string2 =
-          Handler.string_of_state_fully_deciphered parameter error
-            handler_kappa agent_type
-            site2
-            state2
-        in
-        let error =
-          Exception.check_point
-            Exception.warn parameter error error' __POS__ Exit
-        in
-        error,
+              (cap (in_agent_comma agent_string))
+              site_string2 state_string2 site_string1 state_string1 endofline
+        end
+      else
+        error,()
+    | Partition (v, list) ->
+      let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "%s%s%s is %s whenever %s is %s.%s"
-          (Remanent_parameters.get_prefix parameter)
-          (cap (in_agent_comma agent_string))
-          site_string2 state_string2 site_string1 state_string1 endofline
-    end
-  else
-    error,()
-| Partition (v, list) ->
-  let () =
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "%s%s%s" (Remanent_parameters.get_prefix parameter)
-      (cap (in_agent_colon agent_string)) endofline
-  in
-  let error, site_string =
-    Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type
-      v
-  in
-  let parameter = Remanent_parameters.update_prefix parameter tab in
-  let error =
-    List.fold_left
-      (fun error (a,list) ->
-         let error, parameter  =
-           match Remanent_parameters.get_backend_mode parameter
-           with
-           | Remanent_parameters_sig.Natural_language ->
-             let error, state_string =
-               Handler.string_of_state_fully_deciphered
-                 parameter error handler_kappa agent_type
-                 v a
-             in
-             let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                 "%swhen %s is equal to %s, then:%s%s"
-                 (Remanent_parameters.get_prefix parameter)
-                 site_string state_string endofline beg
+          "%s%s%s" (Remanent_parameters.get_prefix parameter)
+          (cap (in_agent_colon agent_string)) endofline
+      in
+      let error, site_string =
+        Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type
+          v
+      in
+      let parameter = Remanent_parameters.update_prefix parameter tab in
+      let error =
+        List.fold_left
+          (fun error (a,list) ->
+             let error, parameter  =
+               match Remanent_parameters.get_backend_mode parameter
+               with
+               | Remanent_parameters_sig.Natural_language ->
+                 let error, state_string =
+                   Handler.string_of_state_fully_deciphered
+                     parameter error handler_kappa agent_type
+                     v a
+                 in
+                 let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                     "%swhen %s is equal to %s, then:%s%s"
+                     (Remanent_parameters.get_prefix parameter)
+                     site_string state_string endofline beginenumeration
+                 in
+                 let parameter =
+                   Remanent_parameters.update_prefix parameter (tab ^ beginenum ^ " ")
+                 in
+                 error, parameter
+               | Remanent_parameters_sig.Kappa
+               | Remanent_parameters_sig.Raw ->
+                 error, parameter
              in
              let error, t' =
                Ckappa_backend.Ckappa_backend.add_state
                  parameter error handler_kappa
                  agent_id v a t
              in
-               error, parameter
-           | Remanent_parameters_sig.Kappa
-           | Remanent_parameters_sig.Raw ->
-             error, parameter
-         in
-         let error, t' =
-           Ckappa_backend.Ckappa_backend.add_state
-             parameter error handler_kappa
-             agent_id v a t
-         in
-         let error =
-           List.fold_left
-             (fun error token ->
-                let error =
-                  print
-                    ~beginning_of_sentence:false
-                    ~prompt_agent_type:false
-                    ~html_mode
-                    ~show_dep_with_dimmension_higher_than:0
-                    parameter
-                    handler_kappa
-                    error
-                    agent_string
-                    agent_type
-                    agent_id
-                    token
-                    t'
-                in
-                let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "%s" endenum
-                in
-                error)
-             error list
-         in
-         let () =
-           Loggers.fprintf (Remanent_parameters.get_logger parameter)
-             "%s" endenumeration
-         in
-         error)
-      error list
-  in error,()
-   | No_known_translation list ->
-     begin
-       match Remanent_parameters.get_backend_mode parameter
-       with
-       | Remanent_parameters_sig.Kappa
-       | Remanent_parameters_sig.Raw ->
-         begin
-           let error =
-             Ckappa_backend.Ckappa_backend.print
-               (Remanent_parameters.get_logger parameter) parameter error handler_kappa
-               t
-           in
-           let prefix ="   " in
-           let () =
-             Loggers.fprintf
-               (Remanent_parameters.get_logger parameter)
-               " =>\n%s[\n" prefix
-           in
-           let prefix ="\t" in
-           let error, bool =
-             List.fold_left
-               (fun (error, bool) state_list ->
-                  let () =
-                    Loggers.fprintf
-                      (Remanent_parameters.get_logger parameter)
-                      "%s%s" prefix (if bool then "v " else "  ")
-                  in
-                  let error, t' =
-                    List.fold_left
-                      (fun (error,t) (site,state) ->
-                         Ckappa_backend.Ckappa_backend.add_state
-                           parameter error handler_kappa
-                           agent_id site state t)
-                      (error, t)
-                      state_list
-                  in
-                  let error =
-                    Ckappa_backend.Ckappa_backend.print
-                      (Remanent_parameters.get_logger parameter) parameter error handler_kappa
-                      t'
-                  in
-                  let () =
-                    Loggers.print_newline
-                      (Remanent_parameters.get_logger parameter)
-                  in
-                  (error,true)
-               )
-               (error, false)
-               list
-           in
-           let () =
-             Loggers.fprintf
-               (Remanent_parameters.get_logger parameter)
-               "\n%s]\n" prefix
-           in error, ()
-         end
-       | Remanent_parameters_sig.Natural_language ->
-         begin
-           match list with
-           | [] -> error, ()
-           | head :: _ ->
-             let n = List.length head in
-             if List.length head >= dim_min
-             then
-               let () =
-                 Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s"
-                   (Remanent_parameters.get_prefix parameter)
-                   (cap (in_agent_comma agent_string))
-               in
-               let error,() =
-                 let rec aux l error =
-                   match
-                     l
-                   with
-                   | [a, _] ->
-                     let error, string =
-                       Handler.string_of_site_in_natural_language
-                         parameter error handler_kappa agent_type a
-                     in
-                     let () =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                         ", and %s, " string
-                     in
-                     error,()
-                   | [] ->
-                     Exception.warn parameter error __POS__ Exit ()
-                   | (a, _) :: b ->
-                     let error, string =
-                       Handler.string_of_site_in_natural_language
-                         parameter error handler_kappa agent_type a
-                     in
-                     let () =
-                       Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                         ", %s" string
-                     in
-                     aux b error
-                 in
-                 match
-                   head
-                 with
-                 | [] | [_] ->
-                   Exception.warn parameter error __POS__ Exit ()
-                 | (a , _) :: b ->
-                   let error, string =
-                     Handler.string_of_site_in_natural_language
-                       parameter error handler_kappa agent_type
-                       a
+             let error =
+               List.fold_left
+                 (fun error token ->
+                    let error =
+                      print
+                        ~beginning_of_sentence:false
+                        ~prompt_agent_type:false
+                        ~html_mode
+                        ~show_dep_with_dimmension_higher_than:0
+                        parameter
+                        handler_kappa
+                        error
+                        agent_string
+                        agent_type
+                        agent_id
+                        token
+                        t'
+                    in
+                    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                        "%s" endenum
+                    in
+                    error)
+                 error list
+             in
+             let () =
+               Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "%s" endenumeration
+             in
+             error)
+          error list
+      in error,()
+    | No_known_translation list ->
+      begin
+        match Remanent_parameters.get_backend_mode parameter
+        with
+        | Remanent_parameters_sig.Kappa
+        | Remanent_parameters_sig.Raw ->
+          begin
+            let error =
+              Ckappa_backend.Ckappa_backend.print
+                (Remanent_parameters.get_logger parameter) parameter error handler_kappa
+                t
+            in
+            let prefix ="   " in
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameter)
+                " =>\n%s[\n" prefix
+            in
+            let prefix ="\t" in
+            let error, bool =
+              List.fold_left
+                (fun (error, bool) state_list ->
+                   let () =
+                     Loggers.fprintf
+                       (Remanent_parameters.get_logger parameter)
+                       "%s%s" prefix (if bool then "v " else "  ")
+                   in
+                   let error, t' =
+                     List.fold_left
+                       (fun (error,t) (site,state) ->
+                          Ckappa_backend.Ckappa_backend.add_state
+                            parameter error handler_kappa
+                            agent_id site state t)
+                       (error, t)
+                       state_list
+                   in
+                   let error =
+                     Ckappa_backend.Ckappa_backend.print
+                       (Remanent_parameters.get_logger parameter) parameter error handler_kappa
+                       t'
                    in
                    let () =
-                     Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" string
+                     Loggers.print_newline
+                       (Remanent_parameters.get_logger parameter)
                    in
-                   aux
-                     b
-                     error
-               in
-               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                   "are entangled by the following %i-d relationship:%s" n endofline
-               in
-               let parameter = Remanent_parameters.update_prefix parameter "\t" in
-               List.fold_left
-                 (fun error l ->
-                    let error, bool =
-                      List.fold_left
-                        (fun (error, bool) (site_type, state) ->
-                           let error', site_string =
-                             Handler.string_of_site parameter error handler_kappa
-                               agent_type site_type
-                           in
-                           let error =
-                             Exception.check_point
-                               Exception.warn  parameter error error'
-                               __POS__ Exit
-                           in
-                           let error', state_string =
-                             Handler.string_of_state_fully_deciphered parameter error
-                               handler_kappa agent_type site_type state
-                           in
-                           let error =
-                             Exception.check_point
-                               Exception.warn  parameter error error'
-                               __POS__ Exit in
-                           (*-----------------------------------------------------------*)
-                           let () =
-                             if bool
-                             then Loggers.fprintf (Remanent_parameters.get_logger parameter) ","
-                             else Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                                 "%s%s(" (Remanent_parameters.get_prefix parameter) agent_string
-                           in
-                           let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                               "%s%s" site_string state_string
-                           in
-                           error,true
-                        )
-                        (error,false) l
+                   (error,true)
+                )
+                (error, false)
+                list
+            in
+            let () =
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameter)
+                "\n%s]\n" prefix
+            in error, ()
+          end
+        | Remanent_parameters_sig.Natural_language ->
+          begin
+            match list with
+            | [] -> error, ()
+            | head :: _ ->
+              let n = List.length head in
+              if List.length head >= dim_min
+              then
+                let () =
+                  Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s"
+                    (Remanent_parameters.get_prefix parameter)
+                    (cap (in_agent_comma agent_string))
+                in
+                let error,() =
+                  let rec aux l error =
+                    match
+                      l
+                    with
+                    | [a, _] ->
+                      let error, string =
+                        Handler.string_of_site_in_natural_language
+                          parameter error handler_kappa agent_type a
+                      in
+                      let () =
+                        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                          ", and %s, " string
+                      in
+                      error,()
+                    | [] ->
+                      Exception.warn parameter error __POS__ Exit ()
+                    | (a, _) :: b ->
+                      let error, string =
+                        Handler.string_of_site_in_natural_language
+                          parameter error handler_kappa agent_type a
+                      in
+                      let () =
+                        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                          ", %s" string
+                      in
+                      aux b error
+                  in
+                  match
+                    head
+                  with
+                  | [] | [_] ->
+                    Exception.warn parameter error __POS__ Exit ()
+                  | (a , _) :: b ->
+                    let error, string =
+                      Handler.string_of_site_in_natural_language
+                        parameter error handler_kappa agent_type
+                        a
                     in
-                    (*-----------------------------------------------------------*)
                     let () =
-                      if bool
-                      then Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                          ")%s" endofline
-                    in error)
+                      Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" string
+                    in
+                    aux
+                      b
+                      error
+                in
+                let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                    "are entangled by the following %i-d relationship:%s" n endofline
+                in
+                let parameter = Remanent_parameters.update_prefix parameter "\t" in
+                List.fold_left
+                  (fun error l ->
+                     let error, bool =
+                       List.fold_left
+                         (fun (error, bool) (site_type, state) ->
+                            let error', site_string =
+                              Handler.string_of_site parameter error handler_kappa
+                                agent_type site_type
+                            in
+                            let error =
+                              Exception.check_point
+                                Exception.warn  parameter error error'
+                                __POS__ Exit
+                            in
+                            let error', state_string =
+                              Handler.string_of_state_fully_deciphered parameter error
+                                handler_kappa agent_type site_type state
+                            in
+                            let error =
+                              Exception.check_point
+                                Exception.warn  parameter error error'
+                                __POS__ Exit in
+                            (*-----------------------------------------------------------*)
+                            let () =
+                              if bool
+                              then Loggers.fprintf (Remanent_parameters.get_logger parameter) ","
+                              else Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                                  "%s%s(" (Remanent_parameters.get_prefix parameter) agent_string
+                            in
+                            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                                "%s%s" site_string state_string
+                            in
+                            error,true
+                         )
+                         (error,false) l
+                     in
+                     (*-----------------------------------------------------------*)
+                     let () =
+                       if bool
+                       then Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                           ")%s" endofline
+                     in error)
 
-                 error
-                 list,
-               ()
-             else
-               error,()
-         end
-     end
-in
-error
+                  error
+                  list,
+                ()
+              else
+                error,()
+          end
+      end
+  in
+  error
 
 let print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ?html_mode:(html_mode=false)
     ~show_dep_with_dimmension_higher_than:dim_min
@@ -1097,7 +940,7 @@ let print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_age
       agent_type t
   in
   print
-  ~beginning_of_sentence:beggining
-  ~prompt_agent_type ~html_mode
-  ~show_dep_with_dimmension_higher_than:dim_min
-  parameter handler_kappa error agent_string agent_type id translation t
+    ~beginning_of_sentence:beggining
+    ~prompt_agent_type ~html_mode
+    ~show_dep_with_dimmension_higher_than:dim_min
+    parameter handler_kappa error agent_string agent_type id translation t
