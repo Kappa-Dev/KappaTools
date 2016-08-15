@@ -159,11 +159,16 @@ struct
               then
                 error, (map, None)
               else
-                let error, map =
+                let error', map =
                   Ckappa_sig.Site_map_and_set.Map.overwrite
                     parameter error
                     site (new_min,new_max)
                     map
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameter error error' __POS__ Exit
                 in
                 error, (map, Some (new_min, new_max))
             else
@@ -281,11 +286,16 @@ struct
               (new_internal_state,new_binding_state)
               sitemap
           in
-          let error, string_version =  Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+          let error', string_version =  Ckappa_sig.Agent_id_map_and_set.Map.overwrite
               parameter error
               agent_id
               (agent_string, sitemap)
               t.string_version
+          in
+          let error =
+            Exception.check_point
+              Exception.warn
+              parameter error error' __POS__ Exit
           in
           error,
           {
@@ -328,7 +338,7 @@ struct
         t.views
     in
     let error, old_site_map =
-      Ckappa_sig.Agent_id_map_and_set.Map.find_default
+      Ckappa_sig.Agent_id_map_and_set.Map.find_default_without_logs
         parameter error
         Ckappa_sig.Site_map_and_set.Map.empty
         agent_id
@@ -341,12 +351,17 @@ struct
         bond_id
         old_site_map
     in
-    let error, new_bonds =
-      Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+    let error', new_bonds =
+      Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
         parameter error
         agent_id
         new_site_map
         t.bonds
+    in
+    let error =
+      Exception.check_point
+        Exception.warn
+        parameter error error' __POS__ Exit
     in
     let error, (agent_string, old_site_map) =
       Ckappa_sig.Agent_id_map_and_set.Map.find_default
@@ -372,19 +387,41 @@ struct
         (None, Some (Bound_to bond_id))
         old_site_map
     in
-    let error, string_version =
+    let error', string_version =
       Ckappa_sig.Agent_id_map_and_set.Map.overwrite
         parameter error
         agent_id
         (agent_string, new_site_map)
         t.string_version
     in
+    let error =
+      Exception.check_point
+        Exception.warn
+        parameter error error' __POS__ Exit
+    in
     error,
     {t with bonds = new_bonds ; string_version = string_version}
 
+  let add_bond_type
+      parameter error kappa_handler
+      agent_id site agent_name' site' t =
+    let error, (agent_type, _) =
+      Ckappa_sig.Agent_id_map_and_set.Map.find_default
+        parameter error
+        (Ckappa_sig.dummy_agent_name, Ckappa_sig.Site_map_and_set.Map.empty)
+        agent_id
+        t.views
+    in
+    let error, state_id =
+      Handler.id_of_binding_type
+        parameter error kappa_handler
+        agent_type site agent_name' site'
+    in
+    add_state parameter error kappa_handler
+      agent_id site state_id t
 
-
-  let add_bond parameter error kappa_handler
+  let add_bond
+      parameter error kappa_handler
       agent_id site agent_id' site' t =
     let bond_id = t.fresh_bond_id in
     let error_ref = error in

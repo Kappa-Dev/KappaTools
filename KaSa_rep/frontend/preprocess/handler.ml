@@ -518,6 +518,9 @@ let id_of_binding_type
       if not bool then
         Exception.warn
           parameter error __POS__
+          ~message:("agent "^(string_of_int (Ckappa_sig.int_of_agent_name agent_type))^" site"^
+                    (string_of_int (Ckappa_sig.int_of_site_name site))^"agent "^(string_of_int (Ckappa_sig.int_of_agent_name agent_type'))^" site"^
+                    (string_of_int (Ckappa_sig.int_of_site_name site')))
           Exit Ckappa_sig.dummy_state_index
       else
         match

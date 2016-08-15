@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 08/03/2010
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Aug 15 2016>
  * *
  * This library declares exceptions
  *
@@ -90,6 +90,7 @@ let print parameters handlers =
     ()
   else
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sSome exceptions have been raised" (Remanent_parameters.get_prefix parameters) in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     print_for_KaSim parameters handlers
 
 let print_errors_light_for_kasim parameters handlers =

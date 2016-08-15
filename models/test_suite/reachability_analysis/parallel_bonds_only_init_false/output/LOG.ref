@@ -370,8 +370,8 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
-         A(z!1,z!2),B(t!1),A(t!2)
-         A(t!1,t!2),B(z!1),A(z!2)
+         A(t!2,z!1) , B(z!1) , B(t!2)
+         A(t!1,z!2) , B(t!1) , B(z!2)
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -685,5 +685,5 @@ B() => [ B(z) v B(z!A.z) ]
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-When the agent A has its site t bound to the site t of a B, and its site z bound to the site z of a B, then both instances of B are necessarily  different.
+A(t!B.t,z!B.z) => A(t!2,z!1) , B(z!1) , B(t!2)
 execution finished without any exception
