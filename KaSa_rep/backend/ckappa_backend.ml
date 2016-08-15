@@ -372,11 +372,10 @@ struct
               sitemap
           in
           let new_pair =
-            if is_binding_site
-            then
-              old_state, Some state_string
-            else
-              Some state_string, old_binding
+            match is_binding_site, old_state, old_binding with
+            | true, _, _ -> old_state, Some state_string
+            | false, _, None -> Some state_string, Some "?"
+            | false, _, Some _ -> Some state_string, old_binding
           in
           let error, sitemap =
             Wrapped_modules.LoggedStringMap.add_or_overwrite
