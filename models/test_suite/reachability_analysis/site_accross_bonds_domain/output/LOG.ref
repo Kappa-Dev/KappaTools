@@ -997,7 +997,7 @@ Id=76
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B, the internal state of site z is p whenever the binding state of site z is A@z.
+B(z!A.z)=>B(z~p!A.z)
 
 ------------------------------------------------------------
 * Non relational properties:

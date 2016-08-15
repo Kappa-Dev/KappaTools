@@ -469,3 +469,70 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
           print_var parameters error var_id m1 m2 b
         in error,true,()
     end
+
+let has_a_binding_state parameter error kappa_handler agent_type site =
+  let error,site =
+    translate_site parameter error kappa_handler agent_type site
+  in
+  match site with
+  | Ckappa_sig.Internal s ->
+    let new_site = Ckappa_sig.Binding s in
+    let error, dic_opt =
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+        parameter error agent_type kappa_handler.Cckappa_sig.sites
+    in
+    begin
+      match dic_opt with
+      | None ->
+        Exception.warn parameter error __POS__ Exit false
+      | Some dic ->
+        Ckappa_sig.Dictionary_of_sites.member
+          parameter error new_site dic
+    end
+  | Ckappa_sig.Binding _ ->
+    Exception.warn parameter error __POS__ Exit false
+
+let id_of_binding_type
+    parameter error handler_kappa
+    agent_type site agent_type' site' =
+  let state = Ckappa_sig.C_Lnk_type (agent_type',site') in
+  let error, state_dic =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      parameter error
+      (agent_type,site)
+      handler_kappa.Cckappa_sig.states_dic
+  in
+  match state_dic with
+  | None ->
+    Exception.warn
+      parameter error __POS__
+      Exit Ckappa_sig.dummy_state_index
+  | Some state_dic ->
+    begin
+      let error, bool =
+        Ckappa_sig.Dictionary_of_States.member
+          parameter error
+          (Ckappa_sig.Binding state)
+          state_dic
+      in
+      if not bool then
+        Exception.warn
+          parameter error __POS__
+          Exit Ckappa_sig.dummy_state_index
+      else
+        match
+          Ckappa_sig.Dictionary_of_States.allocate_bool
+            parameter error
+            Ckappa_sig.compare_unit_state_index
+            (Ckappa_sig.Binding state)
+            ()
+            Misc_sa.const_unit
+            state_dic
+        with
+        | error, (bool, None) ->
+          Exception.warn
+            parameter error __POS__
+            Exit Ckappa_sig.dummy_state_index
+        | error, (bool, (Some (a,_,_,_))) ->
+          error, a
+    end

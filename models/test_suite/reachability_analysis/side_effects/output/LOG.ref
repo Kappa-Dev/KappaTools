@@ -1714,10 +1714,10 @@ Id=55
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
+B(x!A.x)=>B(x~p!A.x)
 In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
-In agent D, the internal state of site x is p whenever the binding state of site x is E@x.
-In agent E, the internal state of site x is p whenever the binding state of site x is D@x.
+D(x!E.x)=>D(x~p!E.x)
+E(x!D.x)=>E(x~p!D.x)
 
 ------------------------------------------------------------
 * Non relational properties:

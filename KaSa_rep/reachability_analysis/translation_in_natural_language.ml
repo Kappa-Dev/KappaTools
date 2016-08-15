@@ -566,7 +566,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                 t
             in
             let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter) "=>" in
+              Loggers.fprintf (Remanent_parameters.get_logger parameter) " => " in
             let error =
               Ckappa_backend.Ckappa_backend.print
                 (Remanent_parameters.get_logger parameter) parameter error handler_kappa

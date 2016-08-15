@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 14 2016>
+ * Last modification: Time-stamp: <Aug 15 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -106,5 +106,4 @@ let main () =
   let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
   ()
 
-let _ = Ckappa_backend.main () 
-let _ = main ()
+let () = main ()

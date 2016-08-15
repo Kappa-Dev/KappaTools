@@ -613,7 +613,7 @@ Id=33
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B, the binding state of site t is free whenever the binding state of site z is A@z.
+B(z!A.z)=>B(t,z!A.z)
 
 ------------------------------------------------------------
 * Non relational properties:

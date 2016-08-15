@@ -17,7 +17,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-In agent A, the internal state of site y is u whenever the internal state of site x is p.
+A(x~p)=>A(x~p,y~u)
 
 ------------------------------------------------------------
 * Non relational properties:
