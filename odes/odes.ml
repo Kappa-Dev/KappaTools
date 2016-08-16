@@ -433,7 +433,8 @@ struct
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
               (*  (rule_id,rule,mode,lhs,lhs_cc)*)
               (* regular application of tules, we store the embeddings*)
-              let () = debug "@[<v 2>test for rule @[%a@]"
+              let () = debug "@[<v 2>test for rule %i @[%a@]"
+                  enriched_rule.rule_id
                   (I.print_rule ~env) enriched_rule.rule in
               let arity = enriched_rule.mode in
               match arity with
@@ -497,10 +498,6 @@ struct
                     List.fold_left
                       (fun (partial_emb_list,partial_emb_list_with_new_species) cc ->
                          (* First case, we complete with an embedding towards the new_species *)
-                         let partial_emb_list =
-                           add_to_prefix_list cc
-                             (enriched_rule.rule_id,cc) partial_emb_list store_old_embeddings []
-                         in
                          let partial_emb_list_with_new_species =
                            add_to_prefix_list cc (enriched_rule.rule_id,cc)
                              partial_emb_list
@@ -508,9 +505,14 @@ struct
                              (add_to_prefix_list cc (enriched_rule.rule_id,cc) partial_emb_list_with_new_species
                                 store_all_embeddings [])
                          in
+                         let partial_emb_list =
+                           add_to_prefix_list cc
+                             (enriched_rule.rule_id,cc) partial_emb_list store_old_embeddings []
+                         in
+
                          partial_emb_list, partial_emb_list_with_new_species
                       )
-                      ([[]],[[]])
+                      ([[]],[])
                       enriched_rule.lhs_cc
                   in
                   (* compute the corresponding rhs, and put the new species in the working list, and store the corrsponding reactions *)
