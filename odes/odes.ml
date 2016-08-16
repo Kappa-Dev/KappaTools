@@ -248,7 +248,13 @@ struct
       let network, id = add_new_canonic_species canonic species network
       in
       (species::to_be_visited,network), id
-    | Some i -> remanent,i
+    | Some i ->
+      let () = debug "ALREADY SEEN SPECIES @." in
+      let () = debug "canonic form: %a@."
+          (I.print_canonic_species ~sigs) canonic in
+      let () = debug "species: %a@.@."
+          (I.print_chemical_species ~sigs) species in
+      remanent,i
 
   let translate_species sigs species remanent =
     translate_canonic_species sigs
@@ -361,8 +367,10 @@ struct
   let add_reaction
       sigs contact_map enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
+    let _  = debug "REACTANTS\n" in
     let remanent, reactants =
       petrify_mixture sigs contact_map mixture remanent in
+    let _  = debug "PRODUCT\n" in
     let products = I.apply sigs rule embedding_forest mixture in
     let tokens = I.token_vector rule in
     let remanent, products =
@@ -488,11 +496,11 @@ struct
                   in
                   let () = debug "new embeddings" in
                   let () = dump_store   store_new_embeddings in
-                  let () = debug "old embeddings" in
+                  (*  let () = debug "old embeddings" in
                   let () = dump_store   store_old_embeddings in
 
                   let () = debug "all embeddings" in
-                  let () = dump_store   store_all_embeddings in
+                      let () = dump_store   store_all_embeddings in*)
 
                   let _,new_embedding_list =
                     List.fold_left
