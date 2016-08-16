@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 13 2016>
+  * Last modification: Time-stamp: <Aug 16 2016>
 *)
 
 type mixture = Edges.t(* not necessarily connected, fully specified *)
@@ -148,7 +148,7 @@ let apply sigs rule inj_nodes mix =
       (fun (e,i)  ((id,_ as nc),s) ->
          Edges.add_free id s e,Primitives.Transformation.Freed (nc,s)::i)
       (edges',concrete_inserted) remaining_side_effects in
- edges''
+  edges''
 
 let lift_species sigs x =
   fst @@
@@ -161,10 +161,18 @@ let get_variables env = Environment.get_algs env
 let get_obs env =
   Array.to_list @@ Environment.map_observables (fun r -> r) env
 
+let remove_escape_char =
+  (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are moe knowledgeable *)
+  String.map
+    (function '\'' -> '|' | x -> x)
+
+
 let get_obs_titles env =
   Array.to_list @@
   Environment.map_observables
-    (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+    (fun x -> remove_escape_char
+        (Format.asprintf "%a"
+           (Kappa_printer.alg_expr ~env) x))
     env
 
 let get_compil common_args cli_args =
