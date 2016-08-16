@@ -691,7 +691,9 @@ struct
            match decl
            with
            | Dummy_decl -> ()
-           | Init_expr (id,b,_) -> aux id b
+           | Init_expr (id,b,_) ->
+             let () = Mods.DynArray.set dec_tab id (decl,None,b)
+                 in aux id b
            | Var (id,a,b) ->
              let () = Mods.DynArray.set dec_tab id (decl,a,b) in
              aux id b) list in
@@ -970,7 +972,7 @@ struct
             list
       end
     | Var (id,_comment,expr) ->
-      Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
+    Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
 
   let fresh_is_zero network =
     let is_zero = Mods.DynArray.create (get_fresh_ode_var_id network) true in
