@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 14 2016>
+   * Last modification: Time-stamp: <Aug 16 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1384,7 +1384,7 @@ struct
           in
           error, answer_contact_map
         else
-          (*state is not defined*)
+          (*state is not defined*) (*FIXME*)
           Exception.warn
             parameter error __POS__ Exit
             Usual_domains.Undefined
@@ -1775,7 +1775,16 @@ struct
             (*out of the pattern*)
             let error', (dynamic, new_answer) =
               precondition_outside_pattern
-                parameter error dynamic kappa_handler path  bdu_false bdu_true site_correspondence store_covering_classes_id fixpoint_result
+                parameter
+                error
+                dynamic
+                kappa_handler
+                path
+                bdu_false
+                bdu_true
+                site_correspondence
+                store_covering_classes_id
+                fixpoint_result
             in
             let error =
               Exception.check_point
@@ -1811,7 +1820,8 @@ struct
   let print_test_answer parameter answer =
     match answer with
     | Usual_domains.Val l ->
-      List.iter (fun i ->  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      List.iter
+        (fun i ->  Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "List: state:%i\n" (Ckappa_sig.int_of_state_index i)) l
     | Usual_domains.Undefined ->
       Loggers.fprintf (Remanent_parameters.get_logger parameter) "Undefined\n"
@@ -1855,7 +1865,7 @@ struct
           path.Communication.agent_id (*#1:A*)
           rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       with
-      | error, None ->
+      | error, None -> (*FIXME*)
         Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
       | error, Some a -> error, a
     in
@@ -1863,7 +1873,7 @@ struct
       match agent with
       | Cckappa_sig.Ghost
       | Cckappa_sig.Unknown_agent _
-      | Cckappa_sig.Dead_agent _ ->
+      | Cckappa_sig.Dead_agent _ -> (*FIXME dead agent*)
         Exception.warn
           parameter error __POS__ Exit (dynamic, Usual_domains.Undefined)
       | Cckappa_sig.Agent agent ->
@@ -1909,45 +1919,134 @@ struct
           (*There is some states, inside the pattern. Check
             port whether or not it is free/bound?*)
           | error, Some port ->
-            let error, (dynamic, new_answer) =
-              match port.Cckappa_sig.site_free with
-              | None | Some false ->
-                (*it is not free, inside the pattern*)
-                (*let _ =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "-inside pattern:\n"
-                  in*)
-
-                (* Be careful, you should go on insider the pattern only if the partner is well defined (look into the bonds) *)
-                (* if the site is free -> Undefined *)
-                (* if the site is bound and the partner is known
-                   -> precondition_inside_pattern) *)
-                (* if not precondition_outsite_pattern *)
-
-                (* You may have a look at ~/KaSim/models/test_suite/reachability_analysis/bond_in_initial_state to test your correction *)
-
-                let error, (dynamic, new_answer) =
-                  precondition_inside_pattern
-                    parameter error dynamic kappa_handler step
-                    path aux rule tl site_correspondence store_covering_classes_id
-                    fixpoint_result bdu_false bdu_true
+            (*check if it is free?*)
+            match port.Cckappa_sig.site_free with
+            | Some true ->
+              (*then it is inconsistent, undefined*)
+              Exception.warn
+                parameter error __POS__ Exit
+                ~message:"try to navigate through a free site"
+                (dynamic, Usual_domains.Undefined)
+            | None
+            | Some false ->
+              (*it is not free, check if it is fully defined, or incompelete,
+                by looking into the bonds on the lhs*)
+              (*get the information of the agent partner *)
+              let agent_type_partner = step.Communication.agent_type_in in
+              let site_x_partner = step.Communication.site_in in
+              let site_type_y_partner = path.Communication.site in
+              (*get information of the agent*)
+              let agent_id = path.Communication.agent_id in
+              let agent_type = agent.Cckappa_sig.agent_name in
+              let site_x = step.Communication.site_out in
+              (*looking into the bonds of the agent*)
+              match
+                Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                  parameter
+                  error
+                  agent_id
+                  rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
+              with
+              | error, None ->
+                (*it is incompelete, then it is outside the pattern*)
+                let error', (dynamic, new_answer) =
+                  precondition_outside_pattern
+                    parameter
+                    error
+                    dynamic
+                    kappa_handler
+                    path
+                    bdu_false
+                    bdu_true
+                    site_correspondence
+                    store_covering_classes_id
+                    fixpoint_result
                 in
                 let error =
-                  scan_bot
-                    ~also_scan_top:false __POS__
-                    parameter error
-                    new_answer
-                    " in precondition inside a pattern"
+                  Exception.check_point
+                    Exception.warn parameter error error' __POS__ Exit
                 in
                 error, (dynamic, new_answer)
-              (*-------------------------------------------------*)
-              (*it is free, inconsistent*)
-              | Some true ->
-                Exception.warn
-                  parameter error __POS__ Exit
-                  ~message:"try to navigate through a free site" (dynamic, Usual_domains.Undefined)
-            in
-            error, (dynamic, new_answer)
+              | error, Some map ->
+                match
+                  Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                    parameter
+                    error
+                    site_x
+                    map
+                with
+                | error, None ->
+                  (*outside the pattern*)
+                  let error', (dynamic, new_answer) =
+                    precondition_outside_pattern
+                      parameter
+                      error
+                      dynamic
+                      kappa_handler
+                      path
+                      bdu_false
+                      bdu_true
+                      site_correspondence
+                      store_covering_classes_id
+                      fixpoint_result
+                  in
+                  let error =
+                    Exception.check_point
+                      Exception.warn parameter error error' __POS__ Exit
+                  in
+                  error, (dynamic, new_answer)
+                | error, Some site_add ->
+                (*there is a bond, check the following pattern is it well
+                  defined*)
+                  let agent_type' = site_add.Cckappa_sig.agent_type in (*B*)
+                  let site_type' = site_add.Cckappa_sig.site in (*z?*)
+                  (*if A.x is bound to B.x*)
+                  if agent_type' = agent_type_partner &&
+                     site_type' = site_x_partner
+                  then
+                  (*inside the pattern*)
+                    let error', (dynamic, new_answer) =
+                      precondition_inside_pattern
+                        parameter
+                        error
+                        dynamic
+                        kappa_handler
+                        step
+                        path
+                        aux
+                        rule
+                        tl
+                        site_correspondence
+                        store_covering_classes_id
+                        fixpoint_result
+                        bdu_false
+                        bdu_true
+                    in
+                    let error =
+                      Exception.check_point
+                        Exception.warn parameter error error' __POS__ Exit
+                    in
+                    error, (dynamic, new_answer)
+                  else
+                  (*outsite the pattern*)
+                    let error', (dynamic, new_answer) =
+                      precondition_outside_pattern
+                        parameter
+                        error
+                        dynamic
+                        kappa_handler
+                        path
+                        bdu_false
+                        bdu_true
+                        site_correspondence
+                        store_covering_classes_id
+                        fixpoint_result
+                    in
+                    let error =
+                      Exception.check_point
+                        Exception.warn parameter error error' __POS__ Exit
+                    in
+                    error, (dynamic, new_answer)
         in
         error, (dynamic, new_answer)
     in
@@ -1985,10 +2084,16 @@ struct
            | Communication.Pattern ->
              let error, answer_contact_map =
                precondition_typing
-                 parameter error kappa_handler rule_id
-                 current_path.Communication.relative_address current_path store_agent_name dual_contact_map
+                 parameter
+                 error
+                 kappa_handler
+                 rule_id
+                 current_path.Communication.relative_address
+                 current_path
+                 store_agent_name
+                 dual_contact_map
              in
-             let error =
+             let error = (*FIXME*)
                scan_bot
                  ~also_scan_top:false
                  __POS__ parameters error
@@ -2013,11 +2118,22 @@ struct
                    (*pattern navigation*)
                    let error, (dynamic, new_answer) =
                      compute_pattern_navigation
-                       parameter error kappa_handler aux dynamic path
-                       rule step tl bdu_false bdu_true site_correspondence
-                       store_covering_classes_id fixpoint_result
+                       parameter
+                       error
+                       kappa_handler
+                       aux
+                       dynamic
+                       path
+                       rule
+                       step
+                       tl
+                       bdu_false
+                       bdu_true
+                       site_correspondence
+                       store_covering_classes_id
+                       fixpoint_result
                    in
-                   let error =
+                   let error = (*FIXME*)
                      scan_bot
                        ~also_scan_top:false
                        __POS__ parameters error
@@ -2060,7 +2176,7 @@ struct
              let error =
                match update_answer with
                | Usual_domains.Undefined ->
-                 let error, () =
+                 let error, () = (*FIXME*)
                    Exception.warn
                      parameters error __POS__
                      ~message:"bot generated while fetching the potential state of a site"
