@@ -41,16 +41,15 @@ let canonic_form x = x
 
 let connected_components_of_patterns = Array.to_list
 
-let connected_components_of_mixture sigs contact_map e =
+let connected_components_of_mixture sigs contact_map cache e =
   let snap = Edges.build_snapshot sigs e in
   List.fold_left
-    (fun acc (i,m) ->
+    (fun (cache,acc) (i,m) ->
        match Snip.connected_components_sum_of_ambiguous_mixture
-               contact_map (Connected_component.PreEnv.empty sigs)
-               (LKappa.of_raw_mixture m) with
-       | _,[[|x|],_] -> Tools.recti (fun a _ -> x::a) acc i
+               contact_map cache (LKappa.of_raw_mixture m) with
+       | cache',[[|x|],_] -> cache',Tools.recti (fun a _ -> x::a) acc i
        | _ -> assert false)
-    [] snap
+    (cache,[]) snap
 
 type embedding = Renaming.t (* the domain is connected *)
 type embedding_forest = Connected_component.Matching.t

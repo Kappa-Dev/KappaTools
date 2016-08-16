@@ -33,7 +33,8 @@ sig
   val connected_components_of_patterns: pattern -> connected_component list
 
   val connected_components_of_mixture:
-    Signature.s -> Primitives.contact_map -> mixture -> chemical_species list
+    Signature.s -> Primitives.contact_map -> Connected_component.PreEnv.t ->
+    mixture -> Connected_component.PreEnv.t * chemical_species list
 
   type embedding (* the domain is connected *)
   type embedding_forest (* the domain may be not connected *)

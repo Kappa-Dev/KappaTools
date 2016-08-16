@@ -112,6 +112,8 @@ struct
 
       species_tab: I.chemical_species Mods.DynArray.t ;
 
+      cc_cache: Connected_component.PreEnv.t;
+
       varmap: var_id Mods.IntMap.t ;
       tokenmap: ode_var_id Mods.IntMap.t ;
 
@@ -154,6 +156,7 @@ struct
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
       id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0 (I.dummy_chemical_species sigs) ;
+      cc_cache = Connected_component.PreEnv.empty sigs;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
       varmap = Mods.IntMap.empty ;
@@ -286,9 +289,10 @@ struct
       l
       (remanent,[])
 
-  let petrify_mixture sigs contact_map mixture =
-    petrify_species_list sigs
-      (I.connected_components_of_mixture sigs contact_map mixture)
+  let petrify_mixture sigs contact_map mixture (acc,network) =
+    let cc_cache',species = I.connected_components_of_mixture
+        sigs contact_map network.cc_cache mixture in
+    petrify_species_list sigs species (acc,{network with cc_cache = cc_cache'})
 
   let add_to_prefix_list connected_component key prefix_list store acc =
     let list_embeddings =
@@ -395,13 +399,13 @@ struct
     in
     to_be_visited, network
 
-  let initial_network sigs initial_states =
+  let initial_network sigs network initial_states =
     List.fold_left
       (fun remanent species -> fst (translate_species sigs species remanent))
-      ([], init sigs)
+      ([],network)
       initial_states
 
-  let compute_reactions env contact_map rules initial_states =
+  let compute_reactions env contact_map network rules initial_states =
     let sigs =Environment.signatures env in
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
@@ -416,7 +420,7 @@ struct
              list modes)
         (fst_id,[]) rules
     in
-    let to_be_visited, network = initial_network sigs initial_states in
+    let to_be_visited, network = initial_network sigs network initial_states in
     let network =
       {network
        with n_rules = pred n_rules;
@@ -578,12 +582,6 @@ struct
       network
       (Environment.nb_tokens env)
 
-  let translate_species sigs species network =
-    snd (translate_species sigs species ([],network))
-
-  let translate_token token network =
-    snd (translate_token token ([],network))
-
   let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
   let get_reactions network = network.reactions
@@ -595,12 +593,19 @@ struct
     | [] ->
       let _,emb,m = I.disjoint_union sigs [] in
       let m = I.apply sigs c emb m in
-      let cc = I.connected_components_of_mixture sigs contact_map m in
-      List.rev_map
-        (fun x -> translate_species sigs x network)
-        (List.rev cc)
+      let cc_cache',cc =
+        I.connected_components_of_mixture sigs contact_map network.cc_cache m in
+      let network = {network with cc_cache = cc_cache'} in
+      List.fold_left
+        (fun (network,acc) x ->
+           let (_,n'),v = translate_species sigs x ([],network) in n',v::acc)
+        (network,[]) (List.rev cc)
     | l ->
-      List.map (fun (_,token) -> translate_token token network) l
+      List.fold_right (fun (_,token) (network,acc) ->
+          let (_,n'),v = translate_token token ([],network) in n',v::acc) l (network,[])
+
+  let translate_token token network =
+    snd (translate_token token ([],network))
 
   let convert_var_def variable_def network =
     let a,b = variable_def in
@@ -632,7 +637,7 @@ struct
     let list, network =
       List.fold_left
         (fun (list,network) def ->
-           let b,c =
+           let b,(network,c) =
              convert_initial_state (Environment.signatures env) contact_map def network in
            let () =
              List.iter
@@ -756,14 +761,15 @@ struct
      n_obs = network.n_obs - 1}
 
 
-  let species_of_initial_state sigs contact_map =
+  let species_of_initial_state sigs contact_map cc_cache =
     List.fold_left
-      (fun list (_,r,_) ->
+      (fun (cc_cache,list) (_,r,_) ->
          let _,emb,m = I.disjoint_union sigs [] in
          let b = I.apply sigs r emb m in
-         List.rev_append
-           (I.connected_components_of_mixture sigs contact_map b) list)
-      []
+         let cc_cache',acc =
+           I.connected_components_of_mixture sigs contact_map cc_cache b in
+         cc_cache',List.rev_append acc list)
+      (cc_cache,[])
 
   let is_const expr = (* constant propagation is already done *)
     match
@@ -883,19 +889,22 @@ struct
   let split_rules_and_decl network =
     split_rules network (split_var_declaration network init_sort_rules_and_decl)
 
-  let network_from_compil env contact_map init =
+  let network_from_compil env contact_map initial =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules env in
+    let network = init (Environment.signatures env) in
     let () = Format.printf "\t -initial states @." in
-    let initial_state =
-      species_of_initial_state (Environment.signatures env) contact_map init in
+    let cc_cache,initial_state =
+      species_of_initial_state
+        (Environment.signatures env) contact_map network.cc_cache initial in
+    let network = {network with cc_cache = cc_cache} in
     let () = Format.printf "\t -saturating the set of molecular species @." in
     let network =
-      compute_reactions env contact_map rules initial_state in
+      compute_reactions env contact_map network rules initial_state in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens env network in
     let () = Format.printf "\t -variables @." in
-    let network = convert_var_defs env contact_map init network in
+    let network = convert_var_defs env contact_map initial network in
     let () = Format.printf "\t -observables @." in
     let network = convert_obs env network in
     network
