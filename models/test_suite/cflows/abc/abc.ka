@@ -28,8 +28,8 @@
 
 
 #### Initial conditions
-%init: 'n_ab' A(),B()
-%init: 'n_c' C()
+%init: 'n_ab' A(x),B(x)
+%init: 'n_c' C(x1~u,x2~u)
 
 %mod: [true] do $TRACK 'Cuu' [true]
 %mod: [true] do $TRACK 'Cpu' [true]

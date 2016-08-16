@@ -266,9 +266,7 @@ let string_of_un_op _logger op =
   | Operator.TAN -> "tan"
   | Operator.INT -> "floor"
 
-let rec print_alg_expr
-    ?init_mode:(init_mode=false)
-    logger  alg_expr network
+let rec print_alg_expr init_mode logger  alg_expr network
   =
   let var = if init_mode then "init" else "y" in
   let format = Loggers.get_encoding_format logger in
@@ -300,24 +298,24 @@ let rec print_alg_expr
           with
           | INFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr logger a network in
+            let () = print_alg_expr init_mode logger a network in
             let () = Loggers.fprintf logger "%s" string_op in
-            let () = print_alg_expr logger b network in
+            let () = print_alg_expr init_mode logger b network in
             let () = Loggers.fprintf logger ")" in
             ()
           | PREFIX ->
             let () = Loggers.fprintf logger "%s" string_op in
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr logger a network in
+            let () = print_alg_expr init_mode logger a network in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr logger b network in
+            let () = print_alg_expr init_mode logger b network in
             let () = Loggers.fprintf logger ")" in
             ()
           | POSTFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr logger a network in
+            let () = print_alg_expr init_mode logger a network in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr logger b network in
+            let () = print_alg_expr init_mode logger b network in
             let () = Loggers.fprintf logger ")" in
             let () = Loggers.fprintf logger "%s" string_op in
             ()
@@ -328,7 +326,7 @@ let rec print_alg_expr
         let string_op = string_of_un_op logger op in
         let () = Loggers.fprintf logger "%s" string_op in
         let () = if is_fun logger op then Loggers.fprintf logger "(" in
-        let () = print_alg_expr logger a network in
+        let () = print_alg_expr init_mode logger a network in
         let () = if is_fun logger op then Loggers.fprintf logger ")" in
         let () = Loggers.fprintf logger ")" in
         ()
@@ -339,6 +337,8 @@ let rec print_alg_expr
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+let print_alg_expr ?init_mode:(init_mode=false) logger  alg_expr network
+  = print_alg_expr init_mode logger alg_expr network
 
 let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
   match
