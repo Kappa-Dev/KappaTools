@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 14 2016>
+   * Last modification: Time-stamp: <Aug 16 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -831,6 +831,7 @@ struct
                       modified*)
                     error, dynamic, precondition
                   | [], _ | _, [] ->
+                    (*
                       let () =
                         Loggers.fprintf (Remanent_parameters.get_logger parameter)
                           "APPLY BONDS RHS RULE %i"
@@ -906,7 +907,7 @@ struct
                            (Remanent_parameters.get_logger parameter)
                            "%i, " (Ckappa_sig.int_of_state_index i))
                       state'_list_y
-                  in
+                  in*)
                   let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
                     let error, () =
                       Exception.warn parameter error __POS__
@@ -1128,7 +1129,8 @@ struct
       match state_list_lattice with
       | Usual_domains.Val l -> error, l
       | Usual_domains.Any | Usual_domains.Undefined ->
-      let () =
+        (*
+        let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "RULE GET STATE OF SITE RULE %i\n"
           (Ckappa_sig.int_of_rule_id rule_id)
@@ -1171,7 +1173,7 @@ struct
              Usual_domains.Any -> "ANY"
            | Usual_domains.Undefined -> "BOTTOM"
            | _ -> "")
-      in
+      in*)
     (*  let () =
     List.iter
       (fun i ->
@@ -1277,7 +1279,7 @@ struct
                   if error' == error then ()
                   else
                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                      "WRONG TUPLE: !!! \n Rule %i agent_id_t: %i:%s( site_type_x: %i:%s), agent_type_y:%i:%s: (site_type_y:%i:%s) \n"
+                      "\nWRONG TUPLE: !!! \n Rule %i agent_id_t: %i:%s( site_type_x: %i:%s), agent_type_y:%i:%s: (site_type_y:%i:%s) \n"
                       (Ckappa_sig.int_of_rule_id rule_id)
                       (Ckappa_sig.int_of_agent_id agent_id_t)
                       agent_t

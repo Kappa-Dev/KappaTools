@@ -85,14 +85,6 @@ B:(x:A@x, x); A:(x:B@x, x)
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
-RULE GET STATE OF SITE RULE 3
-Agent: 1 Site_b 0 
-
-Agent_type: 0:A Site_b 1:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 3 agent_id_t: 1:B( site_type_x: 0:x), agent_type_y:0:A: (site_type_y:1:x) 
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -122,12 +114,8 @@ WRONG TUPLE: !!!
 		rule 2 is applied for the first time
 
 		Updating the views for B(x!,x~)
-RULE GET STATE OF SITE RULE 2
-Agent: 1 Site_b 0 
 
-Agent_type: 0:A Site_b 1:x Site 0:x
 
-state'_y: BOTTOM
 WRONG TUPLE: !!! 
  Rule 2 agent_id_t: 1:B( site_type_x: 0:x), agent_type_y:0:A: (site_type_y:1:x) 
 
@@ -135,14 +123,6 @@ WRONG TUPLE: !!!
 		the precondition is satisfied
 		Updating the views for B(x!,x~)
 		Updating the views for B(x!,x~)
-RULE GET STATE OF SITE RULE 3
-Agent: 1 Site_b 0 
-
-Agent_type: 0:A Site_b 1:x Site 0:x
-
-state'_y: BOTTOM
-WRONG TUPLE: !!! 
- Rule 3 agent_id_t: 1:B( site_type_x: 0:x), agent_type_y:0:A: (site_type_y:1:x) 
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -186,21 +166,13 @@ Whenever the site x of B and the site x of A are bound together, then the site x
 * Parallel bonds domain
 ------------------------------------------------------------
 Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2139: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2181: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1309: empty list in potential states in post condition; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1389; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2099: bot generated while fetching the potential state of a site in the contact map; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 1878; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2139: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2181: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 2 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2139: bot generated while fetching the potential state of a site while navigating; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2181: bot generated while fetching the potential state of a site; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1185; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1296:  rule 3 agent_id 1 site_type 1; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1307: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2434: bot generated while fetching the potential state of a site in the contact map; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2204; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2474: bot generated while fetching the potential state of a site while navigating; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2516: bot generated while fetching the potential state of a site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1187; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1298:  rule 2 agent_id 1 site_type 1; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1309: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1309: empty list in potential states in post condition; exception:Exit
