@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 13 2016>
+  * Last modification: Time-stamp: <Aug 16 2016>
 *)
 
 let local_trace = false
@@ -230,8 +230,8 @@ struct
     in
     StoreMap.add key new_list store
 
-  let translate_canonic_species canonic species remanent =
-    let id_opt =
+  let translate_canonic_species sigs canonic species remanent =
+  let id_opt =
       VarMap.find_option
         (Nembed canonic)
         (snd remanent).id_of_ode_var in
@@ -239,14 +239,19 @@ struct
       id_opt
     with
     | None ->
+      let () = debug "A NEW SPECIES IS DISCOVERED @." in
+      let () = debug "canonic form: %a@."
+          (I.print_canonic_species ~sigs) canonic in
+      let () = debug "species: %a@.@."
+          (I.print_chemical_species ~sigs) species in
       let to_be_visited, network = remanent in
       let network, id = add_new_canonic_species canonic species network
       in
       (species::to_be_visited,network), id
     | Some i -> remanent,i
 
-  let translate_species species remanent =
-    translate_canonic_species
+  let translate_species sigs species remanent =
+    translate_canonic_species sigs
       (I.canonic_form species) species remanent
 
   let translate_token token remanent =
@@ -262,20 +267,21 @@ struct
     | Some i -> remanent, i
 
   (*  let petrify_canonic_species = translate_canonic_species*)
-  let petrify_species species =
-    translate_canonic_species (I.canonic_form species) species
-  let petrify_species_list l remanent =
+  let petrify_species sigs species =
+    translate_canonic_species sigs
+      (I.canonic_form species) species
+  let petrify_species_list sigs l remanent =
     fold_left_swap
       (fun species (remanent,l) ->
          let remanent, i =
-           petrify_species species remanent
+           petrify_species sigs species remanent
          in
          remanent,(i::l))
       l
       (remanent,[])
 
   let petrify_mixture sigs contact_map mixture =
-    petrify_species_list
+    petrify_species_list sigs
       (I.connected_components_of_mixture sigs contact_map mixture)
 
   let add_to_prefix_list connected_component key prefix_list store acc =
@@ -383,7 +389,7 @@ struct
 
   let initial_network sigs initial_states =
     List.fold_left
-      (fun remanent species -> fst (translate_species species remanent))
+      (fun remanent species -> fst (translate_species sigs species remanent))
       ([], init sigs)
       initial_states
 
@@ -462,6 +468,31 @@ struct
                       store_new_embeddings
                   in
                   (* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
+                  let dump_store store =
+                  if local_trace || !Parameter.debugModeOn
+                  then
+                    StoreMap.iter
+                      (fun (a,b) c ->
+                         let () = debug "@[<v 2>* rule:%i cc:@[%a@]:" a
+                             (I.print_connected_component ~sigs) b
+                         in
+                         let () =
+                           List.iter (fun (a,b) -> debug "%a"
+                                        (I.print_chemical_species ~sigs) b) c
+                         in
+                         let () = debug "@]" in
+                         ()
+                      )
+                      store
+                  in
+                  let () = debug "new embeddings" in
+                  let () = dump_store   store_new_embeddings in
+                  let () = debug "old embeddings" in
+                  let () = dump_store   store_old_embeddings in
+
+                  let () = debug "all embeddings" in
+                  let () = dump_store   store_all_embeddings in
+
                   let _,new_embedding_list =
                     List.fold_left
                       (fun (partial_emb_list,partial_emb_list_with_new_species) cc ->
@@ -537,8 +568,8 @@ struct
       network
       (Environment.nb_tokens env)
 
-  let translate_species species network =
-    snd (translate_species species ([],network))
+  let translate_species sigs species network =
+    snd (translate_species sigs species ([],network))
 
   let translate_token token network =
     snd (translate_token token ([],network))
@@ -556,7 +587,7 @@ struct
       let m = I.apply sigs c emb m in
       let cc = I.connected_components_of_mixture sigs contact_map m in
       List.rev_map
-        (fun x -> translate_species x network)
+        (fun x -> translate_species sigs x network)
         (List.rev cc)
     | l ->
       List.map (fun (_,token) -> translate_token token network) l
