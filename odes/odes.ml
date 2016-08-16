@@ -675,14 +675,14 @@ struct
       | Alg_expr.TOKEN_ID s,_ ->
         let id' = translate_token s network in
         let list = Mods.DynArray.get init_tab id' in
-        List.iter (fun id' -> add_succ id id') list
+        List.iter (fun id'' -> add_succ id id'') list
       | Alg_expr.KAPPA_INSTANCE id',_ ->
         let list = Mods.DynArray.get init_tab id' in
-        List.iter (fun id'' -> add_succ id' id'') list
-      | Alg_expr.ALG_VAR id,_ ->
-        let id' = Mods.IntMap.find_option id network.varmap in
-        match id' with
-        | Some id' -> add_succ id id'
+        List.iter (fun id'' -> add_succ id id'') list
+      | Alg_expr.ALG_VAR id',_ ->
+        let id_opt = Mods.IntMap.find_option id' network.varmap in
+        match id_opt with
+        | Some id'' -> add_succ id id''
         | None -> ()
     in
     let () =
