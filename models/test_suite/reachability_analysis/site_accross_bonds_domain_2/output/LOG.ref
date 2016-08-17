@@ -375,6 +375,18 @@ Influence_map:Inhibition_map:rule(2):'r2' B(z~p)->B(z~u) -> rule(0):'r0' A(z,t~u
 Influence_map:Inhibition_map:rule(4):'r4' A(z!1,t~p),B(z!1,t~p)->A(z!1,t~u),B(z!1,t~u) -> rule(5):'r5' A(t~p)->A(t~q)[0->0]
 Influence_map:Inhibition_map:rule(5):'r5' A(t~p)->A(t~q) -> rule(4):'r4' A(z!1,t~p),B(z!1,t~p)->A(z!1,t~u),B(z!1,t~u)[0->0]
 Reachability analysis...
+A:(z:B@z, t); B:(z:A@z, t)
+A:(z:B@z, t); B:(z:A@z, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(z:A@z, z); A:(z:B@z, t)
+A:(z:B@z, t); B:(z:A@z, t)
+B:(z:A@z, t); A:(z:B@z, t)
+A:(z:B@z, t); B:(z:A@z, t)
+B:(z:A@z, t); A:(z:B@z, t)
+0:A 0:z 1:t (1:B@z) | 1:B 1:z 0:z (1:A@z) 
+0:A 0:z 1:t (1:B@z) | 1:B 1:z 2:t (1:A@z) 
+1:B 1:z 0:z (1:A@z) | 0:A 0:z 1:t (1:B@z) 
+1:B 1:z 2:t (1:A@z) | 0:A 0:z 1:t (1:B@z) 
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -548,12 +560,12 @@ EXTENSIONAL DESCRIPTION:
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=42
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=41
    Node(site_type:1<2)
     Id=27
      Node(site_type:2<1)
@@ -614,19 +626,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=58
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=57
    Node(site_type:1<2)
-    Id=48
+    Id=56
      Node(site_type:2<2)
       Id=0
        Leaf False 
 
-      Id=47
+      Id=55
        Node(site_type:2<3)
         Id=1
          Leaf True 
@@ -689,12 +701,20 @@ EXTENSIONAL DESCRIPTION:
 
 	Wake-up rules
 
+
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+
 	Applying rule 2: r2:
 		the precondition is satisfied
 
 		rule 2: r2 is applied for the first time
 
 		Updating the views for B(z~,z!,t~)
+
+
+WRONG TUPLE: !!! 
+ Rule 2 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -722,6 +742,10 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for B(z~,z!,t~)
 
+
+WRONG TUPLE: !!! 
+ Rule 1 agent_id_t: 0:B( site_type_x: 1:z), agent_type_y:0:A: (site_type_y:0:z) 
+
 ------------------------------------------------------------
 * Dead rules :
 ------------------------------------------------------------
@@ -734,12 +758,12 @@ EXTENSIONAL DESCRIPTION:
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=54
+Id=62
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=53
+  Id=61
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -754,14 +778,14 @@ Id=54
         Id=0
          Leaf False 
 
-    Id=52
+    Id=60
      Node(site_type:1<2)
-      Id=51
+      Id=59
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=47
+        Id=55
          Node(site_type:2<3)
           Id=1
            Leaf True 
@@ -773,12 +797,12 @@ Id=54
        Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=59
+Id=74
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=58
+  Id=73
    Node(site_type:1<1)
     Id=13
      Node(site_type:2<0)
@@ -803,14 +827,14 @@ Id=59
         Id=0
          Leaf False 
 
-    Id=57
+    Id=72
      Node(site_type:1<2)
-      Id=56
+      Id=71
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=55
+        Id=70
          Node(site_type:2<1)
           Id=11
            Node(site_type:3<0)
@@ -825,9 +849,9 @@ Id=59
               Id=0
                Leaf False 
 
-          Id=42
+          Id=44
            Node(site_type:2<2)
-            Id=41
+            Id=43
              Node(site_type:3<0)
               Id=0
                Leaf False 
@@ -851,12 +875,12 @@ Id=59
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=68
+Id=81
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=67
+  Id=80
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -871,9 +895,9 @@ Id=68
         Id=0
          Leaf False 
 
-    Id=66
+    Id=79
      Node(site_type:0<2)
-      Id=64
+      Id=77
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -891,12 +915,12 @@ Id=68
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=84
+Id=97
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=83
+  Id=96
    Node(site_type:0<1)
     Id=7
      Node(site_type:1<0)
@@ -921,14 +945,14 @@ Id=84
         Id=0
          Leaf False 
 
-    Id=82
+    Id=95
      Node(site_type:0<2)
-      Id=38
+      Id=40
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=37
+        Id=39
          Node(site_type:1<1)
           Id=5
            Node(site_type:2<0)
@@ -943,9 +967,9 @@ Id=84
               Id=0
                Leaf False 
 
-          Id=36
+          Id=38
            Node(site_type:1<2)
-            Id=35
+            Id=37
              Node(site_type:2<0)
               Id=0
                Leaf False 
@@ -977,7 +1001,7 @@ B(z) => [ B(t~u,z) ]
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=77
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -992,12 +1016,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=62
+Id=76
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=61
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1007,7 +1031,7 @@ Id=62
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=60
+Id=75
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1022,12 +1046,12 @@ Id=60
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=62
+Id=76
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=61
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1037,7 +1061,7 @@ Id=62
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=37
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1057,6 +1081,39 @@ B() => [ B(z) v B(z!A.z) ]
 B() => [ B(z~u?) v B(z~p?) ]
 B() => [ B(t~u) v B(t~p) ]
 ------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+* Dynamic information
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: q, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: q, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p
+Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
+Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, u
+Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
+Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
+------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raised
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2258: try to navigate through a free site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2474: bot generated while fetching the potential state of a site while navigating; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2516: bot generated while fetching the potential state of a site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1187; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1298:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1309: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2258: try to navigate through a free site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2474: bot generated while fetching the potential state of a site while navigating; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2516: bot generated while fetching the potential state of a site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1187; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1298:  rule 2 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1309: empty list in potential states in post condition; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2258: try to navigate through a free site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2474: bot generated while fetching the potential state of a site while navigating; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/views_domain.ml; message: line 2516: bot generated while fetching the potential state of a site; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1187; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1298:  rule 1 agent_id 0 site_type 0; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/site_accross_bonds_domain.ml; message: line 1309: empty list in potential states in post condition; exception:Exit
