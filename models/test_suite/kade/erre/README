@@ -1,0 +1,8 @@
+#Command-line:
+"${KAPPABIN}"KaDE erre.ka  -d output -t 1 -p 100 || exit 0 
+
+#This is the classical erre model. 
+
+# Know problem, to be fixed soon.
+# Rules with creation only are ignored
+# Some reactions are enumerated several times. 

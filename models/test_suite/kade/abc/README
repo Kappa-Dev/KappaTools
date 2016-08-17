@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaDE ../../cflows/abc/abc.ka  -d output -t 1 -p 100 || exit 0 
+
+#This is the classical abc model. 

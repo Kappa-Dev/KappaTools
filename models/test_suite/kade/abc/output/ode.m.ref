@@ -1,0 +1,229 @@
+function main=main()
+%% command line: 
+%%     'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-t' '1' '-p''100'
+%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+%% 
+%% init - the initial abundances of each species and token
+%% tinit - the initial simulation time (likely 0)
+%% tend - the final simulation time 
+%% initialstep - initial time step at the beginning of numerical integration
+%% num_t_point - the number of time points to return
+
+
+tinit=0.000000;
+tend=1.000000;
+initialstep=0.000001;
+num_t_point=100;
+
+global nodevar
+nodevar=11;
+nvar=11;
+nobs=4;
+nrules=5;
+
+global var
+var=zeros(nvar,1);
+global init
+init=sparse(nodevar,1);
+
+t = 0.000000;
+
+init(11)=t;
+var(8)=1000;
+var(10)=var(8);
+init(3)=var(10);
+init(2)=var(10);
+var(7)=(0+(1*init(10)));
+var(6)=(0+(1*((init(7)+init(8))+init(9))));
+var(9)=10000;
+init(1)=var(9);
+var(5)=(0+(1*((init(1)+init(5))+init(6))));
+var(4)=(0+(1*((init(4)+init(5))+init(9))));
+var(3)=1;
+var(2)=0.100000;
+var(1)=0.001000;
+
+global k
+global kd
+global kun
+global kdun
+
+k(6)=0.001000;
+k(5)=0.100000;
+k(4)=0.001000;
+k(3)=1;
+k(2)=0.001000;
+k(1)=1;
+
+uiIsOctave = false;
+uiIsMatlab = false;
+LIC = license('inuse');
+for elem = 1:numel(LIC)
+    envStr = LIC(elem).feature
+    if strcmpi(envStr,'octave')
+       LICname=envStr;
+       uiIsOctave = true;
+       break
+    end
+    if strcmpi(envStr,'matlab')
+       LICname=envStr
+       uiIsMatlab = true;
+       break
+    end
+end
+
+
+options = odeset('RelTol', 1e-3, ...
+                 'AbsTol', 1e-3, ...
+                 'InitialStep', initialstep, ...
+                 'MaxStep', tend);
+
+
+if uiIsMatlab
+   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+   soln.y=soln.y';
+elseif uiIsOctave
+   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+end
+
+
+nrows = length(soln.x);
+tmp = zeros(nodevar,1);
+
+t = linspace(tinit, tend, num_t_point+1);
+obs = zeros(nrows,nobs);
+
+for j=1:nrows
+    for i=1:nodevar
+        z(i)=soln.y(j,i);
+    end
+    h=ode_obs(z);
+    for i=1:nobs
+        obs(j,i)=h(i);
+    end
+end
+if nobs==1
+   y = interp1(soln.x, obs, t, 'pchip')';
+else
+   y = interp1(soln.x, obs, t, 'pchip');
+end
+
+
+filename = 'data.out';
+fid = fopen (filename,'w');
+fprintf(fid,'# KaDE ../../cflows/abc/abc.ka -d output -t 1 -p 100\n')
+fprintf(fid,'# t')
+fprintf(fid,' |AB|')
+fprintf(fid,' |Cuu|')
+fprintf(fid,' |Cpu|')
+fprintf(fid,' |Cpp|')
+fprintf(fid,'\n')
+for j=1:num_t_point+1
+    fprintf(fid,'%f',t(j));
+    for i=1:nobs
+        fprintf(fid,' %f',y(j,i));
+    end
+    fprintf(fid,'\n');
+end
+fclose(fid);
+
+
+end
+
+
+
+function dydt=ode_aux(t,y)
+
+global nodevar
+global var
+global k
+global kd
+global kun
+global kdun
+
+var(7)=(0+(1*y(10)));
+var(6)=(0+(1*((y(7)+y(8))+y(9))));
+var(5)=(0+(1*((y(1)+y(5))+y(6))));
+var(4)=(0+(1*((y(4)+y(5))+y(9))));
+
+
+dydt=zeros(nodevar,1);
+dydt(6)=dydt(6)-k(3)*y(6);
+dydt(7)=dydt(7)+k(3)*y(6);
+dydt(2)=dydt(2)+k(3)*y(6);
+dydt(6)=dydt(6)-k(6)*y(6)*y(3);
+dydt(3)=dydt(3)-k(6)*y(6)*y(3);
+dydt(5)=dydt(5)+k(6)*y(6)*y(3);
+dydt(9)=dydt(9)-k(5)*y(9);
+dydt(3)=dydt(3)+k(5)*y(9);
+dydt(8)=dydt(8)+k(5)*y(9);
+dydt(8)=dydt(8)-k(1)*y(8);
+dydt(10)=dydt(10)+k(1)*y(8);
+dydt(2)=dydt(2)+k(1)*y(8);
+dydt(8)=dydt(8)-k(6)*y(8)*y(3);
+dydt(3)=dydt(3)-k(6)*y(8)*y(3);
+dydt(9)=dydt(9)+k(6)*y(8)*y(3);
+dydt(2)=dydt(2)-k(2)*y(2)*y(7);
+dydt(7)=dydt(7)-k(2)*y(2)*y(7);
+dydt(8)=dydt(8)+k(2)*y(2)*y(7);
+dydt(5)=dydt(5)-k(3)*y(5);
+dydt(7)=dydt(7)+k(3)*y(5);
+dydt(4)=dydt(4)+k(3)*y(5);
+dydt(5)=dydt(5)-k(5)*y(5);
+dydt(3)=dydt(3)+k(5)*y(5);
+dydt(6)=dydt(6)+k(5)*y(5);
+dydt(4)=dydt(4)-k(4)*y(4)*y(1);
+dydt(1)=dydt(1)-k(4)*y(4)*y(1);
+dydt(5)=dydt(5)+k(4)*y(4)*y(1);
+dydt(4)=dydt(4)-k(5)*y(4);
+dydt(3)=dydt(3)+k(5)*y(4);
+dydt(2)=dydt(2)+k(5)*y(4);
+dydt(2)=dydt(2)-k(6)*y(2)*y(3);
+dydt(3)=dydt(3)-k(6)*y(2)*y(3);
+dydt(4)=dydt(4)+k(6)*y(2)*y(3);
+dydt(11)=1;
+
+end
+
+
+function Init=ode_init()
+
+global nodevar
+global init
+Init=zeros(nodevar,1);
+
+Init(1) = init(1);
+Init(2) = init(2);
+Init(3) = init(3);
+Init(4) = init(4);
+Init(5) = init(5);
+Init(6) = init(6);
+Init(7) = init(7);
+Init(8) = init(8);
+Init(9) = init(9);
+Init(10) = init(10);
+Init(11) = init(11);
+end
+
+
+function obs=ode_obs(y)
+
+global nobs
+global var
+obs = zeros(nobs,1);
+
+t = y(11);
+var(7)=(0+(1*y(10)));
+var(6)=(0+(1*((y(7)+y(8))+y(9))));
+var(5)=(0+(1*((y(1)+y(5))+y(6))));
+var(4)=(0+(1*((y(4)+y(5))+y(9))));
+
+obs(1)=var(4);
+obs(2)=var(5);
+obs(3)=var(6);
+obs(4)=var(7);
+
+end
+
+
+main();
