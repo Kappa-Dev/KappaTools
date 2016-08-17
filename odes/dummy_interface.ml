@@ -1,8 +1,34 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 16 2016>
+  * Last modification: Time-stamp: <Aug 17 2016>
 *)
 
+type compil =
+  {
+    contact_map: (int list * (int * int) list) array array ;
+    environment: Environment.t ;
+    init: (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
+  }
+
+type cache = Connected_component.PreEnv.t
+type hidden_init = Primitives.elementary_rule
+type init = (Alg_expr.t * hidden_init * Location.t) list
+
+let get_init compil= compil.init
+
+let lift_opt f compil_opt =
+  match
+    compil_opt
+  with
+  | None -> None
+  | Some a -> Some (f a)
+
+let contact_map compil = compil.contact_map
+let environment compil = compil.environment
+let sigs compil = Environment.signatures (environment compil)
+
+let sigs_opt = lift_opt sigs
+let environment_opt = lift_opt environment
 type mixture = Edges.t(* not necessarily connected, fully specified *)
 type chemical_species = Connected_component.cc
 (* connected, fully specified *)
@@ -12,10 +38,14 @@ type pattern = Connected_component.cc array
 type connected_component = Connected_component.cc
 (* connected, maybe partially specified *)
 
-let dummy_chemical_species sigs = Connected_component.empty_cc sigs
+let dummy_chemical_species compil =
+  Connected_component.empty_cc (sigs compil)
 
 let do_we_divide_rates_by_n_auto_in_lhs = true
-let print_chemical_species ?sigs = Connected_component.print ?sigs ?with_id:None
+
+let print_chemical_species ?compil =
+  Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
+
 let print_canonic_species = print_chemical_species
 
 let nbr_automorphisms_in_chemical_species x =
@@ -34,14 +64,16 @@ let nbr_automorphisms_in_pattern a =
     aux 1 acc 1 a'.(0)
 
 let compare_connected_component = Connected_component.compare_canonicals
-let print_connected_component ?sigs =
-  Connected_component.print ?sigs ?with_id:None
+let print_connected_component ?compil =
+  Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
 
 let canonic_form x = x
 
 let connected_components_of_patterns = Array.to_list
 
-let connected_components_of_mixture sigs contact_map cache e =
+let connected_components_of_mixture compil cache e =
+  let contact_map = contact_map compil in
+  let sigs = sigs compil in
   let snap = Edges.build_snapshot sigs e in
   List.fold_left
     (fun (cache,acc) (i,m) ->
@@ -74,7 +106,8 @@ let find_embeddings_unary_binary p x =
     [Connected_component.Matching.empty]
     p
 
-let disjoint_union sigs l =
+let disjoint_union compil l =
+  let sigs = sigs compil in
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
   let _,em,mix =
     List.fold_left
@@ -124,10 +157,13 @@ let token_vector a =
        (Location.dummy_annot (Alg_expr.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
     add remove
 
+let token_vector_of_init = token_vector
 let print_rule_id log = Format.fprintf log "%i"
-let print_rule = Kappa_printer.elementary_rule
+let print_rule ?compil =
+  Kappa_printer.elementary_rule ?env:(environment_opt compil)
 
-let apply sigs rule inj_nodes mix =
+let apply compil rule inj_nodes mix =
+  let sigs = sigs compil in
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
                 (inj_nodes,Mods.IntMap.empty)) rule.Primitives.removed in
@@ -150,16 +186,17 @@ let apply sigs rule inj_nodes mix =
       (edges',concrete_inserted) remaining_side_effects in
   edges''
 
-let lift_species sigs x =
+let lift_species compil x =
   fst @@
   Connected_component.add_fully_specified_to_graph
-    sigs (Edges.empty ()) x
+    (sigs compil) (Edges.empty ()) x
 
-let get_rules env =
-  Environment.fold_rules (fun _ acc r -> r::acc) [] env
-let get_variables env = Environment.get_algs env
-let get_obs env =
-  Array.to_list @@ Environment.map_observables (fun r -> r) env
+let get_rules compil =
+  Environment.fold_rules
+    (fun _ acc r -> r::acc) [] (environment compil)
+let get_variables compil = Environment.get_algs (environment compil)
+let get_obs compil =
+  Array.to_list @@ Environment.map_observables (fun r -> r) (environment compil)
 
 let remove_escape_char =
   (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are moe knowledgeable *)
@@ -167,7 +204,8 @@ let remove_escape_char =
     (function '\'' -> '|' | x -> x)
 
 
-let get_obs_titles env =
+let get_obs_titles compil =
+  let env = environment compil in
   Array.to_list @@
   Environment.map_observables
     (fun x -> remove_escape_char
@@ -178,4 +216,17 @@ let get_obs_titles env =
 let get_compil common_args cli_args =
   let (env,_,contact_map,_,_,_,_,init),_,_ =
     Cli_init.get_compilation common_args cli_args in
-  env,contact_map,init
+  {environment = env ;
+   contact_map = contact_map ;
+   init = init}
+
+let empty_cache compil =
+  Connected_component.PreEnv.empty (sigs compil)
+
+let mixture_of_init compil c =
+  let _,emb,m = disjoint_union compil [] in
+  let m = apply compil c emb m in
+  m
+
+let nb_tokens compil =
+  Environment.nb_tokens (environment compil)

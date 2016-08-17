@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 29 2016>
+  * Last modification: Time-stamp: <Aug 17 2016>
 *)
 
 module A = Odes.Make (Dummy_interface)
@@ -87,8 +87,8 @@ let main () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
-    let (env,contact_map,init) = A.get_compil common_args cli_args in
-    let network = A.network_from_compil env contact_map init in
+    let compil = A.get_compil common_args cli_args in
+    let network = A.network_from_compil compil in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
     let () = A.export_network
@@ -98,7 +98,7 @@ let main () =
         ~init_t:cli_args.Run_cli_args.minTimeValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxTimeValue)
         ~nb_points:cli_args.Run_cli_args.pointNumberValue
-        logger env network
+        logger compil network
     in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in

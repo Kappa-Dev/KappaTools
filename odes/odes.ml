@@ -22,7 +22,7 @@ struct
       (struct
         type t = I.chemical_species
         let compare = compare
-        let print = I.print_chemical_species ?sigs:None
+        let print = I.print_chemical_species ?compil:None
       end)
   module SpeciesSet = SpeciesSetMap.Set
   module SpeciesMap = SpeciesSetMap.Map
@@ -44,7 +44,7 @@ struct
               "Component_wise:(%a,%i,%a)"
               I.print_rule_id r
               cc_id
-              (I.print_connected_component ?sigs:None) cc
+              (I.print_connected_component ?compil:None) cc
           in
           let () = I.print_rule_id a r in
           let () = Format.fprintf a "cc_id: %i \n" cc_id in
@@ -120,7 +120,7 @@ struct
 
       species_tab: I.chemical_species Mods.DynArray.t ;
 
-      cc_cache: Connected_component.PreEnv.t;
+      cc_cache: I.cache ;
 
       varmap: var_id Mods.IntMap.t ;
       tokenmap: ode_var_id Mods.IntMap.t ;
@@ -156,15 +156,16 @@ struct
       b a
 
   let get_compil = I.get_compil
-  let init sigs =
+  let init compil =
     {
       rules = [] ;
       reactions = [] ;
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
       id_of_ode_var = VarMap.empty ;
-      species_tab = Mods.DynArray.create 0 (I.dummy_chemical_species sigs) ;
-      cc_cache = Connected_component.PreEnv.empty sigs;
+      species_tab = Mods.DynArray.create 0
+          (I.dummy_chemical_species compil) ;
+      cc_cache = I.empty_cache compil ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
       varmap = Mods.IntMap.empty ;
@@ -248,7 +249,7 @@ struct
     in
     StoreMap.add key new_list store
 
-  let translate_canonic_species sigs canonic species remanent =
+  let translate_canonic_species compil canonic species remanent =
     let id_opt =
       VarMap.find_option
         (Nembed canonic)
@@ -259,9 +260,9 @@ struct
     | None ->
       let () = debug "A NEW SPECIES IS DISCOVERED @." in
       let () = debug "canonic form: %a@."
-          (I.print_canonic_species ~sigs) canonic in
+          (I.print_canonic_species ~compil) canonic in
       let () = debug "species: %a@.@."
-          (I.print_chemical_species ~sigs) species in
+          (I.print_chemical_species ~compil) species in
       let to_be_visited, network = remanent in
       let network, id = add_new_canonic_species canonic species network
       in
@@ -269,13 +270,13 @@ struct
     | Some i ->
       let () = debug "ALREADY SEEN SPECIES @." in
       let () = debug "canonic form: %a@."
-          (I.print_canonic_species ~sigs) canonic in
+          (I.print_canonic_species ~compil) canonic in
       let () = debug "species: %a@.@."
-          (I.print_chemical_species ~sigs) species in
+          (I.print_chemical_species ~compil) species in
       remanent,i
 
-  let translate_species sigs species remanent =
-    translate_canonic_species sigs
+  let translate_species compil species remanent =
+    translate_canonic_species compil
       (I.canonic_form species) species remanent
 
   let translate_token token remanent =
@@ -290,24 +291,24 @@ struct
       (to_be_visited, network), id
     | Some i -> remanent, i
 
-  (*  let petrify_canonic_species = translate_canonic_species*)
-  let petrify_species sigs species =
-    translate_canonic_species sigs
+  let petrify_species compil species =
+    translate_canonic_species compil
       (I.canonic_form species) species
-  let petrify_species_list sigs l remanent =
+  let petrify_species_list compil l remanent =
     fold_left_swap
       (fun species (remanent,l) ->
          let remanent, i =
-           petrify_species sigs species remanent
+           petrify_species compil species remanent
          in
          remanent,(i::l))
       l
       (remanent,[])
 
-  let petrify_mixture sigs contact_map mixture (acc,network) =
-    let cc_cache',species = I.connected_components_of_mixture
-        sigs contact_map network.cc_cache mixture in
-    petrify_species_list sigs species (acc,{network with cc_cache = cc_cache'})
+  let petrify_mixture compil mixture (acc,network) =
+    let cc_cache',species =
+      I.connected_components_of_mixture
+        compil network.cc_cache mixture in
+    petrify_species_list compil species (acc,{network with cc_cache = cc_cache'})
 
   let add_to_prefix_list connected_component key prefix_list store acc =
     let list_embeddings =
@@ -384,16 +385,16 @@ struct
       |Alg_expr.STATE_ALG_OP _),_ as a -> a
 
   let add_reaction
-      sigs contact_map enriched_rule embedding_forest mixture remanent =
+      compil enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
     let _  = debug "REACTANTS\n" in
     let remanent, reactants =
-      petrify_mixture sigs contact_map mixture remanent in
+      petrify_mixture compil mixture remanent in
     let _  = debug "PRODUCT\n" in
-    let products = I.apply sigs rule embedding_forest mixture in
+    let products = I.apply compil rule embedding_forest mixture in
     let tokens = I.token_vector rule in
     let remanent, products =
-      petrify_mixture sigs contact_map products remanent in
+      petrify_mixture compil products remanent in
     let remanent, tokens =
       List.fold_left
         (fun (remanent, tokens) (a,b) ->
@@ -414,25 +415,24 @@ struct
     in
     to_be_visited, network
 
-  let initial_network sigs contact_map network initial_states rules =
+  let initial_network compil network initial_states rules =
     List.fold_left
       (fun remanent enriched_rule ->
          match enriched_rule.lhs_cc with
          | [] ->
            begin
-             let _,embed,mixture = I.disjoint_union sigs [] in
+             let _,embed,mixture = I.disjoint_union compil [] in
              let () = debug "add new reaction" in
-             add_reaction sigs contact_map enriched_rule embed mixture remanent
+             add_reaction compil enriched_rule embed mixture remanent
            end
          | _::_ -> remanent
       )
       (List.fold_left
-         (fun remanent species -> fst (translate_species sigs species remanent))
+         (fun remanent species -> fst (translate_species compil species remanent))
          ([],network)
          initial_states) rules
 
-  let compute_reactions env contact_map network rules initial_states =
-    let sigs =Environment.signatures env in
+  let compute_reactions compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let _,rules =
@@ -449,7 +449,8 @@ struct
     let rules = List.rev rules in
     let to_be_visited, network =
       initial_network
-        sigs contact_map network initial_states rules in
+        compil network initial_states rules
+    in
     let network =
       {network
        with n_rules = pred n_rules;
@@ -465,18 +466,17 @@ struct
 
       | new_species::to_be_visited ->
         let () = debug "@[<v 2>@[test for the new species:@ %a@]"
-            (I.print_chemical_species ~sigs) new_species in
+            (I.print_chemical_species ~compil) new_species in
         (* add in store the embeddings from cc of lhs to new_species,
            for unary application of binary rule, the dictionary of species is updated, and the reaction entered directly *)
         let store, to_be_visited, network  =
           List.fold_left
             (fun
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
-              (*  (rule_id,rule,mode,lhs,lhs_cc)*)
-              (* regular application of tules, we store the embeddings*)
+            (* regular application of tules, we store the embeddings*)
               let () = debug "@[<v 2>test for rule %i @[%a@]"
                   enriched_rule.rule_id
-                  (I.print_rule ~env) enriched_rule.rule in
+                  (I.print_rule ~compil) enriched_rule.rule in
               let arity = enriched_rule.mode in
               match arity with
               | I.Usual ->
@@ -516,11 +516,11 @@ struct
                       StoreMap.iter
                         (fun (a,id,b) c ->
                            let () = debug "@[<v 2>* rule:%i cc:%i:@[%a@]:" a id
-                               (I.print_connected_component ~sigs) b
+                               (I.print_connected_component ~compil) b
                            in
                            let () =
                              List.iter (fun (_,b) -> debug "%a"
-                                           (I.print_chemical_species ~sigs) b) c
+                                           (I.print_chemical_species ~compil) b) c
                            in
                            let () = debug "@]" in
                            ()
@@ -563,12 +563,13 @@ struct
                          let () = debug "compute one refinement" in
                          let () = debug "disjoint union @[<v>%a@]"
                              (Pp.list Pp.space (fun f (_,_,s) ->
-                                  I.print_chemical_species ~sigs f s))
+                                  I.print_chemical_species ~compil f s))
                              list
                          in
-                         let _,embed,mixture = I.disjoint_union sigs list in
+                         let _,embed,mixture = I.disjoint_union compil list in
                          let () = debug "add new reaction" in
-                         add_reaction sigs contact_map enriched_rule embed mixture remanent)
+                         add_reaction
+                           compil enriched_rule embed mixture remanent)
                       (to_be_visited,network)
                       new_embedding_list
                   in
@@ -580,13 +581,13 @@ struct
                 begin
                   (* unary application of binary rules *)
                   let () = debug "unary case" in
-
                   let to_be_visited, network =
                     let lembed = I.find_embeddings_unary_binary enriched_rule.lhs new_species in
                     fold_left_swap
                       (fun embed ->
-                         add_reaction sigs contact_map enriched_rule embed
-                           (I.lift_species sigs new_species))
+                         add_reaction
+                           compil  enriched_rule embed
+                           (I.lift_species compil new_species))
                       lembed
                       (to_be_visited, network)
                   in
@@ -604,30 +605,30 @@ struct
     let () = debug "@]@." in
     o
 
-  let convert_tokens env network =
+  let convert_tokens compil network =
     Tools.recti
       (fun network a ->
          snd (fst (translate_token a ([],network))))
       network
-      (Environment.nb_tokens env)
+      (I.nb_tokens compil)
 
   let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
   let get_reactions network = network.reactions
 
-  let convert_initial_state sigs contact_map intro network =
+  let convert_initial_state compil intro network =
     let b,c,a = intro in
     convert_alg_expr (b,a) network,
-    match I.token_vector c with
+    match I.token_vector_of_init c with
     | [] ->
-      let _,emb,m = I.disjoint_union sigs [] in
-      let m = I.apply sigs c emb m in
+      let m = I.mixture_of_init compil c in
       let cc_cache',cc =
-        I.connected_components_of_mixture sigs contact_map network.cc_cache m in
+        I.connected_components_of_mixture compil network.cc_cache m
+      in
       let network = {network with cc_cache = cc_cache'} in
       List.fold_left
         (fun (network,acc) x ->
-           let (_,n'),v = translate_species sigs x ([],network) in n',v::acc)
+           let (_,n'),v = translate_species compil x ([],network) in n',v::acc)
         (network,[]) (List.rev cc)
     | l ->
       List.fold_right (fun (_,token) (network,acc) ->
@@ -640,8 +641,9 @@ struct
     let a,b = variable_def in
     a,convert_alg_expr b network
 
-  let convert_var_defs env contact_map init network =
-    let list_var = I.get_variables env in
+  let convert_var_defs compil network =
+    let list_var = I.get_variables compil in
+    let init = I.get_init compil in
     let list, network =
       Tools.array_fold_lefti
         (fun i (list,network) def ->
@@ -667,7 +669,7 @@ struct
       List.fold_left
         (fun (list,network) def ->
            let b,(network,c) =
-             convert_initial_state (Environment.signatures env) contact_map def network in
+             convert_initial_state compil def network in
            let () =
              List.iter
                (fun id -> add id (get_fresh_var_id network))
@@ -792,13 +794,13 @@ struct
      n_obs = network.n_obs - 1}
 
 
-  let species_of_initial_state sigs contact_map cc_cache =
+  let species_of_initial_state compil cc_cache =
     List.fold_left
       (fun (cc_cache,list) (_,r,_) ->
-         let _,emb,m = I.disjoint_union sigs [] in
-         let b = I.apply sigs r emb m in
-         let cc_cache',acc =
-           I.connected_components_of_mixture sigs contact_map cc_cache b in
+         let b = I.mixture_of_init compil r in
+          let cc_cache',acc =
+           I.connected_components_of_mixture compil cc_cache b
+         in
          cc_cache',List.rev_append acc list)
       (cc_cache,[])
 
@@ -920,24 +922,25 @@ struct
   let split_rules_and_decl network =
     split_rules network (split_var_declaration network init_sort_rules_and_decl)
 
-  let network_from_compil env contact_map initial =
+  let network_from_compil compil =
     let () = Format.printf "+ generate the network... @." in
-    let rules = I.get_rules env in
-    let network = init (Environment.signatures env) in
+    let rules = I.get_rules compil in
+    let network = init compil in
     let () = Format.printf "\t -initial states @." in
     let cc_cache,initial_state =
-      species_of_initial_state
-        (Environment.signatures env) contact_map network.cc_cache initial in
+      species_of_initial_state compil network.cc_cache
+        (I.get_init compil)
+    in
     let network = {network with cc_cache = cc_cache} in
     let () = Format.printf "\t -saturating the set of molecular species @." in
     let network =
-      compute_reactions env contact_map network rules initial_state in
+      compute_reactions compil network rules initial_state in
     let () = Format.printf "\t -tokens @." in
-    let network = convert_tokens env network in
+    let network = convert_tokens compil network in
     let () = Format.printf "\t -variables @." in
-    let network = convert_var_defs env contact_map initial network in
+    let network = convert_var_defs compil network in
     let () = Format.printf "\t -observables @." in
-    let network = convert_obs env network in
+    let network = convert_obs compil network in
     network
 
   let handler_init =
