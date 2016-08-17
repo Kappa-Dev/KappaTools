@@ -27,19 +27,27 @@ struct
   module SpeciesSet = SpeciesSetMap.Set
   module SpeciesMap = SpeciesSetMap.Map
 
+  type connected_component_id = int
+  let fst_cc_id = 1
+  let next_cc_id = succ
   module Store =
     SetMap.Make
       (struct
-        type t = I.rule_id * I.connected_component
-        let compare (a,c) (a',c') =
-          let x = compare a a' in
+        type t =
+          I.rule_id * connected_component_id * I.connected_component
+        let compare (a,b,c) (a',b',c') =
+          let x = compare (a,b) (a',b') in
           if x <> 0 then x else I.compare_connected_component c c'
-        let print a (r,cc) =
+        let print a (r,cc_id,cc) =
           let () =
             Format.fprintf a
-              "Component_wise:(%a,%a)"
-              I.print_rule_id r (I.print_connected_component ?sigs:None) cc  in
+              "Component_wise:(%a,%i,%a)"
+              I.print_rule_id r
+              cc_id
+              (I.print_connected_component ?sigs:None) cc
+          in
           let () = I.print_rule_id a r in
+          let () = Format.fprintf a "cc_id: %i \n" cc_id in
           I.print_connected_component a cc
       end)
 
@@ -89,7 +97,7 @@ struct
       rule: I.rule ;
       mode: I.arity ;
       lhs: I.pattern ;
-      lhs_cc: I.connected_component list ;
+      lhs_cc: (connected_component_id * I.connected_component) list ;
       divide_rate_by: int
     }
 
@@ -203,7 +211,14 @@ struct
 
   let enrich_rule rule mode id =
     let lhs = I.lhs rule in
-    let lhs_cc = I.connected_components_of_patterns lhs in
+    let _,lhs_cc =
+      List.fold_left
+        (fun (counter,list) cc ->
+           (next_cc_id counter,
+            (counter,cc)::list))
+        (fst_cc_id,[])
+        (List.rev (I.connected_components_of_patterns lhs))
+    in
     {
       rule_id = id ;
       rule = rule ;
@@ -469,11 +484,11 @@ struct
                   let () = debug "regular case" in
                   let store_new_embeddings =
                     List.fold_left
-                      (fun store cc ->
+                      (fun store (cc_id,cc) ->
                          let () = debug "find embeddings" in
                          let lembed = I.find_embeddings cc new_species in
                          add_embedding_list
-                           (enriched_rule.rule_id,cc)
+                           (enriched_rule.rule_id,cc_id,cc)
                            (List.rev_map (fun a -> a,new_species) (List.rev lembed))
                            store
                       )
@@ -499,8 +514,8 @@ struct
                     if local_trace || !Parameter.debugModeOn
                     then
                       StoreMap.iter
-                        (fun (a,b) c ->
-                           let () = debug "@[<v 2>* rule:%i cc:@[%a@]:" a
+                        (fun (a,id,b) c ->
+                           let () = debug "@[<v 2>* rule:%i cc:%i:@[%a@]:" a id
                                (I.print_connected_component ~sigs) b
                            in
                            let () =
@@ -522,18 +537,18 @@ struct
 
                   let _,new_embedding_list =
                     List.fold_left
-                      (fun (partial_emb_list,partial_emb_list_with_new_species) cc ->
+                      (fun (partial_emb_list,partial_emb_list_with_new_species) (cc_id,cc) ->
                          (* First case, we complete with an embedding towards the new_species *)
+                         let label = enriched_rule.rule_id,cc_id,cc in
                          let partial_emb_list_with_new_species =
-                           add_to_prefix_list cc (enriched_rule.rule_id,cc)
-                             partial_emb_list
+                           add_to_prefix_list cc label   partial_emb_list
                              store_new_embeddings
-                             (add_to_prefix_list cc (enriched_rule.rule_id,cc) partial_emb_list_with_new_species
+                             (add_to_prefix_list cc label partial_emb_list_with_new_species
                                 store_all_embeddings [])
                          in
                          let partial_emb_list =
                            add_to_prefix_list cc
-                             (enriched_rule.rule_id,cc) partial_emb_list store_old_embeddings []
+                             label partial_emb_list store_old_embeddings []
                          in
 
                          partial_emb_list, partial_emb_list_with_new_species
