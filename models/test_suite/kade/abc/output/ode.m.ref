@@ -33,12 +33,12 @@ var(8)=1000;
 var(10)=var(8);
 init(3)=var(10);
 init(2)=var(10);
-var(7)=(0+(1*init(10)));
-var(6)=(0+(1*((init(7)+init(8))+init(9))));
+var(7)=(0+(1*init(9)));
+var(6)=(0+(1*((init(6)+init(8))+init(10))));
 var(9)=10000;
 init(1)=var(9);
-var(5)=(0+(1*((init(1)+init(5))+init(6))));
-var(4)=(0+(1*((init(4)+init(5))+init(9))));
+var(5)=(0+(1*((init(1)+init(5))+init(7))));
+var(4)=(0+(1*((init(4)+init(5))+init(10))));
 var(3)=1;
 var(2)=0.100000;
 var(1)=0.001000;
@@ -48,12 +48,12 @@ global kd
 global kun
 global kdun
 
-k(6)=0.001000;
-k(5)=0.100000;
-k(4)=0.001000;
-k(3)=1;
-k(2)=0.001000;
 k(1)=1;
+k(2)=0.001000;
+k(3)=1;
+k(4)=0.001000;
+k(5)=0.100000;
+k(6)=0.001000;
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -141,37 +141,37 @@ global kd
 global kun
 global kdun
 
-var(7)=(0+(1*y(10)));
-var(6)=(0+(1*((y(7)+y(8))+y(9))));
-var(5)=(0+(1*((y(1)+y(5))+y(6))));
-var(4)=(0+(1*((y(4)+y(5))+y(9))));
+var(7)=(0+(1*y(9)));
+var(6)=(0+(1*((y(6)+y(8))+y(10))));
+var(5)=(0+(1*((y(1)+y(5))+y(7))));
+var(4)=(0+(1*((y(4)+y(5))+y(10))));
 
 
 dydt=zeros(nodevar,1);
-dydt(6)=dydt(6)-k(3)*y(6);
-dydt(7)=dydt(7)+k(3)*y(6);
-dydt(2)=dydt(2)+k(3)*y(6);
-dydt(6)=dydt(6)-k(6)*y(6)*y(3);
-dydt(3)=dydt(3)-k(6)*y(6)*y(3);
-dydt(5)=dydt(5)+k(6)*y(6)*y(3);
-dydt(9)=dydt(9)-k(5)*y(9);
-dydt(3)=dydt(3)+k(5)*y(9);
-dydt(8)=dydt(8)+k(5)*y(9);
-dydt(8)=dydt(8)-k(1)*y(8);
-dydt(10)=dydt(10)+k(1)*y(8);
-dydt(2)=dydt(2)+k(1)*y(8);
+dydt(10)=dydt(10)-k(5)*y(10);
+dydt(3)=dydt(3)+k(5)*y(10);
+dydt(8)=dydt(8)+k(5)*y(10);
 dydt(8)=dydt(8)-k(6)*y(8)*y(3);
 dydt(3)=dydt(3)-k(6)*y(8)*y(3);
-dydt(9)=dydt(9)+k(6)*y(8)*y(3);
-dydt(2)=dydt(2)-k(2)*y(2)*y(7);
-dydt(7)=dydt(7)-k(2)*y(2)*y(7);
-dydt(8)=dydt(8)+k(2)*y(2)*y(7);
-dydt(5)=dydt(5)-k(3)*y(5);
-dydt(7)=dydt(7)+k(3)*y(5);
-dydt(4)=dydt(4)+k(3)*y(5);
+dydt(10)=dydt(10)+k(6)*y(8)*y(3);
+dydt(8)=dydt(8)-k(1)*y(8);
+dydt(9)=dydt(9)+k(1)*y(8);
+dydt(2)=dydt(2)+k(1)*y(8);
+dydt(2)=dydt(2)-k(2)*y(2)*y(6);
+dydt(6)=dydt(6)-k(2)*y(2)*y(6);
+dydt(8)=dydt(8)+k(2)*y(2)*y(6);
+dydt(7)=dydt(7)-k(6)*y(7)*y(3);
+dydt(3)=dydt(3)-k(6)*y(7)*y(3);
+dydt(5)=dydt(5)+k(6)*y(7)*y(3);
+dydt(7)=dydt(7)-k(3)*y(7);
+dydt(6)=dydt(6)+k(3)*y(7);
+dydt(2)=dydt(2)+k(3)*y(7);
 dydt(5)=dydt(5)-k(5)*y(5);
 dydt(3)=dydt(3)+k(5)*y(5);
-dydt(6)=dydt(6)+k(5)*y(5);
+dydt(7)=dydt(7)+k(5)*y(5);
+dydt(5)=dydt(5)-k(3)*y(5);
+dydt(6)=dydt(6)+k(3)*y(5);
+dydt(4)=dydt(4)+k(3)*y(5);
 dydt(4)=dydt(4)-k(4)*y(4)*y(1);
 dydt(1)=dydt(1)-k(4)*y(4)*y(1);
 dydt(5)=dydt(5)+k(4)*y(4)*y(1);
@@ -213,10 +213,10 @@ global var
 obs = zeros(nobs,1);
 
 t = y(11);
-var(7)=(0+(1*y(10)));
-var(6)=(0+(1*((y(7)+y(8))+y(9))));
-var(5)=(0+(1*((y(1)+y(5))+y(6))));
-var(4)=(0+(1*((y(4)+y(5))+y(9))));
+var(7)=(0+(1*y(9)));
+var(6)=(0+(1*((y(6)+y(8))+y(10))));
+var(5)=(0+(1*((y(1)+y(5))+y(7))));
+var(4)=(0+(1*((y(4)+y(5))+y(10))));
 
 obs(1)=var(4);
 obs(2)=var(5);

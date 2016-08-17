@@ -431,6 +431,7 @@ struct
              list modes)
         (fst_id,[]) rules
     in
+    let rules = List.rev rules in
     let to_be_visited, network =
       initial_network
         sigs contact_map network initial_states rules in
@@ -503,7 +504,7 @@ struct
                                (I.print_connected_component ~sigs) b
                            in
                            let () =
-                             List.iter (fun (a,b) -> debug "%a"
+                             List.iter (fun (_,b) -> debug "%a"
                                            (I.print_chemical_species ~sigs) b) c
                            in
                            let () = debug "@]" in
