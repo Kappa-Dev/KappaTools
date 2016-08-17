@@ -165,6 +165,7 @@ dydt(2)=dydt(2)+k(5)*y(3);
 dydt(2)=dydt(2)-k(6)*y(2)*y(1);
 dydt(1)=dydt(1)-k(6)*y(2)*y(1);
 dydt(3)=dydt(3)+k(6)*y(2)*y(1);
+dydt(1)=dydt(1)+k(1);
 dydt(5)=1;
 
 end

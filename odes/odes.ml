@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 16 2016>
+  * Last modification: Time-stamp: <Aug 17 2016>
 *)
 
 let local_trace = false
@@ -234,7 +234,7 @@ struct
     StoreMap.add key new_list store
 
   let translate_canonic_species sigs canonic species remanent =
-  let id_opt =
+    let id_opt =
       VarMap.find_option
         (Nembed canonic)
         (snd remanent).id_of_ode_var in
@@ -399,11 +399,22 @@ struct
     in
     to_be_visited, network
 
-  let initial_network sigs network initial_states =
+  let initial_network sigs contact_map network initial_states rules =
     List.fold_left
-      (fun remanent species -> fst (translate_species sigs species remanent))
-      ([],network)
-      initial_states
+      (fun remanent enriched_rule ->
+         match enriched_rule.lhs_cc with
+         | [] ->
+           begin
+             let _,embed,mixture = I.disjoint_union sigs [] in
+             let () = debug "add new reaction" in
+             add_reaction sigs contact_map enriched_rule embed mixture remanent
+           end
+         | _::_ -> remanent
+      )
+      (List.fold_left
+         (fun remanent species -> fst (translate_species sigs species remanent))
+         ([],network)
+         initial_states) rules
 
   let compute_reactions env contact_map network rules initial_states =
     let sigs =Environment.signatures env in
@@ -420,7 +431,9 @@ struct
              list modes)
         (fst_id,[]) rules
     in
-    let to_be_visited, network = initial_network sigs network initial_states in
+    let to_be_visited, network =
+      initial_network
+        sigs contact_map network initial_states rules in
     let network =
       {network
        with n_rules = pred n_rules;
@@ -482,28 +495,28 @@ struct
                   in
                   (* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
                   let dump_store store =
-                  if local_trace || !Parameter.debugModeOn
-                  then
-                    StoreMap.iter
-                      (fun (a,b) c ->
-                         let () = debug "@[<v 2>* rule:%i cc:@[%a@]:" a
-                             (I.print_connected_component ~sigs) b
-                         in
-                         let () =
-                           List.iter (fun (a,b) -> debug "%a"
-                                        (I.print_chemical_species ~sigs) b) c
-                         in
-                         let () = debug "@]" in
-                         ()
-                      )
-                      store
+                    if local_trace || !Parameter.debugModeOn
+                    then
+                      StoreMap.iter
+                        (fun (a,b) c ->
+                           let () = debug "@[<v 2>* rule:%i cc:@[%a@]:" a
+                               (I.print_connected_component ~sigs) b
+                           in
+                           let () =
+                             List.iter (fun (a,b) -> debug "%a"
+                                           (I.print_chemical_species ~sigs) b) c
+                           in
+                           let () = debug "@]" in
+                           ()
+                        )
+                        store
                   in
                   let () = debug "new embeddings" in
                   let () = dump_store   store_new_embeddings in
                   (*  let () = debug "old embeddings" in
-                  let () = dump_store   store_old_embeddings in
+                      let () = dump_store   store_old_embeddings in
 
-                  let () = debug "all embeddings" in
+                      let () = debug "all embeddings" in
                       let () = dump_store   store_all_embeddings in*)
 
                   let _,new_embedding_list =
@@ -693,7 +706,7 @@ struct
            | Dummy_decl -> ()
            | Init_expr (id,b,_) ->
              let () = Mods.DynArray.set dec_tab id (decl,None,b)
-                 in aux id b
+             in aux id b
            | Var (id,a,b) ->
              let () = Mods.DynArray.set dec_tab id (decl,a,b) in
              aux id b) list in
@@ -972,7 +985,7 @@ struct
             list
       end
     | Var (id,_comment,expr) ->
-    Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
+      Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id) expr handler_expr
 
   let fresh_is_zero network =
     let is_zero = Mods.DynArray.create (get_fresh_ode_var_id network) true in
