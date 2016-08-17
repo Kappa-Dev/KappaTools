@@ -52,8 +52,8 @@ Priority
 Outputs
 Kappa_files
 
+Ode_interface_sig
 Ode_interface
-Dummy_interface
 Odes
 
 Analyzer
