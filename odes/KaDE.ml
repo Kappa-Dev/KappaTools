@@ -3,7 +3,7 @@
   * Last modification: Time-stamp: <Aug 17 2016>
 *)
 
-module A = Odes.Make (Dummy_interface)
+module A = Odes.Make (Ode_interface)
 
 let main () =
   let usage_msg =

@@ -10,7 +10,7 @@ let debug s =
       Format.err_formatter s
   else Format.ifprintf Format.err_formatter s
 
-module Make(I:Ode_interface.Interface) =
+module Make(I:Ode_interface_sig.Interface) =
 struct
 
   let alg_of_int i =

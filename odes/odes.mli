@@ -3,7 +3,7 @@
   * Last modification: Time-stamp: <Aug 17 2016>
 *)
 
-module Make(I:Ode_interface.Interface) :
+module Make(I:Ode_interface_sig.Interface) :
 sig
   type ode_var_id
   type 'a network
