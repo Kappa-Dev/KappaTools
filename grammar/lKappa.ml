@@ -838,6 +838,14 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
         raise
           (ExceptionDefn.Malformed_Decl
              ("A rule named '"^lab^"' already exists.",pos))
+      else if r.Ast.arrow = Ast.LRAR then
+        let set'' =
+          Mods.StringSet.add (Ast.flip_label lab) set' in
+        if set' == set'' then
+          raise
+            (ExceptionDefn.Malformed_Decl
+               ("A rule named '"^Ast.flip_label lab^"' already exists.",pos))
+        else (id,set''),lab
       else (id,set'),lab in
   let acc',k_def =
     if ast_alg_has_mix r.Ast.k_def then
