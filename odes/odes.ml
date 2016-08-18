@@ -1276,8 +1276,9 @@ struct
              then
                let rule_string =
                  Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule in
+               let () = Loggers.print_newline logger in
                let () =
-                 Ode_loggers.print_comment logger ("rule: "^rule_string)
+                 Ode_loggers.print_comment logger ("rule    : "^rule_string)
                in
                let () = Loggers.print_newline logger in
                let () = Ode_loggers.print_comment logger "reaction: "in
@@ -1314,6 +1315,7 @@ struct
                    to_nocc_correct compil nauto))
                (List.rev reactants)
            in
+           let () = Loggers.print_newline logger in 
            let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
            let () = do_it Ode_loggers.produce products reactants' enriched_rule in
            let () =

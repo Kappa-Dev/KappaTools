@@ -142,53 +142,73 @@ var(1)=((1*(2*y(6)))/2);
 
 
 dydt=zeros(nodevar,1);
-%rule: A(x!1), B(x!1) -> A(x), B(x)
+
+%rule    : A(x!1), B(x!1) -> A(x), B(x)
 %reaction: A(x!1), B(x!1) -> A(x) + B(x)
+
 dydt(7)=dydt(7)-k(8)*y(7);
 dydt(1)=dydt(1)+k(8)*y(7);
 dydt(2)=dydt(2)+k(8)*y(7);
-%rule: A(x), B(x) -> A(x!1), B(x!1)
+
+%rule    : A(x), B(x) -> A(x!1), B(x!1)
 %reaction: B(x) + A(x) -> A(x!1), B(x!1)
+
 dydt(2)=dydt(2)-k(7)*y(2)*y(1);
 dydt(1)=dydt(1)-k(7)*y(2)*y(1);
 dydt(7)=dydt(7)+k(7)*y(2)*y(1);
-%rule: R(r!_) -> R(r)
+
+%rule    : R(r!_) -> R(r)
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+
 dydt(6)=dydt(6)-2*k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
-%rule: R(r!_) -> R(r)
+
+%rule    : R(r!_) -> R(r)
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+
 dydt(6)=dydt(6)-2*k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
-%rule: R(r!_) -> 
+
+%rule    : R(r!_) -> 
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r) + E(r!1), R(e!1, r)
+
 dydt(6)=dydt(6)-2*k(4)*y(6)/2;
 dydt(5)=dydt(5)+k(4)*y(6)/2;
 dydt(4)=dydt(4)+k(4)*y(6)/2;
-%rule: R(r!_) -> 
+
+%rule    : R(r!_) -> 
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r)
+
 dydt(6)=dydt(6)-2*k(4)*y(6)/2;
 dydt(4)=dydt(4)+k(4)*y(6)/2;
 dydt(5)=dydt(5)+k(4)*y(6)/2;
-%rule: R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+
+%rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 %reaction: E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
+
 dydt(5)=dydt(5)-k(3)*y(5)*y(5);
 dydt(5)=dydt(5)-k(3)*y(5)*y(5);
 dydt(6)=dydt(6)+2*k(3)*y(5)*y(5);
-%rule: E(r!1), R(e!1,r) -> E(r), R(e,r)
+
+%rule    : E(r!1), R(e!1,r) -> E(r), R(e,r)
 %reaction: E(r!1), R(e!1, r) -> E(r) + R(e, r)
+
 dydt(5)=dydt(5)-k(2)*y(5);
 dydt(3)=dydt(3)+k(2)*y(5);
 dydt(4)=dydt(4)+k(2)*y(5);
-%rule: E(r), R(e) -> E(r!1), R(e!1)
+
+%rule    : E(r), R(e) -> E(r!1), R(e!1)
 %reaction: R(e, r) + E(r) -> E(r!1), R(e!1, r)
+
 dydt(4)=dydt(4)-k(1)*y(4)*y(3);
 dydt(3)=dydt(3)-k(1)*y(4)*y(3);
 dydt(5)=dydt(5)+k(1)*y(4)*y(3);
-%rule:  -> R(e,r)
+
+%rule    :  -> R(e,r)
 %reaction:  -> R(e, r)
+
 dydt(3)=dydt(3)+k(6);
 dydt(8)=1;
 

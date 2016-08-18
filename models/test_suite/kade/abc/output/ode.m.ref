@@ -151,58 +151,80 @@ var(4)=(1*((y(4)+y(5))+y(9)));
 
 
 dydt=zeros(nodevar,1);
-%rule: mod x1
+
+%rule    : mod x1
 %reaction: A(x, c!1), C(x1~u!1, x2~u) -> A(x, c) + C(x1~p, x2~u)
+
 dydt(6)=dydt(6)-k(4)*y(6);
 dydt(7)=dydt(7)+k(4)*y(6);
 dydt(2)=dydt(2)+k(4)*y(6);
-%rule: a.b
+
+%rule    : a.b
 %reaction: B(x) + A(x, c!1), C(x1~u!1, x2~u) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
+
 dydt(6)=dydt(6)-k(1)*y(6)*y(3);
 dydt(3)=dydt(3)-k(1)*y(6)*y(3);
 dydt(5)=dydt(5)+k(1)*y(6)*y(3);
-%rule: a.b_op
+
+%rule    : a.b_op
 %reaction: A(x!1, c!2), B(x!1), C(x1~p, x2~u!2) -> A(x, c!1), C(x1~p, x2~u!1) + B(x)
+
 dydt(9)=dydt(9)-k(2)*y(9);
 dydt(3)=dydt(3)+k(2)*y(9);
 dydt(8)=dydt(8)+k(2)*y(9);
-%rule: mod x2
+
+%rule    : mod x2
 %reaction: A(x, c!1), C(x1~p, x2~u!1) -> A(x, c) + C(x1~p, x2~p)
+
 dydt(8)=dydt(8)-k(6)*y(8);
 dydt(10)=dydt(10)+k(6)*y(8);
 dydt(2)=dydt(2)+k(6)*y(8);
-%rule: a.b
+
+%rule    : a.b
 %reaction: B(x) + A(x, c!1), C(x1~p, x2~u!1) -> A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)
+
 dydt(8)=dydt(8)-k(1)*y(8)*y(3);
 dydt(3)=dydt(3)-k(1)*y(8)*y(3);
 dydt(9)=dydt(9)+k(1)*y(8)*y(3);
-%rule: a.c
+
+%rule    : a.c
 %reaction: C(x1~p, x2~u) + A(x, c) -> A(x, c!1), C(x1~p, x2~u!1)
+
 dydt(2)=dydt(2)-k(5)*y(2)*y(7);
 dydt(7)=dydt(7)-k(5)*y(2)*y(7);
 dydt(8)=dydt(8)+k(5)*y(2)*y(7);
-%rule: mod x1
+
+%rule    : mod x1
 %reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x!1, c), B(x!1) + C(x1~p, x2~u)
+
 dydt(5)=dydt(5)-k(4)*y(5);
 dydt(7)=dydt(7)+k(4)*y(5);
 dydt(4)=dydt(4)+k(4)*y(5);
-%rule: a.b_op
+
+%rule    : a.b_op
 %reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x, c!1), C(x1~u!1, x2~u) + B(x)
+
 dydt(5)=dydt(5)-k(2)*y(5);
 dydt(3)=dydt(3)+k(2)*y(5);
 dydt(6)=dydt(6)+k(2)*y(5);
-%rule: ab.c
+
+%rule    : ab.c
 %reaction: C(x1~u, x2~u) + A(x!1, c), B(x!1) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
+
 dydt(4)=dydt(4)-k(3)*y(4)*y(1);
 dydt(1)=dydt(1)-k(3)*y(4)*y(1);
 dydt(5)=dydt(5)+k(3)*y(4)*y(1);
-%rule: a.b_op
+
+%rule    : a.b_op
 %reaction: A(x!1, c), B(x!1) -> A(x, c) + B(x)
+
 dydt(4)=dydt(4)-k(2)*y(4);
 dydt(3)=dydt(3)+k(2)*y(4);
 dydt(2)=dydt(2)+k(2)*y(4);
-%rule: a.b
+
+%rule    : a.b
 %reaction: B(x) + A(x, c) -> A(x!1, c), B(x!1)
+
 dydt(2)=dydt(2)-k(1)*y(2)*y(3);
 dydt(3)=dydt(3)-k(1)*y(2)*y(3);
 dydt(4)=dydt(4)+k(1)*y(2)*y(3);
