@@ -43,6 +43,8 @@ models/test_suite/*/*/output/*.diff
 models/test_suite/*/*/output/*.dot
 models/test_suite/*/*/output/*.dat
 models/test_suite/*/*/output/*.ka
+models/test_suite/*/*/output/*.json
+models/test_suite/*/*/output/ode.m
 models/test_suite/*/*/output/data.out
 models/test_suite/*/*/output/data.svg
 models/test_suite/*/*/output/LOG
