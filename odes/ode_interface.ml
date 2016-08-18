@@ -189,28 +189,6 @@ let rate _compil rule (_,arity,_) =
   | Usual -> Some rule.Primitives.rate
   | Unary -> Tools.option_map fst rule.Primitives.unary_rate
 
-let rate_name compil rule rule_id =
-  let _env = environment compil in
-  let _id = rule.Primitives.syntactic_rule in
-  let (kade_id,arity,direction) = rule_id in
-  let arity_tag =
-    match arity with
-    | Usual -> ""
-    | Unary -> "(unary context)"
-  in
-  let direction_tag =
-    match direction with
-    | Direct -> ""
-    | Op -> "(op)"
-  in
-  let rule_name = (* Pierre, could you help me here please ? *)
-    (* I would need the base label of the rule *)
-    (* ex: 'A.B' A(x),B(x) <-> A(x!1),B(x!1) @ 1(2),3(4) *)
-    (* I am expecting "A.B" whatever the value of the variables arity or direct is *)
-    "Rule "^(string_of_int kade_id)
-  in
-  rule_name^arity_tag^direction_tag
-
 let token_vector a =
   let add,remove  =
     a.Primitives.injected_tokens,a.Primitives.consumed_tokens
@@ -224,6 +202,25 @@ let token_vector_of_init = token_vector
 let print_rule_id log = Format.fprintf log "%i"
 let print_rule ?compil =
   Kappa_printer.elementary_rule ?env:(environment_opt compil)
+let print_rule_name ?compil f r =
+  let env = environment_opt compil in
+  let id = r.Primitives.syntactic_rule in
+  Environment.print_ast_rule ?env f id
+
+let rate_name compil rule rule_id =
+  let (_kade_id,arity,direction) = rule_id in
+  let arity_tag =
+    match arity with
+    | Usual -> ""
+    | Unary -> "(unary context)"
+  in
+  let direction_tag =
+    match direction with
+    | Direct -> ""
+    | Op -> "(op)"
+  in
+  Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
+    arity_tag direction_tag
 
 let apply compil rule inj_nodes mix =
   let sigs = sigs compil in

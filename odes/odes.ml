@@ -1274,7 +1274,8 @@ struct
            let () =
              if I.do_we_prompt_reactions compil
              then
-               let rule_string = "(coming soon)" in
+               let rule_string =
+                 Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule in
                let () =
                  Ode_loggers.print_comment logger ("rule: "^rule_string)
                in
