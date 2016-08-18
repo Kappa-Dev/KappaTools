@@ -8,6 +8,9 @@ function main=main()
 %% tend - the final simulation time 
 %% initialstep - initial time step at the beginning of numerical integration
 %% num_t_point - the number of time points to return
+%%
+%% variables (init(i),y(i)) denote numbers of embeddings 
+%% rule rates are not corrected by the number of automorphisms in the lhs of rules
 
 
 tinit=0.000000;
@@ -139,52 +142,52 @@ var(1)=((1*(2*y(6)))/2);
 
 
 dydt=zeros(nodevar,1);
-%rule: 
+%rule: (coming soon)
 %reaction: A(x!1), B(x!1) -> A(x) + B(x)
 dydt(7)=dydt(7)-k(8)*y(7);
 dydt(1)=dydt(1)+k(8)*y(7);
 dydt(2)=dydt(2)+k(8)*y(7);
-%rule: 
+%rule: (coming soon)
 %reaction: B(x) + A(x) -> A(x!1), B(x!1)
 dydt(2)=dydt(2)-k(7)*y(2)*y(1);
 dydt(1)=dydt(1)-k(7)*y(2)*y(1);
 dydt(7)=dydt(7)+k(7)*y(2)*y(1);
-%rule: 
+%rule: (coming soon)
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
 dydt(6)=dydt(6)-2*k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
-%rule: 
+%rule: (coming soon)
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
 dydt(6)=dydt(6)-2*k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
-%rule: 
+%rule: (coming soon)
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r) + E(r!1), R(e!1, r)
 dydt(6)=dydt(6)-2*k(4)*y(6)/2;
 dydt(5)=dydt(5)+k(4)*y(6)/2;
 dydt(4)=dydt(4)+k(4)*y(6)/2;
-%rule: 
+%rule: (coming soon)
 %reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r)
 dydt(6)=dydt(6)-2*k(4)*y(6)/2;
 dydt(4)=dydt(4)+k(4)*y(6)/2;
 dydt(5)=dydt(5)+k(4)*y(6)/2;
-%rule: 
+%rule: (coming soon)
 %reaction: E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
 dydt(5)=dydt(5)-k(3)*y(5)*y(5);
 dydt(5)=dydt(5)-k(3)*y(5)*y(5);
 dydt(6)=dydt(6)+2*k(3)*y(5)*y(5);
-%rule: 
+%rule: (coming soon)
 %reaction: E(r!1), R(e!1, r) -> E(r) + R(e, r)
 dydt(5)=dydt(5)-k(2)*y(5);
 dydt(3)=dydt(3)+k(2)*y(5);
 dydt(4)=dydt(4)+k(2)*y(5);
-%rule: 
+%rule: (coming soon)
 %reaction: R(e, r) + E(r) -> E(r!1), R(e!1, r)
 dydt(4)=dydt(4)-k(1)*y(4)*y(3);
 dydt(3)=dydt(3)-k(1)*y(4)*y(3);
 dydt(5)=dydt(5)+k(1)*y(4)*y(3);
-%rule: 
+%rule: (coming soon)
 %reaction:  -> R(e, r)
 dydt(3)=dydt(3)+k(6);
 dydt(8)=1;

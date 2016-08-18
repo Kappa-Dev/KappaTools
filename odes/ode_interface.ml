@@ -45,16 +45,19 @@ type connected_component = Connected_component.cc
 let dummy_chemical_species compil =
   Connected_component.empty_cc (sigs compil)
 
+let rate_convention compil = compil.rate_convention
+let what_do_we_count compil = compil.count
+
 let do_we_divide_rates_by_n_auto_in_lhs compil =
   match
-    compil.rate_convention
+    rate_convention compil
   with
   | Ode_args.KaSim -> false
   | Ode_args.Biochemist -> true
 
   let do_we_count_in_embeddings compil =
     match
-      compil.count
+      what_do_we_count compil 
     with
     | Ode_args.Occurrences -> false
     | Ode_args.Embeddings -> true

@@ -1126,7 +1126,9 @@ struct
     let () = Loggers.fprintf logger "%%" in
     let () = Ode_loggers.print_comment logger ("     "^command_line_quotes) in
     let () = Loggers.print_newline logger in
-    let () = Ode_loggers.print_ode_preamble logger () in
+    let count = I.what_do_we_count compil in
+    let rate_convention = I.rate_convention compil in
+    let () = Ode_loggers.print_ode_preamble ~count ~rate_convention logger () in
     let () = Loggers.print_newline logger in
     let () = Ode_loggers.associate logger Ode_loggers.Tinit (alg_of_float init_t) handler_expr in
     let () =

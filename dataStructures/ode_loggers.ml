@@ -70,6 +70,8 @@ let print_list logger l =
 
 let print_ode_preamble
     logger
+    ~count
+    ~rate_convention
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
     ()
   =
@@ -89,7 +91,15 @@ let print_ode_preamble
               "%% tinit - the initial simulation time (likely 0)";
               "%% tend - the final simulation time ";
               "%% initialstep - initial time step at the beginning of numerical integration";
-              "%% num_t_point - the number of time points to return"] in
+              "%% num_t_point - the number of time points to return";
+              "%%" ;
+              "%% "^(match count with Ode_args.Embeddings -> "variables (init(i),y(i)) denote numbers of embeddings "
+                                    | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
+              "%% rule rates are "^
+              (match rate_convention
+               with Ode_args.Biochemist -> ""
+                  | Ode_args.KaSim -> "not ")^"corrected by the number of automorphisms in the lhs of rules"] in
+
         let () = Loggers.print_newline logger in
         ()
       end
