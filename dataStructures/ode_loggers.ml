@@ -455,7 +455,7 @@ let apply_correct correct var  =
   match
     correct
   with
-  | Nil -> var_string
+  | Nil | Div 1 | Mul 1 -> var_string
   | Div i -> var_string^"/"^(string_of_int i)
   | Mul i -> (string_of_int i)^"*"^var_string
 
