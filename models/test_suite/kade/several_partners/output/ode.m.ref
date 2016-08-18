@@ -29,9 +29,9 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(6)=t;
-init(1)=6;
-init(2)=4.500000;
-var(1)=((0+(1*(((init(2)+init(3))+init(4))+(2*init(5)))))*t);
+init(1)=(1*6);
+init(2)=(1*4.500000);
+var(1)=((1*(((init(2)+init(3))+init(4))+(2*init(5))))*t);
 
 global k
 global kd
@@ -122,33 +122,33 @@ global kd
 global kun
 global kdun
 
-var(1)=((0+(1*(((y(2)+y(3))+y(4))+(2*y(5)))))*t);
+var(1)=((1*(((y(2)+y(3))+y(4))+(2*y(5))))*t);
 
 k(2)=t;
 k(3)=var(1);
 k(4)=var(1);
 
 dydt=zeros(nodevar,1);
-dydt(3)=dydt(3)-k(3)*y(3);
-dydt(1)=dydt(1)+k(3)*y(3);
-dydt(2)=dydt(2)-k(2)*y(2)*y(3);
-dydt(3)=dydt(3)-k(2)*y(2)*y(3);
-dydt(5)=dydt(5)+k(2)*y(2)*y(3);
-dydt(5)=dydt(5)-k(4)*y(5);
-dydt(3)=dydt(3)+k(4)*y(5);
-dydt(5)=dydt(5)-k(3)*y(5);
-dydt(4)=dydt(4)+k(3)*y(5);
-dydt(4)=dydt(4)-k(4)*y(4);
-dydt(1)=dydt(1)+k(4)*y(4);
-dydt(2)=dydt(2)-k(1)*y(2)*y(4);
-dydt(4)=dydt(4)-k(1)*y(2)*y(4);
-dydt(5)=dydt(5)+k(1)*y(2)*y(4);
-dydt(2)=dydt(2)-k(2)*y(2)*y(1);
-dydt(1)=dydt(1)-k(2)*y(2)*y(1);
-dydt(4)=dydt(4)+k(2)*y(2)*y(1);
-dydt(2)=dydt(2)-k(1)*y(2)*y(1);
-dydt(1)=dydt(1)-k(1)*y(2)*y(1);
-dydt(3)=dydt(3)+k(1)*y(2)*y(1);
+dydt(3)=dydt(3)-k(3)*y(3)/1;
+dydt(1)=dydt(1)+k(3)*y(3)/1;
+dydt(2)=dydt(2)-k(2)*y(2)/1*y(3)/1;
+dydt(3)=dydt(3)-k(2)*y(2)/1*y(3)/1;
+dydt(5)=dydt(5)+k(2)*y(2)/1*y(3)/1;
+dydt(5)=dydt(5)-k(4)*y(5)/1;
+dydt(3)=dydt(3)+k(4)*y(5)/1;
+dydt(5)=dydt(5)-k(3)*y(5)/1;
+dydt(4)=dydt(4)+k(3)*y(5)/1;
+dydt(4)=dydt(4)-k(4)*y(4)/1;
+dydt(1)=dydt(1)+k(4)*y(4)/1;
+dydt(2)=dydt(2)-k(1)*y(2)/1*y(4)/1;
+dydt(4)=dydt(4)-k(1)*y(2)/1*y(4)/1;
+dydt(5)=dydt(5)+k(1)*y(2)/1*y(4)/1;
+dydt(2)=dydt(2)-k(2)*y(2)/1*y(1)/1;
+dydt(1)=dydt(1)-k(2)*y(2)/1*y(1)/1;
+dydt(4)=dydt(4)+k(2)*y(2)/1*y(1)/1;
+dydt(2)=dydt(2)-k(1)*y(2)/1*y(1)/1;
+dydt(1)=dydt(1)-k(1)*y(2)/1*y(1)/1;
+dydt(3)=dydt(3)+k(1)*y(2)/1*y(1)/1;
 dydt(6)=1;
 
 end
@@ -176,7 +176,7 @@ global var
 obs = zeros(nobs,1);
 
 t = y(6);
-var(1)=((0+(1*(((y(2)+y(3))+y(4))+(2*y(5)))))*t);
+var(1)=((1*(((y(2)+y(3))+y(4))+(2*y(5))))*t);
 
 
 end

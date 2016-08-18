@@ -9,6 +9,9 @@ type compil =
     environment: Environment.t ;
     init: (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
     rate_convention: Ode_args.rate_convention ;
+    show_reactions: bool ;
+    count: Ode_args.count ;
+    compute_jacobian: bool
   }
 
 type cache = Connected_component.PreEnv.t
@@ -48,6 +51,13 @@ let do_we_divide_rates_by_n_auto_in_lhs compil =
   with
   | Ode_args.KaSim -> false
   | Ode_args.Biochemist -> true
+
+  let do_we_count_in_embeddings compil =
+    match
+      compil.count
+    with
+    | Ode_args.Occurrences -> false
+    | Ode_args.Embeddings -> true
 
 let print_chemical_species ?compil =
   Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
@@ -260,7 +270,9 @@ let get_obs_titles compil =
            (Kappa_printer.alg_expr ~env) x))
     env
 
-let get_compil ~rate_convention common_args cli_args =
+let get_compil
+    ~rate_convention  ~show_reactions ~count ~compute_jacobian
+    common_args cli_args =
   let (env,_,contact_map,_,_,_,_,init),_,_ =
     Cli_init.get_compilation common_args cli_args in
   {
@@ -268,6 +280,9 @@ let get_compil ~rate_convention common_args cli_args =
     contact_map = contact_map ;
     init = init ;
     rate_convention = rate_convention ;
+    show_reactions = show_reactions ;
+    count = count ;
+    compute_jacobian = compute_jacobian
   }
 
 let empty_cache compil =

@@ -39,6 +39,7 @@ type variable =
   | Tmp
   | Current_time
 
+type correct = Div of int | Mul of int | Nil
 
 type ('a,'b) network_handler =
   {
@@ -79,11 +80,11 @@ val declare_init: Loggers.t -> int -> unit
 
 val launch_main: Loggers.t -> unit
 
-val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
-val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> variable list -> unit
+val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> (variable * correct) list -> unit
+val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> (variable * correct) list -> unit
 val update_token:
   Loggers.t -> variable -> nauto_in_lhs:int -> variable ->
-  'a Alg_expr.e Location.annot -> variable list -> ('a, int) network_handler -> unit
+  'a Alg_expr.e Location.annot -> (variable * correct) list -> ('a, int) network_handler -> unit
 
 val print_comment:
   Loggers.t ->

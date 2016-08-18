@@ -7,7 +7,12 @@ sig
   type ode_var_id
   type 'a network
 
-  val get_compil : rate_convention:Ode_args.rate_convention -> Common_args.t -> Run_cli_args.t -> I.compil
+  val get_compil :
+    rate_convention:Ode_args.rate_convention ->
+    show_reactions:bool ->
+    count:Ode_args.count ->
+    compute_jacobian:bool ->
+    Common_args.t -> Run_cli_args.t -> I.compil
 
   val network_from_compil:
     I.compil -> int network
@@ -26,5 +31,7 @@ sig
     max_t:float ->
     nb_points:int -> Loggers.t -> I.compil -> int network -> unit
 
-  val species_of_species_id: int network -> ode_var_id -> I.chemical_species
+  val species_of_species_id:
+    int network -> ode_var_id ->
+    (I.chemical_species * int)
 end

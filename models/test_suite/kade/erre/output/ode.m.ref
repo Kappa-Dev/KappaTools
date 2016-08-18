@@ -29,12 +29,12 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(8)=t;
-init(1)=6;
-init(2)=4.500000;
-init(4)=10;
-init(3)=100;
-var(2)=(0+(1*(init(3)+init(5))));
-var(1)=((0+(1*(2*init(6))))/2);
+init(1)=(1*6);
+init(2)=(1*4.500000);
+init(4)=(1*10);
+init(3)=(1*100);
+var(2)=(1*(init(3)+init(5)));
+var(1)=((1*(2*init(6)))/2);
 
 global k
 global kd
@@ -134,38 +134,38 @@ global kd
 global kun
 global kdun
 
-var(2)=(0+(1*(y(3)+y(5))));
-var(1)=((0+(1*(2*y(6))))/2);
+var(2)=(1*(y(3)+y(5)));
+var(1)=((1*(2*y(6)))/2);
 
 
 dydt=zeros(nodevar,1);
-dydt(7)=dydt(7)-k(8)*y(7);
-dydt(1)=dydt(1)+k(8)*y(7);
-dydt(2)=dydt(2)+k(8)*y(7);
-dydt(2)=dydt(2)-k(7)*y(2)*y(1);
-dydt(1)=dydt(1)-k(7)*y(2)*y(1);
-dydt(7)=dydt(7)+k(7)*y(2)*y(1);
-dydt(6)=dydt(6)-2*k(5)*y(6);
-dydt(5)=dydt(5)+k(5)*y(6);
-dydt(5)=dydt(5)+k(5)*y(6);
-dydt(6)=dydt(6)-2*k(5)*y(6);
-dydt(5)=dydt(5)+k(5)*y(6);
-dydt(5)=dydt(5)+k(5)*y(6);
-dydt(6)=dydt(6)-2*k(4)*y(6);
-dydt(5)=dydt(5)+k(4)*y(6);
-dydt(4)=dydt(4)+k(4)*y(6);
-dydt(6)=dydt(6)-2*k(4)*y(6);
-dydt(4)=dydt(4)+k(4)*y(6);
-dydt(5)=dydt(5)+k(4)*y(6);
-dydt(5)=dydt(5)-k(3)*y(5)*y(5);
-dydt(5)=dydt(5)-k(3)*y(5)*y(5);
-dydt(6)=dydt(6)+2*k(3)*y(5)*y(5);
-dydt(5)=dydt(5)-k(2)*y(5);
-dydt(3)=dydt(3)+k(2)*y(5);
-dydt(4)=dydt(4)+k(2)*y(5);
-dydt(4)=dydt(4)-k(1)*y(4)*y(3);
-dydt(3)=dydt(3)-k(1)*y(4)*y(3);
-dydt(5)=dydt(5)+k(1)*y(4)*y(3);
+dydt(7)=dydt(7)-k(8)*y(7)/1;
+dydt(1)=dydt(1)+k(8)*y(7)/1;
+dydt(2)=dydt(2)+k(8)*y(7)/1;
+dydt(2)=dydt(2)-k(7)*y(2)/1*y(1)/1;
+dydt(1)=dydt(1)-k(7)*y(2)/1*y(1)/1;
+dydt(7)=dydt(7)+k(7)*y(2)/1*y(1)/1;
+dydt(6)=dydt(6)-2*k(5)*y(6)/2;
+dydt(5)=dydt(5)+k(5)*y(6)/2;
+dydt(5)=dydt(5)+k(5)*y(6)/2;
+dydt(6)=dydt(6)-2*k(5)*y(6)/2;
+dydt(5)=dydt(5)+k(5)*y(6)/2;
+dydt(5)=dydt(5)+k(5)*y(6)/2;
+dydt(6)=dydt(6)-2*k(4)*y(6)/2;
+dydt(5)=dydt(5)+k(4)*y(6)/2;
+dydt(4)=dydt(4)+k(4)*y(6)/2;
+dydt(6)=dydt(6)-2*k(4)*y(6)/2;
+dydt(4)=dydt(4)+k(4)*y(6)/2;
+dydt(5)=dydt(5)+k(4)*y(6)/2;
+dydt(5)=dydt(5)-k(3)*y(5)/1*y(5)/1;
+dydt(5)=dydt(5)-k(3)*y(5)/1*y(5)/1;
+dydt(6)=dydt(6)+2*k(3)*y(5)/1*y(5)/1;
+dydt(5)=dydt(5)-k(2)*y(5)/1;
+dydt(3)=dydt(3)+k(2)*y(5)/1;
+dydt(4)=dydt(4)+k(2)*y(5)/1;
+dydt(4)=dydt(4)-k(1)*y(4)/1*y(3)/1;
+dydt(3)=dydt(3)-k(1)*y(4)/1*y(3)/1;
+dydt(5)=dydt(5)+k(1)*y(4)/1*y(3)/1;
 dydt(3)=dydt(3)+k(6);
 dydt(8)=1;
 
@@ -196,8 +196,8 @@ global var
 obs = zeros(nobs,1);
 
 t = y(8);
-var(2)=(0+(1*(y(3)+y(5))));
-var(1)=((0+(1*(2*y(6))))/2);
+var(2)=(1*(y(3)+y(5)));
+var(1)=((1*(2*y(6)))/2);
 
 obs(1)=var(1);
 obs(2)=var(2);

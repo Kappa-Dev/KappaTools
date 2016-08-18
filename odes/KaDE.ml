@@ -5,6 +5,7 @@
 
 module A = Odes.Make (Ode_interface)
 
+let lowercase = String.lowercase(*_ascii  : ocaml 4.03*)
 let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
@@ -51,22 +52,22 @@ let main () =
     (*let () =
       Parameter.time_independent := common_args.Common_args.timeIndependent*)
     let backend =
-      match ode_args.Ode_args.backend with
-      | "Octave" | "OCTAVE" | "octave" -> Loggers.Octave
-      | "Matlab" | "MATLAB" | "matlab" -> Loggers.Matlab
+      match lowercase ode_args.Ode_args.backend with
+      | "octave" -> Loggers.Octave
+      | "matlab" -> Loggers.Matlab
       | s ->
         begin
           Arg.usage options usage_msg;
           Debug.tag
             Format.std_formatter
-            ("Wrong option "^s^".\nOnly matlab and octave backends are supported.");
+            ("Wrong option "^s^".\nOnly Matlab and Octave backends are supported.");
           exit 0
         end
     in
     let rate_convention =
-      match ode_args.Ode_args.rate_convention with
-    | "kasim" | "KaSim" | "KASIM" -> Ode_args.KaSim
-    | "biochemist" | "Biochemist" | "BIOCHEMIST" ->
+      match lowercase ode_args.Ode_args.rate_convention with
+    | "kasim" -> Ode_args.KaSim
+    | "biochemist"  ->
       let () =
       Debug.tag
         Format.std_formatter
@@ -82,6 +83,22 @@ let main () =
         exit 0
       end
     in
+    let count =
+      match lowercase ode_args.Ode_args.count with
+      | "embedding" | "embeddings" -> Ode_args.Embeddings
+      | "occurrences" | "occurrence" | "instances" | "instance"->
+        Ode_args.Occurrences
+    | s ->
+      begin
+        Arg.usage options usage_msg;
+        Debug.tag
+          Format.std_formatter
+          ("Wrong option "^s^".\nOnly Embeddings and Occurrences are supported.");
+        exit 0
+      end
+    in
+    let show_reactions = ode_args.Ode_args.show_reactions in
+    let compute_jacobian = ode_args.Ode_args.compute_jacobian in
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
       | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
@@ -107,7 +124,11 @@ let main () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
-    let compil = A.get_compil rate_convention common_args cli_args in
+    let compil =
+      A.get_compil
+        ~rate_convention ~show_reactions ~count ~compute_jacobian
+        common_args cli_args
+    in
     let network = A.network_from_compil compil in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in

@@ -40,6 +40,8 @@ type variable =
   | Tmp
   | Current_time
 
+type correct = Div of int | Mul of int | Nil
+
 type ('a,'b) network_handler =
   {
     int_of_obs: 'b -> int;
@@ -445,6 +447,15 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+let apply_correct correct var  =
+  let var_string = string_of_variable var in
+    match
+    correct
+  with
+  | Nil -> var_string
+  | Div i -> var_string^"/"^(string_of_int i)
+  | Mul i -> (string_of_int i)^"*"^var_string
+
 let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
   match
     Loggers.get_encoding_format logger
@@ -482,7 +493,9 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
       let () = Loggers.fprintf logger "%s" (string_of_variable var_rate) in
       let () =
         List.iter
-          (fun var -> Loggers.fprintf logger "*%s" (string_of_variable var))
+          (fun (var,correct) ->
+             Loggers.fprintf logger "*%s"
+               (apply_correct correct var))
           var_list
       in
       let () = Loggers.fprintf logger ";" in
@@ -524,7 +537,8 @@ let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
       let () = Loggers.fprintf logger "%s" (string_of_variable var_rate) in
       let () =
         List.iter
-          (fun var -> Loggers.fprintf logger "*%s" (string_of_variable var))
+          (fun (var,correct) ->
+             Loggers.fprintf logger "*%s" (apply_correct correct var))
           var_list
       in
       let () = Loggers.fprintf logger "*(" in

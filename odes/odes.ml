@@ -64,7 +64,9 @@ struct
   let fst_id = 1
   let next_id id = id + 1
 
-  type ode_var = Nembed of I.canonic_species | Token of int | Dummy
+  type ode_var =
+    | Noccurrences of I.canonic_species
+    | Nembed of I.canonic_species | Token of int | Dummy
   type lhs_decl = Init_decl | Var_decl of string | Init_value of ode_var
 
 
@@ -75,7 +77,7 @@ struct
         let compare = compare
         let print log x =
           match x with
-          | Nembed x -> I.print_canonic_species log x
+          | Nembed x | Noccurrences x -> I.print_canonic_species log x
           | Token x -> Format.fprintf log "%i" x
           | Dummy -> ()
       end)
@@ -134,7 +136,7 @@ struct
       id_of_ode_var: ode_var_id VarMap.t ;
       fresh_ode_var_id: ode_var_id ;
 
-      species_tab: I.chemical_species Mods.DynArray.t ;
+      species_tab: (I.chemical_species*int) Mods.DynArray.t ;
 
       cc_cache: I.cache ;
 
@@ -172,6 +174,7 @@ struct
       b a
 
   let get_compil = I.get_compil
+
   let init compil =
     {
       rules = [] ;
@@ -180,7 +183,7 @@ struct
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
       id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0
-          (I.dummy_chemical_species compil) ;
+          (I.dummy_chemical_species compil,1) ;
       cc_cache = I.empty_cache compil ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
@@ -191,6 +194,45 @@ struct
       obs = [] ;
       n_obs = 1 ;
     }
+
+  let from_nembed_correct compil nauto =
+    if I.do_we_count_in_embeddings compil then
+      Ode_loggers.Nil
+    else
+      Ode_loggers.Div nauto
+
+  let from_nocc_correct compil nauto =
+    if I.do_we_count_in_embeddings compil then
+      Ode_loggers.Mul nauto
+    else
+      Ode_loggers.Nil
+
+  let to_nembed_correct compil nauto =
+    if I.do_we_count_in_embeddings compil then
+      Ode_loggers.Nil
+    else
+      Ode_loggers.Mul nauto
+
+  let to_nocc_correct compil nauto =
+    if I.do_we_count_in_embeddings compil then
+      Ode_loggers.Div nauto
+    else
+      Ode_loggers.Nil
+
+  let lift f compil expr nauto =
+    match f compil nauto with
+    | Ode_loggers.Nil -> expr
+    | Ode_loggers.Div n ->
+      Alg_expr.BIN_ALG_OP
+        (Operator.DIV,Location.dummy_annot expr,alg_of_int n)
+    | Ode_loggers.Mul n ->
+      Alg_expr.BIN_ALG_OP
+        (Operator.MULT,alg_of_int n,Location.dummy_annot expr)
+
+  let to_nembed = lift to_nembed_correct
+  let to_nocc = lift to_nocc_correct
+  let from_nembed = lift from_nembed_correct
+  let from_nocc = lift from_nocc_correct
 
   let is_known_variable variable network =
     VarSet.mem variable network.ode_variables
@@ -217,7 +259,7 @@ struct
       Mods.DynArray.set
         network.species_tab
         (get_fresh_ode_var_id network)
-        species
+        (species, I.nbr_automorphisms_in_chemical_species species)
     in
     add_new_var (Nembed canonic) network
 
@@ -342,13 +384,19 @@ struct
       )
       acc prefix_list
 
-  let convert_cc connected_component network =
+  let nembed_of_connected_component compil network connected_component =
     VarMap.fold
       (fun vars id alg ->
          match vars with
          | Token _ | Dummy -> alg
-         | Nembed _ ->
-           let species = Mods.DynArray.get network.species_tab id in
+         | Nembed _ | Noccurrences _ ->
+           let from =
+             match vars with
+             | Token _ | Dummy -> assert false
+             | Nembed _ -> from_nembed compil
+             | Noccurrences _ -> from_nocc compil
+           in
+           let (species,nauto) = Mods.DynArray.get network.species_tab id in
            let n_embs =
              List.length
                (I.find_embeddings connected_component species) in
@@ -358,10 +406,13 @@ struct
              let term =
                if n_embs = 1 then species
                else
-                 Alg_expr.BIN_ALG_OP
-                   (Operator.MULT,
-                    alg_of_int n_embs,
-                    Location.dummy_annot species)
+                 to_nembed compil
+                   (from
+                      (Alg_expr.BIN_ALG_OP
+                         (Operator.MULT,
+                          alg_of_int n_embs,
+                          Location.dummy_annot species)) nauto)
+                   nauto
              in
              if alg = Alg_expr.CONST (Nbr.zero) then term
              else
@@ -373,32 +424,43 @@ struct
       network.id_of_ode_var
       (Alg_expr.CONST (Nbr.zero))
 
-  let rec convert_alg_expr alg network =
+  let rec convert_alg_expr compil network alg =
     match
       alg
     with
     | Alg_expr.BIN_ALG_OP (op, arg1, arg2 ),loc ->
       Alg_expr.BIN_ALG_OP
-        (op, convert_alg_expr arg1 network, convert_alg_expr arg2 network),loc
+        (op, convert_alg_expr compil network arg1,
+         convert_alg_expr compil network arg2),loc
     | Alg_expr.UN_ALG_OP (op, arg),loc ->
-      Alg_expr.UN_ALG_OP (op, convert_alg_expr arg network),loc
+      Alg_expr.UN_ALG_OP
+        (op, convert_alg_expr compil network arg),loc
     | Alg_expr.KAPPA_INSTANCE cc, loc ->
-      List.fold_left
-        (fun acc l ->
-           Alg_expr.BIN_ALG_OP
-             (Operator.SUM,
-              Location.dummy_annot acc,
-              Location.dummy_annot @@
-              Array.fold_left
-                (fun expr h ->
-                   Alg_expr.BIN_ALG_OP
-                     (Operator.MULT,
-                      Location.dummy_annot expr,
-                      Location.dummy_annot (convert_cc h network)))
-                (Alg_expr.CONST Nbr.one)
-                l))
-        (Alg_expr.CONST Nbr.zero)
-        cc, loc
+      begin
+        let f x =
+          Array.fold_left
+            (fun expr h ->
+               Alg_expr.BIN_ALG_OP
+                 (Operator.MULT,
+                  Location.dummy_annot expr,
+                  Location.dummy_annot
+                    (nembed_of_connected_component compil network  h)))
+            (Alg_expr.CONST Nbr.one)
+            x
+        in
+        match cc with
+        | [] -> alg_of_int 0
+        | head::tail ->
+          List.fold_left
+            (fun acc l ->
+               Alg_expr.BIN_ALG_OP
+                 (Operator.SUM,
+                  Location.dummy_annot acc,
+                  Location.dummy_annot @@
+                  f l))
+            (f head)
+            tail, loc
+      end
     | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
       |Alg_expr.STATE_ALG_OP _),_ as a -> a
 
@@ -417,7 +479,7 @@ struct
       List.fold_left
         (fun (remanent, tokens) (a,b) ->
            let remanent, id = translate_token b remanent in
-           let a' = convert_alg_expr a (snd remanent) in
+           let a' = convert_alg_expr compil (snd remanent) a in
            remanent,(a',(Location.dummy_annot id))::tokens)
         (remanent,[])
         tokens
@@ -644,7 +706,7 @@ struct
 
   let convert_initial_state compil intro network =
     let b,c,a = intro in
-    convert_alg_expr (b,a) network,
+    convert_alg_expr compil network (b,a) ,
     match I.token_vector_of_init c with
     | [] ->
       let m = I.mixture_of_init compil c in
@@ -663,9 +725,9 @@ struct
   let translate_token token network =
     snd (translate_token token ([],network))
 
-  let convert_var_def variable_def network =
+  let convert_var_def compil network variable_def =
     let a,b = variable_def in
-    a,convert_alg_expr b network
+    a,convert_alg_expr compil network b
 
   let convert_var_defs compil network =
     let list_var = I.get_variables compil in
@@ -673,7 +735,7 @@ struct
     let list, network =
       Tools.array_fold_lefti
         (fun i (list,network) def ->
-           let a,b = convert_var_def def network in
+           let a,b = convert_var_def compil network def in
            (Var (get_fresh_var_id network,Some a,b))::list,
            inc_fresh_var_id
              {network with
@@ -810,7 +872,7 @@ struct
            inc_fresh_obs_id
              {network with
               obs = (get_fresh_obs_id network,
-                     convert_alg_expr (Location.dummy_annot obs) network)
+                     convert_alg_expr compil network (Location.dummy_annot obs))
                     ::network.obs})
         network
         list_obs
@@ -915,7 +977,7 @@ struct
            match rate with
            | None -> sort_rules
            | Some rate ->
-             let rate = convert_alg_expr rate network in
+             let rate = convert_alg_expr compil network rate in
              let sort_rules =
                if is_const rate
                then
@@ -989,7 +1051,7 @@ struct
     else
       Ode_loggers.increment ~init_mode logger (Ode_loggers.Init x)
 
-  let affect_var is_zero ?init_mode:(init_mode=false) logger network decl =
+  let affect_var is_zero ?init_mode:(init_mode=false) logger compil network decl =
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl -> ()
@@ -998,29 +1060,25 @@ struct
         match list with
         | [] -> ()
         | [a] ->
-          let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network a)
-          in
+          let n = snd (species_of_species_id network a) in
           let expr =
-            if n = 1
-            then
-              expr
-            else
-              Location.dummy_annot (Alg_expr.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
+            Location.dummy_annot
+              (to_nembed compil (from_nocc compil (fst expr) n) n)
           in
           increment is_zero ~init_mode logger a expr handler_expr
         | _ ->
-          let () = Ode_loggers.associate ~init_mode logger (Ode_loggers.Expr id') expr handler_expr in
+          let () = Ode_loggers.associate
+              ~init_mode logger (Ode_loggers.Expr id') expr handler_expr
+          in
           List.iter
             (fun id ->
-               let n = I.nbr_automorphisms_in_chemical_species (species_of_species_id network id)
+               let n =
+                 snd (species_of_species_id network id)
                in
-               let expr = Location.dummy_annot (Alg_expr.ALG_VAR id') in
                let expr =
-                 if n = 1
-                 then
-                   expr
-                 else
-                   Location.dummy_annot (Alg_expr.BIN_ALG_OP(Operator.MULT,alg_of_int n,expr))
+                 Location.dummy_annot
+                   (to_nembed compil
+                      (from_nocc compil (Alg_expr.ALG_VAR id') n) n)
                in
                increment is_zero logger ~init_mode id expr handler_init)
             list
@@ -1124,7 +1182,7 @@ struct
     in
     let () =
       List.iter
-        (affect_var is_zero logger ~init_mode:true network)
+        (affect_var is_zero logger ~init_mode:true compil network)
         network.var_declaration
     in
     let () = Loggers.print_newline logger in
@@ -1158,7 +1216,7 @@ struct
     let () = Loggers.print_newline logger in
     ()
 
-  let export_dydt logger network split =
+  let export_dydt logger compil network split =
     let is_zero = fresh_is_zero network in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
     let () = Loggers.print_newline logger in
@@ -1169,7 +1227,9 @@ struct
       Ode_loggers.declare_global logger (Ode_loggers.Expr 1)
     in
     let () = declare_rates_global logger network in
-    let () = List.iter (affect_var is_zero logger ~init_mode:false network) split.var_decl in
+    let () =
+      List.iter
+        (affect_var is_zero logger ~init_mode:false compil network) split.var_decl in
     let () = Loggers.print_newline logger in
     let () =
       List.iter
@@ -1185,10 +1245,17 @@ struct
       List.iter
         (fun species ->
            let nauto_in_species =
-             I.nbr_automorphisms_in_chemical_species (species_of_species_id network species)
+             if I.do_we_count_in_embeddings compil
+             then
+               snd
+                 (species_of_species_id network species)
+             else 1
            in
            let nauto_in_lhs = enriched_rule.divide_rate_by in
-           f logger (Ode_loggers.Deriv species) ~nauto_in_species ~nauto_in_lhs (var_of_rule enriched_rule) reactants)
+           f
+             logger (Ode_loggers.Deriv species)
+             ~nauto_in_species ~nauto_in_lhs
+             (var_of_rule enriched_rule) reactants)
         l
     in
     let () =
@@ -1196,8 +1263,15 @@ struct
         (fun (reactants, products, token_vector, enriched_rule) ->
            let nauto_in_lhs = enriched_rule.divide_rate_by in
            let reactants' =
-             List.rev_map (fun x -> Ode_loggers.Concentration x) (List.rev reactants) in
-
+             List.rev_map
+               (fun x ->
+                  let nauto = snd
+                      (species_of_species_id network x)
+                  in
+                  (Ode_loggers.Concentration x,
+                   to_nocc_correct compil nauto))
+               (List.rev reactants)
+           in
            let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
            let () = do_it Ode_loggers.produce products reactants' enriched_rule in
            let () =
@@ -1205,7 +1279,8 @@ struct
                (fun (expr,(token,_loc)) ->
                   Ode_loggers.update_token
                     logger
-                    (Ode_loggers.Deriv token) ~nauto_in_lhs (var_of_rule enriched_rule)
+                    (Ode_loggers.Deriv token) ~nauto_in_lhs
+                    (var_of_rule enriched_rule)
                     expr reactants' (handler_expr network))
                token_vector
            in ()
@@ -1246,7 +1321,7 @@ struct
     let () = Loggers.print_newline logger in
     ()
 
-  let export_obs logger network split =
+  let export_obs logger compil network split =
     let is_zero = fresh_is_zero network in
     let () = Ode_loggers.open_procedure logger "obs" "ode_obs" ["y"] in
     (* add t *)
@@ -1261,12 +1336,18 @@ struct
       Ode_loggers.initialize logger (Ode_loggers.Obs (network.n_obs))
     in
     let () = Loggers.print_newline logger in
-    let () = Ode_loggers.associate_t logger (get_last_ode_var_id network) in
-    let () = List.iter (affect_var is_zero logger ~init_mode:false network) split.var_decl in
+    let () = Ode_loggers.associate_t logger
+        (get_last_ode_var_id network)
+    in
+    let () =
+      List.iter
+        (affect_var is_zero logger ~init_mode:false compil network) split.var_decl
+    in
     let () = Loggers.print_newline logger in
     let () =
       List.iter
-        (fun (id,expr) -> Ode_loggers.associate logger (Ode_loggers.Obs id) expr (handler_expr network))
+        (fun (id,expr) ->
+           Ode_loggers.associate logger (Ode_loggers.Obs id) expr (handler_expr network))
         network.obs
     in
     let () = Loggers.print_newline logger in
@@ -1291,12 +1372,12 @@ struct
         logger compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -ode system @." in
-    let () = export_dydt logger network sorted_rules_and_decl in
+    let () = export_dydt logger compil network sorted_rules_and_decl in
     let () = Format.printf "\t -initial state @." in
 
     let () = export_init logger network in
     let () = Format.printf "\t -observables @." in
-    let () = export_obs logger network sorted_rules_and_decl in
+    let () = export_obs logger compil network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in
     ()
 
