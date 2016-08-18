@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 17 2016>
+  * Last modification: Time-stamp: <Aug 18 2016>
 *)
 
 module type Interface =
@@ -57,12 +57,14 @@ sig
     pattern * embedding_forest * mixture
 
   type rule
+  type rule_name = string
   type arity = Usual | Unary
+  type direction = Direct | Op
   type rule_id = int
-  type rule_id_with_mode = rule_id * arity
+  type rule_id_with_mode = rule_id * arity * direction
 
-  val valid_modes: rule -> arity list
-  val lhs: rule -> pattern
+  val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
+  val lhs: compil -> rule_id_with_mode -> rule -> pattern
   val token_vector:
     rule ->
     (connected_component array list Alg_expr.e Location.annot * int) list
@@ -73,9 +75,10 @@ sig
   val print_rule:
     ?compil:compil -> Format.formatter -> rule -> unit
   val rate:
-    rule -> arity ->
+    compil -> rule -> rule_id_with_mode ->
     connected_component array list Alg_expr.e Location.annot option
-
+  val rate_name:
+    compil -> rule -> rule_id_with_mode -> rule_name
   val apply: compil -> rule -> embedding_forest -> mixture  -> mixture
   val mixture_of_init: compil -> hidden_init -> mixture
   val lift_species: compil -> chemical_species -> mixture

@@ -34,15 +34,17 @@ struct
     SetMap.Make
       (struct
         type t =
-          I.rule_id * connected_component_id * I.connected_component
+          I.rule_id_with_mode * connected_component_id * I.connected_component
         let compare (a,b,c) (a',b',c') =
           let x = compare (a,b) (a',b') in
           if x <> 0 then x else I.compare_connected_component c c'
-        let print a (r,cc_id,cc) =
+        let print a ((r,ar,dir),cc_id,cc) =
           let () =
             Format.fprintf a
-              "Component_wise:(%a,%i,%a)"
+              "Component_wise:(%a,%s,%s,%i,%a)"
               I.print_rule_id r
+              (match ar with I.Usual -> "@" | I.Unary -> "(1)")
+              (match dir with I.Direct -> "->" | I.Op -> "<-")
               cc_id
               (I.print_connected_component ?compil:None) cc
           in
@@ -93,18 +95,31 @@ struct
 
   type enriched_rule =
     {
-      rule_id: rule_id ;
+      rule_id_with_mode: (rule_id*I.arity*I.direction);
       rule: I.rule ;
-      mode: I.arity ;
       lhs: I.pattern ;
       lhs_cc: (connected_component_id * I.connected_component) list ;
       divide_rate_by: int
     }
 
+  let rule_id_of e =
+    let (a,_,_) = e.rule_id_with_mode in a
+
+  let arity_of e =
+    let (_,a,_) = e.rule_id_with_mode in a
+
+  let direction_of e =
+    let (_,_,a) = e.rule_id_with_mode in a
+
+  let var_of_rate (rule_id,arity,direction) =
+    match arity,direction with
+    | I.Usual,I.Direct -> Ode_loggers.Rate rule_id
+    | I.Unary,I.Direct -> Ode_loggers.Rateun rule_id
+    | I.Usual,I.Op -> Ode_loggers.Rated rule_id
+    | I.Unary,I.Op -> Ode_loggers.Rateund rule_id
+
   let var_of_rule rule =
-    match rule.mode with
-    | I.Usual -> Ode_loggers.Rate rule.rule_id
-    | I.Unary -> Ode_loggers.Rateun rule.rule_id
+    var_of_rate rule.rule_id_with_mode
 
   type 'a network =
     {
@@ -210,8 +225,8 @@ struct
     {network with tokenmap = Mods.IntMap.add token id network.tokenmap},
     id
 
-  let enrich_rule rule mode id =
-    let lhs = I.lhs rule in
+  let enrich_rule compil rule rule_id_with_mode =
+    let lhs = I.lhs compil rule_id_with_mode rule in
     let _,lhs_cc =
       List.fold_left
         (fun (counter,list) cc ->
@@ -221,9 +236,8 @@ struct
         (List.rev (I.connected_components_of_patterns lhs))
     in
     {
-      rule_id = id ;
+      rule_id_with_mode = rule_id_with_mode ;
       rule = rule ;
-      mode = mode ;
       lhs = lhs ;
       lhs_cc = lhs_cc ;
       divide_rate_by =
@@ -437,16 +451,16 @@ struct
     let n_rules = List.length rules in
     let rules =
       List.rev
-         (snd
-            (List.fold_left
-               (fun (id,list) rule ->
-                  let modes = I.valid_modes rule in
-                  next_id id,
-                  List.fold_left
-                    (fun list mode ->
-                       (enrich_rule rule mode id)::list)
-                    list modes)
-               (fst_id,[]) (List.rev rules)))
+        (snd
+           (List.fold_left
+              (fun (id,list) rule ->
+                 let modes = I.valid_modes compil rule id in
+                 next_id id,
+                 List.fold_left
+                   (fun list mode ->
+                      (enrich_rule compil rule mode)::list)
+                   list modes)
+              (fst_id,[]) (List.rev rules)))
     in
     let to_be_visited, network =
       initial_network
@@ -476,11 +490,10 @@ struct
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
               (* regular application of tules, we store the embeddings*)
               let () = debug "@[<v 2>test for rule %i (Aut:%i)@[%a@]"
-                  enriched_rule.rule_id
+                  (rule_id_of enriched_rule)
                   enriched_rule.divide_rate_by
                   (I.print_rule ~compil) enriched_rule.rule in
-              let arity = enriched_rule.mode in
-              match arity with
+              match arity_of enriched_rule  with
               | I.Usual ->
                 begin
                   let () = debug "regular case" in
@@ -490,7 +503,7 @@ struct
                          let () = debug "find embeddings" in
                          let lembed = I.find_embeddings cc new_species in
                          add_embedding_list
-                           (enriched_rule.rule_id,cc_id,cc)
+                           (enriched_rule.rule_id_with_mode,cc_id,cc)
                            (List.rev_map (fun a -> a,new_species) (List.rev lembed))
                            store
                       )
@@ -516,8 +529,13 @@ struct
                     if local_trace || !Parameter.debugModeOn
                     then
                       StoreMap.iter
-                        (fun (a,id,b) c ->
-                           let () = debug "@[<v 2>* rule:%i cc:%i:@[%a@]:" a id
+                        (fun ((a,ar,dir),id,b) c ->
+                           let () = debug "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
+                               (match ar with I.Usual -> "@"
+                                            | I.Unary -> "(1)")
+                               (match dir with I.Direct -> "->"
+                                             | I.Op -> "<-")
+                               id
                                (I.print_connected_component ~compil) b
                            in
                            let () =
@@ -541,7 +559,9 @@ struct
                     List.fold_left
                       (fun (partial_emb_list,partial_emb_list_with_new_species) (cc_id,cc) ->
                          (* First case, we complete with an embedding towards the new_species *)
-                         let label = enriched_rule.rule_id,cc_id,cc in
+                         let label =
+                           enriched_rule.rule_id_with_mode,cc_id,cc
+                         in
                          let partial_emb_list_with_new_species =
                            add_to_prefix_list cc label   partial_emb_list
                              store_new_embeddings
@@ -827,9 +847,9 @@ struct
       var_decl: 'a decl list ;
       init: 'a decl list ;
       const_rate :
-        (I.rule_id * I.rule * I.arity * 'a rate) list ;
+        (I.rule_id_with_mode * I.rule * 'a rate) list ;
       var_rate :
-        (I.rule_id * I.rule * I.arity * 'a rate) list ;
+        (I.rule_id_with_mode * I.rule * 'a rate) list ;
     }
 
   let init_sort_rules_and_decl =
@@ -841,11 +861,6 @@ struct
       var_rate = [] ;
       init = [] ;
     }
-
-  let var_rate (id,mode,_) =
-    match mode with
-    | I.Usual -> Ode_loggers.Rate id
-    | I.Unary -> Ode_loggers.Rateun id
 
   let split_var_declaration network sort_rules_and_decls =
     let decl =
@@ -885,11 +900,14 @@ struct
       init = List.rev decl.init}
 
 
-  let split_rules network sort_rules_and_decls =
+  let split_rules compil network sort_rules_and_decls =
     let sort =
       List.fold_left
         (fun sort_rules enriched_rule ->
-           let rate = I.rate enriched_rule.rule enriched_rule.mode in
+           let rate =
+             I.rate
+               compil enriched_rule.rule enriched_rule.rule_id_with_mode
+           in
            match rate with
            | None -> sort_rules
            | Some rate ->
@@ -900,17 +918,17 @@ struct
                  {
                    sort_rules
                    with const_rate =
-                          (enriched_rule.rule_id,
+                          (enriched_rule.rule_id_with_mode,
                            enriched_rule.rule,
-                           enriched_rule.mode, rate)::sort_rules.const_rate
+                           rate)::sort_rules.const_rate
                  }
                else
                  {
                    sort_rules
                    with var_rate =
-                          (enriched_rule.rule_id,
+                          (enriched_rule.rule_id_with_mode,
                            enriched_rule.rule,
-                           enriched_rule.mode, rate)::sort_rules.var_rate
+                          rate)::sort_rules.var_rate
                  }
              in
              sort_rules)
@@ -921,8 +939,8 @@ struct
      with const_rate = List.rev sort.const_rate ;
           var_rate = List.rev sort.var_rate}
 
-  let split_rules_and_decl network =
-    split_rules network (split_var_declaration network init_sort_rules_and_decl)
+  let split_rules_and_decl compil network =
+    split_rules compil network (split_var_declaration network init_sort_rules_and_decl)
 
   let network_from_compil compil =
     let () = Format.printf "+ generate the network... @." in
@@ -1111,10 +1129,10 @@ struct
     let () = declare_rates_global logger network in
     let () =
       List.iter
-        (fun (id,_rule,mode,rate) ->
+        (fun (rule_id_with_mode,_rule,rate) ->
            Ode_loggers.associate
              logger
-             (var_rate (id,mode,rate)) rate handler_expr)
+             (var_of_rate rule_id_with_mode) rate handler_expr)
         split.const_rate
     in
     let titles = I.get_obs_titles compil in
@@ -1153,10 +1171,10 @@ struct
     let () = Loggers.print_newline logger in
     let () =
       List.iter
-        (fun (id,_rule,mode,rate) ->
+        (fun (id,_rule,rate) ->
            Ode_loggers.associate
              logger
-             (var_rate (id,mode,rate)) rate (handler_expr network))
+             (var_of_rate id) rate (handler_expr network))
         split.var_rate
     in
     let () = Loggers.print_newline logger in
@@ -1261,7 +1279,7 @@ struct
     (* add a spurious variable for time *)
     let network = inc_fresh_ode_var_id network in
     let sorted_rules_and_decl =
-      split_rules_and_decl network
+      split_rules_and_decl compil network
     in
     let () = Format.printf "+ exporting the network... @." in
     let () = Format.printf "\t -main function @." in

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 17 2016>
+  * Last modification: Time-stamp: <Aug 18 2016>
 *)
 
 type compil =
@@ -128,25 +128,38 @@ let disjoint_union compil l =
 type rule = Primitives.elementary_rule
 type rule_id = int
 type arity = Usual | Unary
-type rule_id_with_mode = rule_id * arity
+type direction = Direct | Op
+type rule_name = string
+type rule_id_with_mode = rule_id * arity * direction
 
-let lhs r = r.Primitives.connected_components
+let lhs _compil _rule_id r = r.Primitives.connected_components
 
 let add x y list  =
   match y with
   | None -> list
   | Some _ -> x::list
 
-let valid_modes rule =
-  Usual::
-  (add Unary rule.Primitives.unary_rate [])
+let mode_of_rule compil rule =
+  let env = environment compil in
+  let id = rule.Primitives.syntactic_rule in
+  Direct
 
-let rate rule mode =
+let valid_modes compil rule id =
+  let mode = mode_of_rule compil rule in
+  List.rev_map
+    (fun x -> id,x,mode)
+    (List.rev
+       (Usual::
+        (add Unary rule.Primitives.unary_rate [])))
+
+let rate _compil rule (_,arity,_) =
   match
-    mode
+    arity
   with
   | Usual -> Some rule.Primitives.rate
   | Unary -> Tools.option_map fst rule.Primitives.unary_rate
+
+let rate_name compil rule rule = ""
 
 let token_vector a =
   let add,remove  =
