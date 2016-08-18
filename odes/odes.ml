@@ -95,6 +95,7 @@ struct
 
   type enriched_rule =
     {
+      comment: string;
       rule_id_with_mode: (rule_id*I.arity*I.direction);
       rule: I.rule ;
       lhs: I.pattern ;
@@ -236,6 +237,7 @@ struct
         (List.rev (I.connected_components_of_patterns lhs))
     in
     {
+      comment = I.rate_name compil rule rule_id_with_mode ;
       rule_id_with_mode = rule_id_with_mode ;
       rule = rule ;
       lhs = lhs ;
@@ -847,9 +849,9 @@ struct
       var_decl: 'a decl list ;
       init: 'a decl list ;
       const_rate :
-        (I.rule_id_with_mode * I.rule * 'a rate) list ;
+        (enriched_rule * 'a rate) list ;
       var_rate :
-        (I.rule_id_with_mode * I.rule * 'a rate) list ;
+        (enriched_rule * 'a rate) list ;
     }
 
   let init_sort_rules_and_decl =
@@ -918,17 +920,15 @@ struct
                  {
                    sort_rules
                    with const_rate =
-                          (enriched_rule.rule_id_with_mode,
-                           enriched_rule.rule,
+                          (enriched_rule,
                            rate)::sort_rules.const_rate
                  }
                else
                  {
                    sort_rules
                    with var_rate =
-                          (enriched_rule.rule_id_with_mode,
-                           enriched_rule.rule,
-                          rate)::sort_rules.var_rate
+                          (enriched_rule,
+                           rate)::sort_rules.var_rate
                  }
              in
              sort_rules)
@@ -1129,10 +1129,10 @@ struct
     let () = declare_rates_global logger network in
     let () =
       List.iter
-        (fun (rule_id_with_mode,_rule,rate) ->
+        (fun (rule,rate) ->
            Ode_loggers.associate
-             logger
-             (var_of_rate rule_id_with_mode) rate handler_expr)
+             ~comment:rule.comment logger
+             (var_of_rate rule.rule_id_with_mode) rate handler_expr)
         split.const_rate
     in
     let titles = I.get_obs_titles compil in
@@ -1171,10 +1171,10 @@ struct
     let () = Loggers.print_newline logger in
     let () =
       List.iter
-        (fun (id,_rule,rate) ->
+        (fun (rule,rate) ->
            Ode_loggers.associate
              logger
-             (var_of_rate id) rate (handler_expr network))
+             (var_of_rule rule) rate (handler_expr network))
         split.var_rate
     in
     let () = Loggers.print_newline logger in
@@ -1293,7 +1293,7 @@ struct
     let () = Format.printf "\t -initial state @." in
 
     let () = export_init logger network in
-    let () = Format.printf "\t -rates @." in
+    let () = Format.printf "\t -observables @." in
     let () = export_obs logger network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in
     ()

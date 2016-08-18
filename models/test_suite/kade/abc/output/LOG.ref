@@ -22,4 +22,4 @@ done
 	 -main function 
 	 -ode system 
 	 -initial state 
-	 -rates 
+	 -observables 

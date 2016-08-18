@@ -48,12 +48,12 @@ global kd
 global kun
 global kdun
 
-k(1)=0.001000;
-k(2)=0.100000;
-k(3)=0.001000;
-k(4)=1;
-k(5)=0.001000;
-k(6)=1;
+k(1)=0.001000;%Rule 1@
+k(2)=0.100000;%Rule 2@
+k(3)=0.001000;%Rule 3@
+k(4)=1;%Rule 4@
+k(5)=0.001000;%Rule 5@
+k(6)=1;%Rule 6@
 
 uiIsOctave = false;
 uiIsMatlab = false;

@@ -140,9 +140,9 @@ let add x y list  =
   | Some _ -> x::list
 
 let mode_of_rule compil rule =
-  let env = environment compil in
-  let id = rule.Primitives.syntactic_rule in
-  Direct
+  let _env = environment compil in
+  let _id = rule.Primitives.syntactic_rule in
+  Direct (* please fill: how do I know if the rule is direct or reverse*)
 
 let valid_modes compil rule id =
   let mode = mode_of_rule compil rule in
@@ -159,7 +159,13 @@ let rate _compil rule (_,arity,_) =
   | Usual -> Some rule.Primitives.rate
   | Unary -> Tools.option_map fst rule.Primitives.unary_rate
 
-let rate_name compil rule rule = ""
+let rate_name compil rule rule_id =
+  let _env = environment compil in
+  let _id = rule.Primitives.syntactic_rule in
+  let (kade_id,arity,direct) = rule_id in
+  "Rule "^(string_of_int kade_id)^(match arity with Usual -> "@"
+                                                  | Unary -> "(1)")^
+  (match direct with Direct -> "" | Op -> "op")
 
 let token_vector a =
   let add,remove  =

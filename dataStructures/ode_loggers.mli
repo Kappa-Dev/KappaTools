@@ -66,7 +66,7 @@ val print_dump_plots: data_file:string ->  command_line:string ->  titles:string
 
 val initialize: Loggers.t -> variable -> unit
 val associate:
-  ?init_mode:bool -> Loggers.t -> variable ->
+  ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
   'a Alg_expr.e Location.annot -> ('a, int) network_handler -> unit
 val increment:
   ?init_mode:bool -> Loggers.t -> variable ->

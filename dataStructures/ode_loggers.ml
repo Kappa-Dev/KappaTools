@@ -340,7 +340,30 @@ let rec print_alg_expr init_mode logger  alg_expr network
 let print_alg_expr ?init_mode:(init_mode=false) logger  alg_expr network
   = print_alg_expr init_mode logger alg_expr network
 
-let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
+let print_comment
+    logger
+    ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
+    string
+  =
+  let format = Loggers.get_encoding_format logger in
+  if shall_I_do_it format filter_in filter_out
+  then
+    match
+      format
+    with
+    | Loggers.Matlab
+    | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
+    | Loggers.Maple -> ()
+    | Loggers.Json
+    | Loggers.DOT
+    | Loggers.HTML_Graph
+    | Loggers.HTML
+    | Loggers.HTML_Tabular
+    | Loggers.TXT
+    | Loggers.TXT_Tabular
+    | Loggers.XLS -> ()
+
+let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable alg_expr network =
   match
     Loggers.get_encoding_format logger
   with
@@ -349,6 +372,11 @@ let associate ?init_mode:(init_mode=false) logger variable alg_expr network =
       let () = Loggers.fprintf logger "%s=" (string_of_variable variable) in
       let () = print_alg_expr ~init_mode logger alg_expr network in
       let () = Loggers.fprintf logger ";" in
+      let () =
+        if not (comment = "")
+        then
+          print_comment logger comment
+      in
       let () = Loggers.print_newline logger in
       ()
     end
@@ -509,30 +537,6 @@ let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
-let print_comment
-    logger
-    ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
-    string
-  =
-  let format = Loggers.get_encoding_format logger in
-  if shall_I_do_it format filter_in filter_out
-  then
-    match
-      format
-    with
-    | Loggers.Matlab
-    | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
-    | Loggers.Maple -> ()
-    | Loggers.Json
-    | Loggers.DOT
-    | Loggers.HTML_Graph
-    | Loggers.HTML
-    | Loggers.HTML_Tabular
-    | Loggers.TXT
-    | Loggers.TXT_Tabular
-    | Loggers.XLS -> ()
-
-
 
 let print_options logger =
   let format = Loggers.get_encoding_format logger in
