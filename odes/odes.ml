@@ -475,8 +475,9 @@ struct
             (fun
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
               (* regular application of tules, we store the embeddings*)
-              let () = debug "@[<v 2>test for rule %i @[%a@]"
+              let () = debug "@[<v 2>test for rule %i (Aut:%i)@[%a@]"
                   enriched_rule.rule_id
+                  enriched_rule.divide_rate_by
                   (I.print_rule ~compil) enriched_rule.rule in
               let arity = enriched_rule.mode in
               match arity with
