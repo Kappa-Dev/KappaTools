@@ -57,7 +57,7 @@ struct
 
   type id = int
   type ode_var_id = id
-  type intro_coef_id = id
+  (*  type intro_coef_id = id*)
   type var_id = id
   type obs_id = id
   type rule_id = id
@@ -1269,6 +1269,38 @@ struct
       List.iter
         (fun (reactants, products, token_vector, enriched_rule) ->
            let nauto_in_lhs = enriched_rule.divide_rate_by in
+           let () =
+             if I.do_we_prompt_reactions compil
+             then
+               let rule_string = "(coming soon)" in
+               let () =
+                 Ode_loggers.print_comment logger ("rule: "^rule_string)
+               in
+               let () = Loggers.print_newline logger in
+               let () = Ode_loggers.print_comment logger "reaction: "in
+               let dump list  =
+                 let _ =
+                   List.fold_left
+                   (fun bool k ->
+                      let prefix = if bool then " + " else "" in
+                      let species_string =
+                        Format.asprintf "%a"
+                          (fun log id -> I.print_chemical_species ~compil log
+                              (fst (Mods.DynArray.get network.species_tab id)))
+                          k
+                      in
+                      let () = Loggers.fprintf logger "%s%s" prefix species_string in
+                      true)
+                   false
+                   (List.rev list)
+                 in ()
+               in
+               let () = dump reactants in
+               let () = Loggers.fprintf logger " -> " in
+               let () = dump products in
+               let () = Loggers.print_newline logger in
+               ()
+           in
            let reactants' =
              List.rev_map
                (fun x ->
@@ -1322,10 +1354,10 @@ struct
         let comment =
           if k = get_fresh_ode_var_id network - 1 then "t"
           else
-          Format.asprintf "%a"
-            (fun log id -> I.print_chemical_species ~compil log
-                (fst (Mods.DynArray.get network.species_tab id)))
-            k
+            Format.asprintf "%a"
+              (fun log id -> I.print_chemical_species ~compil log
+                  (fst (Mods.DynArray.get network.species_tab id)))
+              k
         in
         let () = Ode_loggers.declare_init ~comment logger k in
         aux (next_id k)

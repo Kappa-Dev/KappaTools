@@ -59,6 +59,9 @@ let do_we_divide_rates_by_n_auto_in_lhs compil =
     | Ode_args.Occurrences -> false
     | Ode_args.Embeddings -> true
 
+let do_we_prompt_reactions compil =
+  compil.show_reactions
+
 let print_chemical_species ?compil =
   Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
 

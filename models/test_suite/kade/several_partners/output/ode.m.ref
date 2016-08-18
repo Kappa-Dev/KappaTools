@@ -129,23 +129,39 @@ k(3)=var(1);
 k(4)=var(1);
 
 dydt=zeros(nodevar,1);
+%rule: 
+%reaction: A(x!1), B(x!1, y) -> B(x, y)
 dydt(3)=dydt(3)-k(3)*y(3);
 dydt(1)=dydt(1)+k(3)*y(3);
+%rule: 
+%reaction: A(x!1), B(x!1, y) + A(x) -> A(x!1), B(x!1, y!2), A(x!2)
 dydt(2)=dydt(2)-k(2)*y(2)*y(3);
 dydt(3)=dydt(3)-k(2)*y(2)*y(3);
 dydt(5)=dydt(5)+k(2)*y(2)*y(3);
+%rule: 
+%reaction: A(x!1), B(x!1, y!2), A(x!2) -> A(x!1), B(x!1, y)
 dydt(5)=dydt(5)-k(4)*y(5);
 dydt(3)=dydt(3)+k(4)*y(5);
+%rule: 
+%reaction: A(x!1), B(x!1, y!2), A(x!2) -> A(x!1), B(x, y!1)
 dydt(5)=dydt(5)-k(3)*y(5);
 dydt(4)=dydt(4)+k(3)*y(5);
+%rule: 
+%reaction: A(x!1), B(x, y!1) -> B(x, y)
 dydt(4)=dydt(4)-k(4)*y(4);
 dydt(1)=dydt(1)+k(4)*y(4);
+%rule: 
+%reaction: A(x!1), B(x, y!1) + A(x) -> A(x!1), B(x!1, y!2), A(x!2)
 dydt(2)=dydt(2)-k(1)*y(2)*y(4);
 dydt(4)=dydt(4)-k(1)*y(2)*y(4);
 dydt(5)=dydt(5)+k(1)*y(2)*y(4);
+%rule: 
+%reaction: B(x, y) + A(x) -> A(x!1), B(x, y!1)
 dydt(2)=dydt(2)-k(2)*y(2)*y(1);
 dydt(1)=dydt(1)-k(2)*y(2)*y(1);
 dydt(4)=dydt(4)+k(2)*y(2)*y(1);
+%rule: 
+%reaction: B(x, y) + A(x) -> A(x!1), B(x!1, y)
 dydt(2)=dydt(2)-k(1)*y(2)*y(1);
 dydt(1)=dydt(1)-k(1)*y(2)*y(1);
 dydt(3)=dydt(3)+k(1)*y(2)*y(1);
