@@ -1,0 +1,7 @@
+#Command-line:
+"${KAPPABIN}"KaDE erre.ka  -d output -t 1 -p 100 || exit 0
+
+#We test what happens in case of ambiguous side effect
+
+# Know problem, to be fixed soon.
+# It crashes
