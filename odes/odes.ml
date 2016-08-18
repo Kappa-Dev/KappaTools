@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 17 2016>
+  * Last modification: Time-stamp: <Aug 18 2016>
 *)
 
 let local_trace = false
@@ -435,25 +435,26 @@ struct
   let compute_reactions compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
-    let _,rules =
-      List.fold_left
-        (fun (id,list) rule ->
-           let modes = I.valid_modes rule in
-           next_id id,
-           List.fold_left
-             (fun list mode ->
-                (enrich_rule rule mode id)::list)
-             list modes)
-        (fst_id,[]) rules
+    let rules =
+      List.rev
+         (snd
+            (List.fold_left
+               (fun (id,list) rule ->
+                  let modes = I.valid_modes rule in
+                  next_id id,
+                  List.fold_left
+                    (fun list mode ->
+                       (enrich_rule rule mode id)::list)
+                    list modes)
+               (fst_id,[]) (List.rev rules)))
     in
-    let rules = List.rev rules in
     let to_be_visited, network =
       initial_network
         compil network initial_states rules
     in
     let network =
       {network
-       with n_rules = pred n_rules;
+       with n_rules = n_rules;
             rules = rules }
     in
     let store = StoreMap.empty in
@@ -473,7 +474,7 @@ struct
           List.fold_left
             (fun
               (store_old_embeddings, to_be_visited, network)  enriched_rule ->
-            (* regular application of tules, we store the embeddings*)
+              (* regular application of tules, we store the embeddings*)
               let () = debug "@[<v 2>test for rule %i @[%a@]"
                   enriched_rule.rule_id
                   (I.print_rule ~compil) enriched_rule.rule in
@@ -798,7 +799,7 @@ struct
     List.fold_left
       (fun (cc_cache,list) (_,r,_) ->
          let b = I.mixture_of_init compil r in
-          let cc_cache',acc =
+         let cc_cache',acc =
            I.connected_components_of_mixture compil cc_cache b
          in
          cc_cache',List.rev_append acc list)
