@@ -98,16 +98,27 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
        if i <> p_id then acc else
          match port with
          | (Ast.LNK_ANY,_), s ->
-           assert (s = LKappa.Maintained);
-           let ports' = Array.copy ag.LKappa.ra_ports in
-           let () =
-             ports'.(i) <-
-               (Location.dummy_annot (Ast.LNK_VALUE (id,dst_info)),p_switch) in
-           ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
-              LKappa.ra_ints = ag.LKappa.ra_ints;
-              LKappa.ra_erased = ag.LKappa.ra_erased;
-              LKappa.ra_syntax = ag.LKappa.ra_syntax;}, todo)
-           :: acc
+           if s = LKappa.Maintained then
+             let ports' = Array.copy ag.LKappa.ra_ports in
+             let () =
+               ports'.(i) <-
+                 (Location.dummy_annot (Ast.LNK_VALUE (id,dst_info)),p_switch) in
+             ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
+                LKappa.ra_ints = ag.LKappa.ra_ints;
+                LKappa.ra_erased = ag.LKappa.ra_erased;
+                LKappa.ra_syntax = ag.LKappa.ra_syntax;}, todo)
+             :: acc
+           else if s = LKappa.Erased && p_switch = LKappa.Freed then
+             let ports' = Array.copy ag.LKappa.ra_ports in
+             let () =
+               ports'.(i) <-
+                 (Location.dummy_annot (Ast.LNK_VALUE (id,dst_info)),s) in
+             ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
+                LKappa.ra_ints = ag.LKappa.ra_ints;
+                LKappa.ra_erased = ag.LKappa.ra_erased;
+                LKappa.ra_syntax = ag.LKappa.ra_syntax;}, todo)
+             :: acc
+           else acc
          | (Ast.LNK_VALUE (k,x),_),s when k > id ->
            begin
              match
@@ -124,7 +135,8 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
                   LKappa.ra_erased = ag.LKappa.ra_erased;
                   LKappa.ra_syntax = ag.LKappa.ra_syntax;},
                 todo') :: acc
-             |_ -> acc
+             |[], _ -> acc
+             | _ :: _ :: _, _ -> assert false
            end
          | ((Ast.LNK_VALUE _ | Ast.LNK_TYPE _ | Ast.FREE | Ast.LNK_SOME),_), _ ->
            acc
