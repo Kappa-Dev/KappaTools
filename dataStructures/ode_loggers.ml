@@ -347,23 +347,27 @@ let print_comment
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
     string
   =
-  let format = Loggers.get_encoding_format logger in
-  if shall_I_do_it format filter_in filter_out
+  if string = ""
   then
-    match
-      format
-    with
-    | Loggers.Matlab
-    | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
-    | Loggers.Maple -> ()
-    | Loggers.Json
-    | Loggers.DOT
-    | Loggers.HTML_Graph
-    | Loggers.HTML
-    | Loggers.HTML_Tabular
-    | Loggers.TXT
-    | Loggers.TXT_Tabular
-    | Loggers.XLS -> ()
+    ()
+  else
+    let format = Loggers.get_encoding_format logger in
+    if shall_I_do_it format filter_in filter_out
+    then
+      match
+        format
+      with
+      | Loggers.Matlab
+      | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
+      | Loggers.Maple -> ()
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph
+      | Loggers.HTML
+      | Loggers.HTML_Tabular
+      | Loggers.TXT
+      | Loggers.TXT_Tabular
+      | Loggers.XLS -> ()
 
 let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable alg_expr network =
   match
@@ -374,11 +378,8 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable
       let () = Loggers.fprintf logger "%s=" (string_of_variable variable) in
       let () = print_alg_expr ~init_mode logger alg_expr network in
       let () = Loggers.fprintf logger ";" in
-      let () =
-        if not (comment = "")
-        then
-          print_comment logger comment
-      in
+      let () = if comment = "" then () else Loggers.fprintf logger " " in
+      let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
       ()
     end
@@ -429,7 +430,7 @@ let init_time logger n =
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
+let increment ?init_mode:(init_mode=false) ?comment:(comment="") logger variable alg_expr network =
   match
     Loggers.get_encoding_format logger
   with
@@ -439,6 +440,8 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
       let () = Loggers.fprintf logger "%s=%s+(" var var in
       let () = print_alg_expr ~init_mode logger alg_expr network in
       let () = Loggers.fprintf logger ");" in
+      let () = if comment = "" then () else Loggers.fprintf logger " " in
+      let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
       ()
     end
@@ -449,7 +452,7 @@ let increment ?init_mode:(init_mode=false)  logger variable alg_expr network =
 
 let apply_correct correct var  =
   let var_string = string_of_variable var in
-    match
+  match
     correct
   with
   | Nil -> var_string
@@ -584,7 +587,7 @@ let start_time logger float =
   let () = Loggers.fprintf logger "t = %f;" float in
   Loggers.print_newline logger
 
-let declare_init logger i =
+let declare_init ?comment:(comment="") logger i =
   match
     Loggers.get_encoding_format logger
   with
@@ -592,8 +595,9 @@ let declare_init logger i =
   | Loggers.Octave ->
     let () =
       Loggers.fprintf logger
-        "Init(%i) = init(%i);" i i
+        "Init(%i) = init(%i); " i i
     in
+    let () = print_comment logger comment in
     Loggers.print_newline logger
   | Loggers.Maple -> ()
   | Loggers.Json

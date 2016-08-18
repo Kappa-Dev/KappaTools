@@ -1044,12 +1044,13 @@ struct
     }
 
 
-  let increment is_zero ?init_mode:(init_mode=false) logger x =
+  let increment
+      is_zero ?init_mode:(init_mode=false) ?comment:(comment="") logger x =
     if is_zero x
     then
-      Ode_loggers.associate ~init_mode logger (Ode_loggers.Init x)
+      Ode_loggers.associate ~init_mode ~comment logger (Ode_loggers.Init x)
     else
-      Ode_loggers.increment ~init_mode logger (Ode_loggers.Init x)
+      Ode_loggers.increment ~init_mode ~comment logger (Ode_loggers.Init x)
 
   let affect_var is_zero ?init_mode:(init_mode=false) logger compil network decl =
     let handler_expr = handler_expr network in
@@ -1060,12 +1061,18 @@ struct
         match list with
         | [] -> ()
         | [a] ->
-          let n = snd (species_of_species_id network a) in
+          let species, n = species_of_species_id network a in
           let expr =
             Location.dummy_annot
               (to_nembed compil (from_nocc compil (fst expr) n) n)
           in
-          increment is_zero ~init_mode logger a expr handler_expr
+          let comment =
+            Format.asprintf "%a"
+              (fun log  ->
+                 I.print_chemical_species ~compil log )
+              species
+          in
+          increment is_zero ~init_mode ~comment logger a expr handler_expr
         | _ ->
           let () = Ode_loggers.associate
               ~init_mode logger (Ode_loggers.Expr id') expr handler_expr
@@ -1295,7 +1302,7 @@ struct
     let () = Loggers.print_newline logger in
     ()
 
-  let export_init logger network =
+  let export_init logger compil network =
     let () = Ode_loggers.open_procedure logger "Init" "ode_init" [] in
     let () = Loggers.print_newline logger in
     let () =
@@ -1312,7 +1319,15 @@ struct
       then
         ()
       else
-        let () = Ode_loggers.declare_init logger k in
+        let comment =
+          if k = get_fresh_ode_var_id network - 1 then "t"
+          else
+          Format.asprintf "%a"
+            (fun log id -> I.print_chemical_species ~compil log
+                (fst (Mods.DynArray.get network.species_tab id)))
+            k
+        in
+        let () = Ode_loggers.declare_init ~comment logger k in
         aux (next_id k)
     in
     let () = aux fst_id in
@@ -1375,7 +1390,7 @@ struct
     let () = export_dydt logger compil network sorted_rules_and_decl in
     let () = Format.printf "\t -initial state @." in
 
-    let () = export_init logger network in
+    let () = export_init logger compil network in
     let () = Format.printf "\t -observables @." in
     let () = export_obs logger compil network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in

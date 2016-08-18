@@ -70,13 +70,13 @@ val associate:
   ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
   'a Alg_expr.e Location.annot -> ('a, int) network_handler -> unit
 val increment:
-  ?init_mode:bool -> Loggers.t -> variable ->
+  ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
   'a Alg_expr.e Location.annot -> ('a, int) network_handler -> unit
 val associate_nrows: Loggers.t -> unit
 val associate_t: Loggers.t -> int -> unit
 val init_time: Loggers.t -> int -> unit
 val start_time: Loggers.t -> float -> unit
-val declare_init: Loggers.t -> int -> unit
+val declare_init: ?comment:string -> Loggers.t -> int -> unit
 
 val launch_main: Loggers.t -> unit
 

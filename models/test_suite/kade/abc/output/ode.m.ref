@@ -36,7 +36,7 @@ init(2)=(1*var(10));
 var(7)=(1*init(10));
 var(6)=(1*((init(7)+init(8))+init(9)));
 var(9)=10000;
-init(1)=(1*var(9));
+init(1)=(1*var(9)); %C(x1~u, x2~u)
 var(5)=(1*((init(1)+init(5))+init(6)));
 var(4)=(1*((init(4)+init(5))+init(9)));
 var(3)=1;
@@ -48,12 +48,12 @@ global kd
 global kun
 global kdun
 
-k(1)=0.001000;%Rule 1
-k(2)=0.100000;%Rule 2
-k(3)=0.001000;%Rule 3
-k(4)=1;%Rule 4
-k(5)=0.001000;%Rule 5
-k(6)=1;%Rule 6
+k(1)=0.001000; %Rule 1
+k(2)=0.100000; %Rule 2
+k(3)=0.001000; %Rule 3
+k(4)=1; %Rule 4
+k(5)=0.001000; %Rule 5
+k(6)=1; %Rule 6
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -192,17 +192,17 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1);
-Init(2) = init(2);
-Init(3) = init(3);
-Init(4) = init(4);
-Init(5) = init(5);
-Init(6) = init(6);
-Init(7) = init(7);
-Init(8) = init(8);
-Init(9) = init(9);
-Init(10) = init(10);
-Init(11) = init(11);
+Init(1) = init(1); %C(x1~u, x2~u)
+Init(2) = init(2); %A(x, c)
+Init(3) = init(3); %B(x)
+Init(4) = init(4); %A(x!1, c), B(x!1)
+Init(5) = init(5); %A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
+Init(6) = init(6); %A(x, c!1), C(x1~u!1, x2~u)
+Init(7) = init(7); %C(x1~p, x2~u)
+Init(8) = init(8); %A(x, c!1), C(x1~p, x2~u!1)
+Init(9) = init(9); %A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)
+Init(10) = init(10); %C(x1~p, x2~p)
+Init(11) = init(11); %t
 end
 
 

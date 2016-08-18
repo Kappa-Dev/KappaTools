@@ -29,8 +29,8 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(6)=t;
-init(1)=(1*6);
-init(2)=(1*4.500000);
+init(1)=(1*6); %B(x, y)
+init(2)=(1*4.500000); %A(x)
 var(1)=((1*(((init(2)+init(3))+init(4))+(2*init(5))))*t);
 
 global k
@@ -38,7 +38,7 @@ global kd
 global kun
 global kdun
 
-k(1)=1;%Rule 1
+k(1)=1; %Rule 1
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -160,12 +160,12 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1);
-Init(2) = init(2);
-Init(3) = init(3);
-Init(4) = init(4);
-Init(5) = init(5);
-Init(6) = init(6);
+Init(1) = init(1); %B(x, y)
+Init(2) = init(2); %A(x)
+Init(3) = init(3); %A(x!1), B(x!1, y)
+Init(4) = init(4); %A(x!1), B(x, y!1)
+Init(5) = init(5); %A(x!1), B(x!1, y!2), A(x!2)
+Init(6) = init(6); %t
 end
 
 
