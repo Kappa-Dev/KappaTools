@@ -8,6 +8,7 @@ type compil =
     contact_map: (int list * (int * int) list) array array ;
     environment: Environment.t ;
     init: (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
+    rate_convention: Ode_args.rate_convention ;
   }
 
 type cache = Connected_component.PreEnv.t
@@ -41,7 +42,12 @@ type connected_component = Connected_component.cc
 let dummy_chemical_species compil =
   Connected_component.empty_cc (sigs compil)
 
-let do_we_divide_rates_by_n_auto_in_lhs = true
+let do_we_divide_rates_by_n_auto_in_lhs compil =
+  match
+    compil.rate_convention
+  with
+  | Ode_args.KaSim -> false
+  | Ode_args.Biochemist -> true
 
 let print_chemical_species ?compil =
   Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
@@ -142,8 +148,16 @@ let add x y list  =
 let mode_of_rule compil rule =
   let _env = environment compil in
   let _id = rule.Primitives.syntactic_rule in
-  Direct (* please fill: how do I know if the rule is direct or reverse*)
-
+  if (* Pierre, could you help me here please ? *)
+    (* I would like to know if the rule comes from the interpretation of a rule in a direct way, or from the interpretation of a rule in a reverse way *)
+    (* ex: 'A.B' A(x),B(x) <-> A(x!1),B(x!1) @ 1(2),3(4) *)
+    (* I am expecting Direct for the rule A(x),B(x) -> A(x!1),B(x!1) @ 1(2) *)
+    (* and Op for the rule A(x!1),B(x!1) -> A(x),B(x) @ 3(4) *)
+    true
+  then
+    Direct
+  else
+    Op
 let valid_modes compil rule id =
   let mode = mode_of_rule compil rule in
   List.rev_map
@@ -162,10 +176,24 @@ let rate _compil rule (_,arity,_) =
 let rate_name compil rule rule_id =
   let _env = environment compil in
   let _id = rule.Primitives.syntactic_rule in
-  let (kade_id,arity,direct) = rule_id in
-  "Rule "^(string_of_int kade_id)^(match arity with Usual -> "@"
-                                                  | Unary -> "(1)")^
-  (match direct with Direct -> "" | Op -> "op")
+  let (kade_id,arity,direction) = rule_id in
+  let arity_tag =
+    match arity with
+    | Usual -> ""
+    | Unary -> "(unary context)"
+  in
+  let direction_tag =
+    match direction with
+    | Direct -> ""
+    | Op -> "(op)"
+  in
+  let rule_name = (* Pierre, could you help me here please ? *)
+    (* I would need the base label of the rule *)
+    (* ex: 'A.B' A(x),B(x) <-> A(x!1),B(x!1) @ 1(2),3(4) *)
+    (* I am expecting "A.B" whatever the value of the variables arity or direct is *)
+    "Rule "^(string_of_int kade_id)
+  in
+  rule_name^arity_tag^direction_tag
 
 let token_vector a =
   let add,remove  =
@@ -232,12 +260,15 @@ let get_obs_titles compil =
            (Kappa_printer.alg_expr ~env) x))
     env
 
-let get_compil common_args cli_args =
+let get_compil ~rate_convention common_args cli_args =
   let (env,_,contact_map,_,_,_,_,init),_,_ =
     Cli_init.get_compilation common_args cli_args in
-  {environment = env ;
-   contact_map = contact_map ;
-   init = init}
+  {
+    environment = env ;
+    contact_map = contact_map ;
+    init = init ;
+    rate_convention = rate_convention ;
+  }
 
 let empty_cache compil =
   Connected_component.PreEnv.empty (sigs compil)

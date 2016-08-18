@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 17 2016>
+  * Last modification: Time-stamp: <Aug 18 2016>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -8,7 +8,8 @@ module A = Odes.Make (Ode_interface)
 let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave] [-t-init time] [-t time] [-p points] [-o output_file]\n"
+    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave]
+[--rate-convention KaSim ][-t-init time] [-t time] [-p points] [-o output_file]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -62,6 +63,25 @@ let main () =
           exit 0
         end
     in
+    let rate_convention =
+      match ode_args.Ode_args.rate_convention with
+    | "kasim" | "KaSim" | "KASIM" -> Ode_args.KaSim
+    | "biochemist" | "Biochemist" | "BIOCHEMIST" ->
+      let () =
+      Debug.tag
+        Format.std_formatter
+        ("The biochemist mode is not working correctly at the moment")
+      in
+      Ode_args.Biochemist
+    | s ->
+      begin
+        Arg.usage options usage_msg;
+        Debug.tag
+          Format.std_formatter
+          ("Wrong option "^s^".\nOnly KaSim and Biochemist are supported.");
+        exit 0
+      end
+    in
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
       | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
@@ -87,7 +107,7 @@ let main () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
-    let compil = A.get_compil common_args cli_args in
+    let compil = A.get_compil rate_convention common_args cli_args in
     let network = A.network_from_compil compil in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in

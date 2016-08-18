@@ -243,8 +243,10 @@ struct
       lhs = lhs ;
       lhs_cc = lhs_cc ;
       divide_rate_by =
-        if I.do_we_divide_rates_by_n_auto_in_lhs
+        if I.do_we_divide_rates_by_n_auto_in_lhs compil
         then I.nbr_automorphisms_in_pattern lhs
+        (* Pierre, could you help me here please ? *)
+        (* here I need the number of auto in the lhs of the original rule, not the one in the refinment of the rule *)
         else 1
     }
 

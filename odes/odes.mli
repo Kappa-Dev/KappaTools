@@ -1,14 +1,13 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 17 2016>
+  * Last modification: Time-stamp: <Aug 18 2016>
 *)
-
 module Make(I:Ode_interface_sig.Interface) :
 sig
   type ode_var_id
   type 'a network
 
-  val get_compil : Common_args.t -> Run_cli_args.t -> I.compil
+  val get_compil : rate_convention:Ode_args.rate_convention -> Common_args.t -> Run_cli_args.t -> I.compil
 
   val network_from_compil:
     I.compil -> int network

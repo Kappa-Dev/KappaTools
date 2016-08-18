@@ -41,14 +41,14 @@ global kd
 global kun
 global kdun
 
-k(1)=1;%Rule 1@
-k(2)=2;%Rule 2@
-k(3)=3;%Rule 3@
-k(4)=4;%Rule 4@
-k(5)=5;%Rule 5@
-k(6)=6;%Rule 6@
-k(7)=12;%Rule 7@
-k(8)=13;%Rule 8@
+k(1)=1;%Rule 1
+k(2)=2;%Rule 2
+k(3)=3;%Rule 3
+k(4)=4;%Rule 4
+k(5)=5;%Rule 5
+k(6)=6;%Rule 6
+k(7)=12;%Rule 7
+k(8)=13;%Rule 8
 
 uiIsOctave = false;
 uiIsMatlab = false;

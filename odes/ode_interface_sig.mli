@@ -33,7 +33,7 @@ sig
   val print_canonic_species:
     ?compil:compil -> Format.formatter -> canonic_species -> unit
 
-  val do_we_divide_rates_by_n_auto_in_lhs: bool
+  val do_we_divide_rates_by_n_auto_in_lhs: compil -> bool 
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
   val nbr_automorphisms_in_pattern: pattern -> int
 
@@ -84,6 +84,7 @@ sig
   val lift_species: compil -> chemical_species -> mixture
 
   val get_compil:
+    rate_convention:Ode_args.rate_convention ->
     Common_args.t -> Run_cli_args.t -> compil
   val get_rules: compil -> rule list
   val get_variables:
