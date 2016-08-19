@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 14 2016>
+   * Last modification: Time-stamp: <Aug 19 2016>
    *
    * Abstract domain to record live rules
    *
@@ -352,62 +352,52 @@ let may_get_free_by_side_effect parameters kappa_handler error precondition rule
     end
   else error, false
 
+let rec follow_path_inside_cc
+    parameters error cc agent_id relative_address site
+  =
+  match
+    relative_address
+  with
+  | [] -> error, Located agent_id
+  | head::tail ->
+    begin
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters error agent_id (*A*) cc.Cckappa_sig.bonds
+      with
+      | error, None -> error, May_exist
+      | error, Some map ->
+        begin
+          match
+            Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+              parameters error head.site_out (*A.x*) map
+          with
+          | error, None -> error, May_exist
+          | error, Some site_add ->
+            (*-----------------------------------------------*)
+            (*A.x is bound to something*)
+            let agent_type' = site_add.Cckappa_sig.agent_type in
+            let site_type' = site_add.Cckappa_sig.site in
+            (*check that A.x is bound to B.y*)
+            if agent_type' = head.agent_type_in
+            && site_type' = head.site_in
+            then
+              (*recursively apply to #i tail*)
+              follow_path_inside_cc
+                parameters error cc
+                site_add.Cckappa_sig.agent_index tail site
+            else
+              let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WRONG TARGET\n" in
+              error, Cannot_exist
+        end
+    end
 
-let rec post_condition parameters kappa_handler error rule precondition dynamic path =
+let rec post_condition parameters kappa_handler error rule precondition dynamic r agent_id relative_address site  =
   let cc = rule.Cckappa_sig.rule_rhs in
   (*---------------------------------------------------------*)
   (*inside the pattern, check the binding information in the lhs of the current agent*)
-  let rec aux error path =
-    match
-      path.relative_address
-    with
-    | [] -> error, Located path.agent_id
-    | head::tail ->
-      begin
-        match
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-            parameters
-            error
-            path.agent_id (*A*)
-            cc.Cckappa_sig.bonds
-        with
-        | error, None -> error, May_exist
-        | error, Some map ->
-          begin
-            match
-              Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-                parameters
-                error
-                head.site_out (*A.x*)
-                map
-            with
-            | error, None -> error, May_exist
-            | error, Some site_add ->
-              (*-----------------------------------------------*)
-              (*A.x is bound to something*)
-              let agent_type' = site_add.Cckappa_sig.agent_type in
-              let site_type' = site_add.Cckappa_sig.site in
-              (*check that A.x is bound to B.y*)
-              if agent_type' = head.agent_type_in
-              && site_type' = head.site_in
-              then
-                (*recursively apply to #i tail*)
-                let next_path =
-                  {
-                    path with
-                    agent_id = site_add.Cckappa_sig.agent_index;
-                    relative_address = tail;
-                  }
-                in
-                aux error next_path
-              else
-                let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WRONG TARGET\n" in
-                error, Cannot_exist
-          end
-      end
-  in
   let error, potential_values =
-    match aux error path
+    match follow_path_inside_cc parameters error cc agent_id relative_address site
     with
     | error, Cannot_exist -> error, Usual_domains.Undefined
     | error, May_exist -> error, Usual_domains.Any
@@ -439,7 +429,7 @@ let rec post_condition parameters kappa_handler error rule precondition dynamic 
                 Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
                   parameters
                   error
-                  path.site
+                  site
                   proper_agent.Cckappa_sig.agent_interface
               in
               begin
@@ -466,10 +456,12 @@ let rec post_condition parameters kappa_handler error rule precondition dynamic 
   | Usual_domains.Any ->
     begin
       let path =
-        match path.defined_in with
-        | RHS r ->
-          { path with defined_in = LHS r}
-        | LHS _ | Pattern -> path
+        {
+          defined_in = LHS r ;
+          agent_id = agent_id ;
+          site = site ;
+          relative_address = relative_address ;
+        }
       in
       let error, dynamic, precondition, values =
         get_state_of_site
@@ -504,13 +496,14 @@ and get_state_of_site
       let error, dynamic, range =
         post_condition
           parameters kappa_handler error
-          rule.Cckappa_sig.e_rule_c_rule precondition dynamic path
+          rule.Cckappa_sig.e_rule_c_rule precondition dynamic
+          rule path.agent_id path.relative_address path.site
       in
       error, dynamic, precondition,  range
   end
 
 let refine_information_about_state_of_sites_in_precondition
-     precondition f =
+    precondition f =
   let new_f parameter error dynamic path =
     let error, dynamic, old_output =
       precondition.state_of_sites_in_precondition

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 14 2016>
+   * Last modification: Time-stamp: <Aug 19 2016>
    *
    * Abstract domain to record live rules
    *
@@ -13,17 +13,22 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
+type output =
+  | Cannot_exist
+  | May_exist
+  | Located of Ckappa_sig.c_agent_id
+
 type path_defined_in =
   | LHS of Cckappa_sig.enriched_rule
   | RHS of Cckappa_sig.enriched_rule
   | Pattern
 
 type event =
-| Dummy (* to avoid compilation warning *)
-| Check_rule of Ckappa_sig.c_rule_id
-| See_a_new_bond of
-    ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
-        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+  | Dummy (* to avoid compilation warning *)
+  | Check_rule of Ckappa_sig.c_rule_id
+  | See_a_new_bond of
+      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
+       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 type step =
   {
@@ -58,13 +63,13 @@ type 'a fold =
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   Exception.method_handler *
-    ((Remanent_parameters_sig.parameters ->
-      Ckappa_sig.c_state ->
-      Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
-      Exception.method_handler * 'a ->
-      Exception.method_handler * 'a) ->
-     Exception.method_handler -> 'a ->
-     Exception.method_handler * 'a) Usual_domains.flat_lattice
+  ((Remanent_parameters_sig.parameters ->
+    Ckappa_sig.c_state ->
+    Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
+    Exception.method_handler * 'a ->
+    Exception.method_handler * 'a) ->
+   Exception.method_handler -> 'a ->
+   Exception.method_handler * 'a) Usual_domains.flat_lattice
 
 val dummy_precondition: precondition
 
@@ -105,7 +110,7 @@ val refine_information_about_state_of_sites_in_precondition:
    path ->
    Ckappa_sig.c_state list Usual_domains.flat_lattice ->
    Exception.method_handler * Analyzer_headers.global_dynamic_information *
-     Ckappa_sig.c_state list Usual_domains.flat_lattice) ->
+   Ckappa_sig.c_state list Usual_domains.flat_lattice) ->
   precondition
 
 val get_potential_partner:
@@ -149,3 +154,10 @@ val get_state_of_site:
   Exception.method_handler * Analyzer_headers.global_dynamic_information *
   precondition *
   Ckappa_sig.c_state list Usual_domains.flat_lattice
+
+val follow_path_inside_cc:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Cckappa_sig.mixture ->
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
+  step list -> 'a -> Exception.method_handler * output
