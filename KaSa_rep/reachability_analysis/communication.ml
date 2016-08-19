@@ -57,11 +57,22 @@ type step =
 
 type path =
   {
-    defined_in: path_defined_in;
     agent_id: Ckappa_sig.c_agent_id;
     relative_address: step list;
     site: Ckappa_sig.c_site_name;
   }
+
+type path_in_pattern =
+  {
+    defined_in: path_defined_in;
+    path:path;
+  }
+
+let get_defined_in p = p.defined_in
+let get_agent_id p = p.path.agent_id
+let get_site p = p.path.site
+let get_relative_address p = p.path.relative_address
+
 
 module type PathMap =
 sig
@@ -353,17 +364,17 @@ let may_get_free_by_side_effect parameters kappa_handler error precondition rule
   else error, false
 
 let rec follow_path_inside_cc
-    parameters error cc agent_id relative_address site
+    parameters error cc path
   =
   match
-    relative_address
+    path.relative_address
   with
-  | [] -> error, Located agent_id
+  | [] -> error, Located path.agent_id
   | head::tail ->
     begin
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-          parameters error agent_id (*A*) cc.Cckappa_sig.bonds
+          parameters error path.agent_id (*A*) cc.Cckappa_sig.bonds
       with
       | error, None -> error, May_exist
       | error, Some map ->
@@ -385,19 +396,21 @@ let rec follow_path_inside_cc
               (*recursively apply to #i tail*)
               follow_path_inside_cc
                 parameters error cc
-                site_add.Cckappa_sig.agent_index tail site
+                {path with agent_id = site_add.Cckappa_sig.agent_index;
+                           relative_address = tail}
             else
               let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WRONG TARGET\n" in
               error, Cannot_exist
         end
     end
 
-let rec post_condition parameters kappa_handler error rule precondition dynamic r agent_id relative_address site  =
+let rec post_condition parameters kappa_handler error r precondition dynamic path  =
+  let rule = r.Cckappa_sig.e_rule_c_rule in
   let cc = rule.Cckappa_sig.rule_rhs in
   (*---------------------------------------------------------*)
   (*inside the pattern, check the binding information in the lhs of the current agent*)
   let error, potential_values =
-    match follow_path_inside_cc parameters error cc agent_id relative_address site
+    match follow_path_inside_cc parameters error cc path
     with
     | error, Cannot_exist -> error, Usual_domains.Undefined
     | error, May_exist -> error, Usual_domains.Any
@@ -429,7 +442,7 @@ let rec post_condition parameters kappa_handler error rule precondition dynamic 
                 Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
                   parameters
                   error
-                  site
+                  path.site
                   proper_agent.Cckappa_sig.agent_interface
               in
               begin
@@ -458,9 +471,7 @@ let rec post_condition parameters kappa_handler error rule precondition dynamic 
       let path =
         {
           defined_in = LHS r ;
-          agent_id = agent_id ;
-          site = site ;
-          relative_address = relative_address ;
+          path = path
         }
       in
       let error, dynamic, precondition, values =
@@ -469,7 +480,7 @@ let rec post_condition parameters kappa_handler error rule precondition dynamic 
           precondition dynamic path
       in
       let error, bool =
-        may_get_free_by_side_effect parameters kappa_handler error precondition rule path in
+        may_get_free_by_side_effect parameters kappa_handler error precondition rule path.path in
       if bool
       then
         match values with
@@ -489,15 +500,14 @@ and get_state_of_site
     | LHS _ | Pattern ->
       let error, dynamic, range =
         precondition.state_of_sites_in_precondition
-          parameters error dynamic path
+          parameters error dynamic path.path
       in
       error, dynamic, precondition, range
     | RHS rule ->
       let error, dynamic, range =
         post_condition
           parameters kappa_handler error
-          rule.Cckappa_sig.e_rule_c_rule precondition dynamic
-          rule path.agent_id path.relative_address path.site
+          rule precondition dynamic path.path
       in
       error, dynamic, precondition,  range
   end

@@ -39,11 +39,21 @@ type step =
 
 type path =
   {
-    defined_in: path_defined_in;
     agent_id: Ckappa_sig.c_agent_id;
     relative_address: step list;
     site: Ckappa_sig.c_site_name;
   }
+
+type path_in_pattern =
+       {
+         defined_in: path_defined_in ;
+         path:path ;
+       }
+
+val get_defined_in: path_in_pattern -> path_defined_in
+val get_agent_id: path_in_pattern -> Ckappa_sig.c_agent_id
+val get_site: path_in_pattern -> Ckappa_sig.c_site_name
+val get_relative_address: path_in_pattern -> step list
 
 module type PathMap =
 sig
@@ -150,7 +160,7 @@ val get_state_of_site:
   Exception.method_handler ->
   precondition ->
   Analyzer_headers.global_dynamic_information ->
-  path ->
+  path_in_pattern ->
   Exception.method_handler * Analyzer_headers.global_dynamic_information *
   precondition *
   Ckappa_sig.c_state list Usual_domains.flat_lattice
@@ -159,5 +169,4 @@ val follow_path_inside_cc:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.mixture ->
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
-  step list -> 'a -> Exception.method_handler * output
+  path -> Exception.method_handler * output

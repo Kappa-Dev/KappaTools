@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 16 2016>
+   * Last modification: Time-stamp: <Aug 19 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -176,7 +176,7 @@ struct
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_potential_tuple_pair_set
 
-  let set_potential_tuple_pair_set r static =
+    let set_potential_tuple_pair_set r static =
     set_basic_static_information
       {
         (get_basic_static_information static) with
@@ -385,24 +385,24 @@ struct
         static in
 
     (*let store_views_rhs = get_views_rhs static in
-    let store_bonds_rhs = get_bonds_rhs static in
-    let store_potential_tuple_pair_set =
+      let store_bonds_rhs = get_bonds_rhs static in
+      let store_potential_tuple_pair_set =
       get_potential_tuple_pair_set static in
-    let error, store_potential_tuple_pair_set =
+      let error, store_potential_tuple_pair_set =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair_set
         parameter error
         rule_id store_bonds_rhs
         store_views_rhs
         kappa_handler
         store_potential_tuple_pair_set
-    in
-    let static = set_potential_tuple_pair_set store_potential_tuple_pair_set
+      in
+      let static = set_potential_tuple_pair_set store_potential_tuple_pair_set
         static in
-    (**)
-    let error, store_test =
+      (**)
+      let error, store_test =
       Site_accross_bonds_domain_static.collect_pair_sites_aux
         parameter error rule_id store_views_rhs
-    in*)
+      in*)
     (* store_potential_tuple_pair is completely wrong *)
     (* Let me recall you the definition.
        this set should contain the pairs
@@ -418,14 +418,14 @@ struct
     (* but some sites site_t, site_u are not even binding sites !!! *)
 
     (*let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let error, store_potential_tuple_pair =
+      let error, store_potential_tuple_pair =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair
         parameter error
         rule_id
         store_test
         store_potential_tuple_pair
-    in
-    let static = set_potential_tuple_pair store_potential_tuple_pair static in*)
+      in
+      let static = set_potential_tuple_pair store_potential_tuple_pair static in*)
     (*------------------------------------------------------------*)
     (*created a bond*)
     let store_created_bonds = get_created_bonds static in
@@ -499,24 +499,24 @@ struct
            in
            let () =
              Loggers.fprintf
-             (Remanent_parameters.get_logger parameter)
-             "%i:%s %i:%s %i:%s (%i:%s) | %i:%s %i:%s %i:%s (%i:%s) \n"
-             (Ckappa_sig.int_of_agent_name a)
-             agent
-             (Ckappa_sig.int_of_site_name b)
-             site
-             (Ckappa_sig.int_of_site_name c)
-             site'
-             (Ckappa_sig.int_of_state_index d)
-             state
-             (Ckappa_sig.int_of_agent_name e)
-             agent1
-             (Ckappa_sig.int_of_site_name f)
-             site1
-             (Ckappa_sig.int_of_site_name g)
-             site1'
-             (Ckappa_sig.int_of_state_index h)
-             state1
+               (Remanent_parameters.get_logger parameter)
+               "%i:%s %i:%s %i:%s (%i:%s) | %i:%s %i:%s %i:%s (%i:%s) \n"
+               (Ckappa_sig.int_of_agent_name a)
+               agent
+               (Ckappa_sig.int_of_site_name b)
+               site
+               (Ckappa_sig.int_of_site_name c)
+               site'
+               (Ckappa_sig.int_of_state_index d)
+               state
+               (Ckappa_sig.int_of_agent_name e)
+               agent1
+               (Ckappa_sig.int_of_site_name f)
+               site1
+               (Ckappa_sig.int_of_site_name g)
+               site1'
+               (Ckappa_sig.int_of_state_index h)
+               state1
            in error
         )
         store_potential_tuple_pair error
@@ -700,18 +700,19 @@ struct
     let path =
       {
         Communication.defined_in = defined_in ;
-        Communication.agent_id = agent_id;
-        Communication.relative_address = []; (**)
-        Communication.site = site_type;
-      }
+        Communication.path =
+          {Communication.agent_id = agent_id;
+           Communication.relative_address = []; (**)
+           Communication.site = site_type;
+          }}
     in
     (*get a list of site_type2 state in the precondition*)
     let error, global_dynamic, precondition, state_list_lattice =
       Communication.get_state_of_site
-      parameter kappa_handler error
-      precondition
-      (get_global_dynamic_information dynamic)
-      path
+        parameter kappa_handler error
+        precondition
+        (get_global_dynamic_information dynamic)
+        path
     in
     let error, state_list =
       match state_list_lattice with
@@ -908,7 +909,7 @@ struct
                            "%i, " (Ckappa_sig.int_of_state_index i))
                       state'_list_y
                   in*)
-                  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+                    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
                     let error, () =
                       Exception.warn parameter error __POS__
                         ~message:((context rule_id agent_id_t site_type'_x)^(context rule_id agent_id_u site_type'_y)^"\nempty list in potential states in post condition") Exit ()
@@ -1113,9 +1114,11 @@ struct
     let path =
       {
         Communication.defined_in = defined_in;
-        Communication.agent_id = agent_id_t;
-        Communication.relative_address = [step];
-        Communication.site = site_type'_y
+        path =
+          {
+            Communication.agent_id = agent_id_t;
+            Communication.relative_address = [step];
+            Communication.site = site_type'_y}
       }
     in
     let error, global_dynamic, precondition, state_list_lattice =
@@ -1174,17 +1177,17 @@ struct
            | Usual_domains.Undefined -> "BOTTOM"
            | _ -> "")
       in*)
-    (*  let () =
-    List.iter
-      (fun i ->
-         Loggers.fprintf
-           (Remanent_parameters.get_logger parameter)
-           "%i, " (Ckappa_sig.int_of_state_index i))
-      state_list
-        in*)
-      let () =
-        Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      Exception.warn parameter error __POS__ Exit []
+        (*  let () =
+            List.iter
+            (fun i ->
+             Loggers.fprintf
+               (Remanent_parameters.get_logger parameter)
+               "%i, " (Ckappa_sig.int_of_state_index i))
+            state_list
+            in*)
+        let () =
+          Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        Exception.warn parameter error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list

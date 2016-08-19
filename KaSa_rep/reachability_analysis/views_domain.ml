@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 16 2016>
+   * Last modification: Time-stamp: <Aug 19 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1644,10 +1644,10 @@ struct
                   in
                   let error, bdu_X =
                     match
-                    Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                      parameter error
-                      (agent_type_in, cv_id)
-                      fixpoint_result
+                      Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                        parameter error
+                        (agent_type_in, cv_id)
+                        fixpoint_result
                     with
                     | error, None -> error, bdu_false
                     | error, Some bdu -> error, bdu
@@ -1721,426 +1721,378 @@ struct
       Exception.warn parameter error __POS__ Exit
         (dynamic, Usual_domains.Undefined)
 
-      (*revert the list and then take the first two elements in the list, there
-        are two cases, first case: there exists two elements inside the list,
-        other case is there is only one element inside the list*)
-      (*begin
-        let last_step_opt =
-          last parameter error path.Communication.relative_address
-        in
-        match last_step_opt with
-        | error, None ->
-          Exception.warn
-            parameter error __POS__
-            ~message:"empty path in precondition outside pattern"
-            Exit (dynamic, Usual_domains.Any)
-        | error, Some fst_step ->
-          begin
-            let fst_agent = fst_step.Communication.agent_type_in in
-            let fst_site = fst_step.Communication.site_in in (*D.t*)
-            let step_agent = step.Communication.agent_type_in in
-            let step_site = step.Communication.site_in in
+  (*revert the list and then take the first two elements in the list, there
+    are two cases, first case: there exists two elements inside the list,
+    other case is there is only one element inside the list*)
+  (*begin
+    let last_step_opt =
+      last parameter error path.Communication.relative_address
+    in
+    match last_step_opt with
+    | error, None ->
+      Exception.warn
+        parameter error __POS__
+        ~message:"empty path in precondition outside pattern"
+        Exit (dynamic, Usual_domains.Any)
+    | error, Some fst_step ->
+      begin
+        let fst_agent = fst_step.Communication.agent_type_in in
+        let fst_site = fst_step.Communication.site_in in (*D.t*)
+        let step_agent = step.Communication.agent_type_in in
+        let step_site = step.Communication.site_in in
 
-            (*In D, site t has the binding state B.w, get the information of the state B.w for t*)
-            let error, state_dic =
-              Misc_sa.unsome
-                (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-                   parameter
-                   error
-                   (fst_agent, fst_site) (*D.t*)
-                   kappa_handler.Cckappa_sig.states_dic)
-                (fun error ->
-                   Exception.warn
-                     parameter error __POS__ Exit
-                     (Ckappa_sig.Dictionary_of_States.init()))
-            in
-            (*the state of site t is B.w*)
-            let state = Ckappa_sig.C_Lnk_type (step_agent, step_site) in
-            (*check that if the state B@w is defined or not*)
-            let error, b =
-              Ckappa_sig.Dictionary_of_States.member
+        (*In D, site t has the binding state B.w, get the information of the state B.w for t*)
+        let error, state_dic =
+          Misc_sa.unsome
+            (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+               parameter
+               error
+               (fst_agent, fst_site) (*D.t*)
+               kappa_handler.Cckappa_sig.states_dic)
+            (fun error ->
+               Exception.warn
+                 parameter error __POS__ Exit
+                 (Ckappa_sig.Dictionary_of_States.init()))
+        in
+        (*the state of site t is B.w*)
+        let state = Ckappa_sig.C_Lnk_type (step_agent, step_site) in
+        (*check that if the state B@w is defined or not*)
+        let error, b =
+          Ckappa_sig.Dictionary_of_States.member
+            parameter
+            error
+            (Ckappa_sig.Binding state)
+            state_dic
+        in
+        (*--------------------------------------------------------*)
+        if b
+        then
+          (*state is defined, get the information about this state*)
+          let error, (dynamic, new_answer) =
+            match
+              Ckappa_sig.Dictionary_of_States.allocate
                 parameter
                 error
+                Ckappa_sig.compare_unit_state_index
                 (Ckappa_sig.Binding state)
+                ()
+                Misc_sa.const_unit
                 state_dic
-            in
-            (*--------------------------------------------------------*)
-            if b
-            then
-              (*state is defined, get the information about this state*)
-              let error, (dynamic, new_answer) =
+            with
+            | error, None -> (*inconsistent*)
+              error, (dynamic, Usual_domains.Undefined)
+            | error, Some (state, _, _, _) -> (*state of t is B@w*)
+              (*for each covering class containing D@v, if t in covering class,
+                take the state of v knowing that t has type B@w*)
+              (*covering class containing D@v*)
+              let error, cv_list =
                 match
-                  Ckappa_sig.Dictionary_of_States.allocate
+                  Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                     parameter
                     error
-                    Ckappa_sig.compare_unit_state_index
-                    (Ckappa_sig.Binding state)
-                    ()
-                    Misc_sa.const_unit
-                    state_dic
+                    (fst_agent, path.Communication.site) (*D@v*)
+                    store_covering_classes_id
                 with
-                | error, None -> (*inconsistent*)
-                  error, (dynamic, Usual_domains.Undefined)
-                | error, Some (state, _, _, _) -> (*state of t is B@w*)
-                  (*for each covering class containing D@v, if t in covering class,
-                    take the state of v knowing that t has type B@w*)
-                  (*covering class containing D@v*)
-                  let error, cv_list =
-                    match
-                      Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                        parameter
-                        error
-                        (fst_agent, path.Communication.site) (*D@v*)
-                        store_covering_classes_id
-                    with
-                    | error, None ->
-                      Exception.warn parameter error __POS__ Exit []
-                    | error, Some l -> error, l
-                  in
-                  (*get a triple (cv_id, list, set) of the last agent that containing t*)
-                  let error, site_correspondence =
-                    match
-                      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
-                        parameter
-                        error
-                        fst_agent (*D*)
-                        site_correspondence
-                    with
-                    | error, None ->
-                      Exception.warn parameter error __POS__ Exit []
-                    | error, Some l -> error, l
-                  in
-                  (*---------------------------------------------------*)
-                  let error, dynamic, bdu =
-                    List.fold_left
-                      (fun (error, dynamic, bdu) cv_id ->
-                         (*FIX ME: check whether or not t is in this covering class*)
-                         let error, b =
-                           List.fold_left
-                             (fun (error, bool) (h, _list, _set)  ->
-                               if h = cv_id
-                               then
-                                 error, true
-                               else
-                                 error, bool
-                             ) (error, false) site_correspondence
-                         in
-                         if b
-                         then
-                           (*------------------------------------------------*)
-                           (*t is in CV, take the states of v knowing that t has type B@w*)
-                           let error, new_site_name =
-                             get_new_site_name
-                               parameter
-                               error
-                               cv_id
-                               path.Communication.site (*state v in D*)
-                               site_correspondence
-                           in
-                           (*fetch bdu of D*)
-                           let error, bdu_X =
-                             match
-                               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                                 parameter
-                                 error
-                                 (fst_agent, cv_id)
-                                 fixpoint_result
-                             with
-                             | error, None -> error, bdu_false
-                             | error, Some bdu -> error, bdu
-                           in
-                           let handler =
-                             Analyzer_headers.get_mvbdu_handler dynamic
-                           in
-                           let error, handler, singleton =
-                             Ckappa_sig.Views_bdu.build_variables_list
-                               parameter
-                               handler
-                               error
-                               [new_site_name]
-                           in
-                           (*build new bdu where state t = B@w, get bdu_X and change the type*)
-                           let error, handler, list =
-                             Ckappa_sig.Views_bdu.extensional_of_mvbdu
-                               parameter
-                               handler
-                               error
-                               bdu_X
-                           in
-                           let error, handler, new_bdu =
-                             List.fold_left (fun (error, handler, bdu) pair_list ->
-                                 let error, new_pair_list =
-                                   List.fold_left
-                                     (fun (error, current_list) (site, _) ->
-                                        error, (site, state) :: current_list
-                                     ) (error, []) pair_list
-                                 in
-                                 (*build bdu with state = B@w*)
-                                 let error, handler, new_bdu =
-                                   Bdu_static_views.build_bdu
-                                     parameter
-                                     handler
-                                     error
-                                     new_pair_list
-                                 in
-                                 let error, handler, conj_bdu =
-                                   Ckappa_sig.Views_bdu.mvbdu_and
-                                     parameter
-                                     handler
-                                     error
-                                     bdu
-                                     new_bdu
-                                 in
-                                 error, handler, conj_bdu
-                               ) (error, handler, bdu_true) list
-                           in
-                           (*to the conjunction between bdu_X and new_bdu*)
-                           let error, handler, bdu_conj =
-                             Ckappa_sig.Views_bdu.mvbdu_and
-                               parameter
-                               handler
-                               error
-                               bdu_X
-                               new_bdu
-                           in
-                           (*do the projection of bdu_conj and singleton*)
-                           let error, handler, bdu_proj =
-                             Ckappa_sig.Views_bdu.mvbdu_project_keep_only
-                               parameter
-                               handler
-                               error
-                               bdu_conj
-                               singleton
-                           in
-                           (*rename*)
-                           let error, handler, new_site_name_1 =
-                             Ckappa_sig.Views_bdu.build_renaming_list
-                               parameter
-                               handler
-                               error
-                               [new_site_name, path.Communication.site]
-                           in
-                           (*do the conjuntion between bdu and bdu final*)
-                           let error, handler, bdu_renamed =
-                             Ckappa_sig.Views_bdu.mvbdu_rename
-                               parameter
-                               handler
-                               error
-                               bdu_proj
-                               new_site_name_1
-                           in
-                           let error, handler, bdu =
-                             Ckappa_sig.Views_bdu.mvbdu_and
-                               parameter
-                               handler
-                               error
-                               bdu
-                               bdu_renamed
-                           in
-                           let dynamic =
-                             Analyzer_headers.set_mvbdu_handler handler dynamic
-                           in
-                           error, dynamic, bdu
-                         else
-                           (*---------------------------------------------*)
-                           (*t is not in CV, take the state of v*)
-                           let error, new_site_name =
-                             get_new_site_name
-                               parameter
-                               error
-                               cv_id
-                               path.Communication.site (*state v in D*)
-                               site_correspondence
-                           in
-                           (*fetch the bdu of D*)
-                           let error, bdu_X =
-                             match
-                               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                                 parameter
-                                 error
-                                 (fst_agent, cv_id)
-                                 fixpoint_result
-                             with
-                             | error, None -> error, bdu_false
-                             | error, Some bdu -> error, bdu
-                           in
-                           (*projection over new_site_name v*)
-                           let handler = Analyzer_headers.get_mvbdu_handler dynamic in
-                           let error, handler, singleton =
-                             Ckappa_sig.Views_bdu.build_variables_list
-                               parameter
-                               handler
-                               error
-                               [new_site_name]
-                           in
-                           (*do the projection of v at this bdu*)
-                           let error, handler, bdu_proj =
-                             Ckappa_sig.Views_bdu.mvbdu_project_keep_only
-                               parameter
-                               handler
-                               error
-                               bdu_X
-                               singleton
-                           in
-                           (*then rename v to 1*)
-                           let error, handler, new_site_name_1 =
-                             Ckappa_sig.Views_bdu.build_renaming_list
-                               parameter
-                               handler
-                               error
-                               [new_site_name, Ckappa_sig.site_name_of_int 1]
-                           in
-                           let error, handler, bdu_renamed =
-                             Ckappa_sig.Views_bdu.mvbdu_rename
-                               parameter
-                               handler
-                               error
-                               bdu_proj
-                               new_site_name_1
-                           in
-                           let error, handler, bdu =
-                             Ckappa_sig.Views_bdu.mvbdu_and
-                               parameter
-                               handler
-                               error
-                               bdu
-                               bdu_renamed
-                           in
-                           let dynamic =
-                             Analyzer_headers.set_mvbdu_handler handler dynamic
-                           in
-                           error, dynamic, bdu
-                      ) (error, dynamic, bdu_true) cv_list
-                  in
-                  (*--------------------------------------------------*)
-                  let handler = Analyzer_headers.get_mvbdu_handler dynamic in
-                  let error, handler, list =
-                    Ckappa_sig.Views_bdu.extensional_of_mvbdu
-                      parameter
-                      handler
-                      error
-                      bdu
-                  in
-                  let dynamic =
-                    Analyzer_headers.set_mvbdu_handler handler dynamic
-                  in
-                  (*--------------------------------------------------*)
-                  let error, state_list =
-                    List.fold_left (fun (error, output) list ->
-                        match list with
-                        | [_, state] -> error, state :: output
-                        | _ -> Exception.warn
-                                 parameter error __POS__ Exit output
-                      ) (error, []) list
-                  in
-                  error, (dynamic, Usual_domains.Val (List.rev state_list))
+                | error, None ->
+                  Exception.warn parameter error __POS__ Exit []
+                | error, Some l -> error, l
               in
-              error, (dynamic, new_answer)
-            else
-              (*state is not defined*)
-              (*give a warning*)
-              Exception.warn
-                parameter error __POS__ Exit (dynamic, Usual_domains.Undefined)
-          end
-      end*)
+              (*get a triple (cv_id, list, set) of the last agent that containing t*)
+              let error, site_correspondence =
+                match
+                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                    parameter
+                    error
+                    fst_agent (*D*)
+                    site_correspondence
+                with
+                | error, None ->
+                  Exception.warn parameter error __POS__ Exit []
+                | error, Some l -> error, l
+              in
+              (*---------------------------------------------------*)
+              let error, dynamic, bdu =
+                List.fold_left
+                  (fun (error, dynamic, bdu) cv_id ->
+                     (*FIX ME: check whether or not t is in this covering class*)
+                     let error, b =
+                       List.fold_left
+                         (fun (error, bool) (h, _list, _set)  ->
+                           if h = cv_id
+                           then
+                             error, true
+                           else
+                             error, bool
+                         ) (error, false) site_correspondence
+                     in
+                     if b
+                     then
+                       (*------------------------------------------------*)
+                       (*t is in CV, take the states of v knowing that t has type B@w*)
+                       let error, new_site_name =
+                         get_new_site_name
+                           parameter
+                           error
+                           cv_id
+                           path.Communication.site (*state v in D*)
+                           site_correspondence
+                       in
+                       (*fetch bdu of D*)
+                       let error, bdu_X =
+                         match
+                           Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                             parameter
+                             error
+                             (fst_agent, cv_id)
+                             fixpoint_result
+                         with
+                         | error, None -> error, bdu_false
+                         | error, Some bdu -> error, bdu
+                       in
+                       let handler =
+                         Analyzer_headers.get_mvbdu_handler dynamic
+                       in
+                       let error, handler, singleton =
+                         Ckappa_sig.Views_bdu.build_variables_list
+                           parameter
+                           handler
+                           error
+                           [new_site_name]
+                       in
+                       (*build new bdu where state t = B@w, get bdu_X and change the type*)
+                       let error, handler, list =
+                         Ckappa_sig.Views_bdu.extensional_of_mvbdu
+                           parameter
+                           handler
+                           error
+                           bdu_X
+                       in
+                       let error, handler, new_bdu =
+                         List.fold_left (fun (error, handler, bdu) pair_list ->
+                             let error, new_pair_list =
+                               List.fold_left
+                                 (fun (error, current_list) (site, _) ->
+                                    error, (site, state) :: current_list
+                                 ) (error, []) pair_list
+                             in
+                             (*build bdu with state = B@w*)
+                             let error, handler, new_bdu =
+                               Bdu_static_views.build_bdu
+                                 parameter
+                                 handler
+                                 error
+                                 new_pair_list
+                             in
+                             let error, handler, conj_bdu =
+                               Ckappa_sig.Views_bdu.mvbdu_and
+                                 parameter
+                                 handler
+                                 error
+                                 bdu
+                                 new_bdu
+                             in
+                             error, handler, conj_bdu
+                           ) (error, handler, bdu_true) list
+                       in
+                       (*to the conjunction between bdu_X and new_bdu*)
+                       let error, handler, bdu_conj =
+                         Ckappa_sig.Views_bdu.mvbdu_and
+                           parameter
+                           handler
+                           error
+                           bdu_X
+                           new_bdu
+                       in
+                       (*do the projection of bdu_conj and singleton*)
+                       let error, handler, bdu_proj =
+                         Ckappa_sig.Views_bdu.mvbdu_project_keep_only
+                           parameter
+                           handler
+                           error
+                           bdu_conj
+                           singleton
+                       in
+                       (*rename*)
+                       let error, handler, new_site_name_1 =
+                         Ckappa_sig.Views_bdu.build_renaming_list
+                           parameter
+                           handler
+                           error
+                           [new_site_name, path.Communication.site]
+                       in
+                       (*do the conjuntion between bdu and bdu final*)
+                       let error, handler, bdu_renamed =
+                         Ckappa_sig.Views_bdu.mvbdu_rename
+                           parameter
+                           handler
+                           error
+                           bdu_proj
+                           new_site_name_1
+                       in
+                       let error, handler, bdu =
+                         Ckappa_sig.Views_bdu.mvbdu_and
+                           parameter
+                           handler
+                           error
+                           bdu
+                           bdu_renamed
+                       in
+                       let dynamic =
+                         Analyzer_headers.set_mvbdu_handler handler dynamic
+                       in
+                       error, dynamic, bdu
+                     else
+                       (*---------------------------------------------*)
+                       (*t is not in CV, take the state of v*)
+                       let error, new_site_name =
+                         get_new_site_name
+                           parameter
+                           error
+                           cv_id
+                           path.Communication.site (*state v in D*)
+                           site_correspondence
+                       in
+                       (*fetch the bdu of D*)
+                       let error, bdu_X =
+                         match
+                           Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                             parameter
+                             error
+                             (fst_agent, cv_id)
+                             fixpoint_result
+                         with
+                         | error, None -> error, bdu_false
+                         | error, Some bdu -> error, bdu
+                       in
+                       (*projection over new_site_name v*)
+                       let handler = Analyzer_headers.get_mvbdu_handler dynamic in
+                       let error, handler, singleton =
+                         Ckappa_sig.Views_bdu.build_variables_list
+                           parameter
+                           handler
+                           error
+                           [new_site_name]
+                       in
+                       (*do the projection of v at this bdu*)
+                       let error, handler, bdu_proj =
+                         Ckappa_sig.Views_bdu.mvbdu_project_keep_only
+                           parameter
+                           handler
+                           error
+                           bdu_X
+                           singleton
+                       in
+                       (*then rename v to 1*)
+                       let error, handler, new_site_name_1 =
+                         Ckappa_sig.Views_bdu.build_renaming_list
+                           parameter
+                           handler
+                           error
+                           [new_site_name, Ckappa_sig.site_name_of_int 1]
+                       in
+                       let error, handler, bdu_renamed =
+                         Ckappa_sig.Views_bdu.mvbdu_rename
+                           parameter
+                           handler
+                           error
+                           bdu_proj
+                           new_site_name_1
+                       in
+                       let error, handler, bdu =
+                         Ckappa_sig.Views_bdu.mvbdu_and
+                           parameter
+                           handler
+                           error
+                           bdu
+                           bdu_renamed
+                       in
+                       let dynamic =
+                         Analyzer_headers.set_mvbdu_handler handler dynamic
+                       in
+                       error, dynamic, bdu
+                  ) (error, dynamic, bdu_true) cv_list
+              in
+              (*--------------------------------------------------*)
+              let handler = Analyzer_headers.get_mvbdu_handler dynamic in
+              let error, handler, list =
+                Ckappa_sig.Views_bdu.extensional_of_mvbdu
+                  parameter
+                  handler
+                  error
+                  bdu
+              in
+              let dynamic =
+                Analyzer_headers.set_mvbdu_handler handler dynamic
+              in
+              (*--------------------------------------------------*)
+              let error, state_list =
+                List.fold_left (fun (error, output) list ->
+                    match list with
+                    | [_, state] -> error, state :: output
+                    | _ -> Exception.warn
+                             parameter error __POS__ Exit output
+                  ) (error, []) list
+              in
+              error, (dynamic, Usual_domains.Val (List.rev state_list))
+          in
+          error, (dynamic, new_answer)
+        else
+          (*state is not defined*)
+          (*give a warning*)
+          Exception.warn
+            parameter error __POS__ Exit (dynamic, Usual_domains.Undefined)
+      end
+    end*)
 
-(*---------------------------------------------------------------*)
+  (*---------------------------------------------------------------*)
   (*inside the pattern*)
 
   let precondition_inside_pattern
       parameter error dynamic kappa_handler
       step path agent_type
-      aux rule tl site_correspondence store_covering_classes_id
+      aux rule erule tl site_correspondence store_covering_classes_id
       fixpoint_result bdu_false bdu_true
     =
     (*---------------------------------------------------------*)
     (*inside the pattern, check the binding information in the lhs of the current agent*)
-    let error, (dynamic, update_answer) =
-      match
-        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-          parameter
-          error
-          path.Communication.agent_id (*A*)
-          rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
-      with
-      | error, None ->
-        (*-----------------------------------------------------*)
-        (* this agent has no bound. As in the case outside the pattern.*)
-        let error', (dynamic, new_answer) =
-          precondition_outside_pattern
-            parameter
-            error
-            dynamic
-            kappa_handler
-            path
-            agent_type
-            bdu_false
-            bdu_true
-            site_correspondence
-            store_covering_classes_id
-            fixpoint_result
-        in
-        let error =
-          Exception.check_point
-            Exception.warn parameter error error' __POS__ Exit
-        in
-        error, (dynamic, new_answer)
-      (*--------------------------------------------------------*)
-      (*search inside this map which agent and site, A.x bind to.*)
-      | error, Some map ->
-        let error, (dynamic, update_answer) =
-          match
-            Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-              parameter
-              error
-              step.Communication.site_out (*A.x*)
-              map
-          with
-          | error, None ->
-            (*------------------------------------------------*)
-            (*out of the pattern*)
-            let error', (dynamic, new_answer) =
-              precondition_outside_pattern
-                parameter
-                error
-                dynamic
-                kappa_handler
-                path
-                agent_type
-                bdu_false
-                bdu_true
-                site_correspondence
-                store_covering_classes_id
-                fixpoint_result
-            in
-            let error =
-              Exception.check_point
-                Exception.warn parameter error error' __POS__ Exit
-            in
-            error, (dynamic, new_answer)
-          | error, Some site_add ->
-            (*-----------------------------------------------*)
-            (*A.x is bound to something*)
-            let agent_type' = site_add.Cckappa_sig.agent_type in
-            (*check that A.x is bound to B.y*)
-            if agent_type' = step.Communication.agent_type_in
-            then
-              (*recursively apply to #i tail*)
-              let next_path =
-                {
-                  path with
-                  Communication.agent_id = site_add.Cckappa_sig.agent_index;
-                  Communication.relative_address = tl;
-                }
-              in
-              let error, dynamic, new_answer = aux dynamic next_path in
-              error, (dynamic, new_answer)
-            else
-              error, (dynamic, Usual_domains.Undefined)
-        in
-        error, (dynamic, update_answer)
+    let error, output =
+      Communication.follow_path_inside_cc
+        parameter error
+        rule.Cckappa_sig.rule_lhs
+        path
     in
-    error, (dynamic, update_answer)
+    match output with
+    | Communication.Cannot_exist ->
+      error, (dynamic, Usual_domains.Undefined)
+    | Communication.May_exist ->
+      (*-----------------------------------------------------*)
+      let error', (dynamic, new_answer) =
+        precondition_outside_pattern
+          parameter error dynamic kappa_handler
+          path
+          agent_type
+          bdu_false
+          bdu_true
+          site_correspondence
+          store_covering_classes_id
+          fixpoint_result
+      in
+      let error =
+        Exception.check_point
+          Exception.warn parameter error error' __POS__ Exit
+      in
+      error, (dynamic, new_answer)
+    (*--------------------------------------------------------*)
+    | Communication.Located agent_id ->
+      (*search inside this map which agent and site, A.x bind to.*)
+      let next_path =
+        {
+              Communication.site = path.Communication.site ;
+              Communication.agent_id = agent_id ;
+              Communication.relative_address = [];}
+      in
+      let error, dynamic, new_answer = aux dynamic next_path in
+      error, (dynamic, new_answer)
 
   (*-------------------------------------------------------------*)
 
@@ -2149,7 +2101,7 @@ struct
     | Usual_domains.Val l ->
       List.iter
         (fun i ->  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "List: state:%i\n" (Ckappa_sig.int_of_state_index i)) l
+            "List: state:%i\n" (Ckappa_sig.int_of_state_index i)) l
     | Usual_domains.Undefined ->
       Loggers.fprintf (Remanent_parameters.get_logger parameter) "Undefined\n"
     | Usual_domains.Any ->
@@ -2181,7 +2133,7 @@ struct
 
   let compute_pattern_navigation
       parameter error kappa_handler
-      aux dynamic path rule step tl bdu_false bdu_true site_correspondence
+      aux dynamic path rule erule step tl bdu_false bdu_true site_correspondence
       store_covering_classes_id fixpoint_result =
     let error, agent =
       match
@@ -2329,16 +2281,17 @@ struct
                   in
                   error, (dynamic, new_answer)
                 | error, Some site_add ->
-                (*there is a bond, check the following pattern is it well
-                  defined*)
+                  (*there is a bond, check the following pattern is it well
+                    defined*)
                   let agent_type' = site_add.Cckappa_sig.agent_type in (*B*)
                   let site_type' = site_add.Cckappa_sig.site in (*z?*)
                   (*if A.x is bound to B.x*)
                   if agent_type' = agent_type_partner &&
                      site_type' = site_x_partner
                   then
-                  (*inside the pattern*)
+                    (*inside the pattern*)
                     let error', (dynamic, new_answer) =
+
                       precondition_inside_pattern
                         parameter
                         error
@@ -2349,6 +2302,7 @@ struct
                         agent_type
                         aux
                         rule
+                        erule
                         tl
                         site_correspondence
                         store_covering_classes_id
@@ -2362,7 +2316,7 @@ struct
                     in
                     error, (dynamic, new_answer)
                   else
-                  (*outsite the pattern*)
+                    (*outsite the pattern*)
                     let error', (dynamic, new_answer) =
                       precondition_outside_pattern
                         parameter
@@ -2390,13 +2344,13 @@ struct
   (*------------------------------------------------------------*)
 
   let compute_precondition_enable
-      parameter error kappa_handler rule rule_id precondition
+      parameter error kappa_handler rule erule rule_id precondition
       bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
       Communication.refine_information_about_state_of_sites_in_precondition
         precondition
-        (fun parameters error dynamic current_path former_answer ->
+        (fun parameters error dynamic (current_path:Communication.path) former_answer ->
            (*-----------------------------------------------------*)
            (*typing*)
            let error =
@@ -2406,127 +2360,107 @@ struct
                former_answer
                " from overlying domain"
            in
-           match current_path.Communication.defined_in with
-           | Communication.RHS _ ->
-             let error, () =
-               Exception.warn
-                 parameters error __POS__
-                 ~message:"refinement should be called on LHS or patterns only"
-                 Exit ()
+           let error, answer_contact_map =
+             precondition_typing
+               parameter
+               error
+               kappa_handler
+               rule_id
+               current_path.Communication.relative_address
+               current_path
+               store_agent_name
+               dual_contact_map
+           in
+           let error = (*FIXME*)
+             scan_bot
+               ~also_scan_top:false
+               __POS__ parameters error
+               answer_contact_map
+               " in the contact map"
+           in
+           (*-----------------------------------------------------*)
+           (* The output should be more precise than former_answer:
+              If the former_answer is any, do not change anything,
+              If the former_answer is Val l,
+              then the answer must be Val l', with l' a sublist of l *)
+           let error, dynamic, new_answer =
+             let rec aux dynamic path =
+               let step_list = path.Communication.relative_address in
+               match step_list with
+               | step :: tl ->
+                 (*------------------------------------------------*)
+                 (*pattern navigation*)
+                 let error, (dynamic, new_answer) =
+                   compute_pattern_navigation
+                     parameter error kappa_handler
+                     aux dynamic path rule erule
+                     step
+                     tl
+                     bdu_false
+                     bdu_true
+                     site_correspondence
+                     store_covering_classes_id
+                     fixpoint_result
+                 in
+                 let error = (*FIXME*)
+                   scan_bot
+                     ~also_scan_top:false
+                     __POS__ parameters error
+                     new_answer
+                     " while navigating"
+                 in
+                 let update_answer =
+                   Usual_domains.glb_list new_answer former_answer in
+                 error, dynamic, update_answer
+               (*--------------------------------------------------*)
+               (*empty relative_adress*)
+               | [] ->
+                 let error, dynamic, new_answer =
+                   precondition_empty_step_list
+                     kappa_handler parameter error dynamic
+                     rule_id path store_agent_name bdu_false bdu_true store_covering_classes_id
+                     site_correspondence fixpoint_result proj_bdu_test_restriction
+                 in
+                 let error =
+                   scan_bot
+                     ~also_scan_top:false
+                     __POS__ parameters error
+                     new_answer
+                     " while navigating (empty path)"
+                 in
+                 (*let _ =
+                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                     "-Pattern is empty\n";
+                   in*)
+                 (*do I need to do the intersection with former answer?*)
+                 let update_answer =
+                   Usual_domains.glb_list new_answer former_answer in
+                 error, dynamic, update_answer
              in
-             error, dynamic, former_answer
-           | Communication.LHS _
-           | Communication.Pattern ->
-             let error, answer_contact_map =
-               precondition_typing
-                 parameter
-                 error
-                 kappa_handler
-                 rule_id
-                 current_path.Communication.relative_address
-                 current_path
-                 store_agent_name
-                 dual_contact_map
-             in
-             let error = (*FIXME*)
-               scan_bot
-                 ~also_scan_top:false
-                 __POS__ parameters error
-                 answer_contact_map
-                 " in the contact map"
-             in
-             (*-----------------------------------------------------*)
-             (* The output should be more precise than former_answer:
-                If the former_answer is any, do not change anything,
-                If the former_answer is Val l,
-                then the answer must be Val l', with l' a sublist of l *)
-             let error, dynamic, new_answer =
-               let rec aux dynamic path =
-                 let step_list = path.Communication.relative_address in
-                 match step_list with
-                 | step :: tl ->
-                   (*let _ =
-                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                       "Pattern navigation\n"
-                     in*)
-                   (*------------------------------------------------*)
-                   (*pattern navigation*)
-                   let error, (dynamic, new_answer) =
-                     compute_pattern_navigation
-                       parameter
-                       error
-                       kappa_handler
-                       aux
-                       dynamic
-                       path
-                       rule
-                       step
-                       tl
-                       bdu_false
-                       bdu_true
-                       site_correspondence
-                       store_covering_classes_id
-                       fixpoint_result
-                   in
-                   let error = (*FIXME*)
-                     scan_bot
-                       ~also_scan_top:false
-                       __POS__ parameters error
-                       new_answer
-                       " while navigating"
-                   in
-                   let update_answer =
-                     Usual_domains.glb_list new_answer former_answer in
-                   error, dynamic, update_answer
-                 (*--------------------------------------------------*)
-                 (*empty relative_adress*)
-                 | [] ->
-                   let error, dynamic, new_answer =
-                     precondition_empty_step_list
-                       kappa_handler parameter error dynamic
-                       rule_id path store_agent_name bdu_false bdu_true store_covering_classes_id
-                       site_correspondence fixpoint_result proj_bdu_test_restriction
-                   in
-                   let error =
-                     scan_bot
-                       ~also_scan_top:false
-                       __POS__ parameters error
-                       new_answer
-                       " while navigating (empty path)"
-                   in
-                   (*let _ =
-                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                       "-Pattern is empty\n";
-                     in*)
-                   (*do I need to do the intersection with former answer?*)
-                   let update_answer =
-                     Usual_domains.glb_list new_answer former_answer in
-                   error, dynamic, update_answer
-               in
-               aux dynamic current_path
-             in
-             (*final intersection with contact map*)
-             let update_answer =
-               Usual_domains.glb_list answer_contact_map new_answer in
-             let error =
-               match update_answer with
-               | Usual_domains.Undefined ->
-                 let error, () = (*FIXME*)
-                   Exception.warn
-                     parameters error __POS__
-                     ~message:"bot generated while fetching the potential state of a site"
-                     Exit ()
-                 in error
-               | Usual_domains.Any ->
-                 let error, () =
-                   Exception.warn
-                     parameters error __POS__
-                     ~message:"top generated while fetching the potential state of a site"
-                     Exit ()
-                 in error
-               | Usual_domains.Val _  -> error
-             in
-             error, dynamic,  update_answer
+             aux dynamic current_path
+           in
+           (*final intersection with contact map*)
+           let update_answer =
+             Usual_domains.glb_list answer_contact_map new_answer in
+           let error =
+             match update_answer with
+             | Usual_domains.Undefined ->
+               let error, () = (*FIXME*)
+                 Exception.warn
+                   parameters error __POS__
+                   ~message:"bot generated while fetching the potential state of a site"
+                   Exit ()
+               in error
+             | Usual_domains.Any ->
+               let error, () =
+                 Exception.warn
+                   parameters error __POS__
+                   ~message:"top generated while fetching the potential state of a site"
+                   Exit ()
+               in error
+             | Usual_domains.Val _  -> error
+           in
+           error, dynamic,  update_answer
         )
     in
     error, precondition
@@ -2538,16 +2472,20 @@ struct
     let compil = get_compil static in
     let kappa_handler = get_kappa_handler static in
     let rules = compil.Cckappa_sig.rules in
-    let error, rule =
+    let error, rule, erule =
       match
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.unsafe_get
-          parameter
-          error
-          rule_id
-          rules
+          parameter error rule_id rules
       with
-      | error, None -> Preprocess.empty_rule parameter error
-      | error, Some rule -> error, rule.Cckappa_sig.e_rule_c_rule
+      | error, None ->
+        let error, rule = Preprocess.empty_rule parameter error in
+        let error, erule = Preprocess.empty_e_rule parameter error in
+        let error, () =
+          Exception.warn parameter error __POS__
+            ~message:"unknown rule" Exit ()
+        in
+        error, rule, erule
+      | error, Some rule -> error, rule.Cckappa_sig.e_rule_c_rule, rule
     in
     (*-----------------------------------------------------------*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -2588,7 +2526,7 @@ struct
       (*-----------------------------------------------------*)
       (*get a set of sites in a covering class: later with state list*)
       let error, precondition =
-        compute_precondition_enable parameter error kappa_handler rule rule_id
+        compute_precondition_enable parameter error kappa_handler rule erule  rule_id
           precondition bdu_false bdu_true dual_contact_map store_agent_name
           site_correspondence store_covering_classes_id fixpoint_result
           proj_bdu_test_restriction
