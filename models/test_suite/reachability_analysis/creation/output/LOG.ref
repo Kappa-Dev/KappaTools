@@ -577,11 +577,6 @@ A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u) v A(x~p) ]
 D() => [ D(x~u) v D(x~p) ]
 ------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

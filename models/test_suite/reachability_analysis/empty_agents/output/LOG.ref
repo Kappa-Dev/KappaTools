@@ -296,11 +296,6 @@ Id=5
 EXTENSIONAL DESCRIPTION:
 D() => [ D(x~u) ]
 ------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception

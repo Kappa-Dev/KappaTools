@@ -45,11 +45,6 @@ P() => [ P(b2~u) v P(b2~p) ]
 P() => [ P(g) v P(g!K.x) ]
 K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
-* Site accross bonds domain
-------------------------------------------------------------
-* Static information
-* Dynamic information
-------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
 execution finished without any exception
