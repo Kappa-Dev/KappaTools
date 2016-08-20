@@ -204,8 +204,7 @@ A() =>
 	v A(x~p,y~u,z~u)
 	v A(x~p,y~p,z~u)
 	v A(x~u,y~u,z~u)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:

@@ -359,8 +359,7 @@ A() =>
 	v A(t~u,w~p,x~p,y~p,z~u)
 	v A(t~u,w~u,x~u,y~u,z~u)
 	v A(t~u,w~u,x~u,y~p,z~u)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -402,8 +401,7 @@ A() =>
 	v A(t~u,w~p,x~p,y~p,z~u)
 	v A(t~u,w~u,x~u,y~u,z~u)
 	v A(t~u,w~u,x~u,y~p,z~u)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:

@@ -259,8 +259,7 @@ A() =>
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~p,e2~u,g~u)
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~p,e2~p,g~u)
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -544,8 +543,7 @@ A() =>
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~p,e2~u,g~u)
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~p,e2~p,g~u)
 	v A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:

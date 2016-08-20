@@ -23,8 +23,7 @@ R() =>
 	v R(c!R.c,cr,n,x!E.x)
 	v R(c!R.c,cr,n!R.cr,x!E.x)
 	v R(c,cr,n,x)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -38,22 +37,22 @@ R() => [ R(x) v R(x!E.x) ]
 * Properties in connected agents
 ------------------------------------------------------------
 R(c!1),R(c!1) => 
-   [
-        R(c!1,cr!R.n),R(c!1,cr)
-      v R(c!1,cr),R(c!1,cr)
-      v R(c!1,cr),R(c!1,cr!R.n)
-  ]
+	[
+		  R(c!1,cr!R.n),R(c!1,cr)
+		v R(c!1,cr),R(c!1,cr)
+		v R(c!1,cr),R(c!1,cr!R.n)
+	]
 R(c!1),R(c!1) => 
-   [
-        R(c!1,cr!R.n),R(c!1,n!R.cr)
-      v R(c!1,cr),R(c!1,n)
-  ]
+	[
+		  R(c!1,cr!R.n),R(c!1,n!R.cr)
+		v R(c!1,cr),R(c!1,n)
+	]
 R(c!1),R(c!1) => 
-   [
-        R(c!1,n!R.cr),R(c!1,n)
-      v R(c!1,n),R(c!1,n)
-      v R(c!1,n),R(c!1,n!R.cr)
-  ]
+	[
+		  R(c!1,n!R.cr),R(c!1,n)
+		v R(c!1,n),R(c!1,n)
+		v R(c!1,n),R(c!1,n!R.cr)
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------

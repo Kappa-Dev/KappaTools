@@ -28,8 +28,7 @@ P() =>
 	v P(a1~u,a2~u,b1~u,b2~p,g)
 	v P(a1~u,a2~p,b1~u,b2~u,g)
 	v P(a1~u,a2~p,b1~u,b2~p,g)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -77,8 +76,7 @@ P() =>
 	v P(a1~u,a2~u,b1~u,b2~p,g)
 	v P(a1~u,a2~p,b1~u,b2~u,g)
 	v P(a1~u,a2~p,b1~u,b2~p,g)
-
-	]
+   ]
 
 ------------------------------------------------------------
 * Non relational properties:
