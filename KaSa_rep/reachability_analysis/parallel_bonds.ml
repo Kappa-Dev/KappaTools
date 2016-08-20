@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 19 2016>
+  * Last modification: Time-stamp: <Aug 20 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1186,7 +1186,7 @@ struct
         let () =
           Loggers.fprintf log
             "------------------------------------------------------------\n";
-          Loggers.fprintf log "* Parallel bonds domain\n";
+          Loggers.fprintf log "* Properties of pairs of bonds\n";
           Loggers.fprintf log
             "------------------------------------------------------------\n"
         in

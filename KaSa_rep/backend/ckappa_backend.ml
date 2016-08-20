@@ -501,7 +501,7 @@ struct
         (fun _ (agent_string, site_map) bool ->
            let () =
              if bool then
-               Loggers.fprintf logger " , "
+               Loggers.fprintf logger ","
            in
            let () = Loggers.fprintf logger "%s(" agent_string in
            let _bool =

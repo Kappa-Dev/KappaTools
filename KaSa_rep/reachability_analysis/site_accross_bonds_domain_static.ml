@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 13 2016>
+   * Last modification: Time-stamp: <Aug 20 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -291,7 +291,7 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
 (*collect a set of tuple pair (A.x.y, B.z.t)*)
 
 let collect_potential_tuple_pair parameter error
-    rule_id store_bonds_rhs store_views_rhs kappa_handler store_result =
+    rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_rhs_set =
     get_set parameter error rule_id
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
@@ -309,7 +309,7 @@ let collect_potential_tuple_pair parameter error
        let error, fst_list =
        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
          (fun v (error, current_list) ->
-            let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
+            let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
             if agent_id = agent_id_v &&
                agent_type = agent_type_v && site_type <> site_type_v
             then
@@ -324,7 +324,7 @@ let collect_potential_tuple_pair parameter error
        let error, snd_list =
        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
          (fun v (error, current_list) ->
-            let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
+            let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
             if agent_id1 = agent_id_v &&
                agent_type1 = agent_type_v && site_type1 <> site_type_v
             then
@@ -339,17 +339,6 @@ let collect_potential_tuple_pair parameter error
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
              List.fold_left (fun (error, store_result) y ->
-                 let error, (agent, site, site', state_x,
-                             agent1, site1, site1', state1_x) =
-                   Site_accross_bonds_domain_type.convert_tuple
-                     parameter error kappa_handler
-                     (x, y)
-                 in
-                 let () =
-                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                     "%s:(%s:%s, %s); %s:(%s:%s, %s)\n"
-                     agent site state_x site' agent1 site1 state1_x site1'
-                 in
                  let error, store_result =
                    Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.add_when_not_in
                      parameter error

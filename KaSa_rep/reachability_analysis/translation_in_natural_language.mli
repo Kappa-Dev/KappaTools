@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Aug 20 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -19,6 +19,13 @@ type rename_sites =
    Exception.method_handler ->
    Ckappa_sig.Site_map_and_set.Map.elt ->
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
+
+val non_relational:
+  Remanent_parameters_sig.parameters ->
+  Ckappa_sig.Views_bdu.handler ->
+  Exception.method_handler  ->
+  Ckappa_sig.Views_bdu.mvbdu ->
+  Exception.method_handler * Ckappa_sig.Views_bdu.handler * bool
 
 val translate: Remanent_parameters_sig.parameters ->
   Ckappa_sig.Views_bdu.handler ->

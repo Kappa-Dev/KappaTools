@@ -2133,7 +2133,7 @@ struct
 
   let scan_bot_warn
       ~also_scan_top:(also_scan_top:bool)
-      pos parameters error elt string
+      (a,_,_,_) parameters error elt string
     =
     let () =
       match elt with
@@ -2142,7 +2142,7 @@ struct
           Remanent_parameters.get_dump_reachability_analysis_wl
             parameters
         then
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sbot generated while fetching the potential state of a site %s" (Remanent_parameters.get_prefix parameters) string in
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%sbot generated while fetching the potential state of a site %s" (Remanent_parameters.get_prefix parameters) a string in
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
       | Usual_domains.Any when also_scan_top ->
         if

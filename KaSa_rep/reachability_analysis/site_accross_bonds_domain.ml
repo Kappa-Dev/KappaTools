@@ -378,7 +378,6 @@ struct
       Site_accross_bonds_domain_static.collect_potential_tuple_pair
         parameter error
         rule_id store_bonds_rhs store_views_rhs
-        kappa_handler
         store_potential_tuple_pair
     in
     let static = set_potential_tuple_pair store_potential_tuple_pair
@@ -470,7 +469,6 @@ struct
   let scan_rules static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
-    let kappa_handler = get_kappa_handler static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter
@@ -488,41 +486,6 @@ struct
     (*partition map with key is the pair in bonds rhs*)
     (*------------------------------------------------------------*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let error  =
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-        (fun ((a,b,c,d),(e,f,g,h)) error ->
-           let error, (agent, site, site', state,
-                       agent1, site1, site1', state1) =
-             Site_accross_bonds_domain_type.convert_tuple
-               parameter error kappa_handler
-               ((a, b, c, d), (e, f, g, h))
-           in
-           let () =
-             Loggers.fprintf
-               (Remanent_parameters.get_logger parameter)
-               "%i:%s %i:%s %i:%s (%i:%s) | %i:%s %i:%s %i:%s (%i:%s) \n"
-               (Ckappa_sig.int_of_agent_name a)
-               agent
-               (Ckappa_sig.int_of_site_name b)
-               site
-               (Ckappa_sig.int_of_site_name c)
-               site'
-               (Ckappa_sig.int_of_state_index d)
-               state
-               (Ckappa_sig.int_of_agent_name e)
-               agent1
-               (Ckappa_sig.int_of_site_name f)
-               site1
-               (Ckappa_sig.int_of_site_name g)
-               site1'
-               (Ckappa_sig.int_of_state_index h)
-               state1
-           in error
-        )
-        store_potential_tuple_pair error
-    in
-
-
     let error, store_partition_bonds_rhs_map =
       Site_accross_bonds_domain_static.collect_partition_bonds_rhs_map
         parameter error
@@ -1099,7 +1062,7 @@ struct
   let get_state_of_site_in_pre_post_condition_2
       kappa_handler
       parameter error
-      dynamic rule_id
+      dynamic
       agent_id_t
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
@@ -1139,7 +1102,7 @@ struct
     error, dynamic, precondition, state_list
 
   let get_state_of_site_in_precondition_2 kappa_handler
-      parameter error dynamic rule_id rule agent_id
+      parameter error dynamic rule agent_id
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
       precondition =
@@ -1147,24 +1110,22 @@ struct
     get_state_of_site_in_pre_post_condition_2
       kappa_handler
       parameter error dynamic
-      rule_id agent_id
+      agent_id
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
       defined_in
       precondition
 
   let get_state_of_site_in_postcondition_2 kappa_handler
-      parameter error dynamic rule_id rule agent_id
+      parameter error dynamic rule agent_id
       (site_type_x, agent_type_y, site_type_y) site_type'_y
       precondition =
     let defined_in = Communication.RHS rule in
     get_state_of_site_in_pre_post_condition_2
       kappa_handler
       parameter error dynamic
-      rule_id agent_id
-      (site_type_x, agent_type_y, site_type_y)
-      site_type'_y
-      defined_in precondition
+      agent_id (site_type_x, agent_type_y, site_type_y) site_type'_y defined_in
+      precondition
 
   type pos = Fst | Snd
   let get_partition_modified pos static =
@@ -1173,33 +1134,22 @@ struct
     | Snd -> get_partition_modified_map_2 static
 
   let get_state_of_site_in_postcondition_gen
-      pos
-      kappa_handler
-      parameter error dynamic
-      rule_id rule
-      agent_id_mod
-      (agent_type_x, site_type_x, site_type'_x, state_x)
-      (agent_type_y, site_type_y, site_type'_y, state_y)
+      pos kappa_handler parameter error dynamic
+      rule agent_id_mod
+      (agent_type_x, site_type_x, site_type'_x, _)
+      (agent_type_y, site_type_y, site_type'_y, _)
       precondition
     =
     match pos with
     | Fst ->
       get_state_of_site_in_postcondition_2
-        kappa_handler
-        parameter error dynamic
-        rule_id rule
-        agent_id_mod
-        (site_type_x, agent_type_y, site_type_y)
-        site_type'_y
+        kappa_handler parameter error dynamic
+        rule agent_id_mod (site_type_x, agent_type_y, site_type_y) site_type'_y
         precondition
     | Snd ->
       get_state_of_site_in_postcondition_2
-        kappa_handler
-        parameter error dynamic
-        rule_id rule
-        agent_id_mod
-        (site_type_y, agent_type_x, site_type_x)
-        site_type'_x
+        kappa_handler parameter error dynamic
+        rule agent_id_mod (site_type_y, agent_type_x, site_type_x) site_type'_x
         precondition
 
   let  apply_rule_modified_explicity_gen
@@ -1229,13 +1179,8 @@ struct
               let (agent_type_y, site_type_y, site_type'_y, state_y) = y in
               let error', dynamic, precondition, state'_list_other =
                 get_state_of_site_in_postcondition_gen
-                  pos
-                  kappa_handler
-                  parameter error dynamic
-                  rule_id rule
-                  agent_id_mod
-                  x
-                  y
+                  pos kappa_handler parameter error dynamic
+                  rule agent_id_mod x y
                   precondition
               in
               let error', (agent_y, site_y) =
@@ -1303,10 +1248,8 @@ struct
                                Ckappa_sig.snd_site, state_mod]
                        in
                        let pair =
-                         (agent_type_x, site_type_x, site_type'_x,
-                          state_x),
-                         (agent_type_y, site_type_y, site_type'_y,
-                          state_y)
+                         (agent_type_x, site_type_x, site_type'_x,state_x),
+                         (agent_type_y, site_type_y, site_type'_y,state_y)
                        in
                        let handler = get_mvbdu_handler dynamic in
                        let error, handler, mvbdu =
@@ -1425,11 +1368,15 @@ struct
       then
         let () =
           Loggers.fprintf log
-            "------------------------------------------------------------\n";
-          Loggers.fprintf log "* Site accross bonds domain\n";
+            "------------------------------------------------------------";
+          Loggers.print_newline log;
+          Loggers.fprintf log "* Properties in connected agents";
+          Loggers.print_newline log;
+
           Loggers.fprintf log
-            "------------------------------------------------------------\n";
-          Loggers.fprintf log "* Static information\n";
+            "------------------------------------------------------------";
+          Loggers.print_newline log
+
         in
         (*--------------------------------------------------------*)
         (*tuple pair where the first site belongs to the created bond*)
@@ -1564,9 +1511,7 @@ struct
           let () = Loggers.print_newline log in*)
         (*--------------------------------------------------------*)
         (*print result*)
-        let () =
-          Loggers.fprintf log "* Dynamic information\n"
-        in
+
         let store_value = get_value dynamic in
         let error, handler =
           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
