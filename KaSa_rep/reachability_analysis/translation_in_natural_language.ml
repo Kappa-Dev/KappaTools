@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Aug 15 2016>
+ * Last modification: Time-stamp: <Aug 20 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -774,6 +774,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
                 (Remanent_parameters.get_logger parameter)
                 " =>\n%s[\n" prefix
             in
+            let prefix' = prefix in
             let prefix ="\t" in
             let error, bool =
               List.fold_left
@@ -809,7 +810,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
             let () =
               Loggers.fprintf
                 (Remanent_parameters.get_logger parameter)
-                "\n%s]\n" prefix
+                "%s]\n" prefix'
             in error, ()
           end
         | Remanent_parameters_sig.Natural_language ->

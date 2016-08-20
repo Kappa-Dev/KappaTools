@@ -437,7 +437,7 @@ let print_site_accross_domain
               Loggers.print_newline (Remanent_parameters.get_logger parameters)
             in
             let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) "   ["
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) "\t["
             in
             let error, _ =
               List.fold_left
@@ -452,7 +452,7 @@ let print_site_accross_domain
                      let () =
                        Loggers.fprintf
                          (Remanent_parameters.get_logger parameters)
-                         (if bool  then "      v " else "        ")
+                         (if bool  then "\t\tv " else "\t\t  ")
                      in
                      let error, pattern =
                        Ckappa_backend.Ckappa_backend.add_state
@@ -476,7 +476,7 @@ let print_site_accross_domain
             in
             let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             let () = Loggers.fprintf
-                (Remanent_parameters.get_logger parameters) "  ]" in
+                (Remanent_parameters.get_logger parameters) "\t]" in
             let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             error, handler
         end
