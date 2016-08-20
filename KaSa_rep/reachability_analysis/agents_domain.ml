@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -484,50 +484,70 @@ struct
     let handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
-      let parameter = Remanent_parameters.update_prefix parameter "" in
-      let () = Loggers.print_newline loggers in
-      let () =
-        Loggers.fprintf loggers
-          "------------------------------------------------------------"
+      let error, bool =  Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
+          parameter
+          error
+          (fun _parameter error _k bool bool'-> error, bool && bool')
+          result
+          true
       in
-      let () = Loggers.print_newline loggers in
-      let () =
-        Loggers.fprintf loggers
-          "* Dead agents :"
-      in
-      let () = Loggers.print_newline loggers in
-      let () =
-        Loggers.fprintf loggers
-          "------------------------------------------------------------"
-      in
-      let () = Loggers.print_newline loggers in
-      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter
-        parameter
+      if not bool then
+        let parameter = Remanent_parameters.update_prefix parameter "" in
+        let () = Loggers.print_newline loggers in
+        let () =
+          Loggers.fprintf loggers
+            "------------------------------------------------------------"
+        in
+        let () = Loggers.print_newline loggers in
+        let () =
+          Loggers.fprintf loggers
+            "* There are some non creatable agents "
+        in
+        let () = Loggers.print_newline loggers in
+        let () =
+          Loggers.fprintf loggers
+            "------------------------------------------------------------"
+        in
+        let () = Loggers.print_newline loggers in
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.iter
+          parameter
+          error
+          (fun parameter error k bool ->
+             if bool
+             then
+               error
+             else
+               let error', agent_string =
+                 try
+                   Handler.string_of_agent parameter error handler
+                     k
+                 with
+                   _ ->
+                   Exception.warn
+                     parameter error __POS__ Exit (Ckappa_sig.string_of_agent_name k)
+               in
+               let error =
+                 Exception.check_point
+                   Exception.warn parameter error error' __POS__ Exit
+               in
+               let () = Loggers.fprintf loggers
+                   "%s cannot occur in the model" agent_string
+               in
+               let () = Loggers.print_newline loggers in
+               error)
+          result
+      else
+        let () =
+          Loggers.fprintf loggers
+            "------------------------------------------------------------"
+        in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let () =
+          Loggers.fprintf loggers
+            "every agent may occur in the model"
+        in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
         error
-        (fun parameter error k bool ->
-           if bool
-           then
-             error
-           else
-             let error', agent_string =
-               try
-                 Handler.string_of_agent parameter error handler
-                   k
-               with
-                 _ ->
-                 Exception.warn
-                   parameter error __POS__ Exit (Ckappa_sig.string_of_agent_name k)
-             in
-             let error =
-               Exception.check_point
-                 Exception.warn parameter error error' __POS__ Exit
-             in
-             let () = Loggers.fprintf loggers
-                 "%s is a dead agent." agent_string
-             in
-             let () = Loggers.print_newline loggers in
-             error)
-        result
     else
       error
 

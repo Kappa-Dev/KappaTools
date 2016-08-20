@@ -523,16 +523,14 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 6 will never be applied.
 rule 7 will never be applied.
 rule 8 will never be applied.
 rule 9 will never be applied.
-
 ------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -636,11 +634,9 @@ EXTENSIONAL DESCRIPTION:
 A() => [ A(x~u) v A(x~p) ]
 B() => [ B(x~u) v B(x~p) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

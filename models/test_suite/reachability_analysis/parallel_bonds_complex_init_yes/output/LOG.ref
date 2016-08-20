@@ -477,36 +477,6 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p,z)->A(x~u,z) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
-A:(z:B@z, t); B:(z:A@z, t)
-A:(z:B@z, t); B:(z:A@z, x)
-A:(z:B@z, x); B:(z:A@z, t)
-A:(z:B@z, x); B:(z:A@z, x)
-B:(z:A@z, t); A:(z:B@z, t)
-B:(z:A@z, t); A:(z:B@z, x)
-B:(z:A@z, x); A:(z:B@z, t)
-B:(z:A@z, x); A:(z:B@z, x)
-A:(t:B@t, x); B:(t:A@t, x)
-B:(t:A@t, x); A:(t:B@t, x)
-A:(z:B@z, t); B:(z:A@z, t)
-A:(t:B@t, z); B:(t:A@t, z)
-B:(z:A@z, t); A:(z:B@z, t)
-B:(t:A@t, z); A:(t:B@t, z)
-A:(z:B@z, t); B:(z:A@z, t)
-A:(t:B@t, z); B:(t:A@t, z)
-B:(z:A@z, t); A:(z:B@z, t)
-B:(t:A@t, z); A:(t:B@t, z)
-0:A 1:z 0:x (1:B@z) | 1:B 1:z 0:x (1:A@z) 
-0:A 1:z 0:x (1:B@z) | 1:B 1:z 2:t (1:A@z) 
-0:A 1:z 2:t (1:B@z) | 1:B 1:z 0:x (1:A@z) 
-0:A 1:z 2:t (1:B@z) | 1:B 1:z 2:t (1:A@z) 
-0:A 2:t 0:x (1:B@t) | 1:B 2:t 0:x (1:A@t) 
-0:A 2:t 1:z (1:B@t) | 1:B 2:t 1:z (1:A@t) 
-1:B 1:z 0:x (1:A@z) | 0:A 1:z 0:x (1:B@z) 
-1:B 1:z 0:x (1:A@z) | 0:A 1:z 2:t (1:B@z) 
-1:B 1:z 2:t (1:A@z) | 0:A 1:z 0:x (1:B@z) 
-1:B 1:z 2:t (1:A@z) | 0:A 1:z 2:t (1:B@z) 
-1:B 2:t 0:x (1:A@t) | 0:A 2:t 0:x (1:B@t) 
-1:B 2:t 1:z (1:A@t) | 0:A 2:t 1:z (1:B@t) 
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:

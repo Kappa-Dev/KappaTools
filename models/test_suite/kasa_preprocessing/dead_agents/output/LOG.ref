@@ -584,7 +584,7 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~)
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 0 will never be applied.
 rule 6 will never be applied.
@@ -593,10 +593,10 @@ rule 8 will never be applied.
 rule 9 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-D is a dead agent.
-E is a dead agent.
+D cannot occur in the model
+E cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -781,11 +781,9 @@ A() => [ A(x) ]
 A() => [ A(x~u?) v A(x~p?) ]
 B() => [ B(x~u) v B(x~p) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -197,7 +197,7 @@ struct
             in
             let () = Loggers.print_newline log in
             let () = Loggers.print_newline log in
-              dynamic
+            dynamic
           else
             dynamic
         in
@@ -242,49 +242,70 @@ struct
     let handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
-      let parameter =
-        Remanent_parameters.update_prefix parameter ""
+      let error, bool =
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+          parameter
+          error
+          (fun _parameter error _k bool bool'-> error, bool && bool')
+          result
+          true
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "------------------------------------------------------------" in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "* Dead rules :"
-      in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "------------------------------------------------------------" in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.iter
-        parameter
+      if not bool then
+        let parameter =
+          Remanent_parameters.update_prefix parameter ""
+        in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "------------------------------------------------------------" in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "* There are some non applyable rules"
+        in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "------------------------------------------------------------" in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.iter
+          parameter
+          error
+          (fun parameter error k bool ->
+             if bool
+             then
+               error
+             else
+               let error', rule_string =
+                 try
+                   Handler.string_of_rule parameter error handler compiled k
+                 with
+                 | _ ->
+                   Exception.warn
+                     parameter error __POS__ Exit (Ckappa_sig.string_of_rule_id k)
+               in
+               let error =
+                 Exception.check_point
+                   Exception.warn parameter error error' __POS__ Exit
+               in
+               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                   "%s will never be applied." rule_string
+               in
+               let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+               error)
+          result
+      else
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "------------------------------------------------------------"
+        in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "every rule may be applied"
+        in
+        let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
         error
-        (fun parameter error k bool ->
-           if bool
-           then
-             error
-           else
-             let error', rule_string =
-               try
-                 Handler.string_of_rule parameter error handler compiled k
-               with
-               | _ ->
-                 Exception.warn
-                   parameter error __POS__ Exit (Ckappa_sig.string_of_rule_id k)
-             in
-             let error =
-               Exception.check_point
-                 Exception.warn parameter error error' __POS__ Exit
-             in
-             let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                 "%s will never be applied." rule_string
-             in
-             let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-             error)
-        result
     else
       error
 

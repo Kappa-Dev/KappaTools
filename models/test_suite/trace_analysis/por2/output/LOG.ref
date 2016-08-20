@@ -5,14 +5,10 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* Dead rules :
+every rule may be applied
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 DISTRIB
 1;2;3;4;
 0;1;3;4;
@@ -375,12 +371,10 @@ A() => [ A(z~u) v A(z~p) ]
 A() => [ A(w~u) v A(w~p) ]
 A() => [ A(t~u) v A(t~p) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception
 Parsing relations.ka...
@@ -390,14 +384,10 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* Dead rules :
+every rule may be applied
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Relational properties:
@@ -424,11 +414,9 @@ A() => [ A(z~u) v A(z~p) ]
 A() => [ A(w~u) v A(w~p) ]
 A() => [ A(t~u) v A(t~p) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

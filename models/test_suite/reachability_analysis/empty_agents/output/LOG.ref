@@ -229,15 +229,15 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 4 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-E is a dead agent.
-F is a dead agent.
+E cannot occur in the model
+F cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -296,11 +296,9 @@ Id=5
 EXTENSIONAL DESCRIPTION:
 D() => [ D(x~u) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

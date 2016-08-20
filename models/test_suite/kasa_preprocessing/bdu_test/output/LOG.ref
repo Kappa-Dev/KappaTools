@@ -92,14 +92,14 @@ Influence_map:Inhibition_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(0):'Auu'
 Reachability analysis...
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-A is a dead agent.
+A cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -113,11 +113,9 @@ A is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

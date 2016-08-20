@@ -76,13 +76,11 @@ Reachability analysis...
 		the precondition is satisfied
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 7: KO will never be applied.
-
 ------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Relational properties:
@@ -106,11 +104,9 @@ A() => [ A(y~u) v A(y~p) v A(y~q) ]
 A() => [ A(x~u) v A(x~p) v A(x~0) v A(x~q) ]
 A() => [ A(z~u) v A(z~q) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

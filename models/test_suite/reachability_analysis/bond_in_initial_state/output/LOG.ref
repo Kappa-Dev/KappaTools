@@ -5,10 +5,6 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-A:(x:B@x, x); B:(x:A@x, x)
-B:(x:A@x, x); A:(x:B@x, x)
-0:A 1:x 0:x (1:B@x) | 1:B 0:x 1:x (1:A@x) 
-1:B 0:x 1:x (1:A@x) | 0:A 1:x 0:x (1:B@x) 
 	Views in initial state
 
 			A(x!B@x)
@@ -34,21 +30,12 @@ B:(x:A@x, x); A:(x:B@x, x)
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
 
 	Applying rule 0:
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
 
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
 
 	Applying rule 2:
 		the precondition is not satisfied yet
@@ -90,13 +77,6 @@ B:(x:A@x, x); A:(x:B@x, x)
 
 	Applying rule 0:
 		the precondition is satisfied
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -126,25 +106,14 @@ B:(x:A@x, x); A:(x:B@x, x)
 
 	Applying rule 0:
 		the precondition is satisfied
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
-                Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
 
 	Applying rule 1:
 		the precondition is satisfied
 		Updating the views for A(x!)
-
 ------------------------------------------------------------
-* Dead rules :
+every rule may be applied
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Relational properties:
@@ -158,13 +127,9 @@ A() => [ A(x~u?) ]
 B() => [ B(x~u?) v B(x~p?) ]
 B() => [ B(x) v B(x!A.x) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
-Whenever the site x of A and the site x of B are bound together, then the site x of A and x of B can have the following respective states: u, u
-Whenever the site x of B and the site x of A are bound together, then the site x of B and x of A can have the following respective states: u, u
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

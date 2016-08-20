@@ -629,14 +629,6 @@ Influence_map:Inhibition_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
 Reachability analysis...
-C:(x:A@x, x); A:(x:C@x, x)
-A:(x:C@x, x); C:(x:A@x, x)
-D:(x:E@x, x); E:(x:D@x, x)
-E:(x:D@x, x); D:(x:E@x, x)
-0:A 1:x 0:x (2:C@x) | 2:C 1:x 0:x (1:A@x) 
-2:C 1:x 0:x (1:A@x) | 0:A 1:x 0:x (2:C@x) 
-3:D 1:x 0:x (1:E@x) | 4:E 1:x 0:x (1:D@x) 
-4:E 1:x 0:x (1:D@x) | 3:D 1:x 0:x (1:E@x) 
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -1336,14 +1328,10 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 11: r11:
 		the precondition is satisfied
 		Updating the views for D(x~,x!)
-
 ------------------------------------------------------------
-* Dead rules :
+every rule may be applied
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -1891,17 +1879,9 @@ D() => [ D(x~u?) v D(x~p?) ]
 E() => [ E(x) v E(x!D.x) ]
 E() => [ E(x~u?) v E(x~p?) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: p, p
-Whenever the site x of A and the site x of C are bound together, then the site x of A and x of C can have the following respective states: u, p
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, u
-Whenever the site x of C and the site x of A are bound together, then the site x of C and x of A can have the following respective states: p, p
-Whenever the site x of D and the site x of E are bound together, then the site x of D and x of E can have the following respective states: p, p
-Whenever the site x of E and the site x of D are bound together, then the site x of E and x of D can have the following respective states: p, p
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

@@ -175,7 +175,7 @@ Reachability analysis...
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 0 will never be applied.
 rule 1 will never be applied.
@@ -183,10 +183,10 @@ rule 2 will never be applied.
 rule 3 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-A is a dead agent.
-B is a dead agent.
+A cannot occur in the model
+B cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -200,11 +200,9 @@ B is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

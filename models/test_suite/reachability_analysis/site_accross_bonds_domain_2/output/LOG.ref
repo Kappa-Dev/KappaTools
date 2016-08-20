@@ -375,18 +375,6 @@ Influence_map:Inhibition_map:rule(2):'r2' B(z~p)->B(z~u) -> rule(0):'r0' A(z,t~u
 Influence_map:Inhibition_map:rule(4):'r4' A(z!1,t~p),B(z!1,t~p)->A(z!1,t~u),B(z!1,t~u) -> rule(5):'r5' A(t~p)->A(t~q)[0->0]
 Influence_map:Inhibition_map:rule(5):'r5' A(t~p)->A(t~q) -> rule(4):'r4' A(z!1,t~p),B(z!1,t~p)->A(z!1,t~u),B(z!1,t~u)[0->0]
 Reachability analysis...
-A:(z:B@z, t); B:(z:A@z, t)
-A:(z:B@z, t); B:(z:A@z, z)
-B:(z:A@z, t); A:(z:B@z, t)
-B:(z:A@z, z); A:(z:B@z, t)
-A:(z:B@z, t); B:(z:A@z, t)
-B:(z:A@z, t); A:(z:B@z, t)
-A:(z:B@z, t); B:(z:A@z, t)
-B:(z:A@z, t); A:(z:B@z, t)
-0:A 0:z 1:t (1:B@z) | 1:B 1:z 0:z (1:A@z) 
-0:A 0:z 1:t (1:B@z) | 1:B 1:z 2:t (1:A@z) 
-1:B 1:z 0:z (1:A@z) | 0:A 0:z 1:t (1:B@z) 
-1:B 1:z 2:t (1:A@z) | 0:A 0:z 1:t (1:B@z) 
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -733,14 +721,10 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for B(z~,z!,t~)
-
 ------------------------------------------------------------
-* Dead rules :
+every rule may be applied
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -1069,23 +1053,15 @@ B() => [ B(z) v B(z!A.z) ]
 B() => [ B(z~u?) v B(z~p?) ]
 B() => [ B(t~u) v B(t~p) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
-Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: q, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: p, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and z of B can have the following respective states: u, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: q, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: p, p
-Whenever the site z of A and the site z of B are bound together, then the site t of A and t of B can have the following respective states: u, u
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, u
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, p
-Whenever the site z of B and the site z of A are bound together, then the site z of B and t of A can have the following respective states: p, q
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, p
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: p, q
-Whenever the site z of B and the site z of A are bound together, then the site t of B and t of A can have the following respective states: u, u
+A(z!1),B(z!1) => 
+   [
+        A(t~q,z!1),B(t~p,z!1)
+      v A(t~p,z!1),B(t~p,z!1)
+      v A(t~u,z!1),B(t~u,z!1)
+  ]
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

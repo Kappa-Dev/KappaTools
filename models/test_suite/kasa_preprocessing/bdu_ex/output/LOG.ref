@@ -420,14 +420,10 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,y~,x!)
 		Updating the views for A(x~,y~,x!)
-
 ------------------------------------------------------------
-* Dead rules :
+every rule may be applied
 ------------------------------------------------------------
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -604,11 +600,9 @@ A() => [ A(y~u) v A(y~p) ]
 A() => [ A(x~u?) v A(x~p?) ]
 A() => [ A(x) v A(x!A.x) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

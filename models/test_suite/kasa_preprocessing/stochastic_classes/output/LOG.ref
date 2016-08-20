@@ -506,7 +506,7 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 rule 2: r2 will never be applied.
@@ -517,12 +517,12 @@ rule 7: r7 will never be applied.
 rule 8: r8 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-A is a dead agent.
-C is a dead agent.
-E is a dead agent.
-F is a dead agent.
+A cannot occur in the model
+C cannot occur in the model
+E cannot occur in the model
+F cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -716,11 +716,9 @@ B() => [ B(x~u) ]
 D() => [ D(y~u) ]
 D() => [ D(x~u) ]
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

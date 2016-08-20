@@ -188,23 +188,19 @@ Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A(x~u,y),B(x,y)->A(x~p,y!1),B(x!1,y) -> rule(1):'r1' B(x!_,y),C(x)->B(x!_,y!1),C(x!1)[1->0]
 Reachability analysis...
-A:(y:B@x, x); B:(x:A@y, y)
-B:(x:A@y, y); A:(y:B@x, x)
-0:A 1:y 0:x (1:B@x) | 1:B 0:x 1:y (1:A@y) 
-1:B 0:x 1:y (1:A@y) | 0:A 1:y 0:x (1:B@x) 
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 rule 1: r1 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-A is a dead agent.
-B is a dead agent.
-C is a dead agent.
+A cannot occur in the model
+B cannot occur in the model
+C cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -218,11 +214,9 @@ C is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception

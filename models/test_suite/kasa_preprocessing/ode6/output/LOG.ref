@@ -449,33 +449,9 @@ Influence_map:Inhibition_map:rule(3):'r3' R(k,t),E(y)->R(k,t!1),E(y!1) -> rule(2
 Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> rule(1):'r1' Sh(x~u,y),R(x,y,z)->Sh(x~p,y!1),R(x,y,z!1)[0->1]
 Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> rule(2):'r2' R(x,y,z),R(k,t)->R(x,y!1,z),R(k!1,t)[0->0]
 Reachability analysis...
-Sh:(y:R@z, x); R:(z:Sh@y, x)
-Sh:(y:R@z, x); R:(z:Sh@y, y)
-Sh:(y:R@z, x); R:(z:Sh@y, x)
-Sh:(y:R@z, x); R:(z:Sh@y, y)
-R:(z:Sh@y, x); Sh:(y:R@z, x)
-R:(z:Sh@y, x); Sh:(y:R@z, x)
-R:(z:Sh@y, y); Sh:(y:R@z, x)
-R:(z:Sh@y, y); Sh:(y:R@z, x)
-R:(y:R@k, x); R:(k:R@y, t)
-R:(y:R@k, z); R:(k:R@y, t)
-R:(k:R@y, t); R:(y:R@k, x)
-R:(k:R@y, t); R:(y:R@k, z)
-1:Sh 2:y 0:x (1:R@z) | 2:R 0:z 1:y (1:Sh@y) 
-1:Sh 2:y 0:x (1:R@z) | 2:R 0:z 4:x (1:Sh@y) 
-1:Sh 2:y 1:x (1:R@z) | 2:R 0:z 1:y (1:Sh@y) 
-1:Sh 2:y 1:x (1:R@z) | 2:R 0:z 4:x (1:Sh@y) 
-2:R 0:z 1:y (1:Sh@y) | 1:Sh 2:y 0:x (1:R@z) 
-2:R 0:z 1:y (1:Sh@y) | 1:Sh 2:y 1:x (1:R@z) 
-2:R 0:z 4:x (1:Sh@y) | 1:Sh 2:y 0:x (1:R@z) 
-2:R 0:z 4:x (1:Sh@y) | 1:Sh 2:y 1:x (1:R@z) 
-2:R 1:y 0:z (1:R@k) | 2:R 2:k 3:t (1:R@y) 
-2:R 1:y 4:x (1:R@k) | 2:R 2:k 3:t (1:R@y) 
-2:R 2:k 3:t (1:R@y) | 2:R 1:y 0:z (1:R@k) 
-2:R 2:k 3:t (1:R@y) | 2:R 1:y 4:x (1:R@k) 
 
 ------------------------------------------------------------
-* Dead rules :
+* There are some non applyable rules
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 rule 1: r1 will never be applied.
@@ -484,12 +460,12 @@ rule 3: r3 will never be applied.
 rule 4: r4 will never be applied.
 
 ------------------------------------------------------------
-* Dead agents :
+* There are some non creatable agents 
 ------------------------------------------------------------
-ab is a dead agent.
-Sh is a dead agent.
-R is a dead agent.
-E is a dead agent.
+ab cannot occur in the model
+Sh cannot occur in the model
+R cannot occur in the model
+E cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
@@ -503,11 +479,9 @@ E is a dead agent.
 * Non relational properties:
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Site accross bonds domain
+* Properties in connected agents
 ------------------------------------------------------------
-* Static information
-* Dynamic information
 ------------------------------------------------------------
-* Parallel bonds domain
+* Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception
