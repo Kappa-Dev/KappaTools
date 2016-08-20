@@ -4,6 +4,45 @@ Compiling...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+C:(y:C@y, x); C:(y:C@y, x)
+C:(y:C@y, x); C:(y:C@y, x)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, y)
+A:(z:A@y, z); A:(y:A@z, z)
+A:(z:A@y, z); A:(y:A@z, z)
+A:(z:A@y, z); A:(y:A@z, y)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, z)
+A:(z:A@y, y); A:(y:A@z, y)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, z); A:(z:A@y, z)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, z); A:(z:A@y, z)
+A:(y:A@z, z); A:(z:A@y, y)
+A:(y:A@z, y); A:(z:A@y, y)
+A:(y:A@z, y); A:(z:A@y, z)
+A:(y:A@z, y); A:(z:A@y, y)
+0:A 2:z 0:y (1:A@y) | 0:A 3:y 0:y (1:A@z) 
+0:A 2:z 0:y (1:A@y) | 0:A 3:y 1:z (1:A@z) 
+0:A 2:z 0:y (1:A@y) | 0:A 3:y 2:z (1:A@z) 
+0:A 2:z 1:z (1:A@y) | 0:A 3:y 0:y (1:A@z) 
+0:A 2:z 1:z (1:A@y) | 0:A 3:y 1:z (1:A@z) 
+0:A 2:z 1:z (1:A@y) | 0:A 3:y 2:z (1:A@z) 
+0:A 2:z 3:y (1:A@y) | 0:A 3:y 0:y (1:A@z) 
+0:A 2:z 3:y (1:A@y) | 0:A 3:y 1:z (1:A@z) 
+0:A 2:z 3:y (1:A@y) | 0:A 3:y 2:z (1:A@z) 
+0:A 3:y 0:y (1:A@z) | 0:A 2:z 0:y (1:A@y) 
+0:A 3:y 0:y (1:A@z) | 0:A 2:z 1:z (1:A@y) 
+0:A 3:y 0:y (1:A@z) | 0:A 2:z 3:y (1:A@y) 
+0:A 3:y 1:z (1:A@z) | 0:A 2:z 0:y (1:A@y) 
+0:A 3:y 1:z (1:A@z) | 0:A 2:z 1:z (1:A@y) 
+0:A 3:y 1:z (1:A@z) | 0:A 2:z 3:y (1:A@y) 
+0:A 3:y 2:z (1:A@z) | 0:A 2:z 0:y (1:A@y) 
+0:A 3:y 2:z (1:A@z) | 0:A 2:z 1:z (1:A@y) 
+0:A 3:y 2:z (1:A@z) | 0:A 2:z 3:y (1:A@y) 
+2:C 1:y 0:x (1:C@y) | 2:C 1:y 0:x (1:C@y) 
 
 ------------------------------------------------------------
 * Dead rules :
@@ -28,6 +67,11 @@ A() => [ A(z~u?) v A(z~p?) ]
 A() => [ A(y~u?) v A(y~p?) ]
 A() => [ A(z) ]
 A() => [ A(y) ]
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+* Dynamic information
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------

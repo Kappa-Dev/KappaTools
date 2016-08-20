@@ -347,6 +347,22 @@ Influence_map:Wake_up_map:rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1) -> rule(
 Influence_map:Inhibition_map:rule(0):'r0' A(z,t),B(z,t)->A(z!1,t),B(z!1,t) -> rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1)[0->0];[1->1]
 Influence_map:Inhibition_map:rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1) -> rule(0):'r0' A(z,t),B(z,t)->A(z!1,t),B(z!1,t)[0->0];[1->1]
 Reachability analysis...
+A:(z:B@z, t); B:(z:A@z, t)
+B:(z:A@z, t); A:(z:B@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(t:A@t, z); A:(t:B@t, z)
+A:(z:B@z, t); B:(z:A@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(t:A@t, z); A:(t:B@t, z)
+A:(z:B@z, t); B:(z:A@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(t:A@t, z); A:(t:B@t, z)
+0:A 0:z 1:t (1:B@z) | 1:B 0:z 1:t (1:A@z) 
+0:A 1:t 0:z (1:B@t) | 1:B 1:t 0:z (1:A@t) 
+1:B 0:z 1:t (1:A@z) | 0:A 0:z 1:t (1:B@z) 
+1:B 1:t 0:z (1:A@t) | 0:A 1:t 0:z (1:B@t) 
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:

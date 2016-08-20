@@ -460,6 +460,32 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p)->A(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
+A:(z:B@z, t); B:(z:A@z, t)
+A:(z:B@z, t); B:(z:A@z, x)
+A:(z:B@z, x); B:(z:A@z, t)
+A:(z:B@z, x); B:(z:A@z, x)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(z:A@z, t); A:(z:B@z, x)
+B:(z:A@z, x); A:(z:B@z, t)
+B:(z:A@z, x); A:(z:B@z, x)
+A:(z:B@z, t); B:(z:A@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(t:A@t, z); A:(t:B@t, z)
+A:(z:B@z, t); B:(z:A@z, t)
+A:(t:B@t, z); B:(t:A@t, z)
+B:(z:A@z, t); A:(z:B@z, t)
+B:(t:A@t, z); A:(t:B@t, z)
+0:A 1:z 0:x (1:B@z) | 1:B 1:z 0:x (1:A@z) 
+0:A 1:z 0:x (1:B@z) | 1:B 1:z 2:t (1:A@z) 
+0:A 1:z 2:t (1:B@z) | 1:B 1:z 0:x (1:A@z) 
+0:A 1:z 2:t (1:B@z) | 1:B 1:z 2:t (1:A@z) 
+0:A 2:t 1:z (1:B@t) | 1:B 2:t 1:z (1:A@t) 
+1:B 1:z 0:x (1:A@z) | 0:A 1:z 0:x (1:B@z) 
+1:B 1:z 0:x (1:A@z) | 0:A 1:z 2:t (1:B@z) 
+1:B 1:z 2:t (1:A@z) | 0:A 1:z 0:x (1:B@z) 
+1:B 1:z 2:t (1:A@z) | 0:A 1:z 2:t (1:B@z) 
+1:B 2:t 1:z (1:A@t) | 0:A 2:t 1:z (1:B@t) 
 	Views in initial state
 
 INTENSIONAL DESCRIPTION:
@@ -600,12 +626,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=26
+Id=30
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=29
    Node(site_type:1<2)
     Id=17
      Node(site_type:2<0)
@@ -642,12 +668,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=37
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=32
+  Id=36
    Node(site_type:1<1)
     Id=17
      Node(site_type:2<0)
@@ -689,19 +715,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=39
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=38
+  Id=27
    Node(site_type:1<2)
-    Id=37
+    Id=26
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=36
+      Id=25
        Node(site_type:2<2)
         Id=15
          Node(site_type:3<1)
@@ -731,19 +757,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=45
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=44
+  Id=47
    Node(site_type:1<1)
-    Id=37
+    Id=26
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=36
+      Id=25
        Node(site_type:2<2)
         Id=15
          Node(site_type:3<1)
@@ -788,21 +814,21 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=71
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=42
+  Id=45
    Node(site_type:1<2)
-    Id=41
+    Id=44
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=40
+      Id=43
        Node(site_type:2<1)
-        Id=27
+        Id=31
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -815,7 +841,7 @@ Id=48
             Id=0
              Leaf False 
 
-        Id=36
+        Id=25
          Node(site_type:2<2)
           Id=15
            Node(site_type:3<1)
@@ -863,12 +889,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=78
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=77
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -904,12 +930,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=78
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=77
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -979,12 +1005,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=72
+Id=99
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=71
+  Id=98
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1023,12 +1049,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=72
+Id=99
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=71
+  Id=98
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)

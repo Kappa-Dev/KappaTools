@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 19 2016>
+   * Last modification: Time-stamp: <Aug 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -242,7 +242,7 @@ let overwrite_potential_partners_map
 
 type output =
   | Cannot_exist
-  | May_exist
+  | May_exist of path
   | Located of Ckappa_sig.c_agent_id
 
 
@@ -363,8 +363,71 @@ let may_get_free_by_side_effect parameters kappa_handler error precondition rule
     end
   else error, false
 
+let min_not_free interv =
+  if interv.Cckappa_sig.min = Ckappa_sig.dummy_state_index
+  then Ckappa_sig.dummy_state_index_1
+  else interv.Cckappa_sig.min
+
+let check_state_compatibility parameters error kappa_handler
+    cc
+    agent_id_source  site_source agent_target site_target =
+  match
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+      parameters error agent_id_source (*A*) cc.Cckappa_sig.views
+  with
+  | error, Some Cckappa_sig.Ghost -> error, true
+  | error, None
+  | error,
+    Some
+      (Cckappa_sig.Dead_agent _ | Cckappa_sig.Unknown_agent _)
+    ->
+    Exception.warn
+      parameters error __POS__ ~message:"null pointer" Exit false
+  | error, Some Cckappa_sig.Agent ag ->
+    let agent_source = ag.Cckappa_sig.agent_name in
+    let error, interval =
+      Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+        parameters error site_source
+        ag.Cckappa_sig.agent_interface
+    in
+    begin
+      match interval
+      with
+      | None -> error, true
+      | Some i ->
+        let interv = i.Cckappa_sig.site_state in
+        let rec aux error k =
+          if Ckappa_sig.compare_state_index k interv.Cckappa_sig.max > 0
+          then
+            error, false
+          else
+            let error, opt =
+              Handler.dual parameters error kappa_handler
+                agent_source site_source k
+            in
+            match opt
+            with
+            | Some (agent_target', site_target',_) when
+                agent_target' = agent_target
+                && site_target' = site_target
+              -> error, true
+            | Some _ ->
+              aux error (Ckappa_sig.next_state_index k)
+            | None ->
+              let error, () =
+                Exception.warn
+                  parameters error __POS__
+                  Exit ()
+              in
+              aux error (Ckappa_sig.next_state_index k)
+        in aux error
+          (min_not_free interv)
+    end
+
+
+
 let rec follow_path_inside_cc
-    parameters error cc path
+    parameters error kappa_handler cc path
   =
   match
     path.relative_address
@@ -376,14 +439,28 @@ let rec follow_path_inside_cc
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
           parameters error path.agent_id (*A*) cc.Cckappa_sig.bonds
       with
-      | error, None -> error, May_exist
+      | error, None ->
+        let error, bool =
+          check_state_compatibility parameters error kappa_handler
+            cc path.agent_id head.site_out head.agent_type_in head.site_in in
+        if bool
+        then error, May_exist path
+        else error, Cannot_exist
       | error, Some map ->
         begin
           match
             Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-              parameters error head.site_out (*A.x*) map
+              parameters error head.site_out  (*A.x*) map
           with
-          | error, None -> error, May_exist
+          | error, None ->
+            let error, bool =
+              check_state_compatibility
+                parameters error kappa_handler
+                cc path.agent_id head.site_out head.agent_type_in head.site_in
+            in
+            if bool
+            then error, May_exist path
+            else error, Cannot_exist
           | error, Some site_add ->
             (*-----------------------------------------------*)
             (*A.x is bound to something*)
@@ -395,7 +472,7 @@ let rec follow_path_inside_cc
             then
               (*recursively apply to #i tail*)
               follow_path_inside_cc
-                parameters error cc
+                parameters error kappa_handler cc
                 {path with agent_id = site_add.Cckappa_sig.agent_index;
                            relative_address = tail}
             else
@@ -409,11 +486,13 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
   let cc = rule.Cckappa_sig.rule_rhs in
   (*---------------------------------------------------------*)
   (*inside the pattern, check the binding information in the lhs of the current agent*)
-  let error, potential_values =
-    match follow_path_inside_cc parameters error cc path
+  let error, (potential_values, continuation_opt) =
+    match follow_path_inside_cc parameters error kappa_handler cc path
     with
-    | error, Cannot_exist -> error, Usual_domains.Undefined
-    | error, May_exist -> error, Usual_domains.Any
+    | error, Cannot_exist ->
+      error, (Usual_domains.Undefined,None)
+    | error, May_exist continuation ->
+      error, (Usual_domains.Any, Some continuation)
     | error, Located agent_id ->
       begin
         let agent =
@@ -427,7 +506,7 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
         with
         | error, None ->
           Exception.warn
-            parameters error __POS__ Exit Usual_domains.Undefined
+            parameters error __POS__ Exit (Usual_domains.Undefined,None)
         | error, Some agent ->
           begin
             match agent with
@@ -435,7 +514,7 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
             | Cckappa_sig.Dead_agent _
             | Cckappa_sig.Unknown_agent _ ->
               Exception.warn
-                parameters error __POS__ Exit Usual_domains.Undefined
+                parameters error __POS__ Exit (Usual_domains.Undefined,None)
 
             | Cckappa_sig.Agent proper_agent ->
               let error, state_opt =
@@ -447,7 +526,13 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
               in
               begin
                 match state_opt with
-                | None -> error, Usual_domains.Any
+                | None ->
+                  error,
+                  (Usual_domains.Any,
+                   Some
+                     {path with agent_id = agent_id ;
+                                relative_address = []})
+
                 | Some interval ->
                   let interval = interval.Cckappa_sig.site_state in
                   let list =
@@ -458,7 +543,7 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
                     in
                     aux interval.Cckappa_sig.max []
                   in
-                  error, Usual_domains.Val list
+                  error, (Usual_domains.Val list, None)
               end
           end
       end
@@ -468,6 +553,14 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
     -> error, dynamic, potential_values
   | Usual_domains.Any ->
     begin
+      let error, path =
+        match continuation_opt with
+        | None ->
+          Exception.warn
+            parameters error __POS__
+            Exit path
+        | Some path -> error, path
+      in
       let path =
         {
           defined_in = LHS r ;

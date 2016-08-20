@@ -5,6 +5,37 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+R:(c:R@c, x); R:(c:R@c, x)
+R:(c:R@c, x); R:(c:R@c, x)
+R:(c:R@c, n); R:(c:R@c, n)
+R:(c:R@c, n); R:(c:R@c, cr)
+R:(c:R@c, cr); R:(c:R@c, n)
+R:(c:R@c, cr); R:(c:R@c, cr)
+R:(cr:R@n, n); R:(n:R@cr, cr)
+R:(cr:R@n, n); R:(n:R@cr, c)
+R:(cr:R@n, c); R:(n:R@cr, cr)
+R:(cr:R@n, c); R:(n:R@cr, c)
+R:(c:R@c, n); R:(c:R@c, n)
+R:(c:R@c, n); R:(c:R@c, cr)
+R:(c:R@c, cr); R:(c:R@c, n)
+R:(c:R@c, cr); R:(c:R@c, cr)
+R:(n:R@cr, cr); R:(cr:R@n, n)
+R:(n:R@cr, cr); R:(cr:R@n, c)
+R:(n:R@cr, c); R:(cr:R@n, n)
+R:(n:R@cr, c); R:(cr:R@n, c)
+1:R 1:c 0:x (1:R@c) | 1:R 1:c 0:x (1:R@c) 
+1:R 1:c 2:cr (1:R@c) | 1:R 1:c 2:cr (1:R@c) 
+1:R 1:c 2:cr (1:R@c) | 1:R 1:c 3:n (1:R@c) 
+1:R 1:c 3:n (1:R@c) | 1:R 1:c 2:cr (1:R@c) 
+1:R 1:c 3:n (1:R@c) | 1:R 1:c 3:n (1:R@c) 
+1:R 2:cr 1:c (1:R@n) | 1:R 3:n 1:c (1:R@cr) 
+1:R 2:cr 1:c (1:R@n) | 1:R 3:n 2:cr (1:R@cr) 
+1:R 2:cr 3:n (1:R@n) | 1:R 3:n 1:c (1:R@cr) 
+1:R 2:cr 3:n (1:R@n) | 1:R 3:n 2:cr (1:R@cr) 
+1:R 3:n 1:c (1:R@cr) | 1:R 2:cr 1:c (1:R@n) 
+1:R 3:n 1:c (1:R@cr) | 1:R 2:cr 3:n (1:R@n) 
+1:R 3:n 2:cr (1:R@cr) | 1:R 2:cr 1:c (1:R@n) 
+1:R 3:n 2:cr (1:R@cr) | 1:R 2:cr 3:n (1:R@n) 
 
 ------------------------------------------------------------
 * Dead rules :
@@ -32,10 +63,34 @@ R() =>
 * Non relational properties:
 ------------------------------------------------------------
 E() => [ E(x) v E(x!R.x) ]
+R() => [ R(c) v R(c!R.c) ]
 R() => [ R(n) v R(n!R.cr) ]
 R() => [ R(cr) v R(cr!R.n) ]
-R() => [ R(c) v R(c!R.c) ]
 R() => [ R(x) v R(x!E.x) ]
+------------------------------------------------------------
+* Site accross bonds domain
+------------------------------------------------------------
+* Static information
+* Dynamic information
+Whenever the site c of R and the site c of R are bound together, then the site x of R and x of R can have the following respective states: E@x, E@x
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: R@n, free
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and cr of R can have the following respective states: free, R@n
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: R@n, R@cr
+Whenever the site c of R and the site c of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: R@cr, R@n
+Whenever the site c of R and the site c of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: R@cr, free
+Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: free, free
+Whenever the site c of R and the site c of R are bound together, then the site n of R and n of R can have the following respective states: free, R@cr
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
+Whenever the site cr of R and the site n of R are bound together, then the site c of R and cr of R can have the following respective states: R@c, free
+Whenever the site cr of R and the site n of R are bound together, then the site n of R and c of R can have the following respective states: free, R@c
+Whenever the site cr of R and the site n of R are bound together, then the site n of R and cr of R can have the following respective states: free, free
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and c of R can have the following respective states: R@c, R@c
+Whenever the site n of R and the site cr of R are bound together, then the site c of R and n of R can have the following respective states: R@c, free
+Whenever the site n of R and the site cr of R are bound together, then the site cr of R and c of R can have the following respective states: free, R@c
+Whenever the site n of R and the site cr of R are bound together, then the site cr of R and n of R can have the following respective states: free, free
 ------------------------------------------------------------
 * Parallel bonds domain
 ------------------------------------------------------------
