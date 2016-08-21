@@ -89,6 +89,18 @@ let rec list_map_flatten f = function (* list_bind *)
     (List.fold_left (fun x y -> List.rev_append y x) [] (List.rev_map f l))
  *)
 
+let remove_consecutive_double_in_list l =
+  let rec aux last l acc =
+    match
+      l
+    with h::q when last=h -> aux last q acc
+       | h::q -> aux h q (h::acc)
+       | [] -> List.rev acc
+  in
+  match l with
+    [] -> []
+  | h::q -> aux h q [h]
+
 let rec list_fold_right_map f l x =
   match l with
   | [] -> ([],x)

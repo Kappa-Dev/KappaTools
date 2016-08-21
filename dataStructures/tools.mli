@@ -33,6 +33,8 @@ val list_random : 'a list -> 'a
 val list_smart_filter : ('a -> bool) -> 'a list -> 'a list
 val list_smart_map : ('a -> 'a) -> 'a list -> 'a list
 
+val remove_consecutive_double_in_list : 'a list -> 'a list
+
 (** {5 Misc utilities } *)
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Aug 21 2016>
    *
    * Abstract domain to record live rules
    *
@@ -245,43 +245,79 @@ type output =
   | May_exist of path
   | Located of Ckappa_sig.c_agent_id
 
+let last_agent_type parameters error rule path =
+  match
+    List.rev path.relative_address
+  with
+  | [] ->
+    begin
+      let agent =
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          path.agent_id (*A*)
+          rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+      in
+      match agent
+      with
+      | error, None ->
+        Exception.warn
+          parameters error __POS__ Exit Ckappa_sig.dummy_agent_name
+      | error, Some agent ->
+        begin
+          match agent with
+          | Cckappa_sig.Ghost
+          | Cckappa_sig.Dead_agent _
+          | Cckappa_sig.Unknown_agent _ ->
+            Exception.warn
+              parameters error __POS__ Exit
+              Ckappa_sig.dummy_agent_name
+          | Cckappa_sig.Agent proper_agent ->
+            error,
+            proper_agent.Cckappa_sig.agent_name
+        end
+    end
+  | head::_ ->
+    error, head.agent_type_in
+
+
+let may_be_modified parameters error rule path =
+  let error, agent_name = last_agent_type parameters error rule path in
+  let site_name = path.site in
+  let modif = rule.Cckappa_sig.diff_direct in
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+    parameters error
+    (fun parameters error _ agent list ->
+       if agent.Cckappa_sig.agent_name = agent_name
+       then
+         match
+           Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+             parameters error site_name agent.Cckappa_sig.agent_interface
+         with
+         | error, None -> error, list
+         | error, Some interval ->
+           let range = interval.Cckappa_sig.site_state in
+           if range.Cckappa_sig.min = range.Cckappa_sig.max
+           then
+             error,range.Cckappa_sig.min::list
+           else
+             Exception.warn
+               parameters error __POS__
+               Exit list
+       else
+         error, list
+    ) modif []
+
+
+(*  Ckappa_sig.c_state
+      interval
+      port
+      Ckappa_sig.Site_map_and_set.Map.t
+      proper_agent
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t*)
 
 let may_get_free_by_side_effect parameters kappa_handler error precondition rule path =
-  let error, agent_name =
-    match
-      List.rev path.relative_address
-    with
-    | [] ->
-      begin
-        let agent =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-            parameters
-            error
-            path.agent_id (*A*)
-            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        in
-        match agent
-        with
-        | error, None ->
-          Exception.warn
-            parameters error __POS__ Exit Ckappa_sig.dummy_agent_name
-        | error, Some agent ->
-          begin
-            match agent with
-            | Cckappa_sig.Ghost
-            | Cckappa_sig.Dead_agent _
-            | Cckappa_sig.Unknown_agent _ ->
-              Exception.warn
-                parameters error __POS__ Exit
-                Ckappa_sig.dummy_agent_name
-            | Cckappa_sig.Agent proper_agent ->
-              error,
-              proper_agent.Cckappa_sig.agent_name
-          end
-      end
-    | head::_ ->
-      error, head.agent_type_in
-  in
+  let error, agent_name = last_agent_type parameters error rule path in
   let site_name = path.site in
   let error, is_binding_site =
     Handler.is_binding_site parameters error kappa_handler agent_name site_name
@@ -574,16 +610,28 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
       in
       let error, bool =
         may_get_free_by_side_effect parameters kappa_handler error precondition rule path.path in
-      if bool
-      then
-        match values with
-        | Usual_domains.Val l ->
-          error, dynamic,
-          (Usual_domains.Val
-             ((Ckappa_sig.state_index_of_int 0)::l))
-        | Usual_domains.Undefined | Usual_domains.Any ->
-          error, dynamic, values
-      else
+      let error, list =
+        may_be_modified parameters error 
+          rule path.path in
+
+      match values with
+      | Usual_domains.Val l ->
+        if bool || list<>[]
+        then
+          let l_side =
+            if bool
+            then (Ckappa_sig.state_index_of_int 0)::l
+            else
+              l
+          in
+          let l_all =
+            Tools.remove_consecutive_double_in_list
+              (List.sort Ckappa_sig.compare_state_index
+                 (List.rev_append list l_side))
+          in
+          error, dynamic, Usual_domains.Val (l_all)
+        else error, dynamic, values
+      | Usual_domains.Undefined | Usual_domains.Any ->
         error, dynamic, values
     end
 and get_state_of_site
