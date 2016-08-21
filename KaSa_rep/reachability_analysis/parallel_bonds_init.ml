@@ -250,15 +250,17 @@ let collect_non_parallel_init parameter store_bonds_init store_site_pair_list er
 (********************************************************************)
 (*collect result of parallel bonds in the intitial state*)
 
-let collect_value_parallel_bonds parameter store_parallel_bonds_init
-    error kappa_handler store_result =
-  let error, parallel_list =
+let collect_value_parallel_bonds parameter store_parallel_bonds_init tuples_of_interest error kappa_handler store_result =
+  let parallel_list =
     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold
       (fun ((_, agent_type, site_type, site_type1, state, state1),
-            (_, agent_type', site_type', site_type1', state', state1')) (error, current_list) ->
-        error, ((agent_type, site_type, site_type1, state, state1),
-                (agent_type', site_type', site_type1', state', state1')) :: current_list
-      ) store_parallel_bonds_init (error, [])
+            (_, agent_type', site_type', site_type1', state', state1'))  current_list ->
+            let tuple =
+            ((agent_type, site_type, site_type1, state, state1),
+             (agent_type', site_type', site_type1', state', state1')) in
+            if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem tuple tuples_of_interest then tuple :: current_list
+            else current_list
+      ) store_parallel_bonds_init []
   in
   (*----------------------------------------------------------------*)
   let error, value_parallel_bonds =
@@ -278,8 +280,7 @@ let collect_value_parallel_bonds parameter store_parallel_bonds_init
 (*******************************************************************)
 (*collect result of non parallel bonds in the initital state*)
 
-let collect_value_non_parallel_bonds parameter store_non_parallel_init
-    error kappa_handler store_result =
+let collect_value_non_parallel_bonds parameter store_non_parallel_init tuples_of_interest error kappa_handler store_result =
   let store_non_parallel_init_list =
     Ckappa_sig.Agent_map_and_set.Map.map
       (fun list ->
@@ -290,8 +291,11 @@ let collect_value_non_parallel_bonds parameter store_non_parallel_init
                 (_, _, site_type1, state1),
                 (_, agent_type'', site_type', state'),
                 (_, _, site_type1', state1')) ->
+               let tuple =
                ((agent_type, site_type, site_type1, state, state1),
-                (agent_type'', site_type', site_type1', state', state1')) :: current_list
+                (agent_type'', site_type', site_type1', state', state1')) in
+               if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem tuple tuples_of_interest then tuple :: current_list
+               else current_list
              ) [] list
          in
          new_pair_list

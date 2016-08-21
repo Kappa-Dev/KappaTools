@@ -608,6 +608,7 @@ struct
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let handler = get_mvbdu_handler dynamic in
+    let tuple_of_interest = get_potential_tuple_pair static in
     let error, handler, store_result =
       Site_accross_bonds_domain_static.collect_pair_tuple_init
         parameter
@@ -618,6 +619,7 @@ struct
         species
         store_bonds_init
         store_pair_sites_init
+        tuple_of_interest
         store_result
     in
     let dynamic = set_mvbdu_handler handler dynamic in

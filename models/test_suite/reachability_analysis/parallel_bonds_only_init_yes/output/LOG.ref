@@ -335,10 +335,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
-         B(t!1,z!2),A(t!1,z!2)
-         B(t!2,z!1),A(t!2,z!1)
-         A(t!1,z!2),B(t!1,z!2)
-         A(t!2,z!1),B(t!2,z!1)
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -701,6 +697,4 @@ A(t!1),B(t!1) =>
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-A(t!B.t,z!B.z) => A(t!2,z!1),B(t!2,z!1)
-B(t!A.t,z!A.z) => B(t!2,z!1),A(t!2,z!1)
 execution finished without any exception

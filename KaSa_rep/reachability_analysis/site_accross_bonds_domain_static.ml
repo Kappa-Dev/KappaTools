@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Aug 21 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -307,34 +307,34 @@ let collect_potential_tuple_pair parameter error
        let (agent_id, agent_type, site_type, state) = x in
        let (agent_id1, agent_type1, site_type1, state1) = y in
        let error, fst_list =
-       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
-         (fun v (error, current_list) ->
-            let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
-            if agent_id = agent_id_v &&
-               agent_type = agent_type_v && site_type <> site_type_v
-            then
-              let fst_list =
-                (agent_type, site_type, site_type_v, state) ::
-                current_list
-              in
-              error, fst_list
-            else error, current_list
-         ) views_rhs_set (error, [])
+         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+           (fun v (error, current_list) ->
+              let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
+              if agent_id = agent_id_v &&
+                 agent_type = agent_type_v && site_type <> site_type_v
+              then
+                let fst_list =
+                  (agent_type, site_type, site_type_v, state) ::
+                  current_list
+                in
+                error, fst_list
+              else error, current_list
+           ) views_rhs_set (error, [])
        in
        let error, snd_list =
-       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
-         (fun v (error, current_list) ->
-            let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
-            if agent_id1 = agent_id_v &&
-               agent_type1 = agent_type_v && site_type1 <> site_type_v
-            then
-              let snd_list =
-                (agent_type1, site_type1, site_type_v, state1) ::
-                current_list
-              in
-              error, snd_list
-            else error, current_list
-         ) views_rhs_set (error, [])
+         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+           (fun v (error, current_list) ->
+              let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
+              if agent_id1 = agent_id_v &&
+                 agent_type1 = agent_type_v && site_type1 <> site_type_v
+              then
+                let snd_list =
+                  (agent_type1, site_type1, site_type_v, state1) ::
+                  current_list
+                in
+                error, snd_list
+              else error, current_list
+           ) views_rhs_set (error, [])
        in
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
@@ -396,7 +396,7 @@ let collect_potential_tuple_pair parameter error
   in
   error, store_result
 
-let collect_potential_tuple_pair parameter error rule_id
+  let collect_potential_tuple_pair parameter error rule_id
     store_pair_rhs store_result =
   let error, store_pair_set =
     get_set parameter error rule_id
@@ -432,7 +432,7 @@ let collect_potential_tuple_pair parameter error rule_id
       ) store_pair_set (error, store_result)
   in
   error, store_result
-         *)
+*)
 (***************************************************************)
 (*use the projection of set*)
 (*
@@ -888,7 +888,7 @@ let collect_bonds_init parameter error init_state =
 (***************************************************************)
 
 let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
-    _init_state store_bonds_init store_pair_sites_init store_result =
+    _init_state store_bonds_init store_pair_sites_init tuples_of_interest store_result =
   (*fold over a set of pair and check the first site whether or not it
     belongs to a set of sites that can be bound*)
   let error, handler, store_result =
@@ -912,16 +912,21 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
            (*test*)
            let proj (_, b,c, d, e, _) = (b, c, d, e) in
            let pair = proj x, proj y in
-           (*-----------------------------------------------------------*)
-           let error, handler, mvbdu =
-             Ckappa_sig.Views_bdu.mvbdu_of_association_list
-               parameter handler error pair_list
-           in
-           let error, handler, store_result =
-             Site_accross_bonds_domain_type.add_link
-               parameter error bdu_false handler kappa_handler pair mvbdu store_result
-           in
-           error, handler, store_result
+
+           if
+             Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem pair tuples_of_interest 
+           then
+             (*-----------------------------------------------------------*)
+             let error, handler, mvbdu =
+               Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                 parameter handler error pair_list
+             in
+             let error, handler, store_result =
+               Site_accross_bonds_domain_type.add_link
+                 parameter error bdu_false handler kappa_handler pair mvbdu store_result
+             in
+             error, handler, store_result
+           else error, handler, store_result
          else
            error, handler, store_result
       ) store_pair_sites_init (error, handler, store_result)

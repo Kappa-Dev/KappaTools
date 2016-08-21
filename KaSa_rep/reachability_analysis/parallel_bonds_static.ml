@@ -27,9 +27,6 @@ type local_static_information =
     store_bonds_rhs_full :
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_parallel_bonds_rhs:
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
-
     store_rule_has_parallel_bonds_rhs:
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
     (*a map check a bond between A.x and B.z*)
@@ -72,11 +69,11 @@ type local_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     (*rule has parallel bonds on the lhs*)
     store_rule_has_parallel_bonds_lhs :
-      (bool * Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t)
+      (Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
     (*rule has non parallel bonds on the lhs*)
     store_rule_has_non_parallel_bonds_lhs:
-      (bool *
+      (
        ((Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
          Ckappa_sig.c_agent_name * Ckappa_sig.Site_map_and_set.Map.elt *
          Ckappa_sig.c_state) *
@@ -88,6 +85,16 @@ type local_static_information =
          Ckappa_sig.c_site_name * Ckappa_sig.c_state))
          list)
         Ckappa_sig.Rule_map_and_set.Map.t;
+    store_parallel_bonds_rhs:
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
+    store_non_parallel_bonds_rhs:
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
+    store_parallel_bonds_lhs:
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
+    store_non_parallel_bonds_lhs:
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
+    store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
+
   }
 
 (*******************************************************************)
@@ -98,6 +105,10 @@ let init_local_static =
     store_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_rhs_full = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_parallel_bonds_rhs = Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty;
+    store_parallel_bonds_lhs = Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty;
+    store_non_parallel_bonds_rhs = Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty;
+    store_non_parallel_bonds_lhs = Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty;
+    store_tuples_of_interest = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_rule_has_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_rule_has_non_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
@@ -470,7 +481,6 @@ let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full
 
 let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
     error rule_id rule store_result =
-  let error, store_result1 =
     collect_rule_has_parallel_bonds
       parameter
       error
@@ -478,17 +488,7 @@ let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
       store_bonds_lhs_full
-      Ckappa_sig.Rule_map_and_set.Map.empty
-  in
-  let error, store_result =
-    Ckappa_sig.Rule_map_and_set.Map.fold
-      (fun rid set (error, map)->
-         Ckappa_sig.Rule_map_and_set.Map.add
-           parameter error
-           rid (true,set) map)
-      store_result1 (error, store_result)
-  in
-  error, store_result
+      store_result
 
 (**************************************************************************)
 (*non parallel bonds*)

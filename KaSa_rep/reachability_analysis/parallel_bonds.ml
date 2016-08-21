@@ -149,6 +149,55 @@ struct
       }
       static
 
+
+  let get_parallel_bonds_lhs static =
+    (get_local_static_information
+       static).Parallel_bonds_static.store_parallel_bonds_lhs
+
+  let set_parallel_bonds_lhs bonds static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        Parallel_bonds_static.store_parallel_bonds_lhs = bonds
+      }
+      static
+
+  let get_non_parallel_bonds_rhs static =
+    (get_local_static_information
+       static).Parallel_bonds_static.store_non_parallel_bonds_rhs
+
+  let set_non_parallel_bonds_rhs bonds static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        Parallel_bonds_static.store_non_parallel_bonds_rhs = bonds
+      }
+      static
+
+  let get_non_parallel_bonds_lhs static =
+    (get_local_static_information
+       static).Parallel_bonds_static.store_non_parallel_bonds_lhs
+
+  let set_non_parallel_bonds_lhs bonds static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        Parallel_bonds_static.store_non_parallel_bonds_lhs = bonds
+      }
+      static
+
+  let get_tuples_of_interest static =
+    (get_local_static_information
+       static).Parallel_bonds_static.store_tuples_of_interest
+
+  let set_tuples_of_interest bonds static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        Parallel_bonds_static.store_tuples_of_interest = bonds
+      }
+      static
+
   let get_rule_has_parallel_bonds_rhs static =
     (get_local_static_information
        static).Parallel_bonds_static.store_rule_has_parallel_bonds_rhs
@@ -399,6 +448,17 @@ struct
         store_result
     in
     let static = set_parallel_bonds_rhs store_result static in
+    let store_rule_has_parallel_bonds_lhs = get_rule_has_parallel_bonds_lhs static in
+    let store_result = get_parallel_bonds_lhs static in
+    let error, store_result =
+      Parallel_bonds_static.collect_parallel_bonds_rhs
+        parameter
+        store_rule_has_parallel_bonds_lhs
+        error
+        rule_id
+        store_result
+    in
+    let static = set_parallel_bonds_lhs store_result static in
     error, static
 
   (****************************************************************)
@@ -445,6 +505,33 @@ struct
     in
     let static = set_snd_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
+    let lift error s =
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold
+        (fun ((_,a,b,c,d,e),(_,a',b',c',d',e')) (error, set)->
+           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in parameter error
+             ((a,b,c,d,e),(a',b',c',d',e')) set )
+        s
+        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
+    in
+    let error, store_result1 = lift error (get_parallel_bonds_lhs static) in
+    let error, store_result2 = lift error (get_parallel_bonds_rhs static) in
+    let error, store_result3 = lift error (get_non_parallel_bonds_lhs static) in
+    let error, store_result4 = lift error (get_non_parallel_bonds_lhs static) in
+    let error, store_result =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+        parameter error store_result1 store_result2
+    in
+    let error, store_result' =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+        parameter error store_result3 store_result4
+    in
+    let error, store_result =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+        parameter error store_result store_result'
+    in
+    let static =
+      set_tuples_of_interest store_result static
+    in
     error, static, dynamic
 
   (***************************************************************)
@@ -487,6 +574,9 @@ struct
 
   let compute_value_init static dynamic error init_state =
     let parameter = get_parameter static in
+    let tuples_of_interest =
+      get_tuples_of_interest static
+    in
     let kappa_handler = get_kappa_handler static in
     (*--------------------------------------------------------*)
     (*bonds in the initial states*)
@@ -494,7 +584,7 @@ struct
       Parallel_bonds_init.collect_bonds_initial
         parameter
         error
-        init_state
+          init_state
     in
     (*--------------------------------------------------------*)
     (*a set of potential non parallel bonds*)
@@ -518,6 +608,7 @@ struct
       Parallel_bonds_init.collect_value_non_parallel_bonds
         parameter
         store_non_parallel_init
+        tuples_of_interest
         error
         kappa_handler
         store_result
@@ -539,6 +630,7 @@ struct
       Parallel_bonds_init.collect_value_parallel_bonds
         parameter
         store_parallel_bonds_init
+        tuples_of_interest
         error
         kappa_handler
         store_result
@@ -571,7 +663,7 @@ struct
       | error, None ->
         error,
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty
-      | error, Some (_, s) -> error, s
+      | error, Some s -> error, s
     in
     (*-----------------------------------------------------------*)
     let store_non_parallel_map = get_rule_has_non_parallel_bonds_lhs static in
@@ -581,7 +673,7 @@ struct
           parameter error rule_id store_non_parallel_map
       with
       | error, None -> error, []
-      | error, Some (_, l) -> error, l
+      | error, Some l -> error, l
     in
     (*-----------------------------------------------------------*)
     let store_value = get_value dynamic in
