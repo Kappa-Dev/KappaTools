@@ -611,7 +611,7 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
       let error, bool =
         may_get_free_by_side_effect parameters kappa_handler error precondition rule path.path in
       let error, list =
-        may_be_modified parameters error 
+        may_be_modified parameters error
           rule path.path in
 
       match values with
@@ -666,6 +666,58 @@ let refine_information_about_state_of_sites_in_precondition
     cache_state_of_sites = PathMap.empty Usual_domains.Any;
     state_of_sites_in_precondition = new_f
   }
+
+let get_state_of_site_in_pre_post_condition
+    get_global_dynamic_information set_global_dynamic_information
+    kappa_handler parameter error dynamic
+    agent_id site_type defined_in precondition =
+  let path =
+    {
+      defined_in = defined_in ;
+      path =
+        {
+          agent_id = agent_id;
+          relative_address = [];
+          site = site_type;
+        }}
+  in
+  (*get a list of site_type2 state in the precondition*)
+  let error, global_dynamic, precondition, state_list_lattice =
+    get_state_of_site
+      parameter kappa_handler error
+      precondition
+      (get_global_dynamic_information dynamic)
+      path
+  in
+  let error, state_list =
+    match state_list_lattice with
+    | Usual_domains.Val l -> error, l
+    | Usual_domains.Any | Usual_domains.Undefined ->
+      Exception.warn parameter error __POS__ Exit []
+  in
+  let dynamic = set_global_dynamic_information global_dynamic dynamic in
+  error, dynamic, precondition, state_list
+
+(*use this function before apply a rule, like in is_enabled*)
+
+let get_state_of_site_in_precondition
+    get_global_dynamic_information set_global_dynamic_information
+    parameter error kappa_handler dynamic rule agent_id site_type precondition =
+  let defined_in = LHS rule in
+  get_state_of_site_in_pre_post_condition
+    get_global_dynamic_information set_global_dynamic_information
+    parameter error kappa_handler dynamic agent_id
+    site_type defined_in precondition
+
+let get_state_of_site_in_postcondition
+    get_global_dynamic_information set_global_dynamic_information
+    parameter error kappa_handler dynamic rule agent_id site_type precondition =
+  let defined_in = RHS rule in
+  get_state_of_site_in_pre_post_condition
+    get_global_dynamic_information set_global_dynamic_information
+    parameter error kappa_handler dynamic agent_id
+    site_type defined_in precondition
+
 
 (*let get_state_of_site error dynamic precondition path =
   match

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Aug 21 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -656,52 +656,6 @@ struct
 
   (****************************************************************)
 
-  let get_state_of_site_in_pre_post_condition
-      parameter error static dynamic agent_id
-      site_type defined_in precondition =
-    let kappa_handler = get_kappa_handler static in
-    let path =
-      {
-        Communication.defined_in = defined_in ;
-        Communication.path =
-          {Communication.agent_id = agent_id;
-           Communication.relative_address = []; (**)
-           Communication.site = site_type;
-          }}
-    in
-    (*get a list of site_type2 state in the precondition*)
-    let error, global_dynamic, precondition, state_list_lattice =
-      Communication.get_state_of_site
-        parameter kappa_handler error
-        precondition
-        (get_global_dynamic_information dynamic)
-        path
-    in
-    let error, state_list =
-      match state_list_lattice with
-      | Usual_domains.Val l -> error, l
-      | Usual_domains.Any | Usual_domains.Undefined ->
-        Exception.warn parameter error __POS__ Exit []
-    in
-    let dynamic = set_global_dynamic_information global_dynamic dynamic in
-    error, dynamic, precondition, state_list
-
-  (*use this function before apply a rule, like in is_enabled*)
-
-  let get_state_of_site_in_precondition
-      parameter error static dynamic rule agent_id site_type precondition =
-    let defined_in = Communication.LHS rule in
-    get_state_of_site_in_pre_post_condition
-      parameter error static dynamic agent_id
-      site_type defined_in precondition
-
-  let get_state_of_site_in_postcondition
-      parameter error static dynamic rule agent_id site_type precondition =
-    let defined_in = Communication.RHS rule in
-    get_state_of_site_in_pre_post_condition
-      parameter error static dynamic agent_id
-      site_type defined_in precondition
-
   let context rule_id agent_id site_type =
     " rule "^(Ckappa_sig.string_of_rule_id rule_id)^
     " agent_id "^(Ckappa_sig.string_of_agent_id agent_id)^
@@ -757,8 +711,10 @@ struct
            Site_accross_bonds_domain_type.PairSite_map_and_set.Set.fold
              (fun (site_type'_x, site_type'_y) (error, dynamic, precondition) ->
                 let error', dynamic, precondition, state'_list_x =
-                  get_state_of_site_in_postcondition
-                    parameter error static dynamic
+                  Communication.get_state_of_site_in_postcondition
+                    get_global_dynamic_information
+                    set_global_dynamic_information
+                    kappa_handler parameter error dynamic
                     rule
                     agent_id_t
                     site_type'_x
@@ -772,9 +728,11 @@ struct
                     __POS__ Exit
                 in
                 let error', dynamic, precondition, state'_list_y =
-                  get_state_of_site_in_postcondition
-                    parameter error
-                    static dynamic
+                  Communication.get_state_of_site_in_postcondition
+                    get_global_dynamic_information
+                    set_global_dynamic_information
+                    kappa_handler parameter error
+                    dynamic
                     rule
                     agent_id_u
                     site_type'_y
@@ -970,8 +928,10 @@ struct
            Site_accross_bonds_domain_type.PairSite_map_and_set.Set.fold
              (fun (site_type'_x, site_type'_y) (error, dynamic, precondition) ->
                 let error', dynamic, precondition, state'_list_x =
-                  get_state_of_site_in_postcondition
-                    parameter error static dynamic
+                  Communication.get_state_of_site_in_postcondition
+                    get_global_dynamic_information
+                    set_global_dynamic_information
+                    kappa_handler parameter error dynamic
                     rule
                     agent_id_t
                     site_type'_x
@@ -985,9 +945,12 @@ struct
                     __POS__ Exit
                 in
                 let error', dynamic, precondition, state'_list_y =
-                  get_state_of_site_in_postcondition
+                  Communication.get_state_of_site_in_postcondition
+                    get_global_dynamic_information
+                    set_global_dynamic_information
+                    kappa_handler
                     parameter error
-                    static dynamic
+                    dynamic
                     rule
                     agent_id_u
                     site_type'_y

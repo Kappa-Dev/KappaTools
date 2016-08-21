@@ -4,7 +4,7 @@
      * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
      *
      * Creation: 2016, the 31th of March
-     * Last modification: Time-stamp: <Aug 06 2016>
+     * Last modification: Time-stamp: <Aug 21 2016>
      *
      * Abstract domain to detect whether when two sites of an agent are bound,
      * they must be bound to the same agent.
@@ -165,7 +165,7 @@ let collect_parallel_bonds_init parameter store_bonds_init error init_state =
 let collect_non_parallel_init_aux parameter store_bonds_init error =
   let error, store_result =
     Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
-      (fun ((agent_id, _, site_type, state),
+      (fun ((agent_id, agent_type, site_type, state),
             (agent_id', agent_type', site_type', state')) (error, store_result) ->
         (*get old*)
         let error, old_list =
@@ -178,7 +178,7 @@ let collect_non_parallel_init_aux parameter store_bonds_init error =
         (*get a map of agent_type with a site pair list: (A.x, B.x)*)
         let site_pair_list =
           (*id:0:x:1, id:1:y:1*)
-          ((agent_id, site_type, state), (agent_id', site_type', state')) :: old_list
+          ((agent_id, agent_type, site_type, state), (agent_id', site_type', state')) :: old_list
         in
         let error, store_result =
           Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
@@ -204,9 +204,11 @@ let collect_non_parallel_init parameter store_bonds_init store_site_pair_list er
                let error, store_result =
                  List.fold_left
                    (fun (error, store_result)
-                     ((agent_id1, site_type1, state1), (agent_id1', site_type1', state1')) ->
+                     ((agent_id1, agent_type1, site_type1, state1),
+                      (agent_id1', site_type1', state1')) ->
                      (*B = B, and their id are different*)
                      if agent_id' <> agent_id1' &&  agent_type' = agent_type1'
+                        && agent_type1 = agent_type
                      then
                        (*two elements in the list*)
                        if site_type <> site_type1 (*A.x <> A.y*)

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Aug 21 2016>
    *
    * Abstract domain to record live rules
    *
@@ -40,10 +40,10 @@ type path =
   }
 
 type path_in_pattern =
-       {
-         defined_in: path_defined_in ;
-         path:path ;
-       }
+  {
+    defined_in: path_defined_in ;
+    path:path ;
+  }
 
 type output =
   | Cannot_exist
@@ -171,3 +171,31 @@ val follow_path_inside_cc:
   Cckappa_sig.kappa_handler ->
   Cckappa_sig.mixture ->
   path -> Exception.method_handler * output
+
+val get_state_of_site_in_precondition:
+  ('a -> Analyzer_headers.global_dynamic_information) ->
+  (Analyzer_headers.global_dynamic_information -> 'a -> 'b) ->
+  Cckappa_sig.kappa_handler ->
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  'a ->
+  Cckappa_sig.enriched_rule ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  precondition ->
+  Exception.method_handler * 'b * precondition *
+  Ckappa_sig.c_state list
+
+val get_state_of_site_in_postcondition:
+  ('a -> Analyzer_headers.global_dynamic_information) ->
+  (Analyzer_headers.global_dynamic_information -> 'a -> 'b) ->
+  Cckappa_sig.kappa_handler ->
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  'a ->
+  Cckappa_sig.enriched_rule ->
+  Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_site_name ->
+  precondition ->
+  Exception.method_handler * 'b * precondition *
+  Ckappa_sig.c_state list

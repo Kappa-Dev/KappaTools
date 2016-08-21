@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 20 2016>
+  * Last modification: Time-stamp: <Aug 21 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -666,41 +666,6 @@ struct
      agents, whether they cannot be bound to the same agent, whether we cannot
      know, and deal with accordingly *)
 
-  (* TODO: provide a polymorphic primitive in communication.ml to do
-     define this function, and the one for postcondition only once *)
-  let get_state_of_site_in_precondition
-      parameter error static dynamic rule_id agent_id site_type precondition
-    =
-    (*binding action: A.x.B.z -> parallel bonds: A.x.y.B.z.t, B.z.t.A.x.y
-      (first bound)*)
-    (*build a path for the second site in this bound. A.y*)
-    let kappa_handler = get_kappa_handler static in
-    let path =
-      {
-        Communication.defined_in = Communication.LHS rule_id;
-        Communication.path =
-          {Communication.agent_id = agent_id;
-           Communication.relative_address = [];
-           Communication.site = site_type;
-          }}
-    in
-    (*get a list of site_type2 state in the precondition*)
-    let error, global_dynamic, precondition, state_list_lattice =
-      Communication.get_state_of_site
-        parameter kappa_handler error
-        precondition
-        (get_global_dynamic_information dynamic)
-        path
-    in
-    let error, state_list =
-      match state_list_lattice with
-      | Usual_domains.Val l -> error, l
-      | Usual_domains.Any | Usual_domains.Undefined ->
-        Exception.warn
-          parameter error __POS__ Exit []
-    in
-    let dynamic = set_global_dynamic_information global_dynamic dynamic in
-    error, dynamic, precondition, state_list
 
   (***********************************************************)
 
@@ -751,10 +716,12 @@ struct
       let store_rule_has_parallel_bonds_rhs = get_rule_has_parallel_bonds_rhs static in
       let error, rule_has_parallel_bonds_rhs_set =
         match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
-            rule_id store_rule_has_parallel_bonds_rhs
+          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+            parameter error rule_id
+            store_rule_has_parallel_bonds_rhs
         with
-        | error, None -> error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty
+        | error, None ->
+          error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty
         | error, Some s -> error, s
       in
       (*-----------------------------------------------------------*)
@@ -779,18 +746,24 @@ struct
                    (*------------------------------------------------------*)
                    (*get a list of potential states of the second site*)
                    let error, dynamic, precondition, state_list =
-                     get_state_of_site_in_precondition
+                     Communication.get_state_of_site_in_postcondition
+                       get_global_dynamic_information
+                       set_global_dynamic_information
+                       kappa_handler
                        parameter error
-                       static dynamic
+                       dynamic
                        rule
                        agent_id1 (*A*)
                        site_type2
                        precondition
                    in
                    let error, dynamic, precondition, state_list' =
-                     get_state_of_site_in_precondition
+                     Communication.get_state_of_site_in_postcondition
+                       get_global_dynamic_information
+                       set_global_dynamic_information
+                       kappa_handler
                        parameter error
-                       static dynamic
+                       dynamic
                        rule
                        agent_id1' (*B*)
                        site_type2'
@@ -923,18 +896,24 @@ struct
                  in
                  (*-----------------------------------------------------------*)
                  let error, dynamic, precondition, state_list =
-                   get_state_of_site_in_precondition
+                   Communication.get_state_of_site_in_postcondition
+                     get_global_dynamic_information
+                     set_global_dynamic_information
+                     kappa_handler
                      parameter error
-                     static dynamic
+                     dynamic
                      rule
                      agent_id1
                      site_type1
                      precondition
                  in
                  let error, dynamic, precondition, state_list' =
-                   get_state_of_site_in_precondition
+                   Communication.get_state_of_site_in_precondition
+                     get_global_dynamic_information
+                     set_global_dynamic_information
+                     kappa_handler
                      parameter error
-                     static dynamic
+                     dynamic
                      rule
                      agent_id1'
                      site_type1'

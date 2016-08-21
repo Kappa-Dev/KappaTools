@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Aug 21 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -29,6 +29,7 @@ type local_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_parallel_bonds_rhs:
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t;
+
     store_rule_has_parallel_bonds_rhs:
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
     (*a map check a bond between A.x and B.z*)
@@ -467,7 +468,7 @@ let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full
   in
   error, store_result
 
-  let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
+let collect_rule_has_parallel_bonds_lhs parameter store_bonds_lhs_full
     error rule_id rule store_result =
   let error, store_result1 =
     collect_rule_has_parallel_bonds
