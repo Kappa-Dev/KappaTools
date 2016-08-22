@@ -1,0 +1,14 @@
+%agent:A(z,t)		
+%agent:B(z,t)
+%agent:C(x)
+%agent:D(x)
+
+-> C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3) @1
+C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3) -> D(x!1),A(z!1,t!2),B(t!2,z!3),D(x!3) @1
+C() -> @ 1
+
+
+
+
+
+
