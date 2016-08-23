@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 21 2016>
+  * Last modification: Time-stamp: <Aug 23 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -584,7 +584,7 @@ struct
       Parallel_bonds_init.collect_bonds_initial
         parameter
         error
-          init_state
+        init_state
     in
     (*--------------------------------------------------------*)
     (*a set of potential non parallel bonds*)
@@ -839,26 +839,20 @@ struct
                    (*get a list of potential states of the second site*)
                    let error, dynamic, precondition, state_list =
                      Communication.get_state_of_site_in_postcondition
+                       get_global_static_information
                        get_global_dynamic_information
                        set_global_dynamic_information
-                       kappa_handler
-                       parameter error
-                       dynamic
-                       rule
-                       agent_id1 (*A*)
-                       site_type2
+                       error static  dynamic
+                       (rule_id,rule) agent_id1 (*A*) site_type2
                        precondition
                    in
                    let error, dynamic, precondition, state_list' =
                      Communication.get_state_of_site_in_postcondition
+                       get_global_static_information
                        get_global_dynamic_information
                        set_global_dynamic_information
-                       kappa_handler
-                       parameter error
-                       dynamic
-                       rule
-                       agent_id1' (*B*)
-                       site_type2'
+                       error static dynamic
+                       (rule_id,rule) agent_id1' (*B*) site_type2'
                        precondition
                    in
                    let error, potential_list =
@@ -989,26 +983,22 @@ struct
                  (*-----------------------------------------------------------*)
                  let error, dynamic, precondition, state_list =
                    Communication.get_state_of_site_in_postcondition
+                     get_global_static_information
                      get_global_dynamic_information
                      set_global_dynamic_information
-                     kappa_handler
-                     parameter error
-                     dynamic
-                     rule
+                     error static dynamic
+                     (rule_id,rule)
                      agent_id1
                      site_type1
                      precondition
                  in
                  let error, dynamic, precondition, state_list' =
                    Communication.get_state_of_site_in_precondition
+                     get_global_static_information
                      get_global_dynamic_information
                      set_global_dynamic_information
-                     kappa_handler
-                     parameter error
-                     dynamic
-                     rule
-                     agent_id1'
-                     site_type1'
+                     error static dynamic
+                     (rule_id,rule) agent_id1' site_type1'
                      precondition
                  in
                  (*-----------------------------------------------------------*)

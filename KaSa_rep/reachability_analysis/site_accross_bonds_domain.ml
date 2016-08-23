@@ -669,7 +669,7 @@ struct
   (***************************************************************)
   (* there is a bond in the domain of a rule *)
 
-  let apply_rule_bonds_rhs static dynamic error rule_id rule precondition =
+(*  let apply_rule_bonds_rhs static dynamic error rule_id rule precondition =
     let parameter  = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -717,12 +717,11 @@ struct
              (fun (site_type'_x, site_type'_y) (error, dynamic, precondition) ->
                 let error', dynamic, precondition, state'_list_x =
                   Communication.get_state_of_site_in_postcondition
+                    get_global_static_information
                     get_global_dynamic_information
                     set_global_dynamic_information
-                    kappa_handler parameter error dynamic
-                    rule
-                    agent_id_t
-                    site_type'_x
+                    error static dynamic
+                    (rule_id,rule) agent_id_t site_type'_x
                     precondition
                 in
                 let error =
@@ -734,13 +733,11 @@ struct
                 in
                 let error', dynamic, precondition, state'_list_y =
                   Communication.get_state_of_site_in_postcondition
+                    get_global_static_information
                     get_global_dynamic_information
                     set_global_dynamic_information
-                    kappa_handler parameter error
-                    dynamic
-                    rule
-                    agent_id_u
-                    site_type'_y
+                    error static dynamic
+                    (rule_id,rule) agent_id_u site_type'_y
                     precondition
                 in
                 let error =
@@ -880,7 +877,7 @@ struct
              ) proj_potential_tuple_pair_set (error, dynamic, precondition)
         ) bonds_rhs_set (error, dynamic, precondition)
     in
-    error, dynamic, precondition
+    error, dynamic, precondition*)
 
   (***************************************************************)
   (*there is an action binding in the domain of a rule*)
@@ -934,12 +931,11 @@ struct
              (fun (site_type'_x, site_type'_y) (error, dynamic, precondition) ->
                 let error', dynamic, precondition, state'_list_x =
                   Communication.get_state_of_site_in_postcondition
+                    get_global_static_information
                     get_global_dynamic_information
                     set_global_dynamic_information
-                    kappa_handler parameter error dynamic
-                    rule
-                    agent_id_t
-                    site_type'_x
+                    error static dynamic
+                    (rule_id,rule) agent_id_t site_type'_x
                     precondition
                 in
                 let error =
@@ -951,14 +947,11 @@ struct
                 in
                 let error', dynamic, precondition, state'_list_y =
                   Communication.get_state_of_site_in_postcondition
+                    get_global_static_information
                     get_global_dynamic_information
                     set_global_dynamic_information
-                    kappa_handler
-                    parameter error
-                    dynamic
-                    rule
-                    agent_id_u
-                    site_type'_y
+                    error static dynamic
+                    (rule_id,rule) agent_id_u site_type'_y
                     precondition
                 in
                 let error =
@@ -1028,9 +1021,8 @@ struct
 
   (*build a new path *)
   let get_state_of_site_in_pre_post_condition_2
-      kappa_handler
-      parameter error
-      dynamic
+      error
+      static dynamic
       agent_id_t
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
@@ -1054,8 +1046,9 @@ struct
     in
     let error, global_dynamic, precondition, state_list_lattice =
       Communication.get_state_of_site
-        parameter kappa_handler error
+        error
         precondition
+        (get_global_static_information static)
         (get_global_dynamic_information dynamic)
         path
     in
@@ -1064,34 +1057,33 @@ struct
       | Usual_domains.Val l -> error, l
       | Usual_domains.Undefined -> error, []
       | Usual_domains.Any ->
-        Exception.warn parameter error __POS__ Exit []
+        Exception.warn
+          (get_parameter static) error __POS__ Exit []
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
-  let get_state_of_site_in_precondition_2 kappa_handler
-      parameter error dynamic rule agent_id
+  let get_state_of_site_in_precondition_2
+      error static dynamic rule agent_id
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
       precondition =
     let defined_in = Communication.LHS rule in
     get_state_of_site_in_pre_post_condition_2
-      kappa_handler
-      parameter error dynamic
+      error static dynamic
       agent_id
       (site_type_x, agent_type_y, site_type_y)
       site_type'_y
       defined_in
       precondition
 
-  let get_state_of_site_in_postcondition_2 kappa_handler
-      parameter error dynamic rule agent_id
+  let get_state_of_site_in_postcondition_2
+      error static dynamic rule agent_id
       (site_type_x, agent_type_y, site_type_y) site_type'_y
       precondition =
     let defined_in = Communication.RHS rule in
     get_state_of_site_in_pre_post_condition_2
-      kappa_handler
-      parameter error dynamic
+      error static dynamic
       agent_id (site_type_x, agent_type_y, site_type_y) site_type'_y defined_in
       precondition
 
@@ -1102,7 +1094,7 @@ struct
     | Snd -> get_partition_modified_map_2 static
 
   let get_state_of_site_in_postcondition_gen
-      pos kappa_handler parameter error dynamic
+      pos error static dynamic
       rule agent_id_mod
       (agent_type_x, site_type_x, site_type'_x, _)
       (agent_type_y, site_type_y, site_type'_y, _)
@@ -1111,13 +1103,15 @@ struct
     match pos with
     | Fst ->
       get_state_of_site_in_postcondition_2
-        kappa_handler parameter error dynamic
-        rule agent_id_mod (site_type_x, agent_type_y, site_type_y) site_type'_y
+        error static dynamic
+        rule agent_id_mod
+        (site_type_x, agent_type_y, site_type_y) site_type'_y
         precondition
     | Snd ->
       get_state_of_site_in_postcondition_2
-        kappa_handler parameter error dynamic
-        rule agent_id_mod (site_type_y, agent_type_x, site_type_x) site_type'_x
+        error static dynamic
+        rule agent_id_mod
+        (site_type_y, agent_type_x, site_type_x) site_type'_x
         precondition
 
   let  apply_rule_modified_explicity_gen
@@ -1147,8 +1141,8 @@ struct
               let (agent_type_y, site_type_y, site_type'_y, state_y) = y in
               let error', dynamic, precondition, state'_list_other =
                 get_state_of_site_in_postcondition_gen
-                  pos kappa_handler parameter error dynamic
-                  rule agent_id_mod x y
+                  pos error static dynamic
+                  (rule_id,rule) agent_id_mod x y
                   precondition
               in
               let error', (agent_y, site_y) =
@@ -1374,10 +1368,10 @@ struct
       (*1.a bonds on the rhs: not sure you need this test, it will be
         covered by 1.c and 1.d *)
       (*------------------------------------------------------*)
-      let error, dynamic, precondition =
+      (*    let error, dynamic, precondition =
         apply_rule_bonds_rhs
           static dynamic error rule_id rule precondition
-      in
+            in*)
       (*------------------------------------------------------*)
       (*1.b created bonds *)
       (*------------------------------------------------------*)

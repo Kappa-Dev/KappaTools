@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 21 2016>
+   * Last modification: Time-stamp: <Aug 23 2016>
    *
    * Abstract domain to record live rules
    *
@@ -14,8 +14,8 @@
    * under the terms of the GNU Library General Public License *)
 
 type path_defined_in =
-  | LHS of Cckappa_sig.enriched_rule
-  | RHS of Cckappa_sig.enriched_rule
+  | LHS of (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule)
+  | RHS of (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule)
   | Pattern
 
 type event =
@@ -155,10 +155,9 @@ val overwrite_potential_partners_map:
   Exception.method_handler * precondition
 
 val get_state_of_site:
-  Remanent_parameters_sig.parameters ->
-  Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
   precondition ->
+  Analyzer_headers.global_static_information ->
   Analyzer_headers.global_dynamic_information ->
   path_in_pattern ->
   Exception.method_handler * Analyzer_headers.global_dynamic_information *
@@ -173,27 +172,25 @@ val follow_path_inside_cc:
   path -> Exception.method_handler * output
 
 val get_state_of_site_in_precondition:
-  ('a -> Analyzer_headers.global_dynamic_information) ->
-  (Analyzer_headers.global_dynamic_information -> 'a -> 'b) ->
-  Cckappa_sig.kappa_handler ->
-  Remanent_parameters_sig.parameters ->
+  ('static -> Analyzer_headers.global_static_information) ->
+  ('dynamic -> Analyzer_headers.global_dynamic_information) ->
+  (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'c) ->
   Exception.method_handler ->
-  'a ->
-  Cckappa_sig.enriched_rule ->
+  'static -> 'dynamic ->
+  (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule) ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->
-  Exception.method_handler * 'b * precondition *
+  Exception.method_handler * 'c * precondition *
   Ckappa_sig.c_state list
 
 val get_state_of_site_in_postcondition:
-  ('a -> Analyzer_headers.global_dynamic_information) ->
-  (Analyzer_headers.global_dynamic_information -> 'a -> 'b) ->
-  Cckappa_sig.kappa_handler ->
-  Remanent_parameters_sig.parameters ->
+  ('static -> Analyzer_headers.global_static_information) ->
+  ('dynamic -> Analyzer_headers.global_dynamic_information) ->
+  (Analyzer_headers.global_dynamic_information -> 'dynamic -> 'b) ->
   Exception.method_handler ->
-  'a ->
-  Cckappa_sig.enriched_rule ->
+  'static -> 'dynamic ->
+  (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule) ->
   Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_site_name ->
   precondition ->

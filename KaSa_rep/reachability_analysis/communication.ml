@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 21 2016>
+   * Last modification: Time-stamp: <Aug 23 2016>
    *
    * Abstract domain to record live rules
    *
@@ -14,8 +14,8 @@
    * under the terms of the GNU Library General Public License *)
 
 type path_defined_in =
-  | LHS of Cckappa_sig.enriched_rule
-  | RHS of Cckappa_sig.enriched_rule
+  | LHS of (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule)
+  | RHS of (Ckappa_sig.c_rule_id * Cckappa_sig.enriched_rule)
   | Pattern
 
 type event =
@@ -316,88 +316,18 @@ let may_be_modified parameters error rule path =
       proper_agent
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t*)
 
-let may_get_free_by_side_effect parameters kappa_handler error precondition rule path =
+let may_get_free_by_side_effect parameters error static _precondition rule_id rule path =
   let error, agent_name = last_agent_type parameters error rule path in
-  let site_name = path.site in
-  let error, is_binding_site =
-    Handler.is_binding_site parameters error kappa_handler agent_name site_name
+  let error, list =
+    Ckappa_sig.AgentRule_map_and_set.Map.find_default_without_logs
+      parameters
+      error
+      []
+      (agent_name,rule_id)
+      (snd (Analyzer_headers.get_potential_side_effects static))
   in
-  if is_binding_site
-  then
-    begin
-      let list = rule.Cckappa_sig.actions.Cckappa_sig.half_break in
-      let rec aux1 error list =
-        match list
-        with
-        | [] -> error, false
-        | (site, site_state_opt)::tail ->
-          begin
-            let error, site_state_list =
-              match site_state_opt
-              with
-              | Some l ->
-                begin
-                  error,
-                  let rec aux3 k output =
-                    if Ckappa_sig.compare_state_index k l.Cckappa_sig.min < 0
-                    then output
-                    else aux3 (Ckappa_sig.pred_state_index k) (k::output)
-                  in
-                  aux3 l.Cckappa_sig.max []
-                end
-              | None ->
-                begin
-                  let error, partner =
-                    precondition.partner_fold  parameters
-                      error site.Cckappa_sig.agent_type
-                      site.Cckappa_sig.site
-                  in
-                  match partner with
-                  | Usual_domains.Undefined ->
-                    Exception.warn parameters error __POS__ Exit
-                      []
-                  | Usual_domains.Val f ->
-                    f
-                      (fun _parameter state _ (error,list) ->
-                         error, state::list)
-                      error
-                      []
-                  | Usual_domains.Any ->
-                    Exception.warn parameters error __POS__ Exit
-                      []
-
-                end
-            in
-            let rec aux2 error state_list =
-              match state_list with
-              | [] -> error, false
-              | state::tail ->
-                let error, opt =
-                  Handler.dual
-                    parameters error kappa_handler site.Cckappa_sig.agent_type
-                    site.Cckappa_sig.site state
-                in
-                match opt with
-                | None ->
-                  Exception.warn parameters error __POS__ Exit true
-                | Some (agent',site_name', _)
-                  when agent_name = agent' && site_name = site_name'
-                  -> error, true
-                | Some _ ->
-                  aux2 error tail
-            in
-            let error, output = aux2 error site_state_list in
-            if output
-            then
-              error, output
-            else
-              aux1 error tail
-          end
-
-      in
-      aux1 error list
-    end
-  else error, false
+  let site_name = path.site in
+  error, List.exists (fun (a,_) -> a=site_name) list
 
 let min_not_free interv =
   if interv.Cckappa_sig.min = Ckappa_sig.dummy_state_index
@@ -517,7 +447,9 @@ let rec follow_path_inside_cc
         end
     end
 
-let rec post_condition parameters kappa_handler error r precondition dynamic path  =
+let rec post_condition error rule_id r precondition static dynamic path  =
+  let parameters = Analyzer_headers.get_parameter static in
+  let kappa_handler = Analyzer_headers.get_kappa_handler static in
   let rule = r.Cckappa_sig.e_rule_c_rule in
   let cc = rule.Cckappa_sig.rule_rhs in
   (*---------------------------------------------------------*)
@@ -599,17 +531,16 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
       in
       let path =
         {
-          defined_in = LHS r ;
+          defined_in = LHS (rule_id,r) ;
           path = path
         }
       in
       let error, dynamic, precondition, values =
         get_state_of_site
-          parameters kappa_handler error
-          precondition dynamic path
+          error precondition static dynamic path
       in
       let error, bool =
-        may_get_free_by_side_effect parameters kappa_handler error precondition rule path.path in
+        may_get_free_by_side_effect parameters error static precondition rule_id rule path.path in
       let error, list =
         may_be_modified parameters error
           rule path.path in
@@ -635,8 +566,9 @@ let rec post_condition parameters kappa_handler error r precondition dynamic pat
         error, dynamic, values
     end
 and get_state_of_site
-    parameters kappa_handler error precondition dynamic path =
+    error precondition static dynamic path =
   begin
+    let parameters = Analyzer_headers.get_parameter static in
     match path.defined_in with
     | LHS _ | Pattern ->
       let error, dynamic, range =
@@ -644,11 +576,10 @@ and get_state_of_site
           parameters error dynamic path.path
       in
       error, dynamic, precondition, range
-    | RHS rule ->
+    | RHS (rule_id, rule) ->
       let error, dynamic, range =
         post_condition
-          parameters kappa_handler error
-          rule precondition dynamic path.path
+          error rule_id rule precondition static dynamic path.path
       in
       error, dynamic, precondition,  range
   end
@@ -668,9 +599,12 @@ let refine_information_about_state_of_sites_in_precondition
   }
 
 let get_state_of_site_in_pre_post_condition
+    get_global_static_information
     get_global_dynamic_information set_global_dynamic_information
-    kappa_handler parameter error dynamic
+    error static dynamic
     agent_id site_type defined_in precondition =
+  let static = get_global_static_information static in
+  let parameter = Analyzer_headers.get_parameter static in
   let path =
     {
       defined_in = defined_in ;
@@ -684,8 +618,9 @@ let get_state_of_site_in_pre_post_condition
   (*get a list of site_type2 state in the precondition*)
   let error, global_dynamic, precondition, state_list_lattice =
     get_state_of_site
-      parameter kappa_handler error
+      error
       precondition
+      static
       (get_global_dynamic_information dynamic)
       path
   in

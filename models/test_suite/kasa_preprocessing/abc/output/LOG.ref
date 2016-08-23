@@ -938,19 +938,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=110
+Id=107
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=109
+  Id=106
    Node(site_type:1<2)
-    Id=108
+    Id=105
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=107
+      Id=104
        Node(site_type:2<2)
         Id=25
          Node(site_type:3<0)
@@ -992,12 +992,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=125
+Id=122
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=124
+  Id=121
    Node(site_type:1<2)
     Id=31
      Node(site_type:2<2)
@@ -1027,12 +1027,12 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=82
+Id=88
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=81
+  Id=87
    Node(site_type:1<1)
     Id=19
      Node(site_type:2<1)
@@ -1094,14 +1094,14 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=129
+Id=126
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=121
+  Id=118
    Node(site_type:1<2)
-    Id=120
+    Id=117
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1132,12 +1132,12 @@ Id=45
      Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=115
+Id=112
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=114
+  Id=111
    Node(site_type:1<1)
     Id=78
      Node(site_type:2<0)
@@ -1172,14 +1172,14 @@ Id=115
         Id=0
          Leaf False 
 
-    Id=113
+    Id=110
      Node(site_type:1<2)
-      Id=112
+      Id=109
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=111
+        Id=108
          Node(site_type:2<1)
           Id=95
            Node(site_type:3<0)
@@ -1204,7 +1204,7 @@ Id=115
               Id=0
                Leaf False 
 
-          Id=107
+          Id=104
            Node(site_type:2<2)
             Id=25
              Node(site_type:3<0)
@@ -1240,7 +1240,7 @@ Id=115
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=133
+Id=128
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1255,12 +1255,12 @@ Id=133
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=132
+Id=127
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=87
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1270,12 +1270,12 @@ Id=132
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=132
+Id=127
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=87
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1285,26 +1285,26 @@ Id=132
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=210
+Id=205
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=209
+  Id=204
    Node(site_type:0<1)
-    Id=202
+    Id=197
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=201
+      Id=196
        Node(site_type:1<1)
-        Id=169
+        Id=164
          Node(site_type:2<0)
           Id=0
            Leaf False 
 
-          Id=168
+          Id=163
            Node(site_type:2<2)
             Id=11
              Node(site_type:3<0)
@@ -1325,23 +1325,23 @@ Id=210
         Id=0
          Leaf False 
 
-    Id=208
+    Id=203
      Node(site_type:0<2)
-      Id=207
+      Id=202
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=206
+        Id=201
          Node(site_type:1<1)
-          Id=167
+          Id=162
            Node(site_type:2<0)
             Id=0
              Leaf False 
 
-            Id=166
+            Id=161
              Node(site_type:2<1)
-              Id=138
+              Id=133
                Node(site_type:3<0)
                 Id=0
                  Leaf False 
@@ -1357,14 +1357,14 @@ Id=210
               Id=0
                Leaf False 
 
-          Id=205
+          Id=200
            Node(site_type:1<2)
-            Id=204
+            Id=199
              Node(site_type:2<0)
               Id=0
                Leaf False 
 
-              Id=203
+              Id=198
                Node(site_type:2<1)
                 Id=11
                  Node(site_type:3<0)
@@ -1402,7 +1402,7 @@ C() =>
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=133
+Id=128
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1417,12 +1417,12 @@ Id=133
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=132
+Id=127
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=87
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1432,12 +1432,12 @@ Id=132
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=132
+Id=127
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=87
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1477,7 +1477,7 @@ Id=66
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=138
+Id=133
  Node(site_type:3<0)
   Id=0
    Leaf False 
@@ -1492,12 +1492,12 @@ Id=138
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=132
+Id=127
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=87
+  Id=85
    Node(site_type:0<2)
     Id=1
      Leaf True 
