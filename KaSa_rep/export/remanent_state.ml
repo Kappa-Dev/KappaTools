@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 23 2016>
+  * Last modification: Time-stamp: <Aug 24 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -133,13 +133,11 @@ let rhs = "RHS"
 let lhs = "LHS"
 
 let half_influence_map_to_json =
-  Json.map_to_json
+  InfluenceNodeMap.to_json
     ~lab_key:source ~lab_value:target_map
-    InfluenceNodeMap.fold
     influence_node_to_json
-    (Json.map_to_json
+    (InfluenceNodeMap.to_json
        ~lab_key:target ~lab_value:location_pair_list
-       InfluenceNodeMap.fold
        influence_node_to_json
        (Json.list_to_json
           (Json.pair_to_json
@@ -151,17 +149,13 @@ let half_influence_map_to_json =
     )
 
 let half_influence_map_of_json =
-  Json.map_of_json
+  InfluenceNodeMap.of_json
     ~error_msg:(Json.build_msg "activation or inhibition map")
     ~lab_key:source ~lab_value:target_map
-    InfluenceNodeMap.add
-    InfluenceNodeMap.empty
     (influence_node_of_json ~error_msg:(Json.build_msg "influence node"))
-    (Json.map_of_json
+    (InfluenceNodeMap.of_json
        ~lab_key:target ~lab_value:location_pair_list
        ~error_msg:"map of lists of pairs of locations"
-       InfluenceNodeMap.add
-       InfluenceNodeMap.empty
        (influence_node_of_json ~error_msg:(Json.build_msg "influence node"))
        (Json.list_of_json ~error_msg:"list of pair of locations"
           (Json.pair_of_json
@@ -198,13 +192,11 @@ let stateslist="states list"
 let prop="property states"
 let bind="binding states"
 let contact_map_to_json =
-  Json.map_to_json
+  Mods.StringMap.to_json
     ~lab_key:agent ~lab_value:interface
-    Mods.StringMap.fold
     Json.string_to_json
-    (Json.map_to_json
+    (Mods.StringMap.to_json
        ~lab_key:site ~lab_value:stateslist
-       Mods.StringMap.fold
        Json.string_to_json
        (Json.pair_to_json
           ~lab1:prop ~lab2:bind
@@ -217,16 +209,12 @@ let contact_map_to_json =
           )))
 
 let contact_map_of_json =
-  Json.map_of_json
+  Mods.StringMap.of_json
     ~lab_key:agent ~lab_value:interface
-    Mods.StringMap.add
-    Mods.StringMap.empty
     (Json.string_of_json ~error_msg:(Json.build_msg "agent name"))
-    (Json.map_of_json
+    (Mods.StringMap.of_json
        ~error_msg:(Json.build_msg "interface")
        ~lab_key:site ~lab_value:stateslist
-       Mods.StringMap.add
-       Mods.StringMap.empty
        (Json.string_of_json ~error_msg:(Json.build_msg "site name"))
        (Json.pair_of_json
           ~error_msg:(Json.build_msg "pair of lists of sites")
