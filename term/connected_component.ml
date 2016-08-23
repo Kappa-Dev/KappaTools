@@ -1265,12 +1265,12 @@ module Matching = struct
     let rec aux_from_edges cache (obs,rev_deps as acc) = function
       | [] -> acc,cache
       | (pid,point,inj_point2graph) :: remains ->
-        let root_bundle =
-          get_root inj_point2graph point in
         let acc' =
           match point.is_obs_of with
           | None -> acc
           | Some ndeps ->
+            let root_bundle =
+              get_root inj_point2graph point in
             ((point.content,root_bundle) :: obs,
              Operator.DepSet.union rev_deps ndeps) in
         let remains' =

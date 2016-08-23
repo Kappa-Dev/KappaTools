@@ -110,6 +110,7 @@ site/external/jquery:
 
 site/JsSim.js: JsSim.byte site
 	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
+	sed -i.bak 's/g.process.argv.length>0/g.process.argv.length>1/' site/JsSim.js
 
 site/WebWorker.js: WebWorker.byte site
 	js_of_ocaml --debuginfo --pretty "+nat.js" _build/js/$< -o $@
