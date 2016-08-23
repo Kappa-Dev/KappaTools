@@ -16,38 +16,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-let list_to_json to_json l =
-  `List
-    (List.rev_map to_json (List.rev l))
-
-let json_to_list title of_json json =
-  match json
-  with
-  | `List l as x ->
-    begin
-      try
-        List.rev_map of_json (List.rev l)
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error (("Not a correct "^title),x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error (("Not a correct "^title),x))
-
-let assoc_to_json to_json l =
-  `Assoc
-    (List.rev_map to_json (List.rev l))
-
-let json_to_assoc title of_json json =
-  match json
-  with
-  | `Assoc l as x ->
-    begin
-      try
-        List.rev_map of_json (List.rev l)
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error (("Not a correct "^title),x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error (("Not a correct "^title),x))
-
 let direction_to_json direction =
   match direction with
   | Graph_loggers_sig.Direct -> `String "Direct"
@@ -104,7 +72,7 @@ let directive_to_json option =
   | Graph_loggers_sig.LineStyle linestyle ->
     "linestyle", linestyle_to_json linestyle
 
-let directives_to_json = assoc_to_json directive_to_json
+let directives_to_json = Json.assoc_to_json directive_to_json
 
 let node_to_json (id, directives) =
   `Assoc [
@@ -119,8 +87,8 @@ let edge_to_json (id1, id2, directives) =
   ]
 
 
-let nodes_to_json = list_to_json node_to_json
-let edges_to_json = list_to_json edge_to_json
+let nodes_to_json = Json.list_to_json node_to_json
+let edges_to_json = Json.list_to_json edge_to_json
 
 let to_json graph =
   (`Assoc [
@@ -182,7 +150,7 @@ let directive_of_json =
   | (_,x) -> raise (Yojson.Basic.Util.Type_error ("Not a correct directive",x))
 
 let directives_of_json directives =
-    json_to_assoc "directive list" directive_of_json directives
+  Json.assoc_of_json ~error_msg:(Json.build_msg "list of directives") directive_of_json directives
 
 let id_of_json = function
   | `String string -> string
@@ -211,8 +179,13 @@ let edge_of_json = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct edge",x))
 
-let nodes_of_json = json_to_list "node list" node_of_json
-let edges_of_json = json_to_list "edge list" edge_of_json
+let nodes_of_json =
+  Json.list_of_json
+    ~error_msg:(Json.build_msg "node list") node_of_json
+let edges_of_json =
+  Json.list_of_json
+    ~error_msg:(Json.build_msg "edge list") edge_of_json
+
 let of_json = function
   | `Assoc l as x when List.length l = 2 ->
     begin
@@ -223,37 +196,3 @@ let of_json = function
         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
-
-(*tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
-          algs = NamedDecls.of_json
-              (fun x -> Location.dummy_annot (Alg_expr.of_json x))
-              (List.assoc "algs" l);
-          observables = (match List.assoc "observables" l with
-              | `List o ->
-                Tools.array_map_of_list
-                  (fun x -> Location.dummy_annot (Alg_expr.of_json x)) o
-              | _ -> raise Not_found);
-          ast_rules = (match List.assoc "ast_rules" l with
-              | `List o ->
-                Tools.array_map_of_list
-                  (function
-                    | `List [`Null;r]->
-                      (None, Location.dummy_annot (LKappa.rule_of_json r))
-                    | `List [`String n;r]->
-                      (Some (Location.dummy_annot n),
-                       Location.dummy_annot (LKappa.rule_of_json r))
-                    | _ -> raise Not_found) o
-              | _ -> raise Not_found);
-          rules = [||];
-          cc_of_unaries = Connected_component.Set.empty;
-          perturbations = [||];
-          dependencies_in_time = Operator.DepSet.empty;
-          dependencies_in_event = Operator.DepSet.empty;
-          need_update_each_loop = Operator.DepSet.empty;
-          algs_reverse_dependencies = [||];
-          tokens_reverse_dependencies = [||];
-        }
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))*)

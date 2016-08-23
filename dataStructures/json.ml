@@ -34,6 +34,25 @@ let list_of_json
     end
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let assoc_to_json to_json l =
+  `Assoc
+     (List.rev_map to_json (List.rev l)) 
+
+let assoc_of_json
+    ?error_msg:(error_msg=build_msg "association")
+    of_json json =
+  match json
+  with
+  | `Assoc l as x ->
+    begin
+      try
+        List.rev_map of_json (List.rev l)
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (error_msg,x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+
 let pair_to_json ?lab1:(lab1="first") ?lab2:(lab2="second") to_json1 to_json2 (a,b) =
   `Assoc
     [

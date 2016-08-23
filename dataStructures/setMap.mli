@@ -222,6 +222,20 @@ sig
   val bindings : 'a t -> (elt * 'a) list
   val print:
     (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+
+    val of_json:
+      ?lab_key:string -> ?lab_value:string -> ?error_msg:string ->
+      (Yojson.Basic.json -> elt) ->
+      (Yojson.Basic.json -> 'value) ->
+      Yojson.Basic.json -> 'value t
+
+    val to_json:
+      ?lab_key:string -> ?lab_value:string ->
+      (elt -> Yojson.Basic.json) ->
+      ('value -> Yojson.Basic.json) ->
+      'value t -> Yojson.Basic.json
+
+
 end
 
 module type S = sig

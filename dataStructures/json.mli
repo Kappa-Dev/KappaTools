@@ -19,6 +19,16 @@ val list_of_json:
   (Yojson.Basic.json -> 'a) ->
   Yojson.Basic.json -> 'a list
 
+val assoc_to_json:
+  ('a  -> string * Yojson.Basic.json) ->
+  'a list -> Yojson.Basic.json
+
+val assoc_of_json:
+    ?error_msg:string ->
+    (string * Yojson.Basic.json -> 'a)
+    ->
+     Yojson.Basic.json -> 'a list
+
 val pair_to_json:
   ?lab1:string -> ?lab2:string ->
   ('a -> Yojson.Basic.json) ->

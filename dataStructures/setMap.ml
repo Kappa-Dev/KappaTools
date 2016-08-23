@@ -232,6 +232,18 @@ sig
   val bindings : 'a t -> (elt * 'a) list
   val print:
     (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+
+    val of_json:
+      ?lab_key:string -> ?lab_value:string -> ?error_msg:string ->
+      (Yojson.Basic.json -> elt) ->
+      (Yojson.Basic.json -> 'value) ->
+      Yojson.Basic.json -> 'value t
+
+    val to_json:
+      ?lab_key:string -> ?lab_value:string ->
+      (elt -> Yojson.Basic.json) ->
+      ('value -> Yojson.Basic.json) ->
+      'value t -> Yojson.Basic.json
 end
 
 module type S = sig
@@ -1816,6 +1828,18 @@ struct
             warn parameters error f g right1 right2 res''
 
     let fold_restriction_with_logs warn parameters error f set map res = fold_restriction_with_missing_associations_with_logs warn parameters error f (fun _ x -> x) set map res
+
+    let to_json
+        ?lab_key:(lab_key="key") ?lab_value:(lab_value="value") =
+      Json.map_to_json ~lab_key ~lab_value fold
+
+
+    let of_json
+        ?lab_key:(lab_key="key")
+        ?lab_value:(lab_value="value")
+        ?error_msg:(error_msg=Json.build_msg "map") =
+      Json.map_of_json ~lab_key ~lab_value ~error_msg
+        add empty
 
   end
 end
