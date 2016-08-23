@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Aug 06 2016>
+  * Last modification: Time-stamp: <Aug 23 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -35,6 +35,9 @@ type bdu_common_static =
     store_agent_name             : Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t;
     store_side_effects           : half_break_action * remove_action;
     store_potential_side_effects : potential_partner_free *  potential_partner_bind;
+    store_potential_side_effects_per_rule:
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) list 
+        Ckappa_sig.Rule_map_and_set.Map.t;
     (*bond in the rhs and in the lhs*)
     store_bonds_rhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_lhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
@@ -864,13 +867,13 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       store_result.store_action_binding
   in
   error,
-  {
-    store_agent_name = store_agent_name;
-    store_side_effects = store_side_effects;
-    store_potential_side_effects = store_potential_side_effects;
-    store_bonds_rhs = store_bonds_rhs;
-    store_bonds_lhs = store_bonds_lhs;
-    store_action_binding = store_action_binding
+  {store_result with
+   store_agent_name = store_agent_name;
+   store_side_effects = store_side_effects;
+   store_potential_side_effects = store_potential_side_effects;
+   store_bonds_rhs = store_bonds_rhs;
+   store_bonds_lhs = store_bonds_lhs;
+   store_action_binding = store_action_binding
   }
 
 (************************************************************************************)
@@ -884,11 +887,14 @@ let init_bdu_common_static =
   let init_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty in
+  let inite_potential_side_effects_per_rule =
+    Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_common_static =
     {
       store_agent_name              = init_agent_name;
       store_side_effects            = (init_half_break, init_remove);
       store_potential_side_effects  = (init_potential_free, init_potential_bind);
+      store_potential_side_effects_per_rule = inite_potential_side_effects_per_rule;
       store_bonds_rhs = init_bonds_rhs;
       store_bonds_lhs = init_bonds_lhs;
       store_action_binding = init_action_binding
@@ -897,6 +903,10 @@ let init_bdu_common_static =
   init_common_static
 
 (************************************************************************************)
+module Proj_agent_rule_to_rule =
+  Map_wrapper.Proj
+    (Ckappa_sig.AgentRule_map_and_set)
+    (Ckappa_sig.Rule_map_and_set)
 
 let scan_rule_set parameter error handler_kappa compil =
   let error, store_result =
@@ -912,4 +922,20 @@ let scan_rule_set parameter error handler_kappa compil =
            store_result
       ) compil.Cckappa_sig.rules init_bdu_common_static
   in
-  error, store_result
+  let error, potential_side_effects_per_rule =
+    Proj_agent_rule_to_rule.monadic_proj_map_i
+      (fun _parameter error (_,rule_id) -> error, rule_id) parameter error []
+      (fun _parameters error old (agent_name,_) l ->
+         let new_list =
+           List.fold_left
+             (fun old (x,y) -> (agent_name,x,y)::old)
+             old l
+         in
+         error,new_list)
+      (snd store_result.store_potential_side_effects)
+  in
+  error,
+  {store_result
+   with
+    store_potential_side_effects_per_rule = potential_side_effects_per_rule
+  }

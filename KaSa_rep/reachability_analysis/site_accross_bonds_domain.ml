@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 22 2016>
+   * Last modification: Time-stamp: <Aug 23 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -89,6 +89,9 @@ struct
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
+
+  let get_potential_side_effects static =
+    lift Analyzer_headers.get_potential_side_effects_per_rule static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
@@ -1336,74 +1339,21 @@ struct
     let error, dynamic = free_site_gen ~pos:Fst static dynamic error agent' site_name' state' in
     free_site_gen ~pos:Snd static dynamic error agent' site_name' state'
 
-  let apply_rule_side_effects static dynamic error rule_id rule precondition =
-    let parameters = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
-    let list =
-      rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.actions.Cckappa_sig.half_break
+  let apply_rule_side_effects static dynamic error rule_id =
+    let parameter = get_parameter static in
+    let error, list =
+      Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
+        parameter error
+        []
+        rule_id (get_potential_side_effects static)
     in
     List.fold_left
-      (fun (error, dynamic, precondition) (site, site_state_opt) ->
-         let error, is_binding =
-           Handler.is_binding_site parameters error kappa_handler
-             site.Cckappa_sig.agent_type site.Cckappa_sig.site
-         in
+      (fun (error, dynamic) (agent_name, site, state) ->
+         free_site
+           static dynamic error agent_name site state)
+      (error, dynamic)
+      list
 
-         if not is_binding
-         then
-           error, dynamic, precondition
-         else
-           let error, precondition, site_state_list =
-             match site_state_opt
-             with
-             | Some l ->
-               begin
-                 error, precondition,
-                 let rec aux3 k output =
-                   if Ckappa_sig.compare_state_index k l.Cckappa_sig.min < 0
-                   then output
-                   else aux3 (Ckappa_sig.pred_state_index k) (k::output)
-                 in
-                 aux3 l.Cckappa_sig.max []
-               end
-             | None ->
-               begin
-                 let error, precondition, partner =
-                   Communication.fold_over_potential_partners
-                     parameters error precondition
-                     site.Cckappa_sig.agent_type
-                     site.Cckappa_sig.site
-                     (fun _parameters state _site (error,list) ->
-                        error, state::list) []
-                 in
-                 match partner with
-                 | Usual_domains.Top ->
-                   let error, list =
-                     Exception.warn parameters error __POS__ Exit []
-                   in error, precondition, list
-                 | Usual_domains.Not_top list ->
-                   error, precondition, list
-               end
-           in
-           let error, dynamic =
-             List.fold_left
-               (fun (error, dynamic) state ->
-                  let error, opt =
-                    Handler.dual
-                      parameters error kappa_handler site.Cckappa_sig.agent_type
-                      site.Cckappa_sig.site state
-                  in
-                  match opt with
-                  | None ->
-                    Exception.warn parameters error __POS__
-                      ~message:((context rule_id (Ckappa_sig.agent_id_of_int (Ckappa_sig.int_of_agent_name site.Cckappa_sig.agent_type)) site.Cckappa_sig.site)^" state "^(string_of_int (Ckappa_sig.int_of_state_index state))) Exit dynamic
-                  | Some (agent',site_name', state') ->
-                    free_site
-                      static dynamic error agent' site_name' state'
-               )
-               (error, dynamic) site_state_list in
-           error, dynamic, precondition)
-      (error, dynamic, precondition) list
   (***************************************************************)
 
   let apply_rule static dynamic error rule_id precondition =
@@ -1442,8 +1392,8 @@ struct
           static dynamic error rule_id rule precondition
       in
       (*1.d a site is modified by side effect *)
-      let error, dynamic, precondition =
-        apply_rule_side_effects static dynamic error rule_id rule precondition
+      let error, dynamic =
+        apply_rule_side_effects static dynamic error rule_id
       in
       (*-----------------------------------------------------------*)
       let event_list = [] in
