@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Aug 23 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -23,6 +23,12 @@ type internal_contact_map =
 
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
+
+val contact_map_to_json:
+  contact_map -> Yojson.Basic.json
+
+val contact_map_of_json:
+  Yojson.Basic.json -> contact_map
 
 type quark_map = Quark_type.quarks
 
@@ -43,6 +49,7 @@ type location =
   | Direct of int
   | Side_effect of int
 
+
 type 'a pair = 'a * 'a
 
 type influence_map =
@@ -50,6 +57,12 @@ type influence_map =
     positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
     negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
   }
+
+val influence_map_to_json:
+  influence_map -> Yojson.Basic.json
+
+val influence_map_of_json:
+  ?error_msg:string -> Yojson.Basic.json -> influence_map
 
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
@@ -59,7 +72,7 @@ type ('static,'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
 type dead_rules = Ckappa_sig.c_rule_id list
-type dead_agents = Ckappa_sig.c_agent_name list 
+type dead_agents = Ckappa_sig.c_agent_name list
 
 type flow =
     Ckappa_sig.Site_union_find.t

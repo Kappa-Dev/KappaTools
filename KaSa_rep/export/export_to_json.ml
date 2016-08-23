@@ -17,12 +17,12 @@ let init ?compil () =
 
 let get_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let state, cm = get_contact_map ~accuracy_level state in
-  state, contact_map_to_json cm
+  state, Remanent_state.contact_map_to_json cm
 
 
 let get_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let state, influence_map = get_influence_map ~accuracy_level state in
-  state, influence_map_to_json influence_map
+  state, Remanent_state.influence_map_to_json influence_map
 
 
 

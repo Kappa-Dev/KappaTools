@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Aug 23 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -57,6 +57,25 @@ type influence_node =
   | Rule of rule_id
   | Var of var_id
 
+let influence_node_to_json a =
+  match a
+  with
+  | Var i ->
+    `Assoc ["variable",Json.int_to_json i]
+  | Rule i  ->
+    `Assoc ["rule",Json.int_to_json i]
+
+let influence_node_of_json
+    ?error_msg:(error_msg="Not a correct influence node")
+  =
+  function
+  | `Assoc ["variable",json] ->
+    Var (Json.int_of_json json)
+  | `Assoc ["rule",json] ->
+    Rule (Json.int_of_json json)
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+
 module InfluenceNodeSetMap =
   SetMap.Make
     (struct
@@ -77,6 +96,25 @@ type location =
   | Direct of int
   | Side_effect of int
 
+let location_to_json a =
+  match a
+  with
+  | Direct i ->
+    `Assoc ["direct",Json.int_to_json i]
+  | Side_effect i  ->
+    `Assoc ["side_effects",Json.int_to_json i]
+
+let location_of_json
+    ?error_msg:(error_msg="Not a correct location")
+  =
+  function
+  | `Assoc ["direct",json] ->
+    Direct (Json.int_of_json json)
+  | `Assoc ["side_effect",json] ->
+    Side_effect (Json.int_of_json json)
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
 type 'a pair = 'a * 'a
 
 type influence_map =
@@ -84,6 +122,126 @@ type influence_map =
     positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
     negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
   }
+
+let wakeup = "wake-up map"
+let inhibition = "inhibition map"
+let source = "source"
+let target_map = "target map"
+let target = "target"
+let location_pair_list = "location pair list"
+let rhs = "RHS"
+let lhs = "LHS"
+
+let half_influence_map_to_json =
+  Json.map_to_json
+    ~lab_key:source ~lab_value:target_map
+    InfluenceNodeMap.fold
+    influence_node_to_json
+    (Json.map_to_json
+       ~lab_key:target ~lab_value:location_pair_list
+       InfluenceNodeMap.fold
+       influence_node_to_json
+       (Json.list_to_json
+          (Json.pair_to_json
+             ~lab1:rhs ~lab2:lhs
+             location_to_json
+             location_to_json
+          )
+       )
+    )
+
+let half_influence_map_of_json =
+  Json.map_of_json
+    ~error_msg:(Json.build_msg "activation or inhibition map")
+    ~lab_key:source ~lab_value:target_map
+    InfluenceNodeMap.add
+    InfluenceNodeMap.empty
+    (influence_node_of_json ~error_msg:(Json.build_msg "influence node"))
+    (Json.map_of_json
+       ~lab_key:target ~lab_value:location_pair_list
+       ~error_msg:"map of lists of pairs of locations"
+       InfluenceNodeMap.add
+       InfluenceNodeMap.empty
+       (influence_node_of_json ~error_msg:(Json.build_msg "influence node"))
+       (Json.list_of_json ~error_msg:"list of pair of locations"
+          (Json.pair_of_json
+             ~error_msg:""
+             ~lab1:rhs ~lab2:lhs
+             (location_of_json ~error_msg:(Json.build_msg "location"))
+             (location_of_json ~error_msg:(Json.build_msg "location")))))
+
+let influence_map_to_json influence_map =
+  `Assoc
+    [
+      wakeup,half_influence_map_to_json influence_map.positive;
+      inhibition,half_influence_map_to_json
+        influence_map.negative;]
+
+let influence_map_of_json ?error_msg:(error_msg=Json.build_msg "influence map") =
+  function
+  | `Assoc l as x when List.length l = 2 ->
+    begin
+      try
+        {positive =
+           half_influence_map_of_json (List.assoc wakeup l);
+         negative =
+           half_influence_map_of_json (List.assoc inhibition l)}
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (error_msg,x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+let agent="agent name"
+let interface="interface"
+let site="site name"
+let stateslist="states list"
+let prop="property states"
+let bind="binding states"
+let contact_map_to_json =
+  Json.map_to_json
+    ~lab_key:agent ~lab_value:interface
+    Mods.StringMap.fold
+    Json.string_to_json
+    (Json.map_to_json
+       ~lab_key:site ~lab_value:stateslist
+       Mods.StringMap.fold
+       Json.string_to_json
+       (Json.pair_to_json
+          ~lab1:prop ~lab2:bind
+          (Json.list_to_json Json.string_to_json)
+          (Json.list_to_json
+             (Json.pair_to_json
+                ~lab1:agent ~lab2:site
+                Json.string_to_json
+                Json.string_to_json)
+          )))
+
+let contact_map_of_json =
+  Json.map_of_json
+    ~lab_key:agent ~lab_value:interface
+    Mods.StringMap.add
+    Mods.StringMap.empty
+    (Json.string_of_json ~error_msg:(Json.build_msg "agent name"))
+    (Json.map_of_json
+       ~error_msg:(Json.build_msg "interface")
+       ~lab_key:site ~lab_value:stateslist
+       Mods.StringMap.add
+       Mods.StringMap.empty
+       (Json.string_of_json ~error_msg:(Json.build_msg "site name"))
+       (Json.pair_of_json
+          ~error_msg:(Json.build_msg "pair of lists of sites")
+          ~lab1:prop ~lab2:bind
+          (Json.list_of_json
+             ~error_msg:(Json.build_msg "list of internal states")
+             (Json.string_of_json
+                ~error_msg:(Json.build_msg "internal state")))
+          (Json.list_of_json
+             ~error_msg:(Json.build_msg "list of binding states")
+             (Json.pair_of_json
+                ~error_msg:(Json.build_msg "binding type")
+                ~lab1:agent ~lab2:site
+                (Json.string_of_json ~error_msg:(Json.build_msg "agent name"))
+                (Json.string_of_json ~error_msg:(Json.build_msg "site"))))))
 
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
@@ -97,7 +255,7 @@ type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
 type dead_rules = Ckappa_sig.c_rule_id list
-type dead_agents = Ckappa_sig.c_agent_name list 
+type dead_agents = Ckappa_sig.c_agent_name list
 
 
 type flow =
@@ -165,7 +323,7 @@ let create_state ?errors parameters init =
     dead_rules = None ;
     dead_agents = None ;
     errors = error ;
-    }
+  }
 
 let do_event_gen f phase n state =
   let error, log_info =
@@ -223,7 +381,7 @@ let set_internal_contact_map accuracy int_contact_map state =
   {state
    with internal_contact_map = AccuracyMap.add accuracy int_contact_map state.internal_contact_map}
 let get_internal_contact_map accuracy state =
-    AccuracyMap.find_option accuracy state.internal_contact_map
+  AccuracyMap.find_option accuracy state.internal_contact_map
 let get_reachability_result state = state.reachability_state
 let set_reachability_result reachability_state state =
   {state with reachability_state = Some reachability_state}
