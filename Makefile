@@ -89,7 +89,7 @@ site: $(RESOURCES_HTML)
 	mkdir -p $@
 	cp $^ site
 
-site/external:
+site/external: site
 	mkdir -p $@
 
 site/external/bootstrap-3.3.5-dist:
@@ -219,13 +219,18 @@ debug:
 
 all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
 
+clean_ide:
+	rm -f StdSim bin/StdSim
+	rm -rf ide/Kappa.iconset
+	rm -f ide/Kappa.icns
+
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
 	find man \( -name \*.htm \) -delete
 	find man/scripts \( -name \*.witness \) -delete
 	rm -rf $(MANGENREP)
 
-clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
+clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc clean_ide
 	"$(OCAMLBINPATH)ocamlbuild" -clean
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
@@ -265,3 +270,18 @@ full:
 light:
 	$(MAKE) clean
 	$(MAKE) USE_TK=0 || echo 0
+
+ide/Kappa.iconset: ide/Kappa-Logo.png
+	rm -rf $@ && mkdir $@
+	sips -z 16 16     $< --out $@/icon_16x16.png
+	sips -z 32 32     $< --out $@/icon_16x16@2x.png
+	sips -z 32 32     $< --out $@/icon_32x32.png
+	sips -z 64 64     $< --out $@/icon_32x32@2x.png
+	sips -z 128 128   $< --out $@/icon_128x128.png
+	sips -z 256 256   $< --out $@/icon_128x128@2x.png
+	sips -z 256 256   $< --out $@/icon_256x256.png
+	sips -z 512 512   $< --out $@/icon_256x256@2x.png
+	sips -z 512 512   $< --out $@/icon_512x512.png
+	cp $< $@/icon_512x512@2x.png
+ide/Kappa.icns: ide/Kappa.iconset
+	iconutil -c icns $<

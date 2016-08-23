@@ -161,7 +161,7 @@ let set_runtime_url
                                 command = command;
                                 args = _ } } ->
         let () = Common.debug ("set_runtime_url:"^url) in
-        let js_node_runtime = new JsNode.runtime command ["--stdio"] in
+        let js_node_runtime = new JsNode.runtime command [] in
         if js_node_runtime#is_running () then
           let () = Common.debug (Js.string "sucess") in
           let () = runtime_state :=  Some (js_node_runtime :> Api_v1.runtime) in
