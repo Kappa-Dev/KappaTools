@@ -1831,14 +1831,14 @@ struct
 
     let to_json
         ?lab_key:(lab_key="key") ?lab_value:(lab_value="value") =
-      Json.map_to_json ~lab_key ~lab_value fold
+      JsonUtil.map_to_json ~lab_key ~lab_value fold
 
 
     let of_json
         ?lab_key:(lab_key="key")
         ?lab_value:(lab_value="value")
-        ?error_msg:(error_msg=Json.build_msg "map") =
-      Json.map_of_json ~lab_key ~lab_value ~error_msg
+        ?error_msg:(error_msg=JsonUtil.build_msg "map") =
+      JsonUtil.map_of_json ~lab_key ~lab_value ~error_msg
         add empty
 
   end

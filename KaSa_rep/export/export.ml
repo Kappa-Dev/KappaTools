@@ -1114,7 +1114,7 @@ let json_to_rule_id =
   | x -> raise (Yojson.Basic.Util.Type_error (("Not a correct rule_id"),x))
 
 let dead_rules_to_json =
-  Json.list_to_json rule_id_to_json
+  JsonUtil.list_to_json rule_id_to_json
 
 let json_to_dead_rules =
-  Json.list_of_json json_to_rule_id
+  JsonUtil.list_of_json json_to_rule_id
