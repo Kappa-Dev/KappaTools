@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 23 2016>
+  * Last modification: Time-stamp: <Aug 24 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -383,18 +383,6 @@ struct
     in
     let static = set_bonds_lhs_full store_bonds_lhs_full static in
     (*------------------------------------------------------*)
-    (*binding on the left hand side*)
-    let store_bonds_lhs_full = get_bonds_lhs_full static in
-    let error, store_bonds_lhs_full =
-      Parallel_bonds_static.collect_bonds_lhs_full
-        parameter
-        error
-        rule_id
-        rule
-        store_bonds_lhs_full
-    in
-    let static = set_bonds_lhs_full store_bonds_lhs_full static in
-    (*------------------------------------------------------*)
     (*a set of rules that has a potential double binding on the lhs*)
     let store_bonds_lhs_full = get_bonds_lhs_full static in
     let store_result = get_rule_has_parallel_bonds_lhs static in
@@ -423,7 +411,7 @@ struct
     in
     let static = set_rule_has_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
-    (*a set of rules that has a potential non double bindings on the rhs*)
+    (*a set of rules that has a potential non parallel bindings on the rhs*)
     let store_result = get_rule_has_non_parallel_bonds_rhs static in
     let error, store_result =
       Parallel_bonds_static.collect_rule_has_non_parallel_bonds_rhs
@@ -459,6 +447,28 @@ struct
         store_result
     in
     let static = set_parallel_bonds_lhs store_result static in
+    let store_rule_has_non_parallel_bonds_rhs = get_rule_has_non_parallel_bonds_rhs static in
+    let store_result = get_non_parallel_bonds_rhs static in
+    let error, store_result =
+      Parallel_bonds_static.collect_non_parallel_bonds_rhs
+        parameter
+        store_rule_has_non_parallel_bonds_rhs
+        error
+        rule_id
+        store_result
+    in
+    let static = set_non_parallel_bonds_rhs store_result static in
+    let store_rule_has_non_parallel_bonds_lhs = get_rule_has_non_parallel_bonds_lhs static in
+    let store_result = get_non_parallel_bonds_lhs static in
+    let error, store_result =
+      Parallel_bonds_static.collect_non_parallel_bonds_rhs
+        parameter
+        store_rule_has_non_parallel_bonds_lhs
+        error
+        rule_id
+        store_result
+    in
+    let static = set_non_parallel_bonds_lhs store_result static in
     error, static
 
   (****************************************************************)
@@ -484,26 +494,6 @@ struct
     in
     (*------------------------------------------------------*)
     (*A(x!1, y), B(x!1, y): first site is an action binding*)
-    let store_action_binding = get_action_binding static in
-    let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
-    let error, store_result =
-      Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
-        parameter
-        error
-        store_action_binding
-        store_parallel_bonds_rhs
-    in
-    let static = set_fst_site_create_parallel_bonds_rhs store_result static in
-    (*------------------------------------------------------*)
-    (*A(x, y!1), B(x, y!1): second site is an action binding *)
-    let store_parallel_bonds_rhs = get_parallel_bonds_rhs static in
-    let error, store_result =
-      Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
-        parameter error
-        store_action_binding
-        store_parallel_bonds_rhs
-    in
-    let static = set_snd_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
     let lift error s =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.fold
@@ -516,7 +506,7 @@ struct
     let error, store_result1 = lift error (get_parallel_bonds_lhs static) in
     let error, store_result2 = lift error (get_parallel_bonds_rhs static) in
     let error, store_result3 = lift error (get_non_parallel_bonds_lhs static) in
-    let error, store_result4 = lift error (get_non_parallel_bonds_lhs static) in
+    let error, store_result4 = lift error (get_non_parallel_bonds_rhs static) in
     let error, store_result =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
         parameter error store_result1 store_result2
@@ -532,6 +522,26 @@ struct
     let static =
       set_tuples_of_interest store_result static
     in
+    let tuple_of_interest = store_result in
+    let store_action_binding = get_action_binding static in
+    let error, store_result =
+      Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
+        parameter
+        error
+        store_action_binding
+        tuple_of_interest
+    in
+    let static = set_fst_site_create_parallel_bonds_rhs store_result static in
+    (*------------------------------------------------------*)
+    (*A(x, y!1), B(x, y!1): second site is an action binding *)
+    let error, store_result =
+      Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
+        parameter error
+        store_action_binding
+        tuple_of_interest
+    in
+    let static = set_snd_site_create_parallel_bonds_rhs store_result static in
+
     error, static, dynamic
 
   (***************************************************************)

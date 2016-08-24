@@ -59,6 +59,13 @@ sig
     Cckappa_sig.kappa_handler ->
     t -> Exception.method_handler
 
+    val print_list:
+      Loggers.t ->
+      Remanent_parameters_sig.parameters ->
+      Exception.method_handler ->
+      Cckappa_sig.kappa_handler ->
+      t list -> Exception.method_handler
+
   val to_json:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler ->

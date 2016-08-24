@@ -535,4 +535,25 @@ struct
         t.string_version
         false
     in error
+
+  let print_list logger parameter error kappa_handler list =
+    match list with
+    |  [] -> error
+    | [a] -> print logger parameter error kappa_handler a
+    | _::_ ->
+      begin
+        let () = Loggers.fprintf logger "[ " in
+        let error,_ =
+          List.fold_left
+            (fun (error, bool) pattern ->
+               let () =
+                 if bool then
+                   Loggers.fprintf logger " v "
+               in
+               print logger parameter error kappa_handler pattern,true)
+            (error, false)
+            list in
+        let () = Loggers.fprintf logger " ]" in
+        error
+      end
 end

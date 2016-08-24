@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 23 2016>
+   * Last modification: Time-stamp: <Aug 24 2016>
    *
    * Abstract domain to record live rules
    *
@@ -478,11 +478,12 @@ let rec post_condition error rule_id r precondition static dynamic path  =
         | error, Some agent ->
           begin
             match agent with
-            | Cckappa_sig.Ghost
+            | Cckappa_sig.Ghost 
             | Cckappa_sig.Dead_agent _
             | Cckappa_sig.Unknown_agent _ ->
               Exception.warn
-                parameters error __POS__ Exit (Usual_domains.Undefined,None)
+                parameters error __POS__ Exit
+                ~message:((string_of_int (Ckappa_sig.int_of_agent_id agent_id)))                (Usual_domains.Undefined,None)
 
             | Cckappa_sig.Agent proper_agent ->
               let error, state_opt =

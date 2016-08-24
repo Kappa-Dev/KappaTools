@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa parallel_bonds.ka --output-directory output --verbosity-level-for-view-analysis Mute --debugging-mode || exit 0 

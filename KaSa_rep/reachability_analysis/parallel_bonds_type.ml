@@ -114,6 +114,10 @@ let convert_refined_tuple parameters error kappa_handler tuple =
   error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',
           Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
 
+let cons_opt a l =
+  match a with None -> l
+             | Some a -> a::l
+
 let print_parallel_constraint
     ?verbose:(verbose=true)
     ?sparse:(sparse=false)
@@ -142,15 +146,57 @@ let print_parallel_constraint
       parameters error kappa_handler
       agent_id site' agent'' site''' t_precondition
   in
+  let error, t_same_self =
+    if agent = agent'' && site<>site'' && site'<>site'''
+    then
+      let error, t_same_self =
+        Ckappa_backend.Ckappa_backend.add_bond
+          parameters error kappa_handler
+          agent_id site agent_id site'' t_precondition
+      in
+      error, Some t_same_self
+    else
+      error, None
+  in
   let error, agent_id'', t_same =
     Ckappa_backend.Ckappa_backend.add_agent
       parameters error kappa_handler
       agent'' t_precondition
   in
+  let error, t_distinct_self1 =
+    if agent = agent'' &&
+       site <> site'' && site <> site' && site' <> site''
+    then
+      let error, t_distinct_self1 =
+        Ckappa_backend.Ckappa_backend.add_bond
+          parameters error kappa_handler
+          agent_id site' agent_id'' site'''  t_same
+      in
+      let error, t_distinct_self1 =
+        Ckappa_backend.Ckappa_backend.add_bond
+          parameters error kappa_handler
+          agent_id site agent_id site'' t_distinct_self1
+      in
+      error, Some t_distinct_self1
+    else
+      error, None
+  in
   let error, t_same =
     Ckappa_backend.Ckappa_backend.add_bond
       parameters error kappa_handler
       agent_id site agent_id'' site'' t_same
+  in
+  let error, t_distinct_self2 =
+    if agent = agent'' &&
+       site' <> site''' && site' <> site && site<>site'''
+    then
+      let error, t_distinct_self2 =
+        Ckappa_backend.Ckappa_backend.add_bond
+          parameters error kappa_handler
+          agent_id site' agent_id site''' t_same
+      in error, Some t_distinct_self2
+    else
+      error, None
   in
   let error, agent_id''', t_distinct =
     Ckappa_backend.Ckappa_backend.add_agent
@@ -166,6 +212,14 @@ let print_parallel_constraint
     Ckappa_backend.Ckappa_backend.add_bond
       parameters error kappa_handler
       agent_id site' agent_id'' site''' t_same
+  in
+  let list_same =
+    t_same::(cons_opt t_same_self [])
+  in
+  let list_distinct =
+    t_distinct::
+    (cons_opt t_distinct_self1
+       (cons_opt t_distinct_self2 []))
   in
   if sparse && compare site site' > 0
   then error
@@ -198,10 +252,9 @@ let print_parallel_constraint
                       (Remanent_parameters.get_logger parameters) "%s" prefix
                   in error
               in
-              let error =
-                Ckappa_backend.Ckappa_backend.print
+              let error = Ckappa_backend.Ckappa_backend.print_list
                   (Remanent_parameters.get_logger parameters) parameters error kappa_handler
-                  t_same
+                  list_same
               in
               let () =
                 Loggers.print_newline (Remanent_parameters.get_logger parameters)
@@ -254,9 +307,9 @@ let print_parallel_constraint
                   in error
               in
               let error =
-                Ckappa_backend.Ckappa_backend.print
+                Ckappa_backend.Ckappa_backend.print_list
                   (Remanent_parameters.get_logger parameters) parameters error kappa_handler
-                  t_distinct
+                  list_distinct
               in
               let () =
                 Loggers.print_newline (Remanent_parameters.get_logger parameters)
