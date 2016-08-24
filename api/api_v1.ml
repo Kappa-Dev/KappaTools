@@ -36,15 +36,16 @@ end = struct
     { switch : Lwt_switch.t
     ; counter : Counter.t
     ; log_buffer : Buffer.t
-    ; plot : ApiTypes.plot ref
-    ; distances : ApiTypes.distances ref
-    ; snapshots : ApiTypes.snapshot list ref
-    ; flux_maps : ApiTypes.flux_map list ref
-    ; files : ApiTypes.file_line list ref
-    ; error_messages : ApiTypes.errors ref
+    ; log_form : Format.formatter
+    ; mutable plot : ApiTypes.plot
+    ; mutable distances : ApiTypes.distances
+    ; mutable snapshots : ApiTypes.snapshot list
+    ; mutable flux_maps : ApiTypes.flux_map list
+    ; mutable files : ApiTypes.file_line list
+    ; mutable error_messages : ApiTypes.errors
     ; contact_map : Primitives.contact_map
     ; env : Environment.t
-    ; domain : Connected_component.Env.t
+    ; mutable domain : Connected_component.Env.t
     ; mutable graph : Rule_interpreter.t
     ; mutable state : State_interpreter.t
     }
@@ -95,6 +96,47 @@ end = struct
         | exn -> log ~exn "" >>=
           (fun () -> Lwt.fail exn))
 
+      let outputs simulation =
+        function
+        | Data.Flux flux_map ->
+          simulation.flux_maps <-
+            ((Api_data.api_flux_map flux_map)::simulation.flux_maps)
+        | Data.Plot (time,new_observables) ->
+          let new_values =
+            List.map (fun nbr -> Nbr.to_float nbr)
+              (Array.to_list new_observables) in
+          simulation.plot <-
+            {simulation.plot with
+             ApiTypes.time_series =
+               { ApiTypes.time = time ; values = new_values }
+               :: simulation.plot.ApiTypes.time_series }
+        | Data.Print file_line ->
+          simulation.files <-
+            ((Api_data.api_file_line file_line)::simulation.files)
+        | Data.Snapshot snapshot ->
+          simulation.snapshots <-
+            ((Api_data.api_snapshot (Environment.signatures simulation.env) snapshot)
+             ::simulation.snapshots)
+        | Data.UnaryDistances unary_distances ->
+          simulation.distances <-
+            let (one_big_list,_) =
+              Array.fold_left
+                (fun (l,i) a ->
+                   match a with
+                   | Some ls ->
+                     let add_rule_id =
+                       List.map
+                         (fun (t,d) ->
+                            {ApiTypes.rule_dist =
+                               unary_distances.Data.distances_rules.(i);
+                             ApiTypes.time_dist = t;
+                             ApiTypes.dist = d}) ls
+                     in (List.append l add_rule_id, i+1)
+                   | None -> (l, i+1))
+                ([],0) unary_distances.Data.distances_data in
+            one_big_list
+        | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
+
   class virtual runtime min_run_duration =
     object(self)
 
@@ -135,59 +177,14 @@ end = struct
         ApiTypes.token ApiTypes.result Lwt.t =
         if parameter.ApiTypes.nb_plot > 0 then
           let current_id = self#new_id () in
-          let plot : ApiTypes.plot ref =
-            ref { ApiTypes.legend = []
-                ; ApiTypes.time_series = [] }
-          in
-          let distances : ApiTypes.distances ref = ref [] in
-          let error_messages : ApiTypes.errors ref = ref [] in
-          let snapshots : ApiTypes.snapshot list ref = ref [] in
-          let flux_maps : ApiTypes.flux_map list ref = ref [] in
-          let files : ApiTypes.file_line list ref = ref [] in
           let simulation_log_buffer = Buffer.create 512 in
-          let log_form =
-            Format.formatter_of_buffer simulation_log_buffer in
-          let outputs sigs =
-            function
-            | Data.Flux flux_map ->
-              flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
-            | Data.Plot (time,new_observables) ->
-              let new_values =
-                List.map (fun nbr -> Nbr.to_float nbr)
-                  (Array.to_list new_observables) in
-              plot := {!plot with ApiTypes.time_series =
-                                    { ApiTypes.time = time ;
-                                      values = new_values }
-                                    :: !plot.ApiTypes.time_series }
-            | Data.Print file_line ->
-              files := ((Api_data.api_file_line file_line)::!files)
-            | Data.Snapshot snapshot ->
-              snapshots := ((Api_data.api_snapshot sigs snapshot)::!snapshots)
-            | Data.UnaryDistances unary_distances ->
-              distances :=
-                let (one_big_list,_) =
-                  Array.fold_left
-                    (fun (l,i) a ->
-                       match a with
-                       | Some ls ->
-                         let add_rule_id =
-                           List.map
-                             (fun (t,d) ->
-                                {ApiTypes.rule_dist =
-                                   unary_distances.Data.distances_rules.(i);
-                                 ApiTypes.time_dist = t;
-                                 ApiTypes.dist = d}) ls
-                         in (List.append l add_rule_id, i+1)
-                       | None -> (l, i+1))
-                    ([],0) unary_distances.Data.distances_data in
-                one_big_list
-            | Data.Log s ->
-              Format.fprintf log_form "%s@." s in
+          let simulation_log_form =
+             Format.formatter_of_buffer simulation_log_buffer in
           Lwt.catch
             (fun () ->
                (build_ast parameter.ApiTypes.code self#time_yield self#log) >>=
                (function
-                   `Right ((sig_nd,tk_nd,updated_vars,result) ,contact_map) ->
+                   `Right ((sig_nd,tk_nd,updated_vars,result),contact_map) ->
                    let simulation_counter =
                      Counter.create
                        ~init_t:(0. : float)
@@ -198,26 +195,35 @@ end = struct
                    Eval.compile
                      ~pause:(fun f -> Lwt.bind (self#time_yield ()) f)
                      ~return:Lwt.return ?rescale_init:None
-                     ~outputs:(outputs (Signature.create []))
+                     ~outputs:(function
+                         | Data.Log s ->
+                           Format.fprintf simulation_log_form "%s@." s
+                         | Data.Snapshot _ | Data.Flux _ | Data.Plot _ |
+                           Data.Print _ | Data.UnaryDistances _ -> assert false)
                      sig_nd tk_nd contact_map
                      simulation_counter result >>=
                    (fun (env,domain,has_tracking,
                          store_distances,_,init_l) ->
+                     let env' =
+                       Environment.propagate_constant
+                         updated_vars simulation_counter env in
                      let simulation =
                        { switch = Lwt_switch.create ()
                        ; counter = simulation_counter
                        ; log_buffer = simulation_log_buffer
-                       ; plot = plot
-                       ; distances = distances
-                       ; error_messages = error_messages
-                       ; snapshots = snapshots
-                       ; flux_maps = flux_maps
-                       ; files = files
+                       ; log_form = simulation_log_form
+                       ; plot =
+                           { ApiTypes.legend = []; ApiTypes.time_series = [] }
+                       ; distances = []
+                       ; error_messages = []
+                       ; snapshots = []
+                       ; flux_maps = []
+                       ; files = []
                        ; contact_map = contact_map
-                       ; env = env
+                       ; env = env'
                        ; domain = domain
-                       ; graph = Rule_interpreter.empty ~store_distances env
-                       ; state = State_interpreter.empty env [] []
+                       ; graph = Rule_interpreter.empty ~store_distances env'
+                       ; state = State_interpreter.empty env' [] []
                        } in
                      let () =
                        context <-
@@ -236,23 +242,24 @@ end = struct
                                  Eval.build_initial_state
                                    ~bind:(fun x f ->
                                        (self#time_yield ()) >>= (fun () -> x >>= f))
-                                   ~return:Lwt.return [] simulation_counter
-                                   env domain story_compression
+                                   ~return:Lwt.return [] simulation.counter
+                                   simulation.env simulation.domain story_compression
                                    store_distances init_l >>=
                                  (fun (graph,state) ->
                                     let () = simulation.graph <- graph;
                                       simulation.state <- state in
+                                    let log_form =
+                                      Format.formatter_of_buffer simulation.log_buffer in
                                     let () = ExceptionDefn.flush_warning log_form in
-                                    let sigs = Environment.signatures env in
                                     let legend =
                                       Environment.map_observables
                                         (Format.asprintf
                                            "%a"
-                                           (Kappa_printer.alg_expr ~env))
-                                        env in
+                                           (Kappa_printer.alg_expr ~env:simulation.env))
+                                        simulation.env in
                                     let () =
-                                      plot :=
-                                        { !plot
+                                      simulation.plot <-
+                                        { simulation.plot
                                           with ApiTypes.legend = Array.to_list legend}
                                     in
                                     let rstop = ref false in
@@ -262,8 +269,9 @@ end = struct
                                               Sys.time () -. lastyield < min_run_duration do
                                           let (stop,graph',state') =
                                             State_interpreter.a_loop
-                                              ~outputs:(outputs sigs)
-                                              env domain simulation.counter
+                                              ~outputs:(outputs simulation)
+                                              simulation.env simulation.domain
+                                              simulation.counter
                                               simulation.graph simulation.state in
                                           rstop := stop;
                                           simulation.graph <- graph';
@@ -281,23 +289,24 @@ end = struct
                                     (fun () ->
                                        let _ =
                                          State_interpreter.end_of_simulation
-                                           ~outputs:(outputs sigs) log_form env
+                                           ~outputs:(outputs simulation)
+                                           simulation.log_form simulation.env
                                            simulation.counter simulation.graph
                                            simulation.state in
                                        Lwt.return_unit)))
                                (function
                                  | ExceptionDefn.Internal_Error error as exn ->
-                                   let () = error_messages :=
+                                   let () = simulation.error_messages <-
                                        (Api_data.api_location_errors error)
                                    in
                                    self#log ~exn ""
                                  | Invalid_argument error as exn ->
-                                   let () = error_messages :=
+                                   let () = simulation.error_messages <-
                                        (Api_data.api_message_errors ("Runtime error "^ error))
                                    in
                                    self#log ~exn ""
                                  | exn ->
-                                   let () = error_messages :=
+                                   let () = simulation.error_messages <-
                                        (Api_data.api_message_errors (Printexc.to_string exn)) in
                                    self#log ~exn ""
                                )) in
@@ -315,6 +324,58 @@ end = struct
         else
           Api_data.lwt_msg msg_observables_less_than_zero
 
+       method private perturbate token text =
+        Lwt.catch
+          (fun () ->
+             match IntMap.find_option token context.states with
+             | None ->
+               Api_data.lwt_msg msg_token_not_found
+             | Some simulation ->
+               if Lwt_switch.is_on simulation.switch then
+                 failwith "BAAAAD" (*TODO*)
+               else
+                 let cc_preenv =
+                   Connected_component.PreEnv.of_env simulation.domain in
+                 match LKappa.modif_expr_of_ast
+                         (Environment.signatures simulation.env)
+                         (Environment.tokens_finder simulation.env)
+                         (Environment.algs_finder simulation.env)
+                         (KappaParser.effect KappaLexer.token text) [] with
+                 | _, _::_ ->
+                    Api_data.lwt_msg "$UPDATE is not implemented (yet?)"
+                | e', [] ->
+                  let cc_preenv', e'' = Eval.compile_modification_no_update
+                      simulation.contact_map cc_preenv e' in
+                  let cc_env' =
+                    if cc_preenv == cc_preenv' then simulation.domain
+                    else Connected_component.PreEnv.finalize cc_preenv' in
+                  simulation.domain <- cc_env';
+                  let _,graph',state' =
+                    List.fold_left
+                      (fun (stop,graph',state' as acc) x ->
+                         if stop then acc else
+                           State_interpreter.do_modification
+                             ~outputs:(outputs simulation) simulation.env cc_env'
+                             simulation.counter graph' state' x)
+                      (false,simulation.graph,simulation.state) e'' in
+                  simulation.graph <- graph';
+                  simulation.state <- state';
+                  Lwt.return (`Right ()))
+          (function
+              ExceptionDefn.Syntax_Error e ->
+              Lwt.return
+                (`Left
+                   (Api_data.api_location_errors e))
+            | ExceptionDefn.Malformed_Decl e ->
+              Lwt.return
+                (`Left
+                   (Api_data.api_location_errors e))
+            | exn ->
+              (self#log ~exn "")
+              >>=
+              (fun _ -> Api_data.lwt_msg (Printexc.to_string exn))
+          )
+
       method status
           (token : ApiTypes.token) : ApiTypes.state ApiTypes.result Lwt.t =
         Lwt.catch
@@ -323,19 +384,14 @@ end = struct
              | None ->
                Api_data.lwt_msg msg_token_not_found
              | Some state ->
-               let () =
-                 if not (Lwt_switch.is_on state.switch) then
-                   context <-
-                     { context with states = IntMap.remove token context.states }
-               in
                Lwt.return
-                 (match !(state.error_messages) with
+                 (match state.error_messages with
                     [] ->
                     `Right
                       ({ ApiTypes.plot =
-                           Some !(state.plot);
+                           Some state.plot;
                          ApiTypes.distances =
-                           Some !(state.distances);
+                           Some state.distances;
                          ApiTypes.time =
                            Counter.time state.counter;
                          ApiTypes.time_percentage =
@@ -349,16 +405,16 @@ end = struct
                          ApiTypes.log_messages =
                            [Buffer.contents state.log_buffer] ;
                          ApiTypes.snapshots =
-                           !(state.snapshots);
+                           state.snapshots;
                          ApiTypes.flux_maps =
-                           !(state.flux_maps);
+                           state.flux_maps;
                          ApiTypes.files =
-                           !(state.files);
+                           state.files;
                          is_running =
                            Lwt_switch.is_on state.switch
                        } : ApiTypes.state )
                   | _ ->
-                    `Left !(state.error_messages)
+                    `Left state.error_messages
                  )
           )
           (fun exn ->

@@ -33,6 +33,9 @@
 %start interactive_command
 %type <(Ast.mixture,string) Ast.command> interactive_command
 
+%start effect
+%type <(Ast.mixture,string) Ast.modif_expr> effect
+
 %% /*Grammar rules*/
 
 newline:
