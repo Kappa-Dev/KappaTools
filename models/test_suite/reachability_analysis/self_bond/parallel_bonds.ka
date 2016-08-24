@@ -19,4 +19,3 @@
 'r6' F(z,t),F(z),F(t) -> F(z!1,t!2),F(z!1),F(t!2) @1
 
 
-#r4 is unreachable.
