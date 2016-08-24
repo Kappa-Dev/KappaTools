@@ -65,9 +65,17 @@ let translate_bond parameter error site_add agent_id site_type_source views =
 
 
 (******************************************************************)
-
-let collect_parallel_or_not_bonds_init
-    parameter kappa_handler error tuple_of_interest init_state store_result =
+let collect_parallel_or_not_bonds_in_pattern
+    parameter error ?tuple_of_interest pattern =
+  let good_tuple =
+    match tuple_of_interest with
+    | None -> (fun _ -> true)
+    | Some t_set ->
+      (fun tuple ->
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
+        (Parallel_bonds_type.project2 tuple) t_set
+      )
+  in
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter error
     (fun parameter error agent_id_source bonds_map store_result
@@ -83,7 +91,7 @@ let collect_parallel_or_not_bonds_init
                 site_add
                 agent_id_source
                 site_type_source
-                init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
+                pattern.Cckappa_sig.views
             in
             Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source' site_add'
@@ -108,20 +116,21 @@ let collect_parallel_or_not_bonds_init
                       site_add'
                       agent_id_source
                       site_type_source'
-                      init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
+                      pattern.Cckappa_sig.views
                   in
                   (* the two target sites  should also have different types *)
                   if site_type_target <> site_type_target'
                   then
                     let tuple =
-                      ((agent_type_source, site_type_source, site_type_source', state_source, state_source'),
-                       (agent_type_target,
+                      ((agent_id_source,agent_type_source, site_type_source, site_type_source', state_source, state_source'),
+                       (agent_id_target,agent_type_target,
                         site_type_target, site_type_target', state_target, state_target'))
                     in
-                    if (* only tuples of interest are interesting :-) *) Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem tuple tuple_of_interest
+                    if (* only tuples of interest are interesting :-) *)
+                      good_tuple tuple
                     then
-                      Parallel_bonds_type.add_value
-                        parameter error kappa_handler
+                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add
+                        parameter error
                         tuple
                         (Usual_domains.Val bool)
                         store_result
@@ -133,5 +142,21 @@ let collect_parallel_or_not_bonds_init
               ) bonds_map (error, store_result)
           ) bonds_map (error, store_result)
     )
-    init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds
-    store_result
+    pattern.Cckappa_sig.bonds
+    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
+
+let collect_parallel_or_not_bonds_init
+    parameter kappa_handler error tuple_of_interest init_state store_result =
+  let tuple_of_interest = Some tuple_of_interest in
+  let error, big_store =
+    collect_parallel_or_not_bonds_in_pattern
+      parameter error ?tuple_of_interest init_state.Cckappa_sig.e_init_c_mixture
+  in
+  Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+    (fun tuple value (error, store_result) ->
+       Parallel_bonds_type.add_value
+         parameter error kappa_handler
+         (Parallel_bonds_type.project2 tuple)
+         value
+         store_result)
+    big_store (error, store_result)
