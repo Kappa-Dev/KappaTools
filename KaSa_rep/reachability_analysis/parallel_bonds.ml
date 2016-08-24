@@ -588,61 +588,15 @@ struct
       get_tuples_of_interest static
     in
     let kappa_handler = get_kappa_handler static in
-    (*--------------------------------------------------------*)
-    (*bonds in the initial states*)
-    let error, store_bonds_init =
-      Parallel_bonds_init.collect_bonds_initial
-        parameter
-        error
-        init_state
-    in
-    (*--------------------------------------------------------*)
-    (*a set of potential non parallel bonds*)
-    let error, store_site_pair_list =
-      Parallel_bonds_init.collect_non_parallel_init_aux
-        parameter
-        store_bonds_init
-        error
-    in
-    let error, store_non_parallel_init =
-      Parallel_bonds_init.collect_non_parallel_init
-        parameter
-        store_bonds_init
-        store_site_pair_list
-        error
-    in
-    (*---------------------------------------------------------*)
-    (*value of non parallel bonds*)
+    (*value of parallel and non parallel bonds*)
     let store_result = get_value dynamic in
     let error, store_result =
-      Parallel_bonds_init.collect_value_non_parallel_bonds
+      Parallel_bonds_init.collect_parallel_or_not_bonds_init
         parameter
-        store_non_parallel_init
-        tuples_of_interest
-        error
         kappa_handler
-        store_result
-    in
-    let dynamic = set_value store_result dynamic in
-    (*---------------------------------------------------------*)
-    (*a set of potential parallel bonds*)
-    let error, store_parallel_bonds_init =
-      Parallel_bonds_init.collect_parallel_bonds_init
-        parameter
-        store_bonds_init
         error
+        tuples_of_interest
         init_state
-    in
-    (*---------------------------------------------------------*)
-    (*value of parallel bonds*)
-    let store_result = get_value dynamic in
-    let error, store_result =
-      Parallel_bonds_init.collect_value_parallel_bonds
-        parameter
-        store_parallel_bonds_init
-        tuples_of_interest
-        error
-        kappa_handler
         store_result
     in
     let dynamic = set_value store_result dynamic in
@@ -867,8 +821,8 @@ struct
                List.fold_left
                  (fun
                    (error, dynamic, precondition, store_result) (z, t) ->
-                   let (agent_id1, agent_type1, site_type1, site_type2, state1, state2) = z in
-                   let (agent_id1', agent_type1', site_type1', site_type2', state1', state2') = t in
+                   let (agent_id1, agent_type1, site_type1, site_type2, state1, _state2) = z in
+                   let (agent_id1', agent_type1', site_type1', site_type2', state1', _state2') = t in
                    if necessarily_non_parallel (z,t) rule_has_non_parallel_bonds_rhs_set
                    || necessarily_parallel (z,t)
                         rule_has_parallel_bonds_rhs_set
@@ -932,31 +886,31 @@ struct
                              second site, it will give a different value: whether Undefined or
                              Any, (question 1 and 2)*)
 
-                             begin
-                               (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
-                               if Ckappa_sig.int_of_state_index pre_state2 = 0
-                               (*|| Ckappa_sig.int_of_state_index pre_state2' = 0*)
-                               then
-                                 (*answer of question 1: the second site is free*)
-                                 let new_value = Usual_domains.lub value Usual_domains.Undefined in
-                                 error, new_value
-                               else
-                                 (* the pre_state2 is bound or pre_state2' is bound. Question
-                                    2: both sites are bound with the good sites, then return Any,
-                                    if not return false*)
-                                 begin
-                                   if s_type2 = s_type2' && pre_state2 = pre_state2' &&
-                                      not (Ckappa_sig.int_of_state_index pre_state2' = 0)
-                                   then
-                                     (*both question1 and 2 are yes: return any*)
-                                     let new_value = Usual_domains.lub value Usual_domains.Any in
-                                     error, new_value
-                                   else
-                                     (*the question1 is true but the question 2 is false -> false*)
-                                     let new_value = Usual_domains.lub value (Usual_domains.Val false) in
-                                     error, new_value
-                                 end
-                             end
+                           begin
+                             (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
+                             if Ckappa_sig.int_of_state_index pre_state2 = 0
+                             (*|| Ckappa_sig.int_of_state_index pre_state2' = 0*)
+                             then
+                               (*answer of question 1: the second site is free*)
+                               let new_value = Usual_domains.lub value Usual_domains.Undefined in
+                               error, new_value
+                             else
+                               (* the pre_state2 is bound or pre_state2' is bound. Question
+                                  2: both sites are bound with the good sites, then return Any,
+                                  if not return false*)
+                               begin
+                                 if s_type2 = s_type2' && pre_state2 = pre_state2' &&
+                                    not (Ckappa_sig.int_of_state_index pre_state2' = 0)
+                                 then
+                                   (*both question1 and 2 are yes: return any*)
+                                   let new_value = Usual_domains.lub value Usual_domains.Any in
+                                   error, new_value
+                                 else
+                                   (*the question1 is true but the question 2 is false -> false*)
+                                   let new_value = Usual_domains.lub value (Usual_domains.Val false) in
+                                   error, new_value
+                               end
+                           end
                          ) (error, old_value) potential_list
                      in
                      (*------------------------------------------------------*)
