@@ -332,7 +332,14 @@ let compute_full_support parameter error ag_id rule =
         let error, list, list' =
           Ckappa_sig.Site_map_and_set.Map.fold
             (fun site state (error,list,list') ->
-               let error, list = SiteSet.add parameter error site list in
+               let error', list = SiteSet.add parameter error site list in
+               let error =
+                 Exception.check_point
+                   Exception.warn
+                   parameter error error'
+                   __POS__
+                   Exit
+               in
                error, list,(site,state)::list')
             v.Cckappa_sig.agent_interface
             (error, SiteSet.empty,[])
@@ -342,19 +349,7 @@ let compute_full_support parameter error ag_id rule =
       end
     | None ->
       begin
-        match view with
-        | Some v ->
-          error, Some v.Cckappa_sig.agent_name, None
-        | None ->
-          let error, () =
-            Exception.warn
-              parameter
-              error
-              __POS__
-              Exit
-              ()
-          in
-          error, None, None
+        error, None, None
       end
   in
   let error, agent =
@@ -442,10 +437,17 @@ let build_support parameter error rules =
                   __POS__
                   Exit
               in
-              let error, new_map =
+              let error', new_map =
                 LabelMap.add
                   parameter error
                   (Rule r_id,ag_id,0) mvbdu old_map
+              in
+              let error =
+                Exception.check_point
+                  Exception.warn
+                  parameter error error'
+                  __POS__
+                  Exit
               in
               let error, degradation = Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
                   parameter error agent_name new_map degradation
@@ -465,10 +467,17 @@ let build_support parameter error rules =
                   __POS__
                   Exit
               in
-              let error, new_map =
+              let error', new_map =
                 LabelMap.add
                   parameter error
                   (Rule r_id,ag_id,0) (set_test, asso_test, set_mod, asso_mod) old_map
+              in
+              let error =
+                Exception.check_point
+                  Exception.warn
+                  parameter error error'
+                  __POS__
+                  Exit
               in
               let error, map = Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
                   parameter error agent_name new_map map
@@ -480,13 +489,28 @@ let build_support parameter error rules =
     (Ckappa_sig.Agent_map_and_set.Map.empty, Ckappa_sig.Agent_map_and_set.Map.empty,
      Ckappa_sig.Agent_map_and_set.Map.empty)
 
-let pw list =
-  List.fold_left
-    (fun acc elt ->
+let pw parameter error list =
+  let error, map =
+    List.fold_left
+      (fun (error, acc) (a,b) ->
+         let error, old =
+           SiteMap.find_default_without_logs
+             parameter error [] a
+             acc in
+         SiteMap.add_or_overwrite parameter error a (b::old) acc)
+      (error, SiteMap.empty)
+      list
+  in
+  error, SiteMap.fold
+    (fun a l acc ->
        List.fold_left
-         (fun acc list -> list::(elt::list)::acc)
-         [] acc)
-    [[]] list
+         (fun acc list ->
+            List.fold_left
+              (fun acc b ->
+                 ((a,b)::list)::acc)
+              acc l)
+         acc acc)
+    map [[]]
 
 let build_side_effect
     parameter error static rules agent_name site_set =
@@ -510,8 +534,9 @@ let build_side_effect
            Exit
        in
        let list = List.filter (fun (a,_) -> SiteSet.mem a site_set) list in
+       let error, list = pw parameter error list in
        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
-         parameter error r_id (pw list) map)
+         parameter error r_id list map)
     rules
     init
 
@@ -573,8 +598,15 @@ let concurrent_sites parameter error mvbdu support =
        let hconsed =
          Ckappa_sig.Views_intbdu.build_variables_list ext_list
        in
-       let error, map' =
+       let error', map' =
          LabelMap.add parameter error label (sites_in_conflict,hconsed) map'
+       in
+       let error =
+         Exception.check_point
+           Exception.warn
+           parameter error error'
+           __POS__
+           Exit
        in
        error, map')
     support
@@ -1208,12 +1240,19 @@ let agent_trace parameter log_info error handler static handler_kappa compil out
                     mvbdu_of_reverse_order_association_list
                       def_list
                   in
-                  let error, site_set =
+                  let error', site_set =
                     List.fold_left
                       (fun (error, set) site ->
                          SiteSet.add parameter error site set)
                       (error, SiteSet.empty)
                       ext_list
+                  in
+                  let error =
+                    Exception.check_point
+                      Exception.warn
+                      parameter error error'
+                      __POS__
+                      Exit
                   in
                   let error, potential_side_effect =
                     build_side_effect
@@ -1248,8 +1287,15 @@ let agent_trace parameter log_info error handler static handler_kappa compil out
                             Ckappa_sig.Views_intbdu.build_association_list
                               asso_modif
                           in
-                          let error, map =
+                          let error', map =
                             LabelMap.add parameter error label (test,asso_test,modif,asso_modif) map
+                          in
+                          let error =
+                            Exception.check_point
+                              Exception.warn
+                              parameter error error'
+                              __POS__
+                              Exit
                           in
                           error, map)
                       support
@@ -1262,11 +1308,18 @@ let agent_trace parameter log_info error handler static handler_kappa compil out
                          let error, support, _ =
                            List.fold_left
                              (fun (error, support, id) list ->
-                                let error, test =
+                                let error', test =
                                   List.fold_left
                                     (fun (error,set) (a,_) ->
                                        SiteSet.add parameter error  a set)
                                     (error,SiteSet.empty) list
+                                in
+                                let error =
+                                  Exception.check_point
+                                    Exception.warn
+                                    parameter error error'
+                                    __POS__
+                                    Exit
                                 in
                                 let modif = test in
                                 let asso_test =
@@ -1286,8 +1339,15 @@ let agent_trace parameter log_info error handler static handler_kappa compil out
                                   Ckappa_sig.Views_intbdu.build_association_list asso_modif in
                                 let label = (Rule r_id,
                                              Ckappa_sig.agent_id_of_int (-1),id) in
-                                let error, support =
+                                let error', support =
                                   LabelMap.add parameter error label (test,asso_test,modif,asso_modif) support
+                                in
+                                let error =
+                                  Exception.check_point
+                                    Exception.warn
+                                    parameter error error'
+                                    __POS__
+                                    Exit
                                 in
                                 (error, support, id+1)
                              )
@@ -1433,7 +1493,7 @@ let agent_trace parameter log_info error handler static handler_kappa compil out
                                    transition_system with
                                    nodes_degradation =
                                      (mvbdu,label)::transition_system.nodes_degradation}
-                                   )
+                            )
                             transition_system
                             transition_system.nodes)
                       degradation
