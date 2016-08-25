@@ -132,7 +132,7 @@ let collect_parallel_or_not_bonds_in_pattern
                       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add
                         parameter error
                         tuple
-                        (Usual_domains.Val bool)
+                        bool
                         store_result
                     else
                       error, store_result
@@ -157,6 +157,6 @@ let collect_parallel_or_not_bonds_init
        Parallel_bonds_type.add_value
          parameter error kappa_handler
          (Parallel_bonds_type.project2 tuple)
-         value
+         (Usual_domains.Val value)
          store_result)
     big_store (error, store_result)
