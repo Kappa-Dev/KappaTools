@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 24 2016>
+   * Last modification: Time-stamp: <Aug 25 2016>
    *
    * Abstract domain to record live rules
    *
@@ -442,7 +442,6 @@ let rec follow_path_inside_cc
                 {path with agent_id = site_add.Cckappa_sig.agent_index;
                            relative_address = tail}
             else
-              let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "WRONG TARGET\n" in
               error, Cannot_exist
         end
     end
@@ -478,7 +477,7 @@ let rec post_condition error rule_id r precondition static dynamic path  =
         | error, Some agent ->
           begin
             match agent with
-            | Cckappa_sig.Ghost 
+            | Cckappa_sig.Ghost
             | Cckappa_sig.Dead_agent _
             | Cckappa_sig.Unknown_agent _ ->
               Exception.warn
@@ -496,11 +495,19 @@ let rec post_condition error rule_id r precondition static dynamic path  =
               begin
                 match state_opt with
                 | None ->
-                  error,
-                  (Usual_domains.Any,
-                   Some
-                     {path with agent_id = agent_id ;
-                                relative_address = []})
+                  if List.exists (fun (a,_) -> a=agent_id)
+                      rule.Cckappa_sig.actions.Cckappa_sig.creation
+                  then
+                    (* the agent has been created and the site not specified *)
+                    (* we know that its state is 0 *)
+                    error,
+                    (Usual_domains.Val [Ckappa_sig.dummy_state_index], None)
+                  else
+                    error,
+                    (Usual_domains.Any,
+                     Some
+                       {path with agent_id = agent_id ;
+                                  relative_address = []})
 
                 | Some interval ->
                   let interval = interval.Cckappa_sig.site_state in
@@ -530,41 +537,48 @@ let rec post_condition error rule_id r precondition static dynamic path  =
             Exit path
         | Some path -> error, path
       in
-      let path =
-        {
-          defined_in = LHS (rule_id,r) ;
-          path = path
-        }
-      in
-      let error, dynamic, precondition, values =
-        get_state_of_site
-          error precondition static dynamic path
-      in
-      let error, bool =
-        may_get_free_by_side_effect parameters error static precondition rule_id rule path.path in
-      let error, list =
-        may_be_modified parameters error
-          rule path.path in
+      if List.exists (fun (a,_) -> a=path.agent_id)
+          rule.Cckappa_sig.actions.Cckappa_sig.creation
+      then
+        (* try to exist from a site that is unspecified in a created agent *)
+        (* this site is free, thus the path is not reaslisable *)
+        error, dynamic, Usual_domains.Undefined
+      else
+        let path =
+          {
+            defined_in = LHS (rule_id,r) ;
+            path = path
+          }
+        in
+        let error, dynamic, precondition, values =
+          get_state_of_site
+            error precondition static dynamic path
+        in
+        let error, bool =
+          may_get_free_by_side_effect parameters error static precondition rule_id rule path.path in
+        let error, list =
+          may_be_modified parameters error
+            rule path.path in
 
-      match values with
-      | Usual_domains.Val l ->
-        if bool || list<>[]
-        then
-          let l_side =
-            if bool
-            then (Ckappa_sig.state_index_of_int 0)::l
-            else
-              l
-          in
-          let l_all =
-            Tools.remove_consecutive_double_in_list
-              (List.sort Ckappa_sig.compare_state_index
-                 (List.rev_append list l_side))
-          in
-          error, dynamic, Usual_domains.Val (l_all)
-        else error, dynamic, values
-      | Usual_domains.Undefined | Usual_domains.Any ->
-        error, dynamic, values
+        match values with
+        | Usual_domains.Val l ->
+          if bool || list<>[]
+          then
+            let l_side =
+              if bool
+              then (Ckappa_sig.state_index_of_int 0)::l
+              else
+                l
+            in
+            let l_all =
+              Tools.remove_consecutive_double_in_list
+                (List.sort Ckappa_sig.compare_state_index
+                   (List.rev_append list l_side))
+            in
+            error, dynamic, Usual_domains.Val (l_all)
+          else error, dynamic, values
+        | Usual_domains.Undefined | Usual_domains.Any ->
+          error, dynamic, values
     end
 and get_state_of_site
     error precondition static dynamic path =
