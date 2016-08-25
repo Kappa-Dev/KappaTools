@@ -281,8 +281,7 @@ A() => [ A(g~u) v A(g~p) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/agent_trace.ml; message: line 353; exception:Exit
+execution finished without any exception
 Parsing ../protein2x5.ka...
 done
 Compiling...
@@ -566,5 +565,4 @@ A() => [ A(g~u) v A(g~p) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/agent_trace.ml; message: line 353; exception:Exit
+execution finished without any exception
