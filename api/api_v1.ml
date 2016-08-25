@@ -1,12 +1,8 @@
 open Lwt.Infix
 module ApiTypes = ApiTypes_j
 
-let msg_process_not_running =
-  "process not running"
 let msg_token_not_found =
   "token not found"
-let msg_observables_less_than_zero =
-  "Plot observables must be greater than zero"
 let msg_process_not_running =
   "process not running"
 let msg_process_already_paused =
@@ -78,14 +74,10 @@ end = struct
   type context = { states : simulator_state IntMap.t
                  ; id : int }
 
-  let format_error_message (message,linenumber) =
-    Format.sprintf "Error at %s : %s"
-      (Location.to_string linenumber)
-      message
   let build_ast
       (code : string)
       yield
-      (log : ?exn:exn -> string -> unit Lwt.t) =
+      (_ : ?exn:exn -> string -> unit Lwt.t) =
     let lexbuf : Lexing.lexbuf = Lexing.from_string code in
     Lwt.catch
       (fun () ->
@@ -131,7 +123,8 @@ end = struct
             ((Api_data.api_file_line file_line)::simulation.files)
         | Data.Snapshot snapshot ->
           simulation.snapshots <-
-            ((Api_data.api_snapshot (Environment.signatures simulation.env) snapshot)
+            ((Api_data.api_snapshot
+                (Environment.signatures simulation.env) snapshot)
              ::simulation.snapshots)
         | Data.UnaryDistances unary_distances ->
           simulation.distances <-
@@ -256,31 +249,43 @@ end = struct
                              Lwt.catch (fun () ->
                                  let story_compression =
                                    Tools.option_map
-                                     (fun  _ -> ((false,false,false),true))
+                                     (fun  _ ->
+                                        ((false,false,false),true))
                                      has_tracking
                                  in
                                  Eval.build_initial_state
                                    ~bind:(fun x f ->
-                                       (self#time_yield ()) >>= (fun () -> x >>= f))
-                                   ~return:Lwt.return [] simulation.counter
-                                   simulation.env simulation.domain story_compression
+                                       (self#time_yield ()) >>=
+                                       (fun () -> x >>= f))
+                                   ~return:Lwt.return []
+                                   simulation.counter
+                                   simulation.env
+                                   simulation.domain
+                                   story_compression
                                    store_distances init_l >>=
                                  (fun (graph,state) ->
                                     let () = simulation.graph <- graph;
                                       simulation.state <- state in
                                     let log_form =
-                                      Format.formatter_of_buffer simulation.log_buffer in
-                                    let () = ExceptionDefn.flush_warning log_form in
+                                      Format.formatter_of_buffer
+                                        simulation.log_buffer
+                                    in
+                                    let () =
+                                      ExceptionDefn.flush_warning
+                                        log_form
+                                    in
                                     let legend =
                                       Environment.map_observables
                                         (Format.asprintf
                                            "%a"
-                                           (Kappa_printer.alg_expr ~env:simulation.env))
+                                           (Kappa_printer.alg_expr
+                                              ~env:simulation.env))
                                         simulation.env in
                                     let () =
                                       simulation.plot <-
                                         { simulation.plot
-                                          with ApiTypes.legend = Array.to_list legend }
+                                          with ApiTypes.legend =
+                                                 Array.to_list legend }
                                     in
                                     (self#run simulation) >>=
                                     (fun _ -> Lwt.return_unit)
@@ -434,7 +439,9 @@ end = struct
           (catch_error (fun e -> Lwt.return (`Left e)))
 
 
-      method private continue (token : ApiTypes.token) (parameter : ApiTypes.parameter) :
+      method private continue
+          (token : ApiTypes.token)
+          (parameter : ApiTypes.parameter) :
         unit ApiTypes.result Lwt.t =
         Lwt.catch
           (fun () ->
@@ -444,9 +451,19 @@ end = struct
                if Lwt_switch.is_on simulation.switch then
                  Api_data.lwt_msg msg_process_not_paused
                else
-                 let () = simulation.switch <- Lwt_switch.create () in
-                 let () = Counter.set_max_time simulation.counter parameter.ApiTypes.max_time in
-                 let () = Counter.set_max_events simulation.counter parameter.ApiTypes.max_events in
+                 let () =
+                   simulation.switch <- Lwt_switch.create ()
+                 in
+                 let () =
+                   Counter.set_max_time
+                     simulation.counter
+                     parameter.ApiTypes.max_time
+                 in
+                 let () =
+                   Counter.set_max_events
+                     simulation.counter
+                     parameter.ApiTypes.max_events
+                 in
                  self#run simulation
           )
           (catch_error (fun e -> Lwt.return (`Left e)))
