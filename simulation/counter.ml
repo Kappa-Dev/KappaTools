@@ -70,8 +70,8 @@ type t = {
     mutable stat_null : Stat_null_events.t ;
     init_time : float ;
     init_event : int ;
-    max_time : float option ;
-    max_events : int option ;
+    mutable max_time : float option ;
+    mutable max_events : int option ;
     plot_points : int ;
     dE : int option ;
     dT : float option ;
@@ -116,6 +116,8 @@ let one_time_correction_event c ti =
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
 let max_events c = c.max_events
+let set_max_time c t : unit = c.max_time <- t
+let set_max_events c e : unit = c.max_events <- e
 let plot_points c = c.plot_points
 let event_percentage (counter : t) : int option =
   match counter.max_events with

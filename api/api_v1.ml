@@ -7,8 +7,34 @@ let msg_token_not_found =
   "token not found"
 let msg_observables_less_than_zero =
   "Plot observables must be greater than zero"
+let msg_process_not_running =
+  "process not running"
+let msg_process_already_paused =
+  "process already paused"
+let msg_process_not_paused =
+  "process not paused"
+let msg_observables_less_than_zero =
+  "Plot observables must be greater than zero"
+let msg_missing_perturbation_context =
+  "Invalid runtime state missing missing perturbation context"
 
 let () = Printexc.record_backtrace true
+
+let catch_error : 'a . (Api_data.Api_types.errors -> 'a) -> exn -> 'a =
+  fun handler ->
+  (function
+    |  ExceptionDefn.Syntax_Error e ->
+      handler (Api_data.api_location_errors e)
+    | ExceptionDefn.Malformed_Decl e ->
+      handler  (Api_data.api_location_errors e)
+    | ExceptionDefn.Internal_Error error ->
+      handler (Api_data.api_location_errors error)
+    | Invalid_argument error ->
+      handler (Api_data.api_message_errors ("Runtime error "^ error))
+    | exn -> handler (Api_data.api_message_errors (Printexc.to_string exn))
+  )
+
+
 
 type runtime =
   < parse : ApiTypes.code -> ApiTypes.parse ApiTypes.result Lwt.t;
@@ -33,7 +59,7 @@ module Base : sig
 end = struct
   module IntMap = Mods.IntMap
   type simulator_state =
-    { switch : Lwt_switch.t
+    { mutable switch : Lwt_switch.t
     ; counter : Counter.t
     ; log_buffer : Buffer.t
     ; log_form : Format.formatter
@@ -84,17 +110,7 @@ end = struct
                        raw_ast) >>=
                     (fun (contact_map,_kasa_state) ->
                        Lwt.return (`Right (ast,contact_map))))))))
-      (function
-          ExceptionDefn.Syntax_Error e ->
-          Lwt.return
-            (`Left
-               (Api_data.api_location_errors e))
-        | ExceptionDefn.Malformed_Decl e ->
-          Lwt.return
-            (`Left
-               (Api_data.api_location_errors e))
-        | exn -> log ~exn "" >>=
-          (fun () -> Lwt.fail exn))
+      (catch_error (fun e -> Lwt.return (`Left e)))
 
       let outputs simulation =
         function
@@ -198,8 +214,11 @@ end = struct
                      ~outputs:(function
                          | Data.Log s ->
                            Format.fprintf simulation_log_form "%s@." s
-                         | Data.Snapshot _ | Data.Flux _ | Data.Plot _ |
-                           Data.Print _ | Data.UnaryDistances _ -> assert false)
+                         | Data.Snapshot _
+                         | Data.Flux _
+                         | Data.Plot _
+                         | Data.Print _
+                         | Data.UnaryDistances _ -> assert false)
                      sig_nd tk_nd contact_map
                      simulation_counter result >>=
                    (fun (env,domain,has_tracking,
@@ -213,7 +232,8 @@ end = struct
                        ; log_buffer = simulation_log_buffer
                        ; log_form = simulation_log_form
                        ; plot =
-                           { ApiTypes.legend = []; ApiTypes.time_series = [] }
+                           { ApiTypes.legend = [];
+                             ApiTypes.time_series = [] }
                        ; distances = []
                        ; error_messages = []
                        ; snapshots = []
@@ -260,67 +280,21 @@ end = struct
                                     let () =
                                       simulation.plot <-
                                         { simulation.plot
-                                          with ApiTypes.legend = Array.to_list legend}
+                                          with ApiTypes.legend = Array.to_list legend }
                                     in
-                                    let rstop = ref false in
-                                    let rec iter () =
-                                      let () =
-                                        while (not !rstop) &&
-                                              Sys.time () -. lastyield < min_run_duration do
-                                          let (stop,graph',state') =
-                                            State_interpreter.a_loop
-                                              ~outputs:(outputs simulation)
-                                              simulation.env simulation.domain
-                                              simulation.counter
-                                              simulation.graph simulation.state in
-                                          rstop := stop;
-                                          simulation.graph <- graph';
-                                          simulation.state <- state'
-                                        done in
-                                      if !rstop then
-                                        (Lwt_switch.turn_off simulation.switch)
-                                        >>= (fun () -> Lwt.return_unit)
-                                      else
-                                      if Lwt_switch.is_on simulation.switch
-                                      then (let () = lastyield <- Sys.time () in
-                                            self#yield ()) >>= iter
-                                      else Lwt.return_unit in
-                                    (iter ()) >>=
-                                    (fun () ->
-                                       let _ =
-                                         State_interpreter.end_of_simulation
-                                           ~outputs:(outputs simulation)
-                                           simulation.log_form simulation.env
-                                           simulation.counter simulation.graph
-                                           simulation.state in
-                                       Lwt.return_unit)))
-                               (function
-                                 | ExceptionDefn.Internal_Error error as exn ->
-                                   let () = simulation.error_messages <-
-                                       (Api_data.api_location_errors error)
-                                   in
-                                   self#log ~exn ""
-                                 | Invalid_argument error as exn ->
-                                   let () = simulation.error_messages <-
-                                       (Api_data.api_message_errors ("Runtime error "^ error))
-                                   in
-                                   self#log ~exn ""
-                                 | exn ->
-                                   let () = simulation.error_messages <-
-                                       (Api_data.api_message_errors (Printexc.to_string exn)) in
-                                   self#log ~exn ""
-                               )) in
+                                    (self#run simulation) >>=
+                                    (fun _ -> Lwt.return_unit)
+                                 )
+                              )
+                               (catch_error
+                                  (fun e ->
+                                     let () = simulation.error_messages <- e in
+                                     Lwt.return_unit)
+                               )
+                          ) in
                      Lwt.return (`Right current_id))
                  | `Left _ as out -> Lwt.return out))
-            (function
-              | ExceptionDefn.Malformed_Decl error ->
-                Lwt.return (`Left (Api_data.api_location_errors error))
-              | ExceptionDefn.Internal_Error error ->
-                Lwt.return (`Left (Api_data.api_location_errors error))
-              | Invalid_argument error ->
-                Lwt.return (`Left (Api_data.api_message_errors ("Runtime error "^ error)))
-              | exn ->
-                Lwt.return (`Left (Api_data.api_message_errors (Printexc.to_string exn))))
+            (catch_error (fun e -> Lwt.return (`Left e)))
         else
           Api_data.lwt_msg msg_observables_less_than_zero
 
@@ -332,7 +306,7 @@ end = struct
                Api_data.lwt_msg msg_token_not_found
              | Some simulation ->
                if Lwt_switch.is_on simulation.switch then
-                 failwith "BAAAAD" (*TODO*)
+                 Api_data.lwt_msg msg_process_not_paused
                else
                  let cc_preenv =
                    Connected_component.PreEnv.of_env simulation.domain in
@@ -342,7 +316,7 @@ end = struct
                          (Environment.algs_finder simulation.env)
                          (KappaParser.effect KappaLexer.token text) [] with
                  | _, _::_ ->
-                    Api_data.lwt_msg "$UPDATE is not implemented (yet?)"
+                   Api_data.lwt_msg "$UPDATE is not implemented (yet?)"
                 | e', [] ->
                   let cc_preenv', e'' = Eval.compile_modification_no_update
                       simulation.contact_map cc_preenv e' in
@@ -361,20 +335,7 @@ end = struct
                   simulation.graph <- graph';
                   simulation.state <- state';
                   Lwt.return (`Right ()))
-          (function
-              ExceptionDefn.Syntax_Error e ->
-              Lwt.return
-                (`Left
-                   (Api_data.api_location_errors e))
-            | ExceptionDefn.Malformed_Decl e ->
-              Lwt.return
-                (`Left
-                   (Api_data.api_location_errors e))
-            | exn ->
-              (self#log ~exn "")
-              >>=
-              (fun _ -> Api_data.lwt_msg (Printexc.to_string exn))
-          )
+          (catch_error (fun e -> Lwt.return (`Left e)))
 
       method status
           (token : ApiTypes.token) : ApiTypes.state ApiTypes.result Lwt.t =
@@ -413,19 +374,15 @@ end = struct
                          is_running =
                            Lwt_switch.is_on state.switch
                        } : ApiTypes.state )
-                  | _ ->
-                    `Left state.error_messages
+                  | _ -> `Left state.error_messages
                  )
           )
-          (fun exn ->
-             (self#log ~exn "")
-             >>=
-             (fun _ -> Api_data.lwt_msg (Printexc.to_string exn))
-          )
+          (catch_error (fun e -> Lwt.return (`Left e)))
+
       method list () : ApiTypes.catalog ApiTypes.result Lwt.t =
         Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))
 
-      method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
+      method private pause (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
         Lwt.catch
           (fun () ->
              match IntMap.find_option token context.states with
@@ -436,8 +393,84 @@ end = struct
                  >>= (fun _ -> Lwt.return (`Right ()))
                else
                  Api_data.lwt_msg msg_process_not_running)
-          (fun e -> Api_data.lwt_msg (Printexc.to_string e))
+          (catch_error (fun e -> Lwt.return (`Left e)))
 
+      method private run (simulation : simulator_state) :
+        unit ApiTypes.result Lwt.t =
+        Lwt.catch
+          (fun () ->
+             let rstop = ref false in
+             let rec iter () =
+               let () =
+                 while (not !rstop) &&
+                       Sys.time () -. lastyield < min_run_duration do
+                   let (stop,graph',state') =
+                     State_interpreter.a_loop
+                       ~outputs:(outputs simulation)
+                       simulation.env simulation.domain
+                       simulation.counter
+                       simulation.graph simulation.state in
+                   rstop := stop;
+                   simulation.graph <- graph';
+                   simulation.state <- state'
+                 done in
+               if !rstop then
+                 (Lwt_switch.turn_off simulation.switch)
+                 >>= (fun () -> Lwt.return_unit)
+               else
+               if Lwt_switch.is_on simulation.switch
+               then (let () = lastyield <- Sys.time () in
+                     self#yield ()) >>= iter
+               else Lwt.return_unit in
+             (iter ()) >>=
+        (fun () ->
+          let _ =
+            State_interpreter.end_of_simulation
+              ~outputs:(outputs simulation)
+              simulation.log_form simulation.env
+              simulation.counter simulation.graph
+               simulation.state in
+          Lwt.return (`Right ())))
+          (catch_error (fun e -> Lwt.return (`Left e)))
+
+
+      method private continue (token : ApiTypes.token) (parameter : ApiTypes.parameter) :
+        unit ApiTypes.result Lwt.t =
+        Lwt.catch
+          (fun () ->
+             match IntMap.find_option token context.states with
+             | None -> Api_data.lwt_msg msg_token_not_found
+             | Some simulation ->
+               if Lwt_switch.is_on simulation.switch then
+                 Api_data.lwt_msg msg_process_not_paused
+               else
+                 let () = simulation.switch <- Lwt_switch.create () in
+                 let () = Counter.set_max_time simulation.counter parameter.ApiTypes.max_time in
+                 let () = Counter.set_max_events simulation.counter parameter.ApiTypes.max_events in
+                 self#run simulation
+          )
+          (catch_error (fun e -> Lwt.return (`Left e)))
+
+      method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
+        Lwt.catch
+          (fun () ->
+             match IntMap.find_option token context.states with
+             | None -> Api_data.lwt_msg msg_token_not_found
+             | Some state ->
+               (if Lwt_switch.is_on state.switch then
+                  Lwt_switch.turn_off state.switch
+                else
+                  Lwt.return_unit)
+               >>=
+               (fun _ ->
+                  let () =
+                    context <-
+                      { context with states = IntMap.remove token context.states }
+                  in
+                  Lwt.return (`Right ())
+               )
+          )
+          (catch_error (fun e -> Lwt.return (`Left e)))
     end;;
 
 end;;

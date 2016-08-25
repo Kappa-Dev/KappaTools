@@ -17,6 +17,12 @@ OCAMLBUILDFLAGS = $(EXTRAFLAGS)
 
 USE_TK?=0
 
+ifeq ($(DEBUG),1)
+JSOFOCAMLFLAGS = --debuginfo --pretty "+weak.js" "+nat.js"
+else
+JSOFOCAMLFLAGS = 
+endif
+
 ifeq ($(USE_TK),1)
 OCAMLINCLUDES = -pkg labltk -I KaSa_rep/lib/full -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
 else
@@ -109,11 +115,11 @@ site/external/jquery:
 	curl -LsS -o site/external/jquery/jquery.js https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js
 
 site/JsSim.js: JsSim.byte site
-	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
+	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
 	sed -i.bak 's/g.process.argv.length>0/g.process.argv.length>1/' site/JsSim.js
 
 site/WebWorker.js: WebWorker.byte site
-	js_of_ocaml --debuginfo --pretty "+nat.js" _build/js/$< -o $@
+	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
 
 ounit: TestJsSim TestWebSim
 

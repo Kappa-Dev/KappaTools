@@ -21,6 +21,8 @@ val inc_stories : t -> unit
 
 val max_time : t -> float option
 val max_events : t -> int option
+val set_max_time  : t -> float option -> unit
+val set_max_events : t -> int option -> unit
 val event_percentage : t -> int option
 val event : t -> int
 val time_percentage : t -> int option
