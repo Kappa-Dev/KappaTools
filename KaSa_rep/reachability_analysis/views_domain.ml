@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Aug 25 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3711,7 +3711,7 @@ struct
             (get_fixpoint_result dynamic)
         in
         let error, log_info, handler =
-          Agent_trace.agent_trace parameter (get_log_info dynamic) error handler handler_kappa compil output
+          Agent_trace.agent_trace parameter (get_log_info dynamic) error handler (get_global_static_information static) handler_kappa compil output
         in
         error, set_mvbdu_handler handler (set_log_info log_info dynamic)
       else
