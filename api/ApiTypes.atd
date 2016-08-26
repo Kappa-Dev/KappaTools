@@ -11,7 +11,7 @@ type range <ocaml predef module="Location"> =
        from_position : position <json name="from"> ;
        to_position : position <json name="to"> }
 type severity =
-     [ Error <json name="error"> | Warning <json name="warning"> ]
+     [ Error <json name="error"> | Warning <json name="warning"> | Info <json name="info"> ]
 
 type error =
      { severity : severity;
@@ -21,9 +21,12 @@ type error =
 type errors =
      error list
 
+type messages =
+     error list
+
 type version =
-     { build : string ;
-       version : string }
+     { version_build : string  <json name="build"> ;
+       version_id : string  <json name="version"> ; }
 
 type parameter =
      { code : code;
@@ -31,11 +34,14 @@ type parameter =
        max_time : float nullable;
        max_events : int nullable
      }
+type perturbation =
+     { perturbation_code : code ; }
 
 type ('l,'r) either = [ Left of 'l | Right of 'r ] <json repr="object">
 type ('r) result = (errors,'r) either
 
-type observable = { time : float; values : float list }
+type observable = { observation_time : float <json name="time">;
+                    observation_values : float list <json name="values">; }
 
 type plot = { legend: string list;
       	      time_series : observable list }

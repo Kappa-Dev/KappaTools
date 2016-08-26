@@ -2,8 +2,6 @@
    and the simulator datatypes.  This class serves to map
    the two implementations.
 *)
-module Api_types = ApiTypes_j
-
 let plot_pg_store
     ~plot
     ~file
@@ -13,50 +11,50 @@ let plot_pg_store
   = { Pp_svg.file = file;
       Pp_svg.title = title;
       Pp_svg.descr = descr;
-      Pp_svg.legend = Array.of_list plot.Api_types.legend;
+      Pp_svg.legend = Array.of_list plot.ApiTypes_j.legend;
       Pp_svg.points =
         List.map
-          (fun (observable : Api_types.observable) ->
-             (observable.Api_types.time,
+          (fun (observable : ApiTypes_j.observable) ->
+             (observable.ApiTypes_j.observation_time ,
               Tools.array_map_of_list
-		(fun x -> Nbr.F x) observable.Api_types.values))
-          plot.Api_types.time_series
+		(fun x -> Nbr.F x) observable.ApiTypes_j.observation_values))
+          plot.ApiTypes_j.time_series
     }
 
 let plot_values
     ?(separator : string = ",")
-    (plot : Api_types.plot) : string =
+    (plot : ApiTypes_j.plot) : string =
   String.concat "\n"
     ((String.concat
         separator
-        ("time"::plot.Api_types.legend))::
+        ("time"::plot.ApiTypes_j.legend))::
      (List.map
-        (fun (observable : Api_types.observable) ->
+        (fun (observable : ApiTypes_j.observable) ->
            String.concat separator
              (List.map
                 (Format.sprintf "%e")
-                (observable.Api_types.time
-                 ::observable.Api_types.values)
+                (observable.ApiTypes_j.observation_time
+                 ::observable.ApiTypes_j.observation_values)
              )
         )
-        plot.Api_types.time_series)
+        plot.ApiTypes_j.time_series)
     )
 
 
-let api_file_line (file_line : Data.file_line) : Api_types.file_line =
-  { Api_types.file_name = file_line.Data.file_name
-  ; Api_types.line = file_line.Data.line
+let api_file_line (file_line : Data.file_line) : ApiTypes_j.file_line =
+  { ApiTypes_j.file_name = file_line.Data.file_name
+  ; ApiTypes_j.line = file_line.Data.line
   }
 
-let api_flux_map (flux_map : Data.flux_map) : Api_types.flux_map =
-  { Api_types.flux_begin_time = flux_map.Data.flux_data.Data.flux_start;
-    Api_types.flux_end_time = flux_map.Data.flux_end ;
-    Api_types.flux_rules = Array.to_list flux_map.Data.flux_rules;
-    Api_types.flux_hits = Array.to_list flux_map.Data.flux_data.Data.flux_hits;
-    Api_types.flux_fluxs =
+let api_flux_map (flux_map : Data.flux_map) : ApiTypes_j.flux_map =
+  { ApiTypes_j.flux_begin_time = flux_map.Data.flux_data.Data.flux_start;
+    ApiTypes_j.flux_end_time = flux_map.Data.flux_end ;
+    ApiTypes_j.flux_rules = Array.to_list flux_map.Data.flux_rules;
+    ApiTypes_j.flux_hits = Array.to_list flux_map.Data.flux_data.Data.flux_hits;
+    ApiTypes_j.flux_fluxs =
       List.map
         Array.to_list (Array.to_list flux_map.Data.flux_data.Data.flux_fluxs);
-    Api_types.flux_name = flux_map.Data.flux_data.Data.flux_name
+    ApiTypes_j.flux_name = flux_map.Data.flux_data.Data.flux_name
   }
 
 let links_of_mix mix =
@@ -81,20 +79,20 @@ let api_mixture sigs mix =
   let links = links_of_mix mix in
   Array.mapi
     (fun i a ->
-       { Api_types.node_quantity = None;
-	 Api_types.node_name =
+       { ApiTypes_j.node_quantity = None;
+	 ApiTypes_j.node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
-	 Api_types.node_sites =
+	 ApiTypes_j.node_sites =
            Array.mapi
              (fun j s ->
-		{ Api_types.site_name =
+		{ ApiTypes_j.site_name =
                     Format.asprintf
                       "%a" (Signature.print_site sigs a.Raw_mixture.a_type) j;
-		  Api_types.site_links =
+		  ApiTypes_j.site_links =
                     (match Mods.Int2Map.find_option (i,j) links with
                      | None -> []
                      | Some dst -> [dst]);
-		  Api_types.site_states =
+		  ApiTypes_j.site_states =
                     (match s with
                      | None -> []
                      | Some k ->
@@ -106,10 +104,10 @@ let api_mixture sigs mix =
        }
     ) (Array.of_list mix)
 
-let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
-  { Api_types.snap_file = snapshot.Data.snap_file
-  ; Api_types.snap_event = snapshot.Data.snap_event
-  ; Api_types.agents =
+let api_snapshot sigs (snapshot : Data.snapshot) : ApiTypes_j.snapshot =
+  { ApiTypes_j.snap_file = snapshot.Data.snap_file
+  ; ApiTypes_j.snap_event = snapshot.Data.snap_event
+  ; ApiTypes_j.agents =
       snd
         (List.fold_left
            (fun (old_offset,old_agents) (agent,mixture) ->
@@ -120,20 +118,20 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
 		(agent_id+old_offset,site_id)
               in
               let update_sites site = { site with
-					Api_types.site_links =
+					ApiTypes_j.site_links =
 					  List.map
 					    update_links
-					    site.Api_types.site_links
+					    site.ApiTypes_j.site_links
 				      } in
               let new_agents =
 		List.map
-                  (fun (node : Api_types.site_node)->
+                  (fun (node : ApiTypes_j.site_node)->
                      { node with
-                       Api_types.node_quantity = quantity ;
-                       Api_types.node_sites =
+                       ApiTypes_j.node_quantity = quantity ;
+                       ApiTypes_j.node_sites =
 			 Array.map
                            update_sites
-                           node.Api_types.node_sites
+                           node.ApiTypes_j.node_sites
                      }
                   )
                   mixture
@@ -143,11 +141,11 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
            (0,[])
            snapshot.Data.agents
         )
-  ; Api_types.tokens =
+  ; ApiTypes_j.tokens =
       List.map (fun (token,value) ->
-          { Api_types.node_name = token ;
-            Api_types.node_quantity = Some (Nbr.to_float value);
-            Api_types.node_sites = Array.of_list [] })
+          { ApiTypes_j.node_name = token ;
+            ApiTypes_j.node_quantity = Some (Nbr.to_float value);
+            ApiTypes_j.node_sites = Array.of_list [] })
         (Array.to_list snapshot.Data.tokens)
   }
 
@@ -155,61 +153,72 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
 let find_link cm (a,s) =
   let rec auxs i j = function
     | [] -> raise Not_found
-    | (s',_) :: t -> if s = s' then (i,j) else auxs i (succ j) t in
+    | (s',_) :: t ->
+      if s = s' then
+        (i,j)
+      else
+        auxs i (succ j) t
+  in
   let rec auxa i = function
     | [] -> raise Not_found
-    | (a',l) :: t -> if a = a' then auxs i 0 l else auxa (succ i) t in
+    | (a',l) :: t ->
+      if a = a' then
+        auxs i 0 l
+      else auxa (succ i) t
+  in
   auxa 0 cm
 
 let api_contact_map sigs cm =
   Array.mapi
     (fun ag sites ->
-       { Api_types.node_quantity = None;
-	 Api_types.node_name =
+       { ApiTypes_j.node_quantity = None;
+	 ApiTypes_j.node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) ag;
-	 Api_types.node_sites =
+	 ApiTypes_j.node_sites =
            Array.mapi
              (fun site (states,links) ->
-		{ Api_types.site_name =
+		{ ApiTypes_j.site_name =
                     Format.asprintf "%a" (Signature.print_site sigs ag) site;
-		  Api_types.site_links = links;
-		  Api_types.site_states =
+		  ApiTypes_j.site_links = links;
+		  ApiTypes_j.site_states =
                     List.map
-                      (Format.asprintf "%a" (Signature.print_internal_state sigs ag site))
+                      (Format.asprintf
+                         "%a"
+                         (Signature.print_internal_state sigs ag site))
                       states;
 		}) sites;
        }) cm
 
 let api_contactmap_site_graph
-    (contactmap : Api_types.parse) : Api_types.site_graph =
-  contactmap.Api_types.contact_map
+    (contactmap : ApiTypes_j.parse) : ApiTypes_j.site_graph =
+  contactmap.ApiTypes_j.contact_map
 
 let offset_site_graph
     (offset : int)
-    (site_nodes : Api_types.site_node list) :
-  Api_types.site_node list =
+    (site_nodes : ApiTypes_j.site_node list) :
+  ApiTypes_j.site_node list =
   List.map
     (fun site_node ->
        { site_node with
-         Api_types.node_sites =
+         ApiTypes_j.node_sites =
            Array.map
              (fun site ->
 		{ site with
-                  Api_types.site_links =
+                  ApiTypes_j.site_links =
                     List.map (fun (i,j) -> (i+offset,j+offset))
-                      site.Api_types.site_links })
-             site_node.Api_types.node_sites
+                      site.ApiTypes_j.site_links })
+             site_node.ApiTypes_j.node_sites
        }
     )
     site_nodes
 
 let api_snapshot_site_graph
-    (snapshot : Api_types.snapshot) : Api_types.site_graph =
+    (snapshot : ApiTypes_j.snapshot) : ApiTypes_j.site_graph =
   Array.of_list
     (List.concat
-       [snapshot.Api_types.agents;
-        let offset = List.length snapshot.Api_types.agents in
-        offset_site_graph offset snapshot.Api_types.tokens])
+       [snapshot.ApiTypes_j.agents;
+        let offset = List.length snapshot.ApiTypes_j.agents in
+        offset_site_graph offset snapshot.ApiTypes_j.tokens])
 
 (* map out *)
 let normalize_edge
@@ -235,7 +244,7 @@ type site_node_component = { index : int ;
                              site_node : ApiTypes_t.site_node ;
                              mutable component_id : int }
 
-let api_snapshot_dot (snapshot : Api_types.snapshot) =
+let api_snapshot_dot (snapshot : ApiTypes_j.snapshot) =
   let site_nodes : ApiTypes_t.site_node list =
     Array.to_list
       (api_snapshot_site_graph snapshot)
@@ -272,7 +281,7 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
          (List.map (fun c -> c.component_id) components_index))
   in
   (* get site node by component it is in *)
-  let agent_components id : Api_types.site_node list =
+  let agent_components id : ApiTypes_j.site_node list =
     let components =
       List.filter
         (fun s -> s.component_id = id)
@@ -290,28 +299,28 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
     List.map
       (fun c ->
          { c.site_node  with
-           Api_types.node_sites =
+           ApiTypes_j.node_sites =
              Array.map
                (fun site ->
                   { site with
-                    Api_types.site_links =
+                    ApiTypes_j.site_links =
                       List.map
                         (fun (agent,site) ->
                            (List.assoc agent local_index,site))
-                        site.Api_types.site_links })
-               c.site_node.Api_types.node_sites })
+                        site.ApiTypes_j.site_links })
+               c.site_node.ApiTypes_j.node_sites })
       components
   in
   let () =
     List.iteri
       (fun index site_node ->
          Array.iter
-           (fun (site : Api_types.site) ->
+           (fun (site : ApiTypes_j.site) ->
               List.iter
 		(update_site index)
-		(List.map fst site.Api_types.site_links)
+		(List.map fst site.ApiTypes_j.site_links)
            )
-           site_node.Api_types.node_sites
+           site_node.ApiTypes_j.node_sites
       )
       site_nodes
   in
@@ -319,11 +328,11 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
   let f = Format.formatter_of_buffer b in
   let format_sites
       ppf
-      ((component_id,components) : int * Api_types.site_node list) =
+      ((component_id,components) : int * ApiTypes_j.site_node list) =
     let site_label agent site : string =
       (Array.get
-         (List.nth components agent).Api_types.node_sites
-         site).Api_types.site_name
+         (List.nth components agent).ApiTypes_j.node_sites
+         site).ApiTypes_j.site_name
     in
     let links : ((int * int)* (int * int)) list =
       List.flatten
@@ -336,8 +345,8 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
                          (fun (target_agent_id,target_site_id) ->
                             ((source_agent_id,source_site_id),
                              (target_agent_id,target_site_id))
-                         ) site.Api_types.site_links)
-                    (Array.to_list site_node.Api_types.node_sites))))
+                         ) site.ApiTypes_j.site_links)
+                    (Array.to_list site_node.ApiTypes_j.node_sites))))
            components)
     in
     let deduplicated_links : ((int * int)* (int * int)) list =
@@ -353,24 +362,24 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
           let site_label : string =
             String.concat
               ","
-              (List.map (fun site -> site.Api_types.site_name
+              (List.map (fun site -> site.ApiTypes_j.site_name
                                      ^
                                      (String.concat
                                         ""
                                         (List.map
                                            (fun label -> "~"^label)
-                                           site.Api_types.site_states)
+                                           site.ApiTypes_j.site_states)
                                      )
                         )
-                 (Array.to_list site_node.Api_types.node_sites))
+                 (Array.to_list site_node.ApiTypes_j.node_sites))
           in
             Format.fprintf
               f
               "node%d_%d [label = \"@[<h>%s@]\", color = \"%s\", style=filled];"
               component_id
               index
-              (site_node.Api_types.node_name^"("^site_label^")")
-              (hash_color site_node.Api_types.node_name)
+              (site_node.ApiTypes_j.node_name^"("^site_label^")")
+              (hash_color site_node.ApiTypes_j.node_name)
        )
     )
     ppf
@@ -402,11 +411,11 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
     (Pp.list
        Pp.cut
        (fun f component_id ->
-          let components : Api_types.site_node list =
+          let components : ApiTypes_j.site_node list =
             agent_components component_id
           in
           match components with
-          | { Api_types.node_quantity = Some node_quantity
+          | { ApiTypes_j.node_quantity = Some node_quantity
             ; _ }::_ ->
             Format.fprintf
               f
@@ -440,15 +449,15 @@ let api_snapshot_dot (snapshot : Api_types.snapshot) =
   let () = Format.fprintf
       f "@[<v>digraph G{@,%a@,%a}@]"
       format_components (List.sort (fun a b -> a - b) components_ids)
-      format_tokens snapshot.Api_types.tokens
+      format_tokens snapshot.ApiTypes_j.tokens
   in
   let () = Format.pp_print_flush f () in
   Buffer.contents b
 
 
 
-let api_snapshot_kappa (snapshot : Api_types.snapshot) =
-  (*let () = print_string (Api_types.string_of_snapshot snapshot) in *)
+let api_snapshot_kappa (snapshot : ApiTypes_j.snapshot) =
+  (*let () = print_string (ApiTypes_j.string_of_snapshot snapshot) in *)
 (*
   let format_edge
       (label : string)
@@ -633,12 +642,12 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
     List.iteri
       (fun index site_node ->
          Array.iter
-           (fun (site : Api_types.site) ->
+           (fun (site : ApiTypes_j.site) ->
               List.iter
 		(update_site index)
-		(List.map fst site.Api_types.site_links)
+		(List.map fst site.ApiTypes_j.site_links)
            )
-           site_node.Api_types.node_sites
+           site_node.ApiTypes_j.node_sites
       )
       site_nodes
   in
@@ -649,7 +658,7 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
          (kappa_fragments : string list)
          (component : (int * ApiTypes_t.site_node) list) ->
          match component with
-         | (_,{ Api_types.node_quantity = Some node_quantity
+         | (_,{ ApiTypes_j.node_quantity = Some node_quantity
               ; _ })::tail ->
            (Format.sprintf "%%init: %f %s"
               node_quantity
@@ -664,22 +673,22 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
           agent_components
           components_ids))
 
-let api_parse_is_empty (parse : Api_types.parse) =
-  0 = Array.length parse.Api_types.contact_map
+let api_parse_is_empty (parse : ApiTypes_j.parse) =
+  0 = Array.length parse.ApiTypes_j.contact_map
 
 let api_message_errors
-    ?(severity:Api_types.severity = `Error)
-    (message : string) : Api_types.errors =
-  [{ Api_types.severity = severity;
-     Api_types.message = message ;
-     Api_types.range = None }]
+    ?(severity:ApiTypes_j.severity = `Error)
+    (message : string) : ApiTypes_j.errors =
+  [{ ApiTypes_j.severity = severity;
+     ApiTypes_j.message = message ;
+     ApiTypes_j.range = None }]
 
 let api_location_errors
-    ?(severity:Api_types.severity = `Error)
+    ?(severity:ApiTypes_j.severity = `Error)
     ((message,location) : string Location.annot) =
-  [{ Api_types.severity = severity;
-     Api_types.message = message ;
-     Api_types.range = Some (Location.to_range location) }]
+  [{ ApiTypes_j.severity = severity;
+     ApiTypes_j.message = message ;
+     ApiTypes_j.range = Some (Location.to_range location) }]
 
 let api_exception_errors (e : exn) =
   api_message_errors (Printexc.to_string e)
@@ -688,33 +697,33 @@ let lwt_msg (msg : string) =
   Lwt.return
     (`Left (api_message_errors msg))
 let lwt_bind
-    (f : 'a -> 'b Api_types.result Lwt.t)
-    (result : 'a Api_types.result)
-  : 'b Api_types.result Lwt.t =
+    (f : 'a -> 'b ApiTypes_j.result Lwt.t)
+    (result : 'a ApiTypes_j.result)
+  : 'b ApiTypes_j.result Lwt.t =
   match result with
     `Left l -> Lwt.return (`Left l)
   | `Right r -> (f r)
-let lwt_ignore (result : 'a Api_types.result) =
+let lwt_ignore (result : 'a ApiTypes_j.result) =
   match result with
     `Left _l -> Lwt.return_unit
   | `Right _r -> Lwt.return_unit
 
 let eq_position l r =
-  l.Api_types.chr = r.Api_types.chr
+  l.ApiTypes_j.chr = r.ApiTypes_j.chr
   &&
-  l.Api_types.line = r.Api_types.line
+  l.ApiTypes_j.line = r.ApiTypes_j.line
 let eq_range l r =
   match(l,r) with
   | (None,None) -> true
   | (Some l,Some r) ->
-    eq_position l.Api_types.from_position r.Api_types.from_position
-    && eq_position l.Api_types.to_position r.Api_types.to_position
+    eq_position l.ApiTypes_j.from_position r.ApiTypes_j.from_position
+    && eq_position l.ApiTypes_j.to_position r.ApiTypes_j.to_position
   | _ -> false
 let rec eq_errors  l r =
   match (l,r) with
   | ([],[]) -> true
   | (l::l_tail,r::r_tail) ->
-    l.Api_types.message = r.Api_types.message
-    && eq_range l.Api_types.range r.Api_types.range
+    l.ApiTypes_j.message = r.ApiTypes_j.message
+    && eq_range l.ApiTypes_j.range r.ApiTypes_j.range
     && eq_errors l_tail r_tail
   | _ -> false

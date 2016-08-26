@@ -31,7 +31,7 @@ let request_handler
   in ()
 
 let on_message
-    (runtime : Api_v1.runtime)
+    (runtime : Api_v1.api_runtime)
     (post_message : string -> unit)
     (text_message : string) : unit =
   let message : WebMessage.request WebMessage.message =
@@ -75,6 +75,30 @@ let on_message
       token
       runtime#stop
       (fun result -> `Stop result)
+  | `Peturbation peturbation ->
+    request_handler
+      post_message
+      message.WebMessage.id
+      (peturbation.perturbation_token,
+       { ApiTypes_j.perturbation_code = peturbation.perturbation_code })
+      (fun (token,peturbation) -> runtime#perturbate token peturbation)
+      (fun result -> `Peturbation result)
+  | `Pause token ->
+    request_handler
+      post_message
+      message.WebMessage.id
+      token
+      runtime#pause
+      (fun result -> `Pause result)
+  | `Continue continuation ->
+    request_handler
+      post_message
+      message.WebMessage.id
+      (continuation.continuation_token,
+       continuation.continuation_parameter)
+      (fun (token,parameter) -> runtime#continue token parameter)
+      (fun result -> `Continue result)
+
 
 type context = { mailboxes : WebMessage.response option Lwt_mvar.t IntMap.t
                ; id : int }
@@ -208,6 +232,64 @@ class virtual runtime ?(timeout : float = 10.) ()
            None ->
            Lwt.fail TimeOut
 	 | Some (`Stop unit) ->
+           Lwt.return unit
+	 | Some response ->
+           Lwt.fail (BadResponse response)
+      )
+
+    method perturbate
+        (token : ApiTypes.token)
+        (perturbation : ApiTypes.perturbation) :
+      unit ApiTypes.result Lwt.t =
+      let perturbation = { perturbation_token = token ;
+                           perturbation_code = perturbation.ApiTypes.perturbation_code ; } in
+      let var : WebMessage.response option Lwt_mvar.t =
+	self#send (`Peturbation perturbation  )
+      in
+      (Lwt_mvar.take var)
+      >>=
+      (fun (response : WebMessage.response option) ->
+	 match response with
+           None ->
+           Lwt.fail TimeOut
+	 | Some (`Peturbation unit) ->
+           Lwt.return unit
+	 | Some response ->
+           Lwt.fail (BadResponse response)
+      )
+
+    method pause (token : ApiTypes.token) :
+      unit ApiTypes.result Lwt.t =
+      let var : WebMessage.response option Lwt_mvar.t =
+	self#send (`Pause token)
+      in
+      (Lwt_mvar.take var)
+      >>=
+      (fun (response : WebMessage.response option) ->
+	 match response with
+           None ->
+           Lwt.fail TimeOut
+	 | Some (`Pause unit) ->
+           Lwt.return unit
+	 | Some response ->
+           Lwt.fail (BadResponse response)
+      )
+
+    method continue
+        (token : ApiTypes.token)
+        (parameter : ApiTypes.parameter) :
+      unit ApiTypes.result Lwt.t =
+      let var : WebMessage.response option Lwt_mvar.t =
+	self#send (`Continue { continuation_token = token ;
+     		               continuation_parameter = parameter ; })
+      in
+      (Lwt_mvar.take var)
+      >>=
+      (fun (response : WebMessage.response option) ->
+	 match response with
+           None ->
+           Lwt.fail TimeOut
+	 | Some (`Continue unit) ->
            Lwt.return unit
 	 | Some response ->
            Lwt.fail (BadResponse response)

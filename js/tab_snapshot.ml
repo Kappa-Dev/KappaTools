@@ -10,13 +10,16 @@ let state_snapshot state =
   | None -> []
   | Some state -> state.ApiTypes.snapshots
 
-let navli = Ui_common.badge
+let navli (t : Ui_simulation.t) =
+  Ui_common.badge
+    t
     (fun state -> List.length (state_snapshot state))
 
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
 
-let configuration : Widget_export.configuration =
+let configuration (t : Ui_simulation.t) : Widget_export.configuration =
+  let simulation_null = (Ui_simulation.simulation_null t) in
   { Widget_export.id = "snapshot"
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
@@ -64,12 +67,13 @@ let configuration : Widget_export.configuration =
            | [] -> false
            | _ -> true
         )
-        UIState.model_runtime_state
+        simulation_null
 
   }
 
 
-let content =
+let content (t : Ui_simulation.t) =
+  let simulation_null = (Ui_simulation.simulation_null t) in
   let select =
     Tyxml_js.R.Html.select
       ~a:[ Html.a_class ["form-control"]
@@ -97,12 +101,13 @@ let content =
                    (state_snapshot state)
 		)
            )
-           UIState.model_runtime_state in
+           simulation_null in
        list
       )
   in
   let snapshot_select =
     Ui_common.toggle_element
+      t
       state_snapshot
       [
 	Tyxml_js.R.Html.div
@@ -120,19 +125,19 @@ let content =
 		     | _ -> [select]
 		    )
                )
-               UIState.model_runtime_state
+                    simulation_null
 	   in
 	   list
 	  )
       ]
   in
   let export_controls =
-    Widget_export.content configuration
+    Widget_export.content (configuration t)
   in
   [%html {|<div>
              <div class="row">
                <div class="center-block display-header">
-         |}[snapshot_select]{|
+         |}[ snapshot_select ]{|
                </div>
              </div>
              <div class="row">
@@ -143,7 +148,7 @@ let content =
         </div>|}]
 
 
-let navcontent = [content]
+let navcontent (t : Ui_simulation.t) = [content t]
 
 let update_snapshot
     (snapshot_js : Js_contact.contact_map Js.t)
@@ -167,7 +172,8 @@ let update_snapshot
     (Js.string json)
     (Js.Opt.option (Ui_state.agent_count ()))
 
-let select_snapshot () =
+let select_snapshot (t : Ui_simulation.t) =
+  let simulation_null = (Ui_simulation.simulation_null t) in
   let snapshot_js : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id true in
   let index = Js.Opt.bind
@@ -180,7 +186,7 @@ let select_snapshot () =
            _ -> Js.null
       )
   in
-  match (React.S.value UIState.model_runtime_state) with
+  match (React.S.value simulation_null) with
     None -> ()
   | Some state ->
     let index = Js.Opt.get index (fun _ -> 0) in
@@ -194,7 +200,8 @@ let select_snapshot () =
     else
       set_current_snapshot None
 
-let onload () : unit =
+let onload (t : Ui_simulation.t) : unit =
+  let simulation_null = (Ui_simulation.simulation_null t) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -206,25 +213,23 @@ let onload () : unit =
     snapshot_select_dom
     ##.
       onchange := Dom_html.handler
-	(fun _ ->
-           let () = select_snapshot ()
-           in Js._true)
+	(fun _ -> let () = select_snapshot t in Js._true)
   in
   let () =
     Common.jquery_on
       "#navsnapshot"
       "shown.bs.tab"
       (fun _ ->
-         match (React.S.value UIState.model_runtime_state) with
+         match (React.S.value simulation_null) with
            None -> ()
-         | Some _state -> select_snapshot ())
+         | Some _state -> select_snapshot t)
   in
-  let () = Widget_export.onload configuration in
+  let () = Widget_export.onload (configuration t) in
   let _ : unit React.signal = React.S.l1
       (fun state -> match state with
 	   None -> ()
-	 | Some _state -> select_snapshot ()
+	 | Some _state -> select_snapshot t
       )
-      UIState.model_runtime_state
+      simulation_null
   in
   ()

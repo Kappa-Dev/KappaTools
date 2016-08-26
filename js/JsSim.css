@@ -60,6 +60,13 @@ rect { stroke-width: 2; }
 #file-selector {
     display:none;
 }
+.panel-controls {
+    height: 120px;
+}
+.panel-message {
+    height: 40px;
+    min-height:40px;
+}
 .panel-content {
     min-height: 50% !important;
 }

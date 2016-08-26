@@ -50,18 +50,17 @@ let panel_heading =
               </div>
             </div>|}]
 
-let xml =
+let xml (t : Ui_simulation.t) =
   [Html.div ~a:[Html.a_class ["panel";"panel-default"]]
     [%html {|<div class="panel-heading">
-         |}[panel_heading]{|
+                |}[panel_heading]{|
              </div>
-
              <div class="panel-body">
                 <textarea id="code-mirror"> </textarea>
              </div>
 
              <div id="configuration-panel">
-                |}[Settings.xml]{|
+                |}[Tab_settings.xml t]{|
              </div>
 
              <div id="simulation-panel"></div>|}]]
@@ -84,8 +83,9 @@ let setup_lint codemirror update_linting =
                    the code mirror code independent of the api code.
                 *)
                 ~severity:( match error.Api_types.severity with
-                    | `Error -> Codemirror.Error
-                    | `Warning -> Codemirror.Warning
+                          | `Error -> Codemirror.Error
+                          | `Warning -> Codemirror.Warning
+                          | `Info -> Codemirror.Warning
                   )
                 ~from:(position range.Location.from_position)
                 ~to_:(position range.Location.to_position))
@@ -161,7 +161,7 @@ let initialize codemirror () =
   with Not_found ->
     return_unit
 
-let onload () : unit =
+let onload (t : Ui_simulation.t) : unit =
   (* this needs to be called before code mirror is created *)
   let update_linting : codemirror Js.t
     -> Codemirror.lint Js.t Js.js_array Js.t
@@ -269,7 +269,7 @@ let onload () : unit =
 		     then file_select_handler ()
 		     else return_unit))
   in
-  let () = Settings.onload () in
+  let () = Tab_settings.onload t in
   ()
 
 let onunload () = ()

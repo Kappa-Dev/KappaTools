@@ -2,11 +2,14 @@ module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
-let toggle_element projection content =
+let toggle_element
+  (t : Ui_simulation.t)
+  (projection : ApiTypes_j.state option -> 'a list)
+  (content : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) =
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
           (React.S.bind
-             UIState.model_runtime_state
+             (Ui_simulation.simulation_output t)
              (fun state -> React.S.const
                  (match projection state with
                   | [] -> ["hidden"]
@@ -162,41 +165,43 @@ let save_plot_ui
            Js._true)
   in
   ()
-let badge counter
+let badge
+    (t : Ui_simulation.t)
+    (counter : ApiTypes_j.state option -> int)
   =
+  let badge_list, badge_handle = ReactiveData.RList.create [] in
   [ Tyxml_js.R.Html.span
-      (let badge_list, badge_handle =
-         ReactiveData.RList.create [] in
-       let _ = React.S.map
+      (let _ = React.S.map
            (fun state ->
               let count = counter state in
               if count > 0  then
                 ReactiveData.RList.set
                   badge_handle
-                  [ Html.pcdata " ";
-                    Html.span ~a:[ Html.a_class ["badge"]]
-                      [ Html.pcdata (string_of_int count) ]
+                  [ Html.pcdata " " ;
+                    Html.span
+                      ~a:[ Html.a_class ["badge"] ; ]
+                      [ Html.pcdata (string_of_int count) ; ] ;
                   ]
               else
-                ReactiveData.RList.set badge_handle []
+                 ReactiveData.RList.set badge_handle []
            )
-           UIState.model_runtime_state in
+           (Ui_simulation.simulation_output t) in
        badge_list
       )
   ]
+let arguments (key : string) : string list =
+    List.map
+      snd
+      (List.filter
+	 (fun (k,_) -> key = k)
+	 Url.Current.arguments)
 
 let version
     ?(test:'a option = None)
     ~(prod:'a)
     ~(dev:'a)
   :'a =
-  let version : string list =
-    List.map
-      snd
-      (List.filter
-         (fun (key,_) -> key = "version")
-         Url.Current.arguments)
-  in
+  let version : string list = arguments "version" in
   match (test,version) with
   | (Some test,["test"]) -> test
   | (_,["dev"]) -> dev
@@ -246,3 +251,29 @@ let navcontent = function
       ~a:[ Html.a_class ["panel-content";"tab-content"]]
       (onenavcontent t true c ::
        List.map (fun (t,c) -> onenavcontent t false c) l)
+
+let level
+    ?debug
+    ?info
+    ?notice
+    ?warning
+    ?error
+    ?fatal
+    () : 'a list =
+  let level : string list = arguments "level" in
+  let extract key value =
+    match value with
+    | None -> []
+    | Some value ->
+     if List.mem key level then
+       [value]
+     else
+       []
+  in
+  (extract "debug" debug)@
+  (extract "info" info)@
+  (extract "notice" notice)@
+  (extract "warning" warning)@
+  (extract "error" error)@
+  (extract "fatal" fatal)@
+  []

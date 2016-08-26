@@ -76,10 +76,10 @@ let create_observable ~(observable : ApiTypes.observable)
   let configuration : plot_observable Js.t = new%js constructor_observable in
   let () = (Js.Unsafe.coerce configuration)
            ##.
-             time := observable.ApiTypes.time;
+             time := observable.ApiTypes.observation_time;
     (Js.Unsafe.coerce configuration)
     ##.
-      values := Js.array (Array.of_list observable.ApiTypes.values);
+      values := Js.array (Array.of_list observable.ApiTypes.observation_values);
     ()
   in configuration
 

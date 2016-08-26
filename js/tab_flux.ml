@@ -19,7 +19,8 @@ let state_fluxmap
   | Some state -> state.ApiTypes.flux_maps
 let serialize_json : (string -> unit) ref = ref (fun _ -> ())
 
-let configuration : Widget_export.configuration =
+let configuration (t : Ui_simulation.t) : Widget_export.configuration =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg
@@ -38,10 +39,11 @@ let configuration : Widget_export.configuration =
            | [] -> false
            | _ -> true
         )
-        UIState.model_runtime_state
+        simulation_output
   }
 
-let content =
+let content (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let flux_select =
     Tyxml_js.R.Html.select
       ~a:[ Html.a_class ["form-control"]
@@ -59,7 +61,7 @@ let content =
                    (state_fluxmap state)
 		)
            )
-           UIState.model_runtime_state in
+           simulation_output in
        flux_list
       )
   in
@@ -79,7 +81,7 @@ let content =
 		 | _ -> [flux_select]
 		)
            )
-           UIState.model_runtime_state
+           simulation_output
        in
        flux_list
       )
@@ -89,7 +91,7 @@ let content =
                   ; Html.a_class ["checkbox-control"]
                   ; Html.a_input_type `Checkbox ] () in
   let export_controls =
-    Widget_export.content configuration
+    Widget_export.content (configuration t)
   in
   [%html {|<div>
            <div class="row">
@@ -135,18 +137,19 @@ let content =
 				 |}[export_controls]{|
      </div>|}]
 
-let navcontent =
+let navcontent (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   [ Html.div
       ~a:[Tyxml_js.R.Html.a_class
             (React.S.bind
-               UIState.model_runtime_state
+               simulation_output
                (fun state -> React.S.const
                    (match state_fluxmap state with
                       [] -> ["hidden"]
                     | _::_ -> ["show"])
                )
             )]
-      [content]
+      [content t]
   ]
 let update_flux_map
     (flux_js : Js_flux.flux_map Js.t)
@@ -160,7 +163,8 @@ let update_flux_map
   in
   flux_js##setFlux(flux_data)
 
-let select_fluxmap flux_map =
+let select_fluxmap (t : Ui_simulation.t) flux_map =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let index = Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom -> let select_dom : Dom_html.inputElement Js.t =
@@ -170,7 +174,7 @@ let select_fluxmap flux_map =
           _ -> Js.null
       )
   in
-  match (React.S.value UIState.model_runtime_state) with
+  match (React.S.value simulation_output) with
     None -> ()
   | Some state -> let index = Js.Opt.get index (fun _ -> 0) in
     if List.length state.ApiTypes.flux_maps > 0 then
@@ -180,10 +184,10 @@ let select_fluxmap flux_map =
     else
       ()
 
-let navli = Ui_common.badge (fun state -> List.length (state_fluxmap state))
+let navli (t : Ui_simulation.t) = Ui_common.badge t (fun state -> List.length (state_fluxmap state))
 
-let onload () =
-  let () = Widget_export.onload configuration in
+let onload (t : Ui_simulation.t) =
+  let () = Widget_export.onload (configuration t) in
   let flux_configuration : Js_flux.flux_configuration Js.t =
     Js_flux.create_configuration
       ~short_labels:true
@@ -213,7 +217,7 @@ let onload () =
        : Dom_html.element Js.t) in
   let () = select_dom##.onchange := Dom_html.handler
 	(fun _ ->
-	   let () = select_fluxmap flux
+	   let () = select_fluxmap t flux
 	   in Js._true)
   in
   let div : Dom_html.element Js.t =
@@ -227,6 +231,6 @@ let onload () =
          "\" width=\"300\" height=\"300\"><g/></svg>") in
   let () = Common.jquery_on "#navflux"
       "shown.bs.tab"
-      (fun _ -> select_fluxmap flux)
+      (fun _ -> select_fluxmap t flux)
   in
-  select_fluxmap flux
+  select_fluxmap t flux

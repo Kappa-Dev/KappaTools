@@ -2,7 +2,7 @@ module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
-let navli = []
+let navli (_ : Ui_simulation.t) = []
 
 let display_id = "contact-map-display"
 let export_id = "contact-export"
@@ -44,9 +44,9 @@ let content =
 				       |}[export_controls]{|
         </div>|}]
 
-let navcontent = [ Html.div [content] ]
+let navcontent (_ : Ui_simulation.t) = [ Html.div [content] ]
 
-let onload () =
+let onload (_ : Ui_simulation.t) =
   let () = Widget_export.onload configuration in
   let contactmap : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id false in

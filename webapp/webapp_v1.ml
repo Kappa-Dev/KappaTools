@@ -1,17 +1,10 @@
 module Runtime = Api_v1.Base
-module ApiTypes = ApiTypes_j
 
 open Lwt
 open Cohttp_lwt_unix
 open Cohttp
-open Request
-open Api
-open Runtime
-open ApiTypes
-open Conduit_lwt_unix
-open Unix
+open Cohttp.Request
 open Lwt_log
-open Re
 
 (*  Lwt_log_core.log *)
 
@@ -27,7 +20,7 @@ class runtime ()  = object
       ~level:Lwt_log_core.Info
       ?exn
       msg
-  inherit Api_v1.Base.runtime 1.0
+  inherit Api_v1.Base.base_runtime 1.0
 end
 
 let runtime_state = new runtime ()
@@ -46,7 +39,7 @@ let server_respond (body : string) =
 let result_response string_of_success result =
   match result with
     `Left errors ->
-    let error_msg : string = ApiTypes.string_of_errors errors in
+    let error_msg : string = ApiTypes_j.string_of_errors errors in
     (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
     >>=
     (fun _ ->
@@ -61,16 +54,31 @@ let result_response string_of_success result =
       ~status:`OK
       ~body:success_msg ()
 
-let process_url_pattern = Re.compile (Re_perl.re "^/v1/process/([0-9]+$)")
-let get_token path : int option =
+type command = PERTURBATE | PAUSE | CONTINUE
+type url_parameters = { id : int ;  command : command option ; }
+let process_url_string = "^/v1/process/([0-9]+)(/perturbate|/pause|/continue)?$"
+let process_url_pattern = Re.compile (Re_perl.re process_url_string)
+let parse_url_parameters path : url_parameters option =
   try
     let matches = Re.exec process_url_pattern path in
-    Some (int_of_string (Re.get matches 1))
-  with Failure _ | Not_found -> None
+    Some { id = int_of_string (Re.get matches 1) ;
+           command =
+             try match Re.Group.get matches 2 with
+               | "/perturbate" -> Some PERTURBATE
+               | "/pause" -> Some PAUSE
+               | "/continue" -> Some CONTINUE
+               | _ -> None
+             with
+             | _ -> None }
+
+  with
+  | Failure _
+  | Not_found -> None
+  | _ -> None
 
 let handler
     ?(shutdown_key : string option  = None)
-    (conn : Cohttp_lwt_unix.Server.conn)
+    (_ : Cohttp_lwt_unix.Server.conn)
     (request : Cohttp.Request.t)
     (body : Cohttp_lwt_body.t)
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
@@ -105,8 +113,7 @@ let handler
               async
                 (fun () ->
                    Lwt_unix.sleep 1.0 >>=
-                   fun () ->
-                   exit 0)
+                   fun () -> exit 0)
             in
             shutdown_okay
           else
@@ -114,9 +121,9 @@ let handler
   (* GET /version *)
   | "/v1/version" ->
     server_respond
-      (ApiTypes.string_of_version
-         { build = Version.version_msg ;
-           version = "v1" })
+      (ApiTypes_j.string_of_version
+         { ApiTypes_j.version_build = Version.version_msg ;
+           ApiTypes_j.version_id = "v1" })
   (* GET /parse *)
   | "/v1/parse" ->
     Uri.get_query_param uri "code" |>
@@ -124,8 +131,8 @@ let handler
        match code with
          None ->
          Server.respond_string
-           `Unprocessable_entity
-           "missing code"
+           ~status:`Unprocessable_entity
+           ~body:"missing code"
            ()
        | Some code ->
          (Lwt_log_core.log
@@ -135,32 +142,33 @@ let handler
          (fun () -> runtime_state#parse code)
          >>=
          (fun parse ->
-            result_response ApiTypes.string_of_parse parse)
+            result_response (ApiTypes_j.string_of_parse ?len:None) parse)
     )(* GET /process *)
   | "/v1/process" when request.meth = `GET ->
     (runtime_state#list ())
     >>=
-    (fun catalog -> result_response ApiTypes.string_of_catalog catalog)
+    (fun catalog ->
+       result_response (ApiTypes_j.string_of_catalog ?len:None) catalog)
   (* POST /process *)
   | "/v1/process" when request.meth = `POST ->
     (Cohttp_lwt_body.to_string body)
     >>= (fun body ->
-        (try let parameter : ApiTypes.parameter =
-               ApiTypes.parameter_of_string body in
+        (try
+           let parameter : ApiTypes_j.parameter =
+             ApiTypes_j.parameter_of_string body in
            runtime_state#start parameter
-         with  Yojson.Json_error error ->
-           Api_data.lwt_msg error
-             | Ag_oj_run.Error error ->
-               Api_data.lwt_msg error
-             | e ->
-               Api_data.lwt_msg (Printexc.to_string e)
+         with
+         | Yojson.Json_error error -> Api_data.lwt_msg error
+         | Ag_oj_run.Error error -> Api_data.lwt_msg error
+         | e -> Api_data.lwt_msg (Printexc.to_string e)
         )
         >>=
-        (fun token -> result_response ApiTypes.string_of_token token)
-
+        (fun token ->
+           result_response (ApiTypes_j.string_of_token ?len:None) token)
       )
   (* OPTIONS /v1/process/[token] *)
-  | x when request.meth = `OPTIONS && None != get_token x ->
+  | x when request.meth = `OPTIONS
+        && None != parse_url_parameters x ->
     let h =
       Header.init_with
         "Access-Control-Allow-Origin"
@@ -182,25 +190,70 @@ let handler
       ~body:""
       ()
   (* DELETE /v1/process/[token] *)
-  | x when request.meth = `DELETE && None != get_token x ->
-    (match get_token x with
-     | None ->
-       bad_request
-     | Some token ->
-       (runtime_state#stop token)
+  | x when request.meth = `DELETE
+        && None != parse_url_parameters x ->
+    (match parse_url_parameters x with
+     | None -> bad_request
+     | Some url_parameters ->
+       (runtime_state#stop url_parameters.id)
        >>=
        (fun unit ->
-          result_response ApiTypes.string_of_alias_unit unit)
+          result_response (ApiTypes_j.string_of_alias_unit ?len:None) unit)
     )
   (* GET /v1/process/[token] *)
-  | x when request.meth = `GET && None != get_token x ->
-    (match get_token x with
-     | None ->
-       bad_request
-     | Some token ->
-       (runtime_state#status token)
+  | x when request.meth = `GET && None != parse_url_parameters x ->
+    (match parse_url_parameters x with
+     | None -> bad_request
+     | Some url_parameters ->
+       (runtime_state#status url_parameters.id)
        >>=
        (fun status ->
-          result_response ApiTypes.string_of_state status)
+          result_response (ApiTypes_j.string_of_state ?len:None) status)
+    )
+  | x when request.meth = `POST
+        && None != parse_url_parameters x ->
+    (match parse_url_parameters x with
+     | Some { id = id ; command = None } ->
+       (runtime_state#status id)
+       >>=
+       (fun status ->
+          result_response (ApiTypes_j.string_of_state ?len:None) status)
+     | Some { id = id ; command = Some PAUSE } ->
+       (runtime_state#pause id)
+       >>=
+       (fun status ->
+          result_response (ApiTypes_j.string_of_alias_unit ?len:None) status)
+     | Some { id = id ; command = Some PERTURBATE } ->
+       (Cohttp_lwt_body.to_string body)
+       >>=
+       (fun body ->
+          (try let perturbation : ApiTypes_j.perturbation =
+                 ApiTypes_j.perturbation_of_string body in
+             runtime_state#perturbate id perturbation
+           with
+           | Yojson.Json_error error -> Api_data.lwt_msg error
+           | Ag_oj_run.Error error -> Api_data.lwt_msg error
+           | e -> Api_data.lwt_msg (Printexc.to_string e)
+          ))
+       >>=
+       (fun status ->
+          result_response (ApiTypes_j.string_of_alias_unit ?len:None) status)
+     | Some { id = id ; command = Some CONTINUE } ->
+       (Cohttp_lwt_body.to_string body)
+       >>=
+       (fun body ->
+          (try let parameter : ApiTypes_j.parameter =
+                 ApiTypes_j.parameter_of_string body in
+             runtime_state#continue id parameter
+           with
+           | Yojson.Json_error error -> Api_data.lwt_msg error
+           | Ag_oj_run.Error error -> Api_data.lwt_msg error
+           | e -> Api_data.lwt_msg (Printexc.to_string e)
+          )
+       )
+       >>=
+       (fun status ->
+          result_response (ApiTypes_j.string_of_alias_unit ?len:None) status)
+     | None -> bad_request
     )
   | _ -> bad_request;;

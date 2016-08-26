@@ -12,10 +12,10 @@ class runtime ()  = object
       ~level:Lwt_log_core.Info
       ?exn
       msg
-  inherit Api_v1.Base.runtime 1.0
+  inherit Api_v1.Base.base_runtime 1.0
 end
 
-let runtime = (new runtime () :> Api_v1.runtime)
+let runtime = (new runtime () :> Api_v1.api_runtime)
 
 let process_comand (text_message : string) : unit Lwt.t =
   let () =

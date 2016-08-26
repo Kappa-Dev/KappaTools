@@ -169,4 +169,39 @@ class runtime
           Api_types.alias_unit_of_string
           Api_types.errors_of_string)
 
+    method perturbate
+        (token : Api_types.token)
+        (perturbation : Api_types.perturbation) :
+      unit Api_types.result Lwt.t =
+      let url : string = Format.sprintf "%s/v1/process/%d/perturbate" url token in
+      (post timeout
+         (Api_types.string_of_perturbation perturbation)
+         url
+         Api_types.alias_unit_of_string
+         Api_types.errors_of_string
+      )
+
+    method pause
+        (token : Api_types.token) :
+      unit Api_types.result Lwt.t =
+      let url : string = Format.sprintf "%s/v1/process/%d/pause" url token in
+      (post timeout
+         (Api_types.string_of_alias_unit ())
+         url
+         Api_types.alias_unit_of_string
+         Api_types.errors_of_string
+      )
+
+    method continue
+      (token : Api_types.token)
+      (parameter : Api_types.parameter) :
+      unit Api_types.result Lwt.t =
+      let url : string = Format.sprintf "%s/v1/process/%d/continue" url token in
+      (post timeout
+         (Api_types.string_of_parameter parameter)
+         url
+         Api_types.alias_unit_of_string
+         Api_types.errors_of_string
+      )
+
   end;;

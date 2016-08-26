@@ -16,12 +16,13 @@ let state_distances state = match state with
     None -> None
   | Some state -> state.ApiTypes.distances
 
-let content =
+let content (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let export_controls =
     Html.div
       ~a:[Tyxml_js.R.Html.a_class
             (React.S.bind
-               UIState.model_runtime_state
+               simulation_output
                (fun state ->
                   React.S.const
                     (match state_distances state with
@@ -44,7 +45,7 @@ let content =
 				   |}[export_controls]{|
         </div>|}]
 
-let navcontent = [ Html.div [content] ]
+let navcontent (t : Ui_simulation.t) = [ Html.div [content t] ]
 
 let update_distances
     (distances : distances_plot Js.t)
@@ -56,7 +57,7 @@ let update_distances
     let distances_data : Js.js_string Js.t = Js.string distances_string in
     distances##setData(distances_data)
 
-let onload () =
+let onload (t : Ui_simulation.t) =
   let distances_plot : distances_plot Js.t =
     Js_distances.create_distances_plot div_id in
   let () = Ui_common.save_plot_ui
@@ -73,11 +74,12 @@ let onload () =
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let () = Common.jquery_on
       "#navgraph"
       "shown.bs.tab"
       (fun _ ->
-         match (React.S.value UIState.model_runtime_state) with
+         match (React.S.value simulation_output) with
            None -> ()
          | Some state ->
            update_distances distances_plot state.ApiTypes.distances)
@@ -88,8 +90,8 @@ let onload () =
            None -> ()
          | Some state ->
            update_distances distances_plot state.ApiTypes.distances)
-      UIState.model_runtime_state
+      simulation_output
   in
   ()
 
-let navli = []
+let navli ( _ : Ui_simulation.t) = []

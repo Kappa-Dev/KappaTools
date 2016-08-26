@@ -1,21 +1,23 @@
 module Html5 = Tyxml_js.Html5
 
 let prod _ =
+  let ui_simulation : Ui_simulation.t = Ui_simulation.create () in
   let main =
     Js.Opt.get (Ui_common.document##getElementById (Js.string "main"))
       (fun () -> assert false) in
-  let () = Dom.appendChild main Panel_tab.navtabs in
-  let () = Dom.appendChild main Panel_tab.navcontents in
-  let () = Panel_tab.onload ()
+  let () = Dom.appendChild main (Panel_tab.navtabs ui_simulation) in
+  let () = Dom.appendChild main (Panel_tab.navcontents ui_simulation) in
+  let () = Panel_tab.onload ui_simulation
   in Js._true
 
 let dev _ =
+  let ui_simulation : Ui_simulation.t = Ui_simulation.create () in
   let main =
     Js.Opt.get (Ui_common.document##getElementById (Js.string "main"))
       (fun () -> assert false) in
-  let () = Dom.appendChild main Panel_tab.navtabs in
-  let () = Dom.appendChild main Panel_tab.navcontents in
-  let () = Panel_tab.onload ()
+  let () = Dom.appendChild main (Panel_tab.navtabs ui_simulation) in
+  let () = Dom.appendChild main (Panel_tab.navcontents ui_simulation) in
+  let () = Panel_tab.onload ui_simulation
   in Js._true
 
 let onunload _ =

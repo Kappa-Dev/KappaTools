@@ -2,7 +2,7 @@ module UIState = Ui_state
 module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
 
-let navli = []
+let navli (_ : Ui_simulation.t) = []
 
 let state_log
     (state : ApiTypes.state option) : string list =
@@ -10,12 +10,13 @@ let state_log
   | None -> []
   | Some state -> state.ApiTypes.log_messages
 
-let navcontent =
+let navcontent (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   [ Html.div
       ~a:[Html.a_class ["panel-pre" ]]
       [ Tyxml_js.R.Html.pcdata
           (React.S.bind
-             UIState.model_runtime_state
+             simulation_output
              (fun state -> React.S.const
 		 (String.concat ""
                     (state_log state)
@@ -24,4 +25,4 @@ let navcontent =
           )
       ]
   ]
-let onload () = ()
+let onload (_ : Ui_simulation.t) = ()

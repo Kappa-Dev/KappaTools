@@ -1,5 +1,5 @@
+
 open Lwt.Infix
-module ApiTypes = ApiTypes_j
 
 let msg_token_not_found =
   "token not found"
@@ -16,7 +16,7 @@ let msg_missing_perturbation_context =
 
 let () = Printexc.record_backtrace true
 
-let catch_error : 'a . (Api_data.Api_types.errors -> 'a) -> exn -> 'a =
+let catch_error : 'a . (ApiTypes_j.errors -> 'a) -> exn -> 'a =
   fun handler ->
   (function
     |  ExceptionDefn.Syntax_Error e ->
@@ -31,40 +31,57 @@ let catch_error : 'a . (Api_data.Api_types.errors -> 'a) -> exn -> 'a =
   )
 
 
-
-type runtime =
-  < parse : ApiTypes.code -> ApiTypes.parse ApiTypes.result Lwt.t;
-    start : ApiTypes.parameter -> ApiTypes.token ApiTypes.result Lwt.t;
-    status : ApiTypes.token -> ApiTypes.state ApiTypes.result Lwt.t;
-    list : unit -> ApiTypes.catalog ApiTypes.result Lwt.t;
-    stop : ApiTypes.token -> unit ApiTypes.result Lwt.t;
-  >;;
+class type api_runtime =
+  object
+    method parse :
+      ApiTypes_j.code ->
+      ApiTypes_j.parse ApiTypes_j.result Lwt.t
+    method start :
+      ApiTypes_j.parameter ->
+      ApiTypes_j.token ApiTypes_j.result Lwt.t
+    method status :
+      ApiTypes_j.token ->
+      ApiTypes_j.state ApiTypes_j.result Lwt.t
+    method list :
+      unit ->
+      ApiTypes_j.catalog ApiTypes_j.result Lwt.t
+    method stop :
+      ApiTypes_j.token ->
+      unit ApiTypes_j.result Lwt.t
+    method perturbate :
+      ApiTypes_j.token ->
+      ApiTypes_j.perturbation ->
+      unit ApiTypes_j.result Lwt.t
+    method pause :
+      ApiTypes_j.token ->
+      unit ApiTypes_j.result Lwt.t
+    method continue :
+      ApiTypes_j.token ->
+      ApiTypes_j.parameter ->
+      unit ApiTypes_j.result Lwt.t
+  end;;
 
 module Base : sig
 
-  class virtual runtime :
+  class virtual base_runtime :
     float -> object
-      method parse : ApiTypes.code -> ApiTypes.parse ApiTypes.result Lwt.t
-      method start : ApiTypes.parameter -> ApiTypes.token ApiTypes.result Lwt.t
-      method status : ApiTypes.token -> ApiTypes.state ApiTypes.result Lwt.t
-      method list : unit -> ApiTypes.catalog ApiTypes.result Lwt.t
-      method stop : ApiTypes.token -> unit ApiTypes.result Lwt.t
       method virtual log : ?exn:exn -> string -> unit Lwt.t
       method virtual yield : unit -> unit Lwt.t
+      inherit api_runtime
     end;;
 end = struct
   module IntMap = Mods.IntMap
   type simulator_state =
-    { mutable switch : Lwt_switch.t
+    { mutable is_running : bool
     ; counter : Counter.t
     ; log_buffer : Buffer.t
     ; log_form : Format.formatter
-    ; mutable plot : ApiTypes.plot
-    ; mutable distances : ApiTypes.distances
-    ; mutable snapshots : ApiTypes.snapshot list
-    ; mutable flux_maps : ApiTypes.flux_map list
-    ; mutable files : ApiTypes.file_line list
-    ; mutable error_messages : ApiTypes.errors
+    ; mutable plot : ApiTypes_j.plot
+    ; mutable distances : ApiTypes_j.distances
+    ; mutable snapshots : ApiTypes_j.snapshot list
+    ; mutable flux_maps : ApiTypes_j.flux_map list
+    ; mutable files : ApiTypes_j.file_line list
+    ; mutable error_messages : ApiTypes_j.errors
     ; contact_map : Primitives.contact_map
     ; env : Environment.t
     ; mutable domain : Connected_component.Env.t
@@ -115,9 +132,10 @@ end = struct
               (Array.to_list new_observables) in
           simulation.plot <-
             {simulation.plot with
-             ApiTypes.time_series =
-               { ApiTypes.time = time ; values = new_values }
-               :: simulation.plot.ApiTypes.time_series }
+             ApiTypes_j.time_series =
+               { ApiTypes_j.observation_time = time ;
+                 ApiTypes_j.observation_values = new_values ; }
+               :: simulation.plot.ApiTypes_j.time_series }
         | Data.Print file_line ->
           simulation.files <-
             ((Api_data.api_file_line file_line)::simulation.files)
@@ -136,19 +154,18 @@ end = struct
                      let add_rule_id =
                        List.map
                          (fun (t,d) ->
-                            {ApiTypes.rule_dist =
+                            {ApiTypes_j.rule_dist =
                                unary_distances.Data.distances_rules.(i);
-                             ApiTypes.time_dist = t;
-                             ApiTypes.dist = d}) ls
+                             ApiTypes_j.time_dist = t;
+                             ApiTypes_j.dist = d}) ls
                      in (List.append l add_rule_id, i+1)
                    | None -> (l, i+1))
                 ([],0) unary_distances.Data.distances_data in
             one_big_list
         | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
 
-  class virtual runtime min_run_duration =
+  class virtual base_runtime min_run_duration =
     object(self)
-
       val mutable lastyield = Sys.time ()
       method virtual log : ?exn:exn -> string -> unit Lwt.t
       method virtual yield : unit -> unit Lwt.t
@@ -165,14 +182,14 @@ end = struct
         else Lwt.return_unit
 
       method parse
-          (code : ApiTypes.code) : ApiTypes.parse ApiTypes.result Lwt.t =
+          (code : ApiTypes_j.code) : ApiTypes_j.parse ApiTypes_j.result Lwt.t =
         Lwt.bind
           (build_ast code self#time_yield self#log)
           (function
             | `Right ((sigs,_,_,_),contact_map) ->
               Lwt.return
                 (`Right
-                   { ApiTypes.contact_map =
+                   { ApiTypes_j.contact_map =
                        Api_data.api_contact_map sigs contact_map })
             | `Left e -> Lwt.return (`Left e))
 
@@ -182,25 +199,25 @@ end = struct
         result
 
       method start
-          (parameter : ApiTypes.parameter) :
-        ApiTypes.token ApiTypes.result Lwt.t =
-        if parameter.ApiTypes.nb_plot > 0 then
+          (parameter : ApiTypes_j.parameter) :
+        ApiTypes_j.token ApiTypes_j.result Lwt.t =
+        if parameter.ApiTypes_j.nb_plot > 0 then
           let current_id = self#new_id () in
           let simulation_log_buffer = Buffer.create 512 in
           let simulation_log_form =
              Format.formatter_of_buffer simulation_log_buffer in
           Lwt.catch
             (fun () ->
-               (build_ast parameter.ApiTypes.code self#time_yield self#log) >>=
+               (build_ast parameter.ApiTypes_j.code self#time_yield self#log) >>=
                (function
                    `Right ((sig_nd,tk_nd,updated_vars,result),contact_map) ->
                    let simulation_counter =
                      Counter.create
                        ~init_t:(0. : float)
                        ~init_e:(0 : int)
-                       ?max_t:parameter.ApiTypes.max_time
-                       ?max_e:parameter.ApiTypes.max_events
-                       ~nb_points:(parameter.ApiTypes.nb_plot : int) in
+                       ?max_t:parameter.ApiTypes_j.max_time
+                       ?max_e:parameter.ApiTypes_j.max_events
+                       ~nb_points:(parameter.ApiTypes_j.nb_plot : int) in
                    Eval.compile
                      ~pause:(fun f -> Lwt.bind (self#time_yield ()) f)
                      ~return:Lwt.return ?rescale_init:None
@@ -220,23 +237,22 @@ end = struct
                        Environment.propagate_constant
                          updated_vars simulation_counter env in
                      let simulation =
-                       { switch = Lwt_switch.create ()
-                       ; counter = simulation_counter
-                       ; log_buffer = simulation_log_buffer
-                       ; log_form = simulation_log_form
-                       ; plot =
-                           { ApiTypes.legend = [];
-                             ApiTypes.time_series = [] }
-                       ; distances = []
-                       ; error_messages = []
-                       ; snapshots = []
-                       ; flux_maps = []
-                       ; files = []
-                       ; contact_map = contact_map
-                       ; env = env'
-                       ; domain = domain
-                       ; graph = Rule_interpreter.empty ~store_distances env'
-                       ; state = State_interpreter.empty env' [] []
+                       { is_running = true ;
+                         counter = simulation_counter ;
+                         log_buffer = simulation_log_buffer ;
+                         log_form = simulation_log_form ;
+                         plot = { ApiTypes_j.legend = [] ;
+                                  ApiTypes_j.time_series = [] ; } ;
+                         distances = [] ;
+                         error_messages = [] ;
+                         snapshots = [] ;
+                         flux_maps = [] ;
+                         files = [] ;
+                         contact_map = contact_map ;
+                         env = env' ;
+                         domain = domain ;
+                         graph = Rule_interpreter.empty ~store_distances env' ;
+                         state = State_interpreter.empty env' [] [] ;
                        } in
                      let () =
                        context <-
@@ -284,7 +300,7 @@ end = struct
                                     let () =
                                       simulation.plot <-
                                         { simulation.plot
-                                          with ApiTypes.legend =
+                                          with ApiTypes_j.legend =
                                                  Array.to_list legend }
                                     in
                                     (self#run simulation) >>=
@@ -303,14 +319,18 @@ end = struct
         else
           Api_data.lwt_msg msg_observables_less_than_zero
 
-       method private perturbate token text =
+      method perturbate token perturbation :
+        unit ApiTypes_j.result Lwt.t =
+        let lexbuf =
+          Lexing.from_string perturbation.ApiTypes_j.perturbation_code
+        in
         Lwt.catch
           (fun () ->
              match IntMap.find_option token context.states with
              | None ->
                Api_data.lwt_msg msg_token_not_found
              | Some simulation ->
-               if Lwt_switch.is_on simulation.switch then
+               if simulation.is_running then
                  Api_data.lwt_msg msg_process_not_paused
                else
                  let cc_preenv =
@@ -319,7 +339,7 @@ end = struct
                          (Environment.signatures simulation.env)
                          (Environment.tokens_finder simulation.env)
                          (Environment.algs_finder simulation.env)
-                         (KappaParser.effect KappaLexer.token text) [] with
+                         (KappaParser.effect KappaLexer.token lexbuf) [] with
                  | _, _::_ ->
                    Api_data.lwt_msg "$UPDATE is not implemented (yet?)"
                 | e', [] ->
@@ -341,67 +361,64 @@ end = struct
                   simulation.state <- state';
                   Lwt.return (`Right ()))
           (catch_error (fun e -> Lwt.return (`Left e)))
-
-      method status
-          (token : ApiTypes.token) : ApiTypes.state ApiTypes.result Lwt.t =
+      val create_state = fun state ->
+        { ApiTypes_j.plot = Some state.plot ;
+          ApiTypes_j.distances = Some state.distances ;
+          ApiTypes_j.time = Counter.time state.counter ;
+          ApiTypes_j.time_percentage = Counter.time_percentage state.counter ;
+          ApiTypes_j.event = Counter.event state.counter ;
+          ApiTypes_j.event_percentage = Counter.event_percentage state.counter ;
+          ApiTypes_j.tracked_events = Counter.tracked_events state.counter ;
+          ApiTypes_j.log_messages = [Buffer.contents state.log_buffer] ;
+          ApiTypes_j.snapshots = state.snapshots ;
+          ApiTypes_j.flux_maps = state.flux_maps ;
+          ApiTypes_j.files = state.files ;
+          is_running = state.is_running ;
+        }
+      method status (token : ApiTypes_j.token) :
+        ApiTypes_j.state ApiTypes_j.result Lwt.t =
         Lwt.catch
           (fun () ->
              match IntMap.find_option token context.states with
              | None ->
                Api_data.lwt_msg msg_token_not_found
              | Some state ->
+               let () =
+                 Lwt.async
+                   (fun () -> self#log (string_of_bool state.is_running)) in
                Lwt.return
                  (match state.error_messages with
-                    [] ->
-                    `Right
-                      ({ ApiTypes.plot =
-                           Some state.plot;
-                         ApiTypes.distances =
-                           Some state.distances;
-                         ApiTypes.time =
-                           Counter.time state.counter;
-                         ApiTypes.time_percentage =
-                           Counter.time_percentage state.counter;
-                         ApiTypes.event =
-                           Counter.event state.counter;
-                         ApiTypes.event_percentage =
-                           Counter.event_percentage state.counter;
-                         ApiTypes.tracked_events =
-                           Counter.tracked_events state.counter;
-                         ApiTypes.log_messages =
-                           [Buffer.contents state.log_buffer] ;
-                         ApiTypes.snapshots =
-                           state.snapshots;
-                         ApiTypes.flux_maps =
-                           state.flux_maps;
-                         ApiTypes.files =
-                           state.files;
-                         is_running =
-                           Lwt_switch.is_on state.switch
-                       } : ApiTypes.state )
-                  | _ -> `Left state.error_messages
-                 )
+                    [] -> `Right (create_state state)
+                  | _ -> `Left state.error_messages)
           )
           (catch_error (fun e -> Lwt.return (`Left e)))
 
-      method list () : ApiTypes.catalog ApiTypes.result Lwt.t =
+      method list () : ApiTypes_j.catalog ApiTypes_j.result Lwt.t =
         Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))
 
-      method private pause (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
+      method pause (token : ApiTypes_j.token) :
+        unit ApiTypes_j.result Lwt.t =
         Lwt.catch
           (fun () ->
              match IntMap.find_option token context.states with
              | None -> Api_data.lwt_msg msg_token_not_found
              | Some state ->
-               if Lwt_switch.is_on state.switch then
-                 Lwt_switch.turn_off state.switch
-                 >>= (fun _ -> Lwt.return (`Right ()))
-               else
-                 Api_data.lwt_msg msg_process_not_running)
+               let () =
+                 (if state.is_running then
+                    state.is_running <- false
+                  else
+                    ())
+               in
+               Lwt.return_unit
+               >>= (fun _ -> Lwt.return (`Right ())))
           (catch_error (fun e -> Lwt.return (`Left e)))
 
       method private run (simulation : simulator_state) :
-        unit ApiTypes.result Lwt.t =
+        unit ApiTypes_j.result Lwt.t =
+        let () = Lwt.async (fun () -> self#log "run.1") in
+        (self#log "run.2")
+        >>=
+        (fun _ ->
         Lwt.catch
           (fun () ->
              let rstop = ref false in
@@ -420,74 +437,89 @@ end = struct
                    simulation.state <- state'
                  done in
                if !rstop then
-                 (Lwt_switch.turn_off simulation.switch)
-                 >>= (fun () -> Lwt.return_unit)
-               else
-               if Lwt_switch.is_on simulation.switch
-               then (let () = lastyield <- Sys.time () in
-                     self#yield ()) >>= iter
-               else Lwt.return_unit in
+                 let () = Lwt.async (fun () -> self#log "run.3") in
+                 let () = simulation.is_running <- false in
+                 Lwt.return_unit
+              else if simulation.is_running then
+                 let () = Lwt.async (fun () -> self#log "run.4") in
+                 (let () = lastyield <- Sys.time () in
+                  self#yield ()) >>= iter
+              else
+                let () = Lwt.async (fun () -> self#log "run.5") in
+                 Lwt.return_unit
+             in
              (iter ()) >>=
-        (fun () ->
-          let _ =
-            State_interpreter.end_of_simulation
-              ~outputs:(outputs simulation)
-              simulation.log_form simulation.env
-              simulation.counter simulation.graph
-               simulation.state in
-          Lwt.return (`Right ())))
+             (fun () ->
+                let _ =
+                  State_interpreter.end_of_simulation
+                    ~outputs:(outputs simulation)
+                    simulation.log_form simulation.env
+                    simulation.counter simulation.graph
+                    simulation.state in
+                Lwt.return (`Right ())))
           (catch_error (fun e -> Lwt.return (`Left e)))
+        )
 
-
-      method private continue
-          (token : ApiTypes.token)
-          (parameter : ApiTypes.parameter) :
-        unit ApiTypes.result Lwt.t =
+      method continue
+          (token : ApiTypes_j.token)
+          (parameter : ApiTypes_j.parameter) :
+        unit ApiTypes_j.result Lwt.t =
+        let () = Lwt.async (fun () -> self#log "continue.1") in
         Lwt.catch
           (fun () ->
              match IntMap.find_option token context.states with
-             | None -> Api_data.lwt_msg msg_token_not_found
+             | None ->
+               let () = Lwt.async (fun () -> self#log "continue.2") in
+               Api_data.lwt_msg msg_token_not_found
              | Some simulation ->
-               if Lwt_switch.is_on simulation.switch then
-                 Api_data.lwt_msg msg_process_not_paused
+               let () = Lwt.async (fun () -> self#log "continue.3") in
+               if simulation.is_running then
+                 let () = Lwt.async (fun () -> self#log "continue.4") in
+                 Lwt.return (`Right ())
                else
-                 let () =
-                   simulation.switch <- Lwt_switch.create ()
-                 in
+                 let () = Lwt.async (fun () -> self#log "continue.5") in
+                 let () = simulation.is_running <- true in
                  let () =
                    Counter.set_max_time
                      simulation.counter
-                     parameter.ApiTypes.max_time
+                     parameter.ApiTypes_j.max_time
                  in
                  let () =
                    Counter.set_max_events
                      simulation.counter
-                     parameter.ApiTypes.max_events
+                     parameter.ApiTypes_j.max_events
                  in
-                 self#run simulation
+                 let () = Lwt.async (fun () -> self#log "continue.6") in
+                 let () = Lwt.async (fun () -> self#run simulation) in
+                 Lwt.return (`Right ())
           )
-          (catch_error (fun e -> Lwt.return (`Left e)))
+          (catch_error
+             (fun e ->
+                let () = Lwt.async (fun () -> self#log "continue.7") in
+                Lwt.return (`Left e)))
 
-      method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
+      method stop (token : ApiTypes_j.token) : unit ApiTypes_j.result Lwt.t =
         Lwt.catch
           (fun () ->
              match IntMap.find_option token context.states with
              | None -> Api_data.lwt_msg msg_token_not_found
              | Some state ->
-               (if Lwt_switch.is_on state.switch then
-                  Lwt_switch.turn_off state.switch
-                else
-                  Lwt.return_unit)
-               >>=
-               (fun _ ->
-                  let () =
-                    context <-
-                      { context with states = IntMap.remove token context.states }
-                  in
-                  Lwt.return (`Right ())
-               )
+               let () = if state.is_running then
+                           state.is_running <- false
+                         else
+                           ()
+               in
+               let () =
+                 context <-
+                   { context
+                     with states = IntMap.remove token context.states }
+               in
+               Lwt.return (`Right ())
           )
           (catch_error (fun e -> Lwt.return (`Left e)))
+
+      initializer
+        Lwt.async (fun () -> self#log "created runtime")
     end;;
 
 end;;

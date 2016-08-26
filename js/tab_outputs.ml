@@ -42,11 +42,12 @@ let state_outputs state : (string option * string list) list =
       []
       state.ApiTypes.files
 
-let navli =
-  Ui_common.badge
+let navli (t : Ui_simulation.t) =
+  Ui_common.badge t
     (fun state -> List.length (state_outputs state))
 
-let content =
+let content (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let select =
     Tyxml_js.R.Html.select
       ~a:[ Html.a_class ["form-control"]
@@ -98,7 +99,7 @@ let content =
                    files
 		)
            )
-           UIState.model_runtime_state in
+           simulation_output in
        list
       )
   in
@@ -123,7 +124,7 @@ let content =
 		 | _ -> [select]
 		)
            )
-           UIState.model_runtime_state
+           simulation_output
        in
        list
       )
@@ -157,7 +158,8 @@ let content =
    </div>
 </div>|}]
 
-let select_outputs () =
+let select_outputs (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let index = Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom ->
@@ -168,8 +170,8 @@ let select_outputs () =
            _ -> Js.null
       )
   in
-  match state_outputs (React.S.value UIState.model_runtime_state) with
-    [] -> ()
+  match state_outputs (React.S.value simulation_output) with
+  | [] -> ()
   | l ->
     let index = Js.Opt.get index (fun _ -> 0) in
     if List.length l > index then
@@ -178,21 +180,22 @@ let select_outputs () =
     else
       ()
 
-let navcontent =
+let navcontent (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   [ Html.div
       ~a:[Tyxml_js.R.Html.a_class
             (React.S.bind
-               UIState.model_runtime_state
+               simulation_output
                (fun state -> React.S.const
                    (match state_outputs state with
                       [] -> ["hidden"]
                     | _::_ -> ["show"])
                )
             )]
-      [content]
+      [content t]
   ]
 
-let onload () =
+let onload (t : Ui_simulation.t) =
   let select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -202,7 +205,7 @@ let onload () =
        : Dom_html.element Js.t) in
   let () = select_dom##.onchange := Dom_html.handler
 	(fun _ ->
-	   let () = select_outputs ()
+	   let () = select_outputs t
 	   in Js._true)
   in
 

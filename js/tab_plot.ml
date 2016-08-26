@@ -19,7 +19,8 @@ let state_plot state =
      | _ -> state.ApiTypes.plot
     )
 
-let configuration : Widget_export.configuration =
+let configuration (t : Ui_simulation.t) : Widget_export.configuration =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
@@ -27,7 +28,7 @@ let configuration : Widget_export.configuration =
       ; Widget_export.export_json
           ~serialize_json:(fun () ->
               (match
-		 state_plot (React.S.value UIState.model_runtime_state)
+		 state_plot (React.S.value simulation_output)
                with
                | None -> "null"
                | Some plot -> ApiTypes.string_of_plot plot
@@ -39,7 +40,7 @@ let configuration : Widget_export.configuration =
             fun (filename : string) ->
               let data =
 		match
-                  state_plot (React.S.value UIState.model_runtime_state)
+                  state_plot (React.S.value simulation_output)
 		with
                 | None -> ""
                 | Some p -> Api_data.plot_values p
@@ -56,11 +57,12 @@ let configuration : Widget_export.configuration =
            | None -> false
            | Some _ -> true
         )
-        UIState.model_runtime_state
+        simulation_output
 
   }
 
-let content =
+let content (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let plot_show_legend =
     Html.input ~a:[ Html.a_id "plot-show-legend"
                   ; Html.a_input_type `Checkbox
@@ -78,7 +80,7 @@ let content =
                   ; Html.a_input_type `Checkbox
                   ] () in
   let export_controls =
-    Widget_export.content configuration
+    Widget_export.content (configuration t)
   in
   [%html {|<div>
 	   <div class="row">
@@ -108,11 +110,12 @@ let content =
 							 |}[export_controls]{|
   </div>|}]
 
-let navcontent =
+let navcontent (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
   [ Html.div
       ~a:[Tyxml_js.R.Html.a_class
             (React.S.bind
-               UIState.model_runtime_state
+               simulation_output
                (fun state ->
                   React.S.const
                     (match state_plot state with
@@ -120,7 +123,7 @@ let navcontent =
                      | Some _ -> ["show"])
                )
             )]
-      [ content ]
+      [ content t ]
   ]
 
 let state_plot state = match state with
@@ -148,8 +151,9 @@ let update_plot
     let data : plot_data Js.t = Js_plot.create_data ~plot:data in
     plot##setPlot(data)
 
-let onload () =
-  let () = Widget_export.onload configuration in
+let onload (t : Ui_simulation.t) =
+  let simulation_output = (Ui_simulation.simulation_output t) in
+  let () = Widget_export.onload (configuration t) in
   let configuration : plot_configuration Js.t =
     Js_plot.create_configuration
       ~plot_div_id:display_id
@@ -169,8 +173,8 @@ let onload () =
       "#navgraph"
       "shown.bs.tab"
       (fun _ ->
-	 match (React.S.value UIState.model_runtime_state) with
-           None -> ()
+	 match (React.S.value simulation_output) with
+         | None -> ()
 	 | Some state -> update_plot plot state.ApiTypes.plot)
   in
   let _ =
@@ -178,8 +182,8 @@ let onload () =
       (fun state -> match state with
            None -> ()
 	 | Some state -> update_plot plot state.ApiTypes.plot)
-      UIState.model_runtime_state
+      simulation_output
   in
   ()
 
-let navli = []
+let navli (_ : Ui_simulation.t) = []
