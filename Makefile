@@ -20,7 +20,7 @@ USE_TK?=0
 ifeq ($(DEBUG),1)
 JSOFOCAMLFLAGS = --debuginfo --pretty "+weak.js" "+nat.js"
 else
-JSOFOCAMLFLAGS = +nat.js +weak.js
+JSOFOCAMLFLAGS = "+nat.js" "+weak.js"
 endif
 
 ifeq ($(USE_TK),1)
