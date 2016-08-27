@@ -8,11 +8,10 @@ let name_map_of_array ?forbidden a =
     | Some s -> fun x -> Mods.StringSet.mem x s in
   Tools.array_fold_lefti
     (fun i map ((x,pos),_) ->
-       let map' = Mods.StringMap.add x i map in
-       if bad x || map == map' then
+       if bad x || Mods.StringMap.mem x map then
          raise (ExceptionDefn.Malformed_Decl
                   ("Label '"^x^"' already defined", pos))
-       else map')
+       else Mods.StringMap.add x i map)
     Mods.StringMap.empty a
 
 let create ?forbidden a = { decls = a; finder = name_map_of_array ?forbidden a}

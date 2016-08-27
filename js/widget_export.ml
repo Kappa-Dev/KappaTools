@@ -111,7 +111,7 @@ let onload (configuration :  configuration) =
     in
     let is_disabled : bool Js.t =
       Js.bool
-        (String.length (String.trim filename) == 0)
+        (String.length (String.trim filename) = 0)
     in
     let () =
       export_button##.disabled := is_disabled

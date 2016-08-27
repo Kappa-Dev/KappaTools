@@ -1,0 +1,5 @@
+%agent: A(x)
+%agent: B(x,y)
+%agent: A(x,y)
+
+A(x),A(y) -> A(x!1),A(y!1) @ 1

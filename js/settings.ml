@@ -36,7 +36,7 @@ let time_limit =
                   let value = string_of_float value in
                   let format_float n =
                     let length = String.length n in
-                    if length > 0 && String.get n (length - 1) == '.' then
+                    if length > 0 && String.get n (length - 1) = '.' then
                       n^"0"
                     else
                       n

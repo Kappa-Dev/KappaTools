@@ -1,0 +1,4 @@
++ Command line to rerun is: 'KaSim' 'twice_in_signature.ka' '-seed' '23014' '-d' 'output' '--compile'
+Parsing twice_in_signature.ka...
+done
++ Sanity checks
