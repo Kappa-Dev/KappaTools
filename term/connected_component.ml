@@ -249,10 +249,10 @@ let raw_to_navigation (full:bool) nodes_by_type internals links =
                       Navigation.ToNothing)::ans,re)
                else acc
              | Link (n,l) ->
-               if List.mem n don then acc
+               if List.mem n don || (n = h && i > l) then acc
                else if n = h || List.mem n re
                then
-                 if full
+                 if full || first
                  then (false,
                        (((if first
                           then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
