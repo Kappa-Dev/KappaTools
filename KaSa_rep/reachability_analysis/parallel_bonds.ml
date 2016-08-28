@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 24 2016>
+  * Last modification: Time-stamp: <Aug 28 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -150,17 +150,17 @@ struct
       static
 
 
-  let get_parallel_bonds_lhs static =
+(* let get_parallel_bonds_lhs static =
     (get_local_static_information
-       static).Parallel_bonds_static.store_parallel_bonds_lhs
+       static).Parallel_bonds_static.store_parallel_or_not_bonds_lhs*)
 
-  let set_parallel_bonds_lhs bonds static =
+(*  let set_parallel_bonds_lhs bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        Parallel_bonds_static.store_parallel_bonds_lhs = bonds
+        Parallel_bonds_static.store_parallel_or_not_bonds_lhs = bonds
       }
-      static
+      static*)
 
   let get_non_parallel_bonds_rhs static =
     (get_local_static_information
@@ -174,7 +174,7 @@ struct
       }
       static
 
-  let get_non_parallel_bonds_lhs static =
+(*  let get_non_parallel_bonds_lhs static =
     (get_local_static_information
        static).Parallel_bonds_static.store_non_parallel_bonds_lhs
 
@@ -184,7 +184,7 @@ struct
         (get_local_static_information static) with
         Parallel_bonds_static.store_non_parallel_bonds_lhs = bonds
       }
-      static
+      static*)
 
   let get_tuples_of_interest static =
     (get_local_static_information
@@ -263,17 +263,17 @@ struct
 
   let get_rule_has_parallel_bonds_lhs static =
     (get_local_static_information
-       static).Parallel_bonds_static.store_rule_has_parallel_bonds_lhs
+       static).Parallel_bonds_static.store_rule_has_parallel_or_not_bonds_lhs
 
   let set_rule_has_parallel_bonds_lhs bonds static =
     set_local_static_information
       {
         (get_local_static_information static) with
-        Parallel_bonds_static.store_rule_has_parallel_bonds_lhs = bonds
+        Parallel_bonds_static.store_rule_has_parallel_or_not_bonds_lhs = bonds
       }
       static
 
-  (*non parallel bonds*)
+(*  (*non parallel bonds*)
   let get_rule_has_non_parallel_bonds_lhs static =
     (get_local_static_information
        static).Parallel_bonds_static.store_rule_has_non_parallel_bonds_lhs
@@ -284,7 +284,7 @@ struct
         (get_local_static_information static) with
         Parallel_bonds_static.store_rule_has_non_parallel_bonds_lhs = bonds
       }
-      static
+      static*)
   (*---------------------------------------------------------------*)
   (*dynamic information*)
 
@@ -383,13 +383,11 @@ struct
     in
     let static = set_bonds_lhs_full store_bonds_lhs_full static in
     (*------------------------------------------------------*)
-    (*a set of rules that has a potential double binding on the lhs*)
-    let store_bonds_lhs_full = get_bonds_lhs_full static in
+    (*a set of rules that has a potential double binding or potential non parallel binding on the lhs*)
     let store_result = get_rule_has_parallel_bonds_lhs static in
     let error, store_result =
-      Parallel_bonds_static.collect_rule_has_parallel_bonds_lhs
+      Parallel_bonds_static.collect_rule_has_parallel_or_not_bonds_lhs
         parameter
-        store_bonds_lhs_full
         error
         rule_id
         rule
@@ -397,6 +395,18 @@ struct
     in
     let static = set_rule_has_parallel_bonds_lhs store_result static in
     (*------------------------------------------------------*)
+    (*    let store_rule_has_parallel_bonds_lhs = get_rule_has_parallel_bonds_lhs static in
+  let store_result = get_parallel_bonds_lhs static in
+  let error, store_result =
+    Parallel_bonds_static.collect_parallel_bonds_lhs
+      parameter
+      error
+      store_rule_has_parallel_bonds_lhs
+      rule_id
+      store_result
+  in
+          let static = set_parallel_bonds_lhs store_result static in*)
+
     (*a set of rules that has a potential double bindings on the rhs*)
     let store_bonds_rhs_full = get_bonds_rhs_full static in
     let store_result = get_rule_has_parallel_bonds_rhs static in
@@ -436,17 +446,6 @@ struct
         store_result
     in
     let static = set_parallel_bonds_rhs store_result static in
-    let store_rule_has_parallel_bonds_lhs = get_rule_has_parallel_bonds_lhs static in
-    let store_result = get_parallel_bonds_lhs static in
-    let error, store_result =
-      Parallel_bonds_static.collect_parallel_bonds_rhs
-        parameter
-        store_rule_has_parallel_bonds_lhs
-        error
-        rule_id
-        store_result
-    in
-    let static = set_parallel_bonds_lhs store_result static in
     let store_rule_has_non_parallel_bonds_rhs = get_rule_has_non_parallel_bonds_rhs static in
     let store_result = get_non_parallel_bonds_rhs static in
     let error, store_result =
@@ -458,17 +457,6 @@ struct
         store_result
     in
     let static = set_non_parallel_bonds_rhs store_result static in
-    let store_rule_has_non_parallel_bonds_lhs = get_rule_has_non_parallel_bonds_lhs static in
-    let store_result = get_non_parallel_bonds_lhs static in
-    let error, store_result =
-      Parallel_bonds_static.collect_non_parallel_bonds_rhs
-        parameter
-        store_rule_has_non_parallel_bonds_lhs
-        error
-        rule_id
-        store_result
-    in
-    let static = set_non_parallel_bonds_lhs store_result static in
     error, static
 
   (****************************************************************)
@@ -503,18 +491,27 @@ struct
         s
         (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
     in
-    let error, store_result1 = lift error (get_parallel_bonds_lhs static) in
+    let lift_map error s =
+      Ckappa_sig.Rule_map_and_set.Map.fold
+        (fun _ big_store (error, set) ->
+           Parallel_bonds_static.project_away_ag_id_and_convert_into_set
+             parameter error big_store set)
+        s
+        (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
+    in
+    let error, store_result1 =
+      lift_map error (get_rule_has_parallel_bonds_lhs static) in
     let error, store_result2 = lift error (get_parallel_bonds_rhs static) in
-    let error, store_result3 = lift error (get_non_parallel_bonds_lhs static) in
+    (*  let error, store_result3 = lift error (get_non_parallel_bonds_lhs static) in*)
     let error, store_result4 = lift error (get_non_parallel_bonds_rhs static) in
     let error, store_result =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
         parameter error store_result1 store_result2
     in
-    let error, store_result' =
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+    let error, store_result' = error, store_result4 in
+    (*  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
         parameter error store_result3 store_result4
-    in
+        in*)
     let error, store_result =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
         parameter error store_result store_result'
@@ -620,17 +617,20 @@ struct
     (*-----------------------------------------------------------*)
     (*a set of rules has parallel bonds on the lhs*)
     let store_rule_has_parallel_bonds_lhs = get_rule_has_parallel_bonds_lhs static in
-    let error, parallel_set =
+    let error, parallel_map =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
               parameter error rule_id store_rule_has_parallel_bonds_lhs
       with
       | error, None ->
         error,
-        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.empty
+        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
       | error, Some s -> error, s
     in
+    let list =
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings parallel_map
+    in
     (*-----------------------------------------------------------*)
-    let store_non_parallel_map = get_rule_has_non_parallel_bonds_lhs static in
+    (*  let store_non_parallel_map = get_rule_has_non_parallel_bonds_lhs static in
     let error, non_parallel_list =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
@@ -638,7 +638,7 @@ struct
       with
       | error, None -> error, []
       | error, Some l -> error, l
-    in
+        in*)
     (*-----------------------------------------------------------*)
     let store_value = get_value dynamic in
     (* JF: you should check that for all element of parallel_list the
@@ -656,8 +656,8 @@ struct
             list
           with
           | [] -> error, true
-          | head::tail ->
-            let pair = Parallel_bonds_type.project2 head in
+          | (tuple,parallel_or_not)::tail ->
+            let pair = Parallel_bonds_type.project2 tuple in
             let error, value =
               match
                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
@@ -670,14 +670,15 @@ struct
             in
             match value with
             | Usual_domains.Undefined | Usual_domains.Val false -> error, false
-            | Usual_domains.Val true | Usual_domains.Any -> scan tail error
+            | Usual_domains.Val b when b<> parallel_or_not
+              -> error, false
+            | Usual_domains.Val _
+            |  Usual_domains.Any -> scan tail error
         in
-        let error, bool1 =
-          scan
-            (Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Set.elements parallel_set)
-            error
-        in
-        if not bool1
+          scan list error
+      end
+    in
+        (*    if not bool1
         then
           error, false
         else
@@ -710,7 +711,7 @@ struct
           in
           scan non_parallel_list error
       end
-    in
+              in*)
     if bool
     then error, dynamic, Some precondition
     else
