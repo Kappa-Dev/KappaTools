@@ -303,6 +303,141 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for C(z!,t!)
 		Updating the views for C(z!,t!)
 		Updating the views for C(z!,t!)
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:C:cv_id:0
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:1<2)
+    Id=24
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=13
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=6
+     Node(site_type:1<3)
+      Id=5
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=4
+         Node(site_type:2<1)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=45
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=44
+   Node(site_type:0<2)
+    Id=40
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:1<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=43
+     Node(site_type:0<3)
+      Id=17
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<1)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+In agent C: 
+C(z!C.t) => [ C(t,z!C.t) ]
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=40
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=39
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=38
+   Node(site_type:0<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+C() => [ C(t) v C(t!C.z) ]
+C() => [ C(z) v C(z!C.z) v C(z!C.t) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
 Some exceptions have been raised
 error: file_name: setMap.ml; message: line 659; exception:Not_found
 error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1306; exception:Exit

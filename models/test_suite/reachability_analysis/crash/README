@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa crash.ka --output-directory output --verbosity-level-for-view-analysis Mute --debugging-mode || exit 0 
+"${KAPPABIN}"KaSa crash.ka --output-directory output --debugging-mode || exit 0 

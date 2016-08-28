@@ -9,4 +9,4 @@
 'r3' A(z!_,t!2),B(t!2) -> @1
 'r4' A(z!1,t!2),B(z!1,t!2) -> @1
 
-#r3 & r4 are unreachable.
+

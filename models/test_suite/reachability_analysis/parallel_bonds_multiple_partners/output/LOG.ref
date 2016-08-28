@@ -1162,4 +1162,421 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 8:
 		the precondition is satisfied
 		Updating the views for A(x~,y~,z~,a~,b~)
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=159
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=158
+   Node(site_type:1<1)
+    Id=85
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=84
+       Node(site_type:2<1)
+        Id=83
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=82
+           Node(site_type:3<1)
+            Id=13
+             Node(site_type:4<0)
+              Id=0
+               Leaf False 
+
+              Id=12
+               Node(site_type:4<1)
+                Id=11
+                 Node(site_type:5<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=10
+                   Node(site_type:5<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+            Id=81
+             Node(site_type:3<2)
+              Id=80
+               Node(site_type:4<0)
+                Id=0
+                 Leaf False 
+
+                Id=38
+                 Node(site_type:4<2)
+                  Id=11
+                   Node(site_type:5<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=10
+                     Node(site_type:5<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=157
+     Node(site_type:1<2)
+      Id=156
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=155
+         Node(site_type:2<2)
+          Id=154
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=153
+             Node(site_type:3<1)
+              Id=13
+               Node(site_type:4<0)
+                Id=0
+                 Leaf False 
+
+                Id=12
+                 Node(site_type:4<1)
+                  Id=11
+                   Node(site_type:5<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=10
+                     Node(site_type:5<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=152
+               Node(site_type:3<2)
+                Id=151
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=100
+                   Node(site_type:4<2)
+                    Id=99
+                     Node(site_type:5<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=46
+                       Node(site_type:5<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=329
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=328
+   Node(site_type:0<1)
+    Id=320
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=319
+       Node(site_type:1<1)
+        Id=318
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=317
+           Node(site_type:2<1)
+            Id=314
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=313
+               Node(site_type:3<1)
+                Id=9
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+            Id=316
+             Node(site_type:2<2)
+              Id=315
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=32
+                 Node(site_type:3<2)
+                  Id=9
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=327
+     Node(site_type:0<2)
+      Id=326
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=325
+         Node(site_type:1<2)
+          Id=324
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=323
+             Node(site_type:2<1)
+              Id=314
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=313
+                 Node(site_type:3<1)
+                  Id=9
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=322
+               Node(site_type:2<2)
+                Id=321
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=234
+                   Node(site_type:3<2)
+                    Id=190
+                     Node(site_type:4<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=36
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() =>
+   [
+	  A(a~u,b~p,x~p,y~u,z~p)
+	v A(a~u,b~u,x~p,y~u,z~p)
+	v A(a~p,b~p,x~p,y~u,z~p)
+	v A(a~p,b~u,x~p,y~u,z~p)
+	v A(a~u,b~u,x~p,y~u,z~u)
+	v A(a~u,b~p,x~p,y~p,z~p)
+	v A(a~u,b~u,x~p,y~p,z~p)
+	v A(a~p,b~p,x~p,y~p,z~p)
+	v A(a~p,b~u,x~p,y~p,z~p)
+	v A(a~u,b~u,x~p,y~p,z~u)
+	v A(a~u,b~u,x~u,y~u,z~p)
+	v A(a~p,b~u,x~u,y~u,z~p)
+	v A(a~u,b~u,x~u,y~u,z~u)
+   ]
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=187
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=192
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=191
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=188
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=28
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=189
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=190
+ Node(site_type:4<0)
+  Id=0
+   Leaf False 
+
+  Id=36
+   Node(site_type:4<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(y~u) v A(y~p) ]
+A() => [ A(x~u) v A(x~p) ]
+A() => [ A(z~u) v A(z~p) ]
+A() => [ A(a~u) v A(a~p) ]
+A() => [ A(b~u) v A(b~p) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
 execution finished without any exception

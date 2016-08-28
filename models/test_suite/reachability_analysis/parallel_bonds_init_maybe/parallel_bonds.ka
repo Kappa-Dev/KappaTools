@@ -10,4 +10,6 @@
 'r2' A(t!1,z),B(t!1,z) -> A(t!1,z!2),B(t!1,z!2) @1
 'r3' A(t,z!1),B(t,z!1) -> A(t!2,z!1),B(t!2,z!1) @1
 
-#the answer is maybe/any
+#the answer is:
+# A: maybe/any
+# B: parallel bonds
