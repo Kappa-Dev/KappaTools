@@ -29,10 +29,10 @@ module PairAgentsSitesStates_map_and_set =
     (SetMap.Make
        (struct
          type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+           Ckappa_sig.c_agent_id * ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-            Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state)
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
          let compare = compare
          let print _ _ = ()
        end))
@@ -411,8 +411,10 @@ let add_value parameters error kappa_handler x value store_result =
     error, store_result
 
 let project (_,b,c,d,e,f) = (b,c,d,e,f)
+let get_id ((a,_,_,_,_,_),_) = a
+let get_tuple (a,b) = project a,project b
 
-let project2 (x,y) = (project x,project y)
+let project2 = snd
 
 let add_value_from_refined_tuple parameters error kappa_handler x =
   add_value parameters error kappa_handler (project2 x)
@@ -425,7 +427,7 @@ let add_symmetric_tuple_pair f parameter error (x,y) remanent =
   List.fold_left
     (fun (error, remanent) t ->
        f
-         parameter error t remanent
+         parameter error (get_id t,get_tuple t) remanent
     )
     (error, remanent)
     [x,y;(*y,x;*)x',y';(*y',x'*)]
