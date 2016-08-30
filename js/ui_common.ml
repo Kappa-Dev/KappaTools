@@ -9,7 +9,7 @@ let toggle_element projection content =
              UIState.model_runtime_state
              (fun state -> React.S.const
                  (match projection state with
-                    [] -> ["hidden"]
+                  | [] -> ["hidden"]
                   | _::_ -> ["show"])
              )
           )]
@@ -54,15 +54,15 @@ let export_controls
       export_formats
   in
   [%html {|<div class="row">
-	   <div class="col-sm-12">
-	   <div class="form-inline">
+           <div class="col-sm-12">
+           <div class="form-inline">
            <div class="form-group">
            <select class="form-control"
                    id="|}export_select_id{|"><option value="png">png</option><option value="svg">svg</option>|}export_formats_select{|</select>
-																      </div>
-																      <div class="form-group">
-																      <label class="checkbox-inline">
-																      |}[export_filename]{|
+                                                                                                                                      </div>
+                                                                                                                                      <div class="form-group">
+                                                                                                                                      <label class="checkbox-inline">
+                                                                                                                                    |}[export_filename]{|
            </label>
         </div>
         <div class="form-group">
@@ -125,14 +125,14 @@ let save_plot_ui
   let () =
     export_filename##.oninput :=
       Dom_html.handler
-	(fun _ ->
+        (fun _ ->
            let () = export_button_toggle () in
            Js._true)
   in
   let () =
     export_button##.onclick :=
       Dom_html.handler
-	(fun _ ->
+        (fun _ ->
            let suffix : string =
              Js.to_string (export_format##.value)
            in
@@ -144,18 +144,18 @@ let save_plot_ui
                root
              else
                root^"."^default
-	   in
+           in
            let () = match suffix with
                "svg" -> Common.plotSVG svg_div_id
-			  title
-			  (filename "svg")
+                          title
+                          (filename "svg")
                           svg_style_id
              | "png" ->
                Common.plotPNG
-		 svg_div_id
-		 title
-		 (filename "png")
-		 svg_style_id
+                 svg_div_id
+                 title
+                 (filename "png")
+                 svg_style_id
              | "dat" -> export_data (filename dat_file_extension)
              | f -> Common.error ("Unknown format"^f)
            in
@@ -194,10 +194,55 @@ let version
     List.map
       snd
       (List.filter
-	 (fun (key,_) -> key = "version")
-	 Url.Current.arguments)
+         (fun (key,_) -> key = "version")
+         Url.Current.arguments)
   in
   match (test,version) with
   | (Some test,["test"]) -> test
   | (_,["dev"]) -> dev
   | _ -> prod
+
+let navli label active decorations =
+  let default_attributes =
+    [ Html.a_id ("nav"^label)
+    ; Html.Unsafe.string_attrib "role" "presentation" ]
+  in
+  let attributes =
+    if active then
+      (Html.a_class ["active"])::default_attributes
+    else
+      default_attributes
+  in
+  Html.li ~a:attributes
+    [ Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
+                ; Html.Unsafe.string_attrib "role" "tab"
+                ; Html.Unsafe.string_attrib "aria-controls" label
+                ; Html.a_href ("#"^label) ]
+        (List.append [ Html.cdata label ]  decorations)
+    ]
+
+let navtabs nav_tab_id = function
+  | [] -> assert false
+  | (ti,l) :: t ->
+    Html.ul
+      ~a:[ Html.a_id nav_tab_id
+         ; Html.a_class ["nav";"nav-tabs"]
+         ; Html.Unsafe.string_attrib "role" "tablist" ]
+      (navli ti true l :: List.map (fun (t,li) -> navli t false li) t)
+
+let onenavcontent label active content =
+  Html.div
+    ~a:[ Html.a_id label
+       ; if active then
+           Html.a_class ["tab-pane";"active"]
+         else
+           Html.a_class ["tab-pane"]
+       ; Html.Unsafe.string_attrib "role" "tabpanel" ] content
+
+let navcontent = function
+  | [] -> assert false
+  | (t,c) :: l ->
+    Html.div
+      ~a:[ Html.a_class ["panel-content";"tab-content"]]
+      (onenavcontent t true c ::
+       List.map (fun (t,c) -> onenavcontent t false c) l)

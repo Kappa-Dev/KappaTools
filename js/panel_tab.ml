@@ -1,73 +1,35 @@
 module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
 
-open Js
-
 let nav_tab_id = "navtabs"
 
-let navli label active decorations =
-  let default_attributes =
-    [ Html.a_id ("nav"^label)
-    ; Html.Unsafe.string_attrib "role" "presentation" ]
-  in
-  let attributes =
-    if active then
-      (Html.a_class ["active"])::default_attributes
-    else
-      default_attributes
-  in
-  Html.li ~a:attributes
-    [ Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
-                ; Html.Unsafe.string_attrib "role" "tab"
-                ; Html.Unsafe.string_attrib "aria-controls" label
-                ; Html.a_href ("#"^label) ]
-        (List.append [ Html.cdata label ]  decorations)
-    ]
 let navtabs =
   Tyxml_js.To_dom.of_ul @@
-  Html.ul
-    ~a:[ Html.a_id nav_tab_id
-       ; Html.a_class ["nav";"nav-tabs"]
-       ; Html.Unsafe.string_attrib "role" "tablist" ]
-    [ navli "editor"    true  Tab_editor.navli
-    ; navli "contact"   false Tab_contact.navli
-    ; navli "plot"      false Tab_plot.navli
-    ; navli "flux"      false Tab_flux.navli
-    ; navli "snapshot"  false Tab_snapshot.navli
-    ; navli "outputs"   false Tab_outputs.navli
-    ; navli "distances" false Tab_distances.navli
-    ; navli "log"       false Tab_log.navli ]
+  Ui_common.navtabs nav_tab_id
+    [ "editor",    Tab_editor.navli
+    ; "plot",      Tab_plot.navli
+    ; "flux",      Tab_flux.navli
+    ; "snapshot",  Tab_snapshot.navli
+    ; "outputs",   Tab_outputs.navli
+    ; "distances", Tab_distances.navli ]
 
-let navcontent label active content =
-  Html.div
-    ~a:[ Html.a_id label
-       ; if active then
-           Html.a_class ["tab-pane";"active"]
-         else
-           Html.a_class ["tab-pane"]
-       ; Html.Unsafe.string_attrib "role" "tabpanel" ] content
 let navcontents =
   Tyxml_js.To_dom.of_div @@
-  Html.div
-    ~a:[ Html.a_class ["panel-content";"tab-content"]]
-    [ navcontent "editor"     true  Tab_editor.navcontent
-    ; navcontent "contact"    false Tab_contact.navcontent
-    ; navcontent "plot"       false Tab_plot.navcontent
-    ; navcontent "flux"       false Tab_flux.navcontent
-    ; navcontent "snapshot"   false Tab_snapshot.navcontent
-    ; navcontent "outputs"    false Tab_outputs.navcontent
-    ; navcontent "distances"  false Tab_distances.navcontent
-    ; navcontent "log"        false Tab_log.navcontent ]
+  Ui_common.navcontent
+    [ "editor",    Tab_editor.navcontent
+    ; "plot",      Tab_plot.navcontent
+    ; "flux",      Tab_flux.navcontent
+    ; "snapshot",  Tab_snapshot.navcontent
+    ; "outputs",   Tab_outputs.navcontent
+    ; "distances", Tab_distances.navcontent ]
 
 let onload () =
   let () = Tab_editor.onload () in
-  let () = Tab_contact.onload () in
   let () = Tab_plot.onload () in
   let () = Tab_flux.onload () in
   let () = Tab_snapshot.onload () in
   let () = Tab_outputs.onload () in
   let () = Tab_distances.onload () in
-  let () = Tab_log.onload () in
   ()
 
 let onunload () =
