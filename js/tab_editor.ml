@@ -4,23 +4,13 @@ module Api_types = ApiTypes_j
 open Js
 open Codemirror
 
-let rec list_last =
-  function
-  | [] -> failwith "list_last"
-  | [ x ] -> x
-  | _ :: l -> list_last l
-
 open Lwt
 let document = Dom_html.window##.document
 let has_been_modified = ref (false)
 
 module Html = Tyxml_js.Html5
-let file_selector_id = "file-selector"
-let file_selector =
-  Html.input
-    ~a:[ Html.a_id file_selector_id ;
-         Html.Unsafe.string_attrib "type" "file" ;
-         Html.Unsafe.string_attrib "accept" ".ka" ]
+
+let navli = []
 
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
@@ -62,26 +52,21 @@ let panel_heading =
               </div>
             </div>|}]
 
-let xml =
-  [%html {|<div class="col-md-6">
-             <div class="panel panel-default">
-                <div class="panel-heading">
+let navcontent =
+  [Html.div ~a:[Html.a_class ["panel";"panel-default"]]
+    [%html {|<div class="panel-heading">
          |}[panel_heading]{|
-                </div>
+             </div>
 
-                <div class="panel-body">
-                   <textarea id="code-mirror"> </textarea>
-                </div>
+             <div class="panel-body">
+                <textarea id="code-mirror"> </textarea>
+             </div>
 
-                <div id="configuration-panel">
-                   |}[Settings.xml]{|
-                </div>
+             <div id="configuration-panel">
+                |}[Settings.xml]{|
+             </div>
 
-
-                <div id="simulation-panel"></div>
-
-              </div>
-           </div>|}]
+             <div id="simulation-panel"></div>|}]]
 
 let setup_lint codemirror update_linting =
   let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
