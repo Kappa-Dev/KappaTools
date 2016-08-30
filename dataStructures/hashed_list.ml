@@ -1,10 +1,10 @@
-module Hashed_list =
+module Make =
   functor (A:SetMap.OrderedType) ->
   struct
     type elt_id = int
     type hashed_list = int
     let compare = compare
-    module SetMap = SetMap.Make(A) 
+    module SetMap = SetMap.Make(A)
     type cache =
       {
         dictionary: elt_id SetMap.Map.t ;

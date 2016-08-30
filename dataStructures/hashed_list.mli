@@ -1,4 +1,4 @@
-module Hashed_list (A:SetMap.OrderedType) :
+module Make (A:SetMap.OrderedType) :
 sig
   type cache
   type hashed_list
@@ -11,5 +11,3 @@ sig
   val empty: hashed_list
 
 end
-
-val main: unit -> unit

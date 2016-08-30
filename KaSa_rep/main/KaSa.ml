@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 23 2016>
+ * Last modification: Time-stamp: <Aug 30 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -107,5 +107,4 @@ let main () =
   ()
 
 let () = main ()
-let _ = Hashed_list.main 
 let _ = Export_to_json.init
