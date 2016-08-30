@@ -61,18 +61,18 @@ let influence_node_to_json a =
   match a
   with
   | Var i ->
-    `Assoc ["variable",JsonUtil.int_to_json i]
+    `Assoc ["variable",JsonUtil.of_int i]
   | Rule i  ->
-    `Assoc ["rule",JsonUtil.int_to_json i]
+    `Assoc ["rule",JsonUtil.of_int i]
 
 let influence_node_of_json
     ?error_msg:(error_msg="Not a correct influence node")
   =
   function
   | `Assoc ["variable",json] ->
-    Var (JsonUtil.int_of_json json)
+    Var (JsonUtil.to_int json)
   | `Assoc ["rule",json] ->
-    Rule (JsonUtil.int_of_json json)
+    Rule (JsonUtil.to_int json)
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
 
@@ -97,21 +97,16 @@ type location =
   | Side_effect of int
 
 let location_to_json a =
-  match a
-  with
-  | Direct i ->
-    `Assoc ["direct",JsonUtil.int_to_json i]
-  | Side_effect i  ->
-    `Assoc ["side_effects",JsonUtil.int_to_json i]
+  match a with
+  | Direct i -> `Assoc ["direct",JsonUtil.of_int i]
+  | Side_effect i  -> `Assoc ["side_effects",JsonUtil.of_int i]
 
 let location_of_json
     ?error_msg:(error_msg="Not a correct location")
   =
   function
-  | `Assoc ["direct",json] ->
-    Direct (JsonUtil.int_of_json json)
-  | `Assoc ["side_effect",json] ->
-    Side_effect (JsonUtil.int_of_json json)
+  | `Assoc ["direct",json] -> Direct (JsonUtil.to_int json)
+  | `Assoc ["side_effect",json] -> Side_effect (JsonUtil.to_int json)
   | x ->
     raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
@@ -139,8 +134,8 @@ let half_influence_map_to_json =
     (InfluenceNodeMap.to_json
        ~lab_key:target ~lab_value:location_pair_list
        influence_node_to_json
-       (JsonUtil.list_to_json
-          (JsonUtil.pair_to_json
+       (JsonUtil.of_list
+          (JsonUtil.of_pair
              ~lab1:rhs ~lab2:lhs
              location_to_json
              location_to_json
@@ -157,8 +152,8 @@ let half_influence_map_of_json =
        ~lab_key:target ~lab_value:location_pair_list
        ~error_msg:"map of lists of pairs of locations"
        (influence_node_of_json ~error_msg:(JsonUtil.build_msg "influence node"))
-       (JsonUtil.list_of_json ~error_msg:"list of pair of locations"
-          (JsonUtil.pair_of_json
+       (JsonUtil.to_list ~error_msg:"list of pair of locations"
+          (JsonUtil.to_pair
              ~error_msg:""
              ~lab1:rhs ~lab2:lhs
              (location_of_json ~error_msg:(JsonUtil.build_msg "location"))
@@ -194,42 +189,42 @@ let bind="binding states"
 let contact_map_to_json =
   Mods.StringMap.to_json
     ~lab_key:agent ~lab_value:interface
-    JsonUtil.string_to_json
+    JsonUtil.of_string
     (Mods.StringMap.to_json
        ~lab_key:site ~lab_value:stateslist
-       JsonUtil.string_to_json
-       (JsonUtil.pair_to_json
+       JsonUtil.of_string
+       (JsonUtil.of_pair
           ~lab1:prop ~lab2:bind
-          (JsonUtil.list_to_json JsonUtil.string_to_json)
-          (JsonUtil.list_to_json
-             (JsonUtil.pair_to_json
+          (JsonUtil.of_list JsonUtil.of_string)
+          (JsonUtil.of_list
+             (JsonUtil.of_pair
                 ~lab1:agent ~lab2:site
-                JsonUtil.string_to_json
-                JsonUtil.string_to_json)
+                JsonUtil.of_string
+                JsonUtil.of_string)
           )))
 
 let contact_map_of_json =
   Mods.StringMap.of_json
     ~lab_key:agent ~lab_value:interface
-    (JsonUtil.string_of_json ~error_msg:(JsonUtil.build_msg "agent name"))
+    (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
     (Mods.StringMap.of_json
        ~error_msg:(JsonUtil.build_msg "interface")
        ~lab_key:site ~lab_value:stateslist
-       (JsonUtil.string_of_json ~error_msg:(JsonUtil.build_msg "site name"))
-       (JsonUtil.pair_of_json
+       (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
+       (JsonUtil.to_pair
           ~error_msg:(JsonUtil.build_msg "pair of lists of sites")
           ~lab1:prop ~lab2:bind
-          (JsonUtil.list_of_json
+          (JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "list of internal states")
-             (JsonUtil.string_of_json
+             (JsonUtil.to_string
                 ~error_msg:(JsonUtil.build_msg "internal state")))
-          (JsonUtil.list_of_json
+          (JsonUtil.to_list
              ~error_msg:(JsonUtil.build_msg "list of binding states")
-             (JsonUtil.pair_of_json
+             (JsonUtil.to_pair
                 ~error_msg:(JsonUtil.build_msg "binding type")
                 ~lab1:agent ~lab2:site
-                (JsonUtil.string_of_json ~error_msg:(JsonUtil.build_msg "agent name"))
-                (JsonUtil.string_of_json ~error_msg:(JsonUtil.build_msg "site"))))))
+                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
+                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site"))))))
 
 type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t

@@ -189,3 +189,8 @@ val link_to_json :
 val link_of_json :
   ('a -> Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'a) ->
   (Yojson.Basic.json list -> 'b) -> Yojson.Basic.json -> ('a, 'b) link
+
+val compil_of_json :
+  Yojson.Basic.json -> (agent,mixture,string,rule) compil
+val compil_to_json :
+  (agent,mixture,string,rule) compil -> Yojson.Basic.json

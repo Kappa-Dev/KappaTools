@@ -342,9 +342,9 @@ let rule_of_json = function
           r_un_rate = None;
         }
       with Not_found ->
-        raise (Yojson.Basic.Util.Type_error ("Uncorrect rule",x))
+        raise (Yojson.Basic.Util.Type_error ("Incorrect rule",x))
     end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rule",x))
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect rule",x))
 
 
 let build_l_type sigs pos dst_ty dst_p switch =

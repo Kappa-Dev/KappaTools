@@ -1,44 +1,39 @@
 let build_msg s = "Not a correct "^s
-let string_to_json (s:string) = `String s
+let of_string (s:string) = `String s
 
-let string_of_json ?error_msg:(error_msg=build_msg "string") =
+let to_string ?error_msg:(error_msg=build_msg "string") =
   function
   | `String (s:string) -> s
-  | x ->
-    raise
-      (Yojson.Basic.Util.Type_error (error_msg,x))
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
-let int_to_json (s:int) = `Int s
+let of_int (s:int) = `Int s
 
-let int_of_json ?error_msg:(error_msg=build_msg "int") =
+let to_int ?error_msg:(error_msg=build_msg "int") =
   function
   | `Int (s:int) -> s
-  | x ->
-    raise
-      (Yojson.Basic.Util.Type_error (error_msg,x))
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
-let list_to_json to_json l =
-  `List
-    (List.rev_map to_json (List.rev l))
+let of_option to_json = function
+  | None -> `Null
+  | Some x -> to_json x
+let to_option = Yojson.Basic.Util.to_option
 
-let list_of_json
-    ?error_msg:(error_msg=build_msg "list") of_json =
-  function
+let of_list to_json l =
+  `List (List.rev_map to_json (List.rev l))
+
+let to_list ?error_msg:(error_msg=build_msg "list") of_json = function
   | `List l as x ->
     begin
-      try
-        List.rev_map of_json (List.rev l)
+      try List.rev_map of_json (List.rev l)
       with Not_found ->
-        raise
-          (Yojson.Basic.Util.Type_error (error_msg,x))
+        raise (Yojson.Basic.Util.Type_error (error_msg,x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
-let assoc_to_json to_json l =
-  `Assoc
-     (List.rev_map to_json (List.rev l)) 
+let of_assoc to_json l =
+  `Assoc (List.rev_map to_json (List.rev l))
 
-let assoc_of_json
+let to_assoc
     ?error_msg:(error_msg=build_msg "association")
     of_json json =
   match json
@@ -53,14 +48,11 @@ let assoc_of_json
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
 
-let pair_to_json ?lab1:(lab1="first") ?lab2:(lab2="second") to_json1 to_json2 (a,b) =
-  `Assoc
-    [
-      lab1, to_json1 a;
-      lab2, to_json2 b
-    ]
+let of_pair ?(lab1="first") ?(lab2="second") to_json1 to_json2 (a,b) =
+  `Assoc [ lab1, to_json1 a; lab2, to_json2 b ]
 
-let pair_of_json ?lab1:(lab1="first") ?lab2:(lab2="second") ?error_msg:(error_msg=build_msg "pair") of_json1 of_json2 =
+let to_pair ?lab1:(lab1="first") ?lab2:(lab2="second")
+    ?error_msg:(error_msg=build_msg "pair") of_json1 of_json2 =
   function
   | `Assoc l as x when List.length l = 2 ->
     begin
@@ -72,10 +64,7 @@ let pair_of_json ?lab1:(lab1="first") ?lab2:(lab2="second") ?error_msg:(error_ms
     end
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
-
-
-
-let map_to_json
+let of_map
     ?lab_key:(lab_key="key")
     ?lab_value:(lab_value="value")
     fold key_to_json value_to_json map =
@@ -92,8 +81,7 @@ let map_to_json
           [])
     )
 
-
-let map_of_json
+let to_map
     ?lab_key:(lab_key="key")
     ?lab_value:(lab_value="value")
     ?error_msg:(error_msg=build_msg "map")

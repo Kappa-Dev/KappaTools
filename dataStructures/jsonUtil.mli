@@ -1,57 +1,46 @@
+(** Jsonify simple types *)
+
 val build_msg: string -> string
 
-val string_to_json:
-  string -> Yojson.Basic.json
+val of_string: string -> Yojson.Basic.json
+val to_string: ?error_msg:string -> Yojson.Basic.json  -> string
 
-val string_of_json:
-  ?error_msg:string -> Yojson.Basic.json  -> string
+val of_int: int -> Yojson.Basic.json
+val to_int: ?error_msg:string -> Yojson.Basic.json  -> int
 
-val int_to_json: int -> Yojson.Basic.json
+val of_option: ('a -> Yojson.Basic.json) -> 'a option -> Yojson.Basic.json
+val to_option: (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a option
+(** Beware: `Null is reserved for None *)
 
-val int_of_json:
-  ?error_msg:string -> Yojson.Basic.json  -> int
+val of_list: ('a -> Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
+val to_list:
+  ?error_msg:string -> (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a list
 
-val list_to_json:
-  ('a -> Yojson.Basic.json) ->
-  'a list -> Yojson.Basic.json
-val list_of_json:
-  ?error_msg:string ->
-  (Yojson.Basic.json -> 'a) ->
+val of_assoc:
+  ('a  -> string * Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
+val to_assoc:
+  ?error_msg:string -> (string * Yojson.Basic.json -> 'a) ->
   Yojson.Basic.json -> 'a list
 
-val assoc_to_json:
-  ('a  -> string * Yojson.Basic.json) ->
-  'a list -> Yojson.Basic.json
-
-val assoc_of_json:
-    ?error_msg:string ->
-    (string * Yojson.Basic.json -> 'a)
-    ->
-     Yojson.Basic.json -> 'a list
-
-val pair_to_json:
+val of_pair:
   ?lab1:string -> ?lab2:string ->
-  ('a -> Yojson.Basic.json) ->
-  ('b -> Yojson.Basic.json) ->
+  ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
   ('a * 'b) -> Yojson.Basic.json
-
-val pair_of_json:
+val to_pair:
   ?lab1:string -> ?lab2:string -> ?error_msg:string ->
-  (Yojson.Basic.json -> 'a) ->
-  (Yojson.Basic.json -> 'b) ->
+  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> 'a * 'b
 
-val map_of_json:
+val of_map:
+  ?lab_key:string -> ?lab_value:string ->
+  (('key -> 'value -> Yojson.Basic.json list -> Yojson.Basic.json list) ->
+   'map -> Yojson.Basic.json list -> Yojson.Basic.json list) ->
+  ('key -> Yojson.Basic.json) -> ('value -> Yojson.Basic.json) ->
+  'map -> Yojson.Basic.json
+val to_map:
   ?lab_key:string -> ?lab_value:string -> ?error_msg:string ->
   ('key -> 'value -> 'map -> 'map) ->
   'map ->
   (Yojson.Basic.json -> 'key) ->
   (Yojson.Basic.json -> 'value) ->
   Yojson.Basic.json -> 'map
-
-val map_to_json:
-  ?lab_key:string -> ?lab_value:string ->
-  (('key -> 'value -> Yojson.Basic.json list -> Yojson.Basic.json list) -> 'map -> Yojson.Basic.json list -> Yojson.Basic.json list) ->
-  ('key -> Yojson.Basic.json) ->
-  ('value -> Yojson.Basic.json) ->
-  'map -> Yojson.Basic.json

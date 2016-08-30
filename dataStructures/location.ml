@@ -59,3 +59,43 @@ let to_range (location : t) : range =
     to_position =
      { chr =  end_location.Lexing.pos_bol
      ; line = end_location.Lexing.pos_lnum } }
+
+let to_json loc =
+  let (start,stop) = loc in
+  `Assoc
+    [
+      "file", `String start.Lexing.pos_fname;
+      "from_pos",
+      `Assoc ["line",`Int start.Lexing.pos_lnum;
+              "chr",`Int (start.Lexing.pos_cnum - start.Lexing.pos_bol)];
+      "to_pos",
+      `Assoc ["line",`Int stop.Lexing.pos_lnum;
+              "chr",`Int (stop.Lexing.pos_cnum - stop.Lexing.pos_bol)];
+    ]
+
+let position_of_json file = function
+  | `Assoc [ "line", `Int l; "chr", `Int  c ] |
+    `Assoc [ "chr", `Int c; "line", `Int l ] ->
+    {
+      Lexing.pos_fname = file;
+      Lexing.pos_lnum = l;
+      Lexing.pos_bol = 0;
+      Lexing.pos_cnum = c;
+    }
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a position",x))
+let of_json = function
+  | `Assoc [ "file", `String f; "from_pos", fr; "to_pos", t ] |
+    `Assoc [ "file", `String f; "to_pos", t; "from_pos", fr ] |
+    `Assoc [ "from_pos", fr; "to_pos", t; "file", `String f ] |
+    `Assoc [ "to_pos", t; "from_pos", fr; "file", `String f ] |
+    `Assoc [ "from_pos", fr; "file", `String f; "to_pos", t ] |
+    `Assoc [ "to_pos", t; "file", `String f; "from_pos", fr ] ->
+    (position_of_json f fr,position_of_json f t)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
+
+let annot_to_json f (x,l) =
+  `Assoc [ "val", f x; "loc", to_json l]
+let annot_of_json f = function
+  | `Assoc [ "val", x; "loc", l ] | `Assoc [ "loc", l; "val", x ] ->
+    (f x, of_json l)
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))

@@ -19,3 +19,8 @@ type range = { file : string ;
                to_position: position }
 
 val to_range : t -> range
+
+val of_json : Yojson.Basic.json -> t
+val to_json : t -> Yojson.Basic.json
+val annot_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a annot
+val annot_to_json : ('a -> Yojson.Basic.json) -> 'a annot -> Yojson.Basic.json

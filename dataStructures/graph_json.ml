@@ -72,7 +72,7 @@ let directive_to_json option =
   | Graph_loggers_sig.LineStyle linestyle ->
     "linestyle", linestyle_to_json linestyle
 
-let directives_to_json = JsonUtil.assoc_to_json directive_to_json
+let directives_to_json = JsonUtil.of_assoc directive_to_json
 
 let node_to_json (id, directives) =
   `Assoc [
@@ -87,8 +87,8 @@ let edge_to_json (id1, id2, directives) =
   ]
 
 
-let nodes_to_json = JsonUtil.list_to_json node_to_json
-let edges_to_json = JsonUtil.list_to_json edge_to_json
+let nodes_to_json = JsonUtil.of_list node_to_json
+let edges_to_json = JsonUtil.of_list edge_to_json
 
 let to_json graph =
   (`Assoc [
@@ -150,7 +150,7 @@ let directive_of_json =
   | (_,x) -> raise (Yojson.Basic.Util.Type_error ("Not a correct directive",x))
 
 let directives_of_json directives =
-  JsonUtil.assoc_of_json ~error_msg:(JsonUtil.build_msg "list of directives")
+  JsonUtil.to_assoc ~error_msg:(JsonUtil.build_msg "list of directives")
     directive_of_json directives
 
 let id_of_json = function
@@ -181,10 +181,10 @@ let edge_of_json = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct edge",x))
 
 let nodes_of_json =
-  JsonUtil.list_of_json
+  JsonUtil.to_list
     ~error_msg:(JsonUtil.build_msg "node list") node_of_json
 let edges_of_json =
-  JsonUtil.list_of_json
+  JsonUtil.to_list
     ~error_msg:(JsonUtil.build_msg "edge list") edge_of_json
 
 let of_json = function

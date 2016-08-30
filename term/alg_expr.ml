@@ -11,10 +11,13 @@ type 'a e =
 type t = Connected_component.cc array list e
 
 let rec to_json f = function
-  | BIN_ALG_OP (op,(a,_),(b,_)) ->
-    `List [Operator.bin_alg_op_to_json op;to_json f a;to_json f b]
-  | UN_ALG_OP (op,(a,_)) ->
-    `List [Operator.un_alg_op_to_json op;to_json f a]
+  | BIN_ALG_OP (op,a,b) ->
+    `List [Operator.bin_alg_op_to_json op;
+           Location.annot_to_json (to_json f) a;
+           Location.annot_to_json (to_json f) b]
+  | UN_ALG_OP (op,a) ->
+    `List [Operator.un_alg_op_to_json op;
+           Location.annot_to_json (to_json f) a]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [`String "VAR";`Int i]
   | KAPPA_INSTANCE cc -> f cc
@@ -25,11 +28,13 @@ let rec of_json f = function
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
-       Location.dummy_annot (of_json f a),Location.dummy_annot (of_json f b))
+       Location.annot_of_json (of_json f) a,
+       Location.annot_of_json (of_json f) b)
   | `List [`String "VAR";`Int i] -> ALG_VAR i
   | `List [`String "TOKEN";`Int i] -> TOKEN_ID i
   | `List [op;a] ->
-    UN_ALG_OP (Operator.un_alg_op_of_json op,Location.dummy_annot (of_json f a))
+    UN_ALG_OP (Operator.un_alg_op_of_json op,
+               Location.annot_of_json (of_json f) a)
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
