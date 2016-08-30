@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Aug 21 2016>
+   * Last modification: Time-stamp: <Aug 30 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -17,7 +17,7 @@ let local_trace = false
 
 (***************************************************************)
 (*type*)
-(* agent_ids makes sense only in the contact of a given rule *)
+(* agent_ids makes sense only in the context of a given rule *)
 
 type basic_static_information =
   {
@@ -41,8 +41,6 @@ type basic_static_information =
     (*------------------------------------------------------------------*)
     store_potential_tuple_pair :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
-    (*store_potential_tuple_pair_set:
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;*)
     (*------------------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map :
@@ -914,7 +912,7 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
            let pair = proj x, proj y in
 
            if
-             Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem pair tuples_of_interest 
+             Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem pair tuples_of_interest
            then
              (*-----------------------------------------------------------*)
              let error, handler, mvbdu =
