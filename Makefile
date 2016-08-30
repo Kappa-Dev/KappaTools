@@ -221,7 +221,7 @@ doc: man/KaSim_manual.pdf
 doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
 debug:
-	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte KaDE.byte dev/db_printers.cma
+	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte KaDE.byte KaStor.byte dev/db_printers.cma
 
 all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
 

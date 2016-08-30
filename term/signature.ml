@@ -36,25 +36,6 @@ let internal_state_of_num site_num val_num sign =
   with
   | Invalid_argument _ -> raise Not_found
 
-let create_t ast_intf =
-  NamedDecls.create (
-    Tools.array_map_of_list
-      (fun p ->
-         match p.Ast.port_lnk with
-         | (Ast.FREE,_) ->
-           (p.Ast.port_nme,
-            match p.Ast.port_int with
-            | [] -> None
-            | l ->
-              Some (NamedDecls.create
-                      (Tools.array_map_of_list (fun x -> (x,())) l))
-           )
-         | ((Ast.LNK_SOME | Ast.LNK_ANY |
-             Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
-           raise (ExceptionDefn.Malformed_Decl
-                    ("Link status inside a definition of signature", pos))
-      ) ast_intf)
-
 let print_one f sign =
   Format.fprintf
     f "@[%a@]"
@@ -132,10 +113,7 @@ let default_internal_state agent_id site_id sigs =
   | Invalid_argument _ ->
     invalid_arg "Signature.default_num_value: invalid site identifier"
 
-let create l =
-  NamedDecls.create (Tools.array_map_of_list
-                       (fun (name,intf) -> (name,create_t intf))
-                       l)
+let create t = NamedDecls.create t
 
 let print_agent sigs f ag_ty =
   Format.pp_print_string f @@ agent_of_num ag_ty sigs

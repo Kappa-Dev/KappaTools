@@ -1,30 +1,28 @@
-let alg_expr ?env f alg =
+let cc_mix ?env =
   let sigs = match env with
     | None -> None
     | Some e -> Some (Environment.signatures e) in
-  let rec aux f = function
-    | Alg_expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
-      Format.fprintf f "(%a %a %a)" aux a Operator.print_bin_alg_op op aux b
-    | Alg_expr.UN_ALG_OP (op, (a,_)) ->
-      Format.fprintf f "(%a %a)" Operator.print_un_alg_op op aux a
-    | Alg_expr.STATE_ALG_OP op -> Operator.print_state_alg_op f op
-    | Alg_expr.CONST n -> Nbr.print f n
-    | Alg_expr.ALG_VAR i ->
-      Environment.print_alg ?env f i
-    | Alg_expr.KAPPA_INSTANCE ccs ->
-      Pp.list
-        (fun f -> Format.fprintf f " +@ ")
-        (fun f ccs ->
-           Pp.array
-             (fun f -> Format.fprintf f "*")
-             (fun _ f cc ->
-                Format.fprintf
-                  f "|%a|"
-                  (Connected_component.print ?sigs ?with_id:None) cc) f ccs)
-        f ccs
-    | Alg_expr.TOKEN_ID i ->
-      Format.fprintf f "|%a|" (Environment.print_token ?env) i
-  in aux f alg
+  Pp.list
+    (fun f -> Format.fprintf f " +@ ")
+    (fun f ccs ->
+       Pp.array
+         (fun f -> Format.fprintf f "*")
+         (fun _ f cc ->
+            Format.fprintf
+              f "|%a|"
+              (Connected_component.print ?sigs ?with_id:None) cc) f ccs)
+
+let alg_expr ?env =
+  Alg_expr.print
+    (cc_mix ?env)
+    (fun f i -> Format.fprintf f "|%a|" (Environment.print_token ?env) i)
+    (Environment.print_alg ?env)
+
+let bool_expr ?env =
+  Alg_expr.print_bool
+    (cc_mix ?env)
+    (fun f i -> Format.fprintf f "|%a|" (Environment.print_token ?env) i)
+    (Environment.print_alg ?env)
 
 let print_expr ?env f e =
   let aux f = function
@@ -136,14 +134,13 @@ let perturbation ?env f pert =
   let aux f =
     Format.fprintf
       f "%a do %a"
-      (Ast.print_bool (alg_expr ?env)) (fst pert.Primitives.precondition)
+      (bool_expr ?env) (fst pert.Primitives.precondition)
       (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
   match pert.Primitives.abort with
   | None -> Format.fprintf f "%%mod: %t" aux
   | Some (ab,_) ->
-    Format.fprintf f "%%mod: repeat %t until %a" aux
-      (Ast.print_bool (alg_expr ?env)) ab
+    Format.fprintf f "%%mod: repeat %t until %a" aux (bool_expr ?env) ab
 
 let env f env =
   Environment.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)

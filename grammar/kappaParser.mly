@@ -63,7 +63,7 @@ start_rule:
 			 (*for backward compatibility, shortcut for %var + %plot*)
 			   {r with
 			     Ast.variables = var::r.Ast.variables;
-			     Ast.observables = (Ast.OBS_VAR lbl,pos)
+			     Ast.observables = (Alg_expr.ALG_VAR lbl,pos)
 						 ::r.Ast.observables}
 		      | Ast.PLOT expr ->
 			 {r with Ast.observables = expr::r.Ast.observables}
@@ -230,7 +230,7 @@ variable_declaration:
 		 (fun f -> Format.pp_print_string
 			     f "use |kappa instance| instead.")
 	      in
-	      (($1,rhs_pos 1),(Ast.KAPPA_INSTANCE $2,rhs_pos 2))}
+	      (($1,rhs_pos 1),(Alg_expr.KAPPA_INSTANCE $2,rhs_pos 2))}
     | LABEL alg_expr {(($1,rhs_pos 1),$2)}
     | LABEL error
 	    {raise
@@ -241,14 +241,14 @@ variable_declaration:
 
 bool_expr:
     | OP_PAR bool_expr CL_PAR {$2}
-    | bool_expr AND bool_expr {add_pos (Ast.BOOL_OP(Operator.AND,$1,$3))}
-    | bool_expr OR bool_expr {add_pos (Ast.BOOL_OP(Operator.OR,$1,$3))}
-    | alg_expr GREATER alg_expr {add_pos (Ast.COMPARE_OP(Operator.GREATER,$1,$3))}
-    | alg_expr SMALLER alg_expr {add_pos (Ast.COMPARE_OP(Operator.SMALLER,$1,$3))}
-    | alg_expr EQUAL alg_expr {add_pos (Ast.COMPARE_OP(Operator.EQUAL,$1,$3))}
-    | alg_expr DIFF alg_expr {add_pos (Ast.COMPARE_OP(Operator.DIFF,$1,$3))}
-    | TRUE {add_pos Ast.TRUE}
-    | FALSE {add_pos Ast.FALSE}
+    | bool_expr AND bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.AND,$1,$3))}
+    | bool_expr OR bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.OR,$1,$3))}
+    | alg_expr GREATER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.GREATER,$1,$3))}
+    | alg_expr SMALLER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.SMALLER,$1,$3))}
+    | alg_expr EQUAL alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.EQUAL,$1,$3))}
+    | alg_expr DIFF alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.DIFF,$1,$3))}
+    | TRUE {add_pos Alg_expr.TRUE}
+    | FALSE {add_pos Alg_expr.FALSE}
     ;
 
 rule_label:
@@ -298,22 +298,22 @@ arrow:
     ;
 
 constant:
-    | INFINITY {add_pos (Ast.CONST (Nbr.F infinity))}
-    | FLOAT {add_pos (Ast.CONST (Nbr.F $1))}
-    | INT {add_pos (Ast.CONST (Nbr.I $1))}
-    | EMAX {add_pos (Ast.STATE_ALG_OP (Operator.EMAX_VAR))}
-    | TMAX {add_pos (Ast.STATE_ALG_OP (Operator.TMAX_VAR))}
-    | PLOTNUM {add_pos (Ast.STATE_ALG_OP (Operator.PLOTNUM))}
-    | CPUTIME {add_pos (Ast.STATE_ALG_OP (Operator.CPUTIME))}
+    | INFINITY {add_pos (Alg_expr.CONST (Nbr.F infinity))}
+    | FLOAT {add_pos (Alg_expr.CONST (Nbr.F $1))}
+    | INT {add_pos (Alg_expr.CONST (Nbr.I $1))}
+    | EMAX {add_pos (Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR))}
+    | TMAX {add_pos (Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR))}
+    | PLOTNUM {add_pos (Alg_expr.STATE_ALG_OP (Operator.PLOTNUM))}
+    | CPUTIME {add_pos (Alg_expr.STATE_ALG_OP (Operator.CPUTIME))}
     ;
 
 variable:
-    | PIPE ID PIPE {add_pos (Ast.TOKEN_ID ($2))}
-    | PIPE non_empty_mixture PIPE { add_pos (Ast.KAPPA_INSTANCE $2) }
-    | LABEL {add_pos (Ast.OBS_VAR ($1))}
-    | TIME {add_pos (Ast.STATE_ALG_OP (Operator.TIME_VAR))}
-    | EVENT {add_pos (Ast.STATE_ALG_OP (Operator.EVENT_VAR))}
-    | NULL_EVENT {add_pos (Ast.STATE_ALG_OP (Operator.NULL_EVENT_VAR))}
+    | PIPE ID PIPE {add_pos (Alg_expr.TOKEN_ID ($2))}
+    | PIPE non_empty_mixture PIPE { add_pos (Alg_expr.KAPPA_INSTANCE $2) }
+    | LABEL {add_pos (Alg_expr.ALG_VAR ($1))}
+    | TIME {add_pos (Alg_expr.STATE_ALG_OP (Operator.TIME_VAR))}
+    | EVENT {add_pos (Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR))}
+    | NULL_EVENT {add_pos (Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR))}
     ;
 
 small_alg_expr:
@@ -321,31 +321,31 @@ small_alg_expr:
     | constant {$1}
     | variable {$1}
     | MAX small_alg_expr small_alg_expr
-	  {add_pos (Ast.BIN_ALG_OP(Operator.MAX,$2,$3))}
+	  {add_pos (Alg_expr.BIN_ALG_OP(Operator.MAX,$2,$3))}
     | MIN small_alg_expr small_alg_expr
-	  {add_pos (Ast.BIN_ALG_OP(Operator.MIN,$2,$3))}
-    | EXPONENT alg_expr {add_pos (Ast.UN_ALG_OP(Operator.EXP,$2))}
-    | SINUS alg_expr {add_pos (Ast.UN_ALG_OP(Operator.SINUS,$2))}
-    | COSINUS alg_expr {add_pos (Ast.UN_ALG_OP(Operator.COSINUS,$2))}
-    | TAN alg_expr {add_pos (Ast.UN_ALG_OP(Operator.TAN,$2))}
-    | ABS alg_expr {add_pos (Ast.UN_ALG_OP(Operator.INT,$2))}
-    | SQRT alg_expr {add_pos (Ast.UN_ALG_OP(Operator.SQRT,$2))}
-    | LOG alg_expr {add_pos (Ast.UN_ALG_OP(Operator.LOG,$2))}
+	  {add_pos (Alg_expr.BIN_ALG_OP(Operator.MIN,$2,$3))}
+    | EXPONENT alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.EXP,$2))}
+    | SINUS alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.SINUS,$2))}
+    | COSINUS alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.COSINUS,$2))}
+    | TAN alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.TAN,$2))}
+    | ABS alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.INT,$2))}
+    | SQRT alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.SQRT,$2))}
+    | LOG alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.LOG,$2))}
     ;
 
 alg_expr:
-    | MINUS alg_expr { add_pos (Ast.UN_ALG_OP(Operator.UMINUS,$2)) }
+    | MINUS alg_expr { add_pos (Alg_expr.UN_ALG_OP(Operator.UMINUS,$2)) }
     | small_alg_expr { $1 }
-    | alg_expr MULT alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.MULT,$1,$3))}
-    | alg_expr PLUS alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.SUM,$1,$3))}
-    | alg_expr DIV alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.DIV,$1,$3))}
-    | alg_expr MINUS alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.MINUS,$1,$3))}
-    | alg_expr POW alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.POW,$1,$3))}
-    | alg_expr MODULO alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.MODULO,$1,$3))}
+    | alg_expr MULT alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MULT,$1,$3))}
+    | alg_expr PLUS alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.SUM,$1,$3))}
+    | alg_expr DIV alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.DIV,$1,$3))}
+    | alg_expr MINUS alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MINUS,$1,$3))}
+    | alg_expr POW alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.POW,$1,$3))}
+    | alg_expr MODULO alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MODULO,$1,$3))}
 
 birate:
     | AT rate {let (k2,k1) = $2 in (k2,k1,None,None)}
-    | AT rate COMMA rate {let (k2,k1) = $2 in 
+    | AT rate COMMA rate {let (k2,k1) = $2 in
 			  let (kback,kback1) = $4 in
 			  (k2,k1,Some kback,kback1)}
     | {raise (ExceptionDefn.Syntax_Error (add_pos "rule rate expected"))}
@@ -365,7 +365,7 @@ multiple_mixture:
     | alg_expr non_empty_mixture {($1,($2, rhs_pos 2))}
       /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
     | non_empty_mixture
-	{(Location.dummy_annot (Ast.CONST (Nbr.one)),add_pos $1)}
+	{(Location.dummy_annot (Alg_expr.CONST (Nbr.one)),add_pos $1)}
     ;
 
 non_empty_mixture:
@@ -418,7 +418,7 @@ link_state:
 ;
 
 interactive_command:
-	| RUN NEWLINE {Ast.RUN (Ast.FALSE)}
+	| RUN NEWLINE {Ast.RUN (Alg_expr.FALSE)}
 	| RUN bool_expr NEWLINE {Ast.RUN (fst $2)}
 	| effect NEWLINE {Ast.MODIFY $1}
 	| EOF {Ast.QUIT}

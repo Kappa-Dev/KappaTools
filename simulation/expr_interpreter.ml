@@ -16,7 +16,8 @@ let value_state_alg_op counter ?(time=Counter.current_time counter) = function
 type alg_stack_element =
   | TO_EXEC_ALG of Operator.bin_alg_op * Alg_expr.t
   | TO_EXEC_COMP of Operator.compare_op * Alg_expr.t
-  | TO_EXEC_BOOL of Operator.bool_op * Alg_expr.t Ast.bool_expr
+  | TO_EXEC_BOOL of Operator.bool_op *
+                    (Connected_component.t array list,int) Alg_expr.bool_expr
   | TO_COMPUTE_ALG of Operator.bin_alg_op * Nbr.t
   | TO_COMPUTE_COMP of Operator.compare_op * Nbr.t
   | TO_COMPUTE_UN of Operator.un_alg_op
@@ -86,13 +87,13 @@ and with_value_alg_bool counter ?time ~get_alg ~get_mix ~get_tok n = function
   | [] -> failwith "type error in with_value_alg_bool"
 and exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr sk =
   match expr with
-  | Ast.TRUE -> with_value_bool counter ?time ~get_alg ~get_mix ~get_tok true sk
-  | Ast.FALSE ->
+  | Alg_expr.TRUE -> with_value_bool counter ?time ~get_alg ~get_mix ~get_tok true sk
+  | Alg_expr.FALSE ->
      with_value_bool counter ?time ~get_alg ~get_mix ~get_tok false sk
-  | Ast.BOOL_OP (op,(a,_),(b,_)) ->
+  | Alg_expr.BOOL_OP (op,(a,_),(b,_)) ->
      exec_bool counter ?time ~get_alg ~get_mix ~get_tok
 	       a (TO_EXEC_BOOL (op,b) :: sk)
-  | Ast.COMPARE_OP (op,(a,_),(b,_)) ->
+  | Alg_expr.COMPARE_OP (op,(a,_),(b,_)) ->
      exec_alg counter ?time ~get_alg ~get_mix ~get_tok with_value_alg_bool
 	      a (TO_EXEC_COMP (op,b) :: sk)
 and with_value_bool counter ?time ~get_alg ~get_mix ~get_tok b = function

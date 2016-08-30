@@ -682,13 +682,13 @@ let scan_var parameter error handler var_id var quarks =
   let aux error var list_pos list_neg =
     match var
     with
-    | Ast.KAPPA_INSTANCE(mixture) -> error,mixture::list_pos,list_neg
-    | Ast.BIN_ALG_OP _
-    | Ast.UN_ALG_OP _
-    | Ast.CONST _
-    | Ast.TOKEN_ID _
-    | Ast.STATE_ALG_OP _
-    | Ast.OBS_VAR _
+    | Alg_expr.KAPPA_INSTANCE(mixture) -> error,mixture::list_pos,list_neg
+    | Alg_expr.BIN_ALG_OP _
+    | Alg_expr.UN_ALG_OP _
+    | Alg_expr.CONST _
+    | Alg_expr.TOKEN_ID _
+    | Alg_expr.STATE_ALG_OP _
+    | Alg_expr.ALG_VAR _
       ->
       begin (* to do *)
         error,list_pos,list_neg

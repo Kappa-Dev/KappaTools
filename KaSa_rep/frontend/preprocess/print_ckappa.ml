@@ -167,7 +167,7 @@ let print_mixture  parameter error mixture =
 let rec print_alg parameter (error:Exception.method_handler) alg =
   match alg
   with
-  | Ast.BIN_ALG_OP (op,(alg1,_),(alg2,_)) ->
+  | Alg_expr.BIN_ALG_OP (op,(alg1,_),(alg2,_)) ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
     let error = print_alg parameter error alg1 in
     let () =
@@ -179,7 +179,7 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
     let error = print_alg parameter error alg2 in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
     error
-  | Ast.UN_ALG_OP (op,(alg,_)) ->
+  | Alg_expr.UN_ALG_OP (op,(alg,_)) ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
     let () =
       match
@@ -191,7 +191,7 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
     let error = print_alg parameter error alg in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  ")" in
     error
-  | Ast.STATE_ALG_OP state_alg_op ->
+  | Alg_expr.STATE_ALG_OP state_alg_op ->
     let () =
       match
         Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
@@ -200,15 +200,15 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
       | Some formatter -> Operator.print_state_alg_op formatter state_alg_op
     in
     error
-  | Ast.OBS_VAR string ->
+  | Alg_expr.ALG_VAR string ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "%s" string
     in error
-  | Ast.TOKEN_ID token ->
+  | Alg_expr.TOKEN_ID token ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "%s" token
     in error
-  | Ast.KAPPA_INSTANCE mixture ->
+  | Alg_expr.KAPPA_INSTANCE mixture ->
     print_mixture parameter error mixture
-  | Ast.CONST t ->
+  | Alg_expr.CONST t ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "%s" (Nbr.to_string t)
     in error
 

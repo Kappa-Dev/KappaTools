@@ -967,19 +967,22 @@ let compute_signature show_title state =
   let l =
     Mods.StringMap.fold
       (fun a interface list ->
-         (Location.dummy_annot a ,
-          Mods.StringMap.fold
-            (fun x (states,_binding) acc ->
-               {
-                 Ast.port_nme = Location.dummy_annot x ;
-                 Ast.port_int =
-                   List.rev_map
-                     (fun s -> Location.dummy_annot s)
-                     (List.rev states);
-                 Ast.port_lnk = Location.dummy_annot Ast.FREE}::acc)
-            interface [])::list)
+         (Location.dummy_annot a,
+          NamedDecls.create
+            (Array.of_list
+               (Mods.StringMap.fold
+                  (fun x (states,_binding) acc ->
+                     (Location.dummy_annot x,
+                      match states with
+                      | [] -> None
+                      | l -> Some
+                               (NamedDecls.create
+                                  (Tools.array_map_of_list
+                                     (fun i ->
+                                        (Location.dummy_annot i,())) l)))::acc)
+                  interface [])))::list)
       l [] in
-  let signature = Signature.create l in
+  let signature = Signature.create (Array.of_list l) in
   Remanent_state.set_signature signature state,
   signature
 

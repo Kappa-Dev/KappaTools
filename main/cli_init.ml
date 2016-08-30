@@ -31,7 +31,7 @@ let get_compilation ?max_e common_args cli_args =
           ~pause:(fun f -> f ())
           ~return:(fun x -> x)
           ?rescale_init:cli_args.Run_cli_args.rescale
-          ~outputs:(Outputs.go (Signature.create []))
+          ~outputs:(Outputs.go (Signature.create [||]))
           sigs_nd tk_nd contact_map counter result' in
       (env, cc_env, contact_map, updated_vars, story_compression,
        unary_distances, dotCflow, init_l),counter,[]

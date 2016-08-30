@@ -415,8 +415,8 @@ type 'mixture rule =
     lhs   : 'mixture;
     arrow : Ast.arrow;
     rhs   : 'mixture;
-    k_def : ('mixture,string) Ast.ast_alg_expr Location.annot;
-    k_un  : ('mixture,string) Ast.ast_alg_expr Location.annot option
+    k_def : ('mixture,string) Alg_expr.e Location.annot;
+    k_un  : ('mixture,string) Alg_expr.e Location.annot option
   }
 
 type 'mixture perturbation = ('mixture,string) Ast.perturbation
@@ -560,7 +560,7 @@ type c_mixture =
     c_dot   : (int * int) list
   }
 
-type c_variable = (c_mixture,string) Ast.ast_alg_expr
+type c_variable = (c_mixture,string) Alg_expr.e
 
 type action =
   | Release    of c_bond
@@ -578,16 +578,16 @@ type c_rule =
   }
 
 type c_perturbation =
-  ((((c_mixture,string) Ast.ast_alg_expr Ast.bool_expr) * position)
+  ((((c_mixture,string) Alg_expr.bool_expr) * position)
    * (c_modif_expr list)
-   * ((c_mixture,string) Ast.ast_alg_expr Ast.bool_expr * position) option)
+   * ((c_mixture,string) Alg_expr.bool_expr * position) option)
   * position
 
 and c_modif_expr =
-  | C_INTRO    of ((c_mixture,string) Ast.ast_alg_expr * c_mixture * position)
-  | C_DELETE   of ((c_mixture,string) Ast.ast_alg_expr * c_mixture * position)
+  | C_INTRO    of ((c_mixture,string) Alg_expr.e * c_mixture * position)
+  | C_DELETE   of ((c_mixture,string) Alg_expr.e * c_mixture * position)
   | C_UPDATE   of
-      (string * (c_mixture,string) Ast.ast_alg_expr * position) (*TODO: pause*)
+      (string * (c_mixture,string) Alg_expr.e * position) (*TODO: pause*)
   | C_STOP     of position
   | C_SNAPSHOT of position (*maybe later of mixture too*)
 
@@ -615,7 +615,7 @@ type c_compil =
     (*agent signature declaration*)
     c_rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t;
     (*rules (possibly named)*)
-    c_observables : (c_mixture,string) Ast.ast_alg_expr Int_storage.Nearly_inf_Imperatif.t;
+    c_observables : (c_mixture,string) Alg_expr.e Int_storage.Nearly_inf_Imperatif.t;
     (*list of patterns to plot*)
     c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)

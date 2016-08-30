@@ -53,7 +53,8 @@ val loop :
 
 val interactive_loop :
   outputs:(Data.t -> unit) -> Format.formatter ->
-  Alg_expr.t Ast.bool_expr -> Environment.t -> Connected_component.Env.t ->
+  (Connected_component.t array list,int) Alg_expr.bool_expr ->
+  Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
 (** [interactive_loop message_formatter env domain counter graph]
  does a simulation in the command-line setting up to an interruption *)

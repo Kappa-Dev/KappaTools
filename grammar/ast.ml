@@ -1,5 +1,3 @@
-open Operator
-
 type ('a,'annot) link =
   | LNK_VALUE of int * 'annot
   | FREE
@@ -18,42 +16,24 @@ type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
-type ('mixt,'id) ast_alg_expr =
-    BIN_ALG_OP of
-      bin_alg_op * ('mixt,'id) ast_alg_expr Location.annot
-      * ('mixt,'id) ast_alg_expr Location.annot
-  | UN_ALG_OP of un_alg_op * ('mixt,'id) ast_alg_expr Location.annot
-  | STATE_ALG_OP of state_alg_op
-  | OBS_VAR of 'id
-  | TOKEN_ID of 'id
-  | KAPPA_INSTANCE of 'mixt
-  | CONST of Nbr.t
-
-type 'a bool_expr =
-  | TRUE
-  | FALSE
-  | BOOL_OP of
-      bool_op * 'a bool_expr Location.annot * 'a bool_expr Location.annot
-  | COMPARE_OP of compare_op * 'a Location.annot * 'a Location.annot
-
 type arrow = RAR | LRAR
 
 type rule = {
   lhs: mixture ;
-  rm_token: ((mixture,string) ast_alg_expr Location.annot
+  rm_token: ((mixture,string) Alg_expr.e Location.annot
              * string Location.annot) list ;
   arrow:arrow ;
   rhs: mixture ;
-  add_token: ((mixture,string) ast_alg_expr Location.annot
+  add_token: ((mixture,string) Alg_expr.e Location.annot
               * string Location.annot) list;
-  k_def: (mixture,string) ast_alg_expr Location.annot ;
+  k_def: (mixture,string) Alg_expr.e Location.annot ;
   k_un:
-    ((mixture,string) ast_alg_expr Location.annot *
+    ((mixture,string) Alg_expr.e Location.annot *
      int Location.annot option) option;
   (*k_1:radius_opt*)
-  k_op: (mixture,string) ast_alg_expr Location.annot option ;
+  k_op: (mixture,string) Alg_expr.e Location.annot option ;
   k_op_un:
-    ((mixture,string) ast_alg_expr Location.annot *
+    ((mixture,string) Alg_expr.e Location.annot *
      int Location.annot option) option;
   (*rate for backward rule*)
 }
@@ -66,36 +46,36 @@ type 'alg_expr print_expr =
 
 type ('mixture,'id) modif_expr =
   | INTRO of
-      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
+      (('mixture,'id) Alg_expr.e Location.annot * 'mixture Location.annot)
   | DELETE of
-      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
+      (('mixture,'id) Alg_expr.e Location.annot * 'mixture Location.annot)
   | UPDATE of
       ('id Location.annot *
-       ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
+       ('mixture,'id) Alg_expr.e Location.annot) (*TODO: pause*)
   | UPDATE_TOK of
       ('id Location.annot *
-       ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
-  | STOP of ('mixture,'id) ast_alg_expr print_expr list
-  | SNAPSHOT of ('mixture,'id) ast_alg_expr print_expr list
+       ('mixture,'id) Alg_expr.e Location.annot) (*TODO: pause*)
+  | STOP of ('mixture,'id) Alg_expr.e print_expr list
+  | SNAPSHOT of ('mixture,'id) Alg_expr.e print_expr list
   (*maybe later of mixture too*)
   | PRINT of
-      ((('mixture,'id) ast_alg_expr print_expr list) *
-       (('mixture,'id)  ast_alg_expr print_expr list))
+      ((('mixture,'id) Alg_expr.e print_expr list) *
+       (('mixture,'id)  Alg_expr.e print_expr list))
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Location.annot)
   | CFLOWMIX of (bool * 'mixture Location.annot)
-  | FLUX of bool * ('mixture,'id) ast_alg_expr print_expr list
-  | FLUXOFF of ('mixture,'id) ast_alg_expr print_expr list
+  | FLUX of bool * ('mixture,'id) Alg_expr.e print_expr list
+  | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
 
 type ('mixture,'id) perturbation =
-  (('mixture,'id) ast_alg_expr bool_expr Location.annot *
+  (('mixture,'id) Alg_expr.bool_expr Location.annot *
    (('mixture,'id) modif_expr list) *
-   ('mixture,'id) ast_alg_expr bool_expr Location.annot option) Location.annot
+   ('mixture,'id) Alg_expr.bool_expr Location.annot option) Location.annot
 
 type configuration = string Location.annot * (string Location.annot list)
 
 type ('mixture,'id) variable_def =
-  string Location.annot * ('mixture,'id) ast_alg_expr Location.annot
+  string Location.annot * ('mixture,'id) Alg_expr.e Location.annot
 
 type ('mixture,'id) init_t =
   | INIT_MIX of 'mixture
@@ -107,17 +87,17 @@ type ('mixture,'id) instruction =
   | VOLSIG   of string * float * string (* type, volume, parameter*)
   | INIT     of
       string Location.annot option *
-      ('mixture,'id) ast_alg_expr Location.annot *
+      ('mixture,'id) Alg_expr.e Location.annot *
       ('mixture,'id) init_t Location.annot
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
-  | PLOT     of ('mixture,'id) ast_alg_expr Location.annot
+  | PLOT     of ('mixture,'id) Alg_expr.e Location.annot
   | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
 
 type ('mixture,'id) command =
-  | RUN of ('mixture,'id) ast_alg_expr bool_expr
+  | RUN of ('mixture,'id) Alg_expr.bool_expr
   | MODIFY of ('mixture,'id) modif_expr
   | QUIT
 
@@ -133,11 +113,11 @@ type ('agent,'mixture,'id,'rule) compil =
       (string Location.annot option * 'rule Location.annot) list;
     (*rules (possibly named)*)
     observables :
-      ('mixture,'id) ast_alg_expr Location.annot list;
+      ('mixture,'id) Alg_expr.e Location.annot list;
     (*list of patterns to plot*)
     init :
       (string Location.annot option *
-       ('mixture,'id) ast_alg_expr Location.annot *
+       ('mixture,'id) Alg_expr.e Location.annot *
        ('mixture,'id) init_t Location.annot) list;
     (*initial graph declaration*)
     perturbations :
@@ -271,56 +251,6 @@ let agent_of_json = function
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
 
-let rec print_ast_alg pr_mix pr_tok pr_var f = function
-  | CONST n -> Nbr.print f n
-  | OBS_VAR lab -> Format.fprintf f "'%a'" pr_var lab
-  | KAPPA_INSTANCE ast ->
-    Format.fprintf f "|%a|" pr_mix ast
-  | TOKEN_ID tk -> Format.fprintf f "|%a|" pr_tok tk
-  | STATE_ALG_OP op -> Operator.print_state_alg_op f op
-  | BIN_ALG_OP (op, (a,_), (b,_)) ->
-    Format.fprintf f "(%a %a %a)"
-      (print_ast_alg pr_mix pr_tok pr_var) a
-      Operator.print_bin_alg_op op
-      (print_ast_alg pr_mix pr_tok pr_var) b
-  |UN_ALG_OP (op, (a,_)) ->
-    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op
-      (print_ast_alg pr_mix pr_tok pr_var) a
-
-let rec alg_to_json f_mix f_var = function
-  | BIN_ALG_OP (op,a,b) ->
-    `List [Operator.bin_alg_op_to_json op;
-           Location.annot_to_json (alg_to_json f_mix f_var) a;
-           Location.annot_to_json (alg_to_json f_mix f_var) b]
-  | UN_ALG_OP (op,a) ->
-    `List [Operator.un_alg_op_to_json op;
-           Location.annot_to_json (alg_to_json f_mix f_var) a]
-  | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
-  | OBS_VAR o -> `List [`String "VAR";f_var o]
-  | KAPPA_INSTANCE ast -> f_mix ast
-  | TOKEN_ID i -> `List [`String "TOKEN";f_var i]
-  | CONST n -> Nbr.to_json n
-
-let rec alg_of_json f_mix f_var = function
-  | `List [op;a;b] ->
-    BIN_ALG_OP
-      (Operator.bin_alg_op_of_json op,
-       Location.annot_of_json (alg_of_json f_mix f_var) a,
-       Location.annot_of_json (alg_of_json f_mix f_var) b)
-  | `List [`String "VAR";o] -> OBS_VAR (f_var o)
-  | `List [`String "TOKEN";i] -> TOKEN_ID (f_var i)
-  | `List [op;a] ->
-    UN_ALG_OP (Operator.un_alg_op_of_json op,
-               Location.annot_of_json (alg_of_json f_mix f_var) a)
-  | x ->
-    try STATE_ALG_OP (Operator.state_alg_op_of_json x)
-    with Yojson.Basic.Util.Type_error _ ->
-    try  CONST (Nbr.of_json x)
-    with Yojson.Basic.Util.Type_error _ ->
-    try KAPPA_INSTANCE (f_mix x)
-    with Yojson.Basic.Util.Type_error _ ->
-      raise (Yojson.Basic.Util.Type_error ("Invalid Ast_alg_expr",x))
-
 let init_to_json f_mix f_var = function
   | INIT_MIX m -> `List [`String "mixture"; f_mix m ]
   | INIT_TOK t -> `List [`String "token"; f_var t ]
@@ -331,14 +261,16 @@ let init_of_json f_mix f_var = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Ast init statement",x))
 
 let print_tok pr_mix pr_tok pr_var f ((nb,_),(n,_)) =
-  Format.fprintf f "%a:%a" (print_ast_alg pr_mix pr_tok pr_var) nb pr_tok n
+  Format.fprintf f "%a:%a" (Alg_expr.print pr_mix pr_tok pr_var) nb pr_tok n
 let print_one_size tk f mix =
   Format.fprintf
     f "%a%t%a" print_ast_mix mix
     (fun f -> match tk with [] -> () | _::_ -> Format.pp_print_string f " | ")
     (Pp.list
        (fun f -> Format.pp_print_string f " + ")
-       (print_tok print_ast_mix Format.pp_print_string Format.pp_print_string))
+       (print_tok
+          (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+          Format.pp_print_string Format.pp_print_string))
     tk
 let print_arrow f = function
   | RAR -> Format.pp_print_string f "->"
@@ -346,17 +278,18 @@ let print_arrow f = function
 
 let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
   Format.fprintf
-    f "%a%t" (print_ast_alg pr_mix pr_tok pr_var) def
+    f "%a%t" (Alg_expr.print pr_mix pr_tok pr_var) def
     (fun f ->
        match op with
          None -> ()
        | Some (d,_) ->
-         Format.fprintf f ", %a" (print_ast_alg pr_mix pr_tok pr_var) d)
+         Format.fprintf f ", %a" (Alg_expr.print pr_mix pr_tok pr_var) d)
 let print_rates un op f def =
   Format.fprintf
     f "%a%t"
     (print_raw_rate
-       print_ast_mix Format.pp_print_string Format.pp_print_string op)
+       (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+       Format.pp_print_string Format.pp_print_string op)
     def
     (fun f ->
        match un with
@@ -364,8 +297,9 @@ let print_rates un op f def =
        | Some ((d,_),max_dist) ->
          Format.fprintf
            f "(%a:%a)"
-           (print_ast_alg
-              print_ast_mix Format.pp_print_string Format.pp_print_string) d
+           (Alg_expr.print
+              (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+              Format.pp_print_string Format.pp_print_string) d
            (Pp.option (fun f (md,_) -> Format.pp_print_int f md)) max_dist)
 let print_ast_rule f r =
   Format.fprintf
@@ -386,7 +320,7 @@ let rule_to_json f_mix f_var r =
     "rm_token",
     JsonUtil.of_list
       (JsonUtil.of_pair
-         (Location.annot_to_json (alg_to_json f_mix f_var))
+         (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
          string_annot_to_json)
       r.rm_token;
     "bidirectionnal", `Bool (r.arrow = LRAR);
@@ -394,21 +328,21 @@ let rule_to_json f_mix f_var r =
     "add_token",
     JsonUtil.of_list
       (JsonUtil.of_pair
-         (Location.annot_to_json (alg_to_json f_mix f_var))
+         (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
          string_annot_to_json)
       r.add_token;
-    "k_def", Location.annot_to_json (alg_to_json f_mix f_var) r.k_def;
+    "k_def", Location.annot_to_json (Alg_expr.to_json f_mix f_var) r.k_def;
     "k_un",
     JsonUtil.of_option
-      (JsonUtil.of_pair (Location.annot_to_json (alg_to_json f_mix f_var))
+      (JsonUtil.of_pair (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
          (JsonUtil.of_option (Location.annot_to_json JsonUtil.of_int)))
       r.k_un;
     "k_op",
     JsonUtil.of_option
-      (Location.annot_to_json (alg_to_json f_mix f_var)) r.k_op;
+      (Location.annot_to_json (Alg_expr.to_json f_mix f_var)) r.k_op;
     "k_op_un",
     JsonUtil.of_option
-      (JsonUtil.of_pair (Location.annot_to_json (alg_to_json f_mix f_var))
+      (JsonUtil.of_pair (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
          (JsonUtil.of_option (Location.annot_to_json JsonUtil.of_int)))
       r.k_op_un;
   ]
@@ -422,7 +356,7 @@ let rule_of_json f_mix f_var = function
           rm_token =
             JsonUtil.to_list
               (JsonUtil.to_pair
-                 (Location.annot_of_json (alg_of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  string_annot_of_json)
               (List.assoc "rm_token" l);
           arrow =
@@ -432,25 +366,25 @@ let rule_of_json f_mix f_var = function
           add_token =
             JsonUtil.to_list
               (JsonUtil.to_pair
-                 (Location.annot_of_json (alg_of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  string_annot_of_json)
               (List.assoc "add_token" l);
           k_def = Location.annot_of_json
-              (alg_of_json f_mix f_var) (List.assoc "k_def" l);
+              (Alg_expr.of_json f_mix f_var) (List.assoc "k_def" l);
           k_un =
             JsonUtil.to_option
               (JsonUtil.to_pair
-                 (Location.annot_of_json (alg_of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  (JsonUtil.to_option
                     (Location.annot_of_json (JsonUtil.to_int ?error_msg:None))))
               (List.assoc "k_un" l);
           k_op = JsonUtil.to_option
-              (Location.annot_of_json (alg_of_json f_mix f_var))
+              (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
               (List.assoc "k_op" l);
           k_op_un =
             JsonUtil.to_option
               (JsonUtil.to_pair
-                 (Location.annot_of_json (alg_of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  (JsonUtil.to_option
                     (Location.annot_of_json (JsonUtil.to_int ?error_msg:None))))
               (List.assoc "k_op_un" l);
@@ -460,74 +394,34 @@ let rule_of_json f_mix f_var = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule",x))
 
-let rec print_bool p_alg f = function
-  | TRUE -> Format.fprintf f "[true]"
-  | FALSE -> Format.fprintf f "[false]"
-  | BOOL_OP (op,(a,_), (b,_)) ->
-    Format.fprintf f "(%a %a %a)" (print_bool p_alg) a
-      Operator.print_bool_op op (print_bool p_alg) b
-  | COMPARE_OP (op,(a,_), (b,_)) ->
-    Format.fprintf f "(%a %a %a)"
-      p_alg a Operator.print_compare_op op p_alg b
-
-let print_ast_bool pr_mix pr_tok pr_var =
-  print_bool (print_ast_alg pr_mix pr_tok pr_var)
-
-let rec bool_to_json f_alg = function
-  | TRUE -> `Bool true
-  | FALSE -> `Bool false
-  | BOOL_OP (op,a,b) ->
-    `List [ Operator.bool_op_to_json op;
-            Location.annot_to_json (bool_to_json f_alg) a;
-            Location.annot_to_json (bool_to_json f_alg) b ]
-  | COMPARE_OP (op,a,b) ->
-    `List [ Operator.compare_op_to_json op;
-            Location.annot_to_json f_alg a; Location.annot_to_json f_alg b ]
-
-let rec bool_of_json f_alg = function
-  | `Bool b -> if b then TRUE else FALSE
-  | `List [op; a; b] as x ->
-    begin
-      try BOOL_OP (Operator.bool_op_of_json op,
-                   Location.annot_of_json (bool_of_json f_alg) a,
-                   Location.annot_of_json (bool_of_json f_alg) b)
-      with Yojson.Basic.Util.Type_error _ ->
-      try COMPARE_OP (Operator.compare_op_of_json op,
-                      Location.annot_of_json f_alg a,
-                      Location.annot_of_json f_alg b)
-      with Yojson.Basic.Util.Type_error _ ->
-        raise (Yojson.Basic.Util.Type_error ("Incorrect bool expr",x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect bool_expr",x))
-
 let print_expr_to_json f_mix f_var = function
   | Str_pexpr s -> string_annot_to_json s
-  | Alg_pexpr a -> Location.annot_to_json (alg_to_json f_mix f_var) a
+  | Alg_pexpr a -> Location.annot_to_json (Alg_expr.to_json f_mix f_var) a
 
 let print_expr_of_json f_mix f_var x =
   try Str_pexpr (string_annot_of_json x)
   with Yojson.Basic.Util.Type_error _ ->
-  try Alg_pexpr (Location.annot_of_json (alg_of_json f_mix f_var) x)
+  try Alg_pexpr (Location.annot_of_json (Alg_expr.of_json f_mix f_var) x)
   with Yojson.Basic.Util.Type_error _ ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
 
 let modif_to_json f_mix f_var = function
   | INTRO (alg,mix) ->
     `List [ `String "INTRO";
-            Location.annot_to_json (alg_to_json f_mix f_var) alg;
+            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg;
             Location.annot_to_json f_mix mix ]
   | DELETE (alg,mix) ->
     `List [ `String "DELETE";
-            Location.annot_to_json (alg_to_json f_mix f_var) alg;
+            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg;
             Location.annot_to_json f_mix mix ]
   | UPDATE (id,alg) ->
     `List [ `String "UPDATE";
             Location.annot_to_json f_var id;
-            Location.annot_to_json (alg_to_json f_mix f_var) alg ]
+            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg ]
   | UPDATE_TOK (id,alg) ->
     `List [ `String "UPDATE_TOK";
             Location.annot_to_json f_var id;
-            Location.annot_to_json (alg_to_json f_mix f_var) alg ]
+            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg ]
   | STOP l ->
     `List (`String "STOP" :: List.map (print_expr_to_json f_mix f_var) l)
   | SNAPSHOT l ->
@@ -550,20 +444,20 @@ let modif_to_json f_mix f_var = function
 let modif_of_json f_mix f_var = function
   | `List [ `String "INTRO"; alg; mix ] ->
      INTRO
-       (Location.annot_of_json (alg_of_json f_mix f_var) alg,
+       (Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg,
         Location.annot_of_json f_mix mix)
   | `List [ `String "DELETE"; alg; mix ] ->
     DELETE
-      (Location.annot_of_json (alg_of_json f_mix f_var) alg,
+      (Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg,
        Location.annot_of_json f_mix mix)
   | `List [ `String "UPDATE"; id; alg ] ->
     UPDATE
       (Location.annot_of_json f_var id,
-       Location.annot_of_json (alg_of_json f_mix f_var) alg)
+       Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg)
   | `List [ `String "UPDATE_TOK"; id; alg ] ->
      UPDATE_TOK
        (Location.annot_of_json f_var id,
-        Location.annot_of_json (alg_of_json f_mix f_var) alg)
+        Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg)
   | `List (`String "STOP" :: l) ->
     STOP (List.map (print_expr_of_json f_mix f_var) l)
   | `List (`String "SNAPSHOT" :: l) ->
@@ -665,7 +559,7 @@ let compil_to_json c =
       "variables", JsonUtil.of_list
         (JsonUtil.of_pair
            string_annot_to_json
-           (Location.annot_to_json (alg_to_json mix_to_json var_to_json)))
+           (Location.annot_to_json (Alg_expr.to_json mix_to_json var_to_json)))
         c.variables;
       "rules", JsonUtil.of_list
         (JsonUtil.of_pair
@@ -674,12 +568,12 @@ let compil_to_json c =
         c.rules;
       "observables",
       JsonUtil.of_list
-        (Location.annot_to_json (alg_to_json mix_to_json var_to_json))
+        (Location.annot_to_json (Alg_expr.to_json mix_to_json var_to_json))
         c.observables;
       "init",
       JsonUtil.of_list
         (JsonUtil.of_pair
-           (Location.annot_to_json (alg_to_json mix_to_json var_to_json))
+           (Location.annot_to_json (Alg_expr.to_json mix_to_json var_to_json))
            (Location.annot_to_json (init_to_json mix_to_json var_to_json)))
         (List.map (fun (_,a,i) -> (a,i)) c.init);
       "perturbations", JsonUtil.of_list
@@ -687,11 +581,11 @@ let compil_to_json c =
            (fun (pre,modif,post) ->
               `List [
                 Location.annot_to_json
-                  (bool_to_json (alg_to_json mix_to_json var_to_json)) pre;
+                  (Alg_expr.bool_to_json mix_to_json var_to_json) pre;
                 JsonUtil.of_list (modif_to_json mix_to_json var_to_json) modif;
                 JsonUtil.of_option
                   (Location.annot_to_json
-                     (bool_to_json (alg_to_json mix_to_json var_to_json))) post;
+                     (Alg_expr.bool_to_json mix_to_json var_to_json)) post;
               ])) c.perturbations;
       "configurations",
       JsonUtil.of_list
@@ -717,7 +611,7 @@ let compil_of_json = function
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST variables")
               (JsonUtil.to_pair
                  string_annot_of_json
-                 (Location.annot_of_json (alg_of_json mix_of_json var_of_json)))
+                 (Location.annot_of_json (Alg_expr.of_json mix_of_json var_of_json)))
               (List.assoc "variables" l);
           rules =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST rules")
@@ -728,7 +622,7 @@ let compil_of_json = function
               (List.assoc "rules" l);
           observables =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST observables")
-              (Location.annot_of_json (alg_of_json mix_of_json var_of_json))
+              (Location.annot_of_json (Alg_expr.of_json mix_of_json var_of_json))
               (List.assoc "observables" l);
           init =
             List.map
@@ -736,7 +630,7 @@ let compil_of_json = function
               (JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST init")
                  (JsonUtil.to_pair
                     (Location.annot_of_json
-                       (alg_of_json mix_of_json var_of_json))
+                       (Alg_expr.of_json mix_of_json var_of_json))
                     (Location.annot_of_json
                        (init_of_json mix_of_json var_of_json)))
                  (List.assoc "init" l));
@@ -746,13 +640,13 @@ let compil_of_json = function
                  (function
                    | `List [pre; modif; post] ->
                      (Location.annot_of_json
-                        (bool_of_json (alg_of_json mix_of_json var_of_json))
+                        (Alg_expr.bool_of_json mix_of_json var_of_json)
                         pre,
                       JsonUtil.to_list
                         (modif_of_json mix_of_json var_of_json) modif,
                       JsonUtil.to_option
                         (Location.annot_of_json
-                           (bool_of_json (alg_of_json mix_of_json var_of_json)))
+                           (Alg_expr.bool_of_json mix_of_json var_of_json))
                         post)
                    | x ->
                      raise

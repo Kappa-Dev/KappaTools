@@ -8,8 +8,9 @@ val init_kasa :
 
 val compile_bool:
   Primitives.contact_map -> Connected_component.PreEnv.t ->
-  (LKappa.rule_mixture, int) Ast.ast_alg_expr Ast.bool_expr Location.annot ->
-  Connected_component.PreEnv.t * Alg_expr.t Ast.bool_expr Location.annot
+  (LKappa.rule_mixture, int) Alg_expr.bool_expr Location.annot ->
+  Connected_component.PreEnv.t *
+  (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot
 
 val compile_modification_no_update:
   Primitives.contact_map -> Connected_component.PreEnv.t ->

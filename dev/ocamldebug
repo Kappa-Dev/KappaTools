@@ -3,8 +3,11 @@
 HISTORYFILE=/tmp/ocamldebug-KaSim_history
 BUILDROOT=${KAPPABIN}../_build/
 
+EXEC=$1
+shift;
+
 ledit -x -h ${HISTORYFILE} ocamldebug $(ocamlfind query -r -i-format yojson) \
       -I ${BUILDROOT}dev -I ${BUILDROOT}grammar \
       -I ${BUILDROOT}pattern -I ${BUILDROOT}simulation -I ${BUILDROOT}term \
       -I ${BUILDROOT}siteGraphs -I ${BUILDROOT}dataStructures -I ${BUILDROOT}main \
-      -I ${BUILDROOT}cflow ${BUILDROOT}main/KaSim.byte $@
+      -I ${BUILDROOT}cflow ${BUILDROOT}${EXEC}.byte $@

@@ -295,13 +295,13 @@ let filter_influence parameters error handler compilation map bool =
     match
       snd (v.Cckappa_sig.e_variable)
     with
-    | Ast.KAPPA_INSTANCE(mixture), _ -> error,mixture
-    | Ast.BIN_ALG_OP (_,_,_),_
-    | Ast.UN_ALG_OP (_,_),_
-    | Ast.STATE_ALG_OP _, _
-    | Ast.OBS_VAR _,_
-    | Ast.TOKEN_ID _,_
-    | Ast.CONST _,_     ->
+    | Alg_expr.KAPPA_INSTANCE(mixture), _ -> error,mixture
+    | Alg_expr.BIN_ALG_OP (_,_,_),_
+    | Alg_expr.UN_ALG_OP (_,_),_
+    | Alg_expr.STATE_ALG_OP _, _
+    | Alg_expr.ALG_VAR _,_
+    | Alg_expr.TOKEN_ID _,_
+    | Alg_expr.CONST _,_     ->
       let error,() =
         Exception.warn
           parameters error __POS__

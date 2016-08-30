@@ -490,20 +490,20 @@ let rec alg_map f error alg =
   match
     alg
   with
-  | Ast.BIN_ALG_OP (op,(m1,pos1),(m2,pos2)) ->
+  | Alg_expr.BIN_ALG_OP (op,(m1,pos1),(m2,pos2)) ->
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in
-    error,Ast.BIN_ALG_OP (op,(m1',pos1),(m2',pos2))
-  | Ast.UN_ALG_OP (op,(m1,pos1)) ->
+    error,Alg_expr.BIN_ALG_OP (op,(m1',pos1),(m2',pos2))
+  | Alg_expr.UN_ALG_OP (op,(m1,pos1)) ->
     let error,m1' = alg_map f error m1 in
-    error,Ast.UN_ALG_OP (op,(m1',pos1))
-  | Ast.STATE_ALG_OP s -> error,Ast.STATE_ALG_OP s
-  | Ast.OBS_VAR s -> error,Ast.OBS_VAR s
-  | Ast.TOKEN_ID s -> error,Ast.TOKEN_ID s
-  | Ast.KAPPA_INSTANCE mixture ->
+    error,Alg_expr.UN_ALG_OP (op,(m1',pos1))
+  | Alg_expr.STATE_ALG_OP s -> error,Alg_expr.STATE_ALG_OP s
+  | Alg_expr.ALG_VAR s -> error,Alg_expr.ALG_VAR s
+  | Alg_expr.TOKEN_ID s -> error,Alg_expr.TOKEN_ID s
+  | Alg_expr.KAPPA_INSTANCE mixture ->
     let error,mixture' = f error mixture in
-    error,Ast.KAPPA_INSTANCE mixture'
-  | Ast.CONST x -> error,Ast.CONST x
+    error,Alg_expr.KAPPA_INSTANCE mixture'
+  | Alg_expr.CONST x -> error,Alg_expr.CONST x
 
 let print_expr_map  f error alg =
   match
@@ -525,32 +525,32 @@ let rec bool_map f error alg =
   match
     alg
   with
-  | Ast.TRUE -> error,Ast.TRUE
-  | Ast.FALSE -> error,Ast.FALSE
-  | Ast.BOOL_OP(Operator.AND,(b1,pos1),(b2,pos2)) ->
+  | Alg_expr.TRUE -> error,Alg_expr.TRUE
+  | Alg_expr.FALSE -> error,Alg_expr.FALSE
+  | Alg_expr.BOOL_OP(Operator.AND,(b1,pos1),(b2,pos2)) ->
     let error,b1' = bool_map f error b1 in
     let error,b2' = bool_map f error b2 in
-    error,Ast.BOOL_OP(Operator.AND,(b1',pos1),(b2',pos2))
-  | Ast.BOOL_OP(Operator.OR,(b1,pos1),(b2,pos2)) ->
+    error,Alg_expr.BOOL_OP(Operator.AND,(b1',pos1),(b2',pos2))
+  | Alg_expr.BOOL_OP(Operator.OR,(b1,pos1),(b2,pos2)) ->
     let error,b1' = bool_map f error b1 in
     let error,b2' = bool_map f error b2 in
-    error,Ast.BOOL_OP(Operator.OR,(b1',pos1),(b2',pos2))
-  | Ast.COMPARE_OP(Operator.GREATER,(m1,pos1),(m2,pos2)) ->
+    error,Alg_expr.BOOL_OP(Operator.OR,(b1',pos1),(b2',pos2))
+  | Alg_expr.COMPARE_OP(Operator.GREATER,(m1,pos1),(m2,pos2)) ->
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in
-    error,Ast.COMPARE_OP(Operator.GREATER,(m1',pos1),(m2',pos2))
-  | Ast.COMPARE_OP(Operator.SMALLER,(m1,pos1),(m2,pos2)) ->
+    error,Alg_expr.COMPARE_OP(Operator.GREATER,(m1',pos1),(m2',pos2))
+  | Alg_expr.COMPARE_OP(Operator.SMALLER,(m1,pos1),(m2,pos2)) ->
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in
-    error,Ast.COMPARE_OP(Operator.SMALLER,(m1',pos1),(m2',pos2))
-  | Ast.COMPARE_OP(Operator.EQUAL,(m1,pos1),(m2,pos2)) ->
+    error,Alg_expr.COMPARE_OP(Operator.SMALLER,(m1',pos1),(m2',pos2))
+  | Alg_expr.COMPARE_OP(Operator.EQUAL,(m1,pos1),(m2,pos2)) ->
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in
-    error,Ast.COMPARE_OP(Operator.EQUAL,(m1',pos1),(m2',pos2))
-  | Ast.COMPARE_OP(Operator.DIFF,(m1,pos1),(m2,pos2)) ->
+    error,Alg_expr.COMPARE_OP(Operator.EQUAL,(m1',pos1),(m2',pos2))
+  | Alg_expr.COMPARE_OP(Operator.DIFF,(m1,pos1),(m2,pos2)) ->
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in
-    error,Ast.COMPARE_OP(Operator.DIFF,(m1',pos1),(m2',pos2))
+    error,Alg_expr.COMPARE_OP(Operator.DIFF,(m1',pos1),(m2',pos2))
 
 let modif_map f_forbidding_question_marks f_allowing_question_marks error alg =
   match

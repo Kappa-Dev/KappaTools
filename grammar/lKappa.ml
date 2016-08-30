@@ -22,11 +22,11 @@ type rule =
   { r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_rm_tokens :
-      ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
+      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
     r_add_tokens :
-      ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
-    r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
-    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot
+      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
+    r_rate : (rule_mixture,int) Alg_expr.e Location.annot;
+    r_un_rate : ((rule_mixture,int) Alg_expr.e Location.annot
                  * int Location.annot option) option;
   }
 
@@ -76,13 +76,13 @@ let switching_to_json = function
   | Freed -> `String "Freed"
   | Maintained -> `String "Maintained"
   | Erased -> `String "Erased"
-  | Linked (i,_) -> `Int i
+  | Linked i -> Location.annot_to_json JsonUtil.of_int i
 let switching_of_json = function
   | `String "Freed" -> Freed
   | `String "Maintained" -> Maintained
   | `String "Erased"-> Erased
-  | `Int i -> Linked (Location.dummy_annot i)
-  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Switching",x))
+  | x -> Linked (Location.annot_of_json
+                   (JsonUtil.to_int~error_msg:"Invalid Switching") x)
 
 let print_rule_link sigs f ((e,_),s) =
   Format.fprintf
@@ -221,14 +221,18 @@ let print_rhs ~ltypes sigs created f mix =
 let print_rates sigs pr_tok pr_var f r =
   Format.fprintf
     f " @@ %a%t"
-    (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) (fst r.r_rate)
+    (Alg_expr.print
+       (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+       pr_tok pr_var) (fst r.r_rate)
     (fun f ->
        match r.r_un_rate with
        | None -> ()
        | Some ((ra,_),max_dist) ->
          Format.fprintf
            f "(%a%a)"
-           (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) ra
+           (Alg_expr.print
+              (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+              pr_tok pr_var) ra
            (Pp.option (fun f (md,_) ->
                 Format.fprintf f ":%a" Format.pp_print_int md)) max_dist)
 
@@ -243,7 +247,9 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
        (fun f ((nb,_),tk) ->
           Format.fprintf
             f "%a:%a"
-            (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) nb
+            (Alg_expr.print
+               (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+               pr_tok pr_var) nb
             pr_tok tk))
     r.r_rm_tokens
     (print_rhs ~ltypes sigs r.r_created) r.r_mix
@@ -255,7 +261,9 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
        (fun f ((nb,_),tk) ->
           Format.fprintf
             f "%a:%a"
-            (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) nb
+            (Alg_expr.print
+               (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+               pr_tok pr_var) nb
             pr_tok tk))
     r.r_add_tokens
     (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
@@ -265,10 +273,12 @@ let rule_agent_to_json a =
     "type", `Int a.ra_type;
     "bindings",
     `List (Array.fold_right
-             (fun ((e,_),s) c ->
-                (`List [Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
-                          (fun (s,a) -> [`Int s;`Int a]) e;
-                        switching_to_json s])::c)
+             (fun (e,s) c ->
+                (`List [
+                    Location.annot_to_json
+                      (Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
+                         (fun (s,a) -> [`Int s;`Int a])) e;
+                       switching_to_json s])::c)
              a.ra_ports []);
     "states",
     `List (Array.fold_right
@@ -285,13 +295,13 @@ let rule_agent_of_json = function
             Tools.array_map_of_list
               (function
                 | `List [e;s] ->
-                  (Location.dummy_annot
+                  (Location.annot_of_json
                      (Ast.link_of_json
                         (fun _ -> Yojson.Basic.Util.to_int)
                         Yojson.Basic.Util.to_int
                         (function
                           | [`Int s; `Int a] -> (s,a)
-                          | _ -> raise Not_found) e),
+                          | _ -> raise Not_found)) e,
                   switching_of_json s)
                 | _ -> raise Not_found) s
           | _ -> raise Not_found in
@@ -312,40 +322,72 @@ let rule_agent_of_json = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid rule_agent",x))
 
+let rule_mixture_to_json = JsonUtil.of_list rule_agent_to_json
+let rule_mixture_of_json = JsonUtil.to_list rule_agent_of_json
+
+let lalg_expr_to_json = Alg_expr.to_json rule_mixture_to_json JsonUtil.of_int
+let lalg_expr_of_json =
+  Alg_expr.of_json rule_mixture_of_json (JsonUtil.to_int ?error_msg:None)
+
 let rule_to_json r =
-  let () =
-    ExceptionDefn.warning
-      (fun f -> Format.pp_print_string f "Fake LKappa.rule_to_json") in
   `Assoc
     [
-      "mixture",
-      `List (List.map rule_agent_to_json r.r_mix);
-      "created", `List [];
-      "rm_tokens", `List [];
-      "add_tokens", `List [];
-      "rate", `Null;
-      "unary_rate", `Null
+      "mixture", rule_mixture_to_json r.r_mix;
+      "created", Raw_mixture.to_json r.r_created;
+      "rm_tokens",
+      JsonUtil.of_list
+        (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
+           (Location.annot_to_json lalg_expr_to_json)
+           JsonUtil.of_int)
+        r.r_rm_tokens;
+      "add_tokens",
+      JsonUtil.of_list
+        (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
+           (Location.annot_to_json lalg_expr_to_json)
+           JsonUtil.of_int)
+        r.r_add_tokens;
+      "rate", Location.annot_to_json lalg_expr_to_json r.r_rate;
+      "unary_rate",
+      JsonUtil.of_option
+        (JsonUtil.of_pair
+           (Location.annot_to_json lalg_expr_to_json)
+           (JsonUtil.of_option (Location.annot_to_json JsonUtil.of_int)))
+        r.r_un_rate;
     ]
 let rule_of_json = function
   | `Assoc l as x when List.length l < 7 ->
     begin
       try
         {
-          r_mix =
-            (match List.assoc "mixture" l with
-             | `List a -> List.map rule_agent_of_json a
-             | _ -> raise Not_found);
-          r_created = [];
-          r_rm_tokens = [];
-          r_add_tokens = [];
-          r_rate = Location.dummy_annot (Ast.CONST (Nbr.zero));
-          r_un_rate = None;
+          r_mix = rule_mixture_of_json (List.assoc "mixture" l);
+          r_created = Raw_mixture.of_json (List.assoc "created" l);
+          r_rm_tokens =
+            JsonUtil.to_list
+              (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
+                 (Location.annot_of_json lalg_expr_of_json)
+                 (JsonUtil.to_int ?error_msg:None))
+              (List.assoc "rm_tokens" l);
+          r_add_tokens =
+            JsonUtil.to_list
+              (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
+                 (Location.annot_of_json lalg_expr_of_json)
+                 (JsonUtil.to_int ?error_msg:None))
+              (List.assoc "rm_tokens" l);
+          r_rate = Location.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
+          r_un_rate =
+            (try
+               JsonUtil.to_option
+                 (JsonUtil.to_pair
+                    (Location.annot_of_json lalg_expr_of_json)
+                    (JsonUtil.to_option (Location.annot_of_json
+                                           (JsonUtil.to_int ?error_msg:None))))
+                 (List.assoc "unary_rate" l)
+             with Not_found -> None);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect rule",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect rule",x))
-
 
 let build_l_type sigs pos dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
@@ -489,11 +531,12 @@ let of_raw_mixture x =
     x
 
 let rec ast_alg_has_mix = function
-  | Ast.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
-  | Ast.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
-  | (Ast.STATE_ALG_OP _ | Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ ), _ ->
+  | Alg_expr.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
+  | Alg_expr.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
+  | (Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ |
+     Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ ), _ ->
     false
-  | Ast.KAPPA_INSTANCE _, _ -> true
+  | Alg_expr.KAPPA_INSTANCE _, _ -> true
 
 let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -824,7 +867,7 @@ let add_un_variable k_un acc rate_var =
   | Some (k,dist) ->
     let acc_un,k' = if ast_alg_has_mix k then
         ((Location.dummy_annot rate_var,k)::acc,
-         Location.dummy_annot (Ast.OBS_VAR rate_var))
+         Location.dummy_annot (Alg_expr.ALG_VAR rate_var))
       else (acc,k) in
     (acc_un,Some (k',dist))
 
@@ -851,7 +894,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
     if ast_alg_has_mix r.Ast.k_def then
       let rate_var = label^"_rate" in
       ((Location.dummy_annot rate_var,r.Ast.k_def)::acc,
-       Location.dummy_annot (Ast.OBS_VAR rate_var))
+       Location.dummy_annot (Alg_expr.ALG_VAR rate_var))
     else (acc,r.Ast.k_def) in
   let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
   let acc''',rules' =
@@ -863,7 +906,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
       ((Location.dummy_annot rate_var,k)::acc_un,
        (Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
         r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-        Location.dummy_annot (Ast.OBS_VAR rate_var),k_op_un,r_pos)::rules)
+        Location.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
     | Ast.LRAR, Some rate ->
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
@@ -890,9 +933,9 @@ let mixture_of_ast sigs pos mix =
 
 let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
   ((match alg with
-      | Ast.KAPPA_INSTANCE ast ->
-        Ast.KAPPA_INSTANCE (mixture_of_ast sigs pos ast)
-      | Ast.OBS_VAR lab ->
+      | Alg_expr.KAPPA_INSTANCE ast ->
+        Alg_expr.KAPPA_INSTANCE (mixture_of_ast sigs pos ast)
+      | Alg_expr.ALG_VAR lab ->
         let i =
           match Mods.StringMap.find_option lab algs with
           | Some x -> x
@@ -905,33 +948,33 @@ let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
                      ("Reference to not yet defined '"^lab ^"' is forbidden.",
                       pos))
           | None | Some _ -> ()
-        in Ast.OBS_VAR i
-      | Ast.TOKEN_ID tk_nme ->
+        in Alg_expr.ALG_VAR i
+      | Alg_expr.TOKEN_ID tk_nme ->
         let i =
           match Mods.StringMap.find_option tk_nme tok with
           | Some x -> x
           | None ->
             raise (ExceptionDefn.Malformed_Decl
                      (tk_nme ^ " is not a declared token",pos))
-        in Ast.TOKEN_ID i
-      | (Ast.STATE_ALG_OP _ | Ast.CONST _) as x -> x
-      | Ast.BIN_ALG_OP (op, a, b) ->
-        Ast.BIN_ALG_OP (op,
+        in Alg_expr.TOKEN_ID i
+      | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
+      | Alg_expr.BIN_ALG_OP (op, a, b) ->
+        Alg_expr.BIN_ALG_OP (op,
                         alg_expr_of_ast sigs tok algs ?max_allowed_var a,
                         alg_expr_of_ast sigs tok algs ?max_allowed_var b)
-      | Ast.UN_ALG_OP (op,a) ->
-        Ast.UN_ALG_OP
+      | Alg_expr.UN_ALG_OP (op,a) ->
+        Alg_expr.UN_ALG_OP
           (op,alg_expr_of_ast sigs tok algs ?max_allowed_var a)),
    pos)
 
 let rec bool_expr_of_ast sigs tok algs = function
-  | (Ast.TRUE | Ast.FALSE),_ as x -> x
-  | Ast.BOOL_OP (op,x,y),pos ->
-    Ast.BOOL_OP
+  | (Alg_expr.TRUE | Alg_expr.FALSE),_ as x -> x
+  | Alg_expr.BOOL_OP (op,x,y),pos ->
+    Alg_expr.BOOL_OP
       (op, bool_expr_of_ast sigs tok algs x, bool_expr_of_ast sigs tok algs y),
     pos
-  | Ast.COMPARE_OP (op,x,y),pos ->
-    Ast.COMPARE_OP
+  | Alg_expr.COMPARE_OP (op,x,y),pos ->
+    Alg_expr.COMPARE_OP
       (op,alg_expr_of_ast sigs tok algs x, alg_expr_of_ast sigs tok algs y),pos
 
 let print_expr_of_ast sigs tok algs = function
@@ -1003,15 +1046,38 @@ let init_of_ast sigs tok = function
       raise (ExceptionDefn.Malformed_Decl
                (lab ^" is not a declared token",pos))
 
+let create_t ast_intf =
+  NamedDecls.create (
+    Tools.array_map_of_list
+      (fun p ->
+         match p.Ast.port_lnk with
+         | (Ast.FREE,_) ->
+           (p.Ast.port_nme,
+            match p.Ast.port_int with
+            | [] -> None
+            | l ->
+              Some (NamedDecls.create
+                      (Tools.array_map_of_list (fun x -> (x,())) l))
+           )
+         | ((Ast.LNK_SOME | Ast.LNK_ANY |
+             Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
+           raise (ExceptionDefn.Malformed_Decl
+                    ("Link status inside a definition of signature", pos))
+      ) ast_intf)
+
+let create_sig l =
+  Tools.array_map_of_list
+    (fun (name,intf) -> (name,create_t intf)) l
+
 let compil_of_ast overwrite c =
-  let sigs = Signature.create c.Ast.signatures in
+  let sigs = Signature.create (create_sig c.Ast.signatures) in
   let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_right
       name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
   let alg_vars_over =
     Tools.list_rev_map_append
       (fun (x,v) -> (Location.dummy_annot x,
-                     Location.dummy_annot (Ast.CONST v))) overwrite
+                     Location.dummy_annot (Alg_expr.CONST v))) overwrite
       (List.filter
          (fun ((x,_),_) ->
             List.for_all (fun (x',_) -> x <> x') overwrite)

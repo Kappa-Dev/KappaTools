@@ -2,7 +2,7 @@ open Ast
 
 let rec compile_alg domain (alg,pos) =
   match alg with
-  | Ast.KAPPA_INSTANCE ast ->
+  | Alg_expr.KAPPA_INSTANCE ast ->
     begin
       match domain with
       | Some (origin,contact_map,domain) ->
@@ -15,15 +15,15 @@ let rec compile_alg domain (alg,pos) =
         raise (ExceptionDefn.Internal_Error
                  ("Theoritically pure alg_expr has a mixture",pos))
     end
-  | Ast.OBS_VAR i -> (domain,(Alg_expr.ALG_VAR i,pos))
-  | Ast.TOKEN_ID i -> (domain,(Alg_expr.TOKEN_ID i,pos))
-  | Ast.STATE_ALG_OP (op) -> (domain,(Alg_expr.STATE_ALG_OP (op),pos))
-  | Ast.CONST n -> (domain,(Alg_expr.CONST n,pos))
-  | Ast.BIN_ALG_OP (op, a, b) ->
+  | Alg_expr.ALG_VAR i -> (domain,(Alg_expr.ALG_VAR i,pos))
+  | Alg_expr.TOKEN_ID i -> (domain,(Alg_expr.TOKEN_ID i,pos))
+  | Alg_expr.STATE_ALG_OP (op) -> (domain,(Alg_expr.STATE_ALG_OP (op),pos))
+  | Alg_expr.CONST n -> (domain,(Alg_expr.CONST n,pos))
+  | Alg_expr.BIN_ALG_OP (op, a, b) ->
     let domain',a' = compile_alg domain a in
     let domain'',b' = compile_alg domain' b in
     (domain'',(Alg_expr.BIN_ALG_OP (op,a',b'),pos))
-  | Ast.UN_ALG_OP (op,a) ->
+  | Alg_expr.UN_ALG_OP (op,a) ->
     let domain',a' = compile_alg domain a in
     (domain',(Alg_expr.UN_ALG_OP (op,a'),pos))
 
@@ -35,16 +35,16 @@ let compile_alg ?origin contact_map domain (alg,pos) =
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
 let rec compile_bool contact_map domain = function
-  | Ast.TRUE,pos -> (domain,(Ast.TRUE,pos))
-  | Ast.FALSE,pos -> (domain,(Ast.FALSE,pos))
-  | Ast.BOOL_OP (op,a,b), pos ->
+  | Alg_expr.TRUE,pos -> (domain,(Alg_expr.TRUE,pos))
+  | Alg_expr.FALSE,pos -> (domain,(Alg_expr.FALSE,pos))
+  | Alg_expr.BOOL_OP (op,a,b), pos ->
     let domain',a' = compile_bool contact_map domain a in
     let domain'',b' = compile_bool contact_map domain' b in
-    (domain'',(Ast.BOOL_OP (op,a',b'),pos))
-  | Ast.COMPARE_OP (op,a,b),pos ->
+    (domain'',(Alg_expr.BOOL_OP (op,a',b'),pos))
+  | Alg_expr.COMPARE_OP (op,a,b),pos ->
     let (domain',a') = compile_alg contact_map domain a in
     let (domain'',b') = compile_alg contact_map domain' b in
-    (domain'',(Ast.COMPARE_OP (op,a',b'), pos))
+    (domain'',(Alg_expr.COMPARE_OP (op,a',b'), pos))
 
 let tokenify contact_map domain l =
   List.fold_right
@@ -165,9 +165,10 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
     with Not_found ->
     try let (_,(var,_)) = List.find (fun ((l,_),_) -> l = label) algs in
       match var with
-      | Ast.KAPPA_INSTANCE mix -> mix
-      | (Ast.BIN_ALG_OP _ | Ast.UN_ALG_OP _ | Ast.STATE_ALG_OP _ |
-         Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ ) -> raise Not_found
+      | Alg_expr.KAPPA_INSTANCE mix -> mix
+      | (Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ ) ->
+        raise Not_found
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl
                ("Label '" ^ label ^
@@ -184,7 +185,7 @@ let rule_effect
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
       LKappa.r_rm_tokens = rm; LKappa.r_add_tokens = add;
-      LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
+      LKappa.r_rate = Location.dummy_annot (Alg_expr.CONST Nbr.zero);
       LKappa.r_un_rate = None; } in
   let (domain',alg_pos) =
     compile_alg contact_map domain alg_expr in
@@ -216,9 +217,9 @@ let effects_of_modif
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
   | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
     rule_effect contact_map domain
-      (Location.dummy_annot (Ast.CONST (Nbr.one)))
+      (Location.dummy_annot (Alg_expr.CONST (Nbr.one)))
       ([],[],
-       [Location.dummy_annot (Ast.TOKEN_ID tk_id), tk_id],
+       [Location.dummy_annot (Alg_expr.TOKEN_ID tk_id), tk_id],
        [(alg_expr, tk_id)])
       tk_pos rev_effects
   | SNAPSHOT pexpr ->
@@ -314,8 +315,9 @@ let inits_of_result ?rescale contact_map env preenv res =
            | None -> alg
            | Some r ->
              Location.dummy_annot
-               (Ast.BIN_ALG_OP (Operator.MULT,alg,
-                                Location.dummy_annot (Ast.CONST (Nbr.F r)))) in
+               (Alg_expr.BIN_ALG_OP
+                  (Operator.MULT,alg,
+                   Location.dummy_annot (Alg_expr.CONST (Nbr.F r)))) in
          match init_t with
          | INIT_MIX ast,mix_pos ->
            let sigs = Environment.signatures env in
@@ -325,7 +327,7 @@ let inits_of_result ?rescale contact_map env preenv res =
              { LKappa.r_mix = [];
                LKappa.r_created = LKappa.to_raw_mixture sigs ast;
                LKappa.r_rm_tokens = []; LKappa.r_add_tokens = [];
-               LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
+               LKappa.r_rate = Location.dummy_annot (Alg_expr.CONST Nbr.zero);
                LKappa.r_un_rate = None; } in
            let preenv'',state' =
              match
@@ -344,7 +346,7 @@ let inits_of_result ?rescale contact_map env preenv res =
            let fake_rule =
              { LKappa.r_mix = []; LKappa.r_created = []; LKappa.r_rm_tokens = [];
                LKappa.r_add_tokens = [(alg, tk_id)];
-               LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
+               LKappa.r_rate = Location.dummy_annot (Alg_expr.CONST Nbr.zero);
                LKappa.r_un_rate = None; } in
            match
              rules_of_ast

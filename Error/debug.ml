@@ -6,4 +6,4 @@ let tag_if_debug s =
 		       Format.std_formatter s
   else Format.ifprintf Format.std_formatter s
 
-let global_sigs : Signature.s ref = ref (Signature.create [])
+let global_sigs : Signature.s ref = ref (Signature.create [||])

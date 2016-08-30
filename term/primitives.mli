@@ -63,9 +63,11 @@ type modification =
        Alg_expr.t Ast.print_expr list)
 
 type perturbation =
-  { precondition: Alg_expr.t Ast.bool_expr Location.annot;
+  { precondition:
+      (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot;
     effect : modification list;
-    abort : Alg_expr.t Ast.bool_expr Location.annot option;
+    abort : (Connected_component.t array list,int)
+        Alg_expr.bool_expr Location.annot option;
   }
 
 val exists_modification : (modification -> bool) -> perturbation list -> bool
@@ -74,8 +76,8 @@ val map_expr_rule : (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
   elementary_rule -> elementary_rule
 val map_expr_perturbation :
   (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
-  (Alg_expr.t Ast.bool_expr Location.annot ->
-   Alg_expr.t Ast.bool_expr Location.annot) ->
+  ((Connected_component.t array list,int) Alg_expr.bool_expr Location.annot ->
+   (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot) ->
   perturbation -> perturbation
 
 val stops_of_perturbation :

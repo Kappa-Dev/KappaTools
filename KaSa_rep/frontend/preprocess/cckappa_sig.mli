@@ -114,7 +114,7 @@ type enriched_variable =
   {
     e_id       : string;
     e_id_dot   : string;
-    c_variable : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
+    c_variable : (Ckappa_sig.mixture,string) Alg_expr.e;
     e_variable : (mixture,string) Ast.variable_def
   }
 
@@ -142,15 +142,15 @@ type rule =
   }
 
 type perturbation =
-  ((((mixture,string) Ast.ast_alg_expr Ast.bool_expr) * Ckappa_sig.position) *
+  ((((mixture,string) Alg_expr.bool_expr) * Ckappa_sig.position) *
    (modif_expr list) *
-   (((mixture,string) Ast.ast_alg_expr Ast.bool_expr * Ckappa_sig.position)  option)) *
+   (((mixture,string) Alg_expr.bool_expr * Ckappa_sig.position)  option)) *
   Ckappa_sig.position
 
 and modif_expr =
-  | INTRO    of ((mixture,string) Ast.ast_alg_expr * mixture * Ckappa_sig.position)
-  | DELETE   of ((mixture,string) Ast.ast_alg_expr * mixture * Ckappa_sig.position)
-  | UPDATE   of (string * Ckappa_sig.position * (mixture, string) Ast.ast_alg_expr * Ckappa_sig.position)
+  | INTRO    of ((mixture,string) Alg_expr.e * mixture * Ckappa_sig.position)
+  | DELETE   of ((mixture,string) Alg_expr.e * mixture * Ckappa_sig.position)
+  | UPDATE   of (string * Ckappa_sig.position * (mixture, string) Alg_expr.e * Ckappa_sig.position)
   (*TODO: pause*)
   | STOP     of Ckappa_sig.position
   | SNAPSHOT of Ckappa_sig.position (*maybe later of mixture too*)
@@ -166,8 +166,8 @@ type enriched_rule =
 
 type enriched_init =
   {
-    e_init_factor     : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
-    e_init_c_factor   : (mixture,string) Ast.ast_alg_expr;
+    e_init_factor     : (Ckappa_sig.mixture,string) Alg_expr.e;
+    e_init_c_factor   : (mixture,string) Alg_expr.e;
     e_init_string_pos : string Location.annot option;
     e_init_mixture    : Ckappa_sig.mixture;
     e_init_c_mixture  : mixture
@@ -185,7 +185,7 @@ type compil =
     rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
     (*rules (possibly named)*)
     observables :
-      (mixture,string) Ast.ast_alg_expr Location.annot Int_storage.Nearly_inf_Imperatif.t;
+      (mixture,string) Alg_expr.e Location.annot Int_storage.Nearly_inf_Imperatif.t;
     (*list of patterns to plot*)
     init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)

@@ -70,10 +70,10 @@ val print_dump_plots: data_file:string ->  command_line:string ->  titles:string
 val initialize: Loggers.t -> variable -> unit
 val associate:
   ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
-  'a Alg_expr.e Location.annot -> ('a, int) network_handler -> unit
+  ('a,'b) Alg_expr.e Location.annot -> ('a, 'b) network_handler -> unit
 val increment:
   ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
-  'a Alg_expr.e Location.annot -> ('a, int) network_handler -> unit
+  ('a,'b) Alg_expr.e Location.annot -> ('a, 'b) network_handler -> unit
 val associate_nrows: Loggers.t -> unit
 val associate_t: Loggers.t -> int -> unit
 val init_time: Loggers.t -> int -> unit
@@ -86,7 +86,8 @@ val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -
 val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> (variable * correct) list -> unit
 val update_token:
   Loggers.t -> variable -> nauto_in_lhs:int -> variable ->
-  'a Alg_expr.e Location.annot -> (variable * correct) list -> ('a, int) network_handler -> unit
+  ('a,'b) Alg_expr.e Location.annot -> (variable * correct) list ->
+  ('a, 'b) network_handler -> unit
 
 val print_comment:
   Loggers.t ->

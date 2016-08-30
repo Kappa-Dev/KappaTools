@@ -75,9 +75,9 @@ let print_agent ?env f i =
     Signature.print_agent env.signatures f i
 let print_alg ?env f id =
   match env with
-  | None -> Format.fprintf f "'__alg_%i'" id
+  | None -> Format.fprintf f "__alg_%i" id
   | Some env ->
-    Format.fprintf f "'%s'" (NamedDecls.elt_name env.algs id)
+    Format.fprintf f "%s" (NamedDecls.elt_name env.algs id)
 let print_token ?env f id =
   match env with
   | None -> Format.fprintf f "__token_%i" id
@@ -182,10 +182,12 @@ let to_json env =
     "signatures", Signature.to_json env.signatures;
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
-      (fun (x,_) -> Alg_expr.to_json dummy_kappa_instance x) env.algs;
+      (fun (x,_) ->
+         Alg_expr.to_json dummy_kappa_instance JsonUtil.of_int x) env.algs;
     "observables",
     `List (Array.fold_right
-             (fun (x,_) l -> Alg_expr.to_json dummy_kappa_instance x :: l)
+             (fun (x,_) l ->
+                Alg_expr.to_json dummy_kappa_instance JsonUtil.of_int x :: l)
              env.observables []);
     "ast_rules",
     `List
@@ -214,13 +216,15 @@ let of_json = function
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
               (fun x -> Location.dummy_annot
-                  (Alg_expr.of_json kappa_instance_of_dummy x))
+                  (Alg_expr.of_json kappa_instance_of_dummy
+                     (JsonUtil.to_int ?error_msg:None) x))
               (List.assoc "algs" l);
           observables = (match List.assoc "observables" l with
               | `List o ->
                 Tools.array_map_of_list
                   (fun x -> Location.dummy_annot
-                      (Alg_expr.of_json kappa_instance_of_dummy x)) o
+                      (Alg_expr.of_json kappa_instance_of_dummy
+                         (JsonUtil.to_int ?error_msg:None) x)) o
               | _ -> raise Not_found);
           ast_rules = (match List.assoc "ast_rules" l with
               | `List o ->

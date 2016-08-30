@@ -5,7 +5,7 @@
 module Make(I:Ode_interface_sig.Interface) :
 sig
   type ode_var_id
-  type 'a network
+  type ('a,'b) network
 
   val get_compil :
     rate_convention:Ode_args.rate_convention ->
@@ -14,13 +14,12 @@ sig
     compute_jacobian:bool ->
     Common_args.t -> Run_cli_args.t -> I.compil
 
-  val network_from_compil:
-    I.compil -> int network
+  val network_from_compil: I.compil -> (int,int) network
 
   val get_reactions:
-    'a network ->
+    ('a,'b) network ->
     (ode_var_id list * ode_var_id list *
-     ('a Alg_expr.e Location.annot *
+     (('a,'b) Alg_expr.e Location.annot *
       ode_var_id  Location.annot) list  * I.rule) list
 
   val export_network:
@@ -29,9 +28,8 @@ sig
     data_file:string ->
     init_t:float ->
     max_t:float ->
-    nb_points:int -> Loggers.t -> I.compil -> int network -> unit
+    nb_points:int -> Loggers.t -> I.compil -> (int,int) network -> unit
 
   val species_of_species_id:
-    int network -> ode_var_id ->
-    (I.chemical_species * int)
+    (int,int) network -> ode_var_id -> (I.chemical_species * int)
 end

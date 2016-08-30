@@ -77,7 +77,7 @@ let write_out thread_is_running counter label log_buffer =
 
 let fake_env =
   Environment.init
-    (Signature.create []) (NamedDecls.create [||]) (NamedDecls.create [||])
+    (Signature.create [||]) (NamedDecls.create [||]) (NamedDecls.create [||])
     (Operator.DepSet.empty,Operator.DepSet.empty,[||],[||])
     ([||],[||],Connected_component.Set.empty) [||] [||]
 

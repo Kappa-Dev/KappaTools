@@ -202,69 +202,69 @@ let print_diffview parameters error handler diff =
 
 let rec print_short_alg parameters error handler alg =
   match alg with
-  |Ast.BIN_ALG_OP(Operator.MULT,a1,a2),_ ->
+  |Alg_expr.BIN_ALG_OP(Operator.MULT,a1,a2),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "*" in
     let error = print_short_alg parameters error handler a2 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
     error
-  | Ast.BIN_ALG_OP(Operator.SUM,a1,a2),_ ->
+  | Alg_expr.BIN_ALG_OP(Operator.SUM,a1,a2),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "+" in
     let error = print_short_alg parameters error handler a2 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
     error
-  | Ast.BIN_ALG_OP(Operator.DIV,a1,a2),_ ->
+  | Alg_expr.BIN_ALG_OP(Operator.DIV,a1,a2),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "/" in
     let error = print_short_alg parameters error handler a2 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
     error
-  | Ast.BIN_ALG_OP(Operator.MINUS,a1,a2),_ ->
+  | Alg_expr.BIN_ALG_OP(Operator.MINUS,a1,a2),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "-" in
     let error = print_short_alg parameters error handler a2 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
     error
-  | Ast.BIN_ALG_OP(Operator.POW,a1,a2),_ ->
+  | Alg_expr.BIN_ALG_OP(Operator.POW,a1,a2),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "**" in
     let error = print_short_alg parameters error handler a2 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
     error
-  | Ast.BIN_ALG_OP(Operator.MODULO,a1,a2),_ ->
+  | Alg_expr.BIN_ALG_OP(Operator.MODULO,a1,a2),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "mod" in
     let error = print_short_alg parameters error handler a2 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
     error
-  | Ast.UN_ALG_OP(Operator.LOG,a1),_ ->
+  | Alg_expr.UN_ALG_OP(Operator.LOG,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(log(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
     error
-  | Ast.UN_ALG_OP(Operator.SQRT,a1),_ ->
+  | Alg_expr.UN_ALG_OP(Operator.SQRT,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(sqrt(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
     error
-  | Ast.UN_ALG_OP(Operator.EXP,a1),_ ->
+  | Alg_expr.UN_ALG_OP(Operator.EXP,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(exp(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
     error
-  | Ast.UN_ALG_OP(Operator.SINUS,a1),_ ->
+  | Alg_expr.UN_ALG_OP(Operator.SINUS,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(sin(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
     error
-  | Ast.UN_ALG_OP(Operator.COSINUS,a1),_ ->
+  | Alg_expr.UN_ALG_OP(Operator.COSINUS,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(cos(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
@@ -274,44 +274,44 @@ let rec print_short_alg parameters error handler alg =
          let error = print_short_alg parameters error handler a1 in
          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
          error  *)
-  | Ast.UN_ALG_OP(Operator.TAN,a1),_ ->
+  | Alg_expr.UN_ALG_OP(Operator.TAN,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(tan(" in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
     error
-  | Ast.STATE_ALG_OP Operator.TIME_VAR,_ ->
+  | Alg_expr.STATE_ALG_OP Operator.TIME_VAR,_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "#TIME#" in
     error
-  | Ast.STATE_ALG_OP Operator.EVENT_VAR,_ ->
+  | Alg_expr.STATE_ALG_OP Operator.EVENT_VAR,_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "#EVENT#" in
     error
 
-  | Ast.OBS_VAR s,_ ->
+  | Alg_expr.ALG_VAR s,_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(OBS(%s))" s in
     error
 
-  | Ast.CONST(Nbr.F(f)),_ ->
+  | Alg_expr.CONST(Nbr.F(f)),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%f " f in
     error
 
   (*MOD: add print integer at compilation variables*)
-  | Ast.CONST(Nbr.I(i)),_ ->
+  | Alg_expr.CONST(Nbr.I(i)),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%d " i in
     error
 
-  | Ast.UN_ALG_OP (Operator.UMINUS,_),_
-  | Ast.UN_ALG_OP (Operator.INT,_),_
-  | Ast.BIN_ALG_OP (Operator.MAX,_,_),_
-  | Ast.BIN_ALG_OP (Operator.MIN,_,_),_
-  | Ast.STATE_ALG_OP (Operator.NULL_EVENT_VAR
-                     | Operator.TMAX_VAR
-                     | Operator.EMAX_VAR
-                     | Operator.PLOTNUM
-                     | Operator.CPUTIME
-                ),_
-  | Ast.CONST (Nbr.I64 _),_
-  | Ast.TOKEN_ID _,_
-  | Ast.KAPPA_INSTANCE _,_ ->  (*to do*) error
+  | Alg_expr.UN_ALG_OP (Operator.UMINUS,_),_
+  | Alg_expr.UN_ALG_OP (Operator.INT,_),_
+  | Alg_expr.BIN_ALG_OP (Operator.MAX,_,_),_
+  | Alg_expr.BIN_ALG_OP (Operator.MIN,_,_),_
+  | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR
+                          | Operator.TMAX_VAR
+                          | Operator.EMAX_VAR
+                          | Operator.PLOTNUM
+                          | Operator.CPUTIME
+                          ),_
+  | Alg_expr.CONST (Nbr.I64 _),_
+  | Alg_expr.TOKEN_ID _,_
+  | Alg_expr.KAPPA_INSTANCE _,_ ->  (*to do*) error
  (* | Ast.INFINITY _ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "+oo" in
     error *)

@@ -1,8 +1,10 @@
 let print_ast_alg f a =
-  Ast.print_ast_alg (fun _ () -> ()) (fun f (x,_) -> Format.pp_print_string f x)
+  Alg_expr.print (fun _ () -> ()) (fun f (x,_) -> Format.pp_print_string f x)
 		    (fun f (x,_) -> Format.pp_print_string f x) f a
 let print_alg = Kappa_printer.alg_expr ?env:None
-let print_bool = Ast.print_bool print_alg
+let print_bool f a =
+  Alg_expr.print_bool (fun _ () -> ()) (fun f (x,_) -> Format.pp_print_string f x)
+    (fun f (x,_) -> Format.pp_print_string f x) f a
 let print_cc = Connected_component.print ?sigs:None ~with_id:()
 let print_place = Agent_place.print ?sigs:None
 let print_transformation = Primitives.Transformation.print ?sigs:None

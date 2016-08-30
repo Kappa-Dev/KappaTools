@@ -17,42 +17,24 @@ type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
-type ('mixt,'id) ast_alg_expr =
-  | BIN_ALG_OP of
-      Operator.bin_alg_op * ('mixt,'id) ast_alg_expr Location.annot
-      * ('mixt,'id) ast_alg_expr Location.annot
-  | UN_ALG_OP of Operator.un_alg_op * ('mixt,'id) ast_alg_expr Location.annot
-  | STATE_ALG_OP of Operator.state_alg_op
-  | OBS_VAR of 'id
-  | TOKEN_ID of 'id
-  | KAPPA_INSTANCE of 'mixt
-  | CONST of Nbr.t
-
-type 'a bool_expr =
-  | TRUE
-  | FALSE
-  | BOOL_OP of Operator.bool_op *
-               'a bool_expr Location.annot * 'a bool_expr Location.annot
-  | COMPARE_OP of Operator.compare_op * 'a Location.annot * 'a Location.annot
-
 type arrow = RAR | LRAR
 
 type rule = {
   lhs: mixture ;
-  rm_token: ((mixture,string) ast_alg_expr Location.annot *
+  rm_token: ((mixture,string) Alg_expr.e Location.annot *
              string Location.annot) list;
   arrow:arrow ;
   rhs: mixture ;
-  add_token: ((mixture,string) ast_alg_expr Location.annot *
+  add_token: ((mixture,string) Alg_expr.e Location.annot *
               string Location.annot) list;
-  k_def: (mixture,string) ast_alg_expr Location.annot ;
+  k_def: (mixture,string) Alg_expr.e Location.annot ;
   k_un:
-    ((mixture,string) ast_alg_expr Location.annot *
+    ((mixture,string) Alg_expr.e Location.annot *
      int Location.annot option) option;
   (*k_1:radius_opt*)
-  k_op: (mixture,string) ast_alg_expr Location.annot option ;
+  k_op: (mixture,string) Alg_expr.e Location.annot option ;
   k_op_un:
-    ((mixture,string) ast_alg_expr Location.annot *
+    ((mixture,string) Alg_expr.e Location.annot *
      int Location.annot option) option;
   (*rate for backward rule*)
 }
@@ -65,37 +47,37 @@ type 'alg_expr print_expr =
 
 type ('mixture,'id) modif_expr =
   | INTRO of
-      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
+      (('mixture,'id) Alg_expr.e Location.annot * 'mixture Location.annot)
   | DELETE of
-      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
+      (('mixture,'id) Alg_expr.e Location.annot * 'mixture Location.annot)
   | UPDATE of
-      ('id Location.annot * ('mixture,'id) ast_alg_expr Location.annot)
+      ('id Location.annot * ('mixture,'id) Alg_expr.e Location.annot)
   (*TODO: pause*)
   | UPDATE_TOK of
-      ('id Location.annot * ('mixture,'id) ast_alg_expr Location.annot)
+      ('id Location.annot * ('mixture,'id) Alg_expr.e Location.annot)
   (*TODO: pause*)
-  | STOP of ('mixture,'id) ast_alg_expr print_expr list
-  | SNAPSHOT of ('mixture,'id) ast_alg_expr print_expr list
+  | STOP of ('mixture,'id) Alg_expr.e print_expr list
+  | SNAPSHOT of ('mixture,'id) Alg_expr.e print_expr list
   (*maybe later of mixture too*)
   | PRINT of
-      ((('mixture,'id) ast_alg_expr print_expr list) *
-       (('mixture,'id) ast_alg_expr print_expr list))
+      ((('mixture,'id) Alg_expr.e print_expr list) *
+       (('mixture,'id) Alg_expr.e print_expr list))
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Location.annot)
   | CFLOWMIX of (bool * 'mixture Location.annot)
-  | FLUX of bool * ('mixture,'id) ast_alg_expr print_expr list
-  | FLUXOFF of ('mixture,'id) ast_alg_expr print_expr list
+  | FLUX of bool * ('mixture,'id) Alg_expr.e print_expr list
+  | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
 
 type ('mixture,'id) perturbation =
-  (('mixture,'id) ast_alg_expr bool_expr Location.annot *
+  (('mixture,'id) Alg_expr.bool_expr Location.annot *
    (('mixture,'id) modif_expr list) *
-   ('mixture,'id) ast_alg_expr bool_expr Location.annot option)
+   ('mixture,'id) Alg_expr.bool_expr Location.annot option)
     Location.annot
 
 type configuration = string Location.annot * (string Location.annot list)
 
 type ('mixture,'id) variable_def =
-  string Location.annot * ('mixture,'id) ast_alg_expr Location.annot
+  string Location.annot * ('mixture,'id) Alg_expr.e Location.annot
 
 type ('mixture,'id) init_t =
   | INIT_MIX of 'mixture
@@ -107,17 +89,17 @@ type ('mixture,'id) instruction =
   | VOLSIG   of string * float * string (* type, volume, parameter*)
   | INIT     of
       string Location.annot option *
-      ('mixture,'id) ast_alg_expr Location.annot *
+      ('mixture,'id) Alg_expr.e Location.annot *
       ('mixture,'id) init_t Location.annot
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
-  | PLOT     of ('mixture,'id) ast_alg_expr Location.annot
+  | PLOT     of ('mixture,'id) Alg_expr.e Location.annot
   | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
 
 type ('mixture,'id) command =
-  | RUN of ('mixture,'id) ast_alg_expr bool_expr
+  | RUN of ('mixture,'id) Alg_expr.bool_expr
   | MODIFY of ('mixture,'id) modif_expr
   | QUIT
 
@@ -132,11 +114,11 @@ type ('agent,'mixture,'id,'rule) compil =
       (string Location.annot option * 'rule Location.annot) list;
     (*rules (possibly named)*)
     observables :
-      ('mixture,'id) ast_alg_expr Location.annot list;
+      ('mixture,'id) Alg_expr.e Location.annot list;
     (*list of patterns to plot*)
     init :
       (string Location.annot option *
-       ('mixture,'id) ast_alg_expr Location.annot *
+       ('mixture,'id) Alg_expr.e Location.annot *
        ('mixture,'id) init_t Location.annot) list;
     (*initial graph declaration*)
     perturbations :
@@ -165,21 +147,9 @@ val print_link :
   (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ('a, 'b) link -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit
-val print_ast_alg :
-  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
-  (Format.formatter -> 'b -> unit) ->
-  Format.formatter -> ('a,'b) ast_alg_expr -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
 val print_ast_rule_no_rate :
   reverse:bool -> Format.formatter -> rule -> unit
-
-val print_bool :
-  (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> 'a bool_expr -> unit
-val print_ast_bool :
-  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
-  (Format.formatter -> 'b -> unit) ->
-  Format.formatter -> ('a,'b) ast_alg_expr bool_expr -> unit
 
 val link_to_json :
   ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->

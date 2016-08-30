@@ -116,9 +116,11 @@ type modification =
 	 Alg_expr.t Ast.print_expr list)
 
 type perturbation =
-    { precondition: Alg_expr.t Ast.bool_expr Location.annot;
+  { precondition:
+      (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot;
       effect : modification list;
-      abort : Alg_expr.t Ast.bool_expr Location.annot option;
+      abort : (Connected_component.t array list,int)
+          Alg_expr.bool_expr Location.annot option;
     }
 
 let exists_modification check l =

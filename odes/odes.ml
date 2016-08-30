@@ -85,8 +85,10 @@ struct
   module VarMap = VarSetMap.Map
 
   type 'a decl =
-    | Var of var_id * string Location.annot option * 'a Alg_expr.e Location.annot
-    | Init_expr of var_id  * 'a Alg_expr.e Location.annot * ode_var_id list
+    | Var of
+        var_id * string Location.annot option * ('a,int) Alg_expr.e Location.annot
+    | Init_expr of
+        var_id  * ('a,int) Alg_expr.e Location.annot * ode_var_id list
     | Dummy_decl
 
   let var_id_of_decl decl =
@@ -124,12 +126,13 @@ struct
   let var_of_rule rule =
     var_of_rate rule.rule_id_with_mode
 
-  type 'a network =
+  type ('a,'b) network =
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
       reactions:
-        (id list * id list * ('a Alg_expr.e Location.annot*id Location.annot) list
+        (id list * id list *
+         (('a,'b) Alg_expr.e Location.annot*id Location.annot) list
          * enriched_rule) list ;
 
       ode_vars_tab: ode_var Mods.DynArray.t ;
@@ -148,7 +151,7 @@ struct
 
       n_rules: int ;
 
-      obs: (obs_id * 'a Alg_expr.e Location.annot) list ;
+      obs: (obs_id * ('a,'b) Alg_expr.e Location.annot) list ;
       n_obs: int ;
 
     }
@@ -904,18 +907,18 @@ struct
     | Alg_expr.TOKEN_ID _,_
     | Alg_expr.KAPPA_INSTANCE _,_ -> false
 
-  type 'a rate = 'a Alg_expr.e Location.annot
+  type ('a,'b) rate = ('a,'b) Alg_expr.e Location.annot
 
-  type 'a sort_rules_and_decl =
+  type ('a,'b) sort_rules_and_decl =
     {
       const_decl_set : Mods.StringSet.t ;
       const_decl: 'a decl list ;
       var_decl: 'a decl list ;
       init: 'a decl list ;
       const_rate :
-        (enriched_rule * 'a rate) list ;
+        (enriched_rule * ('a,'b) rate) list ;
       var_rate :
-        (enriched_rule * 'a rate) list ;
+        (enriched_rule * ('a,'b) rate) list ;
     }
 
   let init_sort_rules_and_decl =

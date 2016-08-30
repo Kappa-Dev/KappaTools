@@ -19,7 +19,7 @@ val value_alg :
 
 val value_bool :
   get_alg:(int -> Alg_expr.t) -> Counter.t -> t ->
-  Alg_expr.t Ast.bool_expr -> bool
+  (Connected_component.t array list,int) Alg_expr.bool_expr -> bool
 
 (** {6 Core} *)
 

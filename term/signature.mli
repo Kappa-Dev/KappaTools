@@ -13,7 +13,8 @@ val internal_state_of_num : int -> int -> t -> string
 
 type s (** Store of all the agents *)
 
-val create : Ast.agent list -> s
+val create :
+  (string Location.annot * unit NamedDecls.t option NamedDecls.t) array -> s
 
 val size : s -> int
 val get : s -> int -> t

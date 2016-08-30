@@ -42,11 +42,11 @@ type rule =
   { r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_rm_tokens :
-      ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
+      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
     r_add_tokens :
-      ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
-    r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
-    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot
+      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
+    r_rate : (rule_mixture,int) Alg_expr.e Location.annot;
+    r_un_rate : ((rule_mixture,int) Alg_expr.e Location.annot
                  * int Location.annot option) option;
   }
 
@@ -61,8 +61,8 @@ val rule_of_json : Yojson.Basic.json -> rule
 val bool_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
-    Ast.ast_alg_expr Ast.bool_expr Location.annot ->
-  (rule_agent list, int) Ast.ast_alg_expr Ast.bool_expr Location.annot
+    Alg_expr.bool_expr Location.annot ->
+  (rule_agent list, int) Alg_expr.bool_expr Location.annot
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
