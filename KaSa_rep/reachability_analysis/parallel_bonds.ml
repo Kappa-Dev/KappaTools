@@ -123,18 +123,6 @@ struct
       }
       static
 
-  let get_bonds_rhs_full static =
-    (get_local_static_information
-       static).Parallel_bonds_static.store_bonds_rhs_full
-
-  let set_bonds_rhs_full bonds static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-        Parallel_bonds_static.store_bonds_rhs_full = bonds
-      }
-      static
-
   (*parallel bonds*)
 
   let get_tuples_of_interest static =
@@ -182,20 +170,6 @@ struct
       {
         (get_local_static_information static) with
         Parallel_bonds_static.store_snd_site_create_parallel_bonds_rhs = l
-      }
-      static
-
-  (*lhs*)
-
-  let get_bonds_lhs_full static =
-    (get_local_static_information
-       static).Parallel_bonds_static.store_bonds_lhs_full
-
-  let set_bonds_lhs_full bonds static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-        Parallel_bonds_static.store_bonds_lhs_full = bonds
       }
       static
 
@@ -284,22 +258,6 @@ struct
         parameter error rule_id rule store_action_binding
     in
     let static = set_action_binding store_action_binding static in
-    (*------------------------------------------------------*)
-    (*binding on the right hand side*)
-    let store_bonds_rhs_full = get_bonds_rhs_full static in
-    let error, store_bonds_rhs_full =
-      Parallel_bonds_static.collect_bonds_rhs_full
-        parameter error rule_id rule store_bonds_rhs_full
-    in
-    let static = set_bonds_rhs_full store_bonds_rhs_full static in
-    (*------------------------------------------------------*)
-    (*binding on the left hand side*)
-    let store_bonds_lhs_full = get_bonds_lhs_full static in
-    let error, store_bonds_lhs_full =
-      Parallel_bonds_static.collect_bonds_lhs_full
-        parameter error rule_id rule store_bonds_lhs_full
-    in
-    let static = set_bonds_lhs_full store_bonds_lhs_full static in
     (*------------------------------------------------------*)
     (*a set of rules that has a potential double binding or potential non parallel binding on the lhs*)
     let store_result = get_rule_double_bonds_lhs static in
@@ -482,10 +440,10 @@ struct
             | Usual_domains.Val _
             |  Usual_domains.Any -> scan tail error
         in
-          scan list error
+        scan list error
       end
     in
-          if bool
+    if bool
     then error, dynamic, Some precondition
     else
       error, dynamic, None
@@ -499,13 +457,185 @@ struct
 
   (***********************************************************)
   (* we know from the syntax that a created bond necessarily belongs to
-   a pair of parallel bonds or a pair of non-parallel bonds *)
+     a pair of parallel bonds or a pair of non-parallel bonds *)
   let necessarily_double idx idy (x,y) map =
     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.mem
       (idx,(x,y))
       map || Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.mem
       (idy,(y,x))
       map
+
+  type pos = Fst | Snd
+  let apply_gen pos parameter error static dynamic precondition rule_id rule =
+    let store_site_create_parallel_bonds_rhs =
+      match pos
+      with
+      | Fst -> get_fst_site_create_parallel_bonds_rhs static
+      | Snd -> get_snd_site_create_parallel_bonds_rhs static
+    in
+    let error, store_pair_bind_map =
+      match
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+          parameter error
+          rule_id
+          store_site_create_parallel_bonds_rhs
+      with
+      | error, None -> error,
+                       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
+      | error, Some m -> error, m
+    in
+    let store_rule_double_bonds_rhs = get_rule_double_bonds_rhs static in
+    let error, rule_double_bonds_rhs_map =
+      match
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+          parameter error rule_id store_rule_double_bonds_rhs
+      with
+      | error, None ->
+        error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
+      | error, Some map -> error, map
+    in
+    (*-----------------------------------------------------------*)
+    Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
+      (fun (_, _) parallel_list (error, dynamic, precondition, store_result) ->
+         let error, dynamic, precondition, store_result =
+           List.fold_left
+             (fun
+               (error, dynamic, precondition, store_result) (z, t) ->
+               let (agent_id1, agent_type1, site_type1, site_type2, state1, state2) = z in
+               let (agent_id1', agent_type1', site_type1', site_type2', state1', state2') = t in
+               let z' = Parallel_bonds_type.project z in
+               let t' = Parallel_bonds_type.project t in
+               let other_site, other_site' =
+                 match pos with
+                 | Fst -> site_type2, site_type2'
+                 | Snd -> site_type1, site_type1'
+               in
+               if
+                 necessarily_double
+                   agent_id1 agent_id1' (z',t')
+                   rule_double_bonds_rhs_map
+               then
+                 (error, dynamic, precondition, store_result)
+               else
+                 (*to be checked the agent_type, and site_type1*)
+                 let error, old_value =
+                   match
+                     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
+                       parameter error
+                       (agent_id1,(z', t'))
+                       store_result
+                   with
+                   | error, None ->
+                     error, Usual_domains.Undefined
+                   | error, Some value -> error, value
+                 in
+                 (*------------------------------------------------------*)
+                 (*get a list of potential states of the second site*)
+                 let error, dynamic, precondition, state_list =
+                   Communication.get_state_of_site_in_postcondition
+                     get_global_static_information
+                     get_global_dynamic_information
+                     set_global_dynamic_information
+                     error static  dynamic
+                     (rule_id,rule) agent_id1 (*A*) other_site
+                     precondition
+                 in
+                 let error, dynamic, precondition, state_list' =
+                   Communication.get_state_of_site_in_postcondition
+                     get_global_static_information
+                     get_global_dynamic_information
+                     set_global_dynamic_information
+                     error static dynamic
+                     (rule_id,rule) agent_id1' (*B*) other_site'
+                     precondition
+                 in
+                 let error, potential_list =
+                   List.fold_left
+                     (fun (error, current_list) pre_state ->
+                        List.fold_left
+                          (fun (error, current_list) pre_state' ->
+                             let state1, state2, state1', state2' =
+                               match pos with
+                               | Fst ->  state1, pre_state, state1', pre_state'
+                               | Snd ->  pre_state, state2, pre_state', state2'
+                             in
+                             let potential_list =
+                               ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
+                                (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                               :: current_list
+                             in
+                             error, potential_list
+                          ) (error, current_list) state_list'
+                     ) (error, []) state_list
+                 in
+                 (*------------------------------------------------------*)
+                 (*fold over a potential list and compare with parallel list*)
+                 let error, value =
+                   List.fold_left (fun (error, value) (x', y') ->
+                       let site_other, pre_state_other, site_other', pre_state_other' =
+                         match pos
+                         with Fst ->
+                           let (_, _, _, s_type2, _, pre_state2) = x' in
+                           let (_, _, _, s_type2', _, pre_state2') = y' in
+                           s_type2,pre_state2, s_type2', pre_state2'
+                            | Snd ->
+                              let (_,_,s_type1,_,pre_state1,_) = x' in
+                              let (_,_,s_type1',_,pre_state1',_) = y' in
+                              s_type1, pre_state1, s_type1', pre_state1'
+                       in
+                       (*check if the pre_state2 and pre_state2' of the other sites are
+                                                  bound and if yes which the good state?  - Firstly check that if the
+                                                  parallel bonds depend on the state of the
+                                                  second site, it will give a different value: whether Undefined or
+                                                  Any, (question 1 and 2)*)
+                       begin
+                         (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
+                         if Ckappa_sig.int_of_state_index pre_state_other = 0
+                         then
+                           (*answer of question 1: the second site is free*)
+                           let new_value = Usual_domains.lub value Usual_domains.Undefined in
+                           error, new_value
+                         else
+                           (* the pre_state2 is bound or pre_state2' is bound. Question
+                              2: both sites are bound with the good sites, then return Any,
+                              if not return false*)
+                           begin
+                             if site_other = site_other' && pre_state_other = pre_state_other' &&
+                                not (Ckappa_sig.int_of_state_index pre_state_other' = 0)
+                             then
+                               (*both question1 and 2 are yes: return any*)
+                               let new_value = Usual_domains.lub value Usual_domains.Any in
+                               error, new_value
+                             else
+                               (*the question1 is true but the question 2 is false -> false*)
+                               let new_value = Usual_domains.lub value (Usual_domains.Val false) in
+                               error, new_value
+                           end
+                       end
+                     ) (error, old_value) potential_list
+                 in
+                 (*------------------------------------------------------*)
+                 (*call the symmetric add *)
+                 let error, store_result =
+                   Parallel_bonds_type.add_symmetric_tuple_pair
+                     (fun parameter error t map ->
+                        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+                          parameter error
+                          t
+                          value
+                          map)
+                     parameter
+                     error
+                     (z, t)
+                     store_result
+                 in
+                 error, dynamic, precondition, store_result
+             ) (error, dynamic, precondition, store_result) parallel_list
+         in
+         error, dynamic, precondition, store_result
+      ) store_pair_bind_map
+      (error, dynamic, precondition,
+       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
 
   let apply_rule static dynamic error rule_id precondition =
     let event_list = [] in
@@ -541,431 +671,173 @@ struct
       (*------------------------------------------------------------------*)
       (*the rule creates a bond matching with
         the first bond in a potential double bindings*)
-      let store_fst_site_create_parallel_bonds_rhs = get_fst_site_create_parallel_bonds_rhs static in
-      let error, store_pair_bind_map =
-        match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error
-            rule_id
-            store_fst_site_create_parallel_bonds_rhs
-        with
-        | error, None -> error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
-        | error, Some m -> error, m
-      in
-      let store_rule_has_parallel_bonds_rhs = get_rule_double_bonds_rhs static in
-      let error, rule_has_parallel_bonds_rhs_map =
-        match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id
-            store_rule_has_parallel_bonds_rhs
-        with
-        | error, None ->
-          error, Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
-        | error, Some map -> error, map
-      in
       (*-----------------------------------------------------------*)
       let error, dynamic, precondition, store_value1 =
-        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
-          (fun (_, _) parallel_list (error, dynamic, precondition, store_result) ->
-             let error, dynamic, precondition, store_result =
-               List.fold_left
-                 (fun
-                   (error, dynamic, precondition, store_result) (z, t) ->
-                   let (agent_id1, agent_type1, site_type1, site_type2, state1, _state2) = z in
-                   let (agent_id1', agent_type1', site_type1', site_type2', state1', _state2') = t in
-                   let z' = Parallel_bonds_type.project z in
-                   let t' = Parallel_bonds_type.project t in
-                   if
-                     necessarily_double
-                       agent_id1 agent_id1' (z',t')
-                       rule_has_parallel_bonds_rhs_map
-                 then
-                     (error, dynamic, precondition, store_result)
-                   else
-                     (*to be checked the agent_type, and site_type1*)
-                     let error, old_value =
-                       match
-                         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
-                           parameter error
-                           (agent_id1,(z', t'))
-                           store_result
-                       with
-                       | error, None ->
-                         error, Usual_domains.Undefined
-                       | error, Some value -> error, value
-                     in
-                     (*------------------------------------------------------*)
-                     (*get a list of potential states of the second site*)
-                     let error, dynamic, precondition, state_list =
-                       Communication.get_state_of_site_in_postcondition
-                         get_global_static_information
-                         get_global_dynamic_information
-                         set_global_dynamic_information
-                         error static  dynamic
-                         (rule_id,rule) agent_id1 (*A*) site_type2
-                         precondition
-                     in
-                     let error, dynamic, precondition, state_list' =
-                       Communication.get_state_of_site_in_postcondition
-                         get_global_static_information
-                         get_global_dynamic_information
-                         set_global_dynamic_information
-                         error static dynamic
-                         (rule_id,rule) agent_id1' (*B*) site_type2'
-                         precondition
-                     in
-                     let error, potential_list =
-                       List.fold_left
-                         (fun (error, current_list) pre_state ->
-                            List.fold_left
-                              (fun (error, current_list) pre_state' ->
-                                 let potential_list =
-                                   ((agent_id1, agent_type1, site_type1, site_type2, state1, pre_state),
-                                    (agent_id1', agent_type1', site_type1', site_type2', state1', pre_state'))
-                                   :: current_list
-                                 in
-                                 error, potential_list
-                              ) (error, current_list) state_list'
-                         ) (error, []) state_list
-                     in
-                     (*------------------------------------------------------*)
-                     (*fold over a potential list and compare with parallel list*)
-                     let error, value =
-                       List.fold_left (fun (error, value) (x', y') ->
-                           let (_, _, _, s_type2, _, pre_state2) = x' in
-                           let (_, _, _, s_type2', _, pre_state2') = y' in
-                           (*check if the pre_state2 and pre_state2' of the second site are
-                             bound and if yes which the good state?  - Firstly check that if the
-                             parallel bonds depend on the state of the
-                             second site, it will give a different value: whether Undefined or
-                             Any, (question 1 and 2)*)
-
-                           begin
-                             (*question 1: if the pre_state2/pre_state2' of A or B is free -> undefined*)
-                             if Ckappa_sig.int_of_state_index pre_state2 = 0
-                             (*|| Ckappa_sig.int_of_state_index pre_state2' = 0*)
-                             then
-                               (*answer of question 1: the second site is free*)
-                               let new_value = Usual_domains.lub value Usual_domains.Undefined in
-                               error, new_value
-                             else
-                               (* the pre_state2 is bound or pre_state2' is bound. Question
-                                  2: both sites are bound with the good sites, then return Any,
-                                  if not return false*)
-                               begin
-                                 if s_type2 = s_type2' && pre_state2 = pre_state2' &&
-                                    not (Ckappa_sig.int_of_state_index pre_state2' = 0)
-                                 then
-                                   (*both question1 and 2 are yes: return any*)
-                                   let new_value = Usual_domains.lub value Usual_domains.Any in
-                                   error, new_value
-                                 else
-                                   (*the question1 is true but the question 2 is false -> false*)
-                                   let new_value = Usual_domains.lub value (Usual_domains.Val false) in
-                                   error, new_value
-                               end
-                           end
-                         ) (error, old_value) potential_list
-                     in
-                     (*------------------------------------------------------*)
-                     (*call the symmetric add *)
-                     let error, store_result =
-                       Parallel_bonds_type.add_symmetric_tuple_pair
-                         (fun parameter error t map ->
-                            Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
-                              parameter error
-                              t
-                              value
-                              map)
-                         parameter
-                         error
-                         (z, t)
-                         store_result
-                     in
-                     error, dynamic, precondition, store_result
-                 ) (error, dynamic, precondition, store_result) parallel_list
-             in
-             error, dynamic, precondition, store_result
-          ) store_pair_bind_map
-          (error, dynamic, precondition,
-           Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
+        apply_gen Fst parameter error static dynamic precondition rule_id rule
       in
+      (*------------------------------------------------------------------*)
+      (*the rule creates a bond matching with
+        the second bond in a potential double bindings*)
       (*-----------------------------------------------------------*)
-      (*revert*)
-      (* It should be the same piece of code modulo one argument
-         specifying if we look at the first bond or the second one
-         in tuple of interest *)
-      let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in
-      let error, store_pair_bind_map2 =
-        match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error
-            rule_id
-            store_snd_site_create_parallel_bonds_rhs
-        with
-        | error, None ->
-          error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
-        | error, Some  m -> error, m
-      in
       let error, dynamic, precondition, store_value2 =
-        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
-          (fun (x, y) parallel_list (error, dynamic, precondition, store_result) ->
-             let (agent_id, agent_type, site_type, state) = x in
-             let (agent_id', agent_type', site_type', state') = y in
-             List.fold_left (fun (error, dynamic, precondition, store_result) (z, t) ->
-             let (agent_id1, agent_type1, site_type1, site_type2, state1, _state2) = z in
-             let (agent_id1', agent_type1', site_type1', site_type2', state1', _state2') = t in
-             let z' = agent_type1, site_type1, site_type2, state1, _state2 in
-             let t' = agent_type1', site_type1', site_type2', state1', _state2'  in
-                 if necessarily_double agent_id1
-                      agent_id1' (z',t') rule_has_parallel_bonds_rhs_map
-(*                 || necessarily_double  (z,t)
-                      rule_has_parallel_bonds_rhs_set*)
-                 then
-                   (error, dynamic, precondition, store_result)
-                 else
-                   (*to be check agent_type and site_type1*)
-                   let error, old_value =
-                     match
-                       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
-                         parameter error
-                         (agent_id1,(z', t'))
-                         store_result
-                     with
-                     | error, None -> error, Usual_domains.Undefined
-                     | error, Some value -> error, value
-                   in
-                   (*-----------------------------------------------------------*)
-                   let error, dynamic, precondition, state_list =
-                     Communication.get_state_of_site_in_postcondition
-                       get_global_static_information
-                       get_global_dynamic_information
-                       set_global_dynamic_information
-                       error static dynamic
-                       (rule_id,rule)
-                       agent_id1
-                       site_type1
-                       precondition
-                   in
-                   let error, dynamic, precondition, state_list' =
-                     Communication.get_state_of_site_in_precondition
-                       get_global_static_information
-                       get_global_dynamic_information
-                       set_global_dynamic_information
-                       error static dynamic
-                       (rule_id,rule) agent_id1' site_type1'
-                       precondition
-                   in
-                   (*-----------------------------------------------------------*)
-                   let error, potential_list =
-                     List.fold_left (fun (error, current_list) pre_state ->
-                         List.fold_left (fun (error, current_list) pre_state' ->
-                             let potential_list =
-                               ((agent_id, agent_type, site_type1, site_type, pre_state, state),
-                                (agent_id', agent_type', site_type1', site_type', pre_state', state'))
-                               :: current_list
-                             in
-                             error, potential_list
-                           ) (error, current_list) state_list'
-                       ) (error, []) state_list
-                   in
-                   (*-----------------------------------------------------------*)
-                   let error, value =
-                     List.fold_left (fun (error, value) (x', y') ->
-                         let (_, _, s_type, _, pre_state, _) = x' in
-                         let (_, _, s_type', _, pre_state', _) = y' in
-                         begin
-                           if (Ckappa_sig.int_of_state_index pre_state = 0)
-                           then
-                             let new_value = Usual_domains.lub value Usual_domains.Undefined in
-                             error, new_value
-                           else
-                             begin
-                               if s_type = s_type' && pre_state = pre_state' &&
-                                  not (Ckappa_sig.int_of_state_index pre_state' = 0)
-                               then
-                                 let new_value = Usual_domains.lub value Usual_domains.Any in
-                                 error, new_value
-                               else
-                                 let new_value = Usual_domains.lub value (Usual_domains.Val false) in
-                                 error, new_value
-                             end
-                         end
-                       ) (error, old_value) potential_list
-                   in
-                   (*-----------------------------------------------------------*)
-                   let error, store_result =
-                     Parallel_bonds_type.add_symmetric_tuple_pair
-                       (fun parameter error t map ->
-                          Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
-                            parameter error
-                            t value map)
-                       parameter error
-                       (z, t)
-                       store_result
-                   in
-                   error, dynamic, precondition, store_result
-               ) (error, dynamic, precondition, store_result) parallel_list
-          ) store_pair_bind_map2
-          (error, dynamic, precondition,
-           Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
+        apply_gen Snd parameter error static dynamic precondition rule_id rule
       in
-      (*-----------------------------------------------------------*)
-      (*combine two value above*)
-      let bool =
-        if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.is_empty store_value1
-        && Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.is_empty store_value2
-        then
-          false
-        else
-          let () = dump_title () in
-          true
-      in
-      let error, store_value =
-        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold2
-          parameter error
-          (fun parameter error x value store_result ->
-             let error, store_result =
-               Parallel_bonds_type.add_value_from_refined_tuple
-                 parameter error kappa_handler x value store_result
-             in
-             error, store_result
-          )
-          (fun parameter error x value store_result ->
-             let error, store_result =
-               Parallel_bonds_type.add_value_from_refined_tuple
-                 parameter error kappa_handler
-                 x value store_result
-             in
-             error, store_result
-          )
-          (fun parameter error x value1 value2 store_result ->
-             let new_value = Usual_domains.lub value1 value2 in
-             let error, store_result =
-               Parallel_bonds_type.add_value_from_refined_tuple
-                 parameter error kappa_handler
-                 x new_value store_result
-             in
-             error, store_result
-          )
-          store_value1
-          store_value2
-          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
-      in
-      (*--------------------------------------------------------------*)
-      (*if it belongs to non parallel bonds then false*)
-      let store_parallel_map = get_rule_double_bonds_rhs static in
-      let error, double_rhs_list =
-        match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter
-            error rule_id store_parallel_map
-        with
-        | error, None ->
-          error,
-          Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
-        | error, Some m -> error, m
-      in
-      let error, store_non_parallel =
-        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
-          (fun (_,y) b (error, store_result)  ->
-             if b then error, store_result
-             else
-               let error, store_result =
-                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
-                   parameter error
-                   y (Usual_domains.Val false)
-                   store_result
-               in
-               error, store_result
-          )
-          double_rhs_list
-          (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
-      in
-      (*--------------------------------------------------------------*)
-      (*fold with store_value above*)
-      let error, map_value = error, store_value in
-      let () =
-        if not bool &&
-           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
-             store_non_parallel
-        then
-          ()
-        else
-          dump_title ()
-      in
-      let store_result = get_value dynamic in
-      let error, store_result =
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
-          parameter error
-          (fun parameter error x value store_result ->
-             Parallel_bonds_type.add_value parameter error kappa_handler x value store_result
-          )
-          (fun parameter error x value store_result ->
-             Parallel_bonds_type.add_value parameter error kappa_handler x value store_result
-          )
-          (fun parameter error x value1 value2 store_result ->
-             let new_value = Usual_domains.lub value1 value2 in
-             Parallel_bonds_type.add_value parameter error kappa_handler x new_value store_result
-          )
-          map_value
-          store_non_parallel
-          store_result
-      in
-      let dynamic = set_value store_result dynamic in
-      (*--------------------------------------------------------------*)
-      (*if it belongs to parallel bonds then true*)
-      let error, store_parallel =
-        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
-          (fun (x, y) b (error, store_result) ->
-             if b then
-               let pair = Parallel_bonds_type.project2 (x, y) in
-             let error, store_result =
-               Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
-                 parameter error
-                 pair
-                 (Usual_domains.Val true)
-                 store_result
-             in
-             error, store_result
-             else error, store_result
-          )
-          double_rhs_list
-          (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
-      in
-      (*--------------------------------------------------------------*)
-      (*fold over the store_value and parallel bond value *)
-      let () =
-        if not bool &&
-           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
-             store_parallel
-        then
-          ()
-        else
-          dump_title ()
-      in
-      let store_result = get_value dynamic in
-      let error, store_result =
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
-          parameter error
-          (fun parameter error x value store_result ->
-             Parallel_bonds_type.add_value parameter error
-               kappa_handler x value store_result
-          )
-          (fun parameter error x value store_result ->
-             Parallel_bonds_type.add_value parameter error
-               kappa_handler x value store_result
-          )
-          (fun parameter error x value1 value2 store_result ->
-             let new_value = Usual_domains.lub value1 value2 in
-             Parallel_bonds_type.add_value parameter error
-               kappa_handler x new_value store_result
-          )
-          map_value
-          store_parallel
-          store_result
-      in
-      let dynamic = set_value store_result dynamic in
-      error, dynamic, (precondition, event_list)
+  (*-----------------------------------------------------------*)
+  (*combine two value above*)
+  let bool =
+    if Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.is_empty store_value1
+    && Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.is_empty store_value2
+    then
+      false
+    else
+      let () = dump_title () in
+      true
+  in
+  let error, store_value =
+    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold2
+      parameter error
+      (fun parameter error x value store_result ->
+         let error, store_result =
+           Parallel_bonds_type.add_value_from_refined_tuple
+             parameter error kappa_handler x value store_result
+         in
+         error, store_result
+      )
+      (fun parameter error x value store_result ->
+         let error, store_result =
+           Parallel_bonds_type.add_value_from_refined_tuple
+             parameter error kappa_handler
+             x value store_result
+         in
+         error, store_result
+      )
+      (fun parameter error x value1 value2 store_result ->
+         let new_value = Usual_domains.lub value1 value2 in
+         let error, store_result =
+           Parallel_bonds_type.add_value_from_refined_tuple
+             parameter error kappa_handler
+             x new_value store_result
+         in
+         error, store_result
+      )
+      store_value1
+      store_value2
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty
+  in
+  (*--------------------------------------------------------------*)
+  (*if it belongs to non parallel bonds then false*)
+  let store_parallel_map = get_rule_double_bonds_rhs static in
+  let error, double_rhs_list =
+    match
+      Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter
+        error rule_id store_parallel_map
+    with
+    | error, None ->
+      error,
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
+    | error, Some m -> error, m
+  in
+  let error, store_non_parallel =
+    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+      (fun (_,y) b (error, store_result)  ->
+         if b then error, store_result
+         else
+           let error, store_result =
+             Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+               parameter error
+               y (Usual_domains.Val false)
+               store_result
+           in
+           error, store_result
+      )
+      double_rhs_list
+      (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
+  in
+  (*--------------------------------------------------------------*)
+  (*fold with store_value above*)
+  let error, map_value = error, store_value in
+  let () =
+    if not bool &&
+       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
+         store_non_parallel
+    then
+      ()
+    else
+      dump_title ()
+  in
+  let store_result = get_value dynamic in
+  let error, store_result =
+    Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
+      parameter error
+      (fun parameter error x value store_result ->
+         Parallel_bonds_type.add_value parameter error kappa_handler x value store_result
+      )
+      (fun parameter error x value store_result ->
+         Parallel_bonds_type.add_value parameter error kappa_handler x value store_result
+      )
+      (fun parameter error x value1 value2 store_result ->
+         let new_value = Usual_domains.lub value1 value2 in
+         Parallel_bonds_type.add_value parameter error kappa_handler x new_value store_result
+      )
+      map_value
+      store_non_parallel
+      store_result
+  in
+  let dynamic = set_value store_result dynamic in
+  (*--------------------------------------------------------------*)
+  (*if it belongs to parallel bonds then true*)
+  let error, store_parallel =
+    Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+      (fun (x, y) b (error, store_result) ->
+         if b then
+           let pair = Parallel_bonds_type.project2 (x, y) in
+           let error, store_result =
+             Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+               parameter error
+               pair
+               (Usual_domains.Val true)
+               store_result
+           in
+           error, store_result
+         else error, store_result
+      )
+      double_rhs_list
+      (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
+  in
+  (*--------------------------------------------------------------*)
+  (*fold over the store_value and parallel bond value *)
+  let () =
+    if not bool &&
+       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
+         store_parallel
+    then
+      ()
+    else
+      dump_title ()
+  in
+  let store_result = get_value dynamic in
+  let error, store_result =
+    Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
+      parameter error
+      (fun parameter error x value store_result ->
+         Parallel_bonds_type.add_value parameter error
+           kappa_handler x value store_result
+      )
+      (fun parameter error x value store_result ->
+         Parallel_bonds_type.add_value parameter error
+           kappa_handler x value store_result
+      )
+      (fun parameter error x value1 value2 store_result ->
+         let new_value = Usual_domains.lub value1 value2 in
+         Parallel_bonds_type.add_value parameter error
+           kappa_handler x new_value store_result
+      )
+      map_value
+      store_parallel
+      store_result
+  in
+  let dynamic = set_value store_result dynamic in
+  error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)

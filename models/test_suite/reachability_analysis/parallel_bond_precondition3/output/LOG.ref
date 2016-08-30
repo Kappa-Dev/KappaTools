@@ -787,13 +787,13 @@ Id=5
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:2<0)
+Id=30
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=12
-   Node(site_type:2<2)
+  Id=2
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -802,13 +802,13 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
+Id=17
+ Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=2
-   Node(site_type:1<2)
+  Id=12
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -832,13 +832,13 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:2<0)
+Id=30
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=12
-   Node(site_type:2<2)
+  Id=2
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -847,13 +847,13 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:1<0)
+Id=17
+ Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=2
-   Node(site_type:1<2)
+  Id=12
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -881,21 +881,6 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=30
  Node(site_type:1<0)
   Id=0
@@ -903,21 +888,6 @@ Id=30
 
   Id=2
    Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=32
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=31
-   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -941,6 +911,21 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
+Id=32
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=31
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
 Id=30
  Node(site_type:1<0)
   Id=0
@@ -948,6 +933,21 @@ Id=30
 
   Id=2
    Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -970,11 +970,11 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t) v A(t!B.t) ]
 A() => [ A(z) v A(z!B.z) ]
+A() => [ A(t) v A(t!B.t) ]
 A() => [ A(x~u) ]
-B() => [ B(t) v B(t!A.t) ]
 B() => [ B(z) v B(z!A.z) ]
+B() => [ B(t) v B(t!A.t) ]
 B() => [ B(x~u) ]
 ------------------------------------------------------------
 * Properties in connected agents
