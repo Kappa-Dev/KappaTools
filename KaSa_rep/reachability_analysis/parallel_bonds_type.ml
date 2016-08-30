@@ -94,25 +94,12 @@ let convert_tuple parameters error kappa_handler tuple =
   error, (agent,site,site',agent'',site'',site''')
 
 let convert_refined_tuple parameters error kappa_handler tuple =
-  let (agent_id,agent,site,site',_,_),(agent_id',agent'',site'',site''',_,_) =
-    tuple
+  let error, (agent,site,site',agent'',site'',site''') =
+    convert_tuple parameters error kappa_handler (snd tuple)
   in
-  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
-  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  let error, agent =
-    Handler.translate_agent
-      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-      parameters error kappa_handler agent
-  in
-  let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
-  let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' =
-    Handler.translate_agent
-      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-      parameters error kappa_handler agent''
-  in
-  error, (Ckappa_sig.string_of_agent_id agent_id, agent,site,site',
-          Ckappa_sig.string_of_agent_id agent_id',agent'',site'',site''')
+  error,
+  (Ckappa_sig.string_of_agent_id (fst tuple), agent,site,site',
+          agent'',site'',site''')
 
 let cons_opt a l =
   match a with None -> l
