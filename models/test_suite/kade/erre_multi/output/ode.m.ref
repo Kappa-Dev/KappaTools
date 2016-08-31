@@ -10,7 +10,7 @@ function main=main()
 %% num_t_point - the number of time points to return
 %%
 %% variables (init(i),y(i)) denote numbers of embeddings 
-%% rule rates are not corrected by the number of automorphisms in the lhs of rules
+%% rule rates are corrected by the number of automorphisms in the lhs of rules
 
 
 tinit=0.000000;
@@ -204,23 +204,23 @@ dydt(3)=dydt(3)+k(11)*y(7);
 %rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 %reaction: E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
 
-dydt(3)=dydt(3)-k(9)*y(3)*y(4);
-dydt(4)=dydt(4)-k(9)*y(3)*y(4);
-dydt(7)=dydt(7)+k(9)*y(3)*y(4);
+dydt(3)=dydt(3)-1/2*k(9)*y(3)*y(4);
+dydt(4)=dydt(4)-1/2*k(9)*y(3)*y(4);
+dydt(7)=dydt(7)+1/2*k(9)*y(3)*y(4);
 
 %rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 %reaction: E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
 
-dydt(4)=dydt(4)-k(7)*y(4)*y(3);
-dydt(3)=dydt(3)-k(7)*y(4)*y(3);
-dydt(7)=dydt(7)+k(7)*y(4)*y(3);
+dydt(4)=dydt(4)-1/2*k(7)*y(4)*y(3);
+dydt(3)=dydt(3)-1/2*k(7)*y(4)*y(3);
+dydt(7)=dydt(7)+1/2*k(7)*y(4)*y(3);
 
 %rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 %reaction: E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
 
-dydt(3)=dydt(3)-k(5)*y(3)*y(3);
-dydt(3)=dydt(3)-k(5)*y(3)*y(3);
-dydt(6)=dydt(6)+2*k(5)*y(3)*y(3);
+dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
+dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
+dydt(6)=dydt(6)+2/2*k(5)*y(3)*y(3);
 
 %rule    : R(e!_,r) -> R(e,r)
 %reaction: E(r!1, s), R(e!1, r) -> E(r, s) + R(e, r)
@@ -260,9 +260,9 @@ dydt(4)=dydt(4)+k(11)*y(5)/2;
 %rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 %reaction: E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3)
 
-dydt(4)=dydt(4)-k(10)*y(4)*y(4);
-dydt(4)=dydt(4)-k(10)*y(4)*y(4);
-dydt(5)=dydt(5)+2*k(10)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
+dydt(5)=dydt(5)+2/2*k(10)*y(4)*y(4);
 
 %rule    : R(e!_,r) -> R(e,r)
 %reaction: E(r, s!1), R(e!1, r) -> E(r, s) + R(e, r)

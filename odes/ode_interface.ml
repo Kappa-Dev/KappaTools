@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 18 2016>
+  * Last modification: Time-stamp: <Aug 31 2016>
 *)
 
 type compil =
@@ -15,6 +15,7 @@ type compil =
   }
 
 type cache = Connected_component.PreEnv.t
+type nauto_in_lhs_cache = LKappa_auto.cache
 type hidden_init = Primitives.elementary_rule
 type init = (Alg_expr.t * hidden_init * Location.t) list
 
@@ -57,7 +58,7 @@ let do_we_divide_rates_by_n_auto_in_lhs compil =
 
   let do_we_count_in_embeddings compil =
     match
-      what_do_we_count compil 
+      what_do_we_count compil
     with
     | Ode_args.Occurrences -> false
     | Ode_args.Embeddings -> true
@@ -290,6 +291,7 @@ let get_compil
 
 let empty_cache compil =
   Connected_component.PreEnv.empty (sigs compil)
+let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
 let mixture_of_init compil c =
   let _,emb,m = disjoint_union compil [] in
@@ -298,3 +300,11 @@ let mixture_of_init compil c =
 
 let nb_tokens compil =
   Environment.nb_tokens (environment compil)
+
+
+let nbr_automorphisms_in_lhs cache compil rule =
+  let rule_id = rule.Primitives.syntactic_rule  in
+  let lkappa_rule =
+    Environment.get_ast_rule compil.environment rule_id
+  in
+  LKappa_auto.nauto cache lkappa_rule.LKappa.r_mix

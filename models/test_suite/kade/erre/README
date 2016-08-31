@@ -2,6 +2,3 @@
 "${KAPPABIN}"KaDE erre.ka  -d output -t 1 -p 100 || exit 0
 
 #This is the classical erre model.
-
-#known problems
-# Automorphisms in lhs of rules are not counted well in case of side-effects

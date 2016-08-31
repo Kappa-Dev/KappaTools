@@ -9,7 +9,7 @@ module Make =
       {
         dictionary: elt_id SetMap.Map.t ;
         next_elt_id: elt_id ;
-        cons: hashed_list option Mods.DynArray.t Mods.DynArray.t ;
+        cons: hashed_list option Mods.DynArray.t option Mods.DynArray.t ;
         next_list_id: hashed_list;
       }
 
@@ -28,7 +28,7 @@ module Make =
       {
         dictionary = SetMap.Map.empty ;
         next_elt_id = fst_elt_id ;
-        cons = Mods.DynArray.make_matrix 0 0 None;
+        cons = Mods.DynArray.create 0 None;
         next_list_id = fst_list_id;
       }
 
@@ -44,16 +44,25 @@ module Make =
 
     let cons cache head tail =
       let cache, hash_head = hash_elt cache head in
+      let subtab =
+        match
+          Mods.DynArray.get cache.cons hash_head
+        with
+        | Some subtab -> subtab
+        | None ->
+          let subtab = Mods.DynArray.create 0 None in
+          let () = Mods.DynArray.set cache.cons hash_head (Some subtab) in
+          subtab
+      in
       match
-        Mods.DynArray.get
-          (Mods.DynArray.get cache.cons hash_head) tail
+        Mods.DynArray.get subtab tail
       with
       | Some hash -> cache, hash
       | None ->
         let cache, hash = fresh_list_id cache in
         let () =
           Mods.DynArray.set
-            (Mods.DynArray.get cache.cons hash_head)
+            subtab
             tail
             (Some hash)
         in
@@ -65,6 +74,31 @@ module Make =
       | h::t ->
         let cache, t = hash cache t in
         cons cache h t
-  end
 
-let main () = ()
+    let print formatter =
+      Format.fprintf formatter "%i"
+
+    let print_cache formatter cache =
+      let () =
+        Format.fprintf formatter "Cache\n next_fresh_list_id: %i; next_fresh_elt_id: %i\n" cache.next_list_id cache.next_elt_id
+      in
+      let () =
+        SetMap.Map.iter
+          (fun a i ->
+             Format.fprintf formatter "DIC:%a:%i\n" A.print a i)
+          cache.dictionary
+      in
+      Mods.DynArray.iteri
+        (fun a opt ->
+           match opt
+           with
+           | None -> ()
+           | Some opt ->
+             Mods.DynArray.iteri (fun b k ->
+                 match k
+                 with
+                 | None -> ()
+                 | Some k ->
+                   Format.fprintf formatter "(%i,%i)->%i \n" a b k) opt)
+        cache.cons
+  end

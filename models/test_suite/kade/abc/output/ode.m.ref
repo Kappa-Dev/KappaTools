@@ -10,7 +10,7 @@ function main=main()
 %% num_t_point - the number of time points to return
 %%
 %% variables (init(i),y(i)) denote numbers of embeddings 
-%% rule rates are not corrected by the number of automorphisms in the lhs of rules
+%% rule rates are corrected by the number of automorphisms in the lhs of rules
 
 
 tinit=0.000000;

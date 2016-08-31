@@ -10,7 +10,7 @@ function main=main()
 %% num_t_point - the number of time points to return
 %%
 %% variables (init(i),y(i)) denote numbers of embeddings 
-%% rule rates are not corrected by the number of automorphisms in the lhs of rules
+%% rule rates are corrected by the number of automorphisms in the lhs of rules
 
 
 tinit=0.000000;
@@ -188,9 +188,9 @@ dydt(5)=dydt(5)+k(4)*y(6)/2;
 %rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 %reaction: E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
 
-dydt(5)=dydt(5)-k(3)*y(5)*y(5);
-dydt(5)=dydt(5)-k(3)*y(5)*y(5);
-dydt(6)=dydt(6)+2*k(3)*y(5)*y(5);
+dydt(5)=dydt(5)-1/2*k(3)*y(5)*y(5);
+dydt(5)=dydt(5)-1/2*k(3)*y(5)*y(5);
+dydt(6)=dydt(6)+2/2*k(3)*y(5)*y(5);
 
 %rule    : E(r!1), R(e!1,r) -> E(r), R(e,r)
 %reaction: E(r!1), R(e!1, r) -> E(r) + R(e, r)

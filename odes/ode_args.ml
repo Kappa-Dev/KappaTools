@@ -12,7 +12,7 @@ type t = {
 let default : t =
   {
     backend = "Octave" ;
-    rate_convention = "KaSim" ;
+    rate_convention = "Biochemist" ;
     count = "Embeddings" ;
     show_reactions = true ;
     compute_jacobian = false ;
@@ -24,7 +24,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    "Available backends are Octave and Matlab") ;
   "--rate-convention",
   Arg.String (fun rate_convention -> t.rate_convention <- rate_convention),
-  "Tune whether or not rule rates are divided by the number of automorphisms in the lhs \n\t (KaSim -> we do not divide; Biochemist -> we divide) \n\t The Biochemist option is not available yet" ;
+  "Tune whether or not rule rates are divided by the number of automorphisms in the lhs \n\t (KaSim -> we do not divide; Biochemist -> we divide)" ;
   "--count",
   Arg.String (fun count -> t.count <- count),
   "Tune whether ode variables denote number of occurrences or number of embeddings" ;

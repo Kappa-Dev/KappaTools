@@ -29,6 +29,7 @@ val get_algs :
   t -> (string Location.annot * Alg_expr.t Location.annot) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
+val get_ast_rule: t -> int -> LKappa.rule
 val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
 val fold_rules :
   (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a

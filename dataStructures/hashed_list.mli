@@ -9,5 +9,6 @@ sig
      cache -> A.t list -> cache * hashed_list
   val cons: cache -> A.t -> hashed_list  -> cache * hashed_list
   val empty: hashed_list
-
+  val print: Format.formatter -> hashed_list -> unit
+  val print_cache: Format.formatter -> cache -> unit 
 end

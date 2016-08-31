@@ -9,7 +9,6 @@ module type GenArray = sig
     val init: int -> (int -> 'a) -> 'a t
     val make: int -> 'a -> 'a t
     val append: 'a t -> 'a t -> 'a t
-    val make_matrix: int -> int -> 'a -> 'a t t
     val concat: 'a t list -> 'a t
     val sub: 'a t -> int -> int -> 'a t
     val copy: 'a t -> 'a t

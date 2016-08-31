@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 18 2016>
+  * Last modification: Time-stamp: <Aug 31 2016>
 *)
 
 let local_trace = false
@@ -142,7 +142,6 @@ struct
       species_tab: (I.chemical_species*int) Mods.DynArray.t ;
 
       cc_cache: I.cache ;
-
       varmap: var_id Mods.IntMap.t ;
       tokenmap: ode_var_id Mods.IntMap.t ;
 
@@ -271,7 +270,7 @@ struct
     {network with tokenmap = Mods.IntMap.add token id network.tokenmap},
     id
 
-  let enrich_rule compil rule rule_id_with_mode =
+  let enrich_rule cache compil rule rule_id_with_mode =
     let lhs = I.lhs compil rule_id_with_mode rule in
     let _,lhs_cc =
       List.fold_left
@@ -281,18 +280,20 @@ struct
         (fst_cc_id,[])
         (List.rev (I.connected_components_of_patterns lhs))
     in
+    let cache, divide_rate_by =
+      if I.do_we_divide_rates_by_n_auto_in_lhs compil
+      then
+        I.nbr_automorphisms_in_lhs cache compil rule
+      else cache, 1
+    in
+    cache,
     {
       comment = I.rate_name compil rule rule_id_with_mode ;
       rule_id_with_mode = rule_id_with_mode ;
       rule = rule ;
       lhs = lhs ;
       lhs_cc = lhs_cc ;
-      divide_rate_by =
-        if I.do_we_divide_rates_by_n_auto_in_lhs compil
-        then I.nbr_automorphisms_in_pattern lhs
-        (* Pierre, could you help me here please ? *)
-        (* here I need the number of auto in the lhs of the original rule, not the one in the refinment of the rule *)
-        else 1
+      divide_rate_by = divide_rate_by ;
     }
 
   let add_embedding key embed store =
@@ -518,18 +519,19 @@ struct
   let compute_reactions compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
+    let cache = I.empty_lkappa_cache () in
     let rules =
       List.rev
         (snd
            (List.fold_left
-              (fun (id,list) rule ->
+              (fun ((id, cache), list) rule ->
                  let modes = I.valid_modes compil rule id in
-                 next_id id,
                  List.fold_left
-                   (fun list mode ->
-                      (enrich_rule compil rule mode)::list)
-                   list modes)
-              (fst_id,[]) (List.rev rules)))
+                   (fun ((id,cache), list) mode ->
+                      let cache, elt = enrich_rule cache compil rule mode in
+                      (id,cache), elt::list)
+                   ((next_id id,cache),list) modes)
+              ((fst_id,cache),[]) (List.rev rules)))
     in
     let to_be_visited, network =
       initial_network
@@ -1288,18 +1290,18 @@ struct
                let dump list  =
                  let _ =
                    List.fold_left
-                   (fun bool k ->
-                      let prefix = if bool then " + " else "" in
-                      let species_string =
-                        Format.asprintf "%a"
-                          (fun log id -> I.print_chemical_species ~compil log
-                              (fst (Mods.DynArray.get network.species_tab id)))
-                          k
-                      in
-                      let () = Loggers.fprintf logger "%s%s" prefix species_string in
-                      true)
-                   false
-                   (List.rev list)
+                     (fun bool k ->
+                        let prefix = if bool then " + " else "" in
+                        let species_string =
+                          Format.asprintf "%a"
+                            (fun log id -> I.print_chemical_species ~compil log
+                                (fst (Mods.DynArray.get network.species_tab id)))
+                            k
+                        in
+                        let () = Loggers.fprintf logger "%s%s" prefix species_string in
+                        true)
+                     false
+                     (List.rev list)
                  in ()
                in
                let () = dump reactants in
@@ -1318,7 +1320,7 @@ struct
                    to_nocc_correct compil nauto))
                (List.rev reactants)
            in
-           let () = Loggers.print_newline logger in 
+           let () = Loggers.print_newline logger in
            let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
            let () = do_it Ode_loggers.produce products reactants' enriched_rule in
            let () =

@@ -71,8 +71,6 @@ let init n f =
     in
     Binary m
 
-let make_matrix m n a = init m (fun _ -> create n a)
-
 let append a b =
   let lb = length b in
   let la = length a in
