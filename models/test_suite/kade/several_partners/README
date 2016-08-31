@@ -2,7 +2,3 @@
 "${KAPPABIN}"KaDE several_partners.ka  -d output -t 1 -p 100 || exit 0
 
 #Test what happen in case of a side-effect with several potential partner.
-
-
-# Know problem
-# It crashes.

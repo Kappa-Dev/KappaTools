@@ -97,7 +97,7 @@ let print_ode_preamble
                                     | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
               "%% rule rates are "^
               (match rate_convention
-               with Ode_args.Biochemist -> ""
+               with Ode_args.Divide_by_nbr_of_autos_in_lhs -> ""
                   | Ode_args.KaSim -> "not ")^"corrected by the number of automorphisms in the lhs of rules"] in
 
         let () = Loggers.print_newline logger in

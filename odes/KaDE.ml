@@ -67,13 +67,8 @@ let main () =
     let rate_convention =
       match lowercase ode_args.Ode_args.rate_convention with
     | "kasim" -> Ode_args.KaSim
-    | "biochemist"  ->
-      let () =
-      Debug.tag
-        Format.std_formatter
-        ("The biochemist mode is not working correctly at the moment")
-      in
-      Ode_args.Biochemist
+    | "divide_by_nbr_of_autos_in_lhs"  ->
+      Ode_args.Divide_by_nbr_of_autos_in_lhs
     | s ->
       begin
         Arg.usage options usage_msg;

@@ -1,6 +1,6 @@
 function main=main()
 %% command line: 
-%%     'KaDE' 'bet.ka' '-d' 'output' '-t' '1' '-p' '100' '--rate-convention''Biochemist'
+%%     'KaDE' 'bet.ka' '-d' 'output' '-t' '1' '-p''100'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -97,7 +97,7 @@ end
 
 filename = 'data.out';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE bet.ka -d output -t 1 -p 100 --rate-convention Biochemist\n')
+fprintf(fid,'# KaDE bet.ka -d output -t 1 -p 100\n')
 fprintf(fid,'# t')
 fprintf(fid,'\n')
 for j=1:num_t_point+1

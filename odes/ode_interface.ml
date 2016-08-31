@@ -54,7 +54,7 @@ let do_we_divide_rates_by_n_auto_in_lhs compil =
     rate_convention compil
   with
   | Ode_args.KaSim -> false
-  | Ode_args.Biochemist -> true
+  | Ode_args.Divide_by_nbr_of_autos_in_lhs -> true
 
   let do_we_count_in_embeddings compil =
     match
