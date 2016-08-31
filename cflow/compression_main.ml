@@ -219,7 +219,7 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
                       S.PH.B.PB.CI.Po.K.H.dump_json parameter
                         (Story_json.status_to_json {
                             Story_json.phase=Story_json.Inprogress;
-                            Story_json.message="Start collecting one new trace"
+                            Story_json.message="Start one causal compression"
                           })
                     in
                     let error,log_info,trace_before_compression =
@@ -328,6 +328,13 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
                       aux
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
+                         let () =
+                           S.PH.B.PB.CI.Po.K.H.dump_json parameter
+                             (Story_json.status_to_json {
+                                 Story_json.phase=Story_json.Inprogress;
+                                 Story_json.message="Start collecting one new trace"
+                                      })
+                         in
                          let error,log_info,trace =
                            U.remove_pseudo_inverse_events (do_not_log parameter)
                              ~shall_we_compute:always ~shall_we_compute_profiling_information:always
@@ -385,6 +392,13 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
                       aux
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
+                         let () =
+                           S.PH.B.PB.CI.Po.K.H.dump_json parameter
+                             (Story_json.status_to_json {
+                                 Story_json.phase=Story_json.Inprogress;
+                                 Story_json.message="Start collecting one new trace"
+                               })
+                         in
                          let error,log_info,trace =
                            U.remove_pseudo_inverse_events
                              (do_not_log parameter)
