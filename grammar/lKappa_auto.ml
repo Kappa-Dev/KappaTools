@@ -515,6 +515,8 @@ let cannonical_of_root bonds_map array ag_id =
     [Regular (agent_name, prop, binding)]
     Mods.Int2Set.empty Mods.IntMap.empty
 
+(* when rhs of rules are taken into account *)
+(* The cc that contains created agents only shall be ignored *)
 let keep_this_cc rate_convention n_agents cc =
   match rate_convention with
   | Ode_args.KaSim -> assert false
