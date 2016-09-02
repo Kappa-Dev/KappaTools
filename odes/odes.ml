@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 31 2016>
+  * Last modification: Time-stamp: <Sep 01 2016>
 *)
 
 let local_trace = false
@@ -281,10 +281,7 @@ struct
         (List.rev (I.connected_components_of_patterns lhs))
     in
     let cache, divide_rate_by =
-      if I.do_we_divide_rates_by_n_auto_in_lhs compil
-      then
-        I.nbr_automorphisms_in_lhs cache compil rule
-      else cache, 1
+        I.divide_rule_rate_by cache compil rule
     in
     cache,
     {

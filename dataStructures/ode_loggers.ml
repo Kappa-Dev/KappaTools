@@ -93,13 +93,23 @@ let print_ode_preamble
               "%% initialstep - initial time step at the beginning of numerical integration";
               "%% num_t_point - the number of time points to return";
               "%%" ;
-              "%% "^(match count with Ode_args.Embeddings -> "variables (init(i),y(i)) denote numbers of embeddings "
-                                    | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
-              "%% rule rates are "^
-              (match rate_convention
-               with Ode_args.Divide_by_nbr_of_autos_in_lhs -> ""
-                  | Ode_args.KaSim -> "not ")^"corrected by the number of automorphisms in the lhs of rules"] in
-
+              "%% "^
+              (match
+                 count
+               with
+               | Ode_args.Embeddings -> "variables (init(i),y(i)) denote numbers of embeddings "
+               | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
+              "%% "^
+              (match
+                 rate_convention
+               with
+               | Ode_args.Biochemist ->
+                 "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
+               | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+                 "rule rates are corrected by the number of automorphisms in the lhs of rules"
+               | Ode_args.KaSim ->
+                 "no correcion is applied on rule rates")]
+            in
         let () = Loggers.print_newline logger in
         ()
       end

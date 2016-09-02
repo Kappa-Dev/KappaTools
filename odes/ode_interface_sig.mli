@@ -1,13 +1,13 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 31 2016>
+  * Last modification: Time-stamp: <Sep 01 2016>
 *)
 
 module type Interface =
 sig
   type compil
   type cache
-  type nauto_in_lhs_cache
+  type nauto_in_rules_cache
 
 
   type mixture              (* not necessarily connected, fully specified *)
@@ -21,7 +21,7 @@ sig
     ((connected_component array list,int) Alg_expr.e * hidden_init * Location.t) list
 
   val empty_cache: compil -> cache
-  val empty_lkappa_cache: unit -> nauto_in_lhs_cache
+  val empty_lkappa_cache: unit -> nauto_in_rules_cache
   val get_init: compil -> init
   val mixture_of_init: compil -> hidden_init -> mixture
   val dummy_chemical_species: compil -> chemical_species
@@ -38,7 +38,6 @@ sig
 
   val rate_convention: compil -> Ode_args.rate_convention
   val what_do_we_count: compil -> Ode_args.count
-  val do_we_divide_rates_by_n_auto_in_lhs: compil -> bool
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
@@ -69,8 +68,8 @@ sig
   type rule_id = int
   type rule_id_with_mode = rule_id * arity * direction
 
-  val nbr_automorphisms_in_lhs:
-    nauto_in_lhs_cache -> compil -> rule -> nauto_in_lhs_cache * int
+  val divide_rule_rate_by:
+    nauto_in_rules_cache -> compil -> rule -> nauto_in_rules_cache * int
 
 
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list

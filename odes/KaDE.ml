@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 31 2016>
+  * Last modification: Time-stamp: <Sep 01 2016>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -69,6 +69,7 @@ let main () =
     | "kasim" -> Ode_args.KaSim
     | "divide_by_nbr_of_autos_in_lhs"  ->
       Ode_args.Divide_by_nbr_of_autos_in_lhs
+    | "biochemist" -> Ode_args.Biochemist 
     | s ->
       begin
         Arg.usage options usage_msg;

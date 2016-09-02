@@ -1,4 +1,4 @@
 type cache
 
 val init_cache: unit -> cache
-val nauto: cache -> LKappa.rule_mixture -> cache * int
+val nauto: Ode_args.rate_convention -> cache -> LKappa.rule_mixture -> Raw_mixture.t -> cache * int

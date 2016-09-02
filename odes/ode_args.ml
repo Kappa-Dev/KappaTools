@@ -1,4 +1,6 @@
-type rate_convention = KaSim | Divide_by_nbr_of_autos_in_lhs
+type rate_convention =
+  | KaSim | Divide_by_nbr_of_autos_in_lhs
+  | Biochemist
 type count = Embeddings | Occurrences
 
 type t = {
@@ -24,7 +26,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    "Available backends are Octave and Matlab") ;
   "--rate-convention",
   Arg.String (fun rate_convention -> t.rate_convention <- rate_convention),
-  "Tune whether or not rule rates are divided by the number of automorphisms in the lhs \n\t (KaSim -> we do not divide; Divide_by_nbr_of_autos_in_lhs -> we divide)" ;
+  "Tune which correction is applied to rule rates \n\t KaSim -> we do not divide; \n\t Divide_by_nbr_of_autos_in_lhs -> we divide by the number of autos in the lhs \n\t Biochemist -> we divide by the number of autos in the lhs that induce an auto in the rhs" ;
   "--count",
   Arg.String (fun count -> t.count <- count),
   "Tune whether ode variables denote number of occurrences or number of embeddings" ;

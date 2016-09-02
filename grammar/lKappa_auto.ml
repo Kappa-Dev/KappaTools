@@ -1,3 +1,18 @@
+type binding_id = Lhs of int | Rhs of int
+
+module Binding_id =
+struct
+  type t = binding_id
+  let compare = compare
+  let print log =
+    function
+    | Lhs i -> Format.fprintf log "LHS(%i)" i
+    | Rhs i -> Format.fprintf log "RHS(%i)" i
+end
+
+module Binding_idSetMap = SetMap.Make (Binding_id)
+module Binding_idMap = Binding_idSetMap.Map
+
 module Binding_states =
 struct
   type t = int * ((int, unit) Ast.link)
@@ -75,44 +90,94 @@ let id =
 (* In views, any location annotation has been removed *)
 (* Link values have been replaced with the corresponding binding type *)
 (* Lastly, each agent is provided with its set of bond sites *)
-let translate cache lkappa_mixture =
-  let add_map i j map =
-    Mods.IntMap.add
-      i (j::(Mods.IntMap.find_default [] i map)) map
+(* according to the rate convention the rhs may be taken into account *)
+(* Sites in the nhs are numbered between n_sites and 2*n_sites *)
+(* If the rhs is taken into account, deleted agents have a special site (-1)
+   with internal state 0 *)
+(* The state of this site shall be preserved by autos *)
+let translate rate_convention cache lkappa_mixture ag_created =
+  let add_map rate_convention i j map =
+    match rate_convention, i  with
+    | Ode_args.KaSim, _  -> assert false
+    | Ode_args.Divide_by_nbr_of_autos_in_lhs , Lhs _ | Ode_args.Biochemist, _  ->
+      Binding_idMap.add
+        i (j::(Binding_idMap.find_default [] i map)) map
+    | Ode_args.Divide_by_nbr_of_autos_in_lhs, Rhs _ -> map
   in
-  let lkappa_array = Array.of_list lkappa_mixture in
-  let array_name = Array.make (Array.length lkappa_array) 0 in
+  let ag_created =
+    match rate_convention with
+    | Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs -> []
+    | Ode_args.Biochemist -> ag_created
+  in
+  let n_agents_wo_creation = List.length lkappa_mixture in
+  let n_agents =
+    match rate_convention with
+    | Ode_args.KaSim -> assert false
+    | Ode_args.Divide_by_nbr_of_autos_in_lhs -> n_agents_wo_creation
+    | Ode_args.Biochemist -> n_agents_wo_creation + (List.length ag_created)
+  in
+  let array_name = Array.make n_agents 0 in
   let state_of_internal x =
     match x with
-    | LKappa.I_ANY
-    | LKappa.I_ANY_CHANGED _
-    | LKappa.I_ANY_ERASED -> None
-    | LKappa.I_VAL_CHANGED (state, _)
-    | LKappa.I_VAL_ERASED state -> Some state
+    | LKappa.I_ANY -> None, None
+    | LKappa.I_ANY_CHANGED state' -> None, Some state'
+    | LKappa.I_ANY_ERASED -> None, None
+    | LKappa.I_VAL_CHANGED (state, state') -> Some state, Some state'
+    | LKappa.I_VAL_ERASED state -> Some state, None
   in
-  let scan_bonds_identifier, _  =
-    Array.fold_left
+  let intermediary  =
+    List.fold_left
       (fun (map, agent_id) agent ->
          let () = array_name.(agent_id) <- agent.LKappa.ra_type in
+         let n_site = Array.length agent.LKappa.ra_ports in
          let map, _ =
            Array.fold_left
-             (fun (map, site_id) ((state,_),_) ->
-                match state with
-                | Ast.LNK_VALUE (i,_) ->
-                  (add_map i (agent_id, site_id) map, site_id + 1)
-                | Ast.FREE
-                | Ast.LNK_ANY
-                | Ast.LNK_SOME
-                | Ast.LNK_TYPE _ -> map, site_id + 1)
+             (fun (map, site_id) ((state,_),switch) ->
+                match state, switch with
+                | Ast.LNK_VALUE (i,_), LKappa.Maintained  ->
+                  add_map rate_convention (Rhs i) (agent_id,site_id+n_site)
+                    (add_map rate_convention (Lhs i) (agent_id, site_id) map), site_id + 1
+                | Ast.LNK_VALUE (i,_), LKappa.Linked (j,_) ->
+                  add_map rate_convention (Rhs j) (agent_id,site_id+n_site)
+                    (add_map rate_convention (Lhs i) (agent_id, site_id) map), site_id + 1
+                | Ast.LNK_VALUE (i,_), _ ->
+                  add_map rate_convention (Lhs i) (agent_id, site_id) map, site_id + 1
+                | _, LKappa.Linked (j,_) ->
+                  add_map rate_convention (Rhs j) (agent_id, site_id+n_site) map, site_id + 1
+                | (Ast.FREE | Ast.LNK_SOME | Ast.LNK_ANY | Ast.LNK_TYPE _),
+                  (LKappa.Maintained | LKappa.Freed | LKappa.Erased ) -> map, site_id+1
+
+             )
              (map, 0)
              agent.LKappa.ra_ports
          in
          (map, agent_id + 1))
-      (Mods.IntMap.empty,0)
-      lkappa_array
+      (Binding_idMap.empty,0)
+      lkappa_mixture
+  in
+  let scan_bonds_identifier, _ =
+    List.fold_left
+      (fun (map, agent_id) agent ->
+         let () = array_name.(agent_id) <- agent.Raw_mixture.a_type in
+         let n_site = Array.length agent.Raw_mixture.a_ports in
+         let map, _ =
+           Array.fold_left
+             (fun (map, site_id) state ->
+                match state with
+                | Raw_mixture.VAL i ->
+                  add_map rate_convention (Rhs i) (agent_id,site_id+n_site) map,
+                  site_id + 1
+                | Raw_mixture.FREE ->
+                  map, site_id +1)
+             (map, 0)
+             agent.Raw_mixture.a_ports
+         in
+         (map, agent_id + 1))
+      intermediary
+      ag_created
   in
   let bonds_map =
-    Mods.IntMap.fold
+    Binding_idMap.fold
       (fun _ list map ->
          match list
          with
@@ -123,43 +188,109 @@ let translate cache lkappa_mixture =
       scan_bonds_identifier
       Mods.Int2Map.empty
   in
-  let translate_agent cache array_name agent_id agent =
+  let translate_agent rate_convention cache array_name agent_id agent =
     let agent_name = agent.LKappa.ra_type in
-    let rule_internal,_ =
+    let n_sites = Array.length agent.LKappa.ra_ports in
+    let rule_internal,_ = (* regular sites *)
       Array.fold_left
         (fun (list,site_id) state ->
-           match state_of_internal state with
-           | None -> list, site_id +1
-           | Some x -> (site_id,x)::list, site_id+1)
+           let fst_opt,snd_opt = state_of_internal state in
+           let list =
+             match fst_opt  with
+             | None -> list
+             | Some x -> (site_id,x)::list
+           in
+           let list =
+             match rate_convention, snd_opt with
+             | (Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs) , _
+             | _ , None -> list
+             | Ode_args.Biochemist,  Some x -> (site_id + n_sites,x)::list
+           in
+           list, site_id+1)
         ([],0) agent.LKappa.ra_ints
+    in
+    let rule_internal = (* Here we add the fictitious site for the agents that are degraded  *)
+      match rate_convention with
+      | Ode_args.KaSim -> assert false
+      | Ode_args.Divide_by_nbr_of_autos_in_lhs -> rule_internal
+      | Ode_args.Biochemist ->
+        if agent.LKappa.ra_erased then
+          (-1,0)::rule_internal
+        else rule_internal
     in
     let rule_port,interface,_ =
       Array.fold_left
-        (fun (list, interface, site_id) ((port,_),_) ->
-           match port with
-           | Ast.LNK_VALUE _  ->
-             let ag_partner, site_partner =
-               match
-                 Mods.Int2Map.find_option (agent_id, site_id) bonds_map
-               with
-               | None -> assert false
-               | Some x -> x
-             in
-             let ag_partner = array_name.(ag_partner) in
-             (site_id,
-              Ast.LNK_TYPE
-                (site_partner,
-                 ag_partner))
-             ::list,
-             Mods.IntSet.add site_id interface,site_id + 1
-           | Ast.FREE
-           | Ast.LNK_ANY
-           | Ast.LNK_SOME ->
-             (site_id,id port)::list, interface, site_id+1
-           | Ast.LNK_TYPE (a,b) ->
-             (site_id,
-              Ast.LNK_TYPE
-                (a,b))::list, interface,site_id+1
+        (fun (list, interface, site_id) ((port,_),switch) ->
+           let list, interface =
+             match port with
+             | Ast.LNK_VALUE _  ->
+               let ag_partner, site_partner =
+                 match
+                   Mods.Int2Map.find_option (agent_id, site_id) bonds_map
+                 with
+                 | None ->
+                   assert false
+                 | Some x -> x
+               in
+               let ag_partner = array_name.(ag_partner) in
+               (site_id,
+                Ast.LNK_TYPE
+                  (site_partner,
+                   ag_partner))
+               ::list,
+               Mods.IntSet.add site_id interface
+             | Ast.FREE
+             | Ast.LNK_ANY
+             | Ast.LNK_SOME | Ast.LNK_TYPE _ ->
+               (site_id,id port)::list, interface
+           in
+           let list, interface =
+             match rate_convention with
+             | Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+               list, interface
+             | Ode_args.Biochemist ->
+               begin
+                 match port, switch with
+                 | _, LKappa.Linked _ ->
+                   let site_id = site_id + n_sites in
+                   let ag_partner, site_partner =
+                     match
+                       Mods.Int2Map.find_option (agent_id, site_id) bonds_map
+                     with
+                     | None -> assert false
+                     | Some x -> x
+                   in
+                   let ag_partner = array_name.(ag_partner) in
+                   (site_id,
+                    Ast.LNK_TYPE
+                      (site_partner,
+                       ag_partner))
+                   ::list,
+                   Mods.IntSet.add site_id interface
+                 | Ast.LNK_VALUE _, LKappa.Maintained ->
+                   let site_id = site_id + n_sites in
+                   let ag_partner, site_partner =
+                     match
+                       Mods.Int2Map.find_option (agent_id, site_id) bonds_map
+                     with
+                     | None -> assert false
+                     | Some x -> x
+                   in
+                   let ag_partner = array_name.(ag_partner) in
+                   (site_id,
+                    Ast.LNK_TYPE
+                      (site_partner,
+                       ag_partner))
+                   ::list,
+                   Mods.IntSet.add site_id interface
+                 | (Ast.LNK_VALUE _ | Ast.FREE | Ast.LNK_ANY | Ast.LNK_SOME | Ast.LNK_TYPE _),
+                   (LKappa.Maintained | LKappa.Erased) -> list, interface
+                 | _, LKappa.Freed ->
+                   let site_id = site_id + n_sites in
+                   (site_id,Ast.FREE)::list, interface
+               end
+           in
+           list, interface, site_id + 1
         )
         ([],Mods.IntSet.empty,0)
         agent.LKappa.ra_ports
@@ -177,17 +308,82 @@ let translate cache lkappa_mixture =
           binding_state_cache = cache_binding},
     (agent_name, rule_internal, rule_port, interface)
   in
-  let array =
-    Array.make (Array.length lkappa_array) (0,PropertiesCache.empty,BindingCache.empty,Mods.IntSet.empty)
+  let translate_created_agent cache array_name agent_id agent =
+    let agent_name = agent.Raw_mixture.a_type in
+    let n_sites = Array.length agent.Raw_mixture.a_ports in
+    let rule_internal,_ =
+      Array.fold_left
+        (fun (list,site_id) state ->
+           let list =
+             match state  with
+             | None -> list
+             | Some x -> (site_id,x)::list
+           in
+           list, site_id+1)
+        ([],n_sites) agent.Raw_mixture.a_ints
+    in
+    let rule_port,interface,_ =
+      Array.fold_left
+        (fun (list, interface, site_id) port ->
+           let list, interface =
+             match port with
+             | Raw_mixture.VAL _  ->
+               let ag_partner, site_partner =
+                 match
+                   Mods.Int2Map.find_option (agent_id, site_id) bonds_map
+                 with
+                 | None ->
+                   assert false
+                 | Some x -> x
+               in
+               let ag_partner = array_name.(ag_partner) in
+               (site_id,
+                Ast.LNK_TYPE
+                  (site_partner,
+                   ag_partner))
+               ::list,
+               Mods.IntSet.add site_id interface
+             | Raw_mixture.FREE ->
+               (site_id, Ast.FREE)::list, interface
+           in
+           list, interface, site_id + 1
+        )
+        ([],Mods.IntSet.empty,n_sites)
+        agent.Raw_mixture.a_ports
+    in
+    let cache_prop = cache.internal_state_cache in
+    let cache_binding = cache.binding_state_cache in
+    let cache_prop, rule_internal =
+      PropertiesCache.hash cache_prop rule_internal
+    in
+    let cache_binding, rule_port =
+      BindingCache.hash cache_binding rule_port
+    in
+    {cache
+     with internal_state_cache = cache_prop ;
+          binding_state_cache = cache_binding},
+    (agent_name, rule_internal, rule_port, interface)
   in
-  let cache, _ =
-    Array.fold_left
+  let array =
+    Array.make n_agents (0,PropertiesCache.empty,BindingCache.empty,Mods.IntSet.empty)
+  in
+  let intermediary =
+    List.fold_left
       (fun (cache, ag_id) agent ->
-         let cache, ag = translate_agent cache array_name ag_id agent in
+         let cache, ag = translate_agent rate_convention cache array_name ag_id agent in
          let () = array.(ag_id)<-ag in
          cache, ag_id+1)
       (cache, 0)
-      lkappa_array
+      lkappa_mixture
+  in
+  let cache, _ =
+    List.fold_left
+      (fun (cache, ag_id) agent ->
+         let cache, ag = translate_created_agent cache array_name ag_id agent in
+         let () = array.(ag_id)<-ag in
+         cache, ag_id+1)
+      intermediary
+      ag_created
   in
   cache, array, bonds_map
 
@@ -319,57 +515,71 @@ let cannonical_of_root bonds_map array ag_id =
     [Regular (agent_name, prop, binding)]
     Mods.Int2Set.empty Mods.IntMap.empty
 
+let keep_this_cc rate_convention n_agents cc =
+  match rate_convention with
+  | Ode_args.KaSim -> assert false
+  | Ode_args.Biochemist ->
+    begin
+      List.exists (fun i -> i<n_agents) cc
+    end
+  | Ode_args.Divide_by_nbr_of_autos_in_lhs -> true
 
-let mixture_to_species_map cache lkappa_mixture =
+let mixture_to_species_map rate_convention cache lkappa_mixture created =
   let map = CannonicMap.empty in
-  let cache, array, bonds_map = translate cache lkappa_mixture in
+  let n_agents = List.length lkappa_mixture in
+  let cache, array, bonds_map =
+    translate rate_convention cache lkappa_mixture created
+  in
   let cc_list = decompose bonds_map array in
   let cannonic_cache, map =
     List.fold_left
       (fun (cache, map) cc ->
-         match cc with
-         | [] -> cache, map
-         | h::t ->
-           let _,occs =
-             List.fold_left
-               (fun (best,occs) i ->
-                  let cmp = compare array.(i) best in
-                  if cmp < 0
-                  then (array.(i),[i])
-                  else if cmp = 0
-                  then (best,i::occs)
-                  else (best,occs))
-               (array.(h),[h]) t
-           in
-           let occs =
-             List.rev_map
-               (cannonical_of_root bonds_map array)
-               occs
-           in
-           let cache, cannonic, nauto =
-             match occs with
-             | [] -> assert false
-             | h::t ->
-               let cache, hash = CannonicCache.hash cache h in
+         if keep_this_cc rate_convention n_agents cc
+         then
+           match cc with
+           | [] -> cache, map
+           | h::t ->
+             let _,occs =
                List.fold_left
-                 (fun (cache, cannonic, nauto) list ->
-                    let cache, hash = CannonicCache.hash cache list in
-                    let cmp = compare cannonic hash in
+                 (fun (best,occs) i ->
+                    let cmp = compare array.(i) best in
                     if cmp < 0
-                    then cache, cannonic, nauto
+                    then (array.(i),[i])
                     else if cmp = 0
-                    then cache, cannonic, nauto+1
-                    else cache, hash, 1)
-                 (cache, hash, 1)
-                 t
-           in
-           match
-             CannonicMap.find_option cannonic map
-           with
-           | None -> cache, CannonicMap.add cannonic (1,nauto) map
-           | Some (occ, nauto') when nauto = nauto' ->
-             cache, CannonicMap.add cannonic (occ+1,nauto) map
-           | Some _ -> assert false)
+                    then (best,i::occs)
+                    else (best,occs))
+                 (array.(h),[h]) t
+             in
+             let occs =
+               List.rev_map
+                 (cannonical_of_root bonds_map array)
+                 occs
+             in
+             let cache, cannonic, nauto =
+               match occs with
+               | [] -> assert false
+               | h::t ->
+                 let cache, hash = CannonicCache.hash cache h in
+                 List.fold_left
+                   (fun (cache, cannonic, nauto) list ->
+                      let cache, hash = CannonicCache.hash cache list in
+                      let cmp = compare cannonic hash in
+                      if cmp < 0
+                      then cache, cannonic, nauto
+                      else if cmp = 0
+                      then cache, cannonic, nauto+1
+                      else cache, hash, 1)
+                   (cache, hash, 1)
+                   t
+             in
+             match
+               CannonicMap.find_option cannonic map
+             with
+             | None -> cache, CannonicMap.add cannonic (1,nauto) map
+             | Some (occ, nauto') when nauto = nauto' ->
+               cache, CannonicMap.add cannonic (occ+1,nauto) map
+             | Some _ -> assert false
+         else cache, map)
       (cache.cannonic_cache, map)
       cc_list
   in
@@ -391,6 +601,6 @@ let nauto_of_map map =
     map
     1
 
-let nauto cache lkappa_mixture =
-  let cache, map = mixture_to_species_map cache lkappa_mixture in
+let nauto rate_convention cache lkappa_mixture created =
+  let cache, map = mixture_to_species_map rate_convention cache lkappa_mixture created  in
   cache, nauto_of_map map
