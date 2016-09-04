@@ -7,7 +7,7 @@ let get_compilation ?max_e common_args cli_args =
       ?max_e
       ~nb_points:cli_args.Run_cli_args.pointNumberValue in
   let (env, cc_env, contact_map, updated_vars, story_compression,
-       unary_distances, dotCflows, init_l),
+       unary_distances, formatCflows, init_l),
       counter,alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
     | "" ->
@@ -26,7 +26,7 @@ let get_compilation ?max_e common_args cli_args =
       let contact_map,_kasa_state =
         Eval.init_kasa Remanent_parameters_sig.KaSim sigs_nd result in
       let () = Format.printf "+ Compiling...@." in
-      let (env, cc_env, story_compression, unary_distances, dotCflow, init_l)=
+      let (env, cc_env, story_compression, unary_distances, formatCflow, init_l)=
         Eval.compile
           ~pause:(fun f -> f ())
           ~return:(fun x -> x)
@@ -34,7 +34,7 @@ let get_compilation ?max_e common_args cli_args =
           ~outputs:(Outputs.go (Signature.create [||]))
           sigs_nd tk_nd contact_map counter result' in
       (env, cc_env, contact_map, updated_vars, story_compression,
-       unary_distances, dotCflow, init_l),counter,[]
+       unary_distances, formatCflow, init_l),counter,[]
     | marshalized_file ->
       try
         let d = open_in_bin marshalized_file in
@@ -47,10 +47,10 @@ let get_compilation ?max_e common_args cli_args =
         let () = Format.printf "+ Loading simulation package %s...@."
             marshalized_file in
         let env,cc_env,contact_map,updated_vars,story_compression,
-            unary_distances,dotCflow,init_l =
+            unary_distances,formatCflow,init_l =
           (Marshal.from_channel d :
              Environment.t*Connected_component.Env.t*Primitives.contact_map*
-             int list* (bool*bool*bool) option*bool option*bool*
+             int list* (bool*bool*bool) option*bool option*Ast.formatCflow*
              (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
         let () = Pervasives.close_in d  in
         let alg_overwrite =
@@ -63,7 +63,7 @@ let get_compilation ?max_e common_args cli_args =
           List.fold_left
             (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
         (env,cc_env,contact_map,updated_vars',story_compression,
-         unary_distances,dotCflow,init_l),
+         unary_distances,formatCflow,init_l),
         counter,alg_overwrite
       with
       | ExceptionDefn.Malformed_Decl _ as e -> raise e
@@ -74,4 +74,4 @@ let get_compilation ?max_e common_args cli_args =
         exit 1 in
   let env' = Environment.propagate_constant updated_vars counter env in
   (env', cc_env, contact_map, updated_vars, story_compression,
-   unary_distances, dotCflows, init_l),counter,alg_overwrite
+   unary_distances, formatCflows, init_l),counter,alg_overwrite

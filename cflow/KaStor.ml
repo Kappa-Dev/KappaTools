@@ -43,7 +43,7 @@ let server_mode () =
                                  (Yojson.Basic.Util.member "strong" json)
               with None -> false | Some b -> b in
             Compression_main.compress_and_print
-              ~called_from:Remanent_parameters_sig.Server ~dotFormat:false
+              ~called_from:Remanent_parameters_sig.Server ~dotFormat:Ast.Html
               ~none ~weak ~strong env (Compression_main.init_secret_log_info ())
               steps
           with Yojson.Basic.Util.Type_error (e,x) ->
@@ -83,8 +83,9 @@ let main () =
                   (Yojson.Basic.Util.member "strong" json)
           with None -> false | Some b -> b))
     in
+    let dot_html = if (!dotCflows) then Ast.Dot else Ast.Html in 
     Compression_main.compress_and_print
-      ~called_from:Remanent_parameters_sig.KaSim ~dotFormat:(!dotCflows)
+      ~called_from:Remanent_parameters_sig.KaSim ~dotFormat:dot_html
       ~none ~weak ~strong env (Compression_main.init_secret_log_info ()) steps
 
 let () = main ()

@@ -613,39 +613,40 @@ let pretty_print
                (0.,[],0) (List.rev stories)
            in
            let () =   (*dump grid fic state env ; *)
-             if dotFormat then
-               let profiling desc =
-                 Format.fprintf
-                   desc "/* @[Compression of %d causal flows" n;
-                 Format.fprintf
-                   desc "@ obtained in average at %E t.u@] */@,"
-                   (av_t/.(float_of_int n)) ;
-                 Format.fprintf
-                   desc "@[/* Compressed causal flows were:@ [%a] */@]"
-                   (Pp.list (fun f -> Format.fprintf f ";@,")
-                      Format.pp_print_int) ids
-               in
-               Kappa_files.with_cflow_file
-                 [compression_type;string_of_int cpt] "dot"
-                 (dot_of_grid profiling env enriched_config)
-             else
-               let profiling desc =
-                 Format.fprintf
-                   desc
-                   "@[<v 2><dl>@,<dt>Compression of</dt><dd>%d causal flows</dd>"n;
-                 Format.fprintf
-                   desc "@,<dt>obtained in average at</dt><dd>%E t.u</dd>@,"
-                   (av_t/.(float_of_int n)) ;
-                 Format.fprintf desc "<dt>Compressed causal flows were:</dt>";
-                 Format.fprintf
-                   desc "@ <dd>[@[%a@]]</dd>@]@,</dl>"
-                   (Pp.list (fun f -> Format.fprintf f ";@,")
-                      Format.pp_print_int) ids;
-               in
-               Kappa_files.with_cflow_file
-                 [compression_type;string_of_int cpt] "html"
-                 (html_of_grid
-                    profiling compression_type cpt env enriched_config) in
+             match dotFormat with
+             | Ast.Dot ->
+                let profiling desc =
+                  Format.fprintf
+                    desc "/* @[Compression of %d causal flows" n;
+                  Format.fprintf
+                    desc "@ obtained in average at %E t.u@] */@,"
+                    (av_t/.(float_of_int n)) ;
+                  Format.fprintf
+                    desc "@[/* Compressed causal flows were:@ [%a] */@]"
+                    (Pp.list (fun f -> Format.fprintf f ";@,")
+                             Format.pp_print_int) ids
+                in
+                Kappa_files.with_cflow_file
+                  [compression_type;string_of_int cpt] "dot"
+                  (dot_of_grid profiling env enriched_config)
+             | Ast.Html | Ast.Json ->
+                let profiling desc =
+                  Format.fprintf
+                    desc
+                    "@[<v 2><dl>@,<dt>Compression of</dt><dd>%d causal flows</dd>"n;
+                  Format.fprintf
+                    desc "@,<dt>obtained in average at</dt><dd>%E t.u</dd>@,"
+                    (av_t/.(float_of_int n)) ;
+                  Format.fprintf desc "<dt>Compressed causal flows were:</dt>";
+                  Format.fprintf
+                    desc "@ <dd>[@[%a@]]</dd>@]@,</dl>"
+                    (Pp.list (fun f -> Format.fprintf f ";@,")
+                             Format.pp_print_int) ids;
+                in
+                Kappa_files.with_cflow_file
+                  [compression_type;string_of_int cpt] "html"
+                  (html_of_grid
+                     profiling compression_type cpt env enriched_config) in
            cpt+1
         ) 0 story_list
     in

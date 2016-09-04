@@ -41,11 +41,11 @@ val end_of_simulation :
 
 val finalize :
   outputs:(Data.t -> unit) -> called_from:Remanent_parameters_sig.called_from ->
-  bool -> Format.formatter ->
+  Ast.formatCflow -> Format.formatter ->
   Environment.t -> Counter.t -> Rule_interpreter.t -> t -> unit
 
 val loop :
-  outputs:(Data.t -> unit) -> dotCflows:bool ->
+  outputs:(Data.t -> unit) -> formatCflows:Ast.formatCflow ->
   Format.formatter -> Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> unit
 (** [loop message_formatter env domain counter graph]

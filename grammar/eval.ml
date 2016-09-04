@@ -381,7 +381,7 @@ let configurations_of_result result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (unary_dist,story_compression,dotCflow as acc)
+    (fun (unary_dist,story_compression,formatCflow as acc)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -390,7 +390,7 @@ let configurations_of_result result =
           | ("strong",_)::tl -> parse (a,b,true) tl
           | ("weak",_)::tl -> parse (a,true,c) tl
           | ("none",_)::tl -> parse (true,b,c) tl
-          | [] -> (unary_dist,(a,b,c),dotCflow)
+          | [] -> (unary_dist,(a,b,c),formatCflow)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
                      ("Unkown value "^error^" for compression mode", pos))
@@ -398,11 +398,11 @@ let configurations_of_result result =
         parse story_compression value_list
       | "jsonUnaryDistance" ->
         if get_bool_value pos_p param value_list
-        then (Some true,story_compression,dotCflow)
+        then (Some true,story_compression,formatCflow)
         else acc
       | "storeUnaryDistance" ->
         ((if get_bool_value pos_p param value_list then Some false else None),
-         story_compression,dotCflow)
+         story_compression,formatCflow)
       | "cflowFileName" ->
         let () = get_value pos_p param value_list
             (fun x _ -> Kappa_files.set_cflow x) in
@@ -447,7 +447,9 @@ let configurations_of_result result =
             ) Parameter.maxConsecutiveClash in
         acc
       | "dotCflows" ->
-        unary_dist,story_compression,get_bool_value pos_p param value_list
+         if get_bool_value pos_p param value_list then
+           (unary_dist,story_compression, Dot) else 
+           (unary_dist,story_compression, Html)
       | "colorDot" ->
         let () = set_value pos_p param value_list
             (fun value pos_v ->
@@ -465,7 +467,7 @@ let configurations_of_result result =
         acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) (None,(false,false,false),true) result.configurations
+    ) (None,(false,false,false), Dot) result.configurations
 
 let compile_alg_vars contact_map domain vars =
   Tools.array_fold_left_mapi
@@ -550,7 +552,7 @@ let compile ~outputs ~pause ~return
     ?rescale_init sigs_nd tk_nd contact_map counter result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let unary_distances,story_compression,dotCflow =
+  let unary_distances,story_compression,formatCflow =
     configurations_of_result result in
   pause @@ fun () ->
   let preenv = Connected_component.PreEnv.empty sigs_nd in
@@ -611,7 +613,7 @@ let compile ~outputs ~pause ~return
       ?rescale:rescale_init contact_map env preenv result in
   return (env, domain,
           (if has_tracking then Some story_compression else None),
-          unary_distances, dotCflow, init_l)
+          unary_distances, formatCflow, init_l)
 
 let build_initial_state
     ~bind ~return alg_overwrite counter env cc_env

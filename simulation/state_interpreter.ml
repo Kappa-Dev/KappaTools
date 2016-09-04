@@ -392,7 +392,7 @@ let finalize ~outputs ~called_from dotFormat form env counter graph state =
            output_char c '\n')
   | None -> ()
 
-let loop ~outputs ~dotCflows form env domain counter graph state =
+let loop ~outputs ~formatCflows form env domain counter graph state =
   let called_from = Remanent_parameters_sig.KaSim in
   let user_interrupted = ref false in
   let old_sigint_behavior =
@@ -423,7 +423,7 @@ let loop ~outputs ~dotCflows form env domain counter graph state =
       else a_loop ~outputs env domain counter graph state in
     if stop then
       let () = Sys.set_signal Sys.sigint old_sigint_behavior in
-      finalize ~outputs ~called_from dotCflows form env counter graph' state'
+      finalize ~outputs ~called_from formatCflows form env counter graph' state'
     else let () = Counter.tick form counter in iter graph' state'
   in iter graph state
 

@@ -71,7 +71,7 @@ let () =
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
     let (env, cc_env, contact_map, _, story_compression,
-         unary_distances, dotCflows, init_l as init_result),
+         unary_distances, formatCflows, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
         ?max_e:kasim_args.Kasim_args.maxEventValue common_args cli_args in
 
@@ -194,14 +194,14 @@ let () =
               cc_env,(false,graph,state) in
           if stop then
             State_interpreter.finalize
-              ~outputs ~called_from:Remanent_parameters_sig.KaSim dotCflows
+              ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
               Format.std_formatter env counter graph' state'
           else
             toplevel cc_env' graph' state' in
         toplevel cc_env graph state
       else
         State_interpreter.loop
-          ~outputs ~dotCflows
+          ~outputs ~formatCflows
           Format.std_formatter env cc_env counter graph state in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()
