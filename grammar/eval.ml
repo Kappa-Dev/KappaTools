@@ -447,9 +447,21 @@ let configurations_of_result result =
             ) Parameter.maxConsecutiveClash in
         acc
       | "dotCflows" ->
-         if get_bool_value pos_p param value_list then
+         let formatCflow = get_value pos_p param value_list
+            (fun v p -> match v with
+                        | "true" | "yes" | "dot" -> Dot
+                        |"false" | "no" | "html" -> Html
+                        | "json " -> Json
+                        | _ as error  ->
+                           raise
+                             (ExceptionDefn.Malformed_Decl
+                                ("Value "^error^
+                                   " should be either \"html, dot\" or \"json\"", p))
+            ) in
+         (unary_dist,story_compression,formatCflow)
+(*         if get_bool_value pos_p param value_list then
            (unary_dist,story_compression, Dot) else 
-           (unary_dist,story_compression, Html)
+           (unary_dist,story_compression, Html)*)
       | "colorDot" ->
         let () = set_value pos_p param value_list
             (fun value pos_v ->
