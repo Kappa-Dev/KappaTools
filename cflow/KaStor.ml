@@ -83,7 +83,7 @@ let main () =
                   (Yojson.Basic.Util.member "strong" json)
           with None -> false | Some b -> b))
     in
-    let dot_html = if (!dotCflows) then Ast.Dot else Ast.Html in 
+    let dot_html = if (!dotCflows) then Ast.Dot else Ast.Html in
     Compression_main.compress_and_print
       ~called_from:Remanent_parameters_sig.KaSim ~dotFormat:dot_html
       ~none ~weak ~strong env (Compression_main.init_secret_log_info ()) steps
