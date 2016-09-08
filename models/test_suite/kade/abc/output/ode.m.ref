@@ -51,12 +51,6 @@ global kd
 global kun
 global kdun
 
-k(1)=0.001000; %a.b
-k(2)=0.100000; %a.b_op
-k(3)=0.001000; %ab.c
-k(4)=1; %mod x1
-k(5)=0.001000; %a.c
-k(6)=1; %mod x2
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -149,6 +143,12 @@ var(6)=(1*((y(7)+y(8))+y(9)));
 var(5)=(1*((y(1)+y(5))+y(6)));
 var(4)=(1*((y(4)+y(5))+y(9)));
 
+k(1)=var(1);
+k(2)=var(2);
+k(3)=var(1);
+k(4)=var(3);
+k(5)=var(1);
+k(6)=var(3);
 
 dydt=zeros(nodevar,1);
 
