@@ -73,8 +73,8 @@ type t = {
     mutable max_time : float option ;
     mutable max_events : int option ;
     plot_points : int ;
-    dE : int option ;
-    dT : float option ;
+    mutable dE : int option ;
+    mutable dT : float option ;
   }
 
 let inc_tick c = c.ticks <- c.ticks + 1
@@ -116,8 +116,6 @@ let one_time_correction_event c ti =
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
 let max_events c = c.max_events
-let set_max_time c t : unit = c.max_time <- t
-let set_max_events c e : unit = c.max_events <- e
 let plot_points c = c.plot_points
 let event_percentage (counter : t) : int option =
   match counter.max_events with
@@ -140,18 +138,29 @@ let tracked_events (counter : t) : int option =
   else
     None
 
-let compute_dT points mx_t =
+let compute_dT points init_v mx_t =
   if points <= 0 then None else
     match mx_t with
     | None -> None
-    | Some max_t -> Some (max_t /. (float_of_int points))
+    | Some max_t -> Some ((max_t -. init_v) /. (float_of_int points))
 
-let compute_dE points mx_e =
+let compute_dE points init_v mx_e =
   if points <= 0 then None else
     match mx_e with
     | None -> None
     | Some max_e ->
-       Some (max (max_e / points) 1)
+       Some (max ((max_e - init_v) / points) 1)
+
+let set_max_time c t =
+  let () =
+    let rem_points = c.plot_points - c.last_point in
+    if rem_points > 0 then c.dT <- compute_dT rem_points (current_time c) t in
+  c.max_time <- t
+let set_max_events c e =
+  let () =
+    let rem_points = c.plot_points - c.last_point in
+    if rem_points > 0 then c.dE <- compute_dE rem_points (current_event c) e in
+  c.max_events <- e
 
 let tick f counter =
   let () =
@@ -201,11 +210,8 @@ let complete_progress_bar form counter =
   Format.pp_print_newline form ()
 
 let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~nb_points =
-  let dE =
-    compute_dE nb_points (Tools.option_map (fun x -> x - init_e) max_e) in
-  let dT =
-    compute_dT nb_points (Tools.option_map (fun x -> x -. init_t) max_t)
-  in
+  let dE = compute_dE nb_points init_e max_e in
+  let dT = compute_dT nb_points init_t max_t in
   {time = init_t ;
    events = init_e ;
    stories = -1 ;
@@ -233,9 +239,9 @@ let reinitialize counter =
 let next_point counter =
   match counter.dT with
   | Some dT ->
-     min counter.plot_points
-	 (int_of_float
-	    ((current_time counter -. counter.init_time) /. dT))
+    int_of_float
+      ((min (Tools.unsome infinity (max_time counter)) (current_time counter)
+       -. counter.init_time) /. dT)
   | None ->
      match counter.dE with
      | None -> 0
