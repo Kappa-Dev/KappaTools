@@ -65,7 +65,7 @@ rule token = parse
 			       Location.of_pos (Lexing.lexeme_start_p lexbuf)
 				(Lexing.lexeme_end_p lexbuf)))
 		     }
-	 | '[' (id as lab) ']' {
+	 | '[' blank* (id as lab) blank* ']' {
 		match lab with
 		| "E" -> EVENT
 		| "E-" -> NULL_EVENT
