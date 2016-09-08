@@ -38,7 +38,7 @@ let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z' '_' '-' '+']+)
 let pert = '$' id
 
 rule token = parse
-	 | '\\' eol {Lexing.new_line lexbuf ; token lexbuf}
+	 | '\\' blank* eol {Lexing.new_line lexbuf ; token lexbuf}
 	 | "&&" {AND}
 	 | "||" {OR}
 	 | "<->" {KAPPA_LRAR}
@@ -160,14 +160,14 @@ rule token = parse
 and read_label acc char_list =
   parse
   | eof {String.concat "" (List.rev_map (fun x -> String.make 1 x) acc)}
-  | '\\' eol {Lexing.new_line lexbuf ; read_label acc char_list lexbuf}
+  | '\\' blank* eol {Lexing.new_line lexbuf ; read_label acc char_list lexbuf}
   | _ as c {if List.mem c char_list
 	    then String.concat "" (List.rev_map (fun x -> String.make 1 x) acc)
 	    else read_label (c::acc) char_list lexbuf}
 
 and comment = parse
 	    | eol {Lexing.new_line lexbuf ; NEWLINE}
-	    | '\\' eol {Lexing.new_line lexbuf; token lexbuf}
+	    | '\\' blank* eol {Lexing.new_line lexbuf; token lexbuf}
 	    | eof {EOF}
 	    | _ {comment lexbuf}
 
