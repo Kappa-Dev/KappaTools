@@ -210,7 +210,7 @@ end = struct
             (fun () ->
                (build_ast parameter.ApiTypes_j.code self#time_yield self#log) >>=
                (function
-                   `Right ((sig_nd,tk_nd,updated_vars,result),contact_map) ->
+                   `Right ((sig_nd,tk_nd,_updated_vars,result),contact_map) ->
                    let simulation_counter =
                      Counter.create
                        ~init_t:(0. : float)
@@ -233,9 +233,6 @@ end = struct
                      simulation_counter result >>=
                    (fun (env,domain,has_tracking,
                          store_distances,_,init_l) ->
-                     let env' =
-                       Environment.propagate_constant
-                         updated_vars simulation_counter env in
                      let simulation =
                        { is_running = true ;
                          counter = simulation_counter ;
@@ -249,10 +246,10 @@ end = struct
                          flux_maps = [] ;
                          files = [] ;
                          contact_map = contact_map ;
-                         env = env' ;
+                         env = env ;
                          domain = domain ;
-                         graph = Rule_interpreter.empty ~store_distances env' ;
-                         state = State_interpreter.empty env' [] [] ;
+                         graph = Rule_interpreter.empty ~store_distances env ;
+                         state = State_interpreter.empty env [] [] ;
                        } in
                      let () =
                        context <-
@@ -303,14 +300,13 @@ end = struct
                                           with ApiTypes_j.legend =
                                                  Array.to_list legend }
                                     in
-                                    (self#run simulation) >>=
-                                    (fun _ -> Lwt.return_unit)
+                                    self#run simulation
                                  )
                               )
                                (catch_error
                                   (fun e ->
                                      let () = simulation.error_messages <- e in
-                                     Lwt.return_unit)
+                                     Lwt.return (`Left e))
                                )
                           ) in
                      Lwt.return (`Right current_id))
@@ -335,31 +331,28 @@ end = struct
                else
                  let cc_preenv =
                    Connected_component.PreEnv.of_env simulation.domain in
-                 match LKappa.modif_expr_of_ast
-                         (Environment.signatures simulation.env)
-                         (Environment.tokens_finder simulation.env)
-                         (Environment.algs_finder simulation.env)
-                         (KappaParser.effect KappaLexer.token lexbuf) [] with
-                 | _, _::_ ->
-                   Api_data.lwt_msg "$UPDATE is not implemented (yet?)"
-                | e', [] ->
-                  let cc_preenv', e'' = Eval.compile_modification_no_update
+                 let e',_ = LKappa.modif_expr_of_ast
+                     (Environment.signatures simulation.env)
+                     (Environment.tokens_finder simulation.env)
+                     (Environment.algs_finder simulation.env)
+                     (KappaParser.effect KappaLexer.token lexbuf) [] in
+                  let cc_preenv', e'' = Eval.compile_modification_no_track
                       simulation.contact_map cc_preenv e' in
-                  let cc_env' =
-                    if cc_preenv == cc_preenv' then simulation.domain
-                    else Connected_component.PreEnv.finalize cc_preenv' in
-                  simulation.domain <- cc_env';
-                  let _,graph',state' =
-                    List.fold_left
-                      (fun (stop,graph',state' as acc) x ->
-                         if stop then acc else
-                           State_interpreter.do_modification
-                             ~outputs:(outputs simulation) simulation.env cc_env'
-                             simulation.counter graph' state' x)
-                      (false,simulation.graph,simulation.state) e'' in
-                  simulation.graph <- graph';
-                  simulation.state <- state';
-                  Lwt.return (`Right ()))
+                 if cc_preenv == cc_preenv' then
+                   let _,graph',state' =
+                     List.fold_left
+                       (fun (stop,graph',state' as acc) x ->
+                          if stop then acc else
+                            State_interpreter.do_modification
+                              ~outputs:(outputs simulation) simulation.env
+                              simulation.domain simulation.counter graph' state' x)
+                       (false,simulation.graph,simulation.state) e'' in
+                   let () = simulation.graph <- graph' in
+                   let () = simulation.state <- state' in
+                   Lwt.return (`Right ())
+                 else (* Connected_component.PreEnv.finalize cc_preenv' *)
+                   Api_data.lwt_msg
+                     "Tracking a new pattern on the fly is impossible (for now?)")
           (catch_error (fun e -> Lwt.return (`Left e)))
       val create_state = fun state ->
         { ApiTypes_j.plot = Some state.plot ;
@@ -418,7 +411,7 @@ end = struct
         let () = Lwt.async (fun () -> self#log "run.1") in
         (self#log "run.2")
         >>=
-        (fun _ ->
+        (fun () ->
         Lwt.catch
           (fun () ->
              let rstop = ref false in

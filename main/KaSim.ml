@@ -70,10 +70,11 @@ let () =
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
-    let (env, cc_env, contact_map, _, story_compression,
+    let (env0, cc_env, contact_map, updated_vars, story_compression,
          unary_distances, formatCflows, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
         ?max_e:kasim_args.Kasim_args.maxEventValue common_args cli_args in
+    let env = Environment.propagate_constant updated_vars counter env0 in
 
     let () =
       Kappa_files.with_marshalized
@@ -142,8 +143,8 @@ let () =
                 let cc_preenv = Connected_component.PreEnv.of_env cc_env in
                 let b' =
                   LKappa.bool_expr_of_ast
-                    (Environment.signatures env) (Environment.tokens_finder env)
-                    (Environment.algs_finder env) (Location.dummy_annot b) in
+                    (Environment.signatures env0) (Environment.tokens_finder env0)
+                    (Environment.algs_finder env0) (Location.dummy_annot b) in
                 let cc_preenv',(b'',pos_b'') =
                   Eval.compile_bool contact_map cc_preenv b' in
                 let cc_env' =
@@ -151,7 +152,7 @@ let () =
                   else Connected_component.PreEnv.finalize cc_preenv' in
                 cc_env',
                 if try Alg_expr.stops_of_bool_expr
-                         (Environment.all_dependencies env) b'' <> []
+                         (Environment.all_dependencies env0) b'' <> []
                   with ExceptionDefn.Unsatisfiable -> true then
                   let () =
                     Pp.error Format.pp_print_string
@@ -159,32 +160,29 @@ let () =
                   (false,graph,state)
                 else State_interpreter.interactive_loop
                     ~outputs
-                    Format.std_formatter b'' env cc_env' counter graph state
+                    Format.std_formatter b'' env0 cc_env' counter graph state
               | Ast.QUIT -> cc_env,(true,graph,state)
               | Ast.MODIFY e ->
                 let cc_preenv = Connected_component.PreEnv.of_env cc_env in
-                match LKappa.modif_expr_of_ast
-                        (Environment.signatures env)
-                        (Environment.tokens_finder env)
-                        (Environment.algs_finder env) e [] with
-                | _, _::_ ->
-                  let () =
-                    Pp.error Format.pp_print_string
-                      (Location.dummy_annot "$UPDATE is not implemented (yet?)") in
-                  cc_env,(false,graph,state)
-                | e', [] ->
-                  let cc_preenv', e'' = Eval.compile_modification_no_update
-                      contact_map cc_preenv e' in
-                  let cc_env' =
-                    if cc_preenv == cc_preenv' then cc_env
-                    else Connected_component.PreEnv.finalize cc_preenv' in
-                  cc_env',
+                let e',_ = LKappa.modif_expr_of_ast
+                    (Environment.signatures env0)
+                    (Environment.tokens_finder env0)
+                    (Environment.algs_finder env0) e [] in
+                let cc_preenv', e'' = Eval.compile_modification_no_track
+                    contact_map cc_preenv e' in
+                if cc_preenv == cc_preenv' then
+                  cc_env,
                   List.fold_left
                     (fun (stop,graph',state' as acc) x ->
                        if stop then acc else
                          State_interpreter.do_modification
-                           ~outputs env cc_env' counter graph' state' x)
+                           ~outputs env0 cc_env counter graph' state' x)
                     (false,graph,state) e''
+                else (* Connected_component.PreEnv.finalize cc_preenv' *)
+                  let () = Pp.error Format.pp_print_string
+                      (Location.dummy_annot
+                         "Tracking a new pattern on the fly is impossible (for now?)") in
+                  cc_env,(false,graph,state)
             with
             | ExceptionDefn.Syntax_Error (msg,pos) ->
               let () = Pp.error Format.pp_print_string (msg,pos) in
@@ -195,7 +193,7 @@ let () =
           if stop then
             State_interpreter.finalize
               ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
-              Format.std_formatter env counter graph' state'
+              Format.std_formatter env0 counter graph' state'
           else
             toplevel cc_env' graph' state' in
         toplevel cc_env graph state

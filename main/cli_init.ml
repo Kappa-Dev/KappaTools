@@ -72,6 +72,5 @@ let get_compilation ?max_e common_args cli_args =
           Format.std_formatter
           "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
         exit 1 in
-  let env' = Environment.propagate_constant updated_vars counter env in
-  (env', cc_env, contact_map, updated_vars, story_compression,
+  (env, cc_env, contact_map, updated_vars, story_compression,
    unary_distances, formatCflows, init_l),counter,alg_overwrite

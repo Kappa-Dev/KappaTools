@@ -260,7 +260,7 @@ let effects_of_modif
   | PLOTENTRY ->
     (domain, (Primitives.PLOTENTRY)::rev_effects)
 
-let compile_modification_no_update contact_map domain m =
+let compile_modification_no_track contact_map domain m =
   effects_of_modif [] [] contact_map (domain,[]) m
 
 let effects_of_modifs ast_algs ast_rules contact_map domain l =
