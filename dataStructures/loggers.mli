@@ -44,9 +44,7 @@ val channel_of_logger: t -> out_channel option
 val flush_buffer: t -> Format.formatter -> unit
 val int_of_string_id: t -> string -> int
 
-val graph_of_logger: t ->
-  (string * Graph_loggers_sig.options list) list
-  *  (string * string * Graph_loggers_sig.options list) list
+val graph_of_logger: t -> Graph_loggers_sig.graph
 val add_node: t -> string -> Graph_loggers_sig.options list -> unit
 val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
 val dump_json: t -> Yojson.Basic.json -> unit
