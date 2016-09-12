@@ -1,5 +1,4 @@
 type t = { mutable backtrace           : bool ;
-     	   mutable implicitSignature   : bool;
 	   mutable debug               : bool;
 	   mutable timeIndependent     : bool }
 

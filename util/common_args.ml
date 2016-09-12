@@ -1,10 +1,8 @@
 type t = { mutable backtrace           : bool ;
-     	   mutable implicitSignature   : bool ;
 	   mutable debug               : bool ;
 	   mutable timeIndependent     : bool }
 
 let default : t = { backtrace = false ;
-    	            implicitSignature = false;
 		    debug = false;
 		    timeIndependent = false }
 
@@ -13,9 +11,6 @@ let options t : (string * Arg.spec * string) list = [
      Arg.Unit (fun () -> Format.print_string Version.version_msg;
 			 Format.print_newline () ; exit 0),
      "display KaSim version");
-    ("--implicit-signature",
-     Arg.Unit (fun () -> t.implicitSignature <- true),
-     "Program will guess agent signatures automatically") ;
     ("--debug", Arg.Unit (fun () -> t.debug <- true),
      "Enable debug mode") ;
     ("--backtrace", Arg.Unit (fun () -> t.backtrace <- true),

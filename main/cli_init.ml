@@ -14,11 +14,6 @@ let get_compilation ?max_e common_args cli_args =
       let result =
         List.fold_left (KappaLexer.compile Format.std_formatter)
           Ast.empty_compil cli_args.Run_cli_args.inputKappaFileNames in
-      let result =
-        if common_args.Common_args.implicitSignature then
-          Ast.implicit_signature result
-        else
-          result in
       let () = Format.printf "+ Sanity checks@." in
       let (sigs_nd,tk_nd,updated_vars,result') =
         LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in

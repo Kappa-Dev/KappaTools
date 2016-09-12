@@ -1070,6 +1070,10 @@ let create_sig l =
     (fun (name,intf) -> (name,create_t intf)) l
 
 let compil_of_ast overwrite c =
+  let c =
+    if c.Ast.signatures = [] && c.Ast.tokens = []
+    then Ast.implicit_signature c
+    else c in
   let sigs = Signature.create (create_sig c.Ast.signatures) in
   let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_right
