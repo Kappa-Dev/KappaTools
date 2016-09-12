@@ -23,6 +23,9 @@ let navcontents (t : Ui_simulation.t) =
     ; "outputs",   (Tab_outputs.navcontent t)
     ; "distances", (Tab_distances.navcontent t) ]
 
+let controls t =
+ Tyxml_js.To_dom.of_div (Tab_settings.xml t)
+
 let onload (t : Ui_simulation.t) =
   let () = Tab_editor.onload t in
   let () = Tab_plot.onload t in
@@ -31,6 +34,7 @@ let onload (t : Ui_simulation.t) =
   let () = Tab_outputs.onload t in
   let () = Tab_distances.onload t in
   let () = Tab_log.onload t in
+  let () = Tab_settings.onload t in
   ()
 
 let onunload () =

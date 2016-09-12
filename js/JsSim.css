@@ -73,9 +73,6 @@ rect { stroke-width: 2; }
 .panel-pre {
     white-space : pre;
 }
-.panel-footer-white {
-    background:white;
-}
 .filename {
     display: inline-block;
     padding: 6px 12px;
@@ -89,15 +86,6 @@ rect { stroke-width: 2; }
     background: rgb(245, 245, 245);
     border : 0px;
     cursor : default;
-}
-.error-footer {
-    color: rgb(169, 68, 66);
-    background-color: rgb(242, 222, 222);
-}
-
-.warning-footer {
-    color: rgb(138, 109, 59);
-    background-color: rgb(252, 248, 227);
 }
 
 .node-rect { stroke-width:2;

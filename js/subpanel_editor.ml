@@ -57,13 +57,7 @@ let xml (t : Ui_simulation.t) =
              </div>
              <div class="panel-body">
                 <textarea id="code-mirror"> </textarea>
-             </div>
-
-             <div id="configuration-panel">
-                |}[Tab_settings.xml t]{|
-             </div>
-
-             <div id="simulation-panel"></div>|}]]
+             </div>|}]]
 
 let setup_lint codemirror update_linting =
   let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
@@ -271,8 +265,6 @@ let onload (t : Ui_simulation.t) : unit =
             if not !has_been_modified || confirm ()
             then file_select_handler ()
             else return_unit))
-  in
-  let () = Tab_settings.onload t in
-  ()
+  in ()
 
 let onunload () = ()

@@ -17,7 +17,7 @@ let navcontent (t : Ui_simulation.t) =
     [Html.div
        ~a:[Html.a_class ["col-md-6"]]
        (Subpanel_editor.xml t);
-    (rightsubpanel t) ]]
+     (rightsubpanel t) ]]
 
 let onload (t : Ui_simulation.t) =
   let () = Subpanel_editor.onload t in

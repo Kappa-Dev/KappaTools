@@ -85,30 +85,9 @@ let signal_change id signal_handler =
 
 let error_messages signal =
   Html.div
-    ~a:[Tyxml_js.R.Html.a_class
-          (React.S.bind
-             signal
-             (fun e -> React.S.const
-                 (match e with
-                  | [] ->
-                    ["panel-footer" ;
-                     "panel-pre" ;
-                     "panel-message" ; ]
-                  | { severity = `Error ; _ }::_ ->
-                    ["panel-footer" ;
-                     "error-footer" ;
-                     "panel-message" ; ]
-                  | { severity = `Warning ; _ }::_ ->
-                    ["panel-footer" ;
-                     "warning-footer" ;
-                     "panel-message" ; ]
-                  | { severity = `Info ; _ }::_ ->
-                    ["panel-footer" ;
-                     "warning-footer" ;
-                     "panel-message" ; ]
-                 ))
-          )
-       ]
+    ~a:[Html.a_class ["panel-heading" ;
+                      "panel-pre" ;
+                      "panel-message" ;] ]
     [Tyxml_js.R.Html.pcdata
        (React.S.bind
           signal
@@ -121,8 +100,6 @@ let error_messages signal =
           )
        )
     ]
-
-let code_messages = error_messages UIState.model_error
 
 let start_button_id = "stop_button"
 let start_button =
@@ -340,7 +317,7 @@ let initializing_xml (t : Ui_simulation.t) =
            (visible_on_states t [ Ui_simulation.INITALIZING ; ])
        ]
   [%html {|
-  <div class="panel-footer panel-footer-white panel-controls">
+  <div class="panel-body panel-controls">
   </div>
   <div class="panel-footer">
   </div>|}]
@@ -348,8 +325,7 @@ let stopped_xml (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states
-              ~a_class:[ "panel-footer" ;
-                         "panel-footer-white" ;
+              ~a_class:[ "panel-body" ;
                          "panel-controls" ; ]
               t
               [Ui_simulation.STOPPED ;
@@ -392,8 +368,7 @@ let running_xml (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states
-              ~a_class:[ "panel-footer" ;
-                         "panel-footer-white" ;
+              ~a_class:[ "panel-body" ;
                          "panel-controls" ; ]
               t [ Ui_simulation.RUNNING ; ]) ]
   [%html {|
@@ -485,8 +460,19 @@ let footer_xml (t : Ui_simulation.t) =
 
 let configuration_id = "configuration-id"
 let xml  (t : Ui_simulation.t) =
-    Html.div
-    ~a:[ Html.a_id configuration_id ]
+  Html.div
+    ~a:[ Html.a_id configuration_id;
+         R.Html.a_class
+           (React.S.bind
+              UIState.model_error
+              (fun e -> React.S.const
+                  ("panel" :: (match e with
+                       | [] -> ["panel-default"]
+                       | { severity = `Error ; _ }::_ -> ["panel-danger"]
+                       | { severity = `Warning ; _ }:: _ -> ["panel-warning"]
+                       | { severity = `Info ; _ }::_ -> ["panel-info"]
+                     )))
+           )]
     [ simulation_messages ;
       initializing_xml t ;
       stopped_xml t ;

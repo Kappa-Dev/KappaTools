@@ -7,6 +7,7 @@ let prod _ =
       (fun () -> assert false) in
   let () = Dom.appendChild main (Panel_tab.navtabs ui_simulation) in
   let () = Dom.appendChild main (Panel_tab.navcontents ui_simulation) in
+  let () = Dom.appendChild main (Panel_tab.controls ui_simulation) in
   let () = Panel_tab.onload ui_simulation
   in Js._true
 
@@ -17,6 +18,7 @@ let dev _ =
       (fun () -> assert false) in
   let () = Dom.appendChild main (Panel_tab.navtabs ui_simulation) in
   let () = Dom.appendChild main (Panel_tab.navcontents ui_simulation) in
+  let () = Dom.appendChild main (Panel_tab.controls ui_simulation) in
   let () = Panel_tab.onload ui_simulation
   in Js._true
 
