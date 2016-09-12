@@ -73,6 +73,7 @@ end = struct
   module IntMap = Mods.IntMap
   type simulator_state =
     { mutable is_running : bool
+    ; mutable run_finalize : bool
     ; counter : Counter.t
     ; log_buffer : Buffer.t
     ; log_form : Format.formatter
@@ -235,6 +236,7 @@ end = struct
                          store_distances,_,init_l) ->
                      let simulation =
                        { is_running = true ;
+                         run_finalize = false ;
                          counter = simulation_counter ;
                          log_buffer = simulation_log_buffer ;
                          log_form = simulation_log_form ;
@@ -443,16 +445,24 @@ end = struct
              in
              (iter ()) >>=
              (fun () ->
-                let _ =
-                  State_interpreter.end_of_simulation
-                    ~outputs:(outputs simulation)
-                    simulation.log_form simulation.env
-                    simulation.counter simulation.graph
-                    simulation.state in
+                let () =
+                  if simulation.run_finalize then
+                    self#finalize(simulation)
+                  else
+                    ()
+                in
                 Lwt.return (`Right ())))
           (catch_error (fun e -> Lwt.return (`Left e)))
         )
 
+      method private finalize(simulation : simulator_state) : unit =
+        let _ =
+          State_interpreter.end_of_simulation
+            ~outputs:(outputs simulation)
+            simulation.log_form simulation.env
+            simulation.counter simulation.graph
+            simulation.state
+        in ()
       method continue
           (token : ApiTypes_j.token)
           (parameter : ApiTypes_j.parameter) :
@@ -496,18 +506,21 @@ end = struct
           (fun () ->
              match IntMap.find_option token context.states with
              | None -> Api_data.lwt_msg msg_token_not_found
-             | Some state ->
-               let () = if state.is_running then
-                           state.is_running <- false
-                         else
-                           ()
-               in
-               let () =
-                 context <-
-                   { context
-                     with states = IntMap.remove token context.states }
-               in
-               Lwt.return (`Right ())
+             | Some simulation ->
+               let () = simulation.run_finalize <- true in
+               (if simulation.is_running then
+                  (self#pause token)
+                else
+                  let () = self#finalize(simulation) in
+                  Lwt.return (`Right ()))
+               >>=
+               (fun _ ->
+                  let () =
+                    context <-
+                      { context
+                        with states = IntMap.remove token context.states }
+                  in
+                  Lwt.return (`Right ()))
           )
           (catch_error (fun e -> Lwt.return (`Left e)))
 

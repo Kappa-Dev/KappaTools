@@ -167,7 +167,28 @@ let perturbation_button =
        ; Html.Unsafe.string_attrib "type" "button"
        ; Html.a_class ["btn" ;
                        "btn-default" ; ] ]
-    [ Html.cdata "pertubation" ]
+    [ Html.cdata "perturbation" ]
+
+type toggle = History | Settings
+let toggle_to_string =
+  function
+  | History -> "history"
+  | Settings -> "settings"
+let toggle_signal, set_toggle = React.S.create History
+
+let toggle_button_id = "toggle_button"
+let toggle_button =
+  Html.button
+    ~a:[ Html.a_id toggle_button_id
+       ; Html.Unsafe.string_attrib "type" "button"
+       ; Html.a_class ["btn" ;
+                       "btn-default" ; ] ]
+    [ Tyxml_js.R.Html.pcdata
+        (React.S.bind
+           toggle_signal
+           (fun toggle ->
+              React.S.const (toggle_to_string toggle)))
+    ]
 
 let select_default_runtime = [ UIState.WebWorker ;
                                UIState.Embedded ; ]
@@ -312,12 +333,7 @@ let perturbation_control (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states t ~a_class:["row"] [Ui_simulation.PAUSED]) ]
-    [%html {| <div class="col-md-4">
-                |}[ perturbation_code_input ]{|
-              </div>
-              <div class="col-md-2">
-                |}[ perturbation_button ]{|
-            </div> |}]
+    [Html.div ~a:[Html.a_class [ "col-md-12" ]] [perturbation_code_input]]
 let initializing_xml (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
@@ -481,6 +497,9 @@ let onload (t : Ui_simulation.t) : unit =
   let select_runtime_dom =
     Tyxml_js.To_dom.of_select select_runtime
   in
+  let toggle_button_dom =
+    Tyxml_js.To_dom.of_button toggle_button
+  in
   let start_button_dom =
     Tyxml_js.To_dom.of_button start_button
   in
@@ -538,17 +557,34 @@ let onload (t : Ui_simulation.t) : unit =
       | head::_ -> set_runtime head (default_runtime)
       | _ -> default_runtime ()
     with _ -> default_runtime () in
-  let () = perturb_button_dom##.onclick :=
+
+
+  let () = toggle_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let () = Lwt_js_events.async
-               (fun _ ->
-                  let code : string =
-                    Js.to_string perturbation_code_input_dom##.value
-                  in
-                  Ui_simulation.perturb_simulation t ~code:code) in
+           let () = set_toggle
+               (match (React.S.value toggle_signal) with
+                | History -> Settings
+                | Settings -> History)
+           in
            Js._true)
   in
+  let run_pertubation () =
+    Lwt_js_events.async
+      (fun _ ->
+         let code : string =
+           Js.to_string perturbation_code_input_dom##.value
+         in
+         Ui_simulation.perturb_simulation t ~code:code)
+  in
+  let () = perturb_button_dom##.onclick :=
+      Dom.handler
+        (fun _ -> let () = run_pertubation () in Js._true)
+  in
+  let () =
+    Common.input_enter
+      ~id:perturbation_code_id
+      ~handler:run_pertubation in
   let () = continue_button_dom##.onclick :=
       Dom.handler
         (fun _ ->

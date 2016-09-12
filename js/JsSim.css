@@ -145,9 +145,9 @@ rect { stroke-width: 2; }
     border: 1px solid #eee;
     min-height: 40px;
 
-    height: calc(100% - 320px);
-    height: -webkit-calc(100% - 320px);
-    height: -moz-calc(100vh - 400px);
+    height: calc(100% - 350px);
+    height: -webkit-calc(100% - 350px);
+    height: -moz-calc(100vh - 430px);
 
 }
 

@@ -237,3 +237,11 @@ function hashColor(s){
     var hashString = String("000000" + hashColor).slice(-6);
     return "#"+hashString;
 }
+
+function inputEnter(id,handler){
+    $(document).keyup(function (e) {
+	if ($(id) && (e.keyCode === 13)) {
+	    handler();
+	}
+    });
+}

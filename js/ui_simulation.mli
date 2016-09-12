@@ -16,4 +16,5 @@ val perturb_simulation : t -> code:string -> unit Lwt.t
 val continue_simulation : t -> unit Lwt.t
 val pause_simulation : t -> unit Lwt.t
 val stop_simulation : t -> unit Lwt.t
+val flush_simulation : t -> unit Lwt.t
 val start_simulation : t -> unit Lwt.t

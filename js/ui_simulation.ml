@@ -78,12 +78,10 @@ let ready_default (msg : string) =
 let ready_simulation
     ?(stopped : Api_v1.api_runtime -> unit Lwt.t =
        ready_default "Simulation stopped")
-      ?(initializing :
-          Api_v1.api_runtime -> unit Lwt.t =
-          ready_default "Simulation initalizing")
-      ?(ready :
-          (Api_v1.api_runtime * ready_state) -> unit Lwt.t =
-          ready_default "Simulation ready")
+    ?(initializing : Api_v1.api_runtime -> unit Lwt.t =
+       ready_default "Simulation initalizing")
+    ?(ready : (Api_v1.api_runtime * ready_state) -> unit Lwt.t =
+       ready_default "Simulation ready")
     (t : t) :
     unit Lwt.t =
   match !Ui_state.runtime_state with
@@ -204,6 +202,19 @@ let stop_simulation
             | `Right () ->
               let () = Ui_state.set_model_error [] in
               Lwt.return_unit))
+    t
+
+let flush_simulation
+    (t : t)
+  : unit Lwt.t =
+  ready_simulation
+    ~stopped:(fun _ -> Lwt.return_unit)
+    ~initializing:(fun _ -> Lwt.return_unit)
+    ~ready:
+      (fun (runtime_state,ready_state) ->
+         let () = t.setter SIMULATION_STOPPED in
+         (runtime_state#stop ready_state.simulation_token) >>=
+         (fun _ -> Lwt.return_unit))
     t
 
 let perturb_simulation

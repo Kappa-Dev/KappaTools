@@ -247,27 +247,30 @@ let onload (t : Ui_simulation.t) : unit =
 	(fun () -> assert false)
     in
     let filename = file##.name in
-    let () = set_file_label (to_string filename) ;
-      Lwt_js_events.async (fun _ -> File.readAsText file >>=
-			    (fun (va : Js.js_string Js.t) ->
-			       codemirror##setValue(va);
-			       return_unit
-			    ));
-      ()
+    let () = set_file_label (to_string filename) in
+    let () = Lwt_js_events.async
+        (fun _ -> File.readAsText file >>=
+	  (fun (va : Js.js_string Js.t) ->
+           let () = codemirror##setValue(va) in
+           Ui_simulation.flush_simulation t
+        ))
     in
     let () = has_been_modified := false in
     return_unit
   in
+  let confirm () : bool = Js.to_bool
+      (Dom_html.window##confirm
+         (Js.string "Modifications will be lost, do you wish to continue?"))
+  in
   let ()  =
-    Lwt.async (fun () -> Lwt_js_events.changes
-		  file_select_dom
-		  (fun _ _ ->
-		     if not !has_been_modified ||
-			Js.to_bool
-			  (Dom_html.window##confirm
-			     (Js.string "Modifications will be lost, do you wish to continue?"))
-		     then file_select_handler ()
-		     else return_unit))
+    Lwt.async
+      (fun () ->
+         Lwt_js_events.changes
+	   file_select_dom
+           (fun _ _ ->
+            if not !has_been_modified || confirm ()
+            then file_select_handler ()
+            else return_unit))
   in
   let () = Tab_settings.onload t in
   ()

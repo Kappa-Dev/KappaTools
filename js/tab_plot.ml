@@ -170,7 +170,7 @@ let onload (t : Ui_simulation.t) =
      it will default to size zero.  so they need to be sized when shown.
   *)
   let () = Common.jquery_on
-      "#navgraph"
+      "#navplot"
       "shown.bs.tab"
       (fun _ ->
 	 match (React.S.value simulation_output) with

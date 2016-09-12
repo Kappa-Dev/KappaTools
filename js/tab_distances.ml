@@ -76,7 +76,7 @@ let onload (t : Ui_simulation.t) =
   *)
   let simulation_output = (Ui_simulation.simulation_output t) in
   let () = Common.jquery_on
-      "#navgraph"
+      "#navdistances"
       "shown.bs.tab"
       (fun _ ->
          match (React.S.value simulation_output) with
