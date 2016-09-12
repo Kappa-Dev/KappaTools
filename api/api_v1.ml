@@ -333,12 +333,14 @@ end = struct
                else
                  let cc_preenv =
                    Connected_component.PreEnv.of_env simulation.domain in
-                 let e',_ = LKappa.modif_expr_of_ast
-                     (Environment.signatures simulation.env)
-                     (Environment.tokens_finder simulation.env)
-                     (Environment.algs_finder simulation.env)
-                     (KappaParser.effect KappaLexer.token lexbuf) [] in
-                  let cc_preenv', e'' = Eval.compile_modification_no_track
+                 let e',_ =
+                   Tools.list_fold_right_map
+                     (LKappa.modif_expr_of_ast
+                        (Environment.signatures simulation.env)
+                        (Environment.tokens_finder simulation.env)
+                        (Environment.algs_finder simulation.env))
+                        (KappaParser.effect_list KappaLexer.token lexbuf) [] in
+                  let cc_preenv', e'' = Eval.compile_modifications_no_track
                       simulation.contact_map cc_preenv e' in
                  if cc_preenv == cc_preenv' then
                    let _,graph',state' =

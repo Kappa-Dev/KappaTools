@@ -164,11 +164,13 @@ let () =
               | Ast.QUIT -> cc_env,(true,graph,state)
               | Ast.MODIFY e ->
                 let cc_preenv = Connected_component.PreEnv.of_env cc_env in
-                let e',_ = LKappa.modif_expr_of_ast
-                    (Environment.signatures env0)
-                    (Environment.tokens_finder env0)
-                    (Environment.algs_finder env0) e [] in
-                let cc_preenv', e'' = Eval.compile_modification_no_track
+                let e',_ =
+                  Tools.list_fold_right_map
+                    (LKappa.modif_expr_of_ast
+                       (Environment.signatures env0)
+                       (Environment.tokens_finder env0)
+                       (Environment.algs_finder env0)) e [] in
+                let cc_preenv', e'' = Eval.compile_modifications_no_track
                     contact_map cc_preenv e' in
                 if cc_preenv == cc_preenv' then
                   cc_env,

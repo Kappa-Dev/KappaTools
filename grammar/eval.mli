@@ -12,9 +12,9 @@ val compile_bool:
   Connected_component.PreEnv.t *
   (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot
 
-val compile_modification_no_track:
+val compile_modifications_no_track:
   Primitives.contact_map -> Connected_component.PreEnv.t ->
-  (LKappa.rule_mixture, int) Ast.modif_expr ->
+  (LKappa.rule_mixture, int) Ast.modif_expr list ->
   Connected_component.PreEnv.t * Primitives.modification list
 
 val compile :

@@ -33,8 +33,8 @@
 %start interactive_command
 %type <(Ast.mixture,string) Ast.command> interactive_command
 
-%start effect
-%type <(Ast.mixture,string) Ast.modif_expr> effect
+%start effect_list
+%type <(Ast.mixture,string) Ast.modif_expr list> effect_list
 
 %% /*Grammar rules*/
 
@@ -420,7 +420,7 @@ link_state:
 interactive_command:
 	| RUN NEWLINE {Ast.RUN (Alg_expr.FALSE)}
 	| RUN bool_expr NEWLINE {Ast.RUN (fst $2)}
-	| effect NEWLINE {Ast.MODIFY $1}
+	| effect_list NEWLINE {Ast.MODIFY $1}
 	| EOF {Ast.QUIT}
 	| error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Unrecognized command"))}

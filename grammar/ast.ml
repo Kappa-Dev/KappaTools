@@ -103,7 +103,7 @@ type ('mixture,'id) instruction =
 
 type ('mixture,'id) command =
   | RUN of ('mixture,'id) Alg_expr.bool_expr
-  | MODIFY of ('mixture,'id) modif_expr
+  | MODIFY of ('mixture,'id) modif_expr list
   | QUIT
 
 type ('agent,'mixture,'id,'rule) compil =
