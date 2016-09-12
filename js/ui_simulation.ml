@@ -233,13 +233,13 @@ let perturb_simulation
          )
          >>=
          (fun response ->
-            let () = match response with
-              | `Left error ->
-                Ui_state.set_model_error error
-              | `Right _ ->
-                Ui_state.set_model_error []
-            in
-            Lwt.return_unit))
+            match response with
+            | `Left error ->
+              let () = Ui_state.set_model_error error in
+              Lwt.return_unit
+            | `Right _ ->
+              let () = Ui_state.set_model_error [] in
+              update_simulation t))
     t
 
 
