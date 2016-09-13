@@ -91,33 +91,61 @@ let content (t : Ui_simulation.t) =
               (state_snapshot state)
   in
   let _ = React.S.map
-      (fun state ->
-	 ReactiveData.RList.set
-    handle
-    (match state_snapshot state with
-       head::[] ->
-       [Html.h4
-	  [ Html.pcdata
-       (Ui_common.option_label head.ApiTypes.snap_file)]]
-     | _ -> [Html.select
-               ~a:[ Html.a_class ["form-control"]
-                  ; Html.a_id select_id ]
-               (select state)
-            ]
-    )
-      )
+      (fun state -> ReactiveData.RList.set handle (select state))
       simulation_output
   in
+  let snapshot_class :
+    empty:(unit -> 'a) ->
+    single:(ApiTypes.snapshot -> 'a) ->
+    multiple:(ApiTypes.snapshot list -> 'a) -> 'a React.signal =
+    fun
+      ~empty
+      ~single
+      ~multiple ->
+    React.S.map
+      (fun state ->
+         match state_snapshot state with
+         | [] -> empty ()
+         | h::[] -> single h
+         | s -> multiple s)
+      simulation_output
+  in
+  let snapshot_label =
+    Html.h4
+      ~a:[ Tyxml_js.R.Html.a_class
+             (snapshot_class
+                ~empty:(fun () -> ["hidden"])
+                ~single:(fun _ -> ["visible"])
+                ~multiple:(fun _ -> ["hidden"]))
+         ]
+      [ Tyxml_js.R.Html.pcdata
+          (React.S.map
+             (fun state ->
+                match state_snapshot state with
+                | [] -> ""
+                | snapshot::[] -> (Ui_common.option_label snapshot.ApiTypes.snap_file)
+                | s -> "")
+             simulation_output)
+      ]
+  in
   let snapshot_select =
+    Tyxml_js.R.Html.select
+      ~a:[ Tyxml_js.R.Html.a_class
+             (snapshot_class
+                ~empty:(fun () -> [ "hidden" ])
+                ~single:(fun _ -> [ "hidden" ])
+                ~multiple:(fun _ -> ["visible" ; "form-control"])) ;
+           Html.a_id select_id ]
+      list
+  in
+  let snapshot_chooser =
     Ui_common.toggle_element
       t
       state_snapshot
       [
-	Tyxml_js.R.Html.div
+	Html.div
 	  ~a:[ Html.a_class ["list-group-item"] ]
-	  (
-	   list
-	  )
+          [ snapshot_label ; snapshot_select ]
       ]
   in
   let export_controls =
@@ -126,7 +154,7 @@ let content (t : Ui_simulation.t) =
   [%html {|<div>
              <div class="row">
                <div class="center-block display-header">
-         |}[ snapshot_select ]{|
+         |}[ snapshot_chooser ]{|
                </div>
              </div>
              <div class="row">
@@ -175,6 +203,7 @@ let select_snapshot (t : Ui_simulation.t) =
            _ -> Js.null
       )
   in
+  let () = Common.debug index in
     match (React.S.value simulation_output) with
   | None -> ()
   | Some state ->
@@ -190,6 +219,7 @@ let select_snapshot (t : Ui_simulation.t) =
       set_current_snapshot None
 
 let onload (t : Ui_simulation.t) : unit =
+  let () = Common.debug ("tab_snapshot-onload") in
   let simulation_output = (Ui_simulation.simulation_output t) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
@@ -202,7 +232,9 @@ let onload (t : Ui_simulation.t) : unit =
     snapshot_select_dom
     ##.
       onchange := Dom_html.handler
-	(fun _ -> let () = select_snapshot t in Js._true)
+	(fun _ ->
+         let () = Common.debug ("onchange") in
+         let () = select_snapshot t in Js._true)
   in
   let () =
     Common.jquery_on
