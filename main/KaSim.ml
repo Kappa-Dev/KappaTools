@@ -73,7 +73,7 @@ let () =
     let (env0, cc_env, contact_map, updated_vars, story_compression,
          unary_distances, formatCflows, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
-        ?max_e:kasim_args.Kasim_args.maxEventValue common_args cli_args in
+        ?max_e:kasim_args.Kasim_args.maxEventValue cli_args in
     let env = Environment.propagate_constant updated_vars counter env0 in
 
     let () =

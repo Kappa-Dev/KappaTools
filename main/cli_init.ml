@@ -1,4 +1,4 @@
-let get_compilation ?max_e common_args cli_args =
+let get_compilation ?max_e cli_args =
   let counter =
     Counter.create
       ~init_t:cli_args.Run_cli_args.minTimeValue

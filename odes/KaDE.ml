@@ -122,9 +122,7 @@ let main () =
     in
     let compil =
       A.get_compil
-        ~rate_convention ~show_reactions ~count ~compute_jacobian
-        common_args cli_args
-    in
+        ~rate_convention ~show_reactions ~count ~compute_jacobian cli_args in
     let network = A.network_from_compil compil in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in

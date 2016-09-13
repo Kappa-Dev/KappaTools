@@ -96,10 +96,8 @@ sig
 
   val get_compil:
     rate_convention:Ode_args.rate_convention ->
-    show_reactions:bool ->
-    count:Ode_args.count ->
-    compute_jacobian:bool ->
-    Common_args.t -> Run_cli_args.t -> compil
+    show_reactions:bool -> count:Ode_args.count ->
+    compute_jacobian:bool -> Run_cli_args.t -> compil
   val get_rules: compil -> rule list
   val get_variables:
     compil ->

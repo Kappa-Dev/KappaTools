@@ -268,10 +268,9 @@ let get_obs_titles compil =
     env
 
 let get_compil
-    ~rate_convention  ~show_reactions ~count ~compute_jacobian
-    common_args cli_args =
+    ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args =
   let (env,_,contact_map,_,_,_,_,init),_,_ =
-    Cli_init.get_compilation common_args cli_args in
+    Cli_init.get_compilation cli_args in
   {
     environment = env ;
     contact_map = contact_map ;
