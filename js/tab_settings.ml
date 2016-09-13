@@ -110,14 +110,14 @@ let start_button =
                          "btn-default" ; ] ; ])
     [ Html.cdata "start" ]
 
-let stop_button_id = "stop_button"
-let stop_button =
+let clear_button_id = "clear_button"
+let clear_button =
   Html.button
-    ~a:[ Html.a_id stop_button_id
+    ~a:[ Html.a_id clear_button_id
        ; Html.Unsafe.string_attrib "type" "button"
        ; Html.a_class ["btn" ;
                        "btn-default" ; ] ]
-    [ Html.cdata "stop" ]
+    [ Html.cdata "clear" ]
 
 let pause_button_id = "pause_button"
 let pause_button =
@@ -441,7 +441,7 @@ let footer_xml (t : Ui_simulation.t) =
                      ~a_class:[ "col-md-2" ]
                      [ Ui_simulation.PAUSED ;
                        Ui_simulation.RUNNING ; ]) ]
-            [ stop_button ]
+            [ clear_button ]
         ]{|
 
       |}[ Html.div
@@ -490,8 +490,8 @@ let onload (t : Ui_simulation.t) : unit =
   let pause_button_dom =
     Tyxml_js.To_dom.of_button pause_button
   in
-  let stop_button_dom =
-    Tyxml_js.To_dom.of_button stop_button
+  let clear_button_dom =
+    Tyxml_js.To_dom.of_button clear_button
   in
   let continue_button_dom =
     Tyxml_js.To_dom.of_button continue_button
@@ -585,7 +585,7 @@ let onload (t : Ui_simulation.t) : unit =
                (fun _ -> Ui_simulation.pause_simulation t) in
            Js._true)
   in
-  let () = stop_button_dom##.onclick :=
+  let () = clear_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
            let () =
