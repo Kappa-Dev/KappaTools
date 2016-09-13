@@ -667,20 +667,10 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is not satisfied yet
 
 	Applying rule 5: r5:
-		the precondition is satisfied
-
-		rule 5: r5 is applied for the first time
-
-		Updating the views for A(z!,t~)
-		Updating the views for B(z~,z!,t~)
+		the precondition is not satisfied yet
 
 	Applying rule 6: r6:
-		the precondition is satisfied
-
-		rule 6: r6 is applied for the first time
-
-		Updating the views for A(z!,t~)
-		Updating the views for B(z~,z!,t~)
+		the precondition is not satisfied yet
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -691,19 +681,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=61
+Id=59
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=60
+  Id=58
    Node(site_type:1<1)
-    Id=59
+    Id=57
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=58
+      Id=56
        Node(site_type:2<1)
         Id=27
          Node(site_type:3<1)
@@ -738,19 +728,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=67
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=68
+  Id=66
    Node(site_type:1<2)
-    Id=63
+    Id=61
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=62
+      Id=60
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -801,20 +791,20 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z~,z!,t~)
 
 	Applying rule 5: r5:
-		the precondition is satisfied
-		Updating the views for A(z!,t~)
-		Updating the views for B(z~,z!,t~)
+		the precondition is not satisfied yet
 
 	Applying rule 6: r6:
-		the precondition is satisfied
-		Updating the views for A(z!,t~)
-		Updating the views for B(z~,z!,t~)
+		the precondition is not satisfied yet
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 		Updating the views for B(z~,z!,t~)
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
+------------------------------------------------------------
+rule 5: r5 will never be applied.
+rule 6: r6 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -846,19 +836,19 @@ Id=55
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=73
+Id=71
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=72
+  Id=70
    Node(site_type:1<1)
-    Id=63
+    Id=61
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=62
+      Id=60
        Node(site_type:2<1)
         Id=45
          Node(site_type:3<0)
@@ -876,9 +866,9 @@ Id=73
         Id=0
          Leaf False 
 
-    Id=71
+    Id=69
      Node(site_type:1<2)
-      Id=70
+      Id=68
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -909,7 +899,7 @@ Id=73
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=72
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -924,12 +914,12 @@ Id=74
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=74
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=73
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -954,12 +944,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=81
+Id=80
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=80
+  Id=79
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -974,9 +964,9 @@ Id=81
         Id=0
          Leaf False 
 
-    Id=79
+    Id=78
      Node(site_type:0<2)
-      Id=74
+      Id=72
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -999,7 +989,7 @@ B(z!A.z) => B(z~p!A.z)
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=72
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1014,28 +1004,13 @@ Id=74
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=74
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=73
    Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=74
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1059,12 +1034,27 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=72
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=74
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=56
+  Id=73
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1075,8 +1065,8 @@ Id=75
 EXTENSIONAL DESCRIPTION:
 A() => [ A(t~u) v A(t~p) ]
 A() => [ A(z) v A(z!B.z) ]
-B() => [ B(z) v B(z!A.z) ]
 B() => [ B(t~u) v B(t~p) ]
+B() => [ B(z) v B(z!A.z) ]
 B() => [ B(z~u?) v B(z~p?) ]
 ------------------------------------------------------------
 * Properties in connected agents

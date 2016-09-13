@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 30 2016>
+  * Last modification: Time-stamp: <Sep 13 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -16,6 +16,7 @@
   * under the terms of the GNU Library General Public License *)
 
 (** Abstract domain to over-approximate the set of reachable views *)
+
 let local_trace = false
 
 module Domain =
@@ -24,17 +25,19 @@ struct
   (* the type of the struct that contains all static information as in the
      previous version of the analysis *)
 
-  (* domain specific info: *)
-  (* collect the set of tuples (A,x,y,B,z,t) such that there exists a rule
+  (*************************************************************************)
+  (* Domain specific information:
+     Collect the set of tuples (A,x,y,B,z,t) such that there exists a rule
      with two agents of type A and B and two bonds between A.x and B.z, and A.y
-     and B.t *)
-  (* for each tuple, collect a map -> (A,x,y,B,z,t) -> (Ag_id,Ag_id) list
+     and B.t.
+     - For each tuple, collect a map -> (A,x,y,B,z,t) -> (Ag_id,Ag_id) list
      RuleIdMap to explain which rules can create a bond of type A.x.z.B
-     (and at which position (its internal state ~u~p, ...).*)
-  (* a map -> (A,x,y,B,z,t) -> (Ag_id,Ag_id) list RuleIdMap to explain
-     which rules can create a bond of type A.y.t.B (and at which position *)
-  (* and a map (A,x,y,B,z,t) -> (Ag_id,Ag_id) list RuleIdMap to explain
+     (and at which position (its internal state ~u~p, ...).
+     - A map -> (A,x,y,B,z,t) -> (Ag_id,Ag_id) list RuleIdMap to explain
+     which rules can create a bond of type A.y.t.B (and at which position
+     - And a map (A,x,y,B,z,t) -> (Ag_id,Ag_id) list RuleIdMap to explain
      which rules can contain parallel bonds in their lhs *)
+  (*************************************************************************)
 
   type static_information =
     {
@@ -43,12 +46,12 @@ struct
     }
 
   (*--------------------------------------------------------------*)
-  (* one map: for each tuple: Yes, No, Maybe, *)
-  (* Yes: to say that when the sites x and y are bound with sites of
-     the good type, then they are bound to the same B*)
-  (* No: to say that when the sites x and y are bound with sites of the good
-     type, then they are never bound to the same B*)
-  (* Maybe: both case may happen*)
+  (* One map: for each tuple: Yes, No, Maybe.
+    - Yes: to say that when the sites x and y are bound with sites of
+     the good type, then they are bound to the same B.
+    - No: to say that when the sites x and y are bound with sites of the good
+     type, then they are never bound to the same B.
+    - Maybe: both cases may happen.*)
 
   type local_dynamic_information =
     {
@@ -64,11 +67,12 @@ struct
       global : Analyzer_headers.global_dynamic_information;
     }
 
-  (*-------------------------------------------------------------*)
-  (** global static information.
-      explain how to extract the handler for kappa expressions from a value
+  (** Static information:
+      Explain how to extract the handler for kappa expressions from a value
       of type static_information. Kappa handler is static and thus it should
       never updated. *)
+
+  (*global static information*)
 
   let get_global_static_information static = static.global_static_information
 
@@ -123,7 +127,7 @@ struct
       }
       static
 
-  (*parallel bonds*)
+  (*static information*)
 
   let get_tuples_of_interest static =
     (get_local_static_information
@@ -185,8 +189,7 @@ struct
       }
       static
 
-  (*---------------------------------------------------------------*)
-  (*dynamic information*)
+  (*global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
 
@@ -202,7 +205,8 @@ struct
       dynamic with global = global
     }
 
-  (*current value of parallel bonds*)
+(*dynamic information*)
+
   let get_value dynamic =
     (get_local_dynamic_information dynamic).store_value
 
@@ -259,7 +263,7 @@ struct
     in
     let static = set_action_binding store_action_binding static in
     (*------------------------------------------------------*)
-    (*a set of rules that has a potential double binding or potential non parallel binding on the lhs*)
+    (*a set of rules that has a potential double binding or potential non double binding on the lhs*)
     let store_result = get_rule_double_bonds_lhs static in
     let error, store_result =
       Parallel_bonds_static.collect_rule_double_bonds_lhs
@@ -276,7 +280,9 @@ struct
     let static = set_rule_double_bonds_rhs store_result static in
     error, static
 
-  (****************************************************************)
+(****************************************************************)
+(*rules*)
+(****************************************************************)
 
   let scan_rules static dynamic error =
     let parameter = get_parameter static in
@@ -358,12 +364,8 @@ struct
     error, static, dynamic
 
   (***************************************************************)
-  (*Initial state*)
-  (***************************************************************)
-
-  (***************************************************************)
   (*a map of parallel bonds in the initial states, if the set
-    if empty then return false, if it has parallel bonds return
+    is empty then returns false, if it has parallel bonds, returns
     true.*)
 
   let compute_value_init static dynamic error init_state =
@@ -393,12 +395,12 @@ struct
     error, dynamic, event_list
 
   (*************************************************************)
-  (* if a parallel bound occur in a lhs, check that this is possible *)
+  (* if a parallel bound occurs on the lhs, check that this is possible *)
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
     let parameter = get_parameter static in
     (*-----------------------------------------------------------*)
-    (*a set of rules has parallel bonds on the lhs*)
+    (*look into the lhs, whether or not there exists a double bound.*)
     let store_rule_has_parallel_bonds_lhs = get_rule_double_bonds_lhs static in
     let error, parallel_map =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
@@ -421,7 +423,7 @@ struct
             list
           with
           | [] -> error, true
-          | (tuple,parallel_or_not)::tail ->
+          | (tuple, parallel_or_not) :: tail ->
             let pair = Parallel_bonds_type.project2 tuple in
             let error, value =
               match
@@ -430,13 +432,17 @@ struct
                   pair
                   store_value
               with
+              (*if we do not find the pair on the lhs inside the result, then return undefined, if there is a double bound then returns its value.*)
               | error, None -> error, Usual_domains.Undefined
               | error, Some v -> error, v
             in
+            (*matching the value on the lhs*)
             match value with
-            | Usual_domains.Undefined | Usual_domains.Val false -> error, false
-            | Usual_domains.Val b when b<> parallel_or_not
-              -> error, false
+            | Usual_domains.Undefined
+            | Usual_domains.Val false -> error, false
+            (*if the value in the result is different than the value on the lhs, then returns false*)
+            | Usual_domains.Val b when b <> parallel_or_not -> error, false
+            (*otherwise continue until the rest of the list*)
             | Usual_domains.Val _
             |  Usual_domains.Any -> scan tail error
         in
@@ -445,15 +451,13 @@ struct
     in
     if bool
     then error, dynamic, Some precondition
-    else
-      error, dynamic, None
+    else error, dynamic, None
 
   (***************************************************************)
   (* when one bond is created, check in the precondition, whether the two
      other sites may be bound, check whether they must be bound to the same
      agents, whether they cannot be bound to the same agent, whether we cannot
      know, and deal with accordingly *)
-
 
   (***********************************************************)
   (* we know from the syntax that a created bond necessarily belongs to

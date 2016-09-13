@@ -849,95 +849,7 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 1:
-		the precondition is satisfied
-
-		rule 1 is applied for the first time
-
-		Updating the views for C(x!)
-		Updating the views for A(z!,t!)
-		Updating the views for B(t!,z!)
-		Updating the views for C(x!)
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=12
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=11
-   Node(site_type:1<3)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			A(z!D@x,t!B@t)
-
-	Wake-up rules
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=16
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=15
-   Node(site_type:1<2)
-    Id=14
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=13
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			B(t!A@t,z!D@x)
-
-	Wake-up rules
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=10
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			D(x!B@z)
-			D(x!A@z)
-
-	Wake-up rules
+		the precondition is not satisfied yet
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -1046,114 +958,7 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 4:
-		the precondition is satisfied
-
-		rule 4 is applied for the first time
-
-		Updating the views for C(x!)
-		Updating the views for E(z!,t!)
-		Updating the views for F(t!,z!)
-		Updating the views for D(x!)
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=12
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=11
-   Node(site_type:1<3)
-    Id=5
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			E(z!G@x,t!F@t)
-
-	Wake-up rules
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=16
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=15
-   Node(site_type:1<2)
-    Id=14
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=13
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			F(t!E@t,z!H@x)
-
-	Wake-up rules
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			G(x!E@z)
-
-	Wake-up rules
-	Dealing with creation
-
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			H(x!F@z)
-
-	Wake-up rules
+		the precondition is not satisfied yet
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -1166,12 +971,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=21
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=20
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<1)
@@ -1196,19 +1001,19 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=34
+Id=26
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=33
+  Id=25
    Node(site_type:1<2)
-    Id=32
+    Id=24
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=31
+      Id=23
        Node(site_type:2<1)
         Id=1
          Leaf True 
@@ -1226,12 +1031,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=21
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=20
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<1)
@@ -1254,44 +1059,44 @@ EXTENSIONAL DESCRIPTION:
 
 	Wake-up rules
 
-	Applying rule 1:
-		the precondition is satisfied
-		Updating the views for C(x!)
-		Updating the views for A(z!,t!)
-		Updating the views for B(t!,z!)
-		Updating the views for C(x!)
-
 	Applying rule 3:
 		the precondition is satisfied
 
-	Applying rule 4:
-		the precondition is satisfied
-		Updating the views for C(x!)
-		Updating the views for E(z!,t!)
-		Updating the views for F(t!,z!)
-		Updating the views for D(x!)
+	Applying rule 1:
+		the precondition is not satisfied yet
 
 	Applying rule 0:
 		the precondition is satisfied
 
 	Applying rule 2:
 		the precondition is satisfied
+
+	Applying rule 4:
+		the precondition is not satisfied yet
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
 ------------------------------------------------------------
-every agent may occur in the model
+rule 1 will never be applied.
+rule 4 will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+G cannot occur in the model
+H cannot occur in the model
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=30
+Id=22
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=11
-   Node(site_type:1<3)
+  Id=6
+   Node(site_type:1<2)
     Id=5
      Node(site_type:2<1)
       Id=0
@@ -1309,20 +1114,20 @@ Id=30
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=37
+Id=29
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=36
+  Id=28
    Node(site_type:1<2)
-    Id=35
+    Id=27
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=13
-       Node(site_type:2<3)
+      Id=4
+       Node(site_type:2<2)
         Id=1
          Leaf True 
 
@@ -1333,13 +1138,13 @@ Id=37
      Leaf False 
 
 agent_type:2:E:cv_id:0
-Id=30
+Id=22
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=11
-   Node(site_type:1<3)
+  Id=6
+   Node(site_type:1<2)
     Id=5
      Node(site_type:2<1)
       Id=0
@@ -1357,20 +1162,20 @@ Id=30
      Leaf False 
 
 agent_type:3:F:cv_id:0
-Id=22
+Id=7
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=21
+  Id=6
    Node(site_type:1<2)
-    Id=20
+    Id=5
      Node(site_type:2<1)
       Id=0
        Leaf False 
 
-      Id=13
-       Node(site_type:2<3)
+      Id=4
+       Node(site_type:2<2)
         Id=1
          Leaf True 
 
@@ -1381,7 +1186,7 @@ Id=22
      Leaf False 
 
 agent_type:4:C:cv_id:0
-Id=27
+Id=19
  Node(site_type:1<1)
   Id=0
    Leaf False 
@@ -1395,41 +1200,13 @@ Id=27
      Leaf False 
 
 agent_type:5:D:cv_id:0
-Id=27
- Node(site_type:1<1)
+Id=18
+ Node(site_type:1<3)
   Id=0
    Leaf False 
 
   Id=17
    Node(site_type:1<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-agent_type:6:G:cv_id:0
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-agent_type:7:H:cv_id:0
-Id=3
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1456,13 +1233,13 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=36
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
-   Node(site_type:0<3)
+  Id=35
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1471,13 +1248,13 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=34
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=8
-   Node(site_type:1<3)
+  Id=2
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1486,12 +1263,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=37
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=35
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1516,13 +1293,13 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=36
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
-   Node(site_type:0<3)
+  Id=35
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1531,13 +1308,13 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=10
+Id=3
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=8
-   Node(site_type:1<3)
+  Id=2
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1546,12 +1323,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=37
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=35
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1561,12 +1338,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=39
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1576,43 +1353,13 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
- Node(site_type:0<1)
+Id=40
+ Node(site_type:0<3)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=38
    Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1640,13 +1387,13 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=36
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
-   Node(site_type:0<3)
+  Id=35
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1655,13 +1402,13 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=34
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=8
-   Node(site_type:1<3)
+  Id=2
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1670,12 +1417,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=37
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=35
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1700,13 +1447,13 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=36
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
-   Node(site_type:0<3)
+  Id=35
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1715,13 +1462,13 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=10
+Id=3
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=8
-   Node(site_type:1<3)
+  Id=2
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1730,12 +1477,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=37
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=35
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1745,12 +1492,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=39
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=38
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1760,43 +1507,13 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
- Node(site_type:0<1)
+Id=40
+ Node(site_type:0<3)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=38
    Node(site_type:0<4)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:0<1)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1805,34 +1522,18 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 A() => [ A(t!B.t) ]
-A() => [ A(z) v A(z!C.x) v A(z!D.x) ]
-B() => [ B(z) v B(z!C.x) v B(z!D.x) ]
+A() => [ A(z) v A(z!C.x) ]
+B() => [ B(z) v B(z!C.x) ]
 B() => [ B(t!A.t) ]
 E() => [ E(t!F.t) ]
-E() => [ E(z) v E(z!C.x) v E(z!G.x) ]
-F() => [ F(z!D.x) v F(z!H.x) ]
+E() => [ E(z) v E(z!C.x) ]
+F() => [ F(z!D.x) ]
 F() => [ F(t!E.t) ]
 C() => [ C(x!A.z) v C(x!B.z) v C(x!E.z) ]
-D() => [ D(x!A.z) v D(x!B.z) v D(x!F.z) ]
-G() => [ G(x!E.z) ]
-H() => [ H(x!F.z) ]
+D() => [ D(x!F.z) ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(t!1),B(t!1) => 
-	[
-		  A(t!1,z!D.x),B(t!1,z!D.x)
-		v A(t!1,z!C.x),B(t!1,z)
-		v A(t!1,z!C.x),B(t!1,z!C.x)
-		v A(t!1,z),B(t!1,z)
-		v A(t!1,z),B(t!1,z!C.x)
-	]
-E(t!1),F(t!1) => 
-	[
-		  E(t!1,z!G.x),F(t!1,z!H.x)
-		v E(t!1,z!C.x),F(t!1,z!D.x)
-		v E(t!1,z),F(t!1,z!D.x)
-	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------

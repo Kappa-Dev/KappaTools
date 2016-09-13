@@ -1,8 +1,8 @@
 digraph G{
-"Init_28" [label="" style="invis" width="0px" height="0px"];
-"Node_27" [label="E(x!R@x)"];
-"Node_28" [label="E(x!free)"];
-"Node_27" -> "Node_28" [label="rule 1: E/R"];
-"Node_28" -> "Node_27" [label="rule 0: E.R"];
-"Init_28" -> "Node_28" [label=""];
+"Init_27" [label="" style="invis" width="0px" height="0px"];
+"Node_26" [label="E(x!R@x)"];
+"Node_27" [label="E(x!free)"];
+"Node_26" -> "Node_27" [label="rule 1: E/R"];
+"Node_27" -> "Node_26" [label="rule 0: E.R"];
+"Init_27" -> "Node_27" [label=""];
 }

@@ -9,6 +9,9 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
+rule 3: R/R will never be applied.
+rule 4: R.int will never be applied.
+rule 5: R/int will never be applied.
 rule 6: obs will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
@@ -16,46 +19,20 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-R() =>
-   [
-	  R(c,cr,n,x!E.x)
-	v R(c!R.c,cr!R.n,n,x!E.x)
-	v R(c!R.c,cr,n,x!E.x)
-	v R(c!R.c,cr,n!R.cr,x!E.x)
-	v R(c,cr,n,x)
-   ]
+R(c!R.c) => R(c!R.c,x!E.x)
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 E() => [ E(x) v E(x!R.x) ]
 R() => [ R(c) v R(c!R.c) ]
-R() => [ R(n) v R(n!R.cr) ]
-R() => [ R(cr) v R(cr!R.n) ]
+R() => [ R(n) ]
+R() => [ R(cr) ]
 R() => [ R(x) v R(x!E.x) ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-R(c!1),R(c!1) => 
-	[
-		  R(c!1,cr!R.n),R(c!1,cr)
-		v R(c!1,cr),R(c!1,cr)
-		v R(c!1,cr),R(c!1,cr!R.n)
-	]
-R(c!1),R(c!1) => 
-	[
-		  R(c!1,cr!R.n),R(c!1,n!R.cr)
-		v R(c!1,cr),R(c!1,n)
-	]
-R(c!1),R(c!1) => 
-	[
-		  R(c!1,n!R.cr),R(c!1,n)
-		v R(c!1,n),R(c!1,n)
-		v R(c!1,n),R(c!1,n!R.cr)
-	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-R(c!R.c,cr!R.n) => R(c!1,cr!2),R(c!1,n!2)
-R(c!R.c,n!R.cr) => R(c!1,n!2),R(c!1,cr!2)
 execution finished without any exception
