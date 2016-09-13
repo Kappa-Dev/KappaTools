@@ -11,7 +11,6 @@ type simulation_status = | STOPPED | INITALIZING | RUNNING | PAUSED
 
 val simulation_status : t -> simulation_status React.signal
 val simulation_output : t -> ApiTypes_j.state option React.signal
-val simulation_null : t -> ApiTypes_j.state option React.signal
 val perturb_simulation : t -> code:string -> unit Lwt.t
 val continue_simulation : t -> unit Lwt.t
 val pause_simulation : t -> unit Lwt.t

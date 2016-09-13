@@ -63,8 +63,6 @@ let simulation_output (t : t) : ApiTypes_j.state option React.signal =
         Some ready_state.simulation_state
     )
     t.signal
-let simulation_null (_ : t) : ApiTypes_j.state option React.signal =
-  React.S.const None
 (* Sugar for error message *)
 let lwt_error msg _ =
   let () = Ui_state.set_model_error (Api_data.api_message_errors msg) in

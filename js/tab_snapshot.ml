@@ -19,7 +19,7 @@ let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
 
 let configuration (t : Ui_simulation.t) : Widget_export.configuration =
-  let simulation_null = (Ui_simulation.simulation_null t) in
+  let simulation_output = (Ui_simulation.simulation_output t) in
   { Widget_export.id = "snapshot"
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
@@ -67,43 +67,46 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
            | [] -> false
            | _ -> true
         )
-        simulation_null
+        simulation_output
 
   }
 
 
 let content (t : Ui_simulation.t) =
-  let simulation_null = (Ui_simulation.simulation_null t) in
-  let select =
-    Tyxml_js.R.Html.select
-      ~a:[ Html.a_class ["form-control"]
-         ; Html.a_id select_id ]
-      (let list, handle = ReactiveData.RList.create [] in
-       let _ = React.S.map
-           (fun state ->
-              ReactiveData.RList.set
-		handle
-		(List.mapi
-                   (fun i snapshot ->
-                      Html.option
-			~a:([ Html.a_value (string_of_int i)]
-			    @
-			    if (match (React.S.value current_snapshot) with
-				| None ->
-				  false
-				| Some s ->
-				  s.ApiTypes.snap_file = snapshot.ApiTypes.snap_file
-                              )
-			    then [Html.a_selected ()]
-			    else [])
-			(Html.pcdata
-			   (Ui_common.option_label snapshot.ApiTypes.snap_file)))
-                   (state_snapshot state)
-		)
-           )
-           simulation_null in
-       list
+  let simulation_output = (Ui_simulation.simulation_output t) in
+  let list, handle = ReactiveData.RList.create [] in
+  let select state =
+    List.mapi
+      (fun i snapshot ->
+         Html.option
+	   ~a:([ Html.a_value (string_of_int i)]
+	   @
+           if (match (React.S.value current_snapshot) with
+	   | None -> false
+           | Some s -> s.ApiTypes.snap_file = snapshot.ApiTypes.snap_file)
+	   then [Html.a_selected ()]
+           else [])
+           (Html.pcdata
+	      (Ui_common.option_label snapshot.ApiTypes.snap_file)))
+              (state_snapshot state)
+  in
+  let _ = React.S.map
+      (fun state ->
+	 ReactiveData.RList.set
+    handle
+    (match state_snapshot state with
+       head::[] ->
+       [Html.h4
+	  [ Html.pcdata
+       (Ui_common.option_label head.ApiTypes.snap_file)]]
+     | _ -> [Html.select
+               ~a:[ Html.a_class ["form-control"]
+                  ; Html.a_id select_id ]
+               (select state)
+            ]
+    )
       )
+      simulation_output
   in
   let snapshot_select =
     Ui_common.toggle_element
@@ -112,21 +115,7 @@ let content (t : Ui_simulation.t) =
       [
 	Tyxml_js.R.Html.div
 	  ~a:[ Html.a_class ["list-group-item"] ]
-	  (let list, handle = ReactiveData.RList.create [] in
-	   let _ = React.S.map
-               (fun state ->
-		  ReactiveData.RList.set
-		    handle
-		    (match state_snapshot state with
-		       head::[] ->
-                       [Html.h4
-			  [ Html.pcdata
-                              (Ui_common.option_label head.ApiTypes.snap_file)]]
-		     | _ -> [select]
-		    )
-               )
-                    simulation_null
-	   in
+	  (
 	   list
 	  )
       ]
@@ -173,7 +162,7 @@ let update_snapshot
     (Js.Opt.option (Ui_state.agent_count ()))
 
 let select_snapshot (t : Ui_simulation.t) =
-  let simulation_null = (Ui_simulation.simulation_null t) in
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let snapshot_js : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id true in
   let index = Js.Opt.bind
@@ -186,8 +175,8 @@ let select_snapshot (t : Ui_simulation.t) =
            _ -> Js.null
       )
   in
-  match (React.S.value simulation_null) with
-    None -> ()
+    match (React.S.value simulation_output) with
+  | None -> ()
   | Some state ->
     let index = Js.Opt.get index (fun _ -> 0) in
     if List.length state.ApiTypes.snapshots > 0 then
@@ -201,7 +190,7 @@ let select_snapshot (t : Ui_simulation.t) =
       set_current_snapshot None
 
 let onload (t : Ui_simulation.t) : unit =
-  let simulation_null = (Ui_simulation.simulation_null t) in
+  let simulation_output = (Ui_simulation.simulation_output t) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -220,16 +209,9 @@ let onload (t : Ui_simulation.t) : unit =
       "#navsnapshot"
       "shown.bs.tab"
       (fun _ ->
-         match (React.S.value simulation_null) with
+         match (React.S.value simulation_output) with
            None -> ()
          | Some _state -> select_snapshot t)
   in
   let () = Widget_export.onload (configuration t) in
-  let _ : unit React.signal = React.S.l1
-      (fun state -> match state with
-	   None -> ()
-	 | Some _state -> select_snapshot t
-      )
-      simulation_null
-  in
   ()
