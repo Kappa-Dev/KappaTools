@@ -101,7 +101,7 @@ let error_messages signal =
        )
     ]
 
-let start_button_id = "stop_button"
+let start_button_id = "start_button"
 let start_button =
   Html.button
     ~a:([ Html.a_id start_button_id ;
@@ -293,19 +293,20 @@ let simulation_messages = error_messages UIState.model_error
 let status_indicator (t : Ui_simulation.t) =
   Html.div
     ~a:[ Html.a_class [ "col-md-2" ] ]
-    [ Tyxml_js.R.Html.pcdata
-        (React.S.bind
-           (Ui_simulation.simulation_status t)
-           (fun status ->
-              React.S.const
-                (match status with
-                 | Ui_simulation.STOPPED -> "stopped"
-                 | Ui_simulation.INITALIZING -> "initalizing"
-                 | Ui_simulation.RUNNING -> "running"
-                 | Ui_simulation.PAUSED -> "paused"
-                )
-           )
-        ) ]
+    (Ui_common.level
+    ~debug:(Tyxml_js.R.Html.pcdata
+              (React.S.bind
+                 (Ui_simulation.simulation_status t)
+                 (fun status ->
+                    React.S.const
+                      (match status with
+                       | Ui_simulation.STOPPED -> "stopped"
+                       | Ui_simulation.INITALIZING -> "initalizing"
+                       | Ui_simulation.RUNNING -> "running"
+                       | Ui_simulation.PAUSED -> "paused"
+                      )
+                 )
+              )) ())
 let perturbation_control (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
@@ -432,6 +433,7 @@ let footer_xml (t : Ui_simulation.t) =
             [ pause_button ]
         ]{|
 
+      |} [status_indicator t]{|
       |}[ Html.div
             ~a:[ Tyxml_js.R.Html.a_class
                    (visible_on_states
@@ -450,10 +452,6 @@ let footer_xml (t : Ui_simulation.t) =
                      [ Ui_simulation.STOPPED ; ]) ]
             [ select_runtime ]
         ]{|
-      |} [ Html.div
-             (Ui_common.level
-                ~debug:(status_indicator t)
-                ())  ]{|
      </div>
 
   </div>|}]
