@@ -572,6 +572,75 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
          f "@[<v 2><script>@,%t@]@,</script>"
          (js_of_grid env enriched_grid))
 
+let json_of_grid enriched_grid env =
+  let log_json = Loggers.open_infinite_buffer ~mode:Loggers.Json () in
+  let () = Graph_loggers.print_graph_preamble log_json "story" in
+  let config = enriched_grid.config in
+  let prec_star = enriched_grid.prec_star in
+  let depth_of_event = enriched_grid.depth_of_event in
+  let sorted_events =
+    Mods.IntMap.fold
+      (fun eid d dmap ->
+         let set = Mods.IntMap.find_default Mods.IntSet.empty d dmap in
+         Mods.IntMap.add d (Mods.IntSet.add eid set) dmap
+      ) depth_of_event Mods.IntMap.empty in
+  let () =
+    Mods.IntMap.iter
+      (fun _ eids_at_d ->
+        Mods.IntSet.iter
+          (fun eid ->
+            match Mods.IntMap.find_option eid config.events_kind with
+            | None -> raise Not_found
+            | Some atom_kind ->
+               if eid <> 0 then
+                 Trace.log_event_kind env log_json eid atom_kind
+          ) eids_at_d
+      ) sorted_events in
+  let () =
+    Mods.IntMap.iter
+      (fun eid pred_set ->
+        if eid <> 0 then
+          Mods.IntSet.iter
+            (fun eid' ->
+              if eid' = 0 then ()
+              else
+                Graph_loggers.print_edge log_json (string_of_int eid')
+                                         (string_of_int eid)
+            ) pred_set
+      ) config.prec_1 in
+  let () =
+    Mods.IntMap.iter
+      (fun eid cflct_set ->
+        if eid <> 0 then
+          let prec = try (fst prec_star).(eid) with _ -> [] in
+          let _ =
+            Mods.IntSet.fold_inv
+              (fun eid' prec ->
+                let bool,prec =
+                  let rec aux prec =
+                    match prec with
+                    | []   -> true,prec
+                    | h::t ->
+                       if h=eid' then false,t else
+                         if h>eid' then aux t else true,prec
+                  in aux prec in
+                let () =
+                  if bool then
+                    Graph_loggers.print_edge
+                      log_json
+                      ~directives:[Graph_loggers_sig.ArrowHead
+                                     Graph_loggers_sig.Tee]
+                      (string_of_int eid)
+                      (string_of_int eid')
+                in
+                prec
+              ) cflct_set prec
+          in ()
+      ) config.conflict in
+  let () = Graph_loggers.print_graph_foot log_json in
+  let graph = Loggers.graph_of_logger log_json in
+  Graph_json.to_json graph
+
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...]
   et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print
@@ -629,7 +698,12 @@ let pretty_print
                 Kappa_files.with_cflow_file
                   [compression_type;string_of_int cpt] "dot"
                   (dot_of_grid profiling env enriched_config)
-             | Ast.Html | Ast.Json ->
+             | Ast.Json ->
+                let filename = Kappa_files.get_cflow
+                                 [compression_type;(string_of_int cpt)] "json"
+                in
+                Yojson.Basic.to_file filename (json_of_grid enriched_config env)
+             | Ast.Html  ->
                 let profiling desc =
                   Format.fprintf
                     desc

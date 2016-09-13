@@ -149,6 +149,7 @@ let with_marshalized f =
      close_out d
 
 let set_cflow s = cflowFileName := s
+let get_cflow l e = get_fresh_filename !cflowFileName l "" e
 let with_cflow_file l e f =
   with_formatter (get_fresh_filename !cflowFileName l "" e) f
 

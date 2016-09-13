@@ -32,6 +32,8 @@ val print_event_kind :
   ?env:Environment.t -> Format.formatter -> event_kind -> unit
 val print_event_kind_dot_annot :
   Environment.t -> Format.formatter -> event_kind -> unit
+val log_event_kind :
+  Environment.t -> Loggers.t -> int -> event_kind -> unit
 
 type event =
   event_kind *

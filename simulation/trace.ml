@@ -85,6 +85,21 @@ let print_event_kind ?env f x =
         f "Intro @[<h>%a@]"
         (Pp.list Pp.comma (Environment.print_agent ~env)) s
 
+let log_event_kind env logger id = function
+  | RULE r_id  ->
+     let _ = Environment.print_ast_rule ~env (Format.str_formatter) r_id in
+     let na = Format.flush_str_formatter () in
+     Graph_loggers.print_node
+       logger
+       ~directives:[Graph_loggers_sig.Label na]
+       (string_of_int id)
+  | OBS name | PERT name ->
+     Graph_loggers.print_node
+       logger
+       ~directives:[Graph_loggers_sig.Label name]
+       (string_of_int id)
+  | INIT _ -> ()
+
 let event_kind_to_json = function
   | OBS s -> `List [`String "OBS"; `String s]
   | RULE i -> `List [`String "RULE"; `Int i]

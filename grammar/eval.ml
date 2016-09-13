@@ -450,7 +450,7 @@ let configurations_of_result result =
             (fun v p -> match v with
                         | "true" | "yes" | "dot" -> Dot
                         |"false" | "no" | "html" -> Html
-                        | "json " -> Json
+                        | "json" -> Json
                         | _ as error  ->
                            raise
                              (ExceptionDefn.Malformed_Decl
