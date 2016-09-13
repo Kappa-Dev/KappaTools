@@ -37,15 +37,20 @@ let content (t : Ui_simulation.t) =
           ~export_data_label:"dat"
       ]
   in
-  [%html {|<div>
+  [%html {|<div class="navcontent-view">
              <div class="row">
-                <div id="|}div_id{|" class="col-sm-8">
-				   </div>
-				   </div>
-				   |}[export_controls]{|
-        </div>|}]
+                <div id="|}div_id{|" class="col-sm-12">
+		</div>
+             </div>
+           </div>
+           <div class="navcontent-controls"> |}[export_controls]{| </div>
+          |}]
 
-let navcontent (t : Ui_simulation.t) = [ Html.div [content t] ]
+let navcontent (t : Ui_simulation.t) =
+  [Ui_common.toggle_element
+     t
+     (fun s -> match state_distances s with None -> [] | Some d -> [s])
+     (content t) ]
 
 let update_distances
     (distances : distances_plot Js.t)

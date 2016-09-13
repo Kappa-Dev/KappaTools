@@ -456,7 +456,7 @@ let api_snapshot_dot (snapshot : ApiTypes_j.snapshot) =
 
 
 
-let api_snapshot_kappa (snapshot : ApiTypes_j.snapshot) =
+let api_snapshot_kappa (snapshot : ApiTypes_j.snapshot) : string =
   (*let () = print_string (ApiTypes_j.string_of_snapshot snapshot) in *)
 (*
   let format_edge

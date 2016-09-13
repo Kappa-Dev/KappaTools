@@ -145,18 +145,18 @@ let content (t : Ui_simulation.t) =
        in
        line_list)
   in
-  [%html {|<div>
-	   <div class="row">
-	   <div class="center-block display-header">
-	   |}[file_select]{|
-      </div>
-   </div>
-   <div class="row">
-      <div class="col-sm-12">
-      |}[file_content]{|
-      </div>
-   </div>
-</div>|}]
+  [ [%html {|<div class="navcontent-view">
+ 	        <div class="row">
+	           <div class="center-block display-header">
+	              |}[file_select]{|
+                   </div>
+                </div>
+                <div class="row">
+                   <div class="col-sm-12">
+                      |}[file_content]{|
+                   </div>
+                </div>
+             </div> |}] ]
 
 let select_outputs (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -181,19 +181,7 @@ let select_outputs (t : Ui_simulation.t) =
       ()
 
 let navcontent (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
-  [ Html.div
-      ~a:[Tyxml_js.R.Html.a_class
-            (React.S.bind
-               simulation_output
-               (fun state -> React.S.const
-                   (match state_outputs state with
-                      [] -> ["hidden"]
-                    | _::_ -> ["show"])
-               )
-            )]
-      [content t]
-  ]
+  [ Ui_common.toggle_element t state_outputs (content t) ]
 
 let onload (t : Ui_simulation.t) =
   let select_dom : Dom_html.inputElement Js.t =

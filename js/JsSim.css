@@ -6,6 +6,9 @@ body { margin-bottom: 60px; }
 
 span.filler:empty:before {
 }
+.kappa-code {
+    white-space : pre;
+}
 
 .plot-axis path,
 .plot-axis line { fill: none;

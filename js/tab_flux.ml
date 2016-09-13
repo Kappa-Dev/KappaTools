@@ -93,7 +93,7 @@ let content (t : Ui_simulation.t) =
   let export_controls =
     Widget_export.content (configuration t)
   in
-  [%html {|<div>
+  [%html {|<div class="navcontent-view">
            <div class="row">
                <div class="center-block display-header">
                 Dynamic influence map between t = <span id="begin_time"></span>s
@@ -132,25 +132,16 @@ let content (t : Ui_simulation.t) =
                    </li>
                 </ul>
              </div>
-          <div id="|}display_id{|" class="col-sm-8"></div>
-				 </div>
-				 |}[export_controls]{|
-     </div>|}]
+          <div id="|}display_id{|" class="col-sm-8"></div></div>
+     </div>
+     <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
 let navcontent (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
-  [ Html.div
-      ~a:[Tyxml_js.R.Html.a_class
-            (React.S.bind
-               simulation_output
-               (fun state -> React.S.const
-                   (match state_fluxmap state with
-                      [] -> ["hidden"]
-                    | _::_ -> ["show"])
-               )
-            )]
-      [content t]
-  ]
+  [Ui_common.toggle_element
+     t
+     state_fluxmap
+     (content t) ]
+
 let update_flux_map
     (flux_js : Js_flux.flux_map Js.t)
     (flux_data : ApiTypes.flux_map) : unit =

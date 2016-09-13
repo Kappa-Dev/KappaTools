@@ -5,6 +5,19 @@ module UIState = Ui_state
 let current_snapshot, set_current_snapshot =
   React.S.create (None : ApiTypes.snapshot option)
 
+type display_format = Kappa | Graph
+let display_format_to_string =
+  function
+  | Kappa -> "Kappa"
+  | Graph -> "Graph"
+let string_to_display_format =
+  function
+  | "Kappa" -> Some Kappa
+  | "Graph" -> Some Graph
+  | _ -> None
+
+let display_format, set_display_format = React.S.create Graph
+
 let state_snapshot state =
   match state with
   | None -> []
@@ -71,6 +84,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
 
   }
 
+let format_select_id = "format_select_id"
 
 let content (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -124,7 +138,7 @@ let content (t : Ui_simulation.t) =
                 match state_snapshot state with
                 | [] -> ""
                 | snapshot::[] -> (Ui_common.option_label snapshot.ApiTypes.snap_file)
-                | s -> "")
+                | _ -> "")
              simulation_output)
       ]
   in
@@ -138,34 +152,77 @@ let content (t : Ui_simulation.t) =
            Html.a_id select_id ]
       list
   in
-  let snapshot_chooser =
-    Ui_common.toggle_element
-      t
-      state_snapshot
-      [
-	Html.div
-	  ~a:[ Html.a_class ["list-group-item"] ]
-          [ snapshot_label ; snapshot_select ]
-      ]
+  let snapshot_chooser = Html.div [ snapshot_label ; snapshot_select ]
   in
   let export_controls =
     Widget_export.content (configuration t)
   in
-  [%html {|<div>
-             <div class="row">
-               <div class="center-block display-header">
-         |}[ snapshot_chooser ]{|
+  let kappa_snapshot_display =
+      Html.div
+          ~a:[ Tyxml_js.R.Html.a_class
+                 (React.S.map
+                    (fun display_format ->
+                       match display_format with
+                         | Kappa -> ["visible" ; "kappa-code" ]
+                         | Graph -> ["hidden"])
+                    display_format
+                 )
+             ]
+      [ Tyxml_js.R.Html.pcdata
+          (React.S.map
+             (fun snapshot ->
+                match snapshot with
+                | None -> ""
+                | Some snapshot -> Api_data.api_snapshot_kappa snapshot)
+             current_snapshot)
+
+      ]
+  in
+  let kappa_graph_display =
+       Html.div
+          ~a:[ Tyxml_js.R.Html.a_class
+                 (React.S.map
+                    (fun display_format ->
+                       match display_format with
+                         | Graph -> ["visible" ; "kappa-code" ]
+                         | Kappa -> ["hidden"])
+                    display_format
+                 ) ;
+               Html.a_id display_id
+             ]
+      [ ]
+  in
+  let format_chooser =
+      [%html {| <select class="form-control" id="|} format_select_id {|"><option value="Kappa">kappa</option><option value="Graph">graph</option></select> |} ]
+  in
+  [%html {|<div class="navcontent-view">
+             <div class="row" style="margin : 5px;">
+                <div class="col-sm-2">
+                |}[ format_chooser ]{|
                </div>
+               <div class="col-sm-10"> |}[ snapshot_chooser ]{| </div>
              </div>
              <div class="row">
-                <div class="col-sm-12" id="|}display_id{|">
-							 </div>
-							 </div>
-							 |}[export_controls]{|
-        </div>|}]
+                <div class="col-sm-12">
+                |}[ kappa_snapshot_display ]{|
+    	        </div>
+	     </div>
+             <div class="row">
+                <div class="col-sm-12">
+                |}[ kappa_graph_display ]{|
+    	        </div>
+	     </div>
+          </div>
+          <div class="navcontent-controls">
+          |}[export_controls]{|
+          </div>
+  |}]
 
-
-let navcontent (t : Ui_simulation.t) = [content t]
+let navcontent (t : Ui_simulation.t) =
+  [Ui_common.toggle_element
+     t
+     state_snapshot
+     (content t) ]
 
 let update_snapshot
     (snapshot_js : Js_contact.contact_map Js.t)
@@ -182,8 +239,7 @@ let update_snapshot
       (Js.string
          (ApiTypes_j.string_of_site_graph site_graph))
   in
-  let json : string =
-    ApiTypes_j.string_of_site_graph site_graph
+  let json : string = ApiTypes_j.string_of_site_graph site_graph
   in
   snapshot_js##setData
     (Js.string json)
@@ -219,13 +275,19 @@ let select_snapshot (t : Ui_simulation.t) =
       set_current_snapshot None
 
 let onload (t : Ui_simulation.t) : unit =
-  let () = Common.debug ("tab_snapshot-onload") in
   let simulation_output = (Ui_simulation.simulation_output t) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
           (Ui_common.document##getElementById
              (Js.string select_id))
+          (fun () -> assert false))
+       : Dom_html.element Js.t) in
+  let format_select_dom : Dom_html.inputElement Js.t =
+    Js.Unsafe.coerce
+      ((Js.Opt.get
+          (Ui_common.document##getElementById
+             (Js.string format_select_id))
           (fun () -> assert false))
        : Dom_html.element Js.t) in
   let () =
@@ -235,6 +297,23 @@ let onload (t : Ui_simulation.t) : unit =
 	(fun _ ->
          let () = Common.debug ("onchange") in
          let () = select_snapshot t in Js._true)
+  in
+  let update_format () =
+    let format_text : string = (Js.to_string format_select_dom##.value) in
+    match string_to_display_format format_text with
+    | Some format -> set_display_format format
+    | None -> assert false
+  in
+  (* get initial value for display format *)
+  let () = update_format () in
+  (* update value for display format *)
+  let () =
+    format_select_dom
+    ##.
+      onchange := Dom_html.handler
+	(fun _ ->
+         let () = update_format () in
+         Js._true)
   in
   let () =
     Common.jquery_on

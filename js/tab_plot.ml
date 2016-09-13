@@ -82,49 +82,36 @@ let content (t : Ui_simulation.t) =
   let export_controls =
     Widget_export.content (configuration t)
   in
-  [%html {|<div>
-	   <div class="row">
-           <div id="plot-label-div" class="center-block display-header">
-           Plot
-           </div>
-	   </div>
-	   <div class="row">
-           <div id="|}display_id{|" class="col-sm-12"></div>
-				  </div>
-				  <div class="row">
-
-				  <div class="col-sm-2">
-				  |}[plot_show_legend]{| Legend
-			     </div>
-
-			     <div class="col-sm-3">
-			     Log X |}[plot_x_axis_log_checkbox]{|
-               Log Y |}[plot_y_axis_log_checkbox]{|
+  [%html {|
+  <div class="navcontent-view">
+      <div class="row">
+         <div id="plot-label-div" class="center-block display-header">
+            Plot
+         </div>
+      </div>
+      <div class="row">
+         <div id="|}display_id{|" class="col-sm-12"></div>
+      </div>
+      <div class="row">
+	 <div class="col-sm-2">
+	    |}[plot_show_legend]{| Legend
+	 </div>
+         <div class="col-sm-3">
+ 	     Log X |}[plot_x_axis_log_checkbox]{|
+             Log Y |}[plot_y_axis_log_checkbox]{|
          </div>
 
          <div class="col-sm-4" id="|}div_axis_select_id{|">
-							 </div>
+	 </div>
+      </div>
+  </div>
+  <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
-							 </div>
-							 <div class="row"><p></p></div>
-							 |}[export_controls]{|
-  </div>|}]
-
-let navcontent (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
-  [ Html.div
-      ~a:[Tyxml_js.R.Html.a_class
-            (React.S.bind
-               simulation_output
-               (fun state ->
-                  React.S.const
-                    (match state_plot state with
-                       None -> ["hidden"]
-                     | Some _ -> ["show"])
-               )
-            )]
-      [ content t ]
-  ]
+let navcontent (t : Ui_simulation.t) : [> Html_types.div ] Html.elt list =
+  [Ui_common.toggle_element
+     t
+     (fun s -> match state_plot s with None -> [] | Some p -> [p])
+     (content t) ]
 
 let state_plot state = match state with
     None -> None

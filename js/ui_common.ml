@@ -277,3 +277,18 @@ let level
   (extract "error" error)@
   (extract "fatal" fatal)@
   []
+
+let features
+    ?(default=[])
+    (options :(string * 'a) list) : 'a list =
+  let features : string list = arguments "feature" in
+  let matches : 'a list =
+    List.map
+      snd
+      (List.filter
+         (fun (feature,_) -> List.mem feature features)
+         options)
+  in
+  match matches with
+  | [] -> default
+  | _::_ -> matches
