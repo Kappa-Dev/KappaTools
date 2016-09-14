@@ -224,7 +224,7 @@ let navcontent (t : Ui_simulation.t) =
      state_snapshot
      (content t) ]
 
-let update_snapshot
+let render_snapshot_graph
     (snapshot_js : Js_contact.contact_map Js.t)
     (snapshot : ApiTypes.snapshot) : unit =
   let () =
@@ -234,16 +234,15 @@ let update_snapshot
   in
   let site_graph : ApiTypes.site_graph =
     Api_data.api_snapshot_site_graph snapshot in
-  let () =
-    Common.debug
-      (Js.string
-         (ApiTypes_j.string_of_site_graph site_graph))
-  in
-  let json : string = ApiTypes_j.string_of_site_graph site_graph
-  in
-  snapshot_js##setData
-    (Js.string json)
-    (Js.Opt.option (Ui_state.agent_count ()))
+  match React.S.value display_format with
+  | Graph ->
+    let json : string = ApiTypes_j.string_of_site_graph site_graph
+    in
+    snapshot_js##setData
+      (Js.string json)
+      (Js.Opt.option (Ui_state.agent_count ()))
+  | Kappa -> ()
+
 
 let select_snapshot (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -268,7 +267,7 @@ let select_snapshot (t : Ui_simulation.t) =
       let snapshot_selected : ApiTypes.snapshot =
         List.nth state.ApiTypes.snapshots index in
       let () = set_current_snapshot (Some snapshot_selected) in
-      update_snapshot
+      render_snapshot_graph
         snapshot_js
         snapshot_selected
     else
@@ -301,7 +300,17 @@ let onload (t : Ui_simulation.t) : unit =
   let update_format () =
     let format_text : string = (Js.to_string format_select_dom##.value) in
     match string_to_display_format format_text with
-    | Some format -> set_display_format format
+    | Some format ->
+      let snapshot_js : Js_contact.contact_map Js.t =
+         Js_contact.create_contact_map display_id true in
+      let () =
+        (match React.S.value current_snapshot with
+         | None -> ()
+         | Some snapshot -> render_snapshot_graph
+                              (snapshot_js : Js_contact.contact_map Js.t)
+                              (snapshot : ApiTypes.snapshot))
+      in
+        set_display_format format
     | None -> assert false
   in
   (* get initial value for display format *)
