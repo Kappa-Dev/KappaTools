@@ -108,7 +108,8 @@ let rec update_simulation (t : t) : unit Lwt.t =
     ~initializing:(fun _ -> Lwt.return_unit)
     ~ready:
       (fun (runtime_state,ready_state) ->
-           let () = Common.debug (Js.string "update_simulation.1") in
+         let () = Common.debug (Js.string "update_simulation.1") in
+         Lwt.join [Lwt_js.sleep poll_interval;
            (runtime_state#status ready_state.simulation_token)
            >>=
            (fun result ->
@@ -127,15 +128,13 @@ let rec update_simulation (t : t) : unit Lwt.t =
                         t.setter
                           (SIMULATION_READY
                              { ready_state with simulation_state = state }) in
-                      (Lwt_js.sleep poll_interval)
-                      >>= (fun _ ->
-                           if state.ApiTypes_j.is_running then
-                             update_simulation t
-                           else
-                             Lwt.return_unit
-                        ))
+                      if state.ApiTypes_j.is_running then
+                        update_simulation t
+                      else
+                        Lwt.return_unit
+                  )
                 t
-           )
+           )]
       )
     t
 
