@@ -244,11 +244,17 @@ let onenavcontent label active content =
            Html.a_class ["tab-pane"]
        ; Html.Unsafe.string_attrib "role" "tabpanel" ] content
 
-let navcontent = function
+let navcontent ?id (classes : string list) = function
   | [] -> assert false
   | (t,c) :: l ->
+    let id : [> `Id ] Html.attrib list =
+      match id with
+      | None -> []
+      | Some id -> [ Html.a_id id ]
+    in
     Html.div
-      ~a:[ Html.a_class ["panel-content";"tab-content"]]
+      ~a:([ Html.a_class
+              (["panel-content";"tab-content"]@classes) ; ]@id)
       (onenavcontent t true c ::
        List.map (fun (t,c) -> onenavcontent t false c) l)
 

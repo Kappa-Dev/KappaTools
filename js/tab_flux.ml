@@ -132,7 +132,8 @@ let content (t : Ui_simulation.t) =
                    </li>
                 </ul>
              </div>
-          <div id="|}display_id{|" class="col-sm-8"></div></div>
+          <div id="|}display_id{|" class="col-sm-8"> |}[ Html.entity "nbsp" ]{| </div>
+        </div>
      </div>
      <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
@@ -225,3 +226,4 @@ let onload (t : Ui_simulation.t) =
       (fun _ -> select_fluxmap t flux)
   in
   select_fluxmap t flux
+let onresize (_ : Ui_simulation.t) : unit = ()

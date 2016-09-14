@@ -40,6 +40,7 @@ let content (t : Ui_simulation.t) =
   [%html {|<div class="navcontent-view">
              <div class="row">
                 <div id="|}div_id{|" class="col-sm-12">
+                 |}[ Html.entity "nbsp" ]{|
 		</div>
              </div>
            </div>
@@ -100,3 +101,4 @@ let onload (t : Ui_simulation.t) =
   ()
 
 let navli ( _ : Ui_simulation.t) = []
+let onresize (_ : Ui_simulation.t) : unit = ()

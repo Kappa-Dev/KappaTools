@@ -62,7 +62,6 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
   }
 
 let content (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
   let plot_show_legend =
     Html.input ~a:[ Html.a_id "plot-show-legend"
                   ; Html.a_input_type `Checkbox
@@ -90,7 +89,7 @@ let content (t : Ui_simulation.t) =
          </div>
       </div>
       <div class="row">
-         <div id="|}display_id{|" class="col-sm-12"></div>
+         <div id="|}display_id{|" class="col-sm-12"> |}[ Html.entity "nbsp"]{| </div>
       </div>
       <div class="row">
 	 <div class="col-sm-2">
@@ -117,27 +116,45 @@ let state_plot state = match state with
     None -> None
   | Some state -> state.ApiTypes.plot
 
-let update_plot
-    (plot : observable_plot Js.t)
-    (data : ApiTypes.plot option) : unit =
-  match data with
-    None -> ()
-  | Some data ->
-    let div : Dom_html.element Js.t =
-      Js.Opt.get (Ui_common.document##getElementById
-                    (Js.string display_id))
-        (fun () -> assert false) in
-    let width = max 400 (div##.offsetWidth - 20)  in
-    let height = width/2 in
+let dimension_ref : Js_plot.plot_dimension Js.t option ref = ref None
+let calculate_dimension () =
+    let min_width = 400 in
+    let min_height = 100 in
+    let offset_width = 100 in
+    let offset_height = 250 in
+    let width =
+      max
+        min_width
+        ((Js.Optdef.get (Dom_html.window##.innerWidth) (fun () -> assert false)) - offset_width)
+    in
+    let height =
+      max
+        min_height
+        ((Js.Optdef.get (Dom_html.window##.innerHeight)(fun () -> assert false)) - offset_height)
+    in
     let dimension =
       Js_plot.create_dimension
         ~height:height
         ~width:width
     in
-    let () = plot##setDimensions(dimension) in
+    let () = dimension_ref := Some dimension
+    in dimension
+
+let get_dimension () =
+  match !dimension_ref with
+  | None -> calculate_dimension ()
+  | Some dimension -> dimension
+
+let update_plot
+    (plot : observable_plot Js.t)
+    (data : ApiTypes.plot option) : unit =
+  match data with
+  | None -> ()
+  | Some data ->
+    let () = plot##setDimensions(get_dimension ()) in
     let data : plot_data Js.t = Js_plot.create_data ~plot:data in
     plot##setPlot(data)
-
+let plot_ref = ref None
 let onload (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
   let () = Widget_export.onload (configuration t) in
@@ -156,6 +173,7 @@ let onload (t : Ui_simulation.t) =
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)
+  let () = plot_ref := Some plot in
   let () = Common.jquery_on
       "#navplot"
       "shown.bs.tab"
@@ -174,3 +192,17 @@ let onload (t : Ui_simulation.t) =
   ()
 
 let navli (_ : Ui_simulation.t) = []
+
+let onresize (t : Ui_simulation.t) =
+  (* recalcuate size *)
+  let simulation_output = (Ui_simulation.simulation_output t) in
+  let _ = calculate_dimension () in
+  let () =
+    match !plot_ref with
+    | None -> ()
+    | Some plot ->
+      (match React.S.value simulation_output with
+      | None -> ()
+      | Some state -> update_plot plot state.ApiTypes.plot)
+  in
+  ()

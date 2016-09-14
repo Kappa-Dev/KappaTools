@@ -14,9 +14,12 @@ let navtabs (t : Ui_simulation.t) =
      @
      (Ui_common.features [("distances", ("distances",Tab_distances.navli t))]))
 
+let navcontents_id : string = "navcontents"
 let navcontents (t : Ui_simulation.t) =
   Tyxml_js.To_dom.of_div @@
   Ui_common.navcontent
+    ~id:navcontents_id
+    []
     ([ "editor",    (Tab_editor.navcontent t)
     ; "plot",      (Tab_plot.navcontent t)
     ; "flux",      (Tab_flux.navcontent t)
@@ -45,3 +48,18 @@ let onload (t : Ui_simulation.t) =
 
 let onunload () =
   Tab_editor.onunload ()
+
+let onresize t =
+  let () = Tab_editor.onresize t in
+  let () = Tab_plot.onresize t in
+  let () = Tab_flux.onresize t in
+  let () = Tab_snapshot.onresize t in
+  let () = Tab_outputs.onresize t in
+  let () =
+    List.iter
+      (fun a -> a ())
+      (Ui_common.features [("distances",fun () -> Tab_distances.onresize t)])
+  in
+  let () = Tab_log.onresize t in
+  let () = Tab_settings.onresize t in
+  ()

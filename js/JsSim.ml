@@ -8,7 +8,12 @@ let prod _ =
   let () = Dom.appendChild main (Panel_tab.navtabs ui_simulation) in
   let () = Dom.appendChild main (Panel_tab.navcontents ui_simulation) in
   let () = Dom.appendChild main (Panel_tab.controls ui_simulation) in
-  let () = Panel_tab.onload ui_simulation
+  let () = Panel_tab.onload ui_simulation in
+  let _ = Dom_html.window##.onresize :=
+      Dom_html.handler
+        (fun _ ->
+           let () = Panel_tab.onresize ui_simulation in
+          Js._true)
   in Js._true
 
 let dev _ =
@@ -19,8 +24,14 @@ let dev _ =
   let () = Dom.appendChild main (Panel_tab.navtabs ui_simulation) in
   let () = Dom.appendChild main (Panel_tab.navcontents ui_simulation) in
   let () = Dom.appendChild main (Panel_tab.controls ui_simulation) in
-  let () = Panel_tab.onload ui_simulation
-  in Js._true
+  let () = Panel_tab.onload ui_simulation in
+  let _ = Dom_html.window##.onresize :=
+      Dom_html.handler
+        (fun _ ->
+           let () = Panel_tab.onresize ui_simulation in
+          Js._true)
+  in
+  Js._true
 
 let onunload _ =
   let () = Panel_tab.onunload () in

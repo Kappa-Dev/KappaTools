@@ -39,9 +39,10 @@ let content =
   [%html {|<div>
              <div class="row">
                 <div id="|}display_id{|" class="col-sm-8">
-	     </div>
+                 |}[ Html.entity "nbsp" ]{|
+	        </div>
 	    </div>
-	   |}[export_controls]{|
+	   |}[ export_controls ]{|
         </div>|}]
 
 let navcontent (_ : Ui_simulation.t) = [ Html.div [content] ]
@@ -85,3 +86,4 @@ let onload (_ : Ui_simulation.t) =
            (Js.string json)
            (Js.Opt.option (Ui_state.agent_count ()))
     )
+let onresize (_ : Ui_simulation.t) : unit = ()

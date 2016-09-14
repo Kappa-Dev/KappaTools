@@ -190,7 +190,7 @@ let content (t : Ui_simulation.t) =
                  ) ;
                Html.a_id display_id
              ]
-      [ ]
+      [ Html.entity "nbsp" ]
   in
   let format_chooser =
       [%html {| <select class="form-control" id="|} format_select_id {|"><option value="Kappa">kappa</option><option value="Graph">graph</option></select> |} ]
@@ -335,3 +335,5 @@ let onload (t : Ui_simulation.t) : unit =
   in
   let () = Widget_export.onload (configuration t) in
   ()
+
+let onresize (_ : Ui_simulation.t) : unit = ()

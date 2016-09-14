@@ -198,3 +198,4 @@ let onload (t : Ui_simulation.t) =
   in
 
   ()
+let onresize (_ : Ui_simulation.t) : unit = ()

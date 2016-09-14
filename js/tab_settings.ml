@@ -632,3 +632,4 @@ let onload (t : Ui_simulation.t) : unit =
          try UIState.set_model_nb_plot (int_of_string value)
          with | Not_found | Failure _ -> ()) in
   ()
+let onresize (_ : Ui_simulation.t) : unit = ()

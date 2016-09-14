@@ -26,3 +26,4 @@ let navcontent (t : Ui_simulation.t) =
       ]
   ]
 let onload (_ : Ui_simulation.t) = ()
+let onresize (_ : Ui_simulation.t) : unit = ()
