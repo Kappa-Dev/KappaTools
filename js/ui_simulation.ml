@@ -1,6 +1,6 @@
 open Lwt
 
-let poll_interval : float = 2.
+let poll_interval : float = 0.5
 type ready_state = { simulation_token : ApiTypes_j.token ;
                      simulation_state : ApiTypes_j.state ; }
 let create_ready_state (token : ApiTypes_j.token) : ready_state =
