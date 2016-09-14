@@ -67,7 +67,7 @@ class runtime
   object(self)
     val mutable process : process Js.t option = None
     val mutable process_is_running : bool = false
-    val mutable buffer : string = ""
+    val buffer = Buffer.create 1024
     initializer
       let configuration : process_configuration Js.t  =
         create_process_configuration
@@ -86,11 +86,12 @@ class runtime
       match Utility.split msg Api_mpi.message_delimter with
       | (prefix,None) ->
         ignore(Common.debug (Js.string "onStdout:none"));
-        buffer <- buffer^prefix
+        Buffer.add_string buffer prefix
       | (prefix,Some suffix) ->
         ignore(Common.debug (Js.string "onStdout:some"));
-        self#receive (buffer^prefix);
-        buffer <- "";
+        Buffer.add_string buffer prefix;
+        self#receive (Buffer.contents buffer);
+        Buffer.reset buffer;
         self#onStdout suffix
 
     method sleep timeout = Lwt_js.sleep timeout
@@ -115,5 +116,5 @@ class runtime
       | Some process -> process##kill
       | None -> ()
 
-    inherit Api_mpi.runtime ~timeout:timeout ()
+    inherit Api_mpi.runtime ~timeout ()
   end

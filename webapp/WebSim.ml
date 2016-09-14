@@ -2,15 +2,9 @@ module ApiTypes = ApiTypes_j
 
 open Lwt
 open Cohttp_lwt_unix
-open Cohttp
 open Request
-open Api
-open ApiTypes
-open Conduit_lwt_unix
 open Unix
 open Lwt_log
-
-let unit_of_lwt lwt = Lwt.async (fun () -> lwt)
 
 let logger (handler : Cohttp_lwt_unix.Server.conn ->
             Cohttp.Request.t ->
@@ -29,7 +23,7 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
   (fun (response,body) ->
      let ip : string =
        match fst conn with
-         Conduit_lwt_unix.TCP {Conduit_lwt_unix.fd; ip; port} ->
+         Conduit_lwt_unix.TCP {Conduit_lwt_unix.fd; _} ->
          (match Lwt_unix.getpeername fd with
           | Lwt_unix.ADDR_INET (ia,port) ->
             Printf.sprintf
@@ -37,39 +31,25 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
               (Ipaddr.to_string (Ipaddr_unix.of_inet_addr ia))
               port
           | Lwt_unix.ADDR_UNIX path -> Printf.sprintf "sock:%s" path)
-       | _ -> "unknown"
+       | Conduit_lwt_unix.Vchan _ | Conduit_lwt_unix.Domain_socket _ -> "unknown"
      in
      let t = Unix.localtime (Unix.time ()) in
-     let timestamp : string =
-       Printf.sprintf "[%02d/%02d/%04d:%02d:%02d:%02d]"
-         t.tm_mday
-         t.tm_mon
-         t.tm_year
-         t.tm_hour
-         t.tm_min
-         t.tm_sec
-     in
      let request_method : string =
-       Code.string_of_method request.meth
+       Cohttp.Code.string_of_method request.meth
      in
      let uri : Uri.t = Request.uri request in
      let request_path : string = Uri.path uri in
      let response_code : string =
-       Code.string_of_status
+       Cohttp.Code.string_of_status
          response.Cohttp.Response.status
      in
-     (* size_of_response *)
-     let log_entry : string =
-       Printf.sprintf "%s\t%s\t\"%s %s\"\t%s"
-         ip
-         timestamp
-         request_method
-         request_path
-         response_code
-     in
-     (Lwt_log_core.log
-	~level:Lwt_log_core.Info
-	log_entry)
+     (Lwt_log_core.info_f
+        "%s\t[%02d/%02d/%04d:%02d:%02d:%02d]\t\"%s %s\"\t%s"
+        ip
+        t.tm_mday t.tm_mon t.tm_year t.tm_hour t.tm_min t.tm_sec
+        request_method
+        request_path
+        response_code)
      >>=
      (fun _ -> Lwt.return (response,body))
   )
@@ -90,17 +70,17 @@ let server =
     | Some seed -> seed
     | None ->
       begin
-        unit_of_lwt
-	  (Lwt_log_core.log
-      ~level:Lwt_log_core.Info
-      "+ Self seeding...@.");
+        Lwt.ignore_result
+          (Lwt_log_core.log
+             ~level:Lwt_log_core.Info
+             "+ Self seeding...@.");
         Random.self_init() ;
         Random.bits ()
       end
   in
   let () =
     Random.init theSeed ;
-    unit_of_lwt
+    Lwt.ignore_result
       (Lwt_log_core.log
 	 ~level:Lwt_log_core.Info
          (Printf.sprintf
@@ -127,6 +107,7 @@ let server =
   Server.create
     ~mode
     (Server.make
+       ~callback:
        (logger
           (match websim_args.Websim_args.api with
 	   | Websim_args.V1 -> Webapp_v1.handler

@@ -374,21 +374,20 @@ end = struct
         }
       method status (token : ApiTypes_j.token) :
         ApiTypes_j.state ApiTypes_j.result Lwt.t =
-        Lwt.catch
+        match IntMap.find_option token context.states with
+        | None ->
+          Api_data.lwt_msg msg_token_not_found
+        | Some state ->
+          self#log (string_of_bool state.is_running) >>=
           (fun () ->
-             match IntMap.find_option token context.states with
-             | None ->
-               Api_data.lwt_msg msg_token_not_found
-             | Some state ->
-               let () =
-                 Lwt.async
-                   (fun () -> self#log (string_of_bool state.is_running)) in
-               Lwt.return
-                 (match state.error_messages with
-                    [] -> `Right (create_state state)
-                  | _ -> `Left state.error_messages)
+             (match state.error_messages with
+              | [] ->
+                Lwt.catch
+                  (fun () ->
+                     Lwt.return (`Right (create_state state)))
+                  (catch_error (fun e -> Lwt.return (`Left e)))
+              | _ -> Lwt.return (`Left state.error_messages))
           )
-          (catch_error (fun e -> Lwt.return (`Left e)))
 
       method list () : ApiTypes_j.catalog ApiTypes_j.result Lwt.t =
         Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))

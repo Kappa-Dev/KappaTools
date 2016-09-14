@@ -1,9 +1,6 @@
 module ApiTypes = ApiTypes_j
 
-open Lwt
-open Api
-open ApiTypes
-open Unix
+open Lwt.Infix
 
 class runtime ()  = object
   method yield () = Lwt_main.yield ()
@@ -12,7 +9,7 @@ class runtime ()  = object
       ~level:Lwt_log_core.Info
       ?exn
       msg
-  inherit Api_v1.Base.base_runtime 1.0
+  inherit Api_v1.Base.base_runtime 0.1
 end
 
 let runtime = (new runtime () :> Api_v1.api_runtime)

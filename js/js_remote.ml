@@ -34,14 +34,7 @@ let post
     (success : (string -> a))
     (fail:(string -> Api_types.errors))
   : a Api_types.result Lwt.t =
-  let var : (a Api_types.result) option Lwt_mvar.t =
-    Lwt_mvar.create_empty ()
-  in
-  let () =
-    Lwt.async
-      (fun () ->
-         Lwt_js.sleep timeout >>= (fun _ -> Lwt_mvar.put var None))
-  in
+  let reply,feeder = Lwt.task () in
   let request : XmlHttpRequest.xmlHttpRequest Js.t =
     XmlHttpRequest.create()
   in
@@ -55,24 +48,18 @@ let post
     request##.onload :=
       Dom.handler
         (fun e ->
-           let msg : string =
-             Js.to_string request##.responseText in
-           let () = Lwt.async  (fun () ->
-               let result : a Api_types.result =
-		 if request##.status == 200 then
-                   `Right(success msg)
-		 else
-                   `Left (fail msg)
-               in
-               Lwt_mvar.put var (Some result))
+           let msg : string = Js.to_string request##.responseText in
+           let () =
+             let result : a Api_types.result =
+               if request##.status == 200 then
+                 `Right(success msg)
+               else
+                 `Left (fail msg) in
+             Lwt.wakeup feeder result
            in Js._true)
   in
   let () = request##send(Js.some (Js.string data)) in
-  (Lwt_mvar.take var)
-  >>=
-  (fun response -> match response with
-       None -> Lwt.fail TimeOut
-     | Some response -> Lwt.return response)
+  Lwt.pick [reply; (Lwt_js.sleep timeout >>= fun () -> Lwt.fail TimeOut)]
 
 class runtime
     ?(timeout:float = 10.0)
@@ -84,36 +71,36 @@ class runtime
       -> (string -> Api_types.errors)
       -> 'a Api_types.result Lwt.t =
       fun frame success fail ->
-	try
-	  if frame.code = 200 then
+        try
+          if frame.code = 200 then
             Lwt.return
               (`Right
-		 (success
+                 (success
                     (Js.to_string frame.content)))
-	  else if frame.code = 400 then
+          else if frame.code = 400 then
             Lwt.return
               (`Left
-		 (fail
+                 (fail
                     (Js.to_string frame.content)))
-	  else
+          else
             Lwt.return
               (`Left
-		 (Api_data.api_message_errors
+                 (Api_data.api_message_errors
                     (Format.sprintf "Unexpected Response code %d" frame.code)))
-	with e ->
-	  Lwt.return
+        with e ->
+          Lwt.return
             (`Left
                (Api_data.api_message_errors
-		  (Printexc.to_string e)))
+                  (Printexc.to_string e)))
 
     method parse (code : Api_types.code) :
       Api_types.parse Api_types.result Lwt.t =
       let url : string = Format.sprintf "%s/v1/parse" url  in
       (XmlHttpRequest.perform_raw
-	 ~get_args:[("code",code)]
-	 ~override_method:`GET
-	 ~response_type:Text
-	 url)
+         ~get_args:[("code",code)]
+         ~override_method:`GET
+         ~response_type:Text
+         url)
       >>=
       (fun frame -> self#hydrate frame
           Api_types.parse_of_string
@@ -133,22 +120,23 @@ class runtime
       Api_types.state Api_types.result Lwt.t =
       let url : string = Format.sprintf "%s/v1/process/%d" url token  in
       (XmlHttpRequest.perform_raw
-	 ~get_args:[]
-	 ~override_method:`GET
-	 ~response_type:Text
-	 url)
+         ~get_args:[]
+         ~override_method:`GET
+         ~response_type:Text
+         url)
       >>=
-      (fun frame -> self#hydrate frame
-          Api_types.state_of_string
-          Api_types.errors_of_string)
+      (fun frame ->
+         self#hydrate frame
+           Api_types.state_of_string
+           Api_types.errors_of_string)
 
     method list () : Api_types.catalog Api_types.result Lwt.t =
       let url : string = Format.sprintf "%s/v1/process" url in
       (XmlHttpRequest.perform_raw
-	 ~get_args:[]
-	 ~override_method:`GET
-	 ~response_type:Text
-	 url)
+         ~get_args:[]
+         ~override_method:`GET
+         ~response_type:Text
+         url)
       >>=
       (fun frame -> self#hydrate
           frame
@@ -159,10 +147,10 @@ class runtime
       let () = Common.debug "stopping" in
       let url : string = Format.sprintf "%s/v1/process/%d" url token in
       (XmlHttpRequest.perform_raw
-	 ~get_args:[]
-	 ~override_method:`DELETE
-	 ~response_type:Text
-	 url)
+         ~get_args:[]
+         ~override_method:`DELETE
+         ~response_type:Text
+         url)
       >>=
       (fun frame -> self#hydrate
           frame

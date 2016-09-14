@@ -1,5 +1,5 @@
 FLG -w +a -strict-formats -safe-string
-PKG yojson re unix lwt cohttp
+PKG yojson re unix lwt
 
 S cflow
 S dataStructures

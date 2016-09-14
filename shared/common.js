@@ -75,12 +75,13 @@ function spawnProcess(param){
 	return null;
     }
     try {
+	process.stdout.setEncoding('utf8');
 	debug(`spawned process ${param.command} ${param.args} pid ${process.pid}`);
 	if(param.onStdout) {
 	    process.stdout.on('data',
 			      function (data) {
 				  debug(data);
-				  param.onStdout(`${data}`); } );
+				  param.onStdout(data); } );
 	}
 	if(param.onStderr) {
 	    process.stderr.on('data',function (data) {

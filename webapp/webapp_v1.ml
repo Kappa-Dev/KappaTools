@@ -1,10 +1,8 @@
 module Runtime = Api_v1.Base
 
-open Lwt
+open Lwt.Infix
 open Cohttp_lwt_unix
-open Cohttp
 open Cohttp.Request
-open Lwt_log
 
 (*  Lwt_log_core.log *)
 
@@ -14,19 +12,19 @@ let fatal ~exn (msg : string) : unit Lwt.t =
   Lwt_log_core.log ~exn ~level:Lwt_log_core.Fatal msg
 
 class runtime ()  = object
-  method yield () = Lwt_main.yield ()
+  method yield () = Lwt_unix.sleep 0.001
   method log ?exn (msg : string) =
     Lwt_log_core.log
       ~level:Lwt_log_core.Info
       ?exn
       msg
-  inherit Api_v1.Base.base_runtime 1.0
+  inherit Api_v1.Base.base_runtime 0.1
 end
 
 let runtime_state = new runtime ()
 let headers =
-  let h = Header.init_with "Access-Control-Allow-Origin" "*" in
-  let h = Header.add h "content-type" "application/json" in
+  let h = Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
+  let h = Cohttp.Header.add h "content-type" "application/json" in
   h
 
 let server_respond (body : string) =
@@ -110,7 +108,7 @@ let handler
         | Some shutdown_key ->
           if shutdown_key = body then
             let () =
-              async
+              Lwt.async
                 (fun () ->
                    Lwt_unix.sleep 1.0 >>=
                    fun () -> exit 0)
@@ -170,17 +168,17 @@ let handler
   | x when request.meth = `OPTIONS
         && None != parse_url_parameters x ->
     let h =
-      Header.init_with
+      Cohttp.Header.init_with
         "Access-Control-Allow-Origin"
         "*"
     in
     let h =
-      Header.add
+      Cohttp.Header.add
         h
         "Access-Control-Allow-Methods" "POST, GET, OPTIONS, DELETE"
     in
     let h =
-      Header.add
+      Cohttp.Header.add
         h
         "Access-Control-Request-Headers" "X-Custom-Header"
     in
