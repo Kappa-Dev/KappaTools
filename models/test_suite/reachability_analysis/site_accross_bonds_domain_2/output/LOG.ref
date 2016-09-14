@@ -590,10 +590,20 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is not satisfied yet
 
 	Applying rule 3: r3:
-		the precondition is not satisfied yet
+		the precondition is satisfied
+
+		rule 3: r3 is applied for the first time
+
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
 
 	Applying rule 4: r4:
-		the precondition is not satisfied yet
+		the precondition is satisfied
+
+		rule 4: r4 is applied for the first time
+
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
 
 	Applying rule 5: r5:
 		the precondition is satisfied
@@ -604,19 +614,19 @@ EXTENSIONAL DESCRIPTION:
 			
 
 INTENSIONAL DESCRIPTION:
-Id=56
+Id=58
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=55
+  Id=57
    Node(site_type:1<2)
-    Id=54
+    Id=56
      Node(site_type:2<2)
       Id=0
        Leaf False 
 
-      Id=53
+      Id=55
        Node(site_type:2<3)
         Id=1
          Leaf True 
@@ -695,10 +705,14 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z~,z!,t~)
 
 	Applying rule 3: r3:
-		the precondition is not satisfied yet
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
 
 	Applying rule 4: r4:
-		the precondition is not satisfied yet
+		the precondition is satisfied
+		Updating the views for A(z!,t~)
+		Updating the views for B(z~,z!,t~)
 
 	Applying rule 5: r5:
 		the precondition is satisfied
@@ -707,12 +721,8 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for B(z~,z!,t~)
-
 ------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule 3: r3 will never be applied.
-rule 4: r4 will never be applied.
+every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -720,12 +730,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=60
+Id=62
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=59
+  Id=61
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -740,14 +750,14 @@ Id=60
         Id=0
          Leaf False 
 
-    Id=58
+    Id=60
      Node(site_type:1<2)
-      Id=57
+      Id=59
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=53
+        Id=55
          Node(site_type:2<3)
           Id=1
            Leaf True 
@@ -983,7 +993,7 @@ Id=81
   Id=0
    Leaf False 
 
-  Id=61
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1013,7 +1023,7 @@ Id=81
   Id=0
    Leaf False 
 
-  Id=61
+  Id=53
    Node(site_type:0<2)
     Id=1
      Leaf True 

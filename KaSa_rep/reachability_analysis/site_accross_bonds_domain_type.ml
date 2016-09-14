@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Sep 14 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -13,20 +13,7 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-module AgentSitesStates_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name *
-            Ckappa_sig.c_site_name *
-            Ckappa_sig.c_site_name *
-            Ckappa_sig.c_state *
-            Ckappa_sig.c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
+(*static views rhs/lhs*)
 module AgentsSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -39,6 +26,7 @@ module AgentsSiteState_map_and_set =
          let print _ _ = ()
        end))
 
+(*static question mark*)
 module AgentsSitesState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -51,6 +39,7 @@ module AgentsSitesState_map_and_set =
          let print _ _ = ()
        end))
 
+(*views in initial state*)
 module AgentsSitesStates_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -63,40 +52,10 @@ module AgentsSitesStates_map_and_set =
          let print _ _ = ()
        end))
 
-
-module PAgentsSitesStates_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name
-            * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name
-            * Ckappa_sig.c_state * Ckappa_sig.c_state) *
-           ( Ckappa_sig.c_agent_name
-             * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name
-             * Ckappa_sig.c_state * Ckappa_sig.c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
 (************************************************************)
 (*PAIR*)
 
-module PairAgentSites_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name *
-            Ckappa_sig.c_site_name *
-            Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_name *
-            Ckappa_sig.c_site_name *
-            Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
+(*partition bonds/created bond rhs map*)
 module PairAgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -127,6 +86,7 @@ module PairAgentSitesState_map_and_set =
          let print _ _ = ()
        end))
 
+(*collect tuple in the lhs*)
 module PairAgentSitesStates_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -203,35 +163,11 @@ module PairSite_map_and_set =
          let print _ _ = ()
        end))
 
+(*project second site*)
 module Proj_potential_tuple_pair_set =
   Map_wrapper.Proj
     (PairAgentSitesState_map_and_set) (*potential tuple pair set*)
     (PairSite_map_and_set) (*use to search the set in bonds rhs*)
-
-module PairSitesState_AgentSitesState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
-            Ckappa_sig.c_state)
-           *
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-            Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Proj_potential_tuple_pair_set_modified =
-  Map_wrapper.Proj
-    (PairAgentSitesState_map_and_set) (*potential tuple pair set*)
-    (PairSitesState_AgentSitesState_map_and_set) (*use to search the set in bonds rhs*)
-
-module Proj_bonds_rhs_set =
-  Map_wrapper.Proj
-    (PairAgentsSiteState_map_and_set) (*set_a*)
-    (PairAgentSiteState_map_and_set) (*set_b*)
 
 module Partition_bonds_rhs_map =
   Map_wrapper.Proj
@@ -243,6 +179,7 @@ module Partition_created_bonds_map =
     (PairAgentSitesState_map_and_set)
     (PairAgentSiteState_map_and_set)
 
+(*partition modified map*)
 module AgentSite_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -281,19 +218,6 @@ let convert_single parameters error kappa_handler single =
   in
   error, (agent, site, state)
 
-let convert_double parameters error kappa_handler double =
-  let (agent, site, site', state) = double in
-  let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
-  (*let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in*)
-  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
-  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  let error, agent =
-    Handler.translate_agent
-      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-      parameters error kappa_handler agent
-  in
-  error, (agent, site, site', state)
-
 let convert_tuple parameters error kappa_handler tuple =
   let (agent,site,site',state),(agent'',site'',site''',state'') = tuple in
   let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
@@ -314,64 +238,10 @@ let convert_tuple parameters error kappa_handler tuple =
   in
   error, (agent,site,site', state, agent'',site'',site''', state'')
 
-let convert_tuple_full parameters error kappa_handler tuple =
-  let (agent,site,site',state,state'),(agent'',site'',site''',state'',state''') =
-    tuple
-  in
-  let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
-  let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in
-  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
-  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  (**)
-  let error, state'' =
-    Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
-  let error, state''' =
-    Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site''' state''' in
-  let error, agent =
-    Handler.translate_agent
-      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-      parameters error kappa_handler agent
-  in
-  let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
-  let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' =
-    Handler.translate_agent
-      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-      parameters error kappa_handler agent''
-  in
-  error, (agent,site,site',state, state', agent'',site'',site''', state'', state''')
-
-(*
-let convert_tuple parameters error kappa_handler tuple =
-  let (agent,site,site',state,state'),(agent'',site'',site''',state'',state''') =
-    tuple
-  in
-  let error, state = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site state in
-  let error, state' = Handler.string_of_state_fully_deciphered parameters error kappa_handler agent site' state' in
-  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
-  let error, site' = Handler.string_of_site_contact_map parameters error kappa_handler agent site' in
-  (**)
-  let error, state'' =
-    Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site'' state'' in
-  let error, state''' =
-    Handler.string_of_state_fully_deciphered parameters error kappa_handler agent'' site''' state''' in
-  let error, agent = Handler.translate_agent
-  ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-parameters error kappa_handler agent in
-  let error, site'' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site'' in
-  let error, site''' = Handler.string_of_site_contact_map parameters error kappa_handler agent'' site''' in
-  let error, agent'' = Handler.translate_agent     ~message:"unknown agent type" ~ml_pos:(Some __POS__) parameters error kappa_handler agent'' in
-  error, (agent,site,site',state, state', agent'',site'',site''', state'', state''')*)
-
-(*
-let project (_,b,c,d,e,f) = (b,c,d,e,f)
-let project2 (x,y) = (project x,project y)*)
-
 (*remove states*)
 let project (_,b,c,d,_,_) = (b,c,d)
 let project2 (x,y) = (project x,project y)
 
-(*todo*)
 let print_site_accross_domain
     ?sparse: (sparse = false)
     ?final_resul:(_final_result = false)
@@ -480,7 +350,6 @@ let print_site_accross_domain
             let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             error, handler
         end
-
       | Remanent_parameters_sig.Natural_language ->
         let () =
           Loggers.fprintf (Remanent_parameters.get_logger parameters)
@@ -493,7 +362,6 @@ let print_site_accross_domain
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         in
         let prefix = prefix^"\t" in
-
         List.fold_left (fun (error, handler) l ->
             match l with
             | [siteone, statex; sitetwo, statey] when
