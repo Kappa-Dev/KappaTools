@@ -2006,4 +2006,15 @@ A(t!A.t,z!A.z) => A(t!2,z!1),A(t!2,z!1)
 B(t!B.z,z!B.t) => [ B(t!2,z!1),B(t!1,z!2) v B(t!1,z!1) ]
 C(t!C.z,z!C.t) => C(t!2,z!1),C(t!1),C(z!2)
 E(t!E.t,z!E.z) => E(t!2,z!1),E(z!1),E(t!2)
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+A(z,t), A(z, t) => (A, z); (A, t); (A, z); (A, t)
+A(t,z), A(t, z) => (A, t); (A, z); (A, t); (A, z)
+B(z,t), B(t, z) => (B, z); (B, t); (B, t); (B, z)
+B(t,z), B(z, t) => (B, t); (B, z); (B, z); (B, t)
+C(z,t), C(t, z) => (C, z); (C, t); (C, t); (C, z)
+C(t,z), C(z, t) => (C, t); (C, z); (C, z); (C, t)
+E(z,t), E(z, t) => (E, z); (E, t); (E, z); (E, t)
+E(t,z), E(t, z) => (E, t); (E, z); (E, t); (E, z)
 execution finished without any exception

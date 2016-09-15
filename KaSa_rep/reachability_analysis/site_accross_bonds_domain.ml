@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 14 2016>
+   * Last modification: Time-stamp: <Sep 15 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -579,7 +579,6 @@ struct
         bdu_false
         handler
         kappa_handler
-        species
         store_bonds_init
         store_pair_sites_init
         tuple_of_interest
@@ -640,8 +639,8 @@ struct
           | error, None -> error, bdu_false
           | error, Some mvbdu -> error, mvbdu
           in
-          (*build mvbdu for the tuple in the lhs, then intersection with the
-            result*)
+          (*build mvbdu for the tuple in the lhs, then do the
+            intersection with the result*)
           let ((_, _, _, _, state2),
                (_, _, _, _, state2')) = tuple in
           let pair_list =
@@ -659,14 +658,12 @@ struct
               parameter handler error mvbdu mvbdu_value
           in
           let dynamic = set_mvbdu_handler handler dynamic in
-          (*convert a mvbdu to list of list*)
-          let error, handler, lists =
-            Ckappa_sig.Views_bdu.extensional_of_mvbdu
-              parameter handler error new_mvbdu
-          in
-          match lists with
-          | [] -> error, false, dynamic
-          | _ -> error, true, dynamic
+          (*check*)
+          if Ckappa_sig.Views_bdu.equal new_mvbdu bdu_false
+          then
+            error, false, dynamic
+          else
+            scan tail error
       in
       scan list error
     end
@@ -1162,9 +1159,6 @@ struct
       in
       error, dynamic, (precondition, [])
     | Some rule ->
-      let parameter =
-        Remanent_parameters.update_prefix parameter "                " in
-      let _log = Remanent_parameters.get_logger parameter in
       (*------------------------------------------------------*)
       (*1.a bonds on the rhs: not sure you need this test, it will be
         covered by 1.c and 1.d *)
@@ -1176,9 +1170,31 @@ struct
       (*------------------------------------------------------*)
       (*1.b created bonds *)
       (*------------------------------------------------------*)
+      let parameter =
+        Remanent_parameters.update_prefix parameter "                "
+      in
+      let dump_title () =
+        if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+        then
+          let () =
+            Loggers.fprintf
+              (Remanent_parameters.get_logger parameter)
+              "%sUpdate information about potential sites accross domain"
+              (Remanent_parameters.get_prefix parameter)
+          in
+          Loggers.print_newline (Remanent_parameters.get_logger parameter)
+        else
+          ()
+      in
       let error, dynamic, precondition =
         apply_rule_created_bonds
           static dynamic error rule_id rule precondition
+      in
+      let store_value = get_value dynamic in
+      let bool =
+        if Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
+        then false
+        else let () = dump_title () in true
       in
       (*-----------------------------------------------------------*)
       (*1.c a site is modified (explicitly) *) (*FIX ME*)
@@ -1186,9 +1202,24 @@ struct
         apply_rule_modified_explicity
           static dynamic error rule_id rule precondition
       in
+      let store_value = get_value dynamic in
+      let () =
+        if not bool &&
+           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
+        then ()
+        else dump_title ()
+      in
+      (*-----------------------------------------------------------*)
       (*1.d a site is modified by side effect *)
       let error, dynamic =
         apply_rule_side_effects static dynamic error rule_id
+      in
+      let store_value = get_value dynamic in
+      let () =
+        if not bool &&
+           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
+        then ()
+        else dump_title ()
       in
       (*-----------------------------------------------------------*)
       let event_list = [] in
@@ -1238,8 +1269,9 @@ struct
           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
             (fun (x, y) mvbdu (error, handler) ->
                Site_accross_bonds_domain_type.print_site_accross_domain
+                 ~verbose:true
                  ~sparse:true
-                 ~final_resul:true
+                 ~final_result:true
                  ~dump_any:true parameter error kappa_handler handler (x, y) mvbdu
             ) store_value (error, handler)
         in

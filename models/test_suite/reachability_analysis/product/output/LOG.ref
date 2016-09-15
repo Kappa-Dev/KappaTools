@@ -891,108 +891,13 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(z~,z!,t!)
 
 	Applying rule 8: r7:
-		the precondition is satisfied
-
-		rule 8: r7 is applied for the first time
-
-		Updating the views for A(z~,z!,t!)
-			
-
-INTENSIONAL DESCRIPTION:
-Id=11
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=10
-   Node(site_type:1<1)
-    Id=9
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<2)
-        Id=7
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			A(z~u,z!A@z,t!A@t)
-
-	Wake-up rules
-		Updating the views for A(z~,z!,t!)
-			
-
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<2)
-    Id=9
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<2)
-        Id=7
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			A(z~p,z!A@z,t!A@t)
-
-	Wake-up rules
+		the precondition is not satisfied yet
 
 	Applying rule 0: r0:
-		the precondition is satisfied
-
-		rule 0: r0 is applied for the first time
-
-		Updating the views for A(z~,z!,t!)
-		Updating the views for A(z~,z!,t!)
+		the precondition is not satisfied yet
 
 	Applying rule 1: r1:
-		the precondition is satisfied
-
-		rule 1: r1 is applied for the first time
-
-		Updating the views for A(z~,z!,t!)
-		Updating the views for A(z~,z!,t!)
+		the precondition is not satisfied yet
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -1022,12 +927,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(z~,z!,t!)
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 8: r7:
-		the precondition is satisfied
-		Updating the views for A(z~,z!,t!)
-		Updating the views for A(z~,z!,t!)
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
+------------------------------------------------------------
+rule 0: r0 will never be applied.
+rule 1: r1 will never be applied.
+rule 8: r7 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -1035,20 +940,20 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=71
+Id=65
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=70
+  Id=64
    Node(site_type:1<2)
-    Id=67
+    Id=44
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=66
-       Node(site_type:2<2)
+      Id=43
+       Node(site_type:2<1)
         Id=42
          Node(site_type:3<0)
           Id=0
@@ -1062,8 +967,23 @@ Id=71
             Id=0
              Leaf False 
 
-        Id=0
-         Leaf False 
+        Id=33
+         Node(site_type:2<2)
+          Id=19
+           Node(site_type:3<0)
+            Id=0
+             Leaf False 
+
+            Id=18
+             Node(site_type:3<1)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
 
     Id=0
      Leaf False 
@@ -1073,27 +993,12 @@ Id=71
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=80
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=82
+Id=68
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=81
+  Id=67
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1103,26 +1008,52 @@ Id=82
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=61
- Node(site_type:2<0)
+Id=72
+ Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
+  Id=71
+   Node(site_type:1<1)
+    Id=61
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
 
-    Id=0
-     Leaf False 
+      Id=4
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=56
+     Node(site_type:1<2)
+      Id=17
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:2<1)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+A(z!A.z) => A(t,z!A.z)
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=80
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1137,12 +1068,12 @@ Id=80
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=82
+Id=68
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=81
+  Id=67
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1174,17 +1105,21 @@ A() => [ A(t) v A(t!A.t) ]
 ------------------------------------------------------------
 A(z!1),A(z!1) => 
 	[
-		  A(t!A.t,z!1),A(t!A.t,z!1)
-		v A(t,z!1),A(t,z!1)
+		  A(z~p!1),A(z~p!1)
+		v A(z~u!1),A(z~u!1)
 	]
 A(t!1),A(t!1) => 
 	[
-		  A(t!1,z!A.z),A(t!1,z!A.z)
-		v A(t!1,z),A(t!1,z)
+		  A(t!1,z~p?),A(t!1,z~p?)
+		v A(t!1,z~u?),A(t!1,z~u?)
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-A(t!A.t,z!A.z) => A(t!2,z!1),A(t!2,z!1)
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+A(z,t), A(z, t) => (A, z); (A, t); (A, z); (A, t)
+A(t,z), A(t, z) => (A, t); (A, z); (A, t); (A, z)
 Some exceptions have been raised
 error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 24: Label 'r3' is already used; exception:Exit

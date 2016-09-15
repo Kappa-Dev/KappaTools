@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Sep 14 2016>
+   * Last modification: Time-stamp: <Sep 15 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -411,8 +411,8 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
               let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
               if agent_id = agent_id_v &&
                  agent_type = agent_type_v &&
-                 site_type <> site_type_v &&
-                 state <> state_v (*choose the state that is not a binding
+                 site_type <> site_type_v (*&&
+                 state <> state_v*) (*choose the state that is not a binding
                                     state*)
               then
                 let fst_list =
@@ -429,8 +429,8 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
               let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
               if agent_id1 = agent_id_v &&
                  agent_type1 = agent_type_v &&
-                 site_type1 <> site_type_v &&
-                 state1 <> state_v (*choose the state that different than
+                 site_type1 <> site_type_v (*&&
+                 state1 <> state_v*) (*choose the state that different than
                                     binding state*)
               then
                 let snd_list =
@@ -896,7 +896,7 @@ let collect_bonds_init parameter error init_state =
 (***************************************************************)
 
 let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
-    _init_state store_bonds_init store_pair_sites_init tuples_of_interest store_result =
+   store_bonds_init store_pair_sites_init tuples_of_interest store_result =
   (*fold over a set of pair and check the first site whether or not it
     belongs to a set of sites that can be bound*)
   let error, handler, store_result =

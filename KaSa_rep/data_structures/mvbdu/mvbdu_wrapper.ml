@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Sep 14 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -29,7 +29,7 @@ sig
 
   val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
   val is_init: unit -> bool
-  val equal: mvbdu -> mvbdu -> bool
+val equal: mvbdu -> mvbdu -> bool
   val equal_with_logs: (mvbdu,mvbdu,bool) binary
   val mvbdu_false: mvbdu constant
   val mvbdu_true:  mvbdu constant

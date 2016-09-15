@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 13 2016>
+  * Last modification: Time-stamp: <Sep 14 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -189,6 +189,20 @@ struct
       }
       static
 
+  (*map tuple to sites*)
+
+  let get_tuple_to_sites static =
+    (get_local_static_information
+       static).Parallel_bonds_static.store_tuple_to_sites
+
+  let set_tuple_to_sites tuple static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        Parallel_bonds_static.store_tuple_to_sites = tuple
+      }
+      static
+
   (*global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
@@ -318,6 +332,7 @@ struct
     let static =
       set_tuples_of_interest store_result static
     in
+    (*------------------------------------------------------*)
     let tuple_of_interest = store_result in
     let store_action_binding = get_action_binding static in
     let error, store_result =
@@ -332,6 +347,15 @@ struct
         parameter error store_action_binding tuple_of_interest
     in
     let static = set_snd_site_create_parallel_bonds_rhs store_result static in
+    (*------------------------------------------------------*)
+    (*map tuples to sites*)
+    let tuple_of_interest = get_tuples_of_interest static in
+    let error, store_result =
+      Parallel_bonds_static.collect_tuple_to_sites
+        parameter error
+        tuple_of_interest
+    in
+    let static = set_tuple_to_sites store_result static in
     error, static, dynamic
 
   (***************************************************************)
@@ -470,6 +494,7 @@ struct
       map
 
   type pos = Fst | Snd
+
   let apply_gen pos parameter error static dynamic precondition rule_id rule =
     let store_site_create_parallel_bonds_rhs =
       match pos
@@ -882,6 +907,68 @@ struct
         in error
       else
         error
+    in
+    (*print a map tuple to sites*)
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_result
+          parameter
+      then
+        let () =
+        Loggers.fprintf log
+          "------------------------------------------------------------\n";
+        Loggers.fprintf log "* Properties of pairs of bonds, a map from tuples to sites\n";
+        Loggers.fprintf log
+          "------------------------------------------------------------\n"
+        in
+        let store_result = get_tuple_to_sites static in
+        let error =
+          Parallel_bonds_type.PairAgentSite_map_and_set.Map.fold
+            (fun (x, y, z, t) pair_set error ->
+               Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
+                 (fun (a, b) error ->
+                    (*print tuples of interest*)
+                    let error, (string_agent, string_site, string_site', string_agent1, string_site1, string_site1') =
+                      Parallel_bonds_type.convert_tuple
+                        parameter error kappa_handler
+                        (a, b)
+                    in
+                    (*convert first pair*)
+                    let error, (string_agent_x, string_site_x) =
+                      Parallel_bonds_type.convert_pair parameter error
+                        kappa_handler
+                        x
+                    in
+                    let error, (string_agent_y, string_site_y) =
+                      Parallel_bonds_type.convert_pair parameter error
+                        kappa_handler
+                        y
+                    in
+                    let error, (string_agent_z, string_site_z) =
+                      Parallel_bonds_type.convert_pair parameter error
+                        kappa_handler
+                        z
+                    in
+                    let error, (string_agent_t, string_site_t) =
+                      Parallel_bonds_type.convert_pair parameter error
+                        kappa_handler
+                        t
+                    in
+                    (*Print*)
+                    let () =
+                      Loggers.fprintf log "%s(%s,%s), %s(%s, %s) => (%s, %s); (%s, %s); (%s, %s); (%s, %s)\n"
+                        string_agent string_site string_site'
+                        string_agent1 string_site1 string_site1'
+                        string_agent_x string_site_x
+                        string_agent_y string_site_y
+                        string_agent_z string_site_z
+                        string_agent_t string_site_t
+                    in
+                    error
+                 ) pair_set error
+            ) store_result error
+        in
+        error
+      else error
     in
     error, dynamic, ()
 

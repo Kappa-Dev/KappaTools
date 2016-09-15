@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 13 2016>
+   * Last modification: Time-stamp: <Sep 14 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -25,8 +25,8 @@ type local_static_information =
     (*rule has two bonds (parallel or not) on the rhs*)      store_rule_double_bonds_rhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
+      (*is a union set of double binding in the lhs and the rhs*)
     store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
-
     (* information of partial formation of parallel or non-parallel bonds in rules *)
     store_views_rhs :
       Parallel_bonds_type.AgentsSiteState_map_and_set.Set.t
@@ -53,6 +53,10 @@ type local_static_information =
       ) list
         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    (*A map from tuples -> sites (agent_type, site_name)*)
+    store_tuple_to_sites :
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t
+        Parallel_bonds_type.PairAgentSite_map_and_set.Map.t;
   }
 
 (*******************************************************************)
@@ -66,7 +70,10 @@ let init_local_static =
     store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_snd_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_rule_double_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_tuple_to_sites = Parallel_bonds_type.PairAgentSite_map_and_set.Map.empty;
   }
+
+(*******************************************************************)
 
 let collect_agent_type_state parameter error agent site_type =
   let dummy_agent = Ckappa_sig.dummy_agent_name in
@@ -141,7 +148,6 @@ let translate_bond parameter error site_add agent_id site_type_source views =
     error, pair
   in
   error, pair
-
 
 let collect_double_bonds_in_pattern
     parameter error ?tuple_of_interest pattern =
@@ -233,7 +239,6 @@ let project_away_ag_id_gen f parameter error big_store acc =
          acc)
     big_store (error, acc)
 
-
 let project_away_ag_id parameter kappa_handler error big_store acc =
   let f parameter error tuple value acc =
     Parallel_bonds_type.add_value
@@ -243,7 +248,6 @@ let project_away_ag_id parameter kappa_handler error big_store acc =
       acc
   in
   project_away_ag_id_gen f parameter error big_store acc
-
 
 let project_away_ag_id_and_convert_into_set
     parameter error big_store acc =
@@ -340,15 +344,9 @@ let collect_action_binding parameter error rule_id rule store_result =
       error, store_result
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
 
-
-(************************************************************************)
-(* Binding information *)
-(************************************************************************)
-
 (****************************************************************)
 (** Detect pair of bonds *)
 (****************************************************************)
-
 
 let collect_rule_double_bonds_lhs
     parameter error rule_id rule store_result  =
@@ -491,12 +489,10 @@ let collect_site_create_parallel_bonds_gen pos parameter error store_action_bind
     store_action_binding
     (error,Ckappa_sig.Rule_map_and_set.Map.empty)
 
-
 let collect_fst_site_create_parallel_bonds  =
   collect_site_create_parallel_bonds_gen Fst
 let collect_snd_site_create_parallel_bonds =
   collect_site_create_parallel_bonds_gen Snd
-
 
 (**************************************************************************)
 (*in the rhs*)
@@ -523,3 +519,20 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error store_action_bind
       store_parallel_bonds
   in
   error, store_result
+
+(*******************************************************************)
+(*A map from tuples -> sites
+  ex: A(x!1, y!2), B(x!1, y!2) -> {(A,x); A(y); B(x); B(y)}
+*)
+(*******************************************************************)
+
+let collect_tuple_to_sites parameter error tuples_of_interest =
+  let proj (a, b, _, _, _) = (a, b) in
+  let proj2 (a, _, c, _, _) = (a, c) in
+  Parallel_bonds_type.Partition_tuples_to_sites_map.monadic_partition_set
+    (fun _ error (x, y) ->
+       error, (proj x, proj2 x, proj y, proj2 y)
+    )
+    parameter
+    error
+    tuples_of_interest

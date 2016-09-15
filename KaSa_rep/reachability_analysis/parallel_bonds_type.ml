@@ -50,6 +50,27 @@ module PairAgentSitesStates_map_and_set =
          let print _ _ = ()
        end))
 
+(*a map from tuples to sites*)
+module PairAgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module Partition_tuples_to_sites_map =
+  Map_wrapper.Proj
+    (PairAgentSitesStates_map_and_set) (*set*)
+    (PairAgentSite_map_and_set) (*map*)
+
+(*******************************************************************)
+
 module AgentsSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -72,6 +93,18 @@ module AgentsSitesStates_map_and_set =
          let compare = compare
          let print _ _ = ()
        end))
+
+(*******************************************************************)
+
+let convert_pair parameters error kappa_handler pair =
+  let (agent,site) = pair in
+  let error, site = Handler.string_of_site_contact_map parameters error kappa_handler agent site in
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error kappa_handler agent
+  in
+  error, (agent, site)
 
 let convert_tuple parameters error kappa_handler tuple =
   let (agent,site,site',_,_),(agent'',site'',site''',_,_) =

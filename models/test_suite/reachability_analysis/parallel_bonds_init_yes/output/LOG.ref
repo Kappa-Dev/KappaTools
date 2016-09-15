@@ -601,20 +601,10 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 2: r2:
-		the precondition is satisfied
-
-		rule 2: r2 is applied for the first time
-
-		Updating the views for A(z!,t!)
-		Updating the views for B(z!,t!)
+		the precondition is not satisfied yet
 
 	Applying rule 3: r3:
-		the precondition is satisfied
-
-		rule 3: r3 is applied for the first time
-
-		Updating the views for A(z!,t!)
-		Updating the views for B(z!,t!)
+		the precondition is not satisfied yet
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -625,8 +615,12 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
+
 ------------------------------------------------------------
-every rule may be applied
+* There are some non applyable rules
+------------------------------------------------------------
+rule 2: r2 will never be applied.
+rule 3: r3 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -831,4 +825,11 @@ A(t!1),B(t!1) =>
 ------------------------------------------------------------
 A(t!B.t,z!B.z) => A(t!2,z!1),B(t!2,z!1)
 B(t!A.t,z!A.z) => B(t!2,z!1),A(t!2,z!1)
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+A(z,t), B(z, t) => (A, z); (A, t); (B, z); (B, t)
+A(t,z), B(t, z) => (A, t); (A, z); (B, t); (B, z)
+B(z,t), A(z, t) => (B, z); (B, t); (A, z); (A, t)
+B(t,z), A(t, z) => (B, t); (B, z); (A, t); (A, z)
 execution finished without any exception

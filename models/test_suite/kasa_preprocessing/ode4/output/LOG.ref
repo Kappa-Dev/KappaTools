@@ -219,4 +219,7 @@ C cannot occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
 execution finished without any exception

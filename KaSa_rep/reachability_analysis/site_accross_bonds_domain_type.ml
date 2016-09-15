@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 14 2016>
+   * Last modification: Time-stamp: <Sep 15 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -243,8 +243,9 @@ let project (_,b,c,d,_,_) = (b,c,d)
 let project2 (x,y) = (project x,project y)
 
 let print_site_accross_domain
+    ?verbose:(verbose=true)
     ?sparse: (sparse = false)
-    ?final_resul:(_final_result = false)
+    ?final_result:(final_result = false)
     ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
   let (agent_type1, site_type1, site_type1', _), (agent_type2, site_type2, site_type2', _) = tuple in
@@ -256,9 +257,16 @@ let print_site_accross_domain
   if sparse && compare (agent1,site1,site1') (agent2,site2,site2') > 0
   then error, handler
   else
+    (*only print the final_result in the case of final_result is set true*)
     let error, handler, non_relational =
+      if final_result
+      then
+        (*at the final result needs to check the non_relational condition*)
       Translation_in_natural_language.non_relational
         parameters handler error mvbdu
+      else
+        (*other cases will by pass this test*)
+        error, handler, false
     in
     if non_relational
     then error, handler
@@ -267,7 +275,7 @@ let print_site_accross_domain
       let error, handler, pair_list =
         Ckappa_sig.Views_bdu.extensional_of_mvbdu
           parameters handler error mvbdu
-      in
+    in
       (*----------------------------------------------------*)
       match Remanent_parameters.get_backend_mode parameters
       with
@@ -287,12 +295,20 @@ let print_site_accross_domain
             parameters error kappa_handler agent_id1 site_type1 agent_id2 site_type2 pattern
         in
         let error =
-          Ckappa_backend.Ckappa_backend.print
-            (Remanent_parameters.get_logger parameters) parameters error kappa_handler
-            pattern
-        in
-        let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+          (*do not print the precondition if it is not the final result*)
+          if final_result
+          then
+            let error =
+              Ckappa_backend.Ckappa_backend.print
+                (Remanent_parameters.get_logger parameters) parameters error
+                kappa_handler
+                pattern
+            in
+            let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameters) " => "
+            in
+            error
+          else error
         in
         begin
           match pair_list with
@@ -301,13 +317,15 @@ let print_site_accross_domain
               Loggers.fprintf (Remanent_parameters.get_logger parameters) ""
             in
             error, handler
-          | [_] -> Exception.warn parameters error __POS__ Exit handler
           | _::_ ->
             let () =
-              Loggers.print_newline (Remanent_parameters.get_logger parameters)
-            in
-            let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters) "\t["
+              if final_result
+              then
+              let () =
+                Loggers.print_newline (Remanent_parameters.get_logger parameters)
+              in
+                Loggers.fprintf (Remanent_parameters.get_logger parameters) "\t["
+              else ()
             in
             let error, _ =
               List.fold_left
@@ -344,10 +362,17 @@ let print_site_accross_domain
                 )
                 (error, false) pair_list
             in
-            let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-            let () = Loggers.fprintf
-                (Remanent_parameters.get_logger parameters) "\t]" in
-            let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+            let () =
+              if final_result
+              then
+                let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+                let () = Loggers.fprintf
+                    (Remanent_parameters.get_logger parameters) "\t]" in
+                let () = Loggers.print_newline                    (Remanent_parameters.get_logger parameters) in
+                ()
+              else
+              let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in ()
+            in
             error, handler
         end
       | Remanent_parameters_sig.Natural_language ->
@@ -406,6 +431,10 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
     Ckappa_sig.Views_bdu.mvbdu_or
       parameter handler error bdu_old mvbdu
   in
+  (*compare mvbdu and old mvbdu*)
+  (*if Ckappa_sig.Views_bdu.equal new_bdu bdu_false
+  then error, handler, store_result
+  else*)
   (*print each step*)
   let error, handler =
     if Remanent_parameters.get_dump_reachability_analysis_diff parameter
@@ -413,6 +442,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       let parameter = Remanent_parameters.update_prefix parameter "                "
       in
       print_site_accross_domain
+        ~verbose:false
         ~dump_any:true parameter error kappa_handler handler pair mvbdu
     else error, handler
   in

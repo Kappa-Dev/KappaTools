@@ -336,6 +336,14 @@ EXTENSIONAL DESCRIPTION:
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
 
+		  A(t!B.t,z!1),B(t!A.t,z!1)
+
+		  A(t!1,z!B.z),B(t!1,z!A.z)
+
+		  B(t!A.t,z!1),A(t!B.t,z!1)
+
+		  B(t!1,z!A.z),A(t!1,z!B.z)
+
 	Applying rule 0: r0:
 		the precondition is satisfied
 
@@ -409,6 +417,11 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
+
+		  A(t,z!1),B(t,z!1)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -484,15 +497,30 @@ EXTENSIONAL DESCRIPTION:
 		(rule 0: r0) should be investigated 
 		(rule 1: r1) should be investigated 
 
+		  A(t!1,z),B(t!1,z)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
 	Applying rule 0: r0:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
 
+		  A(t,z!1),B(t,z!1)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
+
+		  A(t!1,z),B(t!1,z)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -696,5 +724,8 @@ A(t!1),B(t!1) =>
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
 ------------------------------------------------------------
 execution finished without any exception

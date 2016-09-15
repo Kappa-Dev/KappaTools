@@ -502,4 +502,15 @@ C cannot occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+A(x,y), B(x, y) => (A, x); (A, y); (B, x); (B, y)
+A(y,x), B(y, x) => (A, y); (A, x); (B, y); (B, x)
+B(x,y), A(x, y) => (B, x); (B, y); (A, x); (A, y)
+B(x,y), C(x, y) => (B, x); (B, y); (C, x); (C, y)
+B(y,x), A(y, x) => (B, y); (B, x); (A, y); (A, x)
+B(y,x), C(y, x) => (B, y); (B, x); (C, y); (C, x)
+C(x,y), B(x, y) => (C, x); (C, y); (B, x); (B, y)
+C(y,x), B(y, x) => (C, y); (C, x); (B, y); (B, x)
 execution finished without any exception
