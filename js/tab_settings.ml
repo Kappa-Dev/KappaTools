@@ -5,48 +5,79 @@ module R = Tyxml_js.R
 
 open ApiTypes
 
-let document = Dom_html.window##.document
-let number_events_id = "number_events"
-let number_events_input =
+type simulation_limit = TIME_LIMIT | EVENTS_LIMIT
+let simulation_limit_to_string : simulation_limit -> string =
+    function
+    | TIME_LIMIT -> "time"
+    | EVENTS_LIMIT -> "event"
+let string_to_simulation_limit : string -> simulation_limit option =
+    function
+    | "time" -> Some TIME_LIMIT
+    | "event" -> Some EVENTS_LIMIT
+    |  _ -> None
+
+let signal_simulation_limit, set_simulation_limit = React.S.create TIME_LIMIT
+let signal_simulation_value, set_simulation_value = React.S.create ""
+(*  event update *)
+let _ = React.S.map
+           (fun x ->
+              match React.S.value signal_simulation_limit with
+              | TIME_LIMIT -> ()
+              | EVENTS_LIMIT ->
+                (match x with
+                 | Some va -> set_simulation_value (string_of_int va)
+                 | None -> ()))
+           UIState.model_max_events
+
+let _ = React.S.map
+           (fun x ->
+              match React.S.value signal_simulation_limit with
+            | TIME_LIMIT ->
+              (match x with
+               | None -> ()
+               | Some value ->
+                 let value = string_of_float value in
+                 let format_float n =
+                   let length = String.length n in
+                   if length > 0 && String.get n (length - 1) = '.' then
+                     n^"0"
+                   else
+                     n
+                 in
+                 let value = format_float value in
+                 set_simulation_value value)
+            | EVENTS_LIMIT -> ())
+           UIState.model_max_time
+
+let simulation_limit_id = "simulation_limit"
+let simulation_limit_input =
   Html.input
-    ~a:[Html.a_id number_events_id ;
-        Html.a_input_type `Number;
-        Html.a_class [ "form-control" ];
-        Html.a_placeholder "Max number";
-        Tyxml_js.R.Html.a_value
-          (React.S.l1 (fun x -> match x with
-               | Some va -> string_of_int va
-               | None -> "")
-              UIState.model_max_events) ]
-    ()
-let time_limit_id = "time_limit"
-let time_limit_input =
-  Html.input
-    ~a:[Html.a_id time_limit_id ;
+    ~a:[Html.a_id simulation_limit_id ;
         Html.a_input_type `Number;
         Html.a_class ["form-control"];
-        Html.a_placeholder "Time limit";
-        Tyxml_js.R.Html.a_value
+        Tyxml_js.R.Html.a_placeholder
           (React.S.l1
-             (fun x -> match x with
-                | Some value ->
-                  (* string_of_float returns integers with a trailing "."
-                     which is not recognized by javascript.  this is an
-                     attempt at fixing this.
-                  *)
-                  let value = string_of_float value in
-                  let format_float n =
-                    let length = String.length n in
-                    if length > 0 && String.get n (length - 1) = '.' then
-                      n^"0"
-                    else
-                      n
-                  in
-                  let value = format_float value in
-		  value
-                | None -> "") UIState.model_max_time)
+             (function
+               | TIME_LIMIT -> "time limit"
+               | EVENTS_LIMIT -> "max number")
+             signal_simulation_limit
+          ) ;
+        Tyxml_js.R.Html.a_value signal_simulation_value;
        ]
     ()
+
+let simulation_limit_selector_id = "simulation_limit_selector"
+let simulation_limit_selector =
+  let option value =
+    (* to ensure mapping of limit type only happens in on location *)
+    let label = simulation_limit_to_string value in
+    Html.option ~a:[ Html.a_value label ] (Html.pcdata label)
+  in
+  Html.select
+    ~a:[Html.a_id simulation_limit_selector_id ; ]
+    (List.map option [ EVENTS_LIMIT ; TIME_LIMIT ; ])
+
+
 let plot_points_id = "plot_points"
 let plot_points_input =
   Html.input
@@ -71,7 +102,7 @@ let perturbation_code_input =
 let signal_change id signal_handler =
   let input_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
-      ((Js.Opt.get (document##getElementById (Js.string id))
+      ((Js.Opt.get (Ui_common.document##getElementById (Js.string id))
           (fun () -> assert false))
        : Dom_html.element Js.t) in
   input_dom##.onchange :=
@@ -146,27 +177,6 @@ let perturbation_button =
                        "btn-default" ; ] ]
     [ Html.cdata "perturbation" ]
 
-type toggle = History | Settings
-let toggle_to_string =
-  function
-  | History -> "history"
-  | Settings -> "settings"
-let toggle_signal, set_toggle = React.S.create History
-
-let toggle_button_id = "toggle_button"
-let toggle_button =
-  Html.button
-    ~a:[ Html.a_id toggle_button_id
-       ; Html.Unsafe.string_attrib "type" "button"
-       ; Html.a_class ["btn" ;
-                       "btn-default" ; ] ]
-    [ Tyxml_js.R.Html.pcdata
-        (React.S.bind
-           toggle_signal
-           (fun toggle ->
-              React.S.const (toggle_to_string toggle)))
-    ]
-
 let select_default_runtime = [ UIState.WebWorker ;
                                UIState.Embedded ; ]
 let select_runtime_options, select_runtime_options_handle =
@@ -217,6 +227,7 @@ let progress_bar
            (fun value -> React.S.const value)
         )
     ]
+
 let lift f x = match x with | None -> None | Some x -> f x
 let default x d = match x with | None -> d | Some x -> x
 let time_progress_bar  (t : Ui_simulation.t) =
@@ -267,10 +278,12 @@ let tracked_events state =
   in
   match tracked_events with
     None -> None
-  | Some tracked_events -> if tracked_events > 0 then
+  | Some tracked_events ->
+    if tracked_events > 0 then
       Some tracked_events
     else
       None
+
 let tracked_events_count (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
   Tyxml_js.R.Html.pcdata
@@ -307,21 +320,50 @@ let status_indicator (t : Ui_simulation.t) =
                       )
                  )
               )) ())
+
 let perturbation_control (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states t ~a_class:["row"] [Ui_simulation.PAUSED]) ]
-    [Html.div ~a:[Html.a_class [ "col-md-12" ]] [perturbation_code_input]]
+    [Html.div ~a:[Html.a_class [ "col-md-10" ]] [ perturbation_code_input ] ;
+     Html.div ~a:[Html.a_class [ "col-md-2"  ]] [ perturbation_button ] ; ]
 let initializing_xml (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states t [ Ui_simulation.INITALIZING ; ])
        ]
-  [%html {|
+  [[%html {|
   <div class="panel-body panel-controls">
-  </div>
-  <div class="panel-footer">
-  </div>|}]
+    |}[ Html.entity "nbsp" ]{|
+  </div>|}]]
+
+let alert_messages =
+  Html.div
+    ~a:[Tyxml_js.R.Html.a_class
+          (React.S.bind
+             UIState.model_error
+             (fun error ->
+                React.S.const
+                  (match error with
+                   | [] -> [ "alert-sm" ; "alert" ; ]
+                   | _::_ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
+                  )
+             )
+          );
+       ]
+    [Tyxml_js.R.Html.pcdata
+       (React.S.bind
+          UIState.model_error
+          (fun error ->
+             React.S.const
+               (match error with
+                | [] -> ""
+                | h::_ -> h.ApiTypes.message
+               )
+          )
+       )
+    ]
+
 let stopped_xml (t : Ui_simulation.t) =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
@@ -334,17 +376,13 @@ let stopped_xml (t : Ui_simulation.t) =
        ]
   [%html {|
      <div class="row">
-        <div class="col-md-4">
-          |}[ number_events_input ]{|
+        <div class="col-md-2">
+           |}[ simulation_limit_input ]{|
         </div>
-        <div class="col-md-2">events</div>
-     </div>
-
-     <div class="row">
-        <div class="col-md-4">
-           |}[ time_limit_input ]{|
+        <div class="col-md-1">
+           |}[ simulation_limit_selector ]{|
         </div>
-        <div class="col-md-2">sec</div>
+        <div class="col-md-9">|}[ alert_messages ]{|</div>
      </div>
 
 
@@ -355,10 +393,10 @@ let stopped_xml (t : Ui_simulation.t) =
                      ~a_class:[ "row" ]
                      [ Ui_simulation.STOPPED ; ]) ]
             [ Html.div
-                ~a:[ Html.a_class [ "col-md-4" ] ]
+                ~a:[ Html.a_class [ "col-md-2" ] ]
                 [ plot_points_input ] ;
               Html.div
-                ~a:[ Html.a_class [ "col-md-2" ] ]
+                ~a:[ Html.a_class [ "col-md-1" ] ]
                 [ Html.pcdata  "points" ] ; ]
         ]{|
 
@@ -400,60 +438,53 @@ let running_xml (t : Ui_simulation.t) =
         </div>
      </div>
    |}]
-
-let footer_xml (t : Ui_simulation.t) =
-  [%html {|
-  <div class="panel-footer">
-
-     <div class="row">
-      |}[ Html.div
-            ~a:[ Tyxml_js.R.Html.a_class
-                   (visible_on_states
-                     t
-                     ~a_class:[ "col-md-2" ]
-                     [ Ui_simulation.STOPPED ; ]) ]
-            [ start_button ]
-        ]{|
-
-      |}[ Html.div
-            ~a:[ Tyxml_js.R.Html.a_class
-                   (visible_on_states
-                     t
-                     ~a_class:[ "col-md-2" ]
-                     [ Ui_simulation.PAUSED ; ]) ]
-            [ continue_button ]
-        ]{|
-
-      |}[ Html.div
+let controls_xml (t : Ui_simulation.t) =
+  [Html.div
+     ~a:[ Tyxml_js.R.Html.a_class
+            (visible_on_states
+               t
+               ~a_class:[ "col-md-2" ]
+               [ Ui_simulation.STOPPED ; ]) ]
+     [ start_button ] ;
+   Html.div
+     ~a:[ Tyxml_js.R.Html.a_class
+            (visible_on_states
+               t
+               ~a_class:[ "col-md-2" ]
+               [ Ui_simulation.PAUSED ; ]) ]
+     [ continue_button ] ;
+   Html.div
             ~a:[ Tyxml_js.R.Html.a_class
                    (visible_on_states
                      t
                      ~a_class:[ "col-md-2" ]
                      [ Ui_simulation.RUNNING ; ]) ]
-            [ pause_button ]
-        ]{|
+            [ pause_button ] ;
+   status_indicator t ;
+   Html.div
+     ~a:[ Tyxml_js.R.Html.a_class
+            (visible_on_states
+               t
+               ~a_class:[ "col-md-2" ]
+               [ Ui_simulation.PAUSED ;
+                 Ui_simulation.RUNNING ; ]) ]
+     [ clear_button ] ;
+   Html.div
+     ~a:[ Tyxml_js.R.Html.a_class
+            (visible_on_states
+               t
+               ~a_class:[ "col-md-2" ]
+               [ Ui_simulation.STOPPED ; ]) ]
+     [ select_runtime ] ;
+   Html.entity "nbsp" ;
 
-      |} [status_indicator t]{|
+  ]
+let footer_xml (t : Ui_simulation.t) =
+  [%html {|
+  <div class="panel-footer">
       |}[ Html.div
-            ~a:[ Tyxml_js.R.Html.a_class
-                   (visible_on_states
-                     t
-                     ~a_class:[ "col-md-2" ]
-                     [ Ui_simulation.PAUSED ;
-                       Ui_simulation.RUNNING ; ]) ]
-            [ clear_button ]
-        ]{|
-
-      |}[ Html.div
-            ~a:[ Tyxml_js.R.Html.a_class
-                   (visible_on_states
-                     t
-                     ~a_class:[ "col-md-2" ]
-                     [ Ui_simulation.STOPPED ; ]) ]
-            [ select_runtime ]
-        ]{|
-     </div>
-
+            ~a:[ Html.a_class [ "row"; ] ]
+            (controls_xml t) ]{|
   </div>|}]
 
 let configuration_id = "configuration-id"
@@ -471,18 +502,18 @@ let xml  (t : Ui_simulation.t) =
                        | { severity = `Info ; _ }::_ -> ["panel-info"]
                      )))
            )]
-    [ simulation_messages ;
+    [ (* simulation_messages ; *)
       initializing_xml t ;
       stopped_xml t ;
       running_xml t ;
       footer_xml t ; ]
 
 let onload (t : Ui_simulation.t) : unit =
+  let perturbation_button_dom =
+    Tyxml_js.To_dom.of_button perturbation_button
+  in
   let select_runtime_dom =
     Tyxml_js.To_dom.of_select select_runtime
-  in
-  let toggle_button_dom =
-    Tyxml_js.To_dom.of_button toggle_button
   in
   let start_button_dom =
     Tyxml_js.To_dom.of_button start_button
@@ -502,6 +533,10 @@ let onload (t : Ui_simulation.t) : unit =
   let perturbation_code_input_dom =
     Tyxml_js.To_dom.of_input perturbation_code_input
   in
+  let simulation_limit_selector_dom =
+    Tyxml_js.To_dom.of_select simulation_limit_selector
+  in
+
   let args = Url.Current.arguments in
   let set_runtime
       (runtime : Ui_state.runtime)
@@ -541,19 +576,7 @@ let onload (t : Ui_simulation.t) : unit =
       | head::_ -> set_runtime head (default_runtime)
       | _ -> default_runtime ()
     with _ -> default_runtime () in
-
-
-  let () = toggle_button_dom##.onclick :=
-      Dom.handler
-        (fun _ ->
-           let () = set_toggle
-               (match (React.S.value toggle_signal) with
-                | History -> Settings
-                | Settings -> History)
-           in
-           Js._true)
-  in
-  let run_pertubation () =
+  let run_pertubation () : unit =
     Lwt_js_events.async
       (fun _ ->
          let code : string =
@@ -601,6 +624,27 @@ let onload (t : Ui_simulation.t) : unit =
                (fun _ -> Ui_simulation.start_simulation t) in
            Js._true)
   in
+  let handle_simulation_limit_selector () =
+    match string_to_simulation_limit
+            (Js.to_string simulation_limit_selector_dom##.value)
+    with
+    | Some simulation_limit ->
+      let () = Common.debug simulation_limit in
+      let () =
+        (let () = set_simulation_value "" in
+         match simulation_limit with
+         | TIME_LIMIT -> Ui_state.set_model_max_events None
+         | EVENTS_LIMIT -> Ui_state.set_model_max_time None)
+      in
+      set_simulation_limit simulation_limit
+    | None -> ()
+  in
+  let () = handle_simulation_limit_selector () in
+  let () = simulation_limit_selector_dom ##.onchange :=
+      Dom.handler
+        (fun _ -> let () = handle_simulation_limit_selector () in
+          Js._true)
+  in
   let () = select_runtime_dom##.onchange :=
       Dom.handler
         (fun _ ->
@@ -617,19 +661,29 @@ let onload (t : Ui_simulation.t) : unit =
            Js._true
         )
   in
-  let () = signal_change number_events_id
-      (fun value -> UIState.set_model_max_events
-          (try Some (int_of_string value)
-           with | Failure _ -> None)
-      ) in
-  let () = signal_change time_limit_id
+  let () = signal_change simulation_limit_id
       (fun value ->
-         UIState.set_model_max_time
-           (try Some (float_of_string value)
-            with | Failure _ -> None)) in
+         match React.S.value signal_simulation_limit with
+         | TIME_LIMIT ->
+           UIState.set_model_max_time
+             (try Some (float_of_string value)
+              with | Failure _ -> None)
+         | EVENTS_LIMIT ->
+           UIState.set_model_max_time
+             (try Some (float_of_string value)
+              with | Failure _ -> None)
+      )
+  in
   let () = signal_change plot_points_id
       (fun value ->
          try UIState.set_model_nb_plot (int_of_string value)
          with | Not_found | Failure _ -> ()) in
+  let () = perturbation_button_dom##.onclick :=
+      Dom.handler
+        (fun _ ->
+           let () = run_pertubation () in
+           Js._true)
+  in
+
   ()
 let onresize (_ : Ui_simulation.t) : unit = ()

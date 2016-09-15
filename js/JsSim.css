@@ -1,3 +1,5 @@
+.alert-sm { padding: 5px !important;
+	    margin-bottom: 0px; }
 html { position: relative;
        min-height: 100%; }
 
@@ -64,7 +66,7 @@ rect { stroke-width: 2; }
     display:none;
 }
 .panel-controls {
-    height: 120px;
+    height: 100px;
 }
 .panel-message {
     height: 40px;
