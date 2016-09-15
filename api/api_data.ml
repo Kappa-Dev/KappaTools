@@ -244,7 +244,7 @@ type site_node_component = { index : int ;
 let print_site_node ?link_store agid f sn =
   Format.fprintf f "%s(@[<h>%a@])"
     sn.ApiTypes_j.node_name
-    (Pp.array Pp.comma
+    (Pp.array (fun f -> Format.pp_print_string f ",")
        (fun sid f ss -> Format.fprintf f "%s%a%t" ss.ApiTypes_j.site_name
            (Pp.list Pp.empty (fun f i -> Format.fprintf f "~%s" i))
            ss.ApiTypes_j.site_states
@@ -311,7 +311,9 @@ let api_snapshot_dot (snapshot : ApiTypes_j.snapshot) =
 
 let print_site_nodes f sn =
   let link_store = ref (1,Mods.Int2Map.empty) in
-  Pp.array Pp.comma (print_site_node ~link_store) f sn
+  Pp.array
+    (fun f -> Format.pp_print_string f ",")
+    (print_site_node ~link_store) f sn
 
 let api_snapshot_kappa (snapshot : ApiTypes_j.snapshot) : string =
   Format.asprintf
