@@ -243,7 +243,6 @@ let render_snapshot_graph
       (Js.Opt.option (Ui_state.agent_count ()))
   | Kappa -> ()
 
-
 let select_snapshot (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
   let snapshot_js : Js_contact.contact_map Js.t =

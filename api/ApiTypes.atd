@@ -66,7 +66,7 @@ type site = {
      site_states: string list;
 }
 type site_node = {
-     node_quantity : float nullable;
+     node_quantity: float nullable;
      node_name: string;
      node_sites: site list <ocaml repr="array">;
 }
@@ -75,8 +75,8 @@ type site_graph = site_node list <ocaml repr="array">
 type snapshot = {
     snap_file : string;
     snap_event : int;
-    agents : site_node list;
-    tokens : site_node list;
+    agents : (int * site_graph) list;
+    tokens : (float * string) list;
 }
 
 type parse = { contact_map : site_graph }

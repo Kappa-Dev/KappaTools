@@ -17,7 +17,7 @@ let plot_pg_store
           (fun (observable : ApiTypes_j.observable) ->
              (observable.ApiTypes_j.observation_time ,
               Tools.array_map_of_list
-		(fun x -> Nbr.F x) observable.ApiTypes_j.observation_values))
+                (fun x -> Nbr.F x) observable.ApiTypes_j.observation_values))
           plot.ApiTypes_j.time_series
     }
 
@@ -80,26 +80,26 @@ let api_mixture sigs mix =
   Array.mapi
     (fun i a ->
        { ApiTypes_j.node_quantity = None;
-	 ApiTypes_j.node_name =
+         ApiTypes_j.node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
-	 ApiTypes_j.node_sites =
+         ApiTypes_j.node_sites =
            Array.mapi
              (fun j s ->
-		{ ApiTypes_j.site_name =
+                { ApiTypes_j.site_name =
                     Format.asprintf
                       "%a" (Signature.print_site sigs a.Raw_mixture.a_type) j;
-		  ApiTypes_j.site_links =
+                  ApiTypes_j.site_links =
                     (match Mods.Int2Map.find_option (i,j) links with
                      | None -> []
                      | Some dst -> [dst]);
-		  ApiTypes_j.site_states =
+                  ApiTypes_j.site_states =
                     (match s with
                      | None -> []
                      | Some k ->
                        [Format.asprintf
-			  "%a" (Signature.print_internal_state
-				  sigs a.Raw_mixture.a_type j) k;]);
-		})
+                          "%a" (Signature.print_internal_state
+                                  sigs a.Raw_mixture.a_type j) k;]);
+                })
              a.Raw_mixture.a_ints;
        }
     ) (Array.of_list mix)
@@ -108,44 +108,11 @@ let api_snapshot sigs (snapshot : Data.snapshot) : ApiTypes_j.snapshot =
   { ApiTypes_j.snap_file = snapshot.Data.snap_file
   ; ApiTypes_j.snap_event = snapshot.Data.snap_event
   ; ApiTypes_j.agents =
-      snd
-        (List.fold_left
-           (fun (old_offset,old_agents) (agent,mixture) ->
-              let quantity = Some (float_of_int agent) in
-              let mixture = Array.to_list (api_mixture sigs mixture) in
-              let new_offset = old_offset + (List.length mixture) in
-              let update_links (agent_id,site_id : int * int) =
-		(agent_id+old_offset,site_id)
-              in
-              let update_sites site = { site with
-					ApiTypes_j.site_links =
-					  List.map
-					    update_links
-					    site.ApiTypes_j.site_links
-				      } in
-              let new_agents =
-		List.map
-                  (fun (node : ApiTypes_j.site_node)->
-                     { node with
-                       ApiTypes_j.node_quantity = quantity ;
-                       ApiTypes_j.node_sites =
-			 Array.map
-                           update_sites
-                           node.ApiTypes_j.node_sites
-                     }
-                  )
-                  mixture
-              in
-              (new_offset,old_agents@new_agents)
-           )
-           (0,[])
-           snapshot.Data.agents
-        )
+      List.map
+        (fun (agent,mixture) -> (agent,api_mixture sigs mixture))
+        snapshot.Data.agents
   ; ApiTypes_j.tokens =
-      List.map (fun (token,value) ->
-          { ApiTypes_j.node_name = token ;
-            ApiTypes_j.node_quantity = Some (Nbr.to_float value);
-            ApiTypes_j.node_sites = Array.of_list [] })
+      List.map (fun (token,value) -> (Nbr.to_float value,token))
         (Array.to_list snapshot.Data.tokens)
   }
 
@@ -172,21 +139,21 @@ let api_contact_map sigs cm =
   Array.mapi
     (fun ag sites ->
        { ApiTypes_j.node_quantity = None;
-	 ApiTypes_j.node_name =
+         ApiTypes_j.node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) ag;
-	 ApiTypes_j.node_sites =
+         ApiTypes_j.node_sites =
            Array.mapi
              (fun site (states,links) ->
-		{ ApiTypes_j.site_name =
+                { ApiTypes_j.site_name =
                     Format.asprintf "%a" (Signature.print_site sigs ag) site;
-		  ApiTypes_j.site_links = links;
-		  ApiTypes_j.site_states =
+                  ApiTypes_j.site_links = links;
+                  ApiTypes_j.site_states =
                     List.map
                       (Format.asprintf
                          "%a"
                          (Signature.print_internal_state sigs ag site))
                       states;
-		}) sites;
+                }) sites;
        }) cm
 
 let api_contactmap_site_graph
@@ -203,7 +170,7 @@ let offset_site_graph
          ApiTypes_j.node_sites =
            Array.map
              (fun site ->
-		{ site with
+                { site with
                   ApiTypes_j.site_links =
                     List.map (fun (i,j) -> (i+offset,j+offset))
                       site.ApiTypes_j.site_links })
@@ -214,11 +181,41 @@ let offset_site_graph
 
 let api_snapshot_site_graph
     (snapshot : ApiTypes_j.snapshot) : ApiTypes_j.site_graph =
-  Array.of_list
-    (List.concat
-       [snapshot.ApiTypes_j.agents;
-        let offset = List.length snapshot.ApiTypes_j.agents in
-        offset_site_graph offset snapshot.ApiTypes_j.tokens])
+  let tokens_sg = Tools.array_map_of_list (fun (value,token) ->
+      { ApiTypes_j.node_name = token ;
+        ApiTypes_j.node_quantity = Some value;
+        ApiTypes_j.node_sites = [||] })
+      snapshot.ApiTypes_j.tokens in
+  snd
+    (List.fold_left
+       (fun (old_offset,old_agents) (agent,mixture) ->
+          let new_offset = old_offset + (Array.length mixture) in
+          let update_links (agent_id,site_id : int * int) =
+            (agent_id+old_offset,site_id)
+          in
+          let update_sites site = { site with
+                                    ApiTypes_j.site_links =
+                                      List.map
+                                        update_links
+                                        site.ApiTypes_j.site_links
+                                     } in
+          let new_agents =
+            Array.map
+              (fun (node : ApiTypes_j.site_node)->
+                 { node with
+                   ApiTypes_j.node_quantity = Some (float_of_int agent) ;
+                   ApiTypes_j.node_sites =
+                     Array.map
+                       update_sites
+                       node.ApiTypes_j.node_sites
+                 }
+              )
+              mixture
+          in
+          (new_offset,Array.append old_agents new_agents)
+       )
+       (Array.length tokens_sg,tokens_sg)
+       snapshot.ApiTypes_j.agents)
 
 (* map out *)
 let normalize_edge
@@ -244,434 +241,88 @@ type site_node_component = { index : int ;
                              site_node : ApiTypes_t.site_node ;
                              mutable component_id : int }
 
+let print_site_node ?link_store agid f sn =
+  Format.fprintf f "%s(@[<h>%a@])"
+    sn.ApiTypes_j.node_name
+    (Pp.array Pp.comma
+       (fun sid f ss -> Format.fprintf f "%s%a%t" ss.ApiTypes_j.site_name
+           (Pp.list Pp.empty (fun f i -> Format.fprintf f "~%s" i))
+           ss.ApiTypes_j.site_states
+           (fun f -> match link_store with
+              | None -> ()
+              | Some r ->
+                Pp.list Pp.empty
+                  (fun f (agid',sid') ->
+                     let fid,idm = !r in
+                     let lid =
+                       if agid' < agid || (agid' = agid && sid' <= sid) then
+                         let lid,rem = Mods.Int2Map.pop (agid,sid) idm in
+                         let () = r:=(fid,rem) in
+                         Tools.unsome (-1) lid
+                       else
+                         let () =
+                           r:=(succ fid, Mods.Int2Map.add (agid',sid') fid idm) in
+                         fid in
+                     Format.fprintf f "!%i" lid) f
+                  ss.ApiTypes_j.site_links)
+       ))
+    sn.ApiTypes_j.node_sites
+
+let print_site_nodes_dot nb_cc f mix =
+  Pp.array
+    Pp.empty
+    (fun i f sn ->
+       Format.fprintf
+         f "node%d_%d [label = \"@[<h>%a@]\", style=filled];@,"
+         nb_cc i (print_site_node ?link_store:None i) sn;
+       Pp.array Pp.empty
+         (fun si f ss ->
+            Pp.list Pp.empty
+              (fun f (di,dsi) ->
+                 if di < i || (di = i && dsi <=si) then
+                   Format.fprintf
+                     f
+                     "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];@,"
+                     nb_cc i nb_cc di ss.ApiTypes_j.site_name
+                     mix.(di).ApiTypes_j.node_sites.(dsi).ApiTypes_j.site_name)
+              f ss.ApiTypes_j.site_links)
+         f sn.ApiTypes_j.node_sites;
+       Format.fprintf
+         f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc)
+    f mix
+
 let api_snapshot_dot (snapshot : ApiTypes_j.snapshot) =
-  let site_nodes : ApiTypes_t.site_node list =
-    Array.to_list
-      (api_snapshot_site_graph snapshot)
-  in
-  let components_index : site_node_component list =
-    List.mapi
-      (fun index site_node ->
-         { index = index ;
-           site_node = site_node;
-           component_id = index })
-      site_nodes
-  in
-  let update_site
-      (new_component_id : int)
-      (location : int) : unit =
-    let old_component_id : int =
-      (List.nth components_index location).component_id
-    in
-    List.iter
-      (fun site_node_component ->
-         if site_node_component.component_id = old_component_id then
-           site_node_component.component_id <- new_component_id
-         else
-           ()
-      )
-      components_index
-  in
-  (* list of id's of connected components *)
-  let components_ids : int list =
-    Mods.IntSet.elements
-      (List.fold_left
-         (fun set elem -> Mods.IntSet.add elem set)
-         Mods.IntSet.empty
-         (List.map (fun c -> c.component_id) components_index))
-  in
-  (* get site node by component it is in *)
-  let agent_components id : ApiTypes_j.site_node list =
-    let components =
-      List.filter
-        (fun s -> s.component_id = id)
-        components_index
-    in
-    (* Figure out mapping from global id's to
-       id's that are local to the compoents.
-    *)
-    let local_index : (int * int) list =
-      List.mapi (fun i c -> (c.index,i)) components
-    in
-    (* Remaps the agent id's to that they are
-       relative to the connected component.
-    *)
-    List.map
-      (fun c ->
-         { c.site_node  with
-           ApiTypes_j.node_sites =
-             Array.map
-               (fun site ->
-                  { site with
-                    ApiTypes_j.site_links =
-                      List.map
-                        (fun (agent,site) ->
-                           (List.assoc agent local_index,site))
-                        site.ApiTypes_j.site_links })
-               c.site_node.ApiTypes_j.node_sites })
-      components
-  in
-  let () =
-    List.iteri
-      (fun index site_node ->
-         Array.iter
-           (fun (site : ApiTypes_j.site) ->
-              List.iter
-		(update_site index)
-		(List.map fst site.ApiTypes_j.site_links)
-           )
-           site_node.ApiTypes_j.node_sites
-      )
-      site_nodes
-  in
-  let b = Buffer.create 1024 in
-  let f = Format.formatter_of_buffer b in
-  let format_sites
-      ppf
-      ((component_id,components) : int * ApiTypes_j.site_node list) =
-    let site_label agent site : string =
-      (Array.get
-         (List.nth components agent).ApiTypes_j.node_sites
-         site).ApiTypes_j.site_name
-    in
-    let links : ((int * int)* (int * int)) list =
-      List.flatten
-        (List.mapi
-           (fun source_agent_id site_node ->
-              (List.flatten
-                 (List.mapi
-                    (fun source_site_id site ->
-                       List.map
-                         (fun (target_agent_id,target_site_id) ->
-                            ((source_agent_id,source_site_id),
-                             (target_agent_id,target_site_id))
-                         ) site.ApiTypes_j.site_links)
-                    (Array.to_list site_node.ApiTypes_j.node_sites))))
-           components)
-    in
-    let deduplicated_links : ((int * int)* (int * int)) list =
-      EdgeSet.elements
-        (List.fold_left
-           (fun set edge -> EdgeSet.add edge set)
-           EdgeSet.empty
-           links)
-    in
+  Format.asprintf
+    "@[<v>digraph G{@,%a@,%a}@]@."
     (Pp.listi
        Pp.cut
-       (fun index f site_node ->
-          let site_label : string =
-            String.concat
-              ","
-              (List.map (fun site -> site.ApiTypes_j.site_name
-                                     ^
-                                     (String.concat
-                                        ""
-                                        (List.map
-                                           (fun label -> "~"^label)
-                                           site.ApiTypes_j.site_states)
-                                     )
-                        )
-                 (Array.to_list site_node.ApiTypes_j.node_sites))
-          in
-            Format.fprintf
-              f
-              "node%d_%d [label = \"@[<h>%s@]\", color = \"%s\", style=filled];"
-              component_id
-              index
-              (site_node.ApiTypes_j.node_name^"("^site_label^")")
-              (hash_color site_node.ApiTypes_j.node_name)
-       )
-    )
-    ppf
-    components;
-    (Format.fprintf f "@,");
-    (Pp.list
-       Pp.cut
-       (fun f ((source_agent,source_site),(target_agent,target_site)) ->
-            Format.fprintf
-              f
-              "node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];"
-              component_id
-              source_agent
-
-              component_id
-              target_agent
-
-              (site_label source_agent source_site)
-              (site_label target_agent target_site)
-       )
-    )
-    ppf
-    deduplicated_links;
-    (Format.fprintf f (match deduplicated_links with [] -> "" | _ -> "@,"));
-  in
-  let format_components
-      ppf
-      (component_ids : int list) =
-    (Pp.list
-       Pp.cut
-       (fun f component_id ->
-          let components : ApiTypes_j.site_node list =
-            agent_components component_id
-          in
-          match components with
-          | { ApiTypes_j.node_quantity = Some node_quantity
-            ; _ }::_ ->
-            Format.fprintf
-              f
-              "@[<v 2>subgraph cluster%d{@,"
-              component_id;
-            Format.fprintf
-              f
-              "counter%d [label = \"%.0f instance(s)\", shape=none];@,%a}@]"
-              component_id
-              node_quantity
-              format_sites
-              (component_id,components)
-          | _ -> Format.fprintf f ""))
-    ppf
-    component_ids
-  in
-  let format_tokens ppf (tokens : ApiTypes_t.site_node list) =
-    (Pp.listi Pp.cut (fun i f (site_node : ApiTypes_t.site_node) ->
+       (fun i f (nb,mix) ->
+          Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
+          Format.fprintf
+            f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
+            i nb (print_site_nodes_dot i) mix))
+    snapshot.ApiTypes_j.agents
+    (Pp.listi Pp.cut (fun i f (el,na) ->
          Format.fprintf
            f
-           "token_%d [label = \"%s %s \" , shape=none]"
-           i
-           site_node.ApiTypes_t.node_name
-           (match site_node.ApiTypes_t.node_quantity with
-            | Some f -> Format.sprintf "(%.0f)" f
-            | None -> "")
-       ))
-      ppf
-      tokens
-  in
-  let () = Format.fprintf
-      f "@[<v>digraph G{@,%a@,%a}@]"
-      format_components (List.sort (fun a b -> a - b) components_ids)
-      format_tokens snapshot.ApiTypes_j.tokens
-  in
-  let () = Format.pp_print_flush f () in
-  Buffer.contents b
+           "token_%d [label = \"%s (%f)\" , shape=none]"
+           i na el))
+    snapshot.ApiTypes_j.tokens
 
-
+let print_site_nodes f sn =
+  let link_store = ref (1,Mods.Int2Map.empty) in
+  Pp.array Pp.comma (print_site_node ~link_store) f sn
 
 let api_snapshot_kappa (snapshot : ApiTypes_j.snapshot) : string =
-  (*let () = print_string (ApiTypes_j.string_of_snapshot snapshot) in *)
-(*
-  let format_edge
-      (label : string)
-      (((a,b),(c,d)) : (int * int) * (int * int)) : string =
-    Format.sprintf
-      "\n%s ((%d,%d),(%d,%d))\n"
-      label a b c d
-  in
-
-  let debug_edge
-      (label : string)
-      (edge : (int * int) * (int * int)) : unit =
-    print_string
-      (format_edge label edge)
-  in
-*)
-
-  let site_nodes : ApiTypes_t.site_node list =
-    Array.to_list (api_snapshot_site_graph snapshot)
-  in
-  let components_index : (int * ApiTypes_t.site_node) array =
-    Array.of_list
-      (List.mapi (fun index site_node -> (index,site_node)) site_nodes)
-  in
-  let edge_index : int EdgeMap.t =
-    List.fold_left
-      (fun
-        (index : int EdgeMap.t)
-        ((agent_id,site_node) : int * ApiTypes_t.site_node) ->
-        let offset : int = EdgeMap.cardinal index in
-        let index_edges : (int * ((int * int) * (int * int))) list =
-          List.mapi
-            (fun i edge -> (i + offset,edge))
-            (List.flatten
-               (List.mapi
-                  (fun
-                    (site_id : int)
-                    (site : ApiTypes_t.site) ->
-                    List.map
-                      (fun link -> ((agent_id,site_id),link))
-                      site.ApiTypes_t.site_links
-                  )
-                  (Array.to_list site_node.ApiTypes_t.node_sites)
-               )
-            )
-        in
-        List.fold_left
-          (fun
-            (local_index : int EdgeMap.t)
-            ((key,edge) : (int * ((int * int) * (int * int))))
-            ->
-              let edge = normalize_edge edge in
-              if EdgeMap.mem edge local_index then
-                local_index
-              else
-                (*
-                let () =
-                  print_string
-                    (format_edge ((string_of_int key)^"!>") edge)
-                in
-                *)
-                EdgeMap.add
-                  edge
-                  key
-                  local_index
-          )
-          index
-          index_edges
-      )
-      EdgeMap.empty
-      (Array.to_list components_index)
-  in
-  (*
-  let () =
-    EdgeMap.iter
-      (fun key value ->
-        print_string
-          (format_edge ((string_of_int value)^"->") key))
-      edge_index
-  in
-  *)
-  (* let () = print_string "(EdgeMap.cardinal edge_index)" in *)
-  (* let () = print_int (EdgeMap.cardinal edge_index) in *)
-  (* index the connected components *)
-  let update_site
-      (new_component_id : int)
-      (location : int) : unit =
-    let old_component_id : int =
-      fst (Array.get components_index location)
-    in
-    Array.iteri
-      (fun i (current_component_id,current_site_node) ->
-         if current_component_id = old_component_id then
-           Array.set
-             components_index
-             i
-             (new_component_id,current_site_node)
-         else
-           ()
-      )
-      components_index
-  in
-  (* list of id's of connected components *)
-  let components_ids : int list =
-    Mods.IntSet.elements
-      (List.fold_left
-         (fun set elem -> Mods.IntSet.add (fst elem) set)
-         Mods.IntSet.empty
-         (Array.to_list components_index))
-  in
-  (* get components *)
-  let agent_components id : (int * ApiTypes_t.site_node) list =
-    List.map
-      snd
-      (List.filter
-         fst
-         (List.mapi
-            (fun index (component_id,site_node) ->
-               (component_id = id,(index,site_node))
-            )
-            (Array.to_list components_index)
-          : (bool * (int * ApiTypes_t.site_node)) list)
-       : (bool * (int * ApiTypes_t.site_node)) list)
-  in
-  let render_agent (_,(site_node : ApiTypes_t.site_node)) : string =
-    let agent_label  = site_node.ApiTypes_t.node_name in
-    let site_label =
-      String.concat
-        ","
-        (List.map
-           (fun site_node -> site_node.ApiTypes_t.site_name)
-           (Array.to_list site_node.ApiTypes_t.node_sites))
-    in
-    Format.sprintf "%s(%s)" agent_label site_label in
-  let render_component
-      (connected_component : (int * ApiTypes_t.site_node) list) : string =
-    String.concat
-      ","
-      (List.map
-         (fun (agent_id,site_node) ->
-            let agent_label = site_node.ApiTypes_t.node_name in
-            let site_label =
-              String.concat
-		","
-		(List.mapi
-                   (fun site_id site_node ->
-                      site_node.ApiTypes_t.site_name
-                      ^
-                      (String.concat
-                         ""
-                         (List.map
-                            (fun link ->
-                               let edge_id : (int * int) * (int * int) =
-                                 normalize_edge
-                                   ((agent_id,site_id),link)
-                               in
-                               (* let () = debug_edge "lookup" edge_id in *)
-                               let link_id : int =
-                                 EdgeMap.find
-                                   edge_id
-                                   edge_index
-                               in
-(*
-                              let () =
-                                debug_edge
-                                  (string_of_int link_id)
-                                  edge_id
-                              in
-*)
-                               "!"^(string_of_int link_id)
-                            )
-                            site_node.ApiTypes_t.site_links))
-                   )
-                   (Array.to_list site_node.ApiTypes_t.node_sites))
-            in
-            Format.sprintf "%s(%s)" agent_label site_label
-         )
-         connected_component
-      )
-  in
-  let () =
-    List.iteri
-      (fun index site_node ->
-         Array.iter
-           (fun (site : ApiTypes_j.site) ->
-              List.iter
-		(update_site index)
-		(List.map fst site.ApiTypes_j.site_links)
-           )
-           site_node.ApiTypes_j.node_sites
-      )
-      site_nodes
-  in
-  String.concat
-    "\n"
-    (List.fold_left
-       (fun
-         (kappa_fragments : string list)
-         (component : (int * ApiTypes_t.site_node) list) ->
-         match component with
-         | (_,{ ApiTypes_j.node_quantity = Some node_quantity
-              ; _ })::tail ->
-           (Format.sprintf "%%init: %f %s"
-              node_quantity
-              (match tail with
-               | [] -> render_agent (List.hd component)
-               | _ -> render_component component))::kappa_fragments
-         | _ -> kappa_fragments
-
-       )
-       []
-       (List.map
-          agent_components
-          components_ids))
+  Format.asprintf
+    "@[<v>%a@,%a@]"
+    (Pp.list Pp.space (fun f (i,mix) ->
+                       Format.fprintf f "%%init: %i @[<h>%a@]" i
+                                      print_site_nodes mix))
+    snapshot.ApiTypes_j.agents
+    (Pp.list Pp.space (fun f (el,na) ->
+                        Format.fprintf f "%%init: %s <- %f" na el))
+    snapshot.ApiTypes_j.tokens
 
 let api_parse_is_empty (parse : ApiTypes_j.parse) =
   0 = Array.length parse.ApiTypes_j.contact_map
