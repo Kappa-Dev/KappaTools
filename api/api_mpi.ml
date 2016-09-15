@@ -100,7 +100,7 @@ let on_message
       (fun result -> `Continue result)
 
 
-type context = { mailboxes : WebMessage.response option Lwt_mvar.t IntMap.t
+type context = { mailboxes : WebMessage.response option Lwt.u IntMap.t
                ; id : int }
 exception TimeOut
 exception BadResponse of WebMessage.response
@@ -114,18 +114,9 @@ class virtual runtime ?(timeout : float = 10.) ()
     method virtual sleep : float -> unit Lwt.t
 
 
-    method private send (request : WebMessage.request) :
-      WebMessage.response option Lwt_mvar.t =
-      let var : WebMessage.response option Lwt_mvar.t =
-	Lwt_mvar.create_empty ()
-      in
-      let () =
-	Lwt.async
-          (fun () ->
-             self#sleep timeout >>=
-             (fun _ ->
-		Lwt_mvar.put var None))
-      in
+    method private send (request : WebMessage.request):
+      WebMessage.response option Lwt.t =
+      let result,feeder = Lwt.task () in
       let () = context <-
 	  { context with id = context.id + 1 }
       in
@@ -140,9 +131,9 @@ class virtual runtime ?(timeout : float = 10.) ()
       let () = self#post_message message_text in
       let () = context <-
 	  { context with
-            mailboxes = IntMap.add context.id var context.mailboxes }
+            mailboxes = IntMap.add context.id feeder context.mailboxes }
       in
-      var
+      Lwt.pick [self#sleep timeout >>= (fun () -> Lwt.return_none); result]
 
     method virtual post_message : string -> unit
     method receive (response_text : string) =
@@ -151,20 +142,14 @@ class virtual runtime ?(timeout : float = 10.) ()
       let () =
 	match IntMap.find_option message.WebMessage.id context.mailboxes with
         | Some value ->
-          Lwt.async
-            (fun () ->
-	       Lwt_mvar.put value (Some message.WebMessage.data))
+	  Lwt.wakeup value (Some message.WebMessage.data)
 	| None -> ()
       in
       ()
 
     method parse (code : ApiTypes.code) :
       ApiTypes_j.parse ApiTypes_j.result Lwt.t =
-      let var : WebMessage.response option Lwt_mvar.t =
-	self#send (`Parse code)
-      in
-      (Lwt_mvar.take var)
-      >>=
+      self#send (`Parse code) >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
            None ->
@@ -177,12 +162,7 @@ class virtual runtime ?(timeout : float = 10.) ()
 
     method start (parameter : ApiTypes.parameter) :
       ApiTypes.token ApiTypes.result Lwt.t =
-      let var :
-        WebMessage.response option Lwt_mvar.t =
-	self#send (`Start parameter)
-      in
-      (Lwt_mvar.take var)
-      >>=
+	self#send (`Start parameter) >>=
       (fun (response : WebMessage.response option) ->
          match response with
            None -> Lwt.fail TimeOut
@@ -192,11 +172,7 @@ class virtual runtime ?(timeout : float = 10.) ()
 
     method status (token : ApiTypes.token) :
       ApiTypes.state ApiTypes.result Lwt.t =
-      let var : WebMessage.response option Lwt_mvar.t =
-	self#send (`Status token)
-      in
-      (Lwt_mvar.take var)
-      >>=
+      self#send (`Status token) >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
            None ->
@@ -208,9 +184,7 @@ class virtual runtime ?(timeout : float = 10.) ()
       )
 
     method list () : ApiTypes.catalog ApiTypes.result Lwt.t =
-      let var : WebMessage.response option Lwt_mvar.t = self#send (`List ()) in
-      (Lwt_mvar.take var)
-      >>=
+      self#send (`List ()) >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
            None ->
@@ -222,11 +196,7 @@ class virtual runtime ?(timeout : float = 10.) ()
       )
 
     method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
-      let var : WebMessage.response option Lwt_mvar.t =
-	self#send (`Stop token)
-      in
-      (Lwt_mvar.take var)
-      >>=
+	self#send (`Stop token) >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
            None ->
@@ -243,11 +213,7 @@ class virtual runtime ?(timeout : float = 10.) ()
       unit ApiTypes.result Lwt.t =
       let perturbation = { perturbation_token = token ;
                            perturbation_code = perturbation.ApiTypes.perturbation_code ; } in
-      let var : WebMessage.response option Lwt_mvar.t =
-	self#send (`Peturbation perturbation  )
-      in
-      (Lwt_mvar.take var)
-      >>=
+	self#send (`Peturbation perturbation) >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
            None ->
@@ -260,11 +226,7 @@ class virtual runtime ?(timeout : float = 10.) ()
 
     method pause (token : ApiTypes.token) :
       unit ApiTypes.result Lwt.t =
-      let var : WebMessage.response option Lwt_mvar.t =
-	self#send (`Pause token)
-      in
-      (Lwt_mvar.take var)
-      >>=
+	self#send (`Pause token) >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
            None ->
@@ -279,11 +241,8 @@ class virtual runtime ?(timeout : float = 10.) ()
         (token : ApiTypes.token)
         (parameter : ApiTypes.parameter) :
       unit ApiTypes.result Lwt.t =
-      let var : WebMessage.response option Lwt_mvar.t =
 	self#send (`Continue { continuation_token = token ;
      		               continuation_parameter = parameter ; })
-      in
-      (Lwt_mvar.take var)
       >>=
       (fun (response : WebMessage.response option) ->
 	 match response with
