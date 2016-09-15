@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Sep 14 2016>
+   * Last modification: Time-stamp: <Sep 15 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -193,7 +193,7 @@ let collect_test_map parameter error store_test_sites =
          Exception.check_point
            Exception.warn parameter error error' __POS__ Exit
        in
-       error, ( new_set)
+       error, new_set
     ) store_test_sites
 
 (************************************************************************************)

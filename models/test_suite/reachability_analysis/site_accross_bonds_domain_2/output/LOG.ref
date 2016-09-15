@@ -1067,4 +1067,7 @@ A(z!1),B(z!1) =>
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from tuples to sites
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
 execution finished without any exception

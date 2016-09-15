@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 14 2016>
+   * Last modification: Time-stamp: <Sep 15 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -57,6 +57,17 @@ type local_static_information =
     store_tuple_to_sites :
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t
         Parallel_bonds_type.PairAgentSite_map_and_set.Map.t;
+    store_sites_to_tuple :
+      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+       Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+       Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
+        Parallel_bonds_type.AgentSite_map_and_set.Map.t *
+        ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+         Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+         Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
+        Parallel_bonds_type.AgentSite_map_and_set.Map.t
   }
 
 (*******************************************************************)
@@ -71,6 +82,9 @@ let init_local_static =
     store_snd_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_rule_double_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_tuple_to_sites = Parallel_bonds_type.PairAgentSite_map_and_set.Map.empty;
+    store_sites_to_tuple =
+      Parallel_bonds_type.AgentSite_map_and_set.Map.empty,
+      Parallel_bonds_type.AgentSite_map_and_set.Map.empty
   }
 
 (*******************************************************************)
@@ -522,7 +536,7 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error store_action_bind
 
 (*******************************************************************)
 (*A map from tuples -> sites
-  ex: A(x!1, y!2), B(x!1, y!2) -> {(A,x); A(y); B(x); B(y)}
+  ex: A(x!1, y!2), B(x!1, y!2) -> {(A,x); (A,y); (B,x); (B,y)}
 *)
 (*******************************************************************)
 
@@ -536,3 +550,67 @@ let collect_tuple_to_sites parameter error tuples_of_interest =
     parameter
     error
     tuples_of_interest
+
+(*******************************************************************)
+(*A map from sites -> tuples
+  ex: {(A,x); (A,y); (B,x); (B,y)} -> A(x!1, y!2), B(x!1, y!2)
+*)
+(*******************************************************************)
+
+let compare_first_pair parameter error x tuple_set store_result =
+  let (agent_type_x, site_type_x) = x in (*A,x*)
+  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
+    (fun (u, v) (error, store_result) ->
+       let (agent_type, site_type, site_type', state, state') = u in
+       let (agent_type1, site_type1, site_type1', state1, state1') = v in
+       if agent_type_x = agent_type && site_type_x = site_type
+       || agent_type_x = agent_type1  && site_type_x = site_type1
+       then
+         let error, store_result =
+           Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
+             parameter error
+             x
+             (u,v)
+             store_result
+         in
+         error, store_result
+       else error, store_result
+    ) tuple_set (error, store_result)
+
+let compare_snd_pair parameter error y tuple_pair store_result =
+  let (agent_type_y, site_type_y) = y in (*A,x*)
+  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
+    (fun (u, v) (error, store_result) ->
+       let (agent_type, site_type, site_type', state, state') = u in
+       let (agent_type1, site_type1, site_type1', state1, state1') = v in
+       if agent_type_y = agent_type && site_type_y = site_type'
+       || agent_type_y = agent_type1 && site_type_y = site_type1'
+       then
+         let error, store_result =
+           Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
+             parameter error
+             y
+             (u,v)
+             store_result
+         in
+         error, store_result
+       else error, store_result
+    ) tuple_pair (error, store_result)
+
+
+(*map from sites to tuple *)
+
+let collect_sites_to_tuple parameter error map_of_sites store_result =
+  Parallel_bonds_type.PairAgentSite_map_and_set.Map.fold
+    (fun (x, y, z, t) tuple_set (error, store_result) ->
+       let store_result1, store_result2 = store_result in
+       let error, store_result1 =
+         compare_first_pair parameter error x tuple_set
+           store_result1
+       in
+       let error, store_result2 =
+         compare_snd_pair parameter error y tuple_set
+           store_result2
+       in
+       error, (store_result1, store_result2)
+    ) map_of_sites (error, store_result)

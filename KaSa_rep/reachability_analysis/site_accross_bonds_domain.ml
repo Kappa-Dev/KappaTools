@@ -996,7 +996,7 @@ struct
                       ~message: "empty list in potential states in post condition" Exit ()
                     in*)
                   error, dynamic, precondition
-                | [_] -> (*general case*)
+                | [_] -> (*general case, singleton*)
                   List.fold_left
                     (fun (error, dynamic, precondition) state'_other ->
                        let store_result = get_value dynamic in

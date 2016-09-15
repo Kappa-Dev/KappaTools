@@ -48,6 +48,9 @@ K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from tuples to sites
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
 execution finished without any exception
 Parsing protein2x2.ka...
 done
@@ -98,5 +101,8 @@ K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
 ------------------------------------------------------------
 execution finished without any exception

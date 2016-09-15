@@ -1055,4 +1055,7 @@ C() => [ C(x) v C(x!A.y) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from tuples to sites
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
 execution finished without any exception

@@ -65,4 +65,10 @@ R(c,cr), R(c, n) => (R, c); (R, cr); (R, c); (R, n)
 R(c,n), R(c, cr) => (R, c); (R, n); (R, c); (R, cr)
 R(cr,c), R(n, c) => (R, cr); (R, c); (R, n); (R, c)
 R(n,c), R(cr, c) => (R, n); (R, c); (R, cr); (R, c)
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
+(R, c) => {R(c, n), R(c, cr); R(n,c), R(cr, c)}
+(R, cr) => {R(cr, c), R(n, c); R(c,cr), R(c, n)}
+(R, n) => {R(n, c), R(cr, c); R(c,n), R(c, cr)}
 execution finished without any exception

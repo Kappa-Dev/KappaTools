@@ -36,6 +36,9 @@ B cannot occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from tuples to sites
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
 execution finished without any exception
 Parsing add_remove.ka...
 done
@@ -74,5 +77,8 @@ B cannot occur in the model
 ------------------------------------------------------------
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
 ------------------------------------------------------------
 execution finished without any exception

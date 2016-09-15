@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 14 2016>
+  * Last modification: Time-stamp: <Sep 15 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -203,6 +203,18 @@ struct
       }
       static
 
+  let get_sites_to_tuple static =
+    (get_local_static_information
+       static).Parallel_bonds_static.store_sites_to_tuple
+
+  let set_sites_to_tuple sites static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        Parallel_bonds_static.store_sites_to_tuple = sites
+      }
+      static
+
   (*global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
@@ -356,6 +368,16 @@ struct
         tuple_of_interest
     in
     let static = set_tuple_to_sites store_result static in
+    (*------------------------------------------------------*)
+    (*map sites to tuple*)
+    let tuple_to_sites = get_tuple_to_sites static in
+    let store_sites_to_tuple = get_sites_to_tuple static in
+    let error, store_result =
+      Parallel_bonds_static.collect_sites_to_tuple
+        parameter error tuple_to_sites
+        store_sites_to_tuple
+    in
+    let static = set_sites_to_tuple store_result static in
     error, static, dynamic
 
   (***************************************************************)
@@ -908,6 +930,7 @@ struct
       else
         error
     in
+    (***************************************************************)
     (*print a map tuple to sites*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_result
@@ -968,6 +991,102 @@ struct
             ) store_result error
         in
         error
+      else error
+    in
+    (***************************************************************)
+    (*print a map tuple to sites*)
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_result
+          parameter
+      then
+      let () =
+      Loggers.fprintf log
+        "------------------------------------------------------------\n";
+      Loggers.fprintf log "* Properties of pairs of bonds, a map from sites to tuple\n";
+      Loggers.fprintf log
+        "------------------------------------------------------------\n"
+      in
+      let store_result = get_sites_to_tuple static in
+      let store_result1, store_result2 = store_result in
+      let error, _ =
+        Parallel_bonds_type.AgentSite_map_and_set.Map.fold2 parameter error
+          (fun parameter error (agent_type_x, site_type_x) (u, v) error' ->
+          (*convert first pair*)
+          let error, (string_agent_x, string_site_x) =
+            Parallel_bonds_type.convert_pair parameter error
+              kappa_handler
+              (agent_type_x, site_type_x)
+          in
+          let error,
+              (string_agent, string_site, string_site',
+               string_agent1, string_site1, string_site1') =
+            Parallel_bonds_type.convert_tuple parameter error
+              kappa_handler (u, v)
+          in
+          let () =
+            Loggers.fprintf log
+              "(%s, %s) => %s(%s, %s), %s(%s, %s)\n"
+              string_agent_x string_site_x
+              string_agent string_site string_site'
+              string_agent1 string_site1 string_site1'
+          in
+          error, error'
+          )
+          (fun parameter error (agent_type_x, site_type_x) (u', v') error' ->
+          (*convert first pair*)
+          let error, (string_agent_x, string_site_x) =
+            Parallel_bonds_type.convert_pair parameter error
+              kappa_handler
+              (agent_type_x, site_type_x)
+          in
+          let error,
+              (string_agent2, string_site2, string_site2',
+               string_agent3, string_site3, string_site3') =
+            Parallel_bonds_type.convert_tuple parameter error
+              kappa_handler (u', v')
+          in
+          let () =
+            Loggers.fprintf log
+              "(%s, %s) => %s(%s,%s), %s(%s, %s)\n"
+              string_agent_x string_site_x
+              string_agent2 string_site2 string_site2'
+              string_agent3 string_site3 string_site3'
+          in
+          error, error'
+          )
+          (fun parameter error (agent_type_x, site_type_x) (u, v) (u', v')
+            error' ->
+             (*convert first pair*)
+             let error, (string_agent_x, string_site_x) =
+               Parallel_bonds_type.convert_pair parameter error
+                 kappa_handler
+                 (agent_type_x, site_type_x)
+             in
+             let error,
+                 (string_agent, string_site, string_site',
+                  string_agent1, string_site1, string_site1') =
+               Parallel_bonds_type.convert_tuple parameter error
+                 kappa_handler (u, v)
+             in
+             let error,
+                 (string_agent2, string_site2, string_site2',
+                  string_agent3, string_site3, string_site3') =
+               Parallel_bonds_type.convert_tuple parameter error
+                 kappa_handler (u', v')
+             in
+             let () =
+               Loggers.fprintf log
+                 "(%s, %s) => {%s(%s, %s), %s(%s, %s); %s(%s,%s), %s(%s, %s)}\n"
+                 string_agent_x string_site_x
+                 string_agent string_site string_site'
+                 string_agent1 string_site1 string_site1'
+                 string_agent2 string_site2 string_site2'
+                 string_agent3 string_site3 string_site3'
+             in
+             error, error'
+          ) store_result1 store_result2 error
+      in
+      error
       else error
     in
     error, dynamic, ()

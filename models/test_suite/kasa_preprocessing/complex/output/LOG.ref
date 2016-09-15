@@ -513,4 +513,13 @@ B(y,x), A(y, x) => (B, y); (B, x); (A, y); (A, x)
 B(y,x), C(y, x) => (B, y); (B, x); (C, y); (C, x)
 C(x,y), B(x, y) => (C, x); (C, y); (B, x); (B, y)
 C(y,x), B(y, x) => (C, y); (C, x); (B, y); (B, x)
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
+(A, x) => {A(x, y), B(x, y); A(y,x), B(y, x)}
+(A, y) => {A(y, x), B(y, x); A(x,y), B(x, y)}
+(B, x) => {B(x, y), C(x, y); B(y,x), C(y, x)}
+(B, y) => {B(y, x), C(y, x); B(x,y), C(x, y)}
+(C, x) => {C(x, y), B(x, y); C(y,x), B(y, x)}
+(C, y) => {C(y, x), B(y, x); C(x,y), B(x, y)}
 execution finished without any exception
