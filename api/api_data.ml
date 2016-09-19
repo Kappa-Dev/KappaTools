@@ -24,22 +24,20 @@ let plot_pg_store
 let plot_values
     ?(separator : string = ",")
     (plot : ApiTypes_j.plot) : string =
-  String.concat "\n"
+  Format.asprintf "@[<v>%a@]"
+    (Pp.list Pp.space Format.pp_print_string)
     ((String.concat
         separator
         ("time"::plot.ApiTypes_j.legend))::
-     (List.map
-        (fun (observable : ApiTypes_j.observable) ->
-           String.concat separator
-             (List.map
-                (Format.sprintf "%e")
-                (observable.ApiTypes_j.observation_time
-                 ::observable.ApiTypes_j.observation_values)
-             )
-        )
-        plot.ApiTypes_j.time_series)
-    )
-
+     List.rev_map
+       (fun (observable : ApiTypes_j.observable) ->
+          Format.asprintf "%a"
+            (Pp.list (fun f -> Format.pp_print_string f separator)
+               (fun f -> Format.fprintf f "%e"))
+            (observable.ApiTypes_j.observation_time
+             ::observable.ApiTypes_j.observation_values)
+       )
+    plot.ApiTypes_j.time_series)
 
 let api_file_line (file_line : Data.file_line) : ApiTypes_j.file_line =
   { ApiTypes_j.file_name = file_line.Data.file_name

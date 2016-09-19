@@ -3,8 +3,6 @@ module ApiTypes = ApiTypes_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
-open Js_plot
-
 let div_axis_select_id  = "plot-axis-select"
 let display_id = "plot-display"
 let export_id = "plot-export"
@@ -47,7 +45,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
               in
               Common.saveFile
 		~data:data
-		~mime:"text/tab-separated-values"
+		~mime:"text/csv"
 		~filename:filename
         }
       ];
@@ -146,19 +144,19 @@ let get_dimension () =
   | Some dimension -> dimension
 
 let update_plot
-    (plot : observable_plot Js.t)
+    (plot : Js_plot.observable_plot Js.t)
     (data : ApiTypes.plot option) : unit =
   match data with
   | None -> ()
   | Some data ->
     let () = plot##setDimensions(get_dimension ()) in
-    let data : plot_data Js.t = Js_plot.create_data ~plot:data in
+    let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot:data in
     plot##setPlot(data)
 let plot_ref = ref None
 let onload (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
   let () = Widget_export.onload (configuration t) in
-  let configuration : plot_configuration Js.t =
+  let configuration : Js_plot.plot_configuration Js.t =
     Js_plot.create_configuration
       ~plot_div_id:display_id
       ~plot_div_select_id:div_axis_select_id
@@ -168,7 +166,7 @@ let onload (t : Ui_simulation.t) =
       ~plot_x_axis_log_checkbox_id:"plot-x-axis-log-checkbox"
       ~plot_y_axis_log_checkbox_id:"plot-y-axis-log-checkbox"
   in
-  let plot : observable_plot Js.t =
+  let plot : Js_plot.observable_plot Js.t =
     Js_plot.create_observable_plot configuration in
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
