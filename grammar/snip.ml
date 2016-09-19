@@ -1,8 +1,8 @@
 let link_occurence_failure key pos =
   raise (ExceptionDefn.Internal_Error
-           ("Link "^string_of_int key^
-            " is problematic! Either Sanity.mixture is broken"^
-            " or you don't use it!",pos))
+           ("Bug: Link "^string_of_int key^
+            " is problematic! LKappa is either broken"^
+            " or unused! Please report.",pos))
 
 let ports_from_contact_map contact_map ty_id p_id =
   snd contact_map.(ty_id).(p_id)

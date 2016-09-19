@@ -428,12 +428,6 @@ let several_occurence_of_site agent_name (na,pos) =
            ("Site '"^na^
             "' occurs more than once in this agent '"^agent_name^"'",pos))
 
-let site_occurence_failure ag_na (na,pos) =
-  raise (ExceptionDefn.Internal_Error
-           ("Site '"^na^"' of agent '"^ag_na^
-            "' is problematic! Either Sanity.mixture is"^
-            "broken or you don't use it!",pos))
-
 let link_only_one_occurence i pos =
   raise (ExceptionDefn.Malformed_Decl
            ("The link '"^string_of_int i^
@@ -556,12 +550,6 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              several_occurence_of_site agent_name p.Ast.port_nme in
-         let () =
-           if ports.(p_id) <> (Location.dummy_annot Ast.LNK_ANY, Erased) ||
-              match Signature.default_internal_state ag_id p_id sigs with
-              | None -> internals.(p_id) <> I_ANY
-              | Some _ -> internals.(p_id) <> I_ANY_ERASED
-           then site_occurence_failure agent_name p_na in
 
          let () = match p.Ast.port_int with
            | [] -> ()
@@ -622,11 +610,6 @@ let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              several_occurence_of_site agent_name p.Ast.port_nme in
-         let () =
-           if ports.(p_id) <> Raw_mixture.FREE ||
-              internals.(p_id) <>
-              Signature.default_internal_state ag_id p_id sigs
-           then site_occurence_failure agent_name p_na in
          let () = match p.Ast.port_int with
            | [] -> ()
            | [ va ] ->
@@ -665,7 +648,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
       let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p Maintained in
       links_annot
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
-      site_occurence_failure agent_name p'.Ast.port_nme
+      not_enough_specified agent_name p'.Ast.port_nme
     | (Ast.LNK_ANY,pos), (Ast.FREE,_) ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos), Freed) in
       links_annot
@@ -767,7 +750,7 @@ although it is left unpecified in the left hand side"
       List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
-    | [] -> site_occurence_failure agent_name (na,pos)
+    | [] -> not_enough_specified agent_name (na,pos)
     | _ :: _ -> several_occurence_of_site agent_name (na,pos) in
   let rp_r,annot,_ =
     List.fold_left
@@ -778,10 +761,6 @@ although it is left unpecified in the left hand side"
          let () = if pset == pset' then
              several_occurence_of_site agent_name p.Ast.port_nme in
 
-         let () =
-           if ports.(p_id) <> (Location.dummy_annot Ast.LNK_ANY, Maintained)
-           || internals.(p_id) <> I_ANY
-           then site_occurence_failure agent_name p_na in
          let p',rp' = find_in_rp p_na rp in
          let annot' = register_port_modif p_id p.Ast.port_lnk p' annot in
          let () = register_internal_modif p_id p.Ast.port_int p' in
