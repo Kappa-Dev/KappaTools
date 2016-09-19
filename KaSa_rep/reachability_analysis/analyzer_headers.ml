@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 23 2016>
+  * Last modification: Time-stamp: <Sep 19 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -183,6 +183,17 @@ let set_action_binding bonds static =
     {
       (get_bdu_common_static static) with
       Common_static.store_action_binding = bonds
+    }
+    static
+
+let get_views_rhs static =
+  (get_bdu_common_static static).Common_static.store_views_rhs
+
+let set_views_rhs sites static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+      Common_static.store_views_rhs = sites
     }
     static
 

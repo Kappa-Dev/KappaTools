@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 15 2016>
+   * Last modification: Time-stamp: <Sep 19 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -28,12 +28,12 @@ type local_static_information =
       (*is a union set of double binding in the lhs and the rhs*)
     store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
     (* information of partial formation of parallel or non-parallel bonds in rules *)
-    store_views_rhs :
+    (*store_views_rhs :
       Parallel_bonds_type.AgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
-    store_action_binding :
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
+    (*store_action_binding :
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_fst_site_create_parallel_bonds_rhs:
       ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
         Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
@@ -42,7 +42,8 @@ type local_static_information =
         Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
         Ckappa_sig.c_state * Ckappa_sig.c_state)
       ) list
-        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t Ckappa_sig.Rule_map_and_set.Map.t;
+        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
     store_snd_site_create_parallel_bonds_rhs:
       ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
         Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
@@ -74,8 +75,8 @@ type local_static_information =
 
 let init_local_static =
   {
-    store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
+    (*store_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_tuples_of_interest = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_rule_double_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
@@ -274,7 +275,7 @@ let project_away_ag_id_and_convert_into_set
 (************************************************************************)
 (*action binding in the rhs*)
 (************************************************************************)
-
+(*
 let collect_action_binding parameter error rule_id rule store_result =
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
       (*get information of a rule that created a bond*)
@@ -357,7 +358,7 @@ let collect_action_binding parameter error rule_id rule store_result =
       in
       error, store_result
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
-
+  *)
 (****************************************************************)
 (** Detect pair of bonds *)
 (****************************************************************)
@@ -384,7 +385,7 @@ let collect_rule_double_bonds_rhs
 (*views on the rhs*)
 (**************************************************************************)
 
-let collect_views_rhs parameter error rule_id rule store_result =
+(*let collect_views_rhs parameter error rule_id rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
@@ -430,7 +431,7 @@ let collect_views_rhs parameter error rule_id rule store_result =
            error, store_result
       ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
   in
-  error, store_result
+  error, store_result*)
 
 (**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
@@ -447,7 +448,8 @@ let collect_site_create_parallel_bonds_gen pos parameter error store_action_bind
   Ckappa_sig.Rule_map_and_set.Map.fold
     (fun k set (error,map) ->
        let error, new_set =
-         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
+         (*Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold*)
+         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
            (*A.x -> B.z; B.z -> A.x*)
            (fun ((agent_id, agent_type, site_type, state),
                  (agent_id', agent_type', site_type', state')) (error,store_result) ->

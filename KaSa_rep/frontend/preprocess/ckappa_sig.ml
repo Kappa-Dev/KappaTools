@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 14 2016>
+ * Last modification: Time-stamp: <Sep 19 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -168,7 +168,7 @@ module Rule_quick_nearly_Inf_Int_storage_Imperatif =
 module Site_union_find =
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
-(****************************************************************************************)
+(****************************************************************************)
 (*Define module fifo take rule_id*)
 
 module Rule =
@@ -180,7 +180,7 @@ end
 
 module Rule_FIFO = Fifo.WlMake (Rule)
 
-(****************************************************************************************)
+(****************************************************************************)
 
 module Agent_id_nearly_Inf_Int_storage_Imperatif =
   (
@@ -196,7 +196,7 @@ module Agent_id_quick_nearly_Inf_Int_storage_Imperatif =
      and type dimension = int
   )
 
-(****************************************************************************************)
+(***************************************************************************)
 
 module Agent_map_and_set =
   Map_wrapper.Make
@@ -298,7 +298,7 @@ module PairRule_setmap =
       let print = Pp.pair Format.pp_print_int Format.pp_print_int
     end)
 
-(****************************************************************************************)
+(****************************************************************************)
 
 module Site_map_and_set =
   Map_wrapper.Make
@@ -336,7 +336,15 @@ module AgentsSite_map_and_set =
          let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
        end))
 
-(****************************************************************************************)
+module AgentsSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name * c_site_name * c_state
+         let compare = compare
+         let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d
+       end))
+(***************************************************************************)
 (*bonds in rhs and lhs*)
 
 module PairAgentsSiteState_map_and_set =

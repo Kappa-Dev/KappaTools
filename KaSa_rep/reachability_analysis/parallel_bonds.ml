@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 15 2016>
+  * Last modification: Time-stamp: <Sep 19 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -84,6 +84,11 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
+
+  let get_action_binding static =
+    lift Analyzer_headers.get_action_binding static
+
   let get_local_static_information static = static.local_static_information
 
   let set_local_static_information local static =
@@ -103,7 +108,7 @@ struct
     in
     error, rule
 
-  let get_action_binding static =
+  (*let get_action_binding static =
     (get_local_static_information
        static).Parallel_bonds_static.store_action_binding
 
@@ -113,9 +118,9 @@ struct
         (get_local_static_information static) with
         Parallel_bonds_static.store_action_binding = bonds
       }
-      static
+      static*)
 
-  let get_views_rhs static =
+  (*let get_views_rhs static =
     (get_local_static_information
        static).Parallel_bonds_static.store_views_rhs
 
@@ -125,7 +130,7 @@ struct
         (get_local_static_information static) with
         Parallel_bonds_static.store_views_rhs = bonds
       }
-      static
+      static*)
 
   (*static information*)
 
@@ -274,20 +279,20 @@ struct
     let parameter = get_parameter static in
     (*------------------------------------------------------*)
     (*views on the right hand side*)
-    let store_views_rhs = get_views_rhs static in
+    (*let store_views_rhs = get_views_rhs static in
     let error, store_views_rhs =
       Parallel_bonds_static.collect_views_rhs
         parameter error rule_id rule store_views_rhs
     in
-    let static = set_views_rhs store_views_rhs static in
+    let static = set_views_rhs store_views_rhs static in*)
     (*------------------------------------------------------*)
     (*action created a binding site*)
-    let store_action_binding = get_action_binding static in
+    (*let store_action_binding = get_action_binding static in
     let error, store_action_binding =
       Parallel_bonds_static.collect_action_binding
         parameter error rule_id rule store_action_binding
     in
-    let static = set_action_binding store_action_binding static in
+    let static = set_action_binding store_action_binding static in*)
     (*------------------------------------------------------*)
     (*a set of rules that has a potential double binding or potential non double binding on the lhs*)
     let store_result = get_rule_double_bonds_lhs static in
