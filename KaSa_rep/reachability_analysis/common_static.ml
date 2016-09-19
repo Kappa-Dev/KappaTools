@@ -45,6 +45,9 @@ type bdu_common_static =
     store_views_rhs :
       Ckappa_sig.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    store_views_lhs :
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
   }
 
 (*****************************************************************************)
@@ -61,6 +64,7 @@ let init_bdu_common_static =
   let inite_potential_side_effects_per_rule =
     Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty in
+  let init_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_common_static =
     {
       store_agent_name              = init_agent_name;
@@ -71,6 +75,7 @@ let init_bdu_common_static =
       store_bonds_lhs = init_bonds_lhs;
       store_action_binding = init_action_binding;
       store_views_rhs = init_views_rhs;
+      store_views_lhs = init_views_lhs;
     }
   in
   init_common_static
@@ -845,7 +850,7 @@ let collect_action_binding parameter error rule_id rule store_result =
 
 (***************************************************************************)
 
-let collect_views_rhs parameter error rule_id rule store_result =
+let collect_views_aux parameter error rule_id views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
@@ -891,10 +896,23 @@ let collect_views_rhs parameter error rule_id rule store_result =
                store_result
            in
            error, store_result
-      ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
+      ) views store_result
   in
   error, store_result
 
+let collect_views_rhs parameter error rule_id rule store_result =
+  collect_views_aux
+    parameter error
+    rule_id
+    rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+    store_result
+
+let collect_views_lhs parameter error rule_id rule store_result =
+  collect_views_aux
+    parameter error
+    rule_id
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    store_result
 
 
 (***************************************************************************)
@@ -963,6 +981,9 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   let error, store_views_rhs =
     collect_views_rhs parameter error rule_id rule store_result.store_views_rhs
   in
+  let error, store_views_lhs =
+    collect_views_lhs parameter error rule_id rule store_result.store_views_lhs
+  in
   error,
   {store_result with
    store_agent_name = store_agent_name;
@@ -971,7 +992,8 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_bonds_rhs = store_bonds_rhs;
    store_bonds_lhs = store_bonds_lhs;
    store_action_binding = store_action_binding;
-   store_views_rhs = store_views_rhs
+   store_views_rhs = store_views_rhs;
+   store_views_lhs = store_views_lhs
   }
 
 (******************************************************************************)

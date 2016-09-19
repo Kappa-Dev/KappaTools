@@ -197,6 +197,17 @@ let set_views_rhs sites static =
     }
     static
 
+let get_views_lhs static =
+  (get_bdu_common_static static).Common_static.store_views_lhs
+
+let set_views_lhs sites static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+      Common_static.store_views_lhs = sites
+    }
+    static
+
 let compute_initial_state error static =
   let parameter = get_parameter static in
   let compil = get_cc_code static in

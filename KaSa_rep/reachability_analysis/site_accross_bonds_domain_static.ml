@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Sep 15 2016>
+   * Last modification: Time-stamp: <Sep 19 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -22,8 +22,8 @@ let local_trace = false
 type basic_static_information =
   {
     (*------------------------------------------------------------------*)
-    store_views_rhs : Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+    (*store_views_rhs : Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_views_lhs :      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_rhs: Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
@@ -70,7 +70,7 @@ type basic_static_information =
 
 let init_basic_static_information =
   {
-    store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
@@ -319,7 +319,8 @@ let collect_potential_tuple_pair parameter error
   in
   let error, views_rhs_set =
     get_set parameter error rule_id
-      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+(*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty*)
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_views_rhs
   in
   Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
@@ -327,7 +328,8 @@ let collect_potential_tuple_pair parameter error
        let (agent_id, agent_type, site_type, state) = x in
        let (agent_id1, agent_type1, site_type1, state1) = y in
        let error, fst_list =
-         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
+         Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id = agent_id_v &&
@@ -342,7 +344,8 @@ let collect_potential_tuple_pair parameter error
            ) views_rhs_set (error, [])
        in
        let error, snd_list =
-         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
+         Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id1 = agent_id_v &&
@@ -395,7 +398,8 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
   in
   let error, views_lhs_set =
     get_set parameter error rule_id
-      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+      (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty*)
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_views_lhs
   in
   let error, pair_set =
@@ -405,7 +409,8 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
        let (agent_id, agent_type, site_type, state) = x in
        let (agent_id1, agent_type1, site_type1, state1) = y in
        let error, fst_list =
-         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
+         Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               (*views information*)
               let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
@@ -424,7 +429,8 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
            ) views_lhs_set (error, [])
        in
        let error, snd_list =
-         Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+         (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
+         Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
               if agent_id1 = agent_id_v &&

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 15 2016>
+   * Last modification: Time-stamp: <Sep 19 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -95,6 +95,10 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
+
+  let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
+
   let get_rule parameter error static r_id =
     let compil = get_compil static in
     let error, rule  =
@@ -126,7 +130,7 @@ struct
         store_basic_static_information = domain
       } static
 
-  let get_views_rhs static =
+  (*let get_views_rhs static =
     (get_basic_static_information static).Site_accross_bonds_domain_static.store_views_rhs
 
   let set_views_rhs r static =
@@ -134,9 +138,9 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_views_rhs = r
-      } static
+      } static*)
 
-  let get_views_lhs static =
+  (*let get_views_lhs static =
     (get_basic_static_information static).Site_accross_bonds_domain_static.store_views_lhs
 
   let set_views_lhs l static =
@@ -144,7 +148,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_views_lhs = l
-      } static
+      } static*)
 
   let get_bonds_rhs static =
     (get_basic_static_information
@@ -335,19 +339,19 @@ struct
     let kappa_handler = get_kappa_handler static in
     (*------------------------------------------------------------*)
     (*views on the right hand side*)
-    let store_views_rhs = get_views_rhs static in
+    (*let store_views_rhs = get_views_rhs static in
     let error, store_views_rhs =
       Site_accross_bonds_domain_static.collect_views_rhs
         parameter error rule_id rule store_views_rhs
     in
-    let static = set_views_rhs store_views_rhs static in
+    let static = set_views_rhs store_views_rhs static in*)
     (*views on the left hand side*)
-    let store_views_lhs = get_views_lhs static in
+    (*let store_views_lhs = get_views_lhs static in
     let error, store_views_lhs =
       Site_accross_bonds_domain_static.collect_views_lhs
         parameter error rule_id rule store_views_lhs
     in
-    let static = set_views_lhs store_views_lhs static in
+    let static = set_views_lhs store_views_lhs static in*)
     (*------------------------------------------------------------*)
     (*bonds on the right hand side*)
     let store_bonds_rhs = get_bonds_rhs static in
