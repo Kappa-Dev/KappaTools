@@ -31,9 +31,9 @@ type basic_static_information =
     store_bonds_lhs :
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_modified_map :
+    (*store_modified_map :
       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     (*store_created_bonds :
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;*)
@@ -74,7 +74,7 @@ let init_basic_static_information =
     (*store_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     (*store_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     (*-------------------------------------------------------*)
@@ -672,7 +672,8 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
   (*modification*)
   let error, store_modified_set =
     get_set parameter error rule_id
-      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+      (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty*)
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_modified_map
   in
   (*-------------------------------------------------------------*)
@@ -685,7 +686,8 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
             store_result
         in
         (*-------------------------------------------------------------*)
-        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+        (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
+        Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
           (fun m (error, store_result) ->
              let (agent_id_m, _agent_type_m, site_type_m, state_m) = m in
              let error, agent =

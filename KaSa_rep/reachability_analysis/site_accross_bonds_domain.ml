@@ -101,6 +101,8 @@ struct
 
   let get_created_bonds static = lift Analyzer_headers.get_created_bonds static
 
+  let get_modified_map static = lift Analyzer_headers.get_modified_map static
+
   let get_rule parameter error static r_id =
     let compil = get_compil static in
     let error, rule  =
@@ -231,7 +233,7 @@ struct
         Site_accross_bonds_domain_static.store_partition_created_bonds_map = r
       } static
 
-  let get_modified_map static =
+  (*let get_modified_map static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_modified_map
 
@@ -240,7 +242,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_modified_map = r
-      } static
+      } static*)
 
   let get_partition_modified_map_1 static =
     (get_basic_static_information
@@ -413,7 +415,7 @@ struct
     let static = set_created_bonds store_created_bonds static in*)
     (*------------------------------------------------------------*)
     (*modification*)
-    let store_modified_map = get_modified_map static in
+    (*let store_modified_map = get_modified_map static in
     let error, store_modified_map =
       Site_accross_bonds_domain_static.collect_site_modified
         parameter error
@@ -421,7 +423,7 @@ struct
         rule
         store_modified_map
     in
-    let static = set_modified_map store_modified_map static in
+    let static = set_modified_map store_modified_map static in*)
     (*------------------------------------------------------------*)
     (*question marks on the right hand side*)
     let store_question_marks_rhs = get_question_marks_rhs static in
@@ -926,7 +928,8 @@ struct
       rule_id rule precondition modified_set =
     let store_partition_modified_map = get_partition_modified pos  static in
     (*------------------------------------------------------*)
-    Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
+    (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
+    Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
       (fun mod_tuple (error, dynamic, precondition) ->
          let (agent_id_mod, agent_type_mod, site_type_mod, state_mod) = mod_tuple in
          let error, potential_tuple_pair_set =
@@ -1052,7 +1055,8 @@ struct
       Site_accross_bonds_domain_static.get_set parameter
         error
         rule_id
-        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+(*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty*)
+        Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
         store_modified_map
     in
     let error, dynamic, precondition =

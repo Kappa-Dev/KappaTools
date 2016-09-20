@@ -153,6 +153,17 @@ val set_created_bonds :
   global_static_information ->
   global_static_information
 
+val get_modified_map :
+  global_static_information ->
+  Ckappa_sig.AgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t
+
+val set_modified_map :
+  Ckappa_sig.AgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
 val compute_initial_state:
   Exception.method_handler ->
   global_static_information ->

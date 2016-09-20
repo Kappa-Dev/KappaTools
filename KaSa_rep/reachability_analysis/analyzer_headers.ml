@@ -219,6 +219,17 @@ let set_created_bonds sites static =
     }
     static
 
+let get_modified_map static =
+  (get_bdu_common_static static).Common_static.store_modified_map
+
+let set_modified_map sites static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+      Common_static.store_modified_map = sites
+    }
+    static
+
 let compute_initial_state error static =
   let parameter = get_parameter static in
   let compil = get_cc_code static in
