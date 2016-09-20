@@ -138,48 +138,6 @@ struct
         store_basic_static_information = domain
       } static
 
-  (*let get_views_rhs static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_views_rhs
-
-  let set_views_rhs r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_views_rhs = r
-      } static*)
-
-  (*let get_views_lhs static =
-    (get_basic_static_information static).Site_accross_bonds_domain_static.store_views_lhs
-
-  let set_views_lhs l static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_views_lhs = l
-      } static*)
-
-  (*let get_bonds_rhs static =
-    (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_bonds_rhs
-
-  let set_bonds_rhs r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_bonds_rhs = r
-      } static*)
-
-  (*let get_bonds_lhs static =
-    (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_bonds_lhs
-
-  let set_bonds_lhs r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_bonds_lhs = r
-      } static*)
-
   (*tuple pair*)
 
   let get_potential_tuple_pair static =
@@ -215,17 +173,6 @@ struct
         Site_accross_bonds_domain_static.store_partition_bonds_rhs_map = r
       } static
 
-  (*let get_created_bonds static =
-    (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_created_bonds
-
-  let set_created_bonds r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_created_bonds = r
-      } static*)
-
   let get_partition_created_bonds_map static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_partition_created_bonds_map
@@ -236,17 +183,6 @@ struct
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_partition_created_bonds_map = r
       } static
-
-  (*let get_modified_map static =
-    (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_modified_map
-
-  let set_modified_map r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_modified_map = r
-      } static*)
 
   let get_partition_modified_map_1 static =
     (get_basic_static_information
@@ -269,17 +205,6 @@ struct
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_partition_modified_map_2 = r
       } static
-
-  (*let get_question_marks_rhs static =
-    (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_question_marks_rhs
-
-  let set_question_marks_rhs r static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_question_marks_rhs = r
-      } static*)
 
   (** dynamic information*)
 
@@ -344,38 +269,7 @@ struct
 (*rule*)
 
   let scan_rule parameter error rule_id rule static =
-    let kappa_handler = get_kappa_handler static in
-    (*------------------------------------------------------------*)
-    (*views on the right hand side*)
-    (*let store_views_rhs = get_views_rhs static in
-    let error, store_views_rhs =
-      Site_accross_bonds_domain_static.collect_views_rhs
-        parameter error rule_id rule store_views_rhs
-    in
-    let static = set_views_rhs store_views_rhs static in*)
-    (*views on the left hand side*)
-    (*let store_views_lhs = get_views_lhs static in
-    let error, store_views_lhs =
-      Site_accross_bonds_domain_static.collect_views_lhs
-        parameter error rule_id rule store_views_lhs
-    in
-    let static = set_views_lhs store_views_lhs static in*)
-    (*------------------------------------------------------------*)
-    (*bonds on the right hand side*)
-    (*let store_bonds_rhs = get_bonds_rhs static in
-    let error, store_bonds_rhs =
-      Site_accross_bonds_domain_static.collect_bonds_rhs
-        parameter error rule_id rule store_bonds_rhs
-    in
-    let static = set_bonds_rhs store_bonds_rhs static in*)
-    (*------------------------------------------------------------*)
-    (*bonds on the left hand side*)
-    (*let store_bonds_lhs = get_bonds_lhs static in
-    let error, store_bonds_lhs =
-      Site_accross_bonds_domain_static.collect_bonds_lhs
-        parameter error rule_id rule store_bonds_lhs
-    in
-    let static = set_bonds_lhs store_bonds_lhs static in*)
+    (*let kappa_handler = get_kappa_handler static in*)
     (*------------------------------------------------------------*)
     (*tuple pair on the rhs*)
     let store_views_rhs = get_views_rhs static in
@@ -406,42 +300,6 @@ struct
         static
     in
     (*------------------------------------------------------------*)
-    (*created a bond*)
-    (*let store_created_bonds = get_created_bonds static in
-    let error, store_created_bonds =
-      Site_accross_bonds_domain_static.collect_created_bonds
-        parameter
-        error
-        rule
-        rule_id
-        store_created_bonds
-    in
-    let static = set_created_bonds store_created_bonds static in*)
-    (*------------------------------------------------------------*)
-    (*modification*)
-    (*let store_modified_map = get_modified_map static in
-    let error, store_modified_map =
-      Site_accross_bonds_domain_static.collect_site_modified
-        parameter error
-        rule_id
-        rule
-        store_modified_map
-    in
-    let static = set_modified_map store_modified_map static in*)
-    (*------------------------------------------------------------*)
-    (*question marks on the right hand side*)
-    (*let store_question_marks_rhs = get_question_marks_rhs static in
-    let store_modified_map = get_modified_map static in
-    let error, store_question_marks_rhs =
-      Site_accross_bonds_domain_static.collect_question_marks_rhs
-        parameter error
-        kappa_handler
-        rule_id
-        rule
-        store_modified_map
-        store_question_marks_rhs
-    in
-    let static = set_question_marks_rhs store_question_marks_rhs static in*)
     error, static
 
 (****************************************************************)
