@@ -37,9 +37,9 @@ type basic_static_information =
     (*store_created_bonds :
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;*)
-    store_question_marks_rhs :
+    (*store_question_marks_rhs :
       Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     (*------------------------------------------------------------------*)
     (*this is the potential tuple on the rhs*)
     store_potential_tuple_pair :
@@ -76,7 +76,7 @@ let init_basic_static_information =
     store_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     (*store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     (*store_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty;*)
-    store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     (*-------------------------------------------------------*)
     store_potential_tuple_pair =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
@@ -659,7 +659,7 @@ let collect_partition_modified_map_2 parameter error
 
 (***************************************************************)
 (*collect rule that has question marks on the right hand side*)
-
+(*
 let collect_question_marks_rhs parameter error handler_kappa rule_id rule
     store_modified_map store_result =
   (*-------------------------------------------------------------*)
@@ -726,7 +726,7 @@ let collect_question_marks_rhs parameter error handler_kappa rule_id rule
       ) (error, store_result) question_marks_r
   in
   error, store_result
-
+         *)
 (***************************************************************)
 (*Initial state*)
 (***************************************************************)

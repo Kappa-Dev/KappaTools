@@ -266,7 +266,7 @@ struct
         Site_accross_bonds_domain_static.store_partition_modified_map_2 = r
       } static
 
-  let get_question_marks_rhs static =
+  (*let get_question_marks_rhs static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_question_marks_rhs
 
@@ -275,7 +275,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_question_marks_rhs = r
-      } static
+      } static*)
 
   (** dynamic information*)
 
@@ -426,7 +426,7 @@ struct
     let static = set_modified_map store_modified_map static in*)
     (*------------------------------------------------------------*)
     (*question marks on the right hand side*)
-    let store_question_marks_rhs = get_question_marks_rhs static in
+    (*let store_question_marks_rhs = get_question_marks_rhs static in
     let store_modified_map = get_modified_map static in
     let error, store_question_marks_rhs =
       Site_accross_bonds_domain_static.collect_question_marks_rhs
@@ -437,7 +437,7 @@ struct
         store_modified_map
         store_question_marks_rhs
     in
-    let static = set_question_marks_rhs store_question_marks_rhs static in
+    let static = set_question_marks_rhs store_question_marks_rhs static in*)
     error, static
 
 (****************************************************************)
