@@ -103,6 +103,10 @@ struct
 
   let get_modified_map static = lift Analyzer_headers.get_modified_map static
 
+  let get_bonds_rhs static = lift Analyzer_headers.get_bonds_rhs static
+
+  let get_bonds_lhs static = lift Analyzer_headers.get_bonds_lhs static
+
   let get_rule parameter error static r_id =
     let compil = get_compil static in
     let error, rule  =
@@ -154,7 +158,7 @@ struct
         Site_accross_bonds_domain_static.store_views_lhs = l
       } static*)
 
-  let get_bonds_rhs static =
+  (*let get_bonds_rhs static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_bonds_rhs
 
@@ -163,9 +167,9 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_bonds_rhs = r
-      } static
+      } static*)
 
-  let get_bonds_lhs static =
+  (*let get_bonds_lhs static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_bonds_lhs
 
@@ -174,7 +178,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_bonds_lhs = r
-      } static
+      } static*)
 
   (*tuple pair*)
 
@@ -358,20 +362,20 @@ struct
     let static = set_views_lhs store_views_lhs static in*)
     (*------------------------------------------------------------*)
     (*bonds on the right hand side*)
-    let store_bonds_rhs = get_bonds_rhs static in
+    (*let store_bonds_rhs = get_bonds_rhs static in
     let error, store_bonds_rhs =
       Site_accross_bonds_domain_static.collect_bonds_rhs
         parameter error rule_id rule store_bonds_rhs
     in
-    let static = set_bonds_rhs store_bonds_rhs static in
+    let static = set_bonds_rhs store_bonds_rhs static in*)
     (*------------------------------------------------------------*)
     (*bonds on the left hand side*)
-    let store_bonds_lhs = get_bonds_lhs static in
+    (*let store_bonds_lhs = get_bonds_lhs static in
     let error, store_bonds_lhs =
       Site_accross_bonds_domain_static.collect_bonds_lhs
         parameter error rule_id rule store_bonds_lhs
     in
-    let static = set_bonds_lhs store_bonds_lhs static in
+    let static = set_bonds_lhs store_bonds_lhs static in*)
     (*------------------------------------------------------------*)
     (*tuple pair on the rhs*)
     let store_views_rhs = get_views_rhs static in

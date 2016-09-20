@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Sep 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -288,6 +288,19 @@ struct
 
   (**************************************************************************)
 
+  module Proj_bonds =
+    Map_wrapper.Proj
+      (Ckappa_sig.PairAgentsSiteState_map_and_set) (*potential tuple pair set*)
+      (Ckappa_sig.PairAgentSiteState_map_and_set) (*use to search the set in bonds rhs*)
+
+  let proj (_, b, c, d) = (b, c, d)
+  let proj2 (x, y) = proj x, proj y
+
+  let proj_bonds_aux parameter error bonds_set =
+    Proj_bonds.proj_set
+      (fun (x, y) -> proj2 (x, y))
+      parameter error bonds_set
+
   let is_enabled static dynamic error rule_id precondition =
     (*test if the bond in the lhs has already in the contact map, if not
       None, *)
@@ -295,12 +308,14 @@ struct
     let bond_lhs = get_bond_lhs static in
     let contact_map = get_contact_map_dynamic dynamic in
     let error, bond_lhs_set =
-      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
-              rule_id bond_lhs
+      match
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
+          rule_id bond_lhs
       with
-      | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
+      | error, None -> error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
+    let error, bond_lhs_set = proj_bonds_aux parameter error bond_lhs_set in
     if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set contact_map
     then
       (* use the function Communication.overwrite_potential_partners_map to
@@ -376,12 +391,16 @@ struct
     let contact_map = get_contact_map_dynamic dynamic in
     let bond_rhs_map = get_bond_rhs static in
     let error, bond_rhs_set =
-      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id
-              bond_rhs_map
+      match
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter
+          error rule_id
+          bond_rhs_map
       with
-      | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
+      | error, None -> error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
+    let error, bond_rhs_set =
+      proj_bonds_aux parameter error bond_rhs_set in
     let error', union =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.union
         parameter error contact_map bond_rhs_set
