@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Sep 19 2016>
+   * Last modification: Time-stamp: <Sep 20 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -24,8 +24,8 @@ type basic_static_information =
     (*------------------------------------------------------------------*)
     (*store_views_rhs : Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;*)
-    store_views_lhs :      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+    (*store_views_lhs :      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_bonds_rhs: Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_lhs :
@@ -34,9 +34,9 @@ type basic_static_information =
     store_modified_map :
       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_created_bonds :
+    (*store_created_bonds :
       Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_question_marks_rhs :
       Site_accross_bonds_domain_type.AgentsSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -71,11 +71,11 @@ type basic_static_information =
 let init_basic_static_information =
   {
     (*store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
-    store_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     (*-------------------------------------------------------*)
     store_potential_tuple_pair =
@@ -113,7 +113,7 @@ let get_set parameter error rule_id empty_set store_result =
 (***************************************************************)
 (*collect views on the right hand side*)
 
-let collect_views_aux parameter error rule_id views store_result =
+(*let collect_views_aux parameter error rule_id views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
@@ -176,7 +176,7 @@ collect_views_aux
   parameter error
   rule_id
   rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-  store_result
+  store_result*)
 
 (***************************************************************)
 (*collect rule that can be bound on the right hand side*)
@@ -493,7 +493,7 @@ let collect_partition_bonds_rhs_map parameter error
 (***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)
 
-let collect_created_bonds parameter error rule rule_id store_result =
+(*let collect_created_bonds parameter error rule rule_id store_result =
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
       let agent_id = site_add1.Cckappa_sig.agent_index in
       let site_type = site_add1.Cckappa_sig.site in
@@ -564,7 +564,7 @@ let collect_created_bonds parameter error rule rule_id store_result =
           store_result
       in
       error, store_result
-    )(error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
+    )(error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind*)
 
 let collect_partition_created_bonds_map parameter error
     store_potential_tuple_pair_set =
@@ -811,7 +811,8 @@ let collect_pair_sites_init parameter error store_sites_init =
          in
          error, store_result
       ) store_sites_init
-      (error, Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty)
+      (error,
+       Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty)
   in
   error, store_result
 

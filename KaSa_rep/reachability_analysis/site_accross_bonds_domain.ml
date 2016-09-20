@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 19 2016>
+   * Last modification: Time-stamp: <Sep 20 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -98,6 +98,8 @@ struct
   let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
 
   let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
+
+  let get_created_bonds static = lift Analyzer_headers.get_created_bonds static
 
   let get_rule parameter error static r_id =
     let compil = get_compil static in
@@ -207,7 +209,7 @@ struct
         Site_accross_bonds_domain_static.store_partition_bonds_rhs_map = r
       } static
 
-  let get_created_bonds static =
+  (*let get_created_bonds static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_created_bonds
 
@@ -216,7 +218,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_created_bonds = r
-      } static
+      } static*)
 
   let get_partition_created_bonds_map static =
     (get_basic_static_information
@@ -399,7 +401,7 @@ struct
     in
     (*------------------------------------------------------------*)
     (*created a bond*)
-    let store_created_bonds = get_created_bonds static in
+    (*let store_created_bonds = get_created_bonds static in
     let error, store_created_bonds =
       Site_accross_bonds_domain_static.collect_created_bonds
         parameter
@@ -408,7 +410,7 @@ struct
         rule_id
         store_created_bonds
     in
-    let static = set_created_bonds store_created_bonds static in
+    let static = set_created_bonds store_created_bonds static in*)
     (*------------------------------------------------------------*)
     (*modification*)
     let store_modified_map = get_modified_map static in
@@ -695,14 +697,15 @@ struct
     let error, created_bonds_set =
       Site_accross_bonds_domain_static.get_set parameter error
         rule_id
-        Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
         store_created_bonds
     in
     let store_partition_created_bonds_map =
       get_partition_created_bonds_map static in
     (*------------------------------------------------------*)
     let error, dynamic, precondition =
-      Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+      (*Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold*)
+      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
         (fun (t, u) (error, dynamic, precondition) ->
            let (agent_id_t, agent_type_t, site_type_t, state_t) = t in
            let (agent_id_u, agent_type_u, site_type_u, state_u) = u in
