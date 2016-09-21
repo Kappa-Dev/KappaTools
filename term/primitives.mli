@@ -72,6 +72,9 @@ type perturbation =
 
 val exists_modification : (modification -> bool) -> perturbation list -> bool
 
+val extract_connected_components_modifications :
+  modification list -> Connected_component.t list
+
 val map_expr_rule : (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
   elementary_rule -> elementary_rule
 val map_expr_perturbation :

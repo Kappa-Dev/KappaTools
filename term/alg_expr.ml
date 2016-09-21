@@ -125,6 +125,13 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
     | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR) ->
       (in_t,Operator.DepSet.add d in_e,toks_d,out)
 
+let rec aux_extract_cc acc = function
+  | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
+  | UN_ALG_OP (_, a), _ -> aux_extract_cc acc a
+  | (ALG_VAR _ | CONST _ | TOKEN_ID _ | STATE_ALG_OP _), _ -> acc
+  | KAPPA_INSTANCE i, _ -> i :: acc
+let extract_connected_components x = aux_extract_cc [] x
+
 let setup_alg_vars_rev_dep toks vars =
   let in_t = Operator.DepSet.empty in
   let in_e = Operator.DepSet.empty in

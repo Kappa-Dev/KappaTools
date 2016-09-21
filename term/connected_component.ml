@@ -1220,6 +1220,9 @@ module Matching = struct
        | None -> false)
     | nav -> aux_is_root_of graph (Some root) Renaming.empty nav
 
+  let roots_of graph cc =
+    Edges.all_agents_where (fun x -> is_root_of graph x cc) graph
+
   (* get : (ContentAgent.t * int) -> t -> int *)
   let get ((_,_,node),id) (t,_) =
     Renaming.apply (Mods.IntMap.find_default Renaming.empty id t) node

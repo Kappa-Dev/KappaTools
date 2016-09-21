@@ -52,6 +52,8 @@ val setup_alg_vars_rev_dep :
   unit NamedDecls.t -> (string Location.annot * ('a,int) e Location.annot) array ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
 
+val extract_connected_components : ('a,'b) e Location.annot -> 'a list
+
 val propagate_constant :
   int list -> Counter.t ->
   (string Location.annot * ('a,int) e Location.annot) array ->

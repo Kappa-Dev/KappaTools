@@ -755,6 +755,15 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
       else Mods.IntMap.add rule_id stay state.unary_candidates;
     unary_pathes = Mods.Int2Set.fold remove_path byebye state.unary_pathes; }
 
+let incorporate_extra_connected_component state cc =
+  if Connected_component.Map.mem cc state.roots_of_ccs
+  then state
+  else {state with
+        roots_of_ccs =
+          Connected_component.Map.add
+            cc (Connected_component.Matching.roots_of state.edges cc)
+            state.roots_of_ccs}
+
 let snapshot env counter fn state = {
   Data.snap_file = fn;
   Data.snap_event = Counter.current_event counter;

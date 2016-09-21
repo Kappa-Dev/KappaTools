@@ -53,6 +53,8 @@ val link_destination : int -> int -> t -> (agent * int) option
 val get_internal : int -> int -> t -> int
 (** [get_internal ag site graph] *)
 
+val all_agents_where : (agent -> bool) -> t -> Mods.IntSet.t
+
 type path = ((agent * int) * (agent * int)) list
 val empty_path : path
 val singleton_path : agent -> int -> agent -> int -> path

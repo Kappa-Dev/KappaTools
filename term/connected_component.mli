@@ -81,6 +81,8 @@ module Matching : sig
 
   val is_root_of : Edges.t -> Edges.agent -> cc -> bool
 
+  val roots_of : Edges.t -> cc -> Mods.IntSet.t
+
   val elements_with_types : cc array -> t -> Edges.agent list array
 
   type cache

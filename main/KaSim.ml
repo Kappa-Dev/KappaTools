@@ -172,19 +172,22 @@ let () =
                        (Environment.algs_finder env0)) e [] in
                 let cc_preenv', e'' = Eval.compile_modifications_no_track
                     contact_map cc_preenv e' in
-                if cc_preenv == cc_preenv' then
-                  cc_env,
-                  List.fold_left
+                let cc_env',graph' =
+                  if cc_preenv == cc_preenv' then (cc_env,graph)
+                  else
+                    (Connected_component.PreEnv.finalize cc_preenv',
+                     List.fold_left
+                       Rule_interpreter.incorporate_extra_connected_component
+                       graph
+                       (Primitives.extract_connected_components_modifications e''))
+                in
+                cc_env',
+                List.fold_left
                     (fun (stop,graph',state' as acc) x ->
                        if stop then acc else
                          State_interpreter.do_modification
                            ~outputs env0 cc_env counter graph' state' x)
-                    (false,graph,state) e''
-                else (* Connected_component.PreEnv.finalize cc_preenv' *)
-                  let () = Pp.error Format.pp_print_string
-                      (Location.dummy_annot
-                         "Tracking a new pattern on the fly is impossible (for now?)") in
-                  cc_env,(false,graph,state)
+                    (false,graph',state) e''
             with
             | ExceptionDefn.Syntax_Error (msg,pos) ->
               let () = Pp.error Format.pp_print_string (msg,pos) in

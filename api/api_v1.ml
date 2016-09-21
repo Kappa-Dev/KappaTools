@@ -342,21 +342,27 @@ end = struct
                         (KappaParser.effect_list KappaLexer.token lexbuf) [] in
                   let cc_preenv', e'' = Eval.compile_modifications_no_track
                       simulation.contact_map cc_preenv e' in
-                 if cc_preenv == cc_preenv' then
-                   let _,graph',state' =
+                 let graph' =
+                   if cc_preenv == cc_preenv' then simulation.graph
+                   else
+                     let () =
+                       simulation.domain <-
+                         Connected_component.PreEnv.finalize cc_preenv' in
                      List.fold_left
-                       (fun (stop,graph',state' as acc) x ->
-                          if stop then acc else
-                            State_interpreter.do_modification
-                              ~outputs:(outputs simulation) simulation.env
-                              simulation.domain simulation.counter graph' state' x)
-                       (false,simulation.graph,simulation.state) e'' in
-                   let () = simulation.graph <- graph' in
-                   let () = simulation.state <- state' in
-                   Lwt.return (`Right ())
-                 else (* Connected_component.PreEnv.finalize cc_preenv' *)
-                   Api_data.lwt_msg
-                     "Tracking a new pattern on the fly is impossible (for now?)")
+                       Rule_interpreter.incorporate_extra_connected_component
+                       simulation.graph
+                       (Primitives.extract_connected_components_modifications e'') in
+                 let _,graph'',state' =
+                   List.fold_left
+                     (fun (stop,graph',state' as acc) x ->
+                        if stop then acc else
+                          State_interpreter.do_modification
+                            ~outputs:(outputs simulation) simulation.env
+                            simulation.domain simulation.counter graph' state' x)
+                     (false,graph',simulation.state) e'' in
+                 let () = simulation.graph <- graph'' in
+                 let () = simulation.state <- state' in
+                 Lwt.return (`Right ()))
           (catch_error (fun e -> Lwt.return (`Left e)))
       val create_state = fun state ->
         { ApiTypes_j.plot = Some state.plot ;

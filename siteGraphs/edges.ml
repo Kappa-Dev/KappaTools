@@ -76,7 +76,6 @@ let copy graph =
     free_id = graph.free_id;
   }
 
-
 let add_agent sigs ty graph =
   let ar = Signature.arity sigs ty in
   let al = Array.make ar None in
@@ -260,6 +259,13 @@ let exists_fresh ag s ty s' graph =
 let link_destination ag s graph =
   let () = assert (not graph.outdated) in
   (Mods.DynArray.get graph.connect ag).(s)
+
+let all_agents_where f graph =
+  Mods.DynArray.fold_lefti
+    (fun id acc -> function
+       | Some ty when f (id,ty) -> Mods.IntSet.add id acc
+       | _ -> acc)
+    Mods.IntSet.empty graph.sort
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =
