@@ -189,7 +189,7 @@ function observable_plot(configuration){
 
 
         // setup colors
-        var color = d3.scale.category10();
+        var color = d3.scaleOrdinal(d3.schemeCategory10);
         color.domain(that.state.map(function(c,i){ return i; }));
         that.state.forEach(function(s,i){ s.color = color(i);
                                           s.tick = that.ticks.index(i);
@@ -211,17 +211,14 @@ function observable_plot(configuration){
             height = dimensions.height - margin.top - margin.bottom;
 
         // setup x-axis
-        var x = (that.getXAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([0, width]);
+        var x = (that.getXAxisLog()?d3.scale.log().clamp(true):d3.scaleLinear()).range([0, width]);
         var xState = that.getStatesByMode(that.modes.XAXIS)[0];
         x.domain(d3.extent(xState.values));
-        var xAxis = d3.svg.axis().scale(x).orient("bottom");
+        var xAxis = d3.axisBottom(x);
 
         // setup y-axis
-        var y = (that.getYAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([height, 0]);
-        var yAxis = d3.svg
-                      .axis()
-                      .scale(y)
-                      .orient("left")
+        var y = (that.getYAxisLog()?d3.scale.log().clamp(true):d3.scaleLinear()).range([height, 0]);
+        var yAxis = d3.axisLeft(y)
                       .tickFormat(d3.format(".3n"));
 
         var visible = that.getVisible();
@@ -299,8 +296,8 @@ function observable_plot(configuration){
                  ,"rotate(-90)");
 
         // render data
-        var line = d3.svg.line()
-            .interpolate("linear")
+        var line = d3.line()
+            .curve(d3.curveLinear)
             .defined(function(d,i) { return !that.getXAxisLog() || xState.values[i] > 0; })
             .defined(function(d,i) { return !that.getYAxisLog() || d > 0; })
             .x(function(d,i) {

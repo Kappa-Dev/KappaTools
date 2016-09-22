@@ -180,8 +180,24 @@ function Site(siteData,agent){
 }
 
 function SiteLink(nodeId,siteId){
-    this.nodeId = nodeId;
-    this.siteId = siteId;
+    var that = this;
+    that.nodeId = nodeId;
+    that.siteId = siteId;
+    that.equals = function(other){
+	return other.nodeId == that.nodeId && other.siteId == that.siteId;
+    }
+}
+
+function SiteEdge(targetNode,sourceNode){
+    var that = this;
+    that.targetNode = targetNode;
+    that.sourceNode = sourceNode;
+    /* undirected edge comparision */
+    that.equals = function(other){
+	var forward = other.targetNode.equals(that.targetNode) && other.sourceNode.equals(that.sourceNode);
+	var reverse = other.targetNode.equals(that.sourceNode) && other.targetNode.equals(that.sourceNode);
+	return forward || reverse;
+    }
 }
 
 /**
@@ -462,6 +478,18 @@ function Render(id,contactMap){
                              "translate(" + that.layout.margin.left +
                                         "," + that.layout.margin.top +
                                       ")");
+    that.svg.append("rect")
+	    .attr("width", width)
+	    .attr("height", height)
+	    .style("fill", "none")
+	    .style("pointer-events", "all")
+	    .call(d3.zoom()
+	    .scaleExtent([1 / 2, 4])
+	    .on("zoom", zoomed));
+
+    function zoomed() {
+	that.svg.attr("transform", d3.event.transform);
+    }
 
     // http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
 //    if (!$(".contact-tooltip").length){
@@ -486,7 +514,7 @@ function Render(id,contactMap){
     //{ that.color = d3.scale.category10().domain(agentNames); }
 
     if(that.contactMap.nodeCount && that.contactMap.nodeCount <= 10){
-	that.color = d3.scale.category10().domain(agentNames);
+	that.color = d3.scaleOrdinal(d3.schemeCategory10).domain(agentNames);
     } else {
 	that.color = hashColor;
     }
@@ -529,9 +557,9 @@ function Render(id,contactMap){
                                  "translate(" + d.absolute.x + "," + d.absolute.y + ")");
         };
 
-        var drag = d3.behavior
-                     .drag()
-            .on("drag", dragmove);
+        var drag = d3.drag()
+                     .on("drag", dragmove);
+
         that.layout.circleNodes();
         that.svg
             .selectAll(".svg-group")
@@ -655,13 +683,15 @@ function Render(id,contactMap){
               that.updateSites();
 
             });
+
     };
   this.renderLinks = function(){
+      var known_edges = [];
       var edges = that.contactMap
                         .nodeList()
                         .reduce(function(edges,node,index,nodes){
                             var sites = node.sitesList();
-                            sites.forEach(function(source_site){
+                            sites.forEach(function(source_site,sourceSiteId){
                                 source_site.links.forEach(function(target_reference){
                                     var target_site = that.contactMap
                                                           .site(target_reference.nodeId,
@@ -671,147 +701,152 @@ function Render(id,contactMap){
 				    // Add bend if self loop.
 				    // start add middle
 				    var target_node = that.contactMap.node(target_reference.nodeId);
+				    var edge = new SiteEdge(new SiteLink(target_reference.nodeId,target_reference.siteId),
+							    new SiteLink(index,sourceSiteId));
 				    var middle = source_site.absolute.middle(target_site.absolute);
-				    if(target_node.label == node.label){
-	/*
-         *                      . top_loop
-         *                      |
-         *                      |
-         *              {1 unit}| center loop
-         *                      |/
-         *    right_loop .-1/2--.--1/2-. left_loop
-         *                      |
-         *                      | {1 unit}
-	 *                      | site_middle
-         *                      |/
-         *         site_1.------.------. site_2
-         *                      |{1 unit}
-         *                      |
-         *                      |
-         *                      |
-         *                      . center_of_agent
-	 *
-	 * center_of_agent      : center of agent
-	 * site_1,site_2        : the sites that are linked
-	 * site_middle          : middle of the two sites
-	 * unit_vector          : site_middle - center_of_agent
-	 * center_loop          : center_of_agent + unit_vector
-	 * left_loop,right_loop :
-	 * top_loop             :
-         * left_loop,top_loop,right_loop
-         */
-					var center_of_agent = {
-					    get x() { return target_node.absolute.x; },
-					    get y() { return target_node.absolute.y; }
-					};
-					//lineData.push(center_of_agent);
-
-					var site_1 = {
-					    get x() { return source_site.absolute.x; },
-					    get y() { return source_site.absolute.y; }
-					};
-					//lineData.push(site_1);
-
-					var site_2 = {
-					    get x() { return target_site.absolute.x; },
-					    get y() { return target_site.absolute.y; }
-					};
-					//lineData.push(site_2);
-
-					var site_middle_point = function() {
-					    var point =
-						source_site.absolute.middle(target_site.absolute);
-					    return point;
-
-					}
-					var site_middle =
-					    { get x() { return site_middle_point().x; } ,
-					      get y() { return site_middle_point().y; } };
-					//lineData.push(site_middle);
-
-					var unit_vector = function(){
-					    return site_middle_point().subtract(center_of_agent);
-					}
-					var center_loop_point = function(){
-					    var point = site_middle_point().translate(unit_vector());
-					    debug("center_loop_point:"+JSON.stringify(point));
-					    return point;
-					}
-					var center_loop =
-					    { get x() { return center_loop_point().x; } ,
-					      get y() { return center_loop_point().y; } };
-					//lineData.push(center_loop);
-
-					function right_loop_point(){
-					    var a_point =
-						center_loop_point().translate(unit_vector().scale(0.5).r90());
-					    var b_point =
-						center_loop_point().translate(unit_vector().scale(0.5).r270());
-					    var point =
-						(source_site.absolute.distance(a_point) < source_site.absolute.distance(b_point))
-						?a_point:b_point;
-					    return point;
+				    var search = function(current){ return current.equals(edge); };
+				    if(!known_edges.find(search)){
+					if(target_node.label == node.label){
 					    /*
-					    var point =
-						center_loop_point().translate(unit_vector().scale(0.5).r90());
-					    return point;
-					    */
-					}
-					var right_loop =
-					    { get x() { return right_loop_point().x; } ,
-					      get y() { return right_loop_point().y; } };
-					//lineData.push(right_loop);
+					     *                      . top_loop
+					     *                      |
+					     *                      |
+					     *              {1 unit}| center loop
+					     *                      |/
+					     *    right_loop .-1/2--.--1/2-. left_loop
+					     *                      |
+					     *                      | {1 unit}
+					     *                      | site_middle
+					     *                      |/
+					     *         site_1.------.------. site_2
+					     *                      |{1 unit}
+					     *                      |
+					     *                      |
+					     *                      |
+					     *                      . center_of_agent
+					     *
+					     * center_of_agent      : center of agent
+					     * site_1,site_2        : the sites that are linked
+					     * site_middle          : middle of the two sites
+					     * unit_vector          : site_middle - center_of_agent
+					     * center_loop          : center_of_agent + unit_vector
+					     * left_loop,right_loop :
+					     * top_loop             :
+					     * left_loop,top_loop,right_loop
+					     */
+					    var center_of_agent = {
+						get x() { return target_node.absolute.x; },
+						get y() { return target_node.absolute.y; }
+					    };
+					    //lineData.push(center_of_agent);
 
-					function left_loop_point(){
-					    var a_point =
-						center_loop_point().translate(unit_vector().scale(0.5).r90());
-					    var b_point =
-						center_loop_point().translate(unit_vector().scale(0.5).r270());
-					    var point =
-						(source_site.absolute.distance(a_point) >= source_site.absolute.distance(b_point))
-						?a_point:b_point;
-					    return point;
-					}
-					var left_loop =
-					    { get x() { return left_loop_point().x; } ,
-					      get y() { return left_loop_point().y; } };
-					//lineData.push(left_loop);
+					    var site_1 = {
+						get x() { return source_site.absolute.x; },
+						get y() { return source_site.absolute.y; }
+					    };
+					    //lineData.push(site_1);
 
-					function top_loop_point(){
-					    var point =
-						center_loop_point().translate(unit_vector());
-					    return point;
-					}
-					var top_loop =
-					    { get x() { return top_loop_point().x; } ,
-					      get y() { return top_loop_point().y; } };
-					//lineData.push(top_loop);
-					lineData.push(right_loop);
-					lineData.push(top_loop);
-					lineData.push(left_loop);
+					    var site_2 = {
+						get x() { return target_site.absolute.x; },
+						get y() { return target_site.absolute.y; }
+					    };
+					    //lineData.push(site_2);
 
+					    var site_middle_point = function() {
+						var point =
+						    source_site.absolute.middle(target_site.absolute);
+						return point;
+
+					    }
+					    var site_middle =
+						{ get x() { return site_middle_point().x; } ,
+						  get y() { return site_middle_point().y; } };
+					    //lineData.push(site_middle);
+
+					    var unit_vector = function(){
+						return site_middle_point().subtract(center_of_agent);
+					    }
+					    var center_loop_point = function(){
+						var point = site_middle_point().translate(unit_vector());
+						debug("center_loop_point:"+JSON.stringify(point));
+						return point;
+					    }
+					    var center_loop =
+						{ get x() { return center_loop_point().x; } ,
+						  get y() { return center_loop_point().y; } };
+					    //lineData.push(center_loop);
+
+					    function right_loop_point(){
+						var a_point =
+						    center_loop_point().translate(unit_vector().scale(0.5).r90());
+						var b_point =
+						    center_loop_point().translate(unit_vector().scale(0.5).r270());
+						var point =
+						    (source_site.absolute.distance(a_point) < source_site.absolute.distance(b_point))
+						    ?a_point:b_point;
+						return point;
+						/*
+						  var point =
+						  center_loop_point().translate(unit_vector().scale(0.5).r90());
+						  return point;
+						*/
+					    }
+					    var right_loop =
+						{ get x() { return right_loop_point().x; } ,
+						  get y() { return right_loop_point().y; } };
+					    //lineData.push(right_loop);
+
+					    function left_loop_point(){
+						var a_point =
+						    center_loop_point().translate(unit_vector().scale(0.5).r90());
+						var b_point =
+						    center_loop_point().translate(unit_vector().scale(0.5).r270());
+						var point =
+						    (source_site.absolute.distance(a_point) >= source_site.absolute.distance(b_point))
+						    ?a_point:b_point;
+						return point;
+					    }
+					    var left_loop =
+						{ get x() { return left_loop_point().x; } ,
+						  get y() { return left_loop_point().y; } };
+					    //lineData.push(left_loop);
+
+					    function top_loop_point(){
+						var point =
+						    center_loop_point().translate(unit_vector());
+						return point;
+					    }
+					    var top_loop =
+						{ get x() { return top_loop_point().x; } ,
+						  get y() { return top_loop_point().y; } };
+					    //lineData.push(top_loop);
+					    lineData.push(right_loop);
+					    lineData.push(top_loop);
+					    lineData.push(left_loop);
+
+					}
+					// end add middle
+					lineData.push(target_site.absolute);
+					debug("constructor"+JSON.stringify(lineData));
+					known_edges.push(edge);
+					edges.push(lineData);
+				    } else {
+					debug("skipping"+JSON.stringify(edge));
 				    }
-				    // end add middle
-				    lineData.push(target_site.absolute);
-				    debug("constructor"+JSON.stringify(lineData));
-
-                                    edges.push(lineData);
                                 });
                             });
                             return edges;
                         },[]);
       // draw link
+      debug("known_edges"+JSON.stringify(known_edges));
 
       edges.forEach(function(lineData){
 	  debug(JSON.stringify(lineData));
           var lineFunction =
-	      d3.svg.line()
+	      d3.line()
               .x(function(d) { return d.x; })
               .y(function(d) { return d.y; })
-	      .interpolate("linear");
-
-	  //    .interpolate("cardinal");
-          //.interpolate("basis");
+	      .curve(d3.curveLinear);
 
           if(window.level.debug){
               that.svg
@@ -884,11 +919,10 @@ function Render(id,contactMap){
   this.updateLinks = function(){
       that.layout
           .layoutSites();
-      var lineFunction = d3.svg
-                             .line()
-                             .x(function(d) { return d.x; })
-                             .y(function(d) { return d.y; })
-                             .interpolate("basis");
+      var lineFunction = d3.line()
+                           .x(function(d) { return d.x; })
+                           .y(function(d) { return d.y; })
+                           .curve(d3.curveLinear);
         that.svg
             .selectAll('.link-line').attr("d", lineFunction);
 

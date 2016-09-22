@@ -108,7 +108,7 @@ site/external/codemirror-5.14.2:
 
 site/external/d3:
 	mkdir -p $@ ;\
-	curl -LsS -o $@/d3.v3.min.js http://d3js.org/d3.v3.min.js
+	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
 
 site/external/jquery:
 	mkdir -p $@ ;\

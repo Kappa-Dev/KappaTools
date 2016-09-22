@@ -70,7 +70,7 @@ function fluxMap(configuration) {
         var width = configuration.width?configuration.width:960,
             height = configuration.height?configuration.height:700,
             innerRadius = Math.min(width, height) * .37;
-        var arc = d3.svg.arc().innerRadius(innerRadius)
+        var arc = d3.arc().innerRadius(innerRadius)
             .outerRadius(innerRadius + 8);
         var svg_element = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("svg");
         var svg = svg_element.attr("width", width)
@@ -78,7 +78,7 @@ function fluxMap(configuration) {
         svg.selectAll("*").remove();
         svg.append("g").attr("class", "chord").selectAll("path")
             .data(chord.chords).enter().append("path")
-            .filter(function (v) {return (v.source.value != 0); }).attr("d", d3.svg.chord().radius(innerRadius))
+            .filter(function (v) {return (v.source.value != 0); }).attr("d", d3.chord().radius(innerRadius))
             .style("fill", function(d) { return color[d.source.index][d.target.index]; })
             .style("opacity", 1);
         svg.append("g").attr("id", "values").selectAll(".sources")

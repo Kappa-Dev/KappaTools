@@ -42,15 +42,15 @@ function DistancesPlot(id){
 
 	// setup x
 	var xValue = function(d) { return d.time;}, // data -> value
-	xScale = d3.scale.linear().range([0, width]), // value -> display
+	xScale = d3.scaleLinear().range([0, width]), // value -> display
 	xMap = function(d) { return xScale(xValue(d));}, // data -> display
-	xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+	    xAxis = d3.axisBottom(xScale);
 
 	// setup y
 	var yValue = function(d) { return d.distance;}, // data -> value
-	yScale = d3.scale.linear().range([height, 0]), // value -> display
+	yScale = d3.scaleLinear().range([height, 0]), // value -> display
 	yMap = function(d) { return yScale(yValue(d));}, // data -> display
-	yAxis = d3.svg.axis().scale(yScale).orient("left");
+	    yAxis = d3.axisLeft(yScale);
 
 	// add the SVG element
 	var svg = d3.select(that.id).append("svg")
@@ -61,7 +61,7 @@ function DistancesPlot(id){
 
 	// setup fill color
 	var cValue = function(d) { return d.rule;},
-	color = d3.scale.category10();
+        color = d3.scaleOrdinal(d3.schemeCategory10);
 
 	// add the tooltip area to the webpage
 	var tooltip = d3.select("body").append("div")
@@ -160,10 +160,9 @@ function DistancesPlot(id){
 	    .attr("y", 9)
 	    .attr("dy", ".35em")
 	    .style("text-anchor", "end")
-	    .text(function(d) { return d.label;})	
+	    .text(function(d) { return d.label;})
     };
 
     this.renderPlot = wrap(this.renderPlot);
     return this;
 }
-
