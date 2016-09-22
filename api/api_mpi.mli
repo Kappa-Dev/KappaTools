@@ -1,4 +1,5 @@
-val on_message : Api_v1.api_runtime -> (string -> unit) -> string -> unit
+val on_message :
+  Api_v1.api_runtime -> (string -> unit Lwt.t) -> string -> unit Lwt.t
 
 class virtual runtime : ?timeout:float -> unit -> object
     method virtual post_message : string -> unit

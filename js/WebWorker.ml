@@ -1,5 +1,3 @@
-open Lwt
-
 class webworker ()  = object
   method yield = Lwt_js.yield
   method log ?exn (_: string) = Lwt.return_unit
@@ -9,8 +7,9 @@ end
 let runtime = (new webworker () :> Api_v1.api_runtime)
 
 let on_message (text_message : string) : unit =
-  Api_mpi.on_message
-    runtime
-    Worker.post_message
-    text_message
+  Lwt.ignore_result
+    (Api_mpi.on_message
+       runtime
+       (fun s -> let () = Worker.post_message s in Lwt.return_unit)
+       text_message)
 let () = Worker.set_onmessage on_message
