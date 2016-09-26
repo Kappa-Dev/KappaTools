@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Sep 15 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -125,7 +125,7 @@ let collect_modif_map parameter error store_modification_sites =
        error, new_set
     ) store_modification_sites
 
-(************************************************************************************)
+(**************************************************************************)
 (*collect a set of rule_id of test rule and modification *)
 
 let collect_test_sites parameter error rule_id viewslhs

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 25 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3000,7 +3000,8 @@ struct
           ) store_update event_list
       in
       error, dynamic, event_list
-    | Communication.Dummy | Communication.Check_rule _ -> error, dynamic, event_list
+    | Communication.Dummy | Communication.Check_rule _
+    | Communication.Modified_sites _ (*TODO?*) -> error, dynamic, event_list
 
   (**************************************************************************)
 

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Sep 20 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Abstract domain to record live rules
    *
@@ -99,38 +99,6 @@ struct
   (**************************************************************************)
   (*implementations*)
 
-  let collect_agent_type_state parameter error agent site_type =
-    match agent with
-    | Cckappa_sig.Ghost
-    | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
-    | Cckappa_sig.Dead_agent _ ->
-      Exception.warn
-        parameter error __POS__ Exit
-        (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
-    | Cckappa_sig.Agent agent1 ->
-      let agent_type1 = agent1.Cckappa_sig.agent_name in
-      let error, state1 =
-        match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-                parameter
-                error
-                site_type
-                agent1.Cckappa_sig.agent_interface
-        with
-        | error, None ->
-          Exception.warn
-            parameter error __POS__ Exit Ckappa_sig.dummy_state_index
-        | error, Some port ->
-          let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-          if (Ckappa_sig.int_of_state_index state) > 0
-          then error, state
-          else
-            Exception.warn
-              parameter error __POS__ Exit Ckappa_sig.dummy_state_index
-      in
-      error, (agent_type1, state1)
-
-  (**************************************************************************)
-
   let initialize static dynamic error =
     let init_global_static_information =
       {
@@ -190,7 +158,8 @@ struct
     error, dynamic
 
   let add_bond_in_set_of_bonds static dynamic error (x, y) =
-    let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error (x, y) in
+    let error, dynamic =
+      add_oriented_bond_in_set_of_bonds static dynamic error (x, y) in
     add_oriented_bond_in_set_of_bonds static dynamic error (y, x)
 
   let add_oriented_bond_in_map_of_bonds static dynamic error (x, y) =
@@ -224,11 +193,14 @@ struct
     error, dynamic
 
   let add_bond_in_map_of_bonds static dynamic error (x, y) =
-    let error, dynamic = add_oriented_bond_in_map_of_bonds static dynamic error (x, y) in
+    let error, dynamic =
+      add_oriented_bond_in_map_of_bonds static dynamic error (x, y)
+    in
     add_oriented_bond_in_map_of_bonds static dynamic error (y, x)
 
   let add_oriented_bond static dynamic error bond =
-    let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error bond in
+    let error, dynamic =
+      add_oriented_bond_in_set_of_bonds static dynamic error bond in
     add_oriented_bond_in_map_of_bonds static dynamic error bond
 
   let add_bond static dynamic error bond =
@@ -312,11 +284,13 @@ struct
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
           rule_id bond_lhs
       with
-      | error, None -> error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
+      | error, None ->
+        error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
     let error, bond_lhs_set = proj_bonds_aux parameter error bond_lhs_set in
-    if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set contact_map
+    if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set
+        contact_map
     then
       (* use the function Communication.overwrite_potential_partners_map to
          fill the two fields related to the dynamic contact map *)
@@ -333,20 +307,18 @@ struct
              (* Here you should fetch the partner in the dynamic contact
                 map, if defined, *)
              let error, statemap_bottop = (* JF: error should be propagated, Please correct !!! *)
-               Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
+               Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                 parameter error
                  (agent_type, site_type) dynamic.local.bonds_per_site
              in
              match statemap_bottop with
-             | None -> error, Usual_domains.Val (agent_type, site_type, state) (* I think you should raise an error here *)
+             | None ->
+               (*error, Usual_domains.Val (agent_type, site_type, state) *)
+               Exception.warn
+                 parameter error __POS__ ~message:"state map bottop is empty"
+                 Exit (Usual_domains.Val (agent_type, site_type, state))
+              (* I think you should raise an error here *)
              | Some statemap ->
-               (* JF: This does not mean a thing !!! *)
-               (* do you want to fetch the association of state, in this maps,  *)
-               (*
-               Ckappa_sig.State_map_and_set.Map.fold
-                 (fun state (agent_type', site_type', state') _ ->
-                    Usual_domains.Val (agent_type', site_type', state')
-                 ) statemap Usual_domains.Any*)
-
                match
                  Ckappa_sig.State_map_and_set.Map.find_option
                    parameter error

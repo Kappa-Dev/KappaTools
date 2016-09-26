@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 20 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -559,7 +559,7 @@ struct
     (*------------------------------------------------------*)
     let store_created_bonds = get_created_bonds static in
     let error, created_bonds_set =
-      Site_accross_bonds_domain_static.get_set parameter error
+      Common_static.get_set parameter error
         rule_id
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
         store_created_bonds
@@ -568,7 +568,6 @@ struct
       get_partition_created_bonds_map static in
     (*------------------------------------------------------*)
     let error, dynamic, precondition =
-      (*Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold*)
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
         (fun (t, u) (error, dynamic, precondition) ->
            let (agent_id_t, agent_type_t, site_type_t, state_t) = t in
@@ -914,10 +913,9 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store_modified_map = get_modified_map static in
     let error, modified_set =
-      Site_accross_bonds_domain_static.get_set parameter
+      Common_static.get_set parameter
         error
         rule_id
-(*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty*)
         Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
         store_modified_map
     in
@@ -1065,7 +1063,8 @@ struct
       in
       let store_value = get_value dynamic in
       let bool =
-        if Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
+        if
+          Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
         then false
         else let () = dump_title () in true
       in
@@ -1095,6 +1094,7 @@ struct
         else dump_title ()
       in
       (*-----------------------------------------------------------*)
+      (*TODO*)
       let event_list = [] in
       error, dynamic, (precondition, event_list)
 

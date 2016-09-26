@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Sep 19 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -28,12 +28,6 @@ type local_static_information =
       (*is a union set of double binding in the lhs and the rhs*)
     store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
     (* information of partial formation of parallel or non-parallel bonds in rules *)
-    (*store_views_rhs :
-      Parallel_bonds_type.AgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;*)
-    (*store_action_binding :
-      Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_fst_site_create_parallel_bonds_rhs:
       ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
         Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
@@ -68,15 +62,13 @@ type local_static_information =
          Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
         (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
          Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
-        Parallel_bonds_type.AgentSite_map_and_set.Map.t
+          Parallel_bonds_type.AgentSite_map_and_set.Map.t;
   }
 
 (*******************************************************************)
 
 let init_local_static =
   {
-    (*store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
-    (*store_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_tuples_of_interest = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_rule_double_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
@@ -85,41 +77,10 @@ let init_local_static =
     store_tuple_to_sites = Parallel_bonds_type.PairAgentSite_map_and_set.Map.empty;
     store_sites_to_tuple =
       Parallel_bonds_type.AgentSite_map_and_set.Map.empty,
-      Parallel_bonds_type.AgentSite_map_and_set.Map.empty
+      Parallel_bonds_type.AgentSite_map_and_set.Map.empty;
   }
 
 (*******************************************************************)
-
-let collect_agent_type_state parameter error agent site_type =
-  let dummy_agent = Ckappa_sig.dummy_agent_name in
-  let dummy_state = Ckappa_sig.dummy_state_index in
-  match agent with
-  | Cckappa_sig.Ghost
-  | Cckappa_sig.Unknown_agent _ -> error,(dummy_agent, dummy_state)
-  | Cckappa_sig.Dead_agent _ ->
-    Exception.warn
-      parameter error __POS__ Exit (dummy_agent, dummy_state)
-  | Cckappa_sig.Agent agent1 ->
-    let agent_type1 = agent1.Cckappa_sig.agent_name in
-    let error, state1 =
-      match
-        Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-          parameter
-          error
-          site_type
-          agent1.Cckappa_sig.agent_interface
-      with
-      | error, None ->
-        Exception.warn parameter error __POS__ Exit dummy_state
-      | error, Some port ->
-        let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-        if Ckappa_sig.compare_state_index state dummy_state > 0
-        then
-          error, state
-        else
-          Exception.warn parameter error __POS__ Exit dummy_state
-    in
-    error, (agent_type1, state1)
 
 let translate_bond parameter error site_add agent_id site_type_source views =
   let error, pair =
@@ -144,14 +105,14 @@ let translate_bond parameter error site_add agent_id site_type_source views =
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
-      collect_agent_type_state
+      Common_static.collect_agent_type_state
         parameter
         error
         agent_source
         site_type_source
     in
     let error, (agent_type2, state2) =
-      collect_agent_type_state
+      Common_static.collect_agent_type_state
         parameter
         error
         agent_target
@@ -272,93 +233,6 @@ let project_away_ag_id_and_convert_into_set
   in
   project_away_ag_id_gen f parameter error big_store acc
 
-(************************************************************************)
-(*action binding in the rhs*)
-(************************************************************************)
-(*
-let collect_action_binding parameter error rule_id rule store_result =
-  List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
-      (*get information of a rule that created a bond*)
-      let agent_id1 = site_add1.Cckappa_sig.agent_index in
-      let site_type1 = site_add1.Cckappa_sig.site in
-      let agent_id2 = site_add2.Cckappa_sig.agent_index in
-      let site_type2 = site_add2.Cckappa_sig.site in
-      let error, agent_source =
-        match
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        with
-        | error, None ->
-          Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
-        | error, Some agent -> error, agent
-      in
-      (*get pair agent_type, state*)
-      let error, (agent_type1, state1) =
-        collect_agent_type_state
-          parameter
-          error
-          agent_source
-          site_type1
-      in
-      (*----------------------------------------------------------*)
-      (*second pair*)
-      let error, agent_target =
-        match
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        with
-        | error, None -> Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
-        | error, Some agent -> error, agent
-      in
-      let error, (agent_type2, state2) =
-        collect_agent_type_state
-          parameter
-          error
-          agent_target
-          site_type2
-      in
-      (*add the pair inside the set*)
-      let error, old_set =
-        match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter
-            error
-            rule_id
-            store_result
-        with
-        | error, None -> error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.empty
-        | error, Some s -> error, s
-      in
-      let error', set =
-        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-          parameter
-          error
-          ((agent_id1, agent_type1, site_type1, state1), (agent_id2, agent_type2, site_type2, state2))
-          old_set
-      in
-      let error', set =
-        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-          parameter
-          error'
-          ((agent_id2, agent_type2, site_type2, state2),
-           (agent_id1, agent_type1, site_type1, state1))
-          set
-      in
-      let error =
-        Exception.check_point
-          Exception.warn parameter error error' __POS__ Exit
-      in
-      let error, store_result =
-        Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-          parameter
-          error
-          rule_id
-          set
-          store_result
-      in
-      error, store_result
-    ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
-  *)
 (****************************************************************)
 (** Detect pair of bonds *)
 (****************************************************************)
@@ -382,63 +256,13 @@ let collect_rule_double_bonds_rhs
     parameter error rule_id map store_result
 
 (**************************************************************************)
-(*views on the rhs*)
-(**************************************************************************)
-
-(*let collect_views_rhs parameter error rule_id rule store_result =
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-      (fun parameter error agent_id agent store_result ->
-         match agent with
-         | Cckappa_sig.Unknown_agent _
-         | Cckappa_sig.Ghost -> error, store_result
-         | Cckappa_sig.Dead_agent (agent,_,_,_)
-         | Cckappa_sig.Agent agent ->
-           let agent_type = agent.Cckappa_sig.agent_name in
-           let error, old_set =
-             match
-               Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-                 parameter error rule_id store_result
-             with
-             | error, None -> error, Parallel_bonds_type.AgentsSiteState_map_and_set.Set.empty
-             | error, Some s -> error, s
-           in
-           let error', set =
-             Ckappa_sig.Site_map_and_set.Map.fold
-               (fun site_type port (error, store_set) ->
-                  let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-                  let error, store_set =
-                    Parallel_bonds_type.AgentsSiteState_map_and_set.Set.add_when_not_in
-                      parameter error
-                      (agent_id, agent_type, site_type, state)
-                      store_set
-                  in
-                  error, store_set
-               ) agent.Cckappa_sig.agent_interface
-               (error, old_set)
-           in
-           let error =
-             Exception.check_point
-               Exception.warn parameter error error'
-               __POS__ Exit
-           in
-           let error, store_result =
-             Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-               parameter error rule_id
-               set
-               store_result
-           in
-           error, store_result
-      ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
-  in
-  error, store_result*)
-
-(**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
   which rules can create a bond of type A.x.z.B (and at which position)*)
+
 type pos = Fst | Snd
 
-let collect_site_create_parallel_bonds_gen pos parameter error store_action_binding store_parallel_bonds =
+let collect_site_create_parallel_bonds_gen pos parameter error
+    store_action_binding store_parallel_bonds =
   let pick pos a b =
     match pos
     with
@@ -515,7 +339,8 @@ let collect_snd_site_create_parallel_bonds =
 (*the fst map (A,x,y, B,z,t) -> A.x.z.B*)
 (**************************************************************************)
 
-let collect_fst_site_create_parallel_bonds_rhs parameter error store_action_binding store_parallel_bonds  =
+let collect_fst_site_create_parallel_bonds_rhs parameter error
+    store_action_binding store_parallel_bonds  =
   collect_fst_site_create_parallel_bonds
     parameter error
     store_action_binding
@@ -525,8 +350,8 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error store_action_bind
 (*the second map (A,x,y, B,z,t) -> A.y.t.B*)
 (**************************************************************************)
 
-let collect_snd_site_create_parallel_bonds_rhs parameter error store_action_binding
-    store_parallel_bonds =
+let collect_snd_site_create_parallel_bonds_rhs parameter error
+    store_action_binding store_parallel_bonds =
   let error, store_result =
     collect_snd_site_create_parallel_bonds
       parameter
@@ -599,7 +424,6 @@ let compare_snd_pair parameter error y tuple_pair store_result =
        else error, store_result
     ) tuple_pair (error, store_result)
 
-
 (*map from sites to tuple *)
 
 let collect_sites_to_tuple parameter error map_of_sites store_result =
@@ -616,3 +440,41 @@ let collect_sites_to_tuple parameter error map_of_sites store_result =
        in
        error, (store_result1, store_result2)
     ) map_of_sites (error, store_result)
+
+
+(*********************************************************************)
+(*projection modification rules from: (id, agent_name, site, state) ->
+  (agent_name, site)*)
+
+let collect_tuple_to_modified_sites parameter error modified_set
+    tuples_of_interest =
+let proj (a, b, _, _, _) = (a, b) in
+let proj2 (a, _, c, _, _) = (a, c) in
+Parallel_bonds_type.Partition_tuples_to_sites_map.monadic_partition_set
+  (fun _ error (x, y) ->
+     (*if (x,y) both belong to modified set*)
+     if Ckappa_sig.AgentSite_map_and_set.Set.mem
+         (proj x)
+         modified_set &&
+        Ckappa_sig.AgentSite_map_and_set.Set.mem
+          (proj2 x)
+          modified_set &&
+        Ckappa_sig.AgentSite_map_and_set.Set.mem
+          (proj y)
+          modified_set &&
+        Ckappa_sig.AgentSite_map_and_set.Set.mem
+          (proj2 y)
+          modified_set
+     then
+       (*return the value *)
+       error, (proj x, proj2 x, proj y, proj2 y)
+     else
+       (*return dummy*)
+       let dummy_pair =
+         Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name
+       in
+       error, (dummy_pair, dummy_pair, dummy_pair, dummy_pair)
+  )
+  parameter
+  error
+  tuples_of_interest

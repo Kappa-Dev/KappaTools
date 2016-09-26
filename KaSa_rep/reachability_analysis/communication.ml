@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Aug 25 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Abstract domain to record live rules
    *
@@ -21,9 +21,15 @@ type path_defined_in =
 type event =
   | Dummy (* to avoid compilation warning *)
   | Check_rule of Ckappa_sig.c_rule_id
-  | See_a_new_bond of
+  | See_a_new_bond of (*in contact map*)
       ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+  (*in the domain of parallel and site accross*)
+  | Modified_sites of
+      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name))
 
 (*For example:
   E_1(x!1),R_2(x!1,y!2),R_3(y!2,x) -> E_1(x!1),R_2(x!1,y),R_3(y,x)
@@ -167,42 +173,6 @@ let dummy_precondition =
     partner_map = (fun error _ _ _ -> error, Usual_domains.Any);
     partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
-
-(*let get_state_of_site error dynamic precondition path =
-  match
-    PathMap.find path precondition.cache_state_of_site
-  with
-  | Some output ->
-    (*  let _ =
-        match output with
-        | Usual_domains.Val l ->
-        List.iter
-          (fun i -> Printf.fprintf stdout "state:%s\n" (Ckappa_sig.string_of_state_index i)) l
-        | Usual_domains.Any | Usual_domains.Undefined -> ()
-        in*)
-    error, dynamic, precondition, output
-  | None ->
-    begin
-      let error, dynamic, output =
-        precondition.state_of_site error dynamic path
-      in
-      (*let _ =
-        match output with
-        | Usual_domains.Val l ->
-          List.iter (fun i -> Printf.fprintf stdout "None_state:%i\n" (Ckappa_sig.int_of_state_index i)) l
-        | _ -> ()
-        in*)
-      let precondition =
-        {
-          precondition with
-          cache_state_of_site =
-            PathMap.add path output precondition.cache_state_of_site
-        }
-      in
-      error, dynamic, precondition, output
-    end*)
-
-
 
 let get_potential_partner precondition error agent_type site state =
   let error, rep = precondition.partner_map error agent_type site state in
@@ -667,26 +637,3 @@ let get_state_of_site_in_postcondition
     get_global_dynamic_information set_global_dynamic_information
     parameter error kappa_handler dynamic agent_id
     site_type defined_in precondition
-
-
-(*let get_state_of_site error dynamic precondition path =
-  match
-    PathMap.find path precondition.cache_state_of_sites
-  with
-  | Some output ->
-    error, dynamic, precondition, output
-  | None ->
-    begin
-      let error, dynamic, output =
-        precondition.state_of_sites_in_precondition
-          error dynamic path
-      in
-      let precondition =
-        {
-          precondition with
-          cache_state_of_sites =
-            PathMap.add path output precondition.cache_state_of_site
-        }
-      in
-      error, dynamic, precondition, output
-    end*)

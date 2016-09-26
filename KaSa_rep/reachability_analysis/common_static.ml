@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Sep 20 2016>
+  * Last modification: Time-stamp: <Sep 26 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -34,10 +34,11 @@ type bdu_common_static =
   {
     store_agent_name             : Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t;
     store_side_effects           : half_break_action * remove_action;
-    store_potential_side_effects : potential_partner_free *  potential_partner_bind;
+    store_potential_side_effects :
+      potential_partner_free *  potential_partner_bind;
     store_potential_side_effects_per_rule:
-      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) list
-        Ckappa_sig.Rule_map_and_set.Map.t;
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+        list Ckappa_sig.Rule_map_and_set.Map.t;
     (*bond in the rhs and in the lhs*)
     store_bonds_rhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_lhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
@@ -54,6 +55,9 @@ type bdu_common_static =
     store_modified_map :
       Ckappa_sig.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    store_project_modified_map : (*use in parallel domain*)
+    Ckappa_sig.AgentSite_map_and_set.Set.t
+      Ckappa_sig.Rule_map_and_set.Map.t;
   }
 
 (*****************************************************************************)
@@ -73,6 +77,7 @@ let init_bdu_common_static =
   let init_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty in
+  let init_project_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_common_static =
     {
       store_agent_name              = init_agent_name;
@@ -86,10 +91,10 @@ let init_bdu_common_static =
       store_views_lhs = init_views_lhs;
       store_created_bonds = init_created_bonds;
       store_modified_map = init_modified_map;
+      store_project_modified_map = init_project_modified_map;
     }
   in
   init_common_static
-
 
 (****************************************************************************)
 (*get agent_name from (rule_id and agent_id) in the lhs*)
@@ -582,7 +587,8 @@ let collect_potential_side_effects parameter error handler rule_id half_break re
 (***************************************************************************)
 (*compute side effects: this is an update before discover bond function *)
 
-let collect_side_effects parameter error handler rule_id half_break remove store_result =
+let collect_side_effects parameter error handler rule_id half_break remove
+    store_result =
   let store_half_break_action, store_remove_action = store_result in
   (*if there is a half_break action*)
   let error, store_half_break_action =
@@ -639,39 +645,8 @@ let collect_agent_type_state parameter error agent site_type =
 
 (**************************************************************************)
 
-let add_link_set parameter error rule_id (x, y) store_result =
-  let error, old_set =
-    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
-            rule_id store_result
-    with
-    | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
-    | error, Some p -> error, p
-  in
-  let error', set =
-    Ckappa_sig.PairAgentSiteState_map_and_set.Set.add_when_not_in
-      parameter error
-      (x, y)
-      old_set
-  in
-  let error =
-    Exception.check_point
-      Exception.warn parameter error error' __POS__ Exit
-  in
-  let error'', union_set =
-    Ckappa_sig.PairAgentSiteState_map_and_set.Set.union parameter error set old_set
-  in
-  let error =
-    Exception.check_point
-      Exception.warn parameter error error'' __POS__ Exit
-  in
-  let error, store_result =
-    Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
-  in
-  error, store_result
-
-(**************************************************************************)
-
-let collect_pair_of_bonds parameter error site_add agent_id site_type_source views =
+let collect_pair_of_bonds parameter error site_add agent_id site_type_source
+    views =
   let error, pair =
     let agent_index_target = site_add.Cckappa_sig.agent_index in
     let site_type_target = site_add.Cckappa_sig.site in
@@ -716,38 +691,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
   error, pair
 
 (**************************************************************************)
-(*
-let collect_bonds parameter error rule_id bonds views store_result =
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameter error
-      (fun parameter error agent_id bonds_map store_result ->
-         let error, store_result =
-           Ckappa_sig.Site_map_and_set.Map.fold
-             (fun site_type_source site_add (error, store_result) ->
-                let error, pair =
-                  collect_pair_of_bonds
-                    parameter
-                    error
-                    site_add
-                    agent_id
-                    site_type_source
-                    views
-                in
-                let error, store_result =
-                  add_link_set parameter error rule_id pair store_result
-                in
-                error, store_result
-             ) bonds_map (error, store_result)
-         in
-         error, store_result
-      ) bonds store_result
-  in
-  error, store_result
-         *)
-
-(**************************************************************************)
-(*collect bonds lhs*)
+(*common functions*)
 
 let get_set parameter error rule_id empty_set store_result =
   let error, set =
@@ -858,28 +802,6 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
     store_result
 
-(*let collect_bonds_rhs parameter error rule_id rule store_result =
-  let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
-  let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
-  let error, store_result =
-    collect_bonds
-      parameter
-      error
-      rule_id
-      bonds
-      views
-      store_result
-  in
-  error, store_result*)
-
-(*let collect_bonds_lhs parameter error rule_id rule store_result =
-  let views = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
-  let bonds = rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds in
-  let error, store_result =
-    collect_bonds parameter error rule_id bonds views store_result
-  in
-  error, store_result*)
-
 (***************************************************************************)
 (*action binding in the rhs*)
 
@@ -912,7 +834,8 @@ let collect_action_binding parameter error rule_id rule store_result =
       let error, agent_target =
         match
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+            parameter error agent_id2
+            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         with
         | error, None ->
           Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
@@ -1154,6 +1077,42 @@ let collect_modified_map parameter error rule_id rule store_result =
   in
   error, store_result
 
+(*********************************************************************)
+(*projectioin modification rules from: (id, agent_name, site, state) ->
+    (agent_name, site)*)
+
+  module Proj_modif =
+    Map_wrapper.Proj
+      (Ckappa_sig.AgentsSiteState_map_and_set)
+      (Ckappa_sig.AgentSite_map_and_set)
+
+(*AgentsSiteState_map_and_set.Set Rule_map_and_set.Map*)
+let store_project_modified_map parameter error rule_id store_modified_map
+    store_result =
+  let error, modified_set =
+    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+            parameter error rule_id store_modified_map
+    with
+    | error, None -> error, Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
+    | error, Some s -> error, s
+  in
+  (*project set*)
+  let error, project_set =
+    Proj_modif.proj_set
+      (fun (_, agent_type, site_type, _) ->
+       (agent_type, site_type)
+      )
+      parameter
+      error
+      modified_set
+  in
+  let error, store_result =
+    Ckappa_sig.Rule_map_and_set.Map.add
+      parameter error rule_id project_set
+      store_result
+  in
+  error, store_result
+
 (***************************************************************************)
 
 let scan_rule parameter error handler_kappa rule_id rule store_result =
@@ -1231,6 +1190,10 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
     collect_modified_map parameter error rule_id rule
       store_result.store_modified_map
   in
+  let error, store_project_modified_map =
+    store_project_modified_map parameter error rule_id store_modified_map
+      store_result.store_project_modified_map
+  in
   error,
   {store_result with
    store_agent_name = store_agent_name;
@@ -1243,6 +1206,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_views_lhs = store_views_lhs;
    store_created_bonds = store_created_bonds;
    store_modified_map = store_modified_map;
+   store_project_modified_map = store_project_modified_map;
   }
 
 (******************************************************************************)

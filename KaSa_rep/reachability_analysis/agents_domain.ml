@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 20 2016>
+   * Last modification: Time-stamp: <Sep 26 2016>
    *
    * Abstract domain to record live rules
    *
@@ -87,8 +87,6 @@ struct
     {
       dynamic with local = seen_agent
     }
-
-
 
   (*--------------------------------------------------------------------*)
 

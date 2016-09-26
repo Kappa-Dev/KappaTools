@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 20 2016>
+  * Last modification: Time-stamp: <Sep 26 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -160,6 +160,17 @@ val get_modified_map :
 
 val set_modified_map :
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
+val get_project_modified_map :
+  global_static_information ->
+  Ckappa_sig.AgentSite_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t
+
+val set_project_modified_map :
+  Ckappa_sig.AgentSite_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information

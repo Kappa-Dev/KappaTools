@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 19 2016>
+  * Last modification: Time-stamp: <Sep 26 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -89,6 +89,9 @@ struct
   let get_action_binding static =
     lift Analyzer_headers.get_action_binding static
 
+  let get_project_modified_map static =
+    lift Analyzer_headers.get_project_modified_map static
+
   let get_local_static_information static = static.local_static_information
 
   let set_local_static_information local static =
@@ -107,30 +110,6 @@ struct
         compil.Cckappa_sig.rules
     in
     error, rule
-
-  (*let get_action_binding static =
-    (get_local_static_information
-       static).Parallel_bonds_static.store_action_binding
-
-  let set_action_binding bonds static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-        Parallel_bonds_static.store_action_binding = bonds
-      }
-      static*)
-
-  (*let get_views_rhs static =
-    (get_local_static_information
-       static).Parallel_bonds_static.store_views_rhs
-
-  let set_views_rhs bonds static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-        Parallel_bonds_static.store_views_rhs = bonds
-      }
-      static*)
 
   (*static information*)
 
@@ -277,22 +256,6 @@ struct
 
   let scan_rule static _dynamic error rule_id rule =
     let parameter = get_parameter static in
-    (*------------------------------------------------------*)
-    (*views on the right hand side*)
-    (*let store_views_rhs = get_views_rhs static in
-    let error, store_views_rhs =
-      Parallel_bonds_static.collect_views_rhs
-        parameter error rule_id rule store_views_rhs
-    in
-    let static = set_views_rhs store_views_rhs static in*)
-    (*------------------------------------------------------*)
-    (*action created a binding site*)
-    (*let store_action_binding = get_action_binding static in
-    let error, store_action_binding =
-      Parallel_bonds_static.collect_action_binding
-        parameter error rule_id rule store_action_binding
-    in
-    let static = set_action_binding store_action_binding static in*)
     (*------------------------------------------------------*)
     (*a set of rules that has a potential double binding or potential non double binding on the lhs*)
     let store_result = get_rule_double_bonds_lhs static in
@@ -513,6 +476,7 @@ struct
   (***********************************************************)
   (* we know from the syntax that a created bond necessarily belongs to
      a pair of parallel bonds or a pair of non-parallel bonds *)
+
   let necessarily_double idx idy (x,y) map =
     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.mem
       (idx,(x,y))
@@ -536,8 +500,9 @@ struct
           rule_id
           store_site_create_parallel_bonds_rhs
       with
-      | error, None -> error,
-                       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
+      | error, None ->
+        error,
+        Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
       | error, Some m -> error, m
     in
     let store_rule_double_bonds_rhs = get_rule_double_bonds_rhs static in
@@ -694,10 +659,39 @@ struct
        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
 
   let apply_rule static dynamic error rule_id precondition =
-    let event_list = [] in
+    (*--------------------------------------------------------------*)
+    (*TODO*)
     let parameter = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
+    let event_list = [] in
+    (*get a list of modified sites*)
+    let store_project_modified_map = get_project_modified_map static in
+    let error, modified_set =
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+              parameter error rule_id store_project_modified_map
+      with
+      | error, None -> error, Ckappa_sig.AgentSite_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    (*new abstract value for a tuple*)
+    let tuples_of_interest = get_tuples_of_interest static in
+    let error, pair_agent_site_map =
+      Parallel_bonds_static.collect_tuple_to_modified_sites
+        parameter error
+        modified_set
+        tuples_of_interest
+    in
+    (*raise an event when explore a tuple built from modified sites*)
+    let event_list =
+      Parallel_bonds_type.PairAgentSite_map_and_set.Map.fold
+        (fun var tuple_set event_list ->
+           (Communication.Modified_sites var) :: event_list
+        ) pair_agent_site_map event_list
+    in
+
+
+
     (*-----------------------------------------------------------*)
+    let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameter error static rule_id in
     match
       rule
@@ -905,6 +899,7 @@ struct
   (****************************************************************)
 
   let stabilize _static dynamic error = error, dynamic, ()
+
   let print static dynamic (error:Exception.method_handler) loggers =
     let kappa_handler = get_kappa_handler static in
     let parameter = get_parameter static in
