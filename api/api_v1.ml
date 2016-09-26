@@ -349,7 +349,7 @@ end = struct
                        simulation.domain <-
                          Connected_component.PreEnv.finalize cc_preenv' in
                      List.fold_left
-                       Rule_interpreter.incorporate_extra_connected_component
+                       Rule_interpreter.incorporate_extra_pattern
                        simulation.graph
                        (Primitives.extract_connected_components_modifications e'') in
                  let _,graph'',state' =

@@ -177,7 +177,7 @@ let () =
                   else
                     (Connected_component.PreEnv.finalize cc_preenv',
                      List.fold_left
-                       Rule_interpreter.incorporate_extra_connected_component
+                       Rule_interpreter.incorporate_extra_pattern
                        graph
                        (Primitives.extract_connected_components_modifications e''))
                 in

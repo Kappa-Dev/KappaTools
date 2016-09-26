@@ -53,7 +53,7 @@ val adjust_unary_rule_instances :
   rule_id:int -> get_alg:(int -> Alg_expr.t) -> (int -> int -> float -> unit) ->
   Environment.t -> Counter.t -> t -> Primitives.elementary_rule -> t
 
-val incorporate_extra_connected_component : t -> Connected_component.t -> t
+val incorporate_extra_pattern : t -> Connected_component.t -> t
 
 val extra_outdated_var : int -> t -> t
 val update_outdated_activities :
