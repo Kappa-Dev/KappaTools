@@ -13,7 +13,7 @@ type atom =
     causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
     eid:int ; (*event identifier*)
     kind:Trace.event_kind ;
-    (*      observation: string list*)
+    (*observation: string list*)
   }
 
 type attribute = atom list (*vertical sequence of atoms*)
@@ -572,50 +572,65 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
          f "@[<v 2><script>@,%t@]@,</script>"
          (js_of_grid env enriched_grid))
 
-let json_of_grid enriched_grid env =
-  let log_json = Loggers.open_infinite_buffer ~mode:Loggers.Json () in
-  let () = Graph_loggers.print_graph_preamble log_json "story" in
+let json_of_grid enriched_grid grid_story env =
   let config = enriched_grid.config in
   let prec_star = enriched_grid.prec_star in
   let depth_of_event = enriched_grid.depth_of_event in
+  let tbl = Hashtbl.create !Parameter.defaultExtArraySize in
+  let () = Hashtbl.iter
+             ( fun quark att_ls ->
+               List.iter
+                 ( fun atom ->
+                   Hashtbl.add tbl (atom.eid) (atom.causal_impact,quark)) att_ls
+             ) grid_story.flow in
   let sorted_events =
     Mods.IntMap.fold
       (fun eid d dmap ->
          let set = Mods.IntMap.find_default Mods.IntSet.empty d dmap in
          Mods.IntMap.add d (Mods.IntSet.add eid set) dmap
       ) depth_of_event Mods.IntMap.empty in
-  let () =
-    Mods.IntMap.iter
-      (fun _ eids_at_d ->
-        Mods.IntSet.iter
-          (fun eid ->
-            match Mods.IntMap.find_option eid config.events_kind with
-            | None -> raise Not_found
-            | Some atom_kind ->
-               if eid <> 0 then
-                 Trace.log_event_kind env log_json eid atom_kind
-          ) eids_at_d
-      ) sorted_events in
-  let () =
-    Mods.IntMap.iter
-      (fun eid pred_set ->
+  let node_to_json eid =
+    match Mods.IntMap.find_option eid config.events_kind with
+    | None -> raise Not_found
+    | Some atom_kind ->
+       if eid <> 0 then
+         let quarks = Hashtbl.find_all tbl eid in
+         Trace.log_event_kind env eid quarks atom_kind
+       else `Null in
+  let nodes_to_list =
+    Mods.IntMap.fold
+      (fun _ eids_at_d ls ->
+        let ls'' = Mods.IntSet.fold
+                     (fun eid ls' ->
+                       eid::ls') eids_at_d [] in
+        ls''@ls
+      ) sorted_events [] in
+  let nodes_to_json = JsonUtil.of_list node_to_json nodes_to_list in
+  let edge_to_json (eid, eid') =
+    ( `Assoc [
+         "from", `Int eid';
+         "to", `Int eid;
+    ]) in
+  let prec_edges =
+    Mods.IntMap.fold
+      (fun eid pred_set ls ->
         if eid <> 0 then
-          Mods.IntSet.iter
-            (fun eid' ->
-              if eid' = 0 then ()
-              else
-                Graph_loggers.print_edge log_json (string_of_int eid')
-                                         (string_of_int eid)
-            ) pred_set
-      ) config.prec_1 in
-  let () =
-    Mods.IntMap.iter
-      (fun eid cflct_set ->
+          let ls'' = Mods.IntSet.fold
+                       (fun eid' ls' ->
+                         if eid' = 0 then ls'
+                         else (eid, eid')::ls'
+                       ) pred_set [] in
+          ls''@ls
+        else ls) config.prec_1 [] in
+  let prec_edges_to_json = JsonUtil.of_list edge_to_json prec_edges in
+  let confl_edges =
+    Mods.IntMap.fold
+      (fun eid cflct_set ls ->
         if eid <> 0 then
           let prec = try (fst prec_star).(eid) with _ -> [] in
-          let _ =
+          let (_, ls') =
             Mods.IntSet.fold_inv
-              (fun eid' prec ->
+              (fun eid' (prec,ls') ->
                 let bool,prec =
                   let rec aux prec =
                     match prec with
@@ -624,34 +639,33 @@ let json_of_grid enriched_grid env =
                        if h=eid' then false,t else
                          if h>eid' then aux t else true,prec
                   in aux prec in
-                let () =
+                let ls'' =
                   if bool then
-                    Graph_loggers.print_edge
-                      log_json
-                      ~directives:[Graph_loggers_sig.ArrowHead
-                                     Graph_loggers_sig.Tee]
-                      (string_of_int eid)
-                      (string_of_int eid')
-                in
-                prec
-              ) cflct_set prec
-          in ()
-      ) config.conflict in
-  let () = Graph_loggers.print_graph_foot log_json in
-  let graph = Loggers.graph_of_logger log_json in
-  Graph_json.to_json graph
+                    (eid, eid')::ls'
+                  else ls' in
+                (prec,ls'')
+              ) cflct_set (prec,[])
+          in ls'
+        else ls
+      ) config.conflict [] in
+  let confl_edges_to_json = JsonUtil.of_list edge_to_json confl_edges in
+  (`Assoc [
+      "nodes", nodes_to_json;
+      "cause", prec_edges_to_json;
+      "inhibit", confl_edges_to_json
+    ]: Yojson.Basic.json)
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...]
   et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print
     ~dotFormat parameter handler log_info error env config_closure
-    compression_type label story_list =
+    compression_type label grid_list =
   match
     Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
   with
   | None -> error, log_info
   | Some err_fmt ->
-    let n = List.length story_list in
+    let n = List.length grid_list in
     let () =
       if compression_type = "" then
         Format.fprintf err_fmt "+ Pretty printing %d flow%s@."
@@ -667,8 +681,9 @@ let pretty_print
         (fun (error,log_info,list) (x,y) ->
            let error,log_info,x = enrich_grid parameter handler log_info error config_closure x in
            error,log_info,(x,y)::list)
-        (error,log_info,[]) story_list
+        (error,log_info,[]) grid_list
     in
+    let grid_list = List.rev grid_list in
     let story_list = List.rev story_list in
     let _ =
       List.fold_left
@@ -699,11 +714,14 @@ let pretty_print
                   [compression_type;string_of_int cpt] "dot"
                   (dot_of_grid profiling env enriched_config)
              | Ast.Json ->
+                let (grid_story,_) = List.nth grid_list cpt in
                 let filename = Kappa_files.get_cflow
                                  [compression_type;(string_of_int cpt)] "json"
                 in
-                Yojson.Basic.to_file filename (json_of_grid enriched_config env)
-             | Ast.Html  ->
+                Yojson.Basic.to_file
+                  filename
+                  (json_of_grid enriched_config grid_story env)
+             | Ast.Html ->
                 let profiling desc =
                   Format.fprintf
                     desc

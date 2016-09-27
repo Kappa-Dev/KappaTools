@@ -85,20 +85,33 @@ let print_event_kind ?env f x =
         f "Intro @[<h>%a@]"
         (Pp.list Pp.comma (Environment.print_agent ~env)) s
 
-let log_event_kind env logger id = function
+let log_event_kind env id quarks event_kind =
+  let quarks_to_json =
+    JsonUtil.of_list
+      (fun (c,(ni,qi,s)) ->
+        let impact = if (c=1) then "tested"
+                     else if (c=2) then "modified"
+                     else "tested + modified" in
+        let state = if (s=1) then "link" else "internal state" in
+        (`List [
+            `String impact;
+            (`Assoc ["node", `Int ni]);
+            (`Assoc ["site", `Int qi]);
+            `String state;
+      ])) quarks in
+  match event_kind with
   | RULE r_id  ->
      let _ = Environment.print_ast_rule ~env (Format.str_formatter) r_id in
      let na = Format.flush_str_formatter () in
-     Graph_loggers.print_node
-       logger
-       ~directives:[Graph_loggers_sig.Label na]
-       (string_of_int id)
-  | OBS name | PERT name ->
-     Graph_loggers.print_node
-       logger
-       ~directives:[Graph_loggers_sig.Label name]
-       (string_of_int id)
-  | INIT _ -> ()
+     `List [`Int id; `String "RULE"; `String na;
+            (`Assoc ["quarks", quarks_to_json])]
+  | INIT l ->
+     `List [`Int id; `String "INIT"; `List (List.map (fun x -> `Int x) l);
+            (`Assoc ["quarks", quarks_to_json])]
+  | PERT s -> `List [`Int id; `String "PERT"; `String s;
+                     (`Assoc ["quarks", quarks_to_json])]
+  | OBS s -> `List [`Int id; `String "OBS"; `String s;
+                    (`Assoc ["quarks", quarks_to_json])]
 
 let event_kind_to_json = function
   | OBS s -> `List [`String "OBS"; `String s]

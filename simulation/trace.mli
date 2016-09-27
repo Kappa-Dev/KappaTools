@@ -33,7 +33,8 @@ val print_event_kind :
 val print_event_kind_dot_annot :
   Environment.t -> Format.formatter -> event_kind -> unit
 val log_event_kind :
-  Environment.t -> Loggers.t -> int -> event_kind -> unit
+  Environment.t -> int -> (int * (int *int*int)) list ->
+  event_kind -> Yojson.Basic.json
 
 type event =
   event_kind *
