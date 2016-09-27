@@ -194,7 +194,8 @@ function SiteEdge(targetNode,sourceNode){
     that.sourceNode = sourceNode;
     /* undirected edge comparision */
     that.equals = function(other){
-	var forward = other.targetNode.equals(that.targetNode) && other.sourceNode.equals(that.sourceNode);
+	var forward = other.targetNode.equals(that.targetNode)
+	              && other.sourceNode.equals(that.sourceNode);
 	var reverse = other.targetNode.equals(that.sourceNode) && other.targetNode.equals(that.sourceNode);
 	return forward || reverse;
     }
@@ -813,7 +814,7 @@ function Render(id,contactMap){
 
 					    function top_loop_point(){
 						var point =
-						    center_loop_point().translate(unit_vector());
+						    center_loop_point().translate(unit_vector().scale(2.0));
 						return point;
 					    }
 					    var top_loop =
@@ -846,7 +847,7 @@ function Render(id,contactMap){
 	      d3.line()
               .x(function(d) { return d.x; })
               .y(function(d) { return d.y; })
-	      .curve(d3.curveLinear);
+	      .curve(d3.curveBundle.beta(0.5));
 
           if(window.level.debug){
               that.svg
@@ -922,7 +923,7 @@ function Render(id,contactMap){
       var lineFunction = d3.line()
                            .x(function(d) { return d.x; })
                            .y(function(d) { return d.y; })
-                           .curve(d3.curveLinear);
+                           .curve(d3.curveBundle.beta(0.5));
         that.svg
             .selectAll('.link-line').attr("d", lineFunction);
 
