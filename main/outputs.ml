@@ -132,17 +132,21 @@ let output_flux out =
   then json_of_flux out
   else dot_of_flux out
 
+let jsonDistancesDescr = ref false
+let distances = ref (None : (string array * (float * int) list array) option)
+
+let create_distances names in_json =
+  let () = jsonDistancesDescr := in_json in
+  distances := Some (names, Array.make (Array.length names) [])
+
 let print_json_of_unary_distances f unary_distances rules =
   (*unary_distances: (float, int) option list array
     one_big_list: (int, float, int) list*)
-  let (one_big_list,_) =
-    Array.fold_left
-      (fun (l,i) a -> match a with
-         | Some ls ->
-           let add_rule_id = List.map (fun (t,d) -> (i,t,d)) ls in
-           (List.append l add_rule_id, i+1)
-         | None -> (l, i+1))
-      ([],0) unary_distances in
+  let one_big_list =
+    Tools.array_fold_lefti
+      (fun i l ls ->
+         List.fold_left (fun acc (t,d) -> (i,t,d)::acc) l ls)
+      [] unary_distances in
   Format.fprintf
     f "[%a]@."
     (Pp.list
@@ -150,7 +154,7 @@ let print_json_of_unary_distances f unary_distances rules =
        (fun f (id,time,distance) ->
           Format.fprintf
             f "@[{ \"rule\" : \"%s\", @ \"time\" : %e, @ \"distance\" : %d }@]"
-            rules.(id) time distance)) one_big_list
+            rules.(id) time distance)) (List.rev one_big_list)
 
 let json_of_unary_distances unary_distances rules =
   Kappa_files.with_unary_distances
@@ -167,8 +171,8 @@ let print_out_of_unary_distances f distances rule_name =
 let out_of_unary_distances unary_distances rules =
   Array.iteri (fun id distances_list ->
       match distances_list with
-      | None -> ()
-      | Some ls ->
+      | [] -> ()
+      | ls ->
         (*create the file *)
         let filename = Kappa_files.get_distances () in
         let filename_string = filename^(string_of_int id)^".out" in
@@ -179,12 +183,10 @@ let out_of_unary_distances unary_distances rules =
         (*close the file*)
         close_out d) unary_distances
 
-let output_unary_distances in_json distances =
+let output_unary_distances in_json distances_data distances_rules =
   if in_json
-  then json_of_unary_distances
-      distances.Data.distances_data distances.Data.distances_rules
-  else out_of_unary_distances
-      distances.Data.distances_data distances.Data.distances_rules
+  then json_of_unary_distances distances_data distances_rules
+  else out_of_unary_distances distances_data distances_rules
 
 type fd = {
   desc:out_channel;
@@ -195,7 +197,6 @@ type fd = {
 type format = Raw of fd | Svg of Pp_svg.store
 
 let plotDescr = ref None
-let jsonDistancesDescr = ref false
 
 let close_plot () =
   match !plotDescr with
@@ -219,7 +220,7 @@ let print_values_raw is_tsv f (time,l) =
     !Parameter.plotSepChar time print_sep
     (Pp.array print_sep (fun _ -> Nbr.print)) l
 
-let create_plot (filename,title,head) jsonDistances =
+let create_plot (filename,title,head) =
   let format =
     if Filename.check_suffix filename ".svg" then
       Svg {Pp_svg.file = filename;
@@ -235,8 +236,7 @@ let create_plot (filename,title,head) jsonDistances =
       let () = if not is_tsv then Format.fprintf d "# %s@." title in
       let () = print_header_raw is_tsv d head in
       Raw {desc=d_chan; form=d; is_tsv} in
-  let () = plotDescr := Some format in
-  jsonDistancesDescr := jsonDistances
+  plotDescr := Some format
 
 let plot_now l =
   match !plotDescr with
@@ -295,9 +295,18 @@ let go env = function
     in
     Format.fprintf desc "%s@." p.Data.line
   | Data.Log s -> Format.printf "%s@." s
-  | Data.UnaryDistances distances ->
-    output_unary_distances !jsonDistancesDescr distances
+  | Data.UnaryDistance d ->
+    match !distances with
+    | None -> ()
+    | Some (_,tab) ->
+      tab.(d.Data.distance_rule) <-
+        (d.Data.distance_time,d.Data.distance_length)::tab.(d.Data.distance_rule)
 
 let close () =
   let () = close_plot () in
+  let () =
+    match !distances with
+    | None -> ()
+    | Some (rules,data) ->
+      output_unary_distances !jsonDistancesDescr data rules in
   close_desc ()

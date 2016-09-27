@@ -1,4 +1,3 @@
-
 open Lwt.Infix
 
 let msg_token_not_found =
@@ -145,24 +144,15 @@ end = struct
             ((Api_data.api_snapshot
                 (Environment.signatures simulation.env) snapshot)
              ::simulation.snapshots)
-        | Data.UnaryDistances unary_distances ->
+        | Data.UnaryDistance d ->
           simulation.distances <-
-            let (one_big_list,_) =
-              Array.fold_left
-                (fun (l,i) a ->
-                   match a with
-                   | Some ls ->
-                     let add_rule_id =
-                       List.map
-                         (fun (t,d) ->
-                            {ApiTypes_j.rule_dist =
-                               unary_distances.Data.distances_rules.(i);
-                             ApiTypes_j.time_dist = t;
-                             ApiTypes_j.dist = d}) ls
-                     in (List.append l add_rule_id, i+1)
-                   | None -> (l, i+1))
-                ([],0) unary_distances.Data.distances_data in
-            one_big_list
+            {ApiTypes_j.rule_dist =
+               Format.asprintf
+                 "%a" (Environment.print_ast_rule ~env:simulation.env)
+                 d.Data.distance_rule;
+             ApiTypes_j.time_dist = d.Data.distance_time;
+             ApiTypes_j.dist = d.Data.distance_length}
+            :: simulation.distances
         | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
 
   class virtual base_runtime min_run_duration =
@@ -229,11 +219,12 @@ end = struct
                          | Data.Flux _
                          | Data.Plot _
                          | Data.Print _
-                         | Data.UnaryDistances _ -> assert false)
+                         | Data.UnaryDistance _ -> assert false)
                      sig_nd tk_nd contact_map
                      simulation_counter result >>=
                    (fun (env,domain,has_tracking,
                          store_distances,_,init_l) ->
+                     let store_distances = store_distances<>None in
                      let simulation =
                        { is_running = true ;
                          run_finalize = false ;
@@ -277,7 +268,7 @@ end = struct
                                    simulation.env
                                    simulation.domain
                                    story_compression
-                                   store_distances init_l >>=
+                                   ~store_distances init_l >>=
                                  (fun (graph,state) ->
                                     let () = simulation.graph <- graph;
                                       simulation.state <- state in

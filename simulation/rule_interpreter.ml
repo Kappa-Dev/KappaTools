@@ -19,10 +19,10 @@ type t =
         Instantiation.abstract Instantiation.test list)
          list Connected_component.Map.t (*currently tracked ccs *) *
        Trace.t) option;
-    unary_distances: Data.distances option;
+    store_distances: bool;
   }
 
-type result = Clash | Success of t | Corrected of t
+type result = Clash | Success of (int option * t) | Corrected of t
 
 let empty ?story_compression ~store_distances env =
   {
@@ -41,10 +41,7 @@ let empty ?story_compression ~store_distances env =
          then Some (story_compression,Connected_component.Map.empty,[])
          else None
        | None -> None);
-    unary_distances =
-      Tools.option_map
-        (fun _ -> Array.make ((Environment.nb_syntactic_rules env)+1) None)
-        store_distances;
+    store_distances;
   }
 
 let print_injections ?sigs pr f roots_of_patterns =
@@ -405,7 +402,7 @@ let update_edges
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
     outdated_elements = (rev_deps,unary_cands',no_unary'');
     story_machinery = story_machinery';
-    unary_distances = state.unary_distances; }
+    store_distances = state.store_distances; }
 
 let raw_instance_number state patterns_l =
   let size pattern =
@@ -553,7 +550,8 @@ let transform_by_a_rule
   update_edges (Environment.signatures env)
     counter domain unary_patterns inj state' event_kind ?path rule
 
-let apply_unary_rule ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
+let apply_unary_rule
+    ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
   let (root1,root2 as roots) =
     match
       Mods.Int2Set.random
@@ -602,24 +600,13 @@ let apply_unary_rule ~rule_id ~get_alg env domain unary_ccs counter state event_
       | None -> None
       | Some (_, dist_opt) -> dist_opt in
     match Edges.are_connected ~candidate (Environment.signatures env)
-            state.edges nodes.(0) nodes.(1)
-            dist (state'.unary_distances<>None) with
+            state.edges nodes.(0) nodes.(1) dist state'.store_distances with
     | None -> Corrected state'
     | Some _ when missing_patterns -> Corrected state'
     | Some p as path ->
-      let () =
-        match state'.unary_distances with
-        | None -> ()
-        | Some rule_arr ->
-          let n = List.length p in
-          let t = Counter.current_time counter in
-          let rule = Environment.get_rule env rule_id in
-          let syntactic_id = rule.Primitives.syntactic_rule in
-          match rule_arr.(syntactic_id) with
-          | None -> rule_arr.(syntactic_id) <- Some [(t,n)]
-          | Some ls -> rule_arr.(syntactic_id) <- Some ((t,n)::ls) in
       Success
-        (transform_by_a_rule ~get_alg env domain unary_ccs counter state'
+        ((if state'.store_distances then Some (List.length p) else None),
+         transform_by_a_rule ~get_alg env domain unary_ccs counter state'
            event_kind ?path rule inj)
 
 let apply_rule
@@ -661,7 +648,7 @@ let apply_rule
       let out =
         transform_by_a_rule
           ~get_alg env domain unary_patterns counter state event_kind rule inj in
-      Success out
+      Success (None,out)
     | Some _ ->
       try
         let point = (min roots.(0) roots.(1), max roots.(0) roots.(1)) in
@@ -685,7 +672,7 @@ let apply_rule
               (roots.(0),roots.(1)) in
           let state' =
             {state with unary_candidates = cands; unary_pathes = pathes} in
-          Success (transform_by_a_rule
+          Success (None,transform_by_a_rule
                      ~get_alg env domain unary_patterns counter state'
                      event_kind rule inj)
         | Some p ->
@@ -699,13 +686,13 @@ let apply_rule
         let out =
           transform_by_a_rule
             ~get_alg env domain unary_patterns counter state event_kind rule inj in
-        Success out
+        Success (None,out)
 
 let force_rule
     ~get_alg env domain unary_patterns counter state event_kind rule =
   match apply_rule
           ~get_alg env domain unary_patterns counter state event_kind rule with
-  | (Success out | Corrected out) -> out
+  | (Success (_,out) | Corrected out) -> out
   | Clash ->
     match all_injections
             state.edges state.roots_of_patterns rule.Primitives.connected_components
@@ -788,8 +775,6 @@ let print env f state =
            f "%%init: %a <- %a"
            (Environment.print_token ~env) i Nbr.print el))
     state.tokens
-
-let unary_distances state = state.unary_distances
 
 let debug_print f state =
   Format.fprintf

@@ -628,7 +628,7 @@ let compile ~outputs ~pause ~return
 
 let build_initial_state
     ~bind ~return alg_overwrite counter env cc_env
-    story_compression store_distances init_l =
+    story_compression ~store_distances init_l =
   let stops = Environment.fold_perturbations
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation

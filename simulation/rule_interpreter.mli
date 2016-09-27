@@ -2,13 +2,15 @@
 
 type t (**Abstract graph*)
 
-type result = Clash | Success of t | Corrected of t
+type result = Clash | Success of (int option * t) | Corrected of t
+(** the int option is the distance between patterns in unimolecular
+    instances of rule if you've asked for them *)
 
 (** {6 Initialisation} *)
 
 val empty :
   ?story_compression:((bool * bool * bool) * bool) ->
-  store_distances:bool option -> Environment.t -> t
+  store_distances:bool -> Environment.t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Environment.get_alg] but it is not hard
@@ -35,7 +37,7 @@ val apply_unary_rule :
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
- [rule_id] is mandatory if the rule has an unary rate.*)
+    [rule_id] is mandatory if the rule has an unary rate.*)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Environment.t ->
@@ -71,7 +73,6 @@ resynchronizing. (This is what initial state and perturbations do.) *)
 val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
 
 val print : Environment.t -> Format.formatter -> t -> unit
-val unary_distances : t -> Data.distances option
 
 (** {6 Stories} *)
 

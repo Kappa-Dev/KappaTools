@@ -90,7 +90,7 @@ let () =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
         alg_overwrite counter env cc_env
-        story_compression unary_distances init_l in
+        story_compression ~store_distances:(unary_distances<>None) init_l in
     let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
@@ -114,8 +114,17 @@ let () =
       if cli_args.Run_cli_args.pointNumberValue > 0 || head <> [||] then
         let title = "Output of " ^ command_line in
         Outputs.create_plot
-          (Kappa_files.get_data (),title,head)
-          (match unary_distances with Some x -> x | None -> false) in
+          (Kappa_files.get_data (),title,head) in
+    let () =
+      match unary_distances with
+      | None -> ()
+      | Some inJson ->
+        let size = Environment.nb_syntactic_rules env + 1 in
+        let names =
+          Array.init
+            size
+            (Format.asprintf "%a" (Environment.print_ast_rule ~env)) in
+        Outputs.create_distances names inJson in
     let () =
       if cli_args.Run_cli_args.pointNumberValue > 0 then
         Outputs.go (Environment.signatures env)

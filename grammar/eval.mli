@@ -31,5 +31,6 @@ val build_initial_state :
   return:(Rule_interpreter.t * State_interpreter.t -> 'a) ->
   (int * Alg_expr.t) list -> Counter.t -> Environment.t ->
   Connected_component.Env.t -> ((bool*bool*bool)*bool) option ->
-  bool option -> (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
+  store_distances : bool ->
+  (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
   'a

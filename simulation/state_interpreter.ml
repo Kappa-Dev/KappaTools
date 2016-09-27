@@ -68,7 +68,7 @@ let initialize ~bind ~return env domain counter graph0 state0 init_l =
                              (Environment.connected_components_of_unary_rules env)
                              counter s (Trace.INIT creations_sort)
                              compiled_rule with
-                     | Rule_interpreter.Success s -> s
+                     | Rule_interpreter.Success (_,s) -> s
                      | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
                        raise (ExceptionDefn.Internal_Error
                                 ("Bugged initial rule",pos)))
@@ -215,7 +215,7 @@ let perturbate ~outputs env domain counter graph state =
         do_until_noop (succ i) graph state stop in
   do_until_noop 0 graph state false
 
-let one_rule dt stop env domain counter graph state =
+let one_rule ~outputs dt stop env domain counter graph state =
   let choice,_ = Random_tree.random state.activities in
   let rule_id = choice/2 in
   let rule = Environment.get_rule env rule_id in
@@ -256,7 +256,7 @@ let one_rule dt stop env domain counter graph state =
           ~rule_id ~get_alg env domain
           (Environment.connected_components_of_unary_rules env)
           counter graph cause rule with
-  | Rule_interpreter.Success graph' ->
+  | Rule_interpreter.Success (distance,graph') ->
     let graph'' =
       Rule_interpreter.update_outdated_activities
         ~get_alg register_new_activity env counter graph' in
@@ -264,6 +264,15 @@ let one_rule dt stop env domain counter graph state =
       List.iter
         (fun (_,fl) -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
         state.flux in
+    let () =
+      match distance with
+      | None -> ()
+      | Some d ->
+        outputs (Data.UnaryDistance {
+            Data.distance_rule = rule.Primitives.syntactic_rule;
+            Data.distance_time = Counter.current_time counter;
+            Data.distance_length = d;
+          }) in
     let () =
       if !Parameter.debugModeOn then
         Format.printf "@[<v>Obtained@ %a@]@."
@@ -336,7 +345,7 @@ let a_loop ~outputs env domain counter graph state =
       | _ ->
         let (stop,graph',state') =
           perturbate ~outputs env domain counter graph state in
-        one_rule dt stop env domain counter graph' state' in
+        one_rule ~outputs dt stop env domain counter graph' state' in
   let () =
     Counter.fill ~outputs
       counter (observables_values env counter graph' state') in
@@ -345,17 +354,6 @@ let a_loop ~outputs env domain counter graph state =
   out
 
 let end_of_simulation ~outputs form env counter graph state =
-  let () = match Rule_interpreter.unary_distances graph with
-    | None -> ()
-    | Some data ->
-      let size = Environment.nb_syntactic_rules env + 1 in
-      let unary_distances =
-        { Data.distances_data = data;
-          Data.distances_rules =
-            Array.init
-              size
-              (Format.asprintf "%a" (Environment.print_ast_rule ~env)) }
-      in outputs (Data.UnaryDistances unary_distances) in
   let () =
     List.iter
       (fun (_,e) ->
