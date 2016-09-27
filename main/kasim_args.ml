@@ -7,7 +7,6 @@ type t = {
   mutable domainOutputFile : string option;
   mutable traceFile : string option;
   mutable eclipseMode : bool;
-  mutable emacsMode : bool;
   mutable compileMode : bool;
 }
 
@@ -20,7 +19,6 @@ let default : t = {
   domainOutputFile = None;
   traceFile = None;
   eclipseMode = false;
-  emacsMode = false;
   compileMode = false;
 }
 
@@ -55,10 +53,6 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.Unit
      (fun () -> t.eclipseMode <- true),
    "enable this flag for running KaSim behind eclipse plugin") ;
-  ("--emacs-mode",
-   Arg.Unit
-     (fun () -> t.emacsMode <- true),
-   "enable this flag for running KaSim using emacs-mode") ;
   ("--compile",
    Arg.Unit
      (fun () -> t.compileMode <- true),

@@ -15,26 +15,26 @@ let close_desc () =
 let dot_of_flux flux =
   let printer desc =
     let () = Format.fprintf
-               desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
+        desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
     let () = Format.fprintf
-               desc "node [shape=box,style=filled,fillcolor=lightskyblue]@," in
+        desc "node [shape=box,style=filled,fillcolor=lightskyblue]@," in
     let () =
       Pp.array
         (fun _ -> ())
         (fun s ->
-         Pp.array
-           Pp.empty
-           (fun d f v ->
-            if v=0. then ()
-            else
-              let color,arrowhead =
-                if v<0. then ("red3","tee") else ("green3","normal") in
-              Format.fprintf
-                f
-                "@[<h>\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
-                flux.Data.flux_rules.(s)
-                flux.Data.flux_rules.(d)
-                (abs (int_of_float v)) v color arrowhead))
+           Pp.array
+             Pp.empty
+             (fun d f v ->
+                if v=0. then ()
+                else
+                  let color,arrowhead =
+                    if v<0. then ("red3","tee") else ("green3","normal") in
+                  Format.fprintf
+                    f
+                    "@[<h>\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
+                    flux.Data.flux_rules.(s)
+                    flux.Data.flux_rules.(d)
+                    (abs (int_of_float v)) v color arrowhead))
         desc flux.Data.flux_data.Data.flux_fluxs in
     Format.fprintf desc "}@]@."
   in
@@ -42,12 +42,13 @@ let dot_of_flux flux =
 
 let print_json_of_flux f flux =
   let () = Format.fprintf
-             f "@[<v>{@ \"bioBeginTime\" : %e,@ \"bioEndTime\" : %e,@ "
-             flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
+      f "@[<v>{@ \"bioBeginTime\" : %e,@ \"bioEndTime\" : %e,@ "
+      flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
-      (Pp.array Pp.comma (fun _ f x -> Format.fprintf f "\"%s\"" x)) flux.Data.flux_rules
+      (Pp.array Pp.comma (fun _ f x -> Format.fprintf f "\"%s\"" x))
+      flux.Data.flux_rules
       (Pp.array Pp.comma (fun _ -> Format.pp_print_int))
       flux.Data.flux_data.Data.flux_hits in
   Format.fprintf
@@ -55,9 +56,9 @@ let print_json_of_flux f flux =
     (Pp.array
        Pp.comma
        (fun _ f x ->
-        Format.fprintf
-          f "@[[%a]@]"
-          (Pp.array Pp.comma (fun _ f y -> Format.fprintf f "%e" y)) x))
+          Format.fprintf
+            f "@[[%a]@]"
+            (Pp.array Pp.comma (fun _ f y -> Format.fprintf f "%e" y)) x))
     flux.Data.flux_data.Data.flux_fluxs
 
 let json_of_flux flux =
@@ -70,59 +71,59 @@ let html_of_flux flux =
     (Pp_html.graph_page
        (fun f -> Format.pp_print_string f "Dynamic influence map")
        ~subtitle:(fun f -> Format.pp_print_string
-                             f "between t = <span id=\"begin_time\"></span>s and t = <span id=\"end_time\"></span>s (<span id=\"nb_events\"></span> events)")
+                     f "between t = <span id=\"begin_time\"></span>s and t = <span id=\"end_time\"></span>s (<span id=\"nb_events\"></span> events)")
        ["http://d3js.org/d3.v3.min.js"]
        (fun f ->
-       let () =
+          let () =
+            Format.fprintf
+              f "@[<v 2><style>@,.chord path {@ fill-opacity: .67;@ " in
           Format.fprintf
-            f "@[<v 2><style>@,.chord path {@ fill-opacity: .67;@ " in
-       Format.fprintf
-         f "stroke: #000;@ stroke-width: .5px;@ }@]@,</style>")
+            f "stroke: #000;@ stroke-width: .5px;@ }@]@,</style>")
        (fun f ->
-        let () = Format.fprintf f "@[<hv 2><form>@," in
-        let () = Format.fprintf f "@[<v 2><div class=\"form-group\">@," in
-        let () =
-          Format.fprintf f "<label for=\"correction\">Correction</label>@," in
-        let () =
-          Format.fprintf
-            f
-            "<select id=\"select_correction\" class=\"form-control\" id=\"correction\">@," in
-        let () =
-          Format.fprintf f "<option value=\"none\">None</option>@," in
-        let () = Format.fprintf
-                   f "<option value=\"hits\">Rule occurences</option>@," in
-        let () = Format.fprintf
-                   f "<option value=\"time\">Time</option>@]@,</select>@,</div>@," in
-        let () = Format.fprintf
-		   f "<input id=\"toggle_selected_rules\" type=\"button\" value=\"Toggle selected rules\">@," in
-        let () = Format.fprintf f "@[<v 2><label class=\"checkbox-inline\">@," in
-        let () =
-          Format.fprintf
-            f
-            "<input id=\"checkbox_self_influence\" type=\"checkbox\">@," in
-        let () =
-          Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
-	let () = Format.fprintf f "<form id=\"menu\"></form>@," in
-        let () = Format.fprintf
-                   f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.common_js in
-        let () = Format.fprintf
-                   f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.flux_js in
+          let () = Format.fprintf f "@[<hv 2><form>@," in
+          let () = Format.fprintf f "@[<v 2><div class=\"form-group\">@," in
+          let () =
+            Format.fprintf f "<label for=\"correction\">Correction</label>@," in
+          let () =
+            Format.fprintf
+              f
+              "<select id=\"select_correction\" class=\"form-control\" id=\"correction\">@," in
+          let () =
+            Format.fprintf f "<option value=\"none\">None</option>@," in
+          let () = Format.fprintf
+              f "<option value=\"hits\">Rule occurences</option>@," in
+          let () = Format.fprintf
+              f "<option value=\"time\">Time</option>@]@,</select>@,</div>@," in
+          let () = Format.fprintf
+              f "<input id=\"toggle_selected_rules\" type=\"button\" value=\"Toggle selected rules\">@," in
+          let () = Format.fprintf f "@[<v 2><label class=\"checkbox-inline\">@," in
+          let () =
+            Format.fprintf
+              f
+              "<input id=\"checkbox_self_influence\" type=\"checkbox\">@," in
+          let () =
+            Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
+          let () = Format.fprintf f "<form id=\"menu\"></form>@," in
+          let () = Format.fprintf
+              f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.common_js in
+          let () = Format.fprintf
+              f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.flux_js in
 
-        let () = Format.fprintf
-                   f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
-                   print_json_of_flux flux in
-        let () = Format.fprintf f "var ids = {@[@," in
-        let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\",@ " in
-        let () = Format.fprintf f "\"endTimeId\" : \"end_time\",@ " in
-        let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\",@ " in
-        let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\",@ " in
-        let () = Format.fprintf f "\"rulesCheckboxesId\" : \"menu\",@ " in
-        let () = Format.fprintf f "\"toggleRulesId\" : \"toggle_selected_rules\",@ " in
-        let () = Format.fprintf f "\"checkboxSelfInfluenceId\" : \"checkbox_self_influence\"};@]@ " in
-        let () = Format.fprintf f "window.onload = function(){ @[@," in
-        let () = Format.fprintf f "var flux_map = new fluxMap(ids);@ " in
-        let () = Format.fprintf f "flux_map.setFlux(flux); }; @]@," in
-        Format.fprintf f "@]@,</script>"))
+          let () = Format.fprintf
+              f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
+              print_json_of_flux flux in
+          let () = Format.fprintf f "var ids = {@[@," in
+          let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\",@ " in
+          let () = Format.fprintf f "\"endTimeId\" : \"end_time\",@ " in
+          let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\",@ " in
+          let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\",@ " in
+          let () = Format.fprintf f "\"rulesCheckboxesId\" : \"menu\",@ " in
+          let () = Format.fprintf f "\"toggleRulesId\" : \"toggle_selected_rules\",@ " in
+          let () = Format.fprintf f "\"checkboxSelfInfluenceId\" : \"checkbox_self_influence\"};@]@ " in
+          let () = Format.fprintf f "window.onload = function(){ @[@," in
+          let () = Format.fprintf f "var flux_map = new fluxMap(ids);@ " in
+          let () = Format.fprintf f "flux_map.setFlux(flux); }; @]@," in
+          Format.fprintf f "@]@,</script>"))
 
 let output_flux out =
   if Filename.check_suffix out.Data.flux_data.Data.flux_name ".html"
@@ -137,19 +138,19 @@ let print_json_of_unary_distances f unary_distances rules =
   let (one_big_list,_) =
     Array.fold_left
       (fun (l,i) a -> match a with
-		      | Some ls ->
-			 let add_rule_id = List.map (fun (t,d) -> (i,t,d)) ls in
-			 (List.append l add_rule_id, i+1)
-		      | None -> (l, i+1))
+         | Some ls ->
+           let add_rule_id = List.map (fun (t,d) -> (i,t,d)) ls in
+           (List.append l add_rule_id, i+1)
+         | None -> (l, i+1))
       ([],0) unary_distances in
   Format.fprintf
     f "[%a]@."
     (Pp.list
        Pp.comma
        (fun f (id,time,distance) ->
-	Format.fprintf
-	  f "@[{ \"rule\" : \"%s\", @ \"time\" : %e, @ \"distance\" : %d }@]"
-	  rules.(id) time distance)) one_big_list
+          Format.fprintf
+            f "@[{ \"rule\" : \"%s\", @ \"time\" : %e, @ \"distance\" : %d }@]"
+            rules.(id) time distance)) one_big_list
 
 let json_of_unary_distances unary_distances rules =
   Kappa_files.with_unary_distances
@@ -159,35 +160,36 @@ let print_out_of_unary_distances f distances rule_name =
   let () = Format.fprintf f "Rule %s: " rule_name in
   let () = Format.fprintf f "@[<h>%s @]@." "time distance" in
   Format.fprintf f "@[%a@]"
-		 (Pp.list Pp.space (fun f (time,distance) ->
-		       Format.fprintf f "@[ %e @ %d @]@."
-				      time distance)) distances
+    (Pp.list Pp.space (fun f (time,distance) ->
+         Format.fprintf f "@[ %e @ %d @]@."
+           time distance)) distances
 
 let out_of_unary_distances unary_distances rules =
   Array.iteri (fun id distances_list ->
-	       match distances_list with
-	       | None -> ()
-	       | Some ls ->
-		  (*create the file *)
-		  let filename = Kappa_files.get_distances () in
-		  let filename_string = filename^(string_of_int id)^".out" in
-		  let d = Kappa_files.open_out filename_string in
-		  let f = Format.formatter_of_out_channel d in
-		  (*print data*)
-		  let () = print_out_of_unary_distances f ls rules.(id) in
-		  (*close the file*)
-		  close_out d) unary_distances
+      match distances_list with
+      | None -> ()
+      | Some ls ->
+        (*create the file *)
+        let filename = Kappa_files.get_distances () in
+        let filename_string = filename^(string_of_int id)^".out" in
+        let d = Kappa_files.open_out filename_string in
+        let f = Format.formatter_of_out_channel d in
+        (*print data*)
+        let () = print_out_of_unary_distances f ls rules.(id) in
+        (*close the file*)
+        close_out d) unary_distances
 
 let output_unary_distances in_json distances =
   if in_json
   then json_of_unary_distances
-	 distances.Data.distances_data distances.Data.distances_rules
+      distances.Data.distances_data distances.Data.distances_rules
   else out_of_unary_distances
-	 distances.Data.distances_data distances.Data.distances_rules
+      distances.Data.distances_data distances.Data.distances_rules
 
 type fd = {
   desc:out_channel;
   form:Format.formatter;
+  is_tsv:bool;
 }
 
 type format = Raw of fd | Svg of Pp_svg.store
@@ -198,22 +200,24 @@ let jsonDistancesDescr = ref false
 let close_plot () =
   match !plotDescr with
   | None -> ()
-  | Some plot ->
-     match plot with
-     | Raw plot -> close_out plot.desc
-     | Svg s -> Pp_svg.to_file s
+  | Some (Raw plot) -> close_out plot.desc
+  | Some (Svg s) -> Pp_svg.to_file s
 
-let print_header_raw f a =
+let print_header_raw is_tsv f a =
+  let print_sep =
+    if is_tsv then fun f -> Format.pp_print_string f "\t"
+    else !Parameter.plotSepChar in
   Format.fprintf f "@[<h>%s%t%a@]@."
-                 (if !Parameter.emacsMode then "time" else "# time")
-                 !Parameter.plotSepChar
-                 (Pp.array !Parameter.plotSepChar
-                           (fun _ -> Format.pp_print_string)) a
+    (if is_tsv then "time" else "# time") print_sep
+    (Pp.array print_sep (fun _ -> Format.pp_print_string)) a
 
-let print_values_raw f (time,l) =
+let print_values_raw is_tsv f (time,l) =
+  let print_sep =
+    if is_tsv then fun f -> Format.pp_print_string f "\t"
+    else !Parameter.plotSepChar in
   Format.fprintf f "@[<h>%t%E%t%a@]@."
-                 !Parameter.plotSepChar time !Parameter.plotSepChar
-                 (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
+    !Parameter.plotSepChar time print_sep
+    (Pp.array print_sep (fun _ -> Nbr.print)) l
 
 let create_plot (filename,title,head) jsonDistances =
   let format =
@@ -227,28 +231,29 @@ let create_plot (filename,title,head) jsonDistances =
     else
       let d_chan = Kappa_files.open_out filename in
       let d = Format.formatter_of_out_channel d_chan in
-      let () = Format.fprintf d "# %s@." title in
-      let () = print_header_raw d head in
-      Raw {desc=d_chan; form=d} in
+      let is_tsv = Filename.check_suffix filename ".tsv" in
+      let () = if not is_tsv then Format.fprintf d "# %s@." title in
+      let () = print_header_raw is_tsv d head in
+      Raw {desc=d_chan; form=d; is_tsv} in
   let () = plotDescr := Some format in
   jsonDistancesDescr := jsonDistances
 
 let plot_now l =
   match !plotDescr with
   | None -> assert false
-  | Some (Raw fd) -> print_values_raw fd.form l
+  | Some (Raw fd) -> print_values_raw fd.is_tsv fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
 let print_snapshot sigs f s =
   Format.fprintf
     f "@[<v>%a@,%a@]"
     (Pp.list Pp.space (fun f (i,mix) ->
-                       Format.fprintf f "%%init: %i @[<h>%a@]" i
-                                      (Raw_mixture.print ~compact:false sigs) mix))
+         Format.fprintf f "%%init: %i @[<h>%a@]" i
+           (Raw_mixture.print ~compact:false sigs) mix))
     s.Data.agents
     (Pp.array Pp.space (fun _ f (na,el) ->
-                        Format.fprintf
-                          f "%%init: %s <- %a" na Nbr.print el))
+         Format.fprintf
+           f "%%init: %s <- %a" na Nbr.print el))
     s.Data.tokens
 
 let print_dot_snapshot sigs f s =
@@ -257,16 +262,15 @@ let print_dot_snapshot sigs f s =
     (Pp.listi
        Pp.cut
        (fun i f (nb,mix) ->
-        Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
-        Format.fprintf
-          f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
-          i nb (Raw_mixture.print_dot sigs i) mix))
+          Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
+          Format.fprintf
+            f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
+            i nb (Raw_mixture.print_dot sigs i) mix))
     s.Data.agents
     (Pp.array Pp.cut (fun i f (na,el) ->
-                      Format.fprintf
-                        f
-                        "token_%d [label = \"%s (%a)\" , shape=none]"
-                        i na Nbr.print el))
+         Format.fprintf
+           f "token_%d [label = \"%s (%a)\" , shape=none]"
+           i na Nbr.print el))
     s.Data.tokens
 
 let snapshot env s =
@@ -284,15 +288,15 @@ let go env = function
   | Data.Flux f -> output_flux f
   | Data.Plot (x,y) -> plot_now (x,y)
   | Data.Print p ->
-     let desc =
-       match p.Data.file_name with
-         None -> Format.formatter_of_out_channel stdout
-       | Some file -> get_desc file
-     in
-     Format.fprintf desc "%s@." p.Data.line
+    let desc =
+      match p.Data.file_name with
+        None -> Format.formatter_of_out_channel stdout
+      | Some file -> get_desc file
+    in
+    Format.fprintf desc "%s@." p.Data.line
   | Data.Log s -> Format.printf "%s@." s
   | Data.UnaryDistances distances ->
-     output_unary_distances !jsonDistancesDescr distances
+    output_unary_distances !jsonDistancesDescr distances
 
 let close () =
   let () = close_plot () in

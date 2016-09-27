@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -t 2 -p 250 -d output rafinements.ka -seed 16602 || exit 0
+"${KAPPABIN}"KaSim -t 2 -p 250 -d output rafinements.ka -o data.tsv -seed 16602 || exit 0

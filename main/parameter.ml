@@ -13,7 +13,6 @@ let dumpIfDeadlocked = ref false
 let maxConsecutiveClash = ref 2
 let eclipseMode = ref false
 let useColor = ref true
-let emacsMode = ref false
 
 (* expert option for stories *)
   (** Memory **)

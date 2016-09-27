@@ -46,7 +46,6 @@ let main () =
         in*)
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     (*  let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in*)
-    (*let () = Parameter.emacsMode := kasim_args.Kasim_args.emacsMode in*)
     (*let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in*)
     let () = Parameter.batchmode := cli_args.Run_cli_args.batchmode in
     (*let () =
