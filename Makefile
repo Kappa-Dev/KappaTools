@@ -34,7 +34,7 @@ SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness)
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check build-tests doc clean_doc fetch_version on_linux_for_windows debug
+.PHONY: check build-tests doc clean_doc fetch_version KappaBin.zip debug
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -241,8 +241,8 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
-	rm -f KaDE bin/KaDE
-	rm -rf KappaBin
+	rm -f KaDE bin/KaDE StdSim bin/StdSim
+	rm -rf KappaBin KappaBin.zip
 	rm -rf site generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
@@ -260,12 +260,14 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 
 KappaBin.zip:
 	+$(MAKE) clean
-	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native
+	+$(MAKE) $(GENERATED)
+	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native StdSim.native
 	mkdir KappaBin
 	mv _build/main/KaSim.native KappaBin/KaSim.exe
 	mv _build/KaSa_rep/main/KaSa.native KappaBin/KaSa.exe
 	mv _build/cflow/KaStor.native KappaBin/KaStor.exe
 	mv _build/odes/KaDE.native KappaBin/KaDE.exe
+	mv _build/webapp/StdSim.native KappaBin/StdSim.exe
 	zip $@ KappaBin/*.exe
 	rm -r KappaBin
 
