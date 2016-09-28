@@ -66,7 +66,7 @@ function fluxMap(configuration) {
             color = that.flux.fluxs.map(function(a)
                                    {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
                                     .filter(that.filterRules);}).filter(that.filterRules);
-        var chord = d3.layout.chord().padding(.01).matrix(matrix);
+        var chord = d3.chord(matrix).padAngle(.01);
         var width = configuration.width?configuration.width:960,
             height = configuration.height?configuration.height:700,
             innerRadius = Math.min(width, height) * .37;

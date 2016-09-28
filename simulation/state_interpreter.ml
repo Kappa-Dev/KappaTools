@@ -229,12 +229,18 @@ let one_rule ~outputs dt stop env domain counter graph state =
           (fun (relative,fl) ->
              Fluxmap.incr_flux_flux
                rule.Primitives.syntactic_rule syntax_rd_id
-               (if relative
-                then match classify_float old_act with
-                  | FP_zero -> 0.
-                  | (FP_normal | FP_subnormal |FP_infinite | FP_nan) ->
-                    (new_act -. old_act) /. old_act
-                else (new_act -. old_act)) fl)
+               (
+                 let cand =
+                   if relative then (new_act -. old_act) /. old_act
+                  else (new_act -. old_act) in
+                 match classify_float cand with
+                | (FP_nan | FP_infinite) ->
+                  let () =
+                    ExceptionDefn.warning
+                      (fun f -> Format.fprintf
+                          f "An infinite (or NaN) activity variation has been ignored at t=%f"
+                          (Counter.current_time counter)) in 0.
+                | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
           l
     in Random_tree.add rd_id new_act state.activities in
   let () =
