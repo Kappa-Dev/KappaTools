@@ -287,12 +287,25 @@ end = struct
                                            (Kappa_printer.alg_expr
                                               ~env:simulation.env))
                                         simulation.env in
+                                    let first_obs =
+                                      State_interpreter.observables_values
+                                        simulation.env simulation.counter graph state in
+                                    let first_values =
+                                      List.map (fun nbr -> Nbr.to_float nbr)
+                                        (Array.to_list first_obs) in
+
                                     let () =
                                       simulation.plot <-
-                                        { simulation.plot
-                                          with ApiTypes_j.legend =
-                                                 Array.to_list legend }
-                                    in
+                                        { ApiTypes_j.legend =
+                                            Array.to_list legend;
+                                          ApiTypes_j.time_series =
+                                            [
+                                              { ApiTypes_j.observation_time =
+                                                  Counter.current_time simulation.counter;
+                                                ApiTypes_j.observation_values =
+                                                  first_values;
+                                              }
+                                            ]} in
                                     self#run simulation
                                  )
                               )

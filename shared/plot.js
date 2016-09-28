@@ -174,7 +174,7 @@ function observable_plot(configuration){
                 state_observable.values.push(current);
             });
         });
-	if (first_time && last_time){
+	if (first_time !== null && last_time !== null){
             that.start_time = Math.min(first_time,last_time);
             that.end_time = Math.max(first_time,last_time);
 	} else {
@@ -568,7 +568,7 @@ function observable_plot(configuration){
     this.renderLabel = function(){
         var that = this;
         if(that.configuration.plotLabelDivId){
-            if (that.start_time){
+            if (that.start_time !== null){
                 var label =
                     "Plot between t = "
                     +that.formatTime(that.start_time)
