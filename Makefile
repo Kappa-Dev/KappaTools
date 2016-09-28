@@ -260,15 +260,17 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 
 KappaBin.zip:
 	+$(MAKE) clean
-	+$(MAKE) $(GENERATED)
+	+$(MAKE) NO_CDN=1 site/index.html
 	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native StdSim.native
 	mkdir KappaBin
-	mv _build/main/KaSim.native KappaBin/KaSim.exe
-	mv _build/KaSa_rep/main/KaSa.native KappaBin/KaSa.exe
-	mv _build/cflow/KaStor.native KappaBin/KaStor.exe
-	mv _build/odes/KaDE.native KappaBin/KaDE.exe
-	mv _build/webapp/StdSim.native KappaBin/StdSim.exe
-	zip $@ KappaBin/*.exe
+	mkdir KappaBin/bin
+	mv site KappaBin/package.nw
+	mv _build/main/KaSim.native KappaBin/bin/KaSim.exe
+	mv _build/KaSa_rep/main/KaSa.native KappaBin/bin/KaSa.exe
+	mv _build/cflow/KaStor.native KappaBin/bin/KaStor.exe
+	mv _build/odes/KaDE.native KappaBin/bin/KaDE.exe
+	mv _build/webapp/StdSim.native KappaBin/bin/StdSim.exe
+	zip -r $@ KappaBin
 	rm -r KappaBin
 
 full:
