@@ -12,23 +12,23 @@
 #
 #		constants
 
-%var:	'scale'					1/2
+%var:	'scale'				1/2
 %var:	'Avogadro'			6.0221413E+23
-%var:	'mammalian cell'	2.25E-12			# l (mammalian cell)
-%var:	'yeast cell'				4.2E-14					# l (hapl yeast cell)
-%var:	'V'							'scale' * 'yeast cell'
+%var:	'mammalian cell'		2.25E-12	# l (mammalian cell)
+%var:	'yeast cell'			4.2E-14		# l (hapl yeast cell)
+%var:	'V'				'scale' * 'yeast cell'
 
 #//////////////////////////////////////////////////////////////////////////////
 #
 #		rate constants
 
 %var:	'det k_on'		2.5E08	# M^-1 s^-1
-%var:	'det k_off'		2.5		# s^-1
-%var:	'det k_cat'		1			# s^-1
+%var:	'det k_off'		2.5	# s^-1
+%var:	'det k_cat'		1	# s^-1
 
 %var:	'k_on'	'det k_on' / ('Avogadro' * 'V')	# molecule^-1 s^-1
-%var:	'k_off'	'det k_off'								# s^-1
-%var:	'k_cat'	'det k_cat'								# s^-1
+%var:	'k_off'	'det k_off'			# s^-1
+%var:	'k_cat'	'det k_cat'			# s^-1
 
 #------------------------------------------------------------------------------
 #		"mad computer scientist" rate constants
@@ -41,8 +41,8 @@
 #		more reasonable rate constants
 
 #	%var:	'k_on  K'	0.01 / 'scale'	# molecule^-1 s^-1
-#	%var:	'k_off K'	2.5				# s^-1
-#	%var:	'k_cat K'	1					# s^-1
+#	%var:	'k_off K'	2.5		# s^-1
+#	%var:	'k_cat K'	1		# s^-1
 
 #//////////////////////////////////////////////////////////////////////////////
 #
@@ -58,18 +58,11 @@
 #
 #		observables
 
-%obs: 'long'					Shc(PTB!_,Y!1),Grb2(SH2!1,SH3n!2),SoS(PR!2)
-%obs: 'short'					EGFR(Y1092~p!2),Grb2(SH2!2,SH3n!1),SoS(PR!1)
-%obs: 'sos recruited'		Grb2(SH2!_,SH3n!2),SoS(PR!2)
+%obs: 'long'			Shc(PTB!_,Y!1),Grb2(SH2!1,SH3n!2),SoS(PR!2)
+%obs: 'short'			EGFR(Y1092~p!2),Grb2(SH2!2,SH3n!1),SoS(PR!1)
+%var: 'sos recruited'		Grb2(SH2!_,SH3n!2),SoS(PR!2)
 
 
-#//////////////////////////////////////////////////////////////////////////////
-#
-#		behavior
-
-%var: 'x' 0
-#%mod: [true] do ($TRACK 'sos recruited' [true] ; $UPDATE 'x'  'sos recruited')
-#%mod: ('x' > 0 && 'sos recruited' - 'x' > 9) do $TRACK 'sos recruited' [false]
 #//////////////////////////////////////////////////////////////////////////////
 #
 #		rules for "Sos recruitment"
@@ -102,4 +95,3 @@
 'pY@Shc' EGFR(Y1172~p!1), Shc(PTB!1,Y~u) -> EGFR(Y1172~p!1), Shc(PTB!1,Y~p) @ 'k_cat'
 
 'uY@Shc' Shc(Y~p) -> Shc(Y~u) @ 'k_cat'
-
