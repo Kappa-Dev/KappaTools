@@ -66,55 +66,84 @@ function fluxMap(configuration) {
             color = that.flux.fluxs.map(function(a)
                                    {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
                                     .filter(that.filterRules);}).filter(that.filterRules);
-        var chord = d3.chord(matrix).padAngle(.01);
-        var width = configuration.width?configuration.width:960,
+	var width = configuration.width?configuration.width:960,
             height = configuration.height?configuration.height:700,
-            innerRadius = Math.min(width, height) * .37;
-        var arc = d3.arc().innerRadius(innerRadius)
-            .outerRadius(innerRadius + 8);
-        var svg_element = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("svg");
-        var svg = svg_element.attr("width", width)
-                  .attr("height", height).select("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+            innerRadius = Math.min(width, height) * .37,
+	    outerRadius = innerRadius + 8;
+        var svg = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("svg");
+        svg.attr("width", width)
+           .attr("height", height)
+	   .select("g")
+	   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
         svg.selectAll("*").remove();
-        svg.append("g").attr("class", "chord").selectAll("path")
-            .data(chord.chords).enter().append("path")
-            .filter(function (v) {return (v.source.value != 0); }).attr("d", d3.chord().radius(innerRadius))
-            .style("fill", function(d) { return color[d.source.index][d.target.index]; })
-            .style("opacity", 1);
-        svg.append("g").attr("id", "values").selectAll(".sources")
-            .data(chord.chords).enter().append("text").attr("class","sources")
-            .each(function(d) { d.angle = ( d.source.startAngle + d.source.endAngle) / 2; })
-                .attr("dy", ".1em")
-            .attr("transform", function(d) {
-                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                    + "translate(" + (innerRadius - 10) + ")"
-                + (d.angle > Math.PI ? "rotate(180)" : ""); })
-            .style("text-anchor", function(d) { return d.angle > Math.PI ? null : "end" ; })
-            .text(function (d) { return d.source.value.toExponential(2);});
-        svg.select("#values").selectAll(".targets")
-            .data(chord.chords).enter().append("text")
-            .filter(function (v) {return (v.target.value != 0); }).attr("class","targets")
-            .each(function(d) { d.angle = ( d.target.startAngle + d.target.endAngle) / 2; })
-                .attr("dy", ".1em")
-            .attr("transform", function(d) {
-                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                    + "translate(" + (innerRadius - 10) + ")"
-                    + (d.angle > Math.PI ? "rotate(180)" : ""); })
-            .style("text-anchor", function(d) { return d.angle > Math.PI ? null : "end" ; })
-            .text(function (d) { return d.target.value.toExponential(2);});
-        var legends = svg.append("g").selectAll("g").data(chord.groups).enter()
-            .append("g");
+
+
+	var formatValue = d3.formatPrefix(",.0", 1e3);
+
+	var chord = d3.chord()
+	    .padAngle(0.05)
+	    .sortSubgroups(d3.descending);
+
+	var arc = d3.arc()
+	    .innerRadius(innerRadius)
+	    .outerRadius(outerRadius);
+
+	var ribbon = d3.ribbon()
+	    .radius(innerRadius);
+
+	var color = d3.scaleOrdinal()
+	    .domain(d3.range(matrix.length))
+	    .range(["#FF0000" , "#00FF00"]);
+
+	var g = svg.append("g")
+	    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+	    .datum(chord(matrix));
+	var group = g.append("g")
+	    .attr("class", "groups")
+	    .selectAll("g")
+	    .data(function(chords) { return chords.groups; })
+	    .enter().append("g");
+
+	group.append("path")
+	    .style("fill", function(d) { return d3.rgb("#000000"); })
+	    .style("stroke", function(){ return d3.rgb("#000000"); } )
+	    .attr("d", arc);
+
+        var legends = group.append("g");
         legends.append("text")
-            .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
+	    .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
                 .attr("dy", ".1em")
-            .attr("transform", function(d) {
+	    .attr("transform", function(d) {
                 return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                    + "translate(" + (innerRadius + 10) + ")"
-                    + (d.angle > Math.PI ? "rotate(180)" : ""); })
-            .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-            .text(function(d) { return rules[d.index]; });
+		    + "translate(" + (innerRadius + 10) + ")"
+		    + (d.angle > Math.PI ? "rotate(180)" : ""); })
+	    .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+	    .text(function(d) { return rules[d.index]; });
         legends.append("path").style("fill", "#222222").attr("d", arc)
             .on("mouseover", that.fade(svg,.1)).on("mouseout", that.fade(svg,1));
+
+	var ribbon = g.append("g")
+	    .attr("class", "ribbons")
+	    .selectAll("path")
+	    .data(function(chords) { return chords; })
+	    .enter().append("path")
+	    .attr("d", ribbon)
+	    .style("fill", function(d) { return color(d.target.index); })
+	    .style("stroke", function(d) { return d3.rgb(color(d.target.index)).darker(); });
+
+
+	ribbon.data(function(chords){ return chords; })
+	    .enter()
+  	    .append("text")
+	    .each(function(d) { d.labelAngle = ( d.source.startAngle + d.source.endAngle) / 2; })
+                .attr("dy", ".1em")
+            .attr("transform", function(d) {
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                    + "translate(" + (innerRadius - 10) + ")"
+                    + (d.labelAngle > Math.PI ? "rotate(180)" : ""); })
+            .style("text-anchor", function(d) { return d.labelAngle > Math.PI ? null : "end" ; })
+            .text(function (d) { return d.source.value.toExponential(2);});
+
     };
 
     this.render_other = function(){
@@ -122,6 +151,7 @@ function fluxMap(configuration) {
     };
     this.render_controls = function(){
         var rulesCheckboxes = document.getElementById(that.configuration.rulesCheckboxesId);
+
         while (rulesCheckboxes.hasChildNodes()){
             rulesCheckboxes.removeChild(rulesCheckboxes.lastChild);
         };
