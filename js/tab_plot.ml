@@ -1,4 +1,4 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
@@ -41,7 +41,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
                   state_plot (React.S.value simulation_output)
 		with
                 | None -> ""
-                | Some p -> Api_data.plot_values p
+                | Some p -> Api_data_v1.plot_values p
               in
               Common.saveFile
 		~data:data

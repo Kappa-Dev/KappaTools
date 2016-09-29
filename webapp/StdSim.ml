@@ -1,4 +1,4 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 
 open Lwt.Infix
 

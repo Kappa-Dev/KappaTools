@@ -1,23 +1,23 @@
 open Lwt
 
 let poll_interval : float = 0.5
-type ready_state = { simulation_token : ApiTypes_j.token ;
-                     simulation_state : ApiTypes_j.state ; }
-let create_ready_state (token : ApiTypes_j.token) : ready_state =
+type ready_state = { simulation_token : Api_types_v1_j.token ;
+                     simulation_state : Api_types_v1_j.state ; }
+let create_ready_state (token : Api_types_v1_j.token) : ready_state =
   { simulation_token = token ;
     simulation_state =
-      { ApiTypes_j.plot = None;
-        ApiTypes_j.distances = None;
-        ApiTypes_j.time = 0.0;
-        ApiTypes_j.time_percentage = None;
-        ApiTypes_j.event = 0;
-        ApiTypes_j.event_percentage = None;
-        ApiTypes_j.tracked_events = None;
-        ApiTypes_j.log_messages = [];
-        ApiTypes_j.snapshots = [];
-        ApiTypes_j.flux_maps = [];
-        ApiTypes_j.files = [];
-        ApiTypes_j.is_running = true ;
+      { Api_types_v1_j.plot = None;
+        Api_types_v1_j.distances = None;
+        Api_types_v1_j.time = 0.0;
+        Api_types_v1_j.time_percentage = None;
+        Api_types_v1_j.event = 0;
+        Api_types_v1_j.event_percentage = None;
+        Api_types_v1_j.tracked_events = None;
+        Api_types_v1_j.log_messages = [];
+        Api_types_v1_j.snapshots = [];
+        Api_types_v1_j.flux_maps = [];
+        Api_types_v1_j.files = [];
+        Api_types_v1_j.is_running = true ;
       } ; }
 
 type simulation_state =
@@ -47,12 +47,12 @@ let simulation_status (t : t) : simulation_status React.signal =
       | SIMULATION_STOPPED -> STOPPED
       | SIMULATION_INITALIZING -> INITALIZING
       | SIMULATION_READY ready_state ->
-        if ready_state.simulation_state.ApiTypes_j.is_running then
+        if ready_state.simulation_state.Api_types_v1_j.is_running then
           RUNNING
         else PAUSED)
     t.signal
 
-let simulation_output (t : t) : ApiTypes_j.state option React.signal =
+let simulation_output (t : t) : Api_types_v1_j.state option React.signal =
   React.S.map
     (function
       | SIMULATION_STOPPED ->
@@ -65,7 +65,7 @@ let simulation_output (t : t) : ApiTypes_j.state option React.signal =
     t.signal
 (* Sugar for error message *)
 let lwt_error msg _ =
-  let () = Ui_state.set_model_error (Api_data.api_message_errors msg) in
+  let () = Ui_state.set_model_error (Api_data_v1.api_message_errors msg) in
   Lwt.return_unit
 
 
@@ -85,7 +85,7 @@ let ready_simulation
   match !Ui_state.runtime_state with
   | None ->
     let () = Ui_state.set_model_error
-        (Api_data.api_message_errors "Runtime not available")
+        (Api_data_v1.api_message_errors "Runtime not available")
     in
     Lwt.return_unit
   | Some runtime ->
@@ -96,10 +96,10 @@ let ready_simulation
 
 
 let create_parameter () =
-  { ApiTypes_j.code = React.S.value Ui_state.model_text;
-    ApiTypes_j.nb_plot = React.S.value Ui_state.model_nb_plot;
-    ApiTypes_j.max_time = React.S.value Ui_state.model_max_time;
-    ApiTypes_j.max_events = React.S.value Ui_state.model_max_events
+  { Api_types_v1_j.code = React.S.value Ui_state.model_text;
+    Api_types_v1_j.nb_plot = React.S.value Ui_state.model_nb_plot;
+    Api_types_v1_j.max_time = React.S.value Ui_state.model_max_time;
+    Api_types_v1_j.max_events = React.S.value Ui_state.model_max_events
   }
 
 let rec update_simulation (t : t) : unit Lwt.t =
@@ -128,7 +128,7 @@ let rec update_simulation (t : t) : unit Lwt.t =
                         t.setter
                           (SIMULATION_READY
                              { ready_state with simulation_state = state }) in
-                      if state.ApiTypes_j.is_running then
+                      if state.Api_types_v1_j.is_running then
                         update_simulation t
                       else
                         Lwt.return_unit
@@ -221,12 +221,12 @@ let perturb_simulation
   ready_simulation
     ~ready:
       (fun (runtime_state,ready_state) ->
-         if ready_state.simulation_state.ApiTypes_j.is_running then
+         if ready_state.simulation_state.Api_types_v1_j.is_running then
            lwt_error "pertubation can not be applied to running proccess" ()
          else
          (runtime_state#perturbate
             ready_state.simulation_token
-            { ApiTypes_j.perturbation_code = code ; }
+            { Api_types_v1_j.perturbation_code = code ; }
          )
          >>=
          (fun response ->
@@ -243,7 +243,7 @@ let perturb_simulation
 let start_simulation
     (t : t)
   =
-  let on_error (errors : ApiTypes_t.errors) =
+  let on_error (errors : Api_types_v1_t.errors) =
     let () = Ui_state.set_model_error errors in
     let () = t.setter SIMULATION_STOPPED in
     Lwt.return_unit
@@ -273,10 +273,10 @@ let start_simulation
            (function
              | Invalid_argument error ->
                let message = Format.sprintf "Runtime error %s" error in
-               on_error (Api_data.api_message_errors message)
+               on_error (Api_data_v1.api_message_errors message)
              | Sys_error message ->
-               on_error (Api_data.api_message_errors message)
+               on_error (Api_data_v1.api_message_errors message)
              | _ ->
-               on_error (Api_data.api_message_errors "Inialization error"))
+               on_error (Api_data_v1.api_message_errors "Inialization error"))
       )
     t

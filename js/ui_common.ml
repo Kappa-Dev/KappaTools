@@ -1,10 +1,10 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 let toggle_element
   (t : Ui_simulation.t)
-  (projection : ApiTypes_j.state option -> 'a list)
+  (projection : Api_types_v1_j.state option -> 'a list)
   (content : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) =
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
@@ -167,7 +167,7 @@ let save_plot_ui
   ()
 let badge
     (t : Ui_simulation.t)
-    (counter : ApiTypes_j.state option -> int)
+    (counter : Api_types_v1_j.state option -> int)
   =
   let badge_list, badge_handle = ReactiveData.RList.create [] in
   [ Tyxml_js.R.Html.span

@@ -1,4 +1,4 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
@@ -59,7 +59,7 @@ let onload (_ : Ui_simulation.t) =
          | Some data ->
            if Array.length data.ApiTypes.contact_map > 0 then
              let json : string =
-               ApiTypes_j.string_of_site_graph data.ApiTypes.contact_map
+               Api_types_v1_j.string_of_site_graph data.ApiTypes.contact_map
              in
              (contactmap##setData
                 (Js.string json)
@@ -78,10 +78,10 @@ let onload (_ : Ui_simulation.t) =
        | None -> (contactmap##clearData)
        | Some data ->
          let site_graph : ApiTypes.site_graph =
-           Api_data.api_contactmap_site_graph data in
+           Api_data_v1.api_contactmap_site_graph data in
          (* quick cheat to get the count of the agent *)
          let json : string =
-           ApiTypes_j.string_of_site_graph site_graph in
+           Api_types_v1_j.string_of_site_graph site_graph in
          contactmap##setData
            (Js.string json)
            (Js.Opt.option (Ui_state.agent_count ()))

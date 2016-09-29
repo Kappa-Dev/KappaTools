@@ -45,7 +45,7 @@ VERSION=generated/version.ml
 RESOURCE=generated/resource_strings.ml
 GENERATED=$(VERSION) \
 	  $(RESOURCE) \
-	  generated/ApiTypes_t.ml generated/ApiTypes_j.ml \
+	  generated/api_types_v1_t.ml generated/api_types_v1_j.ml \
 	  generated/api_types_t.ml generated/api_types_j.ml \
 	  generated/mpi_message_t.ml generated/mpi_message_j.ml
 
@@ -63,11 +63,11 @@ endif
 generated:
 	mkdir -p generated
 
-generated/ApiTypes_t.ml: api/ApiTypes.atd generated
-	atdgen -t -o generated/ApiTypes api/ApiTypes.atd
+generated/api_types_v1_t.ml: api/api_types_v1.atd generated
+	atdgen -t -o generated/api_types_v1 api/api_types_v1.atd
 
-generated/ApiTypes_j.ml: api/ApiTypes.atd generated
-	atdgen -j -j-std -o generated/ApiTypes api/ApiTypes.atd
+generated/api_types_v1_j.ml: api/api_types_v1.atd generated
+	atdgen -j -j-std -o generated/api_types_v1 api/api_types_v1.atd
 
 generated/api_types_t.ml: api/api_types.atd generated
 	atdgen -t -o generated/api_types api/api_types.atd

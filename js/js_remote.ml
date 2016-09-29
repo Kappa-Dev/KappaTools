@@ -1,6 +1,6 @@
 open Lwt
 open XmlHttpRequest
-module Api_types = ApiTypes_j
+module Api_types = Api_types_v1_j
 
 exception BadResponseCode of int
 exception TimeOut
@@ -85,12 +85,12 @@ class runtime
           else
             Lwt.return
               (`Left
-                 (Api_data.api_message_errors
+                 (Api_data_v1.api_message_errors
                     (Format.sprintf "Unexpected Response code %d" frame.code)))
         with e ->
           Lwt.return
             (`Left
-               (Api_data.api_message_errors
+               (Api_data_v1.api_message_errors
                   (Printexc.to_string e)))
 
     method parse (code : Api_types.code) :

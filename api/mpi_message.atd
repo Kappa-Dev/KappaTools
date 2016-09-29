@@ -1,14 +1,14 @@
 type id = int
 type 'data message = { id : id ; data : 'data }
 
-type catalog <ocaml from="ApiTypes"> = abstract
-type code <ocaml from="ApiTypes"> = abstract
-type error <ocaml from="ApiTypes"> = abstract
-type parameter <ocaml from="ApiTypes"> = abstract
-type ('r) result <ocaml from="ApiTypes"> = abstract
-type state <ocaml from="ApiTypes"> = abstract
-type token <ocaml from="ApiTypes"> = abstract
-type parse <ocaml from="ApiTypes"> = abstract
+type catalog <ocaml from="Api_types_v1"> = abstract
+type code <ocaml from="Api_types_v1"> = abstract
+type error <ocaml from="Api_types_v1"> = abstract
+type parameter <ocaml from="Api_types_v1"> = abstract
+type ('r) result <ocaml from="Api_types_v1"> = abstract
+type state <ocaml from="Api_types_v1"> = abstract
+type token <ocaml from="Api_types_v1"> = abstract
+type parse <ocaml from="Api_types_v1"> = abstract
 type peturbation = { perturbation_token : token ;
                      perturbation_code : string ; }
 type continuation = { continuation_token : token ;

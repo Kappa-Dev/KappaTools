@@ -1,4 +1,4 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 
 open ApiTypes
 open Lwt
@@ -154,7 +154,7 @@ let set_runtime_url
                         url
                     in
                     set_model_error
-                      (Api_data.api_message_errors error_msg)
+                      (Api_data_v1.api_message_errors error_msg)
 		in
 		let () = continuation is_valid_server in
 		Lwt.return_unit
@@ -242,5 +242,5 @@ let agent_count () : int option =
   | None -> None
   | Some data ->
     let site_graph : ApiTypes.site_graph =
-      Api_data.api_contactmap_site_graph data in
+      Api_data_v1.api_contactmap_site_graph data in
     Some (Array.length site_graph)

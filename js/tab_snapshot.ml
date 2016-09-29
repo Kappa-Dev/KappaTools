@@ -1,4 +1,4 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
@@ -52,7 +52,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
               let data = match
 		  (React.S.value current_snapshot : ApiTypes.snapshot option) with
               | None -> ""
-              | Some s -> Api_data.api_snapshot_kappa s
+              | Some s -> Api_data_v1.api_snapshot_kappa s
               in
               Common.saveFile
 		~data:data
@@ -66,7 +66,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
               let data = match
 		  (React.S.value current_snapshot : ApiTypes.snapshot option) with
               | None -> ""
-              | Some s -> Api_data.api_snapshot_dot s
+              | Some s -> Api_data_v1.api_snapshot_dot s
               in
               Common.saveFile
 		~data:data
@@ -173,7 +173,7 @@ let content (t : Ui_simulation.t) =
              (fun snapshot ->
                 match snapshot with
                 | None -> ""
-                | Some snapshot -> Api_data.api_snapshot_kappa snapshot)
+                | Some snapshot -> Api_data_v1.api_snapshot_kappa snapshot)
              current_snapshot)
 
       ]
@@ -230,13 +230,13 @@ let render_snapshot_graph
   let () =
     Common.debug
       (Js.string
-         (ApiTypes_j.string_of_snapshot snapshot))
+         (Api_types_v1_j.string_of_snapshot snapshot))
   in
   let site_graph : ApiTypes.site_graph =
-    Api_data.api_snapshot_site_graph snapshot in
+    Api_data_v1.api_snapshot_site_graph snapshot in
   match React.S.value display_format with
   | Graph ->
-    let json : string = ApiTypes_j.string_of_site_graph site_graph
+    let json : string = Api_types_v1_j.string_of_site_graph site_graph
     in
     snapshot_js##setData
       (Js.string json)

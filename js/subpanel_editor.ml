@@ -1,5 +1,5 @@
 module UIState = Ui_state
-module Api_types = ApiTypes_j
+module Api_types = Api_types_v1_j
 
 open Js
 open Codemirror

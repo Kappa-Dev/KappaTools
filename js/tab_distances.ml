@@ -1,4 +1,4 @@
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 
 module Html = Tyxml_js.Html
 module UIState = Ui_state
@@ -59,7 +59,7 @@ let update_distances
   match data with
     None -> ()
   | Some data ->
-    let distances_string : string = ApiTypes_j.string_of_distances data in
+    let distances_string : string = Api_types_v1_j.string_of_distances data in
     let distances_data : Js.js_string Js.t = Js.string distances_string in
     distances##setData(distances_data)
 

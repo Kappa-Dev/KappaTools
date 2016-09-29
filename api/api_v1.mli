@@ -5,31 +5,31 @@ val msg_observables_less_than_zero : string
 class type api_runtime =
   object
     method parse :
-      ApiTypes_j.code ->
-      ApiTypes_j.parse ApiTypes_j.result Lwt.t
+      Api_types_v1_j.code ->
+      Api_types_v1_j.parse Api_types_v1_j.result Lwt.t
     method start :
-      ApiTypes_j.parameter ->
-      ApiTypes_j.token ApiTypes_j.result Lwt.t
+      Api_types_v1_j.parameter ->
+      Api_types_v1_j.token Api_types_v1_j.result Lwt.t
     method status :
-      ApiTypes_j.token ->
-      ApiTypes_j.state ApiTypes_j.result Lwt.t
+      Api_types_v1_j.token ->
+      Api_types_v1_j.state Api_types_v1_j.result Lwt.t
     method list :
       unit ->
-      ApiTypes_j.catalog ApiTypes_j.result Lwt.t
+      Api_types_v1_j.catalog Api_types_v1_j.result Lwt.t
     method stop :
-      ApiTypes_j.token ->
-      unit ApiTypes_j.result Lwt.t
+      Api_types_v1_j.token ->
+      unit Api_types_v1_j.result Lwt.t
     method perturbate :
-      ApiTypes_j.token ->
-      ApiTypes_j.perturbation ->
-      unit ApiTypes_j.result Lwt.t
+      Api_types_v1_j.token ->
+      Api_types_v1_j.perturbation ->
+      unit Api_types_v1_j.result Lwt.t
     method pause :
-      ApiTypes_j.token ->
-      unit ApiTypes_j.result Lwt.t
+      Api_types_v1_j.token ->
+      unit Api_types_v1_j.result Lwt.t
     method continue :
-      ApiTypes_j.token ->
-      ApiTypes_j.parameter ->
-      unit ApiTypes_j.result Lwt.t
+      Api_types_v1_j.token ->
+      Api_types_v1_j.parameter ->
+      unit Api_types_v1_j.result Lwt.t
   end;;
 
 module Base : sig

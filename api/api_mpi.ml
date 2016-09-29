@@ -1,5 +1,5 @@
 module WebMessage = Mpi_message_j
-module ApiTypes = ApiTypes_j
+module ApiTypes = Api_types_v1_j
 module IntMap = Mods.IntMap
 
 open Lwt.Infix
@@ -68,7 +68,7 @@ let on_message
       post_message
       message.WebMessage.id
       (peturbation.WebMessage.perturbation_token,
-       { ApiTypes_j.perturbation_code =
+       { Api_types_v1_j.perturbation_code =
            peturbation.WebMessage.perturbation_code })
       (fun (token,peturbation) -> runtime#perturbate token peturbation)
       (fun result -> `Peturbation result)
@@ -123,7 +123,7 @@ class virtual runtime ?(timeout : float = 10.) () =
       | None -> ()
 
     method parse (code : ApiTypes.code) :
-      ApiTypes_j.parse ApiTypes_j.result Lwt.t =
+      Api_types_v1_j.parse Api_types_v1_j.result Lwt.t =
       self#send (`Parse code) >>=
       (function
         | `Parse error -> Lwt.return error
