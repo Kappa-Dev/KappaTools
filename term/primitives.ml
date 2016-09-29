@@ -123,7 +123,7 @@ type perturbation =
   }
 
 let exists_modification check l =
-  List.exists (fun p -> List.exists check p.effect) l
+  Array.fold_left (fun acc p -> acc || List.exists check p.effect) false l
 
 let extract_connected_components_expr acc e =
   List.fold_left

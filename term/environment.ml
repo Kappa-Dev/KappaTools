@@ -136,6 +136,28 @@ let print pr_alg pr_rule pr_pert f env =
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
  *)
 
+let check_if_counter_is_filled_enough counter x =
+  let () =
+    if Counter.max_time counter = None && Counter.max_events counter = None
+       && not @@
+       Primitives.exists_modification
+         (function Primitives.STOP _ -> true
+                 | (Primitives.ITER_RULE _ | Primitives.UPDATE _ |
+                    Primitives.SNAPSHOT _ | Primitives.CFLOW _ |
+                    Primitives.FLUX _ | Primitives.FLUXOFF _ |
+                        Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
+                    Primitives.PRINT _) -> false) x.perturbations then
+      raise (ExceptionDefn.Malformed_Decl
+               (Location.dummy_annot
+                  "There is no way for the simulation to stop.")) in
+  if Array.length x.observables > 0 && Counter.plot_points counter < 0
+     && not @@ Primitives.exists_modification
+       (fun x -> x = Primitives.PLOTENTRY)
+       x.perturbations
+  then raise (ExceptionDefn.Malformed_Decl
+                ("Number of point to plot has not been defined.",
+                snd x.observables.(0)))
+
 let propagate_constant updated_vars counter x =
   let algs' = Array.copy x.algs.NamedDecls.decls in
   let () =

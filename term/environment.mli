@@ -63,5 +63,7 @@ val print :
 val to_json : t -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> t
 
+val check_if_counter_is_filled_enough : Counter.t -> t -> unit
+
 val propagate_constant : int list -> Counter.t -> t -> t
 (** [propagate_constant updated_vars counter env] *)

@@ -20,11 +20,11 @@ val compile_modifications_no_track:
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Environment.t * Connected_component.Env.t * (bool*bool*bool) option *
-	    bool option * Ast.formatCflow *
-	      (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
+          bool option * Ast.formatCflow *
+          (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Primitives.contact_map ->
-  Counter.t -> ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
+  ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
 
 val build_initial_state :
   bind:('a -> (Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->

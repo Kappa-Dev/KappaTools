@@ -202,13 +202,6 @@ end = struct
                (build_ast parameter.Api_types_v1_j.code self#time_yield self#log) >>=
                (function
                    `Right ((sig_nd,tk_nd,_updated_vars,result),contact_map) ->
-                   let simulation_counter =
-                     Counter.create
-                       ~init_t:(0. : float)
-                       ~init_e:(0 : int)
-                       ?max_t:parameter.Api_types_v1_j.max_time
-                       ?max_e:parameter.Api_types_v1_j.max_events
-                       ~nb_points:(parameter.Api_types_v1_j.nb_plot : int) in
                    Eval.compile
                      ~pause:(fun f -> Lwt.bind (self#time_yield ()) f)
                      ~return:Lwt.return ?rescale_init:None
@@ -220,11 +213,17 @@ end = struct
                          | Data.Plot _
                          | Data.Print _
                          | Data.UnaryDistance _ -> assert false)
-                     sig_nd tk_nd contact_map
-                     simulation_counter result >>=
+                     sig_nd tk_nd contact_map result >>=
                    (fun (env,domain,has_tracking,
                          store_distances,_,init_l) ->
                      let store_distances = store_distances<>None in
+                     let simulation_counter =
+                       Counter.create
+                         ~init_t:(0. : float)
+                         ~init_e:(0 : int)
+                         ?max_t:parameter.Api_types_v1_j.max_time
+                         ?max_e:parameter.Api_types_v1_j.max_events
+                         ~nb_points:(parameter.Api_types_v1_j.nb_plot : int) in
                      let simulation =
                        { is_running = true ;
                          run_finalize = false ;

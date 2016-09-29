@@ -70,7 +70,7 @@ type perturbation =
         Alg_expr.bool_expr Location.annot option;
   }
 
-val exists_modification : (modification -> bool) -> perturbation list -> bool
+val exists_modification : (modification -> bool) -> perturbation array -> bool
 
 val extract_connected_components_modifications :
   modification list -> Connected_component.t list

@@ -560,7 +560,7 @@ let init_kasa called_from sigs result =
   Export_to_KaSim.flush_errors kasa_state
 
 let compile ~outputs ~pause ~return
-    ?rescale_init sigs_nd tk_nd contact_map counter result =
+    ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
   let unary_distances,story_compression,formatCflow =
@@ -583,31 +583,11 @@ let compile ~outputs ~pause ~return
   outputs (Data.Log "\t -perturbations");
   let (preenv,pert,has_tracking) =
     pert_of_result result.variables result.rules contact_map preenv' result in
-  let () =
-    if Counter.max_time counter = None && Counter.max_events counter = None &&
-       not @@
-       Primitives.exists_modification
-         (function Primitives.STOP _ -> true
-                 | (Primitives.ITER_RULE _ | Primitives.UPDATE _ |
-                    Primitives.SNAPSHOT _ | Primitives.CFLOW _ |
-                    Primitives.FLUX _ | Primitives.FLUXOFF _ |
-                    Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
-                    Primitives.PRINT _) -> false) pert then
-      raise (ExceptionDefn.Malformed_Decl
-               (Location.dummy_annot "There is no way for the simulation to stop.")) in
 
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
   let preenv,obs =
     obs_of_result contact_map preenv result in
-  let () =
-    match obs with
-    | (_,pos) :: _ when Counter.plot_points counter < 0
-                     && not @@ Primitives.exists_modification
-                          (fun x -> x = Primitives.PLOTENTRY) pert ->
-      raise (ExceptionDefn.Malformed_Decl
-               ("Number of point to plot has not been defined.",pos))
-    | _ -> () in
 
   let env =
     Environment.init sigs_nd tk_nd alg_nd alg_deps'
