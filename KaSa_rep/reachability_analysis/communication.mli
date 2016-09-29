@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Sep 26 2016>
+   * Last modification: Time-stamp: <Sep 29 2016>
    *
    * Abstract domain to record live rules
    *
@@ -24,6 +24,14 @@ type event =
   | See_a_new_bond of
       ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
+
+(* JF: No, you shall not communicate tuples of sites here, *)
+(* Only site per site *)
+(* It is up to each abstract domain, when a tuple is modified, to decompose it into a list of sites *)
+(* and then to send the message Modified_site s for each site in that list *)
+(* This is important since we cannot assume that each tuple of sites of interest will have the same number of sites in each domain *)
+(* Already the number of sites in constraints expressed in the View domain is not the same from that the number of sites in constraints expressed in the other domains *)
+
   | Modified_sites of (*a tuple that are modified*)
       ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
