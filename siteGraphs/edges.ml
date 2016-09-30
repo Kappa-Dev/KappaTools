@@ -342,6 +342,7 @@ let debug_print f graph =
                  then Format.pp_print_string f "?"
                | Some ((ag',ty'),s') ->
                  Format.fprintf f "->%i:%i.%i" ag' ty' s'))) in
+  let () = if graph.outdated then Format.fprintf f "OUTDATED@ " in
   Mods.DynArray.print
     Pp.empty
     (fun ag f a ->

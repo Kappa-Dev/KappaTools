@@ -355,9 +355,11 @@ let a_loop ~outputs env domain counter graph state =
   let () =
     Counter.fill ~outputs
       counter (observables_values env counter graph' state') in
-  let () = if stop then
-      ignore (perturbate ~outputs env domain counter graph' state') in
-  out
+  if stop then
+    let (_,graph'',state'') =
+      perturbate ~outputs env domain counter graph' state' in
+    (true,graph'',state'')
+  else out
 
 let end_of_simulation ~outputs form env counter graph state =
   let () =
