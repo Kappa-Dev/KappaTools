@@ -446,9 +446,9 @@ end = struct
                  let () = simulation.is_running <- false in
                  Lwt.return_unit
               else if simulation.is_running then
-                 let () = Lwt.async (fun () -> self#log "run.4") in
-                 (let () = lastyield <- Sys.time () in
-                  self#yield ()) >>= iter
+                let () = Lwt.async (fun () -> self#log "run.4") in
+                (self#yield ()) >>= (fun () ->
+                    let () = lastyield <- Sys.time () in iter ())
               else
                 let () = Lwt.async (fun () -> self#log "run.5") in
                  Lwt.return_unit

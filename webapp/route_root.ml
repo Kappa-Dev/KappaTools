@@ -13,39 +13,43 @@ let route
     ~(shutdown_key: string option)
   : Webapp_common.route_handler list =
   [  { Webapp_common.path = "/v2" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ] ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
-	 (fun ~context:context ->
-	    (manager#service_info ()) >>=
-	    (fun (info : Api_types_j.service_info Api_types_t.result)
-	      -> Webapp_common.result_response
-		  ~string_of_success:Api_types_j.string_of_service_info
-		  ~result:info
-	    )
-	 )
+      (fun ~context:context ->
+        (manager#environment_info ()) >>=
+          (fun (info : Api_types_j.environment_info Api.result)
+          -> Webapp_common.result_response
+            ~string_of_success:Api_types_j.string_of_environment_info
+            ~result:info
+          )
+      )
      };
      { Webapp_common.path = "/v2/shutdown" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ] ;
+       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
          fun ~context:context ->
            (Cohttp_lwt_body.to_string context.Webapp_common.body)
            >>= (fun body -> match shutdown_key with
-	       | Some shutdown_key when shutdown_key = body ->
-		 let () =
-		   async
-		     (fun () ->
-			Lwt_unix.sleep 1.0 >>=
-			fun () -> exit 0)
-		 in
-		 Lwt.return
-		   (Api_common.result_ok "shutting down")
-	       | _ ->
-		 Lwt.return
-		   (Api_common.result_error_msg "shutting down"))
-	   >>= (fun (msg : string Api_types_t.result) ->
-	       Webapp_common.result_response
-		 ~string_of_success:(fun x -> x)
-		 ~result:msg
-	     )
+           | Some shutdown_key when shutdown_key = body ->
+              let () =
+                async
+                  (fun () -> Lwt_unix.sleep 1.0 >>=
+                    fun () -> exit 0)
+              in
+              Lwt.return
+                { Api_types_j.result_data = `Ok "shutting down" ;
+                  Api_types_j.result_code = Api.OK }
+           | _ ->
+              Lwt.return
+                { Api_types_j.result_data =
+		    `Error [{ Api_types_j.message_severity = `Error ;
+			      Api_types_j.message_text = "shutting down" ;
+			      Api_types_j.message_range = None ; }] ;
+                  Api_types_j.result_code = Api.ERROR })
+         >>= (fun (msg) ->
+           Webapp_common.result_response
+             ~string_of_success:(fun x -> x)
+             ~result:msg
+         )
      }
   ]

@@ -20,7 +20,9 @@ let route_handler
     Cohttp_lwt_body.t ->
     (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
   =
-  let manager : Api.manager = new Api_runtime.manager in
+  let system_process : Kappa_facade.system_process = failwith "" in
+  let () = ignore (system_process) in
+  let manager : Api.manager = failwith "" in
   fun (conn : Cohttp_lwt_unix.Server.conn)
     (request : Cohttp.Request.t)
     (body : Cohttp_lwt_body.t)

@@ -1,4 +1,4 @@
-(* This is a mirror of pervaises result when ocaml is upgraded
+(* This is a mirror of pe5Arvaises result when ocaml is upgraded
    this should be replaced by.  It is expected than non error
    message will decide how best to relay its messages.
 *)
@@ -11,41 +11,124 @@ type position <ocaml predef module="Location"> =
        line : int }
 
 type range <ocaml predef module="Location"> =
-     { file : string ;
-       from_position : position <json name="from"> ;
-       to_position : position <json name="to"> }
+     { range_file          <ocaml name="file">          : string ;
+       range_from_position <ocaml name="from_position"> : position <json name="from"> ;
+       range_to_position   <ocaml name="to_position">   : position <json name="to"> }
 type severity =
      [ Error <json name="error">
-     | Warning <json name="warning"> ]
+     | Warning <json name="warning">
+     | Info <json name="info"> ]
 (* Range in this case is optional to support
    non parsing errors.
 *)
-type error =
-     { severity : severity;
-       message : string;
-       range : range nullable }
-type errors =
-     error list
+type message =
+     { message_severity : severity <json name="severity"> ;
+       message_text     : string <json name="text">;
+       message_range    : range nullable  <json name="range"> }
+type errors = message list
 
 (* Code here is the just the http code the int used here
    to prevent there being a dependency on the cohttp package.
    As there are success and failure codes the the response code
    is not part othe the data variant.
    *)
-type result_code = int
-type ('ok) result =
-     { data : ('ok,errors) result_data;
-       result_code : result_code }
+type ('ok,'code)  result =
+     { result_data : ('ok,errors) result_data;
+       result_code : 'code }
 (* Give a summary of the service.  The intention is to give the
    users an overview of the state of the kappa service.
 *)
-type service_info =
-     { sessions : int;
-       processes : int ;
-       build : string }
+type environment_info = { environment_simulations : int <json name="simulations"> ;
+                          environment_projects :  int  <json name="projects"> ;
+                          environment_build : string <json name="build"> ; }
 
-type session_id = string
-(* use salt + hash *)
-type session_metadata = { id : string ; hash : string ; salt : string }
-type session_feedback = { id : session_id ; message : string }
-type session_info = session_metadata list
+type workspace_id = string
+type workspace_catalog = workspace_id list
+type workspace_parameter = { workspace_id : workspace_id }
+type workspace_info = unit
+
+type project_id = string
+type project_catalog = project_id list
+type project_parameter = { project_id : project_id }
+
+type site = {
+     site_name: string;
+     site_links: (int * int) list;
+     site_states: string list;
+}
+type site_node = {
+     node_quantity : float nullable;
+     node_name: string;
+     node_sites: site list <ocaml repr="array">;
+}
+type site_graph = site_node list <ocaml repr="array">
+type project_parse = { contact_map : site_graph }
+type project_info = unit (* TODO refactor this to have summary of project *)
+type kappa_code = string
+type project_modification = unit
+
+type simulation_id = string
+type simulation_catalog = simulation_id list
+type simulation_parameter = { simulation_nb_plot : int <json name="nb_plot"> ;
+                              simulation_max_time : float nullable <json name="max_time"> ;
+                              simulation_max_events : int nullable <json name="max_events">  ;
+                              simulation_id : simulation_id <json name="simulation_id"> ; }
+
+type simulation_perturbation = { perturbation_code : string }
+
+type observable = { observable_time : float <json name="time"> ;
+                    observable_values : float list <json name="values"> }
+
+type plot = { plot_legend: string list <json name="legend"> ;
+      	      plot_time_series : observable list <json name="time_series"> }
+type distance = {rule_dist : string; time_dist : float; dist : int}
+
+type distances = distance list
+type flux_map =
+  { flux_begin_time : float;
+    flux_end_time : float;
+    flux_rules : string list;
+    flux_hits : int list;
+    flux_fluxs : float list list;
+    flux_name : string
+  }
+
+type output_line =
+     { output_line_name : string nullable <json name="name"> ;
+       output_line_text : string <json name="text"> }
+
+type snapshot = {
+    snapshot_file : string;
+    snapshot_event : int;
+    snapshot_agents : site_node list;
+    snapshot_tokens : site_node list;
+}
+type simulation_state = [ Running | Paused | Stopped ]
+type simulation_info = { simulation_plot : plot nullable;
+                         simulation_distances : distances nullable;
+                         simulation_time : float;
+                         simulation_time_percentage : int nullable;
+                         simulation_event : int;
+                         simulation_event_percentage : int nullable;
+                         simulation_tracked_events : int nullable;
+                         simulation_log_messages : string list;
+                         simulation_snapshots : snapshot list;
+                         simulation_flux_maps : flux_map list;
+                         simulation_outputs : output_line list;
+                     	 simulation_state : simulation_state ;
+                       }
+
+type file_id = string
+type file_metadata = { file_compile <ocaml mutable> : bool <json name="compile"> ;
+                       file_hash <ocaml mutable> : string nullable <json name="hash"> ;
+                       file_id <ocaml mutable> : file_id <json name="id"> ;
+                       file_position <ocaml mutable> : int <json name="position"> ; }
+type file_catalog = file_metadata list
+type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
+              file_content <ocaml mutable> : string <json name="content"> }
+type file_modification = { file_modification_compile : bool nullable  <json name="compile"> ;
+                           file_modification_id : string nullable <json name="id"> ;
+                           file_modification_position : int nullable <json name="position"> ;
+			   file_modification_content : string nullable <json name="content"> ;
+			   file_modification_hash <ocaml mutable> : string nullable <json name="hash"> ;
+}

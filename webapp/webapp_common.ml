@@ -22,33 +22,37 @@ let headers =
 *)
 let result_response
     ~(string_of_success: 'ok -> string)
-    ~(result:'ok Api_types_j.result)
+    ~(result:'ok Api.result)
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   Api_common.result_map
-    ~ok:(fun (code : Api_types_j.result_code)
-          (ok : 'a) ->
-	  let body : string = string_of_success ok in
-	  let status = Code.status_of_code code in
-	  Server.respond_string
-            ?headers:(Some headers)
-            ~status:status
-            ~body:body
-	    ())
-    ~error:(fun (code : Api_types_j.result_code)
-             (errors : Api_types_j.errors) ->
-	     let error_msg : string = Api_types_j.string_of_errors errors in
-	     let status = Code.status_of_code code in
-	     (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
-	     >>= (fun _ -> Server.respond_string
-		     ?headers:(Some headers)
-		     ~status:status
-		     ~body:error_msg
-		     ()))
+    ~ok:(fun (code : Api.manager_code)
+             (ok : 'a) ->
+	       failwith ""
+		 (*
+             let body : string = string_of_success ok in
+             let status = Code.status_of_code code in
+             Server.respond_string
+	       ?headers:(Some headers)
+	       ~status:status
+	       ~body:body
+		   ()*) )
+    ~error:(fun (code : Api.manager_code)
+                (errors : Api_types_j.errors) ->
+		  failwith ""
+		    (*
+		let error_msg : string = Api_types_j.string_of_errors errors in
+		let status = Code.status_of_code code in
+		(Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
+		>>= (fun _ -> Server.respond_string
+                  ?headers:(Some headers)
+                  ~status:status
+                  ~body:error_msg
+                      ()) *))
     ~result:result
 
 let string_response
     ?(headers = headers)
-    ?(code : Api_types_j.result_code = 200)
+    ?(code :int = 200)
     ~(body : string)
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   Server.respond_string
@@ -98,17 +102,17 @@ let create_url_matcher (url : string) : url_matcher =
     Format.sprintf
       "^%s$"
       (Re.replace_string
-	 variable_pattern
-	 "(\\w)"
-	 url
+         variable_pattern
+         "(\\w)"
+         url
       )
   in
   let () =
     async
       (fun () ->
-	 Lwt_log_core.log
-	   ~level:Lwt_log_core.Debug
-	   (Format.sprintf " + route : %s" pattern))
+         Lwt_log_core.log
+           ~level:Lwt_log_core.Debug
+           (Format.sprintf " + route : %s" pattern))
   in
   let re =
     Re.compile (Re_perl.re pattern) in
@@ -122,9 +126,9 @@ let rec match_url
   let () =
     async
       (fun () ->
-	 Lwt_log_core.log
-	   ~level:Lwt_log_core.Debug
-	   (Format.sprintf " + url : %s" url))
+         Lwt_log_core.log
+           ~level:Lwt_log_core.Debug
+           (Format.sprintf " + url : %s" url))
   in
   match url_matchers with
   | (arg,matcher)::tail ->
@@ -166,8 +170,8 @@ let route_handler
            (* only select handlers where the method matches *)
            (fun (route,_) ->
               List.mem
-		context.request.meth
-		route.methods)
+                context.request.meth
+                route.methods)
            url_matchers)
         url
     with
