@@ -80,4 +80,5 @@ class TestKappaClient(unittest.TestCase):
         self.assertIsNotNone('build' in info)
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    None
+    #unittest.main(verbosity=2)
