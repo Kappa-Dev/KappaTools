@@ -128,7 +128,7 @@ let do_modification ~outputs env domain counter graph state modification =
     in
     let line = Format.asprintf "%a" print_expr_val pe_expr in
     let () = outputs
-        (Data.Print {Data.file_name = file_opt ; Data.line = line;}) in
+        (Data.Print {Data.file_line_name = file_opt ; Data.file_line_text = line;}) in
     (false, graph, state)
   | Primitives.PLOTENTRY ->
     let () = outputs (Data.Plot (Counter.current_time counter,

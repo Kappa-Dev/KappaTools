@@ -755,10 +755,10 @@ let incorporate_extra_pattern state pattern =
             state.roots_of_patterns}
 
 let snapshot env counter fn state = {
-  Data.snap_file = fn;
-  Data.snap_event = Counter.current_event counter;
-  Data.agents = Edges.build_snapshot (Environment.signatures env) state.edges;
-  Data.tokens = Array.mapi (fun i x ->
+  Data.snapshot_file = fn;
+  Data.snapshot_event = Counter.current_event counter;
+  Data.snapshot_agents = Edges.build_snapshot (Environment.signatures env) state.edges;
+  Data.snapshot_tokens = Array.mapi (fun i x ->
       (Format.asprintf "%a" (Environment.print_token ~env) i,x)) state.tokens;
 }
 

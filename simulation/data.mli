@@ -9,15 +9,16 @@ type flux_map =
     flux_data : flux_data;
     flux_end : float;
   }
-type file_line = { file_name : string option ; line : string }
+type file_line = { file_line_name : string option ;
+                   file_line_text : string }
 
-type snapshot = {
-    snap_file : string;
-    snap_event : int;
-    agents : (int * Raw_mixture.t) list;
-    tokens : (string * Nbr.t) array;
-  }
+type ('agent,'token) generic_snapshot   = {
+    snapshot_file : string;
+    snapshot_event : int;
+    snapshot_agents : 'agent list;
+    snapshot_tokens : 'token array; }
 
+type snapshot =  ((int * Raw_mixture.t),(string * Nbr.t)) generic_snapshot
 type distance = {
   distance_rule : int;
   distance_time : float;

@@ -321,8 +321,10 @@ end;;
 class type manager =
 object
   inherit manager_environment
+    (*
   inherit manager_workspace
   inherit manager_project
   inherit manager_simulation
   inherit manager_file
+    *)
 end;;

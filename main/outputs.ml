@@ -250,11 +250,11 @@ let print_snapshot sigs f s =
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i @[<h>%a@]" i
            (Raw_mixture.print ~compact:false sigs) mix))
-    s.Data.agents
+    s.Data.snapshot_agents
     (Pp.array Pp.space (fun _ f (na,el) ->
          Format.fprintf
            f "%%init: %s <- %a" na Nbr.print el))
-    s.Data.tokens
+    s.Data.snapshot_tokens
 
 let print_dot_snapshot sigs f s =
   Format.fprintf
@@ -266,21 +266,21 @@ let print_dot_snapshot sigs f s =
           Format.fprintf
             f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
             i nb (Raw_mixture.print_dot sigs i) mix))
-    s.Data.agents
+    s.Data.snapshot_agents
     (Pp.array Pp.cut (fun i f (na,el) ->
          Format.fprintf
            f "token_%d [label = \"%s (%a)\" , shape=none]"
            i na Nbr.print el))
-    s.Data.tokens
+    s.Data.snapshot_tokens
 
 let snapshot env s =
-  if Filename.check_suffix s.Data.snap_file ".dot" then
+  if Filename.check_suffix s.Data.snapshot_file ".dot" then
     Kappa_files.with_snapshot
-      s.Data.snap_file s.Data.snap_event "dot"
+      s.Data.snapshot_file s.Data.snapshot_event "dot"
       (fun f -> Format.fprintf f "%a@." (print_dot_snapshot env) s)
   else
     Kappa_files.with_snapshot
-      s.Data.snap_file s.Data.snap_event "ka"
+      s.Data.snapshot_file s.Data.snapshot_event "ka"
       (fun f -> Format.fprintf f "%a@." (print_snapshot env) s)
 
 let go env = function
@@ -289,11 +289,11 @@ let go env = function
   | Data.Plot (x,y) -> plot_now (x,y)
   | Data.Print p ->
     let desc =
-      match p.Data.file_name with
+      match p.Data.file_line_name with
         None -> Format.formatter_of_out_channel stdout
       | Some file -> get_desc file
     in
-    Format.fprintf desc "%s@." p.Data.line
+    Format.fprintf desc "%s@." p.Data.file_line_text
   | Data.Log s -> Format.printf "%s@." s
   | Data.UnaryDistance d ->
     match !distances with

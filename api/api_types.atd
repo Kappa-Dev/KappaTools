@@ -56,11 +56,13 @@ type site = {
      site_links: (int * int) list;
      site_states: string list;
 }
+
 type site_node = {
-     node_quantity : float nullable;
-     node_name: string;
-     node_sites: site list <ocaml repr="array">;
+     site_node_quantity : float nullable;
+     site_node_name: string;
+     site_node_sites: site list <ocaml repr="array">;
 }
+
 type site_graph = site_node list <ocaml repr="array">
 type project_parse = { contact_map : site_graph }
 type project_info = unit (* TODO refactor this to have summary of project *)
@@ -81,29 +83,39 @@ type observable = { observable_time : float <json name="time"> ;
 
 type plot = { plot_legend: string list <json name="legend"> ;
       	      plot_time_series : observable list <json name="time_series"> }
-type distance = {rule_dist : string; time_dist : float; dist : int}
+type distance = { distance_rule : string ;
+     	          distance_time : float;
+		  distance_length : int ; }
 
 type distances = distance list
-type flux_map =
-  { flux_begin_time : float;
-    flux_end_time : float;
-    flux_rules : string list;
-    flux_hits : int list;
-    flux_fluxs : float list list;
-    flux_name : string
-  }
+type flux_flux = float list <ocaml repr="array">
+type flux_data <ocaml predef module="Data"> = {
+     flux_name : string;
+     flux_start : float;
+     flux_hits : int list <ocaml repr="array">;
+     flux_fluxs : flux_flux list <ocaml repr="array">
+}
 
-type output_line =
-     { output_line_name : string nullable <json name="name"> ;
-       output_line_text : string <json name="text"> }
+type flux_map <ocaml predef module="Data"> =
+     { flux_rules : string list <ocaml repr="array">;
+       flux_data : flux_data;
+       flux_end : float;
+     }
 
-type snapshot = {
+type file_line <ocaml predef module="Data"> =
+     { file_line_name : string nullable <json name="name"> ;
+       file_line_text : string <json name="text"> }
+
+type ('agent,'token) generic_snapshot <ocaml predef module="Data"> = {
     snapshot_file : string;
     snapshot_event : int;
-    snapshot_agents : site_node list;
-    snapshot_tokens : site_node list;
-}
+    snapshot_agents : 'agent list;
+    snapshot_tokens : 'token list <ocaml repr="array">; }
+
+type snapshot = ((int * site_graph),(float * string)) generic_snapshot
+
 type simulation_state = [ Running | Paused | Stopped ]
+
 type simulation_info = { simulation_plot : plot nullable;
                          simulation_distances : distances nullable;
                          simulation_time : float;
@@ -114,15 +126,15 @@ type simulation_info = { simulation_plot : plot nullable;
                          simulation_log_messages : string list;
                          simulation_snapshots : snapshot list;
                          simulation_flux_maps : flux_map list;
-                         simulation_outputs : output_line list;
-                     	 simulation_state : simulation_state ;
-                       }
+                         simulation_files : file_line list;
+                         simulation_is_running : bool ;
+			 }
 
 type file_id = string
-type file_metadata = { file_compile <ocaml mutable> : bool <json name="compile"> ;
-                       file_hash <ocaml mutable> : string nullable <json name="hash"> ;
-                       file_id <ocaml mutable> : file_id <json name="id"> ;
-                       file_position <ocaml mutable> : int <json name="position"> ; }
+type file_metadata = { file_metadata_compile <ocaml mutable> : bool <json name="compile"> ;
+                       file_metadata_hash <ocaml mutable> : string nullable <json name="hash"> ;
+                       file_metadata_id <ocaml mutable> : file_id <json name="id"> ;
+                       file_metadata_position <ocaml mutable> : int <json name="position"> ; }
 type file_catalog = file_metadata list
 type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
               file_content <ocaml mutable> : string <json name="content"> }

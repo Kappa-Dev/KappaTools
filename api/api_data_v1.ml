@@ -40,8 +40,8 @@ let plot_values
     plot.Api_types_v1_j.time_series)
 
 let api_file_line (file_line : Data.file_line) : Api_types_v1_j.file_line =
-  { Api_types_v1_j.file_name = file_line.Data.file_name
-  ; Api_types_v1_j.line = file_line.Data.line
+  { Api_types_v1_j.file_name = file_line.Data.file_line_name
+  ; Api_types_v1_j.line = file_line.Data.file_line_text
   }
 
 let api_flux_map (flux_map : Data.flux_map) : Api_types_v1_j.flux_map =
@@ -103,15 +103,15 @@ let api_mixture sigs mix =
     ) (Array.of_list mix)
 
 let api_snapshot sigs (snapshot : Data.snapshot) : Api_types_v1_j.snapshot =
-  { Api_types_v1_j.snap_file = snapshot.Data.snap_file
-  ; Api_types_v1_j.snap_event = snapshot.Data.snap_event
+  { Api_types_v1_j.snap_file = snapshot.Data.snapshot_file
+  ; Api_types_v1_j.snap_event = snapshot.Data.snapshot_event
   ; Api_types_v1_j.agents =
       List.map
         (fun (agent,mixture) -> (agent,api_mixture sigs mixture))
-        snapshot.Data.agents
+        snapshot.Data.snapshot_agents
   ; Api_types_v1_j.tokens =
       List.map (fun (token,value) -> (Nbr.to_float value,token))
-        (Array.to_list snapshot.Data.tokens)
+        (Array.to_list snapshot.Data.snapshot_tokens)
   }
 
 
