@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Sep 26 2016>
+   * Last modification: Time-stamp: <Oct 03 2016>
    *
    * Abstract domain to record live rules
    *
@@ -368,7 +368,9 @@ struct
           error rule_id
           bond_rhs_map
       with
-      | error, None -> error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
+      | error, None ->
+        error,
+        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
     let error, bond_rhs_set =

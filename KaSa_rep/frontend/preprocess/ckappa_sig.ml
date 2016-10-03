@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Sep 19 2016>
+ * Last modification: Time-stamp: <Oct 03 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -16,7 +16,7 @@ module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 
 let local_trace = true
 
-(****************************************************************************************)
+(****************************************************************************)
 
 type position       = Location.t
 type agent_name     = string
@@ -29,7 +29,7 @@ type c_site_name  = int
 type c_state      = int
 type c_rule_id    = int
 
-(****************************************************************************************)
+(****************************************************************************)
 
 let dummy_agent_name = 0
 let dummy_site_name = 0
@@ -77,7 +77,7 @@ let get_agent_color n_sites parameters =
     (Remanent_parameters.get_agent_color_array parameters)
     (Remanent_parameters.get_agent_color_def parameters)
 
-(****************************************************************************************)
+(***************************************************************************)
 
 module Agent_type_nearly_Inf_Int_storage_Imperatif =
   (

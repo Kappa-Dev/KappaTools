@@ -1,4 +1,5 @@
 (* Time-stamp: <Jul 02 2016> *)
+
 module PairAgentsSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -429,7 +430,7 @@ let print_parallel_constraint
         in error
     in error
 
-(* add an abstract value for a tuple *)
+(* add value used in parallel_bonds_static.ml, project_away_ag_id *)
 let add_value parameters error kappa_handler x value store_result =
   let error, old_value =
     match
@@ -444,19 +445,83 @@ let add_value parameters error kappa_handler x value store_result =
   then
     error, store_result
   else
+    (*check whether or not if this is a fresh value*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters
       then
-        let parameters = Remanent_parameters.update_prefix parameters "         " in
+        let parameters =
+          Remanent_parameters.update_prefix parameters "         " in
         print_parallel_constraint
           ~verbose:false
           ~dump_any:true parameters error kappa_handler x value
       else error
     in
+    (*new value only compute when it is needed*)
     let error, store_result =
-      PairAgentSitesStates_map_and_set.Map.add_or_overwrite parameters error x new_value store_result
+      PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+        parameters
+        error
+        x
+        new_value
+        store_result
     in
     error, store_result
+
+(*use at apply_gen*)
+
+let add_value_and_event parameters error kappa_handler x value store_set
+    store_result =
+  let error, old_value =
+    match
+      PairAgentSitesStates_map_and_set.Map.find_option_without_logs
+        parameters error x store_result
+    with
+    | error, None -> error, Usual_domains.Undefined
+    | error, Some v -> error, v
+  in
+  let proj (a, b, _, _, _) = (a, b) in
+  let proj' (a, _, c, _, _) = (a, c) in
+  let pair (x, y) = proj x, proj' x, proj y, proj' y in
+  (*(A,x), (A,y), (B,x), (B,y)*)
+  (*check if this current site already belong insdie the old set, if it is
+    already belong to the old set then return the old set, otherwise at this
+    new sites ?*)
+  let new_value = Usual_domains.lub old_value value in
+  if compare new_value old_value = 0 &&
+     PairAgentSite_map_and_set.Set.mem
+       (pair x)
+       store_set
+  then
+    error, (store_set, store_result)
+  else
+    (*check whether or not if this is a fresh value*)
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_diff parameters
+      then
+        let parameters =
+          Remanent_parameters.update_prefix parameters "         " in
+        print_parallel_constraint
+          ~verbose:false
+          ~dump_any:true parameters error kappa_handler x value
+      else error
+    in
+    (*compute new value only when it is needed*)
+    let error, store_result =
+      PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+        parameters
+        error
+        x
+        new_value
+        store_result
+    in
+    let error, new_set =
+      PairAgentSite_map_and_set.Set.add
+        parameters
+        error
+        (pair x)
+        store_set
+    in
+    error, (new_set, store_result)
 
 let project (_,b,c,d,e,f) = (b,c,d,e,f)
 let get_id ((a,_,_,_,_,_),_) = a

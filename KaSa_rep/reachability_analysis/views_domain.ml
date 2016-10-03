@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Sep 26 2016>
+   * Last modification: Time-stamp: <Oct 03 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -52,8 +52,6 @@ struct
         Ckappa_sig.Views_bdu.mvbdu Wrapped_modules.LoggedIntMap.t
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option ;
     }
-
-
 
   type dynamic_information =
     {
@@ -111,7 +109,10 @@ struct
   (** global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
+  let set_global_dynamic_information gdynamic dynamic =
+    {dynamic with global = gdynamic}
+
   (** handler *)
   let get_mvbdu_handler dynamic =
     Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
@@ -123,14 +124,15 @@ struct
           (get_global_dynamic_information dynamic)
     }
 
-
   (** profiling *)
   let get_log_info dynamic =
     Analyzer_headers.get_log_info (get_global_dynamic_information dynamic)
+
   let set_log_info log_info dynamic =
     {
       dynamic with
-      global = Analyzer_headers.set_log_info log_info (get_global_dynamic_information dynamic)
+      global = Analyzer_headers.set_log_info log_info
+          (get_global_dynamic_information dynamic)
     }
 
   (** local dynamic information*)
@@ -444,10 +446,10 @@ struct
     else
       error
 
-  (************************************************************************************)
+  (**************************************************************************)
 
-  let updates_list2event_list ?title:(title="") static dynamic error agent_type cv_id
-      event_list =
+  let updates_list2event_list ?title:(title="") static dynamic error agent_type
+      cv_id event_list =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, store_covering_classes_modification_update_full =
@@ -472,7 +474,7 @@ struct
       then
         begin
           let log = Remanent_parameters.get_logger parameter in
-          (*-----------------------------------------------------------------------*)
+          (*---------------------------------------------------------------*)
           let error, _agent_string =
             try
               Handler.string_of_agent parameter error kappa_handler agent_type
@@ -481,7 +483,7 @@ struct
                      parameter error __POS__ Exit
                      (Ckappa_sig.string_of_agent_name agent_type)
           in
-          (*-----------------------------------------------------------------------*)
+          (*---------------------------------------------------------------*)
           (*dump covering class label*)
           let error =
             if title <> ""
@@ -498,7 +500,7 @@ struct
             else
               error
           in
-          (*-----------------------------------------------------------------------*)
+          (*----------------------------------------------------------------*)
           let error =
             Ckappa_sig.Rule_map_and_set.Set.fold (fun rule_id error ->
                 let compiled = get_compil static in
@@ -517,7 +519,8 @@ struct
                 in
                 let () =
                   Loggers.fprintf log "%s%s(%s) should be investigated "
-                    (Remanent_parameters.get_prefix parameter) tab rule_id_string
+                    (Remanent_parameters.get_prefix parameter) tab
+                    rule_id_string
                 in
                 let () = Loggers.print_newline log in error)
               s1 error
@@ -2775,7 +2778,8 @@ struct
           let fixpoint_result = get_fixpoint_result dynamic in
           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
           let error, bdu_X =
-            match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+            match
+              Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
                     parameter error (agent_type, cv_id) fixpoint_result
             with
             | error, None -> error, bdu_false
@@ -2891,7 +2895,7 @@ struct
         | error, None -> error, []
         | error, Some (_, l) -> error, l
       in
-      (*-----------------------------------------------------------------------*)
+      (*---------------------------------------------------------------------*)
       (* store result with half_break action: for each add the rule r in
          update of (c) for any covering class that documents this second
          site *)
@@ -2922,7 +2926,7 @@ struct
              error, store_result
           ) store_update (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
       in
-      (*-----------------------------------------------------------------------*)
+      (*---------------------------------------------------------------------*)
       (*store result with remove action*)
       let error, store_update_remove =
         Covering_classes_type.AgentCV_map_and_set.Map.fold
@@ -2946,7 +2950,7 @@ struct
              error, store_result
           ) store_update (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
       in
-      (*-----------------------------------------------------------------------*)
+      (*---------------------------------------------------------------------*)
       (*fold2*)
       let error, store_update =
         Covering_classes_type.AgentCV_map_and_set.Map.fold2

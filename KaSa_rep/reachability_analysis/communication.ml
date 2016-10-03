@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Sep 26 2016>
+   * Last modification: Time-stamp: <Oct 03 2016>
    *
    * Abstract domain to record live rules
    *
@@ -25,11 +25,7 @@ type event =
       ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) *
        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
   (*in the domain of parallel and site accross*)
-  | Modified_sites of
-      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name))
+  | Modified_sites of (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
 
 (*For example:
   E_1(x!1),R_2(x!1,y!2),R_3(y!2,x) -> E_1(x!1),R_2(x!1,y),R_3(y,x)
