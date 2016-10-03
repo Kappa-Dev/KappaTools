@@ -7,6 +7,7 @@ class type system_process =
   object
     method log : ?exn:exn -> string -> unit Lwt.t
     method yield : unit -> unit Lwt.t
+    method min_run_duration : unit -> float
   end
 
 (** State of the running simulation.

@@ -21,6 +21,7 @@ class type system_process =
   object
     method log : ?exn:exn -> string -> unit Lwt.t
     method yield : unit -> unit Lwt.t
+    method min_run_duration : unit -> float
   end
 
 (** Trivial implementation primarily for unit testing. *)
@@ -30,9 +31,9 @@ class null_process : system_process =
       let () = ignore(exn) in
       Lwt.return_unit
     method yield () = Lwt.return_unit
+    method min_run_duration() = 0.0
   end;;
-(* TODO this needs to be put somewhere better *)
-let min_run_duration = 0.0
+
 (** State of the running simulation. *)
 type t =
   { mutable is_running : bool ;
@@ -107,8 +108,7 @@ let build_ast
                (yield ()) >>=
                (fun () ->
                   (* The last yield is updated after the last yield.
-                     It is gotten here for the initial last yeild value.
-                  *)
+                     It is gotten here for the initial last yeild value. *)
                   let lastyield = Sys.time () in
                   (Lwt.wrap3
                      Eval.init_kasa
@@ -205,7 +205,7 @@ let time_yield
     ~(system_process : system_process)
     ~(t : t) : unit Lwt.t =
         let time = Sys.time () in
-        if time -. t.lastyield > min_run_duration then
+        if time -. t.lastyield > system_process#min_run_duration () then
           let () = t.lastyield <- time in
           system_process#yield ()
         else Lwt.return_unit
@@ -229,7 +229,8 @@ let run_simulation
        let rec iter () =
          let () =
            while (not !rstop) &&
-                 Sys.time () -. t.lastyield < min_run_duration do
+                 Sys.time () -. t.lastyield < system_process#min_run_duration ()
+           do
              let (stop,graph',state') =
                      State_interpreter.a_loop
                        ~outputs:(outputs t)
@@ -286,7 +287,11 @@ let start
                  t.counter
                  parameter.Api_types_j.simulation_max_events
              in
-             (*TODO: deal with set nb_plot in counter*)
+             let () =
+               Counter.set_nb_points
+                 t.counter
+                 parameter.Api_types_j.simulation_nb_plot
+             in
              Eval.build_initial_state
                ~bind:(fun x f ->
                    (time_yield ~system_process:system_process ~t:t) >>=

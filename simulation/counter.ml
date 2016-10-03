@@ -72,7 +72,7 @@ type t = {
     init_event : int ;
     mutable max_time : float option ;
     mutable max_events : int option ;
-    plot_points : int ;
+    mutable plot_points : int ;
     mutable dE : int option ;
     mutable dT : float option ;
   }
@@ -208,6 +208,14 @@ let complete_progress_bar form counter =
              n := !n-1
            done in
   Format.pp_print_newline form ()
+
+let set_nb_points (t :t) (nb_points : int) : unit =
+  let dE = compute_dE nb_points t.init_event t.max_events in
+  let dT = compute_dT nb_points t.init_time t.max_time in
+  t.dE <- dE ;
+  t.dT <- dT ;
+  t.plot_points <- nb_points
+
 
 let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~nb_points =
   let dE = compute_dE nb_points init_e max_e in

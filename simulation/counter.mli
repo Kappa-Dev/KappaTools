@@ -1,7 +1,7 @@
 (** Simulation progress keeper *)
 
 type t
-
+val set_nb_points : t -> int -> unit
 val create : ?init_t:float -> ?init_e:int -> ?max_t:float -> ?max_e:int ->
   nb_points:int -> t
 

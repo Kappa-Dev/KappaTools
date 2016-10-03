@@ -15,8 +15,8 @@ class system_process () : Kappa_facade.system_process =
   object
     method log ?exn (msg : string) =
       Lwt_log_core.log ~level:Lwt_log_core.Info ?exn msg
-
     method yield () : unit Lwt.t = Lwt_main.yield ()
+    method min_run_duration () = 0.1
   end
 
 let route_handler
