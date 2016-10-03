@@ -17,6 +17,16 @@ let headers =
   let h = Header.init_with "Access-Control-Allow-Origin" "*" in
   let h = Header.add h "content-type" "application/json" in
   h
+
+let status_of_code : Api.manager_code -> Cohttp.Code.status_code =
+  function
+    Api.OK -> `OK
+  | Api.CREATED -> `Created
+  | Api.ERROR -> `Bad_request
+  | Api.CONFLICT -> `Conflict
+  | Api.NOT_FOUND ->`Not_found
+  | Api.ACCEPTED -> `Accepted
+
 (* Given a result and a way to serialize a success result, return
    to client the the http response.
 *)
@@ -26,28 +36,26 @@ let result_response
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   Api_common.result_map
     ~ok:(fun (code : Api.manager_code)
-             (ok : 'a) ->
-	       failwith ""
-		 (*
-             let body : string = string_of_success ok in
-             let status = Code.status_of_code code in
+          (ok : 'a) ->
+          let body : string = string_of_success ok in
+          let status = status_of_code code in
              Server.respond_string
 	       ?headers:(Some headers)
 	       ~status:status
 	       ~body:body
-		   ()*) )
-    ~error:(fun (code : Api.manager_code)
-                (errors : Api_types_j.errors) ->
-		  failwith ""
-		    (*
-		let error_msg : string = Api_types_j.string_of_errors errors in
-		let status = Code.status_of_code code in
-		(Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
-		>>= (fun _ -> Server.respond_string
-                  ?headers:(Some headers)
-                  ~status:status
-                  ~body:error_msg
-                      ()) *))
+		   ())
+    ~error:(fun
+             (code : Api.manager_code)
+             (errors : Api_types_j.errors) ->
+             let error_msg : string = Api_types_j.string_of_errors errors in
+	     let status = status_of_code code in
+	     (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
+             >>= (fun _ ->
+          Server.respond_string
+            ?headers:(Some headers)
+            ~status:status
+            ~body:error_msg
+            ()))
     ~result:result
 
 let string_response
@@ -102,8 +110,11 @@ let create_url_matcher (url : string) : url_matcher =
     Format.sprintf
       "^%s$"
       (Re.replace_string
+         ?pos:None
+         ?len:None
+         ?all:None
          variable_pattern
-         "(\\w)"
+         ~by:"(\\w)"
          url
       )
   in

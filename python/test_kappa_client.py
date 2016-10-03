@@ -73,12 +73,11 @@ class TestKappaClient(unittest.TestCase):
         """
         runtime = KappaRuntime(self.endpoint)
         info = runtime.info()
-        self.assertIsNotNone('sessions' in info)
-        self.assertEqual(info['sessions'], 0)
-        self.assertIsNotNone('processes' in info)
-        self.assertEqual(info['processes'], 0)
-        self.assertIsNotNone('build' in info)
+        self.assertIsNotNone('environment_simulations' in info)
+        self.assertEqual(info['environment_simulations'], 0)
+        self.assertIsNotNone('environment_projects' in info)
+        self.assertEqual(info['environment_projects'], 0)
+        self.assertIsNotNone('environment_build' in info)
 
 if __name__ == '__main__':
-    None
-    #unittest.main(verbosity=2)
+    unittest.main(verbosity=2)
