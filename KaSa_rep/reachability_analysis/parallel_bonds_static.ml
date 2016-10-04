@@ -19,17 +19,18 @@ let local_trace = false
 type local_static_information =
   {
     (*rule has two bonds (parallel or not) on the lhs*)
-      store_rule_double_bonds_lhs :
+    store_rule_double_bonds_lhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-    (*rule has two bonds (parallel or not) on the rhs*)      store_rule_double_bonds_rhs :
+      (*rule has two bonds (parallel or not) on the rhs*)
+    store_rule_double_bonds_rhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-        (*a reverse map from tuples -> rule_id*)
+    (*a reverse map from tuples -> rule_id*)
     store_double_bonds_rhs_rule :
       Ckappa_sig.c_rule_id list
         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-      (*is a union set of double binding in the lhs and the rhs*)
+    (*is a union set of double binding in the lhs and the rhs*)
     store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
     (* information of partial formation of parallel or non-parallel bonds in rules *)
     store_fst_site_create_parallel_bonds_rhs:
@@ -262,6 +263,7 @@ let collect_rule_double_bonds_rhs
   Ckappa_sig.Rule_map_and_set.Map.add
     parameter error rule_id map store_result
 
+(*a map from tuples -> rule_id list*)
 let collect_double_bonds_rhs_rule parameter error store_rule_double_bonds_rhs
     store_result =
   Ckappa_sig.Rule_map_and_set.Map.fold
@@ -297,7 +299,6 @@ let collect_double_bonds_rhs_rule parameter error store_rule_double_bonds_rhs
             error, store_result
          ) tuple_map (error, store_result)
     ) store_rule_double_bonds_rhs (error, store_result)
-
 
 (**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain

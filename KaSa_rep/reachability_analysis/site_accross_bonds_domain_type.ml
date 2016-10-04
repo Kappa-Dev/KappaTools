@@ -195,6 +195,9 @@ module Partition_modified_map =
     (PairAgentSitesState_map_and_set)
     (AgentSite_map_and_set)
 
+module Proj_potential_tuple_pair_set_lhs =
+  Map_wrapper.Proj (PairAgentSitesStates_map_and_set)(PairAgentSitesState_map_and_set)
+
 (***************************************************************)
 
 let convert_single_without_state parameters error kappa_handler single =
@@ -453,4 +456,4 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
       new_bdu
       store_result
   in
-  error, handler, store_result
+error, handler, store_result

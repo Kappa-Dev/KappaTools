@@ -483,8 +483,8 @@ let add_value_and_event parameters error kappa_handler x value store_set
   let proj' (a, _, c, _, _) = (a, c) in
   let pair (x, y) = proj x, proj' x, proj y, proj' y in
   (*(A,x), (A,y), (B,x), (B,y)*)
-  (*check if this current site already belong insdie the old set, if it is
-    already belong to the old set then return the old set, otherwise at this
+  (*check if this current site already belong to the old set, if it
+    already belong to the old set then return the old set, otherwise add this
     new sites ?*)
   let new_value = Usual_domains.lub old_value value in
   if compare new_value old_value = 0 &&
@@ -494,7 +494,6 @@ let add_value_and_event parameters error kappa_handler x value store_set
   then
     error, (store_set, store_result)
   else
-    (*check whether or not if this is a fresh value*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters
       then
@@ -505,7 +504,6 @@ let add_value_and_event parameters error kappa_handler x value store_set
           ~dump_any:true parameters error kappa_handler x value
       else error
     in
-    (*compute new value only when it is needed*)
     let error, store_result =
       PairAgentSitesStates_map_and_set.Map.add_or_overwrite
         parameters
@@ -514,6 +512,7 @@ let add_value_and_event parameters error kappa_handler x value store_set
         new_value
         store_result
     in
+
     let error, new_set =
       PairAgentSite_map_and_set.Set.add
         parameters

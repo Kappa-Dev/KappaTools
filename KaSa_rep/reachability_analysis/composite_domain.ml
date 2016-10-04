@@ -321,7 +321,7 @@ struct
                 rule_id
             | Communication.See_a_new_bond _
             | Communication.Dummy
-            | Communication.Modified_sites _ -> (*TODO?*)
+            | Communication.Modified_sites _ ->
               error, dynamic
           )(error, dynamic) event_list
       in

@@ -23,12 +23,20 @@ type basic_static_information =
   {
     (*------------------------------------------------------------------*)
     (*this is the potential tuple in the rhs*)
-    store_potential_tuple_pair :
+    store_potential_tuple_pair_rhs :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
+    store_rule_potential_tuple_pair_rhs :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
     (*the potential tuple in the lhs*)
-    store_potential_tuple_pair_lhs :
+    store_rule_potential_tuple_pair_lhs :
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    store_rule_proj_potential_tuple_pair_lhs :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    store_tuples_of_interest :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map :
@@ -52,10 +60,14 @@ type basic_static_information =
 let init_basic_static_information =
   {
     (*-------------------------------------------------------*)
-    store_potential_tuple_pair =
+    store_potential_tuple_pair_rhs =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
-    store_potential_tuple_pair_lhs =
-    Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_rule_potential_tuple_pair_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_rule_potential_tuple_pair_lhs =
+      Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_rule_proj_potential_tuple_pair_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    store_tuples_of_interest =
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
     (*-------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map =
@@ -71,7 +83,7 @@ let init_basic_static_information =
 (***************************************************************)
 (*collect a set of tuple pair (A.x.y, B.z.t) on the rhs*)
 
-let collect_potential_tuple_pair parameter error
+let collect_potential_tuple_pair_rhs parameter error
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_set =
     Common_static.get_set parameter error rule_id
@@ -133,10 +145,19 @@ let collect_potential_tuple_pair parameter error
        error, store_result
     ) bonds_set (error, store_result)
 
+(*rule -> tuples*)
+let collect_rule_potential_tuple_pair_rhs parameter error rule_id
+    store_potential_tuple_pair_rhs store_result =
+  Ckappa_sig.Rule_map_and_set.Map.add
+    parameter error
+    rule_id
+    store_potential_tuple_pair_rhs
+    store_result
+
 (*-------------------------------------------------------*)
 (*potential tuple pair on the rhs*)
 
-let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
+let collect_rule_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
     store_views_lhs store_result =
   let error, bonds_lhs_set =
     Common_static.get_set parameter error rule_id
@@ -208,6 +229,29 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
   (*add the set of tuple to rule_id map*)
     Ckappa_sig.Rule_map_and_set.Map.add
       parameter error rule_id pair_set store_result
+
+let collect_rule_proj_potential_tuple_pair_lhs parameter error
+    store_rule_potential_tuple_pair_lhs store_result =
+  Ckappa_sig.Rule_map_and_set.Map.fold
+    (fun rule_id set (error, store_result) ->
+       let error, new_set =
+       Site_accross_bonds_domain_type.Proj_potential_tuple_pair_set_lhs.proj_set
+         (fun (x,y) ->
+            let proj (a, b, c, d, e) = (a, b, c, d) in
+            proj x, proj y
+         )
+         parameter error
+         set
+       in
+       let error, store_result =
+         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+           parameter error
+           rule_id
+           new_set
+           store_result
+       in
+       error, store_result
+    ) store_rule_potential_tuple_pair_lhs (error, store_result)
 
 (*-------------------------------------------------------*)
 (*PairAgentSites_map_and_set.Set.t PairAgentSite_map_and_set.Map.t
@@ -447,4 +491,4 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
            error, handler, store_result
       ) store_pair_sites_init (error, handler, store_result)
   in
-  error, handler, store_result
+error, handler, store_result
