@@ -137,7 +137,8 @@ let disjoint_union compil l =
             Connected_component.Matching.empty
             (Connected_component.Matching.add_cc em i r''),
           mix'))
-      (List.length l,Connected_component.Matching.empty,Edges.empty ())
+      (List.length l,Connected_component.Matching.empty,
+       Edges.empty ~with_connected_components:false)
       l in
   (pat,em,mix)
 
@@ -243,7 +244,7 @@ let apply compil rule inj_nodes mix =
 let lift_species compil x =
   fst @@
   Connected_component.add_fully_specified_to_graph
-    (sigs compil) (Edges.empty ()) x
+    (sigs compil) (Edges.empty ~with_connected_components:false) x
 
 let get_rules compil =
   Environment.fold_rules

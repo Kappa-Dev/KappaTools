@@ -23,12 +23,15 @@ type t =
 type result = Clash | Success of (int option * t) | Corrected of t
 
 let empty ?story_compression ~store_distances env =
+  let with_connected_components =
+    not (Connected_component.Set.is_empty
+           (Environment.connected_components_of_unary_rules env)) in
   {
     roots_of_patterns = Connected_component.Map.empty;
     unary_patterns_of_roots = Mods.IntMap.empty;
     matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
-    edges = Edges.empty ();
+    edges = Edges.empty ~with_connected_components;
     tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
     outdated_elements = Operator.DepSet.empty,[],true;
     story_machinery =
@@ -342,7 +345,7 @@ let update_edges
           (fun (unary_cands,_ as acc) (pat,root) ->
             if Connected_component.Set.mem pat unary_patterns then
               (root,[(Connected_component.Set.singleton pat,fst root)])
-	      ::unary_cands,false
+              ::unary_cands,false
              else acc) (unary_cands,no_unary') new_obs in
       if path = None && not (Mods.IntMap.is_empty (snd roots''))
       then
@@ -353,7 +356,7 @@ let update_edges
              match
                Edges.paths_of_interest ~looping:(cn',s')
                  (potential_root_of_unary_patterns (snd roots''))
-                 sigs edges'' cn (Edges.singleton_path cn s cn' s') with
+                 edges'' cn (Edges.singleton_path cn s cn' s') with
              | [] -> acc
              | l -> (cn',List.map fst l) :: unary_cands,false)
           unary_pack rule.Primitives.fresh_bindings
@@ -406,7 +409,7 @@ let extra_outdated_var i state =
    outdated_elements =
      (Operator.DepSet.add (Operator.ALG i) deps,unary_cands,no_unary)}
 
-let new_unary_instances sigs rule_id pat1 pat2 created_obs state =
+let new_unary_instances rule_id pat1 pat2 created_obs state =
   let unary_candidates =
     List.fold_left
       (fun acc (restart,l) ->
@@ -433,7 +436,7 @@ let new_unary_instances sigs rule_id pat1 pat2 created_obs state =
                              if Connected_component.Matching.is_root_of state.edges x goal
                              then Some ()
                              else None)
-                          sigs state.edges restart [])
+                          state.edges restart [])
                    with Not_found -> acc)
                 patterns acc) acc l)
       state.unary_candidates created_obs in
@@ -485,7 +488,6 @@ let update_outdated_activities ~get_alg store env counter state =
            | Some (unrate, _) ->
              let state' =
                new_unary_instances
-                 (Environment.signatures env)
                  i rule.Primitives.connected_components.(0)
                  rule.Primitives.connected_components.(1) unary_cands state in
              let va =
@@ -545,37 +547,37 @@ let apply_unary_rule
       unary_candidates = cands;
       outdated_elements =
         (Operator.DepSet.add (Operator.RULE rule_id) deps,unary_cands,false)} in
-  let missing_patterns =
-    not @@
+  if
     Mods.IntSet.mem root1 (Connected_component.Map.find_default
                              Mods.IntSet.empty pattern1 state.roots_of_patterns) &&
     Mods.IntSet.mem root2 (Connected_component.Map.find_default
-                             Mods.IntSet.empty pattern2 state.roots_of_patterns) in
-  let inj1 =
-    Connected_component.Matching.reconstruct
-      state'.edges Connected_component.Matching.empty 0 pattern1 root1 in
-  let inj =
-    match inj1 with
-    | None -> None
-    | Some inj -> Connected_component.Matching.reconstruct
-                    state'.edges inj 1 pattern2 root2 in
-  match inj with
-  | None -> Clash
-  | Some inj ->
-    let nodes = Connected_component.Matching.elements_with_types
-        rule.Primitives.connected_components inj in
-    let dist = match rule.Primitives.unary_rate with
+                             Mods.IntSet.empty pattern2 state.roots_of_patterns) then
+    let inj1 =
+      Connected_component.Matching.reconstruct
+        state'.edges Connected_component.Matching.empty 0 pattern1 root1 in
+    let inj =
+      match inj1 with
       | None -> None
-      | Some (_, dist_opt) -> dist_opt in
-    match Edges.are_connected (Environment.signatures env)
-            state.edges nodes.(0) nodes.(1) dist state'.store_distances with
-    | None -> Corrected state'
-    | Some _ when missing_patterns -> Corrected state'
-    | Some p as path ->
-      Success
-        ((if state'.store_distances then Some (List.length p) else None),
-         transform_by_a_rule ~get_alg env domain unary_ccs counter state'
-           event_kind ?path rule inj)
+      | Some inj -> Connected_component.Matching.reconstruct
+                      state'.edges inj 1 pattern2 root2 in
+    match inj with
+    | None -> Clash
+    | Some inj ->
+      let nodes = Connected_component.Matching.elements_with_types
+          rule.Primitives.connected_components inj in
+      let max_distance = match rule.Primitives.unary_rate with
+        | None -> None
+        | Some (_, dist_opt) -> dist_opt in
+      match Edges.are_connected ?max_distance
+              state.edges nodes.(0) nodes.(1) with
+      | None -> Corrected state'
+      | Some p as path ->
+        Success
+          ((if state'.store_distances then Some (List.length p) else None),
+           transform_by_a_rule ~get_alg env domain unary_ccs counter state'
+             event_kind ?path rule inj)
+  else Corrected state'
+
 
 let apply_rule
     ?rule_id ~get_alg env domain unary_patterns counter state event_kind rule =
@@ -621,12 +623,11 @@ let apply_rule
       try
         let nodes = Connected_component.Matching.elements_with_types
             rule.Primitives.connected_components inj in
-        let dist = match rule.Primitives.unary_rate with
+        let max_distance = match rule.Primitives.unary_rate with
           | None -> None
           | Some (_, dist_opt) -> dist_opt in
         match
-          Edges.are_connected (Environment.signatures env)
-            state.edges nodes.(0) nodes.(1) dist false with
+          Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
         | None ->
           let rid =
             match rule_id with None -> assert false | Some rid -> rid in

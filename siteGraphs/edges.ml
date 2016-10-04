@@ -36,7 +36,72 @@ module Cache = struct
     (Mods.DynArray.get t (i / int_l)) land (1 lsl (i mod int_l)) <> 0
 
   let reset t = Mods.DynArray.fill t 0 (Mods.DynArray.length t) 0
+
+  let iteri f t =
+    ignore @@
+    Mods.DynArray.fold_lefti
+      (fun i acc v ->
+         let () =
+           if v <> 0 then
+             Tools.iteri
+               (fun j -> if v land (1 lsl j) <> 0 then  f ((i*int_l)+j))
+               int_l in
+         acc + int_l) 0 t
 end
+
+let glue_connected_component links cache ccs node1 node2 =
+  let cc_id_op = Mods.DynArray.get ccs node2 in
+  let rec explore_site id site (out,next as acc) =
+    if site = 0 then acc else
+      match (Mods.DynArray.get links id).(pred site) with
+      | None -> explore_site id (pred site) acc
+      | Some ((id',_),_) ->
+        if Mods.DynArray.get ccs id' = cc_id_op then
+          explore_site id (pred site) (true,next)
+        else if Cache.test cache id' then explore_site id (pred site) acc
+        else
+          let () = Cache.mark cache id' in
+          explore_site id (pred site) (out,id'::next) in
+  let rec is_in_cc (out,next as acc) = function
+    | id ::todos ->
+      is_in_cc
+        (explore_site id (Array.length (Mods.DynArray.get links id)) acc)
+        todos
+    | [] -> match next with
+      | [] ->
+        let () =
+          Cache.iteri (fun i -> Mods.DynArray.set ccs i cc_id_op) cache in
+        Cache.reset cache
+      | _ -> is_in_cc (out,[]) next in
+  let () = Cache.mark cache node1 in
+  is_in_cc (false,[]) [node1]
+
+let separate_connected_component links cache ccs node1 node2 =
+  let rec inspect_site id site next =
+    if site = 0 then Some next else
+      match (Mods.DynArray.get links id).(pred site) with
+      | None -> inspect_site id (pred site) next
+      | Some ((id',_),_) ->
+        if id' = node2 then None
+        else if Cache.test cache id' then inspect_site id (pred site) next
+        else
+          let () = Cache.mark cache id' in
+          inspect_site id (pred site) (id'::next) in
+  let rec is_in_cc next = function
+    | id ::todos ->
+      begin match
+          inspect_site id (Array.length (Mods.DynArray.get links id)) next with
+        | None -> ()
+        | Some next' -> is_in_cc next' todos
+      end
+    | [] -> match next with
+      | [] ->
+                let () =
+          Cache.iteri (fun i -> Mods.DynArray.set ccs i (Some node1)) cache in
+        Cache.reset cache
+      | _ -> is_in_cc [] next in
+  let () = Cache.mark cache node1 in  
+  is_in_cc [] [node1]
 
 type t =
   {
@@ -47,12 +112,13 @@ type t =
     sort : int option Mods.DynArray.t;
     cache : Cache.t;
     free_id : int * int list;
+    connected_component : int option Mods.DynArray.t option;
   }
 (** (agent,site -> binding_state; missings);
     agent,site -> internal_state; agent -> sort; free_id
     the free sites are neither in missings nor in linking_destination *)
 
-let empty () =
+let empty ~with_connected_components =
   {
     outdated = false;
     connect = Mods.DynArray.make 1 [||];
@@ -61,6 +127,9 @@ let empty () =
     sort = Mods.DynArray.make 1 None;
     cache = Cache.create ();
     free_id =(0,[]);
+    connected_component = if with_connected_components
+      then Some (Mods.DynArray.make 1 None)
+      else None;
   }
 
 let copy graph =
@@ -74,6 +143,10 @@ let copy graph =
     sort = Mods.DynArray.copy graph.sort;
     cache = Cache.create ();
     free_id = graph.free_id;
+    connected_component =
+      (match graph.connected_component with
+       | None -> None
+       | Some ccs -> Some (Mods.DynArray.copy ccs));
   }
 
 let add_agent sigs ty graph =
@@ -89,6 +162,9 @@ let add_agent sigs ty graph =
     let () = Mods.DynArray.set graph.connect h al in
     let () = Mods.DynArray.set graph.state h ai in
     let () = Mods.DynArray.set graph.sort h (Some ty) in
+    let () = match graph.connected_component with
+      | None -> ()
+      | Some ccs -> Mods.DynArray.set ccs h (Some h) in
     h,
     {
       outdated = false;
@@ -98,6 +174,7 @@ let add_agent sigs ty graph =
       sort = graph.sort;
       cache = graph.cache;
       free_id = (new_id,t);
+      connected_component = graph.connected_component;
     }
   | new_id,[] ->
     let missings' = Tools.recti (fun a s -> Mods.Int2Set.add (new_id,s) a)
@@ -105,6 +182,9 @@ let add_agent sigs ty graph =
     let () = Mods.DynArray.set graph.connect new_id al in
     let () = Mods.DynArray.set graph.state new_id ai in
     let () = Mods.DynArray.set graph.sort new_id (Some ty) in
+    let () = match graph.connected_component with
+      | None -> ()
+      | Some ccs -> Mods.DynArray.set ccs new_id (Some new_id) in
     new_id,
     {
       outdated = false;
@@ -113,7 +193,8 @@ let add_agent sigs ty graph =
       state = graph.state;
       sort = graph.sort;
       cache = graph.cache;
-      free_id = (succ new_id,[])
+      free_id = (succ new_id,[]);
+      connected_component = graph.connected_component;
     }
 
 let add_free ag s graph =
@@ -128,6 +209,7 @@ let add_free ag s graph =
     sort = graph.sort;
     cache = graph.cache;
     free_id = graph.free_id;
+    connected_component = graph.connected_component;
   }
 let add_internal ag s i graph =
   let () = assert (not graph.outdated) in
@@ -141,6 +223,7 @@ let add_internal ag s i graph =
     sort = graph.sort;
     cache = graph.cache;
     free_id = graph.free_id;
+    connected_component = graph.connected_component;
   }
 
 let add_link (ag,ty) s (ag',ty') s' graph =
@@ -148,6 +231,11 @@ let add_link (ag,ty) s (ag',ty') s' graph =
   let () = graph.outdated <- true in
   let () = (Mods.DynArray.get graph.connect ag).(s) <- Some ((ag',ty'),s') in
   let () = (Mods.DynArray.get graph.connect ag').(s') <- Some ((ag,ty),s) in
+  let () = match graph.connected_component with
+    | None -> ()
+    | Some ccs ->
+      if Mods.DynArray.get ccs ag <> Mods.DynArray.get ccs ag' then
+        glue_connected_component graph.connect graph.cache ccs ag ag' in
   {
     outdated = false;
     connect = graph.connect;
@@ -157,6 +245,7 @@ let add_link (ag,ty) s (ag',ty') s' graph =
     sort = graph.sort;
     cache = graph.cache;
     free_id = graph.free_id;
+    connected_component = graph.connected_component;
   }
 
 let remove_agent ag graph =
@@ -165,6 +254,9 @@ let remove_agent ag graph =
   let () = Mods.DynArray.set graph.connect ag [||] in
   let () = Mods.DynArray.set graph.state ag [||] in
   let () = Mods.DynArray.set graph.sort ag None in
+  let () = match graph.connected_component with
+    | None -> ()
+    | Some ccs -> Mods.DynArray.set ccs ag None in
   {
     outdated = false;
     connect = graph.connect;
@@ -172,7 +264,8 @@ let remove_agent ag graph =
     state = graph.state;
     sort = graph.sort;
     cache = graph.cache;
-    free_id = let new_id,ids = graph.free_id in (new_id,ag::ids);
+    free_id = (let new_id,ids = graph.free_id in (new_id,ag::ids));
+    connected_component = graph.connected_component;
   }
 let remove_free ag s graph =
   let () = assert (not graph.outdated) in
@@ -185,7 +278,8 @@ let remove_free ag s graph =
     state = graph.state;
     sort = graph.sort;
     cache = graph.cache;
-    free_id = graph.free_id
+    free_id = graph.free_id;
+    connected_component = graph.connected_component;
   }
 let get_internal ag s graph =
   let () = assert (not graph.outdated) in
@@ -206,7 +300,8 @@ let remove_internal ag s graph =
     state = graph.state;
     sort = graph.sort;
     cache = graph.cache;
-    free_id = graph.free_id
+    free_id = graph.free_id;
+    connected_component = graph.connected_component;
   }
 
 let remove_link ag s ag' s' graph =
@@ -214,6 +309,10 @@ let remove_link ag s ag' s' graph =
   let () = graph.outdated <- true in
   let () = (Mods.DynArray.get graph.connect ag).(s) <- None in
   let () = (Mods.DynArray.get graph.connect ag').(s') <- None in
+  let () = match graph.connected_component with
+    | None -> ()
+    | Some ccs ->
+      separate_connected_component graph.connect graph.cache ccs ag ag' in
   {
     outdated = false;
     connect = graph.connect;
@@ -223,6 +322,7 @@ let remove_link ag s ag' s' graph =
     sort = graph.sort;
     cache = graph.cache;
     free_id = graph.free_id;
+    connected_component = graph.connected_component;
   }
 
 let is_agent (ag,ty) graph =
@@ -383,9 +483,8 @@ let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
 let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
-(* depth = number of edges between root and node *)
 let breadth_first_traversal
-    ~looping dist stop_on_find is_interesting sigs links cache out todos =
+    ~looping ?max_distance stop_on_find is_interesting links cache out todos =
   let rec look_each_site ((id,_ as ag),path as x) site (out,next as acc) =
     if site = 0 then Some (false,out,next) else
       match (Mods.DynArray.get links id).(pred site) with
@@ -403,25 +502,26 @@ let breadth_first_traversal
             | None -> out,false in
           if store&&stop_on_find then Some (true,out',next')
           else look_each_site x (pred site) (out',next') in
+  (* depth = number of edges between root and node *)
   let rec aux depth out next = function
-    | ((_,ty),_ as x)::todos ->
-      (match look_each_site x (Signature.arity sigs ty) (out,next) with
+    | ((id,_),_ as x)::todos ->
+      (match look_each_site
+               x (Array.length (Mods.DynArray.get links id)) (out,next) with
        | None -> []
        | Some (stop,out',next') ->
-         if stop then let () = Cache.reset cache in out'
-         else aux depth out' next' todos)
+         if stop then out' else aux depth out' next' todos)
     | [] -> match next with
-      | [] -> let () = Cache.reset cache in out
+      | [] -> out
       (* end when all graph traversed and return the list of paths *)
-      | _ -> match dist with
-        | Some d when d <= depth -> let () = Cache.reset cache in []
+      | _ -> match max_distance with
+        | Some d when d <= depth -> out
         (* stop when the max distance is reached *)
         | Some _ -> aux (depth+1) out [] next
         | None -> aux depth out [] next in
   aux 1 out [] todos
 
 let paths_of_interest
-    ~looping is_interesting sigs graph (start_point,start_ty) done_path =
+    ~looping is_interesting graph (start_point,start_ty) done_path =
   let () = assert (not graph.outdated) in
   let () = Cache.mark graph.cache start_point in
   let () = List.iter (fun (_,((x,_),_)) -> Cache.mark graph.cache x)
@@ -429,13 +529,14 @@ let paths_of_interest
   let acc = match is_interesting (start_point,start_ty) with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
-  breadth_first_traversal ~looping None false is_interesting sigs graph.connect
-    graph.cache acc [(start_point,start_ty),done_path]
+  let out =
+    breadth_first_traversal ~looping ?max_distance:None false is_interesting
+      graph.connect graph.cache acc [(start_point,start_ty),done_path] in
+  let () = Cache.reset graph.cache in out
 
 (* nodes_x: agent_id list = (int * int) list
    nodes_y: adent_id list = int list *)
-let are_connected
-    ?candidate sigs graph nodes_x nodes_y dist store_dist =
+let are_connected ?max_distance graph nodes_x nodes_y =
   let () = assert (not graph.outdated) in
   (* look for the closest node in nodes_y *)
   let is_in_nodes_y z = if List.mem z nodes_y then Some () else None in
@@ -443,15 +544,12 @@ let are_connected
      start the breadth first search with the boundaries of nodes_x,
      that is all sites that are connected to other nodes in x
      and with all nodes in nodes_x marked as done *)
-  match candidate with
-  | Some p when dist = None && not store_dist && is_valid_path graph p -> Some p
-  | (Some _ | None) ->
-    let prepare =
-      List.fold_left (fun acc (id,_ as ag) ->
-          let () = Cache.mark graph.cache id in
-          (ag,[])::acc) [] nodes_x in
-    match breadth_first_traversal ~looping:((-1,-1),-1) dist true is_in_nodes_y
-            sigs graph.connect graph.cache [] prepare
-    with [] -> None
-       | [ _,p ] -> Some p
-       | _ :: _ -> failwith "Edges.are_they_connected completely broken"
+  let prepare =
+    List.fold_left (fun acc (id,_ as ag) ->
+        let () = Cache.mark graph.cache id in
+        (ag,[])::acc) [] nodes_x in
+  match breadth_first_traversal ~looping:((-1,-1),-1) ?max_distance true
+          is_in_nodes_y graph.connect graph.cache [] prepare
+  with [] -> let () = Cache.reset graph.cache in None
+     | [ _,p ] -> let () = Cache.reset graph.cache in Some p
+     | _ :: _ -> failwith "Edges.are_they_connected completely broken"

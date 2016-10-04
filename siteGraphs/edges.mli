@@ -10,7 +10,7 @@ val agent_of_json : Yojson.Basic.json -> agent
 
 type t
 
-val empty : unit -> t
+val empty : with_connected_components : bool -> t
 
 val copy : t -> t
 (** You'd better NOT use that on the state of a simulation *)
@@ -63,14 +63,13 @@ val print_path :
   ?sigs:Signature.s -> Format.formatter -> path -> unit
 
 val are_connected :
-  ?candidate:path -> Signature.s -> t -> agent list -> agent list ->
-  int option -> bool -> path option
-(** [are_connected ?candidate sigs graph nodes_x nodes_y dist store_dist] *)
+  ?max_distance : int -> t -> agent list -> agent list -> path option
+(** [are_connected ?max_distance graph nodes_x nodes_y] *)
 
 val paths_of_interest :
-  looping:(agent * int) -> (agent -> 'a option) -> Signature.s -> t ->
+  looping:(agent * int) -> (agent -> 'a option) -> t ->
   agent -> path -> (('a*int) * path) list
-(** [paths_of_interest is_interesting sigs graph agent done_path] *)
+(** [paths_of_interest ~looping is_interesting graph agent done_path] *)
 
 val build_snapshot : Signature.s -> t -> (int * Raw_mixture.t) list
 
