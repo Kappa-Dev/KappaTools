@@ -305,6 +305,7 @@ struct
     (*------------------------------------------------------*)
     (*A(x!1, y), B(x!1, y): first site is an action binding*)
     (*------------------------------------------------------*)
+    (*tuples of interest*)
     let lift_map error s =
       Ckappa_sig.Rule_map_and_set.Map.fold
         (fun _ big_store (error, set) ->
@@ -554,6 +555,7 @@ struct
                     state2) = z in
                let (agent_id1', agent_type1', site_type1', site_type2',
                     state1', state2') = t in
+               (*project away agent_id*)
                let z' = Parallel_bonds_type.project z in
                let t' = Parallel_bonds_type.project t in
                let other_site, other_site' =

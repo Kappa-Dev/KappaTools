@@ -1,3 +1,5 @@
+Kappa Static Analyzer (DomainBased-2078-g1a293d3-dirty) (without Tk interface)
+Analysis launched at 2016/10/05 18:32:02 (GMT+2) on mezcal
 Parsing ../contact_map.ka...
 done
 Compiling...
@@ -32,6 +34,20 @@ A() => [ A(y) ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents on the rhs and lhs
+
+------------------------------------------------------------
+A(2:z, 0:y), A(y, y)
+A(2:z, 0:y), A(y, z)
+A(2:z, 1:z), A(y, z)
+A(2:z, 3:y), A(y, y)
+A(2:z, 3:y), A(y, z)
+A(3:y, 0:y), A(z, y)
+A(3:y, 0:y), A(z, y)
+A(3:y, 1:z), A(z, z)
+A(3:y, 2:z), A(z, y)
+A(3:y, 2:z), A(z, y)
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------

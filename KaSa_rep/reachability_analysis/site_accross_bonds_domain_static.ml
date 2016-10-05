@@ -25,18 +25,20 @@ type basic_static_information =
     (*this is the potential tuple in the rhs*)
     store_potential_tuple_pair_rhs :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
+    (*tuple of interest in the rhs: A(z!1, t~u/~p), B(z!1, t~u~/p)*)
     store_rule_potential_tuple_pair_rhs :
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     (*the potential tuple in the lhs*)
     store_rule_potential_tuple_pair_lhs :
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_rule_proj_potential_tuple_pair_lhs :
+    (*tuple of interest in the lhs: A(z!1, t~u/~p), B(z!1, t~u~/p)*)
+    (*store_rule_proj_potential_tuple_pair_lhs :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_tuples_of_interest :
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map :
@@ -51,6 +53,12 @@ type basic_static_information =
     store_partition_modified_map_2 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
+    (*------------------------------------------------------------------*)
+    (*a map from tuples -> sites (agent_type, site_name)*)
+    (*store_tuple_to_sites :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+        Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Map.t;*)
+
   }
 
 (****************************************************************)
@@ -65,9 +73,9 @@ let init_basic_static_information =
     store_rule_potential_tuple_pair_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_rule_potential_tuple_pair_lhs =
       Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_rule_proj_potential_tuple_pair_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+    (*store_rule_proj_potential_tuple_pair_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
     store_tuples_of_interest =
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
     (*-------------------------------------------------------*)
     (*projection or combination*)
     store_partition_bonds_rhs_map =
@@ -78,6 +86,10 @@ let init_basic_static_information =
       Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
     store_partition_modified_map_2 =
       Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
+    (*-------------------------------------------------------*)
+    (*a map from tuples -> sites*)
+    (*store_tuple_to_sites =
+      Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Map.empty;*)
   }
 
 (***************************************************************)
@@ -104,7 +116,8 @@ let collect_potential_tuple_pair_rhs parameter error
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id = agent_id_v &&
-                 agent_type = agent_type_v && site_type <> site_type_v
+                 agent_type = agent_type_v &&
+                 site_type <> site_type_v
               then
                 let fst_list =
                   (agent_type, site_type, site_type_v, state) ::
@@ -119,7 +132,8 @@ let collect_potential_tuple_pair_rhs parameter error
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id1 = agent_id_v &&
-                 agent_type1 = agent_type_v && site_type1 <> site_type_v
+                 agent_type1 = agent_type_v &&
+                 site_type1 <> site_type_v
               then
                 let snd_list =
                   (agent_type1, site_type1, site_type_v, state1) ::
@@ -145,29 +159,21 @@ let collect_potential_tuple_pair_rhs parameter error
        error, store_result
     ) bonds_set (error, store_result)
 
-(*rule -> tuples*)
-let collect_rule_potential_tuple_pair_rhs parameter error rule_id
-    store_potential_tuple_pair_rhs store_result =
-  Ckappa_sig.Rule_map_and_set.Map.add
-    parameter error
-    rule_id
-    store_potential_tuple_pair_rhs
-    store_result
-
 (*-------------------------------------------------------*)
 (*potential tuple pair on the rhs*)
 
-let collect_rule_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
-    store_views_lhs store_result =
-  let error, bonds_lhs_set =
+let collect_rule_potential_tuple_pair_aux
+    parameter error rule_id store_bonds
+    store_views store_result =
+  let error, bonds_set =
     Common_static.get_set parameter error rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-      store_bonds_lhs
+      store_bonds
   in
-  let error, views_lhs_set =
+  let error, views_set =
     Common_static.get_set parameter error rule_id
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-      store_views_lhs
+      store_views
   in
   let error, pair_set =
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
@@ -190,7 +196,7 @@ let collect_rule_potential_tuple_pair_lhs parameter error rule_id store_bonds_lh
                 in
                 error, fst_list
               else error, current_list
-           ) views_lhs_set (error, [])
+           ) views_set (error, [])
        in
        let error, snd_list =
          Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
@@ -206,7 +212,7 @@ let collect_rule_potential_tuple_pair_lhs parameter error rule_id store_bonds_lh
                 in
                 error, snd_list
               else error, current_list
-           ) views_lhs_set (error, [])
+           ) views_set (error, [])
        in
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
@@ -222,13 +228,29 @@ let collect_rule_potential_tuple_pair_lhs parameter error rule_id store_bonds_lh
            ) (error, store_result) fst_list
        in
        error, store_result
-    ) bonds_lhs_set
+    ) bonds_set
     (error,
      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
   in
   (*add the set of tuple to rule_id map*)
     Ckappa_sig.Rule_map_and_set.Map.add
       parameter error rule_id pair_set store_result
+
+let collect_rule_potential_tuple_pair_lhs
+    parameter error rule_id store_bonds_lhs
+    store_views_lhs store_result =
+  collect_rule_potential_tuple_pair_aux
+    parameter error rule_id store_bonds_lhs
+    store_views_lhs store_result
+
+let collect_rule_potential_tuple_pair_rhs
+    parameter error rule_id store_bonds_rhs
+    store_views_rhs store_result =
+  collect_rule_potential_tuple_pair_aux
+    parameter error rule_id store_bonds_rhs
+    store_views_rhs store_result
+
+(*****************************************************************************)
 
 let collect_rule_proj_potential_tuple_pair_lhs parameter error
     store_rule_potential_tuple_pair_lhs store_result =
@@ -296,7 +318,7 @@ let collect_partition_modified_map_1 parameter error
   (*agent_type, site_type, site_type', state*)
   let proj (b, _, d, _) = b, d in
   Site_accross_bonds_domain_type.Partition_modified_map.monadic_partition_set
-    (fun _ error (x, _y) ->
+    (fun _ error (x, _) ->
        (*get the first site*)
        error, proj x
     )
@@ -309,7 +331,7 @@ let collect_partition_modified_map_2 parameter error
   (*agent_type, site_type, site_type', state*)
   let proj (b, _, d, _) = b, d in
   Site_accross_bonds_domain_type.Partition_modified_map.monadic_partition_set
-    (fun _ error (_x, y) ->
+    (fun _ error (_, y) ->
        (*get the second site *)
        error, proj y
     )
@@ -492,3 +514,17 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
       ) store_pair_sites_init (error, handler, store_result)
   in
 error, handler, store_result
+
+(***************************************************************)
+(*a map from tuples -> sites*)
+
+let collect_tuple_to_sites parameter error tuples_of_interest =
+  let proj (a, b, _, _) = (a, b) in
+  let proj2 (a, _, c, _) = (a, c) in
+  Site_accross_bonds_domain_type.Partition_tuples_to_sites_map.monadic_partition_set
+    (fun _ error (x, y) ->
+       error, (proj x, proj2 x, proj y, proj2 y)
+    )
+    parameter
+    error
+    tuples_of_interest
