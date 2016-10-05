@@ -122,14 +122,14 @@ let apply_negative_transformation (side_effects,edges) = function
     let edges' = Edges.remove_free id s edges in
     (side_effects,edges')
   | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
-    let edges' = Edges.remove_link id s id' s' edges in
+    let edges',_ = Edges.remove_link id s id' s' edges in
     (side_effects,edges')
   | Primitives.Transformation.NegativeWhatEver ((id,_),s) ->
     begin
       match Edges.link_destination id s edges with
       | None -> (side_effects,Edges.remove_free id s edges)
       | Some ((id',_ as nc'),s') ->
-        ((nc',s')::side_effects,Edges.remove_link id s id' s' edges)
+        ((nc',s')::side_effects,fst @@ Edges.remove_link id s id' s' edges)
     end
   | Primitives.Transformation.PositiveInternalized _ ->
     raise
@@ -158,7 +158,7 @@ let apply_positive_transformation
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
     let nc = Agent_place.concretize inj2graph n in
     let nc' = Agent_place.concretize inj2graph n' in
-    let edges' = Edges.add_link nc s nc' s' edges in
+    let edges',_ = Edges.add_link nc s nc' s' edges in
     let side_effects' = Tools.list_smart_filter
         (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
     (inj2graph,side_effects',edges'),

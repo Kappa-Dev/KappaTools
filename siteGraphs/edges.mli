@@ -24,13 +24,15 @@ val add_free : int -> int -> t -> t
 val add_internal : int -> int -> int -> t -> t
 (** [add_internal agent_id site internal_state graph] *)
 
-val add_link : agent -> int -> agent -> int -> t -> t
-(** [add_link ag1 s1 ag2 s2 t] *)
+val add_link : agent -> int -> agent -> int -> t -> t * (int*int) option
+(** [add_link ag1 s1 ag2 s2 t]
+ Some (i,j) as second returned element means cc j is now merged into cc i *)
 
 val remove_agent : int -> t -> t
 val remove_free : int -> int -> t -> t
 val remove_internal : int -> int -> t -> t
-val remove_link : int -> int -> int -> int -> t -> t
+val remove_link : int -> int -> int -> int -> t -> t * (int*int) option
+(** Some (i,j) as second returned element means separate "new" cc j from cc i *)
 
 val is_agent : agent -> t -> bool
 (** [is_agent agent graph] *)
@@ -52,6 +54,8 @@ val link_destination : int -> int -> t -> (agent * int) option
 
 val get_internal : int -> int -> t -> int
 (** [get_internal ag site graph] *)
+
+val in_same_connected_component : int -> int -> t -> bool
 
 val all_agents_where : (agent -> bool) -> t -> Mods.IntSet.t
 

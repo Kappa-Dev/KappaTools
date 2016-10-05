@@ -91,14 +91,15 @@ let separate_connected_component links cache ccs node1 node2 =
     | id ::todos ->
       begin match
           inspect_site id (Array.length (Mods.DynArray.get links id)) next with
-        | None -> ()
+        | None -> None
         | Some next' -> is_in_cc next' todos
       end
     | [] -> match next with
       | [] ->
-                let () =
+        let () =
           Cache.iteri (fun i -> Mods.DynArray.set ccs i (Some node1)) cache in
-        Cache.reset cache
+        let () = Cache.reset cache in
+        Some (Tools.unsome (-1) (Mods.DynArray.get ccs node2),node1)
       | _ -> is_in_cc [] next in
   let () = Cache.mark cache node1 in  
   is_in_cc [] [node1]
@@ -231,11 +232,15 @@ let add_link (ag,ty) s (ag',ty') s' graph =
   let () = graph.outdated <- true in
   let () = (Mods.DynArray.get graph.connect ag).(s) <- Some ((ag',ty'),s') in
   let () = (Mods.DynArray.get graph.connect ag').(s') <- Some ((ag,ty),s) in
-  let () = match graph.connected_component with
-    | None -> ()
+  let out = match graph.connected_component with
+    | None -> None
     | Some ccs ->
-      if Mods.DynArray.get ccs ag <> Mods.DynArray.get ccs ag' then
-        glue_connected_component graph.connect graph.cache ccs ag ag' in
+      let i = Tools.unsome (-1) (Mods.DynArray.get ccs ag) in
+      let j = Tools.unsome (-2) (Mods.DynArray.get ccs ag') in
+      if i = j then None else
+        let () =
+          glue_connected_component graph.connect graph.cache ccs ag ag' in
+        Some (j,i) in
   {
     outdated = false;
     connect = graph.connect;
@@ -246,7 +251,7 @@ let add_link (ag,ty) s (ag',ty') s' graph =
     cache = graph.cache;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
-  }
+  },out
 
 let remove_agent ag graph =
   let () = assert (not graph.outdated) in
@@ -309,8 +314,8 @@ let remove_link ag s ag' s' graph =
   let () = graph.outdated <- true in
   let () = (Mods.DynArray.get graph.connect ag).(s) <- None in
   let () = (Mods.DynArray.get graph.connect ag').(s') <- None in
-  let () = match graph.connected_component with
-    | None -> ()
+  let out = match graph.connected_component with
+    | None -> None
     | Some ccs ->
       separate_connected_component graph.connect graph.cache ccs ag ag' in
   {
@@ -323,7 +328,7 @@ let remove_link ag s ag' s' graph =
     cache = graph.cache;
     free_id = graph.free_id;
     connected_component = graph.connected_component;
-  }
+  },out
 
 let is_agent (ag,ty) graph =
   let () = assert (not graph.outdated&&Mods.Int2Set.is_empty graph.missings) in
@@ -366,6 +371,15 @@ let all_agents_where f graph =
        | Some ty when f (id,ty) -> Mods.IntSet.add id acc
        | _ -> acc)
     Mods.IntSet.empty graph.sort
+
+let in_same_connected_component ag ag' graph =
+  match graph.connected_component with
+  | None ->
+    raise (ExceptionDefn.Internal_Error
+             (Location.dummy_annot
+                "in_same_connected_component while not tracking ccs"))
+  | Some ccs ->
+    Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag'
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =

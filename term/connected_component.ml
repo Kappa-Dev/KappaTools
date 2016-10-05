@@ -427,7 +427,7 @@ let add_fully_specified_to_graph sigs graph cc =
                      | Link (x',s') ->
                        match Mods.IntMap.find_option x' emb' with
                        | None -> acc
-                       | Some ag' -> Edges.add_link (a,ty) s ag' s' acc)
+                       | Some ag' -> fst @@ Edges.add_link (a,ty) s ag' s' acc)
                   g'' (Mods.IntMap.find_default [||] x cc.links) in
               (emb',g''')))
       (Mods.IntMap.empty,graph) cc.nodes_by_type in
