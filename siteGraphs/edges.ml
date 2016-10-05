@@ -40,69 +40,75 @@ module Cache = struct
   let iteri f t =
     ignore @@
     Mods.DynArray.fold_lefti
-      (fun i acc v ->
+      (fun _ acc v ->
          let () =
            if v <> 0 then
              Tools.iteri
-               (fun j -> if v land (1 lsl j) <> 0 then  f ((i*int_l)+j))
+               (fun j -> if v land (1 lsl j) <> 0 then f (acc+j))
                int_l in
          acc + int_l) 0 t
 end
 
 let glue_connected_component links cache ccs node1 node2 =
   let cc_id_op = Mods.DynArray.get ccs node2 in
-  let rec explore_site id site (out,next as acc) =
-    if site = 0 then acc else
+  let rec explore_site id site next =
+    if site = 0 then next else
       match (Mods.DynArray.get links id).(pred site) with
-      | None -> explore_site id (pred site) acc
+      | None -> explore_site id (pred site) next
       | Some ((id',_),_) ->
-        if Mods.DynArray.get ccs id' = cc_id_op then
-          explore_site id (pred site) (true,next)
-        else if Cache.test cache id' then explore_site id (pred site) acc
+        if Mods.DynArray.get ccs id' = cc_id_op ||
+           Cache.test cache id' then explore_site id (pred site) next
         else
           let () = Cache.mark cache id' in
-          explore_site id (pred site) (out,id'::next) in
-  let rec is_in_cc (out,next as acc) = function
+          explore_site id (pred site) (id'::next) in
+  let rec is_in_cc next = function
     | id ::todos ->
       is_in_cc
-        (explore_site id (Array.length (Mods.DynArray.get links id)) acc)
+        (explore_site id (Array.length (Mods.DynArray.get links id)) next)
         todos
     | [] -> match next with
       | [] ->
         let () =
           Cache.iteri (fun i -> Mods.DynArray.set ccs i cc_id_op) cache in
         Cache.reset cache
-      | _ -> is_in_cc (out,[]) next in
+      | _ -> is_in_cc [] next in
   let () = Cache.mark cache node1 in
-  is_in_cc (false,[]) [node1]
+  is_in_cc [] [node1]
 
 let separate_connected_component links cache ccs node1 node2 =
-  let rec inspect_site id site next =
+  let old_cc_id = Tools.unsome (-1) (Mods.DynArray.get ccs node2) in
+  let rec inspect_site dst id site next =
     if site = 0 then Some next else
       match (Mods.DynArray.get links id).(pred site) with
-      | None -> inspect_site id (pred site) next
+      | None -> inspect_site dst id (pred site) next
       | Some ((id',_),_) ->
-        if id' = node2 then None
-        else if Cache.test cache id' then inspect_site id (pred site) next
+        if id' = dst then None
+        else if Cache.test cache id' then inspect_site dst id (pred site) next
         else
           let () = Cache.mark cache id' in
-          inspect_site id (pred site) (id'::next) in
-  let rec is_in_cc next = function
+          inspect_site dst id (pred site) (id'::next) in
+  let rec in_same_cc orig dst next = function
     | id ::todos ->
       begin match
-          inspect_site id (Array.length (Mods.DynArray.get links id)) next with
-        | None -> None
-        | Some next' -> is_in_cc next' todos
+          inspect_site dst id (Array.length (Mods.DynArray.get links id)) next with
+      | None -> let () = Cache.reset cache in None
+      | Some next' -> in_same_cc orig dst next' todos
       end
     | [] -> match next with
       | [] ->
-        let () =
-          Cache.iteri (fun i -> Mods.DynArray.set ccs i (Some node1)) cache in
-        let () = Cache.reset cache in
-        Some (Tools.unsome (-1) (Mods.DynArray.get ccs node2),node1)
-      | _ -> is_in_cc [] next in
-  let () = Cache.mark cache node1 in  
-  is_in_cc [] [node1]
+        if Cache.test cache old_cc_id then
+          let () = Cache.reset cache in
+          let () = Cache.mark cache node2 in
+          in_same_cc node2 node1 [] [node2]
+        else
+          let () =
+            Cache.iteri
+              (fun i -> Mods.DynArray.set ccs i (Some orig)) cache in
+          let () = Cache.reset cache in
+          Some (old_cc_id,orig)
+      | _ -> in_same_cc orig dst [] next in
+  let () = Cache.mark cache node1 in
+  in_same_cc node1 node2 [] [node1]
 
 type t =
   {
@@ -381,6 +387,14 @@ let in_same_connected_component ag ag' graph =
   | Some ccs ->
     Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag'
 
+let get_connected_component ag graph =
+  match graph.connected_component with
+  | None ->
+    raise (ExceptionDefn.Internal_Error
+             (Location.dummy_annot
+                "get_connected_component while not tracking ccs"))
+  | Some ccs -> Mods.DynArray.get ccs ag
+
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =
   let rec build acc free_id dangling =
@@ -494,8 +508,6 @@ let rec print_path ?sigs f = function
 let empty_path = []
 let singleton_path n s n' s' = [(n,s),(n',s')]
 let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
-let is_valid_path graph l =
-  List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
 let breadth_first_traversal
     ~looping ?max_distance stop_on_find is_interesting links cache out todos =
@@ -533,20 +545,6 @@ let breadth_first_traversal
         | Some _ -> aux (depth+1) out [] next
         | None -> aux depth out [] next in
   aux 1 out [] todos
-
-let paths_of_interest
-    ~looping is_interesting graph (start_point,start_ty) done_path =
-  let () = assert (not graph.outdated) in
-  let () = Cache.mark graph.cache start_point in
-  let () = List.iter (fun (_,((x,_),_)) -> Cache.mark graph.cache x)
-      done_path in
-  let acc = match is_interesting (start_point,start_ty) with
-    | None -> []
-    | Some x -> [(x,start_point),done_path] in
-  let out =
-    breadth_first_traversal ~looping ?max_distance:None false is_interesting
-      graph.connect graph.cache acc [(start_point,start_ty),done_path] in
-  let () = Cache.reset graph.cache in out
 
 (* nodes_x: agent_id list = (int * int) list
    nodes_y: adent_id list = int list *)

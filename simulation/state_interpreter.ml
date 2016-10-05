@@ -298,14 +298,11 @@ let one_rule ~outputs dt stop env domain counter graph state =
             ~rule_id ~get_alg register_new_activity env counter graph rule),
        state)
   | Rule_interpreter.Corrected graph' ->
-    let graph'' =
-      Rule_interpreter.update_outdated_activities
-        ~get_alg register_new_activity env counter graph' in
     let continue =
       if choice mod 2 = 1
       then Counter.one_no_more_unary_event counter dt
       else Counter.one_no_more_binary_event counter dt in
-    (not continue||stop,graph'',state)
+    (not continue||stop,graph',state)
 
 let activity state = Random_tree.total state.activities
 

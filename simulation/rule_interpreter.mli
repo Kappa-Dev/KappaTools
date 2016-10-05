@@ -92,14 +92,18 @@ val debug_print : Format.formatter -> t -> unit
 
 (** {6 Internals } *)
 val apply_negative_transformation :
-  (Instantiation.concrete Instantiation.site) list * Edges.t ->
+  (Instantiation.concrete Instantiation.site) list *
+  Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t ->
   Instantiation.concrete Primitives.Transformation.t ->
-  (Instantiation.concrete Instantiation.site) list * Edges.t
+  (Instantiation.concrete Instantiation.site) list *
+  Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t
 val apply_positive_transformation :
   Signature.s ->
   (Connected_component.Matching.t * int Mods.IntMap.t) *
-  (Instantiation.concrete Instantiation.site) list * Edges.t ->
+  (Instantiation.concrete Instantiation.site) list *
+  Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t ->
   Instantiation.abstract Primitives.Transformation.t ->
   ((Connected_component.Matching.t * int Mods.IntMap.t) *
-   (Instantiation.concrete Instantiation.site) list * Edges.t) *
+   (Instantiation.concrete Instantiation.site) list *
+   Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t) *
   Instantiation.concrete Primitives.Transformation.t

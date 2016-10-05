@@ -55,6 +55,8 @@ val link_destination : int -> int -> t -> (agent * int) option
 val get_internal : int -> int -> t -> int
 (** [get_internal ag site graph] *)
 
+val get_connected_component : int -> t -> int option
+
 val in_same_connected_component : int -> int -> t -> bool
 
 val all_agents_where : (agent -> bool) -> t -> Mods.IntSet.t
@@ -69,11 +71,6 @@ val print_path :
 val are_connected :
   ?max_distance : int -> t -> agent list -> agent list -> path option
 (** [are_connected ?max_distance graph nodes_x nodes_y] *)
-
-val paths_of_interest :
-  looping:(agent * int) -> (agent -> 'a option) -> t ->
-  agent -> path -> (('a*int) * path) list
-(** [paths_of_interest ~looping is_interesting graph agent done_path] *)
 
 val build_snapshot : Signature.s -> t -> (int * Raw_mixture.t) list
 
