@@ -106,7 +106,11 @@ let log_event_kind env id quarks event_kind =
      `List [`Int id; `String "RULE"; `String na;
             (`Assoc ["quarks", quarks_to_json])]
   | INIT l ->
-     `List [`Int id; `String "INIT"; `List (List.map (fun x -> `Int x) l);
+     let agent_type x =
+       let _ = Environment.print_agent ~env (Format.str_formatter) x in
+       Format.flush_str_formatter () in
+     `List [`Int id; `String "INIT";
+            `List (List.map (fun x -> `String (agent_type x)) l);
             (`Assoc ["quarks", quarks_to_json])]
   | PERT s -> `List [`Int id; `String "PERT"; `String s;
                      (`Assoc ["quarks", quarks_to_json])]
