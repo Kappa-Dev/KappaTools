@@ -1,7 +1,0 @@
-digraph G{
-"Init_23" [label="" style="invis" width="0px" height="0px"];
-"Node_27" [label="B(y!A@y,x!free)"];
-"Node_23" [label="B(y!A@y,x!C@a)"];
-"Node_23" -> "Node_27" [label="rule 0"];
-"Init_23" -> "Node_23" [label=""];
-}

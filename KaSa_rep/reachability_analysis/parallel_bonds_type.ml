@@ -512,7 +512,6 @@ let add_value_and_event parameters error kappa_handler x value store_set
         new_value
         store_result
     in
-
     let error, new_set =
       PairAgentSite_map_and_set.Set.add
         parameters
