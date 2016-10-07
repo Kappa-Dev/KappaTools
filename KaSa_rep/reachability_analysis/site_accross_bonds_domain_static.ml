@@ -8,7 +8,7 @@
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
-   * Copyright 2010u  ,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+   * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
@@ -23,43 +23,25 @@ type basic_static_information =
   {
     (*------------------------------------------------------------------*)
     (*this is the potential tuple in the rhs*)
-    store_potential_tuple_pair_rhs :
+    store_potential_tuple_pair :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t;
-    (*CHECK ME*)
-    store_rule_potential_tuple_pair_rhs :
-      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
     (*the potential tuple in the lhs*)
-    store_rule_potential_tuple_pair_lhs :
+    store_potential_tuple_pair_lhs :
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_tuples_of_interest : (*REMOVE*)
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
     (*------------------------------------------------------------------*)
-    (*projection or combination, map from tuple -> sites*)
-    (*the first site is bound*)
+    (*projection or combination*)
+    store_partition_bonds_rhs_map :
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
+        Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;
     store_partition_created_bonds_map :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;
-    (*the second site is modified*)
     store_partition_modified_map_1 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
     store_partition_modified_map_2 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
-        Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
-    (*------------------------------------------------------------------*)
-    (*a map from sites -> tuples (agent_type, site_name)*)
-    store_sites_to_tuple :
-      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name
-       * Ckappa_sig.c_state) *
-       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_state))
-        Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t *
-      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_state) *
-       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name
-        * Ckappa_sig.c_state))
         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
   }
 
@@ -70,31 +52,26 @@ type basic_static_information =
 let init_basic_static_information =
   {
     (*-------------------------------------------------------*)
-    store_potential_tuple_pair_rhs =
+    store_potential_tuple_pair =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
-    store_rule_potential_tuple_pair_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_rule_potential_tuple_pair_lhs =
-      Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_tuples_of_interest =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
+    store_potential_tuple_pair_lhs =
+    Ckappa_sig.Rule_map_and_set.Map.empty;
     (*-------------------------------------------------------*)
     (*projection or combination*)
+    store_partition_bonds_rhs_map =
+      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;
     store_partition_created_bonds_map =
       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;
     store_partition_modified_map_1 =
       Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
     store_partition_modified_map_2 =
       Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
-    (*-------------------------------------------------------*)
-    store_sites_to_tuple =
-      Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty,
-      Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.empty;
   }
 
 (***************************************************************)
 (*collect a set of tuple pair (A.x.y, B.z.t) on the rhs*)
 
-let collect_potential_tuple_pair_rhs parameter error
+let collect_potential_tuple_pair parameter error
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_set =
     Common_static.get_set parameter error rule_id
@@ -115,8 +92,7 @@ let collect_potential_tuple_pair_rhs parameter error
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id = agent_id_v &&
-                 agent_type = agent_type_v &&
-                 site_type <> site_type_v
+                 agent_type = agent_type_v && site_type <> site_type_v
               then
                 let fst_list =
                   (agent_type, site_type, site_type_v, state) ::
@@ -131,8 +107,7 @@ let collect_potential_tuple_pair_rhs parameter error
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id1 = agent_id_v &&
-                 agent_type1 = agent_type_v &&
-                 site_type1 <> site_type_v
+                 agent_type1 = agent_type_v && site_type1 <> site_type_v
               then
                 let snd_list =
                   (agent_type1, site_type1, site_type_v, state1) ::
@@ -158,31 +133,20 @@ let collect_potential_tuple_pair_rhs parameter error
        error, store_result
     ) bonds_set (error, store_result)
 
-let collect_rule_potential_tuple_pair_rhs parameter error rule_id
-    store_potential_tuple_pair_rhs
-    store_result =
-  Ckappa_sig.Rule_map_and_set.Map.add
-    parameter error
-    rule_id
-    store_potential_tuple_pair_rhs
-    store_result
-
-
 (*-------------------------------------------------------*)
 (*potential tuple pair on the rhs*)
 
-let collect_rule_potential_tuple_pair_aux
-    parameter error rule_id store_bonds
-    store_views store_result =
-  let error, bonds_set =
+let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
+    store_views_lhs store_result =
+  let error, bonds_lhs_set =
     Common_static.get_set parameter error rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-      store_bonds
+      store_bonds_lhs
   in
-  let error, views_set =
+  let error, views_lhs_set =
     Common_static.get_set parameter error rule_id
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-      store_views
+      store_views_lhs
   in
   let error, pair_set =
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
@@ -205,7 +169,7 @@ let collect_rule_potential_tuple_pair_aux
                 in
                 error, fst_list
               else error, current_list
-           ) views_set (error, [])
+           ) views_lhs_set (error, [])
        in
        let error, snd_list =
          Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
@@ -221,7 +185,7 @@ let collect_rule_potential_tuple_pair_aux
                 in
                 error, snd_list
               else error, current_list
-           ) views_set (error, [])
+           ) views_lhs_set (error, [])
        in
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
@@ -237,7 +201,7 @@ let collect_rule_potential_tuple_pair_aux
            ) (error, store_result) fst_list
        in
        error, store_result
-    ) bonds_set
+    ) bonds_lhs_set
     (error,
      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
   in
@@ -245,46 +209,27 @@ let collect_rule_potential_tuple_pair_aux
     Ckappa_sig.Rule_map_and_set.Map.add
       parameter error rule_id pair_set store_result
 
-let collect_rule_potential_tuple_pair_lhs
-    parameter error rule_id store_bonds_lhs
-    store_views_lhs store_result =
-  collect_rule_potential_tuple_pair_aux
-    parameter error rule_id store_bonds_lhs
-    store_views_lhs store_result
+(*-------------------------------------------------------*)
+(*PairAgentSites_map_and_set.Set.t PairAgentSite_map_and_set.Map.t
+  this Map maps the pair
+  ((id, ag,site,state),(id', ag',site', state')) to the set of tuples of
+  interest of the form:
+  ((id, ag,site,state,_,_),(id', ag',site',state',_,_))*)
 
-(*let collect_rule_potential_tuple_pair_rhs
-    parameter error rule_id store_bonds_rhs
-    store_views_rhs store_result =
-  collect_rule_potential_tuple_pair_aux
-    parameter error rule_id store_bonds_rhs
-    store_views_rhs store_result*)
+let collect_partition_bonds_rhs_map parameter error
+    store_potential_tuple_pair_set =
+  (*agent_type, site_type, site_type', state*)
+  let proj (b, c, _, e) = (b, c, e) in
+  (*set_a map_b*)
+  Site_accross_bonds_domain_type.Partition_bonds_rhs_map.monadic_partition_set
+    (fun _parameter error (x, y) ->
+       error, (proj x, proj y)
+    )
+    parameter
+    error
+    store_potential_tuple_pair_set (*set_a*)
 
-(*****************************************************************************)
-
-let collect_rule_proj_potential_tuple_pair_lhs parameter error
-    store_rule_potential_tuple_pair_lhs store_result =
-  Ckappa_sig.Rule_map_and_set.Map.fold
-    (fun rule_id set (error, store_result) ->
-       let error, new_set =
-       Site_accross_bonds_domain_type.Proj_potential_tuple_pair_set_lhs.proj_set
-         (fun (x,y) ->
-            let proj (a, b, c, d, e) = (a, b, c, d) in
-            proj x, proj y
-         )
-         parameter error
-         set
-       in
-       let error, store_result =
-         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-           parameter error
-           rule_id
-           new_set
-           store_result
-       in
-       error, store_result
-    ) store_rule_potential_tuple_pair_lhs (error, store_result)
-
-(*-----------------------------------------------------------------*)
+(***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)
 
 let collect_partition_created_bonds_map parameter error
@@ -307,7 +252,7 @@ let collect_partition_modified_map_1 parameter error
   (*agent_type, site_type, site_type', state*)
   let proj (b, _, d, _) = b, d in
   Site_accross_bonds_domain_type.Partition_modified_map.monadic_partition_set
-    (fun _ error (x, _) ->
+    (fun _ error (x, _y) ->
        (*get the first site*)
        error, proj x
     )
@@ -320,7 +265,7 @@ let collect_partition_modified_map_2 parameter error
   (*agent_type, site_type, site_type', state*)
   let proj (b, _, d, _) = b, d in
   Site_accross_bonds_domain_type.Partition_modified_map.monadic_partition_set
-    (fun _ error (_, y) ->
+    (fun _ error (_x, y) ->
        (*get the second site *)
        error, proj y
     )
@@ -502,120 +447,4 @@ let collect_pair_tuple_init parameter error bdu_false handler kappa_handler
            error, handler, store_result
       ) store_pair_sites_init (error, handler, store_result)
   in
-error, handler, store_result
-
-(***************************************************************)
-(*a map from sites -> tuples.
-  (A, y) -> A(z!1, y), B(z!1, y)
-*)
-
-(*let collect_pair parameter error x y z t tuple_set store_result =
-    Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-    (fun (u, v) (error, store_result) ->
-       let error, store_result =
-         Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Map.add_or_overwrite
-           parameter error
-           (x, y) (*tuples*)
-           (u, v) (*pair of the second site*)
-           store_result
-       in
-       error, store_result
-    )  tuple_set (error, store_result)*)
-
-let collect_tuple_to_sites parameter error
-    store_created_bonds
-    store_partition_modified_map_1
-    store_partition_modified_map_2
-    store_potential_tuple_pair_rhs
-    store_result =
-  let lift_pair error map =
-    Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.fold
-      (fun z tuple_set (error, store_result) ->
-         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-           (fun (u, v) (error, store_result) ->
-              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite
-                parameter error
-                (u, v)
-                z
-                store_result
-           ) tuple_set (error, store_result)
-      ) map (error, Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.empty)
-  in
-  let error, store_map1 =
-    lift_pair error store_partition_modified_map_1
-  in
-  let error, store_map2 =
-    lift_pair error store_partition_modified_map_2
-  in
-  (*let error, store_map3 =
-    Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.fold
-      (fun (x, y) tuple_set (error, store_result) ->
-         let proj (a, b, c) = (a, b) in
-         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-           (fun (u, v) (error, store_result) ->
-              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite
-                parameter error
-                (u, v)
-                (proj x, proj y)
-                store_result
-           ) tuple_set (error, store_result)
-      ) store_created_bonds
-      (error, Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.empty)
-  in*)
-  Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-    (fun (u, v) (error, store_result) ->
-       let dummy_pair = (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name) in
-       (*----------------------------------------------------------------------*)
-       let error, z =
-         match
-           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-             parameter error
-             (u, v)
-             store_map1
-         with
-         | error, None -> error, dummy_pair
-         | error, Some p -> error, p
-       in
-       (*----------------------------------------------------------------------*)
-       let error, t =
-         match
-           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-             parameter error
-             (u, v)
-             store_map2
-         with
-         | error, None -> error, dummy_pair
-         | error, Some p -> error, p
-       in
-       (*----------------------------------------------------------------------*)
-       (*let error, (x, y) =
-       match
-         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-           parameter error
-           (u, v)
-           store_map3
-       with
-       | error, None -> error, (dummy_pair, dummy_pair)
-       | error, Some p -> error, p
-       in*)
-       (*----------------------------------------------------------------------*)
-       (*get the site that are bound*)
-       let store_result1, store_result2 = store_result in
-       let error, store_result1 =
-         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.add_or_overwrite
-           parameter error
-           z
-           (u, v)
-           store_result1
-       in
-       (*----------------------------------------------------------------------*)
-       (*get the sites that are modify*)
-       let error, store_result2 =
-         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.add_or_overwrite
-           parameter error
-           t
-           (u, v)
-           store_result2
-       in
-       error, (store_result1, store_result2)
-    ) store_potential_tuple_pair_rhs (error, store_result)
+  error, handler, store_result

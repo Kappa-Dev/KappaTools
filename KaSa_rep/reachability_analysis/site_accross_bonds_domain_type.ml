@@ -149,28 +149,6 @@ module PairAgentsSitesStates_map_and_set =
          let print _ _ = ()
        end))
 
-(*******************************************************************)
-(*a map from tuples to sites*)
-(*******************************************************************)
-
-module PairAgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module Partition_tuples_to_sites_map =
-  Map_wrapper.Proj
-    (PairAgentSitesState_map_and_set) (*set*)
-    (PairAgentSite_map_and_set) (*map*)
-
 (***************************************************************)
 (*Projection*)
 
@@ -216,9 +194,6 @@ module Partition_modified_map =
   Map_wrapper.Proj
     (PairAgentSitesState_map_and_set)
     (AgentSite_map_and_set)
-
-module Proj_potential_tuple_pair_set_lhs =
-  Map_wrapper.Proj (PairAgentSitesStates_map_and_set)(PairAgentSitesState_map_and_set)
 
 (***************************************************************)
 
@@ -439,7 +414,7 @@ let print_site_accross_domain
           ) (error, handler) pair_list
 
 let add_link parameter error bdu_false handler kappa_handler pair mvbdu
-     store_result =
+    store_result =
   let error, bdu_old =
     match
       PairAgentSitesState_map_and_set.Map.find_option_without_logs
@@ -450,11 +425,6 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
     | error, None -> error, bdu_false
     | error, Some bdu -> error, bdu
   in
-  (*-----------------------------------------------------------*)
-  (*check the freshness *)
-  (*let proj (a, b, _, _) = (a, b) in
-  let proj' (a, _, c, _) = (a, c) in
-  let each_pair (x, y) = proj x, proj' x, proj y, proj' y in*)
   (*-----------------------------------------------------------*)
   (*new bdu, union*)
   let error, handler, new_bdu =
@@ -463,96 +433,24 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
   in
   (*compare mvbdu and old mvbdu*)
   (*if Ckappa_sig.Views_bdu.equal new_bdu bdu_false
-     &&
-     PairAgentSite_map_and_set.Set.mem
-       (each_pair pair)
-       store_set
-  then
-    (*nothing change*)
-    error, handler, store_result
+  then error, handler, store_result
   else*)
-  (*different*)
   (*print each step*)
-    let error, handler =
-      if Remanent_parameters.get_dump_reachability_analysis_diff parameter
-      then
-        let parameter = Remanent_parameters.update_prefix parameter "                " in
-        print_site_accross_domain
-          ~verbose:false
-          ~dump_any:true parameter error kappa_handler handler pair mvbdu
-      else error, handler
-    in
-    (*-----------------------------------------------------------*)
-    let error, store_result =
-      PairAgentSitesState_map_and_set.Map.add_or_overwrite
-        parameter error
-        pair
-        new_bdu
-        store_result
-    in
-    error, handler, store_result
-
-    let proj (a, b, _, _) = (a, b)
-    let proj' (a, _, c, _) = (a, c)
-    let each_pair (x, y) = proj x, proj' x, proj y, proj' y
-
-let add_link_and_event parameter error bdu_false handler kappa_handler pair mvbdu
-    store_set store_result =
-  let error, bdu_old =
-    match
-      PairAgentSitesState_map_and_set.Map.find_option_without_logs
-        parameter error
-        pair
-        store_result
-    with
-    | error, None -> error, bdu_false
-    | error, Some bdu -> error, bdu
+  let error, handler =
+    if Remanent_parameters.get_dump_reachability_analysis_diff parameter
+    then
+      let parameter = Remanent_parameters.update_prefix parameter "                "
+      in
+      print_site_accross_domain
+        ~verbose:false
+        ~dump_any:true parameter error kappa_handler handler pair mvbdu
+    else error, handler
   in
-  (*-----------------------------------------------------------*)
-  (*check the freshness *)
-  (*let proj (a, b, _, _) = (a, b) in
-  let proj' (a, _, c, _) = (a, c) in
-  let each_pair (x, y) = proj x, proj' x, proj y, proj' y in*)
-  (*-----------------------------------------------------------*)
-  (*new bdu, union*)
-  let error, handler, new_bdu =
-    Ckappa_sig.Views_bdu.mvbdu_or
-      parameter handler error bdu_old mvbdu
+  let error, store_result =
+    PairAgentSitesState_map_and_set.Map.add_or_overwrite
+      parameter error
+      pair
+      new_bdu
+      store_result
   in
-  (*compare mvbdu and old mvbdu*)
-  if Ckappa_sig.Views_bdu.equal new_bdu bdu_false
-     &&
-     PairAgentSite_map_and_set.Set.mem
-       (each_pair pair)
-       store_set
-  then
-    (*nothing change*)
-    error, handler, store_set, store_result
-  else
-    (*different*)
-    (*print each step*)
-    let error, handler =
-      if Remanent_parameters.get_dump_reachability_analysis_diff parameter
-      then
-        let parameter = Remanent_parameters.update_prefix parameter "                " in
-        print_site_accross_domain
-          ~verbose:false
-          ~dump_any:true parameter error kappa_handler handler pair mvbdu
-      else error, handler
-    in
-    (*-----------------------------------------------------------*)
-    let error, store_result =
-      PairAgentSitesState_map_and_set.Map.add_or_overwrite
-        parameter error
-        pair
-        new_bdu
-        store_result
-    in
-    let error, new_set =
-      PairAgentSite_map_and_set.Set.add
-        parameter
-        error
-        (each_pair pair)
-        store_set
-    in
-    error, handler, new_set, store_result
+  error, handler, store_result

@@ -19,18 +19,17 @@ let local_trace = false
 type local_static_information =
   {
     (*rule has two bonds (parallel or not) on the lhs*)
-    store_rule_double_bonds_lhs :
+      store_rule_double_bonds_lhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-      (*rule has two bonds (parallel or not) on the rhs*)
-    store_rule_double_bonds_rhs :
+    (*rule has two bonds (parallel or not) on the rhs*)      store_rule_double_bonds_rhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-    (*a reverse map from tuples -> rule_id*)
+        (*a reverse map from tuples -> rule_id*)
     store_double_bonds_rhs_rule :
       Ckappa_sig.c_rule_id list
         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
-    (*is a union set of double binding in the lhs and the rhs*)
+      (*is a union set of double binding in the lhs and the rhs*)
     store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
     (* information of partial formation of parallel or non-parallel bonds in rules *)
     store_fst_site_create_parallel_bonds_rhs:
@@ -263,7 +262,6 @@ let collect_rule_double_bonds_rhs
   Ckappa_sig.Rule_map_and_set.Map.add
     parameter error rule_id map store_result
 
-(*a map from tuples -> rule_id list*)
 let collect_double_bonds_rhs_rule parameter error store_rule_double_bonds_rhs
     store_result =
   Ckappa_sig.Rule_map_and_set.Map.fold
@@ -299,6 +297,7 @@ let collect_double_bonds_rhs_rule parameter error store_rule_double_bonds_rhs
             error, store_result
          ) tuple_map (error, store_result)
     ) store_rule_double_bonds_rhs (error, store_result)
+
 
 (**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
@@ -441,7 +440,7 @@ let compare_first_pair parameter error x tuple_set store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
              parameter error
              x
-             (u, v)
+             (u,v)
              store_result
          in
          error, store_result
@@ -449,7 +448,7 @@ let compare_first_pair parameter error x tuple_set store_result =
     ) tuple_set (error, store_result)
 
 let compare_snd_pair parameter error y tuple_pair store_result =
-  let (agent_type_y, site_type_y) = y in (*B,x*)
+  let (agent_type_y, site_type_y) = y in (*A,x*)
   Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
     (fun (u, v) (error, store_result) ->
        let (agent_type, site_type, site_type', state, state') = u in
@@ -490,7 +489,7 @@ let collect_sites_to_tuple parameter error map_of_sites store_result =
 (*projection modification rules from: (id, agent_name, site, state) ->
   (agent_name, site)*)
 
-(*let collect_tuple_to_modified_sites parameter error modified_set
+let collect_tuple_to_modified_sites parameter error modified_set
     tuples_of_interest =
 let proj (a, b, _, _, _) = (a, b) in
 let proj2 (a, _, c, _, _) = (a, c) in
@@ -521,4 +520,4 @@ Parallel_bonds_type.Partition_tuples_to_sites_map.monadic_partition_set
   )
   parameter
   error
-  tuples_of_interest*)
+  tuples_of_interest
