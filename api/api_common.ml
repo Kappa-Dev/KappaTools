@@ -44,30 +44,13 @@ let result_bind
 
 let md5sum text = Digest.to_hex (Digest.string text)
 
-(* data structures *)
-(* Manager state *)
-type simulation = { simulation_id : Api_types_j.simulation_id ;
-                    runtime_state : Kappa_facade.t;
-                  }
-type parse_state = ParseOk of Api_types_j.project_parse
-                 | ParseErrors of Api_types_j.errors
-
-type project = { project_id : Api_types_j.project_id ;
-                 mutable simulations : simulation list ;
-                 mutable files : Api_types_j.file list;
-                 mutable parse_state : parse_state ; }
-
 let project_kappa_code project : string =
   String.concat ""
     (List.map
        (fun file -> file.Api_types_j.file_content)
        (List.sort
 	  (fun l r -> compare l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-            r.Api_types_j.file_metadata.Api_types_j.file_metadata_position) project.files))
-type workspace = { workspace_id : Api_types_j.workspace_id ;
-                   mutable projects : project list }
-type environment = { mutable workspaces : workspace list ;  }
-let environment_new () : environment = { workspaces = [] }
+            r.Api_types_j.file_metadata.Api_types_j.file_metadata_position) project#get_files))
 
 (* functor to deal with collections *)
 module type COLLECTION_TYPE = sig
@@ -127,23 +110,23 @@ end;;
 
 module WorkspaceCollection : COLLECTION_TYPE
   with type id = Api_types_j.workspace_id
-  and type collection = environment
-  and type item = workspace
+  and type collection = Api_environment.environment
+  and type item = Api_environment.workspace
 =
 struct
   type id = Api_types_j.workspace_id
-  type collection = environment
-  type item = workspace
+  type collection = Api_environment.environment
+  type item = Api_environment.workspace
   let list
-      (environment : environment) =
-    environment.workspaces
+      (environment : Api_environment.environment) =
+      environment#get_workspaces ()
   let update
-      (environment : environment)
-      (workspaces : workspace list) =
-    environment.workspaces <- workspaces
+      (environment : Api_environment.environment)
+      (workspaces : Api_environment.workspace list) =
+    environment#set_workspaces workspaces
   let identifier
-      (workspace : workspace) =
-    workspace.workspace_id
+      (workspace : Api_environment.workspace) =
+    workspace#get_workspace_id ()
   let id_to_string
       (workspace_id : Api_types_j.workspace_id) : string =
     Format.sprintf "%s" workspace_id
@@ -152,22 +135,22 @@ module WorkspaceOperations = CollectionOperations(WorkspaceCollection)
 
 module ProjectCollection : COLLECTION_TYPE
   with type id = Api_types_j.project_id
-  and type collection = workspace
-  and type item = project
+  and type collection = Api_environment.workspace
+  and type item = Api_environment.project
 =
 struct
   type id = Api_types_j.project_id
-  type collection = workspace
-  type item = project
+  type collection = Api_environment.workspace
+  type item = Api_environment.project
   let list
-      (workspace : workspace) =
-    workspace.projects
+      (workspace : Api_environment.workspace) =
+    workspace#get_projects ()
   let update
-      (workspace : workspace)
-      (projects : project list) : unit =
-    workspace.projects <- projects
-  let identifier (project : project) =
-    project.project_id
+      (workspace : Api_environment.workspace)
+      (projects : Api_environment.project list) : unit =
+    workspace#set_projects projects
+  let identifier (project : Api_environment.project) =
+    project#get_project_id ()
   let id_to_string (project_id : Api_types_j.project_id) : string =
     Format.sprintf "%s" project_id
 end;;
@@ -176,22 +159,22 @@ module ProjectOperations = CollectionOperations(ProjectCollection)
 
 module SimulationCollection : COLLECTION_TYPE
   with type id = Api_types_j.simulation_id
-  and type collection = project
-  and type item = simulation
+  and type collection = Api_environment.project
+  and type item = Api_environment.simulation
 =
 struct
   type id = Api_types_j.simulation_id
-  type collection = project
-  type item = simulation
+  type collection = Api_environment.project
+  type item = Api_environment.simulation
   let list
-      (project : project) =
-    project.simulations
+      (project : Api_environment.project) =
+    project#get_simulations ()
   let update
-      (project : project)
-      (simulations : simulation list) : unit =
-    project.simulations <- simulations
-  let identifier (simulation : simulation) =
-    simulation.simulation_id
+      (project : Api_environment.project)
+      (simulations : Api_environment.simulation list) : unit =
+    project#set_simulations simulations
+  let identifier (simulation : Api_environment.simulation) =
+    simulation#get_simulation_id ()
   let id_to_string (simulation_id : Api_types_j.simulation_id) : string =
     Format.sprintf "%s" simulation_id
 end;;

@@ -211,13 +211,13 @@ function observable_plot(configuration){
             height = dimensions.height - margin.top - margin.bottom;
 
         // setup x-axis
-        var x = (that.getXAxisLog()?d3.scale.log().clamp(true):d3.scaleLinear()).range([0, width]);
+        var x = (that.getXAxisLog()?d3.scaleLog().clamp(true):d3.scaleLinear()).range([0, width]);
         var xState = that.getStatesByMode(that.modes.XAXIS)[0];
         x.domain(d3.extent(xState.values));
         var xAxis = d3.axisBottom(x);
 
         // setup y-axis
-        var y = (that.getYAxisLog()?d3.scale.log().clamp(true):d3.scaleLinear()).range([height, 0]);
+        var y = (that.getYAxisLog()?d3.scaleLog().clamp(true):d3.scaleLinear()).range([height, 0]);
         var yAxis = d3.axisLeft(y)
                       .tickFormat(d3.format(".3n"));
 

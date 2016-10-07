@@ -178,9 +178,10 @@ let outputs (simulation : t) =
   | Data.Print file_line ->
     simulation.files <- file_line::simulation.files
   | Data.Snapshot snapshot ->
-    simulation.snapshots <- (Api_data.api_snapshot
-                               (Environment.signatures simulation.env)
-                               snapshot)::simulation.snapshots
+    simulation.snapshots <-
+      (Api_data.label_snapshot
+         (Environment.signatures simulation.env)
+         snapshot)::simulation.snapshots
   | Data.UnaryDistance d -> simulation.distances <-
       {Api_types_j.distance_rule =
          Format.asprintf
@@ -483,3 +484,8 @@ let info
          Lwt.return (`Ok (create_info ~t:t)))
       (catch_error (fun e -> Lwt.return (`Error e)))
   | _ -> Lwt.return (`Error t.error_messages)
+
+let get_contact_map (t : t) : Api_types_j.site_node array =
+  Api_data.api_contact_map
+    (Environment.signatures t.env)
+    t.contact_map

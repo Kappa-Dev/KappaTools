@@ -1,5 +1,5 @@
 class manager_environment
-    (environment : Api_common.environment)
+    (environment : Api_environment.environment)
     (system_process : Kappa_facade.system_process) : Api.manager_environment =
 object
   method environment_info () :
@@ -7,13 +7,13 @@ object
     let projects =
       List.flatten
         (List.map
-           (fun workspace -> workspace.Api_common.projects)
-           environment.Api_common.workspaces)
+           (fun workspace -> workspace#get_projects ())
+           (environment#get_workspaces ()))
     in
     let simulations =
       List.flatten
         (List.map
-           (fun project -> project.Api_common.simulations)
+           (fun project -> project#get_simulations ())
         projects)
     in
     Lwt.return

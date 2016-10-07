@@ -133,26 +133,24 @@ let find_link cm (a,s) =
   in
   auxa 0 cm
 
-let api_contact_map sigs cm =
-  Array.mapi
-    (fun ag sites ->
-       { Api_types_v1_j.node_quantity = None;
-         Api_types_v1_j.node_name =
-           Format.asprintf "%a" (Signature.print_agent sigs) ag;
-         Api_types_v1_j.node_sites =
-           Array.mapi
-             (fun site (states,links) ->
-                { Api_types_v1_j.site_name =
-                    Format.asprintf "%a" (Signature.print_site sigs ag) site;
-                  Api_types_v1_j.site_links = links;
-                  Api_types_v1_j.site_states =
-                    List.map
-                      (Format.asprintf
-                         "%a"
-                         (Signature.print_internal_state sigs ag site))
-                      states;
-                }) sites;
-       }) cm
+let api_contact_map (contact_map : Api_types_j.site_node array) : Api_types_v1_j.site_graph =
+  Array.map
+    (fun { Api_types_j.site_node_quantity = node_quantity ;
+           Api_types_j.site_node_name = node_name;
+           Api_types_j.site_node_sites = node_sites
+         } -> {
+        Api_types_v1_j.node_quantity = node_quantity ;
+        Api_types_v1_j.node_name = node_name ;
+        Api_types_v1_j.node_sites =
+          Array.map
+            (fun site ->
+               { Api_types_v1_j.site_name = site.Api_types_j.site_name ;
+                 Api_types_v1_j.site_links = site.Api_types_j.site_links ;
+                 Api_types_v1_j.site_states = site.Api_types_j.site_states })
+            node_sites
+      }
+    )
+    contact_map
 
 let api_contactmap_site_graph
     (contactmap : Api_types_v1_j.parse) : Api_types_v1_j.site_graph =

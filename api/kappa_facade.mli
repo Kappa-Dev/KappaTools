@@ -54,3 +54,5 @@ val info :
   t:t ->
   (Api_types_j.simulation_info, Api_types_j.errors)
     Api_types_j.result_data Lwt.t
+
+val get_contact_map : t -> Api_types_j.site_node array
