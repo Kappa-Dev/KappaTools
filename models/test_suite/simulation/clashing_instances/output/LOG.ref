@@ -889,10 +889,11 @@ Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
 On roots: 97 97
+Rule rule has now 30 instances.
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 97
+On roots: 69 73
 Rule rule has now 25 instances.
 Obtained
 %init: 5 A(x)
@@ -900,7 +901,7 @@ Obtained
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 69
+On roots: 40 97
 Rule rule has now 16 instances.
 Obtained
 %init: 4 A(x)
@@ -908,7 +909,7 @@ Obtained
 #Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 40
+On roots: 52 69
 Rule rule has now 9 instances.
 Obtained
 %init: 3 A(x)
@@ -916,11 +917,11 @@ Obtained
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 73
+On roots: 52 52
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 1 52
+On roots: 52 1
 Rule rule has now 4 instances.
 Obtained
 %init: 2 A(x)
@@ -928,7 +929,7 @@ Obtained
 #Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 1
+On roots: 52 40
 Rule rule has now 1 instances.
 Obtained
 %init: 1 A(x)
@@ -936,19 +937,15 @@ Obtained
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 73
+On roots: 52 52
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 73
-Applied 0:
-0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
-++  @1
-On roots: 73 73
+On roots: 52 52
 Rule rule has now 0 instances.
 ###########
-Warning: A deadlock was reached after 99 events and 3.185893E+00s (Activity = 0.00000)
-Simulation ended (eff.: 0.916667, detail below)
+Warning: A deadlock was reached after 99 events and 4.857865E+00s (Activity = 0.00000)
+Simulation ended (eff.: 0.925234, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000
 	Clashing instance: 1.000000

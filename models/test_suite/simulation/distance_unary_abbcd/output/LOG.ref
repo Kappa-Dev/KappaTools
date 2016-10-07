@@ -17,8 +17,8 @@ done
 Done
 ____________________________________________________________
 ############################################################
-Simulation ended (eff.: 0.784314, detail below)
-	Valid embedding but no longer unary when required: 0.072727
+Simulation ended (eff.: 0.544959, detail below)
+	Valid embedding but no longer unary when required: 0.059880
 	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.927273
+	Clashing instance: 0.940120
 	Perturbation interrupting time advance: 0.000000
