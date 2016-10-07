@@ -1,0 +1,325 @@
+function main=main()
+%% command line: 
+%%     'KaDE' 'erre.ka' '-d' 'output' '-t' '1' '-p''100'
+%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+%% 
+%% init - the initial abundances of each species and token
+%% tinit - the initial simulation time (likely 0)
+%% tend - the final simulation time 
+%% initialstep - initial time step at the beginning of numerical integration
+%% num_t_point - the number of time points to return
+%%
+%% variables (init(i),y(i)) denote numbers of embeddings 
+%% rule rates are corrected by the number of automorphisms in the lhs of rules
+
+
+tinit=0.000000;
+tend=1.000000;
+initialstep=0.000001;
+num_t_point=100;
+
+global nodevar
+nodevar=8;
+nvar=4;
+nobs=2;
+nrules=12;
+
+global var
+var=zeros(nvar,1);
+global init
+init=sparse(nodevar,1);
+
+t = 0.000000;
+
+init(8)=t;
+init(2)=(1*10); %E(r, s)
+init(1)=(1*100); %R(e, r)
+var(2)=(1*((init(1)+init(3))+init(4)));
+var(1)=((1*(((2*init(5))+(2*init(6)))+(2*init(7))))/2);
+
+global k
+global kd
+global kun
+global kdun
+
+k(1)=1; %E(r,s), R(e) -> E(r!1,s), R(e!1)
+k(2)=1; %E(r,s), R(e) -> E(r,s!1), R(e!1)
+k(3)=2; %R(e!_,r) -> R(e,r)
+k(4)=2; %R(e!_,r) -> R(e,r)
+k(5)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(6)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(7)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(8)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(9)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(10)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(11)=4; %R(r!_) -> 
+k(12)=5; %R(r!_) -> R(r)
+
+uiIsOctave = false;
+uiIsMatlab = false;
+LIC = license('inuse');
+for elem = 1:numel(LIC)
+    envStr = LIC(elem).feature
+    if strcmpi(envStr,'octave')
+       LICname=envStr;
+       uiIsOctave = true;
+       break
+    end
+    if strcmpi(envStr,'matlab')
+       LICname=envStr
+       uiIsMatlab = true;
+       break
+    end
+end
+
+
+options = odeset('RelTol', 1e-3, ...
+                 'AbsTol', 1e-3, ...
+                 'InitialStep', initialstep, ...
+                 'MaxStep', tend);
+
+
+if uiIsMatlab
+   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+   soln.y=soln.y';
+elseif uiIsOctave
+   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+end
+
+
+nrows = length(soln.x);
+tmp = zeros(nodevar,1);
+
+t = linspace(tinit, tend, num_t_point+1);
+obs = zeros(nrows,nobs);
+
+for j=1:nrows
+    for i=1:nodevar
+        z(i)=soln.y(j,i);
+    end
+    h=ode_obs(z);
+    for i=1:nobs
+        obs(j,i)=h(i);
+    end
+end
+if nobs==1
+   y = interp1(soln.x, obs, t, 'pchip')';
+else
+   y = interp1(soln.x, obs, t, 'pchip');
+end
+
+
+filename = 'data.out';
+fid = fopen (filename,'w');
+fprintf(fid,'# KaDE erre.ka -d output -t 1 -p 100\n')
+fprintf(fid,'# t')
+fprintf(fid,' |dimmers|')
+fprintf(fid,' |monomers|')
+fprintf(fid,'\n')
+for j=1:num_t_point+1
+    fprintf(fid,'%f',t(j));
+    for i=1:nobs
+        fprintf(fid,' %f',y(j,i));
+    end
+    fprintf(fid,'\n');
+end
+fclose(fid);
+
+
+end
+
+
+
+function dydt=ode_aux(t,y)
+
+global nodevar
+global var
+global k
+global kd
+global kun
+global kdun
+
+var(2)=(1*((y(1)+y(3))+y(4)));
+var(1)=((1*(((2*y(5))+(2*y(6)))+(2*y(7))))/2);
+
+
+dydt=zeros(nodevar,1);
+
+%rule    : R(r!_) -> R(r)
+%reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r)
+
+dydt(6)=dydt(6)-2*k(12)*y(6)/2;
+dydt(3)=dydt(3)+k(12)*y(6)/2;
+dydt(3)=dydt(3)+k(12)*y(6)/2;
+
+%rule    : R(r!_) -> R(r)
+%reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r)
+
+dydt(6)=dydt(6)-2*k(12)*y(6)/2;
+dydt(3)=dydt(3)+k(12)*y(6)/2;
+dydt(3)=dydt(3)+k(12)*y(6)/2;
+
+%rule    : R(r!_) -> 
+%reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s) + E(r!1, s), R(e!1, r)
+
+dydt(6)=dydt(6)-2*k(11)*y(6)/2;
+dydt(3)=dydt(3)+k(11)*y(6)/2;
+dydt(2)=dydt(2)+k(11)*y(6)/2;
+
+%rule    : R(r!_) -> 
+%reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)
+
+dydt(6)=dydt(6)-2*k(11)*y(6)/2;
+dydt(2)=dydt(2)+k(11)*y(6)/2;
+dydt(3)=dydt(3)+k(11)*y(6)/2;
+
+%rule    : R(r!_) -> R(r)
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r)
+
+dydt(7)=dydt(7)-k(12)*y(7);
+dydt(4)=dydt(4)+k(12)*y(7);
+dydt(3)=dydt(3)+k(12)*y(7);
+
+%rule    : R(r!_) -> R(r)
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r)
+
+dydt(7)=dydt(7)-k(12)*y(7);
+dydt(4)=dydt(4)+k(12)*y(7);
+dydt(3)=dydt(3)+k(12)*y(7);
+
+%rule    : R(r!_) -> 
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s) + E(r, s!1), R(e!1, r)
+
+dydt(7)=dydt(7)-k(11)*y(7);
+dydt(4)=dydt(4)+k(11)*y(7);
+dydt(2)=dydt(2)+k(11)*y(7);
+
+%rule    : R(r!_) -> 
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)
+
+dydt(7)=dydt(7)-k(11)*y(7);
+dydt(2)=dydt(2)+k(11)*y(7);
+dydt(3)=dydt(3)+k(11)*y(7);
+
+%rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+%reaction: E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
+
+dydt(3)=dydt(3)-1/2*k(9)*y(3)*y(4);
+dydt(4)=dydt(4)-1/2*k(9)*y(3)*y(4);
+dydt(7)=dydt(7)+1/2*k(9)*y(3)*y(4);
+
+%rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+%reaction: E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
+
+dydt(4)=dydt(4)-1/2*k(7)*y(4)*y(3);
+dydt(3)=dydt(3)-1/2*k(7)*y(4)*y(3);
+dydt(7)=dydt(7)+1/2*k(7)*y(4)*y(3);
+
+%rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+%reaction: E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
+
+dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
+dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
+dydt(6)=dydt(6)+2/2*k(5)*y(3)*y(3);
+
+%rule    : R(e!_,r) -> R(e,r)
+%reaction: E(r!1, s), R(e!1, r) -> E(r, s) + R(e, r)
+
+dydt(3)=dydt(3)-k(3)*y(3);
+dydt(1)=dydt(1)+k(3)*y(3);
+dydt(2)=dydt(2)+k(3)*y(3);
+
+%rule    : R(r!_) -> R(r)
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r)
+
+dydt(5)=dydt(5)-2*k(12)*y(5)/2;
+dydt(4)=dydt(4)+k(12)*y(5)/2;
+dydt(4)=dydt(4)+k(12)*y(5)/2;
+
+%rule    : R(r!_) -> R(r)
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r)
+
+dydt(5)=dydt(5)-2*k(12)*y(5)/2;
+dydt(4)=dydt(4)+k(12)*y(5)/2;
+dydt(4)=dydt(4)+k(12)*y(5)/2;
+
+%rule    : R(r!_) -> 
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s) + E(r, s!1), R(e!1, r)
+
+dydt(5)=dydt(5)-2*k(11)*y(5)/2;
+dydt(4)=dydt(4)+k(11)*y(5)/2;
+dydt(2)=dydt(2)+k(11)*y(5)/2;
+
+%rule    : R(r!_) -> 
+%reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s)
+
+dydt(5)=dydt(5)-2*k(11)*y(5)/2;
+dydt(2)=dydt(2)+k(11)*y(5)/2;
+dydt(4)=dydt(4)+k(11)*y(5)/2;
+
+%rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+%reaction: E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3)
+
+dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
+dydt(5)=dydt(5)+2/2*k(10)*y(4)*y(4);
+
+%rule    : R(e!_,r) -> R(e,r)
+%reaction: E(r, s!1), R(e!1, r) -> E(r, s) + R(e, r)
+
+dydt(4)=dydt(4)-k(4)*y(4);
+dydt(1)=dydt(1)+k(4)*y(4);
+dydt(2)=dydt(2)+k(4)*y(4);
+
+%rule    : E(r,s), R(e) -> E(r,s!1), R(e!1)
+%reaction: R(e, r) + E(r, s) -> E(r, s!1), R(e!1, r)
+
+dydt(2)=dydt(2)-k(2)*y(2)*y(1);
+dydt(1)=dydt(1)-k(2)*y(2)*y(1);
+dydt(4)=dydt(4)+k(2)*y(2)*y(1);
+
+%rule    : E(r,s), R(e) -> E(r!1,s), R(e!1)
+%reaction: R(e, r) + E(r, s) -> E(r!1, s), R(e!1, r)
+
+dydt(2)=dydt(2)-k(1)*y(2)*y(1);
+dydt(1)=dydt(1)-k(1)*y(2)*y(1);
+dydt(3)=dydt(3)+k(1)*y(2)*y(1);
+dydt(8)=1;
+
+end
+
+
+function Init=ode_init()
+
+global nodevar
+global init
+Init=zeros(nodevar,1);
+
+Init(1) = init(1); %R(e, r)
+Init(2) = init(2); %E(r, s)
+Init(3) = init(3); %E(r!1, s), R(e!1, r)
+Init(4) = init(4); %E(r, s!1), R(e!1, r)
+Init(5) = init(5); %E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3)
+Init(6) = init(6); %E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
+Init(7) = init(7); %E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)
+Init(8) = init(8); %t
+end
+
+
+function obs=ode_obs(y)
+
+global nobs
+global var
+obs = zeros(nobs,1);
+
+t = y(8);
+var(2)=(1*((y(1)+y(3))+y(4)));
+var(1)=((1*(((2*y(5))+(2*y(6)))+(2*y(7))))/2);
+
+obs(1)=var(1);
+obs(2)=var(2);
+
+end
+
+
+main();

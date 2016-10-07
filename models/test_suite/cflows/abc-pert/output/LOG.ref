@@ -1,0 +1,25 @@
++ Command line to rerun is: 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '--batch'
+Parsing abc-pert.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+
+
+	 - weak flow compression (7)
++ Pretty printing 1 weakly compressed flow
+Simulation ended

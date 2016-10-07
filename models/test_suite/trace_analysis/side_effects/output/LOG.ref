@@ -1,0 +1,47 @@
+Parsing side-effects.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule 1 will never be applied.
+rule 3 will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+C() => [ C(b~u) ]
+C() => [ C(a!A.x) v C(a!B.x) ]
+A() => [ A(y!B.y) ]
+A() => [ A(x) v A(x!C.a) ]
+A() => [ A(z~u) v A(z~p) ]
+B() => [ B(x) v B(x!C.a) ]
+B() => [ B(y!A.y) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+B(y,x), B(x, y) => (B, y); (B, x); (B, x); (B, y)
+B(x,y), B(y, x) => (B, x); (B, y); (B, y); (B, x)
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
+(B, y) => {B(y, x), B(x, y); B(x,y), B(y, x)}
+(B, x) => {B(x, y), B(y, x); B(y,x), B(x, y)}
+execution finished without any exception

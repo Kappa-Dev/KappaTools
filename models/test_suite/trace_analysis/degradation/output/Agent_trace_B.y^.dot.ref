@@ -1,0 +1,7 @@
+digraph G{
+"Init_13" [label="" style="invis" width="0px" height="0px"];
+"Final_13" [label="" style="invis" width="0px" height="0px"];
+"Node_13" [label="B(y!A@x)"];
+"Init_13" -> "Node_13" [label=""];
+"Node_13" -> "Final_13" [label="rule 0"];
+}

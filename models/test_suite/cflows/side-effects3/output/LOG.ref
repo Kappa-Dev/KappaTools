@@ -1,0 +1,35 @@
++ Command line to rerun is: 'KaSim' '-i' 'side-effects.ka' '-seed' '501792230' '-e' '199' '-d' 'output' '-dump-trace' 'trace.json'
+Parsing side-effects.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
+Simulation ended
++ Producing causal compressions
+	 - blackboard generation
+	 - computing causal past of each observed events (2)
+Stats:
+ number of step   : 102
+ longest story    : 66
+ average length   : 36.1428571429
+ geometric mean   : 40.5753267745
+
+	 - causal flow compression (2)
+
+
+	 - weak flow compression (2)
++ Pretty printing 2 flows
++ Pretty printing 1 weakly compressed flow

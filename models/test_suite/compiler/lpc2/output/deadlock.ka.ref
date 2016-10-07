@@ -1,0 +1,4 @@
+# Snapshot [Event: 1]
+%init: 1 A(x, y, z)
+%init: 1 B(x)
+

@@ -1,0 +1,24 @@
++ Command line to rerun is: 'KaSim' '-t' '2' '-p' '250' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-seed' '16602'
+Parsing rafinements.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
+Simulation ended (eff.: 0.999995, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Perturbation interrupting time advance: 1.000000

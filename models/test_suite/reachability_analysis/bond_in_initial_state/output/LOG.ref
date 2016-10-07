@@ -1,0 +1,202 @@
+Parsing initial_state.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+	Views in initial state
+
+			A(x!B@x)
+
+	Wake-up rules
+		Updating the views for A(x!)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+	Views in initial state
+
+			A(x~u)
+
+	Wake-up rules
+		Updating the views for A(x~)
+		(rule 0) should be investigated 
+	Views in initial state
+
+			B(x!A@x,x~u)
+
+	Wake-up rules
+		Updating the views for B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+
+		  A(x~u!1),B(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+		rule 0 is applied for the first time
+
+
+		  A(x~u!1),B(x~u!1)
+                Update information about potential sites accross domain
+
+		  A(x~u!1),B(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+		  A(x~u!1),B(x~u!1)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 2:
+		the precondition is not satisfied yet
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		rule 1 is applied for the first time
+
+		Updating the views for A(x!)
+	Dealing with side effects
+
+			B(x!free,x~u)
+
+	Wake-up rules
+		Updating the views for B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		rule 3 is applied for the first time
+
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+			
+
+			B(x!A@x,x~p)
+
+	Wake-up rules
+		Updating the views for B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 0:
+		the precondition is satisfied
+
+		  A(x~u!1),B(x~u!1)
+                Update information about potential sites accross domain
+
+		  A(x~u!1),B(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+		  A(x~u!1),B(x~u!1)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 1:
+		the precondition is satisfied
+		Updating the views for A(x!)
+	Dealing with side effects
+
+			B(x!free,x~p)
+
+	Wake-up rules
+		Updating the views for B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 2:
+		the precondition is satisfied
+
+		rule 2 is applied for the first time
+
+		Updating the views for B(x!,x~)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 3:
+		the precondition is satisfied
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 0:
+		the precondition is satisfied
+
+		  A(x~u!1),B(x~u!1)
+                Update information about potential sites accross domain
+
+		  A(x~u!1),B(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+		  B(x~u!1),A(x~u!1)
+
+		  A(x~u!1),B(x~u!1)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+
+	Applying rule 1:
+		the precondition is satisfied
+		Updating the views for A(x!)
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+                Update information about potential sites accross domain
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+A() => [ A(x!B.x) ]
+A() => [ A(x~u?) ]
+B() => [ B(x~u?) v B(x~p?) ]
+B() => [ B(x) v B(x!A.x) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from tuples to sites
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds, a map from sites to tuple
+------------------------------------------------------------
+execution finished without any exception

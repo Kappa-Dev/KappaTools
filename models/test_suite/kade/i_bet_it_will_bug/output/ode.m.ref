@@ -1,0 +1,163 @@
+function main=main()
+%% command line: 
+%%     'KaDE' 'bet.ka' '-d' 'output' '-t' '1' '-p''100'
+%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+%% 
+%% init - the initial abundances of each species and token
+%% tinit - the initial simulation time (likely 0)
+%% tend - the final simulation time 
+%% initialstep - initial time step at the beginning of numerical integration
+%% num_t_point - the number of time points to return
+%%
+%% variables (init(i),y(i)) denote numbers of embeddings 
+%% rule rates are corrected by the number of automorphisms in the lhs of rules
+
+
+tinit=0.000000;
+tend=1.000000;
+initialstep=0.000001;
+num_t_point=100;
+
+global nodevar
+nodevar=2;
+nvar=1;
+nobs=0;
+nrules=1;
+
+global var
+var=zeros(nvar,1);
+global init
+init=sparse(nodevar,1);
+
+t = 0.000000;
+
+init(2)=t;
+init(1)=(1*4.500000); %A()
+
+global k
+global kd
+global kun
+global kdun
+
+k(1)=1; %A(), A() -> 
+
+uiIsOctave = false;
+uiIsMatlab = false;
+LIC = license('inuse');
+for elem = 1:numel(LIC)
+    envStr = LIC(elem).feature
+    if strcmpi(envStr,'octave')
+       LICname=envStr;
+       uiIsOctave = true;
+       break
+    end
+    if strcmpi(envStr,'matlab')
+       LICname=envStr
+       uiIsMatlab = true;
+       break
+    end
+end
+
+
+options = odeset('RelTol', 1e-3, ...
+                 'AbsTol', 1e-3, ...
+                 'InitialStep', initialstep, ...
+                 'MaxStep', tend);
+
+
+if uiIsMatlab
+   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+   soln.y=soln.y';
+elseif uiIsOctave
+   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+end
+
+
+nrows = length(soln.x);
+tmp = zeros(nodevar,1);
+
+t = linspace(tinit, tend, num_t_point+1);
+obs = zeros(nrows,nobs);
+
+for j=1:nrows
+    for i=1:nodevar
+        z(i)=soln.y(j,i);
+    end
+    h=ode_obs(z);
+    for i=1:nobs
+        obs(j,i)=h(i);
+    end
+end
+if nobs==1
+   y = interp1(soln.x, obs, t, 'pchip')';
+else
+   y = interp1(soln.x, obs, t, 'pchip');
+end
+
+
+filename = 'data.out';
+fid = fopen (filename,'w');
+fprintf(fid,'# KaDE bet.ka -d output -t 1 -p 100\n')
+fprintf(fid,'# t')
+fprintf(fid,'\n')
+for j=1:num_t_point+1
+    fprintf(fid,'%f',t(j));
+    for i=1:nobs
+        fprintf(fid,' %f',y(j,i));
+    end
+    fprintf(fid,'\n');
+end
+fclose(fid);
+
+
+end
+
+
+
+function dydt=ode_aux(t,y)
+
+global nodevar
+global var
+global k
+global kd
+global kun
+global kdun
+
+
+
+dydt=zeros(nodevar,1);
+
+%rule    : A(), A() -> 
+%reaction: A() + A() -> 
+
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+dydt(2)=1;
+
+end
+
+
+function Init=ode_init()
+
+global nodevar
+global init
+Init=zeros(nodevar,1);
+
+Init(1) = init(1); %A()
+Init(2) = init(2); %t
+end
+
+
+function obs=ode_obs(y)
+
+global nobs
+global var
+obs = zeros(nobs,1);
+
+t = y(2);
+
+
+end
+
+
+main();

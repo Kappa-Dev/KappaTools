@@ -1,0 +1,27 @@
++ Command line to rerun is: 'KaSim' '-i' 'link_passing_strong1.ka' '-seed' '611463625' '-e' '100' '-d' 'output' '--time-independent'
+Parsing link_passing_strong1.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+
+
+	 - weak flow compression (14)
+	 - strong flow compression (3)
++ Pretty printing 3 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

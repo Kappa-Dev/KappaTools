@@ -1,0 +1,29 @@
++ Command line to rerun is: 'KaSim' '-i' 'agents_without_sites.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '50' '--time-independent'
+Parsing agents_without_sites.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+
+____________________________________________________________
+############################################################
+
+
+
+	 - weak flow compression (1)
++ Pretty printing 1 weakly compressed flow
+Simulation ended

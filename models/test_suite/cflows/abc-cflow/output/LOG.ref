@@ -1,0 +1,25 @@
++ Command line to rerun is: 'KaSim' '-i' 'abc-cflow.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '-p' '50' '--time-independent'
+Parsing abc-cflow.ka...
+done
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+
+
+	 - weak flow compression (3)
++ Pretty printing 1 weakly compressed flow
+Simulation ended
