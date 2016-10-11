@@ -835,8 +835,12 @@ B(t,z), A(t, z) => (B, t); (B, z); (A, t); (A, z)
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from sites to tuple
 ------------------------------------------------------------
-(A, z) => {A(z, t), B(z, t); A(t,z), B(t, z)}
-(A, t) => {A(t, z), B(t, z); A(z,t), B(z, t)}
-(B, z) => {B(z, t), A(z, t); B(t,z), A(t, z)}
-(B, t) => {B(t, z), A(t, z); B(z,t), A(z, t)}
+(A, z) => A(z, t), B(z, t)
+(A, z) => A(t, z), B(t, z)
+(A, t) => A(z, t), B(z, t)
+(A, t) => A(t, z), B(t, z)
+(B, z) => B(z, t), A(z, t)
+(B, z) => B(t, z), A(t, z)
+(B, t) => B(z, t), A(z, t)
+(B, t) => B(t, z), A(t, z)
 execution finished without any exception

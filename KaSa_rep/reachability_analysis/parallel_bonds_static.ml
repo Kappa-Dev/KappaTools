@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 03 2016>
+   * Last modification: Time-stamp: <Oct 11 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -58,16 +58,8 @@ type local_static_information =
         Parallel_bonds_type.PairAgentSite_map_and_set.Map.t;
     (*a map from sites -> tuples *)
     store_sites_to_tuple :
-      ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-       Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
-      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-       Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
-        Parallel_bonds_type.AgentSite_map_and_set.Map.t *
-        ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-         Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
-        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
-         Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
-          Parallel_bonds_type.AgentSite_map_and_set.Map.t;
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t
+        Parallel_bonds_type.AgentSite_map_and_set.Map.t
   }
 
 (*******************************************************************)
@@ -83,7 +75,6 @@ let init_local_static =
     store_rule_double_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_tuple_to_sites = Parallel_bonds_type.PairAgentSite_map_and_set.Map.empty;
     store_sites_to_tuple =
-      Parallel_bonds_type.AgentSite_map_and_set.Map.empty,
       Parallel_bonds_type.AgentSite_map_and_set.Map.empty;
   }
 
@@ -410,12 +401,15 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error
 *)
 (*******************************************************************)
 
+let proj_first_site (a, b, _, _, _) = (a, b)
+let proj_second_site (a, _, c, _, _) = (a, c)
+
 let collect_tuple_to_sites parameter error tuples_of_interest =
-  let proj (a, b, _, _, _) = (a, b) in
-  let proj2 (a, _, c, _, _) = (a, c) in
   Parallel_bonds_type.Partition_tuples_to_sites_map.monadic_partition_set
-    (fun _ error (x, y) ->
-       error, (proj x, proj2 x, proj y, proj2 y)
+    (fun _ error (u, v) ->
+       error,
+       (proj_first_site u, proj_second_site u,
+        proj_first_site v, proj_second_site v)
     )
     parameter
     error
@@ -436,11 +430,17 @@ let compare_first_pair parameter error x tuple_set store_result =
        if agent_type_x = agent_type && site_type_x = site_type
        || agent_type_x = agent_type1  && site_type_x = site_type1
        then
+         let error, new_set =
+           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
+             parameter error
+             (u, v)
+             Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
+         in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
              parameter error
              x
-             (u,v)
+             new_set
              store_result
          in
          error, store_result
@@ -456,11 +456,17 @@ let compare_snd_pair parameter error y tuple_pair store_result =
        if agent_type_y = agent_type && site_type_y = site_type'
        || agent_type_y = agent_type1 && site_type_y = site_type1'
        then
+         let error, new_set =
+           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
+             parameter error
+             (u, v)
+             Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
+         in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
              parameter error
              y
-             (u,v)
+             new_set
              store_result
          in
          error, store_result
@@ -471,53 +477,81 @@ let compare_snd_pair parameter error y tuple_pair store_result =
 
 let collect_sites_to_tuple parameter error map_of_sites store_result =
   Parallel_bonds_type.PairAgentSite_map_and_set.Map.fold
-    (fun (x, y, z, t) tuple_set (error, store_result) ->
-       let store_result1, store_result2 = store_result in
+    (fun (x, y, _z, _t) tuple_set (error, store_result) ->
+       (*---------------------------------------------------------------*)
        let error, store_result1 =
-         compare_first_pair parameter error x tuple_set
-           store_result1
+         compare_first_pair parameter error
+           x
+           tuple_set
+           Parallel_bonds_type.AgentSite_map_and_set.Map.empty
        in
+       (*---------------------------------------------------------------*)
        let error, store_result2 =
-         compare_snd_pair parameter error y tuple_set
+         compare_snd_pair parameter error
+           y
+           tuple_set
+           Parallel_bonds_type.AgentSite_map_and_set.Map.empty
+       in
+       (*---------------------------------------------------------------*)
+       let add_link parameter error x tuple_set store_result =
+         let error, old_set =
+           match
+             Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
+               parameter error
+               x
+               store_result
+           with
+           | error, None ->
+             error,
+             Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
+           | error, Some s -> error, s
+         in
+         let error, new_set =
+           Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+             parameter error
+             old_set
+             tuple_set
+         in
+         let error, store_result =
+           Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
+             parameter error
+             x
+             new_set
+             store_result
+         in
+         error, store_result
+       in
+       (*---------------------------------------------------------------*)
+       let error, store_result =
+         Parallel_bonds_type.AgentSite_map_and_set.Map.fold2
+           parameter error
+           (fun parameter error elt tuple_set_x store_result ->
+              let error, store_result =
+                add_link parameter error elt tuple_set_x store_result
+              in
+              error, store_result
+           )
+           (fun parameter error elt tuple_set_y store_result ->
+              let error, store_result =
+                add_link parameter error elt tuple_set_y store_result
+              in
+              error, store_result
+           )
+           (fun parameter error elt tuple_set_x tuple_set_y store_result ->
+              let error, new_set =
+                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
+                  parameter error
+                  tuple_set_x
+                  tuple_set_y
+              in
+              let error, store_result =
+                add_link parameter error elt new_set store_result
+              in
+              error, store_result
+           )
+           store_result1
            store_result2
+           store_result
        in
-       error, (store_result1, store_result2)
+       error, store_result
     ) map_of_sites (error, store_result)
-
-
-(*********************************************************************)
-(*projection modification rules from: (id, agent_name, site, state) ->
-  (agent_name, site)*)
-
-let collect_tuple_to_modified_sites parameter error modified_set
-    tuples_of_interest =
-let proj (a, b, _, _, _) = (a, b) in
-let proj2 (a, _, c, _, _) = (a, c) in
-Parallel_bonds_type.Partition_tuples_to_sites_map.monadic_partition_set
-  (fun _ error (x, y) ->
-     (*if (x,y) both belong to modified set*)
-     if Ckappa_sig.AgentSite_map_and_set.Set.mem
-         (proj x)
-         modified_set &&
-        Ckappa_sig.AgentSite_map_and_set.Set.mem
-          (proj2 x)
-          modified_set &&
-        Ckappa_sig.AgentSite_map_and_set.Set.mem
-          (proj y)
-          modified_set &&
-        Ckappa_sig.AgentSite_map_and_set.Set.mem
-          (proj2 y)
-          modified_set
-     then
-       (*return the value *)
-       error, (proj x, proj2 x, proj y, proj2 y)
-     else
-       (*return dummy*)
-       let dummy_pair =
-         Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name
-       in
-       error, (dummy_pair, dummy_pair, dummy_pair, dummy_pair)
-  )
-  parameter
-  error
-  tuples_of_interest

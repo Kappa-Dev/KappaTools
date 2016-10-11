@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 04 2016>
+  * Last modification: Time-stamp: <Oct 11 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -701,124 +701,24 @@ struct
       (error, dynamic, precondition,
        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
 
-  (*let set2list error s =
-    Parallel_bonds_type.PairAgentSite_map_and_set.Set.fold
-      (fun x (error, store_result) ->
-         error, x :: store_result
-      ) s (error, [])*)
-
-  let apply_rule_event_aux static parameter error store_set event_list =
+  let discover_a_new_pair_of_modify_sites static parameter error
+      store_set event_list =
   let error, event_list =
     Parallel_bonds_type.PairAgentSite_map_and_set.Set.fold
       (fun (x, y, z, t) (error, event_list) ->
-         let (a1, s1) = x in
-         let (a2, s2) = y in
-         let (a3, s3) = z in
-         let (a4, s4) = t in
-         (*check if p belong to the modified set*)
-         List.fold_left (fun (error, event_list) event ->
-             match event with
-             | Communication.Modified_sites (agent, site) ->
-               if agent = a1 && site = s1
-               || agent = a2 && site = s2
-               || agent = a3 && site = s3
-               || agent = a4 && site = s4
-               then
-                 error,
-                 (Communication.Modified_sites (agent, site)) :: event_list
-               else error, event_list
-           ) (error, event_list) event_list
+         error,
+         (Communication.Modified_sites x) ::
+         (Communication.Modified_sites y) ::
+         (Communication.Modified_sites z) ::
+         (Communication.Modified_sites t) :: event_list
       ) store_set (error, event_list)
-  in
-  (*-----------------------------------------------------------------------*)
-  let store_sites_to_tuple1, store_sites_to_tuple2 =
-    get_sites_to_tuple static
-  in
-  let store_double_bonds_rhs_rule = get_double_bonds_rhs_rule static in
-  let error, event_list =
-    List.fold_left (fun (error, event_list) event ->
-        match event with
-        | Communication.Modified_sites (agent, site) ->
-          let error, tuple1 =
-            match
-              Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-                parameter error
-                (agent, site)
-                store_sites_to_tuple1
-            with
-            | error, None ->
-              let dummy =
-              (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name,
-               Ckappa_sig.dummy_site_name, Ckappa_sig.dummy_state_index,
-               Ckappa_sig.dummy_state_index) in
-              error, (dummy , dummy)
-            | error, Some tup -> error, tup
-          in
-          (*-----------------------------------------------------------------*)
-          let error, tuple2 =
-            match
-              Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-                    parameter error
-                    (agent, site)
-                    store_sites_to_tuple2
-            with
-            | error, None ->
-              let dummy =
-              (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name,
-               Ckappa_sig.dummy_site_name, Ckappa_sig.dummy_state_index,
-               Ckappa_sig.dummy_state_index) in
-              error, (dummy , dummy)
-            | error, Some tup -> error, tup
-          in
-          (*function from tuple -> rule_id list*)
-          let error, rule_id_list1 =
-            match
-              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                parameter error
-                tuple1
-                store_double_bonds_rhs_rule
-            with
-            | error, None -> error, []
-            | error, Some l -> error, l
-          in
-          let error, rule_id_list2 =
-            match
-              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                parameter error
-                tuple2
-                store_double_bonds_rhs_rule
-            with
-            | error, None -> error, []
-            | error, Some l -> error, l
-          in
-          let rule_id_list = List.append rule_id_list1 rule_id_list2 in
-          (*add rule_id into event_list*)
-          let error, event_list =
-            List.fold_left (fun (error, event_list) rule_id ->
-                error, (Communication.Check_rule rule_id) :: event_list
-              ) (error, event_list) rule_id_list
-          in
-          error, event_list
-      ) (error, []) event_list (*[]? *)
   in
   error, event_list
 
-
-
   let apply_rule static dynamic error rule_id precondition =
     (*--------------------------------------------------------------*)
-    (*TODO*)
     let parameter = get_parameter static in
     let event_list = [] in
-    (*get a list of modified sites*)
-    let store_project_modified_map = get_project_modified_map static in
-    let error, modified_set =
-      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-              parameter error rule_id store_project_modified_map
-      with
-      | error, None -> error, Ckappa_sig.AgentSite_map_and_set.Set.empty
-      | error, Some s -> error, s
-    in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameter error static rule_id in
@@ -979,102 +879,9 @@ struct
   (*-----------------------------------------------------------------------*)
   (*check the new event*)
   let error, event_list =
-    apply_rule_event_aux static parameter error store_set event_list
+    discover_a_new_pair_of_modify_sites
+      static parameter error store_set event_list
   in
-
-  (*let error, event_list =
-    Parallel_bonds_type.PairAgentSite_map_and_set.Set.fold
-      (fun (x, y, z, t) (error, event_list) ->
-         let (a1, s1) = x in
-         let (a2, s2) = y in
-         let (a3, s3) = z in
-         let (a4, s4) = t in
-         (*check if p belong to the modified set*)
-         List.fold_left (fun (error, event_list) event ->
-             match event with
-             | Communication.Modified_sites (agent, site) ->
-               if agent = a1 && site = s1
-               || agent = a2 && site = s2
-               || agent = a3 && site = s3
-               || agent = a4 && site = s4
-               then
-                 error,
-                 (Communication.Modified_sites (agent, site)) :: event_list
-               else error, event_list
-           ) (error, event_list) event_list
-      ) store_set (error, event_list)
-  in
-  (*-----------------------------------------------------------------------*)
-  let store_sites_to_tuple1, store_sites_to_tuple2 =
-    get_sites_to_tuple static
-  in
-  let store_double_bonds_rhs_rule = get_double_bonds_rhs_rule static in
-  let event_list =
-    List.fold_left (fun event_list event ->
-        match event with
-        | Communication.Modified_sites (agent, site) ->
-          let error, tuple1 =
-            match
-              Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-                parameter error
-                (agent, site)
-                store_sites_to_tuple1
-            with
-            | error, None ->
-              let dummy =
-              (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name,
-               Ckappa_sig.dummy_site_name, Ckappa_sig.dummy_state_index,
-               Ckappa_sig.dummy_state_index) in
-              error, (dummy , dummy)
-            | error, Some tup -> error, tup
-          in
-          (*-----------------------------------------------------------------*)
-          let error, tuple2 =
-            match
-              Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-                    parameter error
-                    (agent, site)
-                    store_sites_to_tuple2
-            with
-            | error, None ->
-              let dummy =
-              (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name,
-               Ckappa_sig.dummy_site_name, Ckappa_sig.dummy_state_index,
-               Ckappa_sig.dummy_state_index) in
-              error, (dummy , dummy)
-            | error, Some tup -> error, tup
-          in
-          (*function from tuple -> rule_id list*)
-          let error, rule_id_list1 =
-            match
-              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                parameter error
-                tuple1
-                store_double_bonds_rhs_rule
-            with
-            | error, None -> error, []
-            | error, Some l -> error, l
-          in
-          let error, rule_id_list2 =
-            match
-              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                parameter error
-                tuple2
-                store_double_bonds_rhs_rule
-            with
-            | error, None -> error, []
-            | error, Some l -> error, l
-          in
-          let rule_id_list = List.append rule_id_list1 rule_id_list2 in
-          (*add rule_id into event_list*)
-          let event_list1 =
-            List.fold_left (fun event_list rule_id ->
-                (Communication.Check_rule rule_id) :: event_list
-              ) event_list rule_id_list
-          in
-          event_list
-      ) [] event_list (*[]? *)
-  in*)
   (*--------------------------------------------------------------*)
   (*if it belongs to parallel bonds then true*)
   let error, store_parallel =
@@ -1123,17 +930,72 @@ struct
   in
   let dynamic = set_value store_result dynamic in
   let error, event_list =
-    apply_rule_event_aux static parameter error store_set event_list
-    (*FIXME:event_list started from [] ?*)
+    discover_a_new_pair_of_modify_sites
+      static parameter error store_set event_list
   in
   error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let apply_event_list _static dynamic error _event_list =
+  let apply_event_list static dynamic error _event_list =
+    (*note: start event_list = [] and do not use the event_list in the
+      parameter, it will loop the program*)
     let event_list = [] in
-    error, dynamic, event_list
+    let parameter = get_parameter static in
+    if event_list = []
+    then error, dynamic, event_list
+    else
+    let store_sites_to_tuple = get_sites_to_tuple static in
+    let store_double_bonds_rhs_rule = get_double_bonds_rhs_rule static in
+      (*get a list tuple pair that the pair of modified sites belong to*)
+      let error, event_list =
+        List.fold_left (fun (error, event_list) event ->
+            match event with
+            | Communication.Dummy
+            | Communication.Check_rule _
+            | Communication.See_a_new_bond _ -> error, event_list
+            | Communication.Modified_sites (agent_type, site_type) ->
+              (*search with tuple that this pair of sites belong to*)
+              let error, tuple_pair_set =
+                match
+                  Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
+                    parameter error
+                    (agent_type, site_type)
+                    store_sites_to_tuple
+                with
+                | error, None ->
+                  error,
+                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
+                | error, Some s -> error, s
+              in
+              (*-----------------------------------------------------------*)
+              let error, event_list =
+                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
+                  (fun tuple (error, event_list) ->
+                     let error, rule_id_list =
+                       match
+                         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
+                           parameter error
+                           tuple
+                           store_double_bonds_rhs_rule
+                       with
+                       | error, None -> error, []
+                       | error, Some l -> error, l
+                     in
+                     let error, event_list =
+                       List.fold_left (fun (error, event_list) rule_id ->
+                           error,
+                           (Communication.Check_rule rule_id) :: event_list
+                         ) (error, event_list) rule_id_list
+                     in
+                     error, event_list
+                  ) tuple_pair_set (error, event_list)
+              in
+              error, event_list
+          ) (error, []) event_list
+      in
+      error, dynamic, event_list
 
   (****************************************************************)
 
@@ -1246,84 +1108,33 @@ struct
         "------------------------------------------------------------\n"
       in
       let store_result = get_sites_to_tuple static in
-      let store_result1, store_result2 = store_result in
-      let error, _ =
-        Parallel_bonds_type.AgentSite_map_and_set.Map.fold2 parameter error
-          (fun parameter error (agent_type_x, site_type_x) (u, v) error' ->
-          (*convert first pair*)
-          let error, (string_agent_x, string_site_x) =
-            Parallel_bonds_type.convert_pair parameter error
-              kappa_handler
-              (agent_type_x, site_type_x)
-          in
-          let error,
-              (string_agent, string_site, string_site',
-               string_agent1, string_site1, string_site1') =
-            Parallel_bonds_type.convert_tuple parameter error
-              kappa_handler (u, v)
-          in
-          let () =
-            Loggers.fprintf log
-              "(%s, %s) => %s(%s, %s), %s(%s, %s)\n"
-              string_agent_x string_site_x
-              string_agent string_site string_site'
-              string_agent1 string_site1 string_site1'
-          in
-          error, error'
-          )
-          (fun parameter error (agent_type_x, site_type_x) (u', v') error' ->
-          (*convert first pair*)
-          let error, (string_agent_x, string_site_x) =
-            Parallel_bonds_type.convert_pair parameter error
-              kappa_handler
-              (agent_type_x, site_type_x)
-          in
-          let error,
-              (string_agent2, string_site2, string_site2',
-               string_agent3, string_site3, string_site3') =
-            Parallel_bonds_type.convert_tuple parameter error
-              kappa_handler (u', v')
-          in
-          let () =
-            Loggers.fprintf log
-              "(%s, %s) => %s(%s,%s), %s(%s, %s)\n"
-              string_agent_x string_site_x
-              string_agent2 string_site2 string_site2'
-              string_agent3 string_site3 string_site3'
-          in
-          error, error'
-          )
-          (fun parameter error (agent_type_x, site_type_x) (u, v) (u', v')
-            error' ->
-             (*convert first pair*)
-             let error, (string_agent_x, string_site_x) =
-               Parallel_bonds_type.convert_pair parameter error
-                 kappa_handler
-                 (agent_type_x, site_type_x)
-             in
-             let error,
-                 (string_agent, string_site, string_site',
-                  string_agent1, string_site1, string_site1') =
-               Parallel_bonds_type.convert_tuple parameter error
-                 kappa_handler (u, v)
-             in
-             let error,
-                 (string_agent2, string_site2, string_site2',
-                  string_agent3, string_site3, string_site3') =
-               Parallel_bonds_type.convert_tuple parameter error
-                 kappa_handler (u', v')
-             in
-             let () =
-               Loggers.fprintf log
-                 "(%s, %s) => {%s(%s, %s), %s(%s, %s); %s(%s,%s), %s(%s, %s)}\n"
-                 string_agent_x string_site_x
-                 string_agent string_site string_site'
-                 string_agent1 string_site1 string_site1'
-                 string_agent2 string_site2 string_site2'
-                 string_agent3 string_site3 string_site3'
-             in
-             error, error'
-          ) store_result1 store_result2 error
+      let error =
+        Parallel_bonds_type.AgentSite_map_and_set.Map.fold
+          (fun (agent_type_x, site_type_x) tuple_set error' ->
+             Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
+               (fun (u, v) error' ->
+                  (*convert first pair*)
+                  let error, (string_agent_x, string_site_x) =
+                    Parallel_bonds_type.convert_pair parameter error
+                      kappa_handler
+                      (agent_type_x, site_type_x)
+                  in
+                  let error,
+                      (string_agent, string_site, string_site',
+                       string_agent1, string_site1, string_site1') =
+                    Parallel_bonds_type.convert_tuple parameter error
+                      kappa_handler (u, v)
+                  in
+                  let () =
+                    Loggers.fprintf log
+                      "(%s, %s) => %s(%s, %s), %s(%s, %s)\n"
+                      string_agent_x string_site_x
+                      string_agent string_site string_site'
+                      string_agent1 string_site1 string_site1'
+                  in
+                  error'
+               ) tuple_set error
+          ) store_result error
       in
       error
       else error

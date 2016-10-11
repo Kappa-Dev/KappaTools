@@ -42,6 +42,8 @@ B(x,y), B(y, x) => (B, x); (B, y); (B, y); (B, x)
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from sites to tuple
 ------------------------------------------------------------
-(B, y) => {B(y, x), B(x, y); B(x,y), B(y, x)}
-(B, x) => {B(x, y), B(y, x); B(y,x), B(x, y)}
+(B, y) => B(y, x), B(x, y)
+(B, y) => B(x, y), B(y, x)
+(B, x) => B(y, x), B(x, y)
+(B, x) => B(x, y), B(y, x)
 execution finished without any exception

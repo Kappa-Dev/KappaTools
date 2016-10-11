@@ -2020,12 +2020,20 @@ E(t,z), E(t, z) => (E, t); (E, z); (E, t); (E, z)
 ------------------------------------------------------------
 * Properties of pairs of bonds, a map from sites to tuple
 ------------------------------------------------------------
-(A, z) => {A(z, t), A(z, t); A(t,z), A(t, z)}
-(A, t) => {A(t, z), A(t, z); A(z,t), A(z, t)}
-(B, z) => {B(z, t), B(t, z); B(t,z), B(z, t)}
-(B, t) => {B(t, z), B(z, t); B(z,t), B(t, z)}
-(C, z) => {C(z, t), C(t, z); C(t,z), C(z, t)}
-(C, t) => {C(t, z), C(z, t); C(z,t), C(t, z)}
-(E, z) => {E(z, t), E(z, t); E(t,z), E(t, z)}
-(E, t) => {E(t, z), E(t, z); E(z,t), E(z, t)}
+(A, z) => A(z, t), A(z, t)
+(A, z) => A(t, z), A(t, z)
+(A, t) => A(z, t), A(z, t)
+(A, t) => A(t, z), A(t, z)
+(B, z) => B(z, t), B(t, z)
+(B, z) => B(t, z), B(z, t)
+(B, t) => B(z, t), B(t, z)
+(B, t) => B(t, z), B(z, t)
+(C, z) => C(z, t), C(t, z)
+(C, z) => C(t, z), C(z, t)
+(C, t) => C(z, t), C(t, z)
+(C, t) => C(t, z), C(z, t)
+(E, z) => E(z, t), E(z, t)
+(E, z) => E(t, z), E(t, z)
+(E, t) => E(z, t), E(z, t)
+(E, t) => E(t, z), E(t, z)
 execution finished without any exception
