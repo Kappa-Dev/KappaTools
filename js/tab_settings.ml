@@ -46,7 +46,9 @@ let _ = React.S.map
                  in
                  let value = format_float value in
                  set_simulation_value value)
-            | EVENTS_LIMIT -> ())
+            | EVENTS_LIMIT ->
+
+              ())
            UIState.model_max_time
 
 let simulation_limit_id = "simulation_limit"
@@ -637,7 +639,9 @@ let onload (t : Ui_simulation.t) : unit =
          | EVENTS_LIMIT -> Ui_state.set_model_max_time None)
       in
       set_simulation_limit simulation_limit
-    | None -> ()
+    | None ->
+      let () = Common.debug "handle_simulation_limit_selector" in
+      failwith "handle_simulation_limit_selector"
   in
   let () = handle_simulation_limit_selector () in
   let () = simulation_limit_selector_dom ##.onchange :=
@@ -669,8 +673,8 @@ let onload (t : Ui_simulation.t) : unit =
              (try Some (float_of_string value)
               with | Failure _ -> None)
          | EVENTS_LIMIT ->
-           UIState.set_model_max_time
-             (try Some (float_of_string value)
+           UIState.set_model_max_events
+             (try Some (int_of_string value)
               with | Failure _ -> None)
       )
   in
