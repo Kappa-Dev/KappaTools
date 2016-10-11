@@ -75,7 +75,7 @@ let simulation_limit_selector =
   in
   Html.select
     ~a:[Html.a_id simulation_limit_selector_id ; ]
-    (List.map option [ EVENTS_LIMIT ; TIME_LIMIT ; ])
+    (List.map option [ TIME_LIMIT ; EVENTS_LIMIT ; ])
 
 
 let plot_points_id = "plot_points"
