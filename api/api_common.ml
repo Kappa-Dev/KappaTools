@@ -23,6 +23,23 @@ let result_error_msg
                 Api_types_j.message_range = None }];
     Api_types_j.result_code = result_code }
 
+let result_messages
+    ?(result_code:Api.manager_code = Api.ERROR)
+    (messages : Api_types_j.errors) : 'ok Api.result =
+  { Api_types_j.result_data = `Error messages ;
+    Api_types_j.result_code = result_code }
+
+let result_error_exception
+    ?(severity:Api_types_j.severity = `Error)
+    ?(result_code:Api.manager_code = Api.ERROR)
+    (e : exn) : 'ok Api.result =
+  let message = (try  (Printexc.to_string e)
+                 with _ -> "unspecified exception thrown")
+  in result_error_msg
+    ~severity:severity
+    ~result_code:result_code
+    message
+
 let result_map
     ~(ok:'code -> 'ok -> 'a)
     ~(error:'code -> Api_types_j.errors -> 'a)
@@ -108,45 +125,20 @@ struct
 
 end;;
 
-module WorkspaceCollection : COLLECTION_TYPE
-  with type id = Api_types_j.workspace_id
-  and type collection = Api_environment.environment
-  and type item = Api_environment.workspace
-=
-struct
-  type id = Api_types_j.workspace_id
-  type collection = Api_environment.environment
-  type item = Api_environment.workspace
-  let list
-      (environment : Api_environment.environment) =
-      environment#get_workspaces ()
-  let update
-      (environment : Api_environment.environment)
-      (workspaces : Api_environment.workspace list) =
-    environment#set_workspaces workspaces
-  let identifier
-      (workspace : Api_environment.workspace) =
-    workspace#get_workspace_id ()
-  let id_to_string
-      (workspace_id : Api_types_j.workspace_id) : string =
-    Format.sprintf "%s" workspace_id
-end;;
-module WorkspaceOperations = CollectionOperations(WorkspaceCollection)
-
 module ProjectCollection : COLLECTION_TYPE
   with type id = Api_types_j.project_id
-  and type collection = Api_environment.workspace
+  and type collection = Api_environment.environment
   and type item = Api_environment.project
 =
 struct
   type id = Api_types_j.project_id
-  type collection = Api_environment.workspace
+  type collection = Api_environment.environment
   type item = Api_environment.project
   let list
-      (workspace : Api_environment.workspace) =
+      (workspace : Api_environment.environment) =
     workspace#get_projects ()
   let update
-      (workspace : Api_environment.workspace)
+      (workspace : Api_environment.environment)
       (projects : Api_environment.project list) : unit =
     workspace#set_projects projects
   let identifier (project : Api_environment.project) =
@@ -181,35 +173,52 @@ end;;
 
 module SimulationOperations = CollectionOperations(SimulationCollection)
 
+module FileCollection : COLLECTION_TYPE
+  with type id = Api_types_j.file_id
+  and type collection = Api_environment.project
+  and type item = Api_types_j.file
+=
+struct
+  type id = Api_types_j.file_id
+  type collection = Api_environment.project
+  type item = Api_types_j.file
+  let list
+      (project : Api_environment.project) =
+    project#get_files ()
+  let update
+      (project : Api_environment.project)
+      (files : Api_types_j.file list) : unit =
+    project#set_files files
+  let identifier (file : Api_types_j.file) =
+    file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
+  let id_to_string (file_id : Api_types_j.file_id) : string =
+    Format.sprintf "%s" file_id
+end;;
 
-let bind_project
-    environment
-    (workspace_id : Api_types_j.workspace_id)
-    (project_id : Api_types_j.project_id)
-    handler
-    =
-  WorkspaceOperations.bind
-    workspace_id
-    environment
-    (fun workspace ->
-      ProjectOperations.bind
-        project_id
-        workspace
-        (fun project -> handler workspace project))
+module FileOperations = CollectionOperations(FileCollection)
 
 let bind_simulation
     environment
-    (workspace_id : Api_types_j.workspace_id)
     (project_id : Api_types_j.project_id)
     (simulation_id : Api_types_j.simulation_id)
     handler
     =
-  bind_project
+    ProjectOperations.bind
+      (project_id : Api_types_j.project_id)
+      environment
+      (fun project -> SimulationOperations.bind simulation_id
+          project
+          (fun simulation -> handler project simulation))
+
+let bind_file
     environment
-    (workspace_id : Api_types_j.workspace_id)
     (project_id : Api_types_j.project_id)
-    (fun workspace project ->
-      SimulationOperations.bind
-	simulation_id
-	project
-	(fun simulation -> handler workspace project simulation))
+    (file_id : Api_types_j.file_id)
+    handler
+    =
+    ProjectOperations.bind
+      (project_id : Api_types_j.project_id)
+      environment
+      (fun project -> FileOperations.bind file_id
+          project
+          (fun file -> handler project file))

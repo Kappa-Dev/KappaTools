@@ -48,7 +48,7 @@ type workspace_parameter = { workspace_id : workspace_id }
 type workspace_info = unit
 
 type project_id = string
-type project_catalog = project_id list
+type project_info = project_id list
 type project_parameter = { project_id : project_id }
 
 type site = {
@@ -65,9 +65,7 @@ type site_node = {
 
 type site_graph = site_node list <ocaml repr="array">
 type project_parse = { contact_map : site_graph }
-type project_info = unit (* TODO refactor this to have summary of project *)
 type kappa_code = string
-type project_modification = unit
 
 type simulation_id = string
 type simulation_catalog = simulation_id list
@@ -152,7 +150,7 @@ type file_metadata = { file_metadata_compile <ocaml mutable> : bool <json name="
                        file_metadata_hash <ocaml mutable> : string nullable <json name="hash"> ;
                        file_metadata_id <ocaml mutable> : file_id <json name="id"> ;
                        file_metadata_position <ocaml mutable> : int <json name="position"> ; }
-type file_catalog = file_metadata list
+type file_info = file_metadata list
 type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
               file_content <ocaml mutable> : string <json name="content"> }
 type file_modification = { file_modification_compile : bool nullable  <json name="compile"> ;

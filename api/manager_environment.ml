@@ -4,12 +4,7 @@ class manager_environment
 object
   method environment_info () :
     Api_types_j.environment_info Api.result Lwt.t =
-    let projects =
-      List.flatten
-        (List.map
-           (fun workspace -> workspace#get_projects ())
-           (environment#get_workspaces ()))
-    in
+    let projects = environment#get_projects () in
     let simulations =
       List.flatten
         (List.map

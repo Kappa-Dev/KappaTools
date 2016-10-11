@@ -58,6 +58,58 @@ type t =
     mutable lastyield : float ;
   }
 
+let create_t
+    ~contact_map
+    ~env
+    ~domain
+    ~graph
+    ~state
+    ~store_distances
+    ~init_l
+    ~has_tracking
+    ~lastyield
+  : t =
+  let counter =
+    Counter.create
+      ~init_t:(0. : float) ~init_e:(0 : int)
+      ?max_t:None ?max_e:None ~nb_points:200 in
+  let log_buffer = Buffer.create 512 in
+  let log_form = Format.formatter_of_buffer log_buffer in
+  { is_running = true ;
+    run_finalize = false ;
+    counter = counter ;
+    log_buffer = log_buffer ;
+    log_form = log_form ;
+    plot = { Api_types_j.plot_legend = [] ;
+             Api_types_j.plot_time_series = [] ; } ;
+    distances = [];
+    snapshots = [];
+    flux_maps = [];
+    files = [];
+    error_messages = [];
+    contact_map = contact_map;
+    env = env ;
+    domain = domain;
+    graph = graph;
+    state = state ;
+    store_distances = store_distances;
+    init_l = init_l;
+    has_tracking = has_tracking;
+    lastyield = lastyield;
+  }
+
+let clone_t t =
+  create_t
+    ~contact_map:t.contact_map
+    ~env:t.env
+    ~domain:t.domain
+    ~graph:t.graph
+    ~state:t.state
+    ~store_distances:t.store_distances
+    ~init_l:t.init_l
+    ~has_tracking:t.has_tracking
+    ~lastyield:t.lastyield
+
 let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
   fun handler ->
     (function
@@ -131,33 +183,18 @@ let build_ast
                      (fun (env,domain,has_tracking,
                            store_distances,_,init_l) ->
                        let store_distances = store_distances<>None in
-                       let simulation_counter =
-                         Counter.create
-                           ~init_t:(0. : float) ~init_e:(0 : int)
-                           ?max_t:None ?max_e:None ~nb_points:200 in
                        let simulation =
-                         { is_running = true ;
-                           run_finalize = false ;
-                           counter = simulation_counter ;
-                           log_buffer = simulation_log_buffer ;
-                           log_form = simulation_log_form ;
-                           plot = { Api_types_j.plot_legend = [] ;
-                                    Api_types_j.plot_time_series = [] ; } ;
-                           distances = [] ;
-                           error_messages = [] ;
-                           snapshots = [] ;
-                           flux_maps = [] ;
-                           files = [] ;
-                           contact_map = contact_map ;
-                           env = env ;
-                           domain = domain ;
-                           graph = Rule_interpreter.empty ~store_distances env ;
-                           state = State_interpreter.empty env [] [] ;
-                           store_distances;
-                           has_tracking;
-                           init_l;
-                           lastyield;
-                         } in
+                         create_t
+                         ~contact_map:contact_map
+                         ~env:env
+                         ~domain:domain
+                         ~graph:(Rule_interpreter.empty ~store_distances env)
+                         ~state:(State_interpreter.empty env [] [])
+                         ~store_distances:store_distances
+                         ~has_tracking:has_tracking
+                         ~init_l:init_l
+                         ~lastyield:lastyield
+                       in
                        Lwt.return (`Ok simulation))))))))
     (catch_error (fun e -> Lwt.return (`Error e)))
 
