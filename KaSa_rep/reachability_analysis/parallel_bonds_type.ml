@@ -487,10 +487,9 @@ let add_value_and_event parameters error kappa_handler x value store_set
     already belong to the old set then return the old set, otherwise at this
     new sites ?*)
   let new_value = Usual_domains.lub old_value value in
-  if compare new_value old_value = 0 &&
-     PairAgentSite_map_and_set.Set.mem
-       (pair x)
-       store_set
+  if compare new_value old_value = 0 (*&&
+     PairAgentSite_map_and_set.Set.mem (pair x) store_set*)
+(*shoud not test this*)
   then
     error, (store_set, store_result)
   else
@@ -514,12 +513,17 @@ let add_value_and_event parameters error kappa_handler x value store_set
         new_value
         store_result
     in
-    let error, new_set =
-      PairAgentSite_map_and_set.Set.add
+    let error', new_set =
+      PairAgentSite_map_and_set.Set.add_when_not_in
         parameters
         error
         (pair x)
         store_set
+    in
+    let error =
+    Exception.check_point
+      Exception.warn  parameters error error'
+      __POS__ Exit
     in
     error, (new_set, store_result)
 

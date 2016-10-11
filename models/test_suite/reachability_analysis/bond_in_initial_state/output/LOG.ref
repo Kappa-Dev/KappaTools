@@ -43,14 +43,6 @@ Reachability analysis...
 
 		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
-
-		  A(x~u!1),B(x~u!1)
-
-		  B(x~u!1),A(x~u!1)
-
-		  B(x~u!1),A(x~u!1)
-
-		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
 
@@ -103,14 +95,6 @@ Reachability analysis...
 
 		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
-
-		  A(x~u!1),B(x~u!1)
-
-		  B(x~u!1),A(x~u!1)
-
-		  B(x~u!1),A(x~u!1)
-
-		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
 
@@ -154,14 +138,6 @@ Reachability analysis...
 
 		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
-
-		  A(x~u!1),B(x~u!1)
-
-		  B(x~u!1),A(x~u!1)
-
-		  B(x~u!1),A(x~u!1)
-
-		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
 

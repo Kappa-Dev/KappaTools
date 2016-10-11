@@ -354,7 +354,8 @@ struct
     let store_sites_to_tuple = get_sites_to_tuple static in
     let error, store_result =
       Parallel_bonds_static.collect_sites_to_tuple
-        parameter error tuple_to_sites
+        parameter error
+        tuple_to_sites
         store_sites_to_tuple
     in
     let static = set_sites_to_tuple store_result static in
@@ -701,12 +702,11 @@ struct
       (error, dynamic, precondition,
        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
 
-  let discover_a_new_pair_of_modify_sites static parameter error
-      store_set event_list =
+  let discover_a_new_pair_of_modify_sites error store_set event_list =
   let error, event_list =
     Parallel_bonds_type.PairAgentSite_map_and_set.Set.fold
       (fun (x, y, z, t) (error, event_list) ->
-         error,
+         error, (*no error*)
          (Communication.Modified_sites x) ::
          (Communication.Modified_sites y) ::
          (Communication.Modified_sites z) ::
@@ -845,7 +845,7 @@ struct
       dump_title ()
   in
   let store_result = get_value dynamic in
-  let error, (store_set, store_result) =
+  let error, (store_set, store_result) = (*TODO*)
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
       parameter error
       (fun parameter error x value (store_set, store_result) ->
@@ -880,7 +880,7 @@ struct
   (*check the new event*)
   let error, event_list =
     discover_a_new_pair_of_modify_sites
-      static parameter error store_set event_list
+      error store_set event_list
   in
   (*--------------------------------------------------------------*)
   (*if it belongs to parallel bonds then true*)
@@ -914,7 +914,7 @@ struct
       dump_title ()
   in
   let store_result = get_value dynamic in
-  let error, (store_set, store_result) =
+  let error, (store_set, store_result) = (*TODO*)
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
       (fun x value (error, (store_set, store_result)) ->
          Parallel_bonds_type.add_value_and_event parameter error
@@ -931,23 +931,22 @@ struct
   let dynamic = set_value store_result dynamic in
   let error, event_list =
     discover_a_new_pair_of_modify_sites
-      static parameter error store_set event_list
+      error store_set event_list
   in
   error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let apply_event_list static dynamic error _event_list =
+  let apply_event_list static dynamic error event_list =
     (*note: start event_list = [] and do not use the event_list in the
       parameter, it will loop the program*)
-    let event_list = [] in
-    let parameter = get_parameter static in
-    if event_list = []
+      let parameter = get_parameter static in
+      (*if event_list = []
     then error, dynamic, event_list
-    else
-    let store_sites_to_tuple = get_sites_to_tuple static in
-    let store_double_bonds_rhs_rule = get_double_bonds_rhs_rule static in
+    else*)
+      let store_sites_to_tuple = get_sites_to_tuple static in
+      let store_double_bonds_rhs_rule = get_double_bonds_rhs_rule static in
       (*get a list tuple pair that the pair of modified sites belong to*)
       let error, event_list =
         List.fold_left (fun (error, event_list) event ->
@@ -962,7 +961,7 @@ struct
                   Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
                     parameter error
                     (agent_type, site_type)
-                    store_sites_to_tuple
+                    store_sites_to_tuple (*tuple from lhs and rhs*)
                 with
                 | error, None ->
                   error,
@@ -970,7 +969,140 @@ struct
                 | error, Some s -> error, s
               in
               (*-----------------------------------------------------------*)
+              (*FIXME*)
+              (*get rule_id from tuple on the rhs*)
+              let store_rule_double_bonds_lhs =
+                get_rule_double_bonds_lhs static in
               let error, event_list =
+                Ckappa_sig.Rule_map_and_set.Map.fold
+                  (fun rule_id tuple_pair_map (error, event_list) ->
+                     let error, event_list =
+                       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+                         (fun tuple_pair b (error, event_list) ->
+                            let proj (_,((b, c, d, e, f), (g, h, k, i, j))) =
+                              (b, c, d, e, f), (g, h, k, i, j)
+                            in
+                            let proj_tuple = proj tuple_pair in
+                            (*check if the tuple belongs to the good tuple*)
+                            if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
+                                proj_tuple
+                                tuple_pair_set
+                            then
+                              let event_list =
+                                (Communication.Check_rule rule_id) ::
+                                event_list
+                              in
+                              error, event_list
+                            else
+                              error, event_list
+                         ) tuple_pair_map (error, event_list)
+                     in
+                     error, event_list
+                  ) store_rule_double_bonds_lhs (error, event_list)
+
+              in
+              (**)
+              (*-----------------------------------------------------------*)
+              (*FIXME*)
+              (*get rule_id from tuple on the rhs*)
+              let store_rule_double_bonds_rhs =
+                get_rule_double_bonds_rhs static in
+              let error, event_list =
+                Ckappa_sig.Rule_map_and_set.Map.fold
+                  (fun rule_id tuple_pair_map (error, event_list) ->
+                     let error, event_list =
+                       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+                         (fun tuple_pair b (error, event_list) ->
+                            (*MOVE this function outside*)
+                            let proj (_,((b, c, d, e, f), (g, h, k, i, j))) =
+                              (b, c, d, e, f), (g, h, k, i, j)
+                            in
+                            let proj_tuple = proj tuple_pair in
+                            (*check if the tuple belongs to the good tuple*)
+                            if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
+                                proj_tuple
+                                tuple_pair_set
+                            then
+                              let event_list =
+                                (Communication.Check_rule rule_id) ::
+                                event_list
+                              in
+                              error, event_list
+                            else
+                              error, event_list
+                         ) tuple_pair_map (error, event_list)
+                     in
+                     error, event_list
+                  ) store_rule_double_bonds_rhs (error, event_list)
+              in
+              (*-----------------------------------------------------------*)
+              (*rule_id in the case when the first site created the tuple*)
+              let store_fst_site_create_parallel_bonds_rhs =
+                get_fst_site_create_parallel_bonds_rhs static in
+              let error, event_list =
+                Ckappa_sig.Rule_map_and_set.Map.fold
+                  (fun rule_id tuple_pair_map (error, event_list) ->
+                     let error, event_list =
+                       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
+                         (fun tuple_pair tuple_list (error, event_list) ->
+                            List.fold_left (fun (error, event_list) tuple ->
+                            (*MOVE this function outside*)
+                                let proj (_,b, c, d, e, f) = (b, c, d, e, f) in
+                                let proj2 (x, y) = proj x, proj y in
+                            (*check if the tuple belongs to the good tuple*)
+                                if
+                                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
+                                    (proj2 tuple)
+                                    tuple_pair_set
+                                then
+                                  let event_list =
+                                    (Communication.Check_rule rule_id) ::
+                                    event_list
+                                  in
+                                  error, event_list
+                                else
+                                  error, event_list
+                              ) (error, event_list) tuple_list
+                         ) tuple_pair_map (error, event_list)
+                     in
+                     error, event_list
+                  ) store_fst_site_create_parallel_bonds_rhs (error, event_list)
+              in
+              (*-----------------------------------------------------------*)
+              let store_snd_site_create_parallel_bonds_rhs =
+                get_snd_site_create_parallel_bonds_rhs static in
+              let error, event_list =
+                Ckappa_sig.Rule_map_and_set.Map.fold
+                  (fun rule_id tuple_pair_map (error, event_list) ->
+                     let error, event_list =
+                       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
+                         (fun tuple_pair tuple_list (error, event_list) ->
+                            List.fold_left (fun (error, event_list) tuple ->
+                            (*MOVE this function outside*)
+                                let proj (_,b, c, d, e, f) = (b, c, d, e, f) in
+                                let proj2 (x, y) = proj x, proj y in
+                            (*check if the tuple belongs to the good tuple*)
+                                if
+                                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
+                                    (proj2 tuple)
+                                    tuple_pair_set
+                                then
+                                  let event_list =
+                                    (Communication.Check_rule rule_id) ::
+                                    event_list
+                                  in
+                                  error, event_list
+                                else
+                                  error, event_list
+                              ) (error, event_list) tuple_list
+                         ) tuple_pair_map (error, event_list)
+                     in
+                     error, event_list
+                  ) store_snd_site_create_parallel_bonds_rhs (error, event_list)
+              in
+              error, event_list
+          ) (error, []) event_list
+              (*let error, event_list =
                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
                   (fun tuple (error, event_list) ->
                      let error, rule_id_list =
@@ -978,7 +1110,7 @@ struct
                          Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
                            parameter error
                            tuple
-                           store_double_bonds_rhs_rule
+                           store_double_bonds_rhs_rule (*tuples on the rhs*)
                        with
                        | error, None -> error, []
                        | error, Some l -> error, l
@@ -993,7 +1125,7 @@ struct
                   ) tuple_pair_set (error, event_list)
               in
               error, event_list
-          ) (error, []) event_list
+          ) (error, []) event_list*)
       in
       error, dynamic, event_list
 

@@ -22,11 +22,11 @@ type local_static_information =
       store_rule_double_bonds_lhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-    (*rule has two bonds (parallel or not) on the rhs*)      store_rule_double_bonds_rhs :
+      (*rule has two bonds (parallel or not) on the rhs*)      store_rule_double_bonds_rhs : (*use this*)
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
         (*a reverse map from tuples -> rule_id*)
-    store_double_bonds_rhs_rule :
+      store_double_bonds_rhs_rule : (*REMOVE*)
       Ckappa_sig.c_rule_id list
         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
       (*is a union set of double binding in the lhs and the rhs*)
