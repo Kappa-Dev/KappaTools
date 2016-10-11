@@ -432,7 +432,6 @@ let continue
     ~(t : t)
     ~(parameter : Api_types_j.simulation_parameter)
   : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
-  let () = ignore(system_process) in
   Lwt.catch
     (fun () ->
        if t.is_running then
@@ -449,30 +448,35 @@ let continue
              t.counter
              parameter.Api_types_j.simulation_max_events
          in
+         let () =
+               Lwt.async
+                 (fun () ->
+                    run_simulation ~system_process:system_process ~t:t)
+         in
          Lwt.return (`Ok ())
     )
     (catch_error
        (fun e -> Lwt.return (`Error e)))
 
-let create_info ~(t : t) =
-  { Api_types_j.simulation_plot = Some t.plot ;
-    Api_types_j.simulation_distances = Some t.distances ;
-    Api_types_j.simulation_time = Counter.time t.counter ;
-    Api_types_j.simulation_time_percentage = Counter.time_percentage t.counter ;
-    Api_types_j.simulation_event = Counter.event t.counter ;
-    Api_types_j.simulation_event_percentage = Counter.event_percentage t.counter ;
-    Api_types_j.simulation_tracked_events = Counter.tracked_events t.counter ;
-    Api_types_j.simulation_log_messages = [Buffer.contents t.log_buffer] ;
-    Api_types_j.simulation_snapshots = t.snapshots ;
-    Api_types_j.simulation_flux_maps = t.flux_maps ;
-    Api_types_j.simulation_files = t.files ;
-    Api_types_j.simulation_is_running = t.is_running ;
-  }
+let create_info ~(t : t) : Api_types_j.simulation_status =
+  { Api_types_j.simulation_status_info =
+      { Api_types_j.simulation_info_time = Counter.time t.counter ;
+        Api_types_j.simulation_info_time_percentage = Counter.time_percentage t.counter ;
+        Api_types_j.simulation_info_event = Counter.event t.counter ;
+        Api_types_j.simulation_info_event_percentage = Counter.event_percentage t.counter ;
+        Api_types_j.simulation_info_tracked_events = Counter.tracked_events t.counter ;
+        Api_types_j.simulation_info_is_running = t.is_running ; };
+    Api_types_j.simulation_status_plot = Some t.plot ;
+    Api_types_j.simulation_status_distances = Some t.distances ;
+    Api_types_j.simulation_status_flux_maps = t.flux_maps ;
+    Api_types_j.simulation_status_file_lines = t.files ;
+    Api_types_j.simulation_status_snapshots = t.snapshots ;
+    Api_types_j.simulation_status_log_messages = [Buffer.contents t.log_buffer] ; }
 
 let info
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_types_j.simulation_info,Api_types_j.errors)
+  (Api_types_j.simulation_status,Api_types_j.errors)
     Api_types_j.result_data
     Lwt.t =
   let () = ignore(system_process) in

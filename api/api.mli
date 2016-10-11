@@ -309,6 +309,27 @@ class type manager_simulation =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.simulation_info result Lwt.t
+
+    (* simulation_time
+       simulation_time_percentage
+       simulation_event
+       simulation_event_percentage
+       simulation_tracked_events
+       simulation_is_running
+
+       - list_distances
+       - list_files
+       - list_fluxmap
+       - list_snapshots
+
+       get_distance
+       get_file
+       get_fluxmap
+       get_log_messages
+       get_plot
+       get_snapshot *)
+
+
   end;;
 
 class type manager_environment =
@@ -328,3 +349,108 @@ object
   inherit manager_file
     *)
 end;;
+
+module type Cake = sig
+
+
+  class type  manager_distance =
+    object
+      method simulation_info_distance :
+        Api_types_j.simulation_id ->
+        Api_types_j.distance_info result Lwt.t
+      method simulation_get_distance :
+        Api_types_j.simulation_id ->
+        Api_types_j.distance_id ->
+        Api_types_j.distance result Lwt.t
+    end;;
+
+  class type  manager_file_line =
+    object
+      method simulation_info_file_line :
+        Api_types_j.simulation_id ->
+        Api_types_j.file_line_info result Lwt.t
+      method simulation_get_file_line :
+        Api_types_j.simulation_id ->
+        Api_types_j.file_line_id ->
+        Api_types_j.file_line result Lwt.t
+    end;;
+
+  class type  manager_flux_map =
+    object
+      method simulation_info_flux_map :
+        Api_types_j.simulation_id ->
+        Api_types_j.flux_map_info result Lwt.t
+      method simulation_get_flux_map :
+        Api_types_j.simulation_id ->
+        Api_types_j.flux_map_id ->
+        Api_types_j.flux_map result Lwt.t
+    end;;
+
+  class type  manager_log_message =
+    object
+      method simulation_get_log_message :
+        Api_types_j.simulation_id ->
+        Api_types_j.log_message list result Lwt.t
+    end;;
+
+  class type  manager_plot =
+    object
+      method simulation_get_plot :
+        Api_types_j.simulation_id ->
+        Api_types_j.plot result Lwt.t
+    end;;
+
+  class type  manager_snapshot =
+    object
+      method simulation_info_snapshot :
+        Api_types_j.simulation_id ->
+        Api_types_j.snapshot_info result Lwt.t
+      method simulation_get_snapshot :
+        Api_types_j.simulation_id ->
+        Api_types_j.snapshot_id ->
+        Api_types_j.snapshot result Lwt.t
+    end;;
+
+class type  manager_simulation =
+  object
+    method simulation_list :
+      Api_types_j.simulation_id ->
+      Api_types_j.simulation_catalog result Lwt.t
+
+    method simulation_start :
+      Api_types_j.simulation_id ->
+      Api_types_j.simulation_parameter->
+      Api_types_j.simulation_id result Lwt.t
+
+    method simulation_pause :
+      Api_types_j.simulation_id ->
+      unit result Lwt.t
+
+    method simulation_stop :
+      Api_types_j.simulation_id ->
+      unit result Lwt.t
+
+    method simulation_perturbation :
+      Api_types_j.simulation_id ->
+      Api_types_j.simulation_perturbation ->
+      unit result Lwt.t
+
+    method simulation_continue :
+      Api_types_j.simulation_id ->
+      Api_types_j.simulation_parameter ->
+      unit result Lwt.t
+
+    method simulation_info :
+      Api_types_j.simulation_id ->
+      Api_types_j.simulation_info result Lwt.t
+
+    inherit  manager_distance
+    inherit  manager_file_line
+    inherit  manager_flux_map
+    inherit  manager_log_message
+    inherit  manager_plot
+    inherit  manager_snapshot
+
+  end;;
+
+end

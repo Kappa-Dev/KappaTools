@@ -165,40 +165,60 @@ let api_plot (p) =
     Api_types_v1_j.time_series =
       List.map
         (fun t ->
-           { Api_types_v1_j.observation_time = t.Api_types_j.observable_time ;
-             Api_types_v1_j.observation_values = t.Api_types_j.observable_values ; })
+           { Api_types_v1_j.observation_time =
+               t.Api_types_j.observable_time ;
+             Api_types_v1_j.observation_values =
+               t.Api_types_j.observable_values ; })
         p.Api_types_j.plot_time_series;
   }
 
-let api_status (simulation_info : Api_types_j.simulation_info) :
+let api_status (simulation_status : Api_types_j.simulation_status) :
   Api_types_v1_j.state =
   { Api_types_v1_j.plot =
-      (match simulation_info.Api_types_j.simulation_plot with
+      (match simulation_status.Api_types_j.simulation_status_plot with
       | None -> None
       | Some p -> Some (api_plot p));
     Api_types_v1_j.distances =
-      (match simulation_info.Api_types_j.simulation_distances with
+      (match simulation_status.Api_types_j.simulation_status_distances with
        | None -> None
        | Some distances -> Some (List.map api_distance distances)
       );
     Api_types_v1_j.time =
-      simulation_info.Api_types_j.simulation_time ;
+      simulation_status.Api_types_j.
+        simulation_status_info.Api_types_j.
+        simulation_info_time ;
     Api_types_v1_j.time_percentage =
-      simulation_info.Api_types_j.simulation_time_percentage ;
+      simulation_status.Api_types_j.
+        simulation_status_info.Api_types_j.
+        simulation_info_time_percentage ;
     Api_types_v1_j.event =
-      simulation_info.Api_types_j.simulation_event ;
+      simulation_status.Api_types_j.
+        simulation_status_info.Api_types_j.
+        simulation_info_event ;
     Api_types_v1_j.event_percentage =
-      simulation_info.Api_types_j.simulation_event_percentage ;
+      simulation_status.Api_types_j.
+        simulation_status_info.Api_types_j.
+        simulation_info_event_percentage ;
     Api_types_v1_j.tracked_events =
-      simulation_info.Api_types_j.simulation_tracked_events ;
+      simulation_status.Api_types_j.
+        simulation_status_info.Api_types_j.
+        simulation_info_tracked_events ;
     Api_types_v1_j.log_messages =
-      simulation_info.Api_types_j.simulation_log_messages ;
+      simulation_status.Api_types_j.
+        simulation_status_log_messages ;
     Api_types_v1_j.snapshots =
-      List.map api_snapshot simulation_info.Api_types_j.simulation_snapshots ;
+      List.map api_snapshot
+        simulation_status.Api_types_j.simulation_status_snapshots ;
     Api_types_v1_j.flux_maps =
-      List.map api_flux_map simulation_info.Api_types_j.simulation_flux_maps ;
+      List.map
+        api_flux_map
+        simulation_status.Api_types_j.simulation_status_flux_maps ;
     Api_types_v1_j.files =
-      List.map api_files simulation_info.Api_types_j.simulation_files ;
+      List.map
+        api_files
+        simulation_status.Api_types_j.simulation_status_file_lines ;
     Api_types_v1_j.is_running =
-      simulation_info.Api_types_j.simulation_is_running ;
+      simulation_status.Api_types_j.
+        simulation_status_info.Api_types_j.
+        simulation_info_is_running;
   }
