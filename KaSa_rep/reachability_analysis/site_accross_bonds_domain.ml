@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 11 2016>
+   * Last modification: Time-stamp: <Oct 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -162,7 +162,7 @@ struct
         Site_accross_bonds_domain_static.store_potential_tuple_pair_lhs = l
       } static
 
-  let get_partition_bonds_rhs_map static =
+  (*let get_partition_bonds_rhs_map static =
     (get_basic_static_information
        static).Site_accross_bonds_domain_static.store_partition_bonds_rhs_map
 
@@ -171,7 +171,7 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_partition_bonds_rhs_map = r
-      } static
+      } static*)
 
   let get_partition_created_bonds_map static =
     (get_basic_static_information
@@ -324,7 +324,7 @@ struct
     (*------------------------------------------------------------*)
     (*partition map with key is the pair of the bonds in the rhs*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let error, store_partition_bonds_rhs_map =
+    (*let error, store_partition_bonds_rhs_map =
       Site_accross_bonds_domain_static.collect_partition_bonds_rhs_map
         parameter error
         store_potential_tuple_pair
@@ -333,7 +333,7 @@ struct
       set_partition_bonds_rhs_map
         store_partition_bonds_rhs_map
         static
-    in
+    in*)
     (*there is an action binding*)
     let error, store_partition_created_bonds_map =
       Site_accross_bonds_domain_static.collect_partition_created_bonds_map
@@ -911,7 +911,6 @@ struct
       rule_id rule precondition modified_set store_set =
     let store_partition_modified_map = get_partition_modified pos static in
     (*------------------------------------------------------*)
-    (*Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold*)
     Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
       (fun mod_tuple (error, dynamic, precondition, store_set) ->
          let (agent_id_mod, agent_type_mod, site_type_mod, state_mod) = mod_tuple in
@@ -1011,7 +1010,7 @@ struct
                          Ckappa_sig.Views_bdu.mvbdu_of_association_list
                            parameter handler error pair_list
                        in
-                       let error, handler, store_set, store_result = (*TODO*)
+                       let error, handler, store_set, store_result =
                          Site_accross_bonds_domain_type.add_link_and_event_in_modif
                            parameter error bdu_false handler
                            kappa_handler
@@ -1048,20 +1047,26 @@ struct
       apply_rule_modified_explicity_gen
         ~pos:Fst bdu_false parameter error kappa_handler static dynamic
         rule_id rule precondition modified_set
+        (*CHECK*)
         Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty
     in
     let error, dynamic, precondition, store_set2 =
       apply_rule_modified_explicity_gen
         ~pos:Snd bdu_false parameter error kappa_handler static dynamic
         rule_id rule precondition modified_set
+        (*CHECK*)
         Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty
     in
-    let error, store_set =
+    let error', store_set =
       Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.union
         parameter
         error
         store_set1
         store_set2
+    in
+    let error =
+      Exception.check_point
+        Exception.warn parameter error error' __POS__ Exit
     in
     error, dynamic, precondition, store_set2
 
@@ -1179,10 +1184,21 @@ struct
       (error, dynamic)
       list
 
-  (***************************************************************)
+(***************************************************************)
+
+let discover_a_new_pair_of_modify_sites store_set event_list =
+  let event_list =
+    Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.fold
+      (fun (x, y) event_list -> (*only the second site*)
+         (Communication.Modified_sites x) ::
+         (Communication.Modified_sites y) :: event_list
+      ) store_set event_list
+  in
+  event_list
 
   let apply_rule static dynamic error rule_id precondition =
     let parameter  = get_parameter static in
+    let event_list = [] in
     (*-----------------------------------------------------------*)
     let error, rule = get_rule parameter error static rule_id in
     match rule with
@@ -1239,6 +1255,10 @@ struct
       let store_value = get_value dynamic in
       (*-----------------------------------------------------------*)
       (*TODO: new event*)
+      let event_list =
+        discover_a_new_pair_of_modify_sites store_set event_list
+      in
+      (*-----------------------------------------------------------*)
       let () =
         if not bool &&
            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
@@ -1258,15 +1278,73 @@ struct
         else dump_title ()
       in
       (*-----------------------------------------------------------*)
-      (*TODO*)
-      let event_list = [] in
       error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
        global domain does not collect information *)
 
-  let apply_event_list _static dynamic error _event_list =
-    let event_list = [] in
+  let apply_event_list_aux ~pos static dynamic error event_list  =
+    let parameter = get_parameter static in
+    let store_partition_modified_map = get_partition_modified pos static in
+    let error, event_list =
+      List.fold_left (fun (error, event_list) event ->
+          match event with
+          |  Communication.Dummy
+          | Communication.Check_rule _
+          | Communication.See_a_new_bond _ -> error, event_list
+          | Communication.Modified_sites (agent_type, site_type) ->
+            (*search tuple pair that this pair of site belong to*)
+            let error, tuple_pair_set =
+              match
+                Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
+                  parameter error
+                  (agent_type, site_type)
+                  store_partition_modified_map
+              with
+              | error, None ->
+                error,
+                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
+              | error, Some s -> error, s
+            in
+            (*-----------------------------------------------------------*)
+            (*get rule_id from tuple on the lhs*)
+            let store_potential_tuple_pair_lhs =
+              get_potential_tuple_pair_lhs static
+            in
+            let error, event_list =
+              Ckappa_sig.Rule_map_and_set.Map.fold
+                (fun rule_id tuple_set (error, event_list) ->
+                   Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
+                     (fun tuple (error, event_list) ->
+                        let proj (a, b, c, d, _) = (a, b, c, d) in
+                        let proj2 (x, y) = proj x, proj y in
+                        if
+                          Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem
+                            (proj2 tuple)
+                            tuple_pair_set
+                        then
+                          error,
+                          (Communication.Check_rule rule_id) :: event_list
+                        else error, event_list
+                     ) tuple_set (error, event_list)
+                ) store_potential_tuple_pair_lhs (error, event_list)
+            in
+            error, event_list
+
+
+
+        ) (error, []) event_list
+    in
+    error, dynamic, event_list
+
+  let apply_event_list static dynamic error event_list  =
+    let error, dynamic, event_list =
+      apply_event_list_aux ~pos:Fst static dynamic error event_list
+    in
+    let error, dynamic, event_list =
+      apply_event_list_aux ~pos:Snd static dynamic error event_list
+    in
+
     error, dynamic, event_list
 
   let stabilize _static dynamic error =

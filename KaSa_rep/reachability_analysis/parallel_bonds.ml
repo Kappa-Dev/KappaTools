@@ -981,7 +981,7 @@ struct
             | Communication.Check_rule _
             | Communication.See_a_new_bond _ -> error, event_list
             | Communication.Modified_sites (agent_type, site_type) ->
-              (*search with tuple that this pair of sites belong to*)
+              (*search with tuple that this pair of site belong to*)
               let error, tuple_pair_set =
                 match
                   Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs

@@ -466,11 +466,16 @@ let collect_sites_to_tuple parameter error map_of_sites store_result =
              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
            | error, Some s -> error, s
          in
-         let error, new_set =
+         let error', new_set =
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
              parameter error
              old_set
              tuple_set
+         in
+         let error =
+           Exception.check_point
+             Exception.warn parameter error error'
+             __POS__ Exit
          in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
@@ -498,11 +503,16 @@ let collect_sites_to_tuple parameter error map_of_sites store_result =
               error, store_result
            )
            (fun parameter error elt tuple_set_x tuple_set_y store_result ->
-              let error, new_set =
+              let error', new_set =
                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
                   parameter error
                   tuple_set_x
                   tuple_set_y
+              in
+              let error =
+                Exception.check_point
+                  Exception.warn parameter error error'
+                  __POS__ Exit
               in
               let error, store_result =
                 add_link parameter error elt new_set store_result

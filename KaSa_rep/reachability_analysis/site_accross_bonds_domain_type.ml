@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 11 2016>
+   * Last modification: Time-stamp: <Oct 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -466,6 +466,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
   in
   error, handler, store_result
 
+(*A(_ ,y), B(_, y)*)
 let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
     x mvbdu store_set store_result =
   let error, bdu_old =
@@ -484,17 +485,13 @@ let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
     Ckappa_sig.Views_bdu.mvbdu_or
       parameter handler error bdu_old mvbdu
   in
-  (*let proj (a, b, _, _) = (a, b) in*)
-  let proj' (a, _, c, _) = (a, c) in
-  (*do not consider the first site which is bound*)
-  let pair (x, y) = proj' x, proj' y in
+  let proj (a, _, c, _) = (a, c) in
+  (*not consider the first site that is bound*)
+  let pair (x, y) = proj x, proj y in
   (*-----------------------------------------------------------*)
   (*check the freshness of the pair*)
   (*compare mvbdu and old mvbdu*)
-  if Ckappa_sig.Views_bdu.equal new_bdu bdu_old (*&&
-     PairAgentSite_map_and_set.Set.mem
-       (pair x)
-                                                  store_set*)
+  if Ckappa_sig.Views_bdu.equal new_bdu bdu_old
   then error, handler, store_set, store_result
   else
     (*-----------------------------------------------------------*)
@@ -516,7 +513,6 @@ let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
         new_bdu
         store_result
     in
-    (*if it is a new pair then add it into the set*)
     let error', new_set =
       PairAgentSite_map_and_set.Set.add_when_not_in
         parameter

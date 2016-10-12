@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Sep 26 2016>
+   * Last modification: Time-stamp: <Oct 12 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -31,9 +31,9 @@ type basic_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     (*------------------------------------------------------------------*)
     (*projection or combination*)
-    store_partition_bonds_rhs_map :
+    (*store_partition_bonds_rhs_map :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
-        Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;
+        Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;*)
     store_partition_created_bonds_map :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.t;
@@ -58,8 +58,8 @@ let init_basic_static_information =
     Ckappa_sig.Rule_map_and_set.Map.empty;
     (*-------------------------------------------------------*)
     (*projection or combination*)
-    store_partition_bonds_rhs_map =
-      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;
+    (*store_partition_bonds_rhs_map =
+      Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;*)
     store_partition_created_bonds_map =
       Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.empty;
     store_partition_modified_map_1 =
@@ -216,7 +216,7 @@ let collect_potential_tuple_pair_lhs parameter error rule_id store_bonds_lhs
   interest of the form:
   ((id, ag,site,state,_,_),(id', ag',site',state',_,_))*)
 
-let collect_partition_bonds_rhs_map parameter error
+(*let collect_partition_bonds_rhs_map parameter error
     store_potential_tuple_pair_set =
   (*agent_type, site_type, site_type', state*)
   let proj (b, c, _, e) = (b, c, e) in
@@ -227,7 +227,7 @@ let collect_partition_bonds_rhs_map parameter error
     )
     parameter
     error
-    store_potential_tuple_pair_set (*set_a*)
+    store_potential_tuple_pair_set (*set_a*)*)
 
 (***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)
