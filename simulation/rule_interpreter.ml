@@ -1,10 +1,16 @@
 type t =
   {
+    (* With rectangular approximation *)
     roots_of_patterns: Mods.IntSet.t Connected_component.Map.t;
-    roots_of_unary_patterns: Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t;
+    roots_of_unary_patterns:
+      Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t;
+
+    (* Without rectangular approximation *)
     matchings_of_rule:
       (Connected_component.Matching.t * int list) list Mods.IntMap.t;
-    unary_candidates: Mods.Int2Set.t Mods.IntMap.t;
+    unary_candidates:
+      (Connected_component.Matching.t * Edges.path option) list Mods.IntMap.t;
+
     edges: Edges.t;
     tokens: Nbr.t array;
     outdated_elements: Operator.DepSet.t * bool;
@@ -17,7 +23,7 @@ type t =
     store_distances: bool;
   }
 
-type result = Clash | Success of (int option * t) | Corrected of t
+type result = Clash | Corrected | Success of (int option * t)
 
 let empty ?story_compression ~store_distances env =
   let with_connected_components =
@@ -41,7 +47,7 @@ let empty ?story_compression ~store_distances env =
     store_distances;
   }
 
-let print_injections ?sigs pr f roots_of_patterns =
+let print_injections ?sigs f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
     (Pp.set Connected_component.Map.bindings Pp.space
@@ -49,14 +55,27 @@ let print_injections ?sigs pr f roots_of_patterns =
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
             (Connected_component.print ?sigs ~with_id:()) pattern
-            (Pp.set Mods.IntSet.elements Pp.comma pr) roots
+            Mods.IntSet.print roots
+       )
+    ) roots_of_patterns
+let print_unary_injections ?sigs f roots_of_patterns =
+  Format.fprintf
+    f "@[<v>%a@]"
+    (Pp.set Connected_component.Map.bindings Pp.space
+       (fun f (pattern,root_maps) ->
+          Format.fprintf
+            f "@[# @[%a@] ==>@ @[%a@]@]"
+            (Connected_component.print ?sigs ~with_id:()) pattern
+            (Pp.set Mods.IntMap.bindings Pp.space
+               (fun f (_cc_id, roots) -> Mods.IntSet.print f roots))
+            root_maps
        )
     ) roots_of_patterns
 
 let add_intset_in_intmap id set map =
   if Mods.IntSet.is_empty set
   then Mods.IntMap.remove id map
-  else Mods.IntMap.add id set map  
+  else Mods.IntMap.add id set map
 
 let update_roots is_add unary_ccs edges (map,unary_map) pattern root =
   let va =
@@ -88,30 +107,46 @@ let new_place free_id (inj_nodes,inj_fresh) = function
   | Agent_place.Fresh (_,id) ->
     (inj_nodes,Mods.IntMap.add id free_id inj_fresh)
 
-let all_injections ?excp edges roots patterna =
-  snd @@
-  Tools.array_fold_lefti
-    (fun id (excp,inj_list) pattern ->
-       let cands,excp' =
-         match excp with
-         | Some (cc',root)
-           when Connected_component.is_equal_canonicals pattern cc' ->
-           Mods.IntSet.add root Mods.IntSet.empty,None
-         | (Some _ | None) ->
-           Connected_component.Map.find_default Mods.IntSet.empty pattern roots,
-           excp in
-       (excp',
-        Mods.IntSet.fold
-          (fun root new_injs ->
-             List.fold_left
-               (fun corrects (inj,roots) ->
-                  match Connected_component.Matching.reconstruct
-                          edges inj id pattern root with
-                  | None -> corrects
-                  | Some new_inj -> (new_inj,root::roots) :: corrects)
-               new_injs inj_list)
-          cands []))
-    (excp,[Connected_component.Matching.empty,[]]) patterna
+let all_injections ?excp ?unary_rate edges roots patterna =
+  let _,out =
+    Tools.array_fold_lefti
+      (fun id (excp,inj_list) pattern ->
+         let cands,excp' =
+           match excp with
+           | Some (cc',root)
+             when Connected_component.is_equal_canonicals pattern cc' ->
+             Mods.IntSet.add root Mods.IntSet.empty,None
+           | (Some _ | None) ->
+             Connected_component.Map.find_default
+               Mods.IntSet.empty pattern roots, excp in
+         (excp',
+          Mods.IntSet.fold
+            (fun root new_injs ->
+               List.fold_left
+                 (fun corrects (inj,roots) ->
+                    match Connected_component.Matching.reconstruct
+                            edges inj id pattern root with
+                    | None -> corrects
+                    | Some new_inj -> (new_inj,root::roots) :: corrects)
+                 new_injs inj_list)
+            cands []))
+      (excp,[Connected_component.Matching.empty,[]]) patterna in
+  match unary_rate with
+  | None -> out
+  | Some (_,None) ->
+    List.filter
+      (function
+        | _, [ r1; r2 ] -> not (Edges.in_same_connected_component r1 r2 edges)
+        | _, _ -> false)
+      out
+  | Some (_,(Some _ as max_distance)) ->
+    List.filter
+      (fun (inj,_) ->
+         let nodes = Connected_component.Matching.elements_with_types
+             patterna inj in
+         None =
+         Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
+      out
 
 let break_apart_cc edges roots_of_unary_patterns = function
   | None -> roots_of_unary_patterns
@@ -406,28 +441,30 @@ let store_activity ~get_alg store env counter state id syntax_id rate cc_va =
 let update_outdated_activities ~get_alg store env counter state =
   let deps,changed_connectivity = state.outdated_elements in
   let unary_rule_update i state rule =
-         match rule.Primitives.unary_rate with
-         | None -> state
-         | Some (unrate, _) ->
-           let map1 =
-             Connected_component.Map.find_default
-               Mods.IntMap.empty rule.Primitives.connected_components.(0)
-               state.roots_of_unary_patterns in
-           let map2 =
-             Connected_component.Map.find_default
-               Mods.IntMap.empty rule.Primitives.connected_components.(1)
-               state.roots_of_unary_patterns in
-           let (),va =
-             Mods.IntMap.monadic_fold2_sparse
-               () ()
-               (fun () () _ set1 set2 acc ->
-                  (),(Mods.IntSet.size set1 * Mods.IntSet.size set2) + acc)
-               map1 map2 0 in
-           let () =
-             store_activity
-               ~get_alg store env counter state (2*i+1)
-               rule.Primitives.syntactic_rule (fst unrate) va in
-           state in
+    match rule.Primitives.unary_rate with
+    | None -> state
+    | Some (unrate, _) ->
+      let map1 =
+        Connected_component.Map.find_default
+          Mods.IntMap.empty rule.Primitives.connected_components.(0)
+          state.roots_of_unary_patterns in
+      let map2 =
+        Connected_component.Map.find_default
+          Mods.IntMap.empty rule.Primitives.connected_components.(1)
+          state.roots_of_unary_patterns in
+      let (),va =
+        Mods.IntMap.monadic_fold2_sparse
+          () ()
+          (fun () () _ set1 set2 acc ->
+             (),(Mods.IntSet.size set1 * Mods.IntSet.size set2) + acc)
+          map1 map2 0 in
+      let () =
+        store_activity
+          ~get_alg store env counter state (2*i+1)
+          rule.Primitives.syntactic_rule (fst unrate) va in
+      match Mods.IntMap.pop i state.unary_candidates with
+           | None,_ -> state
+           | Some _, match' -> { state with unary_candidates = match' } in
   let rec aux state deps =
     Operator.DepSet.fold
       (fun dep state ->
@@ -485,70 +522,79 @@ let transform_by_a_rule
 
 let apply_unary_rule
     ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
-  let map1 =
-    Connected_component.Map.find_default
-      Mods.IntMap.empty rule.Primitives.connected_components.(0)
-      state.roots_of_unary_patterns in
-  let map2 =
-    Connected_component.Map.find_default
-      Mods.IntMap.empty rule.Primitives.connected_components.(1)
-      state.roots_of_unary_patterns in
-  let rtree = Random_tree.create
-      (min (Mods.IntMap.size map1) (Mods.IntMap.size map2)) in
-  let (),() =
-             Mods.IntMap.monadic_fold2_sparse
-               () ()
-               (fun () () i set1 set2 () ->
-                  let () =
-                    Random_tree.add
-                      i (float_of_int
-                           (Mods.IntSet.size set1 * Mods.IntSet.size set2))
-                      rtree in
-                  (),())
-               map1 map2 () in
-  let cc_id,_ = Random_tree.random rtree in
-  let root1 =
-    Tools.unsome (-1)
-      (Mods.IntSet.random
-         (Mods.IntMap.find_default Mods.IntSet.empty cc_id map1)) in
-  let root2 =
-    Tools.unsome (-1)
-      (Mods.IntSet.random
-         (Mods.IntMap.find_default Mods.IntSet.empty cc_id map2)) in
-  let () =
-    if !Parameter.debugModeOn then
-      Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
-  let pattern1 = rule.Primitives.connected_components.(0) in
-  let pattern2 = rule.Primitives.connected_components.(1) in
+  let inj,path =
+    match Mods.IntMap.find_option rule_id state.unary_candidates with
+    | Some l -> let inj,path = Tools.list_random l in Some inj,path
+    | None ->
+      let map1 =
+        Connected_component.Map.find_default
+          Mods.IntMap.empty rule.Primitives.connected_components.(0)
+          state.roots_of_unary_patterns in
+      let map2 =
+        Connected_component.Map.find_default
+          Mods.IntMap.empty rule.Primitives.connected_components.(1)
+          state.roots_of_unary_patterns in
+      let rtree = Random_tree.create
+          (min (Mods.IntMap.size map1) (Mods.IntMap.size map2)) in
+      let (),() =
+        Mods.IntMap.monadic_fold2_sparse
+          () ()
+          (fun () () i set1 set2 () ->
+             let () =
+               Random_tree.add
+                 i (float_of_int
+                      (Mods.IntSet.size set1 * Mods.IntSet.size set2))
+                 rtree in
+             (),())
+          map1 map2 () in
+      let cc_id,_ = Random_tree.random rtree in
+      let root1 =
+        Tools.unsome (-1)
+          (Mods.IntSet.random
+             (Mods.IntMap.find_default Mods.IntSet.empty cc_id map1)) in
+      let root2 =
+        Tools.unsome (-1)
+          (Mods.IntSet.random
+             (Mods.IntMap.find_default Mods.IntSet.empty cc_id map2)) in
+      let () =
+        if !Parameter.debugModeOn then
+          Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
+      let pattern1 = rule.Primitives.connected_components.(0) in
+      let pattern2 = rule.Primitives.connected_components.(1) in
+      let inj1 =
+        Connected_component.Matching.reconstruct
+          state.edges Connected_component.Matching.empty 0 pattern1 root1 in
+      match inj1 with
+      | None -> None,None
+      | Some inj -> Connected_component.Matching.reconstruct
+                      state.edges inj 1 pattern2 root2,None in
   let rdeps,changed_c = state.outdated_elements in
   let state' =
     {state with
-      outdated_elements =
-        (Operator.DepSet.add (Operator.RULE rule_id) rdeps,changed_c)} in
-  let inj1 =
-    Connected_component.Matching.reconstruct
-      state'.edges Connected_component.Matching.empty 0 pattern1 root1 in
-  let inj =
-    match inj1 with
-    | None -> None
-    | Some inj -> Connected_component.Matching.reconstruct
-                    state'.edges inj 1 pattern2 root2 in
+     outdated_elements =
+       (Operator.DepSet.add (Operator.RULE rule_id) rdeps,changed_c)} in
   match inj with
   | None -> Clash
   | Some inj ->
     let nodes = Connected_component.Matching.elements_with_types
         rule.Primitives.connected_components inj in
-    let max_distance = match rule.Primitives.unary_rate with
-      | None -> None
-      | Some (_, dist_opt) -> dist_opt in
-    match Edges.are_connected ?max_distance
-            state.edges nodes.(0) nodes.(1) with
-    | None -> Corrected state'
-    | Some p as path ->
+    match path with
+    | Some p ->
       Success
         ((if state'.store_distances then Some (List.length p) else None),
          transform_by_a_rule ~get_alg env domain unary_ccs counter state'
            event_kind ?path rule inj)
+    | None ->
+      let max_distance = match rule.Primitives.unary_rate with
+        | None -> None
+        | Some (_, dist_opt) -> dist_opt in
+      match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
+      | None -> Corrected
+      | Some p as path ->
+        Success
+          ((if state'.store_distances then Some (List.length p) else None),
+           transform_by_a_rule ~get_alg env domain unary_ccs counter state'
+             event_kind ?path rule inj)
 
 let apply_rule
     ?rule_id ~get_alg env domain unary_patterns counter state event_kind rule =
@@ -594,37 +640,31 @@ let apply_rule
       match max_distance with
       | None ->
         if Edges.in_same_connected_component roots.(0) roots.(1) state.edges then
-          Corrected state
+          Corrected
         else
           Success (None,transform_by_a_rule
                      ~get_alg env domain unary_patterns counter state
                      event_kind rule inj)
       | Some _ ->
-        try
-          let nodes = Connected_component.Matching.elements_with_types
-              rule.Primitives.connected_components inj in
-          match
-            Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
-          | None ->
-            Success (None,transform_by_a_rule
-                       ~get_alg env domain unary_patterns counter state
-                       event_kind rule inj)
-          | Some _ -> Corrected state
-        with Not_found ->
-          let out =
-            transform_by_a_rule
-              ~get_alg env domain unary_patterns counter state event_kind rule inj in
-          Success (None,out)
+        let nodes = Connected_component.Matching.elements_with_types
+            rule.Primitives.connected_components inj in
+        match
+          Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
+        | None ->
+          Success (None,transform_by_a_rule
+                     ~get_alg env domain unary_patterns counter state
+                     event_kind rule inj)
+        | Some _ -> Corrected
 
 let force_rule
     ~get_alg env domain unary_patterns counter state event_kind rule =
   match apply_rule
           ~get_alg env domain unary_patterns counter state event_kind rule with
-  | (Success (_,out) | Corrected out) -> out
+  | Success (_,out) -> out
+  | Corrected -> state (*TODO*)
   | Clash ->
-    match all_injections
-            state.edges state.roots_of_patterns rule.Primitives.connected_components
-    with
+    match all_injections ?unary_rate:rule.Primitives.unary_rate state.edges
+            state.roots_of_patterns rule.Primitives.connected_components with
     | [] -> state
     | l ->
       let (h,_) = Tools.list_random l in
@@ -633,8 +673,8 @@ let force_rule
 
 let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
   let matches =
-    all_injections
-      state.edges state.roots_of_patterns rule.Primitives.connected_components in
+    all_injections ?unary_rate:rule.Primitives.unary_rate state.edges
+      state.roots_of_patterns rule.Primitives.connected_components in
   let () =
     store_activity
       ~get_alg store env counter state (2*rule_id)
@@ -645,32 +685,56 @@ let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
       Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
 let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
-  let cands = Mods.IntMap.find_default
-      Mods.Int2Set.empty rule_id state.unary_candidates in
   let pattern1 = rule.Primitives.connected_components.(0) in
   let pattern2 = rule.Primitives.connected_components.(1) in
-  let _,stay =
-    Mods.Int2Set.partition
-      (fun (root1,root2) ->
-         let inj1 =
-           Connected_component.Matching.reconstruct
-             state.edges Connected_component.Matching.empty 0 pattern1 root1 in
-         match inj1 with
-         | None -> true
-         | Some inj -> None =
-                       Connected_component.Matching.reconstruct
-                         state.edges inj 1 pattern2 root2)
-      cands in
+  let (),(cands,len) =
+    Mods.IntMap.monadic_fold2_sparse
+      () ()
+      (fun () () _ set1 set2 out ->
+         (),
+         Mods.IntSet.fold
+           (fun root1 ->
+              Mods.IntSet.fold
+                (fun root2 (list,len as out) ->
+                   let inj1 =
+                     Connected_component.Matching.reconstruct
+                       state.edges Connected_component.Matching.empty 0
+                       pattern1 root1 in
+                   match inj1 with
+                   | None -> out
+                   | Some inj ->
+                     match Connected_component.Matching.reconstruct
+                             state.edges inj 1 pattern2 root2 with
+                     | None -> out
+                     | Some inj' ->
+                       let max_distance = match rule.Primitives.unary_rate with
+                         | None -> None
+                         | Some (_, dist_opt) -> dist_opt in
+                       match max_distance with
+                       | None -> (inj',None)::list,succ len
+                       | Some _ ->
+                         let nodes =
+                           Connected_component.Matching.elements_with_types
+                             rule.Primitives.connected_components inj' in
+                         match Edges.are_connected ?max_distance
+                                 state.edges nodes.(0) nodes.(1) with
+                         | None -> out
+                         | Some _ as p -> (inj',p)::list,succ len)
+                set2)
+           set1 out)
+      (Connected_component.Map.find_default
+         Mods.IntMap.empty pattern1 state.roots_of_unary_patterns)
+      (Connected_component.Map.find_default
+         Mods.IntMap.empty pattern2 state.roots_of_unary_patterns)
+      ([],0) in
   let () =
     store_activity
       ~get_alg store env counter state (2*rule_id+1)
-      rule.Primitives.syntactic_rule
-      (fst rule.Primitives.rate) (Mods.Int2Set.size stay) in
+      rule.Primitives.syntactic_rule (fst rule.Primitives.rate) len in
   { state with
     unary_candidates =
-      if Mods.Int2Set.is_empty stay
-      then Mods.IntMap.remove rule_id state.unary_candidates
-      else Mods.IntMap.add rule_id stay state.unary_candidates;
+      if len = 0 then Mods.IntMap.remove rule_id state.unary_candidates
+      else Mods.IntMap.add rule_id cands state.unary_candidates;
   }
 
 let incorporate_extra_pattern state pattern =
@@ -685,7 +749,8 @@ let incorporate_extra_pattern state pattern =
 let snapshot env counter fn state = {
   Data.snapshot_file = fn;
   Data.snapshot_event = Counter.current_event counter;
-  Data.snapshot_agents = Edges.build_snapshot (Environment.signatures env) state.edges;
+  Data.snapshot_agents =
+    Edges.build_snapshot (Environment.signatures env) state.edges;
   Data.snapshot_tokens = Array.mapi (fun i x ->
       (Format.asprintf "%a" (Environment.print_token ~env) i,x)) state.tokens;
 }
@@ -712,14 +777,9 @@ let debug_print f state =
          Format.fprintf f "token_%i <- %a"
            i Nbr.print el))
     state.tokens
-    (print_injections ?sigs:None Format.pp_print_int) state.roots_of_patterns
-    (Pp.set Mods.IntMap.bindings Pp.cut
-       (fun f (rule,roots) ->
-          Format.fprintf f "@[rule_%i ==> %a@]" rule
-            (Pp.set Mods.Int2Set.elements Pp.comma
-               (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
-            roots))
-    state.unary_candidates
+    (print_injections ?sigs:None) state.roots_of_patterns
+    (print_unary_injections ?sigs:None)
+    state.roots_of_unary_patterns
 
 let add_tracked patterns event_kind tests state =
   match state.story_machinery with

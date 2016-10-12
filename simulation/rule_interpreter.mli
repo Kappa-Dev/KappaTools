@@ -2,7 +2,7 @@
 
 type t (**Abstract graph*)
 
-type result = Clash | Success of (int option * t) | Corrected of t
+type result = Clash | Corrected | Success of (int option * t)
 (** the int option is the distance between patterns in unimolecular
     instances of rule if you've asked for them *)
 
@@ -86,7 +86,7 @@ val generate_stories : t -> (((bool*bool*bool)*bool)*Trace.t) option
 (** {6 Debugging} *)
 
 val print_injections :
-  ?sigs:Signature.s -> (Format.formatter -> int -> unit) -> Format.formatter ->
+  ?sigs:Signature.s -> Format.formatter ->
   Mods.IntSet.t Connected_component.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit
 

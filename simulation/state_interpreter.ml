@@ -69,7 +69,7 @@ let initialize ~bind ~return env domain counter graph0 state0 init_l =
                              counter s (Trace.INIT creations_sort)
                              compiled_rule with
                      | Rule_interpreter.Success (_,s) -> s
-                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
+                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
                        raise (ExceptionDefn.Internal_Error
                                 ("Bugged initial rule",pos)))
                   state value,state0))) (return (graph0,state0)) init_l in
@@ -284,25 +284,24 @@ let one_rule ~outputs dt stop env domain counter graph state =
         Format.printf "@[<v>Obtained@ %a@]@."
           (Rule_interpreter.print env) graph'' in
     (not (Counter.one_constructive_event counter dt)||stop,graph'',state)
-  | Rule_interpreter.Clash ->
+  | (Rule_interpreter.Clash | Rule_interpreter.Corrected) as out ->
+    let continue =
+      if out = Rule_interpreter.Clash then
+        Counter.one_clashing_instance_event counter dt
+      else if choice mod 2 = 1
+      then Counter.one_no_more_unary_event counter dt
+      else Counter.one_no_more_binary_event counter dt in
     if Counter.consecutive_null_event counter <
        !Parameter.maxConsecutiveClash
-    then
-      (not (Counter.one_clashing_instance_event counter dt)||stop,graph,state)
+    then (not continue||stop,graph,state)
     else
-      (not (Counter.one_clashing_instance_event counter dt)||stop,
+      (not continue||stop,
        (if choice mod 2 = 1
         then Rule_interpreter.adjust_unary_rule_instances
             ~rule_id ~get_alg register_new_activity env counter graph rule
         else Rule_interpreter.adjust_rule_instances
             ~rule_id ~get_alg register_new_activity env counter graph rule),
        state)
-  | Rule_interpreter.Corrected graph' ->
-    let continue =
-      if choice mod 2 = 1
-      then Counter.one_no_more_unary_event counter dt
-      else Counter.one_no_more_binary_event counter dt in
-    (not continue||stop,graph',state)
 
 let activity state = Random_tree.total state.activities
 
