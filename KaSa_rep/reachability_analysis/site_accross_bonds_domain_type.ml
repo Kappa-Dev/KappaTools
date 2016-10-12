@@ -466,9 +466,8 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
   in
   error, handler, store_result
 
-(*A(_ ,y), B(_, y)*)
-let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
-    x mvbdu store_set store_result =
+let add_link_common parameter error bdu_false handler
+    kappa_handler x pair mvbdu store_set store_result =
   let error, bdu_old =
     match
       PairAgentSitesState_map_and_set.Map.find_option_without_logs
@@ -485,9 +484,6 @@ let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
     Ckappa_sig.Views_bdu.mvbdu_or
       parameter handler error bdu_old mvbdu
   in
-  let proj (a, _, c, _) = (a, c) in
-  (*not consider the first site that is bound*)
-  let pair (x, y) = proj x, proj y in
   (*-----------------------------------------------------------*)
   (*check the freshness of the pair*)
   (*compare mvbdu and old mvbdu*)
@@ -521,8 +517,40 @@ let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
         store_set
     in
     let error =
-    Exception.check_point
-      Exception.warn  parameter error error'
-      __POS__ Exit
+      Exception.check_point
+        Exception.warn  parameter error error'
+        __POS__ Exit
     in
     error, handler, new_set, store_result
+
+(*A(x!, _), B(x!, _)*)
+let add_link_and_event_in_created_bonds parameter error bdu_false handler
+    kappa_handler x mvbdu store_set store_result =
+  let proj (a, b, _, _) = (a, b) in
+  (*consider the first site that is bound*)
+  let pair (x, y) = proj x, proj y in
+  add_link_common parameter error
+    bdu_false
+    handler
+    kappa_handler
+    x
+    pair
+    mvbdu
+    store_set
+    store_result
+
+(*A(_ ,y), B(_, y)*)
+let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
+    x mvbdu store_set store_result =
+    let proj (a, _, c, _) = (a, c) in
+    (*consider the second site that is modified*)
+    let pair (x, y) = proj x, proj y in
+    add_link_common parameter error
+      bdu_false
+      handler
+      kappa_handler
+      x
+      pair
+      mvbdu
+      store_set
+      store_result

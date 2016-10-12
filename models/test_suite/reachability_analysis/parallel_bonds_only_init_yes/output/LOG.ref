@@ -506,8 +506,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-
-		  A(t,z!1),B(t,z!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -516,8 +514,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
-
-		  A(t!1,z),B(t!1,z)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain

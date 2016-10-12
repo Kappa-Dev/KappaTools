@@ -40,8 +40,6 @@ Reachability analysis...
 
 		rule 0 is applied for the first time
 
-
-		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -92,8 +90,6 @@ Reachability analysis...
 
 	Applying rule 0:
 		the precondition is satisfied
-
-		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -135,8 +131,6 @@ Reachability analysis...
 
 	Applying rule 0:
 		the precondition is satisfied
-
-		  A(x~u!1),B(x~u!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
