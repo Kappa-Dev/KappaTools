@@ -482,14 +482,8 @@ let add_value_and_event parameters error kappa_handler x value store_set
   let proj (a, b, _, _, _) = (a, b) in
   let proj' (a, _, c, _, _) = (a, c) in
   let pair (x, y) = proj x, proj' x, proj y, proj' y in
-  (*(A,x), (A,y), (B,x), (B,y)*)
-  (*check if this current site already belong insdie the old set, if it is
-    already belong to the old set then return the old set, otherwise at this
-    new sites ?*)
   let new_value = Usual_domains.lub old_value value in
-  if compare new_value old_value = 0 (*&&
-     PairAgentSite_map_and_set.Set.mem (pair x) store_set*)
-(*shoud not test this*)
+  if compare new_value old_value = 0
   then
     error, (store_set, store_result)
   else

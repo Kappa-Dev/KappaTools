@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 11 2016>
+   * Last modification: Time-stamp: <Oct 12 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -19,19 +19,18 @@ let local_trace = false
 type local_static_information =
   {
     (*rule has two bonds (parallel or not) on the lhs*)
-      store_rule_double_bonds_lhs :
+    store_rule_double_bonds_lhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-      (*rule has two bonds (parallel or not) on the rhs*)      store_rule_double_bonds_rhs : (*use this*)
+    (*rule has two bonds (parallel or not) on the rhs*)
+    store_rule_double_bonds_rhs : (*use this*)
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-        (*a reverse map from tuples -> rule_id*)
-      store_double_bonds_rhs_rule : (*REMOVE*)
-      Ckappa_sig.c_rule_id list
-        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
       (*is a union set of double binding in the lhs and the rhs*)
-    store_tuples_of_interest: Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
-    (* information of partial formation of parallel or non-parallel bonds in rules *)
+    store_tuples_of_interest:
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
+    (* information of partial formation of parallel or non-parallel bonds in
+       rules *)
     store_fst_site_create_parallel_bonds_rhs:
       ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
         Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
@@ -68,8 +67,6 @@ let init_local_static =
   {
     store_tuples_of_interest = Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_rule_double_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_double_bonds_rhs_rule =
-      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
     store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_snd_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_rule_double_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
@@ -252,43 +249,6 @@ let collect_rule_double_bonds_rhs
   in
   Ckappa_sig.Rule_map_and_set.Map.add
     parameter error rule_id map store_result
-
-let collect_double_bonds_rhs_rule parameter error store_rule_double_bonds_rhs
-    store_result =
-  Ckappa_sig.Rule_map_and_set.Map.fold
-    (fun rule_id tuple_map (error, store_result)  ->
-       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
-         (fun tuple b (error, store_result) ->
-            let _agent_id,
-                ((agent_type, site_type, site_type1, state, state1),
-                 (agent_type2, site_type2, site_type2', state2, state2'))
-              = tuple
-            in
-            let tup = ((agent_type, site_type, site_type1, state, state1),
-                       (agent_type2, site_type2, site_type2', state2, state2'))
-            in
-            let error, old_list =
-              match
-                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                  parameter error
-                  tup
-                  store_result
-              with
-              | error, None -> error, []
-              | error, Some l -> error, l
-            in
-            let new_list = rule_id :: old_list in
-            let error,  store_result =
-              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
-                parameter error
-                tup
-                new_list
-                store_result
-            in
-            error, store_result
-         ) tuple_map (error, store_result)
-    ) store_rule_double_bonds_rhs (error, store_result)
-
 
 (**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
