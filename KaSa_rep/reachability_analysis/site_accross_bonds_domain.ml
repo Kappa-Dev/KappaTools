@@ -1186,8 +1186,13 @@ struct
                mvbdu
                mvbdu'
            in
+           (*TODO?get the store_set*)
            let error, result =
-             Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite parameter error (x,y) mvbdu_or result
+             Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite
+               parameter error
+               (x, y)
+               mvbdu_or
+               result
            in
            let dynamic = set_mvbdu_handler handler dynamic in
            let dynamic = set_value result dynamic in
@@ -1195,7 +1200,9 @@ struct
       ) potential_tuple_pair_set (error, dynamic)
 
   let free_site static dynamic error agent' site_name' state' =
-    let error, dynamic = free_site_gen ~pos:Fst static dynamic error agent' site_name' state' in
+    let error, dynamic =
+      free_site_gen ~pos:Fst static dynamic error agent' site_name' state'
+    in
     free_site_gen ~pos:Snd static dynamic error agent' site_name' state'
 
   let apply_rule_side_effects static dynamic error rule_id =
@@ -1204,7 +1211,8 @@ struct
       Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
         parameter error
         []
-        rule_id (get_potential_side_effects static)
+        rule_id
+        (get_potential_side_effects static)
     in
     List.fold_left
       (fun (error, dynamic) (agent_name, site, state) ->
@@ -1301,7 +1309,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
       in
       (*-----------------------------------------------------------*)
       (*1.d a site is modified by side effect *)
-      let error, dynamic =
+      let error, dynamic = (*TODO?*)
         apply_rule_side_effects static dynamic error rule_id
       in
       let store_value = get_value dynamic in
@@ -1324,7 +1332,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     Ckappa_sig.Rule_map_and_set.Map.fold
       (fun rule_id tuple_set (error, event_list) ->
          Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-           (fun tuple (error, event_list) ->
+           (fun tuple (error, event_list) -> (*CHECK ME*)
               if
                 Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem
                   tuple
@@ -1362,7 +1370,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
                 let proj (a, b, c, d, _) = (a, b, c, d) in
                 let proj2 (x, y) = proj x, proj y in
                 if
-                  Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem
+                  Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem (*CHECK ME*)
                     (proj2 tuple)
                     tuple_pair_set
                 then
@@ -1381,6 +1389,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     let store_partition_created_bonds_map =
       get_partition_created_bonds pos static
     in
+    (*-----------------------------------------------------------*)
     let error, event_list =
       List.fold_left (fun (error, event_list) event ->
           match event with

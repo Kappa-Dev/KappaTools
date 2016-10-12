@@ -326,7 +326,6 @@ let collect_partition_created_bonds_map_2 parameter error
     )
     store_partition_created_bonds_map (error, store_result)
 
-
 let collect_rule_partition_aux parameter error rule_id
     map store_result =
   let error, store_result =
@@ -451,8 +450,6 @@ let collect_rule_partition_created_bonds_map_2 parameter error
       ) store_rule_potential_tuple_pair_set_rhs (error, store_result)
   in
   error, store_result
-
-
 
 (*****************************************************************)
 
