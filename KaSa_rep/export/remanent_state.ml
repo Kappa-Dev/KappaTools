@@ -238,9 +238,10 @@ type internal_contact_map =
 type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
-type dead_rules = Ckappa_sig.c_rule_id list
-type dead_agents = Ckappa_sig.c_agent_name list
 
+type dead_rules = Ckappa_sig.c_rule_id list
+
+type dead_agents = Ckappa_sig.c_agent_name list
 
 type flow =
   Ckappa_sig.Site_union_find.t
@@ -321,76 +322,122 @@ let do_event_gen f phase n state =
   {state with errors = error ; log_info = log_info}
 
 let add_event x y = do_event_gen StoryProfiling.StoryStats.add_event x y
+
 let close_event x y = do_event_gen StoryProfiling.StoryStats.close_event x y
 
 let set_parameters parameters state = {state with parameters = parameters}
+
 let get_parameters state = state.parameters
+
 let get_init state = state.init
-let set_compilation compilation state = {state with compilation = Some compilation}
+
+let set_compilation compilation state =
+  {state with compilation = Some compilation}
+
 let get_compilation state = state.compilation
+
 let set_prehandler handler state = {state with prehandler = Some handler}
+
 let get_prehandler state = state.prehandler
+
 let set_handler handler state = {state with handler = Some handler}
+
 let get_handler state = state.handler
+
 let set_compil compil state = {state with compilation = compil}
+
 let get_compil state = state.compilation
+
 let set_c_compil c_compil state = {state with c_compil = Some c_compil}
+
 let get_c_compil state = state.c_compil
+
 let set_refined_compil refined_compil state =
   {state with refined_compilation = Some refined_compil}
+
 let get_refined_compil state = state.refined_compilation
+
 let set_errors errors state = {state with errors = errors }
+
 let get_errors state = state.errors
+
 let set_quark_map quark_map state =
   {state with quark_map = Some quark_map}
+
 let get_quark_map state = state.quark_map
+
 let set_contact_map accuracy map state =
   {state with contact_map = AccuracyMap.add accuracy map state.contact_map}
+
 let get_contact_map accuracy state =
   AccuracyMap.find_option accuracy state.contact_map
+
 let set_signature signature state = {state with signature = Some signature}
+
 let get_signature state = state.signature
 
 let set_influence_map accuracy map state =
   {state with influence_map = AccuracyMap.add accuracy map state.influence_map}
+
 let get_influence_map accuracy state =
   AccuracyMap.find_option accuracy state.influence_map
+
 let set_internal_influence_map accuracy map state =
   {state
    with internal_influence_map =
           AccuracyMap.add accuracy map state.internal_influence_map}
+
 let get_internal_influence_map accuracy state =
   AccuracyMap.find_option accuracy state.internal_influence_map
+
 let set_internal_contact_map accuracy int_contact_map state =
   {state
    with internal_contact_map = AccuracyMap.add accuracy int_contact_map state.internal_contact_map}
+
 let get_internal_contact_map accuracy state =
   AccuracyMap.find_option accuracy state.internal_contact_map
+
 let get_reachability_result state = state.reachability_state
+
 let set_reachability_result reachability_state state =
   {state with reachability_state = Some reachability_state}
+
 let get_dead_rules state = state.dead_rules
+
 let set_dead_rules dead_rules state =
   {state with dead_rules = Some dead_rules}
+
 let get_dead_agents state = state.dead_agents
+
 let set_dead_agents dead_agents state =
   {state with dead_agents = Some dead_agents}
+
 let get_subviews_info state = state.subviews_info
+
 let set_subviews_info subviews state =
   {state with subviews_info = Some subviews}
+
 let set_bdu_handler bdu_handler state =
   {state with bdu_handler = bdu_handler}
+
 let get_bdu_handler state = state.bdu_handler
+
 let set_ode_flow flow state = {state with ode_flow = Some flow}
+
 let get_ode_flow state = state.ode_flow
+
 let set_ctmc_flow flow state = {state with ctmc_flow = Some flow}
+
 let get_ctmc_flow state = state.ctmc_flow
 
-
-
 let get_influence_map_map state = state.influence_map
+
 let get_contact_map_map state = state.contact_map
+
 let get_internal_contact_map_map state = state.internal_contact_map
+
 let get_internal_influence_map_map state = state.internal_influence_map
+
 let get_log_info state = state.log_info
+
 let set_log_info log state = {state with log_info = log}

@@ -130,8 +130,11 @@ let init ?compil ~called_from () =
   with
   | Some compil ->
     let parameters = Remanent_parameters.get_parameters ~called_from () in
-    let state = Remanent_state.create_state parameters (Remanent_state.Compil compil)
-    in state
+    let state =
+      Remanent_state.create_state parameters
+        (Remanent_state.Compil compil)
+    in
+    state
   | None ->
     begin
       match
@@ -144,12 +147,23 @@ let init ?compil ~called_from () =
       | Remanent_parameters_sig.KaSa ->
         begin
           let errors = Exception.empty_error_handler in
-          let errors,parameters,files  = Get_option.get_option errors in
-          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_full_version parameters) in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_launched_when_and_where parameters) in
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-          Remanent_state.create_state ~errors parameters (Remanent_state.Files files)
+          let errors, parameters, files  = Get_option.get_option errors in
+          let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+              (Remanent_parameters.get_full_version parameters)
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+              (Remanent_parameters.get_launched_when_and_where parameters)
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          in
+          Remanent_state.create_state ~errors parameters
+            (Remanent_state.Files files)
         end
     end
 
@@ -178,9 +192,9 @@ let compute_show_title do_we_show_title log_title =
        | Some title ->
          let title =
            if title_only_in_kasa parameters
-           then title^"..."
+           then title ^ "..."
            else
-             "+ "^title
+             "+ " ^ title
          in
          let () =
            Loggers.fprintf
@@ -274,17 +288,18 @@ let get_gen
   | Some a -> state, a
 
 let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
+
 let flush_errors state =
   Remanent_state.set_errors Exception.empty_error_handler state
 
 let compute_compilation show_title state =
   let compil =
-    match Remanent_state.get_init state
-    with
+    match Remanent_state.get_init state with
     | Remanent_state.Compil compil -> compil
     | Remanent_state.Files files ->
       let () = show_title state in
-      List.fold_left (KappaLexer.compile Format.std_formatter) Ast.empty_compil files
+      List.fold_left (KappaLexer.compile Format.std_formatter)
+        Ast.empty_compil files
   in
   let state = Remanent_state.set_compilation compil state in
   state, compil

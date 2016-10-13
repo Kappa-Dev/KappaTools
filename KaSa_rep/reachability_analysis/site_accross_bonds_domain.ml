@@ -1279,6 +1279,16 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
   in
   event_list
 
+  let can_we_prove_this_is_the_first_application precondition =
+    match
+      Communication.is_the_rule_applied_for_the_first_time precondition
+    with
+    | Usual_domains.Sure_value b ->
+      if b
+      then true
+      else false
+    | Usual_domains.Maybe -> false
+
   let apply_rule static dynamic error rule_id precondition =
     let parameters  = get_parameter static in
     let event_list = [] in
@@ -1318,13 +1328,35 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
         else
           ()
       in
+      (*-----------------------------------------------------------*)
+      (*Check if it is the first time *)
       let error, dynamic, precondition, store_set =
-        apply_rule_created_bonds
-          static dynamic error rule_id rule precondition
+        let b = can_we_prove_this_is_the_first_application precondition in
+        if b
+        then
+          let error, dynamic, precondition, store_set =
+            apply_rule_created_bonds
+              static dynamic error rule_id rule precondition
+          in
+          let store_value = get_value dynamic in
+          let event_list =
+              discover_a_new_pair_of_modify_sites store_set event_list
+          in
+          let bool =
+            if
+              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty
+                store_value
+            then false
+            else let () = dump_title () in true
+          in
+          error, dynamic, precondition, store_set
+        else
+          error, dynamic, precondition,
+          Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty
       in
-      let store_value = get_value dynamic in
       (*-----------------------------------------------------------*)
       (*new event*)
+      (*let store_value = get_value dynamic in
       let event_list =
           discover_a_new_pair_of_modify_sites store_set event_list
       in
@@ -1333,7 +1365,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
         then false
         else let () = dump_title () in true
-      in
+      in*)
       (*-----------------------------------------------------------*)
       (*1.c a site is modified (explicitly) *) (*FIX ME*)
       let error, dynamic, precondition, store_set =
@@ -1347,9 +1379,16 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
         discover_a_new_pair_of_modify_sites store_set event_list
       in
       (*-----------------------------------------------------------*)
+      let bool =
+        if
+          Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
+        then false
+        else let () = dump_title () in true
+      in
       let () =
         if not bool &&
-           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty store_value
+           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.is_empty
+             store_value
         then ()
         else dump_title ()
       in

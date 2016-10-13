@@ -43,6 +43,7 @@ Reachability analysis...
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 2:
 		the precondition is not satisfied yet
@@ -66,6 +67,7 @@ Reachability analysis...
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -84,6 +86,7 @@ Reachability analysis...
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -117,6 +120,7 @@ Reachability analysis...
 		rule 2 is applied for the first time
 
 		Updating the views for B(x!,x~)
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain

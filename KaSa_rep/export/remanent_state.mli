@@ -4,14 +4,17 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 23 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type init = Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil | Files of string list
+type init =
+    Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+  | Files of string list
+
 type accuracy_level = Low | Medium | High | Full
 
 module AccuracyMap: SetMap.Map with type elt = accuracy_level
@@ -49,7 +52,6 @@ type location =
   | Direct of int
   | Side_effect of int
 
-
 type 'a pair = 'a * 'a
 
 type influence_map =
@@ -71,7 +73,9 @@ type internal_influence_map =
 type ('static,'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
+
 type dead_rules = Ckappa_sig.c_rule_id list
+
 type dead_agents = Ckappa_sig.c_agent_name list
 
 type flow =
@@ -84,53 +88,102 @@ val create_state:
   ?errors:Exception.method_handler -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
 
 val set_parameters: Remanent_parameters_sig.parameters -> ('static, 'dynamic) state -> ('static, 'dynamic) state
-val get_parameters: ('static, 'dynamic) state -> Remanent_parameters_sig.parameters
+
+val get_parameters: ('static, 'dynamic) state ->
+  Remanent_parameters_sig.parameters
+
 val add_event: StoryProfiling.step_kind -> (unit -> int) option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
+
 val close_event: StoryProfiling.step_kind -> (unit -> int) option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
+
 val get_init: ('static, 'dynamic) state -> init
+
 val set_compilation: compilation -> ('static, 'dynamic) state -> ('static, 'dynamic) state
+
 val get_compilation: ('static, 'dynamic) state -> compilation option
+
 val set_handler: Cckappa_sig.kappa_handler -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_handler: ('static, 'compile) state -> Cckappa_sig.kappa_handler option
+
 val set_refined_compil: refined_compilation -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_refined_compil:
   ('static, 'compile) state
   -> refined_compilation option
+
 val set_c_compil: Cckappa_sig.compil -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_c_compil: ('static, 'compile) state -> Cckappa_sig.compil option
+
 val get_errors: ('static, 'compile) state -> Exception.method_handler
+
 val set_errors: Exception.method_handler -> ('static, 'compile) state -> ('static, 'compile) state
 
 val set_internal_contact_map: accuracy_level -> internal_contact_map -> ('static, 'compile) state -> ('static, 'compile) state
-val get_internal_contact_map: accuracy_level -> ('static, 'compile) state -> internal_contact_map option
-val set_contact_map: accuracy_level -> contact_map -> ('static, 'compile) state -> ('static, 'compile) state
-val get_contact_map: accuracy_level -> ('static, 'compile) state -> contact_map option
+
+val get_internal_contact_map: accuracy_level -> ('static, 'compile) state ->
+  internal_contact_map option
+
+val set_contact_map: accuracy_level -> contact_map -> ('static, 'compile) state
+  -> ('static, 'compile) state
+
+val get_contact_map: accuracy_level -> ('static, 'compile) state -> contact_map
+    option
+
 val set_signature: Signature.s -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_signature: ('static, 'compile) state -> Signature.s option
+
 val set_quark_map: quark_map -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_quark_map: ('static, 'compile) state -> quark_map option
+
 val set_internal_influence_map: accuracy_level -> internal_influence_map -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_internal_influence_map: accuracy_level -> ('static, 'compile) state -> internal_influence_map option
+
 val set_influence_map: accuracy_level -> influence_map -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_influence_map: accuracy_level -> ('static, 'compile) state -> influence_map option
+
 val set_ode_flow: Ode_fragmentation_type.ode_frag -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_ode_flow: ('static, 'compile) state -> Ode_fragmentation_type.ode_frag option
+
 val set_ctmc_flow: flow -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_ctmc_flow: ('static, 'compile) state -> flow option
+
 val get_bdu_handler: ('static, 'compile) state -> Mvbdu_wrapper.Mvbdu.handler
+
 val set_bdu_handler: Mvbdu_wrapper.Mvbdu.handler -> ('static, 'compile) state -> ('static, 'compile) state
+
 val set_reachability_result: ('static, 'compile) reachability_result -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_reachability_result: ('static, 'compile) state -> ('static, 'compile) reachability_result option
+
 val get_subviews_info: ('static, 'compile) state -> subviews_info option
+
 val set_subviews_info: subviews_info -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_dead_rules: ('static, 'compile) state -> dead_rules option
+
 val set_dead_rules: dead_rules -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_dead_agents: ('static, 'compile) state -> dead_agents option
+
 val set_dead_agents: dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
+
 val get_influence_map_map: ('static, 'compile) state -> influence_map AccuracyMap.t
+
 val get_contact_map_map: ('static, 'compile) state -> contact_map AccuracyMap.t
+
 val get_internal_influence_map_map: ('static, 'compile) state -> internal_influence_map AccuracyMap.t
+
 val get_internal_contact_map_map: ('static, 'compile) state -> internal_contact_map AccuracyMap.t
 
 val set_log_info: StoryProfiling.StoryStats.log_info -> ('static, 'compile) state -> ('static, 'compile) state
-val get_log_info: ('static, 'compile) state -> StoryProfiling.StoryStats.log_info
+
+val get_log_info: ('static, 'compile) state ->
+  StoryProfiling.StoryStats.log_info

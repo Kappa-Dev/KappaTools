@@ -422,6 +422,7 @@ EXTENSIONAL DESCRIPTION:
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -498,6 +499,7 @@ EXTENSIONAL DESCRIPTION:
 		(rule 1: r1) should be investigated 
 
 		  A(t!1,z),B(t!1,z)
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain

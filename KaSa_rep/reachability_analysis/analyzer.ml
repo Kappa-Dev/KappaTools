@@ -61,30 +61,45 @@ struct
     let error, dynamic, () = Domain.print static dynamic error loggers in
     error, dynamic
 
-  let get_log_info dynamic = Analyzer_headers.get_log_info (Domain.get_global_dynamic_information dynamic)
+  let get_log_info dynamic = Analyzer_headers.get_log_info
+      (Domain.get_global_dynamic_information dynamic)
+
   let set_log_info log_info dynamic =
-    let global = Analyzer_headers.set_log_info log_info
-        (Domain.get_global_dynamic_information dynamic) in
+    let global =
+      Analyzer_headers.set_log_info log_info
+        (Domain.get_global_dynamic_information dynamic)
+    in
     Domain.set_global_dynamic_information global dynamic
+
   let lift f parameters error title opt dynamic =
     let log_info = get_log_info dynamic in
     let error, log_info = f parameters error title opt log_info in
     let dynamic = set_log_info log_info dynamic in
     error, dynamic
+
   let add_event = lift StoryProfiling.StoryStats.add_event
+
   let close_event = lift StoryProfiling.StoryStats.close_event
 
   let main parameters log_info error mvbdu_handler compil kappa_handler =
-    let error, log_info = StoryProfiling.StoryStats.add_event parameters error StoryProfiling.Global_initialization None log_info in
+    let error, log_info =
+      StoryProfiling.StoryStats.add_event parameters error
+        StoryProfiling.Global_initialization None log_info
+    in
     let error, static, dynamic =
       Analyzer_headers.initialize_global_information
         parameters log_info error mvbdu_handler compil kappa_handler
     in
-    let error, log_info = StoryProfiling.StoryStats.close_event parameters error StoryProfiling.Global_initialization None log_info in
+    let error, log_info =
+      StoryProfiling.StoryStats.close_event parameters error
+        StoryProfiling.Global_initialization None log_info
+    in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let error, init = Analyzer_headers.compute_initial_state error static in
     let log_info = Analyzer_headers.get_log_info dynamic in
-    let error, log_info = StoryProfiling.StoryStats.add_event parameters error StoryProfiling.Domains_initialization None log_info in
+    let error, log_info =
+      StoryProfiling.StoryStats.add_event parameters error
+        StoryProfiling.Domains_initialization None log_info in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let error, static, dynamic =
       Domain.initialize static dynamic error in
@@ -94,12 +109,18 @@ struct
     let error, dynamic,_ =
       List.fold_left
         (fun (error, dynamic, i) chemical_species ->
-           let error, dynamic = add_event  parameters error (StoryProfiling.Initial_state i) None dynamic in
+           let error, dynamic =
+             add_event
+               parameters error (StoryProfiling.Initial_state i) None dynamic
+           in
            let error, dynamic, () =
              Domain.add_initial_state static dynamic error chemical_species
            in
-           let error, dynamic = close_event parameters error  (StoryProfiling.Initial_state i) None dynamic in
-           error, dynamic, i+1)
+           let error, dynamic =
+             close_event parameters error
+               (StoryProfiling.Initial_state i) None dynamic
+           in
+           error, dynamic, i + 1)
         (error, dynamic, 1)
         init
     in
@@ -112,7 +133,8 @@ struct
         | Some rule_id ->
           let error =
             if local_trace
-            || Remanent_parameters.get_dump_reachability_analysis_iteration parameters
+            || Remanent_parameters.get_dump_reachability_analysis_iteration
+                 parameters
             || Remanent_parameters.get_trace parameters
             then
               let error, rule_id_string =

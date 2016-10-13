@@ -1196,12 +1196,12 @@ Id=57
        Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=90
+Id=88
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=88
+  Id=86
    Node(site_type:1<2)
     Id=76
      Node(site_type:2<0)
@@ -1241,12 +1241,12 @@ Id=106
 
   Id=105
    Node(site_type:0<1)
-    Id=84
+    Id=101
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=83
+      Id=100
        Node(site_type:1<1)
         Id=81
          Node(site_type:2<0)
@@ -1339,12 +1339,12 @@ Id=81
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=94
+Id=92
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=91
+  Id=89
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1391,12 +1391,12 @@ Id=81
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=94
+Id=92
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=91
+  Id=89
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1436,12 +1436,12 @@ Id=81
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=94
+Id=92
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=91
+  Id=89
    Node(site_type:0<2)
     Id=1
      Leaf True 
