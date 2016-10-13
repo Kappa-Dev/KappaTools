@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 03 2016>
+   * Last modification: Time-stamp: <Oct 13 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -718,9 +718,11 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store = get_fixpoint_result dynamic in
     let error, bdu_old =
-      match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-              parameter error
-              (agent_type, cv_id) store
+      match
+        Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+          parameter error
+          (agent_type, cv_id)
+          store
       with
       | error, None -> error, bdu_false
       | error, Some bdu -> error, bdu
@@ -873,7 +875,7 @@ struct
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
 
-  (************************************************************************************)
+  (**************************************************************************)
 
   let build_init_restriction static dynamic error init_state =
     let parameter = get_parameter static in
@@ -891,7 +893,7 @@ struct
                parameter error __POS__ Exit (dynamic, event_list)
            | Cckappa_sig.Agent agent ->
              let agent_type = agent.Cckappa_sig.agent_name in
-             (*----------------------------------------------------------------*)
+             (*-------------------------------------------------------------*)
              let error, (dynamic, event_list) =
                match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                        parameter error agent_type
@@ -915,7 +917,7 @@ struct
                            error
                            pair_list
                        in
-                       (*----------------------------------------------------------------*)
+                       (*----------------------------------------------------*)
                        let error, dynamic, event_list =
                          add_link
                            ~title:"Views in initial state"

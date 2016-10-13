@@ -523,7 +523,7 @@ let add_value_and_event parameters error kappa_handler x value store_set
 
 let project (_,b,c,d,e,f) = (b,c,d,e,f)
 let get_id ((a,_,_,_,_,_),_) = a
-let get_tuple (a,b) = project a,project b
+let get_tuple (a,b) = project a, project b
 
 let project2 = snd
 

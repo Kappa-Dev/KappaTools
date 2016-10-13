@@ -967,7 +967,9 @@ struct
     (*------------------------------------------------------*)
     Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
       (fun mod_tuple (error, dynamic, precondition, store_set) ->
-         let (agent_id_mod, agent_type_mod, site_type_mod, state_mod) = mod_tuple in
+         let (agent_id_mod, agent_type_mod, site_type_mod, state_mod) =
+           mod_tuple
+         in
          let error, potential_tuple_pair_set =
            match
              Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
