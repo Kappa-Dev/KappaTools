@@ -29,6 +29,19 @@ let save_button =
        ; Html.a_class ["btn";"btn-default";"pull-right"]
        ]
     [ Html.cdata "save" ]
+
+let toggle_button_id = "toggle_button"
+let toggle_button =
+  Html.a
+    ~a:[ Html.a_id toggle_button_id
+       ; Tyxml_js.R.Html.Unsafe.string_attrib
+           "download"
+           UIState.opened_filename
+       ; Html.Unsafe.string_attrib "role" "button"
+       ; Html.a_class ["btn";"btn-default";"pull-right"]
+       ]
+    [ Html.cdata "toggle" ]
+
 let file_selector =
   Html.input
     ~a:[ Html.a_id "file-selector" ;
@@ -42,12 +55,15 @@ let panel_heading =
                    Load
                 </label>
              </div>
-             <div class="col-md-4">
+             <div class="col-md-3">
                 <label class="filename">|}[file_label]{|</label>
-							</div>
-							<div class="col-md-2 col-sm-offset-4 pull-right">
-							|}[save_button]{|
-              </div>
+	     </div>
+	     <div class="col-md-2 col-sm-offset-3 pull-right">
+		|}[save_button]{|
+             </div>
+	     <div class="col-md-2">
+		|}[toggle_button]{|
+             </div>
             </div>|}]
 
 let xml (t : Ui_simulation.t) =
@@ -219,11 +235,14 @@ let onload (t : Ui_simulation.t) : unit =
 
 
   let file_select_dom = Tyxml_js.To_dom.of_input file_selector in
-  let save_button_dom  : Dom_html.linkElement Js.t =
+  let save_button_dom : Dom_html.linkElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string save_button_id))
          (fun () -> assert false)) in
-
+  let toggle_button_dom : Dom_html.linkElement Js.t =
+    Js.Unsafe.coerce
+      (Js.Opt.get (document##getElementById (Js.string toggle_button_id))
+         (fun () -> assert false)) in
   let () =
     save_button_dom##.onclick :=
       Dom.handler
@@ -232,6 +251,13 @@ let onload (t : Ui_simulation.t) : unit =
            let editor_text :  Js.js_string Js.t = codemirror##getValue in
            let () =
              save_button_dom##.href := header##concat((Js.escape editor_text)) in
+           Js._true) in
+  let () =
+    toggle_button_dom##.onclick :=
+      Dom.handler
+	(fun _ ->
+           let editor_full = React.S.value Ui_state.editor_full in
+           let () = Ui_state.set_editor_full (not editor_full) in
            Js._true) in
   let file_select_handler () =
     let files = Js.Optdef.get (file_select_dom##.files)

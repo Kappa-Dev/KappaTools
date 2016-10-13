@@ -4,6 +4,8 @@ open ApiTypes
 open Lwt
 
 exception InvalidState of string
+let editor_full , set_editor_full =
+  React.S.create (false : bool)
 let model_parse , set_model_parse =
   React.S.create (None : ApiTypes.parse option)
 let model_text, set_model_text =
