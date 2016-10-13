@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 12 2016>
+   * Last modification: Time-stamp: <Oct 13 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1127,7 +1127,8 @@ struct
   (***************************************************************)
   (*Side effects*)
 
-  let free_site_gen ~pos static dynamic error agent' site_name' state' =
+  let free_site_gen ~pos static dynamic error agent' site_name' state'
+      store_set =
     let parameter  = get_parameter static in
     let store_partition_modified_map = get_partition_modified pos static in
     let error, potential_tuple_pair_set =
@@ -1142,17 +1143,17 @@ struct
         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     (*-----------------------------------------------------------*)
     Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-      (fun (x, y) (error, dynamic) ->
+      (fun (x, y) (error, dynamic, store_set) ->
          let handler = get_mvbdu_handler dynamic in
          let result = get_value dynamic in
          let error, mvbdu_opt =
            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs parameter error (x,y) result
          in
-         match mvbdu_opt
-         with
-         | None -> error, dynamic
+         match mvbdu_opt with
+         | None -> error, dynamic, store_set
          | Some mvbdu ->
            let var  =
              match pos with
@@ -1186,24 +1187,58 @@ struct
                mvbdu
                mvbdu'
            in
-           (*TODO?get the store_set*)
-           let error, result =
-             Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite
-               parameter error
-               (x, y)
-               mvbdu_or
-               result
+           (*check the freshness of the value *)
+           let error, bdu_old =
+             match
+               Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
+                 parameter error
+                 (x, y)
+                 result
+             with
+             | error, None -> error, bdu_false
+             | error, Some bdu -> error, bdu
+           in
+           let error, handler, new_bdu =
+             Ckappa_sig.Views_bdu.mvbdu_or
+               parameter handler error bdu_old mvbdu_or
            in
            let dynamic = set_mvbdu_handler handler dynamic in
-           let dynamic = set_value result dynamic in
-           error, dynamic
-      ) potential_tuple_pair_set (error, dynamic)
+           (*condition*)(*CHECK ME*)
+           if Ckappa_sig.Views_bdu.equal new_bdu bdu_old
+           then error, dynamic, store_set
+           else
+           (*get the store_set*)
+             let error, result =
+               Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite
+                 parameter error
+                 (x, y)
+                 (*mvbdu_or*)new_bdu
+                 result
+             in
+             (*store_set*)
+             let proj (a, _, c, _) = (a, c) in
+             let error', store_set =
+               Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.add_when_not_in
+                 parameter
+                 error
+                 (proj x, proj y)
+                 store_set
+             in
+             let error = Exception.check_point Exception.warn parameter error
+                 error' __POS__ Exit in
+             let dynamic = set_mvbdu_handler handler dynamic in
+             let dynamic = set_value result dynamic in
+             error, dynamic, store_set
+      ) potential_tuple_pair_set (error, dynamic, store_set)
 
-  let free_site static dynamic error agent' site_name' state' =
-    let error, dynamic =
+
+  let free_site static dynamic error agent' site_name' state' store_set =
+    let error, dynamic, store_set =
       free_site_gen ~pos:Fst static dynamic error agent' site_name' state'
+        store_set
     in
     free_site_gen ~pos:Snd static dynamic error agent' site_name' state'
+      store_set
 
   let apply_rule_side_effects static dynamic error rule_id =
     let parameter = get_parameter static in
@@ -1214,12 +1249,21 @@ struct
         rule_id
         (get_potential_side_effects static)
     in
-    List.fold_left
-      (fun (error, dynamic) (agent_name, site, state) ->
-         free_site
-           static dynamic error agent_name site state)
-      (error, dynamic)
-      list
+    let error, dynamic, store_set =
+      List.fold_left
+        (fun (error, dynamic, store_set) (agent_name, site, state) ->
+           let error, dynamic, store_set =
+             free_site
+               static dynamic error agent_name site state
+               store_set
+           in
+           error, dynamic, store_set
+        )
+        (error, dynamic,
+         Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty)
+        list
+    in
+    error, dynamic, store_set
 
 (***************************************************************)
 
@@ -1309,7 +1353,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
       in
       (*-----------------------------------------------------------*)
       (*1.d a site is modified by side effect *)
-      let error, dynamic = (*TODO?*)
+      let error, dynamic, store_set = (*new event*)
         apply_rule_side_effects static dynamic error rule_id
       in
       let store_value = get_value dynamic in
@@ -1382,7 +1426,8 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     in
     error, event_list
 
-  (*-----------------------------------------------------------*)
+(*-----------------------------------------------------------*)
+
   let apply_event_list_aux ~pos static dynamic error event_list  =
     let parameter = get_parameter static in
     let store_partition_modified_map = get_partition_modified pos static in
@@ -1487,6 +1532,17 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
                 store_rule_partition_created_bonds
                 tuple_pair_created_set
                 event_list
+            in
+            (*-----------------------------------------------------------*)
+            (*side effects rule_id*)
+            let store_potential_side_effects =
+              get_potential_side_effects static
+            in
+            let error, event_list =
+              Ckappa_sig.Rule_map_and_set.Map.fold
+                (fun rule_id _list (error, event_list) ->
+                   error, (Communication.Check_rule rule_id) :: event_list
+                ) store_potential_side_effects (error, event_list)
             in
             error, event_list
         ) (error, []) event_list
