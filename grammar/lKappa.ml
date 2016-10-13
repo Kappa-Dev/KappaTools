@@ -558,10 +558,10 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
                I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
            | _ :: (_, pos) :: _ -> several_internal_states pos in
          match p.Ast.port_lnk with
-         | (Ast.LNK_ANY, pos) ->
+         | [Ast.LNK_ANY, pos] ->
            let () =
              ports.(p_id) <- ((Ast.LNK_ANY,pos), Erased) in (lannot,pset')
-         | (Ast.LNK_SOME, pos_lnk) ->
+         | [Ast.LNK_SOME, pos_lnk] ->
            let (na,pos) = p.Ast.port_nme in
            let () =
              ExceptionDefn.warning
@@ -572,7 +572,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
                     na) in
            let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Erased) in
            (lannot,pset')
-         | (Ast.LNK_TYPE (dst_p, dst_ty),pos_lnk) ->
+         | [Ast.LNK_TYPE (dst_p, dst_ty),pos_lnk] ->
            let (na,pos) = p.Ast.port_nme in
            let () =
              ExceptionDefn.warning
@@ -584,11 +584,15 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
            let () = ports.(p_id) <-
                build_l_type sigs pos_lnk dst_ty dst_p Erased in
            (lannot,pset')
-         | (Ast.FREE, pos) ->
-           let () = ports.(p_id) <- (Ast.FREE,pos), Erased in (lannot,pset')
-         | (Ast.LNK_VALUE (i,()), pos) ->
+         | [Ast.FREE,_] | [] ->
+           let () = ports.(p_id) <- Location.dummy_annot Ast.FREE, Erased in
+           (lannot,pset')
+         | [Ast.LNK_VALUE (i,()), pos] ->
            let va,lannot' = build_link pos i ag_id p_id Erased lannot in
-           let () = ports.(p_id) <- va in (lannot',pset'))
+           let () = ports.(p_id) <- va in (lannot',pset')
+         | _::(_,pos)::_ ->
+           raise (ExceptionDefn.Malformed_Decl
+                    ("Several link state for a single site",pos)))
       (links_annot,Mods.IntSet.empty) intf in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
@@ -617,13 +621,14 @@ let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
                Some (Signature.num_of_internal_state p_id va sign)
            | _ :: (_, pos) :: _ -> several_internal_states pos in
          match p.Ast.port_lnk with
-         | ((Ast.LNK_ANY, _) | (Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
+         | ([Ast.LNK_ANY, _] | [Ast.LNK_SOME, _] |
+            [Ast.LNK_TYPE _, _] | _::_::_) ->
            not_enough_specified agent_name p_na
-         | (Ast.LNK_VALUE (i,()), pos) ->
+         | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
            let _,rannot' = build_link pos i ag_id p_id Freed rannot in
            pset',rannot'
-         | (Ast.FREE, _) -> pset',rannot
+         | [Ast.FREE, _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
   rannot,
   ({ Raw_mixture.a_type = ag_id;
@@ -638,21 +643,21 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
   let internals = Array.make arity I_ANY in
   let register_port_modif p_id lnk1 p' (lhs_links,rhs_links as links_annot) =
     match lnk1,p'.Ast.port_lnk with
-    | (Ast.LNK_ANY,_), (Ast.LNK_ANY,_) -> links_annot
-    | (Ast.LNK_SOME,pos), (Ast.LNK_SOME,_) ->
+    | [Ast.LNK_ANY,_], [Ast.LNK_ANY,_] -> links_annot
+    | [Ast.LNK_SOME,pos], [Ast.LNK_SOME,_] ->
       let () = ports.(p_id) <- ((Ast.LNK_SOME,pos), Maintained) in
       links_annot
-    | (Ast.LNK_TYPE ((dst_p'',_ as dst_p),(dst_ty'',_ as dst_ty)),pos),
-      (Ast.LNK_TYPE ((dst_p',_),(dst_ty',_)),_)
+    | [Ast.LNK_TYPE ((dst_p'',_ as dst_p),(dst_ty'',_ as dst_ty)),pos],
+      [Ast.LNK_TYPE ((dst_p',_),(dst_ty',_)),_]
       when dst_p'' = dst_p' && dst_ty'' = dst_ty' ->
       let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p Maintained in
       links_annot
-    | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
+    | _, ([Ast.LNK_ANY,_] | [Ast.LNK_SOME,_] | [Ast.LNK_TYPE _,_]) ->
       not_enough_specified agent_name p'.Ast.port_nme
-    | (Ast.LNK_ANY,pos), (Ast.FREE,_) ->
+    | [Ast.LNK_ANY,pos], ([Ast.FREE,_] | []) ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos), Freed) in
       links_annot
-    | (Ast.LNK_SOME,pos_lnk), (Ast.FREE,_) ->
+    | [Ast.LNK_SOME,pos_lnk], ([Ast.FREE,_] | []) ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
         ExceptionDefn.warning
@@ -663,7 +668,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
                na) in
       let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Freed) in
       links_annot
-    | (Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk), (Ast.FREE,_) ->
+    | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], ([Ast.FREE,_] | []) ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
         ExceptionDefn.warning
@@ -674,17 +679,17 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
                na) in
       let () = ports.(p_id) <- build_l_type sigs pos_lnk dst_ty dst_p Freed in
       links_annot
-    | (Ast.FREE,pos), (Ast.FREE,_) ->
-      let () = ports.(p_id) <- ((Ast.FREE,pos), Maintained) in
+    | ([Ast.FREE,_] | []), ([Ast.FREE,_] | []) ->
+      let () = ports.(p_id) <- (Location.dummy_annot Ast.FREE, Maintained) in
       links_annot
-    | (Ast.LNK_VALUE (i,()),pos), (Ast.FREE,_) ->
+    | [Ast.LNK_VALUE (i,()),pos], ([Ast.FREE,_] | []) ->
       let va,lhs_links' = build_link pos i ag_id p_id Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
-    | (Ast.LNK_ANY,pos_lnk), (Ast.LNK_VALUE (i,()),pos) ->
+    | [Ast.LNK_ANY,pos_lnk], [Ast.LNK_VALUE (i,()),pos] ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), Linked (i,pos)) in
       let _,rhs_links' = build_link pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
-    | (Ast.LNK_SOME,pos_lnk), (Ast.LNK_VALUE (i,()),pos') ->
+    | [Ast.LNK_SOME,pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
         ExceptionDefn.warning
@@ -696,7 +701,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
       let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Linked (i,pos')) in
       let _,rhs_links' = build_link pos' i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
-    | (Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk), (Ast.LNK_VALUE (i,()),pos') ->
+    | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
         ExceptionDefn.warning
@@ -709,15 +714,22 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
           build_l_type sigs pos_lnk dst_ty dst_p (Linked (i,pos')) in
       let _,rhs_links' = build_link pos' i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
-    | (Ast.FREE,pos_lnk), (Ast.LNK_VALUE (i,()),pos) ->
-      let () = ports.(p_id) <- ((Ast.FREE,pos_lnk), Linked (i,pos)) in
+    | ([Ast.FREE,_] | []), [Ast.LNK_VALUE (i,()),pos] ->
+      let () =
+        ports.(p_id) <- (Location.dummy_annot Ast.FREE, Linked (i,pos)) in
       let _,rhs_links' = build_link pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
-    | (Ast.LNK_VALUE (i,()),pos_i), (Ast.LNK_VALUE (j,()),pos_j) ->
+    | [Ast.LNK_VALUE (i,()),pos_i], [Ast.LNK_VALUE (j,()),pos_j] ->
       let va,lhs_links' =
         build_link pos_i i ag_id p_id (Linked (j,pos_j)) lhs_links in
       let _,rhs_links' = build_link pos_j j ag_id p_id Freed rhs_links in
-      let () = ports.(p_id) <- va in (lhs_links',rhs_links') in
+      let () = ports.(p_id) <- va in (lhs_links',rhs_links')
+    | _::(_,pos)::_, _ ->
+      raise (ExceptionDefn.Malformed_Decl
+               ("Several link state for a single site",pos))
+    | _, _::(_,pos)::_ ->
+      raise (ExceptionDefn.Malformed_Decl
+               ("Several link state for a single site",pos)) in
   let register_internal_modif p_id int1 p' =
     match int1,p'.Ast.port_int with
     | [], [] -> ()
@@ -771,7 +783,7 @@ although it is left unpecified in the left hand side"
          let p_na = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let () = register_internal_modif p_id [] p in
-         register_port_modif p_id (Location.dummy_annot Ast.LNK_ANY) p annot)
+         register_port_modif p_id [Location.dummy_annot Ast.LNK_ANY] p annot)
       annot rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},annot'
@@ -1030,7 +1042,7 @@ let create_t ast_intf =
     Tools.array_map_of_list
       (fun p ->
          match p.Ast.port_lnk with
-         | (Ast.FREE,_) ->
+         | [Ast.FREE,_] | [] ->
            (p.Ast.port_nme,
             match p.Ast.port_int with
             | [] -> None
@@ -1038,10 +1050,14 @@ let create_t ast_intf =
               Some (NamedDecls.create
                       (Tools.array_map_of_list (fun x -> (x,())) l))
            )
-         | ((Ast.LNK_SOME | Ast.LNK_ANY |
-             Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
+         | [(Ast.LNK_SOME | Ast.LNK_ANY |
+             Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos] ->
            raise (ExceptionDefn.Malformed_Decl
                     ("Link status inside a definition of signature", pos))
+         | (_,pos)::_::_ ->
+           raise (ExceptionDefn.Internal_Error
+                    ("TODO", pos))
+
       ) ast_intf)
 
 let create_sig l =

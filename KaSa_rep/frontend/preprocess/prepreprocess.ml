@@ -159,7 +159,7 @@ let rec scan_interface parameters k agent interface remanent =
     let remanent = error,a in
     scan_interface parameters k agent interface
       ((match port.Ast.port_lnk with
-          | Ast.LNK_VALUE (i,()),_ ->
+          | [Ast.LNK_VALUE (i,()),_] ->
             add_entry
               parameters
               (Ckappa_sig.agent_id_of_int i)
@@ -167,10 +167,14 @@ let rec scan_interface parameters k agent interface remanent =
               (fst port.Ast.port_nme)
               k
               remanent
-          | Ast.LNK_ANY,_
-          | Ast.FREE, _
-          | Ast.LNK_TYPE _,_
-          | Ast.LNK_SOME,_       -> remanent),set)
+          | [Ast.LNK_ANY,_]
+          | [Ast.FREE, _] | []
+          | [Ast.LNK_TYPE _,_]
+          | [Ast.LNK_SOME,_]       -> remanent
+          | _::(_,pos)::_ ->
+            Exception.warn parameters error __POS__
+              ~message:"More than one link state for a single site" ~pos
+              Exit a),set)
 
 let scan_agent parameters k agent remanent =
   fst (scan_interface parameters k (fst (fst agent)) (snd agent) (remanent,Mods.StringSet.empty))
@@ -226,7 +230,7 @@ let collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanen
 
 let translate_lnk_state parameters lnk_state remanent =
   match lnk_state with
-  | Ast.LNK_VALUE (id,()),position ->
+  | [Ast.LNK_VALUE (id,()),pos] ->
     begin
       let error, remanent = remanent in
       let error, (triple, map) =
@@ -238,10 +242,11 @@ let translate_lnk_state parameters lnk_state remanent =
       in
       match triple with
       | None ->
-        let site = Ckappa_sig.LNK_SOME position in
+        let site = Ckappa_sig.LNK_SOME pos in
         let remanent =
           Exception.warn parameters error __POS__
-            ~message:((Location.to_string position) ^"one dandling bond has been replaced by a wild card")
+            ~message:"one dandling bond has been replaced by a wild card"
+            ~pos
             Exit
             remanent
         in
@@ -249,7 +254,7 @@ let translate_lnk_state parameters lnk_state remanent =
       | Some (agent,site,index) ->
         if (agent,site,index) = ("", "", (*0*)Ckappa_sig.dummy_agent_id)
         then
-          let site = Ckappa_sig.LNK_SOME position in
+          let site = Ckappa_sig.LNK_SOME pos in
           let remanent =
             Exception.warn parameters error __POS__ Exit remanent
           in
@@ -260,34 +265,45 @@ let translate_lnk_state parameters lnk_state remanent =
              agent,
              site,
              (Ckappa_sig.agent_id_of_int id),
-             position),
+             pos),
           (error, (map, (snd remanent)))
     end
-  | Ast.FREE,_ -> Ckappa_sig.FREE,remanent
-  | Ast.LNK_ANY,position -> Ckappa_sig.LNK_ANY position,remanent
-  | Ast.LNK_SOME,position -> Ckappa_sig.LNK_SOME position,remanent
-  | Ast.LNK_TYPE (x,y),_position -> Ckappa_sig.LNK_TYPE (y,x),remanent
+  | [Ast.FREE,_] | [] -> Ckappa_sig.FREE,remanent
+  | [Ast.LNK_ANY,position] -> Ckappa_sig.LNK_ANY position,remanent
+  | [Ast.LNK_SOME,position] -> Ckappa_sig.LNK_SOME position,remanent
+  | [Ast.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent
+  | _::(_,pos)::_ ->
+    let error, va = remanent in
+    Ckappa_sig.LNK_ANY pos,(*FIXME*)
+    Exception.warn parameters error __POS__
+      ~message:"More than one link state for a single site" ~pos
+      Exit va
+
 
 let translate_port parameters int_set port remanent =
   let error,map = remanent in
   let error,_ =
     check_freshness parameters error "Site" (fst (port.Ast.port_nme)) int_set
   in
-  let remanent = error,map in
-  let lnk,remanent = translate_lnk_state parameters port.Ast.port_lnk remanent in
+  let error',is_free =
+    match port.Ast.port_lnk
+    with [Ast.FREE,_] | [] -> error,Some true
+          | [Ast.LNK_ANY,_] -> error,None
+          | [Ast.LNK_SOME,_]
+          | [Ast.LNK_TYPE _,_]
+          | [Ast.LNK_VALUE _,_] -> error,Some false
+          | _::(_,pos)::_ ->
+            Exception.warn parameters error __POS__
+              ~message:"More than one link state for a single site" ~pos
+              Exit None in
+  let lnk,remanent =
+    translate_lnk_state parameters port.Ast.port_lnk (error',map) in
   {
     Ckappa_sig.port_nme = fst (port.Ast.port_nme) ;
     Ckappa_sig.port_int = List.rev_map fst (List.rev port.Ast.port_int) ;
     Ckappa_sig.port_lnk = lnk ;
     (*       port_pos = pos ; *)
-    Ckappa_sig.port_free =
-      (match port.Ast.port_lnk
-       with Ast.FREE,_ -> Some true
-          | Ast.LNK_ANY,_ -> None
-          | Ast.LNK_SOME,_
-          | Ast.LNK_TYPE _,_
-          | Ast.LNK_VALUE _,_ -> Some false )
-  },
+    Ckappa_sig.port_free = is_free },
   remanent
 
 let rec translate_interface parameters int_set interface remanent =

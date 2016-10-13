@@ -15,7 +15,7 @@ type internal = string Location.annot list
 
 type port = {port_nme:string Location.annot;
              port_int:internal;
-             port_lnk:(string Location.annot,unit) link Location.annot;}
+             port_lnk:(string Location.annot,unit) link Location.annot list;}
 
 type agent = (string Location.annot * port list)
 
@@ -211,7 +211,7 @@ let print_ast_internal f l =
 let print_ast_port f p =
   Format.fprintf f "%s%a%a" (fst p.port_nme)
     print_ast_internal p.port_int
-    print_ast_link (fst p.port_lnk)
+    (Pp.list Pp.empty (fun f (x,_) -> print_ast_link f x)) p.port_lnk
 
 let string_annot_to_json = Location.annot_to_json JsonUtil.of_string
 let string_annot_of_json =
@@ -221,9 +221,11 @@ let port_to_json p =
   `Assoc [
     "port_nme", string_annot_to_json p.port_nme;
     "port_int", JsonUtil.of_list string_annot_to_json p.port_int;
-    "port_lnk", Location.annot_to_json
-      (link_to_json
-         (fun _ -> string_annot_to_json) string_annot_to_json (fun () -> []))
+    "port_lnk",
+    JsonUtil.of_list
+      (Location.annot_to_json
+         (link_to_json
+            (fun _ -> string_annot_to_json) string_annot_to_json (fun ()->[])))
       p.port_lnk;
   ]
 let port_of_json = function
@@ -235,10 +237,12 @@ let port_of_json = function
     `Assoc [ "port_lnk", l; "port_int", i; "port_nme", n ] ->
     { port_nme = string_annot_of_json n;
      port_int = JsonUtil.to_list string_annot_of_json i;
-      port_lnk = Location.annot_of_json
-          (link_of_json
-             (fun _ -> string_annot_of_json) string_annot_of_json
-             (fun _ -> ())) l;}
+      port_lnk =
+        JsonUtil.to_list
+          (Location.annot_of_json
+             (link_of_json
+                (fun _ -> string_annot_of_json) string_annot_of_json
+                (fun _ -> ()))) l;}
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
 let print_ast_agent f ((ag_na,_),l) =
@@ -492,7 +496,7 @@ let merge_ports =
   List.fold_left
     (fun acc p ->
        let rec aux = function
-         | [] -> [{p with port_lnk = Location.dummy_annot FREE}]
+         | [] -> [{p with port_lnk = []}]
          | h :: t when fst p.port_nme = fst h.port_nme ->
            {h with port_int = merge_internals h.port_int p.port_int}::t
          | h :: t -> h :: aux t in
@@ -503,7 +507,7 @@ let merge_agents =
     (fun acc ((na,_ as x),s) ->
        let rec aux = function
          | [] -> [x,List.map
-                    (fun p -> {p with port_lnk = Location.dummy_annot FREE}) s]
+                    (fun p -> {p with port_lnk = []}) s]
          | ((na',_),s') :: t when String.compare na na' = 0 ->
            (x,merge_ports s' s)::t
          | h :: t -> h :: aux t in

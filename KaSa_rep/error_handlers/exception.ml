@@ -52,7 +52,7 @@ let warn_with_exn parameters error_handler (file,line,_,_) ?message:(message="")
     (Some file) (Some ("line "^(string_of_int line)^pos^liaison^message))
     exn default
 
-let warn parameters error_handler file_line ?message:(message="") ?pos:(pos=None) exn default =
+let warn parameters error_handler file_line ?message:(message="") ?pos exn default =
   warn_with_exn parameters error_handler file_line ~message ~pos exn (fun () -> default)
 
 let print_for_KaSim parameters handlers =
@@ -114,11 +114,12 @@ let lift_error_logs_for_KaSa f =
        fst (warn_aux parameters error (Some string)
               string_opt exn (fun  () -> ())))
 
-let check_point (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t option ->
-                 exn -> unit -> method_handler * unit)
-    parameter error error' s ?message:(message="") ?pos:(pos=(None:Location.t option)) exn =
+let check_point
+    (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t ->
+     exn -> unit -> method_handler * unit)
+    parameter error error' s ?message ?pos exn =
   if error==error'
   then error
   else
-    let error,() = warn parameter error' s ~message ~pos exn () in
+    let error,() = warn parameter error' s ?message ?pos exn () in
     error

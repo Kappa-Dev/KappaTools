@@ -16,7 +16,7 @@ type internal = string Location.annot list
 
 type port = {port_nme:string Location.annot;
              port_int:internal;
-             port_lnk:(string Location.annot,unit) link Location.annot;}
+             port_lnk:(string Location.annot,unit) link Location.annot list;}
 
 type agent = (string Location.annot * port list)
 

@@ -406,12 +406,12 @@ internal_state:
     ;
 
 link_state:
-  /*empty*/ {add_pos Ast.FREE}
-    | KAPPA_LNK INT {(Ast.LNK_VALUE ($2,()),rhs_pos 2)}
-    | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
-    | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE
-				      (($2,rhs_pos 2),($4,rhs_pos 4)))}
-    | KAPPA_WLD {add_pos Ast.LNK_ANY}
+  /*empty*/ {[]}
+    | KAPPA_LNK INT link_state {(Ast.LNK_VALUE ($2,()),rhs_pos 2)::$3}
+    | KAPPA_LNK KAPPA_SEMI link_state {(Ast.LNK_SOME,rhs_pos 2)::$3}
+    | KAPPA_LNK ID DOT ID link_state {add_pos (Ast.LNK_TYPE
+				      (($2,rhs_pos 2),($4,rhs_pos 4)))::$5}
+    | KAPPA_WLD link_state {add_pos Ast.LNK_ANY::$2}
     | KAPPA_LNK error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Invalid link state"))}

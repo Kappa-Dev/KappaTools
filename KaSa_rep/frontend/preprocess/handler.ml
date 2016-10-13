@@ -23,10 +23,10 @@ let check_pos parameter ka_pos ml_pos message error error' =
   | None -> error'
   | Some ml_pos ->
     Exception.check_point
-      Exception.warn parameter ~message ~pos:ka_pos error error' ml_pos Exit
+      Exception.warn parameter ~message ?pos:ka_pos error error' ml_pos Exit
 
 let translate_agent
-    ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
+    ?ml_pos:(ml_pos=None) ?ka_pos
     ?message:(message="")
     parameter error handler ag =
   let error',(a, _, _) =
