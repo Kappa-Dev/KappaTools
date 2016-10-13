@@ -13,10 +13,7 @@ module Html = Tyxml_js.Html5
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
   Tyxml_js.R.Html.pcdata
-    (React.S.bind
-       file_label_signal
-       (fun env ->
-          React.S.const env))
+    (React.S.bind file_label_signal (fun env -> React.S.const env))
 
 let save_button_id = "save_button"
 let save_button =
@@ -57,19 +54,19 @@ let panel_heading =
              </div>
              <div class="col-md-3">
                 <label class="filename">|}[file_label]{|</label>
-	     </div>
-	     <div class="col-md-2 col-sm-offset-3 pull-right">
-		|}[save_button]{|
+                                                         </div>
+                                                         <div class="col-md-2 col-sm-offset-3 pull-right">
+                                                      |}[save_button]{|
              </div>
-	     <div class="col-md-2">
-		|}[toggle_button]{|
+            <div class="col-md-2">
+       |}[toggle_button]{|
              </div>
             </div>|}]
 
-let xml (t : Ui_simulation.t) =
+let xml (_ : Ui_simulation.t) =
   [Html.div ~a:[Html.a_class ["panel";"panel-default"]]
-    [%html {|<div class="panel-heading">
-                |}[panel_heading]{|
+     [%html {|<div class="panel-heading">
+            |}[panel_heading]{|
              </div>
              <div class="panel-body">
                 <textarea id="code-mirror"> </textarea>
@@ -84,8 +81,7 @@ let setup_lint codemirror update_linting =
     in
     let hydrate (error  : Api_types.error) : lint Js.t option =
       match error.Api_types.range with
-      | None ->
-        None
+      | None -> None
       | Some range ->
         Some (Codemirror.create_lint
                 ~message:error.Api_types.message
@@ -93,9 +89,9 @@ let setup_lint codemirror update_linting =
                    the code mirror code independent of the api code.
                 *)
                 ~severity:( match error.Api_types.severity with
-                          | `Error -> Codemirror.Error
-                          | `Warning -> Codemirror.Warning
-                          | `Info -> Codemirror.Warning
+                    | `Error -> Codemirror.Error
+                    | `Warning -> Codemirror.Warning
+                    | `Info -> Codemirror.Warning
                   )
                 ~from:(position range.Location.from_position)
                 ~to_:(position range.Location.to_position))
@@ -191,15 +187,14 @@ let onload (t : Ui_simulation.t) : unit =
       (fun () -> assert false) in
   let () =
     (Js.Unsafe.coerce configuration)##.lineNumbers := Js._true;
+    (Js.Unsafe.coerce configuration)##.lineWrapping := Js._true;
     (Js.Unsafe.coerce configuration)##.autofocus := Js._true;
     (Js.Unsafe.coerce configuration)##.gutters := gutter_option;
     (Js.Unsafe.coerce configuration)##.lint := Js._true;
     (Js.Unsafe.coerce configuration)##.mode := (Js.string "Kappa")
   in
   let codemirror : codemirror Js.t =
-    Codemirror.fromTextArea
-      textarea
-      configuration in
+    Codemirror.fromTextArea textarea configuration in
   let () = codemirror##setValue(Js.string "") in
   let () = setup_lint codemirror update_linting in
   let _ = Lwt_js_events.async (initialize codemirror) in
@@ -211,7 +206,7 @@ let onload (t : Ui_simulation.t) : unit =
     let () = match !timeout with
         None -> ()
       | Some timeout -> Dom_html.window ##
-			  clearTimeout (timeout) in
+                          clearTimeout (timeout) in
     let delay : float =
       if (((Js.str_array (change##.text ))##.length) > 1)
          ||
@@ -226,13 +221,11 @@ let onload (t : Ui_simulation.t) : unit =
       let () = Common.info text in
       UIState.parse_text (Js.to_string codemirror##getValue) in
     let () = timeout := Some
-	  (Dom_html.window ## setTimeout
+          (Dom_html.window ## setTimeout
              (Js.wrap_callback (fun _ -> handle_timeout ())) delay) in
     ()
   in
-  let () = codemirror##onChange(handler)
-  in
-
+  let () = codemirror##onChange(handler) in
 
   let file_select_dom = Tyxml_js.To_dom.of_input file_selector in
   let save_button_dom : Dom_html.linkElement Js.t =
@@ -246,7 +239,7 @@ let onload (t : Ui_simulation.t) : unit =
   let () =
     save_button_dom##.onclick :=
       Dom.handler
-	(fun _ ->
+        (fun _ ->
            let header = Js.string "data:text/plain;charset=utf-8," in
            let editor_text :  Js.js_string Js.t = codemirror##getValue in
            let () =
@@ -255,25 +248,25 @@ let onload (t : Ui_simulation.t) : unit =
   let () =
     toggle_button_dom##.onclick :=
       Dom.handler
-	(fun _ ->
+        (fun _ ->
            let editor_full = React.S.value Ui_state.editor_full in
            let () = Ui_state.set_editor_full (not editor_full) in
            Js._true) in
   let file_select_handler () =
     let files = Js.Optdef.get (file_select_dom##.files)
-	(fun () -> assert false)
+        (fun () -> assert false)
     in
     let file = Js.Opt.get (files##item (0))
-	(fun () -> assert false)
+        (fun () -> assert false)
     in
     let filename = file##.name in
     let () = set_file_label (to_string filename) in
     let () = Lwt_js_events.async
         (fun _ -> File.readAsText file >>=
-	  (fun (va : Js.js_string Js.t) ->
-           let () = codemirror##setValue(va) in
-           Ui_simulation.flush_simulation t
-        ))
+          (fun (va : Js.js_string Js.t) ->
+             let () = codemirror##setValue(va) in
+             Ui_simulation.flush_simulation t
+          ))
     in
     let () = has_been_modified := false in
     return_unit
@@ -286,11 +279,11 @@ let onload (t : Ui_simulation.t) : unit =
     Lwt.async
       (fun () ->
          Lwt_js_events.changes
-	   file_select_dom
+           file_select_dom
            (fun _ _ ->
-            if not !has_been_modified || confirm ()
-            then file_select_handler ()
-            else return_unit))
+              if not !has_been_modified || confirm ()
+              then file_select_handler ()
+              else return_unit))
   in ()
 
 let onunload () = ()
