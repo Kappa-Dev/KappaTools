@@ -4,14 +4,17 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 24 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type init = Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil | Files of string list
+type init =
+    Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+  | Files of string list
+
 type accuracy_level = Low | Medium | High | Full
 
 module AccuracySetMap =
@@ -42,7 +45,6 @@ module AccuracySetMap =
 
 module AccuracyMap = AccuracySetMap.Map
 
-
 type compilation = ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
 
 type refined_compilation = (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
@@ -51,7 +53,6 @@ type quark_map = Quark_type.quarks
 
 type rule_id = int
 type var_id =  int
-
 
 type influence_node =
   | Rule of rule_id

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 23 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -15,27 +15,36 @@
 let warn parameters mh pos exn default =
   Exception.warn parameters mh pos exn default
 
-(*******************************************************************************)
+(******************************************************************************)
 (*module signatures*)
 type state =
   (Domain_selection.Reachability_analysis.static_information,
    Domain_selection.Reachability_analysis.dynamic_information)
     Remanent_state.state
+
 type contact_map = Remanent_state.contact_map
+
 type ctmc_flow = Remanent_state.flow
+
 type ode_flow = Ode_fragmentation_type.ode_frag
+
 type c_compilation = Cckappa_sig.compil
+
 type reachability_analysis =
   (Domain_selection.Reachability_analysis.static_information,
    Domain_selection.Reachability_analysis.dynamic_information)
     Remanent_state.reachability_result
 
 type parameters = Remanent_parameters_sig.parameters
+
 type errors = Exception.method_handler
+
 type internal_contact_map = Remanent_state.internal_contact_map
+
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+
 type handler = Cckappa_sig.kappa_handler
 
 let string_of_influence_node x =

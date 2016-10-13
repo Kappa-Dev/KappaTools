@@ -255,13 +255,13 @@ struct
   (*****************************************************************)
 
   let scan_rule static _dynamic error rule_id rule =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     (*------------------------------------------------------*)
     (*a set of rules that has a potential double binding or potential non double binding on the lhs*)
     let store_result = get_rule_double_bonds_lhs static in
     let error, store_result =
       Parallel_bonds_static.collect_rule_double_bonds_lhs
-        parameter error rule_id rule store_result
+        parameters error rule_id rule store_result
     in
     let static = set_rule_double_bonds_lhs store_result static in
     (*------------------------------------------------------*)
@@ -269,7 +269,7 @@ struct
     let store_result = get_rule_double_bonds_rhs static in
     let error, store_result =
       Parallel_bonds_static.collect_rule_double_bonds_rhs
-        parameter error rule_id rule store_result
+        parameters error rule_id rule store_result
     in
     let static = set_rule_double_bonds_rhs store_result static in
     error, static
@@ -279,11 +279,11 @@ struct
 (****************************************************************)
 
   let scan_rules static dynamic error =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let compil = get_compil static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-        parameter
+        parameters
         error
         (fun _ error rule_id rule static ->
            scan_rule
@@ -297,7 +297,7 @@ struct
       Ckappa_sig.Rule_map_and_set.Map.fold
         (fun _ big_store (error, set) ->
            Parallel_bonds_static.project_away_ag_id_and_convert_into_set
-             parameter error big_store set)
+             parameters error big_store set)
         s
         (error, Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty)
     in
@@ -307,7 +307,7 @@ struct
       lift_map error (get_rule_double_bonds_rhs static) in
     let error, store_result =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
-        parameter error store_result1 store_result2
+        parameters error store_result1 store_result2
     in
     let static =
       set_tuples_of_interest store_result static
@@ -317,14 +317,14 @@ struct
     let store_action_binding = get_action_binding static in
     let error, store_result =
       Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
-        parameter error store_action_binding tuple_of_interest
+        parameters error store_action_binding tuple_of_interest
     in
     let static = set_fst_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
     (*A(x, y!1), B(x, y!1): second site is an action binding *)
     let error, store_result =
       Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
-        parameter error store_action_binding tuple_of_interest
+        parameters error store_action_binding tuple_of_interest
     in
     let static = set_snd_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
@@ -332,7 +332,7 @@ struct
     let tuple_of_interest = get_tuples_of_interest static in
     let error, store_result =
       Parallel_bonds_static.collect_tuple_to_sites
-        parameter error
+        parameters error
         tuple_of_interest
     in
     let static = set_tuple_to_sites store_result static in
@@ -342,7 +342,7 @@ struct
     let store_sites_to_tuple = get_sites_to_tuple static in
     let error, store_result =
       Parallel_bonds_static.collect_sites_to_tuple
-        parameter error
+        parameters error
         tuple_to_sites
         store_sites_to_tuple
     in
@@ -384,7 +384,7 @@ struct
     true.*)
 
   let compute_value_init static dynamic error init_state =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let tuples_of_interest =
       get_tuples_of_interest static
     in
@@ -393,7 +393,7 @@ struct
     let store_result = get_value dynamic in
     let error, store_result =
       Parallel_bonds_init.collect_parallel_or_not_bonds_init
-        parameter kappa_handler error
+        parameters kappa_handler error
         tuples_of_interest init_state store_result
     in
     let dynamic = set_value store_result dynamic in
@@ -413,13 +413,13 @@ struct
   (* if a parallel bound occurs on the lhs, check that this is possible *)
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     (*-----------------------------------------------------------*)
     (*look into the lhs, whether or not there exists a double bound.*)
     let store_rule_has_parallel_bonds_lhs = get_rule_double_bonds_lhs static in
     let error, parallel_map =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-              parameter error rule_id store_rule_has_parallel_bonds_lhs
+              parameters error rule_id store_rule_has_parallel_bonds_lhs
       with
       | error, None ->
         error,
@@ -443,7 +443,7 @@ struct
             let error, value =
               match
                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                  parameter error
+                  parameters error
                   pair
                   store_value
               with
@@ -488,7 +488,7 @@ struct
 
   type pos = Fst | Snd
 
-  let apply_gen' pos parameter error static dynamic precondition rule_id rule =
+  let apply_gen' pos parameters error static dynamic precondition rule_id rule =
     let store_site_create_parallel_bonds_rhs =
       match pos with
       | Fst -> get_fst_site_create_parallel_bonds_rhs static
@@ -497,7 +497,7 @@ struct
     let error, store_pair_bind_map =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter error
+          parameters error
           rule_id
           store_site_create_parallel_bonds_rhs
       with
@@ -512,7 +512,7 @@ struct
     let error, rule_double_bonds_rhs_map =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter error
+          parameters error
           rule_id
           store_rule_double_bonds_rhs
       with
@@ -555,7 +555,7 @@ struct
                  let error, old_value =
                    match
                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
-                       parameter error
+                       parameters error
                        (agent_id1, (z', t'))
                        store_result
                    with
@@ -672,13 +672,13 @@ struct
                  (*call the symmetric add *)
                  let error, store_result =
                    Parallel_bonds_type.add_symmetric_tuple_pair
-                     (fun parameter error t map ->
+                     (fun parameters error t map ->
                         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
-                          parameter error
+                          parameters error
                           t
                           value
                           map)
-                     parameter
+                     parameters
                      error
                      (z, t)
                      store_result
@@ -691,7 +691,7 @@ struct
       (error, dynamic, precondition,
        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
 
-  let apply_gen pos parameter error static dynamic precondition rule_id rule =
+  let apply_gen pos parameters error static dynamic precondition rule_id rule =
     let store_site_create_parallel_bonds_rhs =
       match pos with
       | Fst -> get_fst_site_create_parallel_bonds_rhs static
@@ -700,7 +700,7 @@ struct
     let error, store_pair_bind_map =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter error
+          parameters error
           rule_id
           store_site_create_parallel_bonds_rhs
       with
@@ -715,7 +715,7 @@ struct
     let error, rule_double_bonds_rhs_map =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter error
+          parameters error
           rule_id
           store_rule_double_bonds_rhs
       with
@@ -756,7 +756,7 @@ struct
                  let error, old_value =
                    match
                      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
-                       parameter error
+                       parameters error
                        (agent_id1, (z', t'))
                        store_result
                    with
@@ -796,7 +796,7 @@ struct
                      error, dynamic, precondition, store_result
                    | [], _ | _, [] ->
                      let error, () =
-                       Exception.warn parameter error __POS__
+                       Exception.warn parameters error __POS__
                          ~message: "empty list in potential states in post condition" Exit ()
                      in
                      error, dynamic, precondition, store_result
@@ -892,13 +892,13 @@ struct
                      (*call the symmetric add *)
                      let error, store_result =
                        Parallel_bonds_type.add_symmetric_tuple_pair
-                         (fun parameter error t map ->
+                         (fun parameters error t map ->
                             Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
-                              parameter error
+                              parameters error
                               t
                               value
                               map)
-                         parameter
+                         parameters
                          error
                          (z, t)
                          store_result
@@ -927,32 +927,32 @@ struct
 
   let apply_rule static dynamic error rule_id precondition =
     (*--------------------------------------------------------------*)
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let event_list = [] in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
-    let error, rule = get_rule parameter error static rule_id in
+    let error, rule = get_rule parameters error static rule_id in
     match rule with
     | None ->
       let error, () =
-        Exception.warn parameter error __POS__ Exit ()
+        Exception.warn parameters error __POS__ Exit ()
       in
       error, dynamic, (precondition, event_list)
     | Some rule ->
-      let parameter =
-        Remanent_parameters.update_prefix parameter "                "
+      let parameters =
+        Remanent_parameters.update_prefix parameters "                "
       in
       let dump_title () =
         if local_trace ||
-           Remanent_parameters.get_dump_reachability_analysis_diff parameter
+           Remanent_parameters.get_dump_reachability_analysis_diff parameters
         then
           let () =
             Loggers.fprintf
-              (Remanent_parameters.get_logger parameter)
+              (Remanent_parameters.get_logger parameters)
               "%sUpdate information about potential double bindings"
-              (Remanent_parameters.get_prefix parameter)
+              (Remanent_parameters.get_prefix parameters)
           in
-          Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
         else
           ()
       in
@@ -961,14 +961,14 @@ struct
         the first bond in a potential double bindings*)
       (*-----------------------------------------------------------*)
       let error, dynamic, precondition, store_value1 =
-        apply_gen Fst parameter error static dynamic precondition rule_id rule
+        apply_gen Fst parameters error static dynamic precondition rule_id rule
       in
       (*------------------------------------------------------------------*)
       (*the rule creates a bond matching with
         the second bond in a potential double bindings*)
       (*-----------------------------------------------------------*)
       let error, dynamic, precondition, store_value2 =
-        apply_gen Snd parameter error static dynamic precondition rule_id rule
+        apply_gen Snd parameters error static dynamic precondition rule_id rule
       in
       (*-----------------------------------------------------------*)
       (*combine two value above*)
@@ -985,27 +985,27 @@ struct
       in
       let error, store_value =
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold2
-          parameter error
-          (fun parameter error x value store_result ->
+          parameters error
+          (fun parameters error x value store_result ->
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameter error kappa_handler x value store_result
+                 parameters error kappa_handler x value store_result
              in
              error, store_result
           )
-          (fun parameter error x value store_result ->
+          (fun parameters error x value store_result ->
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameter error kappa_handler
+                 parameters error kappa_handler
                  x value store_result
              in
              error, store_result
           )
-          (fun parameter error x value1 value2 store_result ->
+          (fun parameters error x value1 value2 store_result ->
              let new_value = Usual_domains.lub value1 value2 in
              let error, store_result =
                Parallel_bonds_type.add_value_from_refined_tuple
-                 parameter error kappa_handler
+                 parameters error kappa_handler
                  x new_value store_result
              in
              error, store_result
@@ -1019,7 +1019,7 @@ struct
       let store_parallel_map = get_rule_double_bonds_rhs static in
       let error, double_rhs_list =
         match
-          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter
+          Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters
             error rule_id store_parallel_map
         with
         | error, None ->
@@ -1034,7 +1034,7 @@ struct
              else
                let error, store_result =
                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
-                   parameter error
+                   parameters error
                    y
                    (Usual_domains.Val false)
                    store_result
@@ -1060,27 +1060,27 @@ struct
       let store_result = get_value dynamic in
       let error, (store_set, store_result) =
         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold2
-          parameter error
-          (fun parameter error x value (store_set, store_result) ->
+          parameters error
+          (fun parameters error x value (store_set, store_result) ->
              Parallel_bonds_type.add_value_and_event
-               parameter error kappa_handler
+               parameters error kappa_handler
                x
                value
                store_set
                store_result
           )
-          (fun parameter error x value (store_set, store_result) ->
-             Parallel_bonds_type.add_value_and_event parameter error
+          (fun parameters error x value (store_set, store_result) ->
+             Parallel_bonds_type.add_value_and_event parameters error
                kappa_handler
                x
                value
                store_set
                store_result
           )
-          (fun parameter error x value1 value2 (store_set, store_result) ->
+          (fun parameters error x value1 value2 (store_set, store_result) ->
              let new_value = Usual_domains.lub value1 value2 in
              Parallel_bonds_type.add_value_and_event
-               parameter error kappa_handler
+               parameters error kappa_handler
                x
                new_value
                store_set
@@ -1105,7 +1105,7 @@ struct
                let pair = Parallel_bonds_type.project2 (x, y) in
                let error, store_result =
                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
-                   parameter error
+                   parameters error
                    pair
                    (Usual_domains.Val true)
                    store_result
@@ -1132,7 +1132,7 @@ struct
       let error, (store_set, store_result) =
         Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
           (fun x value (error, (store_set, store_result)) ->
-             Parallel_bonds_type.add_value_and_event parameter error
+             Parallel_bonds_type.add_value_and_event parameters error
                kappa_handler
                x
                value
@@ -1204,7 +1204,7 @@ struct
   error, event_list
 
   let apply_event_list static dynamic error event_list =
-      let parameter = get_parameter static in
+      let parameters = get_parameter static in
       let store_sites_to_tuple = get_sites_to_tuple static in
       (*get a list tuple pair that the pair of modified sites belong to*)
       let error, event_list =
@@ -1218,7 +1218,7 @@ struct
               let error, tuple_pair_set =
                 match
                   Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-                    parameter error
+                    parameters error
                     (agent_type, site_type)
                     store_sites_to_tuple (*tuple from lhs and rhs*)
                 with
@@ -1280,12 +1280,12 @@ struct
 
   let print static dynamic (error:Exception.method_handler) loggers =
     let kappa_handler = get_kappa_handler static in
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let log = loggers in
     (*-------------------------------------------------------*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_result
-          parameter
+          parameters
       then
         let () =
           Loggers.fprintf log
@@ -1302,7 +1302,7 @@ struct
                  ~verbose:true
                  ~sparse:true
                  ~final_resul:true
-                 ~dump_any:true parameter error kappa_handler tuple value
+                 ~dump_any:true parameters error kappa_handler tuple value
             ) store_value error
         in error
       else
@@ -1312,7 +1312,7 @@ struct
     (*print a map tuple to sites*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_result
-          parameter
+          parameters
       then
         let () =
         Loggers.fprintf log
@@ -1330,27 +1330,27 @@ struct
                     (*print tuples of interest*)
                     let error, (string_agent, string_site, string_site', string_agent1, string_site1, string_site1') =
                       Parallel_bonds_type.convert_tuple
-                        parameter error kappa_handler
+                        parameters error kappa_handler
                         (a, b)
                     in
                     (*convert first pair*)
                     let error, (string_agent_x, string_site_x) =
-                      Parallel_bonds_type.convert_pair parameter error
+                      Parallel_bonds_type.convert_pair parameters error
                         kappa_handler
                         x
                     in
                     let error, (string_agent_y, string_site_y) =
-                      Parallel_bonds_type.convert_pair parameter error
+                      Parallel_bonds_type.convert_pair parameters error
                         kappa_handler
                         y
                     in
                     let error, (string_agent_z, string_site_z) =
-                      Parallel_bonds_type.convert_pair parameter error
+                      Parallel_bonds_type.convert_pair parameters error
                         kappa_handler
                         z
                     in
                     let error, (string_agent_t, string_site_t) =
-                      Parallel_bonds_type.convert_pair parameter error
+                      Parallel_bonds_type.convert_pair parameters error
                         kappa_handler
                         t
                     in
@@ -1375,7 +1375,7 @@ struct
     (*print a map tuple to sites*)
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_result
-          parameter
+          parameters
       then
       let () =
       Loggers.fprintf log
@@ -1392,14 +1392,14 @@ struct
                (fun (u, v) error' ->
                   (*convert first pair*)
                   let error, (string_agent_x, string_site_x) =
-                    Parallel_bonds_type.convert_pair parameter error
+                    Parallel_bonds_type.convert_pair parameters error
                       kappa_handler
                       (agent_type_x, site_type_x)
                   in
                   let error,
                       (string_agent, string_site, string_site',
                        string_agent1, string_site1, string_site1') =
-                    Parallel_bonds_type.convert_tuple parameter error
+                    Parallel_bonds_type.convert_tuple parameters error
                       kappa_handler (u, v)
                   in
                   let () =

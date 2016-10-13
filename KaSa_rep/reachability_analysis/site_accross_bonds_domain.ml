@@ -107,11 +107,11 @@ struct
 
   let get_bonds_lhs static = lift Analyzer_headers.get_bonds_lhs static
 
-  let get_rule parameter error static r_id =
+  let get_rule parameters error static r_id =
     let compil = get_compil static in
     let error, rule  =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
-        parameter
+        parameters
         error
         r_id
         compil.Cckappa_sig.rules
@@ -335,7 +335,7 @@ struct
 (****************************************************************)
 (*rule*)
 
-  let scan_rule parameter error rule_id rule static =
+  let scan_rule parameters error rule_id rule static =
     (*let kappa_handler = get_kappa_handler static in*)
     (*------------------------------------------------------------*)
     (*tuple pair on the rhs*)
@@ -344,7 +344,7 @@ struct
     let store_potential_tuple_pair = get_potential_tuple_pair static in
     let error, store_potential_tuple_pair =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair
-        parameter error
+        parameters error
         rule_id store_bonds_rhs store_views_rhs
         store_potential_tuple_pair
     in
@@ -358,7 +358,7 @@ struct
     in
     let error, store_potential_tuple_pair_rule_rhs =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair_rule_rhs
-        parameter error
+        parameters error
         rule_id
         store_potential_tuple_pair
         store_potential_tuple_pair_rule_rhs
@@ -372,7 +372,7 @@ struct
     let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
     let error, store_potential_tuple_pair_lhs =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs
-        parameter error
+        parameters error
         rule_id
         store_bonds_lhs
         store_views_lhs
@@ -389,16 +389,16 @@ struct
 (*rules*)
 
   let scan_rules static dynamic error =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let compil = get_compil static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-        parameter
+        parameters
         error
-        (fun parameter error rule_id rule static ->
+        (fun parameters error rule_id rule static ->
            let error, static =
              scan_rule
-               parameter error
+               parameters error
                rule_id
                rule.Cckappa_sig.e_rule_c_rule static
            in
@@ -411,7 +411,7 @@ struct
     (*there is an action binding*)
     let error, store_partition_created_bonds_map =
       Site_accross_bonds_domain_static.collect_partition_created_bonds_map
-        parameter error
+        parameters error
         store_potential_tuple_pair
     in
     let static =
@@ -423,7 +423,7 @@ struct
     (*a site is modified explicitly*)
     let error, store_partition_modified_map_1 =
       Site_accross_bonds_domain_static.collect_partition_modified_map_1
-        parameter error
+        parameters error
         store_potential_tuple_pair
     in
     let static =
@@ -433,7 +433,7 @@ struct
     in
     let error, store_partition_modified_map_2 =
       Site_accross_bonds_domain_static.collect_partition_modified_map_2
-        parameter error
+        parameters error
         store_potential_tuple_pair
     in
     let static =
@@ -449,7 +449,7 @@ struct
       get_rule_partition_modified_map_1 static in
     let error, store_rule_partition_modified_map_1 =
       Site_accross_bonds_domain_static.collect_rule_partition_modified_map_1
-        parameter error
+        parameters error
         store_potential_tuple_pair_rule_rhs
         store_rule_partition_modified_map_1
     in
@@ -463,7 +463,7 @@ struct
       get_rule_partition_modified_map_2 static in
     let error, store_rule_partition_modified_map_2 =
       Site_accross_bonds_domain_static.collect_rule_partition_modified_map_2
-        parameter error
+        parameters error
         store_potential_tuple_pair_rule_rhs
         store_rule_partition_modified_map_2
     in
@@ -479,7 +479,7 @@ struct
       get_partition_created_bonds_map_1 static in
     let error, store_partition_created_bonds_map_1 =
       Site_accross_bonds_domain_static.collect_partition_created_bonds_map_1
-        parameter error
+        parameters error
         store_partition_created_bonds_map
         store_partition_created_bonds_map_1
     in
@@ -492,7 +492,7 @@ struct
       get_partition_created_bonds_map_2 static in
     let error, store_partition_created_bonds_map_2 =
       Site_accross_bonds_domain_static.collect_partition_created_bonds_map_2
-        parameter error
+        parameters error
         store_partition_created_bonds_map
         store_partition_created_bonds_map_2
     in
@@ -506,7 +506,7 @@ struct
     in
     let error, store_rule_partition_created_bonds_map_1 =
       Site_accross_bonds_domain_static.collect_rule_partition_created_bonds_map_1
-        parameter error
+        parameters error
         store_potential_tuple_pair_rule_rhs
         store_rule_partition_created_bonds_map_1
     in
@@ -518,7 +518,7 @@ struct
     in
     let error, store_rule_partition_created_bonds_map_2 =
       Site_accross_bonds_domain_static.collect_rule_partition_created_bonds_map_1
-        parameter error
+        parameters error
         store_potential_tuple_pair_rule_rhs
         store_rule_partition_created_bonds_map_2
     in
@@ -570,30 +570,30 @@ struct
   (* take into account bounds that may occur in initial states *)
 
   let get_mvbdu_false global_static dynamic error =
-    let parameter = get_parameter global_static in
+    let parameters = get_parameter global_static in
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, handler_bdu, bdu_false =
       Ckappa_sig.Views_bdu.mvbdu_false
-        parameter handler_bdu error
+        parameters handler_bdu error
     in
     error, set_mvbdu_handler handler_bdu dynamic, bdu_false
 
   let add_initial_state static dynamic error species =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     (*views in the initial state that has two agents and their sites are different*)
     let error, store_views_init =
       Site_accross_bonds_domain_static.collect_views_init
-        parameter error species in
+        parameters error species in
     let error, store_sites_init =
       Site_accross_bonds_domain_static.collect_sites_init
-        parameter error store_views_init in
+        parameters error store_views_init in
     let error, store_pair_sites_init =
       Site_accross_bonds_domain_static.collect_pair_sites_init
-        parameter error store_sites_init in
+        parameters error store_sites_init in
     (*a set of site that can be bounds*)
     let error, store_bonds_init =
       Site_accross_bonds_domain_static.collect_bonds_init
-        parameter error species
+        parameters error species
     in
     (*collect the first site bound, and the second site different than the
       first site, return the information of its state, result*)
@@ -604,7 +604,7 @@ struct
     let tuple_of_interest = get_potential_tuple_pair static in
     let error, handler, store_result =
       Site_accross_bonds_domain_static.collect_pair_tuple_init
-        parameter
+        parameters
         error
         bdu_false
         handler
@@ -628,7 +628,7 @@ struct
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     (*look into the lhs whether or not there exists a site accross pattern or
       not *)
@@ -637,7 +637,7 @@ struct
     in
     let error, tuple_set =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-              parameter error rule_id store_potential_tuple_pair_lhs
+              parameters error rule_id store_potential_tuple_pair_lhs
       with
       | error, None ->
         error,
@@ -662,7 +662,7 @@ struct
           let error, mvbdu_value =
             match
               Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-                parameter error
+                parameters error
                 tuple'
                 store_value
           with
@@ -680,12 +680,12 @@ struct
           let handler = get_mvbdu_handler dynamic in
           let error, handler, mvbdu =
             Ckappa_sig.Views_bdu.mvbdu_of_association_list
-              parameter handler error pair_list
+              parameters handler error pair_list
           in
           (*intersection*)
           let error, handler, new_mvbdu =
             Ckappa_sig.Views_bdu.mvbdu_and
-              parameter handler error mvbdu mvbdu_value
+              parameters handler error mvbdu mvbdu_value
           in
           let dynamic = set_mvbdu_handler handler dynamic in
           (*check*)
@@ -713,13 +713,13 @@ struct
   (*there is an action binding in the domain of a rule*)
 
   let apply_rule_created_bonds static dynamic error rule_id rule precondition =
-    let parameter  = get_parameter static in
+    let parameters  = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     (*------------------------------------------------------*)
     let store_created_bonds = get_created_bonds static in
     let error, created_bonds_set =
-      Common_static.get_set parameter error
+      Common_static.get_set parameters error
         rule_id
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
         store_created_bonds
@@ -735,7 +735,7 @@ struct
            let error, potential_tuple_pair_set =
              match
                Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.find_option_without_logs
-                 parameter error
+                 parameters error
                  ((agent_type_t, site_type_t, state_t),
                   (agent_type_u, site_type_u, state_u))
                  store_partition_created_bonds_map
@@ -752,7 +752,7 @@ struct
            let error, proj_potential_tuple_pair_set =
              Site_accross_bonds_domain_type.Proj_potential_tuple_pair_set.proj_set
                proj2
-               parameter
+               parameters
                error
                potential_tuple_pair_set
            in
@@ -774,7 +774,7 @@ struct
                 let error =
                   Exception.check_point
                     Exception.warn
-                    parameter error error'
+                    parameters error error'
                     ~message:(context rule_id agent_id_t site_type'_x)
                     __POS__ Exit
                 in
@@ -792,7 +792,7 @@ struct
                 let error =
                   Exception.check_point
                     Exception.warn
-                    parameter error error'
+                    parameters error error'
                     ~message:(context rule_id agent_id_u site_type'_y)
                     __POS__ Exit
                 in
@@ -805,7 +805,7 @@ struct
                     error, dynamic, precondition, store_set
                   | [], _ | _, [] ->
                     let error, () =
-                      Exception.warn parameter error __POS__
+                      Exception.warn parameters error __POS__
                         ~message: "empty list in potential states in post condition" Exit ()
                     in
                     error, dynamic, precondition, store_set
@@ -829,11 +829,11 @@ struct
                               let handler = get_mvbdu_handler dynamic in
                               let error, handler, mvbdu =
                                 Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                                  parameter handler error pair_list
+                                  parameters handler error pair_list
                               in
                               let error, handler, store_set, store_result =
                                 Site_accross_bonds_domain_type.add_link_and_event_in_created_bonds
-                                  parameter error bdu_false handler
+                                  parameters error bdu_false handler
                                   kappa_handler
                                   pair
                                   mvbdu
@@ -961,7 +961,7 @@ struct
         precondition
 
   let  apply_rule_modified_explicity_gen
-      ~pos bdu_false parameter error kappa_handler static dynamic
+      ~pos bdu_false parameters error kappa_handler static dynamic
       rule_id rule precondition modified_set store_set =
     let store_partition_modified_map = get_partition_modified pos static in
     (*------------------------------------------------------*)
@@ -973,7 +973,7 @@ struct
          let error, potential_tuple_pair_set =
            match
              Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
-               parameter error
+               parameters error
                (agent_type_mod, site_type_mod)
                store_partition_modified_map
            with
@@ -995,20 +995,20 @@ struct
               in
               let error', (agent_y, site_y) =
                 Site_accross_bonds_domain_type.convert_single_without_state
-                  parameter error'
+                  parameters error'
                   kappa_handler
                   (agent_type_y, site_type_y)
               in
               let error', (agent_x, site_x) =
                 Site_accross_bonds_domain_type.convert_single_without_state
-                  parameter error'
+                  parameters error'
                   kappa_handler
                   (agent_type_x, site_type_x)
               in
               let () =
                 if error' == error then ()
                 else
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
                     "\nWRONG TUPLE: !!! \n Rule %i agent_id_t: %i%s:%s( site_type_x: %i:%s), agent_type_y:%i:%s: (site_type_y:%i:%s) \n"
                     (Ckappa_sig.int_of_rule_id rule_id)
                     (Ckappa_sig.int_of_agent_id agent_id_mod)
@@ -1024,7 +1024,7 @@ struct
               let error =
                 Exception.check_point
                   Exception.warn
-                  parameter error error'
+                  parameters error error'
                   ~message:(context rule_id agent_id_mod
                               (match pos with
                                | Fst -> site_type'_x
@@ -1040,7 +1040,7 @@ struct
                   error, dynamic, precondition, store_set
                 | [] ->
                   (*let error, () =
-                    Exception.warn parameter error __POS__
+                    Exception.warn parameters error __POS__
                       ~message: "empty list in potential states in post condition" Exit ()
                     in*)
                   error, dynamic, precondition, store_set
@@ -1064,11 +1064,11 @@ struct
                        let handler = get_mvbdu_handler dynamic in
                        let error, handler, mvbdu =
                          Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                           parameter handler error pair_list
+                           parameters handler error pair_list
                        in
                        let error, handler, store_set, store_result =
                          Site_accross_bonds_domain_type.add_link_and_event_in_modif
-                           parameter error bdu_false handler
+                           parameters error bdu_false handler
                            kappa_handler
                            pair
                            mvbdu
@@ -1087,12 +1087,12 @@ struct
 
   let apply_rule_modified_explicity static dynamic error rule_id
       rule precondition = (*CHECK ME*)
-    let parameter  = get_parameter static in
+    let parameters  = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store_modified_map = get_modified_map static in
     let error, modified_set =
-      Common_static.get_set parameter
+      Common_static.get_set parameters
         error
         rule_id
         Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
@@ -1101,28 +1101,28 @@ struct
     (*---------------------------------------------------------------*)
     let error, dynamic, precondition, store_set1 =
       apply_rule_modified_explicity_gen
-        ~pos:Fst bdu_false parameter error kappa_handler static dynamic
+        ~pos:Fst bdu_false parameters error kappa_handler static dynamic
         rule_id rule precondition modified_set
         (*CHECK*)
         Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty
     in
     let error, dynamic, precondition, store_set2 =
       apply_rule_modified_explicity_gen
-        ~pos:Snd bdu_false parameter error kappa_handler static dynamic
+        ~pos:Snd bdu_false parameters error kappa_handler static dynamic
         rule_id rule precondition modified_set
         (*CHECK*)
         Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty
     in
     let error', store_set =
       Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.union
-        parameter
+        parameters
         error
         store_set1
         store_set2
     in
     let error =
       Exception.check_point
-        Exception.warn parameter error error' __POS__ Exit
+        Exception.warn parameters error error' __POS__ Exit
     in
     error, dynamic, precondition, store_set2
 
@@ -1131,12 +1131,12 @@ struct
 
   let free_site_gen ~pos static dynamic error agent' site_name' state'
       store_set =
-    let parameter  = get_parameter static in
+    let parameters  = get_parameter static in
     let store_partition_modified_map = get_partition_modified pos static in
     let error, potential_tuple_pair_set =
       match
         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
-          parameter error
+          parameters error
           (agent', site_name')
           store_partition_modified_map
       with
@@ -1152,7 +1152,7 @@ struct
          let handler = get_mvbdu_handler dynamic in
          let result = get_value dynamic in
          let error, mvbdu_opt =
-           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs parameter error (x,y) result
+           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs parameters error (x,y) result
          in
          match mvbdu_opt with
          | None -> error, dynamic, store_set
@@ -1164,28 +1164,28 @@ struct
            in
            let error, handler, cap =
              Ckappa_sig.Views_bdu.mvbdu_of_association_list
-               parameter handler error
+               parameters handler error
                [var,state']
            in
            let error, handler, redefine =
              Ckappa_sig.Views_bdu.build_association_list
-               parameter handler error
+               parameters handler error
                [var, Ckappa_sig.dummy_state_index]
            in
            let error, handler, mvbdu_cap =
              Ckappa_sig.Views_bdu.mvbdu_and
-               parameter handler error
+               parameters handler error
                mvbdu cap
            in
            let error, handler, mvbdu' =
              Ckappa_sig.Views_bdu.mvbdu_redefine
-               parameter handler error
+               parameters handler error
                mvbdu_cap
                redefine
            in
            let error, handler, mvbdu_or =
              Ckappa_sig.Views_bdu.mvbdu_or
-               parameter handler error
+               parameters handler error
                mvbdu
                mvbdu'
            in
@@ -1193,7 +1193,7 @@ struct
            let error, bdu_old =
              match
                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-                 parameter error
+                 parameters error
                  (x, y)
                  result
              with
@@ -1202,7 +1202,7 @@ struct
            in
            let error, handler, new_bdu =
              Ckappa_sig.Views_bdu.mvbdu_or
-               parameter handler error bdu_old mvbdu_or
+               parameters handler error bdu_old mvbdu_or
            in
            let dynamic = set_mvbdu_handler handler dynamic in
            (*condition*)(*CHECK ME*)
@@ -1212,7 +1212,7 @@ struct
            (*get the store_set*)
              let error, result =
                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.add_or_overwrite
-                 parameter error
+                 parameters error
                  (x, y)
                  (*mvbdu_or*)new_bdu
                  result
@@ -1221,12 +1221,12 @@ struct
              let proj (a, _, c, _) = (a, c) in
              let error', store_set =
                Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.add_when_not_in
-                 parameter
+                 parameters
                  error
                  (proj x, proj y)
                  store_set
              in
-             let error = Exception.check_point Exception.warn parameter error
+             let error = Exception.check_point Exception.warn parameters error
                  error' __POS__ Exit in
              let dynamic = set_mvbdu_handler handler dynamic in
              let dynamic = set_value result dynamic in
@@ -1243,10 +1243,10 @@ struct
       store_set
 
   let apply_rule_side_effects static dynamic error rule_id =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let error, list =
       Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
-        parameter error
+        parameters error
         []
         rule_id
         (get_potential_side_effects static)
@@ -1280,14 +1280,14 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
   event_list
 
   let apply_rule static dynamic error rule_id precondition =
-    let parameter  = get_parameter static in
+    let parameters  = get_parameter static in
     let event_list = [] in
     (*-----------------------------------------------------------*)
-    let error, rule = get_rule parameter error static rule_id in
+    let error, rule = get_rule parameters error static rule_id in
     match rule with
     | None ->
       let error, () =
-        Exception.warn  parameter error __POS__ Exit ()
+        Exception.warn parameters error __POS__ Exit ()
       in
       error, dynamic, (precondition, [])
     | Some rule ->
@@ -1302,19 +1302,19 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
       (*------------------------------------------------------*)
       (*1.b created bonds *)
       (*------------------------------------------------------*)
-      let parameter =
-        Remanent_parameters.update_prefix parameter "                "
+      let parameters =
+        Remanent_parameters.update_prefix parameters "                "
       in
       let dump_title () =
-        if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+        if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameters
         then
           let () =
             Loggers.fprintf
-              (Remanent_parameters.get_logger parameter)
+              (Remanent_parameters.get_logger parameters)
               "%sUpdate information about potential sites accross domain"
-              (Remanent_parameters.get_prefix parameter)
+              (Remanent_parameters.get_prefix parameters)
           in
-          Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
         else
           ()
       in
@@ -1372,7 +1372,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
   (* events enable communication between domains. At this moment, the
        global domain does not collect information *)
 
-  let apply_event_rule_aux parameter error store_rule_map tuple_pair_set
+  let apply_event_rule_aux parameters error store_rule_map tuple_pair_set
       event_list=
   let error, event_list =
     Ckappa_sig.Rule_map_and_set.Map.fold
@@ -1431,7 +1431,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
 (*-----------------------------------------------------------*)
 
   let apply_event_list_aux ~pos static dynamic error event_list  =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let store_partition_modified_map = get_partition_modified pos static in
     let store_partition_created_bonds_map =
       get_partition_created_bonds pos static
@@ -1448,7 +1448,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
             let error, tuple_pair_modif_set =
               match
                 Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
-                  parameter error
+                  parameters error
                   (agent_type, site_type)
                   store_partition_modified_map
               with
@@ -1461,7 +1461,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
             let error, tuple_pair_created_set =
               match
                 Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
-                  parameter error
+                  parameters error
                   (agent_type, site_type)
                   store_partition_created_bonds_map
               with
@@ -1496,7 +1496,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
             in
             let error, event_list =
               apply_event_rule_aux
-                parameter
+                parameters
                 error
                 store_potential_tuple_pair_rule_rhs
                 tuple_pair_modif_set
@@ -1504,7 +1504,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
             in
             let error, event_list =
               apply_event_rule_aux
-                parameter
+                parameters
                 error
                 store_potential_tuple_pair_rule_rhs
                 tuple_pair_created_set
@@ -1517,7 +1517,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
             in
             let error, event_list =
               apply_event_rule_aux
-                parameter
+                parameters
                 error
                 store_rule_partition_modified_map
                 tuple_pair_modif_set
@@ -1529,7 +1529,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
               get_rule_partition_created_bonds pos static in
             let error, event_list =
               apply_event_rule_aux
-                parameter
+                parameters
                 error
                 store_rule_partition_created_bonds
                 tuple_pair_created_set
@@ -1572,13 +1572,13 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
   (* to do *)
 
   let print static dynamic (error:Exception.method_handler) loggers =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let handler = get_mvbdu_handler dynamic in
     let log = loggers in
     (*--------------------------------------------------------*)
     let error, handler =
-      if Remanent_parameters.get_dump_reachability_analysis_result parameter
+      if Remanent_parameters.get_dump_reachability_analysis_result parameters
       then
         let () =
           Loggers.fprintf log
@@ -1601,7 +1601,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
                  ~verbose:true
                  ~sparse:true
                  ~final_result:true
-                 ~dump_any:true parameter error kappa_handler handler (x, y) mvbdu
+                 ~dump_any:true parameters error kappa_handler handler (x, y) mvbdu
             ) store_value (error, handler)
         in
         error, handler

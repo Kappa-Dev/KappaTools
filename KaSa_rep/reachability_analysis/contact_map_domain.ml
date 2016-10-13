@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Oct 03 2016>
+   * Last modification: Time-stamp: <Oct 13 2016>
    *
    * Abstract domain to record live rules
    *
@@ -146,11 +146,11 @@ struct
   (*Implementation*)
 
   let add_oriented_bond_in_set_of_bonds static dynamic error (x, y) =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let contact_map_dynamic = get_contact_map_dynamic dynamic in
     let error, contact_map_dynamic =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.add_when_not_in
-        parameter error
+        parameters error
         (x, y)
         contact_map_dynamic
     in
@@ -165,12 +165,12 @@ struct
   let add_oriented_bond_in_map_of_bonds static dynamic error (x, y) =
     let (agent_type, site_type, state) = x in
     let (agent_type', site_type', state') = y in
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let bonds_per_site = get_bonds_per_site dynamic in
     let error, old_map =
       match
         Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-          parameter error
+          parameters error
           (agent_type, site_type)
           bonds_per_site
       with
@@ -178,13 +178,13 @@ struct
       | error, Some m -> error, m
     in
     let error, state_map =
-      Ckappa_sig.State_map_and_set.Map.add_or_overwrite parameter error
+      Ckappa_sig.State_map_and_set.Map.add_or_overwrite parameters error
         state
         (agent_type', site_type', state')
         old_map
     in
     let error, bonds_per_site =
-      Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameter error
+      Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameters error
         (agent_type, site_type)
         state_map
         bonds_per_site
@@ -217,17 +217,17 @@ struct
   (**bond occurs in the initial state*)
 
   let collect_bonds_initial static dynamic error init_state =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let error, dynamic =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-        parameter error
-        (fun parameter error agent_id bonds_map dynamic ->
+        parameters error
+        (fun parameters error agent_id bonds_map dynamic ->
            let error, dynamic =
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type_source site_add (error, dynamic) ->
                   let error, pair =
                     Common_static.collect_pair_of_bonds
-                      parameter
+                      parameters
                       error
                       site_add
                       agent_id
@@ -268,27 +268,27 @@ struct
   let proj (_, b, c, d) = (b, c, d)
   let proj2 (x, y) = proj x, proj y
 
-  let proj_bonds_aux parameter error bonds_set =
+  let proj_bonds_aux parameters error bonds_set =
     Proj_bonds.proj_set
       (fun (x, y) -> proj2 (x, y))
-      parameter error bonds_set
+      parameters error bonds_set
 
   let is_enabled static dynamic error rule_id precondition =
     (*test if the bond in the lhs has already in the contact map, if not
       None, *)
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let bond_lhs = get_bond_lhs static in
     let contact_map = get_contact_map_dynamic dynamic in
     let error, bond_lhs_set =
       match
-        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters error
           rule_id bond_lhs
       with
       | error, None ->
         error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
-    let error, bond_lhs_set = proj_bonds_aux parameter error bond_lhs_set in
+    let error, bond_lhs_set = proj_bonds_aux parameters error bond_lhs_set in
     if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set
         contact_map
     then
@@ -300,7 +300,7 @@ struct
       (* instead of the static one *)
       let error, precondition =
         Communication.overwrite_potential_partners_map
-          parameter
+          parameters
           error
           precondition
           (fun error agent_type site_type state ->
@@ -308,20 +308,20 @@ struct
                 map, if defined, *)
              let error, statemap_bottop = (* JF: error should be propagated, Please correct !!! *)
                Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                 parameter error
+                 parameters error
                  (agent_type, site_type) dynamic.local.bonds_per_site
              in
              match statemap_bottop with
              | None ->
                (*error, Usual_domains.Val (agent_type, site_type, state) *)
                Exception.warn
-                 parameter error __POS__ ~message:"state map bottop is empty"
+                 parameters error __POS__ ~message:"state map bottop is empty"
                  Exit (Usual_domains.Val (agent_type, site_type, state))
               (* I think you should raise an error here *)
              | Some statemap ->
                match
                  Ckappa_sig.State_map_and_set.Map.find_option
-                   parameter error
+                   parameters error
                    state statemap
                with
                | error, None -> error, Usual_domains.Undefined
@@ -330,10 +330,10 @@ struct
           {
             Communication.fold =
               begin
-                fun parameter error agent_type site_type ->
+                fun parameters error agent_type site_type ->
                   let error, statemap_bottop =
                     Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                      parameter error
+                      parameters error
                       (agent_type, site_type) dynamic.local.bonds_per_site
                   in
                   match statemap_bottop with
@@ -345,7 +345,7 @@ struct
                     Usual_domains.Val
                       (fun f error init ->
                          Ckappa_sig.State_map_and_set.Map.fold
-                           (f parameter)
+                           (f parameters)
                            statemap
                            (error, init))
               end
@@ -358,13 +358,13 @@ struct
 
   let apply_rule static dynamic error rule_id precondition =
     let event_list = [] in
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     (*add the bonds in the rhs into the contact map*)
     let contact_map = get_contact_map_dynamic dynamic in
     let bond_rhs_map = get_bond_rhs static in
     let error, bond_rhs_set =
       match
-        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters
           error rule_id
           bond_rhs_map
       with
@@ -374,24 +374,24 @@ struct
       | error, Some s -> error, s
     in
     let error, bond_rhs_set =
-      proj_bonds_aux parameter error bond_rhs_set in
+      proj_bonds_aux parameters error bond_rhs_set in
     let error', union =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.union
-        parameter error contact_map bond_rhs_set
+        parameters error contact_map bond_rhs_set
     in
     let error =
       Exception.check_point
-        Exception.warn parameter error error' __POS__ Exit
+        Exception.warn parameters error error' __POS__ Exit
     in
     let dynamic = set_contact_map_dynamic union dynamic in
     let new_contact_map = get_contact_map_dynamic dynamic in
     let error', map_diff =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff
-        parameter error new_contact_map contact_map
+        parameters error new_contact_map contact_map
     in
     let error =
       Exception.check_point
-        Exception.warn parameter error error' __POS__ Exit
+        Exception.warn parameters error error' __POS__ Exit
     in
     (*update the second field*)
     let error, dynamic =
@@ -419,73 +419,73 @@ struct
     error, dynamic, kasa_state
 
   let print_contact_map_rhs static _dynamic error store_result =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    Loggers.fprintf (Remanent_parameters.get_logger parameter) "Contact map in the rhs:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameters) "Contact map in the rhs:\n";
     Ckappa_sig.Rule_map_and_set.Map.fold
       (fun rule_id pair error ->
          let () =
-           Loggers.fprintf (Remanent_parameters.get_logger parameter)
+           Loggers.fprintf (Remanent_parameters.get_logger parameters)
              "rule_id:%i:\n" (Ckappa_sig.int_of_rule_id rule_id)
          in
          let error =
            Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
              (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) error ->
                 let error, agent_type1_string =
-                  try Handler.string_of_agent parameter error kappa_handler agent_type1
+                  try Handler.string_of_agent parameters error kappa_handler agent_type1
                   with
                   | _ ->
                     Exception.warn
-                      parameter error __POS__ Exit
+                      parameters error __POS__ Exit
                       (Ckappa_sig.string_of_agent_name agent_type1)
                 in
                 let error, site_type1_string =
                   try
-                    Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
+                    Handler.string_of_site parameters error kappa_handler agent_type1 site_type1
                   with
                     _ ->
                     Exception.warn
-                      parameter error __POS__ Exit
+                      parameters error __POS__ Exit
                       (Ckappa_sig.string_of_site_name site_type1)
                 in
                 let error, state1_string =
                   try
-                    Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                    Handler.string_of_state_fully_deciphered parameters error kappa_handler
                       agent_type1 site_type1 state1
                   with
                     _ ->
                     Exception.warn
-                      parameter error __POS__ Exit
+                      parameters error __POS__ Exit
                       (Ckappa_sig.string_of_state_index state1)
                 in
                 let error, agent_type2_string =
-                  try Handler.string_of_agent parameter error kappa_handler agent_type2
+                  try Handler.string_of_agent parameters error kappa_handler agent_type2
                   with
                     _ ->
                     Exception.warn
-                      parameter error __POS__ Exit
+                      parameters error __POS__ Exit
                       (Ckappa_sig.string_of_agent_name agent_type2)
                 in
                 let error, site_type2_string =
                   try
-                    Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
+                    Handler.string_of_site parameters error kappa_handler agent_type2 site_type2
                   with
                     _ ->
                     Exception.warn
-                      parameter error __POS__ Exit
+                      parameters error __POS__ Exit
                       (Ckappa_sig.string_of_site_name site_type2)
                 in
                 let error, state2_string =
                   try
-                    Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                    Handler.string_of_state_fully_deciphered parameters error kappa_handler
                       agent_type2 site_type2 state2
                   with
                     _ -> Exception.warn
-                           parameter error __POS__ Exit
+                           parameters error __POS__ Exit
                            (Ckappa_sig.string_of_state_index state2)
                 in
                 let () =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
                     "agent_type1:%s:site_types:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
                     agent_type1_string
                     site_type1_string
@@ -501,68 +501,68 @@ struct
       ) store_result error
 
   let print_contact_map static _dynamic error store_result =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    Loggers.fprintf (Remanent_parameters.get_logger parameter) "Contact map:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameters) "Contact map:\n";
     let _ =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
         (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) error ->
            let error, agent_type1_string =
-             try Handler.string_of_agent parameter error kappa_handler agent_type1
+             try Handler.string_of_agent parameters error kappa_handler agent_type1
              with
              | _ ->
                Exception.warn
-                 parameter error __POS__ Exit
+                 parameters error __POS__ Exit
                  (Ckappa_sig.string_of_agent_name agent_type1)
            in
            let error, site_type1_string =
              try
-               Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
+               Handler.string_of_site parameters error kappa_handler agent_type1 site_type1
              with
              | _ ->
                Exception.warn
-                 parameter error __POS__ Exit
+                 parameters error __POS__ Exit
                  (Ckappa_sig.string_of_site_name site_type1)
            in
            let error, state1_string =
              try
-               Handler.string_of_state_fully_deciphered parameter error kappa_handler
+               Handler.string_of_state_fully_deciphered parameters error kappa_handler
                  agent_type1 site_type1 state1
              with
                _ ->
                Exception.warn
-                 parameter error __POS__ Exit
+                 parameters error __POS__ Exit
                  (Ckappa_sig.string_of_state_index state1)
            in
            let error, agent_type2_string =
-             try Handler.string_of_agent parameter error kappa_handler agent_type2
+             try Handler.string_of_agent parameters error kappa_handler agent_type2
              with
              | _ ->
                Exception.warn
-                 parameter error __POS__ Exit
+                 parameters error __POS__ Exit
                  (Ckappa_sig.string_of_agent_name agent_type2)
            in
            let error, site_type2_string =
              try
-               Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
+               Handler.string_of_site parameters error kappa_handler agent_type2 site_type2
              with
                _ ->
                Exception.warn
-                 parameter error __POS__ Exit
+                 parameters error __POS__ Exit
                  (Ckappa_sig.string_of_site_name site_type2)
            in
            let error, state2_string =
              try
-               Handler.string_of_state_fully_deciphered parameter error kappa_handler
+               Handler.string_of_state_fully_deciphered parameters error kappa_handler
                  agent_type2 site_type2 state2
              with
                _ ->
                Exception.warn
-                 parameter error __POS__ Exit
+                 parameters error __POS__ Exit
                  (Ckappa_sig.string_of_state_index state2)
            in
            let () =
-             Loggers.fprintf (Remanent_parameters.get_logger parameter)
+             Loggers.fprintf (Remanent_parameters.get_logger parameters)
                "agent_type1:%s:site_type1:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
                agent_type1_string
                site_type1_string

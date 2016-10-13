@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 26 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -242,13 +242,13 @@ let set_project_modified_map sites static =
     static
 
 let compute_initial_state error static =
-  let parameter = get_parameter static in
+  let parameters = get_parameter static in
   let compil = get_cc_code static in
   let error, init =
     (Int_storage.Nearly_inf_Imperatif.fold
-       parameter
+       parameters
        error
-       (fun _parameter error _ i l -> error, i :: l)
+       (fun _parameters error _ i l -> error, i :: l)
        compil.Cckappa_sig.init
        [])
   in
@@ -260,16 +260,16 @@ let get_log_info dynamic = dynamic.log_info
 let set_log_info log_info dynamic = {dynamic with log_info = log_info}
 
 let scan_rule static error =
-  let parameter = get_parameter static in
+  let parameters = get_parameter static in
   let kappa_handler = get_kappa_handler static in
   let compilation = get_cc_code static in
   let error, store_result =
-    Common_static.scan_rule_set parameter error kappa_handler compilation
+    Common_static.scan_rule_set parameters error kappa_handler compilation
   in
   let static = set_bdu_common_static store_result static in
   error, static
 
-let initialize_global_information parameter log_info error mvbdu_handler compilation kappa_handler =
+let initialize_global_information parameters log_info error mvbdu_handler compilation kappa_handler =
   let init_common = Common_static.init_bdu_common_static in
   let init_global_static =
     {
@@ -278,7 +278,7 @@ let initialize_global_information parameter log_info error mvbdu_handler compila
           cc_code = compilation;
           kappa_handler = kappa_handler;
         };
-      global_parameter     = parameter;
+      global_parameter     = parameters;
       global_bdu_common_static = init_common
     }
   in

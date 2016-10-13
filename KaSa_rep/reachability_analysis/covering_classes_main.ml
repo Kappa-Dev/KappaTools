@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 23th of Feburary
-  * Last modification: Time-stamp: <Aug 06 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   *
   * Compute the relations between the left hand site of a rule and its sites.
   *
@@ -19,9 +19,9 @@ let trace = false
 let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
 
 
-let collect_modified_map parameter error diff_reverse store_modified_map =
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-    (fun parameter error _agent_id site_modif store_modified_map ->
+let collect_modified_map parameters error diff_reverse store_modified_map =
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+    (fun parameters error _agent_id site_modif store_modified_map ->
        (*if there is no modified sites then do nothing*)
        if Ckappa_sig.Site_map_and_set.Map.is_empty site_modif.Cckappa_sig.agent_interface
        then error, store_modified_map
@@ -33,7 +33,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
                 (*store site map*)
                 let error,site_map =
                   Ckappa_sig.Site_map_and_set.Map.add
-                    parameter
+                    parameters
                     error
                     site
                     site
@@ -45,13 +45,13 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
          in
          let error =
            Exception.check_point
-             Exception.warn parameter error error' __POS__ Exit
+             Exception.warn parameters error error' __POS__ Exit
          in
          (*compute site_map*)
          let error, old_map =
            match
              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-               parameter
+               parameters
                error
                agent_type
                store_modified_map
@@ -62,14 +62,14 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
          (*store*)
          let error,final_map =
            Ckappa_sig.Site_map_and_set.Map.union
-             parameter
+             parameters
              error
              old_map
              store_site
          in
          let error', store_modified_map =
            Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-             parameter
+             parameters
              error
              agent_type
              final_map
@@ -77,7 +77,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
          in
          let error =
            Exception.check_point
-             Exception.warn parameter error error' __POS__ Exit
+             Exception.warn parameters error error' __POS__ Exit
          in
          error, store_modified_map
     ) diff_reverse
@@ -86,10 +86,10 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
 (*------------------------------------------------------------------------------*)
 (*compute covering classes, site test and bdu*)
 
-let collect_covering_classes parameter error views diff_reverse store_result =
+let collect_covering_classes parameters error views diff_reverse store_result =
   let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold2_common parameter error
-      (fun parameter error _agent_id agent site_modif store_result ->
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold2_common parameters error
+      (fun parameters error _agent_id agent site_modif store_result ->
          (* if in the interface there is no site modified then do nothing *)
          if Ckappa_sig.Site_map_and_set.Map.is_empty
              site_modif.Cckappa_sig.agent_interface
@@ -114,7 +114,7 @@ let collect_covering_classes parameter error views diff_reverse store_result =
              | _ ->
                let error, old_list =
                  match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                         parameter
+                         parameters
                          error
                          agent_type
                          store_result
@@ -125,7 +125,7 @@ let collect_covering_classes parameter error views diff_reverse store_result =
                let new_pair_list = (List.rev site_list) :: old_list in
                let error, store_result =
                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-                   parameter
+                   parameters
                    error
                    agent_type
                    new_pair_list
@@ -149,12 +149,12 @@ let collect_covering_classes parameter error views diff_reverse store_result =
   site), then agent A has only one covering class: CV_1: y
 *)
 
-let scan_rule_covering_classes parameter error _handler rule classes =
+let scan_rule_covering_classes parameters error _handler rule classes =
   (*------------------------------------------------------------------------------*)
   (*compute modified map*)
   let error, store_modified_map =
     collect_modified_map
-      parameter
+      parameters
       error
       rule.Cckappa_sig.diff_reverse
       classes.Covering_classes_type.store_modified_map
@@ -163,7 +163,7 @@ let scan_rule_covering_classes parameter error _handler rule classes =
   (*compute covering_class*)
   let error, store_covering_classes =
     collect_covering_classes
-      parameter
+      parameters
       error
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.diff_reverse
@@ -180,17 +180,17 @@ let scan_rule_covering_classes parameter error _handler rule classes =
 (************************************************************************************)
 (*RULES*)
 
-let scan_rule_set_covering_classes parameter error handler rules =
+let scan_rule_set_covering_classes parameters error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
   let error, init_modif_map =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameter error n_agents in
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameters error n_agents in
   let error, init_class =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameter error n_agents in
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameters error n_agents in
   (*------------------------------------------------------------------------------*)
   (* add each singleton as a covering class *)
   let error, init_class =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
-      parameter
+      parameters
       error
       (fun parameters error agent_type b init_class ->
          Ckappa_sig.Dictionary_of_sites.fold
@@ -230,11 +230,11 @@ let scan_rule_set_covering_classes parameter error handler rules =
   (*map each agent to a list of covering classes*)
   let error, store_covering_classes =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-      parameter error
-      (fun parameter error _rule_id rule classes ->
+      parameters error
+      (fun parameters error _rule_id rule classes ->
          let error, result =
            scan_rule_covering_classes
-             parameter
+             parameters
              error
              handler
              rule.Cckappa_sig.e_rule_c_rule
@@ -256,7 +256,7 @@ let length_sorted (l: Ckappa_sig.c_site_name list list): Ckappa_sig.c_site_name 
 (************************************************************************************)
 (*CLEANING*)
 
-let store_remanent parameter error covering_class _modified_map remanent =
+let store_remanent parameters error covering_class _modified_map remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.Covering_classes_type.store_pointer_backward in
   let good_covering_class = remanent.Covering_classes_type.store_dic in
@@ -264,7 +264,7 @@ let store_remanent parameter error covering_class _modified_map remanent =
   (*covering class dictionary*)
   let error, output =
     Covering_classes_type.Dictionary_of_List_sites.allocate
-      parameter
+      parameters
       error
       compare_unit_covering_class_id
       covering_class (*value: c_site_name list*)
@@ -277,7 +277,7 @@ let store_remanent parameter error covering_class _modified_map remanent =
     | Some (id, _, _, dic) -> error, (id, dic)
     | None ->
       Exception.warn
-        parameter error __POS__ Exit
+        parameters error __POS__ Exit
         (Covering_classes_type.dummy_cv_id, good_covering_class)
   in
   (*------------------------------------------------------------------------------*)
@@ -287,7 +287,7 @@ let store_remanent parameter error covering_class _modified_map remanent =
         let error, old_cv_set =
           match
             Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
-              parameter
+              parameters
               error
               old_cv_id
               pointer_backward
@@ -297,18 +297,18 @@ let store_remanent parameter error covering_class _modified_map remanent =
         in
         let error', new_cv_set =
           Covering_classes_type.CV_map_and_set.Set.add
-            parameter
+            parameters
             error
             cv_id
             old_cv_set
         in
         let error =
           Exception.check_point
-            Exception.warn parameter error error' __POS__ Exit
+            Exception.warn parameters error error' __POS__ Exit
         in
         let error, pointer_backward =
           Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
-            parameter
+            parameters
             error
             old_cv_id (*int*)
             new_cv_set (*set of int*)
@@ -338,9 +338,9 @@ let store_remanent parameter error covering_class _modified_map remanent =
   (0) inter (0,1) -> 0
 *)
 
-let clean_classes parameter error covering_classes modified_map =
+let clean_classes parameters error covering_classes modified_map =
   let error, init_pointer =
-    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameter error 0
+    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
   in
   let init_store_dic = Covering_classes_type.Dictionary_of_List_sites.init () in
   (*------------------------------------------------------------------------------*)
@@ -368,7 +368,7 @@ let clean_classes parameter error covering_classes modified_map =
         let error, potential_supersets =
           match
             Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
-              parameter
+              parameters
               error
               t
               pointer_backward
@@ -384,7 +384,7 @@ let clean_classes parameter error covering_classes modified_map =
             let error, potential_supersets' =
               match
                 Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
-                  parameter
+                  parameters
                   error
                   t'
                   pointer_backward
@@ -396,14 +396,14 @@ let clean_classes parameter error covering_classes modified_map =
             (* intersection of two sets *)
             let error',potential_superset =
               Covering_classes_type.CV_map_and_set.Set.inter
-                parameter
+                parameters
                 error
                 potential_supersets
                 potential_supersets'
             in
             let error =
               Exception.check_point
-                Exception.warn parameter error error'
+                Exception.warn parameters error error'
                 __POS__ Exit
             in
             if
@@ -412,7 +412,7 @@ let clean_classes parameter error covering_classes modified_map =
             then
               let error, result_covering_dic =
                 store_remanent
-                  parameter
+                  parameters
                   error
                   covering_class
                   modified_map
@@ -429,7 +429,7 @@ let clean_classes parameter error covering_classes modified_map =
           (*if it is empty then store it to remanent*)
           let error, result_covering_dic =
             store_remanent
-              parameter
+              parameters
               error
               covering_class
               modified_map
@@ -445,26 +445,26 @@ let clean_classes parameter error covering_classes modified_map =
 (*------------------------------------------------------------------------------*)
 (*compute covering classes in the set of rules*)
 
-let scan_rule_set_remanent parameter error handler rules =
+let scan_rule_set_remanent parameters error handler rules =
   (*create a new initial state to store after cleaning the covering classes*)
   let error, init_result =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
   in
   let error, store_covering_classes =
-    scan_rule_set_covering_classes parameter error handler rules
+    scan_rule_set_covering_classes parameters error handler rules
   in
   let result_covering_classes =
     store_covering_classes.Covering_classes_type.store_covering_classes
   in
   let error, remanent_dictionary =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
       (fun parameters error agent_type covering_class init_remanent ->
          (*------------------------------------------------------------------------------*)
          (*get modified site*)
          let error, modified_map =
            match
              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-               parameter
+               parameters
                error
                agent_type
                store_covering_classes.Covering_classes_type.store_modified_map
@@ -485,24 +485,24 @@ let scan_rule_set_remanent parameter error handler rules =
          (*compute the number of covering classes*)
          let error, get_number_cv =
            (Covering_classes_type.Dictionary_of_List_sites.last_entry
-              parameter error
+              parameters error
               store_remanent_dic.Covering_classes_type.store_dic)
          in
          let number_cv = (Covering_classes_type.int_of_cv_id get_number_cv) + 1 in
          (*------------------------------------------------------------------------------*)
          (*print covering classes*)
          let _ =
-           if Remanent_parameters.get_dump_site_dependencies parameter
+           if Remanent_parameters.get_dump_site_dependencies parameters
            then
-             let parameter =
-               Remanent_parameters.update_prefix parameter ""
+             let parameters =
+               Remanent_parameters.update_prefix parameters ""
              in
              let error, agent_string =
-               Handler.string_of_agent parameter error handler agent_type
+               Handler.string_of_agent parameters error handler agent_type
              in
              let _ =
-               Covering_classes_type.Dictionary_of_List_sites.iter parameter error
-                 (fun parameter error elt_id(*key*) site_type_list(*value*) _ _ ->
+               Covering_classes_type.Dictionary_of_List_sites.iter parameters error
+                 (fun parameters error elt_id(*key*) site_type_list(*value*) _ _ ->
                     let _ =
                       Printf.fprintf stdout
                         "Potential dependencies between sites:Number of covering classes:%i\n"
@@ -519,7 +519,7 @@ let scan_rule_set_remanent parameter error handler rules =
                     let error  =
                       List.fold_left (fun error site_type ->
                           let error, site_string =
-                            Handler.string_of_site parameter error handler agent_type site_type
+                            Handler.string_of_site parameters error handler agent_type site_type
                           in
                           let () =
                             Printf.fprintf stdout "site_type:%i:%s\n"
@@ -557,23 +557,23 @@ let scan_rule_set_remanent parameter error handler rules =
 (************************************************************************************)
 (*MAIN*)
 
-let covering_classes parameter error handler cc_compil =
+let covering_classes parameters error handler cc_compil =
   (*let error, init =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
     in*)
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = scan_rule_set_remanent parameter error handler
+  let parameters = Remanent_parameters.update_prefix parameters "agent_type:" in
+  let error, result = scan_rule_set_remanent parameters error handler
       cc_compil.Cckappa_sig.rules
   in
   error, result
 
 (************************************************************************************)
 (*
-let collect_remanent_list2set parameter error handler_kappa store_remanent  =
+let collect_remanent_list2set parameters error handler_kappa store_remanent  =
   let error, init =
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0
+    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameters error 0
   in
-  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
+  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameters error
     (fun paramter error agent_type remanent store_result ->
      (*-------------------------------------------------------------------------*)
      (*get covering classes dictionary*)

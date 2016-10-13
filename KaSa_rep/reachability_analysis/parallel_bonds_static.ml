@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 12 2016>
+   * Last modification: Time-stamp: <Oct 13 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -77,38 +77,38 @@ let init_local_static =
 
 (*******************************************************************)
 
-let translate_bond parameter error site_add agent_id site_type_source views =
+let translate_bond parameters error site_add agent_id site_type_source views =
   let error, pair =
     let agent_index_target = site_add.Cckappa_sig.agent_index in
     let site_type_target = site_add.Cckappa_sig.site in
     let error, agent_source =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-          parameter error agent_id views
+          parameters error agent_id views
       with
       | error, None ->
-        Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
+        Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, agent_target =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-          parameter error agent_index_target views
+          parameters error agent_index_target views
       with
       | error, None ->
-        Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
+        Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =
       Common_static.collect_agent_type_state
-        parameter
+        parameters
         error
         agent_source
         site_type_source
     in
     let error, (agent_type2, state2) =
       Common_static.collect_agent_type_state
-        parameter
+        parameters
         error
         agent_target
         site_type_target
@@ -121,7 +121,7 @@ let translate_bond parameter error site_add agent_id site_type_source views =
   error, pair
 
 let collect_double_bonds_in_pattern
-    parameter error ?tuple_of_interest pattern =
+    parameters error ?tuple_of_interest pattern =
   let good_tuple =
     match tuple_of_interest with
     | None -> (fun _ -> true)
@@ -132,8 +132,8 @@ let collect_double_bonds_in_pattern
       )
   in
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-    parameter error
-    (fun parameter error agent_id_source bonds_map store_result
+    parameters error
+    (fun parameters error agent_id_source bonds_map store_result
       ->
         Ckappa_sig.Site_map_and_set.Map.fold
           (fun site_type_source site_add
@@ -142,7 +142,7 @@ let collect_double_bonds_in_pattern
                 ((agent_type_source, site_type_source, state_source),
                  (agent_type_target, site_type_target, state_target)) =
               translate_bond
-                parameter error
+                parameters error
                 site_add
                 agent_id_source
                 site_type_source
@@ -167,7 +167,7 @@ let collect_double_bonds_in_pattern
                       ((_,_,state_source'),
                        (_, site_type_target', state_target')) =
                     translate_bond
-                      parameter error
+                      parameters error
                       site_add'
                       agent_id_source
                       site_type_source'
@@ -185,7 +185,7 @@ let collect_double_bonds_in_pattern
                       good_tuple tuple
                     then
                       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.add
-                        parameter error
+                        parameters error
                         tuple
                         bool
                         store_result
@@ -200,55 +200,55 @@ let collect_double_bonds_in_pattern
     pattern.Cckappa_sig.bonds
     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
 
-let project_away_ag_id_gen f parameter error big_store acc =
+let project_away_ag_id_gen f parameters error big_store acc =
   Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
     (fun tuple value (error, acc) ->
        f
-         parameter error
+         parameters error
          (Parallel_bonds_type.project2 tuple)
          value
          acc)
     big_store (error, acc)
 
-let project_away_ag_id parameter kappa_handler error big_store acc =
-  let f parameter error tuple value acc =
+let project_away_ag_id parameters kappa_handler error big_store acc =
+  let f parameters error tuple value acc =
     Parallel_bonds_type.add_value
-      parameter error kappa_handler
+      parameters error kappa_handler
       tuple
       (Usual_domains.Val value)
       acc
   in
-  project_away_ag_id_gen f parameter error big_store acc
+  project_away_ag_id_gen f parameters error big_store acc
 
 let project_away_ag_id_and_convert_into_set
-    parameter error big_store acc =
-  let f parameter error tuple _ acc =
+    parameters error big_store acc =
+  let f parameters error tuple _ acc =
     Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
-      parameter error tuple acc
+      parameters error tuple acc
   in
-  project_away_ag_id_gen f parameter error big_store acc
+  project_away_ag_id_gen f parameters error big_store acc
 
 (****************************************************************)
 (** Detect pair of bonds *)
 (****************************************************************)
 
 let collect_rule_double_bonds_lhs
-    parameter error rule_id rule store_result  =
+    parameters error rule_id rule store_result  =
   let error, map =
     collect_double_bonds_in_pattern
-      parameter error rule.Cckappa_sig.rule_lhs
+      parameters error rule.Cckappa_sig.rule_lhs
   in
   Ckappa_sig.Rule_map_and_set.Map.add
-    parameter error rule_id map store_result
+    parameters error rule_id map store_result
 
 let collect_rule_double_bonds_rhs
-    parameter error rule_id rule store_result  =
+    parameters error rule_id rule store_result  =
   let error, map =
     collect_double_bonds_in_pattern
-      parameter error rule.Cckappa_sig.rule_rhs
+      parameters error rule.Cckappa_sig.rule_rhs
   in
   Ckappa_sig.Rule_map_and_set.Map.add
-    parameter error rule_id map store_result
+    parameters error rule_id map store_result
 
 (**************************************************************************)
 (*a map (A,x,y, B,z,t) -> (Ag_id, Ag_id) RuleIDMap to explain
@@ -256,7 +256,7 @@ let collect_rule_double_bonds_rhs
 
 type pos = Fst | Snd
 
-let collect_site_create_parallel_bonds_gen pos parameter error
+let collect_site_create_parallel_bonds_gen pos parameters error
     store_action_binding store_parallel_bonds =
   let pick pos a b =
     match pos with
@@ -274,7 +274,7 @@ let collect_site_create_parallel_bonds_gen pos parameter error
              let error, old_list =
                match
                  Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.find_option_without_logs
-                   parameter
+                   parameters
                    error
                    ((agent_id, agent_type, site_type, state),
                     (agent_id', agent_type', site_type', state'))
@@ -307,7 +307,7 @@ let collect_site_create_parallel_bonds_gen pos parameter error
              in
              let error, store_result =
                Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.add_or_overwrite
-                 parameter
+                 parameters
                  error
                  ((agent_id, agent_type, site_type, state),
                   (agent_id', agent_type', site_type', state'))
@@ -319,7 +319,7 @@ let collect_site_create_parallel_bonds_gen pos parameter error
            set
            (error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty)
        in
-       Ckappa_sig.Rule_map_and_set.Map.add parameter error k new_set map)
+       Ckappa_sig.Rule_map_and_set.Map.add parameters error k new_set map)
     store_action_binding
     (error,Ckappa_sig.Rule_map_and_set.Map.empty)
 
@@ -333,10 +333,10 @@ let collect_snd_site_create_parallel_bonds =
 (*the fst map (A,x,y, B,z,t) -> A.x.z.B*)
 (**************************************************************************)
 
-let collect_fst_site_create_parallel_bonds_rhs parameter error
+let collect_fst_site_create_parallel_bonds_rhs parameters error
     store_action_binding store_parallel_bonds  =
   collect_fst_site_create_parallel_bonds
-    parameter error
+    parameters error
     store_action_binding
     store_parallel_bonds
 
@@ -344,11 +344,11 @@ let collect_fst_site_create_parallel_bonds_rhs parameter error
 (*the second map (A,x,y, B,z,t) -> A.y.t.B*)
 (**************************************************************************)
 
-let collect_snd_site_create_parallel_bonds_rhs parameter error
+let collect_snd_site_create_parallel_bonds_rhs parameters error
     store_action_binding store_parallel_bonds =
   let error, store_result =
     collect_snd_site_create_parallel_bonds
-      parameter
+      parameters
       error
       store_action_binding
       store_parallel_bonds
@@ -364,14 +364,14 @@ let collect_snd_site_create_parallel_bonds_rhs parameter error
 let proj_first_site (a, b, _, _, _) = (a, b)
 let proj_second_site (a, _, c, _, _) = (a, c)
 
-let collect_tuple_to_sites parameter error tuples_of_interest =
+let collect_tuple_to_sites parameters error tuples_of_interest =
   Parallel_bonds_type.Partition_tuples_to_sites_map.monadic_partition_set
     (fun _ error (u, v) ->
        error,
        (proj_first_site u, proj_second_site u,
         proj_first_site v, proj_second_site v)
     )
-    parameter
+    parameters
     error
     tuples_of_interest
 
@@ -381,7 +381,7 @@ let collect_tuple_to_sites parameter error tuples_of_interest =
 *)
 (*******************************************************************)
 
-let compare_first_pair parameter error x tuple_set store_result =
+let compare_first_pair parameters error x tuple_set store_result =
   let (agent_type_x, site_type_x) = x in (*A,x*)
   Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
     (fun (u, v) (error, store_result) ->
@@ -392,13 +392,13 @@ let compare_first_pair parameter error x tuple_set store_result =
        then
          let error, new_set =
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
-             parameter error
+             parameters error
              (u, v)
              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
          in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
-             parameter error
+             parameters error
              x
              new_set
              store_result
@@ -407,7 +407,7 @@ let compare_first_pair parameter error x tuple_set store_result =
        else error, store_result
     ) tuple_set (error, store_result)
 
-let compare_snd_pair parameter error y tuple_pair store_result =
+let compare_snd_pair parameters error y tuple_pair store_result =
   let (agent_type_y, site_type_y) = y in (*A,x*)
   Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
     (fun (u, v) (error, store_result) ->
@@ -418,13 +418,13 @@ let compare_snd_pair parameter error y tuple_pair store_result =
        then
          let error, new_set =
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
-             parameter error
+             parameters error
              (u, v)
              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
          in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
-             parameter error
+             parameters error
              y
              new_set
              store_result
@@ -435,29 +435,29 @@ let compare_snd_pair parameter error y tuple_pair store_result =
 
 (*map from sites to tuple *)
 
-let collect_sites_to_tuple parameter error map_of_sites store_result =
+let collect_sites_to_tuple parameters error map_of_sites store_result =
   Parallel_bonds_type.PairAgentSite_map_and_set.Map.fold
     (fun (x, y, _z, _t) tuple_set (error, store_result) ->
        (*---------------------------------------------------------------*)
        let error, store_result1 =
-         compare_first_pair parameter error
+         compare_first_pair parameters error
            x
            tuple_set
            Parallel_bonds_type.AgentSite_map_and_set.Map.empty
        in
        (*---------------------------------------------------------------*)
        let error, store_result2 =
-         compare_snd_pair parameter error
+         compare_snd_pair parameters error
            y
            tuple_set
            Parallel_bonds_type.AgentSite_map_and_set.Map.empty
        in
        (*---------------------------------------------------------------*)
-       let add_link parameter error x tuple_set store_result =
+       let add_link parameters error x tuple_set store_result =
          let error, old_set =
            match
              Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-               parameter error
+               parameters error
                x
                store_result
            with
@@ -468,18 +468,18 @@ let collect_sites_to_tuple parameter error map_of_sites store_result =
          in
          let error', new_set =
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
-             parameter error
+             parameters error
              old_set
              tuple_set
          in
          let error =
            Exception.check_point
-             Exception.warn parameter error error'
+             Exception.warn parameters error error'
              __POS__ Exit
          in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
-             parameter error
+             parameters error
              x
              new_set
              store_result
@@ -489,33 +489,33 @@ let collect_sites_to_tuple parameter error map_of_sites store_result =
        (*---------------------------------------------------------------*)
        let error, store_result =
          Parallel_bonds_type.AgentSite_map_and_set.Map.fold2
-           parameter error
-           (fun parameter error elt tuple_set_x store_result ->
+           parameters error
+           (fun parameters error elt tuple_set_x store_result ->
               let error, store_result =
-                add_link parameter error elt tuple_set_x store_result
+                add_link parameters error elt tuple_set_x store_result
               in
               error, store_result
            )
-           (fun parameter error elt tuple_set_y store_result ->
+           (fun parameters error elt tuple_set_y store_result ->
               let error, store_result =
-                add_link parameter error elt tuple_set_y store_result
+                add_link parameters error elt tuple_set_y store_result
               in
               error, store_result
            )
-           (fun parameter error elt tuple_set_x tuple_set_y store_result ->
+           (fun parameters error elt tuple_set_x tuple_set_y store_result ->
               let error', new_set =
                 Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
-                  parameter error
+                  parameters error
                   tuple_set_x
                   tuple_set_y
               in
               let error =
                 Exception.check_point
-                  Exception.warn parameter error error'
+                  Exception.warn parameters error error'
                   __POS__ Exit
               in
               let error, store_result =
-                add_link parameter error elt new_set store_result
+                add_link parameters error elt new_set store_result
               in
               error, store_result
            )

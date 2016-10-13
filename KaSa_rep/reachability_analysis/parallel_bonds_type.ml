@@ -532,13 +532,13 @@ let add_value_from_refined_tuple parameters error kappa_handler x =
 
 let swap_sites_in_tuple (a,b,s,s',st,st') = (a,b,s',s,st',st)
 
-let add_symmetric_tuple_pair f parameter error (x,y) remanent =
+let add_symmetric_tuple_pair f parameters error (x,y) remanent =
   let x' = swap_sites_in_tuple x in
   let y' = swap_sites_in_tuple y in
   List.fold_left
     (fun (error, remanent) t ->
        f
-         parameter error (get_id t,get_tuple t) remanent
+         parameters error (get_id t,get_tuple t) remanent
     )
     (error, remanent)
     [x,y;(*y,x;*)x',y';(*y',x'*)]

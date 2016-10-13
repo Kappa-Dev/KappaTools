@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Aug 06 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -66,44 +66,44 @@ struct
     let global = Analyzer_headers.set_log_info log_info
         (Domain.get_global_dynamic_information dynamic) in
     Domain.set_global_dynamic_information global dynamic
-  let lift f parameter error title opt dynamic =
+  let lift f parameters error title opt dynamic =
     let log_info = get_log_info dynamic in
-    let error, log_info = f parameter error title opt log_info in
+    let error, log_info = f parameters error title opt log_info in
     let dynamic = set_log_info log_info dynamic in
     error, dynamic
   let add_event = lift StoryProfiling.StoryStats.add_event
   let close_event = lift StoryProfiling.StoryStats.close_event
 
-  let main parameter log_info error mvbdu_handler compil kappa_handler =
-    let error, log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Global_initialization None log_info in
+  let main parameters log_info error mvbdu_handler compil kappa_handler =
+    let error, log_info = StoryProfiling.StoryStats.add_event parameters error StoryProfiling.Global_initialization None log_info in
     let error, static, dynamic =
       Analyzer_headers.initialize_global_information
-        parameter log_info error mvbdu_handler compil kappa_handler
+        parameters log_info error mvbdu_handler compil kappa_handler
     in
-    let error, log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Global_initialization None log_info in
+    let error, log_info = StoryProfiling.StoryStats.close_event parameters error StoryProfiling.Global_initialization None log_info in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let error, init = Analyzer_headers.compute_initial_state error static in
     let log_info = Analyzer_headers.get_log_info dynamic in
-    let error, log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Domains_initialization None log_info in
+    let error, log_info = StoryProfiling.StoryStats.add_event parameters error StoryProfiling.Domains_initialization None log_info in
     let dynamic = Analyzer_headers.set_log_info log_info dynamic in
     let error, static, dynamic =
       Domain.initialize static dynamic error in
-    let error, dynamic = close_event parameter error
+    let error, dynamic = close_event parameters error
         StoryProfiling.Domains_initialization None dynamic
     in
     let error, dynamic,_ =
       List.fold_left
         (fun (error, dynamic, i) chemical_species ->
-           let error, dynamic = add_event  parameter error (StoryProfiling.Initial_state i) None dynamic in
+           let error, dynamic = add_event  parameters error (StoryProfiling.Initial_state i) None dynamic in
            let error, dynamic, () =
              Domain.add_initial_state static dynamic error chemical_species
            in
-           let error, dynamic = close_event parameter error  (StoryProfiling.Initial_state i) None dynamic in
+           let error, dynamic = close_event parameters error  (StoryProfiling.Initial_state i) None dynamic in
            error, dynamic, i+1)
         (error, dynamic, 1)
         init
     in
-    let log = Remanent_parameters.get_logger parameter in
+    let log = Remanent_parameters.get_logger parameters in
     let error, static, dynamic =
       let rec aux error dynamic =
         let error, dynamic, next_opt = Domain.next_rule static dynamic error in
@@ -112,17 +112,17 @@ struct
         | Some rule_id ->
           let error =
             if local_trace
-            || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
-            || Remanent_parameters.get_trace parameter
+            || Remanent_parameters.get_dump_reachability_analysis_iteration parameters
+            || Remanent_parameters.get_trace parameters
             then
               let error, rule_id_string =
                 try
-                  Handler.string_of_rule parameter error kappa_handler
+                  Handler.string_of_rule parameters error kappa_handler
                     compil rule_id
                 with
                   _ ->
                   Exception.warn
-                    parameter error __POS__ Exit
+                    parameters error __POS__ Exit
                     (Ckappa_sig.string_of_rule_id rule_id)
               in
               let () = Loggers.print_newline log in
@@ -140,8 +140,8 @@ struct
             | None ->
               let _ =
                 if local_trace
-                || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
-                || Remanent_parameters.get_trace parameter
+                || Remanent_parameters.get_dump_reachability_analysis_iteration parameters
+                || Remanent_parameters.get_trace parameters
                 then
                   let () =
                     Loggers.fprintf log "\t\tthe precondition is not satisfied yet"
@@ -154,8 +154,8 @@ struct
             | Some precondition ->
               let _ =
                 if local_trace
-                || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
-                || Remanent_parameters.get_trace parameter
+                || Remanent_parameters.get_dump_reachability_analysis_iteration parameters
+                || Remanent_parameters.get_trace parameters
                 then
                   let () = Loggers.fprintf log "\t\tthe precondition is satisfied" in
                   let () = Loggers.print_newline log in

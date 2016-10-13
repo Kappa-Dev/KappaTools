@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 26 2016>
+  * Last modification: Time-stamp: <Oct 13 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -74,7 +74,7 @@ sig
 end
 
 (*****************************************************************************************)
-(*Analyzer is a functor takes a module Domain as its parameter.*)
+(*Analyzer is a functor takes a module Domain as its parameters.*)
 
 module Make (Domain:Analyzer_domain_sig.Domain) =
 struct
@@ -141,10 +141,10 @@ struct
 
   let push_rule static dynamic error r_id =
     let working_list = get_working_list dynamic in
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let error, rule_working_list =
       Ckappa_sig.Rule_FIFO.push
-        parameter
+        parameters
         error
         r_id
         working_list
@@ -163,22 +163,22 @@ struct
         working_list
     then error, dynamic, None
     else
-      let parameter = get_parameter static in
+      let parameters = get_parameter static in
       let error, (rule_id_op, working_list_tail) =
         Ckappa_sig.Rule_FIFO.pop
-          parameter error working_list
+          parameters error working_list
       in
       let dynamic = set_working_list working_list_tail dynamic in
       error, dynamic, rule_id_op
 
   (*for each rule with no lhs, push the rule in the working list *)
   let push_rule_creation static dynamic error rule_id rule =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let error, dynamic =
       List.fold_left (fun (error, dynamic) (agent_id, _agent_type) ->
           let error, agent =
             Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-              parameter
+              parameters
               error
               agent_id
               rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
@@ -187,7 +187,7 @@ struct
           | Some Cckappa_sig.Dead_agent _
           | Some Cckappa_sig.Ghost -> error, dynamic
           | None ->
-            Exception.warn parameter error __POS__ Exit dynamic
+            Exception.warn parameters error __POS__ Exit dynamic
           | Some Cckappa_sig.Unknown_agent _
           | Some Cckappa_sig.Agent _ ->
             let error, dynamic =
@@ -199,13 +199,13 @@ struct
     error, dynamic
 
   let scan_rule_creation static dynamic error =
-    let parameter = get_parameter static in
+    let parameters = get_parameter static in
     let compil = get_compil static in
     let rules = compil.Cckappa_sig.rules in
     let error, dynamic =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-        parameter error
-        (fun _parameter error rule_id rule dynamic ->
+        parameters error
+        (fun _parameters error rule_id rule dynamic ->
            let error, dynamic =
              push_rule_creation
                static

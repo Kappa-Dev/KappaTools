@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Oct 03 2016>
+   * Last modification: Time-stamp: <Oct 13 2016>
    *
    * Abstract domain to record live rules
    *
@@ -174,9 +174,9 @@ let get_potential_partner precondition error agent_type site state =
   let error, rep = precondition.partner_map error agent_type site state in
   error, precondition, rep
 
-let fold_over_potential_partners parameter error precondition agent_type site f init =
+let fold_over_potential_partners parameters error precondition agent_type site f init =
   match
-    precondition.partner_fold parameter error agent_type site
+    precondition.partner_fold parameters error agent_type site
   with
   | error, Usual_domains.Any -> error, precondition, Usual_domains.Top
   | error, Usual_domains.Undefined ->
@@ -184,7 +184,7 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
        about it *)
     let error, () =
       Exception.warn
-        parameter error __POS__ ~message:"bottom propagation" Exit ()
+        parameters error __POS__ ~message:"bottom propagation" Exit ()
     in
     error, precondition, Usual_domains.Not_top init
   | error, Usual_domains.Val v ->
