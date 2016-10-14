@@ -67,7 +67,7 @@ let to_pair ?lab1:(lab1="first") ?lab2:(lab2="second")
 let of_map
     ?lab_key:(lab_key="key")
     ?lab_value:(lab_value="value")
-    fold key_to_json value_to_json map =
+    ~fold key_to_json value_to_json map =
   `List
     (List.rev
        (fold
@@ -85,7 +85,7 @@ let to_map
     ?lab_key:(lab_key="key")
     ?lab_value:(lab_value="value")
     ?error_msg:(error_msg=build_msg "map")
-    add empty json_to_key json_to_value =
+    ~add ~empty json_to_key json_to_value =
   function
   | `List l ->
     List.fold_left

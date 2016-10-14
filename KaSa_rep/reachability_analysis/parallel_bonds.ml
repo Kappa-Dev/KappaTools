@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Oct 14 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -722,7 +722,9 @@ struct
   in
   event_list
 
-  let can_we_prove_this_is_the_first_application precondition =
+(*if it is not the first time it is apply then do not apply *)
+
+  let can_we_prove_this_is_not_the_first_application precondition =
     match
       Communication.is_the_rule_applied_for_the_first_time precondition
     with
@@ -825,12 +827,14 @@ struct
       (*if it belongs to non parallel bonds then false*)
       (*deal with creation*)
       let store_parallel_map =
-        if can_we_prove_this_is_the_first_application precondition
+        if can_we_prove_this_is_not_the_first_application precondition
         then
-          (*if Sure_value is true then compute the double bonds on the rhs*)
+          (*it is not applied for the first time.
+            Sure_value is true then compute the double bonds on the rhs*)
           get_rule_double_bonds_rhs static
         else
-          (*if Sure_value is false then it is empty*)
+        (*it is applied for the first time.
+          Sure_value is false then it is empty*)
           Ckappa_sig.Rule_map_and_set.Map.empty
       in
       (*--------------------------------------------------------------*)

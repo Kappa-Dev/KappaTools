@@ -1831,7 +1831,7 @@ struct
 
     let to_json
         ?lab_key:(lab_key="key") ?lab_value:(lab_value="value") =
-      JsonUtil.of_map ~lab_key ~lab_value fold
+      JsonUtil.of_map ~lab_key ~lab_value ~fold
 
 
     let of_json
@@ -1839,7 +1839,7 @@ struct
         ?lab_value:(lab_value="value")
         ?error_msg:(error_msg=JsonUtil.build_msg "map") =
       JsonUtil.to_map ~lab_key ~lab_value ~error_msg
-        add empty
+        ~add ~empty
 
   end
 end
