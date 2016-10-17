@@ -213,11 +213,24 @@ function observable_plot(configuration){
         // setup x-axis
         var x = (that.getXAxisLog()?d3.scaleLog().clamp(true):d3.scaleLinear()).range([0, width]);
         var xState = that.getStatesByMode(that.modes.XAXIS)[0];
-        x.domain(d3.extent(xState.values));
+	/* Get bounds , make sure to filter out nan's caused by log
+	   (in particular that of time equal zero).
+	 */
+	var x_bounds = [d3.min(xState
+			       .values
+			       .filter(function(d)
+				       { return !that.getXAxisLog() || d > 0; })),
+			d3.max(xState
+			       .values
+			       .filter(function(d)
+				       { return !that.getXAxisLog() || d > 0; }))];
+        x.domain(x_bounds);
         var xAxis = d3.axisBottom(x);
 
         // setup y-axis
-        var y = (that.getYAxisLog()?d3.scaleLog().clamp(true):d3.scaleLinear()).range([height, 0]);
+        var y = (that.getYAxisLog()?
+		 d3.scaleLog().clamp(true):
+		 d3.scaleLinear()).range([height, 0]);
         var yAxis = d3.axisLeft(y)
                       .tickFormat(d3.format(".3n"));
 
