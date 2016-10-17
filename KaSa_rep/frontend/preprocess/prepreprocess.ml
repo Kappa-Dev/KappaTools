@@ -167,19 +167,14 @@ let rec scan_interface parameters k agent interface remanent =
               (fst port.Ast.port_nme)
               k
               remanent
-          | [Ast.LNK_ANY,_]
-          | [Ast.FREE, _] | []
-          | [Ast.LNK_TYPE _,_]
-          | [Ast.LNK_SOME,_]       -> remanent
-          | _::(_,pos)::_ ->
-            Exception.warn parameters error __POS__
-              ~message:"More than one link state for a single site" ~pos
-              Exit a),set)
+          | [] | ((Ast.LNK_ANY | Ast.FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
+                  | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),set)
 
-let scan_agent parameters k agent remanent =
-  fst (scan_interface parameters k (fst (fst agent)) (snd agent) (remanent,Mods.StringSet.empty))
+let scan_agent parameters k ((name,_),intf) remanent =
+  fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
 
-let rec collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanent =
+let rec collect_binding_label
+    parameters mixture f (k:Ckappa_sig.c_agent_id) remanent =
   match mixture with
   | agent :: mixture (*| Ast.DOT (_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) ->
     collect_binding_label
@@ -274,13 +269,13 @@ let translate_lnk_state parameters lnk_state remanent =
   | [Ast.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent
   | _::(_,pos)::_ ->
     let error, va = remanent in
-    Ckappa_sig.LNK_ANY pos,(*FIXME*)
+    Ckappa_sig.LNK_ANY pos,
     Exception.warn parameters error __POS__
       ~message:"More than one link state for a single site" ~pos
       Exit va
 
 
-let translate_port parameters int_set port remanent =
+let translate_port is_signature parameters int_set port remanent =
   let error,map = remanent in
   let error,_ =
     check_freshness parameters error "Site" (fst (port.Ast.port_nme)) int_set
@@ -289,15 +284,11 @@ let translate_port parameters int_set port remanent =
     match port.Ast.port_lnk
     with [Ast.FREE,_] | [] -> error,Some true
           | [Ast.LNK_ANY,_] -> error,None
-          | [Ast.LNK_SOME,_]
-          | [Ast.LNK_TYPE _,_]
-          | [Ast.LNK_VALUE _,_] -> error,Some false
-          | _::(_,pos)::_ ->
-            Exception.warn parameters error __POS__
-              ~message:"More than one link state for a single site" ~pos
-              Exit None in
+          | ((Ast.LNK_SOME | Ast.LNK_TYPE _ | Ast.LNK_VALUE _
+            | Ast.FREE | Ast.LNK_ANY),_) :: _ -> error,Some false in
   let lnk,remanent =
-    translate_lnk_state parameters port.Ast.port_lnk (error',map) in
+    if is_signature then Ckappa_sig.FREE,remanent else
+      translate_lnk_state parameters port.Ast.port_lnk (error',map) in
   {
     Ckappa_sig.port_nme = fst (port.Ast.port_nme) ;
     Ckappa_sig.port_int = List.rev_map fst (List.rev port.Ast.port_int) ;
@@ -306,18 +297,22 @@ let translate_port parameters int_set port remanent =
     Ckappa_sig.port_free = is_free },
   remanent
 
-let rec translate_interface parameters int_set interface remanent =
+let rec translate_interface parameters is_signature int_set interface remanent =
   match interface with
   | [] -> Ckappa_sig.EMPTY_INTF,remanent
   | port::interface ->
-    let port,remanent = translate_port parameters int_set port remanent in
-    let interface,remanent = translate_interface parameters int_set interface remanent in
+    let port,remanent =
+      translate_port is_signature parameters int_set port remanent in
+    let interface,remanent =
+      translate_interface parameters is_signature int_set interface remanent in
     Ckappa_sig.PORT_SEP (port,interface),remanent
 
-let translate_interface parameters = translate_interface parameters Mods.StringSet.empty
+let translate_interface parameters is_signature =
+  translate_interface parameters is_signature Mods.StringSet.empty
 
-let translate_agent parameters agent remanent =
-  let interface,remanent = translate_interface parameters (snd agent) remanent in
+let translate_agent parameters is_signature agent remanent =
+  let interface,remanent =
+    translate_interface parameters is_signature (snd agent) remanent in
   {Ckappa_sig.ag_nme = fst (fst agent);
    Ckappa_sig.ag_intf = interface ;
    Ckappa_sig.ag_nme_pos = snd (fst agent);
@@ -337,7 +332,8 @@ let rec translate_mixture_zero_zero  parameters mixture remanent tail_size =
   match mixture with
   | [] -> build_skip tail_size Ckappa_sig.EMPTY_MIX,remanent
   | agent :: mixture ->
-    let agent,remanent = translate_agent parameters agent remanent in
+    let agent,remanent =
+      translate_agent parameters false agent remanent in
     let mixture,remanent = translate_mixture_zero_zero parameters mixture remanent tail_size  in
     Ckappa_sig.COMMA(agent,mixture),remanent
 (*      | Ast.DOT(i,agent,mixture) ->
@@ -367,11 +363,7 @@ let rec translate_mixture_in_rule parameters mixture remanent prefix_size empty_
     | [] -> Ckappa_sig.EMPTY_MIX, remanent
     | agent :: mixture ->
       let agent, remanent =
-        translate_agent
-          parameters
-          agent
-          remanent
-      in
+        translate_agent parameters false agent remanent in
       let mixture, remanent =
         translate_mixture_in_rule
           parameters
@@ -398,7 +390,7 @@ let rec translate_mixture parameters mixture remanent  =
   match mixture with
   | [] -> Ckappa_sig.EMPTY_MIX,remanent
   | agent :: mixture ->
-    let agent,remanent = translate_agent parameters agent remanent in
+    let agent,remanent = translate_agent parameters false agent remanent in
     let mixture,remanent = translate_mixture parameters mixture remanent in
     Ckappa_sig.COMMA(agent,mixture),remanent
 (*      | Ast.DOT(i,agent,mixture) ->
@@ -690,7 +682,7 @@ let refine_agent parameters error agent_set agent =
 
   let agent,(error,_map) =
     translate_agent
-      parameters agent
+      parameters true agent
       (error, (map,
                Ckappa_sig.Agent_id_map_and_set.Set.empty
               ))
@@ -718,7 +710,8 @@ let translate_compil parameters error compil =
   let error,_agent_set,signatures_rev =
     List.fold_left
       (fun  (error,agent_set,list) agent->
-         let error,agent_set,agent = refine_agent parameters error agent_set agent in
+         let error,agent_set,agent =
+           refine_agent parameters error agent_set agent in
          error,agent_set,(agent::list))
       (error,agent_set,[])
       compil.Ast.signatures
@@ -726,7 +719,8 @@ let translate_compil parameters error compil =
   let error,observables_rev =
     List.fold_left
       (fun (error,list) alg ->
-         let error,alg' = alg_with_pos_map (refine_mixture parameters) error alg in
+         let error,alg' =
+           alg_with_pos_map (refine_mixture parameters) error alg in
          error,alg'::list)
       (error,[])
       compil.Ast.observables

@@ -446,12 +446,12 @@ C() => [ C(z) v C(z!C.z) v C(z!C.t) ]
 ------------------------------------------------------------
 Some exceptions have been raised
 error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1303; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
 error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1303; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
 error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1303; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
 error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1303; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
 error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1303; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit

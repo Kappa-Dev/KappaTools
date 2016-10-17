@@ -146,7 +146,8 @@ let add_bond parameters error _i id_agent _agent site id_agent' agent' site' bon
     updated
     bond_list
 
-let translate_agent_sig parameters error handler agent (kasim_id:Ckappa_sig.c_agent_id) =
+let translate_agent_sig
+    parameters error handler agent (kasim_id:Ckappa_sig.c_agent_id) =
   let error, (bool, output) =
     Ckappa_sig.Dictionary_of_agents.allocate_bool
       parameters
