@@ -101,7 +101,7 @@ sig
   val get_rules: compil -> rule list
   val get_variables:
     compil ->
-    (string Location.annot *
+    (string *
      (connected_component array list,int) Alg_expr.e Location.annot) array
   val get_obs: compil -> (connected_component array list,int) Alg_expr.e list
 

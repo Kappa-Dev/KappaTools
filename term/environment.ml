@@ -159,7 +159,9 @@ let check_if_counter_is_filled_enough counter x =
                 snd x.observables.(0)))
 
 let propagate_constant updated_vars counter x =
-  let algs' = Array.copy x.algs.NamedDecls.decls in
+  let algs' =
+    Array.map (fun (x,y) -> (Location.dummy_annot x,y))
+      x.algs.NamedDecls.decls in
   let () =
     Array.iteri
       (fun i (na,v) ->

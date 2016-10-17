@@ -394,7 +394,7 @@ let build_l_type sigs pos dst_ty dst_p switch =
   let p_id = Signature.id_of_site dst_ty dst_p sigs in
   ((Ast.LNK_TYPE (p_id,ty_id),pos),switch)
 
-let build_link pos i ag_ty p_id switch (links_one,links_two) =
+let build_link sigs pos i ag_ty p_id switch (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
     raise (ExceptionDefn.Malformed_Decl
              ("This is the third occurence of link '"^string_of_int i
@@ -407,16 +407,24 @@ let build_link pos i ag_ty p_id switch (links_one,links_two) =
       ((Ast.LNK_VALUE (i,(-1,-1)),pos),switch),
       (Mods.IntMap.add i (ag_ty,p_id,new_link,pos) one',links_two)
     | Some (dst_ty,dst_p,dst_id,_),one' ->
-      let maintained = match switch with
-        | Linked (j,_) -> Some j = dst_id
-        | Freed | Erased | Maintained -> false in
-      ((Ast.LNK_VALUE (i,(dst_p,dst_ty)),pos),
-       if maintained then Maintained else switch),
-      (one',Mods.IntMap.add i (ag_ty,p_id,maintained) links_two)
+      if Signature.allowed_link ag_ty p_id dst_ty dst_p sigs then
+        let maintained = match switch with
+          | Linked (j,_) -> Some j = dst_id
+          | Freed | Erased | Maintained -> false in
+        ((Ast.LNK_VALUE (i,(dst_p,dst_ty)),pos),
+         if maintained then Maintained else switch),
+        (one',Mods.IntMap.add i (ag_ty,p_id,maintained) links_two)
+      else
+        raise (ExceptionDefn.Malformed_Decl
+                 (Format.asprintf
+                    "Forbidden link to a %a.%a from signature declaration"
+                    (Signature.print_site sigs dst_ty) dst_p
+                    (Signature.print_agent sigs) dst_ty,
+                  pos))
 
 let several_internal_states pos =
   raise (ExceptionDefn.Malformed_Decl
-           ("In a pattern, a site cannot have several internal state ",pos))
+           ("In a pattern, a site cannot have several internal states.",pos))
 
 let not_enough_specified agent_name (na,pos) =
   raise (ExceptionDefn.Malformed_Decl
@@ -588,7 +596,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
            let () = ports.(p_id) <- Location.dummy_annot Ast.FREE, Erased in
            (lannot,pset')
          | [Ast.LNK_VALUE (i,()), pos] ->
-           let va,lannot' = build_link pos i ag_id p_id Erased lannot in
+           let va,lannot' = build_link sigs pos i ag_id p_id Erased lannot in
            let () = ports.(p_id) <- va in (lannot',pset')
          | _::(_,pos)::_ ->
            raise (ExceptionDefn.Malformed_Decl
@@ -626,7 +634,7 @@ let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
            not_enough_specified agent_name p_na
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
-           let _,rannot' = build_link pos i ag_id p_id Freed rannot in
+           let _,rannot' = build_link sigs pos i ag_id p_id Freed rannot in
            pset',rannot'
          | [Ast.FREE, _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
@@ -683,11 +691,11 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
       let () = ports.(p_id) <- (Location.dummy_annot Ast.FREE, Maintained) in
       links_annot
     | [Ast.LNK_VALUE (i,()),pos], ([Ast.FREE,_] | []) ->
-      let va,lhs_links' = build_link pos i ag_id p_id Freed lhs_links in
+      let va,lhs_links' = build_link sigs pos i ag_id p_id Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | [Ast.LNK_ANY,pos_lnk], [Ast.LNK_VALUE (i,()),pos] ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), Linked (i,pos)) in
-      let _,rhs_links' = build_link pos i ag_id p_id Freed rhs_links in
+      let _,rhs_links' = build_link sigs pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_SOME,pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
@@ -699,7 +707,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
                f "breaking a semi-link on site '%s' will induce a side effect"
                na) in
       let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Linked (i,pos')) in
-      let _,rhs_links' = build_link pos' i ag_id p_id Freed rhs_links in
+      let _,rhs_links' = build_link sigs pos' i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
@@ -712,17 +720,17 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
                na) in
       let () = ports.(p_id) <-
           build_l_type sigs pos_lnk dst_ty dst_p (Linked (i,pos')) in
-      let _,rhs_links' = build_link pos' i ag_id p_id Freed rhs_links in
+      let _,rhs_links' = build_link sigs pos' i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | ([Ast.FREE,_] | []), [Ast.LNK_VALUE (i,()),pos] ->
       let () =
         ports.(p_id) <- (Location.dummy_annot Ast.FREE, Linked (i,pos)) in
-      let _,rhs_links' = build_link pos i ag_id p_id Freed rhs_links in
+      let _,rhs_links' = build_link sigs pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_VALUE (i,()),pos_i], [Ast.LNK_VALUE (j,()),pos_j] ->
       let va,lhs_links' =
-        build_link pos_i i ag_id p_id (Linked (j,pos_j)) lhs_links in
-      let _,rhs_links' = build_link pos_j j ag_id p_id Freed rhs_links in
+        build_link sigs pos_i i ag_id p_id (Linked (j,pos_j)) lhs_links in
+      let _,rhs_links' = build_link sigs pos_j j ag_id p_id Freed rhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links')
     | _::(_,pos)::_, _ ->
       raise (ExceptionDefn.Malformed_Decl
@@ -1041,23 +1049,15 @@ let create_t ast_intf =
   NamedDecls.create (
     Tools.array_map_of_list
       (fun p ->
-         match p.Ast.port_lnk with
-         | [Ast.FREE,_] | [] ->
-           (p.Ast.port_nme,
-            match p.Ast.port_int with
-            | [] -> None
-            | l ->
-              Some (NamedDecls.create
-                      (Tools.array_map_of_list (fun x -> (x,())) l))
-           )
-         | [(Ast.LNK_SOME | Ast.LNK_ANY |
-             Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos] ->
-           raise (ExceptionDefn.Malformed_Decl
-                    ("Link status inside a definition of signature", pos))
-         | (_,pos)::_::_ ->
-           raise (ExceptionDefn.Internal_Error
-                    ("TODO", pos))
-
+         (p.Ast.port_nme,
+          (NamedDecls.create
+             (Tools.array_map_of_list (fun x -> (x,())) p.Ast.port_int),
+           List.fold_left (fun acc -> function
+               | (Ast.FREE | Ast.LNK_ANY), _ -> acc
+               | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
+                 raise (ExceptionDefn.Malformed_Decl
+                          ("Forbidden link status inside a definition of signature", pos))
+               | Ast.LNK_TYPE (a,b), _ -> (a,b) :: acc) [] p.Ast.port_lnk))
       ) ast_intf)
 
 let create_sig l =

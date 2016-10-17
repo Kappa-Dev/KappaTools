@@ -220,7 +220,7 @@ let add_actions env grid event_number kind actions =
                | None -> grid
                | Some _ -> add (ag,site) false atom_modified grid event_number kind in
              add (ag,site) true atom_modified grid' event_number kind)
-          ag_intf grid in
+          grid ag_intf in
       aux grid q
   in aux grid actions
 

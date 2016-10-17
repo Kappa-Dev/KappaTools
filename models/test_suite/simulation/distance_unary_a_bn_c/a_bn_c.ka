@@ -1,6 +1,6 @@
-%agent: A(a~u~p)
-%agent: B(a,b,b1,c)
-%agent: C(c~u~p)
+%agent: A(a~u~p!a.B)
+%agent: B(a!a.A,b!b.B!b1.B,b1!b.B!b1.B,c!c.C)
+%agent: C(c~u~p!c.B)
 
 'ab' A(a), B(a) -> A(a!1), B(a!1) @ 0.01
 

@@ -995,15 +995,17 @@ let compute_signature show_title state =
           NamedDecls.create
             (Array.of_list
                (Mods.StringMap.fold
-                  (fun x (states,_binding) acc ->
+                  (fun x (states,binding) acc ->
+                     let binding' =
+                       List.map
+                         (fun (x,y) ->
+                            (Location.dummy_annot x, Location.dummy_annot y))
+                         binding in
                      (Location.dummy_annot x,
-                      match states with
-                      | [] -> None
-                      | l -> Some
-                               (NamedDecls.create
-                                  (Tools.array_map_of_list
-                                     (fun i ->
-                                        (Location.dummy_annot i,())) l)))::acc)
+                      (NamedDecls.create
+                         (Tools.array_map_of_list
+                            (fun i -> (Location.dummy_annot i,())) states),
+                       binding'))::acc)
                   interface [])))::list)
       l [] in
   let signature = Signature.create (Array.of_list l) in
@@ -1021,7 +1023,8 @@ let compute_ctmc_flow show_title state =
   let () = show_title state in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  let error, output = Stochastic_classes.stochastic_classes parameters error handler c_compil in
+  let error, output =
+    Stochastic_classes.stochastic_classes parameters error handler c_compil in
   Remanent_state.set_errors
     error
     (Remanent_state.set_ctmc_flow output state),

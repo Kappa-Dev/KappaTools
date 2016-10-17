@@ -4,7 +4,7 @@ type t (** Store of one agent *)
 
 val num_of_site : ?agent_name:string -> string Location.annot -> t -> int
 val site_of_num : int -> t -> string
-val fold : (int -> string -> 'a -> 'a) -> t -> 'a -> 'a
+val fold : (int -> string -> 'a -> 'a) -> 'a -> t -> 'a
 
 val num_of_internal_state : int -> string Location.annot -> t -> int
 (** [num_of_internal_state site_id state_name sign] *)
@@ -14,7 +14,10 @@ val internal_state_of_num : int -> int -> t -> string
 type s (** Store of all the agents *)
 
 val create :
-  (string Location.annot * unit NamedDecls.t option NamedDecls.t) array -> s
+  (string Location.annot *
+   (unit NamedDecls.t *
+    (string Location.annot * string Location.annot) list) NamedDecls.t) array ->
+  s
 
 val size : s -> int
 val get : s -> int -> t
@@ -40,6 +43,9 @@ val internal_states_number : int -> int -> s -> int
 (** [internal_state_number agent_id site_id sigs] *)
 
 val default_internal_state : int -> int -> s -> int option
+
+val allowed_link : int -> int -> int -> int -> s -> bool
+(** [allowed_link ag1 s1 ag2 s2 sigs] *)
 
 val print_agent : s -> Format.formatter -> int -> unit
 val print_site : s -> int -> Format.formatter -> int -> unit

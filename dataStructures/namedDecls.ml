@@ -1,5 +1,5 @@
 type 'a t =
-  { decls : (string Location.annot *'a) array;
+  { decls : (string *'a) array;
     finder : int Mods.StringMap.t }
 
 let name_map_of_array ?forbidden a =
@@ -14,11 +14,14 @@ let name_map_of_array ?forbidden a =
        else Mods.StringMap.add x i map)
     Mods.StringMap.empty a
 
-let create ?forbidden a = { decls = a; finder = name_map_of_array ?forbidden a}
+let create ?forbidden a = {
+  decls = Array.map (fun ((x,_),y) -> (x,y)) a;
+  finder = name_map_of_array ?forbidden a
+}
 
 let size nd = Array.length nd.decls
 
-let elt_name nd i = fst (fst nd.decls.(i))
+let elt_name nd i = fst nd.decls.(i)
 
 let elt_id ?(kind="element") nd (s,pos) =
   match Mods.StringMap.find_option s nd.finder with
@@ -28,7 +31,7 @@ let elt_id ?(kind="element") nd (s,pos) =
              (Format.asprintf "\"%s\" is not a declared %s." s kind,pos))
 
 let print ~sep pp f nd =
-  Pp.array sep (fun i f ((n,_),el) -> pp i n f el) f nd.decls
+  Pp.array sep (fun i f (n,el) -> pp i n f el) f nd.decls
 let debug_print pr f nd =
   print ~sep:Pp.space (fun i n f el ->
       Format.fprintf f "@[%i>%s: @[<2>%a@]@]"
@@ -37,13 +40,18 @@ let debug_print pr f nd =
 
 let fold f acc nd =
   Tools.array_fold_lefti
-    (fun i acc ((na,_),x) -> f i na acc x)
+    (fun i acc (na,x) -> f i na acc x)
     acc nd.decls
+
+let mapi f nd = {
+  decls = Array.mapi (fun i (s,v) -> (s,f i s v)) nd.decls;
+  finder = nd.finder;
+}
 
 let to_json aux nd =
   `List
     (Array.fold_right
-       (fun ((x,_),a) acc -> `Assoc ([("name",`String x);("decl",aux a)]):: acc)
+       (fun (x,a) acc -> `Assoc ([("name",`String x);("decl",aux a)]):: acc)
        nd.decls
        [])
 

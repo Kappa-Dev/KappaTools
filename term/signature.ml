@@ -1,9 +1,6 @@
-type t = ((unit NamedDecls.t) option) NamedDecls.t
+type t = (unit NamedDecls.t * bool array array option) NamedDecls.t
 
-let fold f sign cont =
-  Tools.array_fold_lefti
-    (fun i cont ((na,_),_) -> f i na cont) cont
-    sign.NamedDecls.decls
+let fold f = NamedDecls.fold (fun i n o _ -> f i n o)
 
 let num_of_site ?agent_name site_name sign =
   let kind = match agent_name with
@@ -15,55 +12,49 @@ let site_of_num addr sign =
   try NamedDecls.elt_name sign addr
   with Invalid_argument _ -> raise Not_found
 
-let num_of_internal_state site_id (_,pos as state) sign =
+let num_of_internal_state site_id state sign =
   try
-    let (na,_),values_opt = sign.NamedDecls.decls.(site_id) in
-    match values_opt with
-    | None ->
-      raise (ExceptionDefn.Malformed_Decl
-               ("Site "^na^" has no declared internal state.",pos))
-    | Some nd ->
-      NamedDecls.elt_id ~kind:("internal state for site "^na) nd state
+    let na,(nd,_) = sign.NamedDecls.decls.(site_id) in
+    NamedDecls.elt_id ~kind:("internal state for site "^na) nd state
   with
   | Invalid_argument _ -> raise Not_found
 
 let internal_state_of_num site_num val_num sign =
   try
-    let _,values_opt = sign.NamedDecls.decls.(site_num) in
-    match values_opt with
-    | None -> raise Not_found
-    | Some nd -> fst (fst nd.NamedDecls.decls.(val_num))
+    let _,(nd,_) = sign.NamedDecls.decls.(site_num) in
+    fst nd.NamedDecls.decls.(val_num)
   with
   | Invalid_argument _ -> raise Not_found
 
-let print_one f sign =
-  Format.fprintf
-    f "@[%a@]"
-    (NamedDecls.print
-       ~sep:(fun f -> Format.fprintf f ",@,")
-       (fun _ name f ints ->
-          let pp_int f =
-            match ints with
-            | None -> ()
-            | Some nd ->
-              NamedDecls.print
-                ~sep:(fun _ -> ())
-                (fun _ na f () -> Format.fprintf f "~%s" na) f nd
-          in
-          Format.fprintf f "%s%t" name pp_int))
-    sign
-
 let one_to_json =
   NamedDecls.to_json
-    (function
-      | None -> `Null
-      | Some x -> NamedDecls.to_json (fun () -> `Null) x)
+    (JsonUtil.of_pair
+       (NamedDecls.to_json (fun () -> `Null))
+       (JsonUtil.of_option
+          (fun links ->
+             `List (Array.fold_right (fun a acc ->
+                 `List (Array.fold_right (fun b c -> `Bool b :: c) a []) :: acc)
+                 links []))))
 
 let one_of_json =
   NamedDecls.of_json
-    (Yojson.Basic.Util.to_option
+    (JsonUtil.to_pair
        (NamedDecls.of_json (function
             | `Null -> ()
+            | x -> raise (Yojson.Basic.Util.Type_error
+                            ("Problematic agent signature",x))))
+       (Yojson.Basic.Util.to_option
+          (function
+            | `List l ->
+              Tools.array_map_of_list (function
+                  | `List l' -> Tools.array_map_of_list (function
+                      | `Bool b -> b
+                      | x -> raise (Yojson.Basic.Util.Type_error
+                                      ("Problematic agent signature",x)))
+                      l'
+                  | x -> raise (Yojson.Basic.Util.Type_error
+                                  ("Problematic agent signature",x)))
+                l
             | x -> raise (Yojson.Basic.Util.Type_error
                             ("Problematic agent signature",x)))))
 type s = t NamedDecls.t
@@ -97,23 +88,60 @@ let internal_state_of_id agent_id id_site id_state sigs =
 
 let internal_states_number agent_id site_num sigs =
   try
-    let _,values_opt = (get sigs agent_id).NamedDecls.decls.(site_num) in
-    match values_opt with
-    | None -> 0
-    | Some nd -> NamedDecls.size nd
+    let _,(nd,_) = (get sigs agent_id).NamedDecls.decls.(site_num) in
+    NamedDecls.size nd
   with
   | Invalid_argument _ -> raise Not_found
 
 let default_internal_state agent_id site_id sigs =
   try
-    match (get sigs agent_id).NamedDecls.decls.(site_id) with
-    | _, None -> None
-    | _, Some _ -> Some 0
+    let _,(nd,_) = (get sigs agent_id).NamedDecls.decls.(site_id) in
+    if nd.NamedDecls.decls = [||] then None else Some 0
   with
   | Invalid_argument _ ->
     invalid_arg "Signature.default_num_value: invalid site identifier"
 
-let create t = NamedDecls.create t
+let rec allowed_link ag1 s1 ag2 s2 sigs =
+  if ag1 > ag2 then allowed_link ag2 s2 ag1 s1 sigs
+  else
+    try match (get sigs ag1).NamedDecls.decls.(s1) with
+      | _, (_,None) -> true
+      | _, (_,Some l) -> l.(ag2-ag1).(s2)
+    with
+    | Invalid_argument _ ->
+      invalid_arg "Signature.allowed_link: invalid site identifier"
+
+let create t =
+  let raw = NamedDecls.create t in
+  let no_contact_map = Array.for_all (fun (_,nd) ->
+      Array.for_all (fun (_,(_,x)) -> x = []) nd.NamedDecls.decls) t in
+  let s = Array.length t in
+  NamedDecls.mapi
+    (fun ag ag_na -> NamedDecls.mapi
+        (fun _ si_na (ints,links) ->
+           if no_contact_map then (ints, None) else
+             let out =
+               Array.init
+                 (s-ag)
+                 (fun i ->
+                    Array.make (NamedDecls.size (get raw (i+ag))) false) in
+             let () =
+               List.iter
+                 (fun ((site_name,pos as site),(agent_name,_ as agent)) ->
+                    let a = num_of_agent agent raw in
+                    let s = num_of_site ~agent_name site (get raw a) in
+                    let () = if a >= ag then out.(a-ag).(s) <- true in
+                    if List.exists
+                        (fun ((x,_),(y,_)) -> x = si_na && y = ag_na)
+                        (snd (snd (get raw a).NamedDecls.decls.(s))) then ()
+                    else
+                      raise (ExceptionDefn.Malformed_Decl
+                               (Format.asprintf
+                                  "No link to %s.%s from %s.%s."
+                                  si_na ag_na site_name agent_name,pos)))
+                 links in
+             (ints,Some out)))
+    raw
 
 let print_agent sigs f ag_ty =
   Format.pp_print_string f @@ agent_of_num ag_ty sigs
@@ -127,11 +155,36 @@ let print_site_internal_state sigs ag_ty site f = function
     Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
       (internal_state_of_id ag_ty site id sigs)
 
+let print_one ?sigs f sign =
+  let pp_int =
+    NamedDecls.print
+      ~sep:(fun _ -> ())
+      (fun _ na f () -> Format.fprintf f "~%s" na) in
+  let pp_link =
+    match sigs with
+    | None -> fun _ _ _ -> ()
+    | Some sigs -> fun i f -> function
+      | None -> ()
+      | Some links ->
+        Pp.array Pp.empty
+          (fun ag -> Pp.array Pp.empty
+              (fun si f b -> if b then
+                  Format.fprintf f "!%a.%a"
+                    (print_site sigs (i+ag)) si (print_agent sigs) (i+ag)))
+          f links in
+  Format.fprintf
+    f "@[%a@]"
+    (NamedDecls.print
+       ~sep:(fun f -> Format.fprintf f ",@,")
+       (fun i name f (ints,links) ->
+           Format.fprintf f "%s%a%a" name pp_int ints (pp_link i) links))
+    sign
+
 let print f sigs =
   Format.fprintf
     f "@[<v>%a@]"
     (NamedDecls.print ~sep:Pp.space
-       (fun _ n f si -> Format.fprintf f "%s(%a)" n print_one si))
+       (fun _ n f si -> Format.fprintf f "%s(%a)" n (print_one ~sigs) si))
     sigs
 
 let to_json = NamedDecls.to_json one_to_json

@@ -86,7 +86,7 @@ struct
 
   type 'a decl =
     | Var of
-        var_id * string Location.annot option * ('a,int) Alg_expr.e Location.annot
+        var_id * string option * ('a,int) Alg_expr.e Location.annot
     | Init_expr of
         var_id  * ('a,int) Alg_expr.e Location.annot * ode_var_id list
     | Dummy_decl
@@ -942,7 +942,7 @@ struct
                sort_decls
                with
                  init = decl::sort_decls.init}
-           | Var (_id,Some (a,_),b) ->
+           | Var (_id,Some a,b) ->
              if is_const b
              then
                {

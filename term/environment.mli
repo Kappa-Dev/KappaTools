@@ -25,8 +25,7 @@ val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t
 
 val get_alg : t -> int -> Alg_expr.t
-val get_algs :
-  t -> (string Location.annot * Alg_expr.t Location.annot) array
+val get_algs : t -> (string * Alg_expr.t Location.annot) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
 val get_ast_rule: t -> int -> LKappa.rule
