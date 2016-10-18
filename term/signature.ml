@@ -113,8 +113,10 @@ let rec allowed_link ag1 s1 ag2 s2 sigs =
 
 let create t =
   let raw = NamedDecls.create t in
-  let no_contact_map = Array.for_all (fun (_,nd) ->
-      Array.for_all (fun (_,(_,x)) -> x = []) nd.NamedDecls.decls) t in
+  let no_contact_map = Array.fold_left (fun acc (_,nd) ->
+      acc &&
+      Array.fold_left (fun acc (_,(_,x)) -> acc && x = [])
+        true nd.NamedDecls.decls) true t in
   let s = Array.length t in
   NamedDecls.mapi
     (fun ag ag_na -> NamedDecls.mapi
