@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Sep 19 2016>
+ * Last modification: Time-stamp: <Oct 18 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -14,14 +14,14 @@
 
 module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
-(****************************************************************************************)
+(***************************************************************************)
 
 type position       = Location.t
 type agent_name     = string
 type site_name      = string
 type internal_state = string
 
-(****************************************************************************************)
+(*****************************************************************************)
 
 type c_agent_name
 type c_site_name
@@ -88,7 +88,7 @@ val compare_unit_site_name: unit -> unit -> c_site_name
 val compare_unit_state_index: unit -> unit -> c_state
 
 
-(****************************************************************************************)
+(***************************************************************************)
 
 module Agent_type_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_agent_name
@@ -103,7 +103,8 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif:
   with type key = c_agent_name * c_site_name
    and type dimension = int * int
 
-module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif: Int_storage.Storage
+module
+  Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif: Int_storage.Storage
   with type key = c_agent_name * (c_site_name * c_state)
    and type dimension = int * (int * int)
 
@@ -136,13 +137,13 @@ module Site_union_find: Union_find.Union_find
    and type dimension = int
    and type key = c_site_name
 
-(****************************************************************************************)
+(******************************************************************************)
 (*FIFO*)
 
 module Rule_FIFO : Fifo.Work_list
   with type elt = c_rule_id
 
-(****************************************************************************************)
+(******************************************************************************)
 
 module Agent_id_nearly_Inf_Int_storage_Imperatif : Int_storage.Storage
   with type key = c_agent_id
@@ -156,7 +157,8 @@ module Rule_id_quick_nearly_Inf_Int_storage_Imperatif:
   Int_storage.Storage
   with type key = c_rule_id
    and type dimension = int
-(****************************************************************************************)
+
+(****************************************************************************)
 
 module Agent_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_name
@@ -225,7 +227,7 @@ module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
          (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
 
-(****************************************************************************************)
+(****************************************************************************)
 
 type binding_state =
   | Free

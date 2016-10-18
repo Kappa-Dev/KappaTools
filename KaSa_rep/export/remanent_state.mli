@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Oct 18 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -82,7 +82,38 @@ type flow =
     Ckappa_sig.Site_union_find.t
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
+(*******************************************************************)
+(*TODO*)
+
+(*Ex:
+  "views", hyp: A(x~p) -> refinment: [A(x~p, y~p)]
+  "parallel", hyp: A(x!_, y!_) -> refinment: [A(x!1, y!2), B(x!1, y!2)]
+*)
+
+type 'site_graph lemma =
+  {
+    hyp : 'site_graph ;
+    refinment : 'site_graph list
+  }
+
+type 'site_graph poly_constraint_list =
+  (string * 'site_graph lemma list) list
+
+type internal_constraint_list =
+  Ckappa_backend.Ckappa_backend.t poly_constraint_list
+
+type constraint_list =
+  ((string *
+    (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+       Wrapped_modules.LoggedStringMap.t)
+     list)
+    poly_constraint_list
+
+(*******************************************************************)
+
 type ('static, 'dynamic) state
+
+(*******************************************************************)
 
 val create_state:
   ?errors:Exception.method_handler -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state

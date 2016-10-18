@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Oct 18 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -187,6 +187,7 @@ let site="site name"
 let stateslist="states list"
 let prop="property states"
 let bind="binding states"
+
 let contact_map_to_json =
   Mods.StringMap.to_json
     ~lab_key:agent ~lab_value:interface
@@ -247,6 +248,30 @@ type flow =
   Ckappa_sig.Site_union_find.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
+(*******************************************************************)
+(*TODO*)
+
+type 'site_graph lemma =
+  {
+    hyp : 'site_graph ;
+    refinment : 'site_graph list
+  }
+
+type 'site_graph poly_constraint_list =
+  (string * 'site_graph lemma list) list
+
+type internal_constraint_list =
+  Ckappa_backend.Ckappa_backend.t poly_constraint_list
+
+type constraint_list =
+  ((string *
+    (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+       Wrapped_modules.LoggedStringMap.t)
+     list)
+    poly_constraint_list
+
+(*******************************************************************)
+
 type ('static,'dynamic) state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
@@ -274,6 +299,8 @@ type ('static,'dynamic) state =
     ode_flow: Ode_fragmentation_type.ode_frag option ;
     ctmc_flow: flow option ;
     errors        : Exception.method_handler ;
+    (*TODO*)
+    internal_constraint_list : internal_constraint_list;
   }
 
 let create_state ?errors parameters init =
@@ -308,6 +335,7 @@ let create_state ?errors parameters init =
     dead_rules = None ;
     dead_agents = None ;
     errors = error ;
+    internal_constraint_list = []
   }
 
 let do_event_gen f phase n state =

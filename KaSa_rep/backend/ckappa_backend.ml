@@ -9,6 +9,21 @@ struct
     | Binding_type of Ckappa_sig.agent_name * Ckappa_sig.site_name
     | Bound_to of bond_index
 
+  (*TODO: type store the information before print*)
+  type internal_list = (Ckappa_sig.agent_name *
+                        Wrapped_modules.LoggedStringMap.elt *
+                        Ckappa_sig.internal_state) list
+
+  type bound_to_list =
+    (Ckappa_sig.agent_name * Wrapped_modules.LoggedStringMap.elt * bond_index)
+      list
+
+  type binding_list = (Ckappa_sig.agent_name *
+                       Wrapped_modules.LoggedStringMap.elt *
+                       (Ckappa_sig.agent_name * Ckappa_sig.site_name)) list
+  type triple_pair_list =
+    internal_list * bound_to_list * binding_list
+
   type t =
     {
       views:
@@ -78,6 +93,7 @@ struct
   let max_state_index a b =
     if Ckappa_sig.compare_state_index a b <= 0
     then b else a
+
   let min_state_index a b =
     if Ckappa_sig.compare_state_index a b <= 0
     then a else b
@@ -535,6 +551,58 @@ struct
         t.string_version
         false
     in error
+
+
+  (***************************************************************************)
+  (*TODO:store the information of the print function *)
+
+  let print_store_views error kappa_handler t =
+    let error, store_result =
+      Ckappa_sig.Agent_id_map_and_set.Map.fold
+        (fun _ (agent_string, site_map) (error, current_list) ->
+           let error, current_list =
+             Wrapped_modules.LoggedStringMap.fold
+               (fun site_string (internal, binding) (error, current_list) ->
+                  let current_list1, current_list2, current_list3 =
+                    current_list in
+                  let error, internal_list =
+                    match internal with
+                    | None -> error, current_list1
+                    | Some internal_state ->
+                      (*[agent_string, internal_state, state_int,
+                        (agent_name, site_name)]*)
+                      error,
+                      (agent_string, site_string, internal_state) ::
+                      current_list1
+                  in
+                  let error, bound_to_list, binding_list =
+                    match binding with
+                    | None | Some Free | Some Wildcard
+                    | Some Bound_to_unknown ->
+                      error,
+                      current_list2,
+                      current_list3
+                    | Some (Bound_to state_int) ->
+                      error,
+                      (agent_string, site_string, state_int) :: current_list2,
+                      current_list3
+                    | Some (Binding_type (agent_name, site_name)) ->
+                      error,
+                      current_list2,
+                      (agent_string, site_string, (agent_name, site_name)) ::
+                      current_list3
+                  in
+                  error, (internal_list, bound_to_list, binding_list)
+               ) site_map (error, current_list)
+           in
+           error, current_list
+        )
+        t.string_version
+        (error, ([], [], []))
+    in
+    error, store_result
+
+(***************************************************************************)
 
   let print_list logger parameter error kappa_handler list =
     match list with

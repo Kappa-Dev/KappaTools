@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Oct 14 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3431,7 +3431,7 @@ struct
                    Exception.warn  parameters error error'
                    __POS__ Exit
                in
-               (*-----------------------------------------------------------------------*)
+               (*-----------------------------------------------------------*)
                let () =
                  if local_trace || Remanent_parameters.get_trace parameters
                  then
@@ -3444,7 +3444,7 @@ struct
                    in
                    Loggers.print_newline (Remanent_parameters.get_logger parameters)
                in
-               (*-----------------------------------------------------------------------*)
+               (*------------------------------------------------------------*)
                let error, site_correspondence =
                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
                    parameters error agent_type site_correspondence
@@ -3462,15 +3462,15 @@ struct
                    | _ :: tail -> aux tail
                  in aux site_correspondence
                in
-               (*-----------------------------------------------------------------------*)
+               (*------------------------------------------------------------*)
                let error,(_, map2) =
                  Bdu_static_views.new_index_pair_map parameters error site_correspondence
                in
-               (*-----------------------------------------------------------------------*)
+               (*-----------------------------------------------------------*)
                let error, handler, list' =
                  decomposition parameters handler error bdu_update
                in
-               (*-----------------------------------------------------------------------*)
+               (*-----------------------------------------------------------*)
                let error, (handler, list) =
                  List.fold_left
                    (fun (error, (handler, list)) mvbdu ->
@@ -3518,7 +3518,7 @@ struct
                           rename_site
                           mvbdu
                       in
-                      (*--------------------------------------------------------------------*)
+                      (*----------------------------------------------------*)
                       error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
                    )
                    (error, (handler,list))
