@@ -394,37 +394,11 @@ let finalize ~outputs ~called_from dotFormat form env counter graph state =
            output_char c '\n')
   | None -> ()
 
-let loop ~outputs ~formatCflows form env domain counter graph state =
+let batch_loop ~outputs ~formatCflows form env domain counter graph state =
   let called_from = Remanent_parameters_sig.KaSim in
-  let user_interrupted = ref false in
-  let old_sigint_behavior =
-    Sys.signal
-      Sys.sigint (Sys.Signal_handle (fun _ -> user_interrupted := true)) in
   let rec iter graph state =
-    let stop,graph',state' =
-      if !user_interrupted then
-        let () = Format.pp_print_newline form () in
-        let () =
-          Format.fprintf
-            form
-            "@.***Abort signal received after %E t.u (%d events):@ "
-            (Counter.current_time counter) (Counter.current_event counter) in
-        let () =
-          Format.fprintf
-            form
-            "would you like to record the current state? (y/N)***@." in
-        let () =
-          if not !Parameter.batchmode then
-            match Tools.read_input () with
-            | ("y" | "yes" | "Y" | "Yes" | "YES") ->
-              outputs
-                (Data.Snapshot
-                   (Rule_interpreter.snapshot env counter "dump.ka" graph))
-            | _ -> () in
-        (true,graph,state)
-      else a_loop ~outputs env domain counter graph state in
+    let stop,graph',state' = a_loop ~outputs env domain counter graph state in
     if stop then
-      let () = Sys.set_signal Sys.sigint old_sigint_behavior in
       finalize ~outputs ~called_from formatCflows form env counter graph' state'
     else let () = Counter.tick form counter in iter graph' state'
   in iter graph state

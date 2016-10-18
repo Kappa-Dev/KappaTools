@@ -135,12 +135,11 @@ let () =
     Parameter.initSimTime () ;
     let () =
       let outputs = Outputs.go (Environment.signatures env) in
-      if kasim_args.Kasim_args.interactive then
-        let () =
-          Format.printf
-            "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
-@ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
-@ effect@ to@ perform@ it@]" in
+      if cli_args.Run_cli_args.batchmode then
+        State_interpreter.batch_loop
+          ~outputs ~formatCflows
+          Format.std_formatter env cc_env counter graph state
+      else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel cc_env graph state =
           let () = Format.printf "@.> @?" in
@@ -209,11 +208,29 @@ let () =
               Format.std_formatter env0 counter graph' state'
           else
             toplevel cc_env' graph' state' in
-        toplevel cc_env graph state
-      else
-        State_interpreter.loop
-          ~outputs ~formatCflows
-          Format.std_formatter env cc_env counter graph state in
+        if kasim_args.Kasim_args.interactive then
+          let () =
+            Format.printf
+              "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
+               @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
+               @ effect@ to@ perform@ it@]" in
+          toplevel cc_env graph state
+        else
+          let (stop,graph',state') =
+            State_interpreter.interactive_loop
+              ~outputs Format.std_formatter
+              Alg_expr.FALSE env0 cc_env counter graph state in
+          if stop then
+            State_interpreter.finalize
+              ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
+              Format.std_formatter env0 counter graph' state'
+          else
+          let () =
+            Format.printf
+              "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
+               @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
+               @ effect@ to@ perform@ it@]" in
+            toplevel cc_env graph' state' in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()
     else

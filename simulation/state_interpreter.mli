@@ -44,7 +44,7 @@ val finalize :
   Ast.formatCflow -> Format.formatter ->
   Environment.t -> Counter.t -> Rule_interpreter.t -> t -> unit
 
-val loop :
+val batch_loop :
   outputs:(Data.t -> unit) -> formatCflows:Ast.formatCflow ->
   Format.formatter -> Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> unit
