@@ -1,3 +1,4 @@
+open Lwt
 (* utility for results *)
 let result_data_map
     ~(ok:'ok -> 'a)
@@ -39,25 +40,60 @@ let result_error_exception
     ~severity:severity
     ~result_code:result_code
     message
-
-let result_map
+let result_map :
+  ok:('code -> 'ok -> 'a) ->
+  error:('code -> Api_types_j.errors -> 'a) ->
+  result:('ok, 'code) Api_types_j.result -> 'a =
+  fun
     ~(ok:'code -> 'ok -> 'a)
     ~(error:'code -> Api_types_j.errors -> 'a)
     ~(result:('ok,'code) Api_types_j.result)
-  : 'a =
-  match result.Api_types_j.result_data with
-  | `Ok data -> ok result.Api_types_j.result_code data
-  | `Error data -> error result.Api_types_j.result_code data
+  ->  ((match result.Api_types_j.result_data with
+      | `Ok data -> ok result.Api_types_j.result_code data
+      | `Error data -> error result.Api_types_j.result_code data) : 'a)
 
-let result_bind
+let result_bind :
+  ok:('ok -> ('a_ok, 'a_code) Api_types_j.result) ->
+  result:('ok, 'a_code) Api_types_j.result ->
+  ('a_ok, 'a_code) Api_types_j.result =
+  fun
     ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result)
-    ~(result:('ok,'code) Api_types_j.result)
-  : ('a_ok,'a_code) Api_types_j.result =
-  match result.Api_types_j.result_data with
+    ~(result:('ok,'code) Api_types_j.result) ->
+    ((match result.Api_types_j.result_data with
+        | `Ok data -> ok data
+        | `Error data ->
+          { Api_types_j.result_data = `Error data ;
+            Api_types_j.result_code = result.Api_types_j.result_code }) : ('a_ok,'a_code) Api_types_j.result)
+
+let result_bind_lwt :
+  ok:('ok -> ('a_ok, 'a_code) Api_types_j.result Lwt.t) ->
+  result:('ok, 'a_code) Api_types_j.result ->
+  ('a_ok, 'a_code) Api_types_j.result Lwt.t =
+  fun
+    ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result Lwt.t)
+    ~(result:('ok,'code) Api_types_j.result) ->
+  (match result.Api_types_j.result_data with
   | `Ok data -> ok data
   | `Error data ->
-    { Api_types_j.result_data = `Error data ;
-      Api_types_j.result_code = result.Api_types_j.result_code }
+    Lwt.return { Api_types_j.result_data = `Error data ;
+                 Api_types_j.result_code = result.Api_types_j.result_code }
+    : ('a_ok,'a_code) Api_types_j.result Lwt.t)
+
+let rec result_fold_lwt :
+  f:(('ok, 'a_code) Api_types_j.result -> 'value -> ('ok, 'a_code) Api_types_j.result Lwt.t) ->
+  id:('ok, 'a_code) Api_types_j.result ->
+  ('value list) ->
+  ('a_ok, 'a_code) Api_types_j.result Lwt.t =
+  fun
+  ~(f : (('ok, 'a_code) Api_types_j.result -> 'value -> ('ok, 'a_code) Api_types_j.result Lwt.t))
+  ~(id : ('ok, 'a_code) Api_types_j.result)
+  (l : ('value list)) ->
+    match l with
+    | [] -> Lwt.return id
+    | h::t ->
+      (f id h)>>=
+      (fun result -> result_fold_lwt ~f:f ~id:result t)
+
 
 let md5sum text = Digest.to_hex (Digest.string text)
 
@@ -74,6 +110,7 @@ module type COLLECTION_TYPE = sig
   type id
   type collection
   type item
+  val label : string
   val list : collection -> item list
   val update : collection -> item list -> unit
   val identifier : item -> id
@@ -120,7 +157,7 @@ struct
   match filter id collection with
   | item::_ -> operation item
   | [] ->
-     let m : string = Format.sprintf "id %s not found" (C.id_to_string id) in
+     let m : string = Format.sprintf "%s : %s id not found" (C.id_to_string id) C.label in
      Lwt.return (result_error_msg ~result_code:Api.NOT_FOUND m)
 
 end;;
@@ -134,6 +171,7 @@ struct
   type id = Api_types_j.project_id
   type collection = Api_environment.environment
   type item = Api_environment.project
+  let label : string = "project"
   let list
       (workspace : Api_environment.environment) =
     workspace#get_projects ()
@@ -158,6 +196,7 @@ struct
   type id = Api_types_j.simulation_id
   type collection = Api_environment.project
   type item = Api_environment.simulation
+  let label : string = "simulation"
   let list
       (project : Api_environment.project) =
     project#get_simulations ()
@@ -182,6 +221,7 @@ struct
   type id = Api_types_j.file_id
   type collection = Api_environment.project
   type item = Api_types_j.file
+  let label : string = "file"
   let list
       (project : Api_environment.project) =
     project#get_files ()

@@ -150,7 +150,7 @@ let api_snapshot (snapshot : Api_types_j.snapshot) : Api_types_v1_j.snapshot =
     Api_types_v1_j.tokens =
       Array.to_list snapshot.Api_types_j.snapshot_tokens; }
 
-let api_files (f : Api_types_j.file_line)  =
+let api_files (f : Api_types_j.file_line) : Api_types_v1_j.file_line =
   { Api_types_v1_j.file_name = f.Api_types_j.file_line_name ;
     Api_types_v1_j.line = f.Api_types_j.file_line_text ; }
 

@@ -35,7 +35,7 @@ class type manager_file =
     method file_create :
       Api_types_j.project_id ->
       Api_types_j.file ->
-      Api_types_j.file_metadata result Lwt.t
+      Api_types_j.file_metadata Api_types_j.file_result result Lwt.t
 
     method file_get :
       Api_types_j.project_id ->
@@ -46,12 +46,12 @@ class type manager_file =
       Api_types_j.project_id ->
       Api_types_j.file_id ->
       Api_types_j.file_modification ->
-      Api_types_j.file_metadata result Lwt.t
+      Api_types_j.file_metadata Api_types_j.file_result result Lwt.t
 
     method file_delete :
       Api_types_j.project_id ->
       Api_types_j.file_id ->
-      unit result Lwt.t
+      unit Api_types_j.file_result result Lwt.t
 
   end;;
 

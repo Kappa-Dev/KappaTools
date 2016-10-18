@@ -62,9 +62,9 @@ type site_node = {
      site_node_name: string;
      site_node_sites: site list <ocaml repr="array">;
 }
-
 type site_graph = site_node list <ocaml repr="array">
-type project_parse = { contact_map : site_graph }
+type contact_map = site_graph
+type project_parse = { contact_map : contact_map }
 type kappa_code = string
 
 type simulation_id = string
@@ -150,12 +150,22 @@ type file_metadata = { file_metadata_compile <ocaml mutable> : bool <json name="
                        file_metadata_hash <ocaml mutable> : string nullable <json name="hash"> ;
                        file_metadata_id <ocaml mutable> : file_id <json name="id"> ;
                        file_metadata_position <ocaml mutable> : int <json name="position"> ; }
+
+type ('data) file_result = { file_status_data : 'data ;
+          		     file_status_contact_map : contact_map ; }
 type file_info = file_metadata list
 type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
               file_content <ocaml mutable> : string <json name="content"> }
+type file_patch = {
+     file_patch_start : int nullable ; (* if not provided assume begining *)
+     file_patch_end : int nullable   ; (* if not provided assume end of file *)
+     file_patch_content : string     ; (* content to fill region with *)
+     (* Replacing a file can be encoded by giving the content with out
+        specifying a start or end. *)
+}
 type file_modification = { file_modification_compile : bool nullable  <json name="compile"> ;
                            file_modification_id : string nullable <json name="id"> ;
                            file_modification_position : int nullable <json name="position"> ;
-			   file_modification_content : string nullable <json name="content"> ;
+			   file_modification_patch : file_patch nullable <json name="content"> ;
 			   file_modification_hash <ocaml mutable> : string nullable <json name="hash"> ;
 }
