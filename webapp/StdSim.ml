@@ -15,12 +15,12 @@ end
 let runtime = (new runtime () :> Api_v1.api_runtime)
 
 let process_comand (text_message : string) : unit Lwt.t =
-  Api_mpi.on_message
+  Api_mpi_v1.on_message
     runtime
     (fun message ->
        Lwt_io.write Lwt_io.stdout message >>=
        (fun () ->
-          Lwt_io.write Lwt_io.stdout (String.make 1 Api_mpi.message_delimter)))
+          Lwt_io.write Lwt_io.stdout (String.make 1 Api_mpi_v1.message_delimter)))
     text_message
 
 (*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
@@ -36,7 +36,7 @@ let serve () : unit Lwt.t =
   let rec aux_serve () =
     Lwt_io.read_char Lwt_io.stdin >>=
     (fun (char : char) ->
-       if char = Api_mpi.message_delimter then
+       if char = Api_mpi_v1.message_delimter then
          let m = Buffer.contents buffer in
          process_comand m <&>
          let () = Buffer.reset buffer in aux_serve ()

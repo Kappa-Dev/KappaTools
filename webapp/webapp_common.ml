@@ -32,8 +32,7 @@ let status_of_code : Api.manager_code -> Cohttp.Code.status_code =
 *)
 let result_response
     ~(string_of_success: 'ok -> string)
-    ~(result:'ok Api.result)
-  : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
+  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   Api_common.result_map
     ~ok:(fun (code : Api.manager_code)
           (ok : 'a) ->
@@ -56,7 +55,6 @@ let result_response
             ~status:status
             ~body:error_msg
             ()))
-    ~result:result
 
 let string_response
     ?(headers = headers)

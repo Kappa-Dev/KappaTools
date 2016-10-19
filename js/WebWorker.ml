@@ -8,7 +8,7 @@ let runtime = (new webworker () :> Api_v1.api_runtime)
 
 let on_message (text_message : string) : unit =
   Lwt.ignore_result
-    (Api_mpi.on_message
+    (Api_mpi_v1.on_message
        runtime
        (fun s -> let () = Worker.post_message s in Lwt.return_unit)
        text_message)

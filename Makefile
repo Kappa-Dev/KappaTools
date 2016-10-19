@@ -47,7 +47,8 @@ GENERATED=$(VERSION) \
 	  $(RESOURCE) \
 	  generated/api_types_v1_t.ml generated/api_types_v1_j.ml \
 	  generated/api_types_t.ml generated/api_types_j.ml \
-	  generated/mpi_message_t.ml generated/mpi_message_j.ml
+	  generated/mpi_message_t.ml generated/mpi_message_j.ml \
+	  generated/mpi_message_v1_t.ml generated/mpi_message_v1_j.ml
 
 RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
 		$(wildcard js/*.css) js/favicon.ico js/package.json
@@ -78,8 +79,14 @@ generated/api_types_j.ml: api/api_types.atd generated
 generated/mpi_message_t.ml: api/mpi_message.atd generated
 	atdgen -t -o generated/mpi_message api/mpi_message.atd
 
+generated/mpi_message_v1_t.ml: api/mpi_message_v1.atd generated
+	atdgen -t -o generated/mpi_message_v1 api/mpi_message_v1.atd
+
 generated/mpi_message_j.ml: api/mpi_message.atd generated
 	atdgen -j -j-std -o generated/mpi_message api/mpi_message.atd
+
+generated/mpi_message_v1_j.ml: api/mpi_message_v1.atd generated
+	atdgen -j -j-std -o generated/mpi_message_v1 api/mpi_message_v1.atd
 
 $(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css api/test_message.json
 	./dev/generate-string.sh $^  > $@

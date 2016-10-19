@@ -6,7 +6,6 @@ open Api
 open Conduit_lwt_unix
 open Unix
 open Lwt_log
-open Re
 
 let route
     ~(manager: Api.manager)
@@ -20,7 +19,7 @@ let route
           (fun (info : Api_types_j.environment_info Api.result)
           -> Webapp_common.result_response
             ~string_of_success:Api_types_j.string_of_environment_info
-            ~result:info
+            info
           )
       )
      };
@@ -49,7 +48,7 @@ let route
          >>= (fun (msg) ->
            Webapp_common.result_response
              ~string_of_success:(fun x -> x)
-             ~result:msg
+             msg
          )
      }
   ]

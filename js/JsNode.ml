@@ -83,7 +83,7 @@ class runtime
 
     method private onStdout (msg : string) : unit =
       let () = Common.debug (Js.string msg) in
-      match Utility.split msg Api_mpi.message_delimter with
+      match Utility.split msg Api_mpi_v1.message_delimter with
       | (prefix,None) ->
         ignore(Common.debug (Js.string "onStdout:none"));
         Buffer.add_string buffer prefix
@@ -104,7 +104,7 @@ class runtime
              (Format.sprintf
                 "%s%c"
                 message_text
-                Api_mpi.message_delimter))
+                Api_mpi_v1.message_delimter))
 
     method is_running () : bool =
       match process with
@@ -116,5 +116,5 @@ class runtime
       | Some process -> process##kill
       | None -> ()
 
-    inherit Api_mpi.runtime ~timeout ()
+    inherit Api_mpi_v1.runtime ~timeout ()
   end

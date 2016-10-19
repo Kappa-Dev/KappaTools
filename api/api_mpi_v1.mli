@@ -1,11 +1,11 @@
 val on_message :
-  Api.manager -> (string -> unit Lwt.t) -> string -> unit Lwt.t
+  Api_v1.api_runtime -> (string -> unit Lwt.t) -> string -> unit Lwt.t
 
-class virtual manager : ?timeout:float -> unit -> object
+class virtual runtime : ?timeout:float -> unit -> object
     method virtual post_message : string -> unit
     method virtual sleep : float -> unit Lwt.t
     method receive : string -> unit
-    inherit Api.manager
+    inherit Api_v1.api_runtime
   end
 
 val message_delimter : char

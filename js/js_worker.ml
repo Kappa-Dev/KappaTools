@@ -17,5 +17,5 @@ class runtime
     method sleep timeout = Lwt_js.sleep timeout
     method post_message (message_text : string) : unit =
       worker##postMessage(message_text)
-    inherit Api_mpi.runtime ~timeout:timeout ()
+    inherit Api_mpi_v1.runtime ~timeout:timeout ()
   end

@@ -43,22 +43,22 @@ let result_error_exception
 let result_map :
   ok:('code -> 'ok -> 'a) ->
   error:('code -> Api_types_j.errors -> 'a) ->
-  result:('ok, 'code) Api_types_j.result -> 'a =
+  ('ok, 'code) Api_types_j.result -> 'a =
   fun
     ~(ok:'code -> 'ok -> 'a)
     ~(error:'code -> Api_types_j.errors -> 'a)
-    ~(result:('ok,'code) Api_types_j.result)
+    (result:('ok,'code) Api_types_j.result)
   ->  ((match result.Api_types_j.result_data with
       | `Ok data -> ok result.Api_types_j.result_code data
       | `Error data -> error result.Api_types_j.result_code data) : 'a)
 
 let result_bind :
   ok:('ok -> ('a_ok, 'a_code) Api_types_j.result) ->
-  result:('ok, 'a_code) Api_types_j.result ->
+  ('ok, 'a_code) Api_types_j.result ->
   ('a_ok, 'a_code) Api_types_j.result =
   fun
     ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result)
-    ~(result:('ok,'code) Api_types_j.result) ->
+    (result:('ok,'code) Api_types_j.result) ->
     ((match result.Api_types_j.result_data with
         | `Ok data -> ok data
         | `Error data ->
@@ -67,11 +67,11 @@ let result_bind :
 
 let result_bind_lwt :
   ok:('ok -> ('a_ok, 'a_code) Api_types_j.result Lwt.t) ->
-  result:('ok, 'a_code) Api_types_j.result ->
+  ('ok, 'a_code) Api_types_j.result ->
   ('a_ok, 'a_code) Api_types_j.result Lwt.t =
   fun
     ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result Lwt.t)
-    ~(result:('ok,'code) Api_types_j.result) ->
+    (result:('ok,'code) Api_types_j.result) ->
   (match result.Api_types_j.result_data with
   | `Ok data -> ok data
   | `Error data ->

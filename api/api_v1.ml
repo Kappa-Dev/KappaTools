@@ -81,39 +81,35 @@ end = struct
        project_id
        simulation_id
     ) >>=
-    (fun result ->
-       Api_common.result_bind_lwt
-         ~ok:(fun (distance_info : Api_types_j.distance_info) ->
-             Api_common.result_fold_lwt
-               ~f:(fun result (distance_id : Api_types_j.distance_id) ->
-                   Api_common.result_bind_lwt
-                     ~ok:(fun (state : Api_types_v1_j.state) ->
-                          (manager#simulation_get_distance
-                             project_id
-                             simulation_id
-                             distance_id)
-                          >>=
-                          (fun distance_result ->
-                             (Api_common.result_bind_lwt
-                                ~ok:(fun (distance : Api_types_j.distance) ->
-                                    let distance : Api_types_v1_j.distance = Api_data.api_distance distance in
-                                    Lwt.return
-                                      (Api_common.result_ok
-                                         { state with
-                                           Api_types_v1_j.distances =
-                                             match state.Api_types_v1_j.distances with
-                                             | None ->
-                                               Some (distance::[])
-                                             | Some distances ->
-                                               Some (distance::distances) }))
-                                ~result:distance_result)
-                          )
-                       )
-                     ~result:result)
-               ~id:(Api_common.result_ok state)
-               distance_info.Api_types_j.distance_ids
-              )
-         ~result:result)
+    Api_common.result_bind_lwt
+      ~ok:(fun (distance_info : Api_types_j.distance_info) ->
+          Api_common.result_fold_lwt
+            ~f:(fun result (distance_id : Api_types_j.distance_id) ->
+                Api_common.result_bind_lwt
+                  ~ok:(fun (state : Api_types_v1_j.state) ->
+                      (manager#simulation_get_distance
+                         project_id
+                         simulation_id
+                         distance_id)
+                      >>=
+                      (Api_common.result_bind_lwt
+                         ~ok:(fun (distance : Api_types_j.distance) ->
+                             let distance : Api_types_v1_j.distance = Api_data.api_distance distance in
+                             Lwt.return
+                               (Api_common.result_ok
+                                  { state with
+                                    Api_types_v1_j.distances =
+                                      match state.Api_types_v1_j.distances with
+                                      | None ->
+                                        Some (distance::[])
+                                      | Some distances ->
+                                        Some (distance::distances) }))
+                      )
+                    )
+                  result)
+            ~id:(Api_common.result_ok state)
+            distance_info.Api_types_j.distance_ids
+        )
 
   let assemble_file_line
       (manager : Api.manager)
@@ -124,7 +120,6 @@ end = struct
        project_id
        simulation_id
     ) >>=
-    (fun result ->
        Api_common.result_bind_lwt
          ~ok:(fun (file_line_info : Api_types_j.file_line_info) ->
              Api_common.result_fold_lwt
@@ -136,7 +131,6 @@ end = struct
                              simulation_id
                              file_line_id)
                           >>=
-                          (fun file_result ->
                              (Api_common.result_bind_lwt
                                 ~ok:(fun (file_line : Api_types_j.file_line list) ->
                                     let file_lines : Api_types_v1_j.file_line list =
@@ -146,14 +140,12 @@ end = struct
                                          { state with
                                            Api_types_v1_j.files =
                                              file_lines@state.Api_types_v1_j.files }))
-                                ~result:file_result)
                           )
                        )
-                     ~result:result)
+                     result)
                ~id:(Api_common.result_ok state)
                file_line_info.Api_types_j.file_line_ids
               )
-         ~result:result)
 
 
   let assemble_flux_map
@@ -166,7 +158,6 @@ end = struct
        project_id
        simulation_id
     ) >>=
-    (fun result ->
        Api_common.result_bind_lwt
          ~ok:(fun (flux_map_info : Api_types_j.flux_map_info) ->
              Api_common.result_fold_lwt
@@ -178,7 +169,6 @@ end = struct
                             simulation_id
                             flux_map_id)
                          >>=
-                         (fun flux_result ->
                             (Api_common.result_bind_lwt
                                ~ok:(fun (flux_map : Api_types_j.flux_map) ->
                                    let flux_map : Api_types_v1_j.flux_map = Api_data.api_flux_map flux_map in
@@ -187,14 +177,13 @@ end = struct
                                         { state with
                                           Api_types_v1_j.flux_maps =
                                             flux_map::state.Api_types_v1_j.flux_maps }))
-                               ~result:flux_result)
                          )
                        )
-                     ~result:result)
+                     result)
                ~id:(Api_common.result_ok state)
                flux_map_info.Api_types_j.flux_map_ids
            )
-         ~result:result)
+
 
   let assemble_log_message
           (manager : Api.manager)
@@ -205,7 +194,6 @@ end = struct
        project_id
        simulation_id
     ) >>=
-    (fun result ->
        Api_common.result_bind_lwt
          ~ok:(fun (log_message : Api_types_j.log_message list) ->
              Lwt.return
@@ -213,8 +201,6 @@ end = struct
                   { state with
                     Api_types_v1_j.log_messages = log_message })
            )
-         ~result:result
-    )
 
   let assemble_plot
           (manager : Api.manager)
@@ -225,7 +211,6 @@ end = struct
        project_id
        simulation_id
     ) >>=
-    (fun result ->
        Api_common.result_bind_lwt
          ~ok:(fun (plot : Api_types_j.plot) ->
              Lwt.return
@@ -234,8 +219,7 @@ end = struct
                     Api_types_v1_j.plot = Some (Api_data.api_plot plot)
                   })
            )
-         ~result:result
-    )
+
 
 
   let assemble_snapshot
@@ -247,7 +231,6 @@ end = struct
        project_id
        simulation_id
     ) >>=
-    (fun result ->
        Api_common.result_bind_lwt
          ~ok:(fun (snapshot_info : Api_types_j.snapshot_info) ->
              Api_common.result_fold_lwt
@@ -259,7 +242,6 @@ end = struct
                             simulation_id
                             snapshot_id)
                          >>=
-                         (fun snapshot_result ->
                             (Api_common.result_bind_lwt
                                ~ok:(fun (snapshot : Api_types_j.snapshot) ->
                                    let snapshot : Api_types_v1_j.snapshot = Api_data.api_snapshot snapshot in
@@ -268,14 +250,12 @@ end = struct
                                         { state with
                                           Api_types_v1_j.snapshots =
                                             snapshot::state.Api_types_v1_j.snapshots }))
-                               ~result:snapshot_result)
                          )
                        )
-                     ~result:result)
+                     result)
                ~id:(Api_common.result_ok state)
                snapshot_info.Api_types_j.snapshot_ids
            )
-         ~result:result)
 
   let assemble_state
       (manager : Api.manager)
@@ -308,7 +288,7 @@ end = struct
       ~f:(fun result assembler ->
           Api_common.result_bind_lwt
             ~ok:(fun state -> assembler state)
-            ~result:result)
+            result)
       ~id:(Api_common.result_ok state)
       assemblers
 
@@ -351,22 +331,18 @@ end = struct
           (manager#project_create
              { Api_types_j.project_id = parse_project_id ; })
           >>=
-          (fun result ->
-               (Api_common.result_bind_lwt
-                  ~ok:(fun (project_id : Api_types_j.project_id) ->
-                      (manager#file_create
-                         project_id
-                         file
-                      ) >>=
-                      (fun result ->
-                         Api_common.result_bind_lwt
-                           ~ok:(fun _ ->
-                                let () = _manager <- Some manager in
-                                Lwt.return (Api_common.result_ok manager))
-                           ~result:result
-                      )
-                    )
-                  ~result:result)
+          (Api_common.result_bind_lwt
+             ~ok:(fun (project_id : Api_types_j.project_id) ->
+                 (manager#file_create
+                    project_id
+                    file
+                 ) >>=
+                 (Api_common.result_bind_lwt
+                      ~ok:(fun _ ->
+                          let () = _manager <- Some manager in
+                          Lwt.return (Api_common.result_ok manager))
+                 )
+               )
           )
 
         | Some manager ->
@@ -393,7 +369,6 @@ end = struct
           (code : Api_types_v1_j.code) :
         Api_types_v1_j.parse Api_types_v1_j.result Lwt.t =
         self#manager () >>=
-        (fun result ->
            (Api_common.result_bind_lwt
               ~ok:(fun manager ->
                   let file_modification : Api_types_j.file_modification = {
@@ -412,21 +387,17 @@ end = struct
                      parse_file_id
                      file_modification
                    >>=
-                   (fun result ->
-                      Api_common.result_bind_lwt
+                   (Api_common.result_bind_lwt
                         ~ok:(fun (result : Api_types_j.file_metadata Api_types_j.file_result) ->
                             let () = ignore (result) in
                             Lwt.return (Api_common.result_ok result.Api_types_j.file_status_contact_map)
-                          )
-                        ~result:result
-                      )
+                        )
+                   )
                   )
                 )
-              ~result:result
-           )
+
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ (contact_map : Api_types_j.contact_map) ->
                  Lwt.return
                    (`Right
@@ -437,7 +408,6 @@ end = struct
                  Lwt.return
                    (`Left
                       (Api_data.api_errors errors)))
-             ~result:result
         )
       method private new_id () : int =
         let result = context.id + 1 in
@@ -461,21 +431,18 @@ end = struct
             Api_types_j.file_content = parameter.Api_types_v1_j.code ; }
         in
         self#manager () >>=
-        (fun result_manager ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#project_create
                     { Api_types_j.project_id = project_id; })
                  >>=
-                 (fun result_project ->
-                    Api_common.result_bind_lwt
+                 (Api_common.result_bind_lwt
                       ~ok:(fun (project_id : Api_types_j.project_id) ->
                           (manager#file_create
                              project_id
                              file)
                           >>=
-                          (fun result_file ->
-                            Api_common.result_bind_lwt
+                          (Api_common.result_bind_lwt
                               ~ok:(fun _ ->
                                   manager#simulation_start
                                     project_id
@@ -488,22 +455,19 @@ end = struct
                                       Api_types_j.simulation_id =
                                         simulation_id ;
                                     })
-                              ~result:result_file
                           )
-                        )
-                      ~result:result_project
+                      )
+
                  )
-               )
-             ~result:result_manager
+             )
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ (_ : Api_types_j.simulation_id) -> Lwt.return (`Right current_id))
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
                           (Api_data.api_errors errors)))
-             ~result:result)
+         )
 
       method perturbate
           (token : Api_types_v1_j.token)
@@ -512,23 +476,20 @@ end = struct
         let project_id = string_of_int token in
         let simulation_id = project_id in
         self#manager () >>=
-        (fun result ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#simulation_perturbation
                     project_id
                     simulation_id
                     { Api_types_j.perturbation_code = perturbation.Api_types_v1_j.perturbation_code ;  }))
-             ~result:result
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ () -> Lwt.return (`Right ()))
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
                           (Api_data.api_errors errors)))
-             ~result:result)
+        )
 
 
       method status (token : Api_types_v1_j.token) :
@@ -536,42 +497,36 @@ end = struct
         let project_id = string_of_int token in
         let simulation_id = project_id in
         self#manager () >>=
-        (fun result ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#simulation_info
                     project_id
                     simulation_id)
                  >>=
-                 (fun result ->
-                    Api_common.result_bind_lwt
+                 (Api_common.result_bind_lwt
                       ~ok:(fun info ->
                           assemble_state
                             manager
                             project_id
                             simulation_id
                             info)
-                      ~result:result))
-             ~result:result
+                  ))
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ state -> Lwt.return (`Right state))
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
                           (Api_data.api_errors errors)))
-             ~result:result)
+         )
 
       method list () : Api_types_v1_j.catalog Api_types_v1_j.result Lwt.t =
         self#manager () >>=
-        (fun result ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#project_info ())
                  >>=
-                 (fun result_project_info ->
-                    Api_common.result_bind_lwt
+                 (Api_common.result_bind_lwt
                       ~ok:(fun (project_info : Api_types_j.project_info) ->
                           Api_common.result_fold_lwt
                             ~f:(fun result (project_id : Api_types_j.project_id) ->
@@ -584,47 +539,41 @@ end = struct
                                    Api_common.result_bind_lwt
                                      ~ok:(fun (simulation_list : Api_types_j.simulation_catalog) ->
                                          Lwt.return (Api_common.result_ok (result@(List.map int_of_string simulation_list))))
-                                     ~result:result_simulation_list))
-                                  ~result:result
+                                     result_simulation_list))
+                                  result
                               )
                             ~id:(Api_common.result_ok [])
                             project_info
-                        )
-                      ~result:result_project_info
+                      )
                  )
                )
-             ~result:result
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ state -> Lwt.return (`Right state))
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
                           (Api_data.api_errors errors)))
-             ~result:result)
+         )
 
       method pause (token : Api_types_v1_j.token) :
         unit Api_types_v1_j.result Lwt.t =
         let project_id = string_of_int token in
         let simulation_id = project_id in
         self#manager () >>=
-        (fun result ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#simulation_pause
                     project_id
                     simulation_id))
-             ~result:result
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ () -> Lwt.return (`Right ()))
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
                           (Api_data.api_errors errors)))
-             ~result:result)
+        )
 
       method continue
           (token : Api_types_v1_j.token)
@@ -633,45 +582,38 @@ end = struct
         let project_id = string_of_int token in
         let simulation_id = project_id in
         self#manager () >>=
-        (fun result ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#simulation_continue
                     project_id
                     simulation_id
                     (Api_data.api_parameter parameter)
                  ))
-             ~result:result
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        (Api_common.result_map
              ~ok:(fun _ () -> Lwt.return (`Right ()))
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
                           (Api_data.api_errors errors)))
-             ~result:result)
+        )
 
       method stop (token : Api_types_v1_j.token) : unit Api_types_v1_j.result Lwt.t =
         let project_id = string_of_int token in
         let simulation_id = project_id in
         self#manager () >>=
-        (fun result ->
-           Api_common.result_bind_lwt
+        (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#simulation_stop
                     project_id
                     simulation_id))
-             ~result:result
         ) >>=
-        (fun result ->
-           Api_common.result_map
+        Api_common.result_map
              ~ok:(fun _ () -> Lwt.return (`Right ()))
              ~error:(fun _ errors  ->
-                     Lwt.return
-                       (`Left
-                          (Api_data.api_errors errors)))
-             ~result:result)
+                 Lwt.return
+                   (`Left
+                      (Api_data.api_errors errors)))
 
       initializer
         Lwt.async (fun () -> self#log "created runtime")
