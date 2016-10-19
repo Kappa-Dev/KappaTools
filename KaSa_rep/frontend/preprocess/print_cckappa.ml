@@ -306,7 +306,7 @@ let rec print_short_alg parameters error handler alg =
   | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR
                           | Operator.TMAX_VAR
                           | Operator.EMAX_VAR
-                          | Operator.PLOTNUM
+                          | Operator.PLOTPERIOD
                           | Operator.CPUTIME
                           ),_
   | Alg_expr.CONST (Nbr.I64 _),_

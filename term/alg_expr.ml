@@ -120,7 +120,7 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
     x
   | STATE_ALG_OP op, _ ->
     match op with
-    | (Operator.EMAX_VAR | Operator.TMAX_VAR | Operator.PLOTNUM) -> x
+    | (Operator.EMAX_VAR | Operator.TMAX_VAR | Operator.PLOTPERIOD) -> x
     | Operator.TIME_VAR -> (Operator.DepSet.add d in_t,in_e,toks_d,out)
     | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR) ->
       (in_t,Operator.DepSet.add d in_e,toks_d,out)
@@ -174,8 +174,8 @@ let rec propagate_constant updated_vars counter vars = function
                ~pos (fun f -> Format.pp_print_string
                         f "[Tmax] constant is evaluated to infinity") in
            Nbr.F infinity),pos
-  | STATE_ALG_OP (Operator.PLOTNUM),pos ->
-    CONST (Nbr.I (Counter.plot_points counter)),pos
+  | STATE_ALG_OP (Operator.PLOTPERIOD),pos ->
+    CONST (Nbr.F (Counter.plot_period counter)),pos
   | STATE_ALG_OP (Operator.CPUTIME | Operator.TIME_VAR | Operator.EVENT_VAR
                  | Operator.NULL_EVENT_VAR),_ as x -> x
   | ALG_VAR i,pos as x ->
@@ -222,7 +222,7 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
   | (STATE_ALG_OP Operator.TIME_VAR,_) -> true
   | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                    Operator.NULL_EVENT_VAR | Operator.EMAX_VAR |
-                   Operator.TMAX_VAR | Operator.PLOTNUM),_) -> false
+                   Operator.TMAX_VAR | Operator.PLOTPERIOD),_) -> false
   | (ALG_VAR i,_) ->
     let rec aux j =
       Operator.DepSet.mem (Operator.ALG j) in_t ||
@@ -252,7 +252,7 @@ let rec stops_of_bool_expr vars_deps = function
           | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                           Operator.TIME_VAR | Operator.NULL_EVENT_VAR |
                           Operator.EMAX_VAR |Operator.TMAX_VAR |
-                          Operator.PLOTNUM)
+                          Operator.PLOTPERIOD)
           | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
           raise ExceptionDefn.Unsatisfiable
       end

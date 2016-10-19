@@ -72,9 +72,7 @@ type t = {
     init_event : int ;
     mutable max_time : float option ;
     mutable max_events : int option ;
-    mutable plot_points : int ;
-    mutable dE : int option ;
-    mutable dT : float option ;
+    mutable plot_period : float ;
   }
 
 let inc_tick c = c.ticks <- c.ticks + 1
@@ -116,7 +114,7 @@ let one_time_correction_event c ti =
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
 let max_events c = c.max_events
-let plot_points c = c.plot_points
+let plot_period c = c.plot_period
 let event_percentage (counter : t) : int option =
   match counter.max_events with
   | None -> None
@@ -138,29 +136,8 @@ let tracked_events (counter : t) : int option =
   else
     None
 
-let compute_dT points init_v mx_t =
-  if points <= 0 then None else
-    match mx_t with
-    | None -> None
-    | Some max_t -> Some ((max_t -. init_v) /. (float_of_int points))
-
-let compute_dE points init_v mx_e =
-  if points <= 0 then None else
-    match mx_e with
-    | None -> None
-    | Some max_e ->
-       Some (max ((max_e - init_v) / points) 1)
-
-let set_max_time c t =
-  let () =
-    let rem_points = c.plot_points - c.last_point in
-    if rem_points > 0 then c.dT <- compute_dT rem_points (current_time c) t in
-  c.max_time <- t
-let set_max_events c e =
-  let () =
-    let rem_points = c.plot_points - c.last_point in
-    if rem_points > 0 then c.dE <- compute_dE rem_points (current_event c) e in
-  c.max_events <- e
+let set_max_time c t = c.max_time <- t
+let set_max_events c e = c.max_events <- e
 
 let tick f counter =
   let () =
@@ -209,26 +186,17 @@ let complete_progress_bar form counter =
            done in
   Format.pp_print_newline form ()
 
-let set_nb_points (t :t) (nb_points : int) : unit =
-  let dE = compute_dE nb_points t.init_event t.max_events in
-  let dT = compute_dT nb_points t.init_time t.max_time in
-  t.dE <- dE ;
-  t.dT <- dT ;
-  t.plot_points <- nb_points
+let set_plot_period (t :t) plot_period : unit = t.plot_period <- plot_period
 
 
-let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~nb_points =
-  let dE = compute_dE nb_points init_e max_e in
-  let dT = compute_dT nb_points init_t max_t in
+let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~plot_period =
   {time = init_t ;
    events = init_e ;
    stories = -1 ;
    stat_null = Stat_null_events.init () ;
    max_time = max_t ;
    max_events = max_e ;
-   plot_points = nb_points;
-   dE = dE ;
-   dT = dT ;
+   plot_period = plot_period ;
    init_time = init_t ;
    init_event = init_e ;
    initialized = false ;
@@ -245,41 +213,24 @@ let reinitialize counter =
   counter.stat_null <- Stat_null_events.init ()
 
 let next_point counter =
-  match counter.dT with
-  | Some dT ->
     int_of_float
       ((min (Tools.unsome infinity (max_time counter)) (current_time counter)
-       -. counter.init_time) /. dT)
-  | None ->
-     match counter.dE with
-     | None -> 0
-     | Some dE ->
-        (current_event counter - counter.init_event) / dE
-
+       -. counter.init_time) /. counter.plot_period)
+ 
 let to_plot_points counter =
   let next = next_point counter in
   let last = counter.last_point in
   let () = counter.last_point <- next in
   let n = next - last in
-  match counter.dT with
-  | Some dT ->
-     snd
-       (Tools.recti
-	  (fun (time,acc) _ ->
-	   time -. dT,
-	   if check_output_time counter time then time::acc else acc)
-	  ((float_of_int next) *. dT,[]) n),counter
-  | None ->
-     match max_events counter with
-     | Some _ ->
-        if n>1 then
-          invalid_arg
-            ("Counter.to_plot_points: invalid increment "^string_of_int n)
-        else
-          (if n <> 0 then [counter.time] else []),counter
-     | None -> [],counter
+  snd
+    (Tools.recti
+       (fun (time,acc) _ ->
+          time -. counter.plot_period,
+          if check_output_time counter time then time::acc else acc)
+       ((float_of_int next) *. counter.plot_period,[]) n),counter
 
 let fill ~outputs counter observables_values =
   let points, _counter =
     to_plot_points counter in
-  List.iter (fun t -> outputs (Data.Plot (t,observables_values))) points
+  if observables_values <> [||] then
+    List.iter (fun t -> outputs (Data.Plot (t,observables_values))) points

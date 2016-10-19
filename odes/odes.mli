@@ -24,9 +24,8 @@ sig
     command_line:string ->
     command_line_quotes:string ->
     data_file:string ->
-    init_t:float ->
-    max_t:float ->
-    nb_points:int -> Loggers.t -> I.compil -> (int,int) network -> unit
+    init_t:float -> max_t:float -> plot_period:float ->
+    Loggers.t -> I.compil -> (int,int) network -> unit
 
   val species_of_species_id:
     (int,int) network -> ode_var_id -> (I.chemical_species * int)

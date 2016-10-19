@@ -128,7 +128,7 @@ let main () =
         ~data_file:(Kappa_files.get_data ())
         ~init_t:cli_args.Run_cli_args.minTimeValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxTimeValue)
-        ~nb_points:cli_args.Run_cli_args.pointNumberValue
+        ~plot_period:cli_args.Run_cli_args.plotPeriod
         logger compil network
     in
     let () = Loggers.flush_logger logger in

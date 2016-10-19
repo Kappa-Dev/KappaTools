@@ -26,7 +26,7 @@ type variable =
   | Tinit
   | Tend
   | InitialStep
-  | Num_t_points
+  | Period_t_points
   | Rate of int
   | Rated of int
   | Rateun of int

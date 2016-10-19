@@ -27,7 +27,7 @@ type variable =
   | Tinit
   | Tend
   | InitialStep
-  | Num_t_points
+  | Period_t_points
   | Rate of int
   | Rated of int
   | Rateun of int
@@ -91,7 +91,7 @@ let print_ode_preamble
               "%% tinit - the initial simulation time (likely 0)";
               "%% tend - the final simulation time ";
               "%% initialstep - initial time step at the beginning of numerical integration";
-              "%% num_t_point - the number of time points to return";
+              "%% period_t_point - the time period between points to return";
               "%%" ;
               "%% "^
               (match
@@ -135,7 +135,7 @@ let string_of_variable var =
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
-  | Num_t_points -> "num_t_point"
+  | Period_t_points -> "period_t_point"
   | N_ode_var -> "nodevar"
   | N_var -> "nvar"
   | N_obs -> "nobs"
@@ -160,7 +160,7 @@ let string_of_array_name var =
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
-  | Num_t_points -> "num_t_point"
+  | Period_t_points -> "period_t_point"
   | N_ode_var -> "nodevar"
   | N_var -> "nvar"
   | N_obs -> "nobs"
@@ -211,7 +211,7 @@ let initialize logger variable =
         | Tinit
         | Tend
         | InitialStep
-        | Num_t_points
+        | Period_t_points
         | N_ode_var
         | N_var
         | N_rows
@@ -240,7 +240,7 @@ let initialize logger variable =
         | N_obs
         | N_rules
         | Current_time
-        | Num_t_points -> ()
+        | Period_t_points -> ()
       in
       ()
     end
@@ -311,7 +311,8 @@ let rec print_alg_expr init_mode logger  alg_expr network
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) -> Loggers.fprintf logger "0"
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) -> Loggers.fprintf logger "event_max"
-      | Alg_expr.STATE_ALG_OP (Operator.PLOTNUM) -> Loggers.fprintf logger "num_t_point"
+      | Alg_expr.STATE_ALG_OP (Operator.PLOTPERIOD) ->
+        Loggers.fprintf logger "period_t_point"
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         begin
@@ -704,7 +705,7 @@ let print_interpolate logger =
     let () =
       print_list logger
         [
-          "t = linspace(tinit, tend, num_t_point+1);";
+          "t = linspace(tinit, tend, period_t_point*(tend-tinit)+1);";
           "obs = zeros(nrows,nobs);";
           "";
           "for j=1:nrows";
@@ -758,7 +759,7 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
       print_list logger
         [
           "fprintf(fid,'\\n')";
-          "for j=1:num_t_point+1";
+          "for j=1:period_t_point*(tend-tinit)+1";
           "    fprintf(fid,'%f',t(j));";
           "    for i=1:nobs";
           "        fprintf(fid,' %f',y(j,i));";

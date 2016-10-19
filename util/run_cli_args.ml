@@ -2,7 +2,7 @@ type t = {
   mutable alg_var_overwrite   : (string * Nbr.t) list;
   mutable minTimeValue        : float;
   mutable maxTimeValue        : float option;
-  mutable pointNumberValue    : int;
+  mutable plotPeriod          : float;
   mutable rescale             : float option;
   mutable marshalizedInFile   : string;
   mutable inputKappaFileNames : string list;
@@ -16,7 +16,7 @@ let default : t = {
   alg_var_overwrite = [];
   minTimeValue = 0. ;
   maxTimeValue = None;
-  pointNumberValue = -1;
+  plotPeriod = 1.;
   rescale = None;
   marshalizedInFile = "";
   inputKappaFileNames = [];
@@ -37,9 +37,9 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("-t",
    Arg.Float(fun time -> t.maxTimeValue <- Some time),
    "Max time of simulation (arbitrary time unit)");
-  ("-p",
-   Arg.Int(fun pointNumberValue -> t.pointNumberValue <- pointNumberValue),
-   "Number of points in plot");
+  ("-pp",
+   Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
+   "plot period: time interval in second between points in plot (default: 1.0)");
   ("-var",
    Arg.Tuple
      (let tmp_var_name = ref "" in

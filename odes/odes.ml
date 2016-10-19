@@ -1118,7 +1118,7 @@ struct
     ()
 
   let export_main
-      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
+      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
       logger compil network split =
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
@@ -1143,8 +1143,8 @@ struct
         (alg_of_float  0.000001) handler_expr
     in
     let () =
-      Ode_loggers.associate logger Ode_loggers.Num_t_points
-        (alg_of_int nb_points) handler_expr
+      Ode_loggers.associate logger Ode_loggers.Period_t_points
+        (alg_of_float plot_period) handler_expr
     in
     let () = Loggers.print_newline logger in
     let () =
@@ -1411,7 +1411,7 @@ struct
     ()
 
   let export_network
-      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
+      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
       logger compil network =
     (* add a spurious variable for time *)
     let network = inc_fresh_ode_var_id network in
@@ -1422,7 +1422,7 @@ struct
     let () = Format.printf "\t -main function @." in
     let () =
       export_main
-        ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~nb_points
+        ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
         logger compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -ode system @." in

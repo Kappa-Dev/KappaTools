@@ -5,7 +5,7 @@ let get_compilation ?max_e cli_args =
       ~init_e:0
       ?max_t:cli_args.Run_cli_args.maxTimeValue
       ?max_e
-      ~nb_points:cli_args.Run_cli_args.pointNumberValue in
+      ~plot_period:cli_args.Run_cli_args.plotPeriod in
   let (env, cc_env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflows, init_l),
       counter,alg_overwrite =

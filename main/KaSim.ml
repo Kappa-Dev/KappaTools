@@ -110,10 +110,14 @@ let () =
         Environment.map_observables
           (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
           env in
-      if cli_args.Run_cli_args.pointNumberValue > 0 || head <> [||] then
+      if head <> [||] then
         let title = "Output of " ^ command_line in
-        Outputs.create_plot
-          (Kappa_files.get_data (),title,head) in
+        let () = Outputs.create_plot
+            (Kappa_files.get_data (),title,head) in
+        Outputs.go (Environment.signatures env)
+          (Data.Plot
+             (Counter.current_time counter,
+              State_interpreter.observables_values env counter graph state)) in
     let () =
       match unary_distances with
       | None -> ()
@@ -124,12 +128,6 @@ let () =
             size
             (Format.asprintf "%a" (Environment.print_ast_rule ~env)) in
         Outputs.create_distances names inJson in
-    let () =
-      if cli_args.Run_cli_args.pointNumberValue > 0 then
-        Outputs.go (Environment.signatures env)
-          (Data.Plot
-             (Counter.current_time counter,
-              State_interpreter.observables_values env counter graph state)) in
 
     Parameter.initSimTime () ;
     let () =

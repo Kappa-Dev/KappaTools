@@ -1,9 +1,8 @@
 (** Simulation progress keeper *)
 
 type t
-val set_nb_points : t -> int -> unit
 val create : ?init_t:float -> ?init_e:int -> ?max_t:float -> ?max_e:int ->
-  nb_points:int -> t
+  plot_period:float -> t
 
 val reinitialize : t -> unit
 
@@ -29,7 +28,9 @@ val time_percentage : t -> int option
 val time : t -> float
 val tracked_events : t -> int option
 
-val plot_points : t -> int
+val plot_period : t -> float
+val set_plot_period : t -> float -> unit
+
 val current_time : t -> float
 val current_event : t -> int
 val current_story : t -> int

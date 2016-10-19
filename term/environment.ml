@@ -150,7 +150,7 @@ let check_if_counter_is_filled_enough counter x =
       raise (ExceptionDefn.Malformed_Decl
                (Location.dummy_annot
                   "There is no way for the simulation to stop.")) in
-  if Array.length x.observables > 0 && Counter.plot_points counter < 0
+  if Array.length x.observables > 0 && Counter.plot_period counter < 0.
      && not @@ Primitives.exists_modification
        (fun x -> x = Primitives.PLOTENTRY)
        x.perturbations
