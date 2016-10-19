@@ -72,7 +72,7 @@ let create_t
   let counter =
     Counter.create
       ~init_t:(0. : float) ~init_e:(0 : int)
-      ?max_t:None ?max_e:None ~nb_points:200 in
+      ?max_t:None ?max_e:None ~plot_period:1. in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   { is_running = true ;
@@ -326,9 +326,9 @@ let start
                  parameter.Api_types_j.simulation_max_events
              in
              let () =
-               Counter.set_nb_points
+               Counter.set_plot_period
                  t.counter
-                 parameter.Api_types_j.simulation_nb_plot
+                 parameter.Api_types_j.simulation_plot_period
              in
              Eval.build_initial_state
                ~bind:(fun x f ->

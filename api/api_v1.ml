@@ -446,8 +446,8 @@ end = struct
                               ~ok:(fun _ ->
                                   manager#simulation_start
                                     project_id
-                                    { Api_types_j.simulation_nb_plot =
-                                        parameter.Api_types_v1_j.nb_plot ;
+                                    { Api_types_j.simulation_plot_period =
+                                        parameter.Api_types_v1_j.plot_period ;
                                       Api_types_j.simulation_max_time =
                                         parameter.Api_types_v1_j.max_time ;
                                       Api_types_j.simulation_max_events =

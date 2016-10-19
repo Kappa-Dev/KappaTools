@@ -30,7 +30,7 @@ type version =
 
 type parameter =
      { code : code;
-       nb_plot : int;
+       plot_period : float;
        max_time : float nullable;
        max_events : int nullable
      }

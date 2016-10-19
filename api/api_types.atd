@@ -69,7 +69,7 @@ type kappa_code = string
 
 type simulation_id = string
 type simulation_catalog = simulation_id list
-type simulation_parameter = { simulation_nb_plot : int <json name="nb_plot"> ;
+type simulation_parameter = { simulation_plot_period : float <json name="plot_period"> ;
                               simulation_max_time : float nullable <json name="max_time"> ;
                               simulation_max_events : int nullable <json name="max_events">  ;
                               simulation_id : simulation_id <json name="simulation_id"> ; }

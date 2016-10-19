@@ -109,7 +109,7 @@ let api_errors (errors : Api_types_j.errors) : Api_types_v1_t.errors =
     errors
 
 let api_parameter (parameter : Api_types_v1_j.parameter) : Api_types_j.simulation_parameter =
-{ Api_types_j.simulation_nb_plot = parameter.Api_types_v1_j.nb_plot ;
+{ Api_types_j.simulation_plot_period = parameter.Api_types_v1_j.plot_period ;
   Api_types_j.simulation_max_time = parameter.Api_types_v1_j.max_time ;
   Api_types_j.simulation_max_events = parameter.Api_types_v1_j.max_events ;
   Api_types_j.simulation_id = "ignore" ; }
