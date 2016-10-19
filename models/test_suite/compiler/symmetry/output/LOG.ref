@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-e' '0' '-p' '10'
++ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-e' '0'
 Parsing symmetry.ka...
 done
 + Sanity checks

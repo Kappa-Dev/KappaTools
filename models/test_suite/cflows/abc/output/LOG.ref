@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile' '-d' 'output' '-t' '0' '-p' '10'
++ Command line to rerun is: 'KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile' '-d' 'output' '-t' '0'
 Parsing abc.ka...
 done
 + Sanity checks
@@ -15,7 +15,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
-+ Command line to rerun is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-p' '500' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-pp' '0.012' '--time-independent'
 Parsing abc.ka...
 done
 + Sanity checks

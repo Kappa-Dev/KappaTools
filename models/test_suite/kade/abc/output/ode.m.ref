@@ -1,13 +1,13 @@
 function main=main()
 %% command line: 
-%%     'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-t' '1' '-p''100'
+%%     'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-t' '1' '-pp''0.01'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
 %% tinit - the initial simulation time (likely 0)
 %% tend - the final simulation time 
 %% initialstep - initial time step at the beginning of numerical integration
-%% num_t_point - the number of time points to return
+%% period_t_point - the time period between points to return
 %%
 %% variables (init(i),y(i)) denote numbers of embeddings 
 %% rule rates are corrected by the number of automorphisms in the lhs of rules
@@ -16,7 +16,7 @@ function main=main()
 tinit=0.000000;
 tend=1.000000;
 initialstep=0.000001;
-num_t_point=100;
+period_t_point=0.010000;
 
 global nodevar
 nodevar=11;
@@ -87,7 +87,7 @@ end
 nrows = length(soln.x);
 tmp = zeros(nodevar,1);
 
-t = linspace(tinit, tend, num_t_point+1);
+t = linspace(tinit, tend, period_t_point*(tend-tinit)+1);
 obs = zeros(nrows,nobs);
 
 for j=1:nrows
@@ -108,14 +108,14 @@ end
 
 filename = 'data.out';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE ../../cflows/abc/abc.ka -d output -t 1 -p 100\n')
+fprintf(fid,'# KaDE ../../cflows/abc/abc.ka -d output -t 1 -pp 0.01\n')
 fprintf(fid,'# t')
 fprintf(fid,' |AB|')
 fprintf(fid,' |Cuu|')
 fprintf(fid,' |Cpu|')
 fprintf(fid,' |Cpp|')
 fprintf(fid,'\n')
-for j=1:num_t_point+1
+for j=1:period_t_point*(tend-tinit)+1
     fprintf(fid,'%f',t(j));
     for i=1:nobs
         fprintf(fid,' %f',y(j,i));

@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-e' '200' '-seed' '718860825' '-o' 'data.svg' '-d' 'output' '-p' '100' 'abbcd.ka'
++ Command line to rerun is: 'KaSim' '-e' '200' '-seed' '718860825' '-o' 'data.svg' '-d' 'output' '-pp' '0.012' 'abbcd.ka'
 Parsing abbcd.ka...
 done
 + Sanity checks

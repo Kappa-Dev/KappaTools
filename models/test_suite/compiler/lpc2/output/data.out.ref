@@ -1,4 +1,4 @@
-# Output of 'KaSim' 'lpc2.ka' '-seed' '924556145' '-e' '2' '-p' '2' '-d' 'output'
+# Output of 'KaSim' 'lpc2.ka' '-seed' '924556145' '-e' '2' '-pp' '0.1' '-d' 'output'
 # time 'free A'
  0.000000E+00 0
- 1.857359E-01 1
+ 1.000000E-01 1
