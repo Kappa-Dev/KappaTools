@@ -16,6 +16,7 @@ let to_int ?error_msg:(error_msg=build_msg "int") =
 let of_option to_json = function
   | None -> `Null
   | Some x -> to_json x
+
 let to_option = Yojson.Basic.Util.to_option
 
 let of_list to_json l =

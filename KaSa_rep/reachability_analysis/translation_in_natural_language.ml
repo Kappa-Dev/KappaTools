@@ -27,7 +27,6 @@ type rename_sites =
    Ckappa_sig.Site_map_and_set.Map.elt ->
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
 
-(*TODO: type for store the information before print*)
 
 module Triple_pair_list_map_and_set =
   Map_wrapper.Make
@@ -1255,14 +1254,16 @@ let rec print_store_views
                          ) (error, store_set) l
                     ) (error, store_set) list
                 else
-                  error, Triple_pair_list_map_and_set.Set.empty
+                  error,
+                  Triple_pair_list_map_and_set.Set.empty
             end
         end
   in
   error, store_result
 
-
-let print_store parameters handler_kappa error agent_string agent_type
+let store_views
+    ~show_dep_with_dimmension_higher_than:dim_min
+    parameters handler_kappa error agent_string agent_type
     translation =
   let t = Ckappa_backend.Ckappa_backend.empty in
   let error, id, t =
@@ -1273,8 +1274,8 @@ let print_store parameters handler_kappa error agent_string agent_type
     t
   in
   print_store_views
+    ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error agent_string agent_type id translation t
-
 
 (*****************************************************************************)
 

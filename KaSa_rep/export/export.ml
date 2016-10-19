@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Oct 19 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -17,6 +17,7 @@ let warn parameters mh pos exn default =
 
 (******************************************************************************)
 (*module signatures*)
+
 type state =
   (Domain_selection.Reachability_analysis.static_information,
    Domain_selection.Reachability_analysis.dynamic_information)
@@ -46,6 +47,8 @@ type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
 
 type handler = Cckappa_sig.kappa_handler
+
+(******************************************************************)
 
 let string_of_influence_node x =
   match x with
@@ -120,8 +123,7 @@ let print_contact_map parameters contact_map =
     )
     contact_map
 
-
-(*-------------------------------------------------------------------------------*)
+(*---------------------------------------------------------------------------*)
 (*operations of module signatures*)
 
 let init ?compil ~called_from () =
@@ -375,6 +377,8 @@ let compute_c_compilation_handler show_title state =
        (Remanent_state.set_c_compil c_compil state)),
   (c_compil,handler)
 
+(******************************************************************)
+
 let choose f show_title state =
   let state,pair = compute_c_compilation_handler show_title state in
   state,f pair
@@ -535,7 +539,6 @@ let get_raw_contact_map =
     (Remanent_state.get_contact_map Remanent_state.Low)
     compute_raw_contact_map
 
-
 let convert_label a =
   if a<0 then Remanent_state.Side_effect (-(a+1))
   else Remanent_state.Direct a
@@ -668,7 +671,6 @@ let get_raw_internal_influence_map =
     (Remanent_state.get_internal_influence_map Remanent_state.Low)
     compute_raw_internal_influence_map
 
-
 module AgentProj =
   Map_wrapper.Proj
     (Ckappa_sig.Agent_map_and_set)
@@ -684,9 +686,9 @@ module StateProj =
     (Ckappa_sig.State_map_and_set)
     (Map_wrapper.Make(Mods.StringSetMap))
 
+(******************************************************************)
 
-
-let convert_contact_map show_title state  contact_map =
+let convert_contact_map show_title state contact_map =
   let parameters = Remanent_state.get_parameters state in
   let state, handler = get_handler state in
   let error = Remanent_state.get_errors state in
@@ -737,6 +739,7 @@ let convert_contact_map show_title state  contact_map =
   Remanent_state.set_errors error state,
   contact_map
 
+(******************************************************************)
 
 let convert_influence_map show_title state (wake_up_map, inhibition_map) =
   let parameters = Remanent_state.get_parameters state in
@@ -759,7 +762,6 @@ let convert_influence_map show_title state (wake_up_map, inhibition_map) =
   in
   state,
   output
-
 
 let compute_intermediary_internal_influence_map show_title state =
   let state, handler = get_handler state in
@@ -860,8 +862,6 @@ let get_intermediary_internal_influence_map =
     (Remanent_state.get_internal_influence_map Remanent_state.Medium)
     compute_intermediary_internal_influence_map
 
-
-
 let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =
   match
@@ -877,7 +877,7 @@ let get_influence_map =
     get_internal_influence_map
     convert_influence_map
 
-
+(******************************************************************)
 
 let compute_reachability_result show_title state =
   let state, c_compil = get_c_compilation state in
@@ -906,24 +906,7 @@ let get_reachability_analysis =
     (Remanent_state.get_reachability_result)
     compute_reachability_result
 
-
-let compute_dead_rules _show_title state =
-  let state,_ = get_reachability_analysis state in
-  match
-    Remanent_state.get_dead_rules state
-  with
-  | Some map -> state, map
-  | None -> assert false
-
-
-let get_dead_rules  =
-  get_gen
-    ~do_we_show_title:title_only_in_kasa
-    ~log_title:"Detecting which rules may be triggered during simulations"
-    (*  ~dump:dump_raw_internal_contact_map *)
-    Remanent_state.get_dead_rules
-    compute_dead_rules
-
+(******************************************************************)
 
 let compute_dead_agents _show_title state =
   let state,_ = get_reachability_analysis state in
@@ -933,7 +916,6 @@ let compute_dead_agents _show_title state =
   | Some map -> state, map
   | None -> assert false
 
-
 let get_dead_agents  =
   get_gen
     ~do_we_show_title:title_only_in_kasa
@@ -942,6 +924,7 @@ let get_dead_agents  =
     Remanent_state.get_dead_agents
     compute_dead_agents
 
+(******************************************************************)
 
 let compute_intermediary_internal_contact_map _show_title state =
   let state,_ = get_reachability_analysis state in
@@ -950,7 +933,6 @@ let compute_intermediary_internal_contact_map _show_title state =
   with
   | Some map -> state, map
   | None -> assert false
-
 
 let get_intermediary_internal_contact_map =
   get_gen
@@ -969,7 +951,6 @@ let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
   | Remanent_state.High
   | Remanent_state.Full -> get_intermediary_internal_contact_map state
 
-
 let get_contact_map =
   get_map_gen
     ~do_we_show_title:(fun _ -> true)
@@ -984,6 +965,8 @@ let get_contact_map =
           Some "Refine the contact map")
     get_internal_contact_map
     convert_contact_map
+
+(******************************************************************)
 
 let compute_signature show_title state =
   let state,l = get_contact_map state in
@@ -1016,6 +999,8 @@ let get_signature =
   get_gen
     Remanent_state.get_signature
     compute_signature
+
+(******************************************************************)
 
 let compute_ctmc_flow show_title state =
   let state, c_compil = get_c_compilation state in
@@ -1051,6 +1036,8 @@ let compute_ode_flow show_title state =
     error
     (Remanent_state.set_ode_flow output state),
   output
+
+(******************************************************************)
 
 let get_ode_flow =
   get_gen
@@ -1119,6 +1106,8 @@ let output_internal_contact_map ?loggers ?accuracy_level:(accuracy_level=Remanen
   let error = Preprocess.dot_of_contact_map ?loggers parameters error handler contact_map in
   set_errors error state
 
+(******************************************************************)
+
 let dump_signature state =
   match
     Remanent_state.get_signature state
@@ -1135,6 +1124,26 @@ let dump_errors_light state =
     (Remanent_state.get_parameters state)
     (Remanent_state.get_errors state)
 
+(******************************************************************)
+
+let compute_dead_rules _show_title state =
+  let state,_ = get_reachability_analysis state in
+  match
+    Remanent_state.get_dead_rules state
+  with
+  | Some map -> state, map
+  | None -> assert false
+
+let get_dead_rules  =
+  get_gen
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Detecting which rules may be triggered during simulations"
+    (*  ~dump:dump_raw_internal_contact_map *)
+    Remanent_state.get_dead_rules
+    compute_dead_rules
+
+(******************************************************************)
+
 let rule_id_to_json rule_id =
   `Assoc ["rule id", `Int (Ckappa_sig.int_of_rule_id rule_id)]
 
@@ -1148,3 +1157,65 @@ let dead_rules_to_json =
 
 let json_to_dead_rules =
   JsonUtil.to_list json_to_rule_id
+
+(******************************************************************)
+(*TODO: internal_constraint_list, constraint_list*)
+
+let compute_internal_constraint_list state =
+  let state, _ = get_reachability_analysis state in
+  match Remanent_state.get_internal_contrainst_list state with
+  | [] -> state, []
+  | (s, l) :: tl ->
+    match l with
+    | [] -> state, []
+    | t :: tl -> (*t : Ckappa_backend.t lemma *)
+      let _ =
+        t.Remanent_state.hyp
+      in
+      let _ =
+        t.Remanent_state.refinement
+      in
+      state, []
+
+let get_internal_contrainst_list list state =
+  match list with
+  | [] ->  state, []
+  | (s, l) :: tl -> state, []
+
+(*let convert_internal_constraint_list show_title state list =
+  *)
+
+(*let get_list_gen
+  (get: ?list:Remanent_state.internal_constraint_list ->
+   (Domain_selection.Reachability_analysis.static_information,
+    Domain_selection.Reachability_analysis.dynamic_information)
+     Remanent_state.state ->
+   (Domain_selection.Reachability_analysis.static_information,
+    Domain_selection.Reachability_analysis.dynamic_information)
+     Remanent_state.state * 'a)
+  convert
+  ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+  ?log_title
+  state =
+  let show_title =
+    match log_title with
+    | None -> (fun _ -> ())
+    | Some log_title ->
+      compute_show_title do_we_show_title log_title
+  in
+  let () = show_title state in
+  let state, list =
+    get state
+  in
+  convert (fun _ -> ()) state list
+
+let get_internal_contrainst_list =
+  get_list_gen
+    ~do_we_show_title:(fun _ -> true)
+    ~log_title:(fun x ->
+        match x with
+        | [] -> []
+        | x :: tl -> []
+      )
+    get_internal_contrainst_list
+    convert_internal_constraint_list*)

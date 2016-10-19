@@ -1,5 +1,5 @@
 (**
-   Time-stamp: <Oct 11 2016>
+   Time-stamp: <Oct 19 2016>
 *)
 
 module type Set_with_logs =
@@ -111,6 +111,18 @@ sig
   val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
 
   val bindings : 'a t -> (elt * 'a) list
+
+  val of_json:
+    ?lab_key:string -> ?lab_value:string -> ?error_msg:string ->
+    (Yojson.Basic.json -> elt) ->
+    (Yojson.Basic.json -> 'value) ->
+    Yojson.Basic.json -> 'value t
+
+  val to_json:
+    ?lab_key:string -> ?lab_value:string ->
+    (elt -> Yojson.Basic.json) ->
+    ('value -> Yojson.Basic.json) ->
+    'value t -> Yojson.Basic.json
 
 end
 
@@ -236,6 +248,9 @@ module Make (S_both: (SetMap.S)): S_with_logs
         let compare = S_both.Map.compare
         let equal = S_both.Map.equal
         let bindings = S_both.Map.bindings
+        let to_json = S_both.Map.to_json
+        let of_json = S_both.Map.of_json
+
       end:Map_with_logs
       with type elt = S_both.elt
        and type 'a t = 'a S_both.Map.t

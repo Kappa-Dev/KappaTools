@@ -1,5 +1,5 @@
 (**
-   Time-stamp: <Aug 09 2016>
+   Time-stamp: <Oct 19 2016>
 *)
 
 module type Set_with_logs =
@@ -88,6 +88,17 @@ sig
   val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
   val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
   val bindings : 'a t -> (elt * 'a) list
+  val of_json:
+    ?lab_key:string -> ?lab_value:string -> ?error_msg:string ->
+    (Yojson.Basic.json -> elt) ->
+    (Yojson.Basic.json -> 'value) ->
+    Yojson.Basic.json -> 'value t
+
+  val to_json:
+    ?lab_key:string -> ?lab_value:string ->
+    (elt -> Yojson.Basic.json) ->
+    ('value -> Yojson.Basic.json) ->
+    'value t -> Yojson.Basic.json
 end
 
 module type S_with_logs = sig

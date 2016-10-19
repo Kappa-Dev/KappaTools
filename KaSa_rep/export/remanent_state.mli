@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 18 2016>
+  * Last modification: Time-stamp: <Oct 19 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -93,7 +93,7 @@ type flow =
 type 'site_graph lemma =
   {
     hyp : 'site_graph ;
-    refinment : 'site_graph list
+    refinement : 'site_graph list
   }
 
 type 'site_graph poly_constraint_list =
@@ -108,6 +108,12 @@ type constraint_list =
        Wrapped_modules.LoggedStringMap.t)
      list)
     poly_constraint_list
+
+val constraint_list_to_json:
+  constraint_list -> Yojson.Basic.json
+
+val internal_constraint_list_to_json:
+  internal_constraint_list -> Yojson.Basic.json
 
 (*******************************************************************)
 
@@ -218,3 +224,16 @@ val set_log_info: StoryProfiling.StoryStats.log_info -> ('static, 'compile) stat
 
 val get_log_info: ('static, 'compile) state ->
   StoryProfiling.StoryStats.log_info
+
+(*TODO*)
+
+val get_internal_contrainst_list : ('static, 'compile) state ->
+  internal_constraint_list
+
+val set_internal_contrainst_list : internal_constraint_list -> ('static, 'compile) state -> ('static, 'compile) state
+
+val get_contrainst_list : ('static, 'compile) state ->
+  constraint_list
+
+val set_contrainst_list : constraint_list -> ('static, 'compile) state ->
+  ('static, 'compile) state

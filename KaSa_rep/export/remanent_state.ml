@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 18 2016>
+  * Last modification: Time-stamp: <Oct 19 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -188,6 +188,12 @@ let stateslist="states list"
 let prop="property states"
 let bind="binding states"
 
+(*
+?lab_key:string -> ?lab_value:string ->
+(elt -> Yojson.Basic.json) ->
+('value -> Yojson.Basic.json) ->
+'value t -> Yojson.Basic.json
+*)
 let contact_map_to_json =
   Mods.StringMap.to_json
     ~lab_key:agent ~lab_value:interface
@@ -254,7 +260,7 @@ type flow =
 type 'site_graph lemma =
   {
     hyp : 'site_graph ;
-    refinment : 'site_graph list
+    refinement : 'site_graph list
   }
 
 type 'site_graph poly_constraint_list =
@@ -269,6 +275,127 @@ type constraint_list =
        Wrapped_modules.LoggedStringMap.t)
      list)
     poly_constraint_list
+
+(*******************************************************************)
+(*internal_/constraint_list -> json*)
+
+let constraint_list_to_json_aux site_map =
+  Wrapped_modules.LoggedStringMap.to_json
+    (fun site_string -> JsonUtil.of_string site_string)
+    (fun (internal_opt, binding_opt) ->
+       JsonUtil.of_pair ~lab1:prop ~lab2:bind
+         (fun internal_opt ->
+            JsonUtil.of_option (fun internal_state ->
+                JsonUtil.of_string internal_state
+              ) internal_opt
+         )
+         (fun binding_opt ->
+            match binding_opt with
+            | None
+            | Some Ckappa_backend.Ckappa_backend.Free ->
+              JsonUtil.of_string ""
+            | Some Ckappa_backend.Ckappa_backend.Wildcard ->
+              JsonUtil.of_string "?"
+            | Some Ckappa_backend.Ckappa_backend.Bound_to_unknown ->
+              JsonUtil.of_string "!_"
+            | Some (Ckappa_backend.Ckappa_backend.Bound_to b_int) ->
+              JsonUtil.of_int
+                (Ckappa_backend.Ckappa_backend.int_of_bond_index b_int)
+            | Some (Ckappa_backend.Ckappa_backend.Binding_type
+                      (agent_name, site_name)) ->
+              JsonUtil.of_pair
+                (fun agent_name ->
+                   JsonUtil.of_string agent_name
+                )
+                (fun site_name ->
+                   JsonUtil.of_string site_name
+                )
+                (agent_name, site_name)
+         )
+         (internal_opt, binding_opt)
+    )
+    site_map
+
+let constraint_list_hyp_to_json hyp =
+  let json =
+    JsonUtil.of_assoc (fun (agent_string, site_map) ->
+        agent_string, constraint_list_to_json_aux site_map
+      ) hyp
+in
+json
+
+let constraint_list_refinment_to_json refinement =
+let json =
+  JsonUtil.of_list (fun t ->
+      constraint_list_hyp_to_json t
+    ) refinement
+in
+json
+
+let hyp = "hyp"
+let refinement = "refinement"
+
+let constraint_list_lemma_to_json lemma =
+  `Assoc [
+    hyp, constraint_list_hyp_to_json lemma.hyp;
+    refinement, constraint_list_refinment_to_json lemma.refinement
+  ]
+
+let constraint_list_to_json contrainst_list =
+  JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
+      let json =
+        JsonUtil.of_list (fun lemma ->
+            constraint_list_lemma_to_json lemma
+          ) lemma_list
+      in
+      agent_string, json
+    ) contrainst_list
+
+(*******************************************************************)
+
+let internal_constraint_list_hyp_to_json hyp =
+  let json =
+    Ckappa_sig.Agent_id_map_and_set.Map.to_json
+      (fun agent_id -> JsonUtil.of_int (Ckappa_sig.int_of_agent_id agent_id)
+      )
+      (fun (agent_string, site_map) ->
+         JsonUtil.of_pair
+           (fun agent_string ->
+              JsonUtil.of_string agent_string
+           )
+           (fun site_map ->
+              constraint_list_to_json_aux site_map
+           )
+           (agent_string, site_map)
+      )
+      hyp
+  in
+  json
+
+let internal_constraint_list_refinement_to_json refinement =
+  let json =
+    JsonUtil.of_list (fun t ->
+        internal_constraint_list_hyp_to_json (Ckappa_backend.Ckappa_backend.get_string_version t)
+      ) refinement
+  in
+  json
+
+let internal_constraint_list_lemma_to_json lemma =
+  `Assoc [
+    hyp, internal_constraint_list_hyp_to_json
+      (Ckappa_backend.Ckappa_backend.get_string_version lemma.hyp);
+    refinement, internal_constraint_list_refinement_to_json lemma.refinement
+  ]
+
+let internal_constraint_list_to_json internal_constraint_list =
+  JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
+      let json =
+        JsonUtil.of_list (fun lemma ->
+            internal_constraint_list_lemma_to_json lemma
+          ) lemma_list
+      in
+      agent_string, json
+    ) internal_constraint_list
 
 (*******************************************************************)
 
@@ -301,6 +428,7 @@ type ('static,'dynamic) state =
     errors        : Exception.method_handler ;
     (*TODO*)
     internal_constraint_list : internal_constraint_list;
+    constraint_list : constraint_list;
   }
 
 let create_state ?errors parameters init =
@@ -335,7 +463,8 @@ let create_state ?errors parameters init =
     dead_rules = None ;
     dead_agents = None ;
     errors = error ;
-    internal_constraint_list = []
+    internal_constraint_list = [];
+    constraint_list = []
   }
 
 let do_event_gen f phase n state =
@@ -469,3 +598,15 @@ let get_internal_influence_map_map state = state.internal_influence_map
 let get_log_info state = state.log_info
 
 let set_log_info log state = {state with log_info = log}
+
+let get_internal_contrainst_list state =
+  state.internal_constraint_list
+
+let set_internal_contrainst_list list state =
+  {state with internal_constraint_list = list}
+
+let get_contrainst_list state =
+  state.constraint_list
+
+let set_contrainst_list list state =
+  {state with constraint_list = list}

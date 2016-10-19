@@ -9,6 +9,9 @@ struct
     | Binding_type of Ckappa_sig.agent_name * Ckappa_sig.site_name
     | Bound_to of bond_index
 
+  let int_of_bond_index (a:bond_index) : int = a
+
+
   (*TODO: type store the information before print*)
   type internal_list = (Ckappa_sig.agent_name *
                         Wrapped_modules.LoggedStringMap.elt *
@@ -21,8 +24,18 @@ struct
   type binding_list = (Ckappa_sig.agent_name *
                        Wrapped_modules.LoggedStringMap.elt *
                        (Ckappa_sig.agent_name * Ckappa_sig.site_name)) list
+
   type triple_pair_list =
     internal_list * bound_to_list * binding_list
+
+  module Triple_pair_list_map_and_set =
+    Map_wrapper.Make
+      (SetMap.Make
+         (struct
+           type t = triple_pair_list
+           let compare = compare
+           let print _ _ = ()
+         end))
 
   type t =
     {
@@ -41,6 +54,8 @@ struct
            Wrapped_modules.LoggedStringMap.t)
           Ckappa_sig.Agent_id_map_and_set.Map.t
     }
+
+  let get_string_version t = t.string_version
 
   let empty =
     {
@@ -554,14 +569,21 @@ struct
 
 
   (***************************************************************************)
-  (*TODO:store the information of the print function *)
+  (*REMOVE:store the information of the print function *)
 
   let print_store_views error kappa_handler t =
     let error, store_result =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
         (fun _ (agent_string, site_map) (error, current_list) ->
+           (*let error, current_list =
+             store_views_aux error kappa_handler
+               agent_string
+               site_map
+               current_list
+           in
+             error, current_list*)
            let error, current_list =
-             Wrapped_modules.LoggedStringMap.fold
+           Wrapped_modules.LoggedStringMap.fold
                (fun site_string (internal, binding) (error, current_list) ->
                   let current_list1, current_list2, current_list3 =
                     current_list in

@@ -9,6 +9,8 @@ sig
     | Binding_type of Ckappa_sig.agent_name * Ckappa_sig.site_name
     | Bound_to of bond_index
 
+  val int_of_bond_index : bond_index -> int
+
 (*TODO*)
   type internal_list = (Ckappa_sig.agent_name *
                         Wrapped_modules.LoggedStringMap.elt *
@@ -25,8 +27,14 @@ sig
   type triple_pair_list =
     internal_list * bound_to_list * binding_list
 
-
   val empty: t
+
+  val get_string_version : t ->
+    (string *
+     (string option * binding_state option)
+       Wrapped_modules.LoggedStringMap.t)
+      Ckappa_sig.Agent_id_map_and_set.Map.t
+
   val add_agent:
     Remanent_parameters_sig.parameters ->
     Exception.method_handler  ->
@@ -79,6 +87,19 @@ sig
     Exception.method_handler ->
     Cckappa_sig.kappa_handler ->
     t -> Exception.method_handler
+
+  (*val print_store_views_contrainst_list :
+    Exception.method_handler ->
+    Cckappa_sig.kappa_handler ->
+    ((string *
+      (string option * binding_state option)
+        Wrapped_modules.LoggedStringMap.t) list)
+    -> Exception.method_handler *
+       (string *
+        (Wrapped_modules.LoggedStringMap.elt *
+         (string list *
+          (bond_index list *
+           (Ckappa_sig.agent_name * Ckappa_sig.site_name) list))))*)
 
   val print_store_views:
     Exception.method_handler ->
