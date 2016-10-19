@@ -1,13 +1,12 @@
 """ Web api client for the kappa programming language
 """
 
+import urllib.request
 import urllib
 
 # bad pratice but done to support python2
-try:
-    exec("from urllib2 import urlopen")
-except ImportError:
-    exec("from urllib.request import urlopen")
+
+from urllib.request import urlopen
 
 import json
 
@@ -33,7 +32,7 @@ class KappaRuntime(object):
             version_url = "{0}/version".format(self.url)
             response = urlopen(version_url)
             text = response.read()
-            return json.loads(text)
+            return json.loads(text.decode('utf-8'))
         except urllib2.URLError as exception:
             raise KappaError(exception.reason)
 
@@ -47,7 +46,7 @@ class KappaRuntime(object):
         try:
             response = urllib2.urlopen(parse_url)
             text = response.read()
-            return json.loads(text)
+            return json.loads(text.decode("utf-8"))
         except urllib2.HTTPError as exception:
             if exception.code == 400:
                 error_details = json.loads(exception.read())
@@ -67,24 +66,24 @@ class KappaRuntime(object):
             parameter['max_events'] = None
         code = json.dumps(parameter)
         method = "POST"
-        handler = urllib2.HTTPHandler()
-        opener = urllib2.build_opener(handler)
+        handler = urllib.request.HTTPHandler()
+        opener = urllib.request.build_opener(handler)
         parse_url = "{0}/process".format(self.url)
-        request = urllib2.Request(parse_url, data=code)
+        request = urllib.request.Request(parse_url, data=code.encode("utf-8"))
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib2.HTTPError as exception:
+        except urllib.request.HTTPError as exception:
             connection = exception
-        except urllib2.URLError as exception:
+        except urllib.request.URLError as exception:
             raise KappaError(exception.reason)
 
         if connection.code == 200:
             text = connection.read()
-            return int(json.loads(text))
+            return int(json.loads(text.decode("utf-8")))
         elif connection.code == 400:
             text = connection.read()
-            error_details = json.loads(text)
+            error_details = json.loads(text.decode("utf-8"))
             raise KappaError(error_details)
         else:
             raise exception
@@ -93,16 +92,16 @@ class KappaRuntime(object):
         """ stop running process
         """
         method = "DELETE"
-        handler = urllib2.HTTPHandler()
-        opener = urllib2.build_opener(handler)
+        handler = urllib.request.HTTPHandler()
+        opener = urllib.request.build_opener(handler)
         parse_url = "{0}/process/{1}".format(self.url, token)
-        request = urllib2.Request(parse_url)
+        request = urllib.request.Request(parse_url)
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib2.HTTPError as exception:
+        except urllib.request.HTTPError as exception:
             connection = exception
-        except urllib2.URLError as exception:
+        except urllib.request.URLError as exception:
             raise KappaError(exception.reason)
 
         if connection.code == 200:
@@ -110,7 +109,7 @@ class KappaRuntime(object):
             return None
         elif connection.code == 400:
             text = connection.read()
-            error_details = json.loads(text)
+            error_details = json.loads(textdecode("utf-8"))
             raise KappaError(error_details)
         else:
             raise exception
@@ -120,16 +119,16 @@ class KappaRuntime(object):
         """
         try:
             version_url = "{0}/process/{1}".format(self.url, token)
-            response = urllib2.urlopen(version_url)
+            response = urllib.request.urlopen(version_url)
             text = response.read()
-            return json.loads(text)
-        except urllib2.HTTPError as exception:
+            return json.loads(text.decode("utf-8"))
+        except urllib.request.HTTPError as exception:
             if exception.code == 400:
                 error_details = json.loads(exception.read())
                 raise KappaError(error_details)
             else:
                 raise exception
-        except urllib2.URLError as exception:
+        except urllib.request.URLError as exception:
             KappaError(exception.reason)
 
 
@@ -137,16 +136,16 @@ class KappaRuntime(object):
         """ shutdown server
         """
         method = "POST"
-        handler = urllib2.HTTPHandler()
-        opener = urllib2.build_opener(handler)
+        handler = urllib.request.HTTPHandler()
+        opener = urllib.request.build_opener(handler)
         parse_url = "{0}/shutdown".format(self.url)
-        request = urllib2.Request(parse_url, data=key)
+        request = urllib.request.Request(parse_url, data=key.encode("utf-8"))
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib2.HTTPError as exception:
+        except urllib.request.HTTPError as exception:
             connection = exception
-        except urllib2.URLError as exception:
+        except urllib.request.URLError as exception:
             raise KappaError(exception.reason)
         if connection.code == 200:
             text = connection.read()
