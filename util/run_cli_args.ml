@@ -7,8 +7,9 @@ type t = {
   mutable marshalizedInFile   : string;
   mutable inputKappaFileNames : string list;
   mutable outputDataFile      : string;
-  mutable outputDirectory : string;
-  mutable batchmode : bool;
+  mutable outputDirectory     : string;
+  mutable batchmode           : bool;
+  mutable interactive         : bool;
 }
 
 let default : t = {
@@ -22,6 +23,7 @@ let default : t = {
   outputDataFile = "data.out";
   outputDirectory = ".";
   batchmode  = false;
+  interactive = false;
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -58,10 +60,11 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("-load-sim",
    Arg.String (fun file -> t.marshalizedInFile <- file),
    "load simulation package instead of kappa files") ;
-  ("--batch",
-   Arg.Unit
-     (fun () -> t.batchmode <- true),
-   "Set non interactive mode (always assume default answer)") ;
+  ("-mode",
+   Arg.String
+     (fun m -> if m = "batch" then t.batchmode <- true
+       else if m = "interactive" then t.interactive <- true),
+   "either \"batch\" to never ask anything to the user or \"interactive\" to ask something before doing anything") ;
   ("-rescale", Arg.Float (fun i -> t.rescale <- Some i),
    "Apply rescaling factor to initial condition")
 ]

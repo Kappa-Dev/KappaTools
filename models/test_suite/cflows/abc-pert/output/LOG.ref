@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '--batch'
++ Command line to rerun is: 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '-mode' 'batch'
 Parsing abc-pert.ka...
 done
 + Sanity checks

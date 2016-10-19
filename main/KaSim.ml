@@ -35,7 +35,6 @@ let () =
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in
     let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in
-    let () = Parameter.batchmode := cli_args.Run_cli_args.batchmode in
     let () =
       Parameter.time_independent := common_args.Common_args.timeIndependent in
 
@@ -104,7 +103,7 @@ let () =
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 
-    Kappa_files.setCheckFileExists ~batchmode:!Parameter.batchmode ;
+    Kappa_files.setCheckFileExists ~batchmode:cli_args.Run_cli_args.batchmode ;
 
     let () =
       let head =
@@ -208,7 +207,7 @@ let () =
               Format.std_formatter env0 counter graph' state'
           else
             toplevel cc_env' graph' state' in
-        if kasim_args.Kasim_args.interactive then
+        if cli_args.Run_cli_args.interactive then
           let () =
             Format.printf
               "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\

@@ -45,9 +45,6 @@ let main () =
         Kappa_files.set_traceFile traceFile
         in*)
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
-    (*  let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in*)
-    (*let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in*)
-    let () = Parameter.batchmode := cli_args.Run_cli_args.batchmode in
     (*let () =
       Parameter.time_independent := common_args.Common_args.timeIndependent*)
     let backend =
@@ -102,7 +99,7 @@ let main () =
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
     let () =
-      Kappa_files.setCheckFileExistsODE ~batchmode:!Parameter.batchmode in
+      Kappa_files.setCheckFileExistsODE ~batchmode:cli_args.Run_cli_args.batchmode in
     let command_line =
       Format.asprintf "%a"
         (Pp.array (fun f -> Format.fprintf f " ")

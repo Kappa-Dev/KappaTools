@@ -1,4 +1,4 @@
-# Output of 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '--batch'
+# Output of 'KaSim' '-i' 'abc-pert.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '--time-independent' '-mode' 'batch'
 # time 'AB' 'Cuu' 'Cpu' 'Cpp' 'n_c'
  0.000000E+00 0 0 0 0 0
  9.944113E+00 730 0 0 0 0

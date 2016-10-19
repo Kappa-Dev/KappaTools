@@ -1,5 +1,4 @@
 (*Expert mode values*)
-let batchmode = ref false
 let interrupt_on_exception = false
 let defaultExtArraySize = ref 5
 let defaultGraphSize = ref 5

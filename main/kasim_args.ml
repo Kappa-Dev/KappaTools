@@ -1,7 +1,6 @@
 type t = {
   mutable seedValue           : int option;
   mutable maxEventValue       : int option;
-  mutable interactive         : bool;
 
   mutable marshalizeOutFile : string option;
   mutable domainOutputFile : string option;
@@ -13,7 +12,6 @@ type t = {
 let default : t = {
   seedValue  = None;
   maxEventValue = None;
-  interactive = false;
 
   marshalizeOutFile = None;
   domainOutputFile = None;
@@ -43,10 +41,6 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.String
      (fun traceFile -> t.traceFile <- Some traceFile),
    "file name for dumping the simulation trace") ;
-  ("--interactive",
-   Arg.Unit
-     (fun () -> t.interactive <- true),
-   "Run interactively") ;
   ("-seed", Arg.Int (fun i -> t.seedValue <- Some i),
    "Seed for the random number generator") ;
   ("--eclipse",
