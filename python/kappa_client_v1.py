@@ -2,7 +2,13 @@
 """
 
 import urllib
-import urllib2
+
+# bad pratice but done to support python2
+try:
+    exec("from urllib2 import urlopen")
+except ImportError:
+    exec("from urllib.request import urlopen")
+
 import json
 
 class KappaError(Exception):
@@ -25,7 +31,7 @@ class KappaRuntime(object):
         """
         try:
             version_url = "{0}/version".format(self.url)
-            response = urllib2.urlopen(version_url)
+            response = urlopen(version_url)
             text = response.read()
             return json.loads(text)
         except urllib2.URLError as exception:
@@ -68,7 +74,7 @@ class KappaRuntime(object):
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib2.HTTPError, exception:
+        except urllib2.HTTPError as exception:
             connection = exception
         except urllib2.URLError as exception:
             raise KappaError(exception.reason)
@@ -94,7 +100,7 @@ class KappaRuntime(object):
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib2.HTTPError, exception:
+        except urllib2.HTTPError as exception:
             connection = exception
         except urllib2.URLError as exception:
             raise KappaError(exception.reason)
@@ -138,7 +144,7 @@ class KappaRuntime(object):
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib2.HTTPError, exception:
+        except urllib2.HTTPError as exception:
             connection = exception
         except urllib2.URLError as exception:
             raise KappaError(exception.reason)
@@ -157,9 +163,9 @@ class KappaRuntime(object):
 if __name__ == "__main__":
     with open("../models/abc-pert.ka") as f:
         try:
-            KAPPA_CODE = f.read()
-            KAPPA_RUNTIME = KappaRuntime("http://localhost:8080")
-            SIMULATION_TOKEN = KAPPA_RUNTIME.start({'code': KAPPA_CODE, 'nb_plot': 150})
-            print KAPPA_RUNTIME.status(SIMULATION_TOKEN)
+            code = f.read()
+            runtime = KappaRuntime("http://localhost:8080")
+            token = runtime.start({'code': KAPPA_CODE, 'nb_plot': 150})
+            print(runtime.status(token))
         except KappaError as exception:
-            print exception.errors
+            print(exception.errors)
