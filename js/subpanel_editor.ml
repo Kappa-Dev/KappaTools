@@ -133,8 +133,8 @@ let initialize codemirror () =
           (Some (int_of_string (List.assoc "nb_events" args)))
     with Not_found | Failure _ -> () in
   let () =
-    try UIState.set_model_nb_plot
-          (int_of_string (List.assoc "plot_points" args))
+    try UIState.set_model_plot_period
+          (float_of_string (List.assoc "plot_period" args))
     with Not_found | Failure _ -> () in
   let () =
     try UIState.set_model_max_time

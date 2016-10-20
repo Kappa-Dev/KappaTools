@@ -1,7 +1,6 @@
 module ApiTypes = Api_types_v1_j
 
-open ApiTypes
-open Lwt
+open Lwt.Infix
 
 exception InvalidState of string
 let editor_full , set_editor_full =
@@ -16,8 +15,7 @@ let model_max_events, set_model_max_events =
   React.S.create (None : int option)
 let model_max_time, set_model_max_time =
   React.S.create (None : float option)
-let model_nb_plot, set_model_nb_plot =
-  React.S.create (250 : int)
+let model_plot_period, set_model_plot_period = React.S.create 1.
 let opened_filename, set_opened_filename =
   React.S.create "model.ka"
 

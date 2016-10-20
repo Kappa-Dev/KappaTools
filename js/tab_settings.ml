@@ -80,16 +80,13 @@ let simulation_limit_selector =
     (List.map option [ TIME_LIMIT ; EVENTS_LIMIT ; ])
 
 
-let plot_points_id = "plot_points"
-let plot_points_input =
+let plot_period_input =
   Html.input
-    ~a:[Html.a_id plot_points_id;
-        Html.a_input_type `Number;
-        Html.Unsafe.int_attrib "min" 1 ;
-        Html.a_class [ "form-control" ];
-        Html.a_placeholder "Expected number";
+    ~a:[Html.a_input_type `Number;
+        Html.a_class [ "form-control"];
+        Html.a_placeholder "seconds";
         Tyxml_js.R.Html.a_value
-          (React.S.l1 string_of_int UIState.model_nb_plot)]
+          (React.S.l1 string_of_float UIState.model_plot_period)]
     ()
 
 let perturbation_code_id = "perturbation_code"
@@ -101,12 +98,7 @@ let perturbation_code_input =
         Html.a_placeholder "Simulation Perturbation";]
     ()
 
-let signal_change id signal_handler =
-  let input_dom : Dom_html.inputElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get (Ui_common.document##getElementById (Js.string id))
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
+let signal_change input_dom signal_handler =
   input_dom##.onchange :=
     Dom_html.handler
       (fun _ ->
@@ -378,29 +370,25 @@ let stopped_xml (t : Ui_simulation.t) =
        ]
   [%html {|
      <div class="row">
-        <div class="col-md-2">
-           |}[ simulation_limit_input ]{|
-        </div>
-        <div class="col-md-1">
-           |}[ simulation_limit_selector ]{|
-        </div>
-        <div class="col-md-9">|}[ alert_messages ]{|</div>
-     </div>
-
-
+        <div class="col-md-3">
+        <form class="form-horizontal">
+          <div class="form-group">
+           <label class="col-sm-6">Max |}[ simulation_limit_selector ]{|</label>
+           <div class="col-sm-6">|}[ simulation_limit_input ]{|</div>
+          </div>
       |}[ Html.div
             ~a:[ Tyxml_js.R.Html.a_class
                    (visible_on_states
-                     t
-                     ~a_class:[ "row" ]
-                     [ Ui_simulation.STOPPED ; ]) ]
-            [ Html.div
-                ~a:[ Html.a_class [ "col-md-2" ] ]
-                [ plot_points_input ] ;
-              Html.div
-                ~a:[ Html.a_class [ "col-md-1" ] ]
-                [ Html.pcdata  "points" ] ; ]
+                      t
+                      ~a_class:[ "form-group" ]
+                      [ Ui_simulation.STOPPED ; ]) ]
+            [ Html.label ~a:[Html.a_class ["col-sm-6"] ]
+                [ Html.pcdata  "Plot period" ] ;
+              Html.div ~a:[Html.a_class ["col-sm-6"] ] [plot_period_input] ]
         ]{|
+        </form></div>
+        <div class="col-md-9">|}[ alert_messages ]{|</div>
+     </div>
 
      |}[ perturbation_control t ]{|
    |}]
@@ -665,7 +653,7 @@ let onload (t : Ui_simulation.t) : unit =
            Js._true
         )
   in
-  let () = signal_change simulation_limit_id
+  let () = signal_change (Tyxml_js.To_dom.of_input simulation_limit_input)
       (fun value ->
          match React.S.value signal_simulation_limit with
          | TIME_LIMIT ->
@@ -678,9 +666,9 @@ let onload (t : Ui_simulation.t) : unit =
               with | Failure _ -> None)
       )
   in
-  let () = signal_change plot_points_id
+  let () = signal_change (Tyxml_js.To_dom.of_input plot_period_input)
       (fun value ->
-         try UIState.set_model_nb_plot (int_of_string value)
+         try UIState.set_model_plot_period (float_of_string value)
          with | Not_found | Failure _ -> ()) in
   let () = perturbation_button_dom##.onclick :=
       Dom.handler
