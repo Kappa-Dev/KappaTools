@@ -46,7 +46,7 @@ class manager_distance
         let distance_ids : Api_types_j.distance_id list = List.mapi (fun i _ -> i) distance in
         Api_common.result_ok { Api_types_j.distance_ids = distance_ids }
       | None -> let m : string = "distance not available" in
-        Api_common.result_error_msg ~result_code:Api.NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
     method private get_distance
         (distance_id : Api_types_j.distance_id)
@@ -57,9 +57,9 @@ class manager_distance
         (try Api_common.result_ok (List.nth distance distance_id)
          with _ ->
            let m : string = Format.sprintf "id %d not found" distance_id in
-           Api_common.result_error_msg ~result_code:Api.NOT_FOUND m)
+           Api_common.result_error_msg ~result_code:`NOT_FOUND m)
       | None -> let m : string = "distance not available" in
-        Api_common.result_error_msg ~result_code:Api.NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
 
     method simulation_info_distance
@@ -124,7 +124,7 @@ class manager_file_line
       | [] -> let m : string = Format.sprintf "id %s not found"
                   (match file_line_id with Some id -> id | None -> "None")
         in
-        Api_common.result_error_msg ~result_code:Api.NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`NOT_FOUND m
       | lines -> Api_common.result_ok lines
 
     method simulation_info_file_line
@@ -179,7 +179,7 @@ class manager_flux_map
       try Api_common.result_ok (List.find flux_maps_eq flux_maps_list)
       with Not_found ->
       let m : string = Format.sprintf "id %s not found" flux_map_id in
-      Api_common.result_error_msg ~result_code:Api.NOT_FOUND m
+      Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
 
     method simulation_info_flux_map
@@ -240,7 +240,7 @@ class manager_plot
       match status.Api_types_j.simulation_status_plot with
       | Some plot -> Api_common.result_ok plot
       | None -> let m : string = "plot not available" in
-        Api_common.result_error_msg ~result_code:Api.NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
     method simulation_get_plot
         (project_id : Api_types_j.project_id)
@@ -280,7 +280,7 @@ class manager_snapshot
       try Api_common.result_ok (List.find snapshot_eq snapshot_list)
       with Not_found ->
         let m : string = Format.sprintf "id %s not found" snapshot_id in
-        Api_common.result_error_msg ~result_code:Api.NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
     method simulation_info_snapshot
         (project_id : Api_types_j.project_id)
@@ -377,7 +377,7 @@ class manager_simulation
 	       (Api_common.SimulationCollection.id_to_string simulation_id)
              in
              Lwt.return
-               (Api_common.result_error_msg ~result_code:Api.CONFLICT message)
+               (Api_common.result_error_msg ~result_code:`CONFLICT message)
            else
              let facade = Kappa_facade.clone_t (project#get_state ()) in
              (Kappa_facade.start

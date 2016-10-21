@@ -9,14 +9,14 @@ let result_data_map
   | `Error e -> error e
 
 (* Helper functions for result *)
-let result_ok ?(result_code:Api.manager_code = Api.OK)
+let result_ok ?(result_code:Api.manager_code = `OK)
     (ok:'ok) : 'ok Api.result =
   { Api_types_j.result_data = `Ok ok ;
     Api_types_j.result_code = result_code }
 
 let result_error_msg
     ?(severity:Api_types_j.severity = `Error)
-    ?(result_code:Api.manager_code = Api.ERROR)
+    ?(result_code:Api.manager_code = `ERROR)
     (message:string) : 'ok Api.result =
   { Api_types_j.result_data =
       `Error [{ Api_types_j.message_severity = severity;
@@ -25,14 +25,14 @@ let result_error_msg
     Api_types_j.result_code = result_code }
 
 let result_messages
-    ?(result_code:Api.manager_code = Api.ERROR)
+    ?(result_code:Api.manager_code = `ERROR)
     (messages : Api_types_j.errors) : 'ok Api.result =
   { Api_types_j.result_data = `Error messages ;
     Api_types_j.result_code = result_code }
 
 let result_error_exception
     ?(severity:Api_types_j.severity = `Error)
-    ?(result_code:Api.manager_code = Api.ERROR)
+    ?(result_code:Api.manager_code = `ERROR)
     (e : exn) : 'ok Api.result =
   let message = (try  (Printexc.to_string e)
                  with _ -> "unspecified exception thrown")
@@ -158,7 +158,7 @@ struct
   | item::_ -> operation item
   | [] ->
      let m : string = Format.sprintf "%s : %s id not found" (C.id_to_string id) C.label in
-     Lwt.return (result_error_msg ~result_code:Api.NOT_FOUND m)
+     Lwt.return (result_error_msg ~result_code:`NOT_FOUND m)
 
 end;;
 

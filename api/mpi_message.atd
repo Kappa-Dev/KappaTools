@@ -1,31 +1,115 @@
 type id = int
 type 'data message = { id : id ; data : 'data }
 
-type catalog <ocaml from="Api_types_v1"> = abstract
-type code <ocaml from="Api_types_v1"> = abstract
-type error <ocaml from="Api_types_v1"> = abstract
-type parameter <ocaml from="Api_types_v1"> = abstract
-type ('r) result <ocaml from="Api_types_v1"> = abstract
-type state <ocaml from="Api_types_v1"> = abstract
-type token <ocaml from="Api_types_v1"> = abstract
-type parse <ocaml from="Api_types_v1"> = abstract
-type peturbation = { perturbation_token : token ;
-                     perturbation_code : string ; }
-type continuation = { continuation_token : token ;
-     		      continuation_parameter : parameter }
-type request = [ Parse of code
-               | Start of parameter
-               | Status of token
-               | List of unit
-               | Stop of token
-	       | Peturbation of peturbation
-	       | Pause of token
-	       | Continue of continuation ]
-type response = [ Parse of parse result
-                | Start of token result
-                | Status of state result
-                | List of catalog result
-                | Stop of unit result
-		| Peturbation of unit result
-		| Pause of unit result
-		| Continue of unit result ]
+type manager_code
+     <ocaml module="Api">
+     (* <ocaml_biniou module="Api"> *) =
+      [ OK | CREATED | ERROR | CONFLICT | NOT_FOUND | ACCEPTED ] <json repr="object">
+
+type ('ok,'error) api_result
+     <ocaml from="Api_types" t="result"> =
+     abstract
+type 'ok result = ('ok,manager_code) api_result
+
+type environment_info <ocaml from="Api_types"> = abstract
+
+type project_id <ocaml from="Api_types"> = abstract
+type file <ocaml from="Api_types"> = abstract
+type file_info <ocaml from="Api_types"> = abstract
+type file_modification <ocaml from="Api_types"> = abstract
+type ('data) file_result <ocaml from="Api_types"> = abstract
+type file_metadata <ocaml from="Api_types"> = abstract
+
+
+type project_parameter <ocaml from="Api_types"> = abstract
+type project_info <ocaml from="Api_types"> = abstract
+
+type simulation_id <ocaml from="Api_types"> = abstract
+type simulation_parameter <ocaml from="Api_types"> = abstract
+type simulation_perturbation  <ocaml from="Api_types"> = abstract
+type simulation_info <ocaml from="Api_types"> = abstract
+
+type distance_id <ocaml from="Api_types"> = abstract
+type distance  <ocaml from="Api_types"> = abstract
+
+type file_line_id <ocaml from="Api_types"> = abstract
+type file_line  <ocaml from="Api_types"> = abstract
+type file_id  <ocaml from="Api_types"> = abstract
+type file_line_detail<ocaml from="Api_types"> = abstract
+
+type flux_map_id <ocaml from="Api_types"> = abstract
+type flux_map <ocaml from="Api_types"> = abstract
+
+type log_message <ocaml from="Api_types"> = abstract
+type log_message_detail <ocaml from="Api_types"> = abstract
+
+type plot <ocaml from="Api_types"> = abstract
+
+type snapshot <ocaml from="Api_types"> = abstract
+type snapshot_id <ocaml from="Api_types"> = abstract
+
+type distance_info <ocaml from="Api_types"> = abstract
+type file_line_info <ocaml from="Api_types"> = abstract
+type flux_map_info <ocaml from="Api_types"> = abstract
+type snapshot_info <ocaml from="Api_types"> = abstract
+type simulation_catalog <ocaml from="Api_types"> = abstract
+
+
+
+type request = [ EnvironmentInfo of unit
+               | FileCreate of (project_id * file)
+               | FileDelete of (project_id * file_id)
+               | FileGet of (project_id * file_id)
+               | FileInfo of project_id
+               | FileUpdate of (project_id * file_id * file_modification)
+               | ProjectCreate of project_parameter
+               | ProjectDelete of project_id
+               | ProjectInfo
+               | SimulationContinue of (project_id * simulation_id * simulation_parameter)
+               | SimulationDelete of (project_id * simulation_id)
+               | SimulationGetDistance of (project_id * simulation_id * distance_id)
+               | SimulationGetFileLine of (project_id * simulation_id * file_line_id)
+               | SimulationGetFluxMap of (project_id * simulation_id * flux_map_id)
+               | SimulationGetLogMessage of (project_id * simulation_id)
+               | SimulationGetPlot of (project_id * simulation_id)
+               | SimulationGetSnapshot of (project_id * simulation_id * snapshot_id)
+               | SimulationInfo of (project_id * simulation_id)
+               | SimulationInfoDistance of (project_id * simulation_id)
+               | SimulationInfoFileLine of (project_id * simulation_id)
+               | SimulationInfoFluxMap of (project_id * simulation_id)
+               | SimulationInfoSnapshot of (project_id * simulation_id)
+               | SimulationList of project_id
+               | SimulationPause of (project_id * simulation_id)
+               | SimulationPerturbation of (project_id * simulation_id * simulation_perturbation)
+               | SimulationStart of (project_id * simulation_parameter)
+               | SimulationStop of (project_id * simulation_id)
+               ]
+
+type response = [ EnvironmentInfo of environment_info result
+                | FileCreate of file_metadata file_result result
+                | FileDelete of unit file_result result
+                | FileGet of file result
+                | FileInfo of file_info result
+                | FileUpdate of file_metadata file_result result
+                | ProjectCreate of project_id result
+                | ProjectDelete of unit result
+                | ProjectInfo of project_info result
+                | SimulationContinue of unit result
+                | SimulationDelete of unit result
+                | SimulationGetDistance of distance result
+                | SimulationGetFileLine of file_line_detail result
+                | SimulationGetFluxMap of flux_map result
+                | SimulationGetLogMessage of log_message list result
+                | SimulationGetPlot of plot result
+                | SimulationGetSnapshot of snapshot result
+                | SimulationInfo of simulation_info result
+                | SimulationInfoDistance of distance_info result
+                | SimulationInfoFileLine of file_line_info result
+                | SimulationInfoFluxMap of flux_map_info result
+                | SimulationInfoSnapshot of snapshot_info result
+                | SimulationList of simulation_catalog result
+                | SimulationPause of unit result
+                | SimulationPerturbation of unit result
+                | SimulationStart of simulation_id result
+                | SimulationStop of unit result
+                ]

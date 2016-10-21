@@ -37,14 +37,14 @@ let route
               in
               Lwt.return
                 { Api_types_j.result_data = `Ok "shutting down" ;
-                  Api_types_j.result_code = Api.OK }
+                  Api_types_j.result_code = `OK }
            | _ ->
               Lwt.return
                 { Api_types_j.result_data =
 		    `Error [{ Api_types_j.message_severity = `Error ;
 			      Api_types_j.message_text = "shutting down" ;
 			      Api_types_j.message_range = None ; }] ;
-                  Api_types_j.result_code = Api.ERROR })
+                  Api_types_j.result_code = `ERROR })
          >>= (fun (msg) ->
            Webapp_common.result_response
              ~string_of_success:(fun x -> x)

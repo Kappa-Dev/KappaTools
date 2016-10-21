@@ -27,7 +27,7 @@ object
           (Api_common.ProjectCollection.id_to_string project_id)
       in
       Lwt.return
-        (Api_common.result_error_msg ~result_code:Api.CONFLICT message)
+        (Api_common.result_error_msg ~result_code:`CONFLICT message)
     else
       let kappa_code = "" in
       (Kappa_facade.parse

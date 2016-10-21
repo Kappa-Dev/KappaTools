@@ -31,7 +31,8 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
               (Ipaddr.to_string (Ipaddr_unix.of_inet_addr ia))
               port
           | Lwt_unix.ADDR_UNIX path -> Printf.sprintf "sock:%s" path)
-       | Conduit_lwt_unix.Vchan _ | Conduit_lwt_unix.Domain_socket _ -> "unknown"
+       | Conduit_lwt_unix.Vchan _
+       | Conduit_lwt_unix.Domain_socket _ -> "unknown"
      in
      let t = Unix.localtime (Unix.time ()) in
      let request_method : string =
@@ -82,9 +83,9 @@ let server =
     Random.init theSeed ;
     Lwt.ignore_result
       (Lwt_log_core.log
-	 ~level:Lwt_log_core.Info
+         ~level:Lwt_log_core.Info
          (Printf.sprintf
-	    "+ Initialized random number generator with seed %d@."
+            "+ Initialized random number generator with seed %d@."
             theSeed)
       )
   in
@@ -92,9 +93,9 @@ let server =
     | None -> `TCP (`Port websim_args.Websim_args.port)
     | Some dir ->
       `TLS (`Crt_file_path (dir^"cert.pem"),
-	    `Key_file_path (dir^"privkey.pem"),
+            `Key_file_path (dir^"privkey.pem"),
             `No_password,
-	    `Port websim_args.Websim_args.port) in
+            `Port websim_args.Websim_args.port) in
   let route_handler :
     Cohttp_lwt_unix.Server.conn ->
     Cohttp.Request.t ->
@@ -110,10 +111,10 @@ let server =
        ~callback:
        (logger
           (match websim_args.Websim_args.api with
-	   | Websim_args.V1 -> Webapp_v1.handler
-	      ~shutdown_key:websim_args.Websim_args.shutdown_key
+           | Websim_args.V1 -> Webapp_v1.handler
+              ~shutdown_key:websim_args.Websim_args.shutdown_key
            | Websim_args.V2 -> route_handler
-	  )
+          )
        )
        ()
     )

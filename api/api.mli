@@ -3,7 +3,12 @@
    are run using the kappa code.
 *)
 
-type manager_code = OK | CREATED | ERROR | CONFLICT | NOT_FOUND | ACCEPTED
+type manager_code = [ `ACCEPTED |
+                      `CONFLICT |
+                      `CREATED |
+                      `ERROR |
+                      `NOT_FOUND |
+                      `OK ]
 type result_code = manager_code
 type 'ok result = ('ok,manager_code) Api_types_j.result
 

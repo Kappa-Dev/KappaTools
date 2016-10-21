@@ -20,12 +20,12 @@ let headers =
 
 let status_of_code : Api.manager_code -> Cohttp.Code.status_code =
   function
-    Api.OK -> `OK
-  | Api.CREATED -> `Created
-  | Api.ERROR -> `Bad_request
-  | Api.CONFLICT -> `Conflict
-  | Api.NOT_FOUND ->`Not_found
-  | Api.ACCEPTED -> `Accepted
+    `OK -> `OK
+  | `CREATED -> `Created
+  | `ERROR -> `Bad_request
+  | `CONFLICT -> `Conflict
+  | `NOT_FOUND ->`Not_found
+  | `ACCEPTED -> `Accepted
 
 (* Given a result and a way to serialize a success result, return
    to client the the http response.
@@ -39,16 +39,16 @@ let result_response
           let body : string = string_of_success ok in
           let status = status_of_code code in
              Server.respond_string
-	       ?headers:(Some headers)
-	       ~status:status
-	       ~body:body
-		   ())
+               ?headers:(Some headers)
+               ~status:status
+               ~body:body
+                   ())
     ~error:(fun
              (code : Api.manager_code)
              (errors : Api_types_j.errors) ->
              let error_msg : string = Api_types_j.string_of_errors errors in
-	     let status = status_of_code code in
-	     (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
+             let status = status_of_code code in
+             (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
              >>= (fun _ ->
           Server.respond_string
             ?headers:(Some headers)

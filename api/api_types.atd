@@ -113,6 +113,7 @@ type file_line <ocaml predef module="Data"> =
      { file_line_name : file_line_id;
        file_line_text : string <json name="text"> }
 type file_line_info = { file_line_ids : file_line_id list }
+type file_line_detail = file_line list
 
 (* snapshot *)
 type snapshot_id = string
@@ -126,8 +127,13 @@ type snapshot_info = { snapshot_ids : snapshot_id list }
 
 (* log message *)
 type log_message = string
+type log_message_detail = log_message list
+
 (* info *)
-type simulation_state = [ Running | Paused | Stopped ]
+type simulation_state = [ Running
+                        | Paused
+			| Stopped ]
+
 type simulation_info = {   simulation_info_time : float;
                            simulation_info_time_percentage : int nullable;
                            simulation_info_event : int;

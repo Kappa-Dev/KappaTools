@@ -158,7 +158,7 @@ class manager_file
              in
              Lwt.return
                (Api_common.result_error_msg
-                  ~result_code:Api.CONFLICT message)
+                  ~result_code:`CONFLICT message)
            else
              let file_list : Api_types_j.file list = (project#get_files ()) in
              let () =  project#set_files (file::file_list) in
