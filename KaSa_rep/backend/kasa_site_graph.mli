@@ -10,6 +10,7 @@ sig
     | Bound_to of bond_index
 
   val int_of_bond_index : bond_index -> int
+  val bond_index_of_int : int -> bond_index
 
 (*TODO*)
   type internal_list = (Ckappa_sig.agent_name *
@@ -34,6 +35,11 @@ sig
      (string option * binding_state option)
        Wrapped_modules.LoggedStringMap.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t
+
+  val set_string_version : (*FIXME*)
+    (string *
+     (string option * binding_state option) Wrapped_modules.LoggedStringMap.t)
+      Ckappa_sig.Agent_id_map_and_set.Map.t -> t -> t
 
   val add_agent:
     Remanent_parameters_sig.parameters ->

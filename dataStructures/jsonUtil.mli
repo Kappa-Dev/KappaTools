@@ -9,6 +9,7 @@ val of_int: int -> Yojson.Basic.json
 val to_int: ?error_msg:string -> Yojson.Basic.json  -> int
 
 val of_option: ('a -> Yojson.Basic.json) -> 'a option -> Yojson.Basic.json
+
 val to_option: (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a option
 (** Beware: `Null is reserved for None *)
 

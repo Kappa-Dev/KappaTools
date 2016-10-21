@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 19 2016>
+  * Last modification: Time-stamp: <Oct 21 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -269,12 +269,16 @@ type 'site_graph poly_constraint_list =
 type internal_constraint_list =
   Ckappa_backend.Ckappa_backend.t poly_constraint_list
 
+type site_map =
+  (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
+    Wrapped_modules.LoggedStringMap.t
+
 type constraint_list =
-  ((string *
-    (string option * Ckappa_backend.Ckappa_backend.binding_state option)
-       Wrapped_modules.LoggedStringMap.t)
-     list)
-    poly_constraint_list
+((string *
+  (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+     Wrapped_modules.LoggedStringMap.t)
+   list)
+  poly_constraint_list
 
 (*******************************************************************)
 (*internal_/constraint_list -> json*)
@@ -375,7 +379,8 @@ let internal_constraint_list_hyp_to_json hyp =
 let internal_constraint_list_refinement_to_json refinement =
   let json =
     JsonUtil.of_list (fun t ->
-        internal_constraint_list_hyp_to_json (Ckappa_backend.Ckappa_backend.get_string_version t)
+        internal_constraint_list_hyp_to_json
+          (Ckappa_backend.Ckappa_backend.get_string_version t)
       ) refinement
   in
   json
@@ -396,6 +401,156 @@ let internal_constraint_list_to_json internal_constraint_list =
       in
       agent_string, json
     ) internal_constraint_list
+
+(*******************************************************************)
+(*json -> contrainst_list/internal_constraint_list*)
+
+let binding_opt_of_json ?error_msg:(error_msg="Not a correct binding state") =
+  function
+  | x ->  raise (Yojson.Basic.Util.Type_error (error_msg,x)) (*FIXME*)
+  | `Assoc ["", json] -> Ckappa_backend.Ckappa_backend.Free
+  | `Assoc ["?", json] -> Ckappa_backend.Ckappa_backend.Wildcard
+  | `Assoc ["!_", json] -> Ckappa_backend.Ckappa_backend.Bound_to_unknown
+  | `Assoc ["bound_to", json] ->
+    let int = JsonUtil.to_int
+        ~error_msg:(JsonUtil.build_msg "bound to") json
+    in
+    let bond_index = Ckappa_backend.Ckappa_backend.bond_index_of_int int in
+    Ckappa_backend.Ckappa_backend.Bound_to bond_index
+  | `Assoc ["binding_type", json] ->
+    let agent_name =
+      (fun json ->
+         JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name")
+           json)
+    in
+    let site_name =
+      (fun json ->
+         JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name") json)
+    in
+    let (agent_name, site_name) =
+      (JsonUtil.to_pair
+         ~lab1:agent ~lab2:site ~error_msg:""
+         (fun json -> agent_name json)
+         (fun json -> site_name json)
+         json)
+    in
+    Ckappa_backend.Ckappa_backend.Binding_type (agent_name, site_name)
+
+let pair_state = "pair state"
+let site_map = "site map"
+let internal = "internal state"
+let binding = "binding state"
+
+let constraint_list_of_json_aux json =
+  Wrapped_modules.LoggedStringMap.of_json ~lab_key:site
+    ~lab_value:pair_state ~error_msg:"site_map"
+    (fun json -> (*elt:site_string*)
+       JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name") json
+    )
+    (fun json -> (*internal_opt, binding_opt*)
+       JsonUtil.to_pair ~lab1:internal ~lab2:binding ~error_msg:""
+         (fun json ->
+            JsonUtil.to_option
+              (fun json ->
+                 JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "internal")
+                   json)
+              json)
+         (fun json ->
+            JsonUtil.to_option
+              (fun json ->
+                 binding_opt_of_json json)
+              json)
+         json)
+    json
+
+let constraint_list_hyp_of_json json =
+  JsonUtil.to_list (fun json ->
+      JsonUtil.to_pair
+        (fun json ->
+           JsonUtil.to_string
+             ~error_msg:(JsonUtil.build_msg "agent name") json
+        )
+        (fun json ->
+           constraint_list_of_json_aux json
+        )
+        json
+    ) json
+
+(*list *)
+let constraint_list_refinment_of_json json =
+  JsonUtil.to_list ~error_msg:"refinement"
+    (fun json -> constraint_list_hyp_of_json json)
+    json
+
+(*json -> lemma *)
+let constraint_list_lemma_of_json json =
+  {
+    hyp = constraint_list_hyp_of_json json;
+    refinement = constraint_list_refinment_of_json json;
+  }
+
+let constraint_list_of_json json =
+  JsonUtil.to_list (fun json ->
+      JsonUtil.to_pair
+        (fun json ->
+           JsonUtil.to_string
+             ~error_msg:(JsonUtil.build_msg "agent name") json)
+        (fun json ->(*site graph lemma list*)
+           JsonUtil.to_list (fun json ->
+               constraint_list_lemma_of_json json
+             ) json
+        ) json) json
+
+(*******************************************************************)
+
+let internal_constraint_list_hyp_of_json json =
+  Ckappa_sig.Agent_id_map_and_set.Map.of_json
+    (fun json -> (*elt*)
+       let int =
+         JsonUtil.to_int ~error_msg:"agent_id" json
+       in
+       Ckappa_sig.agent_id_of_int int
+    )
+    (fun json -> (*val:agent_string, site_map*)
+       JsonUtil.to_pair
+         (fun json ->
+           JsonUtil.to_string
+             ~error_msg:(JsonUtil.build_msg "agent name") json
+         )
+         (fun json -> (*string_option * binding_option*)
+            constraint_list_of_json_aux json
+         ) json
+    )
+    json
+
+let internal_constraint_list_refinement_of_json json =
+  JsonUtil.to_list ~error_msg:"refinement list"
+    (fun json ->
+       internal_constraint_list_hyp_of_json
+
+         json
+    ) json
+
+let internal_constraint_list_lemma_of_json json =
+  {
+    hyp = internal_constraint_list_hyp_of_json json;
+    refinement =
+      internal_constraint_list_refinement_of_json json
+  }
+
+let internal_constraint_list_of_json json =
+  JsonUtil.to_list (fun json ->
+      JsonUtil.to_pair ~error_msg:"internal_constraint_list"
+        (fun json -> (*string*)
+           JsonUtil.to_string
+             ~error_msg:(JsonUtil.build_msg "agent name") json)
+        (fun json -> (*t lemma list*)
+           JsonUtil.to_list (fun json -> (*lemma*)
+               internal_constraint_list_lemma_of_json json
+             ) json
+        ) json
+    ) json
+
 
 (*******************************************************************)
 

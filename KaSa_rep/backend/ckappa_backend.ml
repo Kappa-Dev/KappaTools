@@ -11,6 +11,8 @@ struct
 
   let int_of_bond_index (a:bond_index) : int = a
 
+  let bond_index_of_int (a:int) : bond_index = a
+
 
   (*TODO: type store the information before print*)
   type internal_list = (Ckappa_sig.agent_name *
@@ -56,6 +58,8 @@ struct
     }
 
   let get_string_version t = t.string_version
+  let set_string_version s_v t =
+    {t with string_version = s_v}
 
   let empty =
     {

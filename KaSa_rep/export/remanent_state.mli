@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 19 2016>
+  * Last modification: Time-stamp: <Oct 21 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -114,6 +114,17 @@ val constraint_list_to_json:
 
 val internal_constraint_list_to_json:
   internal_constraint_list -> Yojson.Basic.json
+
+val constraint_list_of_json : Yojson.Basic.json ->
+  constraint_list
+
+val internal_constraint_list_of_json :
+  Yojson.Basic.json ->
+  (*string_version -> t*)
+    (string * (string *
+     (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+       Wrapped_modules.LoggedStringMap.t)
+      Ckappa_sig.Agent_id_map_and_set.Map.t lemma list) list
 
 (*******************************************************************)
 
