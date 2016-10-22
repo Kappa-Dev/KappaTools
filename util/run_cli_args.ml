@@ -3,6 +3,7 @@ type t = {
   mutable minTimeValue        : float;
   mutable maxTimeValue        : float option;
   mutable plotPeriod          : float;
+  mutable nb_points           : int option;
   mutable rescale             : float option;
   mutable marshalizedInFile   : string;
   mutable inputKappaFileNames : string list;
@@ -16,6 +17,7 @@ let default : t = {
   alg_var_overwrite = [];
   minTimeValue = 0. ;
   maxTimeValue = None;
+  nb_points = None;
   plotPeriod = 1.;
   rescale = None;
   marshalizedInFile = "";
@@ -40,6 +42,12 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("-pp",
    Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
    "plot period: time interval in second between points in plot (default: 1.0)");
+  ("-pp",
+   Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
+   "plot period: time interval between points in plot (default: 1.0)");
+  ("-p",
+   Arg.Int(fun pointNumberValue -> t.nb_points <- Some pointNumberValue),
+   "Number of line in plot file (deprecated to -pp)");
   ("-var",
    Arg.Tuple
      (let tmp_var_name = ref "" in

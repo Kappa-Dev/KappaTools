@@ -1,11 +1,22 @@
 let get_compilation ?max_e cli_args =
+  let plot_period =
+    match cli_args.Run_cli_args.maxTimeValue,
+          cli_args.Run_cli_args.nb_points with
+    | Some max_t, Some points when cli_args.Run_cli_args.plotPeriod = 1. ->
+      (max_t -. cli_args.Run_cli_args.minTimeValue) /. float_of_int points
+    | _, _ ->
+      let () =
+        if cli_args.Run_cli_args.nb_points <> None then
+          ExceptionDefn.warning
+            (fun f ->
+               Format.pp_print_string f "-p has been ignored") in
+      cli_args.Run_cli_args.plotPeriod in
   let counter =
     Counter.create
       ~init_t:cli_args.Run_cli_args.minTimeValue
       ~init_e:0
       ?max_t:cli_args.Run_cli_args.maxTimeValue
-      ?max_e
-      ~plot_period:cli_args.Run_cli_args.plotPeriod in
+      ?max_e ~plot_period in
   let (env, cc_env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflows, init_l),
       counter,alg_overwrite =
