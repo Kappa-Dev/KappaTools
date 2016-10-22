@@ -28,7 +28,6 @@ let get_compilation ?max_e cli_args =
           ?rescale_init:cli_args.Run_cli_args.rescale
           ~outputs:(Outputs.go (Signature.create [||]))
           sigs_nd tk_nd contact_map result' in
-      let () = Environment.check_if_counter_is_filled_enough counter env in
       (env, cc_env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflow, init_l),counter,[]
     | marshalized_file ->

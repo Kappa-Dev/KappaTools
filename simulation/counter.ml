@@ -216,7 +216,7 @@ let next_point counter =
     int_of_float
       ((min (Tools.unsome infinity (max_time counter)) (current_time counter)
        -. counter.init_time) /. counter.plot_period)
- 
+
 let to_plot_points counter =
   let next = next_point counter in
   let last = counter.last_point in

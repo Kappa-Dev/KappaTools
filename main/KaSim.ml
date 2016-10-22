@@ -72,6 +72,9 @@ let () =
          unary_distances, formatCflows, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
         ?max_e:kasim_args.Kasim_args.maxEventValue cli_args in
+    let () =
+      if cli_args.Run_cli_args.batchmode then
+        Environment.check_if_counter_is_filled_enough counter env0 in
     let env = Environment.propagate_constant updated_vars counter env0 in
 
     let () =
