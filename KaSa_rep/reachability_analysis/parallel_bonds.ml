@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 14 2016>
+  * Last modification: Time-stamp: <Oct 24 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1242,8 +1242,285 @@ struct
     error, dynamic, ()
 
   (****************************************************************)
+(*export the information of parallel  bond to state*)
 
-  let export _static dynamic error kasa_state =
+  let domain_name = "parallel domain"
+
+  let collect_the_head_of_constraint_list error string_version
+      (s, current_list) =
+    let error, (agent_string, current_list) =
+      Ckappa_sig.Agent_id_map_and_set.Map.fold
+        (fun _ (agent_string, site_map)
+          (error, (s, current_list)) ->
+          (*-----------------------------------------*)
+          let error, (hyp, refinement) =
+            Wrapped_modules.LoggedStringMap.fold
+              (fun site_string (internal_opt, binding_opt)
+                (error, current_list) ->
+                let current_list1, current_list2 =
+                  current_list
+                in
+                let hyp =
+                  (site_string, site_map) :: current_list1
+                in
+                let refinement = hyp :: current_list2 in
+                error, (hyp, refinement)
+              ) site_map (error, ([], []))
+          in
+          (*-----------------------------------------*)
+          let lemma =
+            {
+              Remanent_state.hyp = hyp;
+              Remanent_state.refinement = refinement;
+            }
+          in
+          let lemma_list = lemma :: current_list in
+          error, (agent_string, lemma_list)
+        ) string_version (error, (s, current_list))
+    in
+    (*TODO? print_list?*)
+    error, (agent_string, current_list)
+
+  let export static dynamic error kasa_state =
+    let parameters = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let store_value = get_value dynamic in
+    (*string * 'site_graph lemma list : head*)
+    let error, pair =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
+        (fun tuple value (error, (s, current_list)) ->
+           let (agent, site, site', _, _),
+               (agent'', site'', site''', _, _) = tuple
+           in
+           let t_precondition = Ckappa_backend.Ckappa_backend.empty in
+           let error, agent_id, t_precondition =
+             Ckappa_backend.Ckappa_backend.add_agent
+               parameters error kappa_handler
+               agent
+               t_precondition
+           in
+           (*first pair*)
+           let error, t_precondition =
+             Ckappa_backend.Ckappa_backend.add_bond_type
+               parameters error kappa_handler
+               agent_id
+               site
+               agent''
+               site''
+               t_precondition
+           in
+           (*second pair*)
+           let error, t_precondition =
+             Ckappa_backend.Ckappa_backend.add_bond_type
+               parameters error kappa_handler
+               agent_id
+               site'
+               agent''
+               site'''
+               t_precondition
+           in
+           (*--------------------------------------------------------*)
+           let error, t_same_self =
+             if agent = agent'' && site <> site'' && site' <> site'''
+             then
+               let error, t_same_self =
+                 Ckappa_backend.Ckappa_backend.add_bond
+                   parameters error kappa_handler
+                   agent_id
+                   site
+                   agent_id
+                   site''
+                   t_precondition
+               in
+               error, Some t_same_self
+             else
+               error, None
+           in
+           (*--------------------------------------------------------*)
+           let error, agent_id'', t_same =
+             Ckappa_backend.Ckappa_backend.add_agent
+               parameters error kappa_handler
+               agent''
+               t_precondition
+           in
+           (*--------------------------------------------------------*)
+           let error, t_distinct_self1 =
+             if agent = agent'' && site <> site'' &&
+                site <> site' && site' <> site''
+             then
+               let error, t_distinct_self1 =
+                 Ckappa_backend.Ckappa_backend.add_bond
+                   parameters error kappa_handler
+                   agent_id
+                   site'
+                   agent_id''
+                   site'''
+                   t_same
+               in
+               let error, t_distinct_self1 =
+                 Ckappa_backend.Ckappa_backend.add_bond
+                   parameters error kappa_handler
+                   agent_id
+                   site
+                   agent_id
+                   site''
+                   t_distinct_self1
+               in
+               error, Some t_distinct_self1
+             else error, None
+           in
+           (*--------------------------------------------------------*)
+           let error, t_same =
+             Ckappa_backend.Ckappa_backend.add_bond
+               parameters error kappa_handler
+               agent_id
+               site
+               agent_id''
+               site''
+               t_same
+           in
+           (*--------------------------------------------------------*)
+           let error, t_distinct_self2 =
+             if agent = agent'' &&
+                site' <> site''' && site' <> site && site <> site'''
+             then
+               let error, t_distinct_self2 =
+                 Ckappa_backend.Ckappa_backend.add_bond
+                   parameters error kappa_handler
+                   agent_id
+                   site'
+                   agent_id
+                   site'''
+                   t_same
+               in
+               error, Some t_distinct_self2
+             else error, None
+           in
+           (*--------------------------------------------------------*)
+           let error, agent_id''', t_distinct =
+             Ckappa_backend.Ckappa_backend.add_agent
+               parameters error kappa_handler
+               agent''
+               t_same
+           in
+           let error, t_distinct =
+             Ckappa_backend.Ckappa_backend.add_bond
+               parameters error kappa_handler
+               agent_id
+               site'
+               agent_id'''
+               site'''
+               t_distinct
+           in
+           let error, t_same =
+             Ckappa_backend.Ckappa_backend.add_bond
+               parameters error kappa_handler
+               agent_id
+               site'
+               agent_id''
+               site'''
+               t_same
+           in
+           let list_same =
+             t_same :: (Parallel_bonds_type.cons_opt t_same_self []) in
+           let list_distinct =
+             t_distinct ::
+             (Parallel_bonds_type.cons_opt t_distinct_self1
+                (Parallel_bonds_type.cons_opt t_distinct_self2 []))
+           in
+           (*--------------------------------------------------------*)
+           if compare site site' > 0
+           then error, (s, current_list) (*FIXME*)
+           else
+             (*--------------------------------------------------*)
+             match value with
+             | Usual_domains.Undefined -> error, (s, current_list)
+             | Usual_domains.Val true ->
+               begin
+                 match Remanent_parameters.get_backend_mode parameters with
+                 | Remanent_parameters_sig.Kappa
+                 | Remanent_parameters_sig.Raw ->
+                   begin
+                     (*hyp: *)
+                     let string_version =
+                       Ckappa_backend.Ckappa_backend.get_string_version
+                         t_precondition
+                     in
+                     (*the head*)
+                     let error, (agent_string, current_list) =
+                       collect_the_head_of_constraint_list
+                         error string_version (s, current_list)
+                     in
+                     error, (agent_string, current_list)
+                   end
+                 | Remanent_parameters_sig.Natural_language ->
+                   let string_version =
+                     Ckappa_backend.Ckappa_backend.get_string_version
+                       t_same
+                   in
+                   let error, (agent_string, current_list) =
+                     collect_the_head_of_constraint_list error
+                       string_version
+                       (s, current_list)
+                   in
+                   error, (agent_string, current_list)
+               end
+             | Usual_domains.Val false ->
+               begin
+                 match Remanent_parameters.get_backend_mode parameters with
+                 | Remanent_parameters_sig.Kappa
+                 | Remanent_parameters_sig.Raw ->
+                   let string_version =
+                     Ckappa_backend.Ckappa_backend.get_string_version
+                       t_precondition
+                   in
+                   let error, (agent_string, current_list) =
+                     collect_the_head_of_constraint_list
+                       error string_version (s, current_list)
+                   in
+                   error, (agent_string, current_list)
+                 | Remanent_parameters_sig.Natural_language ->
+                   let string_version =
+                     Ckappa_backend.Ckappa_backend.get_string_version
+                       t_distinct
+                   in
+                   let error, (agent_string, current_list) =
+                     collect_the_head_of_constraint_list
+                       error string_version (s, current_list)
+                   in
+                   error, (agent_string, current_list)
+               end
+             | Usual_domains.Any ->
+               match Remanent_parameters.get_backend_mode parameters with
+               | Remanent_parameters_sig.Kappa
+               | Remanent_parameters_sig.Raw ->
+                 error, (s, current_list)
+               | Remanent_parameters_sig.Natural_language ->
+                 let string_version =
+                   Ckappa_backend.Ckappa_backend.get_string_version
+                     t_same
+                 in
+                 let error, (agent_string, current_list) =
+                   collect_the_head_of_constraint_list
+                     error string_version (s, current_list)
+                 in
+                 let string_version =
+                   Ckappa_backend.Ckappa_backend.get_string_version
+                     t_distinct
+                 in (*FIXME*)
+                 let error, (agent_string, current_list) =
+                   collect_the_head_of_constraint_list
+                     error string_version (agent_string, current_list)
+                 in
+                 error, (agent_string, current_list)
+        ) store_value (error, ("", []))
+    in
+    (*------------------------------------------------------------------*)
+    let constraint_list = Remanent_state.get_contrainst_list kasa_state in
+    let pair_list = pair :: constraint_list in
+    let kasa_state =
+      Remanent_state.set_contrainst_list pair_list kasa_state
+    in
     error, dynamic, kasa_state
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

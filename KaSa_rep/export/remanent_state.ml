@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 21 2016>
+  * Last modification: Time-stamp: <Oct 24 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -16,6 +16,8 @@ type init =
   | Files of string list
 
 type accuracy_level = Low | Medium | High | Full
+
+(******************************************************************)
 
 module AccuracySetMap =
   SetMap.Make
@@ -45,6 +47,8 @@ module AccuracySetMap =
 
 module AccuracyMap = AccuracySetMap.Map
 
+(******************************************************************)
+
 type compilation = ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
 
 type refined_compilation = (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
@@ -58,9 +62,10 @@ type influence_node =
   | Rule of rule_id
   | Var of var_id
 
+(******************************************************************)
+
 let influence_node_to_json a =
-  match a
-  with
+  match a with
   | Var i ->
     `Assoc ["variable",JsonUtil.of_int i]
   | Rule i  ->
@@ -76,6 +81,7 @@ let influence_node_of_json
     Rule (JsonUtil.to_int json)
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+(******************************************************************)
 
 module InfluenceNodeSetMap =
   SetMap.Make
@@ -89,6 +95,8 @@ module InfluenceNodeSetMap =
 
 module InfluenceNodeMap = InfluenceNodeSetMap.Map
 
+(******************************************************************)
+
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
   * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
@@ -96,6 +104,8 @@ type internal_influence_map =
 type location =
   | Direct of int
   | Side_effect of int
+
+(******************************************************************)
 
 let location_to_json a =
   match a with
@@ -110,6 +120,8 @@ let location_of_json
   | `Assoc ["side_effect",json] -> Side_effect (JsonUtil.to_int json)
   | x ->
     raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+(******************************************************************)
 
 type 'a pair = 'a * 'a
 
@@ -188,12 +200,8 @@ let stateslist="states list"
 let prop="property states"
 let bind="binding states"
 
-(*
-?lab_key:string -> ?lab_value:string ->
-(elt -> Yojson.Basic.json) ->
-('value -> Yojson.Basic.json) ->
-'value t -> Yojson.Basic.json
-*)
+(******************************************************************)
+
 let contact_map_to_json =
   Mods.StringMap.to_json
     ~lab_key:agent ~lab_value:interface
@@ -242,6 +250,8 @@ type internal_contact_map =
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
+(******************************************************************)
+
 type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
@@ -264,14 +274,15 @@ type 'site_graph lemma =
   }
 
 type 'site_graph poly_constraint_list =
-  (string * 'site_graph lemma list) list
+  (string (*agent_string*) * 'site_graph lemma list) list
 
 type internal_constraint_list =
   Ckappa_backend.Ckappa_backend.t poly_constraint_list
 
 type site_map =
-  (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
-    Wrapped_modules.LoggedStringMap.t
+  (string * (*site_string*)
+   (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
+     Wrapped_modules.LoggedStringMap.t) list
 
 type constraint_list =
 ((string *
@@ -280,6 +291,13 @@ type constraint_list =
    list)
   poly_constraint_list
 
+(*
+string *
+  (string *
+    (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+      Wrapped_modules.LoggedStringMap.t)
+        list Remanent_state.lemma list
+*)
 (*******************************************************************)
 (*internal_/constraint_list -> json*)
 
@@ -550,7 +568,6 @@ let internal_constraint_list_of_json json =
              ) json
         ) json
     ) json
-
 
 (*******************************************************************)
 

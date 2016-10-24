@@ -102,6 +102,10 @@ type 'site_graph poly_constraint_list =
 type internal_constraint_list =
   Ckappa_backend.Ckappa_backend.t poly_constraint_list
 
+(*
+(string * _list lemma list) list
+*)
+
 type constraint_list =
   ((string *
     (string option * Ckappa_backend.Ckappa_backend.binding_state option)
@@ -120,7 +124,7 @@ val constraint_list_of_json : Yojson.Basic.json ->
 
 val internal_constraint_list_of_json :
   Yojson.Basic.json ->
-  (*string_version -> t*)
+  (*string version*)
     (string * (string *
      (string option * Ckappa_backend.Ckappa_backend.binding_state option)
        Wrapped_modules.LoggedStringMap.t)

@@ -13,7 +13,6 @@ struct
 
   let bond_index_of_int (a:int) : bond_index = a
 
-
   (*TODO: type store the information before print*)
   type internal_list = (Ckappa_sig.agent_name *
                         Wrapped_modules.LoggedStringMap.elt *
@@ -49,7 +48,8 @@ struct
       fresh_bond_id: bond_index ;
       bonds:
         bond_index
-          Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_id_map_and_set.Map.t;
+          Ckappa_sig.Site_map_and_set.Map.t
+          Ckappa_sig.Agent_id_map_and_set.Map.t;
       string_version:
         (string *
          (string option * binding_state option)
@@ -58,8 +58,8 @@ struct
     }
 
   let get_string_version t = t.string_version
-  let set_string_version s_v t =
-    {t with string_version = s_v}
+  (*let set_string_version s_v t =
+    {t with string_version = s_v}*)
 
   let empty =
     {
@@ -530,6 +530,13 @@ struct
   let to_json parameter error kappa_handler t =
     error, `Assoc []
 
+(*
+  type constraint_list =
+  ((string *
+    (string option * Ckappa_backend.Ckappa_backend.binding_state option)
+       Wrapped_modules.LoggedStringMap.t)
+     list) *)
+
   let print logger parameter error kappa_handler t  =
     let _bool =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
@@ -573,19 +580,24 @@ struct
 
 
   (***************************************************************************)
-  (*REMOVE:store the information of the print function *)
+(*REMOVE:store the information of the print function *)
+
+  let collect_views error kappa_handler t =
+  Ckappa_sig.Agent_id_map_and_set.Map.fold
+    (fun _ (agent_string, site_map) (error, current_list) ->
+       Wrapped_modules.LoggedStringMap.fold
+         (fun site_string (internal, binding) (error, current_list) ->
+            error,
+
+            (internal, binding) :: current_list
+         ) site_map (error, current_list)
+    ) t.string_version (error, [])
+
 
   let print_store_views error kappa_handler t =
     let error, store_result =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
         (fun _ (agent_string, site_map) (error, current_list) ->
-           (*let error, current_list =
-             store_views_aux error kappa_handler
-               agent_string
-               site_map
-               current_list
-           in
-             error, current_list*)
            let error, current_list =
            Wrapped_modules.LoggedStringMap.fold
                (fun site_string (internal, binding) (error, current_list) ->

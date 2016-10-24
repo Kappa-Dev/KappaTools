@@ -36,10 +36,10 @@ sig
        Wrapped_modules.LoggedStringMap.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t
 
-  val set_string_version : (*FIXME*)
+  (*val set_string_version : (*FIXME*)
     (string *
      (string option * binding_state option) Wrapped_modules.LoggedStringMap.t)
-      Ckappa_sig.Agent_id_map_and_set.Map.t -> t -> t
+      Ckappa_sig.Agent_id_map_and_set.Map.t -> t -> t*)
 
   val add_agent:
     Remanent_parameters_sig.parameters ->
@@ -93,19 +93,6 @@ sig
     Exception.method_handler ->
     Cckappa_sig.kappa_handler ->
     t -> Exception.method_handler
-
-  (*val print_store_views_contrainst_list :
-    Exception.method_handler ->
-    Cckappa_sig.kappa_handler ->
-    ((string *
-      (string option * binding_state option)
-        Wrapped_modules.LoggedStringMap.t) list)
-    -> Exception.method_handler *
-       (string *
-        (Wrapped_modules.LoggedStringMap.elt *
-         (string list *
-          (bond_index list *
-           (Ckappa_sig.agent_name * Ckappa_sig.site_name) list))))*)
 
   val print_store_views:
     Exception.method_handler ->

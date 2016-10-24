@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 19 2016>
+  * Last modification: Time-stamp: <Oct 21 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -294,6 +294,9 @@ let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
 let flush_errors state =
   Remanent_state.set_errors Exception.empty_error_handler state
 
+(******************************************************************)
+(*compilation*)
+
 let compute_compilation show_title state =
   let compil =
     match Remanent_state.get_init state with
@@ -311,6 +314,8 @@ let get_compilation =
     ~phase:StoryProfiling.KaSa_lexing
     Remanent_state.get_compilation
     compute_compilation
+
+(******************************************************************)
 
 let compute_refined_compil show_title state =
   let state,compil = get_compilation state in
@@ -639,7 +644,7 @@ let compute_raw_internal_influence_map show_title state =
   in
   let error =
     if
-      (Remanent_parameters.get_trace parameters  || Print_quarks.trace)
+      (Remanent_parameters.get_trace parameters || Print_quarks.trace)
       && Remanent_parameters.get_influence_map_accuracy_level parameters = Remanent_parameters_sig.Low
     then
       Print_quarks.print_inhibition_map
@@ -1161,61 +1166,31 @@ let json_to_dead_rules =
 (******************************************************************)
 (*TODO: internal_constraint_list, constraint_list*)
 
-let compute_internal_constraint_list state =
-  let state, _ = get_reachability_analysis state in
-  match Remanent_state.get_internal_contrainst_list state with
-  | [] -> state, []
-  | (s, l) :: tl ->
-    match l with
-    | [] -> state, []
-    | t :: tl -> (*t : Ckappa_backend.t lemma *)
-      let _ =
-        t.Remanent_state.hyp
-      in
-      let _ =
-        t.Remanent_state.refinement
-      in
-      state, []
+(*state -> ?: state, constraint_list*)
 
-let get_internal_contrainst_list list state =
-  match list with
-  | [] ->  state, []
-  | (s, l) :: tl -> state, []
 
-(*let convert_internal_constraint_list show_title state list =
-  *)
+(*let compute_constraint_list show_title state _ =
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let state = Remanent_state.set_errors error state in
+  (*constraint_list*)
+  let error, constraint_list =
+    List.fold_left (fun _ (s, lemma_list) ->
 
-(*let get_list_gen
-  (get: ?list:Remanent_state.internal_constraint_list ->
-   (Domain_selection.Reachability_analysis.static_information,
-    Domain_selection.Reachability_analysis.dynamic_information)
-     Remanent_state.state ->
-   (Domain_selection.Reachability_analysis.static_information,
-    Domain_selection.Reachability_analysis.dynamic_information)
-     Remanent_state.state * 'a)
-  convert
-  ?do_we_show_title:(do_we_show_title=(fun _ -> true))
-  ?log_title
-  state =
-  let show_title =
-    match log_title with
-    | None -> (fun _ -> ())
-    | Some log_title ->
-      compute_show_title do_we_show_title log_title
+      ) _ contrainst_list
+      _
   in
-  let () = show_title state in
-  let state, list =
-    get state
+  let state =
+    Remanent_state.set_contrainst_list
+      constraint_list
+      state
   in
-  convert (fun _ -> ()) state list
+  state, constraint_list
 
-let get_internal_contrainst_list =
-  get_list_gen
-    ~do_we_show_title:(fun _ -> true)
-    ~log_title:(fun x ->
-        match x with
-        | [] -> []
-        | x :: tl -> []
-      )
-    get_internal_contrainst_list
-    convert_internal_constraint_list*)
+let get_contrainst_list state =
+
+  let error, store_views =
+    Ckappa_backend.Ckappa_backend.print_store_views error
+      kappa_handler
+      t
+  in*)
