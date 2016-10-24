@@ -72,7 +72,7 @@ let create_t
   let counter =
     Counter.create
       ~init_t:(0. : float) ~init_e:(0 : int)
-      ?max_t:None ?max_e:None ~plot_period:1. in
+      ?max_time:None ?max_event:None ~plot_period:1. in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   { is_running = true ;
