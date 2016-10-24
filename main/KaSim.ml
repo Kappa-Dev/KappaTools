@@ -1,6 +1,6 @@
 let usage_msg =
   "KaSim "^Version.version_string^":\n"^
-  "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
+  "Usage is KaSim [-e events | -t time] [-pp delta_t] [-o output_file] input_files\n"
 
 let () =
   let cli_args = Run_cli_args.default in
@@ -71,7 +71,7 @@ let () =
     let (env0, cc_env, contact_map, updated_vars, story_compression,
          unary_distances, formatCflows, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
-        ?max_e:kasim_args.Kasim_args.maxEventValue cli_args in
+        ?max_event:kasim_args.Kasim_args.maxEventValue cli_args in
     let () =
       if cli_args.Run_cli_args.batchmode then
         Environment.check_if_counter_is_filled_enough counter env0 in
@@ -227,7 +227,7 @@ let () =
           else
           let () =
             Format.printf
-              "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
+              "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
                @ effect@ to@ perform@ it@]" in
             toplevel cc_env graph' state' in

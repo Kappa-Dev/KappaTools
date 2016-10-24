@@ -1,7 +1,8 @@
 (** Simulation progress keeper *)
 
 type t
-val create : ?init_t:float -> ?init_e:int -> ?max_t:float -> ?max_e:int ->
+val create : ?init_t:float -> ?init_e:int ->
+  ?max_time:float -> ?max_event:int ->
   plot_period:float -> t
 
 val reinitialize : t -> unit

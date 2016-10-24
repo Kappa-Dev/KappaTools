@@ -1,4 +1,4 @@
-let get_compilation ?max_e cli_args =
+let get_compilation ?max_event cli_args =
   let plot_period =
     match cli_args.Run_cli_args.maxTimeValue,
           cli_args.Run_cli_args.nb_points with
@@ -15,8 +15,8 @@ let get_compilation ?max_e cli_args =
     Counter.create
       ~init_t:cli_args.Run_cli_args.minTimeValue
       ~init_e:0
-      ?max_t:cli_args.Run_cli_args.maxTimeValue
-      ?max_e ~plot_period in
+      ?max_time:cli_args.Run_cli_args.maxTimeValue
+      ?max_event ~plot_period in
   let (env, cc_env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflows, init_l),
       counter,alg_overwrite =

@@ -223,7 +223,6 @@ let progress_bar
     ]
 
 let lift f x = match x with | None -> None | Some x -> f x
-let default x d = match x with | None -> d | Some x -> x
 let time_progress_bar  (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
   progress_bar
@@ -233,14 +232,14 @@ let time_progress_bar  (t : Ui_simulation.t) =
              (fun (state : ApiTypes.state) -> state.time_percentage)
              state
          in
-         let time_percent : int = default time_percent 0 in
+         let time_percent : int = Tools.unsome 100 time_percent in
          time_percent
        )
         simulation_output)
     (React.S.map (fun state ->
          let time : float option = lift (fun (state : ApiTypes.state) ->
              Some state.time) state in
-         let time : float = default time 0.0 in
+         let time : float = Tools.unsome 0.0 time in
          string_of_float time
        )
        simulation_output)
@@ -251,7 +250,7 @@ let event_progress_bar (t : Ui_simulation.t) =
     (React.S.map (fun state ->
          let event_percentage : int option =
            lift (fun (state: ApiTypes.state) -> state.event_percentage) state in
-         let event_percentage : int = default event_percentage 0 in
+         let event_percentage : int = Tools.unsome 100 event_percentage in
          event_percentage
        )
        simulation_output)
@@ -260,7 +259,7 @@ let event_progress_bar (t : Ui_simulation.t) =
            lift (fun (state : ApiTypes.state) -> Some state.event)
              state
          in
-         let event : int = default event 0 in
+         let event : int = Tools.unsome 0 event in
          string_of_int event
        )
         simulation_output)

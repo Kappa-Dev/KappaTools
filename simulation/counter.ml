@@ -60,22 +60,99 @@ end =
         ((float_of_int t.(time_correction)) /. (float_of_int t.(all)))
   end
 
+module Progress_report =
+struct
+  type bar = {
+    mutable ticks : int ;
+    mutable initialized : bool ;
+    bar_size : int ;
+    bar_char : char ;
+  }
+
+  type text = {
+    mutable last_length : int;
+    mutable last_time : float;
+  }
+
+  type t = Bar of bar | Text of text
+
+  let inc_tick c = c.ticks <- c.ticks + 1
+
+  let create bar_size bar_char =
+    if Unix.isatty Unix.stdout
+    then Text { last_length = 0; last_time = -5.;  }
+    else
+      Bar { ticks = 0; initialized = false; bar_size; bar_char; }
+
+  let reinit = function
+    | Bar c -> c.ticks <- 0; c.initialized <- false
+    | Text c -> c.last_length <- 0; c.last_time <- -5.
+
+  let pp_not_null f x =
+    match classify_float x with
+    | FP_normal ->
+      Format.fprintf f " (%.2f%%)" (x *. 100.)
+    | FP_subnormal | FP_zero | FP_infinite | FP_nan -> ()
+
+  let pp_text time t_r event e_r f s =
+    let string =
+      Format.asprintf "%i events%a %.2e s%a"
+        event pp_not_null e_r time pp_not_null t_r in
+    let () =
+      Format.fprintf f "%s%s@?" (String.make s.last_length '\b') string in
+    s.last_length <- String.length string
+
+  let tick time t_r event e_r f = function
+    | Bar s ->
+      let () =
+        if not s.initialized then
+          let c = ref s.bar_size in
+          while !c > 0 do
+            Format.pp_print_string f "_" ;
+            c:=!c-1
+          done ;
+          Format.pp_print_newline f () ;
+          s.initialized <- true in
+      let n_t = t_r *. (float_of_int s.bar_size) in
+      let n_e = e_r *. (float_of_int s.bar_size) in
+      let n = ref (int_of_float (max n_t n_e) - s.ticks) in
+      while !n > 0 do
+        Format.fprintf f "%c" s.bar_char;
+        if !Parameter.eclipseMode then Format.pp_print_newline f ();
+        inc_tick s; decr n
+      done;
+      Format.pp_print_flush f ()
+    | Text s ->
+      let run = Sys.time () in
+      if run -. s.last_time > 2. then
+        let () = pp_text time t_r event e_r f s in s.last_time <- run
+
+  let complete_progress_bar time event form t =
+    let () =
+      match t with
+      | Bar t ->
+        for _ = t.bar_size - t.ticks downto 1 do
+          Format.fprintf form "%c" t.bar_char
+        done
+      | Text s -> pp_text time 1. event 1. form s in
+    Format.pp_print_newline form ()
+end
+
+
 type t = {
     mutable time:float ;
     mutable events:int ;
     mutable stories:int ;
     mutable last_point : int;
-    mutable initialized : bool ;
-    mutable ticks : int ;
     mutable stat_null : Stat_null_events.t ;
     init_time : float ;
     init_event : int ;
-    mutable max_time : float option ;
-    mutable max_events : int option ;
+    progress_report : Progress_report.t ;
     mutable plot_period : float ;
+    mutable max_time : float option ;
+    mutable max_event : int option ;
   }
 
-let inc_tick c = c.ticks <- c.ticks + 1
 let current_story c = c.stories
 let current_time c = c.time
 let current_event c = c.events
@@ -89,7 +166,7 @@ let check_time c =
 let check_output_time c ot =
   match c.max_time with None -> true | Some max -> ot <= max
 let check_events c =
-  match c.max_events with None -> true | Some max -> c.events < max
+  match c.max_event with None -> true | Some max -> c.events < max
 let one_constructive_event c dt =
   let () = c.stat_null <- Stat_null_events.reset_consecutive c.stat_null in
   let () = inc_events c in
@@ -113,104 +190,75 @@ let one_time_correction_event c ti =
   check_time c && check_events c
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
-let max_events c = c.max_events
+let max_events c = c.max_event
 let plot_period c = c.plot_period
-let event_percentage (counter : t) : int option =
-  match counter.max_events with
-  | None -> None
-  | Some va -> Some (100 * (counter.events - counter.init_event)
-                     / (va - counter.init_event))
-let event (counter : t) : int =
-    counter.events
-let time_percentage (counter : t) : int option =
-  match counter.max_time with
-  | None -> None
-  | Some va -> Some (int_of_float (100. *. (counter.time -. counter.init_time)
-                                   /. (va -. counter.init_time)))
-let time (counter : t) : float =
-    counter.time
 
-let tracked_events (counter : t) : int option =
-  if counter.stories >= 0 then
-    Some counter.stories
-  else
-    None
+let time_ratio t =
+  match t.max_time with
+  | None -> 0.
+  | Some tmax -> (t.time -. t.init_time) /. (tmax -. t.init_time)
+
+  let event_ratio t =
+    match t.max_event with
+    | None -> 0.
+    | Some emax ->
+      if emax = 0 then 0.
+      else float_of_int (t.events - t.init_event) /.
+           float_of_int (emax - t.init_event)
+
+
+
+let event (counter : t) : int = counter.events
+let event_percentage t : int option =
+  let p_e = event_ratio t in
+  match classify_float p_e with
+    | FP_normal -> Some (int_of_float (p_e *. 100.))
+    | FP_subnormal | FP_zero | FP_infinite | FP_nan -> None
+
+let time (counter : t) : float = counter.time
+let time_percentage t : int option =
+  let p_t = time_ratio t in
+  match classify_float p_t with
+    | FP_normal -> Some (int_of_float (p_t *. 100.))
+    | FP_subnormal | FP_zero | FP_infinite | FP_nan -> None
 
 let set_max_time c t = c.max_time <- t
-let set_max_events c e = c.max_events <- e
+let set_max_events c e = c.max_event <- e
 
-let tick f counter =
-  let () =
-    if not counter.initialized then
-      let c = ref !Parameter.progressBarSize in
-      while !c > 0 do
-        Format.pp_print_string f "_" ;
-        c:=!c-1
-      done ;
-      Format.pp_print_newline f () ;
-      counter.initialized <- true
-  in
-  let n_t =
-    match counter.max_time with
-    | None -> 0
-    | Some tmax ->
-       int_of_float
-         ((counter.time -. counter.init_time) *.
-            (float_of_int !Parameter.progressBarSize) /. tmax)
-  and n_e =
-    match counter.max_events with
-    | None -> 0
-    | Some emax ->
-       if emax = 0 then 0
-       else
-         let nplus =
-           (counter.events * !Parameter.progressBarSize) / emax in
-         let nminus =
-           (counter.init_event * !Parameter.progressBarSize) / emax in
-         nplus-nminus
-  in
-  let n = ref ((max n_t n_e) - counter.ticks) in
-  while !n > 0 do
-    Format.fprintf f "%c" !Parameter.progressBarSymbol ;
-    if !Parameter.eclipseMode then Format.pp_print_newline f ();
-    inc_tick counter ;
-    n:=!n-1
-  done;
-  Format.pp_print_flush f ()
 
-let complete_progress_bar form counter =
-  let n = ref (!Parameter.progressBarSize - counter.ticks) in
-  let () = while !n > 0 do
-             Format.fprintf form "%c" !Parameter.progressBarSymbol ;
-             n := !n-1
-           done in
-  Format.pp_print_newline form ()
+let tracked_events (counter : t) : int option =
+  if counter.stories >= 0 then Some counter.stories else None
 
 let set_plot_period (t :t) plot_period : unit = t.plot_period <- plot_period
 
-
-let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~plot_period =
+let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period =
   {time = init_t ;
    events = init_e ;
    stories = -1 ;
    stat_null = Stat_null_events.init () ;
-   max_time = max_t ;
-   max_events = max_e ;
    plot_period = plot_period ;
    init_time = init_t ;
    init_event = init_e ;
-   initialized = false ;
+   max_time; max_event;
+   progress_report = Progress_report.create
+       !Parameter.progressBarSize !Parameter.progressBarSymbol ;
    last_point = 0 ;
-   ticks = 0 ;
   }
+
 let reinitialize counter =
+  let () = Progress_report.reinit counter.progress_report in
   counter.time <- counter.init_time;
   counter.events <- counter.init_event;
   counter.stories <- -1;
   counter.last_point <- 0;
-  counter.initialized <- false;
-  counter.ticks <- 0;
   counter.stat_null <- Stat_null_events.init ()
+
+let tick f c =
+  Progress_report.tick
+    c.time (time_ratio c) c.events (event_ratio c) f c.progress_report
+
+let complete_progress_bar f c =
+  Progress_report.complete_progress_bar c.time c.events f c.progress_report
 
 let next_point counter =
     int_of_float

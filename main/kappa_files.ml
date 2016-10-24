@@ -77,14 +77,13 @@ let setCheckFileExists ~batchmode =
     match file with
     | "" -> ()
     | file ->
-       let file = path file in
-       if not batchmode && Sys.file_exists file then
-  let () =
-    Format.eprintf
-      "File '%s' already exists do you want to erase (y/N)?@." file in
-  let answer = Tools.read_input () in
-  if answer<>"y" then exit 1
-  in
+      let file = path file in
+      if not batchmode && Sys.file_exists file then
+        let () =
+          Format.eprintf
+            "File '%s' already exists do you want to erase (y/N)?@." file in
+        let answer = Tools.read_input () in
+        if answer<>"y" then exit 1 in
   let () = setOutputName () in
   check !influenceFileName ;
   check !fluxFileName ;
