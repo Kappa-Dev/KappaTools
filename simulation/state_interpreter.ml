@@ -408,7 +408,9 @@ let interactive_loop ~outputs form pause_criteria env domain counter graph state
   let user_interrupted = ref false in
   let old_sigint_behavior =
     Sys.signal
-      Sys.sigint (Sys.Signal_handle (fun _ -> user_interrupted := true)) in
+      Sys.sigint (Sys.Signal_handle
+                    (fun _ -> if !user_interrupted then raise Sys.Break
+                      else user_interrupted := true)) in
   let rec iter graph state =
     if !user_interrupted ||
        Rule_interpreter.value_bool counter graph ~get_alg pause_criteria then
