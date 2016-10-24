@@ -84,7 +84,7 @@ let plot_period_input =
   Html.input
     ~a:[Html.a_input_type `Number;
         Html.a_class [ "form-control"];
-        Html.a_placeholder "seconds";
+        Html.a_placeholder "time units";
         Tyxml_js.R.Html.a_value
           (React.S.l1 string_of_float UIState.model_plot_period)]
     ()

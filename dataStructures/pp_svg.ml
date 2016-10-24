@@ -139,7 +139,7 @@ let axis (w,h) (b_op,b_w,b_h) f l =
 		0. (Nbr.F v)) (succ nb_h) in
   let () =
     Format.fprintf f "@]</g>@,@[<hv 2><g id=\"axis_t\">@," in
-  let () = Format.fprintf f "<title>Time in second</title>@," in
+  let () = Format.fprintf f "<title>Time (arbitrary unit)</title>@," in
   let () =
     Format.fprintf f "@[<><path d=\"M %i,%i L %i,%i\"/>@]@,"
 		   b_w (h-b_h) (w-b_op) (h-b_h) in

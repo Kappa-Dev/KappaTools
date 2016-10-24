@@ -41,7 +41,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    "Max time of simulation (arbitrary time unit)");
   ("-pp",
    Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
-   "plot period: time interval in second between points in plot (default: 1.0)");
+   "plot period: time interval between points in plot (default: 1.0)");
   ("-pp",
    Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
    "plot period: time interval between points in plot (default: 1.0)");

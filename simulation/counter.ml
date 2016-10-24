@@ -96,8 +96,8 @@ struct
 
   let pp_text time t_r event e_r f s =
     let string =
-      Format.asprintf "%i events%a %.2e s%a"
-        event pp_not_null e_r time pp_not_null t_r in
+      Format.asprintf "%.2f time units%a in %i events%a"
+        time pp_not_null t_r event pp_not_null e_r in
     let () =
       Format.fprintf f "%s%s@?" (String.make s.last_length '\b') string in
     s.last_length <- String.length string
