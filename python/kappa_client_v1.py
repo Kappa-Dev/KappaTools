@@ -171,7 +171,7 @@ def main():
     url = "http://localhost:8080"
     max_time = 10.0
     max_events = 10
-    nb_plot = 150
+    plot_period = 0.1
 
     try:
         opts, args = getopt.getopt(argv,
@@ -180,14 +180,14 @@ def main():
                                     "url=",
                                     "max_time=",
                                     "max_events=",
-                                    "number_plot=",])
+                                    "plot_period=",])
     except :
         print (cmd+
                   +' -k <kappafile> '
                   +' -u <url> '
                   +' -t <max_time> '
                   +' -e <max_events> '
-                  +' -p <number_plots> ')
+                  +' -pp <plot_period> ')
 
         sys.exit(2)
 
@@ -203,14 +203,14 @@ def main():
             max_time = float(arg)
         elif opt in ("-e", "--max-events"):
             max_events = int(arg)
-        elif opt in ("-p", "--number_plot"):
-            nb_plot = int(arg)
+        elif opt in ("-pp", "--plot_period"):
+            plot_period = float(arg)
 
     print ('Input file is : {0} '.format(inputfile))
     print ('Endpoint url : {0} '.format(url))
     print ('Max time : {0}'.format(max_time))
     print ('Max events : {0} '.format(max_events))
-    print ('Number plot : {0} '.format(nb_plot))
+    print ('Plot period : {0} '.format(plot_period))
 
     try :
         runtime = KappaRuntime(url)
@@ -218,7 +218,7 @@ def main():
             with open(inputfile) as f:
                 code = f.read()
                 token = runtime.start({'code': code,
-                                       'nb_plot': nb_plot ,
+                                       'plot_period': plot_period,
                                        'max_time' : max_time ,
                                        'max_events' : max_events })
                 status = runtime.status(token)
