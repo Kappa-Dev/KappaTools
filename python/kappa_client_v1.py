@@ -110,7 +110,7 @@ class KappaRuntime(object):
             return None
         elif connection.code == 400:
             text = connection.read()
-            error_details = json.loads(textdecode("utf-8"))
+            error_details = json.loads(text.decode("utf-8"))
             raise KappaError(error_details)
         else:
             raise exception
