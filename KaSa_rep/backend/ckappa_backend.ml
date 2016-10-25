@@ -58,8 +58,8 @@ struct
     }
 
   let get_string_version t = t.string_version
-  (*let set_string_version s_v t =
-    {t with string_version = s_v}*)
+  let set_string_version s_v t =
+    {t with string_version = s_v}
 
   let empty =
     {

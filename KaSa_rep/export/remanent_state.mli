@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 21 2016>
+  * Last modification: Time-stamp: <Oct 25 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -242,13 +242,13 @@ val get_log_info: ('static, 'compile) state ->
 
 (*TODO*)
 
-val get_internal_contrainst_list : ('static, 'compile) state ->
+val get_internal_constraint_list : ('static, 'compile) state ->
   internal_constraint_list
 
-val set_internal_contrainst_list : internal_constraint_list -> ('static, 'compile) state -> ('static, 'compile) state
+val set_internal_constraint_list : internal_constraint_list -> ('static, 'compile) state -> ('static, 'compile) state
 
-val get_contrainst_list : ('static, 'compile) state ->
+val get_constraint_list : ('static, 'compile) state ->
   constraint_list
 
-val set_contrainst_list : constraint_list -> ('static, 'compile) state ->
+val set_constraint_list : constraint_list -> ('static, 'compile) state ->
   ('static, 'compile) state

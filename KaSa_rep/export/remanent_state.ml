@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 24 2016>
+  * Last modification: Time-stamp: <Oct 25 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -363,7 +363,7 @@ let constraint_list_lemma_to_json lemma =
     refinement, constraint_list_refinment_to_json lemma.refinement
   ]
 
-let constraint_list_to_json contrainst_list =
+let constraint_list_to_json constraint_list =
   JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
       let json =
         JsonUtil.of_list (fun lemma ->
@@ -371,7 +371,7 @@ let constraint_list_to_json contrainst_list =
           ) lemma_list
       in
       agent_string, json
-    ) contrainst_list
+    ) constraint_list
 
 (*******************************************************************)
 
@@ -545,7 +545,6 @@ let internal_constraint_list_refinement_of_json json =
   JsonUtil.to_list ~error_msg:"refinement list"
     (fun json ->
        internal_constraint_list_hyp_of_json
-
          json
     ) json
 
@@ -771,14 +770,14 @@ let get_log_info state = state.log_info
 
 let set_log_info log state = {state with log_info = log}
 
-let get_internal_contrainst_list state =
+let get_internal_constraint_list state =
   state.internal_constraint_list
 
-let set_internal_contrainst_list list state =
+let set_internal_constraint_list list state =
   {state with internal_constraint_list = list}
 
-let get_contrainst_list state =
+let get_constraint_list state =
   state.constraint_list
 
-let set_contrainst_list list state =
+let set_constraint_list list state =
   {state with constraint_list = list}

@@ -36,10 +36,10 @@ sig
        Wrapped_modules.LoggedStringMap.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t
 
-  (*val set_string_version : (*FIXME*)
+  val set_string_version : (*FIXME*)
     (string *
      (string option * binding_state option) Wrapped_modules.LoggedStringMap.t)
-      Ckappa_sig.Agent_id_map_and_set.Map.t -> t -> t*)
+      Ckappa_sig.Agent_id_map_and_set.Map.t -> t -> t
 
   val add_agent:
     Remanent_parameters_sig.parameters ->
