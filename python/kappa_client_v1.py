@@ -2,8 +2,9 @@
 """
 import urllib.error
 import urllib.request
-import urllib
-import sys, getopt
+import urllib.parse
+import sys
+import getopt
 import time
 # bad pratice but done to support python2
 
