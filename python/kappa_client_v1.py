@@ -42,7 +42,7 @@ class KappaRuntime(object):
             fails.
         """
         query_args = {'code':code}
-        encoded_args = urllib.urlencode(query_args)
+        encoded_args = urllib.parse.urlencode(query_args)
         parse_url = "{0}/parse?{1}".format(self.url, encoded_args)
         try:
             response = urlopen(parse_url)
