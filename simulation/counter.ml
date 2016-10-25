@@ -64,7 +64,6 @@ module Progress_report =
 struct
   type bar = {
     mutable ticks : int ;
-    mutable initialized : bool ;
     bar_size : int ;
     bar_char : char ;
   }
@@ -78,15 +77,16 @@ struct
 
   let inc_tick c = c.ticks <- c.ticks + 1
 
-  let create bar_size bar_char =
+  let create bar_size bar_char f =
     if Unix.isatty Unix.stdout
     then Text { last_length = 0; last_time = -5.;  }
     else
-      Bar { ticks = 0; initialized = false; bar_size; bar_char; }
-
-  let reinit = function
-    | Bar c -> c.ticks <- 0; c.initialized <- false
-    | Text c -> c.last_length <- 0; c.last_time <- -5.
+      let () =
+        for _ = bar_size downto 1 do
+          Format.pp_print_string f "_"
+        done in
+      let () = Format.pp_print_newline f () in
+      Bar { ticks = 0; bar_size; bar_char; }
 
   let pp_not_null f x =
     match classify_float x with
@@ -104,15 +104,6 @@ struct
 
   let tick time t_r event e_r f = function
     | Bar s ->
-      let () =
-        if not s.initialized then
-          let c = ref s.bar_size in
-          while !c > 0 do
-            Format.pp_print_string f "_" ;
-            c:=!c-1
-          done ;
-          Format.pp_print_newline f () ;
-          s.initialized <- true in
       let n_t = t_r *. (float_of_int s.bar_size) in
       let n_e = e_r *. (float_of_int s.bar_size) in
       let n = ref (int_of_float (max n_t n_e) - s.ticks) in
@@ -147,7 +138,7 @@ type t = {
     mutable stat_null : Stat_null_events.t ;
     init_time : float ;
     init_event : int ;
-    progress_report : Progress_report.t ;
+    mutable progress_report : Progress_report.t option ;
     mutable plot_period : float ;
     mutable max_time : float option ;
     mutable max_event : int option ;
@@ -206,8 +197,6 @@ let time_ratio t =
       else float_of_int (t.events - t.init_event) /.
            float_of_int (emax - t.init_event)
 
-
-
 let event (counter : t) : int = counter.events
 let event_percentage t : int option =
   let p_e = event_ratio t in
@@ -240,25 +229,33 @@ let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period =
    init_time = init_t ;
    init_event = init_e ;
    max_time; max_event;
-   progress_report = Progress_report.create
-       !Parameter.progressBarSize !Parameter.progressBarSymbol ;
+   progress_report = None;
    last_point = 0 ;
   }
 
 let reinitialize counter =
-  let () = Progress_report.reinit counter.progress_report in
+  counter.progress_report <- None;
   counter.time <- counter.init_time;
   counter.events <- counter.init_event;
   counter.stories <- -1;
   counter.last_point <- 0;
   counter.stat_null <- Stat_null_events.init ()
 
-let tick f c =
-  Progress_report.tick
-    c.time (time_ratio c) c.events (event_ratio c) f c.progress_report
+let rec tick f c =
+  match c.progress_report with
+  | None ->
+    let () =
+      c.progress_report <-
+        Some (Progress_report.create
+                !Parameter.progressBarSize !Parameter.progressBarSymbol f) in
+    tick f c
+  | Some pr ->
+    Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) f pr
 
 let complete_progress_bar f c =
-  Progress_report.complete_progress_bar c.time c.events f c.progress_report
+  match c.progress_report with
+  | None -> ()
+  | Some pr -> Progress_report.complete_progress_bar c.time c.events f pr
 
 let next_point counter =
     int_of_float
