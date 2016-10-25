@@ -1,9 +1,10 @@
 """ Web api client for the kappa programming language
 """
-
+import urllib.error
 import urllib.request
 import urllib
-
+import sys, getopt
+import time
 # bad pratice but done to support python2
 
 from urllib.request import urlopen
@@ -33,7 +34,7 @@ class KappaRuntime(object):
             response = urlopen(version_url)
             text = response.read()
             return json.loads(text.decode('utf-8'))
-        except urllib2.URLError as exception:
+        except urllib.error.URLError as exception:
             raise KappaError(exception.reason)
 
     def parse(self, code):
@@ -44,16 +45,16 @@ class KappaRuntime(object):
         encoded_args = urllib.urlencode(query_args)
         parse_url = "{0}/parse?{1}".format(self.url, encoded_args)
         try:
-            response = urllib2.urlopen(parse_url)
+            response = urlopen(parse_url)
             text = response.read()
             return json.loads(text.decode("utf-8"))
-        except urllib2.HTTPError as exception:
+        except urllib.error.HTTPError as exception:
             if exception.code == 400:
                 error_details = json.loads(exception.read())
                 raise KappaError(error_details)
             else:
                 raise exception
-        except urllib2.URLError as exception:
+        except urllib.error.URLError as exception:
             KappaError(exception.reason)
 
     def start(self, parameter):
@@ -159,12 +160,79 @@ class KappaRuntime(object):
         else:
             raise exception
 
+
+def main():
+    #command line
+    argv = sys.argv[1:]
+    cmd = "kappa_client_v1.py"
+
+    #default arguments
+    inputfile = None # if missing input file just get version
+    url = "http://localhost:8080"
+    max_time = 10.0
+    max_events = 10
+    nb_plot = 150
+
+    try:
+        opts, args = getopt.getopt(argv,
+                                   "hk:u:t:e:p",
+                                   ["kappafile=",
+                                    "url=",
+                                    "max_time=",
+                                    "max_events=",
+                                    "number_plot=",])
+    except :
+        print (cmd+
+                  +' -k <kappafile> '
+                  +' -u <url> '
+                  +' -t <max_time> '
+                  +' -e <max_events> '
+                  +' -p <number_plots> ')
+
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print (cmd+' -i <inputfile> -o <outputfile>')
+            sys.exit()
+        elif opt in ("-k", "--kappafile"):
+            inputfile = arg
+        elif opt in ("-u", "--url"):
+            url = arg
+        elif opt in ("-t", "--max_time"):
+            max_time = float(arg)
+        elif opt in ("-e", "--max-events"):
+            max_events = int(arg)
+        elif opt in ("-p", "--number_plot"):
+            nb_plot = int(arg)
+
+    print ('Input file is : {0} '.format(inputfile))
+    print ('Endpoint url : {0} '.format(url))
+    print ('Max time : {0}'.format(max_time))
+    print ('Max events : {0} '.format(max_events))
+    print ('Number plot : {0} '.format(nb_plot))
+
+    try :
+        runtime = KappaRuntime(url)
+        if inputfile :
+            with open(inputfile) as f:
+                code = f.read()
+                token = runtime.start({'code': code,
+                                       'nb_plot': nb_plot ,
+                                       'max_time' : max_time ,
+                                       'max_events' : max_events })
+                status = runtime.status(token)
+                while status['is_running']:
+                    time.sleep(1)
+                    sys.stdout.write( '.' )
+                    status = runtime.status(token)
+                print()
+                print(status)
+        else:
+            print(runtime.version())
+    except KappaError as exception:
+        print(exception.errors)
+    None
+
 if __name__ == "__main__":
-    with open("../models/abc-pert.ka") as f:
-        try:
-            code = f.read()
-            runtime = KappaRuntime("http://localhost:8080")
-            token = runtime.start({'code': KAPPA_CODE, 'nb_plot': 150})
-            print(runtime.status(token))
-        except KappaError as exception:
-            print(exception.errors)
+    main()
