@@ -5,7 +5,7 @@ type internal_state  = int
 type binding_type = agent_name * site_name
 
 type abstract = Agent_place.t
-type concrete = Edges.agent
+type concrete = Agent.t
 
 type 'a site = 'a * site_name
 
@@ -191,11 +191,11 @@ let with_sigs f = function
   | None -> Format.pp_print_int
   | Some sigs -> f sigs
 let print_concrete_agent_site ?sigs f ((_,ty as agent),id) =
-  Format.fprintf f "%a.%a" (Edges.print_agent ?sigs) agent
+  Format.fprintf f "%a.%a" (Agent.print ?sigs) agent
     (with_sigs (fun s -> Signature.print_site s ty) sigs) id
 let print_concrete_test ?sigs f = function
   | Is_Here agent ->
-    Format.fprintf f "Is_Here(%a)" (Edges.print_agent ?sigs) agent
+    Format.fprintf f "Is_Here(%a)" (Agent.print ?sigs) agent
   | Has_Internal (((_,ty),id as site),int) ->
     Format.fprintf f "Has_Internal(%a~%a)"
       (print_concrete_agent_site ?sigs) site
@@ -223,7 +223,7 @@ let print_concrete_test ?sigs f = function
 let print_concrete_action ?sigs f = function
   | Create ((_,ty as agent),list) ->
     Format.fprintf
-      f "Create(%a[@[<h>%a@]])" (Edges.print_agent ?sigs) agent
+      f "Create(%a[@[<h>%a@]])" (Agent.print ?sigs) agent
       (Pp.list Pp.comma
          (fun f (x,y) ->
             match sigs with
@@ -249,7 +249,7 @@ let print_concrete_action ?sigs f = function
   | Free site ->
     Format.fprintf f "Free(%a)" (print_concrete_agent_site ?sigs) site
   | Remove agent ->
-    Format.fprintf f "Remove(%a)" (Edges.print_agent ?sigs) agent
+    Format.fprintf f "Remove(%a)" (Agent.print ?sigs) agent
 let print_concrete_binding_state ?sigs f = function
   | ANY -> Format.pp_print_string f "*"
   | FREE -> ()

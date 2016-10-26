@@ -237,29 +237,29 @@ let step_to_json = function
   | Event (x,y,z) ->
     `List [`String "Event";
            event_kind_to_json x;
-           Instantiation.event_to_json Edges.agent_to_json y;
+           Instantiation.event_to_json Agent.to_json y;
            Simulation_info.to_json (fun () -> `Null) z]
   | Init a ->
     `List
       [`String "Init";
-       `List (List.map (Instantiation.action_to_json Edges.agent_to_json) a)]
+       `List (List.map (Instantiation.action_to_json Agent.to_json) a)]
   | Obs (x,y,z) ->
     `List [`String "Obs";
            event_kind_to_json x;
-           `List (List.map (Instantiation.test_to_json Edges.agent_to_json) y);
+           `List (List.map (Instantiation.test_to_json Agent.to_json) y);
            Simulation_info.to_json (fun () -> `Null) z]
   | Dummy _ -> `Null
 let step_of_json = function
   | `List [`String "Subs"; `Int a; `Int b] -> Subs (a,b)
   | `List [`String "Event";x;y;z] ->
     Event (event_kind_of_json x,
-           Instantiation.event_of_json Edges.agent_of_json y,
+           Instantiation.event_of_json Agent.of_json y,
            Simulation_info.of_json (function _ -> ()) z)
   | `List [`String "Init"; `List l ] ->
-    Init (List.map (Instantiation.action_of_json Edges.agent_of_json) l)
+    Init (List.map (Instantiation.action_of_json Agent.of_json) l)
   | `List [`String "Obs"; x; `List l; z] ->
     Obs (event_kind_of_json x,
-         List.map (Instantiation.test_of_json Edges.agent_of_json) l,
+         List.map (Instantiation.test_of_json Agent.of_json) l,
          Simulation_info.of_json (function _ -> ()) z)
   | `Null -> Dummy ""
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect trace step",x))

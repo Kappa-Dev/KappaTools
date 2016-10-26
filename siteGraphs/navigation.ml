@@ -1,6 +1,6 @@
 type id_upto_alpha =
     Existing of int
-  | Fresh of Edges.agent
+  | Fresh of Agent.t
 
 type port = id_upto_alpha * int
 

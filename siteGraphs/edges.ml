@@ -1,19 +1,5 @@
-type agent = int * int
-(** agent_id * agent_type *)
-
-let print_agent ?sigs f (id,ty) =
-  match sigs with
-  | None -> Format.pp_print_int f id
-  | Some sigs -> Format.fprintf f "%a_%i" (Signature.print_agent sigs) ty id
-
-let agent_to_json (id,ty) = `Assoc ["id", `Int id; "type", `Int ty]
-let agent_of_json = function
-  | `Assoc ["id", `Int id; "type", `Int ty]
-  | `Assoc ["type", `Int ty; "id", `Int id] -> (id,ty)
-  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
-
 module Edge = struct
-  type t = agent * int
+  type t = Agent.t * int
   (** agent * site *)
 
   let _compare ((n,_),s) ((n',_),s') =
@@ -484,7 +470,7 @@ let debug_print f graph =
     )
     f graph.connect
 
-type path = ((agent * int) * (agent * int)) list
+type path = ((Agent.t * int) * (Agent.t * int)) list
 (** ((agent_id, agent_name),site_name) *)
 
 let aux_print_site ?sigs ty f i =
@@ -495,14 +481,14 @@ let rec print_path ?sigs f = function
   | [] -> Pp.empty_set f
   | [((_,ty as ag),s),((_,ty' as ag'),s')] ->
     Format.fprintf f "%a.%a@,-%a.%a"
-      (print_agent ?sigs) ag (aux_print_site ?sigs ty) s
-      (aux_print_site ?sigs ty') s' (print_agent ?sigs) ag'
+      (Agent.print ?sigs) ag (aux_print_site ?sigs ty) s
+      (aux_print_site ?sigs ty') s' (Agent.print ?sigs) ag'
   | (((_,ty as ag),s),((p',ty' as ag'),s'))::((((p'',_),_),_)::_ as l) ->
     Format.fprintf f "%a.%a@,-%a.%t%a"
-      (print_agent ?sigs) ag (aux_print_site ?sigs ty) s
+      (Agent.print ?sigs) ag (aux_print_site ?sigs ty) s
       (aux_print_site ?sigs ty') s'
       (fun f ->
-         if p' <> p'' then Format.fprintf f "%a##" (print_agent ?sigs) ag')
+         if p' <> p'' then Format.fprintf f "%a##" (Agent.print ?sigs) ag')
       (print_path ?sigs) l
 
 let empty_path = []

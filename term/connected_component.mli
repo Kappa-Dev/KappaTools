@@ -79,18 +79,18 @@ module Matching : sig
 
   val add_cc : t -> int -> Renaming.t -> t option
 
-  val is_root_of : Edges.t -> Edges.agent -> cc -> bool
+  val is_root_of : Edges.t -> Agent.t -> cc -> bool
 
   val roots_of : Edges.t -> cc -> Mods.IntSet.t
 
-  val elements_with_types : cc array -> t -> Edges.agent list array
+  val elements_with_types : cc array -> t -> Agent.t list array
 
   type cache
   val empty_cache : cache
 
   val observables_from_agent :
     Env.t -> Edges.t ->
-    (((cc * (int * int)) list * Operator.DepSet.t) * cache) -> Edges.agent ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache) -> Agent.t ->
     (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_free domain graph sort agent]
     the int * int in the return list and the following ones
@@ -99,21 +99,19 @@ module Matching : sig
   val observables_from_free :
     Env.t -> Edges.t ->
     (((cc * (int * int)) list * Operator.DepSet.t) * cache) ->
-    Edges.agent -> int ->
-    (((cc * (int * int)) list * Operator.DepSet.t) * cache)
+    Agent.t -> int -> (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_free domain graph sort agent site] *)
 
   val observables_from_internal :
     Env.t -> Edges.t ->
     (((cc * (int * int)) list * Operator.DepSet.t) * cache) ->
-     Edges.agent -> int -> int ->
-    (((cc * (int * int)) list * Operator.DepSet.t) * cache)
+     Agent.t -> int -> int -> (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_internal domain graph sort agent site internal_state] *)
 
   val observables_from_link :
     Env.t -> Edges.t ->
     (((cc * (int * int)) list * Operator.DepSet.t) * cache) ->
-     Edges.agent -> int -> Edges.agent -> int ->
+     Agent.t -> int -> Agent.t -> int ->
     (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
 end

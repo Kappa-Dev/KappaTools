@@ -2,7 +2,7 @@
 
 type id_upto_alpha =
     Existing of int
-  | Fresh of Edges.agent
+  | Fresh of Agent.t
 
 type port = id_upto_alpha * int
 
@@ -23,4 +23,4 @@ val compatible_point : Renaming.t list -> step -> step -> Renaming.t list
 
 val check_edge : Edges.t -> step -> bool
 val injection_for_one_more_edge :
-  ?root:Edges.agent -> Renaming.t -> Edges.t -> step -> Renaming.t option
+  ?root:Agent.t -> Renaming.t -> Edges.t -> step -> Renaming.t option

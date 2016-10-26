@@ -34,6 +34,7 @@ Ast
 LKappa
 Signature
 NamedDecls
+Agent
 Agent_place
 Instantiation
 Alg_expr
