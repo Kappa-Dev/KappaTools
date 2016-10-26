@@ -3,7 +3,7 @@ type token = int
 type catalog = int list
 type code = string
 type parameter = { code : code;
-                   nb_plot : int;
+                   plot_period : float;
                    max_time : float option;
                    max_events : int option
                    }
