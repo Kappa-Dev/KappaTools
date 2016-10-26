@@ -400,7 +400,7 @@ struct
            let (species,nauto) = Mods.DynArray.get network.species_tab id in
            let n_embs =
              List.length
-               (I.find_embeddings connected_component species) in
+               (I.find_embeddings compil connected_component species) in
            if n_embs = 0 then alg
            else
              let species = Alg_expr.KAPPA_INSTANCE id in
@@ -569,7 +569,7 @@ struct
                     List.fold_left
                       (fun store (cc_id,cc) ->
                          let () = debug "find embeddings" in
-                         let lembed = I.find_embeddings cc new_species in
+                         let lembed = I.find_embeddings compil cc new_species in
                          add_embedding_list
                            (enriched_rule.rule_id_with_mode,cc_id,cc)
                            (List.rev_map (fun a -> a,new_species) (List.rev lembed))
@@ -672,7 +672,8 @@ struct
                   (* unary application of binary rules *)
                   let () = debug "unary case" in
                   let to_be_visited, network =
-                    let lembed = I.find_embeddings_unary_binary enriched_rule.lhs new_species in
+                    let lembed =
+                      I.find_embeddings_unary_binary compil enriched_rule.lhs new_species in
                     fold_left_swap
                       (fun embed ->
                          add_reaction

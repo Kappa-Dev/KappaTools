@@ -18,6 +18,8 @@ type cc = {
 
 type t = cc
 
+type id = int
+
 type transition = {
   next: Navigation.step;
   dst: int (* id of cc and also address in the Env.domain map*);
@@ -173,16 +175,6 @@ let automorphisms a =
       | None -> acc
       | Some r -> r::acc) [] l
 
-let embeddings_to_fully_specified a b =
-  match find_root a with
-  | None -> [Renaming.empty]
-  | Some (h,ty) ->
-    List.fold_left (fun acc ag ->
-      match are_compatible
-              ~strict:false h a.links a.internals ag b.links b.internals with
-      | None -> acc
-      | Some r -> r::acc) [] b.nodes_by_type.(ty)
-
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =
   let rec build_for (_,out as acc) don = function
@@ -243,7 +235,7 @@ let raw_to_navigation (full:bool) nodes_by_type internals links =
 let to_navigation cc =
   raw_to_navigation true cc.nodes_by_type cc.internals cc.links
 
-let print ?sigs ~with_id f cc =
+let print_cc ?sigs ~with_id f cc =
   let print_intf (ag_i,_ as ag) link_ids internals neigh =
     snd
       (Tools.array_fold_lefti
@@ -367,7 +359,7 @@ let print_point_dot sigs f (id,point) =
   let style =
     match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-    point.content.id (print ~sigs ~with_id:false) point.content
+    point.content.id (print_cc ~sigs ~with_id:false) point.content
     style (print_sons_dot sigs id point.content) point.sons
 
 let add_fully_specified_to_graph sigs graph cc =
@@ -406,13 +398,16 @@ module Env : sig
     id_by_type: int list array;
     nb_id: int;
     domain: point array;
-    single_agent_points: (cc*Operator.DepSet.t) Mods.IntMap.t;
+    single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
   }
 
   val navigate :
     t -> Navigation.t -> (int * Renaming.t list * point) option
   val get : t -> int -> point
-  val get_single_agent : int -> t -> (cc * Operator.DepSet.t) option
+  val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
+
+  val signatures : t -> Signature.s
+
   val print : Format.formatter -> t -> unit
   val print_dot : Format.formatter -> t -> unit
 end = struct
@@ -421,15 +416,17 @@ end = struct
     id_by_type: int list array;
     nb_id: int;
     domain: point array;
-    single_agent_points: (cc*Operator.DepSet.t) Mods.IntMap.t;
+    single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
   }
+
+  let signatures env = env.sig_decl
 
   let print f env =
     let pp_point f p =
       Format.fprintf
         f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
         (Pp.list Pp.space Format.pp_print_int) p.fathers
-        (print ~sigs:env.sig_decl ~with_id:true) p.content
+        (print_cc ~sigs:env.sig_decl ~with_id:true) p.content
         (fun f ->
            match p.is_obs_of with
            | None -> ()
@@ -452,14 +449,7 @@ end = struct
                 s.above_obs))
         p.sons in
     Format.fprintf
-      f "@[<v>%a%a@]"
-      (Pp.set Mods.IntMap.bindings Pp.space ~trailing:Pp.space
-         (fun f (_,(cc,deps)) ->
-            Format.fprintf
-              f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:true) cc
-              (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-              deps))
-      env.single_agent_points
+      f "@[<v>%a@]"
       (Pp.array Pp.space (fun _ -> pp_point))
       env.domain
 
@@ -491,8 +481,24 @@ end = struct
         ~trailing:Pp.space Pp.space
         (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
     Format.fprintf f "}@]@."
-
 end
+
+let print ?domain ~with_id f id =
+  match domain with
+  | None -> Format.pp_print_int f id
+  | Some env ->
+    print_cc ~sigs:(Env.signatures env) ~with_id f env.Env.domain.(id).content
+
+let embeddings_to_fully_specified domain a_id b =
+  let a = domain.Env.domain.(a_id).content in
+  match find_root a with
+  | None -> [Renaming.empty]
+  | Some (h,ty) ->
+    List.fold_left (fun acc ag ->
+      match are_compatible
+              ~strict:false h a.links a.internals ag b.links b.internals with
+      | None -> acc
+      | Some r -> r::acc) [] b.nodes_by_type.(ty)
 
 let propagate_add_obs obs_id env cc_id =
   let rec aux son_id domain cc_id =
@@ -794,7 +800,9 @@ let add_domain ~deps (free_id,singles,env) cc =
   if nav = [] then
     match find_root cc with
     | None -> assert false
-    | Some (_,ty) -> (free_id,Mods.IntMap.add ty (cc,deps) singles,env)
+    | Some (_,ty) ->
+      (free_id,Mods.IntMap.add ty (cc.id,deps) singles,
+       Mods.IntMap.add cc.id {content= cc; sons=[];fathers=[];is_obs_of=Some deps} env)
   else
     let (free_id',env'),_ = add_new_point ~deps cc.id env free_id [] cc in
     (free_id',singles,env')
@@ -812,6 +820,8 @@ module PreEnv : sig
     Signature.s -> int list array -> int ->
     (cc * Operator.DepSet.t) list Mods.IntMap.t -> t
   val to_work : t -> work
+
+  val get : t -> id -> cc
 
   val sigs : t -> Signature.s
 
@@ -838,6 +848,14 @@ end = struct
   let empty sigs =
     let nbt' = Array.make (Signature.size sigs) [] in
     fresh sigs nbt' 1 Mods.IntMap.empty
+
+  let get env id =
+    Mods.IntMap.fold
+      (fun _ l acc ->
+         List.fold_left (fun acc (cc,_) -> if cc.id = id then cc else acc)
+           acc l)
+      env.domain
+      (empty_cc env.sig_decl)
 
   let fresh_id env =
     succ
@@ -996,16 +1014,12 @@ end = struct
       let w = weight cc in
       Mods.IntMap.add
         w (p::Mods.IntMap.find_default [] w acc) acc in
-    let domain =
-      Mods.IntMap.fold
-        (fun _ p acc -> add_cc acc p) env.Env.single_agent_points
-        Mods.IntMap.empty in
     let domain' =
       Array.fold_left (fun acc p ->
           match p.is_obs_of with
           | None -> acc
           | Some deps -> add_cc acc (p.content,deps))
-        domain env.Env.domain in
+        Mods.IntMap.empty env.Env.domain in
     {
       sig_decl = env.Env.sig_decl;
       nb_id = env.Env.nb_id;
@@ -1042,7 +1056,7 @@ let finish_new ?origin wk =
         | Some r -> (h,add_origin deps origin)::t,r,h in
     aux (Mods.IntMap.find_default [] w wk.cc_env) in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id
-    (Mods.IntMap.add w env_w wk.cc_env),r,out
+    (Mods.IntMap.add w env_w wk.cc_env),r,out.id
 
 let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_links in
@@ -1125,7 +1139,8 @@ module Matching = struct
                  Format.fprintf f "%i:%i->%i" ccid node dst) f nm)) m
 
   (*- rm - reconstruct: Edges.t -> t -> int -> cc -> int -> t option*)
-  let reconstruct graph inj id cc root =
+  let reconstruct domain graph inj id cc_id root =
+    let cc = domain.Env.domain.(cc_id).content in
     match find_root cc with
     | None -> failwith "Matching.reconstruct cc error"
     (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
@@ -1157,7 +1172,8 @@ module Matching = struct
       match Navigation.injection_for_one_more_edge ?root inj graph h with
       | None -> false
       | Some inj' -> aux_is_root_of graph None inj' t
-  let is_root_of graph (_,rty as root) cc =
+  let is_root_of domain graph (_,rty as root) cc_id =
+    let cc = domain.Env.domain.(cc_id).content in
     match cc.discover_nav with
     | [] ->
       (match find_root cc with
@@ -1165,20 +1181,22 @@ module Matching = struct
        | None -> false)
     | nav -> aux_is_root_of graph (Some root) Renaming.empty nav
 
-  let roots_of graph cc =
-    Edges.all_agents_where (fun x -> is_root_of graph x cc) graph
+  let roots_of domain graph cc =
+    Edges.all_agents_where (fun x -> is_root_of domain graph x cc) graph
 
   (* get : (ContentAgent.t * int) -> t -> int *)
   let get ((node,_),id) (t,_) =
     Renaming.apply (Mods.IntMap.find_default Renaming.empty id t) node
 
-  let elements_with_types ccs (t,_) =
+  let elements_with_types domain ccs (t,_) =
     let out = Array.make (Mods.IntMap.size t) [] in
     let () =
       Mods.IntMap.iter
         (fun id map ->
            out.(id) <- Renaming.fold
-               (fun i out acc -> (out,find_ty ccs.(id) i)::acc) map [])
+               (fun i out acc ->
+                  (out,find_ty domain.Env.domain.(ccs.(id)).content i)::acc)
+               map [])
         t in
     out
 
@@ -1219,7 +1237,7 @@ module Matching = struct
           | Some ndeps ->
             let root_bundle =
               get_root inj_point2graph point in
-            ((point.content,root_bundle) :: obs,
+            ((pid,root_bundle) :: obs,
              Operator.DepSet.union rev_deps ndeps) in
         let remains' =
           List.fold_left
@@ -1269,15 +1287,8 @@ module Matching = struct
        Navigation.ToNode (Navigation.Fresh n',site')]
 end
 
-let compare_canonicals cc cc' = Mods.int_compare cc.id cc'.id
+let compare_canonicals cc cc' = Mods.int_compare cc cc'
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
-module ForState = struct
-  type t = cc
-  let compare = compare_canonicals
-  let print = print ?sigs:None ~with_id:true
-end
-
-module SetMap = SetMap.Make(ForState)
-module Set = SetMap.Set
-module Map = SetMap.Map
+module Set = Mods.IntSet
+module Map = Mods.IntMap

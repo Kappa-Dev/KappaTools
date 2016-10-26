@@ -17,7 +17,7 @@ let get_compilation ?max_event cli_args =
       ~init_e:0
       ?max_time:cli_args.Run_cli_args.maxTimeValue
       ?max_event ~plot_period in
-  let (env, cc_env, contact_map, updated_vars, story_compression,
+  let (env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflows, init_l),
       counter,alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
@@ -32,14 +32,14 @@ let get_compilation ?max_event cli_args =
       let contact_map,_kasa_state =
         Eval.init_kasa Remanent_parameters_sig.KaSim sigs_nd result in
       let () = Format.printf "+ Compiling...@." in
-      let (env, cc_env, story_compression, unary_distances, formatCflow, init_l)=
+      let (env, story_compression, unary_distances, formatCflow, init_l)=
         Eval.compile
           ~pause:(fun f -> f ())
           ~return:(fun x -> x)
           ?rescale_init:cli_args.Run_cli_args.rescale
           ~outputs:(Outputs.go (Signature.create [||]))
           sigs_nd tk_nd contact_map result' in
-      (env, cc_env, contact_map, updated_vars, story_compression,
+      (env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflow, init_l),counter,[]
     | marshalized_file ->
       try
@@ -52,10 +52,10 @@ let get_compilation ?max_event cli_args =
                    f "Simulation package loaded, all kappa files are ignored") in
         let () = Format.printf "+ Loading simulation package %s...@."
             marshalized_file in
-        let env,cc_env,contact_map,updated_vars,story_compression,
+        let env,contact_map,updated_vars,story_compression,
             unary_distances,formatCflow,init_l =
           (Marshal.from_channel d :
-             Environment.t*Connected_component.Env.t*Primitives.contact_map*
+             Environment.t*Primitives.contact_map*
              int list* (bool*bool*bool) option*bool option*Ast.formatCflow*
              (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
         let () = Pervasives.close_in d  in
@@ -68,7 +68,7 @@ let get_compilation ?max_event cli_args =
         let updated_vars' =
           List.fold_left
             (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-        (env,cc_env,contact_map,updated_vars',story_compression,
+        (env,contact_map,updated_vars',story_compression,
          unary_distances,formatCflow,init_l),
         counter,alg_overwrite
       with
@@ -78,5 +78,5 @@ let get_compilation ?max_event cli_args =
           Format.std_formatter
           "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
         exit 1 in
-  (env, cc_env, contact_map, updated_vars, story_compression,
+  (env, contact_map, updated_vars, story_compression,
    unary_distances, formatCflows, init_l),counter,alg_overwrite

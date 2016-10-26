@@ -68,7 +68,7 @@ let () =
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
-    let (env0, cc_env, contact_map, updated_vars, story_compression,
+    let (env0, contact_map, updated_vars, story_compression,
          unary_distances, formatCflows, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
         ?max_event:kasim_args.Kasim_args.maxEventValue cli_args in
@@ -91,18 +91,18 @@ let () =
     let (graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
-        alg_overwrite counter env cc_env
+        alg_overwrite counter env
         story_compression ~store_distances:(unary_distances<>None) init_l in
     let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
         Format.eprintf
-          "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,@[%a@]@]@,@[<v 2>Intial graph;@,%a@]@]@."
+          "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
           Kappa_printer.env env
-          Connected_component.Env.print cc_env
+          Connected_component.Env.print (Environment.domain env)
           (Rule_interpreter.print env) graph in
     let () = Kappa_files.with_ccFile
-        (fun f -> Connected_component.Env.print_dot f cc_env) in
+        (fun f -> Connected_component.Env.print_dot f (Environment.domain env)) in
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 
@@ -138,28 +138,32 @@ let () =
       if cli_args.Run_cli_args.batchmode then
         State_interpreter.batch_loop
           ~outputs ~formatCflows
-          Format.std_formatter env cc_env counter graph state
+          Format.std_formatter env counter graph state
       else
         let lexbuf = Lexing.from_channel stdin in
-        let rec toplevel cc_env graph state =
+        let rec toplevel env graph state =
           let () = Format.printf "@.> @?" in
-          let cc_env',(stop,graph',state') =
+          let env',(stop,graph',state') =
             try
               match KappaParser.interactive_command KappaLexer.token lexbuf with
               | Ast.RUN b ->
-                let cc_preenv = Connected_component.PreEnv.of_env cc_env in
+                let cc_preenv =
+                  Connected_component.PreEnv.of_env (Environment.domain env) in
                 let b' =
                   LKappa.bool_expr_of_ast
-                    (Environment.signatures env0) (Environment.tokens_finder env0)
-                    (Environment.algs_finder env0) (Location.dummy_annot b) in
+                    (Environment.signatures env) (Environment.tokens_finder env)
+                    (Environment.algs_finder env) (Location.dummy_annot b) in
                 let cc_preenv',(b'',pos_b'') =
                   Eval.compile_bool contact_map cc_preenv b' in
-                let cc_env' =
-                  if cc_preenv == cc_preenv' then cc_env
-                  else Connected_component.PreEnv.finalize cc_preenv' in
-                cc_env',
+                let env' =
+                  if cc_preenv == cc_preenv' then env
+                  else
+                    Environment.new_domain
+                      (Connected_component.PreEnv.finalize cc_preenv')
+                      env in
+                env',
                 if try Alg_expr.stops_of_bool_expr
-                         (Environment.all_dependencies env0) b'' <> []
+                         (Environment.all_dependencies env) b'' <> []
                   with ExceptionDefn.Unsatisfiable -> true then
                   let () =
                     Pp.error Format.pp_print_string
@@ -167,70 +171,72 @@ let () =
                   (false,graph,state)
                 else State_interpreter.interactive_loop
                     ~outputs
-                    Format.std_formatter b'' env0 cc_env' counter graph state
-              | Ast.QUIT -> cc_env,(true,graph,state)
+                    Format.std_formatter b'' env' counter graph state
+              | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
-                let cc_preenv = Connected_component.PreEnv.of_env cc_env in
+                let cc_preenv =
+                  Connected_component.PreEnv.of_env (Environment.domain env) in
                 let e',_ =
                   Tools.list_fold_right_map
                     (LKappa.modif_expr_of_ast
-                       (Environment.signatures env0)
-                       (Environment.tokens_finder env0)
-                       (Environment.algs_finder env0)) e [] in
+                       (Environment.signatures env)
+                       (Environment.tokens_finder env)
+                       (Environment.algs_finder env)) e [] in
                 let cc_preenv', e'' = Eval.compile_modifications_no_track
                     contact_map cc_preenv e' in
-                let cc_env',graph' =
-                  if cc_preenv == cc_preenv' then (cc_env,graph)
+                let env',graph' =
+                  if cc_preenv == cc_preenv' then (env,graph)
                   else
-                    (Connected_component.PreEnv.finalize cc_preenv',
+                    let fenv = Connected_component.PreEnv.finalize cc_preenv' in
+                    (Environment.new_domain fenv env,
                      List.fold_left
-                       Rule_interpreter.incorporate_extra_pattern
+                       (Rule_interpreter.incorporate_extra_pattern fenv)
                        graph
                        (Primitives.extract_connected_components_modifications e''))
                 in
-                cc_env',
+                env',
                 List.fold_left
                     (fun (stop,graph',state' as acc) x ->
                        if stop then acc else
                          State_interpreter.do_modification
-                           ~outputs env0 cc_env counter graph' state' x)
+                           ~outputs env' counter graph' state' x)
                     (false,graph',state) e''
             with
             | ExceptionDefn.Syntax_Error (msg,pos) ->
               let () = Pp.error Format.pp_print_string (msg,pos) in
-              cc_env,(false,graph,state)
+              env,(false,graph,state)
             | ExceptionDefn.Malformed_Decl er ->
               let () = Pp.error Format.pp_print_string er in
-              cc_env,(false,graph,state) in
+              env,(false,graph,state) in
           if stop then
             State_interpreter.finalize
               ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
-              Format.std_formatter env0 counter graph' state'
+              Format.std_formatter env counter graph' state'
           else
-            toplevel cc_env' graph' state' in
+            toplevel env' graph' state' in
         if cli_args.Run_cli_args.interactive then
           let () =
             Format.printf
               "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
                @ effect@ to@ perform@ it@]" in
-          toplevel cc_env graph state
+          toplevel env0 graph state
         else
           let (stop,graph',state') =
             State_interpreter.interactive_loop
               ~outputs Format.std_formatter
-              Alg_expr.FALSE env0 cc_env counter graph state in
+              Alg_expr.FALSE env counter graph state in
           if stop then
             State_interpreter.finalize
               ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
-              Format.std_formatter env0 counter graph' state'
+              Format.std_formatter env counter graph' state'
           else
           let () =
             Format.printf
               "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
                @ effect@ to@ perform@ it@]" in
-            toplevel cc_env graph' state' in
+            toplevel env0 graph' state' in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()
     else

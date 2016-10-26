@@ -4,12 +4,12 @@
 
 val value_alg :
   Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
-  get_mix:(Connected_component.t array list -> Nbr.t) ->
+  get_mix:(Connected_component.id array list -> Nbr.t) ->
   get_tok:(int -> Nbr.t) -> Alg_expr.t -> Nbr.t
 (** [value_alg c ?t get_alg get_mix get_tok expr_alg] with [get_mix [interp1;...;interpn]] *)
 
 val value_bool :
   Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
-  get_mix:(Connected_component.t array list -> Nbr.t) ->
+  get_mix:(Connected_component.id array list -> Nbr.t) ->
   get_tok:(int -> Nbr.t) ->
-  (Connected_component.t array list,int) Alg_expr.bool_expr -> bool
+  (Connected_component.id array list,int) Alg_expr.bool_expr -> bool

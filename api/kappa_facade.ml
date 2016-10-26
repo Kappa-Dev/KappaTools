@@ -48,8 +48,7 @@ type t =
     mutable files : Api_types_j.file_line list ;
     mutable error_messages : Api_types_j.errors ;
     contact_map : Primitives.contact_map ;
-    env : Environment.t ;
-    mutable domain : Connected_component.Env.t ;
+    mutable env : Environment.t ;
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
     store_distances : bool ;
@@ -61,7 +60,6 @@ type t =
 let create_t
     ~contact_map
     ~env
-    ~domain
     ~graph
     ~state
     ~store_distances
@@ -89,7 +87,6 @@ let create_t
     error_messages = [];
     contact_map = contact_map;
     env = env ;
-    domain = domain;
     graph = graph;
     state = state ;
     store_distances = store_distances;
@@ -102,7 +99,6 @@ let clone_t t =
   create_t
     ~contact_map:t.contact_map
     ~env:t.env
-    ~domain:t.domain
     ~graph:t.graph
     ~state:t.state
     ~store_distances:t.store_distances
@@ -180,14 +176,12 @@ let build_ast
                            | Data.Print _
                            | Data.UnaryDistance _ -> assert false)
                        sig_nd tk_nd contact_map result >>=
-                     (fun (env,domain,has_tracking,
-                           store_distances,_,init_l) ->
+                     (fun (env,has_tracking,store_distances,_,init_l) ->
                        let store_distances = store_distances<>None in
                        let simulation =
                          create_t
                          ~contact_map:contact_map
                          ~env:env
-                         ~domain:domain
                          ~graph:(Rule_interpreter.empty ~store_distances env)
                          ~state:(State_interpreter.empty env [] [])
                          ~store_distances:store_distances
@@ -272,9 +266,7 @@ let run_simulation
              let (stop,graph',state') =
                      State_interpreter.a_loop
                        ~outputs:(outputs t)
-                       t.env t.domain
-                       t.counter
-                       t.graph t.state in
+                       t.env t.counter t.graph t.state in
                    rstop := stop;
                    t.graph <- graph';
                    t.state <- state'
@@ -337,7 +329,6 @@ let start
                ~return:Lwt.return []
                t.counter
                t.env
-               t.domain
                story_compression
                ~store_distances:t.store_distances
                t.init_l >>=
@@ -431,7 +422,7 @@ let perturbation
          Lwt.return (`Error (Api_data.api_message_errors msg_process_not_paused))
        else
          let cc_preenv =
-           Connected_component.PreEnv.of_env t.domain in
+           Connected_component.PreEnv.of_env (Environment.domain t.env) in
          let e',_ =
            Tools.list_fold_right_map
              (LKappa.modif_expr_of_ast
@@ -444,20 +435,18 @@ let perturbation
          let graph' =
            if cc_preenv == cc_preenv' then t.graph
            else
+             let domain' = Connected_component.PreEnv.finalize cc_preenv' in
              let () =
-               t.domain <-
-                 Connected_component.PreEnv.finalize cc_preenv' in
+               t.env <- Environment.new_domain domain' t.env in
              List.fold_left
-               Rule_interpreter.incorporate_extra_pattern
-               t.graph
-               (Primitives.extract_connected_components_modifications e'') in
+               (Rule_interpreter.incorporate_extra_pattern domain')
+               t.graph (Primitives.extract_connected_components_modifications e'') in
          let _,graph'',state' =
            List.fold_left
              (fun (stop,graph',state' as acc) x ->
                 if stop then acc else
                   State_interpreter.do_modification
-                    ~outputs:(outputs t) t.env
-                    t.domain t.counter graph' state' x)
+                    ~outputs:(outputs t) t.env t.counter graph' state' x)
              (false,graph',t.state) e'' in
          let () = t.graph <- graph'' in
          let () = t.state <- state' in

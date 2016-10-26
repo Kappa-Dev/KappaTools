@@ -30,21 +30,22 @@ let lift_opt f compil_opt =
 
 let contact_map compil = compil.contact_map
 let environment compil = compil.environment
-let sigs compil = Environment.signatures (environment compil)
+let domain compil = Environment.domain (environment compil)
 
-let sigs_opt = lift_opt sigs
+let domain_opt = lift_opt domain
 let environment_opt = lift_opt environment
 type mixture = Edges.t(* not necessarily connected, fully specified *)
 type chemical_species = Connected_component.cc
 (* connected, fully specified *)
 type canonic_species = chemical_species (* chemical species in canonic form *)
-type pattern = Connected_component.cc array
+type pattern = Connected_component.id array
 (* not necessarity connected, maybe partially specified *)
-type connected_component = Connected_component.cc
+type connected_component = Connected_component.id
 (* connected, maybe partially specified *)
 
 let dummy_chemical_species compil =
-  Connected_component.empty_cc (sigs compil)
+  Connected_component.empty_cc
+    (Connected_component.Env.signatures (domain compil))
 
 let rate_convention compil = compil.rate_convention
 let what_do_we_count compil = compil.count
@@ -60,28 +61,18 @@ let do_we_prompt_reactions compil =
   compil.show_reactions
 
 let print_chemical_species ?compil =
-  Connected_component.print ?sigs:(sigs_opt compil) ~with_id:false
+  Connected_component.print_cc
+    ?sigs:(Tools.option_map Environment.signatures (environment_opt compil))
+    ~with_id:false
 
 let print_canonic_species = print_chemical_species
 
 let nbr_automorphisms_in_chemical_species x =
   List.length (Connected_component.automorphisms x)
-let nbr_automorphisms_in_pattern a =
-  let a' = Array.copy a in
-  let () = Array.sort Connected_component.compare_canonicals a' in
-  let rec aux i acc n el =
-    if i >= Array.length a' then n * acc else
-      let n' =
-        if Connected_component.is_equal_canonicals a'.(i) el then  n+1 else 1 in
-      aux (succ i) (n *acc) n' a'.(i) in
-  if Array.length a' = 0 then 1 else
-    let acc = Array.fold_left
-        (fun a x -> a*nbr_automorphisms_in_chemical_species x) 1 a' in
-    aux 1 acc 1 a'.(0)
 
 let compare_connected_component = Connected_component.compare_canonicals
 let print_connected_component ?compil =
-  Connected_component.print ?sigs:(sigs_opt compil) ~with_id:false
+  Connected_component.print ?domain:(domain_opt compil) ~with_id:false
 
 let canonic_form x = x
 
@@ -89,13 +80,15 @@ let connected_components_of_patterns = Array.to_list
 
 let connected_components_of_mixture compil cache e =
   let contact_map = contact_map compil in
-  let sigs = sigs compil in
+  let sigs = Connected_component.Env.signatures (domain compil) in
   let snap = Edges.build_snapshot sigs e in
   List.fold_left
     (fun (cache,acc) (i,m) ->
        match Snip.connected_components_sum_of_ambiguous_mixture
                contact_map cache (LKappa.of_raw_mixture m) with
-       | cache',[[|x|],_] -> cache',Tools.recti (fun a _ -> x::a) acc i
+       | cache',[[|x_id|],_] ->
+         let x = Connected_component.PreEnv.get cache' x_id in
+         cache',Tools.recti (fun a _ -> x::a) acc i
        | _ -> assert false)
     (cache,[]) snap
 
@@ -107,12 +100,13 @@ let lift_embedding x =
   Tools.unsome
     Connected_component.Matching.empty
     (Connected_component.Matching.add_cc Connected_component.Matching.empty 0 x)
-let find_embeddings = Connected_component.embeddings_to_fully_specified
+let find_embeddings compil =
+  Connected_component.embeddings_to_fully_specified (domain compil)
 
-let find_embeddings_unary_binary p x =
+let find_embeddings_unary_binary compil p x =
   Tools.array_fold_lefti
     (fun i acc cc ->
-       let em = find_embeddings cc x in
+       let em = find_embeddings compil cc x in
        Tools.list_map_flatten
          (fun m ->
             Tools.list_map_option
@@ -123,7 +117,7 @@ let find_embeddings_unary_binary p x =
     p
 
 let disjoint_union compil l =
-  let sigs = sigs compil in
+  let sigs = Environment.signatures (compil.environment) in
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
   let _,em,mix =
     List.fold_left
@@ -218,7 +212,7 @@ let rate_name compil rule rule_id =
     arity_tag direction_tag
 
 let apply compil rule inj_nodes mix =
-  let sigs = sigs compil in
+  let sigs = Environment.signatures compil.environment in
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
                 (inj_nodes,Mods.IntMap.empty)) rule.Primitives.removed in
@@ -244,7 +238,8 @@ let apply compil rule inj_nodes mix =
 let lift_species compil x =
   fst @@
   Connected_component.add_fully_specified_to_graph
-    (sigs compil) (Edges.empty ~with_connected_components:false) x
+    (Environment.signatures compil.environment)
+    (Edges.empty ~with_connected_components:false) x
 
 let get_rules compil =
   Environment.fold_rules
@@ -270,7 +265,7 @@ let get_obs_titles compil =
 
 let get_compil
     ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args =
-  let (env,_,contact_map,_,_,_,_,init),_,_ =
+  let (env,contact_map,_,_,_,_,init),_,_ =
     Cli_init.get_compilation cli_args in
   {
     environment = env ;
@@ -283,7 +278,7 @@ let get_compil
   }
 
 let empty_cache compil =
-  Connected_component.PreEnv.empty (sigs compil)
+  Connected_component.PreEnv.of_env (Environment.domain compil.environment)
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
 let mixture_of_init compil c =

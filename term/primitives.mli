@@ -32,7 +32,7 @@ end
 type elementary_rule = {
   rate : Alg_expr.t Location.annot;
   unary_rate : (Alg_expr.t Location.annot * int option) option;
-  connected_components : Connected_component.t array;
+  connected_components : Connected_component.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
   fresh_bindings :
@@ -51,11 +51,11 @@ type modification =
   | UPDATE of int * Alg_expr.t Location.annot
   | SNAPSHOT of Alg_expr.t Ast.print_expr list
   | STOP of Alg_expr.t Ast.print_expr list
-  | CFLOW of string option * Connected_component.t array *
+  | CFLOW of string option * Connected_component.id array *
              Instantiation.abstract Instantiation.test list
   | FLUX of bool * Alg_expr.t Ast.print_expr list
   | FLUXOFF of Alg_expr.t Ast.print_expr list
-  | CFLOWOFF of Connected_component.t array
+  | CFLOWOFF of Connected_component.id array
   | PLOTENTRY
   | PRINT of
       (Alg_expr.t Ast.print_expr list *
@@ -63,23 +63,23 @@ type modification =
 
 type perturbation =
   { precondition:
-      (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot;
+      (Connected_component.id array list,int) Alg_expr.bool_expr Location.annot;
     effect : modification list;
-    abort : (Connected_component.t array list,int)
+    abort : (Connected_component.id array list,int)
         Alg_expr.bool_expr Location.annot option;
   }
 
 val exists_modification : (modification -> bool) -> perturbation array -> bool
 
 val extract_connected_components_modifications :
-  modification list -> Connected_component.t list
+  modification list -> Connected_component.id list
 
 val map_expr_rule : (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
   elementary_rule -> elementary_rule
 val map_expr_perturbation :
   (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
-  ((Connected_component.t array list,int) Alg_expr.bool_expr Location.annot ->
-   (Connected_component.t array list,int) Alg_expr.bool_expr Location.annot) ->
+  ((Connected_component.id array list,int) Alg_expr.bool_expr Location.annot ->
+   (Connected_component.id array list,int) Alg_expr.bool_expr Location.annot) ->
   perturbation -> perturbation
 
 val stops_of_perturbation :

@@ -589,25 +589,26 @@ let compile ~outputs ~pause ~return
   let preenv,obs =
     obs_of_result contact_map preenv result in
 
-  let env =
-    Environment.init sigs_nd tk_nd alg_nd alg_deps'
-      (Array.of_list result.rules,rule_nd,cc_unaries)
-      (Array.of_list (List.rev obs)) (Array.of_list pert) in
-
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
   let domain = Connected_component.PreEnv.finalize preenv in
+
+  let env =
+    Environment.init domain tk_nd alg_nd alg_deps'
+      (Array.of_list result.rules,rule_nd,cc_unaries)
+      (Array.of_list (List.rev obs)) (Array.of_list pert) in
+
   outputs (Data.Log "\t -initial conditions");
   pause @@ fun () ->
   let _,init_l =
     inits_of_result
       ?rescale:rescale_init contact_map env preenv result in
-  return (env, domain,
+  return (env,
           (if has_tracking then Some story_compression else None),
           unary_distances, formatCflow, init_l)
 
 let build_initial_state
-    ~bind ~return alg_overwrite counter env cc_env
+    ~bind ~return alg_overwrite counter env
     story_compression ~store_distances init_l =
   let stops = Environment.fold_perturbations
       (fun i acc p ->
@@ -618,4 +619,4 @@ let build_initial_state
   let graph0 = Rule_interpreter.empty ?story_compression ~store_distances env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
   State_interpreter.initialize
-    ~bind ~return env cc_env counter graph0 state0 init_l
+    ~bind ~return env counter graph0 state0 init_l

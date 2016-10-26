@@ -17,17 +17,17 @@ type alg_stack_element =
   | TO_EXEC_ALG of Operator.bin_alg_op * Alg_expr.t
   | TO_EXEC_COMP of Operator.compare_op * Alg_expr.t
   | TO_EXEC_BOOL of Operator.bool_op *
-                    (Connected_component.t array list,int) Alg_expr.bool_expr
+                    (Connected_component.id array list,int) Alg_expr.bool_expr
   | TO_COMPUTE_ALG of Operator.bin_alg_op * Nbr.t
   | TO_COMPUTE_COMP of Operator.compare_op * Nbr.t
   | TO_COMPUTE_UN of Operator.un_alg_op
 
 let rec exec_alg :
 type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
-     get_mix:(Connected_component.t array list -> Nbr.t) ->
+     get_mix:(Connected_component.id array list -> Nbr.t) ->
      get_tok:(int -> Nbr.t) ->
      (Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
-      get_mix:(Connected_component.t array list -> Nbr.t) ->
+      get_mix:(Connected_component.id array list -> Nbr.t) ->
       get_tok:(int -> Nbr.t) ->
       Nbr.t -> alg_stack_element list -> a) ->
      Alg_expr.t -> alg_stack_element list -> a =

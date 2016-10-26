@@ -1,2 +1,2 @@
-"${KAPPABIN}"KaSim -e 1000 -seed 226011309 -o data.svg -d output -pp 0.04 activity.ka
+"${KAPPABIN}"KaSim -e 1000 -seed 226011309 -o data.svg -d output -pp 0.04 activity.ka || true
 # The growth must be exponential

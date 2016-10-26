@@ -41,7 +41,6 @@ sig
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
-  val nbr_automorphisms_in_pattern: pattern -> int
   val canonic_form: chemical_species -> canonic_species
 
   val connected_components_of_patterns: pattern -> connected_component list
@@ -53,9 +52,10 @@ sig
   type embedding (* the domain is connected *)
   type embedding_forest (* the domain may be not connected *)
   val lift_embedding: embedding -> embedding_forest
-  val find_embeddings: connected_component -> chemical_species -> embedding list
+  val find_embeddings:
+    compil -> connected_component -> chemical_species -> embedding list
   val find_embeddings_unary_binary:
-    pattern -> chemical_species -> embedding_forest list
+    compil -> pattern -> chemical_species -> embedding_forest list
   val disjoint_union:
     compil  ->
     (connected_component * embedding * chemical_species) list ->

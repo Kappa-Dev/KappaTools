@@ -43,7 +43,7 @@ let empty env stopping_times alg_overwrite =
     flux = [];
   }
 
-let initialize ~bind ~return env domain counter graph0 state0 init_l =
+let initialize ~bind ~return env counter graph0 state0 init_l =
   let get_alg i = get_alg env state0 i in
   let mgraph =
     List.fold_left
@@ -64,7 +64,7 @@ let initialize ~bind ~return env domain counter graph0 state0 init_l =
                 Nbr.iteri
                   (fun _ s ->
                      match Rule_interpreter.apply_rule
-                             ~get_alg env domain
+                             ~get_alg env
                              (Environment.connected_components_of_unary_rules env)
                              counter s (Trace.INIT creations_sort)
                              compiled_rule with
@@ -89,7 +89,7 @@ let observables_values env counter graph state =
     (Rule_interpreter.value_alg counter graph ~get_alg)
     env
 
-let do_modification ~outputs env domain counter graph state modification =
+let do_modification ~outputs env counter graph state modification =
   let get_alg i = get_alg env state i in
   let print_expr_val =
     Kappa_printer.print_expr_val
@@ -101,7 +101,7 @@ let do_modification ~outputs env domain counter graph state modification =
      Nbr.iteri
        (fun _ g ->
           Rule_interpreter.force_rule
-            ~get_alg env domain
+            ~get_alg env
             (Environment.connected_components_of_unary_rules env)
             counter g (Trace.PERT "pert") r)
        graph n,state)
@@ -143,11 +143,11 @@ let do_modification ~outputs env domain counter graph state modification =
     let name = match name with
       | Some s -> s
       | None ->
-        let sigs = Environment.signatures env in
+        let domain = Environment.domain env in
         Format.asprintf
           "@[<h>%a@]"
           (Pp.array Pp.comma
-             (fun _ -> Connected_component.print ~sigs ~with_id:false))
+             (fun _ -> Connected_component.print ~domain ~with_id:false))
           cc in
     (false,
      Rule_interpreter.add_tracked cc (Trace.OBS name) tests graph,
@@ -180,7 +180,7 @@ let do_modification ~outputs env domain counter graph state modification =
     let () = state.flux <- others in
     (false, graph, state)
 
-let perturbate ~outputs env domain counter graph state =
+let perturbate ~outputs env counter graph state =
   let () = Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
       state.perturbations_not_done_yet in
   let get_alg i = get_alg env state i in
@@ -201,7 +201,7 @@ let perturbate ~outputs env domain counter graph state =
         let stop,graph,state =
           List.fold_left (fun (stop,graph,state as acc) effect ->
               if stop then acc else
-                do_modification ~outputs env domain counter graph state effect)
+                do_modification ~outputs env counter graph state effect)
             (stop,graph,state) pert.Primitives.effect in
         let () = state.perturbations_not_done_yet.(i) <- false in
         let () =
@@ -215,7 +215,7 @@ let perturbate ~outputs env domain counter graph state =
         do_until_noop (succ i) graph state stop in
   do_until_noop 0 graph state false
 
-let one_rule ~outputs dt stop env domain counter graph state =
+let one_rule ~outputs dt stop env counter graph state =
   let choice,_ = Random_tree.random state.activities in
   let rule_id = choice/2 in
   let rule = Environment.get_rule env rule_id in
@@ -259,7 +259,7 @@ let one_rule ~outputs dt stop env domain counter graph state =
     then Rule_interpreter.apply_unary_rule ~rule_id
     else Rule_interpreter.apply_rule ~rule_id in
   match apply_rule
-          ~rule_id ~get_alg env domain
+          ~rule_id ~get_alg env
           (Environment.connected_components_of_unary_rules env)
           counter graph cause rule with
   | Rule_interpreter.Success (distance,graph') ->
@@ -305,7 +305,7 @@ let one_rule ~outputs dt stop env domain counter graph state =
 
 let activity state = Random_tree.total state.activities
 
-let a_loop ~outputs env domain counter graph state =
+let a_loop ~outputs env counter graph state =
   let activity = activity state in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
@@ -332,7 +332,7 @@ let a_loop ~outputs env domain counter graph state =
         let () = state.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
         let stop,graph',state' =
-          perturbate ~outputs env domain counter graph state in
+          perturbate ~outputs env counter graph state in
         (not continue||stop,graph',state')
     else
       (*activity is positive*)
@@ -342,18 +342,18 @@ let a_loop ~outputs env domain counter graph state =
         let () = state.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
         let stop,graph',state' =
-          perturbate ~outputs env domain counter graph state in
+          perturbate ~outputs env counter graph state in
         (not continue||stop,graph',state')
       | _ ->
         let (stop,graph',state') =
-          perturbate ~outputs env domain counter graph state in
-        one_rule ~outputs dt stop env domain counter graph' state' in
+          perturbate ~outputs env counter graph state in
+        one_rule ~outputs dt stop env counter graph' state' in
   let () =
     Counter.fill ~outputs
       counter (observables_values env counter graph' state') in
   if stop then
     let (_,graph'',state'') =
-      perturbate ~outputs env domain counter graph' state' in
+      perturbate ~outputs env counter graph' state' in
     (true,graph'',state'')
   else out
 
@@ -394,16 +394,16 @@ let finalize ~outputs ~called_from dotFormat form env counter graph state =
            output_char c '\n')
   | None -> ()
 
-let batch_loop ~outputs ~formatCflows form env domain counter graph state =
+let batch_loop ~outputs ~formatCflows form env counter graph state =
   let called_from = Remanent_parameters_sig.KaSim in
   let rec iter graph state =
-    let stop,graph',state' = a_loop ~outputs env domain counter graph state in
+    let stop,graph',state' = a_loop ~outputs env counter graph state in
     if stop then
       finalize ~outputs ~called_from formatCflows form env counter graph' state'
     else let () = Counter.tick form counter in iter graph' state'
   in iter graph state
 
-let interactive_loop ~outputs form pause_criteria env domain counter graph state =
+let interactive_loop ~outputs form pause_criteria env counter graph state =
   let get_alg i = get_alg env state i in
   let user_interrupted = ref false in
   let old_sigint_behavior =
@@ -418,7 +418,7 @@ let interactive_loop ~outputs form pause_criteria env domain counter graph state
       (false,graph,state)
     else
       let stop,graph',state' as out =
-        a_loop ~outputs env domain counter graph state in
+        a_loop ~outputs env counter graph state in
       if stop then
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
         out

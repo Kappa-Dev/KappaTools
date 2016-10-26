@@ -1,7 +1,7 @@
 let cc_mix ?env =
-  let sigs = match env with
+  let domain = match env with
     | None -> None
-    | Some e -> Some (Environment.signatures e) in
+    | Some e -> Some (Environment.domain e) in
   Pp.list
     (fun f -> Format.fprintf f " +@ ")
     (fun f ccs ->
@@ -10,7 +10,7 @@ let cc_mix ?env =
          (fun _ f cc ->
             Format.fprintf
               f "|%a|"
-              (Connected_component.print ?sigs ~with_id:false) cc) f ccs)
+              (Connected_component.print ?domain ~with_id:false) cc) f ccs)
 
 let alg_expr ?env =
   Alg_expr.print
@@ -38,9 +38,9 @@ let print_expr_val alg_val f e =
   in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
 
 let elementary_rule ?env f r =
-  let sigs = match env with
-    | None -> None
-    | Some e -> Some (Environment.signatures e) in
+  let domain,sigs = match env with
+    | None -> None,None
+    | Some e -> Some (Environment.domain e), Some (Environment.signatures e) in
   let pr_alg f (a,_) = alg_expr ?env f a in
   let pr_tok f (va,tok) =
     Format.fprintf
@@ -53,7 +53,7 @@ let elementary_rule ?env f r =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
-    let () = Connected_component.print ?sigs ~with_id:true f cc in
+    let () = Connected_component.print ?domain ~with_id:true f cc in
     Format.pp_close_box f () in
   Format.fprintf
     f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a@]%t@[%a@]@]@ @@%a%t"
@@ -76,9 +76,9 @@ let elementary_rule ?env f r =
                    Format.fprintf f ":%a" Format.pp_print_int md))
               dist)
 let modification ?env f m =
-  let sigs = match env with
+  let domain = match env with
     | None -> None
-    | Some e -> Some (Environment.signatures e) in
+    | Some e -> Some (Environment.domain e) in
   match m with
   | Primitives.PRINT (nme,va) ->
     Format.fprintf f "$PRINTF %a <%a>"
@@ -98,7 +98,7 @@ let modification ?env f m =
           let () = Format.pp_open_box f 2 in
           let () = Format.pp_print_int f i in
           let () = Format.pp_print_string f ": " in
-          let () = Connected_component.print ?sigs ~with_id:false f cc in
+          let () = Connected_component.print ?domain ~with_id:false f cc in
           Format.pp_close_box f () in
         Format.fprintf f "$DEL %a %a" (alg_expr ?env) n
           (Pp.array Pp.comma boxed_cc)
@@ -123,12 +123,12 @@ let modification ?env f m =
     Format.fprintf
       f "$TRACK @[%a@] [true]"
       (Pp.array
-         Pp.comma (fun _ -> Connected_component.print ?sigs ~with_id:false)) cc
+         Pp.comma (fun _ -> Connected_component.print ?domain ~with_id:false)) cc
   | Primitives.CFLOWOFF cc ->
     Format.fprintf
       f "$TRACK %a [false]"
       (Pp.array
-         Pp.comma (fun _ -> Connected_component.print ?sigs ~with_id:false)) cc
+         Pp.comma (fun _ -> Connected_component.print ?domain ~with_id:false)) cc
 
 let perturbation ?env f pert =
   let aux f =

@@ -1,5 +1,5 @@
 type t = {
-  signatures : Signature.s;
+  domain : Connected_component.Env.t;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Location.annot) NamedDecls.t;
   observables : Alg_expr.t Location.annot array;
@@ -14,22 +14,22 @@ type t = {
   tokens_reverse_dependencies : Operator.DepSet.t array;
 }
 
-let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
+let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     (ast_rules,rules,cc_of_unaries) obs perts =
-  { signatures = sigs; tokens = tokens; ast_rules = ast_rules;
-    rules = rules; cc_of_unaries = cc_of_unaries; algs = algs;
+  { domain; tokens; ast_rules; rules; cc_of_unaries; algs;
     observables = obs; perturbations = perts;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
   }
 
-let signatures env = env.signatures
+let domain env = env.domain
+let new_domain domain env = {env with domain}
+let signatures env = Connected_component.Env.signatures env.domain
 let tokens_finder env = env.tokens.NamedDecls.finder
 let algs_finder env = env.algs.NamedDecls.finder
 
-let num_of_agent nme env =
-  Signature.num_of_agent nme env.signatures
+let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
 
 let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
@@ -74,8 +74,7 @@ let all_dependencies env =
 let print_agent ?env f i =
   match env with
   | None -> Format.fprintf f "__agent_%i" i
-  | Some env ->
-    Signature.print_agent env.signatures f i
+  | Some env -> Signature.print_agent (signatures env) f i
 let print_alg ?env f id =
   match env with
   | None -> Format.fprintf f "__alg_%i" id
@@ -91,7 +90,7 @@ let print_ast_rule ?env f i =
   match env with
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
-    let sigs = env.signatures in
+    let sigs = signatures env in
     if i = 0 then Format.pp_print_string f "Perturbations"
     else
       match env.ast_rules.(pred i) with
@@ -112,7 +111,7 @@ let print pr_alg pr_rule pr_pert f env =
   let () =
     Format.fprintf
       f "@[<v>@[<v 2>Signatures:@,%a@]@,@[<2>Tokens:@ %a@]@,"
-      Signature.print env.signatures
+      Signature.print (signatures env)
       (NamedDecls.print ~sep:Pp.space (fun _ n f () -> Format.pp_print_string f n))
       env.tokens in
   let () =
@@ -161,7 +160,7 @@ let propagate_constant updated_vars counter x =
            (na,Alg_expr.propagate_constant updated_vars counter algs' v))
       algs' in
   {
-    signatures = x.signatures;
+    domain = x.domain;
     tokens = x.tokens;
     algs = NamedDecls.create algs';
     observables =
@@ -198,7 +197,7 @@ let to_json env =
     ExceptionDefn.warning
       (fun f -> Format.pp_print_string f "Environment.to_json is partial") in
   `Assoc [
-    "signatures", Signature.to_json env.signatures;
+    "signatures", Signature.to_json (signatures env);
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
       (fun (x,_) ->
@@ -231,7 +230,10 @@ let of_json = function
   | `Assoc l as x when List.length l = 5 ->
     begin
       try
-        { signatures = Signature.of_json (List.assoc "signatures" l);
+        { domain =
+            Connected_component.PreEnv.finalize
+              (Connected_component.PreEnv.empty (Signature.of_json (List.assoc "signatures" l)))
+        (*TODO*);
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
               (fun x -> Location.dummy_annot

@@ -16,7 +16,7 @@ type t =
     outdated_elements: Operator.DepSet.t * bool;
     story_machinery :
       (((bool*bool*bool)*bool) *
-       (Trace.event_kind * Connected_component.t array *
+       (Trace.event_kind * Connected_component.id array *
         Instantiation.abstract Instantiation.test list)
          list Connected_component.Map.t (*currently tracked ccs *) *
        Trace.t) option;
@@ -47,25 +47,25 @@ let empty ?story_compression ~store_distances env =
     store_distances;
   }
 
-let print_injections ?sigs f roots_of_patterns =
+let print_injections ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
     (Pp.set Connected_component.Map.bindings Pp.space
        (fun f (pattern,roots) ->
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
-            (Connected_component.print ?sigs ~with_id:true) pattern
+            (Connected_component.print ?domain ~with_id:true) pattern
             Mods.IntSet.print roots
        )
     ) roots_of_patterns
-let print_unary_injections ?sigs f roots_of_patterns =
+let print_unary_injections ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
     (Pp.set Connected_component.Map.bindings Pp.space
        (fun f (pattern,root_maps) ->
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
-            (Connected_component.print ?sigs ~with_id:true) pattern
+            (Connected_component.print ?domain ~with_id:true) pattern
             (Pp.set Mods.IntMap.bindings Pp.space
                (fun f (_cc_id, roots) -> Mods.IntSet.print f roots))
             root_maps
@@ -107,7 +107,7 @@ let new_place free_id (inj_nodes,inj_fresh) = function
   | Agent_place.Fresh (_,id) ->
     (inj_nodes,Mods.IntMap.add id free_id inj_fresh)
 
-let all_injections ?excp ?unary_rate edges roots patterna =
+let all_injections ?excp ?unary_rate domain edges roots patterna =
   let _,out =
     Tools.array_fold_lefti
       (fun id (excp,inj_list) pattern ->
@@ -125,7 +125,7 @@ let all_injections ?excp ?unary_rate edges roots patterna =
                List.fold_left
                  (fun corrects (inj,roots) ->
                     match Connected_component.Matching.reconstruct
-                            edges inj id pattern root with
+                            domain edges inj id pattern root with
                     | None -> corrects
                     | Some new_inj -> (new_inj,root::roots) :: corrects)
                  new_injs inj_list)
@@ -143,7 +143,7 @@ let all_injections ?excp ?unary_rate edges roots patterna =
     List.filter
       (fun (inj,_) ->
          let nodes = Connected_component.Matching.elements_with_types
-             patterna inj in
+             domain patterna inj in
          None =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
       out
@@ -315,7 +315,7 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
     in
     Some (compressions,x,steps'')
 
-let store_obs edges roots obs acc = function
+let store_obs domain edges roots obs acc = function
   | None -> acc
   | Some (_,tracked,_) ->
     List.fold_left
@@ -329,13 +329,14 @@ let store_obs edges roots obs acc = function
                        List.map (Instantiation.concretize_test
                                    (inj,Mods.IntMap.empty)) tests in
                      (ev,tests') :: acc)
-                  acc (all_injections ~excp:(pattern,root) edges roots patterns))
+                  acc
+                  (all_injections ~excp:(pattern,root) domain edges roots patterns))
              acc (Connected_component.Map.find_default [] pattern tracked)
          with Not_found -> acc)
       acc obs
 
 let update_edges
-    sigs counter domain unary_patterns inj_nodes state event_kind ?path rule =
+    counter domain unary_patterns inj_nodes state event_kind ?path rule =
   (*Negative update*)
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
@@ -357,7 +358,8 @@ let update_edges
   let (final_inj2graph,remaining_side_effects,roots_by_cc',edges'),concrete_inserted =
     List.fold_left
       (fun (x,p) h ->
-         let (x', h') = apply_positive_transformation sigs x h in
+         let (x', h') = apply_positive_transformation
+             (Connected_component.Env.signatures domain) x h in
          (x',h'::p))
       (((inj_nodes,Mods.IntMap.empty),side_effects,roots_of_up,edges_after_neg),[])
       rule.Primitives.inserted in
@@ -377,7 +379,7 @@ let update_edges
       (roots_of_p,roots_by_cc') new_obs in
   (*Store event*)
   let new_tracked_obs_instances =
-    store_obs edges'' roots_of_p new_obs [] state.story_machinery in
+    store_obs domain edges'' roots_of_p new_obs [] state.story_machinery in
   let story_machinery' =
     store_event
       counter final_inj2graph new_tracked_obs_instances event_kind
@@ -512,16 +514,17 @@ let update_tokens ~get_alg env counter state consumed injected =
   let state' = do_op Nbr.sub state consumed in do_op Nbr.add state' injected
 
 let transform_by_a_rule
-    ~get_alg env domain unary_patterns counter state event_kind ?path rule inj =
+    ~get_alg env unary_patterns counter state event_kind ?path rule inj =
   let state' =
     update_tokens
       ~get_alg env counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges (Environment.signatures env)
-    counter domain unary_patterns inj state' event_kind ?path rule
+  update_edges
+    counter (Environment.domain env) unary_patterns inj state' event_kind ?path rule
 
 let apply_unary_rule
-    ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
+    ~rule_id ~get_alg env unary_ccs counter state event_kind rule =
+  let domain = Environment.domain env in
   let inj,path =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l -> let inj,path = Tools.list_random l in Some inj,path
@@ -563,11 +566,12 @@ let apply_unary_rule
       let pattern2 = rule.Primitives.connected_components.(1) in
       let inj1 =
         Connected_component.Matching.reconstruct
-          state.edges Connected_component.Matching.empty 0 pattern1 root1 in
+          domain state.edges
+          Connected_component.Matching.empty 0 pattern1 root1 in
       match inj1 with
       | None -> None,None
       | Some inj -> Connected_component.Matching.reconstruct
-                      state.edges inj 1 pattern2 root2,None in
+                      domain state.edges inj 1 pattern2 root2,None in
   let rdeps,changed_c = state.outdated_elements in
   let state' =
     {state with
@@ -577,12 +581,12 @@ let apply_unary_rule
   | None -> Clash
   | Some inj ->
     let nodes = Connected_component.Matching.elements_with_types
-        rule.Primitives.connected_components inj in
+        domain rule.Primitives.connected_components inj in
     match path with
     | Some p ->
       Success
         ((if state'.store_distances then Some (List.length p) else None),
-         transform_by_a_rule ~get_alg env domain unary_ccs counter state'
+         transform_by_a_rule ~get_alg env unary_ccs counter state'
            event_kind ?path rule inj)
     | None ->
       let max_distance = match rule.Primitives.unary_rate with
@@ -593,11 +597,12 @@ let apply_unary_rule
       | Some p as path ->
         Success
           ((if state'.store_distances then Some (List.length p) else None),
-           transform_by_a_rule ~get_alg env domain unary_ccs counter state'
+           transform_by_a_rule ~get_alg env unary_ccs counter state'
              event_kind ?path rule inj)
 
 let apply_rule
-    ?rule_id ~get_alg env domain unary_patterns counter state event_kind rule =
+    ?rule_id ~get_alg env unary_patterns counter state event_kind rule =
+  let domain = Environment.domain env in
   let from_patterns () =
     Tools.array_fold_left_mapi
       (fun id inj pattern ->
@@ -609,7 +614,7 @@ let apply_rule
            | Some x -> x in
          (match inj with
           | Some inj -> Connected_component.Matching.reconstruct
-                          state.edges inj id pattern root
+                          domain state.edges inj id pattern root
           | None -> None),root)
       (Some Connected_component.Matching.empty)
       rule.Primitives.connected_components in
@@ -634,7 +639,7 @@ let apply_rule
     | None ->
       let out =
         transform_by_a_rule
-          ~get_alg env domain unary_patterns counter state event_kind rule inj in
+          ~get_alg env unary_patterns counter state event_kind rule inj in
       Success (None,out)
     | Some (_,max_distance) ->
       match max_distance with
@@ -643,37 +648,41 @@ let apply_rule
           Corrected
         else
           Success (None,transform_by_a_rule
-                     ~get_alg env domain unary_patterns counter state
+                     ~get_alg env unary_patterns counter state
                      event_kind rule inj)
       | Some _ ->
         let nodes = Connected_component.Matching.elements_with_types
-            rule.Primitives.connected_components inj in
+            domain rule.Primitives.connected_components inj in
         match
           Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
         | None ->
           Success (None,transform_by_a_rule
-                     ~get_alg env domain unary_patterns counter state
+                     ~get_alg env unary_patterns counter state
                      event_kind rule inj)
         | Some _ -> Corrected
 
 let force_rule
-    ~get_alg env domain unary_patterns counter state event_kind rule =
+    ~get_alg env unary_patterns counter state event_kind rule =
   match apply_rule
-          ~get_alg env domain unary_patterns counter state event_kind rule with
+          ~get_alg env unary_patterns counter state event_kind rule with
   | Success (_,out) -> out
   | Corrected -> state (*TODO*)
   | Clash ->
-    match all_injections ?unary_rate:rule.Primitives.unary_rate state.edges
+    match all_injections
+            ?unary_rate:rule.Primitives.unary_rate
+            (Environment.domain env) state.edges
             state.roots_of_patterns rule.Primitives.connected_components with
     | [] -> state
     | l ->
       let (h,_) = Tools.list_random l in
       (transform_by_a_rule
-         ~get_alg env domain unary_patterns counter state event_kind rule h)
+         ~get_alg env unary_patterns counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
+  let domain = Environment.domain env in
   let matches =
-    all_injections ?unary_rate:rule.Primitives.unary_rate state.edges
+    all_injections
+      ?unary_rate:rule.Primitives.unary_rate domain state.edges
       state.roots_of_patterns rule.Primitives.connected_components in
   let () =
     store_activity
@@ -685,6 +694,7 @@ let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
       Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
 let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
+  let domain = Environment.domain env in
   let pattern1 = rule.Primitives.connected_components.(0) in
   let pattern2 = rule.Primitives.connected_components.(1) in
   let (),(cands,len) =
@@ -698,13 +708,13 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
                 (fun root2 (list,len as out) ->
                    let inj1 =
                      Connected_component.Matching.reconstruct
-                       state.edges Connected_component.Matching.empty 0
+                       domain state.edges Connected_component.Matching.empty 0
                        pattern1 root1 in
                    match inj1 with
                    | None -> out
                    | Some inj ->
                      match Connected_component.Matching.reconstruct
-                             state.edges inj 1 pattern2 root2 with
+                             domain state.edges inj 1 pattern2 root2 with
                      | None -> out
                      | Some inj' ->
                        let max_distance = match rule.Primitives.unary_rate with
@@ -715,7 +725,7 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
                        | Some _ ->
                          let nodes =
                            Connected_component.Matching.elements_with_types
-                             rule.Primitives.connected_components inj' in
+                             domain rule.Primitives.connected_components inj' in
                          match Edges.are_connected ?max_distance
                                  state.edges nodes.(0) nodes.(1) with
                          | None -> out
@@ -737,13 +747,14 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
       else Mods.IntMap.add rule_id cands state.unary_candidates;
   }
 
-let incorporate_extra_pattern state pattern =
+let incorporate_extra_pattern domain state pattern =
   if Connected_component.Map.mem pattern state.roots_of_patterns
   then state
   else {state with
         roots_of_patterns =
           Connected_component.Map.add
-            pattern (Connected_component.Matching.roots_of state.edges pattern)
+            pattern
+            (Connected_component.Matching.roots_of domain state.edges pattern)
             state.roots_of_patterns}
 
 let snapshot env counter fn state = {
@@ -777,8 +788,8 @@ let debug_print f state =
          Format.fprintf f "token_%i <- %a"
            i Nbr.print el))
     state.tokens
-    (print_injections ?sigs:None) state.roots_of_patterns
-    (print_unary_injections ?sigs:None)
+    (print_injections ?domain:None) state.roots_of_patterns
+    (print_unary_injections ?domain:None)
     state.roots_of_unary_patterns
 
 let add_tracked patterns event_kind tests state =
