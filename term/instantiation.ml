@@ -113,8 +113,8 @@ let subst_map_agent_in_concrete_test f x =
 let subst_agent_in_concrete_test id id' x =
   subst_map_agent_in_concrete_test
     (fun j -> if j = id then id' else j) x
-let rename_abstract_test wk id cc inj x =
-  subst_map_agent_in_test (Agent_place.rename wk id cc inj) x
+let rename_abstract_test id inj x =
+  subst_map_agent_in_test (Agent_place.rename id inj) x
 
 let subst_map2_agent_in_action f f' = function
   | Create (agent,list) as x ->
@@ -145,8 +145,8 @@ let subst_map_agent_in_concrete_action f x =
 let subst_agent_in_concrete_action id id' x =
   subst_map_agent_in_concrete_action
     (fun j -> if j = id then id' else j) x
-let rename_abstract_action wk id cc inj x =
-  subst_map_agent_in_action (Agent_place.rename wk id cc inj) x
+let rename_abstract_action id inj x =
+  subst_map_agent_in_action (Agent_place.rename id inj) x
 
 let subst_map_binding_state f = function
   | (ANY | FREE | BOUND | BOUND_TYPE _ as x) -> x
@@ -161,8 +161,8 @@ let subst_map_agent_in_concrete_side_effect f x =
 let subst_agent_in_concrete_side_effect id id' x =
   subst_map_agent_in_concrete_side_effect
     (fun j -> if j = id then id' else j) x
-let rename_abstract_side_effect wk id cc inj x =
-  subst_map_agent_in_side_effect (Agent_place.rename wk id cc inj) x
+let rename_abstract_side_effect id inj x =
+  subst_map_agent_in_side_effect (Agent_place.rename id inj) x
 
 let subst_map_agent_in_event f (tests,(acs,kasa_side,kasim_side)) =
   (Tools.list_smart_map (subst_map_agent_in_test f) tests,
@@ -184,24 +184,19 @@ let subst_map2_agent_in_concrete_event f f' x =
 let subst_agent_in_concrete_event id id' x =
   subst_map_agent_in_concrete_event
     (fun j -> if j = id then id' else j) x
-let rename_abstract_event wk id cc inj x =
-  subst_map_agent_in_event (Agent_place.rename wk id cc inj) x
+let rename_abstract_event id inj x =
+  subst_map_agent_in_event (Agent_place.rename id inj) x
 
-let with_sigs f = function
-  | None -> Format.pp_print_int
-  | Some sigs -> f sigs
-let print_concrete_agent_site ?sigs f ((_,ty as agent),id) =
-  Format.fprintf f "%a.%a" (Agent.print ?sigs) agent
-    (with_sigs (fun s -> Signature.print_site s ty) sigs) id
+let print_concrete_agent_site ?sigs f (agent,id) =
+  Format.fprintf f "%a.%a" (Agent.print ?sigs ~with_id:true) agent
+    (Agent.print_site ?sigs agent) id
 let print_concrete_test ?sigs f = function
   | Is_Here agent ->
-    Format.fprintf f "Is_Here(%a)" (Agent.print ?sigs) agent
-  | Has_Internal (((_,ty),id as site),int) ->
+    Format.fprintf f "Is_Here(%a)" (Agent.print ?sigs ~with_id:true) agent
+  | Has_Internal ((ag,id as site),int) ->
     Format.fprintf f "Has_Internal(%a~%a)"
       (print_concrete_agent_site ?sigs) site
-      (with_sigs
-         (fun s -> Signature.print_internal_state s ty id)
-         sigs) int
+      (Agent.print_internal ?sigs ag id) int
   | Is_Free site ->
     Format.fprintf f "Is_Free(%a)" (print_concrete_agent_site ?sigs) site
   | Is_Bound site ->
@@ -223,7 +218,7 @@ let print_concrete_test ?sigs f = function
 let print_concrete_action ?sigs f = function
   | Create ((_,ty as agent),list) ->
     Format.fprintf
-      f "Create(%a[@[<h>%a@]])" (Agent.print ?sigs) agent
+      f "Create(%a[@[<h>%a@]])" (Agent.print ?sigs ~with_id:true) agent
       (Pp.list Pp.comma
          (fun f (x,y) ->
             match sigs with
@@ -235,11 +230,9 @@ let print_concrete_action ?sigs f = function
               | Some y ->
                 Format.fprintf f "%i.%i" x y))
       list
-  | Mod_internal (((_,ty),id as site),int) ->
+  | Mod_internal ((ag,id as site),int) ->
     Format.fprintf f "Mod(%a~%a)" (print_concrete_agent_site ?sigs) site
-      (with_sigs
-         (fun s -> Signature.print_internal_state s ty id)
-         sigs) int
+      (Agent.print_internal ?sigs ag id) int
   | Bind (site1,site2) ->
     Format.fprintf f "Bind(%a,%a)" (print_concrete_agent_site ?sigs) site1
       (print_concrete_agent_site ?sigs) site2
@@ -249,7 +242,7 @@ let print_concrete_action ?sigs f = function
   | Free site ->
     Format.fprintf f "Free(%a)" (print_concrete_agent_site ?sigs) site
   | Remove agent ->
-    Format.fprintf f "Remove(%a)" (Agent.print ?sigs) agent
+    Format.fprintf f "Remove(%a)" (Agent.print ?sigs ~with_id:true) agent
 let print_concrete_binding_state ?sigs f = function
   | ANY -> Format.pp_print_string f "*"
   | FREE -> ()

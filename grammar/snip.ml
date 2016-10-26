@@ -591,15 +591,15 @@ let connected_components_of_mixture created mix (env,origin) =
         Connected_component.finish_new ?origin wk_out in
       let added' =
         Tools.list_smart_map
-          (Primitives.Transformation.rename wk_out id cc inj) added in
+          (Primitives.Transformation.rename id inj) added in
       let removed' =
         Tools.list_smart_map
-          (Primitives.Transformation.rename wk_out id cc inj) removed in
+          (Primitives.Transformation.rename id inj) removed in
       let event' =
-        Instantiation.rename_abstract_event wk_out id cc inj event in
+        Instantiation.rename_abstract_event id inj event in
       let l_t' = Mods.IntMap.map
           (fun (((p,s),b) as x) ->
-             let p' = Agent_place.rename wk id cc inj p in
+             let p' = Agent_place.rename id inj p in
              if p == p' then x else ((p',s),b)) l_t in
       aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
   in aux env ([],[]) ([],([],[],[]))

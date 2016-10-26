@@ -44,41 +44,6 @@ type work = {
   dangling: int; (* node_id *)
 }
 
-module ContentAgent = struct
-  type t = int * int * int (** (cc_id,type_id,node_id) *)
-
-  let compare (cc,_,n) (cc',_,n') =
-    let c = Mods.int_compare cc cc' in
-    if c = 0 then Mods.int_compare n n' else c
-
-  let rename wk cc inj (n_cc,n_ty,n_id as node) =
-    if wk.cc_id = n_cc then (cc.id,n_ty, Renaming.apply inj n_id)
-    else node
-
-  let get_sort (_,ty,_) = ty
-
-  let print ?sigs ?with_id f (cc,ty,i) =
-    match sigs with
-    | Some sigs ->
-      Format.fprintf f "%a%t" (Signature.print_agent sigs) ty
-        (fun f -> match with_id with
-           | None -> ()
-           | Some () -> Format.fprintf f "/*%i*/" i)
-    | None -> Format.fprintf f "cc%in%i" cc i
-
-  let print_site ?sigs (cc,agent,i) f id =
-    match sigs with
-    | Some sigs ->
-      Signature.print_site sigs agent f id
-    | None -> Format.fprintf f "cc%in%is%i" cc i id
-
-  let print_internal ?sigs (cc,agent,i) site f id =
-    match sigs with
-    | Some sigs ->
-      Signature.print_site_internal_state sigs agent site f (Some id)
-    | None -> Format.fprintf f "cc%in%is%i~%i" cc i site id
-end
-
 let empty_cc sigs =
   let nbt = Array.make (Signature.size sigs) [] in
   {id = 0; nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
@@ -101,8 +66,8 @@ let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
     (Location.dummy_annot
        (Format.asprintf "Site %a of agent %a already specified"
-          (ContentAgent.print_site ?sigs x) i
-          (ContentAgent.print ?sigs ?with_id:None) x))
+          (Agent.print_site ?sigs x) i
+          (Agent.print ?sigs ~with_id:false) x))
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
@@ -278,8 +243,8 @@ let raw_to_navigation (full:bool) nodes_by_type internals links =
 let to_navigation cc =
   raw_to_navigation true cc.nodes_by_type cc.internals cc.links
 
-let print ?sigs ?with_id f cc =
-  let print_intf (_,_,ag_i as ag) link_ids internals neigh =
+let print ?sigs ~with_id f cc =
+  let print_intf (ag_i,_ as ag) link_ids internals neigh =
     snd
       (Tools.array_fold_lefti
          (fun p (not_empty,(free,link_ids as out)) el ->
@@ -287,12 +252,12 @@ let print ?sigs ?with_id f cc =
               if internals.(p) >= 0
               then Format.fprintf
                   f "%t%a" (if not_empty then Pp.comma else Pp.empty)
-                  (ContentAgent.print_internal ?sigs ag p) internals.(p)
+                  (Agent.print_internal ?sigs ag p) internals.(p)
               else
               if  el <> UnSpec then
                 Format.fprintf
                   f "%t%a" (if not_empty then Pp.comma else Pp.empty)
-                  (ContentAgent.print_site ?sigs ag) p in
+                  (Agent.print_site ?sigs ag) p in
             match el with
             | UnSpec ->
               if internals.(p) >= 0
@@ -308,18 +273,16 @@ let print ?sigs ?with_id f cc =
               let () = Format.fprintf f "!%i" i in
               true,out') (false,link_ids) neigh) in
   let () = Format.pp_open_box f 2 in
-  let () = match with_id with
-    | Some () -> Format.fprintf f "/*cc%i*/@ " cc.id
-    | None -> () in
+  let () = if with_id then Format.fprintf f "/*cc%i*/@ " cc.id in
   let (_,_) =
     Mods.IntMap.fold
       (fun x el (not_empty,link_ids) ->
-         let ag_x = (cc.id,find_ty cc x,x) in
+         let ag_x = (x,find_ty cc x) in
          let () =
            Format.fprintf
              f "%t@[<h>%a("
              (if not_empty then Pp.comma else Pp.empty)
-             (ContentAgent.print ?sigs ?with_id) ag_x in
+             (Agent.print ?sigs ~with_id) ag_x in
          let out = print_intf
              ag_x link_ids (Mods.IntMap.find_default [||] x cc.internals) el in
          let () = Format.fprintf f ")@]" in
@@ -330,46 +293,46 @@ let print_dot sigs f cc =
   let pp_one_node x i f = function
     | UnSpec -> ()
     | Free ->
-       let n = (cc.id,find_ty cc x,x) in
+       let n = (x,find_ty cc x) in
        let () = Format.fprintf
-           f "@[%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
-           (ContentAgent.print_site ?sigs:None n) i Pp.bottom in
+           f "@[cc%i%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
+           cc.id (Agent.print_site ?sigs:None n) i Pp.bottom in
        let () =
          Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
        let () = Format.fprintf
-           f "@[<b>%a ->@ %a@ @[[headlabel=\"%a\",@ weight=\"25\""
-           (ContentAgent.print_site ?sigs:None n) i
-           (ContentAgent.print ?sigs:None ?with_id:None) n
-           (ContentAgent.print_site ~sigs n) i in
+           f "@[<b>cc%i%a ->@ cc%i%a@ @[[headlabel=\"%a\",@ weight=\"25\""
+           cc.id (Agent.print_site ?sigs:None n) i
+           cc.id (Agent.print ?sigs:None ~with_id:false) n
+           (Agent.print_site ~sigs n) i in
        Format.fprintf f",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@,"
     | Link (y,j) ->
-      let n = (cc.id,find_ty cc x,x) in
-      let n' = (cc.id,find_ty cc y,y) in
+      let n = (x,find_ty cc x) in
+      let n' = (y,find_ty cc y) in
       if x<y || (x=y && i<j) then
         let () = Format.fprintf
             f
-            "@[<b>%a ->@ %a@ @[[taillabel=\"%a\",@ headlabel=\"%a\""
-            (ContentAgent.print ?sigs:None ?with_id:None) n
-            (ContentAgent.print ?sigs:None ?with_id:None) n'
-            (ContentAgent.print_site ~sigs n) i
-            (ContentAgent.print_site ~sigs n') j in
+            "@[<b>cc%i%a ->@ cc%i%a@ @[[taillabel=\"%a\",@ headlabel=\"%a\""
+            cc.id (Agent.print ?sigs:None ~with_id:false) n
+            cc.id (Agent.print ?sigs:None ~with_id:false) n'
+            (Agent.print_site ~sigs n) i
+            (Agent.print_site ~sigs n') j in
         Format.fprintf
           f ",@ arrowhead=\"odot\",@ arrowtail=\"odot\",@ dir=\"both\"]@];@]@,"
   in
   let pp_one_internal x i f k =
-    let n = (cc.id,find_ty cc x,x) in
+    let n = (x,find_ty cc x) in
     if k >= 0 then
       let () = Format.fprintf
-          f "@[%ai@ [label=\"%a\",@ height=\".1\",@ width=\".1\""
-          (ContentAgent.print_site ?sigs:None n) i
-          (ContentAgent.print_internal ~sigs n i) k in
+          f "@[cc%i%ai@ [label=\"%a\",@ height=\".1\",@ width=\".1\""
+          cc.id (Agent.print_site ?sigs:None n) i
+          (Agent.print_internal ~sigs n i) k in
       let () =
         Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
       let () = Format.fprintf
-          f "@[<b>%ai ->@ %a@ @[[headlabel=\"%a\",@ weight=25"
-          (ContentAgent.print_site ?sigs:None n) i
-          (ContentAgent.print ?sigs:None ?with_id:None) n
-          (ContentAgent.print_site ~sigs n) i in
+          f "@[<b>cc%i%ai ->@ cc%i%a@ @[[headlabel=\"%a\",@ weight=25"
+          cc.id (Agent.print_site ?sigs:None n) i
+          cc.id (Agent.print ?sigs:None ~with_id:false) n
+          (Agent.print_site ~sigs n) i in
       Format.fprintf f ",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@," in
   let pp_slot pp_el f (x,a) =
     Pp.array (fun _ -> ()) (pp_el x) f a in
@@ -379,11 +342,11 @@ let print_dot sigs f cc =
              (fun _ -> Pp.list
                  (fun f -> Format.pp_print_cut f ())
                  (fun f x ->
-                    let n = (cc.id,find_ty cc x,x) in
+                    let n = (x,find_ty cc x) in
                     Format.fprintf
-                      f "@[%a [label=\"%a\"]@];@,"
-                      (ContentAgent.print ?sigs:None ?with_id:None) n
-                      (ContentAgent.print ~sigs ~with_id:()) n)))
+                      f "@[cc%i%a [label=\"%a\"]@];@,"
+                      cc.id (Agent.print ?sigs:None ~with_id:false) n
+                      (Agent.print ~sigs ~with_id:true) n)))
     cc.nodes_by_type
     (Pp.set ~trailing:(fun f -> Format.pp_print_cut f ())
        Mods.IntMap.bindings (fun f -> Format.pp_print_cut f ())
@@ -404,7 +367,7 @@ let print_point_dot sigs f (id,point) =
   let style =
     match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-    point.content.id (print ~sigs  ?with_id:None) point.content
+    point.content.id (print ~sigs ~with_id:false) point.content
     style (print_sons_dot sigs id point.content) point.sons
 
 let add_fully_specified_to_graph sigs graph cc =
@@ -466,7 +429,7 @@ end = struct
       Format.fprintf
         f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
         (Pp.list Pp.space Format.pp_print_int) p.fathers
-        (print ~sigs:env.sig_decl ~with_id:()) p.content
+        (print ~sigs:env.sig_decl ~with_id:true) p.content
         (fun f ->
            match p.is_obs_of with
            | None -> ()
@@ -493,7 +456,7 @@ end = struct
       (Pp.set Mods.IntMap.bindings Pp.space ~trailing:Pp.space
          (fun f (_,(cc,deps)) ->
             Format.fprintf
-              f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:()) cc
+              f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:true) cc
               (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
               deps))
       env.single_agent_points
@@ -840,13 +803,6 @@ let add_domain ~deps (free_id,singles,env) cc =
 let check_dangling wk =
   if wk.dangling <> 0 then
     raise (dangling_node ~sigs:wk.sigs wk.used_id wk.dangling)
-let check_node_adequacy ~pos wk cc_id =
-  if wk.cc_id <> cc_id then
-    raise (
-      ExceptionDefn.Malformed_Decl
-        (Format.asprintf
-           "A node from a different connected component has been used."
-        ,pos))
 
 module PreEnv : sig
   type t
@@ -1088,10 +1044,7 @@ let finish_new ?origin wk =
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id
     (Mods.IntMap.add w env_w wk.cc_env),r,out
 
-let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
-  let pos = Location.dummy in
-  let () = check_node_adequacy ~pos wk cc1 in
-  let () = check_node_adequacy ~pos wk cc2 in
+let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_links in
   let y_n = Mods.IntMap.find_default [||] y wk.cc_links in
   if x_n.(i) <> UnSpec then
@@ -1105,8 +1058,7 @@ let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
     then { wk with dangling = 0 }
     else wk
 
-let new_free wk ((cc,_,x as n),i) =
-  let () = check_node_adequacy ~pos:Location.dummy wk cc in
+let new_free wk ((x,_ as n),i) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_links in
   if x_n.(i) <> UnSpec then
     raise (already_specified ~sigs:wk.sigs n i)
@@ -1114,8 +1066,7 @@ let new_free wk ((cc,_,x as n),i) =
     let () = x_n.(i) <- Free in
     wk
 
-let new_internal_state wk ((cc,_,x as n), i) va =
-  let () = check_node_adequacy ~pos:Location.dummy wk cc in
+let new_internal_state wk ((x,_ as n), i) va =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_internals in
   if x_n.(i) >= 0 then
     raise (already_specified ~sigs:wk.sigs n i)
@@ -1130,7 +1081,7 @@ let new_node wk type_id =
   | h::t ->
     let () = wk.used_id.(type_id) <- h :: wk.used_id.(type_id) in
     let () = wk.reserved_id.(type_id) <- t in
-    let node = (wk.cc_id,type_id,h) in
+    let node = (h,type_id) in
     (node,
      { wk with
        dangling = if Mods.IntMap.is_empty wk.cc_links then 0 else h;
@@ -1139,7 +1090,7 @@ let new_node wk type_id =
      })
   | [] ->
     let () = wk.used_id.(type_id) <- wk.free_id :: wk.used_id.(type_id) in
-    let node = (wk.cc_id, type_id, wk.free_id) in
+    let node = (wk.free_id, type_id) in
     (node,
      { wk with
        free_id = succ wk.free_id;
@@ -1149,12 +1100,6 @@ let new_node wk type_id =
        cc_internals =
          Mods.IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
      })
-
-module NodeSetMap = SetMap.Make(struct type t = ContentAgent.t
-    let compare = ContentAgent.compare
-    let print = ContentAgent.print ?sigs:None ~with_id:()
-  end)
-module NodeMap = NodeSetMap.Map
 
 module Matching = struct
   type t = Renaming.t Mods.IntMap.t * Mods.IntSet.t
@@ -1224,7 +1169,7 @@ module Matching = struct
     Edges.all_agents_where (fun x -> is_root_of graph x cc) graph
 
   (* get : (ContentAgent.t * int) -> t -> int *)
-  let get ((_,_,node),id) (t,_) =
+  let get ((node,_),id) (t,_) =
     Renaming.apply (Mods.IntMap.find_default Renaming.empty id t) node
 
   let elements_with_types ccs (t,_) =
@@ -1330,7 +1275,7 @@ let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 module ForState = struct
   type t = cc
   let compare = compare_canonicals
-  let print = print ?sigs:None ~with_id:()
+  let print = print ?sigs:None ~with_id:true
 end
 
 module SetMap = SetMap.Make(ForState)

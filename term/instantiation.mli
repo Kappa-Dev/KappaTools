@@ -40,16 +40,13 @@ type 'a event =
     ('a action list * ('a site * 'a binding_state) list * 'a site list)
 
 val rename_abstract_test :
-  Connected_component.work -> int ->
-  Connected_component.cc -> Renaming.t -> abstract test -> abstract test
+  int -> Renaming.t -> abstract test -> abstract test
 val rename_abstract_action :
-  Connected_component.work -> int ->
-  Connected_component.cc -> Renaming.t -> abstract action -> abstract action
+  int -> Renaming.t -> abstract action -> abstract action
 val rename_abstract_event :
-  Connected_component.work -> int ->
-  Connected_component.cc -> Renaming.t -> abstract event -> abstract event
+  int -> Renaming.t -> abstract event -> abstract event
 val rename_abstract_side_effect:
-  Connected_component.work -> int -> Connected_component.cc -> Renaming.t ->
+  int -> Renaming.t ->
   (Agent_place.t * 'a) * Agent_place.t binding_state ->
   (Agent_place.t * 'a) * Agent_place.t binding_state
 val concretize_test :

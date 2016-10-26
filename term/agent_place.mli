@@ -1,12 +1,10 @@
 (** An agent in a connected component *)
 
 type t =
-  Existing of Connected_component.ContentAgent.t * int (* node, id *)
+  | Existing of Agent.t * int (* node, id *)
   | Fresh of int * int (* type, id *)
 
-val rename :
-  Connected_component.work -> int -> Connected_component.cc ->
-  Renaming.t -> t -> t
+val rename : int -> Renaming.t -> t -> t
 
 val concretize :
   (Connected_component.Matching.t * int Mods.IntMap.t) -> t -> int * int

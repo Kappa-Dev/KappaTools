@@ -60,7 +60,7 @@ let do_we_prompt_reactions compil =
   compil.show_reactions
 
 let print_chemical_species ?compil =
-  Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
+  Connected_component.print ?sigs:(sigs_opt compil) ~with_id:false
 
 let print_canonic_species = print_chemical_species
 
@@ -81,7 +81,7 @@ let nbr_automorphisms_in_pattern a =
 
 let compare_connected_component = Connected_component.compare_canonicals
 let print_connected_component ?compil =
-  Connected_component.print ?sigs:(sigs_opt compil) ?with_id:None
+  Connected_component.print ?sigs:(sigs_opt compil) ~with_id:false
 
 let canonic_form x = x
 

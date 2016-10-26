@@ -473,22 +473,19 @@ let debug_print f graph =
 type path = ((Agent.t * int) * (Agent.t * int)) list
 (** ((agent_id, agent_name),site_name) *)
 
-let aux_print_site ?sigs ty f i =
-  match sigs with
-  | None -> Format.pp_print_int f i
-  | Some sigs -> Signature.print_site sigs ty f i
 let rec print_path ?sigs f = function
   | [] -> Pp.empty_set f
-  | [((_,ty as ag),s),((_,ty' as ag'),s')] ->
+  | [(ag,s),(ag',s')] ->
     Format.fprintf f "%a.%a@,-%a.%a"
-      (Agent.print ?sigs) ag (aux_print_site ?sigs ty) s
-      (aux_print_site ?sigs ty') s' (Agent.print ?sigs) ag'
-  | (((_,ty as ag),s),((p',ty' as ag'),s'))::((((p'',_),_),_)::_ as l) ->
+      (Agent.print ?sigs ~with_id:true) ag (Agent.print_site ?sigs ag) s
+      (Agent.print_site ?sigs ag') s' (Agent.print ?sigs ~with_id:true) ag'
+  | ((ag,s),((p',_ as ag'),s'))::((((p'',_),_),_)::_ as l) ->
     Format.fprintf f "%a.%a@,-%a.%t%a"
-      (Agent.print ?sigs) ag (aux_print_site ?sigs ty) s
-      (aux_print_site ?sigs ty') s'
+      (Agent.print ?sigs ~with_id:true) ag (Agent.print_site ?sigs ag) s
+      (Agent.print_site ?sigs ag') s'
       (fun f ->
-         if p' <> p'' then Format.fprintf f "%a##" (Agent.print ?sigs) ag')
+         if p' <> p'' then
+           Format.fprintf f "%a##" (Agent.print ?sigs ~with_id:true) ag')
       (print_path ?sigs) l
 
 let empty_path = []

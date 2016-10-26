@@ -10,25 +10,25 @@ module Transformation = struct
         'a * Instantiation.site_name * Instantiation.internal_state
     | NegativeInternalized of 'a Instantiation.site
 
-  let rename wk id cc inj = function
+  let rename id inj = function
     | Freed (p,s) as x ->
-      let p' = Agent_place.rename wk id cc inj p in
+      let p' = Agent_place.rename id inj p in
       if p == p' then x else Freed (p',s)
     | NegativeWhatEver (p,s) as x ->
-      let p' = Agent_place.rename wk id cc inj p in
+      let p' = Agent_place.rename id inj p in
       if p == p' then x else NegativeWhatEver (p',s)
     | Linked ((p1,s1),(p2,s2)) as x ->
-      let p1' = Agent_place.rename wk id cc inj p1 in
-      let p2' = Agent_place.rename wk id cc inj p2 in
+      let p1' = Agent_place.rename id inj p1 in
+      let p2' = Agent_place.rename id inj p2 in
       if p1 == p1' && p2 == p2' then x else Linked ((p1',s1),(p2',s2))
     | PositiveInternalized (p,s,i) as x ->
-      let p' = Agent_place.rename wk id cc inj p in
+      let p' = Agent_place.rename id inj p in
       if p == p' then x else PositiveInternalized (p',s,i)
     | NegativeInternalized (p,s) as x ->
-      let p' = Agent_place.rename wk id cc inj p in
+      let p' = Agent_place.rename id inj p in
       if p == p' then x else NegativeInternalized (p',s)
     | Agent p as x ->
-      let p' = Agent_place.rename wk id cc inj p in
+      let p' = Agent_place.rename id inj p in
       if p == p' then x else Agent p'
 
   let concretize inj2graph = function

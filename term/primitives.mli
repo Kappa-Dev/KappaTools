@@ -15,8 +15,7 @@ sig
     | NegativeInternalized of 'a Instantiation.site
 
   val rename :
-    Connected_component.work -> int -> Connected_component.cc ->
-    Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t
+    int -> Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t
 
   val concretize :
     Connected_component.Matching.t * int Mods.IntMap.t ->

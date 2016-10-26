@@ -5,21 +5,6 @@ type t = cc (**type for domain points*)
 
 type work (**type for partial domain*)
 
-module ContentAgent : sig
-    type t
-
-    val get_sort : t -> int
-
-    val print :
-      ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
-    val print_site :
-      ?sigs:Signature.s -> t -> Format.formatter -> int -> unit
-    val print_internal :
-      ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
-
-    val rename : work -> cc -> Renaming.t -> t -> t
-  end
-
 module Env : sig
     type t
 
@@ -43,15 +28,15 @@ val empty_cc : Signature.s -> cc
 val begin_new : PreEnv.t -> work
 (** Starts creation *)
 
-val new_node : work -> int -> (ContentAgent.t*work)
+val new_node : work -> int -> (Agent.t*work)
 (** [new_node wk node_type] *)
 
 val new_link :
-  work -> (ContentAgent.t * int) -> (ContentAgent.t * int) -> work
+  work -> (Agent.t * int) -> (Agent.t * int) -> work
 (** [new_link wk (node, site_id) (node', site_id')] *)
 
-val new_free : work -> (ContentAgent.t * int) -> work
-val new_internal_state : work -> (ContentAgent.t * int) -> int -> work
+val new_free : work -> (Agent.t * int) -> work
+val new_internal_state : work -> (Agent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 
 val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*t)
@@ -60,7 +45,7 @@ val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*t)
 
 val compare_canonicals : t -> t -> int
 val is_equal_canonicals : t -> t -> bool
-val print : ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
+val print : ?sigs:Signature.s -> with_id:bool -> Format.formatter -> t -> unit
 (** [print ~sigs ?with_id:None form cc] *)
 
 val print_dot : Signature.s -> Format.formatter -> t -> unit
@@ -73,7 +58,7 @@ module Matching : sig
   type t
   val empty : t
   val debug_print : Format.formatter -> t -> unit
-  val get : (ContentAgent.t * int) -> t -> int
+  val get : (Agent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
   (** [reconstruct graph matching_of_previous_cc cc_id_in_rule cc root ]*)
 
