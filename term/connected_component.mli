@@ -53,11 +53,9 @@ val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*id)
 val compare_canonicals : id -> id -> int
 val is_equal_canonicals : id -> id -> bool
 val print_cc :
-  ?sigs:Signature.s -> with_id:bool -> Format.formatter -> t -> unit
+  ?sigs:Signature.s -> ?cc_id:id -> Format.formatter -> t -> unit
 val print : ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
-
-val print_dot : Signature.s -> Format.formatter -> t -> unit
 
 val find_root_type : t -> int option
 

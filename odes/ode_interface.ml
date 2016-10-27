@@ -63,7 +63,7 @@ let do_we_prompt_reactions compil =
 let print_chemical_species ?compil =
   Connected_component.print_cc
     ?sigs:(Tools.option_map Environment.signatures (environment_opt compil))
-    ~with_id:false
+    ?cc_id:None
 
 let print_canonic_species = print_chemical_species
 
