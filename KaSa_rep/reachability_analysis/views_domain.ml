@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 21 2016>
+   * Last modification: Time-stamp: <Oct 25 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -2731,15 +2731,12 @@ struct
                         Preprocess.declare_site parameters error ag_type site_type contact_map
                       in
                       let error, site = Handler.translate_site parameters error kappa_handler ag_type site_type in
-                      match
-                        site
-                      with
+                      match site with
                       | Ckappa_sig.Internal _ ->
                         let error, contact_map =
                           List.fold_left
                             (fun (error, contact_map) l ->
-                               match l
-                               with
+                               match l with
                                | [site_type',state]
                                  when site_type' = site_type ->
                                  Preprocess.add_internal_state_in_contact_map
@@ -2756,8 +2753,7 @@ struct
                         let error, contact_map =
                           List.fold_left
                             (fun (error, contact_map) l ->
-                               match l
-                               with
+                               match l with
                                | [site_type',state]
                                  when site_type' = site_type ->
                                  if state = Ckappa_sig.state_index_of_int 0
@@ -2768,9 +2764,7 @@ struct
                                      let error, dual =
                                        Handler.dual parameters error kappa_handler ag_type site_type state
                                      in
-                                     match
-                                       dual
-                                     with
+                                     match dual with
                                      | None ->
                                        Exception.warn
                                          parameters error __POS__ Exit contact_map
@@ -2833,7 +2827,7 @@ struct
         error)
       result error
 
-  (************************************************************************************)
+  (**************************************************************************)
 
   let smash_map decomposition
       ~show_dep_with_dimmension_higher_than:_dim_min
@@ -2986,7 +2980,7 @@ struct
                Exception.check_point
                  Exception.warn  parameters error error' __POS__ Exit
              in
-             (*-----------------------------------------------------------------------*)
+             (*-----------------------------------------------------------*)
              Wrapped_modules.LoggedIntMap.fold
                (fun _ mvbdu (error,(handler,list))
                  ->
@@ -3178,7 +3172,8 @@ struct
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:
-        (if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a
+        (if
+          Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a
          then 2
          else 1
         )
@@ -3188,7 +3183,8 @@ struct
   (*****************************************************************)
 
   let print_result_fixpoint_aux
-      parameters handler error handler_kappa site_correspondence result (_static:static_information) =
+      parameters handler error handler_kappa site_correspondence result
+      (_static:static_information) =
     let log = Remanent_parameters.get_logger parameters in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters
     then
@@ -3201,17 +3197,19 @@ struct
             let () = Loggers.print_newline
                 (Remanent_parameters.get_logger parameters) in
             let () =
-              Loggers.fprintf (Remanent_parameters.get_logger parameters)
+              Loggers.fprintf log
                 "------------------------------------------------------------" in
-            let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-            let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+            let () = Loggers.print_newline log in
+            let () = Loggers.fprintf log
                 "* Fixpoint iteration :"
             in
-            let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-            let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+            let () = Loggers.print_newline log in
+            let () = Loggers.fprintf log
                 "------------------------------------------------------------"
             in
-            let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+            let () =
+              Loggers.print_newline log
+            in
             let error =
               print_bdu_update_map
                 parameters
@@ -3223,19 +3221,17 @@ struct
           end
         else error
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+      let () = Loggers.print_newline log in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        Loggers.fprintf log
           "------------------------------------------------------------" in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "* Relational properties:"
-      in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log "* Relational properties:" in
+      let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log
           "------------------------------------------------------------"
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+      let () = Loggers.print_newline log in
       let error, handler =
         print_bdu_update_map_cartesian_decomposition
           parameters
@@ -3245,21 +3241,17 @@ struct
           site_correspondence
           result
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+      let () = Loggers.print_newline log in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        Loggers.fprintf log
           "------------------------------------------------------------" in
-      let () =
-        Loggers.print_newline (Remanent_parameters.get_logger parameters)
-      in
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "* Non relational properties:"
-      in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log "* Non relational properties:" in
+      let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log
           "------------------------------------------------------------"
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+      let () = Loggers.print_newline log in
       let error, handler =
         print_bdu_update_map_cartesian_abstraction
           parameters
@@ -3272,12 +3264,13 @@ struct
       error, handler
     else error, handler
 
-  (************************************************************************************)
+  (************************************************************************)
 
   let print_fixpoint_result static dynamic error _loggers =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
+    let error, store_remanent_triple =
+      get_store_remanent_triple static dynamic error in
     let fixpoint_result = get_fixpoint_result dynamic in
     let handler = get_mvbdu_handler dynamic in
     let error, handler =
@@ -3323,7 +3316,8 @@ struct
         let handler_kappa = get_kappa_handler static in
         let handler = get_mvbdu_handler dynamic in
         let compil = get_compil static in
-        let error, site_correspondence =  get_store_remanent_triple static dynamic error in
+        let error, site_correspondence =
+          get_store_remanent_triple static dynamic error in
         let error, handler, output = smash_map
             (fun _parameters handler error a -> error, handler, [a])
             parameters handler error
@@ -3350,7 +3344,8 @@ struct
     let handler = get_mvbdu_handler dynamic in
     let handler_kappa = get_kappa_handler static in
     let result = get_fixpoint_result dynamic in
-    let error, site_correspondence =  get_store_remanent_triple static dynamic error in
+    let error, site_correspondence =
+      get_store_remanent_triple static dynamic error in
     let error, handler, ranges =
       smash_map
         Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Oct 25 2016>
    *
    * Abstract domain to record live rules
    *
@@ -59,7 +59,9 @@ struct
   (** global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+  let set_global_dynamic_information gdynamic dynamic =
+    {dynamic with global = gdynamic}
+
   (** dead rule local dynamic information*)
   let get_dead_rule dynamic = dynamic.local
 

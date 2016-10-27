@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Oct 25 2016>
    *
    * Abstract domain to record live rules
    *
@@ -74,7 +74,9 @@ struct
     }
 
   let get_global_dynamic_information dynamic = dynamic.global
-  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
+  let set_global_dynamic_information gdynamic dynamic =
+    {dynamic with global = gdynamic}
 
   let get_contact_map_dynamic dynamic =
     (get_local_dynamic_information dynamic).contact_map_dynamic
@@ -450,7 +452,8 @@ struct
                 in
                 let error, state1_string =
                   try
-                    Handler.string_of_state_fully_deciphered parameters error kappa_handler
+                    Handler.string_of_state_fully_deciphered parameters error
+                      kappa_handler
                       agent_type1 site_type1 state1
                   with
                     _ ->
@@ -459,7 +462,8 @@ struct
                       (Ckappa_sig.string_of_state_index state1)
                 in
                 let error, agent_type2_string =
-                  try Handler.string_of_agent parameters error kappa_handler agent_type2
+                  try Handler.string_of_agent parameters error kappa_handler
+                        agent_type2
                   with
                     _ ->
                     Exception.warn
@@ -468,7 +472,8 @@ struct
                 in
                 let error, site_type2_string =
                   try
-                    Handler.string_of_site parameters error kappa_handler agent_type2 site_type2
+                    Handler.string_of_site parameters error kappa_handler
+                      agent_type2 site_type2
                   with
                     _ ->
                     Exception.warn
@@ -477,7 +482,8 @@ struct
                 in
                 let error, state2_string =
                   try
-                    Handler.string_of_state_fully_deciphered parameters error kappa_handler
+                    Handler.string_of_state_fully_deciphered parameters error
+                      kappa_handler
                       agent_type2 site_type2 state2
                   with
                     _ -> Exception.warn

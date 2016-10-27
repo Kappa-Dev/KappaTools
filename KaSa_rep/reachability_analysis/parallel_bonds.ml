@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 25 2016>
+  * Last modification: Time-stamp: <Oct 27 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1130,10 +1130,10 @@ struct
         in error
       else
         error
-    in
+
     (***************************************************************)
     (*print a map tuple to sites*)
-    let error =
+    (*let error =
       if Remanent_parameters.get_dump_reachability_analysis_result
           parameters
       then
@@ -1193,10 +1193,10 @@ struct
         in
         error
       else error
-    in
+    in*)
     (***************************************************************)
     (*print a map tuple to sites*)
-    let error =
+    (*let error =
       if Remanent_parameters.get_dump_reachability_analysis_result
           parameters
       then
@@ -1237,31 +1237,45 @@ struct
           ) store_result error
       in
       error
-      else error
+      else error*)
     in
     error, dynamic, ()
 
 (****************************************************************)
 (*export the information of parallel  bond to state*)
 
-  let collect_the_head_of_constraint_list error string_version
-      (s, current_list) =
-    let error, (agent_string, current_list) =
+  let collect_hyp_of_constraint_list error hyp =
+    Ckappa_sig.Agent_id_map_and_set.Map.fold
+      (fun _ (agent_string, site_map) (error, current_list) ->
+         let hyp = (agent_string, site_map) :: current_list in
+         error, hyp
+      ) hyp (error, [])
+
+  let collect_refinement_of_constraint_list error list =
+    List.fold_left (fun (error, current_list) hyp ->
+        (*translate t -> string_version*)
+        let string_version =
+          Ckappa_backend.Ckappa_backend.get_string_version
+            hyp
+        in
+        let error, hyp =
+          collect_hyp_of_constraint_list error string_version
+        in
+        error, hyp :: current_list
+      ) (error, []) list
+
+  let collect_the_head_of_constraint_list error string_version list
+      current_list =
+    let error, current_list =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ (agent_string, site_map)
-          (error, (s, current_list)) ->
+        (fun _ (agent_string, site_map) (error, current_list) ->
           (*-----------------------------------------*)
-          let error, (hyp, refinement) =
-            Wrapped_modules.LoggedStringMap.fold
-              (fun site_string (internal_opt, binding_opt)
-                (error, current_list) ->
-                let current_list1, current_list2 = current_list in
-                let hyp =
-                  (site_string, site_map) :: current_list1
-                in
-                let refinement = hyp :: current_list2 in
-                error, (hyp, refinement)
-              ) site_map (error, ([], []))
+          let error, hyp =
+            collect_hyp_of_constraint_list error string_version
+          in
+          (*refinement*)
+          let error, refinement =
+            collect_refinement_of_constraint_list error list
           in
           (*-----------------------------------------*)
           let lemma =
@@ -1271,63 +1285,43 @@ struct
             }
           in
           let lemma_list = lemma :: current_list in
-          error, (agent_string, lemma_list)
-        ) string_version (error, (s, current_list))
-    in
-    (*TODO? print_list?*)
-    error, (agent_string, current_list)
-
-  let collect_the_head_of_internal_constraint_list parameters error
-      t current_list =
-    let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
-    let error, current_list =
-      Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun agent_id (agent_string, site_map) (error, current_list) ->
-          (*-----------------------------------------*)
-          let error, (hyp, refinement) =
-            Wrapped_modules.LoggedStringMap.fold
-              (fun site_string (internal_opt, binding_opt)
-                (error, store_result) ->
-                let store_map, current_list = store_result in
-                let error, hyp = (*type t.string_version*)
-                  Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
-                    parameters error
-                    agent_id
-                    (site_string, site_map)
-                    store_map
-                in
-                let t =
-                   Ckappa_backend.Ckappa_backend.set_string_version hyp t in
-                let refinement = t :: current_list in
-                error, (hyp, refinement)
-              )
-              site_map
-              (error,
-               (Ckappa_sig.Agent_id_map_and_set.Map.empty, []))
-          in
-          let t = Ckappa_backend.Ckappa_backend.set_string_version hyp t in
-          (*-----------------------------------------*)
-          let lemma =
-            {
-              Remanent_state.hyp = t;
-              Remanent_state.refinement = refinement;
-            }
-          in
-          let lemma_list = lemma :: current_list in
           error, lemma_list
         ) string_version (error, current_list)
     in
-    (*TODO? print_list?*)
+    error, current_list
+
+  let collect_the_head_of_internal_constraint_list parameters error
+      t list current_list =
+    let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
+    let error, current_list =
+      Ckappa_sig.Agent_id_map_and_set.Map.fold
+        (fun _ (agent_string, site_map) (error, current_list) ->
+           (*return type t.string_version*)
+           let hyp = t in
+           let error, refinement =
+             List.fold_left (fun (error, current_list) hyp ->
+                 error, hyp :: current_list
+               ) (error, []) list
+           in
+           let lemma =
+             {Remanent_state.hyp = hyp;
+              Remanent_state.refinement = refinement}
+           in
+           let lemma_list = lemma :: current_list in
+           error, lemma_list
+        ) string_version (error, current_list)
+    in
     error, current_list
 
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let store_value = get_value dynamic in
+    let domain_name = "Parallel bonds" in
     (*string * 'site_graph lemma list : head*)
-    let error, (agent_string, current_list, current_list2) =
+    let error, (current_list, current_list2) =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.fold
-        (fun tuple value (error, (s, current_list, current_list2)) ->
+        (fun tuple value (error, (current_list, current_list2)) ->
            let (agent, site, site', _, _),
                (agent'', site'', site''', _, _) = tuple
            in
@@ -1469,13 +1463,13 @@ struct
            in
            (*--------------------------------------------------------*)
            if compare site site' > 0
-           then error, (s, current_list, current_list2) (*FIXME*)
+           then error, (current_list, current_list2) (*FIXME*)
            else
              (*--------------------------------------------------*)
              match value with
              | Usual_domains.Undefined ->
                error,
-               (s, current_list, current_list2)
+               (current_list, current_list2)
              | Usual_domains.Val true ->
                begin
                  match Remanent_parameters.get_backend_mode parameters with
@@ -1487,38 +1481,45 @@ struct
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_precondition
                      in
-                     (*the head*)
-                     let error, (agent_string, current_list) =
+                     (*the head:hyp*)
+                     let error, current_list =
                        collect_the_head_of_constraint_list
-                         error string_version (s, current_list)
+                         error
+                         string_version
+                         list_same
+                         current_list
                      in
                      (*internal constraint list*)
                      let error, current_list2 =
                        collect_the_head_of_internal_constraint_list
                          parameters error
                          t_precondition
+                         list_same
                          current_list2
                      in
-                     error, (agent_string, current_list, current_list2)
+                     error, (current_list, current_list2)
                    end
                  | Remanent_parameters_sig.Natural_language ->
                    let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_same
                    in
-                   let error, (agent_string, current_list) =
+                   (*hyp*)
+                   let error, current_list =
                      collect_the_head_of_constraint_list error
                        string_version
-                       (s, current_list)
+                       []
+                       current_list
                    in
                    (*internal constraint list*)
                    let error, current_list2 =
                      collect_the_head_of_internal_constraint_list
                        parameters error
                        t_same
+                       []
                        current_list2
                    in
-                   error, (agent_string, current_list, current_list2)
+                   error, (current_list, current_list2)
                end
              | Usual_domains.Val false ->
                begin
@@ -1529,55 +1530,66 @@ struct
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_precondition
                    in
-                   let error, (agent_string, current_list) =
+                   let error, current_list =
                      collect_the_head_of_constraint_list
-                       error string_version (s, current_list)
+                       error
+                       string_version
+                       list_distinct
+                       current_list
                    in
                    (*internal constraint list*)
                    let error, current_list2 =
                      collect_the_head_of_internal_constraint_list
                        parameters error
                        t_precondition
+                       list_distinct
                        current_list2
                    in
-                   error, (agent_string, current_list, current_list2)
+                   error, (current_list, current_list2)
                  | Remanent_parameters_sig.Natural_language ->
                    let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_distinct
                    in
-                   let error, (agent_string, current_list) =
+                   let error, current_list =
                      collect_the_head_of_constraint_list
                        error
-                       string_version (s, current_list)
+                       string_version
+                       []
+                       current_list
                    in
                    (*internal constraint list*)
                    let error, current_list2 =
                      collect_the_head_of_internal_constraint_list
                        parameters error
-                      t_distinct
+                       t_distinct
+                       []
                        current_list2
                    in
-                   error, (agent_string, current_list, current_list2)
+                   error, (current_list, current_list2)
                end
              | Usual_domains.Any ->
                match Remanent_parameters.get_backend_mode parameters with
                | Remanent_parameters_sig.Kappa
                | Remanent_parameters_sig.Raw ->
-                 error, (s, current_list, current_list2)
+                 error, (current_list, current_list2)
                | Remanent_parameters_sig.Natural_language ->
                  let string_version =
                    Ckappa_backend.Ckappa_backend.get_string_version
                      t_same
                  in
-                 let error, (agent_string, current_list) =
+                 let error, current_list =
                    collect_the_head_of_constraint_list
-                     error string_version (s, current_list)
+                     error
+                     string_version
+                     [] (*TODO*)
+                     current_list
                  in
                  let error, current_list2 =
                    collect_the_head_of_internal_constraint_list
                      parameters error
                      t_same
+                     []
                      current_list2
                  in
                  (*----------------------------------------------*)
@@ -1585,31 +1597,36 @@ struct
                    Ckappa_backend.Ckappa_backend.get_string_version
                      t_distinct
                  in (*FIXME*)
-                 let error, (agent_string, current_list) =
+                 let error, current_list =
                    collect_the_head_of_constraint_list
-                     error string_version (agent_string, current_list)
+                     error
+                     string_version
+                     [] (*TODO*)
+                     current_list
                  in
                  (*internal constraint list*)
                  let error, current_list2 =
                    collect_the_head_of_internal_constraint_list
                      parameters error
                      t_distinct
+                     []
                      current_list2
                  in
-                 error, (agent_string, current_list, current_list2)
-        ) store_value (error, ("", [], []))
+                 error, (current_list, current_list2)
+        ) store_value (error, ([], [])) (*name of domain*)
     in
     (*------------------------------------------------------------------*)
     let constraint_list = Remanent_state.get_constraint_list kasa_state in
-    let pair_list = (agent_string, current_list) :: constraint_list in
+    let pair_list = (domain_name, current_list) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraint_list pair_list kasa_state
     in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
     let internal_constraint_list =
-      Remanent_state.get_internal_constraint_list kasa_state in
-    let pair_list = (agent_string, current_list2) :: internal_constraint_list in
+      Remanent_state.get_internal_constraint_list kasa_state
+    in
+    let pair_list = (domain_name, current_list2) :: internal_constraint_list in
     let kasa_state =
       Remanent_state.set_internal_constraint_list pair_list kasa_state in
     error, dynamic, kasa_state

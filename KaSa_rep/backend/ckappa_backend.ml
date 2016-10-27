@@ -537,39 +537,46 @@ struct
        Wrapped_modules.LoggedStringMap.t)
      list) *)
 
+  let print_aux logger parameter error kappa_handler
+      agent_string site_map bool =
+    let () =
+      if bool then
+        Loggers.fprintf logger ","
+    in
+    let () = Loggers.fprintf logger "%s(" agent_string in
+    let bool =
+      Wrapped_modules.LoggedStringMap.fold
+        (fun site_string (internal,binding) bool ->
+           let () =
+             if bool then Loggers.fprintf logger ","
+           in
+           let () = Loggers.fprintf logger "%s" site_string in
+           let () =
+             match internal with
+             | None -> ()
+             | Some s -> Loggers.fprintf logger "%s" s
+           in
+           let () =
+             match binding with
+             | None | Some Free -> ()
+             | Some Wildcard -> Loggers.fprintf logger "?"
+             | Some Bound_to_unknown -> Loggers.fprintf logger "!_"
+             | Some (Bound_to int) -> Loggers.fprintf logger "!%i" int
+             | Some (Binding_type (ag,st)) ->
+               Loggers.fprintf logger "!%s.%s" ag st
+           in
+           true
+        ) site_map false
+    in
+    bool
+
   let print logger parameter error kappa_handler t  =
     let _bool =
       Ckappa_sig.Agent_id_map_and_set.Map.fold
         (fun _ (agent_string, site_map) bool ->
-           let () =
-             if bool then
-               Loggers.fprintf logger ","
-           in
-           let () = Loggers.fprintf logger "%s(" agent_string in
            let _bool =
-             Wrapped_modules.LoggedStringMap.fold
-               (fun site_string (internal,binding) bool ->
-                  let () =
-                    if bool then Loggers.fprintf logger ","
-                  in
-                  let () = Loggers.fprintf logger "%s" site_string in
-                  let () =
-                    match internal with
-                    | None -> ()
-                    | Some s -> Loggers.fprintf logger "%s" s
-                  in
-                  let () =
-                    match binding with
-                    | None | Some Free -> ()
-                    | Some Wildcard -> Loggers.fprintf logger "?"
-                    | Some Bound_to_unknown -> Loggers.fprintf logger "!_"
-                    | Some (Bound_to int) -> Loggers.fprintf logger "!%i" int
-                    | Some (Binding_type (ag,st)) ->
-                      Loggers.fprintf logger "!%s.%s" ag st
-                  in
-                  true)
-               site_map
-               false
+             print_aux logger parameter error kappa_handler
+               agent_string site_map bool
            in
            let () = Loggers.fprintf logger ")" in
            true
@@ -578,21 +585,7 @@ struct
         false
     in error
 
-
-  (***************************************************************************)
-(*REMOVE:store the information of the print function *)
-
-  let collect_views error kappa_handler t =
-  Ckappa_sig.Agent_id_map_and_set.Map.fold
-    (fun _ (agent_string, site_map) (error, current_list) ->
-       Wrapped_modules.LoggedStringMap.fold
-         (fun site_string (internal, binding) (error, current_list) ->
-            error,
-
-            (internal, binding) :: current_list
-         ) site_map (error, current_list)
-    ) t.string_version (error, [])
-
+(***************************************************************************)
 
   let print_store_views error kappa_handler t =
     let error, store_result =
@@ -644,7 +637,7 @@ struct
 
   let print_list logger parameter error kappa_handler list =
     match list with
-    |  [] -> error
+    | [] -> error
     | [a] -> print logger parameter error kappa_handler a
     | _::_ ->
       begin

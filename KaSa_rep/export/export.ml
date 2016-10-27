@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 21 2016>
+  * Last modification: Time-stamp: <Oct 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -93,8 +93,9 @@ let print_influence_map parameters influence_map =
     (Remanent_parameters.get_logger parameters)
 
 let print_contact_map parameters contact_map =
-  Loggers.fprintf (Remanent_parameters.get_logger parameters)  "Contact map: ";
-  Loggers.print_newline (Remanent_parameters.get_logger parameters) ;
+  let log = (Remanent_parameters.get_logger parameters) in
+  Loggers.fprintf log  "Contact map: ";
+  Loggers.print_newline log;
   Mods.StringMap.iter
     (fun x ->
        Mods.StringMap.iter
@@ -102,7 +103,7 @@ let print_contact_map parameters contact_map =
             if l1<>[]
             then
               begin
-                let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s: " x y in
+                let () = Loggers.fprintf log "%s@%s: " x y in
                 let _ = List.fold_left
                     (fun bool x ->
                        (if bool then
@@ -116,20 +117,19 @@ let print_contact_map parameters contact_map =
             else ();
             List.iter
               (fun (z,t) ->
-                 Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s--%s@%s" x y z t;
-                 Loggers.print_newline (Remanent_parameters.get_logger parameters)
+                 Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                   "%s@%s--%s@%s" x y z t;
+                 Loggers.print_newline
+                   (Remanent_parameters.get_logger parameters)
               ) l2
          )
-    )
-    contact_map
+    ) contact_map
 
 (*---------------------------------------------------------------------------*)
 (*operations of module signatures*)
 
 let init ?compil ~called_from () =
-  match
-    compil
-  with
+  match compil with
   | Some compil ->
     let parameters = Remanent_parameters.get_parameters ~called_from () in
     let state =
@@ -145,7 +145,7 @@ let init ?compil ~called_from () =
       | Remanent_parameters_sig.Internalised
       | Remanent_parameters_sig.Server
       | Remanent_parameters_sig.KaSim
-      | Remanent_parameters_sig.JS -> assert false
+      | Remanent_parameters_sig.JS (*-> assert false*) (*TODO*)
       | Remanent_parameters_sig.KaSa ->
         begin
           let errors = Exception.empty_error_handler in
@@ -238,9 +238,8 @@ let get_gen
     | None -> (fun _ -> true)
     | Some f -> f
   in
-  match
-    get state
-  with
+  (*------------------------------------------------------*)
+  match get state with
   | None ->
     let parameters = Remanent_state.get_parameters state in
     let parameters' =
@@ -264,19 +263,20 @@ let get_gen
         Loggers.print_newline (Remanent_parameters.get_logger parameters')
     in
     let show_title = compute_show_title do_we_show_title log_title in
+    (*------------------------------------------------------*)
     let state =
-      match phase
-      with
+      match phase with
       | None -> state
       | Some phase -> Remanent_state.add_event phase int state
     in
     let state, output = compute show_title state in
+    (*------------------------------------------------------*)
     let state =
-      match phase
-      with
+      match phase with
       | None -> state
       | Some phase -> Remanent_state.close_event phase int state
     in
+    (*------------------------------------------------------*)
     let state =
       if
         Remanent_parameters.get_trace parameters' || dump_result
@@ -285,8 +285,7 @@ let get_gen
       else
         state
     in
-    Remanent_state.set_parameters parameters state,
-    output
+    Remanent_state.set_parameters parameters state, output
   | Some a -> state, a
 
 let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
@@ -756,7 +755,8 @@ let convert_influence_map show_title state (wake_up_map, inhibition_map) =
   let output =
     {
       Remanent_state.positive = convert_half_influence_map wake_up_map nrules ;
-      Remanent_state.negative = convert_half_influence_map inhibition_map nrules ;
+      Remanent_state.negative =
+        convert_half_influence_map inhibition_map nrules ;
     }
   in
   let state =
@@ -840,9 +840,11 @@ let compute_intermediary_internal_influence_map show_title state =
 let get_map_gen
     (get: ?accuracy_level:Remanent_state.accuracy_level ->
      (Domain_selection.Reachability_analysis.static_information,
-      Domain_selection.Reachability_analysis.dynamic_information) Remanent_state.state ->
+      Domain_selection.Reachability_analysis.dynamic_information)
+       Remanent_state.state ->
      (Domain_selection.Reachability_analysis.static_information,
-      Domain_selection.Reachability_analysis.dynamic_information) Remanent_state.state * 'a )
+      Domain_selection.Reachability_analysis.dynamic_information)
+       Remanent_state.state * 'a )
     convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
     ?do_we_show_title:(do_we_show_title=(fun _ -> true))
     ?log_title
@@ -867,11 +869,10 @@ let get_intermediary_internal_influence_map =
     (Remanent_state.get_internal_influence_map Remanent_state.Medium)
     compute_intermediary_internal_influence_map
 
-let get_internal_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
+let get_internal_influence_map
+    ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =
-  match
-    accuracy_level
-  with
+  match accuracy_level with
   | Remanent_state.Low ->
     get_raw_internal_influence_map state
   | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
@@ -1108,15 +1109,15 @@ let output_internal_contact_map ?loggers ?accuracy_level:(accuracy_level=Remanen
   let state, contact_map = get_internal_contact_map ~accuracy_level state in
   let state, handler = get_handler state in
   let error = get_errors state in
-  let error = Preprocess.dot_of_contact_map ?loggers parameters error handler contact_map in
+  let error =
+    Preprocess.dot_of_contact_map ?loggers parameters error handler contact_map
+  in
   set_errors error state
 
 (******************************************************************)
 
 let dump_signature state =
-  match
-    Remanent_state.get_signature state
-  with
+  match Remanent_state.get_signature state with
   | None -> ()
   | Some _signature -> ()
 
@@ -1132,11 +1133,11 @@ let dump_errors_light state =
 (******************************************************************)
 
 let compute_dead_rules _show_title state =
-  let state,_ = get_reachability_analysis state in
+  let state, _ = get_reachability_analysis state in
   match
     Remanent_state.get_dead_rules state
   with
-  | Some map -> state, map
+  | Some l -> state, l
   | None -> assert false
 
 let get_dead_rules  =
@@ -1166,31 +1167,124 @@ let json_to_dead_rules =
 (******************************************************************)
 (*TODO: internal_constraint_list, constraint_list*)
 
-(*state -> ?: state, constraint_list*)
+let get_list_gen
+    ?debug_mode
+    ?dump_result
+    ?stack_title
+    ?do_we_show_title
+    ?log_title
+    ?log_main_title
+    ?log_prefix
+    ?phase
+    ?int
+    ?dump
+    get compute state =
+  let debug_mode =
+    match debug_mode with
+    | None | Some false -> false
+    | Some true -> true
+  in
+  let dump_result =
+    match dump_result with
+    | None | Some false -> false
+    | Some true -> true
+  in
+  let dump =
+    match dump with
+    | None -> (fun state _output -> state)
+    | Some f -> f
+  in
+  let do_we_show_title =
+    match do_we_show_title with
+    | None -> (fun _ -> true)
+    | Some f -> f
+  in
+  (*-------------------------------------------------------*)
+  match get state with
+  | [] ->
+    let parameters = Remanent_state.get_parameters state in
+    let parameters' =
+      Remanent_parameters.update_call_stack parameters
+        debug_mode stack_title
+    in
+    let parameters' =
+      match log_prefix with
+      | None -> parameters'
+      | Some prefix ->
+        Remanent_parameters.set_prefix parameters' prefix
+    in
+    let state = Remanent_state.set_parameters parameters' state in
+    (*-------------------------------------------------------*)
+    let () =
+      match log_main_title with
+      | None -> ()
+      | Some title ->
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" title
+        in
+        Loggers.print_newline (Remanent_parameters.get_logger parameters')
+    in
+    let show_title = compute_show_title do_we_show_title log_title in
+    (*-------------------------------------------------------*)
+    let state =
+      match phase with
+      | None -> state
+      | Some phase -> Remanent_state.add_event phase int state
+    in
+    let state, output = compute show_title state in
+    (*-------------------------------------------------------*)
+    let state =
+      match phase with
+      | None -> state
+      | Some phase -> Remanent_state.close_event phase int state
+    in
+    (*-------------------------------------------------------*)
+    let state =
+      if Remanent_parameters.get_trace parameters' || dump_result
+      then dump state output
+      else state
+    in
+    Remanent_state.set_parameters parameters state, output
+  | l -> state, l
 
-
-(*let compute_constraint_list show_title state _ =
+(* state -> ?: state, constraint_list*)
+let compute_constraint_list show_title state =
+  let state, _ = get_reachability_analysis state in
   let parameters = Remanent_state.get_parameters state in
+  let logger = (Remanent_parameters.get_logger parameters) in
   let error = Remanent_state.get_errors state in
-  let state = Remanent_state.set_errors error state in
-  (*constraint_list*)
-  let error, constraint_list =
-    List.fold_left (fun _ (s, lemma_list) ->
-
-      ) _ contrainst_list
-      _
-  in
-  let state =
-    Remanent_state.set_contrainst_list
-      constraint_list
-      state
-  in
-  state, constraint_list
-
-let get_contrainst_list state =
-
-  let error, store_views =
-    Ckappa_backend.Ckappa_backend.print_store_views error
+  let state, kappa_handler = get_handler state in
+  let l = Remanent_state.get_constraint_list state in
+  let _error =
+    Remanent_state.print_constraint_list_list logger parameters error
       kappa_handler
-      t
-  in*)
+      l
+  in
+  state, l
+
+let get_constraint_list =
+  get_list_gen
+    Remanent_state.get_constraint_list
+    compute_constraint_list
+
+(******************************************************************)
+
+let compute_internal_constraint_list show_title state =
+  let state, _ = get_reachability_analysis state in
+  let parameters = Remanent_state.get_parameters state in
+  let logger = (Remanent_parameters.get_logger parameters) in
+  let error = Remanent_state.get_errors state in
+  let state, kappa_handler = get_handler state in
+  let l = Remanent_state.get_internal_constraint_list state in
+  let _error =
+    Remanent_state.print_internal_constraint_list_list logger
+      parameters error
+      kappa_handler
+      l
+  in
+  state, l
+
+let get_internal_constraint_list =
+  get_list_gen
+    Remanent_state.get_internal_constraint_list
+    compute_internal_constraint_list

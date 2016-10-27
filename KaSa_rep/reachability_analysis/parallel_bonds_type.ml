@@ -286,6 +286,7 @@ let print_parallel_constraint
               let error =
                 if verbose
                 then
+                  (*print hyp*)
                   let error =
                     Ckappa_backend.Ckappa_backend.print
                       (Remanent_parameters.get_logger parameters) parameters
@@ -303,6 +304,7 @@ let print_parallel_constraint
                       (Remanent_parameters.get_logger parameters) "%s" prefix
                   in error
               in
+              (*print the list of refinement*)
               let error = Ckappa_backend.Ckappa_backend.print_list
                   (Remanent_parameters.get_logger parameters) parameters error
                   kappa_handler

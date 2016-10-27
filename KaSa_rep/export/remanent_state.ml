@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 25 2016>
+  * Last modification: Time-stamp: <Oct 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -24,9 +24,7 @@ module AccuracySetMap =
     (struct
       type t = accuracy_level
       let compare a b =
-        match
-          a,b
-        with
+        match a,b with
         | Low,Low -> 0
         | Low,_ -> -1
         | _,Low -> 1
@@ -49,9 +47,13 @@ module AccuracyMap = AccuracySetMap.Map
 
 (******************************************************************)
 
-type compilation = ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+type compilation =
+  ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule)
+    Ast.compil
 
-type refined_compilation = (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
+type refined_compilation =
+  (Ckappa_sig.agent, Ckappa_sig.mixture, string,
+   Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
 
 type quark_map = Quark_type.quarks
 
@@ -274,7 +276,7 @@ type 'site_graph lemma =
   }
 
 type 'site_graph poly_constraint_list =
-  (string (*agent_string*) * 'site_graph lemma list) list
+  (string (*domain name*) * 'site_graph lemma list) list
 
 type internal_constraint_list =
   Ckappa_backend.Ckappa_backend.t poly_constraint_list
@@ -567,6 +569,117 @@ let internal_constraint_list_of_json json =
              ) json
         ) json
     ) json
+
+(***************************************************************************)
+
+let print_internal_constraint_list logger parameters error kappa_handler
+    internal_constraint_list =
+  let (domain_name, lemma_list) = internal_constraint_list in
+  let () =
+  Loggers.fprintf logger
+    "------------------------------------------------------------\n";
+  Loggers.fprintf logger "* Export %s to JSon (internal constraint_list):\n"
+    domain_name;
+  Loggers.fprintf logger
+    "------------------------------------------------------------\n";
+  in
+  List.fold_left (fun error lemma ->
+      let () = Loggers.fprintf logger "Hyp:" in
+      let error =
+        Ckappa_backend.Ckappa_backend.print logger parameters error
+          kappa_handler
+          lemma.hyp
+      in
+      let () = Loggers.fprintf logger "=> [" in
+      let error =
+        List.fold_left (fun error hyp ->
+          Ckappa_backend.Ckappa_backend.print logger parameters error
+            kappa_handler
+            hyp
+          ) error lemma.refinement
+      in
+      let () = Loggers.fprintf logger "]" in
+      let () = Loggers.print_newline logger in
+      error
+    ) error lemma_list
+
+(*print the information as the output of non relational properties*)
+let print_internal_constraint_list_list logger parameters error kappa_handler
+    list =
+    let error =
+      List.fold_left (fun error pattern ->
+          let error =
+            print_internal_constraint_list
+              logger parameters error
+              kappa_handler
+              pattern
+          in
+          let () = Loggers.print_newline logger in
+          error
+        ) error list
+    in
+    error
+
+(***************************************************************************)
+
+let print_for_list logger parameter error kappa_handler t =
+  let _bool =
+    List.fold_left (fun bool (agent_string, site_map) ->
+        let _ =
+          Ckappa_backend.Ckappa_backend.print_aux logger parameter error
+            kappa_handler
+            agent_string site_map bool
+        in
+        let () = Loggers.fprintf logger ")" in
+        true
+      ) false t
+  in
+  error
+
+let print_constraint_list logger parameters error kappa_handler constraint_list
+  =
+  let (domain_name, lemma_list) = constraint_list in
+  let () =
+  Loggers.fprintf logger
+    "------------------------------------------------------------\n";
+  Loggers.fprintf logger "* Export %s to JSon (constraint_list):\n" domain_name;
+  Loggers.fprintf logger
+    "------------------------------------------------------------\n";
+  in
+  List.fold_left (fun error lemma -> (*TODO*)
+      let () = Loggers.fprintf logger "Hyp: " in
+      let error =
+        List.fold_left (fun error hyp ->
+          let error =
+            print_for_list logger parameters error
+              kappa_handler
+              lemma.hyp
+          in
+          let () = Loggers.fprintf logger " => [" in
+            let error =
+              print_for_list logger parameters error
+                kappa_handler
+                hyp
+            in
+            error
+          ) error lemma.refinement
+      in
+      let () = Loggers.fprintf logger "]" in
+      let () = Loggers.print_newline logger in
+      error
+    ) error lemma_list
+
+let print_constraint_list_list logger parameters error kappa_handler list =
+  let error =
+    List.fold_left (fun error pattern ->
+        let error =
+          print_constraint_list logger parameters error kappa_handler pattern
+        in
+        let () = Loggers.print_newline logger in
+        error
+      ) error list
+  in
+  error
 
 (*******************************************************************)
 

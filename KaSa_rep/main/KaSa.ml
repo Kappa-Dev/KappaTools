@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 30 2016>
+ * Last modification: Time-stamp: <Oct 27 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -35,7 +35,8 @@ let main () =
     if Remanent_parameters.get_trace parameters || Print_cckappa.trace
     then
       let state, c_compil = Export_to_KaSa.get_c_compilation state in
-      let parameters' = Remanent_parameters.update_prefix  parameters "Compilation:" in
+      let parameters' =
+        Remanent_parameters.update_prefix  parameters "Compilation:" in
       let state = Export_to_KaSa.set_parameters parameters' state in
       let state = Export_to_KaSa.dump_c_compil state c_compil in
       let state = Export_to_KaSa.set_parameters parameters state in
@@ -60,7 +61,6 @@ let main () =
     else
       state
   in
-
   (*-----------------------------------------------------------------------*)
   let state, reachability_result_opt =
     if Remanent_parameters.get_do_reachability_analysis parameters
@@ -78,12 +78,12 @@ let main () =
       | Remanent_parameters_sig.Medium
       | Remanent_parameters_sig.High
       | Remanent_parameters_sig.Full ->
-        Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Medium state
+        Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Medium
+          state
       | Remanent_parameters_sig.None
       | Remanent_parameters_sig.Low -> state
     else state
   in
-
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)
   let state, stochastic_flow_opt =
@@ -107,4 +107,10 @@ let main () =
   ()
 
 let () = main ()
-let _ = Export_to_json.init
+
+let state = Export_to_json.init ()
+
+(*TODO: call the print function of export for parallel bonds here*)
+
+(*let state, _ = Export_to_json.get_constraint_list state*)
+(*let state, _ = Export_to_json.get_internal_constraint_list state*)

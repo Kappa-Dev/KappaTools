@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Oct 25 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -47,7 +47,7 @@ sig
 
 end
 
-(*****************************************************************************************)
+(***************************************************************************)
 (*Analyzer is a functor takes a module Domain as its parameter.*)
 
 module Make (Domain:Composite_domain.Composite_domain) =
@@ -106,7 +106,7 @@ struct
     let error, dynamic = close_event parameters error
         StoryProfiling.Domains_initialization None dynamic
     in
-    let error, dynamic,_ =
+    let error, dynamic, _ =
       List.fold_left
         (fun (error, dynamic, i) chemical_species ->
            let error, dynamic =
@@ -166,7 +166,8 @@ struct
                 || Remanent_parameters.get_trace parameters
                 then
                   let () =
-                    Loggers.fprintf log "\t\tthe precondition is not satisfied yet"
+                    Loggers.fprintf log
+                      "\t\tthe precondition is not satisfied yet"
                   in
                   let () = Loggers.print_newline log
                   in
@@ -179,7 +180,8 @@ struct
                 || Remanent_parameters.get_dump_reachability_analysis_iteration parameters
                 || Remanent_parameters.get_trace parameters
                 then
-                  let () = Loggers.fprintf log "\t\tthe precondition is satisfied" in
+                  let () = Loggers.fprintf log
+                      "\t\tthe precondition is satisfied" in
                   let () = Loggers.print_newline log in
                   ()
               in

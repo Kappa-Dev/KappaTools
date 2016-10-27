@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Oct 25 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -42,7 +42,9 @@ module Product
     let get_parameter static = Underlying_domain.get_parameter static.underlying_domain
 
     let get_global_dynamic_information dynamic = dynamic.global
-    let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
+    let set_global_dynamic_information gdynamic dynamic =
+      {dynamic with global = gdynamic}
 
     let warn static mh pos message exn default =
       Exception.warn (get_parameter static) mh pos ~message exn default
@@ -61,6 +63,7 @@ module Product
         Underlying_domain.global = dynamic.global;
         Underlying_domain.local = dynamic.local.underlying_domain
       }
+
     let new_domain_dynamic_information underlying_dynamic global_dynamic =
       {
         New_domain.global = underlying_dynamic.Underlying_domain.global;
@@ -70,12 +73,14 @@ module Product
     let initialize global_static_information global_dynamic_information error =
       let error, underlying_domain_static_information,
           underlying_domain_dynamic_information =
-        Underlying_domain.initialize global_static_information
+        Underlying_domain.initialize
+          global_static_information
           global_dynamic_information
           error
       in
       let error, new_domain_static_information, new_domain_dynamic_information =
-        New_domain.initialize global_static_information
+        New_domain.initialize
+          global_static_information
           underlying_domain_dynamic_information.Underlying_domain.global
           error
       in
@@ -84,7 +89,8 @@ module Product
         new_domain        = new_domain_static_information;
         underlying_domain = underlying_domain_static_information
       },
-      smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information
+      smash_dynamic underlying_domain_dynamic_information
+        new_domain_dynamic_information
 
     type 'a zeroary =
       static_information
@@ -138,13 +144,16 @@ module Product
           precondition
       in
       let new_domain_dynamic_information =
-        new_domain_dynamic_information underlying_domain_dynamic_information dynamic
+        new_domain_dynamic_information
+          underlying_domain_dynamic_information
+          dynamic
       in
       match output_opt with
       | None ->
         error,
-        smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
-        None
+        smash_dynamic
+          underlying_domain_dynamic_information
+          new_domain_dynamic_information, None
       | Some precondition ->
         let error, new_domain_dynamic_information, output_opt =
           New_domain.is_enabled
@@ -162,7 +171,8 @@ module Product
         error, dynamic, output_opt
 
     let apply_rule static dynamic error rule_id precondition =
-      let error, underlying_domain_dynamic_information, (precondition, event_list) =
+      let error, underlying_domain_dynamic_information,
+          (precondition, event_list) =
         Underlying_domain.apply_rule
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
@@ -206,9 +216,10 @@ module Product
           error
           event_list
       in
-      let event_list = List.fold_left (fun list a -> a :: list) event_list' event_list'' in
-      (* be careful, the concatenation should be done in the correct order to get
-         a linear time complexity instead of a quadratic one*)
+      let event_list =
+        List.fold_left (fun list a -> a :: list) event_list' event_list'' in
+      (* be careful, the concatenation should be done in the correct order to
+         get a linear time complexity instead of a quadratic one*)
       error,
       smash_dynamic
         underlying_domain_dynamic_information

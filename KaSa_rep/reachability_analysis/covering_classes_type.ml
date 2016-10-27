@@ -5,7 +5,7 @@
  *
  * Creation: 2015, the 23th of Feburary
 <<<<<<< 9d19502c910420cc42bf5de36ec1126ff169633c
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Oct 25 2016>
 =======
  * Last modification: Time-stamp: <Aug 04 2016>
 >>>>>>> continue to use project in apply rule
@@ -26,10 +26,10 @@ type covering_classes =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
   }
 
-(************************************************************************************)
+(***************************************************************************)
 (* DICTIONARY for covering classes *)
 
-(*------------------------------------------------------------------------------*)
+(*------------------------------------------------------------------------*)
 (* TYPE REMANENT:
    key(t): int; 'a t = infinite array of list(#id) *)
 
@@ -40,7 +40,7 @@ let dummy_cv_id = 0
 let int_of_cv_id (a: cv_id) : int = a
 let cv_id_of_int (a: int) : cv_id = a
 
-(************************************************************************************)
+(***************************************************************************)
 
 module List_sites =
 struct

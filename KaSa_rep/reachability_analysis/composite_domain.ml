@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Oct 25 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -65,10 +65,15 @@ sig
   val print: (Loggers.t, unit) unary
 
   val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+
   val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
+
   val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
+
   val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
+
   val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
+
   val set_global_dynamic_information:
     Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
 end
@@ -297,7 +302,8 @@ struct
      through this list and at each event push rule_id inside a working
      list and apply this list of event with new dynamic information*)
 
-  let rec apply_event_list (static:static_information) dynamic error event_list =
+  let rec apply_event_list (static:static_information) dynamic error event_list
+    =
     if event_list = []
     then
       error, dynamic, ()
@@ -363,7 +369,6 @@ struct
   let print static dynamic error loggers =
     lift_unary Domain.print static dynamic error loggers
 
-
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do, via domains.ml *)
 
@@ -377,7 +382,11 @@ struct
     error, dynamic, Usual_domains.Maybe (* to do via c_is_reachable *)
 
   let get_global_dynamic_information dynamic = Domain.get_global_dynamic_information dynamic.domain
+
   let set_global_dynamic_information gdynamic dynamic =
-    {dynamic with domain = Domain.set_global_dynamic_information gdynamic dynamic.domain}
+    {
+      dynamic with
+      domain =
+        Domain.set_global_dynamic_information gdynamic dynamic.domain}
 
 end

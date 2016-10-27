@@ -94,6 +94,15 @@ sig
     Cckappa_sig.kappa_handler ->
     t -> Exception.method_handler
 
+  val print_aux:
+    Loggers.t ->
+    Remanent_parameters_sig.parameters ->
+    Exception.method_handler ->
+    Cckappa_sig.kappa_handler ->
+    string ->
+    (string option * binding_state option)
+      Wrapped_modules.LoggedStringMap.t -> bool -> bool
+
   val print_store_views:
     Exception.method_handler ->
     Cckappa_sig.kappa_handler ->
