@@ -683,6 +683,79 @@ let print_constraint_list_list logger parameters error kappa_handler list =
 
 (*******************************************************************)
 
+let collect_hyp_of_constraint_list error hyp =
+  Ckappa_sig.Agent_id_map_and_set.Map.fold
+    (fun _ (agent_string, site_map) (error, current_list) ->
+       let hyp = (agent_string, site_map) :: current_list in
+       error, hyp
+    ) hyp (error, [])
+
+let collect_refinement_of_constraint_list error list =
+  List.fold_left (fun (error, current_list) hyp ->
+      (*translate t -> string_version*)
+      let string_version =
+        Ckappa_backend.Ckappa_backend.get_string_version
+          hyp
+      in
+      let error, hyp =
+        collect_hyp_of_constraint_list error string_version
+      in
+      error, hyp :: current_list
+    ) (error, []) list
+
+let collect_the_head_of_constraint_list error string_version list
+    current_list =
+  let error, current_list =
+    Ckappa_sig.Agent_id_map_and_set.Map.fold
+      (fun _ (agent_string, site_map) (error, current_list) ->
+        (*-----------------------------------------*)
+        let error, hyp =
+          collect_hyp_of_constraint_list error string_version
+        in
+        (*refinement*)
+        let error, refinement =
+          collect_refinement_of_constraint_list error list
+        in
+        (*-----------------------------------------*)
+        let lemma =
+          {
+            hyp = hyp;
+            refinement = refinement;
+          }
+        in
+        let lemma_list = lemma :: current_list in
+        error, lemma_list
+      ) string_version (error, current_list)
+  in
+  error, current_list
+
+let collect_the_head_of_internal_constraint_list parameters error
+    t list current_list =
+  let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
+  let error, current_list =
+    Ckappa_sig.Agent_id_map_and_set.Map.fold
+      (fun _ (agent_string, site_map) (error, current_list) ->
+         (*return type t.string_version*)
+         let hyp = t in
+         let error, refinement =
+           List.fold_left (fun (error, current_list) hyp ->
+               error, hyp :: current_list
+             ) (error, []) list
+         in
+         let lemma =
+           {hyp = hyp;
+            refinement = refinement}
+         in
+         let lemma_list = lemma :: current_list in
+         error, lemma_list
+      ) string_version (error, current_list)
+  in
+  error, current_list
+
+
+
+(*******************************************************************)
+
 type ('static,'dynamic) state =
   {
     parameters    : Remanent_parameters_sig.parameters ;

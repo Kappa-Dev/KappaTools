@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 14 2016>
+   * Last modification: Time-stamp: <Oct 27 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1604,7 +1604,129 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
   let stabilize _static dynamic error =
     error, dynamic, ()
 
-  let export _static dynamic error kasa_state =
+  (*TODO*)
+  let export static dynamic error kasa_state =
+    let parameters = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let handler = get_mvbdu_handler dynamic in
+    let store_value = get_value dynamic in
+    let domain_name = "Connected agents" in
+    let error, (handler, current_list) =
+      Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
+        (fun tuple mvbdu (error, (handler, current_list)) ->
+           let (agent_type1, site_type1, site_type1', _),
+               (agent_type2, site_type2, site_type2', _) = tuple
+           in
+           (*----------------------------------------------------*)
+           (*TODO*)
+           (*let error, handler, non_relational =
+             if final_result
+             then
+               Translation_in_natural_language.non_relational
+                 parameters handler error mvbdu
+             else
+               error, handler, false
+           in
+           if non_relational
+           then error, current_list
+           else*)
+           (*----------------------------------------------------*)
+           let error, handler, pair_list =
+             Ckappa_sig.Views_bdu.extensional_of_mvbdu
+               parameters handler error mvbdu
+           in
+           match Remanent_parameters.get_backend_mode parameters with
+           | Remanent_parameters_sig.Kappa
+           | Remanent_parameters_sig.Raw ->
+             let pattern = Ckappa_backend.Ckappa_backend.empty in
+             let error, agent_id1, pattern =
+               Ckappa_backend.Ckappa_backend.add_agent
+                 parameters
+                 error
+                 kappa_handler
+                 agent_type1
+                 pattern
+             in
+             let error, agent_id2, pattern =
+               Ckappa_backend.Ckappa_backend.add_agent
+                 parameters error kappa_handler
+                 agent_type2
+                 pattern
+             in
+             let error, pattern =
+               Ckappa_backend.Ckappa_backend.add_bond
+                 parameters error kappa_handler
+                 agent_id1
+                 site_type1
+                 agent_id2
+                 site_type2
+                 pattern
+             in
+             (*TODO*)
+             begin
+               match pair_list with
+               | [] -> error, (handler, current_list)
+               | _::_ ->
+                 (*TODO*)
+                 let error, current_list =
+                   List.fold_left (fun (error, current_list) l ->
+                       match l with
+                       | [siteone, state1; sitetwo, state2] when
+                           siteone == Ckappa_sig.fst_site
+                           && sitetwo == Ckappa_sig.snd_site ->
+                         let error, pattern =
+                           Ckappa_backend.Ckappa_backend.add_state
+                             parameters error kappa_handler
+                             agent_id1
+                             site_type1'
+                             state1
+                             pattern
+                         in
+                         let error, pattern =
+                           Ckappa_backend.Ckappa_backend.add_state
+                             parameters error kappa_handler
+                             agent_id2
+                             site_type2'
+                             state2
+                             pattern
+                         in
+                         let string_version =
+                           Ckappa_backend.Ckappa_backend.get_string_version
+                             pattern
+                         in
+                         let error, current_list =
+                           Remanent_state.collect_the_head_of_constraint_list
+                             error
+                             string_version
+                             []
+                             current_list
+                         in
+                         error, current_list
+                       | _ ->
+                         Exception.warn parameters error __POS__ Exit []
+                     ) (error, current_list) pair_list
+                 in
+                 error, (handler, current_list)
+             end
+           | Remanent_parameters_sig.Natural_language ->
+             error, (handler, current_list)
+        ) store_value (error, (handler, []))
+    in
+    (*------------------------------------------------------------------*)
+    let dynamic = set_mvbdu_handler handler dynamic in
+    let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let pair_list = (domain_name, current_list) :: constraint_list in
+    let kasa_state =
+      Remanent_state.set_constraint_list pair_list kasa_state
+    in
+    (*------------------------------------------------------------------*)
+    (*internal constraint list*)
+    (*let internal_constraint_list = Remanent_state.get_internal_constraint_list
+        kasa_state
+    in
+    let pair_list = (domain_name, current_list2) :: internal_constraint_list in
+    let kasa_state =
+      Remanent_state.set_internal_constraint_list pair_list kasa_state in*)
     error, dynamic, kasa_state
 
   (****************************************************************)

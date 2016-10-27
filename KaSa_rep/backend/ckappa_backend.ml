@@ -586,6 +586,7 @@ struct
     in error
 
 (***************************************************************************)
+(*REMOVE*)
 
   let print_store_views error kappa_handler t =
     let error, store_result =

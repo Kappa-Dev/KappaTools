@@ -1244,75 +1244,6 @@ struct
 (****************************************************************)
 (*export the information of parallel  bond to state*)
 
-  let collect_hyp_of_constraint_list error hyp =
-    Ckappa_sig.Agent_id_map_and_set.Map.fold
-      (fun _ (agent_string, site_map) (error, current_list) ->
-         let hyp = (agent_string, site_map) :: current_list in
-         error, hyp
-      ) hyp (error, [])
-
-  let collect_refinement_of_constraint_list error list =
-    List.fold_left (fun (error, current_list) hyp ->
-        (*translate t -> string_version*)
-        let string_version =
-          Ckappa_backend.Ckappa_backend.get_string_version
-            hyp
-        in
-        let error, hyp =
-          collect_hyp_of_constraint_list error string_version
-        in
-        error, hyp :: current_list
-      ) (error, []) list
-
-  let collect_the_head_of_constraint_list error string_version list
-      current_list =
-    let error, current_list =
-      Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ (agent_string, site_map) (error, current_list) ->
-          (*-----------------------------------------*)
-          let error, hyp =
-            collect_hyp_of_constraint_list error string_version
-          in
-          (*refinement*)
-          let error, refinement =
-            collect_refinement_of_constraint_list error list
-          in
-          (*-----------------------------------------*)
-          let lemma =
-            {
-              Remanent_state.hyp = hyp;
-              Remanent_state.refinement = refinement;
-            }
-          in
-          let lemma_list = lemma :: current_list in
-          error, lemma_list
-        ) string_version (error, current_list)
-    in
-    error, current_list
-
-  let collect_the_head_of_internal_constraint_list parameters error
-      t list current_list =
-    let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
-    let error, current_list =
-      Ckappa_sig.Agent_id_map_and_set.Map.fold
-        (fun _ (agent_string, site_map) (error, current_list) ->
-           (*return type t.string_version*)
-           let hyp = t in
-           let error, refinement =
-             List.fold_left (fun (error, current_list) hyp ->
-                 error, hyp :: current_list
-               ) (error, []) list
-           in
-           let lemma =
-             {Remanent_state.hyp = hyp;
-              Remanent_state.refinement = refinement}
-           in
-           let lemma_list = lemma :: current_list in
-           error, lemma_list
-        ) string_version (error, current_list)
-    in
-    error, current_list
-
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
@@ -1463,7 +1394,7 @@ struct
            in
            (*--------------------------------------------------------*)
            if compare site site' > 0
-           then error, (current_list, current_list2) (*FIXME*)
+           then error, (current_list, current_list2)
            else
              (*--------------------------------------------------*)
              match value with
@@ -1483,7 +1414,7 @@ struct
                      in
                      (*the head:hyp*)
                      let error, current_list =
-                       collect_the_head_of_constraint_list
+                       Remanent_state.collect_the_head_of_constraint_list
                          error
                          string_version
                          list_same
@@ -1491,7 +1422,7 @@ struct
                      in
                      (*internal constraint list*)
                      let error, current_list2 =
-                       collect_the_head_of_internal_constraint_list
+                       Remanent_state.collect_the_head_of_internal_constraint_list
                          parameters error
                          t_precondition
                          list_same
@@ -1506,14 +1437,15 @@ struct
                    in
                    (*hyp*)
                    let error, current_list =
-                     collect_the_head_of_constraint_list error
+                     Remanent_state.collect_the_head_of_constraint_list
+                       error
                        string_version
                        []
                        current_list
                    in
                    (*internal constraint list*)
                    let error, current_list2 =
-                     collect_the_head_of_internal_constraint_list
+                     Remanent_state.collect_the_head_of_internal_constraint_list
                        parameters error
                        t_same
                        []
@@ -1531,7 +1463,7 @@ struct
                        t_precondition
                    in
                    let error, current_list =
-                     collect_the_head_of_constraint_list
+                     Remanent_state.collect_the_head_of_constraint_list
                        error
                        string_version
                        list_distinct
@@ -1539,7 +1471,7 @@ struct
                    in
                    (*internal constraint list*)
                    let error, current_list2 =
-                     collect_the_head_of_internal_constraint_list
+                     Remanent_state.collect_the_head_of_internal_constraint_list
                        parameters error
                        t_precondition
                        list_distinct
@@ -1552,7 +1484,7 @@ struct
                        t_distinct
                    in
                    let error, current_list =
-                     collect_the_head_of_constraint_list
+                     Remanent_state.collect_the_head_of_constraint_list
                        error
                        string_version
                        []
@@ -1560,7 +1492,7 @@ struct
                    in
                    (*internal constraint list*)
                    let error, current_list2 =
-                     collect_the_head_of_internal_constraint_list
+                     Remanent_state.collect_the_head_of_internal_constraint_list
                        parameters error
                        t_distinct
                        []
@@ -1579,14 +1511,14 @@ struct
                      t_same
                  in
                  let error, current_list =
-                   collect_the_head_of_constraint_list
+                   Remanent_state.collect_the_head_of_constraint_list
                      error
                      string_version
                      [] (*TODO*)
                      current_list
                  in
                  let error, current_list2 =
-                   collect_the_head_of_internal_constraint_list
+                   Remanent_state.collect_the_head_of_internal_constraint_list
                      parameters error
                      t_same
                      []
@@ -1598,7 +1530,7 @@ struct
                      t_distinct
                  in (*FIXME*)
                  let error, current_list =
-                   collect_the_head_of_constraint_list
+                   Remanent_state.collect_the_head_of_constraint_list
                      error
                      string_version
                      [] (*TODO*)
@@ -1606,7 +1538,7 @@ struct
                  in
                  (*internal constraint list*)
                  let error, current_list2 =
-                   collect_the_head_of_internal_constraint_list
+                   Remanent_state.collect_the_head_of_internal_constraint_list
                      parameters error
                      t_distinct
                      []

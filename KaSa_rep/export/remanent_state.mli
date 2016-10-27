@@ -153,6 +153,34 @@ val print_internal_constraint_list_list :
   Cckappa_sig.kappa_handler ->
   internal_constraint_list -> Exception.method_handler
 
+val collect_the_head_of_constraint_list :
+Exception.method_handler ->
+(string *
+ (string option *
+  Ckappa_backend.Ckappa_backend.binding_state option)
+   Wrapped_modules.LoggedStringMap.t)
+  Ckappa_sig.Agent_id_map_and_set.Map.t ->
+Ckappa_backend.Ckappa_backend.t list ->
+(string *
+ (string option *
+  Ckappa_backend.Ckappa_backend.binding_state option)
+   Wrapped_modules.LoggedStringMap.t)
+  list lemma list ->
+Exception.method_handler *
+(string *
+ (string option *
+  Ckappa_backend.Ckappa_backend.binding_state option)
+   Wrapped_modules.LoggedStringMap.t)
+  list lemma list
+
+val collect_the_head_of_internal_constraint_list :
+Remanent_parameters_sig.parameters ->
+Exception.method_handler ->
+Ckappa_backend.Ckappa_backend.t ->
+Ckappa_backend.Ckappa_backend.t list ->
+Ckappa_backend.Ckappa_backend.t lemma list ->
+Exception.method_handler * Ckappa_backend.Ckappa_backend.t lemma list
+
 (*******************************************************************)
 
 type ('static, 'dynamic) state
