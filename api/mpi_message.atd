@@ -54,6 +54,7 @@ type flux_map_info <ocaml from="Api_types"> = abstract
 type snapshot_info <ocaml from="Api_types"> = abstract
 type simulation_catalog <ocaml from="Api_types"> = abstract
 
+type unit_t <ocaml_biniou t="unit"> = unit
 
 
 type request = [ EnvironmentInfo of unit
@@ -99,7 +100,7 @@ type response = [ EnvironmentInfo of environment_info result
                 | SimulationGetDistance of distance result
                 | SimulationGetFileLine of file_line_detail result
                 | SimulationGetFluxMap of flux_map result
-                | SimulationGetLogMessage of log_message list result
+                | SimulationGetLogMessage of log_message_detail result
                 | SimulationGetPlot of plot result
                 | SimulationGetSnapshot of snapshot result
                 | SimulationInfo of simulation_info result

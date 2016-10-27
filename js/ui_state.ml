@@ -118,7 +118,7 @@ let set_runtime_url
     let () = set_model_error [] in
     if url = "WebWorker" then
       let () = runtime_state :=
-          Some (new Js_worker.runtime () :> Api_v1.api_runtime)
+          Some (new Web_worker_api_v1.runtime () :> Api_v1.api_runtime)
       in
       let () = continuation true in
       ()
@@ -146,7 +146,7 @@ let set_runtime_url
 		let () =
                   if is_valid_server then
                     runtime_state :=
-                      Some (new Js_remote.runtime url :> Api_v1.api_runtime)
+                      Some (new Rest_api_v1.runtime url :> Api_v1.api_runtime)
                   else
                     let error_msg : string =
                       Format.sprintf "Bad Response %d from %s "

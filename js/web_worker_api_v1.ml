@@ -2,7 +2,7 @@ class runtime
     ?(timeout : float = 10.)
     () =
   object(self)
-    val worker = Worker.create "WebWorker.js"
+    val worker = Worker.create "WebWorkerV1.js"
     initializer
       let () = worker##.onmessage :=
 	  (Dom.handler

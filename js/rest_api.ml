@@ -147,9 +147,9 @@ class manager
           `DELETE
           None
           (fun result -> Mpi_message_j.file_result_of_string
-                           Mpi_message_j.read_file_metadata
+                           Api_types_j.read_unit_t
                            result)
-          (fun result -> `FileCreate result)
+          (fun result -> `FileDelete result)
       | `FileGet (project_id,file_id) ->
         send
           timeout
