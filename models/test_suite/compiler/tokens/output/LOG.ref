@@ -2,9 +2,6 @@
 Parsing tokens.ka...
 done
 + Sanity checks
-+ KaSa tools initialization
-+ Compute the contact map
-Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 + Compiling...
 + Building initial simulation conditions...
 	 -simulation parameters

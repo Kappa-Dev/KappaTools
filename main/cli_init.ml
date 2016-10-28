@@ -26,11 +26,8 @@ let get_compilation ?max_event cli_args =
         List.fold_left (KappaLexer.compile Format.std_formatter)
           Ast.empty_compil cli_args.Run_cli_args.inputKappaFileNames in
       let () = Format.printf "+ Sanity checks@." in
-      let (sigs_nd,tk_nd,updated_vars,result') =
+      let (sigs_nd,contact_map,tk_nd,updated_vars,result') =
         LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in
-      let () = Format.printf "+ KaSa tools initialization@." in
-      let contact_map,_kasa_state =
-        Eval.init_kasa Remanent_parameters_sig.KaSim sigs_nd result in
       let () = Format.printf "+ Compiling...@." in
       let (env, story_compression, unary_distances, formatCflow, init_l)=
         Eval.compile

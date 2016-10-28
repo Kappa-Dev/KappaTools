@@ -522,7 +522,7 @@ let compile_rules alg_deps contact_map domain rules =
   | _, _, None, _, _ ->
     failwith "The origin of Eval.compile_rules has been lost"
 
-let translate_contact_map sigs kasa_contact_map =
+(*let translate_contact_map sigs kasa_contact_map =
   let wdl = Location.dummy_annot in
   let sol = Array.init
       (Signature.size sigs)
@@ -558,7 +558,7 @@ let init_kasa called_from sigs result =
   let () = Export_to_KaSim.dump_errors_light kasa_state in
   translate_contact_map sigs contact_map,
   Export_to_KaSim.flush_errors kasa_state
-
+*)
 let compile ~outputs ~pause ~return
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");

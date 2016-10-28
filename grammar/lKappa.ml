@@ -394,7 +394,18 @@ let build_l_type sigs pos dst_ty dst_p switch =
   let p_id = Signature.id_of_site dst_ty dst_p sigs in
   ((Ast.LNK_TYPE (p_id,ty_id),pos),switch)
 
-let build_link sigs pos i ag_ty p_id switch (links_one,links_two) =
+let add_link_contact_map ?contact_map sty sp dty dp =
+  match contact_map with
+  | None -> ()
+  | Some contact_map ->
+    let si,sl = contact_map.(sty).(sp) in
+    let di,dl = contact_map.(dty).(dp) in
+    let () = contact_map.(sty).(sp) <-
+        si,Tools.list_merge_uniq Mods.int_pair_compare sl [dty,dp] in
+    contact_map.(dty).(dp) <-
+      di,Tools.list_merge_uniq Mods.int_pair_compare dl [sty,sp]
+
+let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
     raise (ExceptionDefn.Malformed_Decl
              ("This is the third occurence of link '"^string_of_int i
@@ -408,6 +419,7 @@ let build_link sigs pos i ag_ty p_id switch (links_one,links_two) =
       (Mods.IntMap.add i (ag_ty,p_id,new_link,pos) one',links_two)
     | Some (dst_ty,dst_p,dst_id,_),one' ->
       if Signature.allowed_link ag_ty p_id dst_ty dst_p sigs then
+        let () = add_link_contact_map ?contact_map ag_ty p_id dst_ty dst_p in
         let maintained = match switch with
           | Linked (j,_) -> Some j = dst_id
           | Freed | Erased | Maintained -> false in
@@ -596,7 +608,8 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
            let () = ports.(p_id) <- Location.dummy_annot Ast.FREE, Erased in
            (lannot,pset')
          | [Ast.LNK_VALUE (i,()), pos] ->
-           let va,lannot' = build_link sigs pos i ag_id p_id Erased lannot in
+           let va,lannot' =
+             build_link sigs pos i ag_id p_id Erased lannot in
            let () = ports.(p_id) <- va in (lannot',pset')
          | _::(_,pos)::_ ->
            raise (ExceptionDefn.Malformed_Decl
@@ -605,7 +618,8 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
-let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
+let annotate_created_agent
+    sigs ?contact_map rannot ((agent_name, pos as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -634,7 +648,8 @@ let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
            not_enough_specified agent_name p_na
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
-           let _,rannot' = build_link sigs pos i ag_id p_id Freed rannot in
+           let _,rannot' =
+             build_link sigs ?contact_map pos i ag_id p_id Freed rannot in
            pset',rannot'
          | [Ast.FREE, _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
@@ -643,7 +658,8 @@ let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
      Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; },
    pos)
 
-let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
+let annotate_agent_with_diff
+    sigs ?contact_map (agent_name, _ as ag_ty) links_annot lp rp =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -691,11 +707,13 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
       let () = ports.(p_id) <- (Location.dummy_annot Ast.FREE, Maintained) in
       links_annot
     | [Ast.LNK_VALUE (i,()),pos], ([Ast.FREE,_] | []) ->
-      let va,lhs_links' = build_link sigs pos i ag_id p_id Freed lhs_links in
+      let va,lhs_links' =
+        build_link sigs pos i ag_id p_id Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | [Ast.LNK_ANY,pos_lnk], [Ast.LNK_VALUE (i,()),pos] ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), Linked (i,pos)) in
-      let _,rhs_links' = build_link sigs pos i ag_id p_id Freed rhs_links in
+      let _,rhs_links' =
+        build_link sigs ?contact_map pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_SOME,pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
@@ -707,7 +725,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
                f "breaking a semi-link on site '%s' will induce a side effect"
                na) in
       let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Linked (i,pos')) in
-      let _,rhs_links' = build_link sigs pos' i ag_id p_id Freed rhs_links in
+      let _,rhs_links' =
+        build_link sigs ?contact_map pos' i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
@@ -720,17 +739,20 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
                na) in
       let () = ports.(p_id) <-
           build_l_type sigs pos_lnk dst_ty dst_p (Linked (i,pos')) in
-      let _,rhs_links' = build_link sigs pos' i ag_id p_id Freed rhs_links in
+      let _,rhs_links' =
+        build_link sigs ?contact_map pos' i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | ([Ast.FREE,_] | []), [Ast.LNK_VALUE (i,()),pos] ->
       let () =
         ports.(p_id) <- (Location.dummy_annot Ast.FREE, Linked (i,pos)) in
-      let _,rhs_links' = build_link sigs pos i ag_id p_id Freed rhs_links in
+      let _,rhs_links' =
+        build_link sigs ?contact_map pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_VALUE (i,()),pos_i], [Ast.LNK_VALUE (j,()),pos_j] ->
-      let va,lhs_links' =
-        build_link sigs pos_i i ag_id p_id (Linked (j,pos_j)) lhs_links in
-      let _,rhs_links' = build_link sigs pos_j j ag_id p_id Freed rhs_links in
+      let va,lhs_links' = build_link
+          sigs pos_i i ag_id p_id (Linked (j,pos_j)) lhs_links in
+      let _,rhs_links' =
+        build_link sigs ?contact_map pos_j j ag_id p_id Freed rhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links')
     | _::(_,pos)::_, _ ->
       raise (ExceptionDefn.Malformed_Decl
@@ -824,20 +846,22 @@ Is responsible for the check that:
 - links appear exactly twice
 *)
 
-let annotate_lhs_with_diff sigs lhs rhs =
+let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
     | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
       when String.compare lag_na rag_na = 0 &&
            Ast.no_more_site_on_right true lag_p rag_p ->
       let ra,links_annot' =
-        annotate_agent_with_diff sigs ag_ty links_annot lag_p rag_p in
+        annotate_agent_with_diff
+          sigs ?contact_map ag_ty links_annot lag_p rag_p in
       aux links_annot' (ra::acc) lt rt
     | erased, added ->
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
           (fun (acc,lannot) x ->
-             let ra,lannot' = annotate_dropped_agent sigs lannot x in
+             let ra,lannot' =
+               annotate_dropped_agent sigs lannot x in
              (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let () =
@@ -848,7 +872,8 @@ let annotate_lhs_with_diff sigs lhs rhs =
       let cmix,(rhs_links_one,_),_ =
         List.fold_left
           (fun (acc,rannot,id) x ->
-             let rannot',x' = annotate_created_agent sigs rannot x in
+             let rannot',x' =
+               annotate_created_agent sigs ?contact_map rannot x in
              x'::acc,rannot',succ id)
           ([],snd links_annot,0) added in
       let () =
@@ -924,8 +949,8 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
     k_def,k_un,r_pos)
    ::rules')
 
-let mixture_of_ast sigs pos mix =
-  match annotate_lhs_with_diff sigs mix mix with
+let mixture_of_ast sigs ?contact_map pos mix =
+  match annotate_lhs_with_diff sigs ?contact_map mix mix with
   | r, [] -> r
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
@@ -958,9 +983,10 @@ let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
         in Alg_expr.TOKEN_ID i
       | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
-        Alg_expr.BIN_ALG_OP (op,
-                        alg_expr_of_ast sigs tok algs ?max_allowed_var a,
-                        alg_expr_of_ast sigs tok algs ?max_allowed_var b)
+        Alg_expr.BIN_ALG_OP
+          (op,
+           alg_expr_of_ast sigs tok algs ?max_allowed_var a,
+           alg_expr_of_ast sigs tok algs ?max_allowed_var b)
       | Alg_expr.UN_ALG_OP (op,a) ->
         Alg_expr.UN_ALG_OP
           (op,alg_expr_of_ast sigs tok algs ?max_allowed_var a)),
@@ -981,15 +1007,16 @@ let print_expr_of_ast sigs tok algs = function
   | Ast.Alg_pexpr x ->
     Ast.Alg_pexpr (alg_expr_of_ast sigs tok algs x)
 
-let modif_expr_of_ast sigs tok algs modif acc =
+let modif_expr_of_ast sigs tok algs contact_map modif acc =
   match modif with
   | Ast.INTRO (how,(who,pos)) ->
     Ast.INTRO
-      (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos)),
+      (alg_expr_of_ast sigs tok algs how,
+       (mixture_of_ast sigs ~contact_map pos who,pos)),
     acc
   | Ast.DELETE (how,(who,pos)) ->
     Ast.DELETE
-      (alg_expr_of_ast sigs tok algs how,(mixture_of_ast sigs pos who,pos)),
+      (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos)),
     acc
   | Ast.UPDATE ((lab,pos),how) ->
     let i =
@@ -1025,19 +1052,20 @@ let modif_expr_of_ast sigs tok algs modif acc =
   | Ast.CFLOWMIX (b,(m,pos)) ->
     Ast.CFLOWMIX (b,(mixture_of_ast sigs pos m,pos)),acc
 
-let perturbation_of_ast sigs tok algs ((pre,mods,post),pos) up_vars =
+let perturbation_of_ast
+    sigs tok algs contact_map ((pre,mods,post),pos) up_vars =
   let mods',up_vars' =
     Tools.list_fold_right_map
-      (modif_expr_of_ast sigs tok algs) mods up_vars in
+      (modif_expr_of_ast sigs tok algs contact_map) mods up_vars in
   ((bool_expr_of_ast sigs tok algs pre,mods',
     match post with
     | None -> None
     | Some post -> Some (bool_expr_of_ast sigs tok algs post)),pos),
   up_vars'
 
-let init_of_ast sigs tok = function
+let init_of_ast sigs tok contact_map = function
   | Ast.INIT_MIX who,pos ->
-    Ast.INIT_MIX (mixture_of_ast sigs pos who),pos
+    Ast.INIT_MIX (mixture_of_ast sigs ~contact_map pos who),pos
   | Ast.INIT_TOK lab,pos ->
     match Mods.StringMap.find_option lab tok with
     | Some x -> Ast.INIT_TOK x,pos
@@ -1070,6 +1098,13 @@ let compil_of_ast overwrite c =
     then Ast.implicit_signature c
     else c in
   let sigs = Signature.create (create_sig c.Ast.signatures) in
+  let contact_map =
+    Array.init
+      (Signature.size sigs)
+      (fun i -> Array.init (Signature.arity sigs i)
+          (fun s -> (Tools.recti
+                       (fun a k -> k::a) []
+                       (Signature.internal_states_number i s sigs),[]))) in
   let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_right
       name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
@@ -1089,8 +1124,8 @@ let compil_of_ast overwrite c =
   let tok = tk_nd.NamedDecls.finder in
   let perts',updated_vars =
     Tools.list_fold_right_map
-      (perturbation_of_ast sigs tok algs) c.Ast.perturbations [] in
-  sigs,tk_nd,updated_vars,
+      (perturbation_of_ast sigs tok algs contact_map) c.Ast.perturbations [] in
+  sigs,contact_map,tk_nd,updated_vars,
   {
     Ast.variables =
       Tools.list_mapi
@@ -1099,7 +1134,8 @@ let compil_of_ast overwrite c =
         alg_vars_over;
     Ast.rules =
       List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
-          let mix,created = annotate_lhs_with_diff sigs lhs rhs in
+          let mix,created =
+            annotate_lhs_with_diff sigs ~contact_map lhs rhs in
           label,
           ({ r_mix = mix; r_created = List.map fst created;
              r_rm_tokens =
@@ -1116,7 +1152,8 @@ let compil_of_ast overwrite c =
              r_un_rate =
                Tools.option_map
                  (fun (un_rate',dist) ->
-                    ((alg_expr_of_ast sigs tok algs ?max_allowed_var:None)
+                    ((alg_expr_of_ast
+                        sigs tok algs ?max_allowed_var:None)
                        un_rate', dist))
                  un_rate;
            },r_pos)) cleaned_rules;
@@ -1125,7 +1162,8 @@ let compil_of_ast overwrite c =
         c.Ast.observables;
     Ast.init =
       List.map (fun (lab,expr,ini) ->
-          lab,alg_expr_of_ast sigs tok algs expr,init_of_ast sigs tok ini)
+          lab,alg_expr_of_ast sigs tok algs expr,
+          init_of_ast sigs tok contact_map ini)
         c.Ast.init;
     Ast.perturbations = perts';
     Ast.volumes = c.Ast.volumes;

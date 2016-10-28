@@ -145,41 +145,35 @@ let build_ast
              (Lwt.wrap2 LKappa.compil_of_ast [] raw_ast) >>=
              (fun
                (sig_nd,
+                contact_map,
                 tk_nd,
                 _updated_vars,
-                result :
-                  Signature.s * unit NamedDecls.t * int list *
+                (result :
                   (Ast.agent,
                    LKappa.rule_agent list,
                    int,
-                   LKappa.rule) Ast.compil) ->
+                   LKappa.rule) Ast.compil)) ->
                (yield ()) >>=
                (fun () ->
                   (* The last yield is updated after the last yield.
                      It is gotten here for the initial last yeild value. *)
                   let lastyield = Sys.time () in
-                  (Lwt.wrap3
-                     Eval.init_kasa
-                     Remanent_parameters_sig.JS
-                     sig_nd
-                     raw_ast) >>=
-                  (fun (contact_map,_kasa_state) ->
-                     Eval.compile
-                       ~pause:(fun f -> Lwt.bind (yield ()) f)
-                       ~return:Lwt.return ?rescale_init:None
-                       ~outputs:(function
-                           | Data.Log s ->
-                             Format.fprintf simulation_log_form "%s@." s
-                           | Data.Snapshot _
-                           | Data.Flux _
-                           | Data.Plot _
-                           | Data.Print _
-                           | Data.UnaryDistance _ -> assert false)
-                       sig_nd tk_nd contact_map result >>=
-                     (fun (env,has_tracking,store_distances,_,init_l) ->
-                       let store_distances = store_distances<>None in
-                       let simulation =
-                         create_t
+                  Eval.compile
+                    ~pause:(fun f -> Lwt.bind (yield ()) f)
+                    ~return:Lwt.return ?rescale_init:None
+                    ~outputs:(function
+                        | Data.Log s ->
+                          Format.fprintf simulation_log_form "%s@." s
+                        | Data.Snapshot _
+                        | Data.Flux _
+                        | Data.Plot _
+                        | Data.Print _
+                        | Data.UnaryDistance _ -> assert false)
+                    sig_nd tk_nd contact_map result >>=
+                  (fun (env,has_tracking,store_distances,_,init_l) ->
+                     let store_distances = store_distances<>None in
+                     let simulation =
+                       create_t
                          ~contact_map:contact_map
                          ~env:env
                          ~graph:(Rule_interpreter.empty ~store_distances env)
@@ -188,8 +182,8 @@ let build_ast
                          ~has_tracking:has_tracking
                          ~init_l:init_l
                          ~lastyield:lastyield
-                       in
-                       Lwt.return (`Ok simulation))))))))
+                     in
+                     Lwt.return (`Ok simulation)))))))
     (catch_error (fun e -> Lwt.return (`Error e)))
 
 let outputs (simulation : t) =
@@ -423,34 +417,42 @@ let perturbation
        else
          let cc_preenv =
            Connected_component.PreEnv.of_env (Environment.domain t.env) in
+         let contact_map' = Array.map Array.copy t.contact_map in
          let e',_ =
            Tools.list_fold_right_map
              (LKappa.modif_expr_of_ast
                 (Environment.signatures t.env)
                 (Environment.tokens_finder t.env)
-                (Environment.algs_finder t.env))
+                (Environment.algs_finder t.env) contact_map')
              (KappaParser.effect_list KappaLexer.token lexbuf) [] in
-         let cc_preenv', e'' = Eval.compile_modifications_no_track
-             t.contact_map cc_preenv e' in
-         let graph' =
-           if cc_preenv == cc_preenv' then t.graph
-           else
-             let domain' = Connected_component.PreEnv.finalize cc_preenv' in
-             let () =
-               t.env <- Environment.new_domain domain' t.env in
+         if Tools.array_fold_lefti
+             (fun n -> Tools.array_fold_lefti
+                 (fun s b x -> b || x != t.contact_map.(n).(s)))
+             false contact_map' then
+           Lwt.fail (ExceptionDefn.Malformed_Decl
+                       (Location.dummy_annot "Creating new link type is forbidden"))
+         else
+           let cc_preenv', e'' = Eval.compile_modifications_no_track
+               t.contact_map cc_preenv e' in
+           let graph' =
+             if cc_preenv == cc_preenv' then t.graph
+             else
+               let domain' = Connected_component.PreEnv.finalize cc_preenv' in
+               let () =
+                 t.env <- Environment.new_domain domain' t.env in
+               List.fold_left
+                 (Rule_interpreter.incorporate_extra_pattern domain')
+                 t.graph (Primitives.extract_connected_components_modifications e'') in
+           let _,graph'',state' =
              List.fold_left
-               (Rule_interpreter.incorporate_extra_pattern domain')
-               t.graph (Primitives.extract_connected_components_modifications e'') in
-         let _,graph'',state' =
-           List.fold_left
-             (fun (stop,graph',state' as acc) x ->
-                if stop then acc else
-                  State_interpreter.do_modification
-                    ~outputs:(outputs t) t.env t.counter graph' state' x)
-             (false,graph',t.state) e'' in
-         let () = t.graph <- graph'' in
-         let () = t.state <- state' in
-         Lwt.return (`Ok ()))
+               (fun (stop,graph',state' as acc) x ->
+                  if stop then acc else
+                    State_interpreter.do_modification
+                      ~outputs:(outputs t) t.env t.counter graph' state' x)
+               (false,graph',t.state) e'' in
+           let () = t.graph <- graph'' in
+           let () = t.state <- state' in
+           Lwt.return (`Ok ()))
     (catch_error (fun e -> Lwt.return (`Error e)))
 
 let continue
