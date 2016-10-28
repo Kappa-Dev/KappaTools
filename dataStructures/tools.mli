@@ -29,6 +29,11 @@ val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
 val list_map_option : ('a -> 'b option) -> 'a list -> 'b list
 val list_random : 'a list -> 'a
 
+(** Set union of 2 sorted list
+  When l1 is included in l2:
+  [list_merge_uniq l1 l2 == list_merge_uniq l2 l1 == l2] *)
+val list_merge_uniq : ('a -> 'a -> int) -> 'a list -> 'a list -> 'a list
+
 (** not tail rec but don't allocate if unecessary *)
 val list_smart_filter : ('a -> bool) -> 'a list -> 'a list
 val list_smart_map : ('a -> 'a) -> 'a list -> 'a list

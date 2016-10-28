@@ -98,15 +98,6 @@ let check form p f string a b =
       (print_list form a;print_list form b;print_list form rep;
        failwith (string^"_output"))
 
-let merge_list p a b =
-  let rec aux a b accu =
-    match a,b with
-    | l,[] | [],l ->  List.rev (List.rev_append l accu)
-    | h::t,h'::t' when h=h' -> aux t t' (h::accu)
-    | h::t,h'::_ when p h h' -> aux t b (h::accu)
-    | _,h'::t' -> aux a t' (h'::accu)
-  in aux a b []
-
 let is_strict_sublist p a b =
   let rec aux a b =
     match a,b with
@@ -117,7 +108,7 @@ let is_strict_sublist p a b =
     | _,_::t' -> aux a t'
   in aux a b
 
-let insert_elt p e = merge_list p [e]
+let insert_elt p e = Tools.list_merge_uniq p [e]
 
 let diff_list p a b =
   let rec aux a b accu =
@@ -132,7 +123,8 @@ let diff_list p a b =
 
 let compare_bool a b = compare a b < 0
 let diff_list_decreasing =  diff_list (swap compare_bool)
-let merge_list_decreasing = merge_list (swap compare_bool)
+let merge_list_decreasing =
+  Tools.list_merge_uniq (fun x y -> Pervasives.compare y x)
 
 
 let closure_bottom_up_with_fold parameter handler log_info error event config prec is_obs f a  =
