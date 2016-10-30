@@ -1,6 +1,5 @@
 module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
-module UIState = Ui_state
 
 let navli (_ : Ui_simulation.t) = []
 
@@ -15,10 +14,10 @@ let configuration : Widget_export.configuration =
       ; Widget_export.export_json
           ~serialize_json:(fun () ->
               (match
-                 React.S.value UIState.model_parse
+                 React.S.value Ui_state.model_parse
                with
                | None -> "null"
-               | Some parse -> ApiTypes.string_of_parse parse
+               | Some parse -> Api_types_j.string_of_contact_map parse
               )
             )
       ];
@@ -26,9 +25,9 @@ let configuration : Widget_export.configuration =
         (fun model_parse ->
            match model_parse with
            | None -> false
-           | Some data -> Array.length data.ApiTypes.contact_map > 0
+           | Some data -> Array.length data > 0
         )
-        UIState.model_parse
+        Ui_state.model_parse
   }
 
 
@@ -47,6 +46,20 @@ let content =
 
 let navcontent (_ : Ui_simulation.t) = [ Html.div [content] ]
 
+let update
+    (data : Api_types_j.contact_map)
+    (contactmap : Js_contact.contact_map Js.t) : unit =
+  let () = Common.debug (Js.string "updating") in
+  let site_graph : Api_types_v1_j.site_graph =
+    Api_data_v1.api_contact_map data in
+  (* quick cheat to get the count of the agents *)
+  let json : string =
+    Api_types_v1_j.string_of_site_graph site_graph in
+  let () = Common.debug (Js.string json) in
+  contactmap##setData
+    (Js.string json)
+    (Js.Opt.option (Ui_state.agent_count ()))
+
 let onload (_ : Ui_simulation.t) =
   let () = Widget_export.onload configuration in
   let contactmap : Js_contact.contact_map Js.t =
@@ -57,33 +70,19 @@ let onload (_ : Ui_simulation.t) =
          match data with
          | None -> (contactmap##clearData)
          | Some data ->
-           if Array.length data.ApiTypes.contact_map > 0 then
-             let json : string =
-               Api_types_v1_j.string_of_site_graph data.ApiTypes.contact_map
-             in
-             (contactmap##setData
-                (Js.string json)
-                (Js.Opt.option (Ui_state.agent_count ()))
-             )
+           if Array.length data > 0 then
+             update data contactmap
            else
-             contactmap##clearData
-      )
-      UIState.model_parse
+             contactmap##clearData)
+      Ui_state.model_parse
+
   in
   Common.jquery_on
     "#navcontact"
     "shown.bs.tab"
     (fun _ ->
-       match (React.S.value UIState.model_parse) with
+       match (React.S.value Ui_state.model_parse) with
        | None -> (contactmap##clearData)
-       | Some data ->
-         let site_graph : ApiTypes.site_graph =
-           Api_data_v1.api_contactmap_site_graph data in
-         (* quick cheat to get the count of the agent *)
-         let json : string =
-           Api_types_v1_j.string_of_site_graph site_graph in
-         contactmap##setData
-           (Js.string json)
-           (Js.Opt.option (Ui_state.agent_count ()))
-    )
+       | Some data -> update data contactmap)
+
 let onresize (_ : Ui_simulation.t) : unit = ()

@@ -1,22 +1,22 @@
-module ApiTypes = Api_types_v1_j
+open Lwt.Infix
 module Html = Tyxml_js.Html5
-open ApiTypes
-module UIState = Ui_state
 
-let div_axis_select_id  = "plot-axis-select"
 let display_id = "flux-map-display"
 let export_id = "flux-export"
 let svg_id = "fluxmap-svg"
-let select_id = "select"
+let select_id = "fluxmap-select"
 
-let rules_checkboxes_id = "rules-checkboxes"
-let checkbox_self_influence_id = "checkbox_self_influence"
+let rules_checkboxes_id = "fluxmap-rules-checkboxes"
+let checkbox_self_influence_id = "fluxmap-checkbox_self_influence"
 
-let state_fluxmap
-    (state : ApiTypes.state option) : ApiTypes.flux_map list =
-  match state with
-  | None -> []
-  | Some state -> state.ApiTypes.flux_maps
+let has_fluxmap
+    (simulation_info : Api_types_j.simulation_info option) :
+  bool =
+  match simulation_info with
+  | None -> false
+  | Some simulation_info ->
+    simulation_info.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps > 0
+
 let serialize_json : (string -> unit) ref = ref (fun _ -> ())
 
 let configuration (t : Ui_simulation.t) : Widget_export.configuration =
@@ -34,11 +34,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
         }
       ];
     show = React.S.map
-        (fun state ->
-           match state_fluxmap state with
-           | [] -> false
-           | _ -> true
-        )
+        has_fluxmap
         simulation_output
   }
 
@@ -50,16 +46,36 @@ let content (t : Ui_simulation.t) =
          ; Html.a_id select_id ]
       (let flux_list, flux_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
-           (fun state ->
-              ReactiveData.RList.set
-		flux_handle
-		(List.mapi
-                   (fun i flux -> Html.option
-		       ~a:[ Html.a_value (string_of_int i) ]
-		       (Html.pcdata
-			  (Ui_common.option_label flux.ApiTypes.flux_name)))
-                   (state_fluxmap state)
-		)
+           (fun _ ->
+              Ui_simulation.manager_operation
+                t
+                (fun
+                  manager
+                  project_id
+                  simulation_id ->
+                  (manager#simulation_info_flux_map
+                     project_id
+                     simulation_id
+                  ) >>=
+                  (Api_common.result_map
+                     ~ok:(fun _ (data : Api_types_t.flux_map_info) ->
+                         let () = ReactiveData.RList.set
+                             flux_handle
+                             (List.mapi
+                                (fun i id -> Html.option
+                                  ~a:[ Html.a_value (string_of_int i) ]
+                                  (Html.pcdata
+                                     (Ui_common.option_label id)))
+                                data.Api_types_t.flux_map_ids
+                             )
+                         in
+                         Lwt.return_unit
+                       )
+                     ~error:(fun _ errors  ->
+                         let () = Ui_state.set_model_error __LOC__ errors in
+                         Lwt.return_unit)
+                  )
+                )
            )
            simulation_output in
        flux_list
@@ -70,16 +86,37 @@ let content (t : Ui_simulation.t) =
       ~a:[ Html.a_class ["list-group-item"] ]
       (let flux_list, flux_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
-           (fun state ->
-              ReactiveData.RList.set
-		flux_handle
-		(match state_fluxmap state with
-		   head::[] -> [Html.h4
-				  [ Html.pcdata
-                                      (Ui_common.option_label
-					 head.ApiTypes.flux_name)]]
-		 | _ -> [flux_select]
-		)
+           (fun _ ->
+              Ui_simulation.manager_operation
+                t
+                (fun
+                  manager
+                  project_id
+                  simulation_id ->
+                  (manager#simulation_info_flux_map
+                     project_id
+                     simulation_id
+                  ) >>=
+                  (Api_common.result_map
+                     ~ok:(fun _ (data : Api_types_t.flux_map_info) ->
+                         let () =
+                           ReactiveData.RList.set
+                             flux_handle
+                           (match data.Api_types_t.flux_map_ids with
+                              head::[] -> [Html.h4
+                                             [ Html.pcdata
+                                                 (Ui_common.option_label
+                                                    head)]]
+                            | _ -> [flux_select]
+                           )
+                         in
+                         Lwt.return_unit
+                       )
+                     ~error:(fun _ errors  ->
+                         let () = Ui_state.set_model_error __LOC__ errors in
+                         Lwt.return_unit)
+                  )
+                )
            )
            simulation_output
        in
@@ -140,20 +177,60 @@ let content (t : Ui_simulation.t) =
 let navcontent (t : Ui_simulation.t) =
   [Ui_common.toggle_element
      t
-     state_fluxmap
+     has_fluxmap
      (content t) ]
 
 let update_flux_map
+    (t : Ui_simulation.t)
     (flux_js : Js_flux.flux_map Js.t)
-    (flux_data : ApiTypes.flux_map) : unit =
-  let flux_data : Js_flux.flux_data Js.t =
-    Js_flux.create_data ~flux_begin_time:flux_data.flux_begin_time
-      ~flux_end_time:flux_data.flux_end_time
-      ~flux_rules:flux_data.flux_rules
-      ~flux_hits:flux_data.flux_hits
-      ~flux_fluxs:flux_data.flux_fluxs
-  in
-  flux_js##setFlux(flux_data)
+    (index : int ): unit =
+  Ui_simulation.manager_operation
+    t
+    (fun
+      manager
+      project_id
+      simulation_id ->
+      (manager#simulation_info_flux_map
+         project_id
+         simulation_id
+      ) >>=
+      (Api_common.result_bind_lwt
+         ~ok:(fun  (flux_map_info : Api_types_j.flux_map_info) ->
+             try
+               let fluxmap_id : string =
+                 List.nth flux_map_info.Api_types_t.flux_map_ids index in
+               (manager#simulation_detail_flux_map
+                  project_id
+                  simulation_id
+                      fluxmap_id
+               )
+             with
+             | Failure f ->
+               Lwt.return
+                 (Api_common.result_error_msg f)
+             | Invalid_argument f ->
+               Lwt.return
+                 (Api_common.result_error_msg f)
+
+           )
+      ) >>=
+      (Api_common.result_map
+         ~ok:(fun _ (flux_map : Api_types_j.flux_map) ->
+             let flux_map = Api_data_v1.api_flux_map flux_map in
+             let flux_data : Js_flux.flux_data Js.t =
+               Js_flux.create_data ~flux_begin_time:flux_map.Api_types_v1_j.flux_begin_time
+                 ~flux_end_time:flux_map.Api_types_v1_j.flux_end_time
+                 ~flux_rules:flux_map.Api_types_v1_j.flux_rules
+                 ~flux_hits:flux_map.Api_types_v1_j.flux_hits
+                 ~flux_fluxs:flux_map.Api_types_v1_j.flux_fluxs
+             in
+             let () = flux_js##setFlux(flux_data) in
+            Lwt.return_unit)
+        ~error:(fun _ errors  ->
+            let () = Ui_state.set_model_error __LOC__ errors in
+            Lwt.return_unit)
+     )
+    )
 
 let select_fluxmap (t : Ui_simulation.t) flux_map =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -169,14 +246,20 @@ let select_fluxmap (t : Ui_simulation.t) flux_map =
   match (React.S.value simulation_output) with
     None -> ()
   | Some state -> let index = Js.Opt.get index (fun _ -> 0) in
-    if List.length state.ApiTypes.flux_maps > 0 then
+    if state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps > 0 then
       update_flux_map
+        t
         flux_map
-        (List.nth state.ApiTypes.flux_maps index)
+        index
     else
       ()
 
-let navli (t : Ui_simulation.t) = Ui_common.badge t (fun state -> List.length (state_fluxmap state))
+let navli (t : Ui_simulation.t) =
+  Ui_common.badge t
+    (fun state ->
+       match state with
+       | None -> 0
+       | Some state -> state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps)
 
 let onload (t : Ui_simulation.t) =
   let () = Widget_export.onload (configuration t) in
@@ -200,6 +283,15 @@ let onload (t : Ui_simulation.t) =
       (fun f -> let filename = Js.string f in
         flux##exportJSON(filename))
   in
+    let () =
+    Common.jquery_on
+      (Format.sprintf "#%s" select_id)
+      ("change")
+      (fun _ ->
+	 let () = select_fluxmap t flux in Js._true)
+  in
+
+  (* TODO
   let select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -207,18 +299,20 @@ let onload (t : Ui_simulation.t) =
              (Js.string select_id))
           (fun () -> assert false))
        : Dom_html.element Js.t) in
+
   let () = select_dom##.onchange := Dom_html.handler
-	(fun _ ->
-	   let () = select_fluxmap t flux
-	   in Js._true)
+        (fun _ ->
+           let () = select_fluxmap t flux
+           in Js._true)
   in
+  *)
   let div : Dom_html.element Js.t =
     Js.Opt.get
       (Ui_common.document##getElementById
          (Js.string display_id))
       (fun () -> assert false) in
   let () = div##.innerHTML := Js.string
-	("<svg id=\""^
+        ("<svg id=\""^
          svg_id^
          "\" width=\"300\" height=\"300\"><g/></svg>") in
   let () = Common.jquery_on "#navflux"

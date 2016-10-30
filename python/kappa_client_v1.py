@@ -6,163 +6,116 @@ import urllib.parse
 import sys
 import getopt
 import time
+import kappa_common
 # bad pratice but done to support python2
 
 from urllib.request import urlopen
 
 import json
 
-class KappaError(Exception):
-    """ Error returned from the Kappa server
-    """
-    def __init__(self, errors):
-        Exception.__init__(self)
-        self.errors = errors
+class Parameter(object):
+    def __init__(self,
+                 code,
+                 plot_period,
+                 max_time = None,
+                 max_events = None,
+                 seed = None) :
+        self.code = code
+        self.plot_period = plot_period
+        self.max_time = max_time
+        self.max_events = max_events
+        self.seed = seed
 
-class KappaRuntime(object):
+    def toJSON(self):
+        return({ "code" : self.code,
+                 "plot_period" : self.plot_period,
+                 "max_time" : self.max_time,
+                 "max_events" : self.max_events ,
+                 "seed" : self.seed })
+
+class Continuation(object):
+    def __init__(self,
+                 token,
+                 parameter):
+        self.continuation_token = token
+        self.continuation_parameter = parameter
+
+    def toJSON(self):
+        return({ "continuation_token" : self.continuation_token,
+                 "continuation_parameter" : self.continuation_parameter, })
+
+class KappaStd(kappa_common.StdBase):
+    def __init__(self, path , delimiter = '\x1e', ):
+        kappa_common.StdBase.__init__(self,
+                                           path ,
+                                           delimiter,)
+    def projection(self,response):
+        result_data = response["data"][1]
+        if result_data[0] == "Right":
+            return(result_data[1])
+        elif result_data[0] == "Left":
+            print(result_data[1])
+            raise kappa_common.KappaError(result_data[1])
+        else:
+            raise kappa_common.KappaError(response)
+
+    def version(self):
+        return(self.dispatch("Version",None))
+
+    def parse(self, code):
+        return(self.dispatch("Parse", code))
+
+    def start(self, parameter):
+        return(self.dispatch("Start", parameter.toJSON()))
+
+    def list(self):
+        return(self.dispatch("List", None))
+
+    def status(self, token):
+        return(self.dispatch("Status", token))
+
+    def stop(self, token):
+        return(self.dispatch("Stop", token))
+
+    def pause(self, token):
+        return(self.dispatch("Pause", token))
+
+    def resume(self, continuation):
+        return(self.dispatch("Resume", continuation))
+
+    def perturbation(self, token , perturbation):
+        return(self.dispatch("Peturbation",
+                             { perturbation_token : token ,
+                               perturbation_code : perturbation }))
+
+
+class KappaRest(kappa_common.RestBase):
     """ Create a client by supplying a web endpoint
     """
     def __init__(self, endpoint):
         self.url = "{0}/v1".format(endpoint)
 
     def version(self):
-        """ get version of environment this should provide
-            a quick status check for the endpoint as the
-            URL is already versioned.
-        """
-        try:
-            version_url = "{0}/version".format(self.url)
-            response = urlopen(version_url)
-            text = response.read()
-            return json.loads(text.decode('utf-8'))
-        except urllib.error.URLError as exception:
-            raise KappaError(exception.reason)
+        return(self.dispatch("GET","{0}/version".format(self.url),None))
 
     def parse(self, code):
-        """ parse code throw an exception if the parse
-            fails.
-        """
         query_args = {'code':code}
         encoded_args = urllib.parse.urlencode(query_args)
         parse_url = "{0}/parse?{1}".format(self.url, encoded_args)
-        try:
-            response = urlopen(parse_url)
-            text = response.read()
-            return json.loads(text.decode("utf-8"))
-        except urllib.error.HTTPError as exception:
-            if exception.code == 400:
-                error_details = json.loads(exception.read())
-                raise KappaError(error_details)
-            else:
-                raise exception
-        except urllib.error.URLError as exception:
-            KappaError(exception.reason)
+        return(self.dispatch("GET",parse_url,None))
 
     def start(self, parameter):
-        """ parse code throw an exception if the parse
-            fails.
-        """
-        if not 'max_time' in parameter:
-            parameter['max_time'] = None
-        if not 'max_events' in parameter:
-            parameter['max_events'] = None
-        if not 'seed' in parameter:
-            parameter['seed'] = None
-        code = json.dumps(parameter)
-        method = "POST"
-        handler = urllib.request.HTTPHandler()
-        opener = urllib.request.build_opener(handler)
-        parse_url = "{0}/process".format(self.url)
-        request = urllib.request.Request(parse_url, data=code.encode("utf-8"))
-        request.get_method = lambda: method
-        try:
-            connection = opener.open(request)
-        except urllib.request.HTTPError as exception:
-            connection = exception
-        except urllib.request.URLError as exception:
-            raise KappaError(exception.reason)
-
-        if connection.code == 200:
-            text = connection.read()
-            return int(json.loads(text.decode("utf-8")))
-        elif connection.code == 400:
-            text = connection.read()
-            error_details = json.loads(text.decode("utf-8"))
-            raise KappaError(error_details)
-        else:
-            raise exception
+        return(self.dispatch("POST","{0}/process".format(self.url)
+                            ,parameter.toJSON()))
 
     def stop(self, token):
-        """ stop running process
-        """
-        method = "DELETE"
-        handler = urllib.request.HTTPHandler()
-        opener = urllib.request.build_opener(handler)
-        parse_url = "{0}/process/{1}".format(self.url, token)
-        request = urllib.request.Request(parse_url)
-        request.get_method = lambda: method
-        try:
-            connection = opener.open(request)
-        except urllib.request.HTTPError as exception:
-            connection = exception
-        except urllib.request.URLError as exception:
-            raise KappaError(exception.reason)
-
-        if connection.code == 200:
-            text = connection.read()
-            return None
-        elif connection.code == 400:
-            text = connection.read()
-            error_details = json.loads(text.decode("utf-8"))
-            raise KappaError(error_details)
-        else:
-            raise exception
+        return(self.dispatch("DELETE","{0}/process/{1}".format(self.url,token),None))
 
     def status(self, token):
-        """ status of running process
-        """
-        try:
-            version_url = "{0}/process/{1}".format(self.url, token)
-            response = urllib.request.urlopen(version_url)
-            text = response.read()
-            return json.loads(text.decode("utf-8"))
-        except urllib.request.HTTPError as exception:
-            if exception.code == 400:
-                error_details = json.loads(exception.read())
-                raise KappaError(error_details)
-            else:
-                raise exception
-        except urllib.request.URLError as exception:
-            KappaError(exception.reason)
+        return(self.dispatch("GET","{0}/process/{1}".format(self.url,token),None))
 
-
-    def shutdown(self, key):
-        """ shutdown server
-        """
-        method = "POST"
-        handler = urllib.request.HTTPHandler()
-        opener = urllib.request.build_opener(handler)
-        parse_url = "{0}/shutdown".format(self.url)
-        request = urllib.request.Request(parse_url, data=key.encode("utf-8"))
-        request.get_method = lambda: method
-        try:
-            connection = opener.open(request)
-        except urllib.request.HTTPError as exception:
-            connection = exception
-        except urllib.request.URLError as exception:
-            raise KappaError(exception.reason)
-        if connection.code == 200:
-            text = connection.read()
-            return text
-        elif connection.code == 400:
-            text = connection.read()
-            raise KappaError(text)
-        elif connection.code == 401:
-            text = connection.read()
-            raise KappaError(text)
-        else:
-            raise exception
-
+    def list(self):
+        return(self.dispatch("GET","{0}/process".format(self.url),None))
 
 def main():
     #command line
@@ -189,7 +142,7 @@ def main():
     except :
         print (cmd+
                   +' -k <kappafile> '
-                  +' -u <url> '
+                  +' -u <url or path to stdsim> '
                   +' -t <max_time> '
                   +' -e <max_events> '
                   +' -pp <plot_period> '
@@ -222,15 +175,18 @@ def main():
     print ('Random seed : {0} '.format(seed))
 
     try :
-        runtime = KappaRuntime(url)
+        if url.startswith('http'):
+            runtime = KappaRest(url)
+        else:
+            runtime = KappaStd(url)
         if inputfile :
             with open(inputfile) as f:
                 code = f.read()
-                token = runtime.start({'code': code,
-                                       'plot_period': plot_period,
-                                       'max_time' : max_time,
-                                       'max_events' : max_events,
-                                       'seed' : seed})
+                token = runtime.start(Parameter(code,
+                                                plot_period,
+                                                max_time = max_time,
+                                                max_events = max_events,
+                                                seed = seed))
                 status = runtime.status(token)
                 while status['is_running']:
                     time.sleep(1)

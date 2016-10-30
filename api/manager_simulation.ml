@@ -1,11 +1,11 @@
 open Lwt
 
-let status_projection :
+let detail_projection :
   environment:Api_environment.environment ->
   system_process:Kappa_facade.system_process ->
   project_id:Api_types_j.project_id ->
   simulation_id:Api_types_j.simulation_id ->
-  projection:(Api_types_j.simulation_status -> 'a Api.result) ->
+  projection:(Api_types_j.simulation_detail -> 'a Api.result) ->
   'a Api.result Lwt.t
   =
   (fun
@@ -13,7 +13,7 @@ let status_projection :
     ~(system_process:Kappa_facade.system_process)
     ~(project_id:Api_types_j.project_id)
     ~(simulation_id:Api_types_j.simulation_id)
-    ~(projection:(Api_types_j.simulation_status -> 'a Api.result))
+    ~(projection:(Api_types_j.simulation_detail -> 'a Api.result))
     ->
   Api_common.bind_simulation
     environment
@@ -25,10 +25,9 @@ let status_projection :
           ~system_process:system_process
           ~t:t) >>=
        (Api_common.result_data_map
-          ~ok:((fun (simulation_status : Api_types_j.simulation_status) ->
-              Lwt.return (projection simulation_status)):
-               (Api_types_j.simulation_status -> 'a Api.result Lwt.t)
-            )
+          ~ok:(fun (simulation_detail : Api_types_j.simulation_detail) ->
+              Lwt.return (projection simulation_detail):
+                (Api_types_j.simulation_detail -> 'a Api.result Lwt.t))
           ~error:((fun (errors : Api_types_j.errors) ->
               Lwt.return (Api_common.result_messages errors)) :
                     Api_types_j.errors -> 'a Api.result Lwt.t)
@@ -39,20 +38,22 @@ class manager_distance
     (environment : Api_environment.environment)
     (system_process : Kappa_facade.system_process) : Api.manager_distance =
   object(self)
-    method private info_distance (status : Api_types_j.simulation_status) :
+    method private info_distance (detail : Api_types_j.simulation_detail) :
       Api_types_j.distance_info Api.result =
-      match status.Api_types_j.simulation_status_distances with
+      match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_distances with
       | Some distance ->
-        let distance_ids : Api_types_j.distance_id list = List.mapi (fun i _ -> i) distance in
-        Api_common.result_ok { Api_types_j.distance_ids = distance_ids }
+        let distance_ids : Api_types_j.distance_id list =
+          List.mapi (fun i _ -> i) distance in
+        Api_common.result_ok
+          { Api_types_j.distance_ids = distance_ids }
       | None -> let m : string = "distance not available" in
         Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
     method private get_distance
         (distance_id : Api_types_j.distance_id)
-        (status : Api_types_j.simulation_status) :
+        (detail : Api_types_j.simulation_detail) :
       Api_types_j.distance Api.result  =
-      match status.Api_types_j.simulation_status_distances with
+      match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_distances with
       | Some distance ->
         (try Api_common.result_ok (List.nth distance distance_id)
          with _ ->
@@ -66,19 +67,19 @@ class manager_distance
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.distance_info Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
           ~simulation_id:simulation_id
           ~projection:self#info_distance
 
-    method simulation_get_distance
+    method simulation_detail_distance
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id)
         (distance_id : Api_types_j.distance_id) :
       Api_types_j.distance Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -92,10 +93,10 @@ class manager_file_line
     (system_process : Kappa_facade.system_process) : Api.manager_file_line =
   object(self)
 
-    method private info_file_line (status : Api_types_j.simulation_status) :
+    method private info_file_line (detail : Api_types_j.simulation_detail) :
       Api_types_j.file_line_info Api.result =
       let file_lines : Api_types_j.file_line list =
-        status.Api_types_j.simulation_status_file_lines in
+        detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_file_lines in
       let file_line_ids : Api_types_j.file_line_id list =
         List.fold_left
           (fun acc l ->
@@ -113,10 +114,10 @@ class manager_file_line
 
     method private get_file_line
         (file_line_id : Api_types_j.file_line_id)
-        (status : Api_types_j.simulation_status) :
+        (status : Api_types_j.simulation_detail) :
       (Api_types_j.file_line list) Api.result =
       let file_line_list : Api_types_j.file_line list =
-        status.Api_types_j.simulation_status_file_lines in
+        status.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_file_lines in
       let file_line_eq : Api_types_j.file_line -> bool =
         fun file_line -> file_line_id = file_line.Api_types_j.file_line_name
       in
@@ -131,7 +132,7 @@ class manager_file_line
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.file_line_info Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -139,12 +140,12 @@ class manager_file_line
           ~projection:self#info_file_line
 
 
-    method simulation_get_file_line
+    method simulation_detail_file_line
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id)
         (file_line_id : Api_types_j.file_line_id) :
       (Api_types_j.file_line list) Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -157,24 +158,27 @@ class manager_flux_map
     (environment : Api_environment.environment)
     (system_process : Kappa_facade.system_process) : Api.manager_flux_map =
   object(self)
-    method private info_flux_map (status : Api_types_j.simulation_status) :
+    method private info_flux_map (detail : Api_types_j.simulation_detail) :
       Api_types_j.flux_map_info Api.result =
       let flux_maps : Api_types_j.flux_map list =
-        status.Api_types_j.simulation_status_flux_maps in
+        detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_flux_maps in
       let flux_map_info =
         { Api_types_j.flux_map_ids =
-            List.map (fun f -> f.Api_types_j.flux_data.Api_types_j.flux_name) flux_maps } in
+            List.map (fun f -> f.Api_types_j.flux_data.Api_types_j.flux_name)
+              flux_maps } in
       Api_common.result_ok flux_map_info
 
     method private get_flux_map
       (flux_map_id : Api_types_j.flux_map_id)
-        (status : Api_types_j.simulation_status) :
+      (detail : Api_types_j.simulation_detail) :
       Api_types_j.flux_map Api.result =
       let flux_maps_list : Api_types_j.flux_map list =
-        status.Api_types_j.simulation_status_flux_maps
+        detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_flux_maps
       in
       let flux_maps_eq : Api_types_j.flux_map -> bool =
-        fun flux_map -> flux_map_id = flux_map.Api_types_j.flux_data.Api_types_j.flux_name
+        fun flux_map ->
+          flux_map_id =
+                        flux_map.Api_types_j.flux_data.Api_types_j.flux_name
       in
       try Api_common.result_ok (List.find flux_maps_eq flux_maps_list)
       with Not_found ->
@@ -186,19 +190,19 @@ class manager_flux_map
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.flux_map_info Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
           ~simulation_id:simulation_id
           ~projection:self#info_flux_map
 
-    method simulation_get_flux_map
+    method simulation_detail_flux_map
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id)
         (flux_map_id : Api_types_j.flux_map_id) :
       Api_types_j.flux_map Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -212,15 +216,15 @@ class manager_log_message
     (system_process : Kappa_facade.system_process) : Api.manager_log_message =
   object(self)
 
-    method private log_message (status : Api_types_j.simulation_status) :
+    method private log_message (detail : Api_types_j.simulation_detail) :
       (Api_types_j.log_message list) Api.result =
-      Api_common.result_ok status.Api_types_j.simulation_status_log_messages
+      Api_common.result_ok detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_log_messages
 
-    method simulation_get_log_message
+    method simulation_detail_log_message
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.log_message list Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -235,18 +239,18 @@ class manager_plot
   Api.manager_plot =
   object(self)
 
-    method private get_plot (status : Api_types_j.simulation_status) :
+    method private get_plot (detail : Api_types_j.simulation_detail) :
       Api_types_j.plot Api.result =
-      match status.Api_types_j.simulation_status_plot with
+      match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_plot with
       | Some plot -> Api_common.result_ok plot
       | None -> let m : string = "plot not available" in
         Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
-    method simulation_get_plot
+    method simulation_detail_plot
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.plot Api.result Lwt.t =
-      status_projection
+      detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -259,20 +263,20 @@ class manager_snapshot
     (system_process : Kappa_facade.system_process) :
   Api.manager_snapshot =
   object(self)
-    method private info_snapshot (status : Api_types_j.simulation_status) :
+    method private info_snapshot (detail : Api_types_j.simulation_detail) :
       Api_types_j.snapshot_info Api.result =
       let snapshots : Api_types_j.snapshot list =
-        status.Api_types_j.simulation_status_snapshots in
+        detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_snapshots in
       let snapshot_info =
         { Api_types_j.snapshot_ids =
             List.map (fun s -> s.Api_types_j.snapshot_file) snapshots } in
       Api_common.result_ok snapshot_info
     method private get_snapshot
         (snapshot_id : Api_types_j.snapshot_id)
-        (status : Api_types_j.simulation_status)
+        (detail : Api_types_j.simulation_detail)
       : Api_types_j.snapshot Api.result =
       let snapshot_list : Api_types_j.snapshot list =
-        status.Api_types_j.simulation_status_snapshots
+        detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_snapshots
       in
       let snapshot_eq : Api_types_j.snapshot -> bool =
         fun snapshot -> snapshot_id = snapshot.Api_types_j.snapshot_file
@@ -286,7 +290,7 @@ class manager_snapshot
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.snapshot_info Api.result Lwt.t =
-      (status_projection
+      (detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -294,12 +298,12 @@ class manager_snapshot
           ~projection:self#info_snapshot
        : Api_types_j.snapshot_info Api.result Lwt.t)
 
-    method simulation_get_snapshot
+    method simulation_detail_snapshot
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id)
         (snapshot_id : Api_types_j.snapshot_id):
       Api_types_j.snapshot Api.result Lwt.t =
-      ((status_projection
+      ((detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
@@ -336,27 +340,16 @@ class manager_simulation
         environment
         project_id
         simulation_id
-        (fun project _ ->
-           (self#simulation_stop
-              project_id
-              simulation_id)
-           >>=
-           (fun _ ->
-              let simulation_list : Api_environment.simulation list =
-                (project#get_simulations ())
-              in
+        (fun project _ -> (self#simulation_stop project_id simulation_id) >>=
+           (fun _ -> let simulation_list : Api_environment.simulation list =
+                       (project#get_simulations ()) in
               let simulation_ne : Api_environment.simulation -> bool =
                 fun simulation ->
-                  (simulation#get_simulation_id ()) <> simulation_id
-              in
-              let () =
-                project#set_simulations
-                  (List.filter simulation_ne simulation_list)
-              in
-              Lwt.return (Api_common.result_ok ())
-              : (unit, Api.manager_code)
-                  Api_types_t.result -> unit Api.result Lwt.t)
-        )
+                  (simulation#get_simulation_id ()) <> simulation_id in
+              let () = project#set_simulations
+                  (List.filter simulation_ne simulation_list) in
+              Lwt.return (Api_common.result_ok ()) : (unit, Api.manager_code)
+                  Api_types_t.result -> unit Api.result Lwt.t))
 
     method simulation_start
         (project_id : Api_types_j.project_id)
@@ -388,15 +381,18 @@ class manager_simulation
              >>=
              (Api_common.result_data_map
                 ~ok:((fun () ->
-                    let simulation = project#create_simulation simulation_id facade in
+                    let simulation =
+                      project#create_simulation simulation_id facade in
                     let () =
                       Api_common.SimulationCollection.update
                         project
-                        (simulation::(Api_common.SimulationCollection.list project))
+                        (simulation::
+                         (Api_common.SimulationCollection.list project))
                     in
                     Lwt.return (Api_common.result_ok simulation_id)
                   ))
-                ~error:((fun errors -> Lwt.return (Api_common.result_messages errors)) :
+                ~error:((fun errors ->
+                         Lwt.return (Api_common.result_messages errors)) :
                    Api_types_t.message list ->
                         Api_types_j.project_id Api.result Lwt.t)
              )
@@ -417,7 +413,7 @@ class manager_simulation
            (fun _ ->
              Lwt.return (Api_common.result_ok ())))
 
-    method simulation_stop
+    method private simulation_stop
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       unit Api.result Lwt.t =
@@ -429,9 +425,11 @@ class manager_simulation
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
            (Api_common.result_data_map
-                ~ok:((fun () -> Lwt.return (Api_common.result_ok ())))
-                ~error:((fun (errors : Api_types_j.errors) -> Lwt.return (Api_common.result_messages errors)) :
-                          Api_types_j.errors -> unit Api.result Lwt.t)
+              ~ok:((fun () ->
+                  Lwt.return (Api_common.result_ok ())))
+              ~error:((fun (errors : Api_types_j.errors) ->
+                       Lwt.return (Api_common.result_messages errors)) :
+                        Api_types_j.errors -> unit Api.result Lwt.t)
            )
         )
 
@@ -495,13 +493,15 @@ class manager_simulation
               ~system_process:system_process
               ~t:t) >>=
            (Api_common.result_data_map
-              ~ok:((fun (simulation_status : Api_types_j.simulation_status) ->
+              ~ok:(fun (simulation_detail : Api_types_j.simulation_detail) ->
                   Lwt.return
                     (Api_common.result_ok
-                       (simulation_status.Api_types_j.simulation_status_info))))
+                       (Api_data.api_simulation_status simulation_detail))
+                )
                 ~error:((fun (errors : Api_types_j.errors) ->
                           Lwt.return (Api_common.result_messages errors)) :
-                          Api_types_j.errors -> Api_types_j.simulation_info Api.result Lwt.t)
+                          Api_types_j.errors ->
+                 Api_types_j.simulation_info Api.result Lwt.t)
            )
         )
 

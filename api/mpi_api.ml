@@ -51,7 +51,7 @@ let on_message
   | `ProjectDelete project_id ->
     (manager#project_delete project_id) >>=
     (handler (fun result -> `ProjectDelete result))
-  | `ProjectInfo ->
+  | `ProjectInfo () ->
     (manager#project_info ()) >>=
     (handler (fun result -> `ProjectInfo result))
   | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
@@ -60,24 +60,24 @@ let on_message
   | `SimulationDelete (project_id,simulation_id) ->
     (manager#simulation_delete project_id simulation_id) >>=
     (handler (fun result -> `SimulationDelete result))
-  | `SimulationGetDistance (project_id,simulation_id,distance_id) ->
-    (manager#simulation_get_distance project_id simulation_id distance_id) >>=
-    (handler (fun result -> `SimulationGetDistance result))
-  | `SimulationGetFileLine (project_id,simulation_id,file_line_id) ->
-    (manager#simulation_get_file_line project_id simulation_id file_line_id) >>=
-    (handler (fun result -> `SimulationGetFileLine result))
-  | `SimulationGetFluxMap (project_id,simulation_id,flux_map_id) ->
-    (manager#simulation_get_flux_map project_id simulation_id flux_map_id) >>=
-    (handler (fun result -> `SimulationGetFluxMap result))
-  | `SimulationGetLogMessage (project_id,simulation_id) ->
-    (manager#simulation_get_log_message project_id simulation_id) >>=
-    (handler (fun result -> `SimulationGetLogMessage result))
-  | `SimulationGetPlot (project_id,simulation_id) ->
-    (manager#simulation_get_plot project_id simulation_id) >>=
-    (handler (fun result -> `SimulationGetPlot result))
-  | `SimulationGetSnapshot (project_id,simulation_id,snapshot_id) ->
-    (manager#simulation_get_snapshot project_id simulation_id snapshot_id) >>=
-    (handler (fun result -> `SimulationGetSnapshot result))
+  | `SimulationDetailDistance (project_id,simulation_id,distance_id) ->
+    (manager#simulation_detail_distance project_id simulation_id distance_id) >>=
+    (handler (fun result -> `SimulationDetailDistance result))
+  | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
+    (manager#simulation_detail_file_line project_id simulation_id file_line_id) >>=
+    (handler (fun result -> `SimulationDetailFileLine result))
+  | `SimulationDetailFluxMap (project_id,simulation_id,flux_map_id) ->
+    (manager#simulation_detail_flux_map project_id simulation_id flux_map_id) >>=
+    (handler (fun result -> `SimulationDetailFluxMap result))
+  | `SimulationDetailLogMessage (project_id,simulation_id) ->
+    (manager#simulation_detail_log_message project_id simulation_id) >>=
+    (handler (fun result -> `SimulationDetailLogMessage result))
+  | `SimulationDetailPlot (project_id,simulation_id) ->
+    (manager#simulation_detail_plot project_id simulation_id) >>=
+    (handler (fun result -> `SimulationDetailPlot result))
+  | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
+    (manager#simulation_detail_snapshot project_id simulation_id snapshot_id) >>=
+    (handler (fun result -> `SimulationDetailSnapshot result))
   | `SimulationInfo (project_id,simulation_id) ->
     (manager#simulation_info project_id simulation_id) >>=
     (handler (fun result -> `SimulationInfo result))
@@ -105,9 +105,6 @@ let on_message
   | `SimulationStart (project_id,simulation_parameter) ->
     (manager#simulation_start project_id simulation_parameter) >>=
     (handler (fun result -> `SimulationStart result))
-  | `SimulationStop (project_id,simulation_id) ->
-    (manager#simulation_stop project_id simulation_id) >>=
-    (handler (fun result -> `SimulationStop result))
 
 class type virtual manager_base_type =
   object
@@ -244,7 +241,7 @@ class virtual  manager_base () : manager_base_type =
 
 
     method project_info () : Api_types_j.project_info Api.result Lwt.t =
-      self#message (`ProjectInfo) >>=
+      self#message (`ProjectInfo ()) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectInfo result ->
@@ -287,16 +284,16 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
 
-    method simulation_get_distance
+    method simulation_detail_distance
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id)
       (distance_id : Api_types_j.distance_id) :
       Api_types_j.distance Api.result Lwt.t =
-      self#message (`SimulationGetDistance
+      self#message (`SimulationDetailDistance
                       (project_id,simulation_id,distance_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationGetDistance distance ->
+            | `SimulationDetailDistance distance ->
               Lwt.return distance
             | response ->
               Lwt.return
@@ -304,16 +301,16 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
 
-    method simulation_get_file_line
+    method simulation_detail_file_line
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id)
       (file_line_id : Api_types_j.file_line_id) :
       Api_types_j.file_line list Api.result Lwt.t =
-      self#message (`SimulationGetFileLine
+      self#message (`SimulationDetailFileLine
                       (project_id,simulation_id,file_line_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationGetFileLine file_line_list ->
+            | `SimulationDetailFileLine file_line_list ->
               Lwt.return file_line_list
             | response ->
               Lwt.return
@@ -321,62 +318,62 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
 
-    method simulation_get_flux_map
+    method simulation_detail_flux_map
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id)
       (flux_map_id : Api_types_j.flux_map_id) :
       Api_types_j.flux_map Api.result Lwt.t =
-      self#message (`SimulationGetFluxMap
+      self#message (`SimulationDetailFluxMap
                       (project_id,simulation_id,flux_map_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationGetFluxMap flux_map ->
+            | `SimulationDetailFluxMap flux_map ->
               Lwt.return flux_map
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_get_log_message
+    method simulation_detail_log_message
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.log_message list Api.result Lwt.t =
-      self#message (`SimulationGetLogMessage
+      self#message (`SimulationDetailLogMessage
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationGetLogMessage log_message ->
+            | `SimulationDetailLogMessage log_message ->
               Lwt.return log_message
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_get_plot
+    method simulation_detail_plot
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
       Api_types_j.plot Api.result Lwt.t =
-      self#message (`SimulationGetPlot
+      self#message (`SimulationDetailPlot
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationGetPlot plot ->
+            | `SimulationDetailPlot plot ->
               Lwt.return plot
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_get_snapshot
+    method simulation_detail_snapshot
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id)
       (snapshot_id : Api_types_j.snapshot_id) :
       Api_types_j.snapshot Api.result Lwt.t =
-      self#message (`SimulationGetSnapshot
+      self#message (`SimulationDetailSnapshot
                       (project_id,simulation_id,snapshot_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationGetSnapshot snapshot ->
+            | `SimulationDetailSnapshot snapshot ->
               Lwt.return snapshot
             | response ->
               Lwt.return
@@ -391,8 +388,8 @@ class virtual  manager_base () : manager_base_type =
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationInfo simulation_info ->
-              Lwt.return simulation_info
+            | `SimulationInfo simulation_status ->
+              Lwt.return simulation_status
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -520,20 +517,6 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_stop
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
-      unit Api.result Lwt.t =
-      self#message (`SimulationStop
-                     (project_id,simulation_id)) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `SimulationStop result ->
-              Lwt.return result
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
   end
 
 module IntMap = Mods.IntMap
@@ -545,20 +528,21 @@ class type virtual manager_mpi_type =
     method virtual post_message : string -> unit
     method virtual sleep : float -> unit Lwt.t
     method virtual post_message : string -> unit
+    method message : Mpi_message_j.request -> Mpi_message_j.response Api.result Lwt.t
+    method receive : string -> unit
 
-    inherit manager_base_type
+    inherit Api.manager
   end
 
-class virtual  manager ?(timeout : float = 10.) () : manager_mpi_type =
+class virtual manager ?(timeout : float = 10.) () : manager_mpi_type =
   object(self)
-
     val mutable context =
       { mailboxes = IntMap.empty ; id = 0 }
 
     method virtual sleep : float -> unit Lwt.t
     method virtual post_message : string -> unit
 
-    method private receive (response_text : string) =
+    method receive (response_text : string) =
       let message : Mpi_message_j.response Mpi_message_j.message =
         Mpi_message_j.message_of_string
           Mpi_message_j.read_response response_text in
@@ -566,7 +550,7 @@ class virtual  manager ?(timeout : float = 10.) () : manager_mpi_type =
       | Some value -> Lwt.wakeup value message.Mpi_message_j.data
       | None -> ()
 
-    method private message (request : Mpi_message_j.request) :
+    method message (request : Mpi_message_j.request) :
       Mpi_message_j.response Api.result Lwt.t =
       let result,feeder = Lwt.task () in
       let () = context <- { context with id = context.id + 1 } in

@@ -1,6 +1,3 @@
-module UIState = Ui_state
-module Api_types = Api_types_v1_j
-
 open Js
 open Codemirror
 
@@ -21,7 +18,13 @@ let save_button =
     ~a:[ Html.a_id save_button_id
        ; Tyxml_js.R.Html.Unsafe.string_attrib
            "download"
-           UIState.opened_filename
+           (React.S.map
+              (function
+                | None -> ""
+                | Some file -> file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
+              )
+              Ui_state.current_file
+           )
        ; Html.Unsafe.string_attrib "role" "button"
        ; Html.a_class ["btn";"btn-default";"pull-right"]
        ]
@@ -31,9 +34,6 @@ let toggle_button_id = "toggle_button"
 let toggle_button =
   Html.a
     ~a:[ Html.a_id toggle_button_id
-       ; Tyxml_js.R.Html.Unsafe.string_attrib
-           "download"
-           UIState.opened_filename
        ; Html.Unsafe.string_attrib "role" "button"
        ; Html.a_class ["btn";"btn-default";"pull-right"]
        ]
@@ -79,16 +79,16 @@ let setup_lint codemirror update_linting =
         ~ch:p.Location.chr
         ~line:(p.Location.line-1)
     in
-    let hydrate (error  : Api_types.error) : lint Js.t option =
-      match error.Api_types.range with
+    let hydrate (error  : Api_types_j.message) : lint Js.t option =
+      match error.Api_types_j.message_range with
       | None -> None
       | Some range ->
         Some (Codemirror.create_lint
-                ~message:error.Api_types.message
+                ~message:error.Api_types_j.message_text
                 (* This is a bit of a hack ... i am trying to keep
                    the code mirror code independent of the api code.
                 *)
-                ~severity:( match error.Api_types.severity with
+                ~severity:( match error.Api_types_j.message_severity with
                     | `Error -> Codemirror.Error
                     | `Warning -> Codemirror.Warning
                     | `Info -> Codemirror.Warning
@@ -117,27 +117,34 @@ let setup_lint codemirror update_linting =
   in
   let _ =
     React.S.l1
-      (fun (e : Api_types.errors)->
-         update_linting
-           codemirror
-           (error_lint e)
+      (fun (e : Ui_state.localized_errors option)->
+         let () =
+           match e with
+           | None -> ()
+           | Some e ->
+             let () =
+               Common.debug (Js.string e.Ui_state.model_error_location) in
+             let e : Api_types_j.errors = e.Ui_state.model_error_messages in
+             ignore (update_linting codemirror (error_lint e))
+         in
+         ()
       )
-      UIState.model_error
+      Ui_state.model_error
   in
   ()
 
 let initialize codemirror () =
   let args = Url.Current.arguments in
   let () =
-    try UIState.set_model_max_events
+    try Ui_state.set_model_max_events
           (Some (int_of_string (List.assoc "nb_events" args)))
     with Not_found | Failure _ -> () in
   let () =
-    try UIState.set_model_plot_period
+    try Ui_state.set_model_plot_period
           (float_of_string (List.assoc "plot_period" args))
     with Not_found | Failure _ -> () in
   let () =
-    try UIState.set_model_max_time
+    try Ui_state.set_model_max_time
           (Some (float_of_string (List.assoc "time_limit" args)))
     with Not_found | Failure _ -> () in
   try
@@ -155,16 +162,21 @@ let initialize codemirror () =
                  (match u with
                   | (Url.Http h | Url.Https h) -> h.Url.hu_path
                   | Url.File f -> f.Url.fu_path) in
-             UIState.set_opened_filename filename in
-         let () =
-           codemirror##setValue(Js.string content.XmlHttpRequest.content) in
+             let filecontent : string =
+               content.XmlHttpRequest.content
+             in
+             let () = Ui_state.set_file filename filecontent in
+             let () = codemirror##setValue(Js.string filecontent) in
+             ()  in
          return_unit)
   with Not_found ->
-  try
-    let text = List.assoc "model_text" args in
-    let () = codemirror##setValue(Js.string text) in
-    return_unit
-  with Not_found ->
+    let filename = "default.ka" in
+    let filecontent =
+      try List.assoc "model_text" args
+      with Not_found -> ""
+    in
+    let () = Ui_state.set_file filename filecontent in
+    let () = codemirror##setValue(Js.string filecontent) in
     return_unit
 
 let onload (t : Ui_simulation.t) : unit =
@@ -203,15 +215,14 @@ let onload (t : Ui_simulation.t) : unit =
   let handler = fun codemirror change ->
     let () = has_been_modified := true in
     let text : string = Js.to_string codemirror##getValue in
-    let () = UIState.set_text text in
     let () = match !timeout with
         None -> ()
-      | Some timeout -> Dom_html.window ##
-                          clearTimeout (timeout) in
+      | Some timeout ->
+        Dom_html.window ## clearTimeout (timeout) in
     let delay : float =
       if (((Js.str_array (change##.text ))##.length) > 1)
          ||
-         (List.length (React.S.value UIState.model_error) > 0)
+         (Ui_state.has_model_error ())
       then
         1.0 *. 1000.0
       else
@@ -220,14 +231,15 @@ let onload (t : Ui_simulation.t) : unit =
     let handle_timeout () =
       let () = Common.info "handle_timeout" in
       let () = Common.info text in
-      UIState.parse_text (Js.to_string codemirror##getValue) in
+      Ui_state.set_filecontent
+        (Js.to_string codemirror##getValue) in
     let () = timeout := Some
           (Dom_html.window ## setTimeout
-             (Js.wrap_callback (fun _ -> handle_timeout ())) delay) in
+             (Js.wrap_callback
+                (fun _ -> handle_timeout ())) delay) in
     ()
   in
   let () = codemirror##onChange(handler) in
-
   let file_select_dom = Tyxml_js.To_dom.of_input file_selector in
   let save_button_dom : Dom_html.linkElement Js.t =
     Js.Unsafe.coerce
@@ -260,14 +272,19 @@ let onload (t : Ui_simulation.t) : unit =
     let file = Js.Opt.get (files##item (0))
         (fun () -> assert false)
     in
-    let filename = file##.name in
-    let () = set_file_label (to_string filename) in
-    let () = Lwt_js_events.async
-        (fun _ -> File.readAsText file >>=
-          (fun (va : Js.js_string Js.t) ->
-             let () = codemirror##setValue(va) in
-             Ui_simulation.flush_simulation t
-          ))
+    let filename = to_string file##.name in
+    let () = set_file_label filename in
+    let () =
+      Lwt_js_events.async
+        ((fun _ ->
+            File.readAsText file >>=
+            (fun  (va : Js.js_string Js.t) ->
+               let () = Ui_state.set_file filename "" in
+               Lwt.return va
+            ) >>=
+            (fun  (va : Js.js_string Js.t) ->
+               let () = codemirror##setValue(va) in
+              Ui_simulation.flush_simulation t)))
     in
     let () = has_been_modified := false in
     return_unit

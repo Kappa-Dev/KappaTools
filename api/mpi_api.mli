@@ -20,8 +20,10 @@ class type virtual manager_mpi_type =
     method virtual post_message : string -> unit
     method virtual sleep : float -> unit Lwt.t
     method virtual post_message : string -> unit
+    method message : Mpi_message_j.request -> Mpi_message_j.response Api.result Lwt.t
+    method receive : string -> unit
 
-    inherit manager_base_type
+    inherit Api.manager
   end
 
 class virtual manager : ?timeout:float -> unit -> manager_mpi_type

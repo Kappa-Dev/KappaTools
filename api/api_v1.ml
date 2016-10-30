@@ -15,6 +15,247 @@ let msg_missing_perturbation_context =
 
 let () = Printexc.record_backtrace true
 
+let assemble_distance
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id)
+    (simulation_id : Api_types_j.simulation_id)
+  : Api_types_v1_t.distances Api.result Lwt.t =
+  (manager#simulation_info_distance
+     project_id
+     simulation_id
+  ) >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (distance_info : Api_types_j.distance_info) ->
+        Api_common.result_fold_lwt
+          ~f:(fun result (distance_id : Api_types_j.distance_id) ->
+              Api_common.result_bind_lwt
+                ~ok:(fun (distances : Api_types_v1_j.distances) ->
+                     (manager#simulation_detail_distance
+                       project_id
+                       simulation_id
+                       distance_id)
+                     >>=
+                     (Api_common.result_bind_lwt
+                        ~ok:(fun (distance : Api_types_j.distance) ->
+                            let distance : Api_types_v1_j.distance =
+                              Api_data_v1.api_distance distance in
+                            Lwt.return (Api_common.result_ok
+                                       (distance::distances))
+                          )
+                        ))
+                result
+             )
+          ~id:(Api_common.result_ok [])
+          distance_info.Api_types_j.distance_ids
+      )
+
+let assemble_file_line
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id)
+    (simulation_id : Api_types_j.simulation_id)
+    : Api_types_v1_j.file_line list Api.result Lwt.t =
+  (manager#simulation_info_file_line
+     project_id
+     simulation_id
+  ) >>=
+    Api_common.result_bind_lwt
+      ~ok:(fun (file_line_info : Api_types_j.file_line_info) ->
+          Api_common.result_fold_lwt
+            ~f:(fun result (file_line_id : Api_types_j.file_line_id) ->
+                Api_common.result_bind_lwt
+                  ~ok:(fun
+                        (old_lines : Api_types_v1_j.file_line list) ->
+                        (manager#simulation_detail_file_line
+                           project_id
+                           simulation_id
+                           file_line_id)
+                        >>=
+                        (Api_common.result_bind_lwt
+                           ~ok:(fun (new_lines : Api_types_j.file_line list) ->
+                               let  new_lines : Api_types_v1_j.file_line list =
+                                    List.map Api_data_v1.api_files new_lines in
+                               Lwt.return
+                                 (Api_common.result_ok
+                                    (old_lines@new_lines)
+                                 )
+                             )
+                        )
+                      )
+                  result
+              )
+            ~id:(Api_common.result_ok [])
+            file_line_info.Api_types_j.file_line_ids
+        )
+
+let assemble_flux_map
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id)
+    (simulation_id : Api_types_j.simulation_id) :
+     Api_types_v1_j.flux_map list Api.result Lwt.t =
+    (manager#simulation_info_flux_map
+       project_id
+       simulation_id
+    ) >>=
+    Api_common.result_bind_lwt
+      ~ok:(fun (flux_map_info : Api_types_j.flux_map_info) ->
+          Api_common.result_fold_lwt
+            ~f:(fun result (flux_map_id : Api_types_j.flux_map_id) ->
+                Api_common.result_bind_lwt
+                  ~ok:(fun (old_flux :  Api_types_v1_j.flux_map list) ->
+                      (manager#simulation_detail_flux_map
+                         project_id
+                         simulation_id
+                         flux_map_id)
+                      >>=
+                      (Api_common.result_bind_lwt
+                         ~ok:(fun (new_flux : Api_types_j.flux_map) ->
+                             let new_map : Api_types_v1_j.flux_map = Api_data_v1.api_flux_map new_flux in
+                             Lwt.return
+                               (Api_common.result_ok (new_map::old_flux))
+                           )
+                      )
+                    )
+                  result
+              )
+            ~id:(Api_common.result_ok [])
+            flux_map_info.Api_types_j.flux_map_ids
+        )
+
+let assemble_log_message
+          (manager : Api.manager)
+          (project_id : Api_types_j.project_id)
+          (simulation_id : Api_types_j.simulation_id) :
+  Api_types_j.log_message list Api.result Lwt.t =
+    (manager#simulation_detail_log_message
+       project_id
+       simulation_id
+    )
+
+let assemble_plot
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id)
+    (simulation_id : Api_types_j.simulation_id) :
+  Api_types_v1_j.plot option Api.result Lwt.t =
+    (manager#simulation_detail_plot
+       project_id
+       simulation_id
+    ) >>=
+       Api_common.result_bind_lwt
+         ~ok:(fun (plot : Api_types_j.plot) ->
+             Lwt.return
+               (Api_common.result_ok (Some (Api_data_v1.api_plot plot)))
+           )
+
+
+let assemble_snapshot
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id)
+    (simulation_id : Api_types_j.simulation_id) :
+  Api_types_v1_j.snapshot list Api.result Lwt.t =
+    (manager#simulation_info_snapshot
+       project_id
+       simulation_id
+    ) >>=
+    Api_common.result_bind_lwt
+      ~ok:(fun (snapshot_info : Api_types_j.snapshot_info) ->
+          Api_common.result_fold_lwt
+            ~f:(fun result (snapshot_id : Api_types_j.snapshot_id) ->
+                Api_common.result_bind_lwt
+                  ~ok:(fun (old_snapshots :  Api_types_v1_j.snapshot list) ->
+                      (manager#simulation_detail_snapshot
+                         project_id
+                         simulation_id
+                         snapshot_id)
+                      >>=
+                      (Api_common.result_bind_lwt
+                         ~ok:(fun (new_snapshot : Api_types_j.snapshot) ->
+                             let new_snapshot : Api_types_v1_j.snapshot =
+                               Api_data_v1.api_snapshot new_snapshot in
+                             Lwt.return
+                               (Api_common.result_ok
+                                  (new_snapshot::old_snapshots)))
+                      )
+                    )
+                  result
+              )
+            ~id:(Api_common.result_ok [])
+            snapshot_info.Api_types_j.snapshot_ids
+        )
+
+let assemble_state
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id)
+    (simulation_id : Api_types_j.simulation_id)
+    (state : Api_types_v1_j.state) :
+  Api_types_v1_j.state Api.result Lwt.t =
+  Lwt.return (Api_common.result_ok state)
+  >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (state : Api_types_v1_j.state) ->
+        (assemble_distance manager project_id simulation_id)
+        >>=
+        Api_common.result_bind_lwt
+          ~ok:(fun (distances : Api_types_v1_t.distances) ->
+              Lwt.return
+                (Api_common.result_ok
+                   { state with Api_types_v1_t.distances = Some distances }))
+      )
+  >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (state : Api_types_v1_j.state) ->
+        (assemble_file_line manager project_id simulation_id)
+        >>=
+        Api_common.result_bind_lwt
+          ~ok:(fun (files : Api_types_v1_j.file_line list) ->
+              Lwt.return
+                (Api_common.result_ok
+                   { state with Api_types_v1_t.files = files }))
+      )
+  >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (state : Api_types_v1_j.state) ->
+        (assemble_flux_map manager project_id simulation_id)
+        >>=
+        Api_common.result_bind_lwt
+          ~ok:(fun (flux_maps : Api_types_v1_j.flux_map list) ->
+              Lwt.return
+                (Api_common.result_ok
+                   { state with Api_types_v1_t.flux_maps = flux_maps }))
+      )
+    >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (state : Api_types_v1_j.state) ->
+        (assemble_log_message manager project_id simulation_id)
+        >>=
+        Api_common.result_bind_lwt
+          ~ok:(fun (log_messages : Api_types_j.log_message list) ->
+              Lwt.return
+                (Api_common.result_ok
+                   { state with Api_types_v1_t.log_messages = log_messages }))
+      )
+    >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (state : Api_types_v1_j.state) ->
+        (assemble_plot manager project_id simulation_id)
+        >>=
+        Api_common.result_bind_lwt
+          ~ok:(fun (plot : Api_types_v1_j.plot option) ->
+              Lwt.return
+                (Api_common.result_ok
+                   { state with Api_types_v1_t.plot = plot }))
+      )
+    >>=
+  Api_common.result_bind_lwt
+    ~ok:(fun (state : Api_types_v1_j.state) ->
+        (assemble_snapshot manager project_id simulation_id)
+        >>=
+        Api_common.result_bind_lwt
+          ~ok:(fun (snapshots : Api_types_v1_j.snapshot list) ->
+              Lwt.return
+                (Api_common.result_ok
+                   { state with Api_types_v1_t.snapshots = snapshots }))
+      )
+
 let catch_error : 'a . (Api_types_v1_j.errors -> 'a) -> exn -> 'a =
   fun handler ->
   (function
@@ -32,6 +273,9 @@ let catch_error : 'a . (Api_types_v1_j.errors -> 'a) -> exn -> 'a =
 
 class type api_runtime =
   object
+    method version :
+      unit ->
+      Api_types_v1_j.version Api_types_v1_j.result Lwt.t
     method parse :
       Api_types_v1_j.code ->
       Api_types_v1_j.parse Api_types_v1_j.result Lwt.t
@@ -72,225 +316,31 @@ end = struct
   module IntMap = Mods.IntMap
   type context = { states : Kappa_facade.t IntMap.t ; id : int }
 
-  let assemble_distance
+  let create_state
       (manager : Api.manager)
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id)
-      (state : Api_types_v1_j.state) : Api_types_v1_j.state Api.result Lwt.t =
-    (manager#simulation_info_distance
-       project_id
-       simulation_id
-    ) >>=
-    Api_common.result_bind_lwt
-      ~ok:(fun (distance_info : Api_types_j.distance_info) ->
-          Api_common.result_fold_lwt
-            ~f:(fun result (distance_id : Api_types_j.distance_id) ->
-                Api_common.result_bind_lwt
-                  ~ok:(fun (state : Api_types_v1_j.state) ->
-                      (manager#simulation_get_distance
-                         project_id
-                         simulation_id
-                         distance_id)
-                      >>=
-                      (Api_common.result_bind_lwt
-                         ~ok:(fun (distance : Api_types_j.distance) ->
-                             let distance : Api_types_v1_j.distance = Api_data.api_distance distance in
-                             Lwt.return
-                               (Api_common.result_ok
-                                  { state with
-                                    Api_types_v1_j.distances =
-                                      match state.Api_types_v1_j.distances with
-                                      | None ->
-                                        Some (distance::[])
-                                      | Some distances ->
-                                        Some (distance::distances) }))
-                      )
-                    )
-                  result)
-            ~id:(Api_common.result_ok state)
-            distance_info.Api_types_j.distance_ids
-        )
-
-  let assemble_file_line
-      (manager : Api.manager)
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
-      (state : Api_types_v1_j.state) : Api_types_v1_j.state Api.result Lwt.t =
-    (manager#simulation_info_file_line
-       project_id
-       simulation_id
-    ) >>=
-       Api_common.result_bind_lwt
-         ~ok:(fun (file_line_info : Api_types_j.file_line_info) ->
-             Api_common.result_fold_lwt
-               ~f:(fun result (file_line_id : Api_types_j.file_line_id) ->
-                   Api_common.result_bind_lwt
-                     ~ok:(fun (state : Api_types_v1_j.state) ->
-                          (manager#simulation_get_file_line
-                             project_id
-                             simulation_id
-                             file_line_id)
-                          >>=
-                             (Api_common.result_bind_lwt
-                                ~ok:(fun (file_line : Api_types_j.file_line list) ->
-                                    let file_lines : Api_types_v1_j.file_line list =
-                                      List.map Api_data.api_files file_line in
-                                    Lwt.return
-                                      (Api_common.result_ok
-                                         { state with
-                                           Api_types_v1_j.files =
-                                             file_lines@state.Api_types_v1_j.files }))
-                          )
-                       )
-                     result)
-               ~id:(Api_common.result_ok state)
-               file_line_info.Api_types_j.file_line_ids
-              )
-
-
-  let assemble_flux_map
-          (manager : Api.manager)
-          (project_id : Api_types_j.project_id)
-          (simulation_id : Api_types_j.simulation_id)
-          (state : Api_types_v1_j.state) :
-    Api_types_v1_j.state Api.result Lwt.t =
-    (manager#simulation_info_flux_map
-       project_id
-       simulation_id
-    ) >>=
-       Api_common.result_bind_lwt
-         ~ok:(fun (flux_map_info : Api_types_j.flux_map_info) ->
-             Api_common.result_fold_lwt
-               ~f:(fun result (flux_map_id : Api_types_j.flux_map_id) ->
-                   Api_common.result_bind_lwt
-                     ~ok:(fun (state : Api_types_v1_j.state) ->
-                         (manager#simulation_get_flux_map
-                            project_id
-                            simulation_id
-                            flux_map_id)
-                         >>=
-                            (Api_common.result_bind_lwt
-                               ~ok:(fun (flux_map : Api_types_j.flux_map) ->
-                                   let flux_map : Api_types_v1_j.flux_map = Api_data.api_flux_map flux_map in
-                                   Lwt.return
-                                     (Api_common.result_ok
-                                        { state with
-                                          Api_types_v1_j.flux_maps =
-                                            flux_map::state.Api_types_v1_j.flux_maps }))
-                         )
-                       )
-                     result)
-               ~id:(Api_common.result_ok state)
-               flux_map_info.Api_types_j.flux_map_ids
-           )
-
-
-  let assemble_log_message
-          (manager : Api.manager)
-          (project_id : Api_types_j.project_id)
-          (simulation_id : Api_types_j.simulation_id)
-          (state : Api_types_v1_j.state) : Api_types_v1_j.state Api.result Lwt.t =
-    (manager#simulation_get_log_message
-       project_id
-       simulation_id
-    ) >>=
-       Api_common.result_bind_lwt
-         ~ok:(fun (log_message : Api_types_j.log_message list) ->
-             Lwt.return
-               (Api_common.result_ok
-                  { state with
-                    Api_types_v1_j.log_messages = log_message })
-           )
-
-  let assemble_plot
-          (manager : Api.manager)
-          (project_id : Api_types_j.project_id)
-          (simulation_id : Api_types_j.simulation_id)
-          (state : Api_types_v1_j.state) : Api_types_v1_j.state Api.result Lwt.t =
-    (manager#simulation_get_plot
-       project_id
-       simulation_id
-    ) >>=
-       Api_common.result_bind_lwt
-         ~ok:(fun (plot : Api_types_j.plot) ->
-             Lwt.return
-               (Api_common.result_ok
-                  { state with
-                    Api_types_v1_j.plot = Some (Api_data.api_plot plot)
-                  })
-           )
-
-
-
-  let assemble_snapshot
-          (manager : Api.manager)
-          (project_id : Api_types_j.project_id)
-          (simulation_id : Api_types_j.simulation_id)
-          (state : Api_types_v1_j.state) : Api_types_v1_j.state Api.result Lwt.t =
-    (manager#simulation_info_snapshot
-       project_id
-       simulation_id
-    ) >>=
-       Api_common.result_bind_lwt
-         ~ok:(fun (snapshot_info : Api_types_j.snapshot_info) ->
-             Api_common.result_fold_lwt
-               ~f:(fun result (snapshot_id : Api_types_j.snapshot_id) ->
-                   Api_common.result_bind_lwt
-                     ~ok:(fun (state : Api_types_v1_j.state) ->
-                         (manager#simulation_get_snapshot
-                            project_id
-                            simulation_id
-                            snapshot_id)
-                         >>=
-                            (Api_common.result_bind_lwt
-                               ~ok:(fun (snapshot : Api_types_j.snapshot) ->
-                                   let snapshot : Api_types_v1_j.snapshot = Api_data.api_snapshot snapshot in
-                                   Lwt.return
-                                     (Api_common.result_ok
-                                        { state with
-                                          Api_types_v1_j.snapshots =
-                                            snapshot::state.Api_types_v1_j.snapshots }))
-                         )
-                       )
-                     result)
-               ~id:(Api_common.result_ok state)
-               snapshot_info.Api_types_j.snapshot_ids
-           )
-
-  let assemble_state
-      (manager : Api.manager)
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
-      (info : Api_types_j.simulation_info) : Api_types_v1_j.state Api.result Lwt.t =
-    let assemblers = [ assemble_distance manager project_id simulation_id ;
-                       assemble_file_line manager project_id simulation_id ;
-                       assemble_flux_map manager project_id simulation_id ;
-                       assemble_log_message manager project_id simulation_id ;
-                       assemble_plot manager project_id simulation_id ;
-                       assemble_snapshot manager project_id simulation_id ;
-                     ] in
+      (status : Api_types_j.simulation_info) : Api_types_v1_j.state Api.result Lwt.t =
     let state =
-      { Api_types_v1_j.plot = None;
-        Api_types_v1_j.distances = None;
-        Api_types_v1_j.time = info.Api_types_j.simulation_info_time ;
-        Api_types_v1_j.time_percentage = info.Api_types_j.simulation_info_time_percentage ;
-        Api_types_v1_j.event = info.Api_types_j.simulation_info_event ;
-        Api_types_v1_j.event_percentage = info.Api_types_j.simulation_info_event_percentage ;
-        Api_types_v1_j.tracked_events = info.Api_types_j.simulation_info_tracked_events ;
-        Api_types_v1_j.log_messages = [];
-        Api_types_v1_j.snapshots = [];
-        Api_types_v1_j.flux_maps = [];
-        Api_types_v1_j.files = [] ;
-        Api_types_v1_j.is_running = info.Api_types_j.simulation_info_is_running ;
+      { Api_types_v1_j.plot             = None;
+        Api_types_v1_j.distances        = None;
+        Api_types_v1_j.time             = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time ;
+        Api_types_v1_j.time_percentage  = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage ;
+        Api_types_v1_j.event            = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event ;
+        Api_types_v1_j.event_percentage = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event_percentage ;
+        Api_types_v1_j.tracked_events   = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_tracked_events ;
+        Api_types_v1_j.log_messages     = [];
+        Api_types_v1_j.snapshots        = [];
+        Api_types_v1_j.flux_maps        = [];
+        Api_types_v1_j.files            = [] ;
+        Api_types_v1_j.is_running       = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_is_running ;
       }
     in
-    Api_common.result_fold_lwt
-      ~f:(fun result assembler ->
-          Api_common.result_bind_lwt
-            ~ok:(fun state -> assembler state)
-            result)
-      ~id:(Api_common.result_ok state)
-      assemblers
+    assemble_state
+      manager
+      project_id
+      simulation_id
+      state
 
 
   class virtual base_runtime min_run_duration =
@@ -365,6 +415,13 @@ end = struct
           self#yield ()
         else Lwt.return_unit
 
+      method version () :
+        Api_types_v1_j.version Api_types_v1_j.result Lwt.t =
+        Lwt.return
+          (`Right
+             { Api_types_v1_j.version_build = Version.version_msg ;
+               Api_types_v1_j.version_id = "v1" })
+
       method parse
           (code : Api_types_v1_j.code) :
         Api_types_v1_j.parse Api_types_v1_j.result Lwt.t =
@@ -407,7 +464,7 @@ end = struct
              ~error:(fun _ errors  ->
                  Lwt.return
                    (`Left
-                      (Api_data.api_errors errors)))
+                      (Api_data_v1.api_errors errors)))
         )
       method private new_id () : int =
         let result = context.id + 1 in
@@ -468,7 +525,7 @@ end = struct
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
-                          (Api_data.api_errors errors)))
+                          (Api_data_v1.api_errors errors)))
          )
 
       method perturbate
@@ -490,7 +547,7 @@ end = struct
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
-                          (Api_data.api_errors errors)))
+                          (Api_data_v1.api_errors errors)))
         )
 
 
@@ -507,7 +564,7 @@ end = struct
                  >>=
                  (Api_common.result_bind_lwt
                       ~ok:(fun info ->
-                          assemble_state
+                          create_state
                             manager
                             project_id
                             simulation_id
@@ -519,7 +576,7 @@ end = struct
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
-                          (Api_data.api_errors errors)))
+                          (Api_data_v1.api_errors errors)))
          )
 
       method list () : Api_types_v1_j.catalog Api_types_v1_j.result Lwt.t =
@@ -540,7 +597,10 @@ end = struct
                                       (fun result_simulation_list ->
                                    Api_common.result_bind_lwt
                                      ~ok:(fun (simulation_list : Api_types_j.simulation_catalog) ->
-                                         Lwt.return (Api_common.result_ok (result@(List.map int_of_string simulation_list))))
+                                         Lwt.return
+                                           (Api_common.result_ok
+                                              (result@
+                                               (List.map int_of_string simulation_list))))
                                      result_simulation_list))
                                   result
                               )
@@ -555,7 +615,7 @@ end = struct
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
-                          (Api_data.api_errors errors)))
+                          (Api_data_v1.api_errors errors)))
          )
 
       method pause (token : Api_types_v1_j.token) :
@@ -574,7 +634,7 @@ end = struct
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
-                          (Api_data.api_errors errors)))
+                          (Api_data_v1.api_errors errors)))
         )
 
       method continue
@@ -589,7 +649,7 @@ end = struct
                  (manager#simulation_continue
                     project_id
                     simulation_id
-                    (Api_data.api_parameter parameter)
+                    (Api_data_v1.api_parameter parameter)
                  ))
         ) >>=
         (Api_common.result_map
@@ -597,7 +657,7 @@ end = struct
              ~error:(fun _ errors  ->
                      Lwt.return
                        (`Left
-                          (Api_data.api_errors errors)))
+                          (Api_data_v1.api_errors errors)))
         )
 
       method stop (token : Api_types_v1_j.token) : unit Api_types_v1_j.result Lwt.t =
@@ -606,7 +666,7 @@ end = struct
         self#manager () >>=
         (Api_common.result_bind_lwt
              ~ok:(fun manager ->
-                 (manager#simulation_stop
+                 (manager#simulation_delete
                     project_id
                     simulation_id))
         ) >>=
@@ -615,7 +675,7 @@ end = struct
              ~error:(fun _ errors  ->
                  Lwt.return
                    (`Left
-                      (Api_data.api_errors errors)))
+                      (Api_data_v1.api_errors errors)))
 
       initializer
         Lwt.async (fun () -> self#log "created runtime")

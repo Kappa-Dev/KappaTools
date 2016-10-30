@@ -376,3 +376,75 @@ let rec eq_errors  l r =
     && eq_range l.Api_types_v1_j.range r.Api_types_v1_j.range
     && eq_errors l_tail r_tail
   | _ -> false
+
+let api_distance (distance)  =
+  { Api_types_v1_j.rule_dist = distance.Api_types_j.distance_rule ;
+    Api_types_v1_j.time_dist = distance.Api_types_j.distance_time ;
+    Api_types_v1_j.dist = distance.Api_types_j.distance_length ; }
+
+let api_files (f : Api_types_j.file_line) : Api_types_v1_j.file_line =
+  { Api_types_v1_j.file_name = f.Api_types_j.file_line_name ;
+    Api_types_v1_j.line = f.Api_types_j.file_line_text ; }
+
+let api_flux_map (flux_map : Api_types_j.flux_map) : Api_types_v1_j.flux_map =
+  { Api_types_v1_j.flux_begin_time = flux_map.Api_types_j.flux_data.Data.flux_start;
+    Api_types_v1_j.flux_end_time = flux_map.Api_types_j.flux_end ;
+    Api_types_v1_j.flux_rules = Array.to_list flux_map.Api_types_j.flux_rules;
+    Api_types_v1_j.flux_hits = Array.to_list flux_map.Api_types_j.flux_data.Api_types_j.flux_hits;
+    Api_types_v1_j.flux_fluxs =
+      List.map
+        Array.to_list (Array.to_list flux_map.Data.flux_data.Data.flux_fluxs);
+    Api_types_v1_j.flux_name = flux_map.Data.flux_data.Data.flux_name
+  }
+
+let api_plot (p) =
+  { Api_types_v1_j.legend = p.Api_types_j.plot_legend ;
+    Api_types_v1_j.time_series =
+      List.map
+        (fun t ->
+           { Api_types_v1_j.observation_time =
+               t.Api_types_j.observable_time ;
+             Api_types_v1_j.observation_values =
+               t.Api_types_j.observable_values ; })
+        p.Api_types_j.plot_time_series;
+  }
+
+let api_snapshot (snapshot : Api_types_j.snapshot) : Api_types_v1_j.snapshot =
+  { Api_types_v1_j.snap_file = snapshot.Api_types_j.snapshot_file ;
+    Api_types_v1_j.snap_event = snapshot.Api_types_j.snapshot_event ;
+    Api_types_v1_j.agents =
+      List.map
+        (fun (index,site_graph) ->
+           (index,
+            Array.map
+              (fun site_node ->
+                 { Api_types_v1_j.node_quantity = site_node.Api_types_j.site_node_quantity ;
+                   Api_types_v1_j.node_name = site_node.Api_types_j.site_node_name ;
+                   Api_types_v1_j.node_sites =
+                     Array.map
+                       (fun (site : Api_types_j.site) ->
+                          ({ Api_types_v1_t.site_name = site.Api_types_t.site_name ;
+                             Api_types_v1_t.site_links = site.Api_types_t.site_links ;
+                             Api_types_v1_t.site_states = site.Api_types_t.site_states ;
+                           }
+                           : Api_types_v1_j.site))
+                       site_node.Api_types_j.site_node_sites; })
+              site_graph))
+        snapshot.Api_types_j.snapshot_agents;
+    Api_types_v1_j.tokens =
+      Array.to_list snapshot.Api_types_j.snapshot_tokens; }
+
+let api_errors (errors : Api_types_j.errors) : Api_types_v1_t.errors =
+  List.map
+    (fun (e : Api_types_t.message) ->
+       { Api_types_v1_t.severity = e.Api_types_t.message_severity ;
+         Api_types_v1_t.message = e.Api_types_t.message_text;
+         Api_types_v1_t.range = e.Api_types_t.message_range })
+    errors
+
+let api_parameter (parameter : Api_types_v1_j.parameter) : Api_types_j.simulation_parameter =
+  { Api_types_j.simulation_plot_period = parameter.Api_types_v1_j.plot_period ;
+    Api_types_j.simulation_max_time = parameter.Api_types_v1_j.max_time ;
+    Api_types_j.simulation_max_events = parameter.Api_types_v1_j.max_events ;
+    Api_types_j.simulation_seed = parameter.Api_types_v1_j.seed ;
+    Api_types_j.simulation_id = "ignore" ; }

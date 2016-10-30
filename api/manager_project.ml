@@ -29,10 +29,9 @@ object
       Lwt.return
         (Api_common.result_error_msg ~result_code:`CONFLICT message)
     else
-      let kappa_code = "" in
       (Kappa_facade.parse
         ~system_process:system_process
-        ~kappa_code:kappa_code)
+        ~kappa_files:[])
       >>=
       (Api_common.result_data_map
          ~ok:((fun (t : Kappa_facade.t) ->

@@ -2,8 +2,54 @@ val msg_process_not_running : string
 val msg_token_not_found : string
 val msg_observables_less_than_zero : string
 
+val assemble_distance :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_v1_t.distances Api.result Lwt.t
+
+
+val assemble_file_line :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_v1_j.file_line list Api.result Lwt.t
+
+val assemble_flux_map :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_v1_j.flux_map list Api.result Lwt.t
+
+val assemble_log_message :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_j.log_message list Api.result Lwt.t
+
+val assemble_plot :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_v1_j.plot option Api.result Lwt.t
+
+val assemble_plot :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_v1_j.plot option Api.result Lwt.t
+
+val assemble_snapshot :
+  Api.manager ->
+  Api_types_j.project_id ->
+  Api_types_j.simulation_id ->
+  Api_types_v1_j.snapshot list Api.result Lwt.t
+
 class type api_runtime =
   object
+    method version :
+      unit ->
+      Api_types_v1_j.version Api_types_v1_j.result Lwt.t
     method parse :
       Api_types_v1_j.code ->
       Api_types_v1_j.parse Api_types_v1_j.result Lwt.t

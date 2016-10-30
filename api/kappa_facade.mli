@@ -21,7 +21,7 @@ class null_process : system_process
 
 val parse :
   system_process:system_process ->
-  kappa_code:string ->
+  kappa_files:Api_types_t.file list ->
   (t, Api_types_j.errors) Api_types_j.result_data Lwt.t
 
 val start :
@@ -54,7 +54,7 @@ val continue :
 val info :
   system_process:system_process ->
   t:t ->
-  (Api_types_j.simulation_status, Api_types_j.errors)
+  (Api_types_j.simulation_detail, Api_types_j.errors)
     Api_types_j.result_data Lwt.t
 
 val get_contact_map : t -> Api_types_j.site_node array

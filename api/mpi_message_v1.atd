@@ -1,6 +1,7 @@
 type id = int
 type 'data message = { id : id ; data : 'data }
 
+type version <ocaml from="Api_types_v1"> = abstract
 type catalog <ocaml from="Api_types_v1"> = abstract
 type code <ocaml from="Api_types_v1"> = abstract
 type error <ocaml from="Api_types_v1"> = abstract
@@ -13,7 +14,8 @@ type peturbation = { perturbation_token : token ;
                      perturbation_code : string ; }
 type continuation = { continuation_token : token ;
      		      continuation_parameter : parameter }
-type request = [ Parse of code
+type request = [ Version of unit
+               | Parse of code
                | Start of parameter
                | Status of token
                | List of unit
@@ -21,7 +23,8 @@ type request = [ Parse of code
 	       | Peturbation of peturbation
 	       | Pause of token
 	       | Continue of continuation ]
-type response = [ Parse of parse result
+type response = [ Version of version result
+                | Parse of parse result
                 | Start of token result
                 | Status of state result
                 | List of catalog result

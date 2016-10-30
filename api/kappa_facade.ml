@@ -34,6 +34,89 @@ class null_process : system_process =
     method min_run_duration() = 0.0
   end;;
 
+type file_index =
+  { file_index_file_id : Api_types_j.file_id ;
+    file_index_line_offset : int ;
+    file_index_char_offset : int ;
+    file_line_count : int ; }
+
+type kappa_file =
+  { kappa_file_id : Api_types_j.file_id ;
+    kappa_file_code : string ;
+  }
+
+type kappa_code = kappa_file list
+
+let rec count_char c s =
+  try
+    let sp = String.index s c in
+    1 + (count_char c (String.sub s (sp+1) (String.length s - sp - 1)))
+  with Not_found -> 0
+
+
+let project_text (files : Api_types_j.file list) :
+  (string * file_index list) =
+  let files : Api_types_j.file list =
+    (List.stable_sort
+       (fun l r ->
+          compare
+            l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
+            r.Api_types_j.file_metadata.Api_types_j.file_metadata_position
+       )
+       files) in
+  List.fold_left
+    (fun (buffer,file_indexes) file ->
+       match file_indexes with
+         [] -> (file.Api_types_j.file_content,
+                [{ file_index_file_id = file.Api_types_j.file_metadata.Api_types_j.file_metadata_id ;
+                   file_index_line_offset = 0 ;
+                   file_index_char_offset = 0 ;
+                   file_line_count = count_char '\n' buffer ;
+                 }])
+       | h::_ -> (buffer^"\n"^file.Api_types_j.file_content ,
+                  { file_index_file_id = file.Api_types_j.file_metadata.Api_types_j.file_metadata_id ;
+                    file_index_line_offset = h.file_index_line_offset + h.file_line_count ;
+                    file_index_char_offset = String.length buffer ;
+                    file_line_count = count_char '\n' buffer ;
+                  }::file_indexes)
+    )
+    ("",[])
+    files
+
+let rec localize_range (range : Api_types_j.range) =
+  function
+  | [] -> range
+  | h::t ->
+    let in_position (p : Api_types_j.position) : bool =
+      h.file_index_line_offset <= p.Api_types_j.line &&
+      p.Api_types_j.line <= h.file_index_line_offset + h.file_line_count
+    in
+    let shift_position (p : Api_types_j.position)  =
+      { p with Api_types_j.line =
+                 p.Api_types_j.line - h.file_index_line_offset }
+    in
+    if in_position range.Api_types_j.from_position
+    || in_position range.Api_types_j.to_position
+    then
+      { Api_types_j.file = h.file_index_file_id ;
+        Api_types_j.from_position = shift_position range.Api_types_j.from_position;
+        Api_types_j.to_position = shift_position range.Api_types_j.to_position; }
+    else
+      localize_range range t
+
+let localize_message (message : Api_types_j.message) (indexes : file_index list) =
+  match message.Api_types_j.message_range with
+  | None ->
+    message
+  | Some range ->
+    { message with
+      Api_types_j.message_range =
+        Some (localize_range range indexes) }
+
+let localize_errors (errors : Api_types_j.errors) (indexes : file_index list) =
+  List.map (fun message -> localize_message message indexes) errors
+
+
 (** State of the running simulation. *)
 type t =
   { mutable is_running : bool ;
@@ -55,7 +138,17 @@ type t =
     init_l : (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
     has_tracking : (bool * bool * bool) option ;
     mutable lastyield : float ;
+    mutable file_indexes : file_index list option;
   }
+
+let t_errors (t : t) (errors : Api_types_j.errors) =
+  match t.file_indexes with
+  | None -> errors
+  | Some indexes ->  localize_errors errors indexes
+let t_range (t : t) (range : Api_types_j.range) =
+  match t.file_indexes with
+  | None -> range
+  | Some indexes ->  localize_range range indexes
 
 let create_t
     ~contact_map
@@ -66,6 +159,7 @@ let create_t
     ~init_l
     ~has_tracking
     ~lastyield
+    ~file_indexes
   : t =
   let counter =
     Counter.create
@@ -93,6 +187,7 @@ let create_t
     init_l = init_l;
     has_tracking = has_tracking;
     lastyield = lastyield;
+    file_indexes = file_indexes;
   }
 
 let clone_t t =
@@ -105,30 +200,35 @@ let clone_t t =
     ~init_l:t.init_l
     ~has_tracking:t.has_tracking
     ~lastyield:t.lastyield
+    ~file_indexes:t.file_indexes
 
-let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
-  fun handler ->
+
+let catch_error : 'a .
+                    (Api_types_j.range -> Api_types_j.range) ->
+  (Api_types_j.errors -> 'a) -> exn -> 'a =
+  fun f handler ->
     (function
       |  ExceptionDefn.Syntax_Error ((message,location) : string Location.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (Location.to_range location))
+             ~region:(Some (f (Location.to_range location)))
              message)
       | ExceptionDefn.Malformed_Decl ((message,location) : string Location.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (Location.to_range location))
+             ~region:(Some (f (Location.to_range location)))
              message)
       | ExceptionDefn.Internal_Error ((message,location) : string Location.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (Location.to_range location))
+             ~region:(Some (f (Location.to_range location)))
              message)
       | Invalid_argument error ->
         handler (Api_data.api_message_errors ("Runtime error "^ error))
       | exn -> handler (Api_data.api_exception_errors exn))
 
 let build_ast
+    (indexes : file_index list)
     (random_state : Random.State.t)
     (code : string)
     (yield : unit -> unit Lwt.t) =
@@ -150,10 +250,10 @@ let build_ast
                 tk_nd,
                 _updated_vars,
                 (result :
-                  (Ast.agent,
-                   LKappa.rule_agent list,
-                   int,
-                   LKappa.rule) Ast.compil)) ->
+                   (Ast.agent,
+                    LKappa.rule_agent list,
+                    int,
+                    LKappa.rule) Ast.compil)) ->
                (yield ()) >>=
                (fun () ->
                   (* The last yield is updated after the last yield.
@@ -181,12 +281,15 @@ let build_ast
                                    ~store_distances random_state env)
                          ~state:(State_interpreter.empty env [] [])
                          ~store_distances:store_distances
-                         ~has_tracking:has_tracking
                          ~init_l:init_l
+                         ~has_tracking:has_tracking
                          ~lastyield:lastyield
+                         ~file_indexes:(Some indexes)
                      in
                      Lwt.return (`Ok simulation)))))))
-    (catch_error (fun e -> Lwt.return (`Error e)))
+    (catch_error
+       (fun range -> localize_range range indexes)
+       (fun e -> Lwt.return (`Error e)))
 
 let outputs (simulation : t) =
   function
@@ -221,32 +324,37 @@ let outputs (simulation : t) =
 
 let parse
     ~(system_process : system_process)
-    ~(kappa_code : string)
+    ~(kappa_files : Api_types_t.file list)
   : (t,Api_types_j.errors) Api_types_j.result_data Lwt.t
-  = Lwt.bind
-    (build_ast (Random.State.make_self_init ()) kappa_code system_process#yield)
+  =
+  let (kappa_code,indexes) = project_text kappa_files in
+  Lwt.bind
+    (build_ast
+       indexes
+       (Random.State.make_self_init ())
+       kappa_code system_process#yield)
     (function
       | `Ok simulation -> Lwt.return (`Ok simulation)
-      | `Error e -> Lwt.return (`Error e))
+      | `Error e -> Lwt.return (`Error (localize_errors e indexes)))
 
 let time_yield
     ~(system_process : system_process)
     ~(t : t) : unit Lwt.t =
-        let time = Sys.time () in
-        if time -. t.lastyield > system_process#min_run_duration () then
-          let () = t.lastyield <- time in
-          system_process#yield ()
-        else Lwt.return_unit
+  let time = Sys.time () in
+  if time -. t.lastyield > system_process#min_run_duration () then
+    let () = t.lastyield <- time in
+    system_process#yield ()
+  else Lwt.return_unit
 
 let finalize_simulation
     ~(t : t) : unit =
-        let _ =
-          State_interpreter.end_of_simulation
-            ~outputs:(outputs t)
-            t.log_form t.env
-            t.counter t.graph
-            t.state
-        in ()
+  let _ =
+    State_interpreter.end_of_simulation
+      ~outputs:(outputs t)
+      t.log_form t.env
+      t.counter t.graph
+      t.state
+  in ()
 
 let run_simulation
     ~(system_process : system_process)
@@ -260,32 +368,32 @@ let run_simulation
                  Sys.time () -. t.lastyield < system_process#min_run_duration ()
            do
              let (stop,graph',state') =
-                     State_interpreter.a_loop
-                       ~outputs:(outputs t)
-                       t.env t.counter t.graph t.state in
-                   rstop := stop;
-                   t.graph <- graph';
-                   t.state <- state'
-                 done in
-               if !rstop then
-                 let () = t.is_running <- false in
-                 Lwt.return_unit
-              else if t.is_running then
-                (system_process#yield ()) >>= (fun () ->
-                    let () = t.lastyield <- Sys.time () in iter ())
-              else
-                Lwt.return_unit
-             in
-             (iter ()) >>=
-             (fun () ->
-                let () =
-                  if t.run_finalize then
-                    finalize_simulation ~t:t
-                  else
-                    ()
-                in
-                Lwt.return (`Ok ())))
-    (catch_error (fun e -> Lwt.return (`Error e)))
+               State_interpreter.a_loop
+                 ~outputs:(outputs t)
+                 t.env t.counter t.graph t.state in
+             rstop := stop;
+             t.graph <- graph';
+             t.state <- state'
+           done in
+         if !rstop then
+           let () = t.is_running <- false in
+           Lwt.return_unit
+         else if t.is_running then
+           (system_process#yield ()) >>= (fun () ->
+               let () = t.lastyield <- Sys.time () in iter ())
+         else
+           Lwt.return_unit
+       in
+       (iter ()) >>=
+       (fun () ->
+          let () =
+            if t.run_finalize then
+              finalize_simulation ~t:t
+            else
+              ()
+          in
+          Lwt.return (`Ok ())))
+    (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
 
 
 
@@ -373,6 +481,7 @@ let start
              )
            )
            (catch_error
+              (t_range t)
               (fun e ->
                  let () = t.error_messages <- e in
                  Lwt.return (`Error e))
@@ -396,16 +505,16 @@ let stop
     ~(t : t) : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
-        Lwt.catch
-          (fun () ->
-             let () = t.run_finalize <- true in
-               (if t.is_running then
-                  (pause ~system_process:system_process ~t:t)
-                else
-                  let () = finalize_simulation ~t:t in
-                  Lwt.return (`Ok ()))
-          )
-          (catch_error (fun e -> Lwt.return (`Error e)))
+  Lwt.catch
+    (fun () ->
+       let () = t.run_finalize <- true in
+       (if t.is_running then
+          (pause ~system_process:system_process ~t:t)
+        else
+          let () = finalize_simulation ~t:t in
+          Lwt.return (`Ok ()))
+    )
+    (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
 
 let perturbation
     ~(system_process : system_process)
@@ -459,7 +568,7 @@ let perturbation
            let () = t.graph <- graph'' in
            let () = t.state <- state' in
            Lwt.return (`Ok ()))
-    (catch_error (fun e -> Lwt.return (`Error e)))
+    (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
 
 let continue
     ~(system_process : system_process)
@@ -483,34 +592,54 @@ let continue
              parameter.Api_types_j.simulation_max_events
          in
          let () =
-               Lwt.async
-                 (fun () ->
-                    run_simulation ~system_process:system_process ~t:t)
+           Lwt.async
+             (fun () ->
+                run_simulation ~system_process:system_process ~t:t)
          in
          Lwt.return (`Ok ())
     )
     (catch_error
+       (t_range t)
        (fun e -> Lwt.return (`Error e)))
 
-let create_info ~(t : t) : Api_types_j.simulation_status =
-  { Api_types_j.simulation_status_info =
-      { Api_types_j.simulation_info_time = Counter.time t.counter ;
-        Api_types_j.simulation_info_time_percentage = Counter.time_percentage t.counter ;
-        Api_types_j.simulation_info_event = Counter.event t.counter ;
-        Api_types_j.simulation_info_event_percentage = Counter.event_percentage t.counter ;
-        Api_types_j.simulation_info_tracked_events = Counter.tracked_events t.counter ;
-        Api_types_j.simulation_info_is_running = t.is_running ; };
-    Api_types_j.simulation_status_plot = Some t.plot ;
-    Api_types_j.simulation_status_distances = Some t.distances ;
-    Api_types_j.simulation_status_flux_maps = t.flux_maps ;
-    Api_types_j.simulation_status_file_lines = t.files ;
-    Api_types_j.simulation_status_snapshots = t.snapshots ;
-    Api_types_j.simulation_status_log_messages = [Buffer.contents t.log_buffer] ; }
+let create_info ~(t : t) : Api_types_j.simulation_detail =
+  let progress :  Api_types_j.simulation_progress =
+    { Api_types_j.simulation_progress_time =
+        Counter.time t.counter ;
+      Api_types_j.simulation_progress_time_percentage =
+        Counter.time_percentage t.counter ;
+      Api_types_j.simulation_progress_event =
+        Counter.event t.counter ;
+      Api_types_j.simulation_progress_event_percentage =
+        Counter.event_percentage t.counter ;
+      Api_types_j.simulation_progress_tracked_events =
+        Counter.tracked_events t.counter ;
+      Api_types_j.simulation_progress_is_running =
+        t.is_running ;
+    } in
+  let output : Api_types_j.simulation_detail_output =
+    { Api_types_j.simulation_output_plot =
+        Some t.plot ;
+      Api_types_j.simulation_output_distances =
+        Some t.distances ;
+      Api_types_j.simulation_output_flux_maps =
+        t.flux_maps ;
+      Api_types_j.simulation_output_file_lines =
+        t.files ;
+      Api_types_j.simulation_output_snapshots =
+        t.snapshots ;
+      Api_types_j.simulation_output_log_messages =
+        [Buffer.contents t.log_buffer] ; }
+  in
+  { Api_types_j.simulation_detail_progress =
+      progress ;
+    Api_types_j.simulation_detail_output =
+      output ; }
 
 let info
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_types_j.simulation_status,Api_types_j.errors)
+  (Api_types_j.simulation_detail,Api_types_j.errors)
     Api_types_j.result_data
     Lwt.t =
   let () = ignore(system_process) in
@@ -520,7 +649,7 @@ let info
     Lwt.catch
       (fun () ->
          Lwt.return (`Ok (create_info ~t:t)))
-      (catch_error (fun e -> Lwt.return (`Error e)))
+      (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
   | _ -> Lwt.return (`Error t.error_messages)
 
 let get_contact_map (t : t) : Api_types_j.site_node array =

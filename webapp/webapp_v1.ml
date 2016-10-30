@@ -92,16 +92,17 @@ let handler
   (* SHUTDOWN *)
   | "/v1/shutdown" when request.meth = `POST  ->
     (Cohttp_lwt_body.to_string body)
-    >>= (fun body ->
-        let shutdown_okay =
-          server_respond "shutting down"
-        in
-        let shutdown_fail =
-          Server.respond_string
-            ?headers:(Some headers)
-            ~status:`Unauthorized
-            ~body:"unathorized"
-            ()
+    >>=
+    (fun body ->
+       let shutdown_okay =
+         server_respond "shutting down"
+       in
+       let shutdown_fail =
+         Server.respond_string
+           ?headers:(Some headers)
+           ~status:`Unauthorized
+           ~body:"unathorized"
+           ()
         in
         match shutdown_key with
           None -> shutdown_fail
@@ -118,10 +119,10 @@ let handler
             shutdown_fail)
   (* GET /version *)
   | "/v1/version" ->
-    server_respond
-      (Api_types_v1_j.string_of_version
-         { Api_types_v1_j.version_build = Version.version_msg ;
-           Api_types_v1_j.version_id = "v1" })
+    (runtime_state#version ())
+    >>=
+    (result_response (Api_types_v1_j.string_of_version ?len:None))
+
   (* GET /parse *)
   | "/v1/parse" ->
     Uri.get_query_param uri "code" |>
@@ -139,14 +140,12 @@ let handler
          >>=
          (fun () -> runtime_state#parse code)
          >>=
-         (fun parse ->
-            result_response (Api_types_v1_j.string_of_parse ?len:None) parse)
+         (result_response (Api_types_v1_j.string_of_parse ?len:None))
     )(* GET /process *)
   | "/v1/process" when request.meth = `GET ->
     (runtime_state#list ())
     >>=
-    (fun catalog ->
-       result_response (Api_types_v1_j.string_of_catalog ?len:None) catalog)
+    (result_response (Api_types_v1_j.string_of_catalog ?len:None))
   (* POST /process *)
   | "/v1/process" when request.meth = `POST ->
     (Cohttp_lwt_body.to_string body)
@@ -161,8 +160,7 @@ let handler
          | e -> Api_data_v1.lwt_msg (Printexc.to_string e)
         )
         >>=
-        (fun token ->
-           result_response (Api_types_v1_j.string_of_token ?len:None) token)
+        (result_response (Api_types_v1_j.string_of_token ?len:None))
       )
   (* OPTIONS /v1/process/[token] *)
   | x when request.meth = `OPTIONS

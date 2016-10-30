@@ -1,14 +1,12 @@
-module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
-module UIState = Ui_state
-open ApiTypes
+open Lwt.Infix
+
 
 let select_id = "output-select-id"
-let display_id = "contact-map-display"
-let export_id = "contact-export"
+let export_id = "output-export"
 
 let current_file, set_current_file =
-  React.S.create (None : (string option * string list) option)
+  React.S.create (None : Api_types_j.file_line_detail option)
 
 let upsert
     (update : 'value -> 'value-> 'value)
@@ -21,30 +19,68 @@ let upsert
     (key,value)::list
 
 let update_outputs
-    (update : string option * string list) : unit =
-  if (Some update) = (React.S.value current_file) then
-    ()
-  else
-    set_current_file (Some update)
+  (t : Ui_simulation.t)
+  (index : int) : unit =
+  Ui_simulation.manager_operation
+    t
+    (fun
+      manager
+      project_id
+      simulation_id ->
+      (manager#simulation_info_file_line
+         project_id
+         simulation_id
+      ) >>=
+      (Api_common.result_bind_lwt
+         ~ok:(fun (file_line_info : Api_types_j.file_line_info) ->
+             try
+               let file_line_info_id : Api_types_j.file_line_id =
+                 List.nth file_line_info.Api_types_t.file_line_ids index in
+               (manager#simulation_detail_file_line
+                  project_id
+                  simulation_id
+                  file_line_info_id
+               )
+             with
+             | Failure f ->
+               Lwt.return
+                 (Api_common.result_error_msg f)
+             | Invalid_argument f ->
+               Lwt.return
+                 (Api_common.result_error_msg f)
 
-let state_outputs state : (string option * string list) list =
-  match state with
-    None -> []
-  | Some state ->
-    List.fold_left
-      (fun files file_line ->
-         (upsert
-            (fun current previous -> current@previous)
-            file_line.file_name
-            [file_line.line]
-            files)
+           )
+      ) >>=
+      (Api_common.result_map
+         ~ok:(fun _ (file_line_detail : Api_types_j.file_line_detail) ->
+             let () = set_current_file (Some file_line_detail) in
+             Lwt.return_unit
+           )
+         ~error:(fun _ errors  ->
+            let () = Ui_state.set_model_error __LOC__ errors in
+            Lwt.return_unit)
       )
-      []
-      state.ApiTypes.files
+    )
+
+let file_count
+    (state : Api_types_j.simulation_info option) :
+  int =
+  match state with
+    None -> 0
+  | Some state ->
+    state.Api_types_t.simulation_info_output.Api_types_t.simulation_output_flux_maps
+(* Careful this defaults to None which a valid file identifier.
+   The idea is to always give a valid file identifier.
+ *)
+let get_file_line_id
+    (file : Api_types_j.file_line_detail) : Api_types_j.file_line_id =
+  match file with
+  | h::_ -> h.Api_types_j.file_line_name
+  | [] -> None
 
 let navli (t : Ui_simulation.t) =
   Ui_common.badge t
-    (fun state -> List.length (state_outputs state))
+    (fun state -> (file_count state))
 
 let content (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -54,50 +90,51 @@ let content (t : Ui_simulation.t) =
          ; Html.a_id select_id ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
-           (fun state ->
-              let files : (string option * string list) list =
-		state_outputs state in
-              let file : (string option * string list) option =
-		React.S.value current_file in
-              let () =
-		match (files,file) with
-		| (f::_,None) -> set_current_file (Some f)
-		| (f::_,Some file) ->
-		  (match
-                     List.filter
-                       (fun (name,_) -> name = fst file)
-                       files
-                   with
-		   | [] -> set_current_file (Some f)
-		   | m::_ ->
-                     if snd file = snd m then ()
-                     else set_current_file (Some m)
-		  )
-		| _ -> ()
-              in (* update *)
-              ReactiveData.RList.set
-		handle
-		(List.mapi
-                   (fun i (key,_) ->
-                      Html.option
-			~a:([ Html.a_value (string_of_int i)]
-			    @
-			    if (match (React.S.value current_file) with
-				| None -> false
-				| Some (k,_) -> key = k
-                              )
-			    then [Html.a_selected ()]
-			    else [])
-			(Html.pcdata
-			   (Ui_common.option_label
-                              (match key with
-                               | None -> ""
-                               | Some name -> name)
-			   )
-			)
-                   )
-                   files
-		)
+           (fun _ ->
+              Ui_simulation.manager_operation
+                t
+                (fun
+                  manager
+                  project_id
+                  simulation_id ->
+                  (manager#simulation_info_file_line
+                     project_id
+                     simulation_id
+                  ) >>=
+                  (Api_common.result_map
+                     ~ok:(fun _ (file_line_info : Api_types_j.file_line_info) ->
+                         let file_ids : Api_types_j.file_line_id list =
+                           file_line_info.Api_types_j.file_line_ids in
+                         let file : Api_types_j.file_line_detail option = React.S.value current_file in
+		         let current_file_id : Api_types_j.file_line_id =
+                           (match (file_ids,file) with
+	                   | (f::_,None) -> f
+		           | (_::_,Some file) -> get_file_line_id file
+                           | _ -> None) in
+                        let file_options =
+                          List.mapi
+                            (fun i key ->
+                               Html.option
+			         ~a:([ Html.a_value (string_of_int i)]@
+                                     (if (key = current_file_id) then
+                                         [Html.a_selected ()]
+			              else  []))
+ 	                         (Html.pcdata
+			            (Ui_common.option_label
+                                        (match key with
+                                         | None -> ""
+                                         | Some name -> name)
+			                )
+			         )
+                            )
+                            file_ids
+                         in
+                         let () = ReactiveData.RList.set handle file_options in
+                         Lwt.return_unit
+                       )
+                     ~error:(failwith "")
+                  )
+                )
            )
            simulation_output in
        list
@@ -108,24 +145,43 @@ let content (t : Ui_simulation.t) =
       ~a:[ Html.a_class ["list-group-item"] ]
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
-           (fun state ->
-              ReactiveData.RList.set
-		handle
-		(match state_outputs state with
-		   (key,_)::[] ->
-                   [Html.h4
-                      [ Html.pcdata
-                          (Ui_common.option_label
-                             (match key with
-                              | None -> ""
-                              | Some file_name -> file_name
-                             )
-                          )]]
-		 | _ -> [select]
-		)
+           (fun _ ->
+              Ui_simulation.manager_operation
+                t
+                (fun
+                  manager
+                  project_id
+                  simulation_id ->
+                  (manager#simulation_info_file_line
+                     project_id
+                     simulation_id
+                  ) >>=
+                  (Api_common.result_map
+                     ~ok:(fun _ (file_line_info : Api_types_j.file_line_info) ->
+                         let () = ReactiveData.RList.set
+                             handle
+                             (match file_line_info.Api_types_j.file_line_ids with
+		                key::[] ->
+                                [Html.h4
+                                   [ Html.pcdata
+                                       (Ui_common.option_label
+                                          (match key with
+                                           | None -> ""
+                                           | Some file_name -> file_name
+                                          )
+                                       )]]
+		              | _ -> [select]
+		             )
+                         in
+                         Lwt.return_unit
+                       )
+                     ~error:(fun _ errors  ->
+                         let () = Ui_state.set_model_error __LOC__ errors in
+                         Lwt.return_unit)
+                  )
+                )
            )
-           simulation_output
-       in
+           simulation_output in
        list
       )
   in
@@ -133,14 +189,15 @@ let content (t : Ui_simulation.t) =
     Tyxml_js.R.Html.div
       (let line_list, line_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
-           (fun (file : (string option * string list) option) ->
+           (fun (file : Api_types_j.file_line_detail option) ->
               match file with
               | None -> ()
-              | Some (_,lines) ->
+              | Some lines->
 		ReactiveData.RList.set
 		  line_handle
-		  (List.map (fun line -> Html.p [ Html.pcdata line ]) lines)
-           )
+                  (List.map
+                     (fun line -> Html.p [ Html.pcdata line.Api_types_j.file_line_text ]) lines)
+                  )
            current_file
        in
        line_list)
@@ -170,20 +227,24 @@ let select_outputs (t : Ui_simulation.t) =
            _ -> Js.null
       )
   in
-  match state_outputs (React.S.value simulation_output) with
-  | [] -> ()
-  | l ->
-    let index = Js.Opt.get index (fun _ -> 0) in
-    if List.length l > index then
-      update_outputs
-        (List.nth l index)
-    else
-      ()
+  let index = Js.Opt.get index (fun _ -> 0) in
+  if file_count (React.S.value simulation_output) > 0 then
+    update_outputs t index
+   else
+     ()
 
 let navcontent (t : Ui_simulation.t) =
-  [ Ui_common.toggle_element t state_outputs (content t) ]
+  [ Ui_common.toggle_element t (fun t -> file_count t > 0) (content t) ]
 
 let onload (t : Ui_simulation.t) =
+  let () =
+    Common.jquery_on
+      (Format.sprintf "#%s" select_id)
+      ("change")
+      (fun _ ->
+	 let () = select_outputs t in Js._true)
+  in  ()
+  (* TODO
   let select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -196,6 +257,6 @@ let onload (t : Ui_simulation.t) =
 	   let () = select_outputs t
 	   in Js._true)
   in
+     *)
 
-  ()
 let onresize (_ : Ui_simulation.t) : unit = ()

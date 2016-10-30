@@ -1,9 +1,8 @@
-module ApiTypes = Api_types_v1_j
+open Lwt.Infix
 module Html = Tyxml_js.Html5
-module UIState = Ui_state
 
 let current_snapshot, set_current_snapshot =
-  React.S.create (None : ApiTypes.snapshot option)
+  React.S.create (None : Api_types_j.snapshot option)
 
 type display_format = Kappa | Graph
 let display_format_to_string =
@@ -18,15 +17,18 @@ let string_to_display_format =
 
 let display_format, set_display_format = React.S.create Graph
 
-let state_snapshot state =
+let snapshot_count
+    (state : Api_types_j.simulation_info option) :
+  int =
   match state with
-  | None -> []
-  | Some state -> state.ApiTypes.snapshots
+  | None -> 0
+  | Some state ->
+    state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_snapshots
 
 let navli (t : Ui_simulation.t) =
   Ui_common.badge
     t
-    (fun state -> List.length (state_snapshot state))
+    (fun state -> snapshot_count state)
 
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
@@ -40,9 +42,9 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
       ; Widget_export.export_json
           ~serialize_json:(fun () ->
               (match
-		 (React.S.value current_snapshot : ApiTypes.snapshot option) with
+		 (React.S.value current_snapshot : Api_types_j.snapshot option) with
               | None -> "null"
-              | Some s -> ApiTypes.string_of_snapshot s
+              | Some s -> Api_types_j.string_of_snapshot s
               )
             )
       ; { Widget_export.suffix = "ka"
@@ -50,9 +52,10 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
         ; Widget_export.export =
 	    fun (filename : string) ->
               let data = match
-		  (React.S.value current_snapshot : ApiTypes.snapshot option) with
+		  (React.S.value current_snapshot : Api_types_j.snapshot option) with
               | None -> ""
-              | Some s -> Api_data_v1.api_snapshot_kappa s
+              | Some s ->
+                Api_data_v1.api_snapshot_kappa (Api_data_v1.api_snapshot s)
               in
               Common.saveFile
 		~data:data
@@ -64,9 +67,9 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
         ; Widget_export.export =
 	    fun (filename : string) ->
               let data = match
-		  (React.S.value current_snapshot : ApiTypes.snapshot option) with
+		  (React.S.value current_snapshot : Api_types_j.snapshot option) with
               | None -> ""
-              | Some s -> Api_data_v1.api_snapshot_dot s
+              | Some s -> Api_data_v1.api_snapshot_dot (Api_data_v1.api_snapshot s)
               in
               Common.saveFile
 		~data:data
@@ -75,11 +78,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
         }
       ];
     show = React.S.map
-        (fun state ->
-           match state_snapshot state with
-           | [] -> false
-           | _ -> true
-        )
+        (fun state -> snapshot_count state > 0)
         simulation_output
 
   }
@@ -89,39 +88,60 @@ let format_select_id = "format_select_id"
 let content (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
   let list, handle = ReactiveData.RList.create [] in
-  let select state =
+  let select (snapshots : Api_types_j.snapshot_id list) =
     List.mapi
-      (fun i snapshot ->
+      (fun i snapshot_id ->
          Html.option
 	   ~a:([ Html.a_value (string_of_int i)]
 	   @
            if (match (React.S.value current_snapshot) with
 	   | None -> false
-           | Some s -> s.ApiTypes.snap_file = snapshot.ApiTypes.snap_file)
+           | Some s -> s.Api_types_j.snapshot_file = snapshot_id)
 	   then [Html.a_selected ()]
            else [])
            (Html.pcdata
-	      (Ui_common.option_label snapshot.ApiTypes.snap_file)))
-              (state_snapshot state)
+	      (Ui_common.option_label snapshot_id)))
+              snapshots
   in
+  (* populate select *)
   let _ = React.S.map
-      (fun state -> ReactiveData.RList.set handle (select state))
+      (fun _ ->
+         Ui_simulation.manager_operation
+           t
+           (fun
+             manager
+             project_id
+             simulation_id ->
+             (manager#simulation_info_snapshot
+                project_id
+                simulation_id
+             ) >>=
+             (Api_common.result_map
+                ~ok:(fun _ (data : Api_types_t.snapshot_info) ->
+                    let () = ReactiveData.RList.set handle (select data.Api_types_t.snapshot_ids) in
+                    Lwt.return_unit)
+                ~error:(fun _ errors  ->
+                    let () = Ui_state.set_model_error __LOC__ errors in
+                    Lwt.return_unit)
+             )
+           )
+      )
       simulation_output
   in
   let snapshot_class :
     empty:(unit -> 'a) ->
-    single:(ApiTypes.snapshot -> 'a) ->
-    multiple:(ApiTypes.snapshot list -> 'a) -> 'a React.signal =
+    single:(unit -> 'a) ->
+    multiple:(unit -> 'a) -> 'a React.signal =
     fun
       ~empty
       ~single
       ~multiple ->
     React.S.map
       (fun state ->
-         match state_snapshot state with
-         | [] -> empty ()
-         | h::[] -> single h
-         | s -> multiple s)
+         match snapshot_count state with
+         | 0 -> empty ()
+         | 1 -> single ()
+         | _ -> multiple ())
       simulation_output
   in
   let snapshot_label =
@@ -134,12 +154,12 @@ let content (t : Ui_simulation.t) =
          ]
       [ Tyxml_js.R.Html.pcdata
           (React.S.map
-             (fun state ->
-                match state_snapshot state with
-                | [] -> ""
-                | snapshot::[] -> (Ui_common.option_label snapshot.ApiTypes.snap_file)
-                | _ -> "")
-             simulation_output)
+             (fun snapshot ->
+                match snapshot with
+                | None -> ""
+                | Some snapshot ->
+                  (Ui_common.option_label snapshot.Api_types_j.snapshot_file))
+             current_snapshot)
       ]
   in
   let snapshot_select =
@@ -173,7 +193,9 @@ let content (t : Ui_simulation.t) =
              (fun snapshot ->
                 match snapshot with
                 | None -> ""
-                | Some snapshot -> Api_data_v1.api_snapshot_kappa snapshot)
+                | Some snapshot ->
+                  Api_data_v1.api_snapshot_kappa
+                    (Api_data_v1.api_snapshot snapshot))
              current_snapshot)
 
       ]
@@ -193,7 +215,10 @@ let content (t : Ui_simulation.t) =
       [ Html.entity "nbsp" ]
   in
   let format_chooser =
-      [%html {| <select class="form-control" id="|} format_select_id {|"><option value="Kappa">kappa</option><option value="Graph">graph</option></select> |} ]
+    [%html
+      {| <select class="form-control" id="|}
+        format_select_id
+        {|"><option value="Kappa">kappa</option><option value="Graph">graph</option></select> |} ]
   in
   [%html {|<div class="navcontent-view">
              <div class="row" style="margin : 5px;">
@@ -221,18 +246,20 @@ let content (t : Ui_simulation.t) =
 let navcontent (t : Ui_simulation.t) =
   [Ui_common.toggle_element
      t
-     state_snapshot
+     (fun state -> snapshot_count state > 0)
      (content t) ]
 
 let render_snapshot_graph
     (snapshot_js : Js_contact.contact_map Js.t)
-    (snapshot : ApiTypes.snapshot) : unit =
+    (snapshot : Api_types_j.snapshot) : unit =
+  let snapshot : Api_types_v1_j.snapshot =
+    Api_data_v1.api_snapshot snapshot in
   let () =
     Common.debug
       (Js.string
          (Api_types_v1_j.string_of_snapshot snapshot))
   in
-  let site_graph : ApiTypes.site_graph =
+  let site_graph : Api_types_v1_j.site_graph =
     Api_data_v1.api_snapshot_site_graph snapshot in
   match React.S.value display_format with
   | Graph ->
@@ -262,15 +289,56 @@ let select_snapshot (t : Ui_simulation.t) =
   | None -> ()
   | Some state ->
     let index = Js.Opt.get index (fun _ -> 0) in
-    if List.length state.ApiTypes.snapshots > 0 then
-      let snapshot_selected : ApiTypes.snapshot =
-        List.nth state.ApiTypes.snapshots index in
-      let () = set_current_snapshot (Some snapshot_selected) in
-      render_snapshot_graph
-        snapshot_js
-        snapshot_selected
-    else
-      set_current_snapshot None
+    if snapshot_count (Some state) > 0 then
+      let () =
+        Ui_simulation.manager_operation
+          t
+          (fun
+            manager
+            project_id
+            simulation_id ->
+            (manager#simulation_info_snapshot
+               project_id
+               simulation_id
+            ) >>=
+            (Api_common.result_bind_lwt
+               ~ok:(fun  (snapshot_info : Api_types_t.snapshot_info) ->
+                   try
+                     let snapshot_id : string =
+                       List.nth snapshot_info.Api_types_t.snapshot_ids index in
+                     (manager#simulation_detail_snapshot
+                        project_id
+                        simulation_id
+                        snapshot_id
+                     )
+             with
+             | Failure f ->
+               Lwt.return
+                 (Api_common.result_error_msg f)
+             | Invalid_argument f ->
+               Lwt.return
+                 (Api_common.result_error_msg f)
+
+                 )
+            ) >>=
+            (Api_common.result_map
+               ~ok:(fun _ (snapshot : Api_types_j.snapshot) ->
+                   let () = set_current_snapshot (Some snapshot) in
+                   let () = render_snapshot_graph
+                     snapshot_js
+                     snapshot
+                   in
+                   Lwt.return_unit)
+               ~error:(fun _ errors  ->
+                   let () = set_current_snapshot None in
+                   let () = Ui_state.set_model_error __LOC__ errors in
+                   Lwt.return_unit)
+            )
+          )
+      in
+      ()
+
+
 
 let onload (t : Ui_simulation.t) : unit =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -307,7 +375,7 @@ let onload (t : Ui_simulation.t) : unit =
          | None -> ()
          | Some snapshot -> render_snapshot_graph
                               (snapshot_js : Js_contact.contact_map Js.t)
-                              (snapshot : ApiTypes.snapshot))
+                              (snapshot : Api_types_j.snapshot))
       in
         set_display_format format
     | None -> assert false

@@ -65,15 +65,15 @@ type request = [ EnvironmentInfo of unit
                | FileUpdate of (project_id * file_id * file_modification)
                | ProjectCreate of project_parameter
                | ProjectDelete of project_id
-               | ProjectInfo
+               | ProjectInfo of unit
                | SimulationContinue of (project_id * simulation_id * simulation_parameter)
                | SimulationDelete of (project_id * simulation_id)
-               | SimulationGetDistance of (project_id * simulation_id * distance_id)
-               | SimulationGetFileLine of (project_id * simulation_id * file_line_id)
-               | SimulationGetFluxMap of (project_id * simulation_id * flux_map_id)
-               | SimulationGetLogMessage of (project_id * simulation_id)
-               | SimulationGetPlot of (project_id * simulation_id)
-               | SimulationGetSnapshot of (project_id * simulation_id * snapshot_id)
+               | SimulationDetailDistance of (project_id * simulation_id * distance_id)
+               | SimulationDetailFileLine of (project_id * simulation_id * file_line_id)
+               | SimulationDetailFluxMap of (project_id * simulation_id * flux_map_id)
+               | SimulationDetailLogMessage of (project_id * simulation_id)
+               | SimulationDetailPlot of (project_id * simulation_id)
+               | SimulationDetailSnapshot of (project_id * simulation_id * snapshot_id)
                | SimulationInfo of (project_id * simulation_id)
                | SimulationInfoDistance of (project_id * simulation_id)
                | SimulationInfoFileLine of (project_id * simulation_id)
@@ -83,7 +83,6 @@ type request = [ EnvironmentInfo of unit
                | SimulationPause of (project_id * simulation_id)
                | SimulationPerturbation of (project_id * simulation_id * simulation_perturbation)
                | SimulationStart of (project_id * simulation_parameter)
-               | SimulationStop of (project_id * simulation_id)
                ]
 
 type response = [ EnvironmentInfo of environment_info result
@@ -97,12 +96,12 @@ type response = [ EnvironmentInfo of environment_info result
                 | ProjectInfo of project_info result
                 | SimulationContinue of unit result
                 | SimulationDelete of unit result
-                | SimulationGetDistance of distance result
-                | SimulationGetFileLine of file_line_detail result
-                | SimulationGetFluxMap of flux_map result
-                | SimulationGetLogMessage of log_message_detail result
-                | SimulationGetPlot of plot result
-                | SimulationGetSnapshot of snapshot result
+                | SimulationDetailDistance of distance result
+                | SimulationDetailFileLine of file_line_detail result
+                | SimulationDetailFluxMap of flux_map result
+                | SimulationDetailLogMessage of log_message_detail result
+                | SimulationDetailPlot of plot result
+                | SimulationDetailSnapshot of snapshot result
                 | SimulationInfo of simulation_info result
                 | SimulationInfoDistance of distance_info result
                 | SimulationInfoFileLine of file_line_info result
@@ -112,5 +111,4 @@ type response = [ EnvironmentInfo of environment_info result
                 | SimulationPause of unit result
                 | SimulationPerturbation of unit result
                 | SimulationStart of simulation_id result
-                | SimulationStop of unit result
                 ]

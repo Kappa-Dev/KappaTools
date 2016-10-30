@@ -90,7 +90,9 @@ type route_filter =
     route
 
 type url_matcher =
-  { re : Re.re; labels : string list }
+  { re : Re.re;
+    labels : string list ;
+    route : string }
 
 let variable_pattern = Re.compile (Re_perl.re "\\{\\w+\\}")
 let label_pattern = Re.compile (Re_perl.re "\\w+")
@@ -112,7 +114,8 @@ let create_url_matcher (url : string) : url_matcher =
          ?len:None
          ?all:None
          variable_pattern
-         ~by:"(\\w)"
+         (* ~by:"(\\w)" *)
+         ~by:"([^\\/]+)"
          url
       )
   in
@@ -125,20 +128,15 @@ let create_url_matcher (url : string) : url_matcher =
   in
   let re =
     Re.compile (Re_perl.re pattern) in
-  { re = re; labels = labels }
+  { re = re;
+    labels = labels ;
+    route = url ; }
 ;;
 
 let rec match_url
     (url_matchers : ('a * url_matcher) list)
     (url : string)
   : ('a * (string * string) list) option =
-  let () =
-    async
-      (fun () ->
-         Lwt_log_core.log
-           ~level:Lwt_log_core.Debug
-           (Format.sprintf " + url : %s" url))
-  in
   match url_matchers with
   | (arg,matcher)::tail ->
     (try
@@ -148,15 +146,17 @@ let rec match_url
               (Re.Group.all
                  (Re.exec matcher.re url)))
        in
-       Some
-         (arg,
-          (List.combine
-             matching
-             matcher.labels))
-     with Not_found ->
-       match_url
-         tail
-         url)
+       let get_parameters : (string * string) list = List.combine matcher.labels matching in
+       let text_parameters : string = String.concat " , " (List.map (fun (key,value) -> key^" : "^value) get_parameters) in
+       let () =
+         async
+           (fun () ->
+              Lwt_log_core.log
+                ~level:Lwt_log_core.Debug
+                (Format.sprintf "match_url :\n+ url : '%s'\n+ route: '%s'\n+ args: { %s }" url matcher.route text_parameters))
+       in
+       Some (arg,get_parameters)
+     with Not_found -> match_url tail url)
   | [] -> None
 
 let route_handler
@@ -174,6 +174,13 @@ let route_handler
         (Request.uri context.request)
     in
     match
+      let () =
+        async
+          (fun () ->
+             Lwt_log_core.log
+               ~level:Lwt_log_core.Debug
+               (Format.sprintf "match_url + url : %s" url))
+      in
       match_url
         (List.filter
            (* only select handlers where the method matches *)
@@ -185,6 +192,18 @@ let route_handler
         url
     with
     | Some (route,arguments) ->
+      (*
+      let () =
+        async
+          (fun () -> (Cohttp_lwt_body.to_string context.body)
+           >>=
+           (fun body ->
+             Lwt_log_core.log
+               ~level:Lwt_log_core.Debug
+               (Format.sprintf "+ body : '%s'\n" body)))
+      in
+         *)
+      let context = { context with arguments = arguments } in
       if context.request.meth = `OPTIONS then
         let h =
           Header.init_with
@@ -210,5 +229,5 @@ let route_handler
           ~body:""
           ()
       else
-        route.operation context
+        route.operation ~context
     | None -> not_found

@@ -66,7 +66,7 @@ class type  manager_distance =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.distance_info result Lwt.t
-    method simulation_get_distance :
+    method simulation_detail_distance :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.distance_id ->
@@ -79,7 +79,7 @@ class type  manager_file_line =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.file_line_info result Lwt.t
-    method simulation_get_file_line :
+    method simulation_detail_file_line :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.file_line_id ->
@@ -92,7 +92,7 @@ class type  manager_flux_map =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.flux_map_info result Lwt.t
-    method simulation_get_flux_map :
+    method simulation_detail_flux_map :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.flux_map_id ->
@@ -101,7 +101,7 @@ class type  manager_flux_map =
 
 class type  manager_log_message =
   object
-    method simulation_get_log_message :
+    method simulation_detail_log_message :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.log_message list result Lwt.t
@@ -109,7 +109,7 @@ class type  manager_log_message =
 
 class type  manager_plot =
   object
-    method simulation_get_plot :
+    method simulation_detail_plot :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.plot result Lwt.t
@@ -121,7 +121,7 @@ class type  manager_snapshot =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.snapshot_info result Lwt.t
-    method simulation_get_snapshot :
+    method simulation_detail_snapshot :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.snapshot_id ->
@@ -148,12 +148,6 @@ class type  manager_simulation =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       unit result Lwt.t
-
-    method simulation_stop :
-      Api_types_j.project_id ->
-      Api_types_j.simulation_id ->
-      unit result Lwt.t
-
 
     method simulation_perturbation :
       Api_types_j.project_id ->

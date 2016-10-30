@@ -50,6 +50,7 @@ type workspace_info = unit
 type project_id = string
 type project_info = project_id list
 type project_parameter = { project_id : project_id }
+type unit_t = unit
 
 type site = {
      site_name: string;
@@ -135,23 +136,47 @@ type log_message_detail = log_message list
 (* info *)
 type simulation_state = [ Running
                         | Paused
-			| Stopped ]
+                        | Stopped ]
 
-type simulation_info = {   simulation_info_time : float;
-                           simulation_info_time_percentage : int nullable;
-                           simulation_info_event : int;
-                           simulation_info_event_percentage : int nullable;
-                           simulation_info_tracked_events : int nullable;
-                           simulation_info_is_running : bool ; }
+type ('plot,'distances,'flux_maps,'file_lines,'snapshots,'log_messages)
+     simulation_output
+     = { simulation_output_plot : 'plot ;
+         simulation_output_distances : 'distances ;
+         simulation_output_flux_maps : 'flux_maps ;
+         simulation_output_file_lines : 'file_lines ;
+         simulation_output_snapshots : 'snapshots;
+         simulation_output_log_messages : 'log_messages; }
 
-(* status *)
-type simulation_status = { simulation_status_info : simulation_info ;
-     		       	   simulation_status_plot : plot nullable;
-			   simulation_status_distances : distances nullable;
-                           simulation_status_flux_maps : flux_map list;
-                           simulation_status_file_lines : file_line list;
-			   simulation_status_snapshots : snapshot list;
-                           simulation_status_log_messages : log_message list; }
+type simulation_info_output =
+     (bool,
+      int,
+      int,
+      int,
+      int,
+      int)
+     simulation_output
+
+type simulation_progress = { simulation_progress_time : float;
+                             simulation_progress_time_percentage : int nullable;
+                             simulation_progress_event : int;
+                             simulation_progress_event_percentage : int nullable;
+                             simulation_progress_tracked_events : int nullable;
+                             simulation_progress_is_running : bool ; }
+
+type simulation_info = { simulation_info_progress : simulation_progress  ;
+		     	 simulation_info_output : simulation_info_output; }
+
+type simulation_detail_output =
+     (plot nullable,
+      distances nullable,
+      flux_map list,
+      file_line list,
+      snapshot list,
+      log_message list)
+     simulation_output
+
+type simulation_detail = { simulation_detail_progress : simulation_progress ;
+     		           simulation_detail_output : simulation_detail_output ; }
 
 (* file *)
 type file_id = string
@@ -161,7 +186,7 @@ type file_metadata = { file_metadata_compile <ocaml mutable> : bool <json name="
                        file_metadata_position <ocaml mutable> : int <json name="position"> ; }
 
 type ('data) file_result = { file_status_data : 'data ;
-          		     file_status_contact_map : contact_map ; }
+                             file_status_contact_map : contact_map ; }
 type file_info = file_metadata list
 type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
               file_content <ocaml mutable> : string <json name="content"> }
@@ -175,6 +200,6 @@ type file_patch = {
 type file_modification = { file_modification_compile : bool nullable  <json name="compile"> ;
                            file_modification_id : string nullable <json name="id"> ;
                            file_modification_position : int nullable <json name="position"> ;
-			   file_modification_patch : file_patch nullable <json name="content"> ;
-			   file_modification_hash <ocaml mutable> : string nullable <json name="hash"> ;
+                           file_modification_patch : file_patch nullable <json name="content"> ;
+                           file_modification_hash <ocaml mutable> : string nullable <json name="hash"> ;
 }

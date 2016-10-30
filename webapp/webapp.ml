@@ -1,6 +1,13 @@
 module ApiTypes = Api_types_v1_j
 
 class system_process () : Kappa_facade.system_process =
+  let () =
+    Lwt.async
+      (fun () ->
+         Lwt_log_core.log
+           ~level:Lwt_log_core.Debug
+           (Format.sprintf " + system process"))
+  in
   object
     method log ?exn (msg : string) =
       Lwt_log_core.log ~level:Lwt_log_core.Info ?exn msg

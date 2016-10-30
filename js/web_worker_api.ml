@@ -1,17 +1,17 @@
 class manager
     ?(timeout : float = 10.)
-    () =
+    ()  =
   object(self)
-    val worker = Worker.create "worker_worker.js"
+    val worker = Worker.create "WebWorker.js"
     initializer
       let () = worker##.onmessage :=
-	  (Dom.handler
+          (Dom.handler
              (fun (response_message : string Worker.messageEvent Js.t) ->
-		let response_text : string =
-		  response_message##.data
-		in
+                let response_text : string =
+                  response_message##.data
+                in
                 let () = self#receive response_text  in
-		Js._true
+                Js._true
              ))
       in ()
     method sleep timeout = Lwt_js.sleep timeout

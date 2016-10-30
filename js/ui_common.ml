@@ -4,16 +4,17 @@ module UIState = Ui_state
 
 let toggle_element
   (t : Ui_simulation.t)
-  (projection : Api_types_v1_j.state option -> 'a list)
+  (projection : Api_types_j.simulation_info option -> bool)
   (content : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) =
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
           (React.S.bind
              (Ui_simulation.simulation_output t)
              (fun state -> React.S.const
-                 (match projection state with
-                  | [] -> ["hidden"]
-                  | _::_ -> ["show"])
+                 (if projection state then
+                    ["show"]
+                  else
+                    ["hidden"])
              )
           )]
     content
@@ -167,7 +168,7 @@ let save_plot_ui
   ()
 let badge
     (t : Ui_simulation.t)
-    (counter : Api_types_v1_j.state option -> int)
+    (counter : Api_types_j.simulation_info option -> int)
   =
   let badge_list, badge_handle = ReactiveData.RList.create [] in
   [ Tyxml_js.R.Html.span

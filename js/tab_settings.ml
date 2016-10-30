@@ -1,9 +1,6 @@
 module UIState = Ui_state
-module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
-
-open ApiTypes
 
 type simulation_limit = TIME_LIMIT | EVENTS_LIMIT
 let simulation_limit_to_string : simulation_limit -> string =
@@ -120,7 +117,7 @@ let error_messages signal =
              React.S.const
                (match error with
                 | [] -> ""
-                | h::_ -> h.ApiTypes.message
+                | h::_ -> h.Api_types_j.message_text
                )
           )
        )
@@ -189,7 +186,7 @@ let visible_class = ["visible"]
 let visible_on_states
     (t : Ui_simulation.t)
     ?(a_class=[])
-    (state : Ui_simulation.simulation_status list) : string list React.signal =
+    (state : Ui_simulation.ui_status list) : string list React.signal =
   (React.S.bind
      (Ui_simulation.simulation_status t)
      (fun run_state ->
@@ -229,7 +226,8 @@ let time_progress_bar  (t : Ui_simulation.t) =
     (React.S.map (fun state ->
          let time_percent : int option =
            lift
-             (fun (state : ApiTypes.state) -> state.time_percentage)
+             (fun (status : Api_types_j.simulation_info) ->
+                status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage )
              state
          in
          let time_percent : int = Tools.unsome 100 time_percent in
@@ -237,8 +235,9 @@ let time_progress_bar  (t : Ui_simulation.t) =
        )
         simulation_output)
     (React.S.map (fun state ->
-         let time : float option = lift (fun (state : ApiTypes.state) ->
-             Some state.time) state in
+         let time : float option =
+           lift (fun (status : Api_types_j.simulation_info) ->
+             Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) state in
          let time : float = Tools.unsome 0.0 time in
          string_of_float time
        )
@@ -249,15 +248,17 @@ let event_progress_bar (t : Ui_simulation.t) =
   progress_bar
     (React.S.map (fun state ->
          let event_percentage : int option =
-           lift (fun (state: ApiTypes.state) -> state.event_percentage) state in
+           lift (fun (status : Api_types_j.simulation_info) ->
+               status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event_percentage) state in
          let event_percentage : int = Tools.unsome 100 event_percentage in
          event_percentage
        )
        simulation_output)
-    (React.S.map (fun state ->
+    (React.S.map (fun status ->
          let event : int option =
-           lift (fun (state : ApiTypes.state) -> Some state.event)
-             state
+           lift (fun (status : Api_types_j.simulation_info) ->
+               Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event)
+             status
          in
          let event : int = Tools.unsome 0 event in
          string_of_int event
@@ -266,7 +267,8 @@ let event_progress_bar (t : Ui_simulation.t) =
 
 let tracked_events state =
   let tracked_events : int option =
-    lift (fun (state : ApiTypes.state) -> state.tracked_events)
+    lift (fun (status : Api_types_j.simulation_info) ->
+        status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_tracked_events)
       state
   in
   match tracked_events with
@@ -295,7 +297,6 @@ let tracked_events_label (t : Ui_simulation.t) =
        )
         simulation_output)
 
-let simulation_messages = error_messages UIState.model_error
 let status_indicator (t : Ui_simulation.t) =
   Html.div
     ~a:[ Html.a_class [ "col-md-2" ] ]
@@ -338,8 +339,8 @@ let alert_messages =
              (fun error ->
                 React.S.const
                   (match error with
-                   | [] -> [ "alert-sm" ; "alert" ; ]
-                   | _::_ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
+                   | None -> [ "alert-sm" ; "alert" ; ]
+                   | Some _ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
                   )
              )
           );
@@ -350,8 +351,11 @@ let alert_messages =
           (fun error ->
              React.S.const
                (match error with
-                | [] -> ""
-                | h::_ -> h.ApiTypes.message
+                | None -> ""
+                | Some localized_errors ->
+                  (match localized_errors.Ui_state.model_error_messages with
+                   | [] -> ""
+                   | h::_ -> h.Api_types_j.message_text)
                )
           )
        )
@@ -484,15 +488,21 @@ let xml  (t : Ui_simulation.t) =
            (React.S.bind
               UIState.model_error
               (fun e -> React.S.const
-                  ("panel" :: (match e with
+                  ("panel" ::
+                   (match e with
+                    | None -> ["panel-default"]
+                    | Some localized_errors ->
+                      (match localized_errors.Ui_state.model_error_messages with
                        | [] -> ["panel-default"]
-                       | { severity = `Error ; _ }::_ -> ["panel-danger"]
-                       | { severity = `Warning ; _ }:: _ -> ["panel-warning"]
-                       | { severity = `Info ; _ }::_ -> ["panel-info"]
-                     )))
+                       | { Api_types_t.message_severity = `Error ; _ }::_ -> ["panel-danger"]
+                       | { Api_types_t.message_severity = `Warning ; _ }:: _ -> ["panel-warning"]
+                       | { Api_types_t.message_severity = `Info ; _ }::_ -> ["panel-info"]
+                      )
+                   )
+                  )
+              )
            )]
-    [ (* simulation_messages ; *)
-      initializing_xml t ;
+    [ initializing_xml t ;
       stopped_xml t ;
       running_xml t ;
       footer_xml t ; ]

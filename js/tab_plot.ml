@@ -1,21 +1,20 @@
-module ApiTypes = Api_types_v1_j
-
 module Html = Tyxml_js.Html5
-module UIState = Ui_state
+open Lwt.Infix
 
 let div_axis_select_id  = "plot-axis-select"
 let display_id = "plot-display"
 let export_id = "plot-export"
 
-let state_plot state =
+let has_plot
+    (state : Api_types_j.simulation_info option) :
+  bool =
   match state with
-  | None -> None
+  | None -> false
   | Some state ->
-    (match state.ApiTypes.plot with
-     (* ignore empty plots for now *)
-     | Some { ApiTypes.time_series = [] ; _ } -> None
-     | _ -> state.ApiTypes.plot
-    )
+    state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot
+
+let serialize_json : (unit -> string) ref = ref (fun _ -> "null")
+let serialize_csv : (unit -> string) ref = ref (fun _ -> "")
 
 let configuration (t : Ui_simulation.t) : Widget_export.configuration =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -24,24 +23,12 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
       ; Widget_export.export_png ~svg_div_id:display_id ()
       ; Widget_export.export_json
-          ~serialize_json:(fun () ->
-              (match
-		 state_plot (React.S.value simulation_output)
-               with
-               | None -> "null"
-               | Some plot -> ApiTypes.string_of_plot plot
-              )
-            )
+          ~serialize_json:!serialize_json
       ; { Widget_export.suffix = "csv"
         ; Widget_export.label = "csv"
         ; Widget_export.export =
             fun (filename : string) ->
-              let data =
-		match
-                  state_plot (React.S.value simulation_output)
-		with
-                | None -> ""
-                | Some p -> Api_data_v1.plot_values p
+              let data = !serialize_csv ()
               in
               Common.saveFile
 		~data:data
@@ -49,13 +36,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
 		~filename:filename
         }
       ];
-    show = React.S.map
-        (fun state ->
-           match state_plot state with
-           | None -> false
-           | Some _ -> true
-        )
-        simulation_output
+    show = React.S.map has_plot simulation_output
 
   }
 
@@ -107,12 +88,8 @@ let content (t : Ui_simulation.t) =
 let navcontent (t : Ui_simulation.t) : [> Html_types.div ] Html.elt list =
   [Ui_common.toggle_element
      t
-     (fun s -> match state_plot s with None -> [] | Some p -> [p])
+     (fun s -> has_plot s )
      (content t) ]
-
-let state_plot state = match state with
-    None -> None
-  | Some state -> state.ApiTypes.plot
 
 let dimension_ref : Js_plot.plot_dimension Js.t option ref = ref None
 let calculate_dimension () =
@@ -123,12 +100,16 @@ let calculate_dimension () =
     let width =
       max
         min_width
-        ((Js.Optdef.get (Dom_html.window##.innerWidth) (fun () -> assert false)) - offset_width)
+        ((Js.Optdef.get
+            (Dom_html.window##.innerWidth)
+            (fun () -> assert false)) - offset_width)
     in
     let height =
       max
         min_height
-        ((Js.Optdef.get (Dom_html.window##.innerHeight)(fun () -> assert false)) - offset_height)
+        ((Js.Optdef.get
+            (Dom_html.window##.innerHeight)
+            (fun () -> assert false)) - offset_height)
     in
     let dimension =
       Js_plot.create_dimension
@@ -144,14 +125,34 @@ let get_dimension () =
   | Some dimension -> dimension
 
 let update_plot
-    (plot : Js_plot.observable_plot Js.t)
-    (data : ApiTypes.plot option) : unit =
-  match data with
-  | None -> ()
-  | Some data ->
-    let () = plot##setDimensions(get_dimension ()) in
-    let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot:data in
-    plot##setPlot(data)
+  (t : Ui_simulation.t)
+  (plot : Js_plot.observable_plot Js.t) : unit =
+  Ui_simulation.manager_operation
+    t
+    (fun
+     manager
+     project_id
+     simulation_id ->
+      (manager#simulation_detail_plot
+         project_id
+         simulation_id
+      ) >>=
+      (Api_common.result_map
+         ~ok:(fun _ (data : Api_types_t.plot)  ->
+             let () = serialize_json  := (fun _ -> Api_types_j.string_of_plot data) in
+             let () = plot##setDimensions(get_dimension ()) in
+             let data : Api_types_v1_j.plot = Api_data_v1.api_plot data in
+             let () = serialize_csv := fun _ ->Api_data_v1.plot_values data in
+             let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot:data in
+             let () = plot##setPlot(data) in
+             Lwt.return_unit
+          )
+        ~error:(fun _ errors  ->
+            let () = Ui_state.set_model_error __LOC__ errors in
+            Lwt.return_unit)
+      )
+    )
+
 let plot_ref = ref None
 let onload (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -178,13 +179,13 @@ let onload (t : Ui_simulation.t) =
       (fun _ ->
 	 match (React.S.value simulation_output) with
          | None -> ()
-	 | Some state -> update_plot plot state.ApiTypes.plot)
+	 | Some _ -> update_plot t plot)
   in
   let _ =
     React.S.l1
       (fun state -> match state with
            None -> ()
-	 | Some state -> update_plot plot state.ApiTypes.plot)
+	 | Some _ -> update_plot t plot)
       simulation_output
   in
   ()
@@ -201,6 +202,6 @@ let onresize (t : Ui_simulation.t) =
     | Some plot ->
       (match React.S.value simulation_output with
       | None -> ()
-      | Some state -> update_plot plot state.ApiTypes.plot)
+      | Some _ -> update_plot t plot)
   in
   ()

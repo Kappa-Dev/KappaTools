@@ -192,14 +192,6 @@ class manager
           None
           (fun _ -> ())
           (fun result -> `ProjectDelete result)
-      | `ProjectInfo  ->
-        send
-          timeout
-          (Format.sprintf "%s/v2/projects" url)
-          `GET
-          None
-          Mpi_message_j.project_info_of_string
-          (fun result -> `ProjectInfo result)
       | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
         send
           timeout
@@ -225,7 +217,7 @@ class manager
           None
           (fun _ -> ())
           (fun result -> `SimulationDelete result)
-      | `SimulationGetDistance (project_id,simulation_id,distance_id) ->
+      | `SimulationDetailDistance (project_id,simulation_id,distance_id) ->
         send
           timeout
           (Format.sprintf
@@ -237,8 +229,8 @@ class manager
           `GET
           None
           Mpi_message_j.distance_of_string
-          (fun result -> `SimulationGetDistance result)
-      | `SimulationGetFileLine (project_id,simulation_id,file_line_id) ->
+          (fun result -> `SimulationDetailDistance result)
+      | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
         send
           timeout
           (Format.sprintf
@@ -253,8 +245,8 @@ class manager
           `GET
           None
           Mpi_message_j.file_line_detail_of_string
-          (fun result -> `SimulationGetFileLine result)
-      | `SimulationGetFluxMap (project_id,simulation_id,flux_map_id) ->
+          (fun result -> `SimulationDetailFileLine result)
+      | `SimulationDetailFluxMap (project_id,simulation_id,flux_map_id) ->
         send
           timeout
           (Format.sprintf
@@ -266,8 +258,8 @@ class manager
           `GET
           None
           Mpi_message_j.flux_map_of_string
-          (fun result -> `SimulationGetFluxMap result)
-      | `SimulationGetLogMessage (project_id,simulation_id) ->
+          (fun result -> `SimulationDetailFluxMap result)
+      | `SimulationDetailLogMessage (project_id,simulation_id) ->
         send
           timeout
           (Format.sprintf
@@ -278,8 +270,8 @@ class manager
           `GET
           None
           Mpi_message_j.log_message_detail_of_string
-          (fun result -> `SimulationGetLogMessage result)
-      | `SimulationGetPlot (project_id,simulation_id) ->
+          (fun result -> `SimulationDetailLogMessage result)
+      | `SimulationDetailPlot (project_id,simulation_id) ->
         send
           timeout
           (Format.sprintf
@@ -290,8 +282,8 @@ class manager
           `GET
           None
           Mpi_message_j.plot_of_string
-          (fun result -> `SimulationGetPlot result)
-      | `SimulationGetSnapshot (project_id,simulation_id,snapshot_id) ->
+          (fun result -> `SimulationDetailPlot result)
+      | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
         send
           timeout
           (Format.sprintf
@@ -303,7 +295,7 @@ class manager
           `GET
           None
           Mpi_message_j.snapshot_of_string
-          (fun result -> `SimulationGetSnapshot result)
+          (fun result -> `SimulationDetailSnapshot result)
       | `SimulationInfo (project_id,simulation_id) ->
         send
           timeout
@@ -415,18 +407,6 @@ class manager
              (Api_types_j.string_of_simulation_parameter simulation_parameter))
           Mpi_message_j.simulation_id_of_string
           (fun result -> `SimulationStart result)
-      | `SimulationStop (project_id,simulation_id) ->
-        send
-          timeout
-          (Format.sprintf
-             "%s/v2/projects/%s/simulations/%s"
-             url
-             project_id
-             simulation_id)
-          `PUT
-          None
-          (fun _ -> ())
-          (fun result -> `SimulationPerturbation result)
 
     inherit Mpi_api.manager_base ()
   end

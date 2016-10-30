@@ -13,7 +13,12 @@ let result_ok ?(result_code:Api.manager_code = `OK)
     (ok:'ok) : 'ok Api.result =
   { Api_types_j.result_data = `Ok ok ;
     Api_types_j.result_code = result_code }
-
+let error_msg
+    ?(severity:Api_types_j.severity = `Error)
+    (message:string) : Api_types_j.message =
+  { Api_types_j.message_severity = severity;
+    Api_types_j.message_text = message;
+    Api_types_j.message_range = None }
 let result_error_msg
     ?(severity:Api_types_j.severity = `Error)
     ?(result_code:Api.manager_code = `ERROR)
@@ -63,7 +68,8 @@ let result_bind :
         | `Ok data -> ok data
         | `Error data ->
           { Api_types_j.result_data = `Error data ;
-            Api_types_j.result_code = result.Api_types_j.result_code }) : ('a_ok,'a_code) Api_types_j.result)
+            Api_types_j.result_code = result.Api_types_j.result_code }) :
+       ('a_ok,'a_code) Api_types_j.result)
 
 let result_bind_lwt :
   ok:('ok -> ('a_ok, 'a_code) Api_types_j.result Lwt.t) ->
@@ -75,19 +81,24 @@ let result_bind_lwt :
   (match result.Api_types_j.result_data with
   | `Ok data -> ok data
   | `Error data ->
-    Lwt.return { Api_types_j.result_data = `Error data ;
-                 Api_types_j.result_code = result.Api_types_j.result_code }
+    Lwt.return
+      { Api_types_j.result_data = `Error data ;
+        Api_types_j.result_code = result.Api_types_j.result_code }
     : ('a_ok,'a_code) Api_types_j.result Lwt.t)
 
 let rec result_fold_lwt :
-  f:(('ok, 'a_code) Api_types_j.result -> 'value -> ('ok, 'a_code) Api_types_j.result Lwt.t) ->
+  f:(('ok, 'a_code) Api_types_j.result ->
+     'value ->
+     ('ok, 'a_code) Api_types_j.result Lwt.t) ->
   id:('ok, 'a_code) Api_types_j.result ->
   ('value list) ->
   ('a_ok, 'a_code) Api_types_j.result Lwt.t =
   fun
-  ~(f : (('ok, 'a_code) Api_types_j.result -> 'value -> ('ok, 'a_code) Api_types_j.result Lwt.t))
-  ~(id : ('ok, 'a_code) Api_types_j.result)
-  (l : ('value list)) ->
+    ~(f : (('ok, 'a_code) Api_types_j.result ->
+           'value ->
+           ('ok, 'a_code) Api_types_j.result Lwt.t))
+    ~(id : ('ok, 'a_code) Api_types_j.result)
+    (l : ('value list)) ->
     match l with
     | [] -> Lwt.return id
     | h::t ->

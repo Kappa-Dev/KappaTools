@@ -87,19 +87,13 @@ let update_file
   in
   ()
 
+type file_index = { file_index_file_id : Api_types_j.file_id ;
+                    file_index_line_offset : int ;
+                    file_index_char_offset : int ;
+                    file_line_count : int ; }
 
-let project_text (project : Api_environment.project) : string =
-  let files : string list =
-    List.map
-      (fun f -> f.Api_types_j.file_content)
-      (List.stable_sort
-         (fun l r ->
-            compare
-              l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-              r.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-         )
-         (project#get_files ())) in
-  String.concat "\n" files
+(* modified from : https://searchcode.com/file/1109908/commons/common.ml *)
+
 let parse_text :
   Api_environment.project ->
   Kappa_facade.system_process ->
@@ -112,7 +106,7 @@ let parse_text :
     ->
       ((Kappa_facade.parse
           ~system_process:system_process
-          ~kappa_code:(project_text project))
+          ~kappa_files:(project#get_files ()))
        >>=
        (Api_common.result_data_map
           ~ok:((fun (kappa_facade : Kappa_facade.t) -> f kappa_facade))

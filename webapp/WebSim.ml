@@ -54,9 +54,10 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
   )
 
 let server =
+  let app_args = App_args.default in
   let common_args = Common_args.default in
   let websim_args = Websim_args.default in
-  let options = App_args.options () @
+  let options = App_args.options app_args @
                 Websim_args.options websim_args @
                 Common_args.options common_args
   in
@@ -84,10 +85,10 @@ let server =
     (Cohttp_lwt_unix.Server.make
        ~callback:
        (logger
-          (match websim_args.Websim_args.api with
-           | Websim_args.V1 -> Webapp_v1.handler
+          (match app_args.App_args.api with
+           | App_args.V1 -> Webapp_v1.handler
               ~shutdown_key:websim_args.Websim_args.shutdown_key
-           | Websim_args.V2 -> route_handler
+           | App_args.V2 -> route_handler
           )
        )
        ()

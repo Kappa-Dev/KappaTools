@@ -1,8 +1,5 @@
-module ApiTypes = Api_types_v1_j
-
-module Html = Tyxml_js.Html
-module UIState = Ui_state
-
+module Html = Tyxml_js.Html5
+open Lwt.Infix
 open Js_distances
 
 let div_id = "distances-div"
@@ -12,9 +9,18 @@ let export_filename_id = "distances-export-filename"
 let export_button_id =  "distances-export-button"
 
 
-let state_distances state = match state with
-    None -> None
-  | Some state -> state.ApiTypes.distances
+let state_distances
+    (state : Api_types_j.simulation_info option) :
+  int option =
+  match state with
+  | None -> None
+  | Some state ->
+    Some
+      state
+      .Api_types_j
+      .simulation_info_output
+      .Api_types_j
+      .simulation_output_distances
 
 let content (t : Ui_simulation.t) =
   let simulation_output = (Ui_simulation.simulation_output t) in
@@ -50,18 +56,37 @@ let content (t : Ui_simulation.t) =
 let navcontent (t : Ui_simulation.t) =
   [Ui_common.toggle_element
      t
-     (fun s -> match state_distances s with None -> [] | Some d -> [s])
+     (fun s -> match state_distances s with None -> false | Some _ -> true)
      (content t) ]
 
 let update_distances
     (distances : distances_plot Js.t)
-    (data : ApiTypes.distances option) : unit =
-  match data with
-    None -> ()
-  | Some data ->
-    let distances_string : string = Api_types_v1_j.string_of_distances data in
-    let distances_data : Js.js_string Js.t = Js.string distances_string in
-    distances##setData(distances_data)
+    (t : Ui_simulation.t) : unit =
+ Ui_simulation.manager_operation
+   t
+   (fun
+     manager
+     project_id
+     simulation_id ->
+     (Api_v1.assemble_distance manager project_id simulation_id)
+     >>=
+     (Api_common.result_map
+        ~ok:(fun _ (data : Api_types_v1_t.distances) ->
+            let () = match data with
+              | [] -> ()
+              | _ ->
+                let distances_string : string =
+                  Api_types_v1_j.string_of_distances data in
+                let distances_data : Js.js_string Js.t =
+                  Js.string distances_string in
+                distances##setData(distances_data)
+            in
+            Lwt.return_unit)
+        ~error:(fun _ errors  ->
+            let () = Ui_state.set_model_error __LOC__ errors in
+            Lwt.return_unit)
+     )
+   )
 
 let onload (t : Ui_simulation.t) =
   let distances_plot : distances_plot Js.t =
@@ -87,15 +112,13 @@ let onload (t : Ui_simulation.t) =
       (fun _ ->
          match (React.S.value simulation_output) with
            None -> ()
-         | Some state ->
-           update_distances distances_plot state.ApiTypes.distances)
+         | Some _ -> update_distances distances_plot t)
   in
   let _ =
     React.S.l1
       (fun state -> match state with
            None -> ()
-         | Some state ->
-           update_distances distances_plot state.ApiTypes.distances)
+         | Some _ -> update_distances distances_plot t)
       simulation_output
   in
   ()

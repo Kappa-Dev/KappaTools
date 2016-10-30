@@ -1,5 +1,3 @@
-module ApiTypes = Api_types_v1_j
-
 class type process_configuration =
   object
     val command : string Js.t Js.prop
@@ -60,7 +58,8 @@ let spawn_process (configuration : process_configuration  Js.t) : process Js.t J
 let kappa_process : process option ref = ref None
 
 
-class runtime
+class manager
+    ?(message_delimiter : char = Mpi_api.default_message_delimter)
     ?(timeout : float = 10.)
     (command : string)
     (args : string list) =
@@ -83,7 +82,7 @@ class runtime
 
     method private onStdout (msg : string) : unit =
       let () = Common.debug (Js.string msg) in
-      match Utility.split msg Api_mpi_v1.message_delimter with
+      match Utility.split msg message_delimiter with
       | (prefix,None) ->
         ignore(Common.debug (Js.string "onStdout:none"));
         Buffer.add_string buffer prefix
@@ -104,7 +103,7 @@ class runtime
              (Format.sprintf
                 "%s%c"
                 message_text
-                Api_mpi_v1.message_delimter))
+                message_delimiter))
 
     method is_running () : bool =
       match process with
@@ -116,5 +115,5 @@ class runtime
       | Some process -> process##kill
       | None -> ()
 
-    inherit Api_mpi_v1.runtime ~timeout ()
+    inherit Mpi_api.manager ~timeout ()
   end

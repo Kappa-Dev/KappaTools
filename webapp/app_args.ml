@@ -1,4 +1,20 @@
-let options ()  : (string * Arg.spec * string) list = [
+open Lwt
+open Unix
+open Lwt_log
+
+type api_version = V1 | V2;;
+
+type t = { mutable seed_value : int option ;
+           mutable api : api_version ; }
+
+let default : t = { seed_value = None;
+                    api = V1; }
+
+let options (t :t)  : (string * Arg.spec * string) list = [
+  ("--development",
+   Arg.Unit
+     (fun () -> t.api <- V2),
+   "enable experimental api - not intended for public use or comment");
   ("--version",
    Arg.Unit
      (fun () ->
@@ -13,7 +29,7 @@ let options ()  : (string * Arg.spec * string) list = [
    let _ =
      Lwt_log.channel
        ~close_mode:(`Keep)
-    ~channel:(Lwt_io.stderr) ()
+       ~channel:(Lwt_io.stderr) ()
    in
    ()
  else

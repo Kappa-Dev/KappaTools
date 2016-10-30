@@ -63,6 +63,13 @@ let on_message
       token
       runtime#stop
       (fun result -> `Stop result)
+  | `Version () ->
+    request_handler
+      post_message
+      message.WebMessage.id
+      ()
+      runtime#version
+      (fun result -> `Version result)
   | `Peturbation peturbation ->
     request_handler
       post_message
@@ -121,6 +128,14 @@ class virtual runtime ?(timeout : float = 10.) () =
       match IntMap.find_option message.WebMessage.id context.mailboxes with
       | Some value -> Lwt.wakeup value message.WebMessage.data
       | None -> ()
+
+    method version () :
+      Api_types_v1_j.version Api_types_v1_j.result Lwt.t =
+      self#send (`Version ()) >>=
+      (function
+        | `Version version -> Lwt.return version
+        | response -> Lwt.fail (BadResponse response)
+      )
 
     method parse (code : ApiTypes.code) :
       Api_types_v1_j.parse Api_types_v1_j.result Lwt.t =
