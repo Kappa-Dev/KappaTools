@@ -47,7 +47,7 @@ type t =
     mutable flux_maps : Api_types_j.flux_map list ;
     mutable files : Api_types_j.file_line list ;
     mutable error_messages : Api_types_j.errors ;
-    contact_map : Primitives.contact_map ;
+    contact_map : Signature.contact_map ;
     mutable env : Environment.t ;
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;

@@ -191,3 +191,5 @@ let print f sigs =
 
 let to_json = NamedDecls.to_json one_to_json
 let of_json = NamedDecls.of_json one_of_json
+
+type contact_map = ((int list) * (int*int) list) array array

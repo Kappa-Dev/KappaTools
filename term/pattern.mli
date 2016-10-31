@@ -23,7 +23,6 @@ module PreEnv : sig
 
   val get : t -> id -> cc (** Awfully inefficient *)
 
-  val empty : Signature.s -> t
   val finalize : t -> Env.t
   val of_env : Env.t -> t
 end
@@ -47,6 +46,8 @@ val new_internal_state : work -> (Agent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 
 val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*id)
+
+val minimal_env : Signature.s -> Signature.contact_map -> PreEnv.t
 
 (** {6 Use a connected component } *)
 

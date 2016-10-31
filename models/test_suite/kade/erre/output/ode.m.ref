@@ -158,49 +158,49 @@ dydt(1)=dydt(1)-k(7)*y(2)*y(1);
 dydt(7)=dydt(7)+k(7)*y(2)*y(1);
 
 %rule    : R(r!_) -> R(r)
-%reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1)
+%reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
 
 dydt(6)=dydt(6)-2*k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 
 %rule    : R(r!_) -> R(r)
-%reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1)
+%reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
 
 dydt(6)=dydt(6)-2*k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 dydt(5)=dydt(5)+k(5)*y(6)/2;
 
 %rule    : R(r!_) -> 
-%reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> E(r) + R(e!1, r), E(r!1)
+%reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r) + E(r!1), R(e!1, r)
 
 dydt(6)=dydt(6)-2*k(4)*y(6)/2;
 dydt(5)=dydt(5)+k(4)*y(6)/2;
 dydt(4)=dydt(4)+k(4)*y(6)/2;
 
 %rule    : R(r!_) -> 
-%reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r)
+%reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r)
 
 dydt(6)=dydt(6)-2*k(4)*y(6)/2;
 dydt(4)=dydt(4)+k(4)*y(6)/2;
 dydt(5)=dydt(5)+k(4)*y(6)/2;
 
 %rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-%reaction: R(e!1, r), E(r!1) + R(e!1, r), E(r!1) -> R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3)
+%reaction: E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
 
 dydt(5)=dydt(5)-1/2*k(3)*y(5)*y(5);
 dydt(5)=dydt(5)-1/2*k(3)*y(5)*y(5);
 dydt(6)=dydt(6)+2/2*k(3)*y(5)*y(5);
 
 %rule    : E(r!1), R(e!1,r) -> E(r), R(e,r)
-%reaction: R(e!1, r), E(r!1) -> E(r) + R(e, r)
+%reaction: E(r!1), R(e!1, r) -> E(r) + R(e, r)
 
 dydt(5)=dydt(5)-k(2)*y(5);
 dydt(3)=dydt(3)+k(2)*y(5);
 dydt(4)=dydt(4)+k(2)*y(5);
 
 %rule    : E(r), R(e) -> E(r!1), R(e!1)
-%reaction: R(e, r) + E(r) -> R(e!1, r), E(r!1)
+%reaction: R(e, r) + E(r) -> E(r!1), R(e!1, r)
 
 dydt(4)=dydt(4)-k(1)*y(4)*y(3);
 dydt(3)=dydt(3)-k(1)*y(4)*y(3);
@@ -225,8 +225,8 @@ Init(1) = init(1); %B(x)
 Init(2) = init(2); %A(x)
 Init(3) = init(3); %R(e, r)
 Init(4) = init(4); %E(r)
-Init(5) = init(5); %R(e!1, r), E(r!1)
-Init(6) = init(6); %R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3)
+Init(5) = init(5); %E(r!1), R(e!1, r)
+Init(6) = init(6); %E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
 Init(7) = init(7); %A(x!1), B(x!1)
 Init(8) = init(8); %t
 end

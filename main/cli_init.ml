@@ -52,7 +52,7 @@ let get_compilation ?max_event cli_args =
         let env,contact_map,updated_vars,story_compression,
             unary_distances,formatCflow,init_l =
           (Marshal.from_channel d :
-             Environment.t*Primitives.contact_map*
+             Environment.t*Signature.contact_map*
              int list* (bool*bool*bool) option*bool option*Ast.formatCflow*
              (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
         let () = Pervasives.close_in d  in

@@ -7,13 +7,13 @@
   Primitives.contact_map * Export_to_KaSim.state
 *)
 val compile_bool:
-  Primitives.contact_map -> Pattern.PreEnv.t ->
+  Signature.contact_map -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Alg_expr.bool_expr Location.annot ->
   Pattern.PreEnv.t *
   (Pattern.id array list,int) Alg_expr.bool_expr Location.annot
 
 val compile_modifications_no_track:
-  Primitives.contact_map -> Pattern.PreEnv.t ->
+  Signature.contact_map -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
@@ -23,7 +23,7 @@ val compile :
           bool option * Ast.formatCflow *
           (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
-  Primitives.contact_map ->
+  Signature.contact_map ->
   ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
 
 val build_initial_state :

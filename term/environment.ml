@@ -232,7 +232,8 @@ let of_json = function
       try
         { domain =
             Pattern.PreEnv.finalize
-              (Pattern.PreEnv.empty (Signature.of_json (List.assoc "signatures" l)))
+              (Pattern.minimal_env
+                 (Signature.of_json (List.assoc "signatures" l)) [||])
         (*TODO*);
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json

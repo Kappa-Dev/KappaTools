@@ -1079,6 +1079,40 @@ let new_node wk type_id =
          Mods.IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
      })
 
+let minimal_env sigs contact_map =
+  Tools.array_fold_lefti
+    (fun ty ->
+       Tools.array_fold_lefti
+         (fun s acc (ints,links) ->
+            let w = begin_new acc in
+            let n,w = new_node w ty in
+            let w = new_free w (n,s) in
+            let acc',_,_cc = finish_new w in
+            let acc'' =
+              List.fold_left
+                (fun acc i ->
+                   let w = begin_new acc in
+                   let n,w = new_node w ty in
+                   let w = new_internal_state w (n,s) i in
+                   let out,_,_cc = finish_new w in
+                   out) acc' ints in
+            List.fold_left
+              (fun acc (ty',s') ->
+                 let w = begin_new acc in
+                 let n,w = new_node w ty in
+                 let n',w = new_node w ty' in
+                 let w = new_link w (n,s) (n',s') in
+                 let out,_,_cc = finish_new w in
+                 if ty = ty' && s < s' then
+                   let w = begin_new out in
+                   let n,w = new_node w ty in
+                   let w = new_link w (n,s) (n,s') in
+                   let out',_,_cc' = finish_new w in
+                   out'
+                 else out) acc'' links
+         ))
+    (PreEnv.empty sigs) contact_map
+
 module Matching = struct
   type t = Renaming.t Mods.IntMap.t * Mods.IntSet.t
   (* (map,set)

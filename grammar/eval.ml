@@ -565,7 +565,7 @@ let compile ~outputs ~pause ~return
   let unary_distances,story_compression,formatCflow =
     configurations_of_result result in
   pause @@ fun () ->
-  let preenv = Pattern.PreEnv.empty sigs_nd in
+  let preenv = Pattern.minimal_env sigs_nd contact_map in
   outputs (Data.Log "\t -variable declarations");
   let preenv',alg_a =
     compile_alg_vars contact_map preenv result.Ast.variables in

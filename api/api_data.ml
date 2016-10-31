@@ -78,7 +78,7 @@ let label_snapshot
 
 let api_contact_map
     (sigs : Signature.s)
-    (cm : Primitives.contact_map) : Api_types_j.site_node array =
+    (cm : Signature.contact_map) : Api_types_j.site_node array =
   Array.mapi
     (fun ag sites ->
        { Api_types_j.site_node_quantity = None;

@@ -1,7 +1,5 @@
 (** Compiled kappa model unit *)
 
-type contact_map = ((int list) * (int*int) list) array array
-
 (** Elementary rule transformations *)
 module Transformation :
 sig
