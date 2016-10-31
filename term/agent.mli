@@ -3,6 +3,8 @@
 type t = int * int
 (** agent_id * agent_type *)
 
+val compare : t -> t -> int
+
 val sort : t -> int
 val id : t -> int
 

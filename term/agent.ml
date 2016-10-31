@@ -25,10 +25,10 @@ let rename inj (n_id,n_ty) = (Renaming.apply inj n_id,n_ty)
 let sort (_,ty) = ty
 let id (id,_) = id
 
+let compare (id1,_) (id2,_) = Mods.int_compare id1 id2
 
 let to_json (id,ty) = `Assoc ["id", `Int id; "type", `Int ty]
 let of_json = function
   | `Assoc ["id", `Int id; "type", `Int ty]
   | `Assoc ["type", `Int ty; "id", `Int id] -> (id,ty)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
-

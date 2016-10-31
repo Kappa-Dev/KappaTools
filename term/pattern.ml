@@ -21,21 +21,28 @@ type id = int
 
 type transition = {
   next: Navigation.step;
-  dst: int (* id of cc and also address in the Env.domain map*);
+  dst: id (* id of cc and also address in the Env.domain map*);
   inj: Renaming.t list; (* From dst To ("this" cc + extra edge) *)
   above_obs: Mods.IntSet.t;
 }
 
 type point = {
   content: cc;
-  is_obs_of: Operator.DepSet.t option;
-  fathers: int (* t.id *) list;
+  is_obs_of: (Agent.t list * Operator.DepSet.t) option;
+  fathers: id list;
   sons: transition list;
+}
+
+type prepoint = {
+  p_id: id;
+  element: cc;
+  depending: Operator.DepSet.t;
+  roots: Agent.t list;
 }
 
 type work = {
   sigs: Signature.s;
-  cc_env: (int * cc * Operator.DepSet.t) list Mods.IntMap.t;
+  cc_env: prepoint list Mods.IntMap.t;
   reserved_id: int list array;
   used_id: int list array;
   free_id: int;
@@ -365,7 +372,7 @@ end = struct
         (fun f ->
            match p.is_obs_of with
            | None -> ()
-           | Some deps ->
+           | Some (_,deps)(*TODO*) ->
              Format.fprintf
                f "@[[%a]@]@ "
                (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
@@ -737,7 +744,7 @@ let add_domain ~deps (free_id,singles,env) cc_id cc =
     match find_root cc with
     | None -> assert false
     | Some (_,ty) ->
-      (free_id,Mods.IntMap.add ty (cc_id,deps) singles,
+      (free_id,Mods.IntMap.add ty (cc_id, snd deps) singles,
        Mods.IntMap.add cc_id {content= cc; sons=[];fathers=[];is_obs_of=Some deps} env)
   else
     let (free_id',env'),_ = add_new_point ~deps cc_id env free_id [] cc_id cc in
@@ -753,10 +760,12 @@ module PreEnv : sig
 
   val empty : Signature.s -> t
   val fresh :
-    Signature.s -> int list array -> int ->
-    (int * cc * Operator.DepSet.t) list Mods.IntMap.t -> t
+    Signature.s -> int list array -> int -> prepoint list Mods.IntMap.t -> t
   val to_work : t -> work
 
+  val add_cc :
+    ?origin:Operator.DepSet.elt -> prepoint list Mods.IntMap.t -> id -> cc ->
+    prepoint list Mods.IntMap.t * Renaming.t * id
   val get : t -> id -> cc
 
   val sigs : t -> Signature.s
@@ -768,7 +777,7 @@ end = struct
     sig_decl: Signature.s;
     id_by_type: int list array;
     nb_id: int;
-    domain: (int * cc * Operator.DepSet.t) list Mods.IntMap.t;
+    domain: prepoint list Mods.IntMap.t;
     mutable used_by_a_begin_new: bool;
   }
 
@@ -788,7 +797,7 @@ end = struct
   let get env id =
     Mods.IntMap.fold
       (fun _ l acc ->
-         List.fold_left (fun acc (cc_id,cc,_) -> if cc_id = id then cc else acc)
+         List.fold_left (fun acc p -> if p.p_id = id then p.element else acc)
            acc l)
       env.domain
       (empty_cc env.sig_decl)
@@ -797,7 +806,7 @@ end = struct
     succ
       (Mods.IntMap.fold
          (fun _ x acc ->
-            List.fold_left (fun acc (cc_id,_,_) -> max acc cc_id) acc x)
+            List.fold_left (fun acc p -> max acc p.p_id) acc x)
          env.domain 0)
 
   let check_vitality env = assert (env.used_by_a_begin_new = false)
@@ -910,7 +919,9 @@ end = struct
       Mods.IntMap.fold
         (fun _ x acc ->
            List.fold_left
-             (fun acc (cc_id,cc,deps) -> add_domain ~deps acc cc_id cc) acc x)
+             (fun acc p ->
+                add_domain ~deps:(p.roots,p.depending) acc p.p_id p.element)
+             acc x)
         env.domain
         (fresh_id env,Mods.IntMap.empty,
          Mods.IntMap.add 0 (empty_point env.sig_decl) Mods.IntMap.empty) in
@@ -946,15 +957,16 @@ end = struct
     }
 
   let of_env env =
-    let add_cc acc (_,cc,_ as p) =
-      let w = weight cc in
+    let add_cc acc p =
+      let w = weight p.element in
       Mods.IntMap.add
         w (p::Mods.IntMap.find_default [] w acc) acc in
     let domain' =
       Tools.array_fold_lefti (fun p_id acc p ->
           match p.is_obs_of with
           | None -> acc
-          | Some deps -> add_cc acc (p_id,p.content,deps))
+          | Some (roots,depending) ->
+            add_cc acc {p_id; element=p.content;depending;roots;})
         Mods.IntMap.empty env.Env.domain in
     {
       sig_decl = env.Env.sig_decl;
@@ -963,6 +975,31 @@ end = struct
       domain = domain';
       used_by_a_begin_new = false;
     }
+
+  let add_cc ?origin env p_id element =
+    let w = weight element in
+    let rec aux = function
+      | [] ->
+        let roots =
+          match find_root element with
+          | None -> assert false
+          | Some (rid,rty) ->
+            List.sort Agent.compare
+              (List.map
+                 (fun r -> (Renaming.apply r rid,rty))
+                 (automorphisms element)) in
+        [{p_id; element;roots;
+          depending=add_origin Operator.DepSet.empty origin}],
+        identity_injection element,p_id
+      | h :: t -> match equal element h.element with
+        | None -> let a,b,c = aux t in h::a,b,c
+        | Some r ->
+          {p_id=h.p_id;
+           element=h.element;
+           depending=add_origin h.depending origin;
+           roots=h.roots}::t,r,h.p_id in
+    let env_w,r,out = aux (Mods.IntMap.find_default [] w env) in
+    Mods.IntMap.add w env_w env,r,out
 end
 
 let begin_new env = PreEnv.to_work env
@@ -982,17 +1019,8 @@ let finish_new ?origin wk =
         raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links;
       discover_nav =
         raw_to_navigation true wk.used_id wk.cc_internals wk.cc_links} in
-  let w = weight cc_candidate in
-  let env_w,r,out =
-    let rec aux = function
-      | [] -> [wk.cc_id,cc_candidate,add_origin Operator.DepSet.empty origin],
-              identity_injection cc_candidate,wk.cc_id
-      | (h_id,h_c,deps as h) :: t -> match equal cc_candidate h_c with
-        | None -> let a,b,c = aux t in h::a,b,c
-        | Some r -> (h_id,h_c,add_origin deps origin)::t,r,h_id in
-    aux (Mods.IntMap.find_default [] w wk.cc_env) in
-  PreEnv.fresh wk.sigs wk.reserved_id wk.free_id
-    (Mods.IntMap.add w env_w wk.cc_env),r,out
+  let preenv,r,out = PreEnv.add_cc ?origin wk.cc_env wk.cc_id cc_candidate in
+  PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out
 
 let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_links in
@@ -1160,20 +1188,17 @@ module Matching = struct
   (*edges: list of concrete edges,
     returns the roots of observables that are above in the domain*)
   let from_edge domain graph acc edges =
-    let get_root inj point =
-      match find_root point.content with
-      | None -> assert false
-      | Some (root,root_type) -> Renaming.apply inj root,root_type in
     let rec aux_from_edges cache (obs,rev_deps as acc) = function
       | [] -> acc,cache
       | (pid,point,inj_point2graph) :: remains ->
         let acc' =
           match point.is_obs_of with
           | None -> acc
-          | Some ndeps ->
-            let root_bundle =
-              get_root inj_point2graph point in
-            ((pid,root_bundle) :: obs,
+          | Some (roots,ndeps) ->
+            (List.fold_left
+               (fun acc (id,ty) ->
+                  (pid,(Renaming.apply inj_point2graph id,ty))::acc)
+               obs roots,
              Operator.DepSet.union rev_deps ndeps) in
         let remains' =
           List.fold_left
