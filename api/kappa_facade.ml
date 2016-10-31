@@ -416,7 +416,7 @@ let perturbation
          Lwt.return (`Error (Api_data.api_message_errors msg_process_not_paused))
        else
          let cc_preenv =
-           Connected_component.PreEnv.of_env (Environment.domain t.env) in
+           Pattern.PreEnv.of_env (Environment.domain t.env) in
          let contact_map' = Array.map Array.copy t.contact_map in
          let e',_ =
            Tools.list_fold_right_map
@@ -437,7 +437,7 @@ let perturbation
            let graph' =
              if cc_preenv == cc_preenv' then t.graph
              else
-               let domain' = Connected_component.PreEnv.finalize cc_preenv' in
+               let domain' = Pattern.PreEnv.finalize cc_preenv' in
                let () =
                  t.env <- Environment.new_domain domain' t.env in
                List.fold_left

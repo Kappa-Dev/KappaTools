@@ -84,8 +84,7 @@ let rules_of_ast
         | (0 | 1) -> unrate,None,uncc
         | 2 ->
           crp,Some (unrate, dist'),
-          Connected_component.Set.add
-            ccs.(0) (Connected_component.Set.add ccs.(1) uncc)
+          Pattern.Set.add ccs.(0) (Pattern.Set.add ccs.(1) uncc)
         | n ->
           raise (ExceptionDefn.Malformed_Decl
                    ("Unary rule does not deal with "^
@@ -115,17 +114,17 @@ let rules_of_ast
       contact_map domain'' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
   let deps_algs',unary_ccs',rules_l =
     match rule_mixtures with
-    | [] -> deps,Connected_component.Set.empty,[]
+    | [] -> deps,Pattern.Set.empty,[]
     | [ r ] ->
       let deps_algs',un_ccs',r' =
-        build deps Connected_component.Set.empty r in
+        build deps Pattern.Set.empty r in
       deps_algs', un_ccs',[r']
     | _ ->
       List.fold_right
         (fun r (deps_algs,un_ccs,out) ->
            let deps_algs',un_ccs',r' = build deps_algs un_ccs r in
            deps_algs',un_ccs',r'::out)
-        rule_mixtures (deps,Connected_component.Set.empty,[]) in
+        rule_mixtures (deps,Pattern.Set.empty,[]) in
   domain',(match origin' with
       | None -> None
       | Some o -> Some (o,
@@ -205,11 +204,11 @@ let effects_of_modif
     ast_algs ast_rules contact_map (domain,rev_effects) = function
   | INTRO (alg_expr, (ast_mix,mix_pos)) ->
     rule_effect contact_map domain alg_expr
-      ([],LKappa.to_raw_mixture (Connected_component.PreEnv.sigs domain) ast_mix,
+      ([],LKappa.to_raw_mixture (Pattern.PreEnv.sigs domain) ast_mix,
        [],[]) mix_pos rev_effects
   | DELETE (alg_expr, (ast_mix, mix_pos)) ->
     rule_effect contact_map domain alg_expr
-      (LKappa.to_erased (Connected_component.PreEnv.sigs domain) ast_mix,
+      (LKappa.to_erased (Pattern.PreEnv.sigs domain) ast_mix,
        [],[],[]) mix_pos rev_effects
   | UPDATE ((i, _), alg_expr) ->
     let (domain', alg_pos) =
@@ -512,10 +511,10 @@ let compile_rules alg_deps contact_map domain rules =
            rules_of_ast ?deps_machinery contact_map domain
              ~syntax_ref short_branch_agents rule in
          (domain',succ syntax_ref,origin',
-          Connected_component.Set.union unary_cc extra_unary_cc,
+          Pattern.Set.union unary_cc extra_unary_cc,
           List.append cr acc))
       (domain,1,Some (Operator.RULE 0,alg_deps),
-       Connected_component.Set.empty,[])
+       Pattern.Set.empty,[])
       rules with
   | fdomain,_,Some (_,falg_deps),unary_cc,frules ->
     fdomain,falg_deps,List.rev frules,unary_cc
@@ -566,7 +565,7 @@ let compile ~outputs ~pause ~return
   let unary_distances,story_compression,formatCflow =
     configurations_of_result result in
   pause @@ fun () ->
-  let preenv = Connected_component.PreEnv.empty sigs_nd in
+  let preenv = Pattern.PreEnv.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
   let preenv',alg_a =
     compile_alg_vars contact_map preenv result.Ast.variables in
@@ -591,7 +590,7 @@ let compile ~outputs ~pause ~return
 
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
-  let domain = Connected_component.PreEnv.finalize preenv in
+  let domain = Pattern.PreEnv.finalize preenv in
 
   let env =
     Environment.init domain tk_nd alg_nd alg_deps'

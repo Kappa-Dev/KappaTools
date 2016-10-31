@@ -1,11 +1,11 @@
 type t = {
-  domain : Connected_component.Env.t;
+  domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Location.annot) NamedDecls.t;
   observables : Alg_expr.t Location.annot array;
   ast_rules : (string Location.annot option * LKappa.rule Location.annot) array;
   rules : Primitives.elementary_rule array;
-  cc_of_unaries : Connected_component.Set.t;
+  cc_of_unaries : Pattern.Set.t;
   perturbations : Primitives.perturbation array;
   dependencies_in_time : Operator.DepSet.t;
   dependencies_in_event : Operator.DepSet.t;
@@ -25,7 +25,7 @@ let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
 
 let domain env = env.domain
 let new_domain domain env = {env with domain}
-let signatures env = Connected_component.Env.signatures env.domain
+let signatures env = Pattern.Env.signatures env.domain
 let tokens_finder env = env.tokens.NamedDecls.finder
 let algs_finder env = env.algs.NamedDecls.finder
 
@@ -213,7 +213,7 @@ let to_json env =
            `List [(match n with None -> `Null | Some (n,_) -> `String n);
               LKappa.rule_to_json r]::l) env.ast_rules []);
     (* rules : Primitives.elementary_rule array;
-       cc_of_unaries : Connected_component.Set.t;
+       cc_of_unaries : Pattern.Set.t;
        perturbations : Primitives.perturbation array;
        dependencies_in_time : Operator.DepSet.t;
        dependencies_in_event : Operator.DepSet.t;
@@ -231,8 +231,8 @@ let of_json = function
     begin
       try
         { domain =
-            Connected_component.PreEnv.finalize
-              (Connected_component.PreEnv.empty (Signature.of_json (List.assoc "signatures" l)))
+            Pattern.PreEnv.finalize
+              (Pattern.PreEnv.empty (Signature.of_json (List.assoc "signatures" l)))
         (*TODO*);
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
@@ -259,7 +259,7 @@ let of_json = function
                     | _ -> raise Not_found) o
               | _ -> raise Not_found);
           rules = [||];
-          cc_of_unaries = Connected_component.Set.empty;
+          cc_of_unaries = Pattern.Set.empty;
           perturbations = [||];
           dependencies_in_time = Operator.DepSet.empty;
           dependencies_in_event = Operator.DepSet.empty;

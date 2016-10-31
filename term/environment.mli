@@ -3,13 +3,13 @@
 type t
 
 val init :
-  Connected_component.Env.t -> unit NamedDecls.t ->
+  Pattern.Env.t -> unit NamedDecls.t ->
   Alg_expr.t Location.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
   ((string Location.annot option * LKappa.rule Location.annot) array *
      Primitives.elementary_rule array *
-       Connected_component.Set.t) ->
+       Pattern.Set.t) ->
   Alg_expr.t Location.annot array -> Primitives.perturbation array -> t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
@@ -19,10 +19,10 @@ val nb_algs : t -> int
 val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
-val connected_components_of_unary_rules : t -> Connected_component.Set.t
+val connected_components_of_unary_rules : t -> Pattern.Set.t
 
-val domain : t -> Connected_component.Env.t
-val new_domain : Connected_component.Env.t -> t -> t
+val domain : t -> Pattern.Env.t
+val new_domain : Pattern.Env.t -> t -> t
 val signatures : t -> Signature.s
 val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t

@@ -7,15 +7,15 @@
   Primitives.contact_map * Export_to_KaSim.state
 *)
 val compile_bool:
-  Primitives.contact_map -> Connected_component.PreEnv.t ->
+  Primitives.contact_map -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Alg_expr.bool_expr Location.annot ->
-  Connected_component.PreEnv.t *
-  (Connected_component.id array list,int) Alg_expr.bool_expr Location.annot
+  Pattern.PreEnv.t *
+  (Pattern.id array list,int) Alg_expr.bool_expr Location.annot
 
 val compile_modifications_no_track:
-  Primitives.contact_map -> Connected_component.PreEnv.t ->
+  Primitives.contact_map -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Ast.modif_expr list ->
-  Connected_component.PreEnv.t * Primitives.modification list
+  Pattern.PreEnv.t * Primitives.modification list
 
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->

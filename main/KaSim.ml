@@ -99,10 +99,10 @@ let () =
         Format.eprintf
           "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
           Kappa_printer.env env
-          Connected_component.Env.print (Environment.domain env)
+          Pattern.Env.print (Environment.domain env)
           (Rule_interpreter.print env) graph in
     let () = Kappa_files.with_ccFile
-        (fun f -> Connected_component.Env.print_dot f (Environment.domain env)) in
+        (fun f -> Pattern.Env.print_dot f (Environment.domain env)) in
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 
@@ -148,7 +148,7 @@ let () =
               match KappaParser.interactive_command KappaLexer.token lexbuf with
               | Ast.RUN b ->
                 let cc_preenv =
-                  Connected_component.PreEnv.of_env (Environment.domain env) in
+                  Pattern.PreEnv.of_env (Environment.domain env) in
                 let b' =
                   LKappa.bool_expr_of_ast
                     (Environment.signatures env) (Environment.tokens_finder env)
@@ -159,7 +159,7 @@ let () =
                   if cc_preenv == cc_preenv' then env
                   else
                     Environment.new_domain
-                      (Connected_component.PreEnv.finalize cc_preenv')
+                      (Pattern.PreEnv.finalize cc_preenv')
                       env in
                 env',
                 if try Alg_expr.stops_of_bool_expr
@@ -175,7 +175,7 @@ let () =
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 let cc_preenv =
-                  Connected_component.PreEnv.of_env (Environment.domain env) in
+                  Pattern.PreEnv.of_env (Environment.domain env) in
                 let contact_map' = Array.map Array.copy contact_map in
                 let e',_ =
                   Tools.list_fold_right_map
@@ -196,7 +196,7 @@ let () =
                 let env',graph' =
                   if cc_preenv == cc_preenv' then (env,graph)
                   else
-                    let fenv = Connected_component.PreEnv.finalize cc_preenv' in
+                    let fenv = Pattern.PreEnv.finalize cc_preenv' in
                     (Environment.new_domain fenv env,
                      List.fold_left
                        (Rule_interpreter.incorporate_extra_pattern fenv)

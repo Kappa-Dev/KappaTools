@@ -147,8 +147,7 @@ let do_modification ~outputs env counter graph state modification =
         Format.asprintf
           "@[<h>%a@]"
           (Pp.array Pp.comma
-             (fun _ -> Connected_component.print ~domain ~with_id:false))
-          cc in
+             (fun _ -> Pattern.print ~domain ~with_id:false)) cc in
     (false,
      Rule_interpreter.add_tracked cc (Trace.OBS name) tests graph,
      state)

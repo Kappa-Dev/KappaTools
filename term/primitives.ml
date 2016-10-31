@@ -86,7 +86,7 @@ end
 type elementary_rule = {
   rate : Alg_expr.t Location.annot;
   unary_rate : (Alg_expr.t Location.annot * int option) option;
-  connected_components : Connected_component.id array;
+  connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
   fresh_bindings :
@@ -104,11 +104,11 @@ type modification =
   | UPDATE of int * Alg_expr.t Location.annot
   | SNAPSHOT of Alg_expr.t Ast.print_expr list
   | STOP of Alg_expr.t Ast.print_expr list
-  | CFLOW of string option * Connected_component.id array *
+  | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list
   | FLUX of bool * Alg_expr.t Ast.print_expr list
   | FLUXOFF of Alg_expr.t Ast.print_expr list
-  | CFLOWOFF of Connected_component.id array
+  | CFLOWOFF of Pattern.id array
   | PLOTENTRY
   | PRINT of
       (Alg_expr.t Ast.print_expr list *
@@ -116,10 +116,10 @@ type modification =
 
 type perturbation =
   { precondition:
-      (Connected_component.id array list,int) Alg_expr.bool_expr Location.annot;
+      (Pattern.id array list,int) Alg_expr.bool_expr Location.annot;
     effect : modification list;
-    abort : (Connected_component.id array list,int)
-        Alg_expr.bool_expr Location.annot option;
+    abort : (Pattern.id array list,int)
+      Alg_expr.bool_expr Location.annot option;
   }
 
 let exists_modification check l =

@@ -7,7 +7,7 @@ type t =
 val rename : int -> Renaming.t -> t -> t
 
 val concretize :
-  (Connected_component.Matching.t * int Mods.IntMap.t) -> t -> int * int
+  (Pattern.Matching.t * int Mods.IntMap.t) -> t -> int * int
 
 val get_type : t -> int
 val same_connected_component : t -> t -> bool

@@ -14,7 +14,7 @@ type compil =
     compute_jacobian: bool
   }
 
-type cache = Connected_component.PreEnv.t
+type cache = Pattern.PreEnv.t
 type nauto_in_rules_cache = LKappa_auto.cache
 type hidden_init = Primitives.elementary_rule
 type init = (Alg_expr.t * hidden_init * Location.t) list
@@ -35,17 +35,16 @@ let domain compil = Environment.domain (environment compil)
 let domain_opt = lift_opt domain
 let environment_opt = lift_opt environment
 type mixture = Edges.t(* not necessarily connected, fully specified *)
-type chemical_species = Connected_component.cc
+type chemical_species = Pattern.cc
 (* connected, fully specified *)
 type canonic_species = chemical_species (* chemical species in canonic form *)
-type pattern = Connected_component.id array
+type pattern = Pattern.id array
 (* not necessarity connected, maybe partially specified *)
-type connected_component = Connected_component.id
+type connected_component = Pattern.id
 (* connected, maybe partially specified *)
 
 let dummy_chemical_species compil =
-  Connected_component.empty_cc
-    (Connected_component.Env.signatures (domain compil))
+  Pattern.empty_cc (Pattern.Env.signatures (domain compil))
 
 let rate_convention compil = compil.rate_convention
 let what_do_we_count compil = compil.count
@@ -61,18 +60,18 @@ let do_we_prompt_reactions compil =
   compil.show_reactions
 
 let print_chemical_species ?compil =
-  Connected_component.print_cc
+  Pattern.print_cc
     ?sigs:(Tools.option_map Environment.signatures (environment_opt compil))
     ?cc_id:None
 
 let print_canonic_species = print_chemical_species
 
 let nbr_automorphisms_in_chemical_species x =
-  List.length (Connected_component.automorphisms x)
+  List.length (Pattern.automorphisms x)
 
-let compare_connected_component = Connected_component.compare_canonicals
+let compare_connected_component = Pattern.compare_canonicals
 let print_connected_component ?compil =
-  Connected_component.print ?domain:(domain_opt compil) ~with_id:false
+  Pattern.print ?domain:(domain_opt compil) ~with_id:false
 
 let canonic_form x = x
 
@@ -80,28 +79,28 @@ let connected_components_of_patterns = Array.to_list
 
 let connected_components_of_mixture compil cache e =
   let contact_map = contact_map compil in
-  let sigs = Connected_component.Env.signatures (domain compil) in
+  let sigs = Pattern.Env.signatures (domain compil) in
   let snap = Edges.build_snapshot sigs e in
   List.fold_left
     (fun (cache,acc) (i,m) ->
        match Snip.connected_components_sum_of_ambiguous_mixture
                contact_map cache (LKappa.of_raw_mixture m) with
        | cache',[[|x_id|],_] ->
-         let x = Connected_component.PreEnv.get cache' x_id in
+         let x = Pattern.PreEnv.get cache' x_id in
          cache',Tools.recti (fun a _ -> x::a) acc i
        | _ -> assert false)
     (cache,[]) snap
 
 type embedding = Renaming.t (* the domain is connected *)
-type embedding_forest = Connected_component.Matching.t
+type embedding_forest = Pattern.Matching.t
 (* the domain may be not connected *)
 
 let lift_embedding x =
   Tools.unsome
-    Connected_component.Matching.empty
-    (Connected_component.Matching.add_cc Connected_component.Matching.empty 0 x)
+    Pattern.Matching.empty
+    (Pattern.Matching.add_cc Pattern.Matching.empty 0 x)
 let find_embeddings compil =
-  Connected_component.embeddings_to_fully_specified (domain compil)
+  Pattern.embeddings_to_fully_specified (domain compil)
 
 let find_embeddings_unary_binary compil p x =
   Tools.array_fold_lefti
@@ -110,10 +109,10 @@ let find_embeddings_unary_binary compil p x =
        Tools.list_map_flatten
          (fun m ->
             Tools.list_map_option
-              (fun r -> Connected_component.Matching.add_cc m i r)
+              (fun r -> Pattern.Matching.add_cc m i r)
               em)
          acc)
-    [Connected_component.Matching.empty]
+    [Pattern.Matching.empty]
     p
 
 let disjoint_union compil l =
@@ -124,14 +123,14 @@ let disjoint_union compil l =
       (fun (i,em,mix) (_,r,cc) ->
          let i = pred i in
          let (mix',r') =
-           Connected_component.add_fully_specified_to_graph sigs mix cc  in
+           Pattern.add_fully_specified_to_graph sigs mix cc  in
          let r'' = Renaming.compose false r r' in
          (i,
           Tools.unsome
-            Connected_component.Matching.empty
-            (Connected_component.Matching.add_cc em i r''),
+            Pattern.Matching.empty
+            (Pattern.Matching.add_cc em i r''),
           mix'))
-      (List.length l,Connected_component.Matching.empty,
+      (List.length l,Pattern.Matching.empty,
        Edges.empty ~with_connected_components:false)
       l in
   (pat,em,mix)
@@ -219,7 +218,7 @@ let apply compil rule inj_nodes mix =
   let (side_effects,dummy,edges_after_neg) =
     List.fold_left
       Rule_interpreter.apply_negative_transformation
-      ([],Connected_component.Map.empty,mix) concrete_removed in
+      ([],Pattern.Map.empty,mix) concrete_removed in
   let (_,remaining_side_effects,_,edges'),concrete_inserted =
     List.fold_left
       (fun (x,p) h ->
@@ -237,7 +236,7 @@ let apply compil rule inj_nodes mix =
 
 let lift_species compil x =
   fst @@
-  Connected_component.add_fully_specified_to_graph
+  Pattern.add_fully_specified_to_graph
     (Environment.signatures compil.environment)
     (Edges.empty ~with_connected_components:false) x
 
@@ -278,7 +277,7 @@ let get_compil
   }
 
 let empty_cache compil =
-  Connected_component.PreEnv.of_env (Environment.domain compil.environment)
+  Pattern.PreEnv.of_env (Environment.domain compil.environment)
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
 let mixture_of_init compil c =

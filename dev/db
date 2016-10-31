@@ -21,8 +21,8 @@ install_printer Raw_printers.print_rule
 install_printer Raw_printers.print_modification
 install_printer Raw_printers.print_perturbation
 install_printer Kappa_printer.env
-install_printer Connected_component.Env.print
-install_printer Connected_component.Matching.debug_print
+install_printer Pattern.Env.print
+install_printer Pattern.Matching.debug_print
 install_printer Edges.debug_print
 install_printer Raw_printers.print_path
 install_printer Causal.debug_print_grid

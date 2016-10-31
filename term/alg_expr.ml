@@ -8,7 +8,7 @@ type ('mix,'id) e =
   | TOKEN_ID of 'id
   | CONST of Nbr.t
 
-type t = (Connected_component.id array list, int) e
+type t = (Pattern.id array list, int) e
 
 type ('mix,'id) bool_expr =
   | TRUE

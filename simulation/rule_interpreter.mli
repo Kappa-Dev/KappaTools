@@ -21,26 +21,26 @@ val value_alg :
 
 val value_bool :
   get_alg:(int -> Alg_expr.t) -> Counter.t -> t ->
-  (Connected_component.id array list,int) Alg_expr.bool_expr -> bool
+  (Pattern.id array list,int) Alg_expr.bool_expr -> bool
 
 (** {6 Core} *)
 
 val apply_rule :
   ?rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Connected_component.Set.t -> Counter.t ->
+  Pattern.Set.t -> Counter.t ->
   t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rule has an unary rate.*)
 
 val apply_unary_rule :
   rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Connected_component.Set.t -> Counter.t ->
+  Pattern.Set.t -> Counter.t ->
   t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
     [rule_id] is mandatory if the rule has an unary rate.*)
 
 val force_rule :
-  get_alg:(int -> Alg_expr.t) -> Environment.t -> Connected_component.Set.t ->
+  get_alg:(int -> Alg_expr.t) -> Environment.t -> Pattern.Set.t ->
   Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> t
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
@@ -54,8 +54,7 @@ val adjust_unary_rule_instances :
   rule_id:int -> get_alg:(int -> Alg_expr.t) -> (int -> int -> float -> unit) ->
   Environment.t -> Counter.t -> t -> Primitives.elementary_rule -> t
 
-val incorporate_extra_pattern :
-  Connected_component.Env.t -> t -> Connected_component.id -> t
+val incorporate_extra_pattern : Pattern.Env.t -> t -> Pattern.id -> t
 
 val extra_outdated_var : int -> t -> t
 val update_outdated_activities :
@@ -77,33 +76,33 @@ val print : Environment.t -> Format.formatter -> t -> unit
 (** {6 Stories} *)
 
 val add_tracked :
-  Connected_component.id array -> Trace.event_kind ->
+  Pattern.id array -> Trace.event_kind ->
   Instantiation.abstract Instantiation.test list ->
   t -> t
-val remove_tracked : Connected_component.id array -> t -> t
+val remove_tracked : Pattern.id array -> t -> t
 val generate_stories : t -> (((bool*bool*bool)*bool)*Trace.t) option
 
 (** {6 Debugging} *)
 
 val print_injections :
-  ?domain:Connected_component.Env.t -> Format.formatter ->
-  Mods.IntSet.t Connected_component.Map.t -> unit
+  ?domain:Pattern.Env.t -> Format.formatter ->
+  Mods.IntSet.t Pattern.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit
 
 (** {6 Internals } *)
 val apply_negative_transformation :
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t ->
+  Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t ->
   Instantiation.concrete Primitives.Transformation.t ->
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t
+  Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t
 val apply_positive_transformation :
   Signature.s ->
-  (Connected_component.Matching.t * int Mods.IntMap.t) *
+  (Pattern.Matching.t * int Mods.IntMap.t) *
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t ->
+  Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t ->
   Instantiation.abstract Primitives.Transformation.t ->
-  ((Connected_component.Matching.t * int Mods.IntMap.t) *
+  ((Pattern.Matching.t * int Mods.IntMap.t) *
    (Instantiation.concrete Instantiation.site) list *
-   Mods.IntSet.t Mods.IntMap.t Connected_component.Map.t * Edges.t) *
+   Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t) *
   Instantiation.concrete Primitives.Transformation.t

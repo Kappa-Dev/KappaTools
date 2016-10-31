@@ -3,9 +3,10 @@ let print_ast_alg f a =
 		    (fun f (x,_) -> Format.pp_print_string f x) f a
 let print_alg = Kappa_printer.alg_expr ?env:None
 let print_bool f a =
-  Alg_expr.print_bool (fun _ () -> ()) (fun f (x,_) -> Format.pp_print_string f x)
+  Alg_expr.print_bool (fun _ () -> ())
+    (fun f (x,_) -> Format.pp_print_string f x)
     (fun f (x,_) -> Format.pp_print_string f x) f a
-let print_cc = Connected_component.print ?domain:None ~with_id:true
+let print_cc = Pattern.print_cc ?sigs:None ?cc_id:None
 let print_place = Agent_place.print ?sigs:None
 let print_transformation = Primitives.Transformation.print ?sigs:None
 let print_rule = Kappa_printer.elementary_rule ?env:None

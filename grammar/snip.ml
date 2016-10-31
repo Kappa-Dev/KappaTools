@@ -374,7 +374,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
       | Some (key,_) -> link_occurence_failure key Location.dummy
     end
   | ag :: ag_l ->
-    let (node,wk) = Connected_component.new_node wk ag.LKappa.ra_type in
+    let (node,wk) = Pattern.new_node wk ag.LKappa.ra_type in
     let place = Agent_place.Existing (node,id) in
     let transf' =
       if ag.LKappa.ra_erased
@@ -403,10 +403,10 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
              else
                Primitives.Transformation.NegativeInternalized (place,site_id)::removed,
                Primitives.Transformation.PositiveInternalized (place,site_id,j)::added),
-            Connected_component.new_internal_state wk (node,site_id) i
+            Pattern.new_internal_state wk (node,site_id) i
           | LKappa.I_VAL_ERASED i ->
             (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,added),
-            Connected_component.new_internal_state wk (node,site_id) i
+            Pattern.new_internal_state wk (node,site_id) i
         in
         match ag.LKappa.ra_ports.(site_id) with
         | (Ast.LNK_ANY,pos), s ->
@@ -417,7 +417,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                  (place,site_id),Some pos) s in
           handle_ports wk' r_l c_l transf' l_t' re acc (succ site_id)
         | (Ast.FREE,_), s ->
-          let wk'' = Connected_component.new_free wk' (node,site_id) in
+          let wk'' = Pattern.new_free wk' (node,site_id) in
           let transf',l_t' =
             define_full_transformation
               sigs transf l_t place site_id
@@ -432,7 +432,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
           match Mods.IntMap.find_option i r_l with
           | Some (node',site' as dst) ->
             let dst_place = Agent_place.Existing (node',id),site' in
-            let wk'' = Connected_component.new_link wk' (node,site_id) dst in
+            let wk'' = Pattern.new_link wk' (node,site_id) dst in
             let c_l' =
               Mods.IntMap.add
                 i (Instantiation.Is_Bound_to ((place,site_id),dst_place))
@@ -452,7 +452,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                    List.for_all (fun x -> not(is_linked_on i x)) re ->
               let wk'' =
                 if site_id' > site_id then
-                  Connected_component.new_link
+                  Pattern.new_link
                     wk' (node,site_id) (node,site_id')
                 else wk' in
               let transf',l_t' =
@@ -489,8 +489,8 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                     (fun x -> not(is_linked_on i x)) acc ->
                 handle_ports
                   wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
-              | _, _ -> link_occurence_failure i pos
-    in handle_ports wk registered_links Mods.IntMap.empty transf' links_transf remains ag_l 0
+              | _, _ -> link_occurence_failure i pos in
+   handle_ports wk registered_links Mods.IntMap.empty transf' links_transf remains ag_l 0
 
 let rec complete_with_creation
     sigs (removed,added) links_transf create_actions actions fresh =
@@ -554,7 +554,7 @@ let incr_origin = function
   | Operator.RULE i -> Operator.RULE (succ i)
 
 let connected_components_of_mixture created mix (env,origin) =
-  let sigs = Connected_component.PreEnv.sigs env in
+  let sigs = Pattern.PreEnv.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
       let removed,added = transformations in
@@ -582,13 +582,13 @@ let connected_components_of_mixture created mix (env,origin) =
         (tests,(actions'',side_sites,side_effects)), transformations''),
        (env,Tools.option_map incr_origin origin))
     | h :: t ->
-      let wk = Connected_component.begin_new env in
+      let wk = Pattern.begin_new env in
       let (wk_out,(removed,added),l_t,event, remains) =
         add_agents_in_cc
           sigs id wk Mods.IntMap.empty transformations
           links_transf instantiations t [h] in
       let (env',inj, cc) =
-        Connected_component.finish_new ?origin wk_out in
+        Pattern.finish_new ?origin wk_out in
       let added' =
         Tools.list_smart_map
           (Primitives.Transformation.rename id inj) added in
@@ -613,7 +613,7 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
 
 let connected_components_sum_of_ambiguous_rule
     contact_map env ?origin precomp_mixs created =
-  let sigs = Connected_component.PreEnv.sigs env in
+  let sigs = Pattern.PreEnv.sigs env in
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs in
   let () =
