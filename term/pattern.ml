@@ -12,7 +12,6 @@ type cc = {
   (*internal state id -> [|... state_j...|]
     i.e agent_id on site_j has internal state state_j (-1 means any) *)
   recogn_nav: Navigation.step list;
-  discover_nav: Navigation.step list;
 }
 
 type t = cc
@@ -54,7 +53,7 @@ type work = {
 
 let empty_cc sigs =
   let nbt = Array.make (Signature.size sigs) [] in
-  {nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
+  {nodes_by_type = nbt; recogn_nav = [];
    links = Mods.IntMap.empty; internals = Mods.IntMap.empty;}
 
 let raw_find_ty tys id =
@@ -105,15 +104,18 @@ let find_root cc = raw_find_root cc.nodes_by_type
 let find_root_type cc = Tools.option_map snd (find_root cc)
 
 let weight cc =
-  let ints =
+  let links,double =
     Mods.IntMap.fold
       (fun _ ->
-         Array.fold_right (fun i acc -> if i <> -1 then succ acc else acc))
-      cc.internals 0 in
+         Array.fold_right
+           (fun i (l,d as acc) -> if i <> UnSpec then
+               (succ l,if i <> Free then succ d else d)
+             else acc))
+      cc.links (0,0) in
   Mods.IntMap.fold
     (fun _ ->
-       Array.fold_right (fun i acc -> if i <> UnSpec then succ acc else acc))
-    cc.links ints
+       Array.fold_right (fun i acc -> if i <> -1 then succ acc else acc))
+    cc.internals (links - double/2)
 
 let are_compatible ~strict root1 links1 ints1 root2 links2 ints2 =
   let rec aux rename = function
@@ -340,11 +342,10 @@ module Env : sig
     id_by_type: int list array;
     nb_id: int;
     domain: point array;
+    elementaries: (Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
   }
 
-  val navigate :
-    t -> Navigation.t -> (int * Renaming.t list * point) option
   val get : t -> int -> point
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
@@ -358,6 +359,7 @@ end = struct
     id_by_type: int list array;
     nb_id: int;
     domain: point array;
+    elementaries: (Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
   }
 
@@ -399,22 +401,6 @@ end = struct
     Mods.IntMap.find_option ty env.single_agent_points
 
   let get env cc_id = env.domain.(cc_id)
-
-  let navigate env nav =
-    let rec aux injs_dst2nav pt_i = function
-      | [] -> Some (pt_i,injs_dst2nav, get env pt_i)
-      | e :: t ->
-        let rec find_good_edge = function (*one should use a hash here*)
-          | [] -> None
-          | s :: tail ->
-            match Navigation.compatible_point injs_dst2nav s.next e with
-            | [] ->  find_good_edge tail
-            | inj' ->
-              aux (Tools.list_map_flatten
-                     (fun x -> List.map (Renaming.compose false x) inj')
-                     s.inj) s.dst t
-        in find_good_edge (get env pt_i).sons
-    in aux [Renaming.empty] 0 nav
 
   let print_dot f env =
     let () = Format.fprintf f "@[<v>strict digraph G {@," in
@@ -501,8 +487,7 @@ let remove_ag_cc inj2cc cc ag_id =
                with Renaming.Undefined -> x) a) prelinks in
     { nodes_by_type = new_nbt;
       links = new_links; internals = new_ints;
-      recogn_nav = raw_to_navigation false new_nbt new_ints new_links;
-      discover_nav = raw_to_navigation true new_nbt new_ints new_links},
+      recogn_nav = raw_to_navigation false new_nbt new_ints new_links},
     to_subst
 
 let update_cc inj2cc cc ag_id links internals =
@@ -518,9 +503,7 @@ let update_cc inj2cc cc ag_id links internals =
              internals = new_ints;
              links = new_links;
              recogn_nav =
-               raw_to_navigation false cc.nodes_by_type new_ints new_links;
-             discover_nav =
-               raw_to_navigation true cc.nodes_by_type new_ints new_links},
+               raw_to_navigation false cc.nodes_by_type new_ints new_links},
            inj2cc)
 
 let compute_cycle_edges cc =
@@ -915,7 +898,30 @@ end = struct
             scan_sons level1 todos set (injs,rfathers,cands'') cc_id p tail
 
   let finalize env =
-    let _,singles,domain =
+    let sigs = env.sig_decl in
+    let elementaries =
+      Array.init (Array.length env.id_by_type)
+        (fun i -> Array.make (Signature.arity sigs i) []) in
+    let fill_elem =
+      List.iter (fun p ->
+          match p.element.recogn_nav with
+          | [] | ((Navigation.Existing _,_),_) :: _ -> assert false
+          | ((Navigation.Fresh _,_),_) :: _ :: _ -> ()
+          | [(Navigation.Fresh (_,ty1),s1),arr as step] ->
+            let sa1 = elementaries.(ty1) in
+            let () = sa1.(s1) <- (step,p.p_id) :: sa1.(s1) in
+            match arr with
+            | Navigation.ToNode (Navigation.Fresh (_,ty2),s2) ->
+              if ty1 = ty2 && s1 <> s2 then
+                sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
+              else
+                let sa2 = elementaries.(ty2) in
+                sa2.(s2) <- (step,p.p_id) :: sa2.(s2)
+            | Navigation.ToNode (Navigation.Existing _,s2) ->
+              sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
+            | Navigation.ToNothing | Navigation.ToInternal _ -> ()) in
+    let () = fill_elem (Mods.IntMap.find_default [] 1 env.domain) in
+    let _,single_agent_points,domain =
       Mods.IntMap.fold
         (fun _ x acc ->
            List.fold_left
@@ -946,14 +952,15 @@ end = struct
         domain Mods.IntMap.empty in
     let s' = iter (tops,domain) in
     let si = match Mods.IntMap.max_key s' with Some i -> succ i | None -> 0 in
-    let out = Array.make si (empty_point env.sig_decl) in
-    let () = Mods.IntMap.iter (fun i p -> out.(i) <- p) s' in
+    let domain = Array.make si (empty_point env.sig_decl) in
+    let () = Mods.IntMap.iter (fun i p -> domain.(i) <- p) s' in
     {
       Env.sig_decl = env.sig_decl;
       Env.id_by_type =env.id_by_type;
       Env.nb_id = env.nb_id;
-      Env.domain = out;
-      Env.single_agent_points = singles;
+      Env.domain;
+      Env.elementaries;
+      Env.single_agent_points;
     }
 
   let of_env env =
@@ -1016,9 +1023,7 @@ let finish_new ?origin wk =
     { nodes_by_type = wk.used_id;
       links = wk.cc_links; internals = wk.cc_internals;
       recogn_nav =
-        raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links;
-      discover_nav =
-        raw_to_navigation true wk.used_id wk.cc_internals wk.cc_links} in
+        raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links} in
   let preenv,r,out = PreEnv.add_cc ?origin wk.cc_env wk.cc_id cc_candidate in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out
 
@@ -1172,7 +1177,7 @@ module Matching = struct
       | Some inj' -> aux_is_root_of graph None inj' t
   let is_root_of domain graph (_,rty as root) cc_id =
     let cc = domain.Env.domain.(cc_id).content in
-    match cc.discover_nav with
+    match cc.recogn_nav with
     | [] ->
       (match find_root cc with
        | Some (_,rty') -> rty = rty'
@@ -1221,7 +1226,7 @@ module Matching = struct
 
   (*edges: list of concrete edges,
     returns the roots of observables that are above in the domain*)
-  let from_edge domain graph acc edges =
+  let from_edge domain graph (out,cache as acc) edge =
     let rec aux_from_edges cache (obs,rev_deps as acc) = function
       | [] -> acc,cache
       | (pid,point,inj_point2graph) :: remains ->
@@ -1254,12 +1259,20 @@ module Matching = struct
         aux_from_edges
           (CacheSetMap.Set.add (pid,Renaming.min_elt inj_point2graph) cache)
           acc' remains' in
-    match Env.navigate domain edges with
-    | None -> acc
-    | Some (pid,injs,point) ->
-      List.fold_left
-        (fun (out,cache) inj -> aux_from_edges cache out [(pid,point,inj)])
-        acc injs
+    match edge with
+    | (Navigation.Existing _,_),_ -> assert false
+    | (Navigation.Fresh (_,ty),s),_ ->
+      let sa = domain.Env.elementaries.(ty) in
+      let rec find_good_edge = function (*one should use a hash here*)
+        | [] -> acc
+        | (st,cc_id) :: tail ->
+          match Navigation.compatible_point [Renaming.empty] st edge with
+          | [] ->  find_good_edge tail
+          | [inj'] ->
+            let dst = domain.Env.domain.(cc_id) in
+            aux_from_edges cache out [(cc_id,dst,inj')]
+          | _ :: _ -> assert false in
+      find_good_edge sa.(s)
 
   let observables_from_agent
       domain graph ((obs,rdeps),cache as acc) (_,ty as node) =
@@ -1272,14 +1285,14 @@ module Matching = struct
 
   let observables_from_free domain graph acc node site =
     from_edge domain graph acc
-      [(Navigation.Fresh node,site),Navigation.ToNothing]
+      ((Navigation.Fresh node,site),Navigation.ToNothing)
   let observables_from_internal domain graph acc node site id =
     from_edge domain graph acc
-      [(Navigation.Fresh node,site),Navigation.ToInternal id]
+      ((Navigation.Fresh node,site),Navigation.ToInternal id)
   let observables_from_link domain graph acc n site  n' site' =
     from_edge domain graph acc
-      [(Navigation.Fresh n,site),
-       Navigation.ToNode (Navigation.Fresh n',site')]
+      ((Navigation.Fresh n,site),
+       Navigation.ToNode (Navigation.Fresh n',site'))
 end
 
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
