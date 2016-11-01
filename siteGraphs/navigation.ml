@@ -43,26 +43,25 @@ let print_step sigs find_ty f = function
       f "-%a_%a->" (print_id sigs) source
       (print_id_internal_state sigs find_ty source site) (Some i)
 
-let compatible_point injs e e' =
+let compatible_point inj e e' =
   match e,e' with
   | ((Existing id,site), ToNothing), e ->
-    List.filter
-      (fun inj -> e = ((Existing (Renaming.apply inj id),site),ToNothing))
-      injs
+    if e = ((Existing (Renaming.apply inj id),site),ToNothing)
+    then Some inj
+    else None
   | ((Existing id,site), ToInternal i), e ->
-    List.filter
-      (fun inj -> e = ((Existing (Renaming.apply inj id),site),ToInternal i))
-      injs
+    if e = ((Existing (Renaming.apply inj id),site),ToInternal i)
+    then Some inj
+    else None
   | ((Existing id,site), ToNode (Existing id',site')), e ->
-    List.filter
-      (fun inj ->
-         e =
-         ((Existing (Renaming.apply inj id),site),
-          ToNode (Existing (Renaming.apply inj id'),site'))
-         || e =
-            ((Existing (Renaming.apply inj id'),site'),
-             ToNode (Existing (Renaming.apply inj id),site)))
-      injs
+    if e =
+       ((Existing (Renaming.apply inj id),site),
+        ToNode (Existing (Renaming.apply inj id'),site'))
+    || e =
+       ((Existing (Renaming.apply inj id'),site'),
+        ToNode (Existing (Renaming.apply inj id),site))
+    then Some inj
+    else None
   | (((Existing id,site),ToNode (Fresh (id',ty),site')),
      ((Existing sid,ssite), ToNode (Fresh(sid',ty'),ssite'))
     | ((Fresh (id',ty),site),ToNode (Existing id,site')),
@@ -71,45 +70,43 @@ let compatible_point injs e e' =
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))
     | ((Fresh (id',ty),site),ToNode (Existing id,site')),
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))) ->
-    List.filter
-      (fun inj -> sid = Renaming.apply inj id && ssite = site
-                  && ty' = ty && ssite' = site')
-      (Tools.list_map_option (Renaming.add id' sid') injs)
+    begin
+      match Renaming.add id' sid' inj with
+      | Some inj' when sid = Renaming.apply inj' id && ssite = site
+                       && ty' = ty && ssite' = site' -> Some inj'
+      | _ -> None
+    end
   | ((Existing _,_), ToNode (Fresh _,_)),
-    (((Fresh _ | Existing _), _), _) -> []
+    (((Fresh _ | Existing _), _), _) -> None
   | ((Fresh (id,ty),site), ToNothing), ((Fresh (id',ty'),site'),x) ->
-     Tools.list_map_option (Renaming.add id id')
-       (List.filter
-          (fun inj ->
-             ty = ty' && site = site' && x = ToNothing
-             && not (Renaming.mem id inj)) injs)
+    if ty = ty' && site = site' && x = ToNothing
+       && not (Renaming.mem id inj)
+    then Renaming.add id id' inj
+    else None
   | ((Fresh (id,ty),site), ToInternal i), ((Fresh (id',ty'),site'),x) ->
-    Tools.list_map_option (Renaming.add id id')
-      (List.filter
-         (fun inj -> ty = ty' && site = site' &&
-                     x = ToInternal i && not (Renaming.mem id inj))
-         injs)
+    if ty = ty' && site = site' &&
+       x = ToInternal i && not (Renaming.mem id inj)
+    then Renaming.add id id' inj
+    else None
   | ((Fresh (id,ty),site), ToNode (Fresh (id',ty'),site')),
     ((Fresh (sid,sty),ssite), ToNode (Fresh (sid',sty'),ssite')) ->
-    List.fold_left
-      (fun acc inj ->
-         if not (Renaming.mem id inj) && not (Renaming.mem id' inj) then
-           if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-           then match Renaming.add id sid inj with
-             | None -> acc
-             | Some inj' -> match Renaming.add id' sid' inj' with
-               | None -> acc
-               | Some inj'' -> inj''::acc
-           else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
-           then match Renaming.add id sid' inj with
-             | None -> acc
-             | Some inj' -> match Renaming.add id' sid inj' with
-               | None -> acc
-               | Some inj'' -> inj''::acc
-           else acc
-         else acc) [] injs
-  | ((Fresh _,_), _), ((Fresh _,_),_) -> []
-  | ((Fresh _,_), _), ((Existing _,_),_) -> []
+    if not (Renaming.mem id inj) && not (Renaming.mem id' inj) then
+      if ty = sty && site = ssite && ty' = sty' && site' = ssite'
+      then match Renaming.add id sid inj with
+        | None -> None
+        | Some inj' -> match Renaming.add id' sid' inj' with
+          | None -> None
+          | Some inj'' -> Some inj''
+      else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
+      then match Renaming.add id sid' inj with
+        | None -> None
+        | Some inj' -> match Renaming.add id' sid inj' with
+          | None -> None
+          | Some inj'' -> Some inj''
+      else None
+    else None
+  | ((Fresh _,_), _), ((Fresh _,_),_) -> None
+  | ((Fresh _,_), _), ((Existing _,_),_) -> None
 
 let rename_id ?but inj2cc = function
   | Fresh _ as x -> x

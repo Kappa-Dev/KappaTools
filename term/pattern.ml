@@ -1225,12 +1225,11 @@ module Matching = struct
       let rec find_good_edge = function (*one should use a hash here*)
         | [] -> acc
         | (st,cc_id) :: tail ->
-          match Navigation.compatible_point [Renaming.empty] st edge with
-          | [] ->  find_good_edge tail
-          | [inj'] ->
+          match Navigation.compatible_point Renaming.empty st edge with
+          | None ->  find_good_edge tail
+          | Some inj' ->
             let dst = domain.Env.domain.(cc_id) in
-            aux_from_edges cache out [(cc_id,dst,inj')]
-          | _ :: _ -> assert false in
+            aux_from_edges cache out [(cc_id,dst,inj')] in
       find_good_edge sa.(s)
 
   let observables_from_agent

@@ -17,7 +17,7 @@ val print_step : Signature.s -> (int -> int) -> Format.formatter -> step -> unit
 
 val rename_step : Renaming.t -> step -> step
 
-val compatible_point : Renaming.t list -> step -> step -> Renaming.t list
+val compatible_point : Renaming.t -> step -> step -> Renaming.t option
 (** Retuns all the extension of the given injections so that the second edge
     is the image of the first one by this injection *)
 
