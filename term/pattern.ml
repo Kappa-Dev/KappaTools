@@ -19,9 +19,9 @@ type t = cc
 type id = int
 
 type transition = {
-  next: Navigation.step;
+  next: Navigation.t;
   dst: id (* id of cc and also address in the Env.domain map*);
-  inj: Renaming.t list; (* From dst To ("this" cc + extra edge) *)
+  inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
   above_obs: Mods.IntSet.t;
 }
 
@@ -157,6 +157,7 @@ let are_compatible ~strict root1 links1 ints1 root2 links2 ints2 =
   | None -> assert false
   | Some r -> aux r [root1,root2]
 
+(** @returns injection from a to b *)
 let equal a b =
   match Tools.array_min_equal_not_null
           (Array.map (fun x -> List.length x,x) a.nodes_by_type)
@@ -295,8 +296,8 @@ let print_sons_dot sigs cc_id cc f sons =
   Pp.list Pp.space ~trailing:Pp.space
     (fun f son -> Format.fprintf
         f "@[cc%i -> cc%i [label=\"%a %a\"];@]" cc_id son.dst
-        (Navigation.print_step sigs (find_ty cc)) son.next
-        (Pp.list Pp.space Renaming.print) son.inj)
+        (Pp.list Pp.empty (Navigation.print_step sigs (find_ty cc))) son.next
+        Renaming.print son.inj)
     f sons
 
 let print_point_dot sigs f (id,point) =
@@ -383,12 +384,11 @@ end = struct
            Pp.space
            (fun f s ->
               Format.fprintf
-                f "@[%a%a@ %i[@[%a@]]@]"
-                (Navigation.print_step env.sig_decl (find_ty p.content)) s.next
-                (Pp.list
-                   Pp.space
-                   (fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
-                s.inj s.dst
+                f "@[%a(%a)@ %i[@[%a@]]@]"
+                (Pp.list Pp.empty
+                   (Navigation.print_step env.sig_decl (find_ty p.content)))
+                s.next
+                Renaming.print s.inj s.dst
                 (Pp.set Mods.IntSet.elements Pp.space Format.pp_print_int)
                 s.above_obs))
         p.sons in
@@ -657,51 +657,32 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
     cc.links
     (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
-let get_domain domain id =
-  match Mods.IntMap.find_option id domain with
-  | None -> assert false
-  | Some x -> x
-
-let navigate_domain env nav =
-  let rec aux injs_dst2nav pt_i = function
-    | [] -> Some (pt_i,injs_dst2nav, get_domain env pt_i)
-    | e :: t ->
-      let rec find_good_edge = function (*one should use a hash here*)
-        | [] -> None
-        | s :: tail ->
-          match Navigation.compatible_point injs_dst2nav s.next e with
-          | [] ->  find_good_edge tail
-          | inj' ->
-            aux (Tools.list_map_flatten
-                   (fun x -> List.map (Renaming.compose false x) inj') s.inj)
-              s.dst t
-      in find_good_edge (get_domain env pt_i).sons
-  in aux [Renaming.empty] 0 nav
-
 let find_domain env cc =
-  let nav = to_navigation cc in
-  (* let () = Format.eprintf *)
-  (*       "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env) cc)) nav *)
-  (*       print env in *)
-  navigate_domain env nav
+  Mods.IntMap.fold
+    (fun id p -> function
+       | Some _ as out -> out
+       | None -> match equal p.content cc with
+         | None -> None
+         | Some inj -> Some (id,inj,p))
+    env None
 
 let rec complete_domain_with obs_id dst env free_id cc_id cc edge inj_dst2cc =
   let rec new_son inj_cc2found = function
     | [] ->
       [{ dst = dst;
-         next = Navigation.rename_step inj_cc2found edge;
-         inj = [Renaming.compose true inj_dst2cc inj_cc2found];
+         next = [Navigation.rename_step inj_cc2found edge];
+         inj = Renaming.compose true inj_dst2cc inj_cc2found;
          above_obs = Mods.IntSet.singleton obs_id;}]
     | h :: t when
-        h.dst = dst && (h.next = Navigation.rename_step inj_cc2found edge) ->
-      {h with inj = (Renaming.compose true inj_dst2cc inj_cc2found)::h.inj} :: t
+        h.dst = dst && (h.next = [Navigation.rename_step inj_cc2found edge]) ->
+      h :: t
     | h :: t -> h :: new_son inj_cc2found t in
   let known_cc = find_domain env cc in
   match known_cc with
   | Some (cc_id', inj_cc_id2cc, point') ->
     let point'' =
       {point' with
-       sons = new_son (Renaming.inverse (List.hd inj_cc_id2cc)) point'.sons} in
+       sons = new_son (Renaming.inverse inj_cc_id2cc) point'.sons} in
     let completed =
       propagate_add_obs obs_id (Mods.IntMap.add cc_id' point'' env) cc_id' in
     (free_id,completed), cc_id'
@@ -857,15 +838,12 @@ end = struct
       | Some cc ->
         let injs',cands',tail' =
           List.fold_left
-            (fun acc s ->
+            (fun (l,c,t as acc) s ->
                if s.dst = cc_id then
-                 List.fold_left
-                   (fun (l,c,t) r ->
-                      let oui,non =
-                        List.partition
-                          (fun (x,_) -> Renaming.equal x r) c in
-                      r::l,non,Tools.list_rev_map_append snd oui t)
-                   acc s.inj
+                 let oui,non =
+                   List.partition
+                     (fun (x,_) -> Renaming.equal x s.inj) c in
+                 s.inj::l,non,Tools.list_rev_map_append snd oui t
                else acc)
             ([],cands,tail) cc.sons in
         if List.length injs' > 1 || List.length cc.sons > 1
@@ -1224,6 +1202,15 @@ module Matching = struct
   type cache = CacheSetMap.Set.t
   let empty_cache = CacheSetMap.Set.empty
 
+  let survive_nav inj graph =
+    List.fold_left
+      (fun inj step ->
+         match inj with
+         | None -> inj
+         | Some inj ->
+           Navigation.injection_for_one_more_edge inj graph step)
+      (Some inj)
+
   (*edges: list of concrete edges,
     returns the roots of observables that are above in the domain*)
   let from_edge domain graph (out,cache as acc) edge =
@@ -1242,19 +1229,16 @@ module Matching = struct
         let remains' =
           List.fold_left
             (fun re son ->
-               match Navigation.injection_for_one_more_edge
-                       inj_point2graph graph son.next with
+               match survive_nav inj_point2graph graph son.next with
                | None -> re
                | Some inj' ->
                  let p' = Env.get domain son.dst in
-                 List.fold_left
-                   (fun remains renaming ->
-                      let rename = Renaming.compose false renaming inj' in
-                      let next = (son.dst,p',rename) in
-                      if CacheSetMap.Set.mem
-                          (son.dst,Renaming.min_elt rename) cache
-                      then remains
-                      else next::remains) re son.inj)
+                 let rename = Renaming.compose false son.inj inj' in
+                 let next = (son.dst,p',rename) in
+                 if CacheSetMap.Set.mem
+                     (son.dst,Renaming.min_elt rename) cache
+                 then re
+                 else next::re)
             remains point.sons in
         aux_from_edges
           (CacheSetMap.Set.add (pid,Renaming.min_elt inj_point2graph) cache)
