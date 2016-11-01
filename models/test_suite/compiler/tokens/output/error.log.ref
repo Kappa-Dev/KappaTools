@@ -14,7 +14,7 @@ Environment:
   Perturbations:
     /*0*/%mod: ([E] = 5) do tt <- 22
 Domain:
-  () -> /*cc0*/  -> (-!A-1_x-⊥->() 1[1])
+  () -> /*cc0*/  -> (-!A-1_x-⊥->() 1)
   (0) -> /*cc1*/ A/*1*/(x) [] -> ()
 Intial graph;
   

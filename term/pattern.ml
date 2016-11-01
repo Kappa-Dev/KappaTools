@@ -22,7 +22,6 @@ type transition = {
   next: Navigation.t;
   dst: id (* id of cc and also address in the Env.domain map*);
   inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
-  above_obs: Mods.IntSet.t;
 }
 
 type point = {
@@ -384,13 +383,11 @@ end = struct
            Pp.space
            (fun f s ->
               Format.fprintf
-                f "@[%a(%a)@ %i[@[%a@]]@]"
+                f "@[%a(%a)@ %i@]"
                 (Pp.list Pp.empty
                    (Navigation.print_step env.sig_decl (find_ty p.content)))
                 s.next
-                Renaming.print s.inj s.dst
-                (Pp.set Mods.IntSet.elements Pp.space Format.pp_print_int)
-                s.above_obs))
+                Renaming.print s.inj s.dst))
         p.sons in
     Format.fprintf
       f "@[<v>%a@]"
@@ -428,26 +425,6 @@ let embeddings_to_fully_specified domain a_id b =
               ~strict:false h a.links a.internals ag b.links b.internals with
       | None -> acc
       | Some r -> r::acc) [] b.nodes_by_type.(ty)
-
-let propagate_add_obs obs_id env cc_id =
-  let rec aux son_id domain cc_id =
-    match Mods.IntMap.find_option cc_id domain with
-    | None -> assert false
-    | Some cc ->
-      let sons' =
-        Tools.list_smart_map
-          (fun s ->
-             if s.dst = son_id && not (Mods.IntSet.mem obs_id s.above_obs)
-             then {s with above_obs = Mods.IntSet.add obs_id s.above_obs}
-             else s) cc.sons in
-      if sons' == cc.sons then domain
-      else
-        let env' =
-          Mods.IntMap.add cc_id {cc with sons = sons'} domain in
-        List.fold_left (aux cc_id) env' cc.fathers in
-  match Mods.IntMap.find_option cc_id env with
-  | None -> assert false
-  | Some cc -> List.fold_left (aux cc_id) env cc.fathers
 
 exception Found
 
@@ -671,8 +648,7 @@ let rec complete_domain_with obs_id dst env free_id cc_id cc edge inj_dst2cc =
     | [] ->
       [{ dst = dst;
          next = [Navigation.rename_step inj_cc2found edge];
-         inj = Renaming.compose true inj_dst2cc inj_cc2found;
-         above_obs = Mods.IntSet.singleton obs_id;}]
+         inj = Renaming.compose true inj_dst2cc inj_cc2found;}]
     | h :: t when
         h.dst = dst && (h.next = [Navigation.rename_step inj_cc2found edge]) ->
       h :: t
@@ -683,8 +659,7 @@ let rec complete_domain_with obs_id dst env free_id cc_id cc edge inj_dst2cc =
     let point'' =
       {point' with
        sons = new_son (Renaming.inverse inj_cc_id2cc) point'.sons} in
-    let completed =
-      propagate_add_obs obs_id (Mods.IntMap.add cc_id' point'' env) cc_id' in
+    let completed = Mods.IntMap.add cc_id' point'' env in
     (free_id,completed), cc_id'
   | None ->
     let son = new_son (identity_injection cc) [] in

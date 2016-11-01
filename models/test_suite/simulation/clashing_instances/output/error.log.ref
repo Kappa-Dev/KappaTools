@@ -11,7 +11,7 @@ Environment:
   Perturbations:
     
 Domain:
-  () -> /*cc0*/  -> (-!A-1_x-⊥->() 1[1])
+  () -> /*cc0*/  -> (-!A-1_x-⊥->() 1)
   (0) -> /*cc1*/ A/*1*/(x) [rate_of_rule [0]] -> ()
   () -> /*cc2*/ A/*1*/() [rate_of_rule [0]] -> ()
 Intial graph;
