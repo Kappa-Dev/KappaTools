@@ -18,8 +18,11 @@ val print_step : Signature.s -> (int -> int) -> Format.formatter -> step -> unit
 val rename_step : Renaming.t -> step -> step
 
 val compatible_point : Renaming.t -> step -> step -> Renaming.t option
-(** Retuns all the extension of the given injections so that the second edge
-    is the image of the first one by this injection *)
+(** Retuns the extension of the given injections so that the second edge
+    is the image of the first *)
+
+val is_subnavigation : Renaming.t -> t -> t -> (Renaming.t * t) option
+(** [is_subnavigation inj_nav2sub nav subpart] *)
 
 val check_edge : Edges.t -> step -> bool
 val injection_for_one_more_edge :

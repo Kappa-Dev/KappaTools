@@ -108,6 +108,17 @@ let compatible_point inj e e' =
   | ((Fresh _,_), _), ((Fresh _,_),_) -> None
   | ((Fresh _,_), _), ((Existing _,_),_) -> None
 
+let rec aux_sub inj goal acc = function
+  | [] -> None
+  | h :: t -> match compatible_point inj h goal with
+    | None -> aux_sub inj goal (h::acc) t
+    | Some inj' -> Some (inj',List.rev_append acc t)
+let rec is_subnavigation inj nav = function
+  | [] -> Some (inj,nav)
+  | h :: t -> match aux_sub inj h [] nav with
+    | None -> None
+    | Some (inj',nav') -> is_subnavigation inj' nav' t
+
 let rename_id ?but inj2cc = function
   | Fresh _ as x -> x
   | Existing n as x ->

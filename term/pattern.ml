@@ -116,45 +116,73 @@ let weight cc =
        Array.fold_right (fun i acc -> if i <> -1 then succ acc else acc))
     cc.internals (links - double/2)
 
-let are_compatible ~strict root1 links1 ints1 root2 links2 ints2 =
-  let rec aux rename = function
-    | [] -> Some rename
-    | (o,p)::todos ->
+let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
+  let tick x =
+    match possibilities with
+    | None -> ()
+    | Some s -> s := Mods.Int2Set.remove x !s in
+  let rec aux at_least_one_edge rename = function
+    | [] -> if at_least_one_edge then Some rename else None
+    | (o,p as pair)::todos ->
+      let () = tick pair in
+      let int1 = Mods.IntMap.find_default [||] o cc1.internals in
+      let int2 = Mods.IntMap.find_default [||] p cc2.internals in
       if
         Tools.array_fold_left2i
           (fun _ b x y -> b && ((not strict && (x = -1||y = -1)) || x = y)) true
-          (Mods.IntMap.find_default [||] o ints1)
-          (Mods.IntMap.find_default [||] p ints2) then
+          int1 int2 then
+        let one_edge =
+          at_least_one_edge ||
+          Tools.array_fold_left2i
+            (fun _ b x y -> b || ((x <> -1||y <> -1) && x = y)) false
+            int1 int2 in
         match Tools.array_fold_left2i
                 (fun _ c x y ->
                    match c with
                    | None -> c
-                   | Some (todo,ren) ->
+                   | Some (_,todo,ren) ->
                      match x, y with
                      | (Link _, Free| Free, Link _) -> None
                      | (UnSpec, Free| Free, UnSpec
-                       |UnSpec, Link _| Link _, UnSpec) ->
+                       | Link _, UnSpec |UnSpec, Link _) ->
                        if strict then None else c
                      | UnSpec, UnSpec -> c
-                     | Free, Free -> c
+                     | Free, Free -> Some (true,todo,ren)
                      | Link (n1,s1), Link (n2,s2) ->
                        if s1 = s2 then
                          if Renaming.mem n1 ren then
-                           if Renaming.apply ren n1 = n2 then c else None
+                           if Renaming.apply ren n1 = n2
+                           then Some (true,todo,ren)
+                           else None
                          else match Renaming.add n1 n2 ren with
                            | None -> None
-                           | Some r' -> Some ((n1,n2)::todo,r')
+                           | Some r' ->
+                             if find_ty cc1 n1 = find_ty cc2 n2
+                             then Some (true,(n1,n2)::todo,r')
+                             else None
                        else None
                 )
-                (Some (todos,rename))
-                (Mods.IntMap.find_default [||] o links1)
-                (Mods.IntMap.find_default [||] p links2) with
+                (Some (one_edge,todos,rename))
+                (Mods.IntMap.find_default [||] o cc1.links)
+                (Mods.IntMap.find_default [||] p cc2.links) with
         | None -> None
-        | Some (todos',ren') -> aux ren' todos'
+        | Some (one_edges',todos',ren') -> aux one_edges' ren' todos'
       else None in
   match Renaming.add root1 root2 Renaming.empty with
   | None -> assert false
-  | Some r -> aux r [root1,root2]
+  | Some r ->
+    if
+      (* is_single_agent *)
+      (Array.for_all (fun x -> x = -1)
+         (Mods.IntMap.find_default [||] root1 cc1.internals) &&
+       Array.for_all (fun x -> x = UnSpec)
+         (Mods.IntMap.find_default [||] root1 cc1.links)) &&
+      (Array.for_all (fun x -> x = -1)
+         (Mods.IntMap.find_default [||] root2 cc2.internals) &&
+       Array.for_all (fun x -> x = UnSpec)
+         (Mods.IntMap.find_default [||] root2 cc2.links))
+    then Some r
+    else aux false r [root1,root2]
 
 (** @returns injection from a to b *)
 let equal a b =
@@ -168,8 +196,7 @@ let equal a b =
       (fun bool ag ->
          match bool with
          | Some _ -> bool
-         | None -> are_compatible
-                     ~strict:true h1 a.links a.internals ag b.links b.internals)
+         | None -> are_compatible ~strict:true h1 a ag b)
       None ags
 
 let automorphisms a =
@@ -178,10 +205,26 @@ let automorphisms a =
           (0,[]) a.nodes_by_type with
   | _,[] -> [Renaming.empty]
   | _,(h::_ as l) -> List.fold_left (fun acc ag ->
-      match are_compatible
-              ~strict:true h a.links a.internals ag a.links a.internals with
+      match are_compatible ~strict:true h a ag a with
       | None -> acc
       | Some r -> r::acc) [] l
+
+let potential_pairing =
+  Tools.array_fold_left2i
+    (fun _ acc la -> List.fold_left
+        (fun acc b -> List.fold_left
+            (fun acc a -> Mods.Int2Set.add (a,b) acc) acc la) acc)
+    Mods.Int2Set.empty
+let matchings a b =
+  let possibilities = ref (potential_pairing a.nodes_by_type b.nodes_by_type) in
+  let rec for_one_root acc =
+    match Mods.Int2Set.choose !possibilities with
+    | None -> acc
+    | Some (x,y) ->
+      match are_compatible ~possibilities ~strict:false x a y b with
+      | None -> for_one_root acc
+      | Some r -> for_one_root (r::acc) in
+  for_one_root []
 
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =
@@ -336,6 +379,69 @@ let add_fully_specified_to_graph sigs graph cc =
       e Renaming.empty  in
   (g,r)
 
+let build_navigations_between inj_d_to_o cc_o cc_d =
+  let rec handle_links discovered next_round recogn intern = function
+    | [] ->
+      if next_round = [] then (List.rev_append recogn intern)
+      else handle_links discovered [] recogn intern next_round
+    | ((i,j,s),(n',s') as h) :: todos ->
+      let n = Renaming.apply inj_d_to_o n' in
+      match Mods.IntSet.mem j discovered, Mods.IntSet.mem n' discovered with
+      | (false, false) ->
+        handle_links discovered (h::next_round) recogn intern todos
+      | (true, true) ->
+        let intern' =
+          ((Navigation.Existing i,s),
+           Navigation.ToNode (Navigation.Existing n,s'))::intern in
+        handle_links discovered next_round recogn intern' todos
+      | true, false ->
+        let recogn' =
+          ((Navigation.Existing i,s),
+           Navigation.ToNode
+             (Navigation.Fresh (n,find_ty cc_d n'),s'))::recogn in
+        handle_links
+          (Mods.IntSet.add n' discovered) next_round recogn' intern todos
+       | false, true ->
+         let recogn' =
+           ((Navigation.Existing n,s'),
+            Navigation.ToNode
+              (Navigation.Fresh (i,find_ty cc_d j),s))::recogn in
+         handle_links
+           (Mods.IntSet.add j discovered) next_round recogn' intern todos in
+    let discov,all_links,intern =
+      Renaming.fold
+      (fun j i (disc,links,inter) ->
+         let linksd = Mods.IntMap.find_default [||] j cc_d.links in
+         let intsd = Mods.IntMap.find_default [||] j cc_d.internals in
+         let disc',linkso,intso =
+           match Mods.IntMap.find_option i cc_o.links with
+           | None ->
+             disc,
+             Array.make (Array.length linksd) UnSpec,
+             Array.make (Array.length linksd) (-1)
+           | Some linkso ->
+             Mods.IntSet.add j disc,
+             linkso,Mods.IntMap.find_default [||] i cc_o.internals in
+         let inter' =
+           Tools.array_fold_left2i
+             (fun s acc o d -> if o = -1 && d <> -1
+               then ((Navigation.Existing i,s),Navigation.ToInternal d)::acc
+               else acc)
+             inter intso intsd in
+         Tools.array_fold_left2i
+           (fun s (dis,li,int as acc) o d ->
+              if o <> UnSpec then acc else
+                match d with
+                | UnSpec -> acc
+                | Free ->
+                  dis,li,((Navigation.Existing i,s),Navigation.ToNothing)::int
+                | Link (n,s') ->
+                  if n > (*la*)j || (n = j && s > s') then acc
+                  else dis,((i,j,s),(n,s'))::li,int)
+         (disc',links,inter') linkso linksd)
+      inj_d_to_o (Mods.IntSet.empty,[],[]) in
+    handle_links discov [] [] intern all_links
+
 module Env : sig
   type t = {
     sig_decl: Signature.s;
@@ -421,8 +527,7 @@ let embeddings_to_fully_specified domain a_id b =
   | None -> [Renaming.empty]
   | Some (h,ty) ->
     List.fold_left (fun acc ag ->
-      match are_compatible
-              ~strict:false h a.links a.internals ag b.links b.internals with
+      match are_compatible ~strict:false h a ag b with
       | None -> acc
       | Some r -> r::acc) [] b.nodes_by_type.(ty)
 
