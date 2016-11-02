@@ -188,6 +188,7 @@ let onload (t : Ui_simulation.t) : unit =
   let () =
     (Js.Unsafe.coerce configuration)##.lineNumbers := Js._true;
     (Js.Unsafe.coerce configuration)##.lineWrapping := Js._true;
+    (Js.Unsafe.coerce configuration)##.styleActiveLine := Js._true;
     (Js.Unsafe.coerce configuration)##.autofocus := Js._true;
     (Js.Unsafe.coerce configuration)##.gutters := gutter_option;
     (Js.Unsafe.coerce configuration)##.lint := Js._true;

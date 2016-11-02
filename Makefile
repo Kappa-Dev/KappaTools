@@ -54,7 +54,7 @@ RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
 		$(wildcard js/*.css) js/favicon.ico js/package.json
 
 ifeq ($(NO_CDN),1)
-SITE_EXTRAS= site/external site/external/bootstrap-3.3.5-dist site/external/codemirror-5.14.2 site/external/d3 site/external/jquery
+SITE_EXTRAS= site/external site/external/bootstrap-3.3.5-dist site/external/codemirror-5.20.2 site/external/d3 site/external/jquery
 INDEX_HTML=js/no-cdn.html
 else
 SITE_EXTRAS=
@@ -109,8 +109,8 @@ site/external/bootstrap-3.3.5-dist:
 	curl -LsS -o $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
 	unzip -d site/external $(TEMPDIR)/bootstrap.zip
 
-site/external/codemirror-5.14.2:
-	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror-5.14.2.zip ;\
+site/external/codemirror-5.20.2:
+	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror-5.20.2.zip ;\
 	unzip -d site/external $(TEMPDIR)/codemirror.zip
 
 site/external/d3:
