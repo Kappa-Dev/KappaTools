@@ -11,7 +11,7 @@ Environment:
   Perturbations:
     
 Domain:
-  () -> /*cc0*/  -> ()
+  /*cc0*/  -> ()
 Intial graph;
   
   

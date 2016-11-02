@@ -34,7 +34,7 @@ t = 0.000000;
 init(6)=t;
 init(1)=(1*6); %B(x, y)
 init(2)=(1*4.500000); %A(x)
-var(1)=((1*(((init(2)+init(3))+init(4))+(2*init(5))))*t);
+var(1)=((1*0)*t);
 
 global k
 global kd
@@ -125,7 +125,7 @@ global kd
 global kun
 global kdun
 
-var(1)=((1*(((y(2)+y(3))+y(4))+(2*y(5))))*t);
+var(1)=((1*0)*t);
 
 k(2)=t;
 k(3)=var(1);
@@ -211,7 +211,7 @@ global var
 obs = zeros(nobs,1);
 
 t = y(6);
-var(1)=((1*(((y(2)+y(3))+y(4))+(2*y(5))))*t);
+var(1)=((1*0)*t);
 
 
 end

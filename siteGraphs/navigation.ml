@@ -29,19 +29,27 @@ let print_id_internal_state sigs find_ty n =
   Signature.print_site_internal_state
     sigs (match n with Existing id -> find_ty id | Fresh (_,ty) -> ty)
 
-let print_step sigs find_ty f = function
-  | (source,site), ToNothing ->
-    Format.fprintf f "-%a_%a-%t->" (print_id sigs) source
+let extend f = function
+  | Existing _ -> f
+  | Fresh (id,ty) -> fun x -> if x = id then ty else f x
+
+let rec print sigs find_ty f = function
+  | [] -> ()
+  | ((source,site), ToNothing) :: t ->
+    Format.fprintf f "-%a_%a-%t->%a" (print_id sigs) source
       (print_id_site sigs find_ty source) site Pp.bottom
-  | (source,site), ToNode (id,port) ->
-    Format.fprintf f "-%a_%a-%a_%a->" (print_id sigs) source
+      (print sigs (extend find_ty source)) t
+  | ((source,site), ToNode (id,port)) :: t ->
+    Format.fprintf f "-%a_%a-%a_%a->%a" (print_id sigs) source
       (print_id_site sigs find_ty source) site
       (print_id sigs) id
       (print_id_site ~source sigs find_ty id) port
-  | (source,site), ToInternal i ->
+      (print sigs (extend (extend find_ty id) source)) t
+  | ((source,site), ToInternal i) :: t ->
     Format.fprintf
-      f "-%a_%a->" (print_id sigs) source
+      f "-%a_%a->%a" (print_id sigs) source
       (print_id_internal_state sigs find_ty source site) (Some i)
+      (print sigs (extend find_ty source)) t
 
 let compatible_point inj e e' =
   match e,e' with

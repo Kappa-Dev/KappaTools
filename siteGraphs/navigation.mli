@@ -12,8 +12,8 @@ type step = port * arrow
 
 type t = step list
 
-val print_step : Signature.s -> (int -> int) -> Format.formatter -> step -> unit
-(** [print_step signatures find_existing_type step] *)
+val print : Signature.s -> (int -> int) -> Format.formatter -> t -> unit
+(** [print signatures find_existing_type nav] *)
 
 val rename_step : Renaming.t -> step -> step
 

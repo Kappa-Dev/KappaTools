@@ -27,8 +27,7 @@ type transition = {
 type point = {
   content: cc;
   is_obs_of: (Agent.t list * Operator.DepSet.t) option;
-  fathers: id list;
-  sons: transition list;
+  mutable sons: transition list;
 }
 
 type prepoint = {
@@ -283,9 +282,6 @@ let raw_to_navigation (full:bool) nodes_by_type internals links =
   | Some (x,_) -> (*(ag_sort,ag_id)*)
     build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
-let to_navigation cc =
-  raw_to_navigation true cc.nodes_by_type cc.internals cc.links
-
 let print_cc ?sigs ?cc_id f cc =
   let print_intf (ag_i,_ as ag) link_ids internals neigh =
     snd
@@ -338,7 +334,7 @@ let print_sons_dot sigs cc_id cc f sons =
   Pp.list Pp.space ~trailing:Pp.space
     (fun f son -> Format.fprintf
         f "@[cc%i -> cc%i [label=\"%a %a\"];@]" cc_id son.dst
-        (Pp.list Pp.empty (Navigation.print_step sigs (find_ty cc))) son.next
+        (Navigation.print sigs (find_ty cc)) son.next
         Renaming.print son.inj)
     f sons
 
@@ -379,7 +375,124 @@ let add_fully_specified_to_graph sigs graph cc =
       e Renaming.empty  in
   (g,r)
 
-let build_navigations_between inj_d_to_o cc_o cc_d =
+let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
+  let img = Renaming.image inj1_to_2 in
+  let available_ids =
+    Array.map (List.filter (fun id -> not (Mods.IntSet.mem id img)))
+      reserved_ids in
+  let used_ids =
+    Array.map
+      (Tools.list_map_option
+         (fun id -> if Renaming.mem id inj1_to_2
+           then Some (Renaming.apply inj1_to_2 id)
+           else None))
+      cc1.nodes_by_type in
+  let available_in_cc1 =
+    Array.mapi
+      (fun i l -> Tools.recti
+          (fun l _ -> List.tl l) l (List.length cc1.nodes_by_type.(i)))
+      reserved_ids in
+  let free_id_for_cc1 = ref free_id in
+  let get_cc2 j ((inj1,free_id),inj2,(todos1,todos2) as pack) =
+    if Renaming.mem j inj2 then (Renaming.apply inj2 j,pack)
+    else
+      let ty = find_ty cc2 j in
+      let img,free_id' =
+        match available_ids.(ty) with
+        | [] -> free_id,succ free_id
+        | h :: t -> let () = available_ids.(ty) <- t in
+          h,free_id in
+      let () = used_ids.(ty) <- img :: used_ids.(ty) in
+      let o =
+        match available_in_cc1.(ty) with
+        | [] -> let x = !free_id_for_cc1 in let () = incr free_id_for_cc1 in x
+        | h :: t -> let () = available_in_cc1.(ty) <- t in h in
+      img,
+      (((match Renaming.add o img inj1 with Some x -> x | None -> assert false),
+        free_id'),
+       (match Renaming.add j img inj2 with Some x -> x | None -> assert false),
+       (todos1,(j,img)::todos2)) in
+  let get_cc1 i ((inj1,free_id),inj2,(todos1,todos2) as pack) =
+    if Renaming.mem i inj1 then (Renaming.apply inj1 i,pack)
+    else
+      let ty = find_ty cc1 i in
+      let img,free_id' =
+        match available_ids.(ty) with
+        | [] -> free_id,succ free_id
+        | h :: t -> let () = available_ids.(ty) <- t in
+          h,free_id in
+      let () = used_ids.(ty) <- img :: used_ids.(ty) in
+      img,
+      (((match Renaming.add i img inj1 with Some x -> x | None -> assert false),
+        free_id'),inj2,((i,img)::todos1,todos2)) in
+  let pack',internals,links =
+    let rec glue pack inj2 internals links = function
+      | [], [] -> (pack,internals,links)
+      | [], (i,j) :: todos2 ->
+        let linksi = Mods.IntMap.find_default [||] i cc2.links in
+        let intso =
+          Array.copy (Mods.IntMap.find_default [||] i cc2.internals) in
+        let linkso = Array.copy linksi in
+        let (pack',inj2',todos') =
+        Tools.array_fold_lefti
+          (fun k acc -> function
+             | (UnSpec | Free) -> acc
+             | Link (n,s) ->
+               let n',acc' = get_cc2 n acc in
+               let () = linkso.(k) <- Link (n',s) in acc')
+          (pack,inj2,([],todos2)) linksi in
+        glue pack' inj2' (Mods.IntMap.add j intso internals)
+          (Mods.IntMap.add j linkso links) todos'
+      | (i,j) :: todos1, todos2 ->
+        let linksi = Mods.IntMap.find_default [||] i cc1.links in
+        let intsi = Mods.IntMap.find_default [||] i cc1.internals in
+        let intso = Array.copy intsi in
+        let linkso = Array.copy linksi in
+        let (pack',inj2',todos') =
+          match Mods.IntMap.find_option j cc2.links with
+          | None ->
+            Tools.array_fold_lefti
+              (fun k acc -> function
+                 | (UnSpec | Free) -> acc
+                 | Link (n,s) ->
+                   let n',acc' = get_cc1 n acc in
+                   let () = linkso.(k) <- Link (n',s) in acc')
+              (pack,inj2,(todos1,todos2)) linksi
+          | Some linksj ->
+            let intsj = Mods.IntMap.find_default [||] j cc2.internals in
+            let () =
+              Array.iteri
+                (fun k v -> if v  <> -1 then intso.(k) <- v) intsj in
+            Tools.array_fold_lefti
+              (fun k acc -> function
+                 | Free -> acc
+                 | Link (n,s) ->
+                   let n',acc' = get_cc1 n acc in
+                   let () = linkso.(k) <- Link (n',s) in acc'
+                 | UnSpec -> match linksj.(k) with
+                   | UnSpec -> acc
+                   | Free -> let () = linkso.(k) <- Free in acc
+                   | Link (n,s) ->
+                     let n',acc' = get_cc2 n acc in
+                     let () = linkso.(k) <- Link (n',s) in acc')
+              (pack,inj2,(todos1,todos2)) linksi in
+        glue pack' inj2' (Mods.IntMap.add j intso internals)
+          (Mods.IntMap.add j linkso links) todos' in
+    glue (inj1_to_2,free_id) (Renaming.identity (Mods.IntSet.elements img))
+         Mods.IntMap.empty Mods.IntMap.empty (Renaming.to_list inj1_to_2,[]) in
+  let nodes_by_type = Array.map (List.sort Mods.int_compare) used_ids in
+  let () =
+    Array.iteri
+      (fun i x -> reserved_ids.(i) <-
+          Tools.list_merge_uniq Mods.int_compare nodes_by_type.(i) x)
+      available_ids in
+  (pack',
+   {
+     nodes_by_type; links; internals;
+     recogn_nav = raw_to_navigation false nodes_by_type internals links;
+   })
+
+let build_navigation_between inj_d_to_o cc_o cc_d =
   let rec handle_links discovered next_round recogn intern = function
     | [] ->
       if next_round = [] then (List.rev_append recogn intern)
@@ -474,8 +587,7 @@ end = struct
   let print f env =
     let pp_point p_id f p =
       Format.fprintf
-        f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
-        (Pp.list Pp.space Format.pp_print_int) p.fathers
+        f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
         (print_cc ~sigs:env.sig_decl ~cc_id:p_id) p.content
         (fun f ->
            match p.is_obs_of with
@@ -490,8 +602,7 @@ end = struct
            (fun f s ->
               Format.fprintf
                 f "@[%a(%a)@ %i@]"
-                (Pp.list Pp.empty
-                   (Navigation.print_step env.sig_decl (find_ty p.content)))
+                (Navigation.print env.sig_decl (find_ty p.content))
                 s.next
                 Renaming.print s.inj s.dst))
         p.sons in
@@ -530,269 +641,6 @@ let embeddings_to_fully_specified domain a_id b =
       match are_compatible ~strict:false h a ag b with
       | None -> acc
       | Some r -> r::acc) [] b.nodes_by_type.(ty)
-
-exception Found
-
-let remove_ag_cc inj2cc cc ag_id =
-  let ty = find_ty cc ag_id in
-  match cc.nodes_by_type.(ty) with
-  | [] -> assert false
-  | max :: tail as list ->
-    let cycle =
-      Renaming.cyclic_permutation_from_list
-        ~stop_at:ag_id list in
-    let to_subst = Renaming.compose true inj2cc cycle in
-    let new_nbt =
-      Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
-    let new_ints,prelinks =
-      if Renaming.is_identity to_subst then
-        Mods.IntMap.remove ag_id cc.internals, Mods.IntMap.remove ag_id cc.links
-      else
-        let swip map =
-          let map' =
-            List.fold_right
-              (fun (s,d) map ->
-                 if s = max || s = d then map else
-                   let tmp = Mods.IntMap.find_default [||] max map in
-                   let map' = Mods.IntMap.add
-                       max (Mods.IntMap.find_default [||] s map) map in
-                   Mods.IntMap.add s tmp map') (Renaming.to_list cycle) map in
-          Mods.IntMap.remove max map' in
-        swip cc.internals,swip cc.links in
-    let new_links =
-      Mods.IntMap.map
-        (fun a -> Array.map (function
-             | (UnSpec | Free) as x -> x
-             | Link (n,_) when n = ag_id -> UnSpec
-             | Link (n,s) as x ->
-               try Link (Renaming.apply cycle n,s)
-               with Renaming.Undefined -> x) a) prelinks in
-    { nodes_by_type = new_nbt;
-      links = new_links; internals = new_ints;
-      recogn_nav = raw_to_navigation false new_nbt new_ints new_links},
-    to_subst
-
-let update_cc inj2cc cc ag_id links internals =
-  if
-    Array.fold_left
-      (fun x -> function UnSpec -> x | (Free | Link _) -> false) true links
-    && Array.fold_left (fun x i -> x && i < 0) true internals
-  then true,remove_ag_cc inj2cc cc ag_id
-  else
-    let new_ints = Mods.IntMap.add ag_id internals cc.internals in
-    let new_links = Mods.IntMap.add ag_id links cc.links in
-    false,({ nodes_by_type = cc.nodes_by_type;
-             internals = new_ints;
-             links = new_links;
-             recogn_nav =
-               raw_to_navigation false cc.nodes_by_type new_ints new_links},
-           inj2cc)
-
-let compute_cycle_edges cc =
-  let rec aux don acc path ag_id =
-    Tools.array_fold_lefti
-      (fun i (don,acc as out) ->
-         function
-         | UnSpec | Free -> out
-         | Link (n',i') ->
-       if List.mem n' don then out
-       else
-         let edge = ((Navigation.Existing ag_id,i),
-                     Navigation.ToNode(Navigation.Existing n',i')) in
-         if ag_id = n' then (don, edge::acc)
-         else
-           let rec extract_cycle acc' = function
-             | ((Navigation.Existing n,i),_ as e) :: t ->
-               if n' = n then
-                 if i' = i then out
-                 else (don,edge::e::acc')
-               else extract_cycle (e::acc') t
-             | ((Navigation.Fresh _,_),_) :: _ -> assert false
-             | [] ->
-               let (don',acc') = aux don acc (edge::path) n' in
-               (n'::don',acc') in
-           extract_cycle acc path)
-      (don,acc) (Mods.IntMap.find_default [||] ag_id cc.links) in
-  let rec element i t =
-    if i = Array.length t then [] else
-      match t.(i) with
-      | [] -> element (succ i) t
-      | h :: _ -> snd (aux [] [] [] h) in
-  element 0 cc.nodes_by_type
-
-let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
-  let rec aux ((f_id,env'),out as acc) = function
-    | ((Navigation.Existing n,i),
-       Navigation.ToNode(Navigation.Existing n',i')) :: q ->
-      let links = Mods.IntMap.find_default [||] n cc.links in
-      let int = Mods.IntMap.find_default [||] n cc.internals in
-      let links' = Array.copy links in
-      let () = links'.(i) <- UnSpec in
-      let has_removed,(cc_tmp,inj2cc) =
-        update_cc (identity_injection cc) cc n links' int in
-      let new_n' = Renaming.apply inj2cc n' in
-      let links_dst = Mods.IntMap.find_default [||] new_n' cc_tmp.links in
-      let int_dst = Mods.IntMap.find_default [||] new_n' cc_tmp.internals in
-      let links_dst' = Array.copy links_dst in
-      let () = links_dst'.(i') <- UnSpec in
-      let has_removed',(cc',inj2cc') =
-        update_cc inj2cc cc_tmp new_n' links_dst' int_dst in
-      let e' =
-        if n = n' && has_removed'
-        then
-          (Navigation.Fresh (Renaming.apply inj2cc' n,find_ty cc n),i),
-          Navigation.ToNode (Navigation.Existing (Renaming.apply inj2cc' n),i')
-        else
-          ((if has_removed
-            then Navigation.Fresh (Renaming.apply inj2cc' n,find_ty cc n)
-            else Navigation.Existing (Renaming.apply inj2cc' n)),i),
-          Navigation.ToNode
-            ((if has_removed'
-              then Navigation.Fresh (Renaming.apply inj2cc' n',find_ty cc n')
-              else Navigation.Existing (Renaming.apply inj2cc' n')),i') in
-      let pack,ans =
-        complete_domain_with obs_id dst env' f_id f_id cc' e' inj2cc' in
-      aux (pack,ans::out) q
-    | [] -> acc
-    | (((Navigation.Existing _,_),Navigation.ToNode(Navigation.Fresh _,_)) |
-       ((Navigation.Existing _,_),
-        (Navigation.ToInternal _ | Navigation.ToNothing)) |
-       ((Navigation.Fresh _,_),_))::_ -> assert false in
-  aux ((free_id,env),[]) (compute_cycle_edges cc)
-
-let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
-  let agent_is_removable lp links internals =
-    try
-      let () = Array.iter (fun el -> if el >= 0 then raise Found) internals in
-      let () =
-        Array.iteri
-          (fun i el -> if i<>lp && el<>UnSpec then raise Found) links in
-      true
-    with Found -> false in
-  let remove_one_internal acc ag_id links internals =
-    Tools.array_fold_lefti
-      (fun i ((f_id,env'), out as acc) el ->
-         if el >= 0 then
-           let int' = Array.copy internals in
-           let () = int'.(i) <- -1 in
-           let has_removed,(cc',inj2cc') =
-             update_cc (identity_injection cc) cc ag_id links int' in
-           let pack,ans =
-             complete_domain_with
-               obs_id dst env' f_id f_id cc'
-               (((if has_removed
-                  then Navigation.Fresh
-                      (Renaming.apply inj2cc' ag_id, find_ty cc ag_id)
-                  else Navigation.Existing (Renaming.apply inj2cc' ag_id)),i),
-                Navigation.ToInternal el)
-               inj2cc' in
-           (pack,ans::out)
-         else acc)
-      acc internals in
-  let remove_one_frontier acc ag_id links internals =
-    Tools.array_fold_lefti
-      (fun i ((f_id,env'),out as acc) ->
-         function
-         | UnSpec -> acc
-         | Free ->
-           let links' = Array.copy links in
-           let () = links'.(i) <- UnSpec in
-           let has_removed,(cc',inj2cc') =
-             update_cc (identity_injection cc) cc ag_id links' internals in
-           let pack,ans =
-             complete_domain_with
-               obs_id dst env' f_id f_id cc'
-               (((if has_removed
-                  then Navigation.Fresh
-                      (Renaming.apply inj2cc' ag_id, find_ty cc ag_id)
-                  else Navigation.Existing (Renaming.apply inj2cc' ag_id)),i),
-                Navigation.ToNothing)
-               inj2cc' in
-           (pack,ans::out)
-         | Link (n',i') ->
-           if not (agent_is_removable i links internals) then acc else
-             let links_dst = Mods.IntMap.find_default [||] n' cc.links in
-             let int_dst = Mods.IntMap.find_default [||] n' cc.internals in
-             let links_dst' = Array.copy links_dst in
-             let () = links_dst'.(i') <- UnSpec in
-             let has_removed,(cc',inj2cc') =
-               update_cc (identity_injection cc) cc n' links_dst' int_dst in
-             let cc'',inj2cc'' =
-               remove_ag_cc inj2cc' cc' (Renaming.apply inj2cc' ag_id) in
-             let pack,ans =
-               complete_domain_with
-                 obs_id dst env' f_id f_id cc''
-                 (((if has_removed
-                    then Navigation.Fresh
-                        (Renaming.apply inj2cc'' n', find_ty cc n')
-                    else Navigation.Existing (Renaming.apply inj2cc'' n')),i'),
-                  Navigation.ToNode
-                    (Navigation.Fresh(Renaming.apply inj2cc'' ag_id,find_ty cc ag_id),i))
-                 inj2cc'' in
-             (pack,ans::out))
-      (remove_one_internal acc ag_id links internals) links in
-  let remove_or_remove_one acc ag_id links internals =
-    remove_one_frontier acc ag_id links internals in
-  Mods.IntMap.fold (fun i links acc ->
-      remove_or_remove_one
-        acc i links (Mods.IntMap.find_default [||] i cc.internals))
-    cc.links
-    (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
-
-let find_domain env cc =
-  Mods.IntMap.fold
-    (fun id p -> function
-       | Some _ as out -> out
-       | None -> match equal p.content cc with
-         | None -> None
-         | Some inj -> Some (id,inj,p))
-    env None
-
-let rec complete_domain_with obs_id dst env free_id cc_id cc edge inj_dst2cc =
-  let rec new_son inj_cc2found = function
-    | [] ->
-      [{ dst = dst;
-         next = [Navigation.rename_step inj_cc2found edge];
-         inj = Renaming.compose true inj_dst2cc inj_cc2found;}]
-    | h :: t when
-        h.dst = dst && (h.next = [Navigation.rename_step inj_cc2found edge]) ->
-      h :: t
-    | h :: t -> h :: new_son inj_cc2found t in
-  let known_cc = find_domain env cc in
-  match known_cc with
-  | Some (cc_id', inj_cc_id2cc, point') ->
-    let point'' =
-      {point' with
-       sons = new_son (Renaming.inverse inj_cc_id2cc) point'.sons} in
-    let completed = Mods.IntMap.add cc_id' point'' env in
-    (free_id,completed), cc_id'
-  | None ->
-    let son = new_son (identity_injection cc) [] in
-    add_new_point ?deps:None obs_id env free_id son cc_id cc
-and add_new_point ?deps obs_id env free_id sons cc_id cc =
-  let (free_id'',env'),fathers =
-    compute_father_candidates
-      complete_domain_with obs_id cc_id env
-      (if cc_id = free_id then succ free_id else free_id) cc in
-  let completed =
-    Mods.IntMap.add
-      cc_id
-      {content = cc;sons=sons; fathers = fathers;
-       is_obs_of = if cc_id = obs_id then deps else None;}
-      env' in
-  ((free_id'',completed),cc_id)
-
-let add_domain ~deps (free_id,singles,env) cc_id cc =
-  let nav = to_navigation cc in
-  if nav = [] then
-    match find_root cc with
-    | None -> assert false
-    | Some (_,ty) ->
-      (free_id,Mods.IntMap.add ty (cc_id, snd deps) singles,
-       Mods.IntMap.add cc_id {content= cc; sons=[];fathers=[];is_obs_of=Some deps} env)
-  else
-    let (free_id',env'),_ = add_new_point ~deps cc_id env free_id [] cc_id cc in
-    (free_id',singles,env')
 
 (** Operation to create cc *)
 let check_dangling wk =
@@ -873,94 +721,13 @@ end = struct
   let sigs env = env.sig_decl
 
   let empty_point sigs =
-    {content = empty_cc sigs; is_obs_of = None; fathers = []; sons = [];}
+    {content = empty_cc sigs; is_obs_of = None; sons = [];}
 
-  let rec remove_from_sons level1 todos set rfathers cc_id = function
-    | [] -> todos,rfathers,set
-    | id :: tail ->
-      match Mods.IntMap.find_option id set with
-      | None -> remove_from_sons level1 todos set rfathers cc_id tail
-      | Some cc ->
-        match List.partition (fun t -> t.dst = cc_id) cc.sons with
-        | [], _ -> remove_from_sons level1 todos set rfathers cc_id tail
-        | _x::_,sons ->
-          if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
-            (*let missings = (*TODO*)
-              List.fold_left
-              (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
-              sons in*)
-            let sons'= (*if IntSet.is_empty missings then sons else*) cc.sons in
-            let rfathers'' =
-              (*if IntSet.is_empty missings then rfathers else*) id::rfathers in
-            remove_from_sons
-              level1 (Mods.IntMap.add id cc.fathers todos)
-              (Mods.IntMap.add id {cc with sons = sons'} set)
-              rfathers'' cc_id tail
-          else
-            let todos',rfathers',set' =
-              remove_from_sons
-            level1 (Mods.IntMap.remove id todos) set [] id cc.fathers in
-            let rfathers,set'' =
-              match rfathers' with
-              | _ :: _ ->
-                id::rfathers,
-                Mods.IntMap.add id {cc with fathers = rfathers'} set'
-              | [] -> rfathers,Mods.IntMap.remove id set' in
-            remove_from_sons level1 todos' set'' rfathers cc_id tail
-  let rec scan_sons level1 todos set (injs,rfathers,cands) cc_id p = function
-    | [] ->
-      let rfathers' =
-        List.fold_left (fun acc (_,i) -> i::acc) rfathers cands in
-      todos,Mods.IntMap.add cc_id {p with fathers = rfathers'} set
-    | id :: tail ->
-      match Mods.IntMap.find_option id set with
-      | None -> scan_sons level1 todos set (injs,rfathers,cands) cc_id p tail
-      | Some cc ->
-        let injs',cands',tail' =
-          List.fold_left
-            (fun (l,c,t as acc) s ->
-               if s.dst = cc_id then
-                 let oui,non =
-                   List.partition
-                     (fun (x,_) -> Renaming.equal x s.inj) c in
-                 s.inj::l,non,Tools.list_rev_map_append snd oui t
-               else acc)
-            ([],cands,tail) cc.sons in
-        if List.length injs' > 1 || List.length cc.sons > 1
-           || cc.is_obs_of <> None || List.mem id level1
-        then
-          scan_sons level1 (Mods.IntMap.add id cc.fathers todos) set
-            (injs'@injs,id::rfathers,cands') cc_id p tail'
-        else
-          let rroots =
-            List.filter
-              (fun r -> not (List.exists (Renaming.equal r) injs)) injs' in
-          let cands'' =
-            List.fold_left
-              (fun c r ->
-                 if List.exists (fun (x,_) -> Renaming.equal x r) c
-                 then c else (r,id)::c)
-              cands rroots in
-          if cands == cands'' then
-            let todos',rfathers',set' =
-              remove_from_sons
-                level1 (Mods.IntMap.remove id todos) set [] id cc.fathers in
-            let rr,set'',tail'' =
-              match rfathers' with
-              | _ :: _ ->
-                (injs'@injs,id::rfathers,cands'),
-                Mods.IntMap.add id {cc with fathers = rfathers'} set',tail'
-              | [] -> (injs,rfathers,cands),Mods.IntMap.remove id set',tail in
-            scan_sons level1 todos' set'' rr cc_id p tail''
-          else
-            scan_sons level1 todos set (injs,rfathers,cands'') cc_id p tail
-
-  let finalize env =
-    let sigs = env.sig_decl in
+  let fill_elem sigs bottom =
     let elementaries =
-      Array.init (Array.length env.id_by_type)
+      Array.init (Signature.size sigs)
         (fun i -> Array.make (Signature.arity sigs i) []) in
-    let fill_elem =
+    let () =
       List.iter (fun p ->
           match p.element.recogn_nav with
           | [] | ((Navigation.Existing _,_),_) :: _ -> assert false
@@ -977,41 +744,74 @@ end = struct
                 sa2.(s2) <- (step,p.p_id) :: sa2.(s2)
             | Navigation.ToNode (Navigation.Existing _,s2) ->
               sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
-            | Navigation.ToNothing | Navigation.ToInternal _ -> ()) in
-    let () = fill_elem (Mods.IntMap.find_default [] 1 env.domain) in
-    let _,single_agent_points,domain =
+            | Navigation.ToNothing | Navigation.ToInternal _ -> ())
+    bottom in
+    elementaries
+
+  let finalize env =
+    let singles = (Mods.IntMap.find_default [] 1 env.domain) in
+    let elementaries = fill_elem env.sig_decl singles in
+    let domain1 =
+      List.fold_left
+        (fun acc x ->
+           Mods.IntMap.add x.p_id
+             { content = x.element; sons = [];
+               is_obs_of = Some (x.roots,x.depending);} acc)
+        Mods.IntMap.empty singles in
+    let s =
       Mods.IntMap.fold
-        (fun _ x acc ->
-           List.fold_left
-             (fun acc p ->
-                add_domain ~deps:(p.roots,p.depending) acc p.p_id p.element)
-             acc x)
-        env.domain
-        (fresh_id env,Mods.IntMap.empty,
-         Mods.IntMap.add 0 (empty_point env.sig_decl) Mods.IntMap.empty) in
-    let level1 = match Mods.IntMap.find_option 0 domain with
-      | None -> assert false
-      | Some zero -> List.map (fun p -> p.dst) zero.sons in
-    let rec iter (todos,env) =
-      if Mods.IntMap.is_empty todos then env else
-        let out =
-          Mods.IntMap.fold
-            (fun id fa (todos,s) ->
-               match Mods.IntMap.find_option id s with
-               | None -> (todos,s)
-               | Some p -> scan_sons level1 todos s ([],[],[]) id p fa)
-            todos (Mods.IntMap.empty,env) in
-        iter out in
-    let tops =
-      Mods.IntMap.fold
-        (fun id p s ->
-           if p.sons = [] && not (List.mem id level1)
-           then Mods.IntMap.add id p.fathers s else s)
-        domain Mods.IntMap.empty in
-    let s' = iter (tops,domain) in
-    let si = match Mods.IntMap.max_key s' with Some i -> succ i | None -> 0 in
-    let domain = Array.make si (empty_point env.sig_decl) in
-    let () = Mods.IntMap.iter (fun i p -> domain.(i) <- p) s' in
+        (fun level l acc ->
+           if level < 2 then acc else
+             List.fold_left (fun acc x ->
+                 let acc' =  Mods.IntMap.add x.p_id
+                     { content = x.element; sons = [];
+                       is_obs_of = Some (x.roots,x.depending);} acc in
+                 List.fold_left (fun acc e ->
+                     match matchings e.element x.element with
+                     | [] -> acc
+                     | injs ->
+                       match Mods.IntMap.find_option e.p_id acc with
+                       | None -> assert false
+                       | Some pe ->
+                         let () = pe.sons <-
+                             List.fold_left
+                               (fun tr inj_e_x ->
+                                  let (inj_e2sup,_),sup =
+                                    merge_compatible env.id_by_type env.nb_id
+                                      inj_e_x e.element x.element in
+                                  match equal sup x.element with
+                                  | None -> assert false
+                                  | Some inj_sup2x ->
+                                    let inj =
+                                      Renaming.inverse
+                                        (Renaming.compose
+                                           false inj_e2sup inj_sup2x) in
+                                    {dst = x.p_id; inj;
+                                     next =
+                                       build_navigation_between
+                                         inj e.element x.element}::tr)
+                               pe.sons injs in
+                         acc
+                   ) acc' singles) acc l)
+        env.domain domain1 in
+    let level0 = Mods.IntMap.find_default [] 0 env.domain in
+    let si =
+      List.fold_left (fun m p -> max m p.p_id)
+        (match Mods.IntMap.max_key s with Some i -> i | None -> 0)
+        level0 in
+    let domain = Array.make (succ si) (empty_point env.sig_decl) in
+    let () = Mods.IntMap.iter (fun i p -> domain.(i) <- p) s in
+    let single_agent_points =
+      List.fold_left
+        (fun acc p ->
+           match find_root p.element with
+           | None -> acc
+           | Some (_,ty) ->
+             let () = domain.(p.p_id) <-
+                 { content = p.element; is_obs_of = Some (p.roots,p.depending);
+                   sons = []; } in
+             Mods.IntMap.add ty (p.p_id,p.depending) acc)
+        Mods.IntMap.empty level0 in
     {
       Env.sig_decl = env.sig_decl;
       Env.id_by_type =env.id_by_type;
