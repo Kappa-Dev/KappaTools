@@ -118,7 +118,7 @@ let compatible_point inj e e' =
 
 let rec aux_sub inj goal acc = function
   | [] -> None
-  | h :: t -> match compatible_point inj h goal with
+  | h :: t -> match compatible_point inj goal h with
     | None -> aux_sub inj goal (h::acc) t
     | Some inj' -> Some (inj',List.rev_append acc t)
 let rec is_subnavigation inj nav = function
@@ -127,19 +127,28 @@ let rec is_subnavigation inj nav = function
     | None -> None
     | Some (inj',nav') -> is_subnavigation inj' nav' t
 
-let rename_id ?but inj2cc = function
-  | Fresh _ as x -> x
-  | Existing n as x ->
-    match but with
-    | Some n' when n = n' -> x
-    | _ -> Existing (Renaming.apply inj2cc n)
 
-let rename_step inj2cc = function
-  | ((x,i), (ToNothing | ToInternal _ as a)) -> ((rename_id inj2cc x,i),a)
-  | ((Fresh (but,_) as x,i),ToNode (y,j)) ->
-    ((x,i),ToNode (rename_id ~but inj2cc y,j))
-  | ((Existing n,i),ToNode (y,j)) ->
-    ((Existing (Renaming.apply inj2cc n),i),ToNode (rename_id inj2cc y,j))
+let rename_id inj2cc = function
+  | Existing n -> inj2cc,Existing (Renaming.apply inj2cc n)
+  | Fresh (id,ty) ->
+    let id' = match Mods.IntSet.max_elt (Renaming.image inj2cc) with
+      | None -> 1
+      | Some i -> succ i in
+    match Renaming.add id id' inj2cc with
+    | None -> assert false
+    | Some inj' -> inj',Fresh (id',ty)
+
+let rec rename inj2cc = function
+  | [] -> inj2cc,[]
+  | ((x,i), (ToNothing | ToInternal _ as a)) :: t ->
+    let inj,x' = rename_id inj2cc x in
+    let inj',t' = rename inj t in
+    inj',((x',i),a)::t'
+  | ((x,i),ToNode (y,j)) :: t->
+    let inj,x' = rename_id inj2cc x in
+    let inj',y' = rename_id inj y in
+    let inj'',t' = rename inj' t in
+    inj'',((x',i),ToNode (y',j))::t'
 
 let check_edge graph = function
   | ((Fresh (id,_),site),ToNothing) -> Edges.is_free id site graph

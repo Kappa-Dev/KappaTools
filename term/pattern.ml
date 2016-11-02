@@ -748,6 +748,24 @@ end = struct
     bottom in
     elementaries
 
+  let insert_navigation domain dst inj_dst2nav p_id nav =
+    let rec insert_nav_aux inj_point2nav p_id nav =
+      let point = domain.(p_id) in
+      let rec insert_nav_sons = function
+        | [] ->
+          let full_inj_n2p,next =
+            Navigation.rename (Renaming.inverse inj_point2nav) nav in
+          let inj = Renaming.compose false inj_dst2nav full_inj_n2p in
+          point.sons <- {dst; inj; next} :: point.sons
+        | h :: t ->
+          match Navigation.is_subnavigation inj_point2nav nav h.next with
+          | None -> insert_nav_sons t
+          | Some (inj,nav') ->
+            if h.dst = dst then insert_nav_sons []
+            else insert_nav_aux (Renaming.compose false h.inj inj) h.dst nav' in
+        insert_nav_sons point.sons in
+    insert_nav_aux (identity_injection domain.(p_id).content) p_id nav
+
   let finalize env =
     let si =
       Mods.IntMap.fold
@@ -775,25 +793,23 @@ end = struct
                      match matchings e.element x.element with
                      | [] -> ()
                      | injs ->
-                       let pe = domain.(e.p_id) in
-                       pe.sons <-
-                         List.fold_left
-                           (fun tr inj_e_x ->
-                              let (inj_e2sup,_),sup =
-                                merge_compatible env.id_by_type env.nb_id
-                                  inj_e_x e.element x.element in
-                              match equal sup x.element with
-                              | None -> assert false
-                              | Some inj_sup2x ->
-                                let inj =
-                                  Renaming.inverse
-                                    (Renaming.compose
-                                       false inj_e2sup inj_sup2x) in
-                                {dst = x.p_id; inj;
-                                 next =
-                                   build_navigation_between
-                                     inj e.element x.element}::tr)
-                           pe.sons injs
+                       List.iter
+                         (fun inj_e_x ->
+                            let (inj_e2sup,_),sup =
+                              merge_compatible env.id_by_type env.nb_id
+                                inj_e_x e.element x.element in
+                            match equal sup x.element with
+                            | None -> assert false
+                            | Some inj_sup2x ->
+                              let inj =
+                                Renaming.inverse
+                                  (Renaming.compose
+                                     false inj_e2sup inj_sup2x) in
+                              let nav = build_navigation_between
+                                  inj e.element x.element in
+                              insert_navigation domain x.p_id inj e.p_id nav
+                         )
+                           injs
                    ) singles) l)
         env.domain in
     let level0 = Mods.IntMap.find_default [] 0 env.domain in

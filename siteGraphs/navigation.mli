@@ -15,14 +15,14 @@ type t = step list
 val print : Signature.s -> (int -> int) -> Format.formatter -> t -> unit
 (** [print signatures find_existing_type nav] *)
 
-val rename_step : Renaming.t -> step -> step
+val rename : Renaming.t -> t -> Renaming.t * t
 
 val compatible_point : Renaming.t -> step -> step -> Renaming.t option
 (** Retuns the extension of the given injections so that the second edge
     is the image of the first *)
 
 val is_subnavigation : Renaming.t -> t -> t -> (Renaming.t * t) option
-(** [is_subnavigation inj_nav2sub nav subpart] *)
+(** [is_subnavigation inj_sub2nav nav subpart] *)
 
 val check_edge : Edges.t -> step -> bool
 val injection_for_one_more_edge :
