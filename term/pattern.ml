@@ -749,58 +749,54 @@ end = struct
     elementaries
 
   let finalize env =
+    let si =
+      Mods.IntMap.fold
+        (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l)
+        env.domain 0 in
+    let domain = Array.make (succ si) (empty_point env.sig_decl) in
     let singles = (Mods.IntMap.find_default [] 1 env.domain) in
     let elementaries = fill_elem env.sig_decl singles in
-    let domain1 =
-      List.fold_left
-        (fun acc x ->
-           Mods.IntMap.add x.p_id
+    let () =
+      List.iter
+        (fun x ->
+           domain.(x.p_id) <-
              { content = x.element; sons = [];
-               is_obs_of = Some (x.roots,x.depending);} acc)
-        Mods.IntMap.empty singles in
-    let s =
-      Mods.IntMap.fold
-        (fun level l acc ->
-           if level < 2 then acc else
-             List.fold_left (fun acc x ->
-                 let acc' =  Mods.IntMap.add x.p_id
+               is_obs_of = Some (x.roots,x.depending); })
+        singles in
+    let () =
+      Mods.IntMap.iter
+        (fun level l ->
+           if level > 1 then
+             List.iter (fun x ->
+                 let () =  domain.(x.p_id) <-
                      { content = x.element; sons = [];
-                       is_obs_of = Some (x.roots,x.depending);} acc in
-                 List.fold_left (fun acc e ->
+                       is_obs_of = Some (x.roots,x.depending);} in
+                 List.iter (fun e ->
                      match matchings e.element x.element with
-                     | [] -> acc
+                     | [] -> ()
                      | injs ->
-                       match Mods.IntMap.find_option e.p_id acc with
-                       | None -> assert false
-                       | Some pe ->
-                         let () = pe.sons <-
-                             List.fold_left
-                               (fun tr inj_e_x ->
-                                  let (inj_e2sup,_),sup =
-                                    merge_compatible env.id_by_type env.nb_id
-                                      inj_e_x e.element x.element in
-                                  match equal sup x.element with
-                                  | None -> assert false
-                                  | Some inj_sup2x ->
-                                    let inj =
-                                      Renaming.inverse
-                                        (Renaming.compose
-                                           false inj_e2sup inj_sup2x) in
-                                    {dst = x.p_id; inj;
-                                     next =
-                                       build_navigation_between
-                                         inj e.element x.element}::tr)
-                               pe.sons injs in
-                         acc
-                   ) acc' singles) acc l)
-        env.domain domain1 in
+                       let pe = domain.(e.p_id) in
+                       pe.sons <-
+                         List.fold_left
+                           (fun tr inj_e_x ->
+                              let (inj_e2sup,_),sup =
+                                merge_compatible env.id_by_type env.nb_id
+                                  inj_e_x e.element x.element in
+                              match equal sup x.element with
+                              | None -> assert false
+                              | Some inj_sup2x ->
+                                let inj =
+                                  Renaming.inverse
+                                    (Renaming.compose
+                                       false inj_e2sup inj_sup2x) in
+                                {dst = x.p_id; inj;
+                                 next =
+                                   build_navigation_between
+                                     inj e.element x.element}::tr)
+                           pe.sons injs
+                   ) singles) l)
+        env.domain in
     let level0 = Mods.IntMap.find_default [] 0 env.domain in
-    let si =
-      List.fold_left (fun m p -> max m p.p_id)
-        (match Mods.IntMap.max_key s with Some i -> i | None -> 0)
-        level0 in
-    let domain = Array.make (succ si) (empty_point env.sig_decl) in
-    let () = Mods.IntMap.iter (fun i p -> domain.(i) <- p) s in
     let single_agent_points =
       List.fold_left
         (fun acc p ->
