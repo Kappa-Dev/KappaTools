@@ -172,14 +172,14 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
   | Some r ->
     if
       (* is_single_agent *)
-      (Array.for_all (fun x -> x = -1)
-         (Mods.IntMap.find_default [||] root1 cc1.internals) &&
-       Array.for_all (fun x -> x = UnSpec)
-         (Mods.IntMap.find_default [||] root1 cc1.links)) &&
-      (Array.for_all (fun x -> x = -1)
-         (Mods.IntMap.find_default [||] root2 cc2.internals) &&
-       Array.for_all (fun x -> x = UnSpec)
-         (Mods.IntMap.find_default [||] root2 cc2.links))
+      (Array.fold_left (fun b x -> b && x = -1)
+         true (Mods.IntMap.find_default [||] root1 cc1.internals) &&
+       Array.fold_left (fun b x -> b && x = UnSpec)
+         true (Mods.IntMap.find_default [||] root1 cc1.links)) &&
+      (Array.fold_left (fun b x -> b && x = -1)
+         true (Mods.IntMap.find_default [||] root2 cc2.internals) &&
+       Array.fold_left (fun b x -> b && x = UnSpec)
+         true (Mods.IntMap.find_default [||] root2 cc2.links))
     then Some r
     else aux false r [root1,root2]
 
