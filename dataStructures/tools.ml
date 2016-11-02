@@ -124,7 +124,7 @@ let rec list_fold_left2 f x l1 l2 =
   | [], _ :: _ | _ :: _, [] -> raise (Invalid_argument "list_fold_left2")
   | h1::t1, h2::t2 -> list_fold_left2 f (f x h1 h2) t1 t2
 
-let list_random l = List.nth l (Random.int (List.length l))
+let list_random rs l = List.nth l (Random.State.int rs (List.length l))
 
 let array_fold_left_mapi f x a =
   let y = ref x in

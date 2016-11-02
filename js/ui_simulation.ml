@@ -99,7 +99,8 @@ let create_parameter () =
   { Api_types_v1_j.code = React.S.value Ui_state.model_text;
     Api_types_v1_j.plot_period = React.S.value Ui_state.model_plot_period;
     Api_types_v1_j.max_time = React.S.value Ui_state.model_max_time;
-    Api_types_v1_j.max_events = React.S.value Ui_state.model_max_events
+    Api_types_v1_j.max_events = React.S.value Ui_state.model_max_events;
+    Api_types_v1_j.seed = React.S.value Ui_state.model_seed;
   }
 
 let rec update_simulation (t : t) : unit Lwt.t =

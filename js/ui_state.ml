@@ -15,6 +15,8 @@ let model_max_events, set_model_max_events =
   React.S.create (None : int option)
 let model_max_time, set_model_max_time =
   React.S.create (None : float option)
+let model_seed, set_model_seed =
+  React.S.create (None : int option)
 let model_plot_period, set_model_plot_period = React.S.create 1.
 let opened_filename, set_opened_filename =
   React.S.create "model.ka"

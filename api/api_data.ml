@@ -112,6 +112,7 @@ let api_parameter (parameter : Api_types_v1_j.parameter) : Api_types_j.simulatio
 { Api_types_j.simulation_plot_period = parameter.Api_types_v1_j.plot_period ;
   Api_types_j.simulation_max_time = parameter.Api_types_v1_j.max_time ;
   Api_types_j.simulation_max_events = parameter.Api_types_v1_j.max_events ;
+  Api_types_j.simulation_seed = parameter.Api_types_v1_j.seed ;
   Api_types_j.simulation_id = "ignore" ; }
 
 let api_flux_map (flux_map : Api_types_j.flux_map) : Api_types_v1_j.flux_map =

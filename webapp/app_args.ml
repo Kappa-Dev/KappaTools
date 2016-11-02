@@ -1,29 +1,18 @@
-open Lwt
-open Unix
-open Lwt_log
-
-type t = {   mutable seed_value : int option; }
-let default : t = { seed_value = None; }
-
-let options (t :t)  : (string * Arg.spec * string) list = [
+let options ()  : (string * Arg.spec * string) list = [
   ("--version",
    Arg.Unit
      (fun () ->
         Format.print_string Version.version_msg ;
-	Format.print_newline () ;
+        Format.print_newline () ;
         exit 0),
    "display KaSim version");
-  ("-seed",
-   Arg.Int
-     (fun i -> t.seed_value <- Some i),
-   "Seed for the random number generator") ;
   ("--log",
    Arg.String
      (fun file_name ->
-	if file_name = "-" then
+       if file_name = "-" then
    let _ =
      Lwt_log.channel
-		  ~close_mode:(`Keep)
+       ~close_mode:(`Keep)
     ~channel:(Lwt_io.stderr) ()
    in
    ()

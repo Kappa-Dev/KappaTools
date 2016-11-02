@@ -1,10 +1,8 @@
 module ApiTypes = Api_types_v1_j
 
-open Lwt
-open Cohttp_lwt_unix
-open Request
+open Lwt.Infix
+open Cohttp_lwt_unix.Request
 open Unix
-open Lwt_log
 
 let logger (handler : Cohttp_lwt_unix.Server.conn ->
             Cohttp.Request.t ->
@@ -16,14 +14,14 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   (Lwt.catch
      (fun () -> handler conn request body)
-     (fun exn -> fatal ~exn "" >>=
+     (fun exn -> Lwt_log.fatal ~exn "" >>=
        (fun () -> Lwt.fail exn))
   )
   >>=
   (fun (response,body) ->
      let ip : string =
        match fst conn with
-         Conduit_lwt_unix.TCP {Conduit_lwt_unix.fd; _} ->
+       | Conduit_lwt_unix.TCP {Conduit_lwt_unix.fd; _} ->
          (match Lwt_unix.getpeername fd with
           | Lwt_unix.ADDR_INET (ia,port) ->
             Printf.sprintf
@@ -38,7 +36,7 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
      let request_method : string =
        Cohttp.Code.string_of_method request.meth
      in
-     let uri : Uri.t = Request.uri request in
+     let uri : Uri.t = Cohttp_lwt_unix.Request.uri request in
      let request_path : string = Uri.path uri in
      let response_code : string =
        Cohttp.Code.string_of_status
@@ -57,38 +55,14 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
 
 let server =
   let common_args = Common_args.default in
-  let app_args = App_args.default in
   let websim_args = Websim_args.default in
-  let options = App_args.options app_args @
+  let options = App_args.options () @
                 Websim_args.options websim_args @
                 Common_args.options common_args
   in
   let usage_msg : string = "kappa webservice" in
   let () = Arg.parse options (fun _ -> ()) usage_msg in
   let () = Printexc.record_backtrace common_args.Common_args.backtrace in
-  let theSeed =
-    match app_args.App_args.seed_value with
-    | Some seed -> seed
-    | None ->
-      begin
-        Lwt.ignore_result
-          (Lwt_log_core.log
-             ~level:Lwt_log_core.Info
-             "+ Self seeding...@.");
-        Random.self_init() ;
-        Random.bits ()
-      end
-  in
-  let () =
-    Random.init theSeed ;
-    Lwt.ignore_result
-      (Lwt_log_core.log
-         ~level:Lwt_log_core.Info
-         (Printf.sprintf
-            "+ Initialized random number generator with seed %d@."
-            theSeed)
-      )
-  in
   let mode = match websim_args.Websim_args.cert_dir with
     | None -> `TCP (`Port websim_args.Websim_args.port)
     | Some dir ->
@@ -105,9 +79,9 @@ let server =
       ~shutdown_key:websim_args.Websim_args.shutdown_key
       ()
   in
-  Server.create
+  Cohttp_lwt_unix.Server.create
     ~mode
-    (Server.make
+    (Cohttp_lwt_unix.Server.make
        ~callback:
        (logger
           (match websim_args.Websim_args.api with

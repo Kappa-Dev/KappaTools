@@ -452,6 +452,8 @@ end = struct
                                         parameter.Api_types_v1_j.max_time ;
                                       Api_types_j.simulation_max_events =
                                         parameter.Api_types_v1_j.max_events ;
+                                      Api_types_j.simulation_seed =
+                                        parameter.Api_types_v1_j.seed ;
                                       Api_types_j.simulation_id =
                                         simulation_id ;
                                     })

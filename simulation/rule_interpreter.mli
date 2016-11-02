@@ -10,7 +10,7 @@ type result = Clash | Corrected | Success of (int option * t)
 
 val empty :
   ?story_compression:((bool * bool * bool) * bool) ->
-  store_distances:bool -> Environment.t -> t
+  store_distances:bool -> Random.State.t -> Environment.t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Environment.get_alg] but it is not hard
@@ -72,6 +72,8 @@ resynchronizing. (This is what initial state and perturbations do.) *)
 val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
 
 val print : Environment.t -> Format.formatter -> t -> unit
+
+val get_random_state : t -> Random.State.t
 
 (** {6 Stories} *)
 

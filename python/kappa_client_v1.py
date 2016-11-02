@@ -66,6 +66,8 @@ class KappaRuntime(object):
             parameter['max_time'] = None
         if not 'max_events' in parameter:
             parameter['max_events'] = None
+        if not 'seed' in parameter:
+            parameter['seed'] = None
         code = json.dumps(parameter)
         method = "POST"
         handler = urllib.request.HTTPHandler()
@@ -173,22 +175,25 @@ def main():
     max_time = 10.0
     max_events = 10
     plot_period = 0.1
+    seed = None
 
     try:
         opts, args = getopt.getopt(argv,
-                                   "hk:u:t:e:p",
+                                   "hk:u:t:e:pp:s",
                                    ["kappafile=",
                                     "url=",
                                     "max_time=",
                                     "max_events=",
-                                    "plot_period=",])
+                                    "plot_period=",
+                                    "seed=",])
     except :
         print (cmd+
                   +' -k <kappafile> '
                   +' -u <url> '
                   +' -t <max_time> '
                   +' -e <max_events> '
-                  +' -pp <plot_period> ')
+                  +' -pp <plot_period> '
+                  +' -s <random_seed> ')
 
         sys.exit(2)
 
@@ -206,12 +211,15 @@ def main():
             max_events = int(arg)
         elif opt in ("-pp", "--plot_period"):
             plot_period = float(arg)
+        elif opt in ("-s", "--seed"):
+            seed = int(arg)
 
     print ('Input file is : {0} '.format(inputfile))
     print ('Endpoint url : {0} '.format(url))
     print ('Max time : {0}'.format(max_time))
     print ('Max events : {0} '.format(max_events))
     print ('Plot period : {0} '.format(plot_period))
+    print ('Random seed : {0} '.format(seed))
 
     try :
         runtime = KappaRuntime(url)
@@ -220,8 +228,9 @@ def main():
                 code = f.read()
                 token = runtime.start({'code': code,
                                        'plot_period': plot_period,
-                                       'max_time' : max_time ,
-                                       'max_events' : max_events })
+                                       'max_time' : max_time,
+                                       'max_events' : max_events,
+                                       'seed' : seed})
                 status = runtime.status(token)
                 while status['is_running']:
                     time.sleep(1)

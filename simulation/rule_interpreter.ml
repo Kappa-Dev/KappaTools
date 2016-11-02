@@ -14,6 +14,8 @@ type t =
     edges: Edges.t;
     tokens: Nbr.t array;
     outdated_elements: Operator.DepSet.t * bool;
+
+    random_state : Random.State.t;
     story_machinery :
       (((bool*bool*bool)*bool) *
        (Trace.event_kind * Pattern.id array *
@@ -25,7 +27,7 @@ type t =
 
 type result = Clash | Corrected | Success of (int option * t)
 
-let empty ?story_compression ~store_distances env =
+let empty ?story_compression ~store_distances random_state env =
   let with_connected_components =
     not (Pattern.Set.is_empty
            (Environment.connected_components_of_unary_rules env)) in
@@ -37,6 +39,7 @@ let empty ?story_compression ~store_distances env =
     edges = Edges.empty ~with_connected_components;
     tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
     outdated_elements = Operator.DepSet.empty,false;
+    random_state;
     story_machinery =
       (match story_compression with
        | Some ((none,weak,strong),dump as story_compression) ->
@@ -396,6 +399,7 @@ let update_edges
     matchings_of_rule = state.matchings_of_rule;
     edges = edges''; tokens = state.tokens;
     outdated_elements = rev_deps,mod_connectivity;
+    random_state = state.random_state;
     story_machinery = story_machinery';
     store_distances = state.store_distances; }
 
@@ -527,7 +531,8 @@ let apply_unary_rule
   let domain = Environment.domain env in
   let inj,path =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
-    | Some l -> let inj,path = Tools.list_random l in Some inj,path
+    | Some l ->
+      let inj,path = Tools.list_random state.random_state l in Some inj,path
     | None ->
       let map1 =
         Pattern.Map.find_default
@@ -550,14 +555,14 @@ let apply_unary_rule
                  rtree in
              (),())
           map1 map2 () in
-      let cc_id,_ = Random_tree.random rtree in
+      let cc_id,_ = Random_tree.random state.random_state rtree in
       let root1 =
         Tools.unsome (-1)
-          (Mods.IntSet.random
+          (Mods.IntSet.random state.random_state
              (Mods.IntMap.find_default Mods.IntSet.empty cc_id map1)) in
       let root2 =
         Tools.unsome (-1)
-          (Mods.IntSet.random
+          (Mods.IntSet.random state.random_state
              (Mods.IntMap.find_default Mods.IntSet.empty cc_id map2)) in
       let () =
         if !Parameter.debugModeOn then
@@ -607,7 +612,7 @@ let apply_rule
     Tools.array_fold_left_mapi
       (fun id inj pattern ->
          let root =
-           match Mods.IntSet.random
+           match Mods.IntSet.random state.random_state
                    (Pattern.Map.find_default
                       Mods.IntSet.empty pattern state.roots_of_patterns) with
            | None -> failwith "Tried to apply_rule with no root"
@@ -625,7 +630,7 @@ let apply_rule
       match Mods.IntMap.find_option id state.matchings_of_rule with
       | Some [] -> assert false
       | Some l ->
-        let (inj,rev_roots) = Tools.list_random l in
+        let (inj,rev_roots) = Tools.list_random state.random_state l in
         Some inj, Tools.array_rev_of_list rev_roots
       | None -> from_patterns () in
   let () =
@@ -674,7 +679,7 @@ let force_rule
             state.roots_of_patterns rule.Primitives.connected_components with
     | [] -> state
     | l ->
-      let (h,_) = Tools.list_random l in
+      let (h,_) = Tools.list_random state.random_state l in
       (transform_by_a_rule
          ~get_alg env unary_patterns counter state event_kind rule h)
 
@@ -827,3 +832,5 @@ let remove_tracked patterns state =
 let generate_stories state =
   Tools.option_map
     (fun (comp,_,steps) -> (comp,List.rev steps)) state.story_machinery
+
+let get_random_state state = state.random_state

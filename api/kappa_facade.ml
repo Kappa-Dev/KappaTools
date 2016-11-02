@@ -129,6 +129,7 @@ let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
       | exn -> handler (Api_data.api_exception_errors exn))
 
 let build_ast
+    (random_state : Random.State.t)
     (code : string)
     (yield : unit -> unit Lwt.t) =
   let lexbuf : Lexing.lexbuf = Lexing.from_string code in
@@ -176,7 +177,8 @@ let build_ast
                        create_t
                          ~contact_map:contact_map
                          ~env:env
-                         ~graph:(Rule_interpreter.empty ~store_distances env)
+                         ~graph:(Rule_interpreter.empty
+                                   ~store_distances random_state env)
                          ~state:(State_interpreter.empty env [] [])
                          ~store_distances:store_distances
                          ~has_tracking:has_tracking
@@ -222,7 +224,7 @@ let parse
     ~(kappa_code : string)
   : (t,Api_types_j.errors) Api_types_j.result_data Lwt.t
   = Lwt.bind
-    (build_ast kappa_code system_process#yield)
+    (build_ast (Random.State.make_self_init ()) kappa_code system_process#yield)
     (function
       | `Ok simulation -> Lwt.return (`Ok simulation)
       | `Error e -> Lwt.return (`Error e))
@@ -316,6 +318,10 @@ let start
                  t.counter
                  parameter.Api_types_j.simulation_plot_period
              in
+             let random_state =
+               match parameter.Api_types_j.simulation_seed with
+               | None -> Random.State.make_self_init ()
+               | Some seed -> Random.State.make [|seed|] in
              Eval.build_initial_state
                ~bind:(fun x f ->
                    (time_yield ~system_process:system_process ~t:t) >>=
@@ -325,6 +331,7 @@ let start
                t.env
                story_compression
                ~store_distances:t.store_distances
+               random_state
                t.init_l >>=
              (fun (graph,state) ->
                 let () = t.graph <- graph;

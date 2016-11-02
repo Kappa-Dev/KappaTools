@@ -27,7 +27,7 @@ val list_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
 val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
 val list_map_option : ('a -> 'b option) -> 'a list -> 'b list
-val list_random : 'a list -> 'a
+val list_random : Random.State.t -> 'a list -> 'a
 
 (** Set union of 2 sorted list
   When l1 is included in l2:

@@ -30,6 +30,6 @@ val build_initial_state :
   bind:('a -> (Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
   return:(Rule_interpreter.t * State_interpreter.t -> 'a) ->
   (int * Alg_expr.t) list -> Counter.t -> Environment.t ->
-  ((bool*bool*bool)*bool) option -> store_distances : bool ->
+  ((bool*bool*bool)*bool) option -> store_distances : bool -> Random.State.t ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
   'a

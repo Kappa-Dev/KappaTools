@@ -215,7 +215,8 @@ let perturbate ~outputs env counter graph state =
   do_until_noop 0 graph state false
 
 let one_rule ~outputs dt stop env counter graph state =
-  let choice,_ = Random_tree.random state.activities in
+  let choice,_ = Random_tree.random
+      (Rule_interpreter.get_random_state graph) state.activities in
   let rule_id = choice/2 in
   let rule = Environment.get_rule env rule_id in
   let register_new_activity rd_id syntax_rd_id new_act =
@@ -306,7 +307,7 @@ let activity state = Random_tree.total state.activities
 
 let a_loop ~outputs env counter graph state =
   let activity = activity state in
-  let rd = Random.float 1.0 in
+  let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
   let dt = abs_float (log rd /. activity) in
 
   let (stop,graph',state' as out) =

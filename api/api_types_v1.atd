@@ -32,7 +32,8 @@ type parameter =
      { code : code;
        plot_period : float;
        max_time : float nullable;
-       max_events : int nullable
+       max_events : int nullable;
+       seed : int nullable;
      }
 type perturbation =
      { perturbation_code : code ; }

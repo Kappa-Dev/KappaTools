@@ -55,8 +55,9 @@ let () =
         let () = Format.printf "+ Self seeding...@." in
         let () = Random.self_init() in
         let out = Random.bits () in
-        out,[|"-seed";string_of_int out|]
-    in Random.init theSeed ;
+        out,[|"-seed";string_of_int out|] in
+    let () = Random.init theSeed (*for reproducible  colors in dot snaphot*) in
+    let random_state = Random.State.make [|theSeed|] in
     let command_line =
       Format.asprintf "@[<h>%a%t%a@]"
         (Pp.array Pp.space
@@ -92,7 +93,8 @@ let () =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
         alg_overwrite counter env
-        story_compression ~store_distances:(unary_distances<>None) init_l in
+        story_compression ~store_distances:(unary_distances<>None)
+        random_state init_l in
     let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then

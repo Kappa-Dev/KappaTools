@@ -92,7 +92,7 @@ sig
   val print: Format.formatter -> t -> unit
 
   val choose: t -> elt option
-  val random: t -> elt option
+  val random: Random.State.t -> t -> elt option
   val min_elt: t -> elt option
   val max_elt: t -> elt option
 end
@@ -947,9 +947,9 @@ struct
     (*      else if k = s then Some key *)
     (*      else find_acc (k - s - 1) r *)
 
-    let random m =
+    let random rs m =
       let s = size m in
-      if s = 0 then None else find_acc (Random.int (size m)) m
+      if s = 0 then None else find_acc (Random.State.int rs (size m)) m
 
     (*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_with_logs
       let split = Lift_error_logs.lift_generic_binary_for_KaSim split_with_logs

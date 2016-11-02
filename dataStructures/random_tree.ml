@@ -149,8 +149,8 @@ let total t =
   else
     infinity
 
-let random t =
-  match Mods.IntSet.random t.inf_list with
+let random rs t =
+  match Mods.IntSet.random rs t.inf_list with
   | Some x -> (unmask t x,infinity)
   | None ->
     let t = update_structure t in
@@ -158,7 +158,7 @@ let random t =
     if a = 0.0
     then raise Not_found
     else
-      let r = Random.float a in
+      let r = Random.State.float rs a in
       let rec find i r =
         let node = t.weight_of_nodes.(i) in
         if r < node then (i,node)

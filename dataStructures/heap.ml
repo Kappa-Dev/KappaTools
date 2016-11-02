@@ -17,7 +17,8 @@ module type T =
     val find : int -> t -> content (*Returns the element at address key*)
     val iteri : (int -> content -> unit) -> t -> unit (*iter on the heap*)
     val fold : (int -> content -> 'a ->'a) -> t -> 'a -> 'a
-    val random : t -> content (*returns a random element from the heap --constant time*)
+    val random : Random.State.t -> t -> content
+    (*returns a random element from the heap --constant time*)
     val is_empty : t -> bool (*is size=0*)
     val mem : int -> t -> bool
   end
@@ -120,10 +121,11 @@ module Make(C:Content) =
       iteri (fun k v -> c:=f k v !c) h ;
       !c
 
-    let random h =
+    let random rg h =
       if h.next_address < 1 then raise Not_found
       else
-	match safe_get "Heap.random" h.ar (Random.int h.next_address) with
+	match safe_get "Heap.random" h.ar
+         (Random.State.int rg h.next_address) with
 	| Some content -> content
 	| None -> invalid_arg "Heap.random: heap is fragmented"
 

@@ -78,7 +78,7 @@ sig
   val print: Format.formatter -> t -> unit
 
   val choose: t -> elt option
-  val random: t -> elt option
+  val random: Random.State.t -> t -> elt option
   val min_elt: t -> elt option
   val max_elt: t -> elt option
 end
