@@ -632,7 +632,7 @@ which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary in
 %agent: C(b,a)
 ##
 %var: 'V'  1
-%var: 'k1'  INF
+%var: 'k1'  inf
 %var: 'k2' 1.0E-4/'V'
 %var: 'k_off' 0.1
 ##
@@ -706,7 +706,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 \ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
 \ttt{|\textit{kappa\_expression}|} & number of occurences of the pattern \textit{kappa\_expression}\\
-\ttt{INF} & symbol for $\infty$ \\\\
+\ttt{inf} & symbol for $\infty$ \\\\
 \toprule
 \ttt{\tcb{unary/binary\_op}} & Interpretation \\
 \midrule
@@ -961,7 +961,7 @@ will interrupt the simulation after exactly 10 time units.
 Continuing with the ABC model, the perturbation effect\index{effect}:
 \lstinline[language=kappa]*$ADD n C(x1~p)*
 will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
-\lstinline[language=kappa]*$DEL  INF B(x!_)*
+\lstinline[language=kappa]*$DEL  inf B(x!_)*
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
 
 There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
@@ -1054,7 +1054,7 @@ Any variable between simple quotes can be updated during a simulation using a de
 This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
 \lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100!
 \noi will cause the on rate of all rules to decrease a hunderd fold. Note that it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' INF!
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf!
 \noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity.
 
 \subsection{Combining several effects in a single perturbation}

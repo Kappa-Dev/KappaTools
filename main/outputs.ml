@@ -216,8 +216,8 @@ let print_values_raw is_tsv f (time,l) =
   let print_sep =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
     else !Parameter.plotSepChar in
-  Format.fprintf f "@[<h>%t%E%t%a@]@."
-    !Parameter.plotSepChar time print_sep
+  Format.fprintf f "@[<h>%t%s%t%a@]@."
+    !Parameter.plotSepChar (string_of_float time) print_sep
     (Pp.array print_sep (fun _ -> Nbr.print)) l
 
 let create_plot (filename,title,head) =

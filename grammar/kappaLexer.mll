@@ -19,6 +19,7 @@
  let () = Hashtbl.add keywords "repeat" REPEAT in
  let () = Hashtbl.add keywords "until" UNTIL in
  let () = Hashtbl.add keywords "INF" INFINITY in
+ let () = Hashtbl.add keywords "inf" INFINITY in
  fun x ->
  try Hashtbl.find keywords x with Not_found -> ID x
 
