@@ -131,9 +131,13 @@ let rec is_subnavigation inj nav = function
 let rename_id inj2cc = function
   | Existing n -> inj2cc,Existing (Renaming.apply inj2cc n)
   | Fresh (id,ty) ->
-    let id' = match Mods.IntSet.max_elt (Renaming.image inj2cc) with
-      | None -> 1
-      | Some i -> succ i in
+    let img = Renaming.image inj2cc in
+    let id' =
+      if Mods.IntSet.mem id img then
+        match Mods.IntSet.max_elt img with
+        | None -> 1
+        | Some i -> succ i
+    else id in
     match Renaming.add id id' inj2cc with
     | None -> assert false
     | Some inj' -> inj',Fresh (id',ty)

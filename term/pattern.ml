@@ -761,8 +761,8 @@ end = struct
           match Navigation.is_subnavigation inj_point2nav nav h.next with
           | None -> insert_nav_sons t
           | Some (inj,nav') ->
-            if h.dst = dst then insert_nav_sons []
-            else insert_nav_aux (Renaming.compose false h.inj inj) h.dst nav' in
+            if h.dst <> dst then
+              insert_nav_aux (Renaming.compose false h.inj inj) h.dst nav' in
         insert_nav_sons point.sons in
     insert_nav_aux (identity_injection domain.(p_id).content) p_id nav
 
