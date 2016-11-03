@@ -25,9 +25,8 @@ let process_comand (text_message : string) : unit Lwt.t =
 
 (*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
 let serve () : unit Lwt.t =
-  let app_args = App_args.default in
   let common_args = Common_args.default in
-  let options = App_args.options app_args @
+  let options = App_args.options () @
                 Common_args.options common_args
   in
   let usage_msg = "kappa stdio simulator" in
