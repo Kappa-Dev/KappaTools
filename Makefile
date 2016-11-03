@@ -35,6 +35,7 @@ MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: check build-tests doc clean_doc fetch_version KappaBin.zip debug
+.PHONY: profiling
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -239,6 +240,9 @@ doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
 debug:
 	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte KaDE.byte KaStor.byte WebSim.byte dev/db_printers.cma
+
+profiling:
+	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all
 
 all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
 
