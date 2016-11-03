@@ -379,7 +379,7 @@ let configurations_of_result result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (unary_dist,story_compression,formatCflow as acc)
+    (fun (unary_dist,story_compression,formatCflow,cflowFile as acc)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -388,7 +388,7 @@ let configurations_of_result result =
           | ("strong",_)::tl -> parse (a,b,true) tl
           | ("weak",_)::tl -> parse (a,true,c) tl
           | ("none",_)::tl -> parse (true,b,c) tl
-          | [] -> (unary_dist,(a,b,c),formatCflow)
+          | [] -> (unary_dist,(a,b,c),formatCflow,cflowFile)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
                      ("Unkown value "^error^" for compression mode", pos))
@@ -396,15 +396,14 @@ let configurations_of_result result =
         parse story_compression value_list
       | "jsonUnaryDistance" ->
         if get_bool_value pos_p param value_list
-        then (Some true,story_compression,formatCflow)
+        then (Some true,story_compression,formatCflow,cflowFile)
         else acc
       | "storeUnaryDistance" ->
         ((if get_bool_value pos_p param value_list then Some false else None),
-         story_compression,formatCflow)
+         story_compression,formatCflow,cflowFile)
       | "cflowFileName" ->
-        let () = get_value pos_p param value_list
-            (fun x _ -> Kappa_files.set_cflow x) in
-        acc
+        get_value pos_p param value_list
+          (fun x _ -> (unary_dist,story_compression,formatCflow,Some x))
       | "progressBarSize" ->
         let () = set_value pos_p param value_list
             (fun v p ->
@@ -456,7 +455,7 @@ let configurations_of_result result =
                                 ("Value "^error^
                                    " should be either \"html, dot\" or \"json\"", p))
             ) in
-         (unary_dist,story_compression,formatCflow)
+         (unary_dist,story_compression,formatCflow,cflowFile)
 (*         if get_bool_value pos_p param value_list then
            (unary_dist,story_compression, Dot) else 
            (unary_dist,story_compression, Html)*)
@@ -477,7 +476,7 @@ let configurations_of_result result =
         acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) (None,(false,false,false), Dot) result.configurations
+    ) (None,(false,false,false), Dot, None) result.configurations
 
 let compile_alg_vars contact_map domain vars =
   Tools.array_fold_left_mapi
@@ -562,7 +561,7 @@ let compile ~outputs ~pause ~return
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let unary_distances,story_compression,formatCflow =
+  let unary_distances,story_compression,formatCflow,cflowFile =
     configurations_of_result result in
   pause @@ fun () ->
   let preenv = Pattern.minimal_env sigs_nd contact_map in
@@ -604,11 +603,11 @@ let compile ~outputs ~pause ~return
       ?rescale:rescale_init contact_map env preenv result in
   return (env,
           (if has_tracking then Some story_compression else None),
-          unary_distances, formatCflow, init_l)
+          unary_distances, formatCflow, cflowFile, init_l)
 
 let build_initial_state
     ~bind ~return alg_overwrite counter env
-    story_compression ~store_distances random_state init_l =
+    trace_file ~store_distances random_state init_l =
   let stops = Environment.fold_perturbations
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation
@@ -616,7 +615,7 @@ let build_initial_state
          List.fold_left (fun acc s -> (s,i)::acc) acc s)
       [] env in
   let graph0 = Rule_interpreter.empty
-      ?story_compression ~store_distances random_state env in
+      ?trace_file ~store_distances random_state env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
   State_interpreter.initialize
     ~bind ~return env counter graph0 state0 init_l

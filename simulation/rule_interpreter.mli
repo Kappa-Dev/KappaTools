@@ -9,8 +9,8 @@ type result = Clash | Corrected | Success of (int option * t)
 (** {6 Initialisation} *)
 
 val empty :
-  ?story_compression:((bool * bool * bool) * bool) ->
-  store_distances:bool -> Random.State.t -> Environment.t -> t
+  ?trace_file:string -> store_distances:bool ->
+  Random.State.t -> Environment.t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Environment.get_alg] but it is not hard
@@ -82,7 +82,7 @@ val add_tracked :
   Instantiation.abstract Instantiation.test list ->
   t -> t
 val remove_tracked : Pattern.id array -> t -> t
-val generate_stories : t -> (((bool*bool*bool)*bool)*Trace.t) option
+val generate_stories : t -> (string*Trace.t) option
 
 (** {6 Debugging} *)
 

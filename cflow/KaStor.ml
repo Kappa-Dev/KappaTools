@@ -9,7 +9,7 @@ let options = [
    Arg.Unit (fun () -> Format.print_string Version.version_msg;
               Format.print_newline () ; exit 0),
    "display KaStor version");
-  ("-o", Arg.String Kappa_files.set_ccFile,
+  ("-o", Arg.String Kappa_files.set_cflow,
    "file name skeleton for outputs") ;
   ("-d",
    Arg.String Kappa_files.set_dir,
@@ -70,19 +70,7 @@ let main () =
     let env = Environment.of_json (Yojson.Basic.Util.member "env" json) in
     let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
     let (none,weak,strong) =
-      if !none_compression || !weak_compression || !strong_compression
-      then (!none_compression, !weak_compression, !strong_compression)
-      else
-        ((match Yojson.Basic.Util.to_bool_option
-                  (Yojson.Basic.Util.member "none" json)
-          with None -> false | Some b -> b),
-         (match Yojson.Basic.Util.to_bool_option
-                  (Yojson.Basic.Util.member "weak" json)
-          with None -> false | Some b -> b),
-         (match Yojson.Basic.Util.to_bool_option
-                  (Yojson.Basic.Util.member "strong" json)
-          with None -> false | Some b -> b))
-    in
+      (!none_compression, !weak_compression, !strong_compression) in
     let dot_html = if (!dotCflows) then Ast.Dot else Ast.Html in
     Compression_main.compress_and_print
       ~called_from:Remanent_parameters_sig.KaSim ~dotFormat:dot_html

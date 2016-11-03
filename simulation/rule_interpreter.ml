@@ -17,7 +17,7 @@ type t =
 
     random_state : Random.State.t;
     story_machinery :
-      (((bool*bool*bool)*bool) *
+      (string *
        (Trace.event_kind * Pattern.id array *
         Instantiation.abstract Instantiation.test list)
          list Pattern.Map.t (*currently tracked ccs *) *
@@ -27,7 +27,7 @@ type t =
 
 type result = Clash | Corrected | Success of (int option * t)
 
-let empty ?story_compression ~store_distances random_state env =
+let empty ?trace_file ~store_distances random_state env =
   let with_connected_components =
     not (Pattern.Set.is_empty
            (Environment.connected_components_of_unary_rules env)) in
@@ -41,12 +41,7 @@ let empty ?story_compression ~store_distances random_state env =
     outdated_elements = Operator.DepSet.empty,false;
     random_state;
     story_machinery =
-      (match story_compression with
-       | Some ((none,weak,strong),dump as story_compression) ->
-         if none || weak || strong || dump
-         then Some (story_compression,Pattern.Map.empty,[])
-         else None
-       | None -> None);
+      Tools.option_map (fun s -> (s,Pattern.Map.empty,[])) trace_file;
     store_distances;
   }
 

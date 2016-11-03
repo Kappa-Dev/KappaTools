@@ -18,7 +18,7 @@ let get_compilation ?max_event cli_args =
       ?max_time:cli_args.Run_cli_args.maxTimeValue
       ?max_event ~plot_period in
   let (env, contact_map, updated_vars, story_compression,
-       unary_distances, formatCflows, init_l),
+       unary_distances, formatCflows, cflowFile, init_l),
       counter,alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
     | "" ->
@@ -29,7 +29,8 @@ let get_compilation ?max_event cli_args =
       let (sigs_nd,contact_map,tk_nd,updated_vars,result') =
         LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in
       let () = Format.printf "+ Compiling...@." in
-      let (env, story_compression, unary_distances, formatCflow, init_l)=
+      let (env, story_compression, unary_distances,
+           formatCflow, cflowFile, init_l) =
         Eval.compile
           ~pause:(fun f -> f ())
           ~return:(fun x -> x)
@@ -37,7 +38,7 @@ let get_compilation ?max_event cli_args =
           ~outputs:(Outputs.go (Signature.create [||]))
           sigs_nd tk_nd contact_map result' in
       (env, contact_map, updated_vars, story_compression,
-       unary_distances, formatCflow, init_l),counter,[]
+       unary_distances, formatCflow, cflowFile,init_l),counter,[]
     | marshalized_file ->
       try
         let d = open_in_bin marshalized_file in
@@ -50,10 +51,10 @@ let get_compilation ?max_event cli_args =
         let () = Format.printf "+ Loading simulation package %s...@."
             marshalized_file in
         let env,contact_map,updated_vars,story_compression,
-            unary_distances,formatCflow,init_l =
+            unary_distances,formatCflow,cflowFile,init_l =
           (Marshal.from_channel d :
-             Environment.t*Signature.contact_map*
-             int list* (bool*bool*bool) option*bool option*Ast.formatCflow*
+             Environment.t*Signature.contact_map*int list*
+             (bool*bool*bool) option*bool option*Ast.formatCflow*string option*
              (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
         let () = Pervasives.close_in d  in
         let alg_overwrite =
@@ -66,7 +67,7 @@ let get_compilation ?max_event cli_args =
           List.fold_left
             (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
         (env,contact_map,updated_vars',story_compression,
-         unary_distances,formatCflow,init_l),
+         unary_distances,formatCflow,cflowFile,init_l),
         counter,alg_overwrite
       with
       | ExceptionDefn.Malformed_Decl _ as e -> raise e
@@ -76,4 +77,4 @@ let get_compilation ?max_event cli_args =
           "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
         exit 1 in
   (env, contact_map, updated_vars, story_compression,
-   unary_distances, formatCflows, init_l),counter,alg_overwrite
+   unary_distances, formatCflows, cflowFile, init_l),counter,alg_overwrite

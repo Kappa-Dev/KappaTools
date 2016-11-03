@@ -2,6 +2,56 @@ let usage_msg =
   "KaSim "^Version.version_string^":\n"^
   "Usage is KaSim [-e events | -t time] [-pp delta_t] [-o output_file] input_files\n"
 
+let tmp_trace = ref(None:string option)
+let remove_trace () = match !tmp_trace with None -> () | Some d -> Sys.remove d
+
+let rec waitpid_non_intr pid =
+  try Unix.waitpid [] pid
+  with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
+
+let finalize
+    ~outputs dotFormat cflow_file env counter graph state stories_compression =
+  let () = Outputs.close () in
+  let () = Counter.complete_progress_bar Format.std_formatter counter in
+  match State_interpreter.end_of_simulation
+          ~outputs Format.std_formatter env counter graph state with
+  | None -> ()
+  | Some (dump,trace) ->
+    let () =
+      Kappa_files.with_channel dump
+        (fun c ->
+           let () = Yojson.Basic.to_channel c
+               (`Assoc [
+                   "env", Environment.to_json env;
+                   "trace", Trace.to_json trace]) in
+           output_char c '\n') in
+    match stories_compression with
+    | None -> ()
+    | Some (none,weak,strong) ->
+      let args = ["-d"; Kappa_files.get_dir (); Kappa_files.path dump] in
+      let args = if none then "--none" :: args else args in
+      let args = if weak then "--weak" :: args else args in
+      let args = if strong then "--strong" :: args else args in
+      let args = if dotFormat = Ast.Dot then args else "--html" :: args in
+      let args = match cflow_file with
+        | None -> args
+        | Some f -> "-o" :: f :: args in
+      let args = if !Parameter.time_independent
+        then "--time-independent" :: args else args in
+      let prog =
+        let predir =
+          Filename.dirname Sys.executable_name in
+        let dir = if Filename.is_implicit Sys.executable_name &&
+                     predir = "." then "" else predir^"/" in
+        dir^"KaStor" in
+      let pid = Unix.create_process prog (Array.of_list (prog::args))
+          Unix.stdin Unix.stdout Unix.stderr in
+      match waitpid_non_intr pid with
+      | _, Unix.WEXITED 127 -> failwith "Unavailable KaStor"
+      | _, Unix.WEXITED n -> if n <> 0 then exit n
+      | _, Unix.WSIGNALED n -> failwith ("Killed with signal "^string_of_int n)
+      | _, Unix.WSTOPPED n -> failwith ("Stopped with signal "^string_of_int n)
+
 let () =
   let cli_args = Run_cli_args.default in
   let kasim_args = Kasim_args.default in
@@ -26,11 +76,6 @@ let () =
       | None -> ()
       | Some domainOutputFile ->
         Kappa_files.set_ccFile domainOutputFile
-    in
-    let () = match kasim_args.Kasim_args.traceFile with
-      | None -> ()
-      | Some traceFile ->
-        Kappa_files.set_traceFile traceFile
     in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in
@@ -70,7 +115,7 @@ let () =
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
     let (env0, contact_map, updated_vars, story_compression,
-         unary_distances, formatCflows, init_l as init_result),
+         unary_distances, formatCflows, cflowFile, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
         ?max_event:kasim_args.Kasim_args.maxEventValue cli_args in
     let () =
@@ -82,18 +127,20 @@ let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in
     let () = Format.printf "+ Building initial state@." in
-    let story_compression =
-      match story_compression with
+    let trace_file =
+      match kasim_args.Kasim_args.traceFile with
+      | Some _ as x -> x
       | None ->
-        if Kappa_files.has_traceFile ()
-        then Some ((false,false,false),true)
-        else None
-      | Some x -> Some (x,Kappa_files.has_traceFile ()) in
+        match story_compression with
+        | None -> None
+        | Some _ ->
+          let () = tmp_trace := Some (Filename.temp_file "trace" ".json") in
+          !tmp_trace in
     let (graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
         alg_overwrite counter env
-        story_compression ~store_distances:(unary_distances<>None)
+        trace_file ~store_distances:(unary_distances<>None)
         random_state init_l in
     let () = Format.printf "Done@." in
     let () =
@@ -138,9 +185,12 @@ let () =
     let () =
       let outputs = Outputs.go (Environment.signatures env) in
       if cli_args.Run_cli_args.batchmode then
-        State_interpreter.batch_loop
-          ~outputs ~formatCflows
-          Format.std_formatter env counter graph state
+        let (graph',state') =
+          State_interpreter.batch_loop
+            ~outputs Format.std_formatter env counter graph state in
+        finalize
+          ~outputs formatCflows cflowFile
+          env counter graph' state' story_compression
       else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel env graph state =
@@ -220,9 +270,9 @@ let () =
               let () = Pp.error Format.pp_print_string er in
               env,(false,graph,state) in
           if stop then
-            State_interpreter.finalize
-              ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
-              Format.std_formatter env counter graph' state'
+            finalize
+              ~outputs formatCflows cflowFile
+              env counter graph' state' story_compression
           else
             toplevel env' graph' state' in
         if cli_args.Run_cli_args.interactive then
@@ -238,9 +288,9 @@ let () =
               ~outputs Format.std_formatter
               Alg_expr.FALSE env counter graph state in
           if stop then
-            State_interpreter.finalize
-              ~outputs ~called_from:Remanent_parameters_sig.KaSim formatCflows
-              Format.std_formatter env counter graph' state'
+            finalize
+              ~outputs formatCflows cflowFile
+              env counter graph' state' story_compression
           else
           let () =
             Format.printf
@@ -249,6 +299,7 @@ let () =
                @ effect@ to@ perform@ it@]" in
             toplevel env0 graph' state' in
     Format.printf "Simulation ended";
+    remove_trace ();
     if Counter.nb_null_event counter = 0 then Format.print_newline()
     else
       let () =
@@ -261,12 +312,12 @@ let () =
   with
   | ExceptionDefn.Malformed_Decl er ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
+    let () = remove_trace () in
     let () = Pp.error Format.pp_print_string er in
     exit 2
   | ExceptionDefn.Internal_Error er ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
+    let () = remove_trace () in
     let () =
       Pp.error
         (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
@@ -274,18 +325,18 @@ let () =
     exit 2
   | Invalid_argument msg ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
+    let () = remove_trace () in
     let s = "" (*Printexc.get_backtrace()*) in
     let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
     exit 2
   | Sys.Break ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
+    let () = remove_trace () in
     let () =
       Format.eprintf "@.***Interrupted by user out of simulation loop***@." in
     exit 1
-  | Sys_error msg ->
+  | e ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
-    let () = Format.eprintf "%s@." msg in
-    exit 2
+    let () = remove_trace () in
+    let () = Format.eprintf "%s@." (Printexc.to_string e) in
+    exit 3

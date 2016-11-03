@@ -10,10 +10,9 @@ let odeFileName = ref "ode.m"
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
 let distancesFileName = ref "distances"
-let traceFileName = ref ""
 
 let path f =
-  if Filename.is_relative f && Filename.dirname f = Filename.current_dir_name
+  if Filename.is_implicit f && Filename.dirname f = Filename.current_dir_name
   then Filename.concat !outputDirName f
   else f
 
@@ -120,14 +119,14 @@ let with_formatter str f =
      let () = f fr in
      Format.pp_print_flush fr ())
 
-let (openOutDescriptors:out_channel list ref) = ref []
-
 let set_dir s =
   let () = try
       if not (Sys.is_directory s)
       then (Format.eprintf "'%s' is not a directory@." s ; exit 1)
     with Sys_error _ -> mk_dir_r s in
   outputDirName := s
+
+let get_dir () = !outputDirName
 
 let set_data f = outputDataName := f
 let get_data () = !outputDataName
@@ -187,12 +186,3 @@ let with_influence f = with_formatter !influenceFileName f
 
 let set_ccFile f = ccFileName := f
 let with_ccFile f = with_formatter !ccFileName f
-
-let set_traceFile f = traceFileName := f
-let has_traceFile () = !traceFileName <> ""
-let with_traceFile f = with_channel !traceFileName f
-
-let close_all_out_desc () =
-  let () =
-    List.iter (fun d -> close_out d) !openOutDescriptors in
-  openOutDescriptors := []

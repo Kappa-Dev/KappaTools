@@ -20,7 +20,7 @@ val compile_modifications_no_track:
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Environment.t * (bool*bool*bool) option *
-          bool option * Ast.formatCflow *
+          bool option * Ast.formatCflow * string option (*cflowFile*) *
           (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Signature.contact_map ->
@@ -30,6 +30,6 @@ val build_initial_state :
   bind:('a -> (Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
   return:(Rule_interpreter.t * State_interpreter.t -> 'a) ->
   (int * Alg_expr.t) list -> Counter.t -> Environment.t ->
-  ((bool*bool*bool)*bool) option -> store_distances : bool -> Random.State.t ->
+  string option -> store_distances : bool -> Random.State.t ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
   'a

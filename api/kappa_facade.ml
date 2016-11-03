@@ -171,7 +171,7 @@ let build_ast
                         | Data.Print _
                         | Data.UnaryDistance _ -> assert false)
                     sig_nd tk_nd contact_map result >>=
-                  (fun (env,has_tracking,store_distances,_,init_l) ->
+                  (fun (env,has_tracking,store_distances,_,_,init_l) ->
                      let store_distances = store_distances<>None in
                      let simulation =
                        create_t
@@ -298,10 +298,9 @@ let start
     Lwt.async
       (fun () ->
          Lwt.catch (fun () ->
-             let story_compression =
+             let trace_file =
                Tools.option_map
-                 (fun  _ ->
-                    ((false,false,false),true))
+                 (fun  _ -> "trace.json")
                  t.has_tracking in
              let () =
                Counter.set_max_time
@@ -329,7 +328,7 @@ let start
                ~return:Lwt.return []
                t.counter
                t.env
-               story_compression
+               trace_file
                ~store_distances:t.store_distances
                random_state
                t.init_l >>=

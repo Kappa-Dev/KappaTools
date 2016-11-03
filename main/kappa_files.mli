@@ -1,9 +1,11 @@
 (** {5 Utilities on files } *)
 val open_out : string -> out_channel
+val path : string -> string
 val mk_dir_r : string -> unit
 val setCheckFileExists : batchmode:bool -> unit
 val setCheckFileExistsODE : batchmode:bool -> unit
 val set_dir : string -> unit
+val get_dir : unit -> string
 val set_data : string -> unit
 val get_data : unit -> string
 
@@ -39,8 +41,4 @@ val with_influence : (Format.formatter -> unit) -> unit
 val set_ccFile : string -> unit
 val with_ccFile : (Format.formatter -> unit) -> unit
 
-val set_traceFile : string -> unit
-val has_traceFile : unit -> bool
-val with_traceFile : (out_channel -> unit) -> unit
-
-val close_all_out_desc : unit -> unit
+val with_channel : string (**path*) -> (out_channel -> unit) -> unit

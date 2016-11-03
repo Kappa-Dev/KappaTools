@@ -35,18 +35,12 @@ val a_loop :
 val end_of_simulation :
   outputs:(Data.t -> unit) -> Format.formatter ->
   Environment.t -> Counter.t -> Rule_interpreter.t -> t ->
-  (((bool*bool*bool)*bool)*Trace.t) option
+  (string*Trace.t) option
 (** What to do after stopping simulation. Returns maybe a trace *)
 
-val finalize :
-  outputs:(Data.t -> unit) -> called_from:Remanent_parameters_sig.called_from ->
-  Ast.formatCflow -> Format.formatter ->
-  Environment.t -> Counter.t -> Rule_interpreter.t -> t -> unit
-
 val batch_loop :
-  outputs:(Data.t -> unit) -> formatCflows:Ast.formatCflow ->
-  Format.formatter -> Environment.t -> Counter.t ->
-  Rule_interpreter.t -> t -> unit
+  outputs:(Data.t -> unit) -> Format.formatter -> Environment.t -> Counter.t ->
+  Rule_interpreter.t -> t -> (Rule_interpreter.t * t)
 (** [loop message_formatter env counter graph]
  does a simulation in the command-line setting *)
 

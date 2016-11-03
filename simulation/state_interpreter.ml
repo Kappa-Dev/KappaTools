@@ -372,34 +372,10 @@ let end_of_simulation ~outputs form env counter graph state =
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories graph
 
-let finalize ~outputs ~called_from dotFormat form env counter graph state =
-  let () = Outputs.close () in
-  let () = Counter.complete_progress_bar form counter in
-  match end_of_simulation ~outputs form env counter graph state with
-  | Some (((none,weak,strong),dump),trace) ->
-    let () =
-      if none || weak || strong then
-        Compression_main.compress_and_print
-          ~called_from ~dotFormat ~none ~weak ~strong
-          env (Compression_main.init_secret_log_info ()) trace in
-    if dump then Kappa_files.with_traceFile
-        (fun c ->
-           let () = Yojson.Basic.to_channel c
-               (`Assoc [
-                   "none", `Bool none;
-                   "weak", `Bool weak;
-                   "strong", `Bool strong;
-                   "env", Environment.to_json env;
-                   "trace", Trace.to_json trace]) in
-           output_char c '\n')
-  | None -> ()
-
-let batch_loop ~outputs ~formatCflows form env counter graph state =
-  let called_from = Remanent_parameters_sig.KaSim in
+let batch_loop ~outputs form env counter graph state =
   let rec iter graph state =
     let stop,graph',state' = a_loop ~outputs env counter graph state in
-    if stop then
-      finalize ~outputs ~called_from formatCflows form env counter graph' state'
+    if stop then (graph',state')
     else let () = Counter.tick form counter in iter graph' state'
   in iter graph state
 

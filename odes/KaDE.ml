@@ -65,7 +65,7 @@ let main () =
     | "kasim" -> Ode_args.KaSim
     | "divide_by_nbr_of_autos_in_lhs"  ->
       Ode_args.Divide_by_nbr_of_autos_in_lhs
-    | "biochemist" -> Ode_args.Biochemist 
+    | "biochemist" -> Ode_args.Biochemist
     | s ->
       begin
         Arg.usage options usage_msg;
@@ -141,12 +141,10 @@ let main () =
   with
   | ExceptionDefn.Malformed_Decl er ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
     let () = Pp.error Format.pp_print_string er in
     exit 2
   | Sys_error msg ->
     let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = Kappa_files.close_all_out_desc () in
     let () = Format.eprintf "%s@." msg in
     exit 2
   | e ->
