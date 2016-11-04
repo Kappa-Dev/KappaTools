@@ -42,9 +42,13 @@ let server_mode () =
             let strong = match Yojson.Basic.Util.to_bool_option
                                  (Yojson.Basic.Util.member "strong" json)
               with None -> false | Some b -> b in
+            let parameter =
+              Compression_main.build_parameter
+                ~called_from:Remanent_parameters_sig.Server
+                ~none ~weak ~strong in
             Compression_main.compress_and_print
-              ~called_from:Remanent_parameters_sig.Server ~dotFormat:Ast.Html
-              ~none ~weak ~strong env (Compression_main.init_secret_log_info ())
+              parameter ~dotFormat:Ast.Html
+              env (Compression_main.init_secret_log_info ())
               steps
           with Yojson.Basic.Util.Type_error (e,x) ->
             Format.eprintf "%s:@ %s@." e (Yojson.Basic.pretty_to_string x)
@@ -64,16 +68,21 @@ let main () =
   if!file = "" then
     server_mode ()
   else
-    let desc = open_in_bin (!file) in
+    let (none,weak,strong) =
+      (!none_compression, !weak_compression, !strong_compression) in
+    let parameter =
+      Compression_main.build_parameter
+        ~called_from:Remanent_parameters_sig.KaSim ~none ~weak ~strong in
+    let desc = open_in (!file) in
+    let () =
+      Loggers.fprintf (Compression_main.get_logger parameter)
+        "+ Loading trace@." in
     let json = Yojson.Basic.from_channel desc in
     let () = close_in desc in
     let env = Environment.of_json (Yojson.Basic.Util.member "env" json) in
     let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
-    let (none,weak,strong) =
-      (!none_compression, !weak_compression, !strong_compression) in
-    let dot_html = if (!dotCflows) then Ast.Dot else Ast.Html in
+    let dotFormat = if (!dotCflows) then Ast.Dot else Ast.Html in
     Compression_main.compress_and_print
-      ~called_from:Remanent_parameters_sig.KaSim ~dotFormat:dot_html
-      ~none ~weak ~strong env (Compression_main.init_secret_log_info ()) steps
+      parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
 
 let () = main ()

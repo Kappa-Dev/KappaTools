@@ -421,6 +421,7 @@ Obtained
 %init: 1 A(x!2, y!1), A(x!1, y!2)
 
 ##
++ Loading trace
 + Producing causal compressions
 
 

@@ -24,6 +24,11 @@ module S = U.S
 type secret_log_info = StoryProfiling.StoryStats.log_info
 let init_secret_log_info = StoryProfiling.StoryStats.init_log_info
 
+type secret_parameter = S.PH.B.PB.CI.Po.K.H.parameter
+
+let build_parameter = S.PH.B.PB.CI.Po.K.H.build_parameter
+let get_logger = S.PH.B.PB.CI.Po.K.H.get_logger
+
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = true
@@ -45,11 +50,9 @@ let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
-let compress_and_print ~called_from ~dotFormat ?js_interface
-    ~none ~weak ~strong env log_info step_list =
+let compress_and_print
+    parameter ~dotFormat ?js_interface env log_info step_list =
   (*let called_from = Remanent_parameters_sig.Server in*)
-  let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter
-      ~called_from ~none ~weak ~strong in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
   let parameter =

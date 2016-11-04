@@ -15,7 +15,9 @@ done
 Done
 ____________________________________________________________
 ############################################################
++ Loading trace
 Simulation ended
++ Loading trace
 + Producing causal compressions
 	 - blackboard generation
 	 - computing causal past of each observed events (2)
