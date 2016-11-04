@@ -153,7 +153,7 @@ let () =
     let () = Kappa_files.with_ccFile
         (fun f -> Pattern.Env.print_dot f (Environment.domain env)) in
     ExceptionDefn.flush_warning Format.err_formatter ;
-    if !Parameter.compileModeOn then exit 0 else ();
+    if !Parameter.compileModeOn then let () = remove_trace () in exit 0 else ();
 
     Kappa_files.setCheckFileExists ~batchmode:cli_args.Run_cli_args.batchmode ;
 
