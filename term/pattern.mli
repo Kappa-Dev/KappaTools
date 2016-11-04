@@ -5,16 +5,32 @@ type t = cc (**type for domain points*)
 
 type id
 
+module ObsMap : sig
+  type 'a t
+
+  val dummy : 'a -> 'a t
+
+  val get : 'a t -> id -> 'a
+  val set : 'a t -> id -> 'a -> unit
+
+  val fold_lefti : (id -> 'a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+  val map : ('a -> 'b) -> 'a t -> 'b t
+  val print :
+    ?trailing:(Format.formatter -> unit) -> (Format.formatter -> unit) ->
+    (id -> Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+end
+
 type work (**type for partial domain*)
 
 module Env : sig
-    type t
+  type t
 
-    val signatures : t -> Signature.s
+  val signatures : t -> Signature.s
+  val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
-    val print : Format.formatter -> t -> unit
-    val print_dot : Format.formatter -> t -> unit
-  end
+  val print : Format.formatter -> t -> unit
+  val print_dot : Format.formatter -> t -> unit
+end
 
 module PreEnv : sig
   type t
@@ -116,4 +132,3 @@ val add_fully_specified_to_graph :
   Signature.s -> Edges.t -> cc -> Edges.t * Renaming.t
 
 module Set : SetMap.Set with type elt=id
-module Map : SetMap.Map with type elt=id

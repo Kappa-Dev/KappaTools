@@ -1,9 +1,9 @@
 type t =
   {
     (* With rectangular approximation *)
-    roots_of_patterns: Mods.IntSet.t Pattern.Map.t;
+    roots_of_patterns: Mods.IntSet.t Pattern.ObsMap.t;
     roots_of_unary_patterns:
-      Mods.IntSet.t Mods.IntMap.t Pattern.Map.t;
+      Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t;
 
     (* Without rectangular approximation *)
     matchings_of_rule:
@@ -20,7 +20,7 @@ type t =
       (string *
        (Trace.event_kind * Pattern.id array *
         Instantiation.abstract Instantiation.test list)
-         list Pattern.Map.t (*currently tracked ccs *) *
+         list Pattern.ObsMap.t (*currently tracked ccs *) *
        Trace.t) option;
     store_distances: bool;
   }
@@ -32,8 +32,10 @@ let empty ?trace_file ~store_distances random_state env =
     not (Pattern.Set.is_empty
            (Environment.connected_components_of_unary_rules env)) in
   {
-    roots_of_patterns = Pattern.Map.empty;
-    roots_of_unary_patterns = Pattern.Map.empty;
+    roots_of_patterns = Pattern.Env.new_obs_map
+        (Environment.domain env) (fun _ -> Mods.IntSet.empty);
+    roots_of_unary_patterns = Pattern.Env.new_obs_map
+        (Environment.domain env) (fun _ -> Mods.IntMap.empty);
     matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
     edges = Edges.empty ~with_connected_components;
@@ -41,15 +43,18 @@ let empty ?trace_file ~store_distances random_state env =
     outdated_elements = Operator.DepSet.empty,false;
     random_state;
     story_machinery =
-      Tools.option_map (fun s -> (s,Pattern.Map.empty,[])) trace_file;
+      Tools.option_map
+        (fun s -> (s, Pattern.Env.new_obs_map
+                     (Environment.domain env) (fun _ -> []),[]))
+        trace_file;
     store_distances;
   }
 
 let print_injections ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
-    (Pp.set Pattern.Map.bindings Pp.space
-       (fun f (pattern,roots) ->
+    (Pattern.ObsMap.print Pp.space
+       (fun pattern f roots ->
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
             (Pattern.print ?domain ~with_id:true) pattern
@@ -59,8 +64,8 @@ let print_injections ?domain f roots_of_patterns =
 let print_unary_injections ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
-    (Pp.set Pattern.Map.bindings Pp.space
-       (fun f (pattern,root_maps) ->
+    (Pattern.ObsMap.print Pp.space
+       (fun pattern f root_maps ->
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
             (Pattern.print ?domain ~with_id:true) pattern
@@ -75,30 +80,26 @@ let add_intset_in_intmap id set map =
   then Mods.IntMap.remove id map
   else Mods.IntMap.add id set map
 
-let update_roots is_add unary_ccs edges (map,unary_map) pattern root =
-  let va =
-    Pattern.Map.find_default Mods.IntSet.empty pattern map in
-  Pattern.Map.add pattern
-    ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) map,
-  (if Pattern.Set.mem pattern unary_ccs then
-     let cc_map =
-       Pattern.Map.find_default Mods.IntMap.empty pattern unary_map in
-     let cc_map' =
-       match Edges.get_connected_component root edges with
-       | Some cc_id ->
-         let set = Mods.IntMap.find_default Mods.IntSet.empty cc_id cc_map in
-         let set' =
-           (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set in
-         add_intset_in_intmap cc_id set' cc_map
-       | None ->
-         Mods.IntMap.map
-           (fun set ->
-              (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set)
-           cc_map in
-     if Mods.IntMap.is_empty cc_map'
-     then Pattern.Map.remove pattern unary_map
-     else Pattern.Map.add pattern cc_map' unary_map
-   else unary_map)
+let update_roots is_add unary_ccs edges map unary_map pattern root =
+  let va = Pattern.ObsMap.get map pattern in
+  let () = Pattern.ObsMap.set map pattern
+      ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) in
+  if Pattern.Set.mem pattern unary_ccs then
+    let cc_map =
+      Pattern.ObsMap.get unary_map pattern in
+    let cc_map' =
+      match Edges.get_connected_component root edges with
+      | Some cc_id ->
+        let set = Mods.IntMap.find_default Mods.IntSet.empty cc_id cc_map in
+        let set' =
+          (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set in
+        add_intset_in_intmap cc_id set' cc_map
+      | None ->
+        Mods.IntMap.map
+          (fun set ->
+             (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set)
+          cc_map in
+    Pattern.ObsMap.set unary_map pattern cc_map'
 
 let new_place free_id (inj_nodes,inj_fresh) = function
   | Agent_place.Existing _ -> failwith "Rule_interpreter.new_place"
@@ -114,9 +115,7 @@ let all_injections ?excp ?unary_rate domain edges roots patterna =
            | Some (cc',root)
              when Pattern.is_equal_canonicals pattern cc' ->
              Mods.IntSet.add root Mods.IntSet.empty,None
-           | (Some _ | None) ->
-             Pattern.Map.find_default
-               Mods.IntSet.empty pattern roots, excp in
+           | (Some _ | None) -> Pattern.ObsMap.get roots pattern, excp in
          (excp',
           Mods.IntSet.fold
             (fun root new_injs ->
@@ -149,7 +148,7 @@ let all_injections ?excp ?unary_rate domain edges roots patterna =
 let break_apart_cc edges roots_of_unary_patterns = function
   | None -> roots_of_unary_patterns
   | Some (origin_cc,new_cc) ->
-    Pattern.Map.map
+    Pattern.ObsMap.map
       (fun cc_map ->
          let oset =
            Mods.IntMap.find_default Mods.IntSet.empty origin_cc cc_map in
@@ -167,7 +166,7 @@ let break_apart_cc edges roots_of_unary_patterns = function
 let merge_cc roots_of_unary_patterns = function
   | None -> roots_of_unary_patterns
   | Some (cc1,cc2) ->
-    Pattern.Map.map
+    Pattern.ObsMap.map
       (fun cc_map ->
          let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc1 cc_map in
          match Mods.IntMap.pop cc2 cc_map with
@@ -329,7 +328,7 @@ let store_obs domain edges roots obs acc = function
                      (ev,tests') :: acc)
                   acc
                   (all_injections ~excp:(pattern,root) domain edges roots patterns))
-             acc (Pattern.Map.find_default [] pattern tracked)
+             acc (Pattern.ObsMap.get tracked pattern)
          with Not_found -> acc)
       acc obs
 
@@ -348,18 +347,23 @@ let update_edges
     List.fold_left
       apply_negative_transformation
       ([],state.roots_of_unary_patterns,state.edges) concrete_removed in
-  let roots_of_p,roots_of_up =
-    List.fold_left
-      (fun r' (pat,(root,_)) -> update_roots false unary_patterns edges_after_neg r' pat root)
-      (state.roots_of_patterns,roots_by_cc) del_obs in
+  let () =
+    List.iter
+      (fun (pat,(root,_)) ->
+         update_roots false unary_patterns edges_after_neg
+           state.roots_of_patterns roots_by_cc pat root)
+      del_obs in
   (*Positive update*)
-  let (final_inj2graph,remaining_side_effects,roots_by_cc',edges'),concrete_inserted =
+  let (final_inj2graph,remaining_side_effects,roots_by_cc',edges'),
+      concrete_inserted =
     List.fold_left
       (fun (x,p) h ->
-         let (x', h') = apply_positive_transformation
+         let (x', h') =
+           apply_positive_transformation
              (Pattern.Env.signatures domain) x h in
          (x',h'::p))
-      (((inj_nodes,Mods.IntMap.empty),side_effects,roots_of_up,edges_after_neg),[])
+      (((inj_nodes,Mods.IntMap.empty),side_effects,roots_by_cc,
+        edges_after_neg),[])
       rule.Primitives.inserted in
   let (edges'',concrete_inserted') =
     List.fold_left
@@ -371,13 +375,16 @@ let update_edges
       (obs_from_transformation domain edges'')
       (([],Operator.DepSet.empty),Pattern.Matching.empty_cache)
       concrete_inserted' in
-  let roots_of_p',roots_of_up' =
-    List.fold_left
-      (fun r' (pat,(root,_)) -> update_roots true unary_patterns edges'' r' pat root)
-      (roots_of_p,roots_by_cc') new_obs in
+  let () =
+    List.iter
+      (fun (pat,(root,_)) ->
+         update_roots true unary_patterns edges''
+           state.roots_of_patterns roots_by_cc' pat root)
+      new_obs in
   (*Store event*)
   let new_tracked_obs_instances =
-    store_obs domain edges'' roots_of_p new_obs [] state.story_machinery in
+    store_obs domain edges'' state.roots_of_patterns
+      new_obs [] state.story_machinery in
   let story_machinery' =
     store_event
       counter final_inj2graph new_tracked_obs_instances event_kind
@@ -387,9 +394,14 @@ let update_edges
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
   let mod_connectivity =
-    changed_connectivity || roots_of_up' != state.roots_of_unary_patterns in
+    changed_connectivity ||
+    Pattern.ObsMap.fold_lefti
+      (fun i b x ->
+         b || x != Pattern.ObsMap.get state.roots_of_unary_patterns i)
+      false roots_by_cc' in
 
-  { roots_of_patterns = roots_of_p'; roots_of_unary_patterns = roots_of_up';
+  { roots_of_patterns = state.roots_of_patterns;
+    roots_of_unary_patterns = roots_by_cc';
     unary_candidates = state.unary_candidates;
     matchings_of_rule = state.matchings_of_rule;
     edges = edges''; tokens = state.tokens;
@@ -400,8 +412,7 @@ let update_edges
 
 let raw_instance_number state patterns_l =
   let size pattern =
-    Mods.IntSet.size (Pattern.Map.find_default
-                        Mods.IntSet.empty pattern state.roots_of_patterns) in
+    Mods.IntSet.size (Pattern.ObsMap.get state.roots_of_patterns pattern) in
   let rect_approx patterns =
     Array.fold_left (fun acc pattern ->  acc * (size pattern)) 1 patterns in
   List.fold_left (fun acc patterns -> acc + (rect_approx patterns)) 0 patterns_l
@@ -446,13 +457,11 @@ let update_outdated_activities ~get_alg store env counter state =
     | None -> state
     | Some (unrate, _) ->
       let map1 =
-        Pattern.Map.find_default
-          Mods.IntMap.empty rule.Primitives.connected_components.(0)
-          state.roots_of_unary_patterns in
+        Pattern.ObsMap.get state.roots_of_unary_patterns
+          rule.Primitives.connected_components.(0)in
       let map2 =
-        Pattern.Map.find_default
-          Mods.IntMap.empty rule.Primitives.connected_components.(1)
-          state.roots_of_unary_patterns in
+        Pattern.ObsMap.get state.roots_of_unary_patterns
+          rule.Primitives.connected_components.(1)in
       let (),va =
         Mods.IntMap.monadic_fold2_sparse
           () ()
@@ -530,13 +539,11 @@ let apply_unary_rule
       let inj,path = Tools.list_random state.random_state l in Some inj,path
     | None ->
       let map1 =
-        Pattern.Map.find_default
-          Mods.IntMap.empty rule.Primitives.connected_components.(0)
-          state.roots_of_unary_patterns in
+        Pattern.ObsMap.get state.roots_of_unary_patterns
+          rule.Primitives.connected_components.(0) in
       let map2 =
-        Pattern.Map.find_default
-          Mods.IntMap.empty rule.Primitives.connected_components.(1)
-          state.roots_of_unary_patterns in
+        Pattern.ObsMap.get state.roots_of_unary_patterns
+           rule.Primitives.connected_components.(1) in
       let rtree = Random_tree.create
           (min (Mods.IntMap.size map1) (Mods.IntMap.size map2)) in
       let (),() =
@@ -608,8 +615,7 @@ let apply_rule
       (fun id inj pattern ->
          let root =
            match Mods.IntSet.random state.random_state
-                   (Pattern.Map.find_default
-                      Mods.IntSet.empty pattern state.roots_of_patterns) with
+                   (Pattern.ObsMap.get state.roots_of_patterns pattern) with
            | None -> failwith "Tried to apply_rule with no root"
            | Some x -> x in
          (match inj with
@@ -732,10 +738,8 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
                          | Some _ as p -> (inj',p)::list,succ len)
                 set2)
            set1 out)
-      (Pattern.Map.find_default
-         Mods.IntMap.empty pattern1 state.roots_of_unary_patterns)
-      (Pattern.Map.find_default
-         Mods.IntMap.empty pattern2 state.roots_of_unary_patterns)
+      (Pattern.ObsMap.get state.roots_of_unary_patterns pattern1)
+      (Pattern.ObsMap.get state.roots_of_unary_patterns pattern2)
       ([],0) in
   let () =
     store_activity
@@ -748,14 +752,14 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
   }
 
 let incorporate_extra_pattern domain state pattern =
-  if Pattern.Map.mem pattern state.roots_of_patterns
-  then state
-  else {state with
-        roots_of_patterns =
-          Pattern.Map.add
-            pattern
-            (Pattern.Matching.roots_of domain state.edges pattern)
-            state.roots_of_patterns}
+  let () =
+    if not (Mods.IntSet.is_empty
+              (Pattern.ObsMap.get state.roots_of_patterns pattern)) then
+      Pattern.ObsMap.set
+      state.roots_of_patterns
+      pattern
+      (Pattern.Matching.roots_of domain state.edges pattern) in
+  state
 
 let snapshot env counter fn state = {
   Data.snapshot_file = fn;
@@ -795,34 +799,31 @@ let debug_print f state =
 let add_tracked patterns event_kind tests state =
   match state.story_machinery with
   | None -> state
-  | Some (comp,tpattern,x) ->
-    let tpattern' =
-      Array.fold_left
-        (fun tpattern pattern ->
-           let acc = Pattern.Map.find_default [] pattern tpattern in
-           Pattern.Map.add
-             pattern ((event_kind,patterns,tests)::acc) tpattern)
-        tpattern patterns in
-    { state with story_machinery = Some (comp,tpattern',x) }
-
+  | Some (_,tpattern,_) ->
+    let () =
+      Array.iter
+        (fun pattern ->
+           let acc = Pattern.ObsMap.get tpattern pattern in
+           Pattern.ObsMap.set tpattern
+             pattern ((event_kind,patterns,tests)::acc))
+        patterns in
+    state
 let remove_tracked patterns state =
   match state.story_machinery with
   | None -> state
-  | Some (comp,tpattern,x) ->
+  | Some (_,tpattern,_) ->
     let tester (_,el,_) =
       not @@
       Tools.array_fold_lefti
         (fun i b x -> b && Pattern.is_equal_canonicals x el.(i))
         true patterns in
-    let tpattern' =
-      Array.fold_left
-        (fun tpattern pattern ->
-           let acc = Pattern.Map.find_default [] pattern tpattern in
-           match List.filter tester acc with
-           | [] -> Pattern.Map.remove pattern tpattern
-           | l -> Pattern.Map.add pattern l tpattern)
-        tpattern patterns in
-    { state with story_machinery = Some (comp,tpattern',x) }
+    let () =
+      Array.iter
+        (fun pattern ->
+           let acc = Pattern.ObsMap.get tpattern pattern in
+           Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
+        patterns in
+    state
 
 let generate_stories state =
   Tools.option_map

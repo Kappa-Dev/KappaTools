@@ -88,23 +88,23 @@ val generate_stories : t -> (string*Trace.t) option
 
 val print_injections :
   ?domain:Pattern.Env.t -> Format.formatter ->
-  Mods.IntSet.t Pattern.Map.t -> unit
+  Mods.IntSet.t Pattern.ObsMap.t -> unit
 val debug_print : Format.formatter -> t -> unit
 
 (** {6 Internals } *)
 val apply_negative_transformation :
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t ->
+  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->
   Instantiation.concrete Primitives.Transformation.t ->
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t
+  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t
 val apply_positive_transformation :
   Signature.s ->
   (Pattern.Matching.t * int Mods.IntMap.t) *
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t ->
+  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->
   Instantiation.abstract Primitives.Transformation.t ->
   ((Pattern.Matching.t * int Mods.IntMap.t) *
    (Instantiation.concrete Instantiation.site) list *
-   Mods.IntSet.t Mods.IntMap.t Pattern.Map.t * Edges.t) *
+   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t) *
   Instantiation.concrete Primitives.Transformation.t

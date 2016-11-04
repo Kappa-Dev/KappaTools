@@ -18,6 +18,12 @@ type t = cc
 
 type id = int
 
+module ObsMap = struct
+  include Mods.DynArray
+
+  let dummy x = make 0 x
+end
+
 type transition = {
   next: Navigation.t;
   dst: id (* id of cc and also address in the Env.domain map*);
@@ -569,6 +575,7 @@ module Env : sig
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
   val signatures : t -> Signature.s
+  val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
   val print : Format.formatter -> t -> unit
   val print_dot : Format.formatter -> t -> unit
@@ -623,6 +630,8 @@ end = struct
         ~trailing:Pp.space Pp.space
         (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
     Format.fprintf f "}@]@."
+
+  let new_obs_map env f = Mods.DynArray.init (Array.length env.domain) f
 end
 
 let print ?domain ~with_id f id =
@@ -1174,4 +1183,3 @@ let compare_canonicals cc cc' = Mods.int_compare cc cc'
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
 module Set = Mods.IntSet
-module Map = Mods.IntMap
