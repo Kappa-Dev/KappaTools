@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 12 2016>
+   * Last modification: Time-stamp: <Nov 04 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -259,7 +259,8 @@ let print_site_accross_domain
     ?final_result:(final_result = false)
     ?dump_any:(_dump_any = false) parameters error kappa_handler handler tuple mvbdu =
   let prefix = Remanent_parameters.get_prefix parameters in
-  let (agent_type1, site_type1, site_type1', _), (agent_type2, site_type2, site_type2', _) = tuple in
+  let (agent_type1, site_type1, site_type1', _),
+      (agent_type2, site_type2, site_type2', _) = tuple in
   (*----------------------------------------------------*)
   (*state1 and state1' are a binding states*)
   let error, (agent1, site1, site1',_, agent2, site2, site2', _) =
@@ -286,7 +287,7 @@ let print_site_accross_domain
       let error, handler, pair_list =
         Ckappa_sig.Views_bdu.extensional_of_mvbdu
           parameters handler error mvbdu
-    in
+      in
       (*----------------------------------------------------*)
       match Remanent_parameters.get_backend_mode parameters
       with

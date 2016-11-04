@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 27 2016>
+  * Last modification: Time-stamp: <Nov 04 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -287,11 +287,7 @@ type site_map =
      Wrapped_modules.LoggedStringMap.t) list
 
 type constraint_list =
-((string *
-  (string option * Ckappa_backend.Ckappa_backend.binding_state option)
-     Wrapped_modules.LoggedStringMap.t)
-   list)
-  poly_constraint_list
+  site_map poly_constraint_list
 
 (*
 string *
@@ -584,7 +580,6 @@ let print_internal_constraint_list logger parameters error kappa_handler
     "------------------------------------------------------------\n";
   in
   List.fold_left (fun error lemma ->
-      let () = Loggers.fprintf logger "Hyp:" in
       let error =
         Ckappa_backend.Ckappa_backend.print logger parameters error
           kappa_handler
@@ -647,13 +642,12 @@ let print_constraint_list logger parameters error kappa_handler constraint_list
     "------------------------------------------------------------\n";
   in
   List.fold_left (fun error lemma -> (*TODO*)
-      let () = Loggers.fprintf logger "Hyp: " in
       let error =
         List.fold_left (fun error hyp ->
           let error =
             print_for_list logger parameters error
               kappa_handler
-              lemma.hyp
+              (List.rev lemma.hyp)
           in
           let () = Loggers.fprintf logger " => [" in
             let error =
@@ -683,76 +677,32 @@ let print_constraint_list_list logger parameters error kappa_handler list =
 
 (*******************************************************************)
 
-let collect_hyp_of_constraint_list error hyp =
-  Ckappa_sig.Agent_id_map_and_set.Map.fold
-    (fun _ (agent_string, site_map) (error, current_list) ->
-       let hyp = (agent_string, site_map) :: current_list in
-       error, hyp
-    ) hyp (error, [])
+let convert_site_graph error string_version =
+  let error, current_list =
+    Ckappa_sig.Agent_id_map_and_set.Map.fold
+      (fun _ (agent_string, site_map) (error, current_list) ->
+         (*-----------------------------------------*)
+         let site_graph =
+           (agent_string, site_map) :: current_list
+         in
+         error, site_graph
+      ) string_version (error, [])
+  in
+  error, List.rev current_list
 
-let collect_refinement_of_constraint_list error list =
-  List.fold_left (fun (error, current_list) hyp ->
-      (*translate t -> string_version*)
-      let string_version =
-        Ckappa_backend.Ckappa_backend.get_string_version
-          hyp
-      in
-      let error, hyp =
-        collect_hyp_of_constraint_list error string_version
-      in
-      error, hyp :: current_list
+let convert_refinement error list =
+  List.fold_left (fun (error, current_list) t ->
+      let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
+      let error, site_graph = convert_site_graph error string_version in
+      error, site_graph :: current_list
     ) (error, []) list
 
-let collect_the_head_of_constraint_list error string_version list
-    current_list =
-  let error, current_list =
-    Ckappa_sig.Agent_id_map_and_set.Map.fold
-      (fun _ (agent_string, site_map) (error, current_list) ->
-        (*-----------------------------------------*)
-        let error, hyp =
-          collect_hyp_of_constraint_list error string_version
-        in
-        (*refinement*)
-        let error, refinement =
-          collect_refinement_of_constraint_list error list
-        in
-        (*-----------------------------------------*)
-        let lemma =
-          {
-            hyp = hyp;
-            refinement = refinement;
-          }
-        in
-        let lemma_list = lemma :: current_list in
-        error, lemma_list
-      ) string_version (error, current_list)
-  in
-  error, current_list
+(*******************************************************************)
 
-let collect_the_head_of_internal_constraint_list parameters error
-    t list current_list =
-  let string_version = Ckappa_backend.Ckappa_backend.get_string_version t in
-  let error, current_list =
-    Ckappa_sig.Agent_id_map_and_set.Map.fold
-      (fun _ (agent_string, site_map) (error, current_list) ->
-         (*return type t.string_version*)
-         let hyp = t in
-         let error, refinement =
-           List.fold_left (fun (error, current_list) hyp ->
-               error, hyp :: current_list
-             ) (error, []) list
-         in
-         let lemma =
-           {hyp = hyp;
-            refinement = refinement}
-         in
-         let lemma_list = lemma :: current_list in
-         error, lemma_list
-      ) string_version (error, current_list)
-  in
-  error, current_list
-
-
+let convert_refinement_internal error list =
+  List.fold_left (fun (error, current_list) hyp ->
+      error, hyp :: current_list
+    ) (error, []) list
 
 (*******************************************************************)
 

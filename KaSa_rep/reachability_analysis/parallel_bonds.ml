@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 27 2016>
+  * Last modification: Time-stamp: <Nov 04 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1412,22 +1412,31 @@ struct
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_precondition
                      in
-                     (*the head:hyp*)
-                     let error, current_list =
-                       Remanent_state.collect_the_head_of_constraint_list
-                         error
-                         string_version
-                         list_same
-                         current_list
+                     let error, site_graph =
+                       Remanent_state.convert_site_graph
+                         error string_version
                      in
+                     let error, refinement =
+                       Remanent_state.convert_refinement error list_same in
+                     let lemma =
+                       {
+                         Remanent_state.hyp = site_graph;
+                         Remanent_state.refinement = refinement
+                       }
+                     in
+                     let current_list = lemma :: current_list in
                      (*internal constraint list*)
-                     let error, current_list2 =
-                       Remanent_state.collect_the_head_of_internal_constraint_list
-                         parameters error
-                         t_precondition
+                     let error, refine =
+                       Remanent_state.convert_refinement_internal error
                          list_same
-                         current_list2
                      in
+                     let lemma_internal =
+                       {
+                         Remanent_state.hyp = t_precondition;
+                         Remanent_state.refinement = refine;
+                       }
+                     in
+                     let current_list2 = lemma_internal :: current_list2 in
                      error, (current_list, current_list2)
                    end
                  | Remanent_parameters_sig.Natural_language ->
@@ -1435,22 +1444,32 @@ struct
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_same
                    in
-                   (*hyp*)
-                   let error, current_list =
-                     Remanent_state.collect_the_head_of_constraint_list
-                       error
+                   let error, site_graph =
+                     Remanent_state.convert_site_graph error
                        string_version
-                       []
-                       current_list
                    in
+                   (*hyp*)
+                   let error, refinement =
+                     Remanent_state.convert_refinement error list_same in
+                   let lemma =
+                     {
+                       Remanent_state.hyp = site_graph;
+                       Remanent_state.refinement = refinement
+                     }
+                   in
+                   let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let error, current_list2 =
-                     Remanent_state.collect_the_head_of_internal_constraint_list
-                       parameters error
-                       t_same
-                       []
-                       current_list2
+                   let error, refine =
+                     Remanent_state.convert_refinement_internal error
+                       list_same
                    in
+                   let lemma_internal =
+                     {
+                       Remanent_state.hyp = t_same;
+                       Remanent_state.refinement = refine
+                     }
+                   in
+                   let current_list2 = lemma_internal :: current_list2 in
                    error, (current_list, current_list2)
                end
              | Usual_domains.Val false ->
@@ -1462,42 +1481,58 @@ struct
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_precondition
                    in
-                   let error, current_list =
-                     Remanent_state.collect_the_head_of_constraint_list
-                       error
-                       string_version
-                       list_distinct
-                       current_list
+                   let error, site_graph =
+                     Remanent_state.convert_site_graph error string_version in
+                   let error, refinement =
+                     Remanent_state.convert_refinement error list_distinct in
+                   let lemma =
+                     {
+                       Remanent_state.hyp = site_graph;
+                       Remanent_state.refinement = refinement
+                     }
                    in
+                   let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let error, current_list2 =
-                     Remanent_state.collect_the_head_of_internal_constraint_list
-                       parameters error
-                       t_precondition
+                   let error, refine =
+                     Remanent_state.convert_refinement_internal error
                        list_distinct
-                       current_list2
                    in
+                   let lemma_internal =
+                     {
+                       Remanent_state.hyp = t_precondition;
+                       Remanent_state.refinement = refine
+                     }
+                   in
+                   let current_list2 = lemma_internal :: current_list2 in
                    error, (current_list, current_list2)
                  | Remanent_parameters_sig.Natural_language ->
                    let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_distinct
                    in
-                   let error, current_list =
-                     Remanent_state.collect_the_head_of_constraint_list
-                       error
-                       string_version
-                       []
-                       current_list
+                   let error, site_graph =
+                     Remanent_state.convert_site_graph error string_version in
+                   let error, refinement =
+                     Remanent_state.convert_refinement error list_distinct in
+                   let lemma =
+                     {
+                       Remanent_state.hyp = site_graph;
+                       Remanent_state.refinement = refinement
+                     }
                    in
+                   let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let error, current_list2 =
-                     Remanent_state.collect_the_head_of_internal_constraint_list
-                       parameters error
-                       t_distinct
-                       []
-                       current_list2
+                   let error, refine =
+                     Remanent_state.convert_refinement_internal error
+                       list_distinct
                    in
+                   let lemma_internal =
+                     {
+                       Remanent_state.hyp = t_distinct;
+                       Remanent_state.refinement = refine
+                     }
+                   in
+                   let current_list2 = lemma_internal :: current_list2 in
                    error, (current_list, current_list2)
                end
              | Usual_domains.Any ->
@@ -1510,40 +1545,55 @@ struct
                    Ckappa_backend.Ckappa_backend.get_string_version
                      t_same
                  in
-                 let error, current_list =
-                   Remanent_state.collect_the_head_of_constraint_list
-                     error
-                     string_version
-                     [] (*TODO*)
-                     current_list
+                 let error, site_graph =
+                   Remanent_state.convert_site_graph error string_version in
+                 let error, refinement =
+                   Remanent_state.convert_refinement error list_same in
+                 let lemma =
+                   {
+                     Remanent_state.hyp = site_graph;
+                     Remanent_state.refinement = refinement
+                   }
                  in
-                 let error, current_list2 =
-                   Remanent_state.collect_the_head_of_internal_constraint_list
-                     parameters error
-                     t_same
-                     []
-                     current_list2
+                 let current_list = lemma :: current_list in
+                 (*internal*)
+                 let error, refine =
+                   Remanent_state.convert_refinement_internal error
+                     list_same
                  in
+                 let lemma_internal =
+                   {
+                     Remanent_state.hyp = t_same;
+                     Remanent_state.refinement = refine
+                   }
+                 in
+                 let current_list2 = lemma_internal :: current_list2 in
                  (*----------------------------------------------*)
                  let string_version =
                    Ckappa_backend.Ckappa_backend.get_string_version
                      t_distinct
-                 in (*FIXME*)
-                 let error, current_list =
-                   Remanent_state.collect_the_head_of_constraint_list
-                     error
-                     string_version
-                     [] (*TODO*)
-                     current_list
                  in
+                 let error, site_graph =
+                   Remanent_state.convert_site_graph error string_version in
+                 let error, refinement =
+                   Remanent_state.convert_refinement error list_distinct in
+                 let lemma =
+                   {
+                     Remanent_state.hyp = site_graph;
+                     Remanent_state.refinement = refinement
+                   }
+                 in
+                 let current_list = lemma :: current_list in
                  (*internal constraint list*)
-                 let error, current_list2 =
-                   Remanent_state.collect_the_head_of_internal_constraint_list
-                     parameters error
-                     t_distinct
-                     []
-                     current_list2
+                 let error, refine =
+                   Remanent_state.convert_refinement_internal error
+                     list_distinct
                  in
+                 let lemma_internal =
+                   {Remanent_state.hyp = t_distinct;
+                    Remanent_state.refinement = refine}
+                 in
+                 let current_list2 = lemma_internal :: current_list2 in
                  error, (current_list, current_list2)
         ) store_value (error, ([], [])) (*name of domain*)
     in
