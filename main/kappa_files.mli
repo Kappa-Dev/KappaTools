@@ -41,4 +41,5 @@ val with_influence : (Format.formatter -> unit) -> unit
 val set_ccFile : string -> unit
 val with_ccFile : (Format.formatter -> unit) -> unit
 
-val with_channel : string (**path*) -> (out_channel -> unit) -> unit
+val with_channel : string -> (out_channel -> unit) -> unit
+(** [with_channel path f] *)
