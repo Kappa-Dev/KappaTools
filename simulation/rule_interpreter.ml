@@ -1,5 +1,7 @@
 type t =
   {
+    mutable outdated : bool;
+
     (* With rectangular approximation *)
     roots_of_patterns: Mods.IntSet.t Pattern.ObsMap.t;
     roots_of_unary_patterns:
@@ -32,6 +34,7 @@ let empty ?trace_file ~store_distances random_state env =
     not (Pattern.Set.is_empty
            (Environment.connected_components_of_unary_rules env)) in
   {
+    outdated = false;
     roots_of_patterns = Pattern.Env.new_obs_map
         (Environment.domain env) (fun _ -> Mods.IntSet.empty);
     roots_of_unary_patterns = Pattern.Env.new_obs_map
@@ -334,6 +337,8 @@ let store_obs domain edges roots obs acc = function
 
 let update_edges
     counter domain unary_patterns inj_nodes state event_kind ?path rule =
+  let () = assert (not state.outdated) in
+  let () = state.outdated <- true in
   (*Negative update*)
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
@@ -400,7 +405,8 @@ let update_edges
          b || x != Pattern.ObsMap.get state.roots_of_unary_patterns i)
       false roots_by_cc' in
 
-  { roots_of_patterns = state.roots_of_patterns;
+  { outdated = false;
+    roots_of_patterns = state.roots_of_patterns;
     roots_of_unary_patterns = roots_by_cc';
     unary_candidates = state.unary_candidates;
     matchings_of_rule = state.matchings_of_rule;
@@ -420,12 +426,14 @@ let instance_number state patterns_l =
   Nbr.I (raw_instance_number state patterns_l)
 
 let value_bool ~get_alg counter state expr =
+  let () = assert (not state.outdated) in
   Expr_interpreter.value_bool
     counter ~get_alg
     ~get_mix:(fun patterns -> instance_number state patterns)
     ~get_tok:(fun i -> state.tokens.(i))
     expr
 let value_alg ~get_alg counter state alg =
+  let () = assert (not state.outdated) in
   Expr_interpreter.value_alg
     counter ~get_alg
     ~get_mix:(fun patterns -> instance_number state patterns)
@@ -451,6 +459,7 @@ let store_activity ~get_alg store env counter state id syntax_id rate cc_va =
   store id syntax_id act
 
 let update_outdated_activities ~get_alg store env counter state =
+  let () = assert (not state.outdated) in
   let deps,changed_connectivity = state.outdated_elements in
   let unary_rule_update i state rule =
     match rule.Primitives.unary_rate with
@@ -532,6 +541,7 @@ let transform_by_a_rule
 
 let apply_unary_rule
     ~rule_id ~get_alg env unary_ccs counter state event_kind rule =
+  let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let inj,path =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
@@ -609,6 +619,7 @@ let apply_unary_rule
 
 let apply_rule
     ?rule_id ~get_alg env unary_patterns counter state event_kind rule =
+  let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let from_patterns () =
     Tools.array_fold_left_mapi
@@ -672,8 +683,8 @@ let force_rule
   match apply_rule
           ~get_alg env unary_patterns counter state event_kind rule with
   | Success (_,out) -> out
-  | Corrected -> state (*TODO*)
-  | Clash ->
+  | Corrected | Clash ->
+    let () = assert (not state.outdated) in
     match all_injections
             ?unary_rate:rule.Primitives.unary_rate
             (Environment.domain env) state.edges
@@ -685,6 +696,7 @@ let force_rule
          ~get_alg env unary_patterns counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
+  let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let matches =
     all_injections
@@ -700,6 +712,7 @@ let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
       Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
 let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
+  let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let pattern1 = rule.Primitives.connected_components.(0) in
   let pattern2 = rule.Primitives.connected_components.(1) in
@@ -752,6 +765,8 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
   }
 
 let incorporate_extra_pattern domain state pattern =
+  let () = assert (not state.outdated) in
+  let () = state.outdated <- true in
   let () =
     if not (Mods.IntSet.is_empty
               (Pattern.ObsMap.get state.roots_of_patterns pattern)) then
@@ -759,7 +774,7 @@ let incorporate_extra_pattern domain state pattern =
       state.roots_of_patterns
       pattern
       (Pattern.Matching.roots_of domain state.edges pattern) in
-  state
+  { state with outdated = false }
 
 let snapshot env counter fn state = {
   Data.snapshot_file = fn;
@@ -797,6 +812,8 @@ let debug_print f state =
     state.roots_of_unary_patterns
 
 let add_tracked patterns event_kind tests state =
+  let () = assert (not state.outdated) in
+  let () = state.outdated <- true in
   match state.story_machinery with
   | None -> state
   | Some (_,tpattern,_) ->
@@ -807,8 +824,10 @@ let add_tracked patterns event_kind tests state =
            Pattern.ObsMap.set tpattern
              pattern ((event_kind,patterns,tests)::acc))
         patterns in
-    state
+    { state with outdated = false }
 let remove_tracked patterns state =
+  let () = assert (not state.outdated) in
+  let () = state.outdated <- true in
   match state.story_machinery with
   | None -> state
   | Some (_,tpattern,_) ->
@@ -823,7 +842,7 @@ let remove_tracked patterns state =
            let acc = Pattern.ObsMap.get tpattern pattern in
            Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
         patterns in
-    state
+    { state with outdated = false }
 
 let generate_stories state =
   Tools.option_map
