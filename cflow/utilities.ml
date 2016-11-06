@@ -690,24 +690,39 @@ let compress
       else
         error, ()
     in
-
-    (*     let error =
-           if debug_mode
-           then
-           let _ =  Debug.tag parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "\t\t * result"  in
-           let _ =
+    let error =
+      if debug_mode
+      then
+        let () =
+          Loggers.fprintf
+            parameter.S.PH.B.PB.CI.Po.K.H.logger_err
+            "\t\t * result"  in
+        let error =
            if S.PH.B.is_failed output
-               then
-           let _ = S.PH.B.export_blackboard_to_xls parameter handler log_info error "FAIL" 0 0 blackboard in
-                 let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
+           then
+             let error, _log_info, () =
+               S.PH.B.export_blackboard_to_xls
+                 parameter handler log_info error "FAIL" 0 0 blackboard
+             in
+             let () =
+               Loggers.fprintf
+                 parameter.S.PH.B.PB.CI.Po.K.H.logger_err
+                 "Fail_to_compress"
+             in
+             error
            else
-           let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in
-           error
-           in
-           error
-           else
-           error
-           in*) error,log_info,list
+             let () =
+               Loggers.fprintf
+                 parameter.S.PH.B.PB.CI.Po.K.H.logger_err
+                 "Succeed_to_compress"
+             in
+             error
+        in
+        error
+      else
+        error
+    in
+    error,log_info,list
 
 let strongly_compress ?heuristic parameter = compress ?heuristic (S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter)
 let weakly_compress ?heuristic parameter = compress ?heuristic (S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter)
@@ -821,7 +836,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
     in
     aux list (error,profiling_information,progress_bar,1,a,0)
   in
-  (*  let () = close_progress_bar_opt (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) in*)
+  let () = close_progress_bar_opt (S.PH.B.PB.CI.Po.K.H.get_logger parameter) in
   let error,profiling_information =
     if StoryProfiling.StoryStats.is_dummy event
     then error,profiling_information
