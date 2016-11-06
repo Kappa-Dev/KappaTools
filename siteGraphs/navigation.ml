@@ -78,12 +78,12 @@ let compatible_point inj e e' =
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))
     | ((Fresh (id',ty),site),ToNode (Existing id,site')),
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))) ->
-    begin
+    if  ssite = site && ty' = ty && ssite' = site'
+        && not (Renaming.mem id' inj) then
       match Renaming.add id' sid' inj with
-      | Some inj' when sid = Renaming.apply inj' id && ssite = site
-                       && ty' = ty && ssite' = site' -> Some inj'
+      | Some inj' when sid = Renaming.apply inj' id  -> Some inj'
       | _ -> None
-    end
+   else None
   | ((Existing _,_), ToNode (Fresh _,_)),
     (((Fresh _ | Existing _), _), _) -> None
   | ((Fresh (id,ty),site), ToNothing), ((Fresh (id',ty'),site'),x) ->
