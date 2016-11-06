@@ -34,7 +34,8 @@ type shall_we = (parameter -> bool)
 (** enriched types for functions: *)
 
 type 'a with_handlers =
-  parameter -> ?shall_we_compute:shall_we -> ?shall_we_compute_profiling_information:shall_we -> kappa_handler -> profiling_info -> error_log -> 'a
+  parameter -> ?shall_we_compute:shall_we -> ?shall_we_compute_profiling_information:shall_we ->
+  ?print_if_zero:shall_we -> kappa_handler -> profiling_info -> error_log -> 'a
 type 'a zeroary =
   (error_log * profiling_info * 'a) with_handlers
 type ('a,'b) unary =

@@ -45,8 +45,8 @@ let th_of_int n =
 
 let max_number_of_itterations = None
 
-let never = (fun _ -> false)
-let always = (fun _ -> true)
+let we_shall_not = (fun _ -> false)
+let we_shall = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
@@ -210,8 +210,9 @@ let compress_and_print
                   ~event:StoryProfiling.Collect_traces
                   (fun
                     parameter
-                    ?(shall_we_compute=always)
-                    ?(shall_we_compute_profiling_information=always)
+                    ?(shall_we_compute=we_shall)
+                    ?(shall_we_compute_profiling_information=we_shall)
+                    ?(print_if_zero=we_shall)
                     handler log_info error story_list observable_id ->
                     let () =
                       if debug_mode then
@@ -259,12 +260,19 @@ let compress_and_print
               error,log_info,table1
           in
           (* Now causal compression, with detection of siphons & detection of pseudo inverse events *)
+          let parameter_deeper =
+            S.PH.B.PB.CI.Po.K.H.set_kasa_parameters
+              (Remanent_parameters.update_prefix
+                 (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+                 "\t\t\t")
+              parameter
+          in
           let one_iteration_of_compression (log_info,error,event_list) =
             let error,log_info,event_list =
               if Graph_closure.ignore_flow_from_outgoing_siphon
               then
-                U.fill_siphon parameter
-                  ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                U.fill_siphon parameter_deeper
+                  ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                   handler log_info error event_list
               else
                 error,log_info,event_list
@@ -276,8 +284,8 @@ let compress_and_print
             let error,log_info,event_list =
               if Parameter.do_global_cut
               then
-                U.cut parameter
-                  ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                U.cut parameter_deeper
+                  ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                   handler log_info error event_list
               else
                 error,log_info,event_list
@@ -285,34 +293,77 @@ let compress_and_print
             if Parameter.cut_pseudo_inverse_event
             then
               U.remove_pseudo_inverse_events
-                parameter
-                ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                parameter_deeper
+                ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                 handler log_info error event_list
             else
               error,log_info,event_list
           in
           (* This fonction iter the causal compression until a fixpoint is reached *)
           let rec aux k (error,log_info,event_list) =
+            let size = Utilities.size_of_pretrace event_list in
             match
               S.PH.B.PB.CI.Po.K.H.get_bound_on_itteration_number parameter
             with
-            | Some k' when k>=k' -> error,log_info,event_list
+            | Some k' when k>=k' ->
+              let () =
+                Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                  "%s\t- max number of iterations reached, %i events remaining @."
+                  (Remanent_parameters.get_prefix
+                     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
+                  size
+              in
+              error,log_info,event_list
             | Some _ | None ->
+              let () =
+                Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                  "%s\t\t- start iteration %i, %i events remaining @."
+                  (Remanent_parameters.get_prefix
+                     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
+                  (k+1)
+                  size
+              in
               let output_opt =
                 try
-                  Some (one_iteration_of_compression (log_info,error,event_list))
+                  Some
+                    (one_iteration_of_compression (log_info,error,event_list))
                 with Sys.Break -> None
               in
               match
                 output_opt
               with
-              | None -> error,log_info,event_list
+              | None ->
+              let () =
+                Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                  "%s\t- iterations stopped by the end-user, %i events remaining @."
+                  (Remanent_parameters.get_prefix
+                     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
+                  size
+              in
+              error,log_info,event_list
               | Some (error,log_info,event_list') ->
                 if U.size_of_pretrace event_list' < U.size_of_pretrace event_list
                 then
                   aux (k+1) (error,log_info,event_list')
                 else
+                let () =
+                  Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                    "%s\t- a fixpoint has been reached, %i events remaining @."
+                    (Remanent_parameters.get_prefix
+                       (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
+                    size
+                in
                   error,log_info,event_list'
+          in
+          let aux k (error,log_info,event_list) =
+            let () =
+              Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                "%s\t- simplify the trace, %i events @."
+                (Remanent_parameters.get_prefix
+                   (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
+                (Utilities.size_of_pretrace event_list)
+            in
+            aux k (error,log_info,event_list)
           in
           let error,log_info,causal_story_table,weakly_story_table =
             if weak_compression_on || strong_compression_on
@@ -325,9 +376,9 @@ let compress_and_print
                   let error,log_info,(_bl,causal_story_table,weak_story_table) =
                     Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
                       parameter
-                      ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                      ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                       handler log_info error
-                      always never Utilities_expert.parameters
+                      we_shall we_shall_not Utilities_expert.parameters
                       aux
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
@@ -340,17 +391,18 @@ let compress_and_print
                          in
                          let error,log_info,trace =
                            U.remove_pseudo_inverse_events (do_not_log parameter)
-                             ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                             ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                              handler log_info error trace
                          in
                          (* we compute causal compression *)
                          U.cut (do_not_log parameter)
-                           ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                           ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                            handler log_info error trace
                       )
                       (fun parameter
                         ?shall_we_compute
                         ?shall_we_compute_profiling_information
+                        ?print_if_zero
                         handler log_info error trace info (blacklist,table2,table3) ->
                         let error,log_info,table2 = U.store_trace parameter handler log_info error trace info table2 in
                         let error,log_info,trace = U.remove_blacklisted_event parameter handler log_info error blacklist trace in
@@ -389,9 +441,9 @@ let compress_and_print
                   let error,log_info,causal_story_table =
                     Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
                       parameter
-                      ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                      ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                       handler log_info error
-                      always never Utilities_expert.parameters
+                      we_shall we_shall_not Utilities_expert.parameters
                       aux
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
@@ -405,18 +457,19 @@ let compress_and_print
                          let error,log_info,trace =
                            U.remove_pseudo_inverse_events
                              (do_not_log parameter)
-                             ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                             ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                              handler log_info error trace
                          in
                          (* we compute causal compression *)
                          U.cut
                            (do_not_log parameter)
-                           ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+                           ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
                            handler log_info error trace
                       )
                       (fun parameter
                         ?shall_we_compute
                         ?shall_we_compute_profiling_information
+                        ?print_if_zero
                         handler log_info error info trace table ->
                         let error, info, table = U.store_trace parameter handler log_info error info trace table in
                         let () = Cflow_js_interface.save_trivial_compression_table js_interface table in
@@ -442,7 +495,11 @@ let compress_and_print
                       let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in
                       let error,log_info,(_blacklist,weakly_story_table) =
                         U.fold_story_table_with_progress_bar parameter handler log_info error "weak compression"
-                          (fun parameter ?shall_we_compute ?shall_we_compute_profiling_information handler log_info error trace list_info (blacklist,story_list) ->
+                          (fun
+                            parameter
+                            ?shall_we_compute ?shall_we_compute_profiling_information
+                            ?print_if_zero
+                            handler log_info error trace list_info (blacklist,story_list) ->
                              let error,log_info,list = U.weakly_compress parameter handler log_info error trace in
                              let error,log_info,blacklist,story_list =
                                List.fold_left
@@ -483,6 +540,7 @@ let compress_and_print
                     (fun
                       parameter
                       ?shall_we_compute ?shall_we_compute_profiling_information
+                      ?print_if_zero
                       handler log_info error refined_event_list list_info strongly_story_table ->
                       let error,log_info,list = U.compress parameter handler log_info error refined_event_list in
                       let error,log_info,strongly_story_table =

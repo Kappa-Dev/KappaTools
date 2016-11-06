@@ -205,9 +205,9 @@ let compute_status_ranges cflow_parameters parameter global_status =
 
 
 let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
-      cflow_parameters ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+      cflow_parameters ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
       handler log_info error
-      always never
+      we_shall never
       parameters
       global_trace_simplification
       f
@@ -219,7 +219,11 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
       trace
       (table:'a)
   =
-  let f cflow_parameters ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace info (last_info,stop_next,global_status,counter,table) =
+  let f
+      cflow_parameters
+      ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
+      ?(print_if_zero=we_shall)
+      handler log_info error trace info (last_info,stop_next,global_status,counter,table) =
     if stop_next
     then error,log_info,Stop.stop (last_info,table)
     else
@@ -233,7 +237,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
 	  let error,log_info,trace = f cflow_parameters handler log_info error trace in
 	  let status_after = get_status_after status_before trace in
 	  let stop = stop_after global_status status_after in
-	  let error,log_info,table = store_result cflow_parameters ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace info table in
+	  let error,log_info,table = store_result cflow_parameters ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall handler log_info error trace info table in
 	  let last_info = Some info in
 	  let global_status = update_status_after global_status status_after in
 	  let global_status =
@@ -264,9 +268,9 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
 	    let status = set_status_init cflow_parameters parameters start_iteration end_simplification counter in
 	    let error,log_info,output =
 	      Utilities.fold_over_the_causal_past_of_observables_with_a_progress_bar
-		cflow_parameters ~shall_we_compute:always ~shall_we_compute_profiling_information:always
+		cflow_parameters ~shall_we_compute:we_shall ~shall_we_compute_profiling_information:we_shall
 		handler log_info error
-		always never
+		we_shall never
 		counter
 		f
 		trace
@@ -283,4 +287,3 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
 	error,log_info,table
   in
   aux log_info error 1 trace table
-
