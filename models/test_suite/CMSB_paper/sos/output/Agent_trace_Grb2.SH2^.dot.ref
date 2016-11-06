@@ -1,0 +1,10 @@
+digraph G{
+"Init_11" [label="" style="invis" width="0px" height="0px"];
+"Node_15" [label="Grb2(SH2!EGFR@Y1092)"];
+"Node_2" [label="Grb2(SH2!Shc@Y)"];
+"Node_11" [label="Grb2(SH2!free)"];
+"Node_15" -> "Node_11" [label="rule 7: R/Grb2"];
+"Node_11" -> "Node_15" [label="rule 6: R.Grb2"];
+"Node_11" -> "Node_2" [label="rule 4: Shc.Grb2"];
+"Init_11" -> "Node_11" [label=""];
+}

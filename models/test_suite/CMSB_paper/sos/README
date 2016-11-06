@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa sos.ka perturb.ka --compute-local-traces --output-directory output || exit 0

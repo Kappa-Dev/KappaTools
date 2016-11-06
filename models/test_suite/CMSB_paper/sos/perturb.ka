@@ -1,0 +1,5 @@
+%def: "displayCompression" "weak" "strong"
+
+%mod: [T]>1 do $TRACK 'sos recruited' [true]
+%mod: [T]>30.5 do $TRACK 'sos recruited' [true]
+%mod: [T]>31 do $TRACK 'sos recruited' [false]

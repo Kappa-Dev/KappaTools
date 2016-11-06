@@ -16,8 +16,11 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
+	- removing events occurring after the last observable: -857 events 
 + Producing causal traces
+	- splitting initial events: +10 events 
 	 - blackboard generation
+	- alpha-conversion
 	 - computing causal past of each observed events (10)
 Stats:
  number of step   : 10174
@@ -26,5 +29,9 @@ Stats:
  geometric mean   : 44.5316220171
 
 	 - causal flow compression (10)
+
+____________________________________________________________
+############################################################
+
 + Pretty printing 10 flows
 Simulation ended

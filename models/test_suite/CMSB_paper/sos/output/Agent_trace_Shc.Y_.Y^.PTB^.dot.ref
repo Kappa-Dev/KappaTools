@@ -1,0 +1,10 @@
+digraph G{
+"Init_99" [label="" style="invis" width="0px" height="0px"];
+"Node_101" [label="Shc(Y~p,Y!free,PTB!EGFR@Y1172)"];
+"Node_100" [label="Shc(Y~u,Y!free,PTB!EGFR@Y1172)"];
+"Node_99" [label="Shc(Y~u,Y!free,PTB!free)"];
+"Node_100" -> "Node_101" [label="rule 18: pY@Shc"];
+"Node_100" -> "Node_99" [label="rule 9: R/Shc"];
+"Node_99" -> "Node_100" [label="rule 8: R.Shc"];
+"Init_99" -> "Node_99" [label=""];
+}

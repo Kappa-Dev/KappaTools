@@ -1,0 +1,8 @@
+digraph G{
+"Init_49" [label="" style="invis" width="0px" height="0px"];
+"Node_46" [label="EGF(r!EGFR@L)"];
+"Node_49" [label="EGF(r!free)"];
+"Node_46" -> "Node_49" [label="rule 3: E/R"];
+"Node_49" -> "Node_46" [label="rule 2: E.R"];
+"Init_49" -> "Node_49" [label=""];
+}

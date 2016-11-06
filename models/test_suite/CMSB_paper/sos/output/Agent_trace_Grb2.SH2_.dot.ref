@@ -1,0 +1,5 @@
+digraph G{
+"Init_49" [label="" style="invis" width="0px" height="0px"];
+"Node_49" [label="Grb2(SH2~u)"];
+"Init_49" -> "Node_49" [label=""];
+}

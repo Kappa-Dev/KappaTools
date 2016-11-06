@@ -1,0 +1,89 @@
+/* Compression of 403 causal flows obtained in average at 1.609420E+00 t.u */
+/* Compressed causal flows were: [4;6;13;15;16;29;36;40;41;42;45;48;52;59;66;
+67;68;72;74;76;78;81;82;85;87;93;96;99;100;113;119;123;125;131;132;133;135;
+138;139;140;145;149;150;153;159;160;169;170;174;176;178;180;182;184;185;186;
+190;193;194;199;200;205;211;212;215;216;220;222;223;225;226;228;230;234;235;
+241;243;244;245;247;250;252;256;258;259;261;262;265;269;270;272;275;281;290;
+292;296;297;299;300;304;309;313;317;319;333;334;335;337;340;343;345;348;349;
+352;355;356;357;358;360;363;367;369;373;381;382;383;384;387;389;390;398;399;
+401;402;403;405;406;408;412;414;419;423;424;427;429;430;431;434;436;439;440;
+445;446;447;448;450;452;454;456;457;459;460;461;462;464;474;475;477;479;485;
+487;492;494;495;497;499;500;501;502;504;506;510;512;513;517;518;525;530;532;
+534;541;542;544;545;549;550;556;566;570;574;577;580;581;583;584;591;598;599;
+602;606;608;611;612;616;619;620;622;623;626;628;629;631;633;634;637;639;641;
+642;644;648;649;650;653;655;659;662;665;666;667;669;675;676;679;680;681;682;
+683;687;688;690;692;693;694;695;696;699;701;703;704;705;708;709;713;715;716;
+719;720;723;733;736;737;738;739;742;744;745;746;752;762;763;764;765;767;770;
+772;774;776;778;779;780;781;782;787;795;796;801;804;806;807;808;813;818;820;
+821;824;826;832;834;842;843;844;848;849;850;853;856;859;873;874;875;877;882;
+887;888;889;890;897;900;901;904;905;907;908;917;923;924;925;926;928;929;934;
+936;938;939;940;944;947;948;950;951;954;955;957;961;964;965;970;971;974;975;
+984;986;988;989;996;997;998;999;1001;1002;1003;1004;1005;1015;1016;1017;1020;
+1021;1025;1026;1028;1029;1030;1031;1032;1036;1040;1041;1042;1044;1051;1053;
+1055;1056;1057;1058;1059;1060;1061;1063;1066;1073;1082] */
+digraph G{
+ ranksep=.5 ;
+{ rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro EGF", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro EGF", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro EGFR", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro EGFR", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro Shc", shape=house, style=filled, fillcolor=green] ;
+node_10 [label="Intro SoS", shape=house, style=filled, fillcolor=green] ;
+node_13 [label="Intro Grb2", shape=house, style=filled, fillcolor=green] ;
+}
+{ rank = same ; "1" [shape=plaintext] ;
+node_6 [label="E.R", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="E.R", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_14 [label="Grb2.SoS", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ;
+node_8 [label="R.R", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ;
+node_9 [label="R.int", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ;
+node_11 [label="pY1172@R", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ;
+node_12 [label="R.Shc", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "6" [shape=plaintext] ;
+node_15 [label="pY@Shc", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "7" [shape=plaintext] ;
+node_16 [label="Shc.Grb2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "8" [shape=plaintext] ;
+node_17 [label="sos recruited", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"];
+"1" -> "2" [style="invis"];
+"2" -> "3" [style="invis"];
+"3" -> "4" [style="invis"];
+"4" -> "5" [style="invis"];
+"5" -> "6" [style="invis"];
+"6" -> "7" [style="invis"];
+"7" -> "8" [style="invis"];
+node_2 -> node_6
+node_3 -> node_6
+node_1 -> node_7
+node_4 -> node_7
+node_6 -> node_8
+node_7 -> node_8
+node_8 -> node_9
+node_9 -> node_11
+node_5 -> node_12
+node_11 -> node_12
+node_10 -> node_14
+node_13 -> node_14
+node_12 -> node_15
+node_13 -> node_16
+node_15 -> node_16
+node_14 -> node_17
+node_16 -> node_17
+}
+/*
+ Dot generation time: 0.000197
+*/
