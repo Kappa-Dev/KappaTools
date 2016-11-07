@@ -4,7 +4,7 @@ The main entry point of KaSim executable is main/KaSim.ml but let's
 describe the API bottom-up.
 
 The folder dataStructures/ has a transparent name. You can find there:
-{!modules: LargeArray SetMap Operator Nbr NamedDecls Location}
+{!modules: DynamicArray SetMap Operator Nbr NamedDecls Location}
 Some pretty printing utilities are here too:
 {!modules: Pp Pp_svg Pp_html}
 Including the KaSa machinery:
