@@ -905,7 +905,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
         raise
           (ExceptionDefn.Malformed_Decl
              ("A rule named '"^lab^"' already exists.",pos))
-      else if r.Ast.arrow = Ast.LRAR then
+      else if r.Ast.bidirectional then
         let set'' =
           Mods.StringSet.add (Ast.flip_label lab) set' in
         if set' == set'' then
@@ -922,8 +922,8 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
     else (acc,r.Ast.k_def) in
   let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
   let acc''',rules' =
-    match r.Ast.arrow,r.Ast.k_op with
-    | Ast.LRAR, Some k when ast_alg_has_mix k ->
+    match r.Ast.bidirectional,r.Ast.k_op with
+    | true, Some k when ast_alg_has_mix k ->
       let rate_var = (Ast.flip_label label)^"_rate" in
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
@@ -931,15 +931,15 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
        (Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
         r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
         Location.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
-    | Ast.LRAR, Some rate ->
+    | true, Some rate ->
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
       (acc_un,
        (Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
         r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
         rate,k_op_un,r_pos)::rules)
-    | Ast.RAR, None -> (acc'',rules)
-    | (Ast.RAR, Some _ | Ast.LRAR, None) ->
+    | false, None -> (acc'',rules)
+    | (false, Some _ | true, None) ->
        raise
          (ExceptionDefn.Malformed_Decl
             ("Incompatible arrow and kinectic rate for inverse definition",

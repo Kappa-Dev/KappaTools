@@ -22,13 +22,11 @@ type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
-type arrow = RAR | LRAR
-
 type rule = {
   lhs: mixture ;
   rm_token: ((mixture,string) Alg_expr.e Location.annot *
              string Location.annot) list;
-  arrow:arrow ;
+  bidirectional:bool ;
   rhs: mixture ;
   add_token: ((mixture,string) Alg_expr.e Location.annot *
               string Location.annot) list;

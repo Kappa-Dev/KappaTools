@@ -131,14 +131,14 @@ val empty_actions: actions
 
 type rule =
   {
-    prefix       : int;
-    delta        : int;
-    rule_lhs     : mixture;
-    rule_arrow   : Ast.arrow;
-    rule_rhs     : mixture;
-    diff_direct  : diff_views;
-    diff_reverse : diff_views;
-    actions      : actions
+    prefix             : int;
+    delta              : int;
+    rule_lhs           : mixture;
+    rule_bidirectional : bool;
+    rule_rhs           : mixture;
+    diff_direct        : diff_views;
+    diff_reverse       : diff_views;
+    actions            : actions
   }
 
 type perturbation =

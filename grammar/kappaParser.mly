@@ -286,15 +286,15 @@ rule_expression:
 				     (Parsing.symbol_end_pos ()) in
 		   let (k2,k1,kback,kback1) = $5 in
 		   let lhs,token_l = $2 and rhs,token_r = $4 in
-		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3;
+		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.bidirectional=$3;
 			 Ast.rhs=rhs; Ast.add_token = token_r;
 			 Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback; Ast.k_op_un=kback1},pos))
 		 }
     ;
 
 arrow:
-    | KAPPA_RAR {Ast.RAR}
-    | KAPPA_LRAR {Ast.LRAR}
+    | KAPPA_RAR {false}
+    | KAPPA_LRAR {true}
     ;
 
 constant:

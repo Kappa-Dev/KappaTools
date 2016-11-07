@@ -421,7 +421,7 @@ type 'mixture rule =
     prefix: int;
     delta: int;
     lhs   : 'mixture;
-    arrow : Ast.arrow;
+    bidirectional : bool;
     rhs   : 'mixture;
     k_def : ('mixture,string) Alg_expr.e Location.annot;
     k_un  : ('mixture,string) Alg_expr.e Location.annot option
@@ -577,12 +577,12 @@ type action =
 
 type c_rule =
   {
-    c_rule_lhs     : c_mixture;
-    c_rule_arrow   : Ast.arrow;
-    c_rule_rhs     : c_mixture;
-    c_diff_direct  : c_mixture;
-    c_diff_reverse : c_mixture;
-    c_side_effects : action list
+    c_rule_lhs           : c_mixture;
+    c_rule_bidirectional : bool;
+    c_rule_rhs           : c_mixture;
+    c_diff_direct        : c_mixture;
+    c_diff_reverse       : c_mixture;
+    c_side_effects       : action list
   }
 
 type c_perturbation =

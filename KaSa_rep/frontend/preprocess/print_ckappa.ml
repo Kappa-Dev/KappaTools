@@ -215,11 +215,10 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
 let print_rule parameter error rule =
   let error = print_mixture parameter error rule.Ckappa_sig.lhs in
   let arrow =
-    match rule.Ckappa_sig.arrow
-    with
-    | Ast.RAR -> (Remanent_parameters.get_uni_arrow_symbol parameter)
-    | Ast.LRAR -> (Remanent_parameters.get_bi_arrow_symbol parameter)
-  in
+    if rule.Ckappa_sig.bidirectional then
+      Remanent_parameters.get_bi_arrow_symbol parameter
+    else
+      Remanent_parameters.get_uni_arrow_symbol parameter in
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" arrow in
   let error = print_mixture parameter error rule.Ckappa_sig.rhs in
   error

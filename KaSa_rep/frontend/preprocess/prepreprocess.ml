@@ -746,26 +746,23 @@ let translate_compil parameters error compil =
              Ckappa_sig.delta = tail_lhs ;
              Ckappa_sig.lhs = lhs ;
              Ckappa_sig.rhs =  rhs ;
-             Ckappa_sig.arrow = rule.Ast.arrow ;
+             Ckappa_sig.bidirectional = rule.Ast.bidirectional ;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
            }
          in
-         match rule.Ast.arrow
-         with
-         | Ast.RAR  ->
-           error,id_set,(id,((Ckappa_sig.Direct,direct),p))::list
-         | Ast.LRAR  ->
+         if rule.Ast.bidirectional then
            let error,reverse =
              error,{direct
                     with Ckappa_sig.lhs = rhs;
                          Ckappa_sig.rhs = lhs;
-                         Ckappa_sig.arrow = Ast.RAR ;
+                         Ckappa_sig.bidirectional = false ;
                    }
            in
            error,id_set,
            (id,((Ckappa_sig.Reverse,reverse),p))::
-           (id,((Ckappa_sig.Direct,({direct with Ckappa_sig.arrow = Ast.RAR })),p))::list)
+           (id,((Ckappa_sig.Direct,({direct with Ckappa_sig.bidirectional = false })),p))::list
+         else error,id_set,(id,((Ckappa_sig.Direct,direct),p))::list)
       (error,id_set,[])
       compil.Ast.rules
   in

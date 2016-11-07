@@ -21,13 +21,11 @@ type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
-type arrow = RAR | LRAR
-
 type rule = {
   lhs: mixture ;
   rm_token: ((mixture,string) Alg_expr.e Location.annot
              * string Location.annot) list ;
-  arrow:arrow ;
+  bidirectional:bool ;
   rhs: mixture ;
   add_token: ((mixture,string) Alg_expr.e Location.annot
               * string Location.annot) list;
@@ -281,9 +279,8 @@ let print_one_size tk f mix =
           (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
           Format.pp_print_string Format.pp_print_string))
     tk
-let print_arrow f = function
-  | RAR -> Format.pp_print_string f "->"
-  | LRAR -> Format.pp_print_string f "<->"
+let print_arrow f bidir =
+  Format.pp_print_string f (if bidir then "<->" else "->")
 
 let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
   Format.fprintf
@@ -314,7 +311,7 @@ let print_ast_rule f r =
   Format.fprintf
     f "@[<h>%a %a %a @@ %a@]"
     (print_one_size r.rm_token) r.lhs
-    print_arrow r.arrow
+    print_arrow r.bidirectional
     (print_one_size r.add_token) r.rhs
     (print_rates r.k_un r.k_op) r.k_def
 let print_ast_rule_no_rate ~reverse f r =
@@ -332,7 +329,7 @@ let rule_to_json f_mix f_var r =
          (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
          string_annot_to_json)
       r.rm_token;
-    "bidirectionnal", `Bool (r.arrow = LRAR);
+    "bidirectional", `Bool r.bidirectional;
     "rhs", f_mix r.rhs;
     "add_token",
     JsonUtil.of_list
@@ -368,9 +365,8 @@ let rule_of_json f_mix f_var = function
                  (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  string_annot_of_json)
               (List.assoc "rm_token" l);
-          arrow =
-            (if Yojson.Basic.Util.to_bool (List.assoc "bidirectionnal" l)
-             then LRAR else RAR);
+          bidirectional =
+            Yojson.Basic.Util.to_bool (List.assoc "bidirectional" l);
           rhs = f_mix (List.assoc "rhs" l);
           add_token =
             JsonUtil.to_list
@@ -534,9 +530,9 @@ let sig_from_rules =
   List.fold_left
     (fun (ags,toks) (_,(r,_)) ->
        let (ags',toks') =
-         match r.arrow with
-         | RAR -> (ags,toks)
-         | LRAR -> (merge_agents ags r.rhs, merge_tokens toks r.add_token) in
+         if r.bidirectional then
+           (merge_agents ags r.rhs, merge_tokens toks r.add_token)
+       else (ags,toks) in
        (merge_agents ags' r.lhs, merge_tokens toks' r.rm_token))
 
 let sig_from_perts =
