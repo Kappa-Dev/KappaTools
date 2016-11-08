@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 04 2016>
+   * Last modification: Time-stamp: <Nov 08 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1604,42 +1604,43 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
   let stabilize _static dynamic error =
     error, dynamic, ()
 
-  (*TODO*)
   let export_aux
-      ?sparse:(sparse=false)
-      ?final_result:(final_result=false)
+      ?final_result:(final_result = false)
       static dynamic error kasa_state =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let handler = get_mvbdu_handler dynamic in
     let store_value = get_value dynamic in
     let domain_name = "Connected agents" in
-    let error, (handler, current_list) =
+    let error, (handler, current_list1, current_list2) =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
-        (fun tuple mvbdu (error, (handler, current_list)) ->
+        (fun tuple mvbdu (error, (handler, current_list1, current_list2)) ->
            let (agent_type1, site_type1, site_type1', _),
                (agent_type2, site_type2, site_type2', _) = tuple
            in
-           let error, (agent1, site1, site1', _, agent2, site2, site2', _) =
-             Site_accross_bonds_domain_type.convert_tuple parameters
-               error kappa_handler tuple in
-           (*----------------------------------------------------*)
-           if sparse &&
-              compare (agent1, site1, site1') (agent2, site2, site2') > 0
-           then error, (handler, current_list)
+           let error, (agent1, site1, site1',_, agent2, site2, site2', _) =
+             Site_accross_bonds_domain_type.convert_tuple parameters error
+               kappa_handler tuple
+           in
+           (*this test remove the relation: B.A*)
+           if compare (agent1,site1,site1') (agent2,site2,site2') > 0
+           then error, (handler, current_list1, current_list2)
            else
-             (*----------------------------------------------------*)
+             (*this test remove the relation when their states are not the
+               same: for instance: A(x~p), B(x~u)*)
              let error, handler, non_relational =
                if final_result
                then
+                 (*at the final result needs to check the non_relational
+                   condition*)
                  Translation_in_natural_language.non_relational
                    parameters handler error mvbdu
                else
+                 (*other cases will by pass this test*)
                  error, handler, false
              in
-             (*----------------------------------------------------*)
              if non_relational
-             then error, (handler, current_list)
+             then error, (handler, current_list1, current_list2)
              else
                (*----------------------------------------------------*)
                let error, handler, pair_list =
@@ -1673,91 +1674,72 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
                      site_type2
                      pattern
                  in
-                 let error, (handler, current_list) =
-                   if final_result
-                   then
-                     let string_version =
-                       Ckappa_backend.Ckappa_backend.get_string_version
-                         pattern
-                     in
-                     (*let error, current_list =
-                       Remanent_state.collect_the_head_of_constraint_list'
-                         error
-                         string_version
-                         current_list
-                     in*)
-                     error, (handler, current_list)
-                   else error, (handler, current_list)
+                 let string_version =
+                   Ckappa_backend.Ckappa_backend.get_string_version
+                     pattern
                  in
-                 error, (handler, current_list)
-                 (*TODO*)
-                 (*begin
-                   match pair_list with
-                   | [] -> error, (handler, current_list)
-                   | _::_ ->
-                     let error, current_list =
-                       List.fold_left (fun (error, current_list) l ->
-                           match l with
-                           | [siteone, state1; sitetwo, state2] when
-                               siteone == Ckappa_sig.fst_site
-                               && sitetwo == Ckappa_sig.snd_site ->
-                             let error, pattern =
-                               Ckappa_backend.Ckappa_backend.add_state
-                                 parameters error kappa_handler
-                                 agent_id1
-                                 site_type1'
-                                 state1
-                                 pattern
-                             in
-                             let error, pattern =
-                               Ckappa_backend.Ckappa_backend.add_state
-                                 parameters error kappa_handler
-                                 agent_id2
-                                 site_type2'
-                                 state2
-                                 pattern
-                             in
-                             let string_version =
-                               Ckappa_backend.Ckappa_backend.get_string_version
-                                 pattern
-                             in
-                             let error, current_list =
-                               Remanent_state.collect_the_head_of_constraint_list'
-                                 error
-                                 string_version
-                                 current_list
-                             in
-                             error, current_list
-                           | _ ->
-                             Exception.warn parameters error __POS__ Exit []
-                         ) (error, []) pair_list
-                     in
-                     error, (handler, current_list)
-                 end*)
+                 let error, site_graph =
+                   Remanent_state.convert_site_graph error string_version
+                 in
+                 let error, refinement =
+                   Remanent_state.convert_refinement_pair_list parameters
+                     error kappa_handler
+                     pattern
+                     agent_id1 site_type1'
+                     agent_id2 site_type2'
+                     pair_list
+                 in
+                 let lemma =
+                   {
+                     Remanent_state.hyp = site_graph;
+                     Remanent_state.refinement = refinement
+                   }
+                 in
+                 let current_list1 = lemma :: current_list1 in
+                 (*---------------------------------------------------*)
+                 (*internal constraint list*)
+                 let error, refine =
+                   Remanent_state.convert_refinement_internal_pair_list
+                     parameters error kappa_handler
+                     pattern
+                     agent_id1 site_type1'
+                     agent_id2 site_type2'
+                     pair_list
+                 in
+                 let lemma_internal =
+                   {
+                     Remanent_state.hyp = pattern;
+                     Remanent_state.refinement = refine;
+                   }
+                 in
+                 let current_list2 = lemma_internal :: current_list2 in
+                 (*---------------------------------------------------*)
+                 error, (handler, current_list1, current_list2)
                | Remanent_parameters_sig.Natural_language ->
-                 error, (handler, current_list)
-        ) store_value (error, (handler, []))
+                 error, (handler, current_list1, current_list2)
+        ) store_value (error, (handler, [], []))
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
     let constraint_list = Remanent_state.get_constraint_list kasa_state in
-    let pair_list = (domain_name, current_list) :: constraint_list in
+    let pair_list = (domain_name, current_list1) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraint_list pair_list kasa_state
     in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
-    (*let internal_constraint_list = Remanent_state.get_internal_constraint_list
+    let internal_constraint_list =
+      Remanent_state.get_internal_constraint_list
         kasa_state
     in
     let pair_list = (domain_name, current_list2) :: internal_constraint_list in
     let kasa_state =
-      Remanent_state.set_internal_constraint_list pair_list kasa_state in*)
+      Remanent_state.set_internal_constraint_list pair_list kasa_state in
     error, dynamic, kasa_state
 
-    let export _static dynamic error kasa_state =
-      (*export_aux ~sparse:true ~final_result:true*)
-      error, dynamic, kasa_state
+  let export static dynamic error kasa_state =
+      export_aux ~final_result:true
+        static dynamic error kasa_state
 
   (****************************************************************)
   (* to do *)

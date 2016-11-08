@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 04 2016>
+  * Last modification: Time-stamp: <Nov 08 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -130,15 +130,6 @@ val internal_constraint_list_of_json :
        Wrapped_modules.LoggedStringMap.t)
       Ckappa_sig.Agent_id_map_and_set.Map.t lemma list) list
 
-(*
-(string *
-            (string *
-             (string option *
-              Ckappa_backend.Ckappa_backend.binding_state option)
-             Wrapped_modules.LoggedStringMap.t list)
-            list lemma list)
-           list
-*)
 val print_constraint_list_list :
   Loggers.t ->
   Remanent_parameters_sig.parameters ->
@@ -180,6 +171,37 @@ val convert_refinement_internal :
   Ckappa_backend.Ckappa_backend.t list ->
   Exception.method_handler *
   Ckappa_backend.Ckappa_backend.t list
+
+val convert_refinement_pair_list :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_backend.Ckappa_backend.t ->
+  Ckappa_backend.Ckappa_backend.agent_id ->
+  Ckappa_sig.c_site_name ->
+  Ckappa_backend.Ckappa_backend.agent_id ->
+  Ckappa_sig.c_site_name ->
+  (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list ->
+  Exception.method_handler *
+   (string *
+    (string option *
+     Ckappa_backend.Ckappa_backend.binding_state option)
+      Wrapped_modules.LoggedStringMap.t)
+     list list
+
+val convert_refinement_internal_pair_list :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_backend.Ckappa_backend.t ->
+  Ckappa_backend.Ckappa_backend.agent_id ->
+  Ckappa_sig.c_site_name ->
+  Ckappa_backend.Ckappa_backend.agent_id ->
+  Ckappa_sig.c_site_name ->
+  (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list ->
+  Exception.method_handler *
+  Ckappa_backend.Ckappa_backend.t list
+
 
 (*******************************************************************)
 

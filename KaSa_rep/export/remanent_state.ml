@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 04 2016>
+  * Last modification: Time-stamp: <Nov 08 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -579,31 +579,50 @@ let print_internal_constraint_list logger parameters error kappa_handler
   Loggers.fprintf logger
     "------------------------------------------------------------\n";
   in
-  List.fold_left (fun error lemma ->
+  List.fold_left (fun (error, bool) lemma ->
       let error =
         Ckappa_backend.Ckappa_backend.print logger parameters error
           kappa_handler
           lemma.hyp
       in
       let () = Loggers.fprintf logger "=> [" in
-      let error =
-        List.fold_left (fun error hyp ->
+      let error, b =
+        match lemma.refinement with
+        | [] -> error, false
+        | [hyp] ->
           Ckappa_backend.Ckappa_backend.print logger parameters error
             kappa_handler
-            hyp
-          ) error lemma.refinement
+            hyp, false
+        | _::_ as l ->
+          List.fold_left (fun (error, bool) hyp ->
+              let () =
+                Loggers.print_newline
+                  (Remanent_parameters.get_logger parameters)
+              in
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  (if bool  then "\t\tv " else "\t\t  ")
+              in
+              let error =
+                Ckappa_backend.Ckappa_backend.print logger parameters error
+                  kappa_handler
+                  hyp
+              in
+              error, true
+            ) (error, false) (List.rev l)
       in
       let () = Loggers.fprintf logger "]" in
       let () = Loggers.print_newline logger in
-      error
-    ) error lemma_list
+      error, b
+    ) (error, false) lemma_list
 
 (*print the information as the output of non relational properties*)
 let print_internal_constraint_list_list logger parameters error kappa_handler
     list =
     let error =
       List.fold_left (fun error pattern ->
-          let error =
+          let error, _ =
             print_internal_constraint_list
               logger parameters error
               kappa_handler
@@ -629,6 +648,7 @@ let print_for_list logger parameter error kappa_handler t =
         true
       ) false t
   in
+  let () = Loggers.fprintf logger " " in
   error
 
 let print_constraint_list logger parameters error kappa_handler constraint_list
@@ -641,32 +661,47 @@ let print_constraint_list logger parameters error kappa_handler constraint_list
   Loggers.fprintf logger
     "------------------------------------------------------------\n";
   in
-  List.fold_left (fun error lemma -> (*TODO*)
+  List.fold_left (fun (error, bool) lemma ->
       let error =
-        List.fold_left (fun error hyp ->
-          let error =
-            print_for_list logger parameters error
-              kappa_handler
-              (List.rev lemma.hyp)
-          in
-          let () = Loggers.fprintf logger " => [" in
-            let error =
-              print_for_list logger parameters error
-                kappa_handler
-                hyp
-            in
-            error
-          ) error lemma.refinement
+        print_for_list logger parameters error
+          kappa_handler
+          lemma.hyp
+      in
+      let () = Loggers.fprintf logger " => [" in
+      (*refinement*)
+      let error, b =
+        match lemma.refinement with
+        | [] -> error, false
+        | [hyp] ->
+          print_for_list logger parameters error
+          kappa_handler
+            hyp, false
+        | _:: _ as l ->
+          List.fold_left (fun (error, bool) hyp ->
+              let () =
+                Loggers.print_newline
+                  (Remanent_parameters.get_logger parameters)
+              in
+              let () =
+                Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  (if bool  then "\t\tv " else "\t\t  ")
+              in
+              let error =
+                print_for_list logger parameters error kappa_handler hyp
+              in
+              error, true
+            ) (error, false) (List.rev l)
       in
       let () = Loggers.fprintf logger "]" in
       let () = Loggers.print_newline logger in
-      error
-    ) error lemma_list
+      error, b
+    ) (error, false) lemma_list
 
 let print_constraint_list_list logger parameters error kappa_handler list =
   let error =
     List.fold_left (fun error pattern ->
-        let error =
+        let error, _ =
           print_constraint_list logger parameters error kappa_handler pattern
         in
         let () = Loggers.print_newline logger in
@@ -696,6 +731,66 @@ let convert_refinement error list =
       let error, site_graph = convert_site_graph error string_version in
       error, site_graph :: current_list
     ) (error, []) list
+
+let convert_refinement_pair_list parameters error kappa_handler pattern
+    agent_id1 site_type1' agent_id2 site_type2'
+    pair_list =
+  List.fold_left (fun (error, current_list) l ->
+      match l with
+      | [siteone, state1; sitetwo, state2] when
+          siteone == Ckappa_sig.fst_site
+          && sitetwo == Ckappa_sig.snd_site ->
+        let error, pattern =
+          Ckappa_backend.Ckappa_backend.add_state
+            parameters error kappa_handler
+            agent_id1
+            site_type1'
+            state1
+            pattern
+        in
+        let error, pattern =
+          Ckappa_backend.Ckappa_backend.add_state
+            parameters error kappa_handler
+            agent_id2
+            site_type2'
+            state2
+            pattern
+        in
+        let string_version =
+          Ckappa_backend.Ckappa_backend.get_string_version
+            pattern
+        in
+        let error, site_graph = convert_site_graph error string_version in
+        error, site_graph :: current_list
+      | _ -> Exception.warn parameters error __POS__ Exit []
+    ) (error, []) pair_list
+
+let convert_refinement_internal_pair_list parameters error kappa_handler pattern
+    agent_id1 site_type1' agent_id2 site_type2' pair_list =
+  List.fold_left (fun (error, current_list) l ->
+      match l with
+      | [siteone, state1; sitetwo, state2] when
+          siteone == Ckappa_sig.fst_site
+          && sitetwo == Ckappa_sig.snd_site ->
+        let error, pattern =
+          Ckappa_backend.Ckappa_backend.add_state
+            parameters error kappa_handler
+            agent_id1
+            site_type1'
+            state1
+            pattern
+        in
+        let error, pattern =
+          Ckappa_backend.Ckappa_backend.add_state
+            parameters error kappa_handler
+            agent_id2
+            site_type2'
+            state2
+            pattern
+        in
+        error, pattern :: current_list
+      | _ -> Exception.warn parameters error __POS__ Exit []
+    ) (error, []) pair_list
 
 (*******************************************************************)
 
