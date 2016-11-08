@@ -995,13 +995,71 @@ end = struct
         insert_nav_sons point.Env.sons in
     insert_nav_aux (identity_injection domain.(p_id).Env.content) p_id nav
 
+  let add_cc ?origin env p_id element =
+    let w = weight element in
+    let rec aux = function
+      | [] ->
+        let roots =
+          match find_root element with
+          | None -> assert false
+          | Some (rid,rty) ->
+            List.sort Agent.compare
+              (List.map
+                 (fun r -> (Renaming.apply r rid,rty))
+                 (automorphisms element)) in
+        [{p_id; element;roots;
+          depending=add_origin Operator.DepSet.empty origin}],
+        identity_injection element,p_id
+      | h :: t -> match equal element h.element with
+        | None -> let a,b,c = aux t in h::a,b,c
+        | Some r ->
+          {p_id=h.p_id;
+           element=h.element;
+           depending=add_origin h.depending origin;
+           roots=h.roots}::t,r,h.p_id in
+    let env_w,r,out = aux (Mods.IntMap.find_default [] w env) in
+    Mods.IntMap.add w env_w env,r,out
+
+  let rec saturate_one this max_l level (_,domain as acc) = function
+    | [] -> if level < max_l then
+        saturate_one this max_l (succ level) acc
+          (Mods.IntMap.find_default [] (succ level) domain)
+      else acc
+    | h :: t ->
+      let acc' =
+        match matchings this.element h.element with
+        | [] -> acc
+        | list ->
+          List.fold_left
+            (fun (mid,acc) r ->
+               let id' = succ mid in
+               let x,_,id =
+                 add_cc acc id' (intersection r this.element h.element) in
+              ((if id = id' then id else mid),x))
+            acc list in
+       saturate_one this max_l level acc' t
+  let rec saturate_level max_l level (_,domain as acc) =
+    match Mods.IntMap.find_option level domain with
+    | None -> if level <= 0 then acc else saturate_level max_l (pred level) acc
+    | Some list ->
+      let rec aux acc = function
+        | [] -> saturate_level max_l (pred level) acc
+        | h::t -> aux (saturate_one h max_l level acc t) t in
+      aux acc list
+  let saturate domain =
+    match Mods.IntMap.max_key domain with
+    | None -> 1,domain
+    | Some l ->
+      let si =
+        Mods.IntMap.fold
+          (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l)
+          domain 0 in
+      saturate_level l l (si,domain)
+
   let finalize env =
-    let si =
-      Mods.IntMap.fold
-        (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l)
-        env.domain 0 in
+    let si,complete_domain = saturate env.domain in
     let domain = Array.make (succ si) (empty_point env.sig_decl) in
-    let singles = (Mods.IntMap.find_default [] 1 env.domain) in
+    let singles = (Mods.IntMap.find_default [] 1 complete_domain) in
     let elementaries = fill_elem env.sig_decl singles in
     let () =
       List.iter
@@ -1040,8 +1098,8 @@ end = struct
                          )
                            injs
                    ) singles) l)
-        env.domain in
-    let level0 = Mods.IntMap.find_default [] 0 env.domain in
+        complete_domain in
+    let level0 = Mods.IntMap.find_default [] 0 complete_domain in
     let single_agent_points =
       List.fold_left
         (fun acc p ->
@@ -1082,31 +1140,6 @@ end = struct
       domain = domain';
       used_by_a_begin_new = false;
     }
-
-  let add_cc ?origin env p_id element =
-    let w = weight element in
-    let rec aux = function
-      | [] ->
-        let roots =
-          match find_root element with
-          | None -> assert false
-          | Some (rid,rty) ->
-            List.sort Agent.compare
-              (List.map
-                 (fun r -> (Renaming.apply r rid,rty))
-                 (automorphisms element)) in
-        [{p_id; element;roots;
-          depending=add_origin Operator.DepSet.empty origin}],
-        identity_injection element,p_id
-      | h :: t -> match equal element h.element with
-        | None -> let a,b,c = aux t in h::a,b,c
-        | Some r ->
-          {p_id=h.p_id;
-           element=h.element;
-           depending=add_origin h.depending origin;
-           roots=h.roots}::t,r,h.p_id in
-    let env_w,r,out = aux (Mods.IntMap.find_default [] w env) in
-    Mods.IntMap.add w env_w env,r,out
 end
 
 (** Operation to create cc *)
