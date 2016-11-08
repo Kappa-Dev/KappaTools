@@ -554,14 +554,15 @@ module Env : sig
 
   type point = {
     content: cc;
-    is_obs_of: (Agent.t list * Operator.DepSet.t) option;
+    roots: Agent.t list;
+    deps: Operator.DepSet.t;
     mutable sons: transition list;
   }
 
   type t = {
     sig_decl: Signature.s;
     id_by_type: int list array;
-    nb_id: int;
+    max_obs: int;
     domain: point array;
     elementaries: (Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
@@ -584,14 +585,15 @@ end = struct
 
   type point = {
     content: cc;
-    is_obs_of: (Agent.t list * Operator.DepSet.t) option;
+    roots: Agent.t list;
+    deps: Operator.DepSet.t;
     mutable sons: transition list;
   }
 
   type t = {
     sig_decl: Signature.s;
     id_by_type: int list array;
-    nb_id: int;
+    max_obs: int;
     domain: point array;
     elementaries: (Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
@@ -604,14 +606,11 @@ end = struct
       Format.fprintf
         f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
         (print_cc ~sigs:env.sig_decl ~cc_id:p_id) p.content
-        (fun f ->
-           match p.is_obs_of with
-           | None -> ()
-           | Some (_,deps)(*TODO*) ->
-             Format.fprintf
-               f "@[[%a]@]@ "
-               (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-               deps)
+        (fun f -> if not (Operator.DepSet.is_empty p.deps) then
+            Format.fprintf
+              f "@[[%a]@]@ "
+              (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+              p.deps)
         (Pp.list
            Pp.space
            (fun f s ->
@@ -641,7 +640,7 @@ end = struct
 
   let print_point_dot sigs f (id,point) =
     let style =
-      match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
+      if Operator.DepSet.is_empty point.deps then "octagon" else "box" in
     Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
       id (print_cc ~sigs ?cc_id:None) point.content
       style (print_sons_dot sigs id point.content) point.sons
@@ -654,7 +653,7 @@ end = struct
         (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
     Format.fprintf f "}@]@."
 
-  let new_obs_map env f = Mods.DynArray.init (Array.length env.domain) f
+  let new_obs_map env f = Mods.DynArray.init env.max_obs f
 end
 
 let print ?domain ~with_id f id =
@@ -786,14 +785,11 @@ module Matching = struct
       | [] -> acc,cache
       | (pid,point,inj_point2graph) :: remains ->
         let acc' =
-          match point.Env.is_obs_of with
-          | None -> acc
-          | Some (roots,ndeps) ->
-            (List.fold_left
-               (fun acc (id,ty) ->
-                  (pid,(Renaming.apply inj_point2graph id,ty))::acc)
-               obs roots,
-             Operator.DepSet.union rev_deps ndeps) in
+          (List.fold_left
+             (fun acc (id,ty) ->
+                (pid,(Renaming.apply inj_point2graph id,ty))::acc)
+             obs point.Env.roots,
+           Operator.DepSet.union rev_deps point.Env.deps) in
         let remains' =
           List.fold_left
             (fun re son ->
@@ -949,7 +945,8 @@ end = struct
   let sigs env = env.sig_decl
 
   let empty_point sigs =
-    {Env.content = empty_cc sigs; Env.is_obs_of = None; Env.sons = [];}
+    {Env.content = empty_cc sigs; Env.roots = [];
+     Env.deps = Operator.DepSet.empty; Env.sons = [];}
 
   let fill_elem sigs bottom =
     let elementaries =
@@ -1048,7 +1045,7 @@ end = struct
       aux acc list
   let saturate domain =
     match Mods.IntMap.max_key domain with
-    | None -> 1,domain
+    | None -> 0,domain
     | Some l ->
       let si =
         Mods.IntMap.fold
@@ -1066,7 +1063,7 @@ end = struct
         (fun x ->
            domain.(x.p_id) <-
              { Env.content = x.element; Env.sons = [];
-               Env.is_obs_of = Some (x.roots,x.depending); })
+               Env.deps = x.depending; Env.roots = x.roots; })
         singles in
     let () =
       Mods.IntMap.iter
@@ -1075,7 +1072,7 @@ end = struct
              List.iter (fun x ->
                  let () =  domain.(x.p_id) <-
                      { Env.content = x.element; Env.sons = [];
-                       Env.is_obs_of = Some (x.roots,x.depending);} in
+                       Env.roots = x.roots; Env.deps = x.depending;} in
                  List.iter (fun e ->
                      match matchings e.element x.element with
                      | [] -> ()
@@ -1107,15 +1104,14 @@ end = struct
            | None -> acc
            | Some (_,ty) ->
              let () = domain.(p.p_id) <-
-                 { Env.content = p.element;
-                   Env.is_obs_of = Some (p.roots,p.depending);
-                   Env.sons = []; } in
+                 { Env.content = p.element; Env.roots = p.roots;
+                   Env.deps = p.depending; Env.sons = []; } in
              Mods.IntMap.add ty (p.p_id,p.depending) acc)
         Mods.IntMap.empty level0 in
     {
       Env.sig_decl = env.sig_decl;
-      Env.id_by_type =env.id_by_type;
-      Env.nb_id = env.nb_id;
+      Env.id_by_type = env.id_by_type;
+      Env.max_obs = fresh_id env;
       Env.domain;
       Env.elementaries;
       Env.single_agent_points;
@@ -1128,14 +1124,12 @@ end = struct
         w (p::Mods.IntMap.find_default [] w acc) acc in
     let domain' =
       Tools.array_fold_lefti (fun p_id acc p ->
-          match p.Env.is_obs_of with
-          | None -> acc
-          | Some (roots,depending) ->
-            add_cc acc {p_id; element=p.Env.content;depending;roots;})
+          add_cc acc {p_id; element=p.Env.content;
+                      depending=p.Env.deps;roots=p.Env.roots;})
         Mods.IntMap.empty env.Env.domain in
     {
       sig_decl = env.Env.sig_decl;
-      nb_id = env.Env.nb_id;
+      nb_id = succ (Array.fold_left (List.fold_left max) 0 env.Env.id_by_type);
       id_by_type = env.Env.id_by_type;
       domain = domain';
       used_by_a_begin_new = false;
