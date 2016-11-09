@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 08 2016>
+ * Last modification: Time-stamp: <Nov 09 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -108,9 +108,9 @@ let main () =
 
 let () = main ()
 
-let state = Export_to_json.init ()
+let state_json = Export_to_json.init ()
 
 (*TODO: call the print function of export for parallel bonds here*)
 
-(*let state, _ = Export_to_json.get_constraint_list state
-  let state, _ = Export_to_json.get_internal_constraint_list state*)
+(*let state, _ = Export_to_json.get_constraint_list state_json*)
+(*  let state, _ = Export_to_json.get_internal_constraint_list state*)

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 25 2016>
+   * Last modification: Time-stamp: <Nov 09 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -2627,7 +2627,8 @@ struct
                  store_result
              in
              error, store_result
-          ) store_update (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
+          ) store_update
+          (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
       in
       (*---------------------------------------------------------------------*)
       (*fold2*)
@@ -2701,104 +2702,6 @@ struct
     in
     error, dynamic, event_list
 
-  let export static dynamic error kasa_state =
-    match get_ranges dynamic with
-    | None -> error, dynamic, kasa_state
-    | Some ranges ->
-      let kappa_handler = get_kappa_handler static in
-      let handler = get_mvbdu_handler dynamic in
-      let parameters = get_parameter static in
-      let contact_map = Preprocess.init_contact_map in
-      let error, (handler, contact_map) =
-        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-          parameters
-          error
-          (fun parameters error ag_type site_map (handler, contact_map) ->
-             let error, contact_map =
-               Preprocess.declare_agent parameters error ag_type contact_map
-             in
-             Wrapped_modules.LoggedIntMap.fold
-               (fun _ mvbdu (error,(handler, contact_map)) ->
-                  let error, handler, list_of_states =
-                    Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters
-                      handler error mvbdu
-                  in
-                  match list_of_states with
-                  | [] -> error, (handler, contact_map)
-                  | [site_type,_]::_ ->
-                    begin
-                      let error, contact_map =
-                        Preprocess.declare_site parameters error ag_type site_type contact_map
-                      in
-                      let error, site = Handler.translate_site parameters error kappa_handler ag_type site_type in
-                      match site with
-                      | Ckappa_sig.Internal _ ->
-                        let error, contact_map =
-                          List.fold_left
-                            (fun (error, contact_map) l ->
-                               match l with
-                               | [site_type',state]
-                                 when site_type' = site_type ->
-                                 Preprocess.add_internal_state_in_contact_map
-                                   parameters error
-                                   (ag_type,site_type) state contact_map
-                               | [] | _::_ ->
-                                 Exception.warn
-                                   parameters error __POS__ Exit
-                                   contact_map)
-                            (error, contact_map) list_of_states
-                        in
-                        error, (handler, contact_map)
-                      | Ckappa_sig.Binding _ ->
-                        let error, contact_map =
-                          List.fold_left
-                            (fun (error, contact_map) l ->
-                               match l with
-                               | [site_type',state]
-                                 when site_type' = site_type ->
-                                 if state = Ckappa_sig.state_index_of_int 0
-                                 then (* we ignore free sites *)
-                                   error, contact_map
-                                 else
-                                   begin
-                                     let error, dual =
-                                       Handler.dual parameters error kappa_handler ag_type site_type state
-                                     in
-                                     match dual with
-                                     | None ->
-                                       Exception.warn
-                                         parameters error __POS__ Exit contact_map
-                                     | Some (ag_type', site_type', _ ) ->
-                                       Preprocess.add_link_in_contact_map
-                                         parameters error
-                                         (ag_type,site_type) (ag_type',site_type')
-                                         contact_map
-                                   end
-                               | [] | _::_ ->
-                                 Exception.warn
-                                   parameters error __POS__ Exit
-                                   contact_map)
-                            (error, contact_map) list_of_states
-                        in
-                        error, (handler, contact_map)
-                    end
-                  | _::_ ->
-                    Exception.warn
-                      parameters error __POS__ Exit (handler, contact_map)
-               )
-               site_map
-               (error, (handler, contact_map))
-          )
-          ranges
-          (handler, contact_map)
-      in
-      let dynamic = set_mvbdu_handler handler dynamic in
-      let kasa_state =
-        Remanent_state.set_internal_contact_map
-          Remanent_state.Medium contact_map kasa_state
-      in
-      error, dynamic, kasa_state
-
   (**************************************************************************)
   (*main print of fixpoint*)
 
@@ -2859,7 +2762,8 @@ struct
          in aux site_correspondence
        in
        let error, (_map1, map2) =
-         Bdu_static_views.new_index_pair_map parameters error site_correspondence
+         Bdu_static_views.new_index_pair_map parameters error
+           site_correspondence
        in
        let rename_site parameters error site_type =
          let error, site_type =
@@ -2945,7 +2849,8 @@ struct
            list)
       result
       (let error, agent_map =
-         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+           parameters error 0
        in
        (error, handler, agent_map))
 
@@ -2971,7 +2876,8 @@ struct
           (fun parameters error agent_type map (handler,list) ->
              let error', agent_string =
                try
-                 Handler.string_of_agent parameters error handler_kappa agent_type
+                 Handler.string_of_agent parameters error handler_kappa
+                   agent_type
                with
                | _ -> Exception.warn parameters error __POS__  Exit
                         (Ckappa_sig.string_of_agent_name agent_type)
@@ -2987,7 +2893,8 @@ struct
                    let error, handler =
                      if local_trace || Remanent_parameters.get_trace parameters
                      then
-                       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                       let () = Loggers.fprintf
+                           (Remanent_parameters.get_logger parameters)
                            "INTENSIONAL DESCRIPTION:"
                        in
                        let () = Loggers.print_newline
@@ -3021,11 +2928,13 @@ struct
       error, handler, List.rev list
     else
       begin
-        let error, (handler, list) = Covering_classes_type.AgentCV_map_and_set.Map.fold
+        let error, (handler, list) =
+          Covering_classes_type.AgentCV_map_and_set.Map.fold
             (fun (agent_type, cv_id) bdu_update (error,(handler,list)) ->
                let error', agent_string =
                  try
-                   Handler.string_of_agent parameters error handler_kappa agent_type
+                   Handler.string_of_agent parameters error handler_kappa
+                     agent_type
                  with
                  | _ ->
                    Exception.warn
@@ -3137,7 +3046,7 @@ struct
 
   let print_bdu_update_map_gen_decomposition decomposition
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-      parameters handler error handler_kappa site_correspondence  result =
+      parameters handler error handler_kappa site_correspondence result =
     let error, handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition
         ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
@@ -3193,12 +3102,12 @@ struct
         || (Remanent_parameters.get_trace parameters)
         then
           begin
-            let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "" in
-            let () = Loggers.print_newline
-                (Remanent_parameters.get_logger parameters) in
+            let () = Loggers.fprintf  log "" in
+            let () = Loggers.print_newline log in
             let () =
               Loggers.fprintf log
-                "------------------------------------------------------------" in
+                "------------------------------------------------------------"
+            in
             let () = Loggers.print_newline log in
             let () = Loggers.fprintf log
                 "* Fixpoint iteration :"
@@ -3318,7 +3227,8 @@ struct
         let compil = get_compil static in
         let error, site_correspondence =
           get_store_remanent_triple static dynamic error in
-        let error, handler, output = smash_map
+        let error, handler, output =
+          smash_map
             (fun _parameters handler error a -> error, handler, [a])
             parameters handler error
             ~show_dep_with_dimmension_higher_than:1
@@ -3327,7 +3237,9 @@ struct
             (get_fixpoint_result dynamic)
         in
         let error, log_info, handler =
-          Agent_trace.agent_trace parameters (get_log_info dynamic) error handler (get_global_static_information static) handler_kappa compil output
+          Agent_trace.agent_trace parameters (get_log_info dynamic) error
+            handler (get_global_static_information static) handler_kappa compil
+            output
         in
         error, set_mvbdu_handler handler (set_log_info log_info dynamic)
       else
@@ -3337,6 +3249,187 @@ struct
       print_fixpoint_result static dynamic error loggers
     in
     error, dynamic, ()
+
+(*-----------------------------------------------*)
+
+  let export_contact_map static dynamic error kasa_state =
+    match get_ranges dynamic with
+    | None -> error, dynamic, kasa_state
+    | Some ranges ->
+      let kappa_handler = get_kappa_handler static in
+      let handler = get_mvbdu_handler dynamic in
+      let parameters = get_parameter static in
+      let contact_map = Preprocess.init_contact_map in
+      (*-----------------------------------------------*)
+      let error, (handler, contact_map) =
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+          parameters
+          error
+          (fun parameters error ag_type site_map (handler, contact_map) ->
+             let error, contact_map =
+               Preprocess.declare_agent parameters error ag_type contact_map
+             in
+             Wrapped_modules.LoggedIntMap.fold
+               (fun _ mvbdu (error,(handler, contact_map)) ->
+                  let error, handler, list_of_states =
+                    Ckappa_sig.Views_bdu.extensional_of_mvbdu parameters
+                      handler error mvbdu
+                  in
+                  match list_of_states with
+                  | [] -> error, (handler, contact_map)
+                  | [site_type,_] ::_ ->
+                    begin
+                      let error, contact_map =
+                        Preprocess.declare_site parameters error ag_type
+                          site_type contact_map
+                    in
+                    let error, site =
+                      Handler.translate_site parameters error kappa_handler
+                        ag_type site_type
+                    in
+                    match site with
+                    | Ckappa_sig.Internal _ ->
+                      let error, contact_map =
+                        List.fold_left
+                          (fun (error, contact_map) l ->
+                             match l with
+                             | [site_type',state]
+                               when site_type' = site_type ->
+                               Preprocess.add_internal_state_in_contact_map
+                                 parameters error
+                                 (ag_type,site_type) state contact_map
+                             | [] | _::_ ->
+                               Exception.warn
+                                 parameters error __POS__ Exit
+                                 contact_map)
+                          (error, contact_map) list_of_states
+                      in
+                      error, (handler, contact_map)
+                    | Ckappa_sig.Binding _ ->
+                      let error, contact_map =
+                        List.fold_left
+                          (fun (error, contact_map) l ->
+                             match l with
+                             | [site_type',state]
+                               when site_type' = site_type ->
+                               if state = Ckappa_sig.state_index_of_int 0
+                               then (* we ignore free sites *)
+                                 error, contact_map
+                               else
+                                 begin
+                                   let error, dual =
+                                     Handler.dual parameters error
+                                       kappa_handler ag_type site_type state
+                                   in
+                                   match dual with
+                                   | None ->
+                                     Exception.warn
+                                       parameters error __POS__ Exit contact_map
+                                   | Some (ag_type', site_type', _ ) ->
+                                     Preprocess.add_link_in_contact_map
+                                       parameters error
+                                       (ag_type,site_type) (ag_type',site_type')
+                                       contact_map
+                                 end
+                             | [] | _::_ ->
+                               Exception.warn
+                                 parameters error __POS__ Exit
+                                 contact_map)
+                          (error, contact_map) list_of_states
+                      in
+                      error, (handler, contact_map)
+                    end
+                  | _::_ ->
+                    Exception.warn
+                      parameters error __POS__ Exit (handler, contact_map)
+               )
+               site_map
+               (error, (handler, contact_map))
+          )
+          ranges
+          (handler, contact_map)
+      in
+      let dynamic = set_mvbdu_handler handler dynamic in
+      let kasa_state =
+        Remanent_state.set_internal_contact_map
+          Remanent_state.Medium contact_map kasa_state
+      in
+      error, dynamic, kasa_state
+
+  let export_relation_properties
+      ~smash:smash
+      ~show_dep_with_dimmension_higher_than:dim_min
+      static dynamic error kasa_state =
+    let parameters = get_parameter static in
+    let handler = get_mvbdu_handler dynamic in
+    let handler_kappa = get_kappa_handler static in
+    let domain_name = "Views domain - relational properties" in
+    let error, site_correspondence =
+      get_store_remanent_triple static dynamic error in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    (*convert result to list*)
+    let error, handler, list =
+      stabilise_bdu_update_map_gen_decomposition
+        Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
+        ~smash:smash
+        ~show_dep_with_dimmension_higher_than:dim_min
+        parameters
+        handler
+        error
+        handler_kappa
+        site_correspondence
+        fixpoint_result
+    in
+    (*store the information for relational properties*)
+    let error, current_list =
+      List.fold_left
+        (fun (error, current_list)
+          (agent_string, agent_type, _, translation) ->
+          let error, current_list =
+            Translation_in_natural_language.convert_views_constraint_list
+              ~show_dep_with_dimmension_higher_than:dim_min
+              parameters
+              handler_kappa
+              error
+              agent_string
+              agent_type
+              translation
+              current_list
+          in
+          error, current_list
+        ) (error, []) list
+    in
+    (*------------------------------------------------------------------*)
+    let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let pair_list = (domain_name, current_list) :: constraint_list in
+    let kasa_state =
+      Remanent_state.set_constraint_list pair_list kasa_state
+    in
+    error, dynamic, kasa_state
+
+  let export static dynamic error kasa_state =
+    let parameters = get_parameter static in
+    (*export of contact map*)
+    let error, dynamic, kasa_state =
+      export_contact_map static dynamic error kasa_state
+    in
+    (*TODO: this function generate error in the compile*)
+    (*export of relational properties*)
+    (*let error, dynamic, kasa_state =
+      export_relation_properties
+        ~smash:true
+        ~show_dep_with_dimmension_higher_than:
+          (if
+            Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition parameters
+           then 2
+           else 1
+          )
+        static dynamic error kasa_state
+    in*)
+    (*export of non relational properties*)
+    error, dynamic, kasa_state
+
+(**************************************************************************)
 
   let stabilize static dynamic error =
     let dim_min = 2 in

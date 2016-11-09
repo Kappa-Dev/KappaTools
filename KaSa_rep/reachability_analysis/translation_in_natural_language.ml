@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Oct 18 2016>
+ * Last modification: Time-stamp: <Nov 09 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -938,6 +938,256 @@ let rec print ?beginning_of_sentence:(beggining=true)
       end
   in
   error
+
+(*****************************************************************************)
+(*convert views to json*)
+
+let rec convert_views_constraint_list_aux
+    ~show_dep_with_dimmension_higher_than:dim_min
+    parameters handler_kappa error
+    agent_string agent_type agent_id translation t current_list =
+  let error, current_list =
+    match translation with
+    | Range (site_type, state_list) -> (*FIXME*)
+      begin
+        if dim_min <= 1
+        then
+          begin
+            match Remanent_parameters.get_backend_mode parameters with
+            | Remanent_parameters_sig.Kappa
+            | Remanent_parameters_sig.Raw ->
+              (*hyp*)
+              let string_version =
+                Ckappa_backend.Ckappa_backend.get_string_version
+                  t
+              in
+              let error, site_graph =
+                Remanent_state.convert_site_graph error string_version
+              in
+              let error, refinement =
+                Remanent_state.convert_refinement_views_constraint_list
+                  parameters error
+                  handler_kappa
+                  agent_id
+                  site_type
+                  t
+                  state_list
+              in
+              let lemma =
+                {
+                  Remanent_state.hyp = site_graph;
+                  Remanent_state.refinement = refinement
+                }
+              in
+              let current_list = lemma :: current_list in
+              error, current_list
+            | Remanent_parameters_sig.Natural_language ->
+              error, current_list
+          end
+        else
+          error, current_list
+      end
+    | Equiv((site1, state1), (site2, state2)) ->
+      if dim_min <= 2
+      then
+        begin
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa
+          | Remanent_parameters_sig.Raw ->
+            let error, t' =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameters error handler_kappa
+                agent_id
+                site1
+                state1
+                t
+            in
+            let string_version =
+              Ckappa_backend.Ckappa_backend.get_string_version
+                t'
+            in
+            let error, site_graph =
+              Remanent_state.convert_site_graph error string_version
+            in
+            (*--------------------------------------------------*)
+            let error, t'' =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameters error handler_kappa
+                agent_id
+                site2
+                state2
+                t
+            in
+            (*check*)
+            let string_version'' =
+              Ckappa_backend.Ckappa_backend.get_string_version
+                t''
+            in
+            let error, site_graph'' =
+              Remanent_state.convert_site_graph error string_version''
+            in
+            (*--------------------------------------------------*)
+            let lemma =
+              {
+                Remanent_state.hyp = site_graph;
+                Remanent_state.refinement = [site_graph'']
+              }
+            in
+            let current_list = lemma :: current_list in
+            error, List.rev current_list
+          | Remanent_parameters_sig.Natural_language ->
+            error, current_list
+        end
+      else
+      error, current_list
+    | Imply((site1, state1), (site2, state2)) ->
+      if dim_min <= 2
+      then
+        begin
+          match Remanent_parameters.get_backend_mode parameters with
+          | Remanent_parameters_sig.Kappa
+          | Remanent_parameters_sig.Raw ->
+            let error, t =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameters error handler_kappa
+                agent_id
+                site1
+                state1
+                t
+            in
+            let string_version =
+              Ckappa_backend.Ckappa_backend.get_string_version
+                t
+            in
+            let error, site_graph =
+              Remanent_state.convert_site_graph error string_version
+            in
+            (*--------------------------------------------------*)
+            let error, t' =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameters error handler_kappa
+                agent_id
+                site2
+                state2
+                t
+            in
+            let string_version' =
+              Ckappa_backend.Ckappa_backend.get_string_version
+                t'
+            in
+            let error, site_graph' =
+              Remanent_state.convert_site_graph error string_version'
+            in
+            (*--------------------------------------------------*)
+            let lemma =
+              {
+                Remanent_state.hyp = site_graph;
+                Remanent_state.refinement = [site_graph']
+              }
+            in
+            let current_list = lemma :: current_list in
+            error, List.rev current_list
+          | Remanent_parameters_sig.Natural_language ->
+            error, current_list
+        end
+      else
+      error, current_list
+    | Partition (v, list) ->
+      let error, current_list =
+        List.fold_left (fun (error, current_list) (a, list) ->
+            let error, t' =
+              Ckappa_backend.Ckappa_backend.add_state
+                parameters error handler_kappa
+                agent_id
+                v a t
+            in
+            let error, current_list =
+              List.fold_left (fun (error, current_list) token ->
+                  convert_views_constraint_list_aux
+                    ~show_dep_with_dimmension_higher_than:0
+                    parameters
+                    handler_kappa
+                    error
+                    agent_string
+                    agent_type
+                    agent_id
+                    token
+                    t'
+                    current_list (*FIXME*)
+                ) (error, current_list) list
+            in
+            error, current_list
+          ) (error, current_list) list
+      in
+      error, current_list
+    | No_known_translation list ->
+      begin
+        match Remanent_parameters.get_backend_mode parameters with
+        | Remanent_parameters_sig.Kappa
+        | Remanent_parameters_sig.Raw ->
+          begin
+            let error, current_list =
+              let string_version =
+              Ckappa_backend.Ckappa_backend.get_string_version
+                t
+              in
+              let error, site_graph =
+                Remanent_state.convert_site_graph error
+                string_version
+              in
+              let error, refinement =
+                List.fold_left (fun (error, current_list) state_list ->
+                    List.fold_left (fun (error, current_list)
+                                     (site, state) ->
+                        let error, t' =
+                          Ckappa_backend.Ckappa_backend.add_state
+                          parameters error handler_kappa
+                          agent_id site state t
+                        in
+                        let string_version' =
+                          Ckappa_backend.Ckappa_backend.get_string_version
+                            t'
+                        in
+                        let error, site_graph' =
+                          Remanent_state.convert_site_graph error
+                            string_version'
+                        in
+                        let refinement = site_graph' :: current_list in
+                        error, refinement
+                                   ) (error, current_list) state_list
+                  ) (error, []) list
+              in
+              (*----------------------------------------*)
+              let lemma =
+                {
+                  Remanent_state.hyp = site_graph;
+                  Remanent_state.refinement = []
+                }
+              in
+              let current_list = lemma :: current_list in
+              error, current_list
+            in
+            error, current_list
+          end
+        | Remanent_parameters_sig.Natural_language ->
+          error, current_list
+      end
+  in
+  error, current_list
+
+let convert_views_constraint_list
+    ~show_dep_with_dimmension_higher_than:dim_min
+    parameters handler_kappa error
+    agent_string agent_type translation current_list =
+  let t = Ckappa_backend.Ckappa_backend.empty in
+  let error, agent_id, t =
+    Ckappa_backend.Ckappa_backend.add_agent
+      parameters error handler_kappa agent_type t
+  in
+  convert_views_constraint_list_aux
+    ~show_dep_with_dimmension_higher_than:dim_min
+    parameters handler_kappa
+    error agent_string agent_type agent_id translation t current_list
 
 (*****************************************************************************)
 (*store the print function*)

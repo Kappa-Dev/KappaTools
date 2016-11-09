@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 08 2016>
+  * Last modification: Time-stamp: <Nov 09 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -798,6 +798,24 @@ let convert_refinement_internal error list =
   List.fold_left (fun (error, current_list) hyp ->
       error, hyp :: current_list
     ) (error, []) list
+
+(*******************************************************************)
+(*views domain*)
+
+let convert_refinement_views_constraint_list parameters error
+    handler_kappa agent_id site_type t state_list =
+  List.fold_left (fun (error, current_list) state ->
+      let error, t =
+        Ckappa_backend.Ckappa_backend.add_state parameters
+          error handler_kappa agent_id site_type state t
+      in
+      let string_version =
+      Ckappa_backend.Ckappa_backend.get_string_version
+        t
+      in
+      let error, site_graph = convert_site_graph error string_version in
+      error, site_graph :: current_list
+    ) (error, []) state_list
 
 (*******************************************************************)
 

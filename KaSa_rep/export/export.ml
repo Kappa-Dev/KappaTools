@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 04 2016>
+  * Last modification: Time-stamp: <Nov 08 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -434,7 +434,7 @@ let compute_raw_internal_contact_map show_title state =
   Remanent_state.set_internal_contact_map Remanent_state.Low contact_map state,
   contact_map
 
-let dump_raw_internal_contact_map state  handler =
+let dump_raw_internal_contact_map state handler =
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
   let error = Print_handler.dot_of_contact_map parameters error handler in

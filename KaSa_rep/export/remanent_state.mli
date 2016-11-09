@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 08 2016>
+  * Last modification: Time-stamp: <Nov 09 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -201,6 +201,22 @@ val convert_refinement_internal_pair_list :
   (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list ->
   Exception.method_handler *
   Ckappa_backend.Ckappa_backend.t list
+
+
+val convert_refinement_views_constraint_list :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Cckappa_sig.kappa_handler ->
+  Ckappa_backend.Ckappa_backend.agent_id ->
+  Ckappa_sig.c_site_name ->
+  Ckappa_backend.Ckappa_backend.t ->
+  Ckappa_sig.c_state list ->
+  Exception.method_handler *
+  (string *
+   (string option *
+    Ckappa_backend.Ckappa_backend.binding_state option)
+     Wrapped_modules.LoggedStringMap.t)
+    list list
 
 
 (*******************************************************************)

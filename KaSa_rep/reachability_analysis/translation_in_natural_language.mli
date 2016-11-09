@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Oct 18 2016>
+ * Last modification: Time-stamp: <Nov 09 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -49,6 +49,26 @@ val print:
   Ckappa_sig.c_agent_name ->
   token ->
   Exception.method_handler
+
+val convert_views_constraint_list :
+  show_dep_with_dimmension_higher_than:int ->
+  Remanent_parameters_sig.parameters ->
+  Cckappa_sig.kappa_handler ->
+  Exception.method_handler ->
+  string ->
+  Ckappa_sig.c_agent_name ->
+  token ->
+  (string *
+   (string option *
+    Ckappa_backend.Ckappa_backend.binding_state option)
+     Wrapped_modules.LoggedStringMap.t)
+    list Remanent_state.lemma list ->
+  Exception.method_handler *
+  (string *
+   (string option *
+    Ckappa_backend.Ckappa_backend.binding_state option)
+     Wrapped_modules.LoggedStringMap.t)
+    list Remanent_state.lemma list
 
 val store_views :
   show_dep_with_dimmension_higher_than:int
