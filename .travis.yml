@@ -46,6 +46,7 @@ matrix:
           - graphviz
           - latex-xcolor
           - texlive-latex-recommended
+          - texlive-fonts-recommended
           - tex4ht
   - os: osx
 
