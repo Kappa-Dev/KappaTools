@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 08 2016>
+  * Last modification: Time-stamp: <Nov 10 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -958,19 +958,18 @@ let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low)
   | Remanent_state.Full -> get_intermediary_internal_contact_map state
 
 let get_contact_map =
-  get_map_gen
-    ~do_we_show_title:(fun _ -> true)
-    ~log_title:(fun x ->
-        match
-          x
-        with
-        | Remanent_state.Low ->
-          Some "Compute the contact map"
-        | Remanent_state.Medium
-        | Remanent_state.High | Remanent_state.Full ->
-          Some "Refine the contact map")
-    get_internal_contact_map
-    convert_contact_map
+    get_map_gen
+      ~do_we_show_title:(fun _ -> true)
+      ~log_title:(fun x ->
+          match x with
+          | Remanent_state.Low ->
+            Some "Compute the contact map"
+          | Remanent_state.Medium
+          | Remanent_state.High | Remanent_state.Full ->
+            Some "Refine the contact map")
+      get_internal_contact_map
+      convert_contact_map
+
 
 (******************************************************************)
 
@@ -1255,6 +1254,7 @@ let compute_constraint_list show_title state =
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
   let l = Remanent_state.get_constraint_list state in
+  (*PRINT*)
   let _error =
     Remanent_state.print_constraint_list_list logger parameters error
       kappa_handler
@@ -1276,6 +1276,7 @@ let compute_internal_constraint_list show_title state =
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
   let l = Remanent_state.get_internal_constraint_list state in
+  (*PRINT*)
   let _error =
     Remanent_state.print_internal_constraint_list_list logger
       parameters error

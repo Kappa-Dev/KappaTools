@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 09 2016>
+  * Last modification: Time-stamp: <Nov 10 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -669,14 +669,14 @@ let print_constraint_list logger parameters error kappa_handler constraint_list
       in
       let () = Loggers.fprintf logger " => [" in
       (*refinement*)
-      let error, b =
-        match lemma.refinement with
+      let error, b =(*TODO*)
+        (*match lemma.refinement with
         | [] -> error, false
         | [hyp] ->
           print_for_list logger parameters error
           kappa_handler
             hyp, false
-        | _:: _ as l ->
+        | _:: _ as l ->*)
           List.fold_left (fun (error, bool) hyp ->
               let () =
                 Loggers.print_newline
@@ -691,7 +691,7 @@ let print_constraint_list logger parameters error kappa_handler constraint_list
                 print_for_list logger parameters error kappa_handler hyp
               in
               error, true
-            ) (error, false) (List.rev l)
+            ) (error, false) (List.rev lemma.refinement)
       in
       let () = Loggers.fprintf logger "]" in
       let () = Loggers.print_newline logger in

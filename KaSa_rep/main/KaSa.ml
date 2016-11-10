@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 09 2016>
+ * Last modification: Time-stamp: <Nov 10 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -78,7 +78,8 @@ let main () =
       | Remanent_parameters_sig.Medium
       | Remanent_parameters_sig.High
       | Remanent_parameters_sig.Full ->
-        Export_to_KaSa.output_contact_map ~accuracy_level:Remanent_state.Medium
+        Export_to_KaSa.output_contact_map
+          ~accuracy_level:Remanent_state.Medium
           state
       | Remanent_parameters_sig.None
       | Remanent_parameters_sig.Low -> state
@@ -111,6 +112,7 @@ let () = main ()
 let state_json = Export_to_json.init ()
 
 (*TODO: call the print function of export for parallel bonds here*)
+(*let state, _ = Export_to_json.get_contact_map state_json*)
 
 (*let state, _ = Export_to_json.get_constraint_list state_json*)
 (*  let state, _ = Export_to_json.get_internal_constraint_list state*)

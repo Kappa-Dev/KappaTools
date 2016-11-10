@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 09 2016>
+   * Last modification: Time-stamp: <Nov 10 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1003,7 +1003,7 @@ struct
              | error, None -> error, bdu_false
              | error, Some bdu -> error, bdu
            in
-           (*---------------------------------------------------------------------*)
+           (*----------------------------------------------------------------*)
            (*bdu intersection*)
            let handler = get_mvbdu_handler dynamic in
            let error, handler, bdu_inter =
@@ -1061,8 +1061,9 @@ struct
 
   (*****************************************************************)
 
-  let step_list_empty kappa_handler dynamic parameters error _rule_id agent_id agent_type site_name
-      cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true site_correspondence =
+  let step_list_empty kappa_handler dynamic parameters error _rule_id agent_id
+      agent_type site_name cv_list fixpoint_result proj_bdu_test_restriction
+      bdu_false bdu_true site_correspondence =
     (*------------------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left
@@ -1091,7 +1092,7 @@ struct
                new_site_string
                (Ckappa_sig.int_of_site_name new_site_name)
              in*)
-           (*---------------------------------------------------------------------*)
+           (*--------------------------------------------------------------*)
            (* fetch the bdu for the agent type and the cv_id in
               the current state of the iteration *)
            let error, bdu_X =
@@ -1199,7 +1200,8 @@ struct
              in
              let error, _state_string =
                try
-                 Handler.string_of_state_fully_deciphered parameters error kappa_handler
+                 Handler.string_of_state_fully_deciphered parameters error
+                   kappa_handler
                    agent_type site_name state
                with
                | _ ->
@@ -1229,7 +1231,8 @@ struct
   (**************************************************************************)
   (*empty case of step list*)
 
-  let precondition_empty_step_list kappa_handler parameters error dynamic rule_id path store_agent_name
+  let precondition_empty_step_list kappa_handler parameters error dynamic
+      rule_id path store_agent_name
       bdu_false bdu_true store_covering_classes_id site_correspondence
       fixpoint_result proj_bdu_test_restriction =
     let error, agent_type =
@@ -1341,12 +1344,14 @@ struct
                kappa_handler.Cckappa_sig.states_dic)
             (fun error ->
                Exception.warn
-                 parameters error __POS__ Exit (Ckappa_sig.Dictionary_of_States.init()))
+                 parameters error __POS__ Exit
+                 (Ckappa_sig.Dictionary_of_States.init()))
         in
         (*---------------------------------------------------------*)
         (*Binding state: B.y*)
         let state =
-          Ckappa_sig.C_Lnk_type (step.Communication.agent_type_in, step.Communication.site_in)
+          Ckappa_sig.C_Lnk_type (step.Communication.agent_type_in,
+                                 step.Communication.site_in)
         in
         (*check if whether or not state is defined*)
         let error, b =
@@ -1736,7 +1741,8 @@ struct
       fixpoint_result bdu_false bdu_true
     =
     (*---------------------------------------------------------*)
-    (*inside the pattern, check the binding information in the lhs of the current agent*)
+    (*inside the pattern, check the binding information in the lhs of the
+      current agent*)
     let error, output =
       Communication.follow_path_inside_cc
         parameters error kappa_handler
@@ -2251,7 +2257,8 @@ struct
 
   let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X =
     let parameters = get_parameter static in
-    let parameter_views = Remanent_parameters.update_prefix parameters "\t\t\t" in
+    let parameter_views = Remanent_parameters.update_prefix parameters "\t\t\t"
+    in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_inter =
       Ckappa_sig.Views_bdu.mvbdu_and
@@ -2292,7 +2299,8 @@ struct
 
   (***************************************************************)
 
-  let compute_bdu_update_side_effects static dynamic error bdu_test list_a bdu_X =
+  let compute_bdu_update_side_effects static dynamic error bdu_test list_a
+      bdu_X =
     let error, dynamic, bdu_result =
       compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X
     in
@@ -2558,7 +2566,7 @@ struct
     match event with
     | Communication.See_a_new_bond ((agent_type, site_type, _state),
                                     (_agent_type', _site_type', state')) ->
-      (*-----------------------------------------------------------------------*)
+      (*--------------------------------------------------------------------*)
       (* get the pairs (r, state) compatible with the second site:half_break *)
       let error, pair_list =
         match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -2860,6 +2868,7 @@ struct
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
       parameters handler error handler_kappa site_correspondence
       result =
+    let log = Remanent_parameters.get_logger parameters in
     if
       smash
     then
@@ -2884,7 +2893,7 @@ struct
              in
              let error =
                Exception.check_point
-                 Exception.warn  parameters error error' __POS__ Exit
+                 Exception.warn parameters error error' __POS__ Exit
              in
              (*-----------------------------------------------------------*)
              Wrapped_modules.LoggedIntMap.fold
@@ -2893,23 +2902,18 @@ struct
                    let error, handler =
                      if local_trace || Remanent_parameters.get_trace parameters
                      then
-                       let () = Loggers.fprintf
-                           (Remanent_parameters.get_logger parameters)
+                       let () = Loggers.fprintf log
                            "INTENSIONAL DESCRIPTION:"
                        in
-                       let () = Loggers.print_newline
-                           (Remanent_parameters.get_logger parameters)
-                       in
+                       let () = Loggers.print_newline log in
                        let () =
                          Ckappa_sig.Views_bdu.print
                            parameters mvbdu
                        in
-                       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                       let () = Loggers.fprintf log
                            "EXTENSIONAL DESCRIPTION:"
                        in
-                       let () = Loggers.print_newline
-                           (Remanent_parameters.get_logger parameters)
-                       in
+                       let () = Loggers.print_newline log in
                        error, handler
                      else
                        error, handler
@@ -2919,7 +2923,9 @@ struct
                        parameters handler error (fun _ e i -> e, i) mvbdu
                    in
                    (*-------------------------------------------------------*)
-                   error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
+                   error,
+                   (handler,
+                    (agent_string, agent_type, mvbdu,translation)::list)
                )
                map
                (error, (handler,list)))
@@ -2951,13 +2957,13 @@ struct
                  if local_trace || Remanent_parameters.get_trace parameters
                  then
                    let () =
-                     Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                     Loggers.fprintf log
                        "agent_type:%i:%s:cv_id:%i"
                        (Ckappa_sig.int_of_agent_name agent_type)
                        agent_string
                        (Covering_classes_type.int_of_cv_id cv_id)
                    in
-                   Loggers.print_newline (Remanent_parameters.get_logger parameters)
+                   Loggers.print_newline log
                in
                (*------------------------------------------------------------*)
                let error, site_correspondence =
@@ -2966,20 +2972,21 @@ struct
                in
                let error, site_correspondence =
                  match site_correspondence with
-                 | None -> Exception.warn  parameters error __POS__ Exit []
+                 | None -> Exception.warn parameters error __POS__ Exit []
                  | Some a -> error, a
                in
                let error, site_correspondence =
                  let rec aux list =
                    match list with
-                   | [] -> Exception.warn  parameters error __POS__ Exit []
+                   | [] -> Exception.warn parameters error __POS__ Exit []
                    | (h, list, _) :: _ when h = cv_id -> error, list
                    | _ :: tail -> aux tail
                  in aux site_correspondence
                in
                (*------------------------------------------------------------*)
                let error,(_, map2) =
-                 Bdu_static_views.new_index_pair_map parameters error site_correspondence
+                 Bdu_static_views.new_index_pair_map parameters error
+                   site_correspondence
                in
                (*-----------------------------------------------------------*)
                let error, handler, list' =
@@ -2990,24 +2997,20 @@ struct
                  List.fold_left
                    (fun (error, (handler, list)) mvbdu ->
                       let error, handler =
-                        if local_trace || Remanent_parameters.get_trace parameters
+                        if local_trace ||
+                           Remanent_parameters.get_trace parameters
                         then
-                          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                          let () = Loggers.fprintf log
                               "INTENSIONAL DESCRIPTION:" in
-                          let () = Loggers.print_newline
-                              (Remanent_parameters.get_logger parameters)
-                          in
+                          let () = Loggers.print_newline log in
                           let () =
                             Ckappa_sig.Views_bdu.print
                               parameters mvbdu
                           in
-                          let () = Loggers.fprintf
-                              (Remanent_parameters.get_logger parameters)
+                          let () = Loggers.fprintf log
                               "EXTENSIONAL DESCRIPTION:"
                           in
-                          let () = Loggers.print_newline
-                              (Remanent_parameters.get_logger parameters)
-                          in
+                          let () = Loggers.print_newline log in
                           error, handler
                         else
                           error, handler
@@ -3034,7 +3037,9 @@ struct
                           mvbdu
                       in
                       (*----------------------------------------------------*)
-                      error, (handler,(agent_string, agent_type, mvbdu,translation)::list)
+                      error,
+                      (handler,
+                       (agent_string, agent_type, mvbdu,translation)::list)
                    )
                    (error, (handler,list))
                    list'
@@ -3050,7 +3055,7 @@ struct
     let error, handler, list =
       stabilise_bdu_update_map_gen_decomposition decomposition
         ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-        parameters handler error handler_kappa site_correspondence  result
+        parameters handler error handler_kappa site_correspondence result
     in
     let error =
       List.fold_left
@@ -3065,35 +3070,36 @@ struct
     error, handler
 
   (****************************************************************)
-  (*non relational properties*)
+  (*Print for NON-Relational properties*)
 
-  let print_bdu_update_map_cartesian_abstraction a b c d =
+  let print_bdu_update_map_cartesian_abstraction parameters handler error
+      handler_kappa  =
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-      a b c d
+      parameters handler error handler_kappa
 
   (*****************************************************************)
-  (*relational properties*)
+  (*Print for relational properties*)
 
-  let print_bdu_update_map_cartesian_decomposition a b c d =
+  let print_bdu_update_map_cartesian_decomposition parameters handler error
+      handler_kappa =
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:
         (if
-          Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a
+          Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition parameters
          then 2
          else 1
         )
       Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
-      a b c d
+      parameters handler error handler_kappa
 
   (*****************************************************************)
 
   let print_result_fixpoint_aux
-      parameters handler error handler_kappa site_correspondence result
-      (_static:static_information) =
+      parameters handler error handler_kappa site_correspondence result =
     let log = Remanent_parameters.get_logger parameters in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters
     then
@@ -3195,7 +3201,6 @@ struct
               kappa_handler
               store_remanent_triple
               fixpoint_result
-              static
           in
           error
         in
@@ -3356,21 +3361,17 @@ struct
       in
       error, dynamic, kasa_state
 
-  let export_relation_properties
+  let export_relation_properties_aux
       ~smash:smash
       ~show_dep_with_dimmension_higher_than:dim_min
-      static dynamic error kasa_state =
-    let parameters = get_parameter static in
-    let handler = get_mvbdu_handler dynamic in
-    let handler_kappa = get_kappa_handler static in
-    let domain_name = "Views domain - relational properties" in
-    let error, site_correspondence =
-      get_store_remanent_triple static dynamic error in
-    let fixpoint_result = get_fixpoint_result dynamic in
+      decomposition
+      domain_name
+      parameters handler error handler_kappa
+      site_correspondence fixpoint_result kasa_state =
     (*convert result to list*)
     let error, handler, list =
       stabilise_bdu_update_map_gen_decomposition
-        Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
+        decomposition
         ~smash:smash
         ~show_dep_with_dimmension_higher_than:dim_min
         parameters
@@ -3397,7 +3398,7 @@ struct
               current_list
           in
           error, current_list
-        ) (error, []) list
+        ) (error, []) (List.rev list)
     in
     (*------------------------------------------------------------------*)
     let constraint_list = Remanent_state.get_constraint_list kasa_state in
@@ -3405,10 +3406,82 @@ struct
     let kasa_state =
       Remanent_state.set_constraint_list pair_list kasa_state
     in
+    error, handler, kasa_state
+
+  let export_relation_properties parameters handler error handler_kappa =
+  let domain_name = "Views domain - relational properties" in
+    export_relation_properties_aux
+      ~smash:true
+      ~show_dep_with_dimmension_higher_than:
+      (if
+          Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition parameters
+         then 2
+         else 1
+        )
+      Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
+      domain_name
+      parameters handler error handler_kappa
+
+  let export_non_relation_properties parameters handler error handler_kappa =
+  let domain_name = "Views domain - non relational properties" in
+    export_relation_properties_aux
+      ~smash:true
+      ~show_dep_with_dimmension_higher_than:1
+      Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
+      domain_name
+      parameters handler error handler_kappa
+
+  let export_views_properties_aux
+      parameters handler error handler_kappa
+      site_correspondence fixpoint_result kasa_state =
+    (*if Remanent_parameters.get_dump_reachability_analysis_result parameters
+    then*)
+      (*relational properties*)
+
+      (*non relational properties*)
+      let error, handler, kasa_state =
+        export_non_relation_properties
+          parameters handler error handler_kappa
+          site_correspondence
+          fixpoint_result
+          kasa_state
+      in
+      let error, handler, kasa_state =
+        export_relation_properties
+          parameters handler error handler_kappa
+          site_correspondence
+          fixpoint_result
+          kasa_state
+      in
+      error, handler, kasa_state
+  (*else
+      error, handler, kasa_state*)
+
+  let export_views_properties static dynamic error kasa_state =
+    let parameters = get_parameter static in
+    let handler = get_mvbdu_handler dynamic in
+    let handler_kappa = get_kappa_handler static in
+    let error, site_correspondence =
+      get_store_remanent_triple static dynamic error in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    let error, handler, kasa_state =
+    if local_trace ||
+       Remanent_parameters.get_dump_reachability_analysis_result parameters
+    then
+      let error, handler, kasa_state =
+        export_views_properties_aux
+          parameters handler error handler_kappa
+          site_correspondence
+          fixpoint_result
+          kasa_state
+      in
+      error, handler, kasa_state
+    else error, handler, kasa_state
+    in
+    let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, kasa_state
 
   let export static dynamic error kasa_state =
-    let parameters = get_parameter static in
     (*export of contact map*)
     let error, dynamic, kasa_state =
       export_contact_map static dynamic error kasa_state
@@ -3416,14 +3489,7 @@ struct
     (*TODO: this function generate error in the compile*)
     (*export of relational properties*)
     (*let error, dynamic, kasa_state =
-      export_relation_properties
-        ~smash:true
-        ~show_dep_with_dimmension_higher_than:
-          (if
-            Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition parameters
-           then 2
-           else 1
-          )
+      export_views_properties
         static dynamic error kasa_state
     in*)
     (*export of non relational properties*)
