@@ -8,16 +8,6 @@ open Unix
 open Lwt_log
 
 let project_ref context =
-  (*
-  let text_parameters : string = String.concat " , " (List.map (fun (key,value) -> key^" : "^value) context.Webapp_common.arguments) in
-  let () =
-    async
-      (fun () ->
-         Lwt_log_core.log
-           ~level:Lwt_log_core.Debug
-           (Format.sprintf "file_ref :\n+ args : { %s }" text_parameters))
-  in
-  *)
   List.assoc "projectid" context.Webapp_common.arguments
 let file_ref context =
   (List.assoc "projectid" context.Webapp_common.arguments,
@@ -52,20 +42,6 @@ let route
          fun ~context:context ->
            (Cohttp_lwt_body.to_string context.Webapp_common.body)
            >>= (fun body ->
-               let () =
-                 async
-                   (fun () ->
-                      Lwt_log_core.log
-                        ~level:Lwt_log_core.Debug
-                        (Format.sprintf "{ 'shutdown' : { 'expected' : '%s' : 'actual' : '%s' } }"
-                           (match shutdown_key with
-                            | None -> "None"
-                            | Some s -> s)
-                           body
-                        )
-                   )
-
-               in
                match shutdown_key with
                | Some shutdown_key when shutdown_key = body ->
                  let () =
@@ -89,7 +65,8 @@ let route
                  msg
              )
      };
-     { Webapp_common.path = "/v2/projects" ;
+     { Webapp_common.path =
+         "/v2/projects" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -100,7 +77,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects" ;
+     { Webapp_common.path =
+         "/v2/projects" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -115,51 +93,20 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}" ;
        Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-                        (*
-
-            (Lwt_log_core.log
-               ~level:Lwt_log_core.Debug
-               (Format.sprintf " + deleting project '%s' " project_id))
-            >>=
-            (fun _ -> manager#project_info ()) >>=
-            (Api_common.result_bind_lwt
-               ~ok:(fun (project_info :Api_types_j.project_info) ->
-                   let () = List.iter
-                       (fun (project_id_debug : Api_types_j.project_id) ->
-                          async
-                            (fun () ->
-                               Lwt_log_core.log
-                                 ~level:Lwt_log_core.Debug
-                                 (Format.sprintf
-                                    "-project_id '%s' '%s' '%s' '%s'\n"
-                                    (String.escaped project_id_debug)
-                                    (String.escaped project_id)
-                                    (string_of_bool
-                                       (String.escaped project_id_debug = String.escaped project_id)
-                                    )
-                                    (string_of_bool
-                                       (project_id_debug = project_id)
-                                    )
-                                 ))
-                       )
-                       project_info
-                   in
-                   Lwt.return (Api_common.result_ok ()))
-            ) >>=
-
-            (fun _ ->   *)
             (manager#project_delete project_id) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/files" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/files" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -175,7 +122,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/files" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/files" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -185,7 +133,8 @@ let route
                ~string_of_success:(Mpi_message_j.string_of_file_info ?len:None))
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/files/{fileid}" ;
        Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -197,7 +146,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/files/{fileid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -208,7 +158,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/files/{fileid}" ;
        Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -224,23 +175,9 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,simulation_id) = simulation_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Mpi_message_j.simulation_parameter_of_string
-            >>=
-            (manager#simulation_continue project_id simulation_id) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}" ;
+       Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,simulation_id) = simulation_ref context in
@@ -250,7 +187,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/distances/{distanceid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/distances/{distanceid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -262,7 +200,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/filelines/{filelinesid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/filelines/{filelinesid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -273,7 +212,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/fluxmaps/{fluxmapsid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/fluxmaps/{fluxmapsid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -284,7 +224,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/logmessages" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/logmessages" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -295,7 +236,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/plot" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/plot" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -306,7 +248,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/snapshots/{snapshotid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/snapshots/{snapshotid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -317,7 +260,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -328,7 +272,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/distances" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/distances" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -339,7 +284,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/filelines" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/filelines" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -350,7 +296,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/fluxmaps" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/fluxmaps" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -361,7 +308,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}/snapshots" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/snapshots" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -372,7 +320,8 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations" ;
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
@@ -383,34 +332,56 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_pause project_id simulation_id) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}" ;
+     (* use the controller pattern *)
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/continue" ;
        Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,simulation_id) = simulation_ref context in
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
-            Mpi_message_j.simulation_perturbation_of_string
+            Api_types_j.simulation_parameter_of_string
             >>=
-            (manager#simulation_perturbation project_id simulation_id) >>=
+            (manager#simulation_continue project_id simulation_id)
+            >>=
+            (Webapp_common.result_response
+                     ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/pause" ;
+       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let (project_id,simulation_id) = simulation_ref context in
+            (manager#simulation_pause project_id simulation_id)
+            >>=
+            (Webapp_common.result_response
+                     ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/perturbation" ;
+       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let (project_id,simulation_id) = simulation_ref context in
+            (Cohttp_lwt_body.to_string context.Webapp_common.body)
+            >|=
+            Api_types_j.simulation_perturbation_of_string
+            >>=
+            (manager#simulation_perturbation project_id simulation_id)
+            >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
          )
      };
      { Webapp_common.path = "/v2/projects/{projectid}/simulations" ;
-       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
+       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in

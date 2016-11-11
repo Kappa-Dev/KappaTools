@@ -38,11 +38,11 @@ let result_response
           (ok : 'a) ->
           let body : string = string_of_success ok in
           let status = status_of_code code in
-             Server.respond_string
-               ?headers:(Some headers)
-               ~status:status
-               ~body:body
-                   ())
+          Server.respond_string
+            ?headers:(Some headers)
+            ~status:status
+            ~body:body
+            ())
     ~error:(fun
              (code : Api.manager_code)
              (errors : Api_types_j.errors) ->
@@ -50,11 +50,11 @@ let result_response
              let status = status_of_code code in
              (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
              >>= (fun _ ->
-          Server.respond_string
-            ?headers:(Some headers)
-            ~status:status
-            ~body:error_msg
-            ()))
+                 Server.respond_string
+                   ?headers:(Some headers)
+                   ~status:status
+                   ~body:error_msg
+                   ()))
 
 let string_response
     ?(headers = headers)
@@ -192,42 +192,43 @@ let route_handler
         url
     with
     | Some (route,arguments) ->
-      (*
-      let () =
-        async
-          (fun () -> (Cohttp_lwt_body.to_string context.body)
-           >>=
-           (fun body ->
-             Lwt_log_core.log
-               ~level:Lwt_log_core.Debug
-               (Format.sprintf "+ body : '%s'\n" body)))
-      in
-         *)
-      let context = { context with arguments = arguments } in
-      if context.request.meth = `OPTIONS then
-        let h =
-          Header.init_with
-            "Access-Control-Allow-Origin"
-            "*"
-        in
-        let h =
-          Header.add
-            h
-            "Access-Control-Allow-Methods"
-            (String.concat
-               " , "
-               (List.map Code.string_of_method route.methods))
-        in
-        let h =
-          Header.add
-            h
-            "Access-Control-Request-Headers" "X-Custom-Header"
-        in
-        Server.respond_string
-          ?headers:(Some h)
-          ~status:`OK
-          ~body:""
-          ()
-      else
-        route.operation ~context
+      Lwt.catch
+        (fun () ->
+           let context = { context with arguments = arguments } in
+           if context.request.meth = `OPTIONS then
+             let h =
+               Header.init_with
+                 "Access-Control-Allow-Origin"
+                 "*"
+             in
+             let h =
+               Header.add
+                 h
+                 "Access-Control-Allow-Methods"
+                 (String.concat
+                    " , "
+                    (List.map Code.string_of_method route.methods))
+             in
+             let h =
+               Header.add
+                 h
+                 "Access-Control-Request-Headers" "X-Custom-Header"
+             in
+             Server.respond_string
+               ?headers:(Some h)
+               ~status:`OK
+               ~body:""
+               ()
+           else
+             route.operation ~context
+        )
+        (fun exn ->
+           result_response
+             ~string_of_success:(fun x -> x)
+             (match exn with
+              | Yojson.Json_error e -> (Api_common.result_error_msg e)
+              | Ag_oj_run.Error e -> (Api_common.result_error_msg e)
+              | exn -> (Api_common.result_error_exception exn)
+             )
+        )
     | None -> not_found

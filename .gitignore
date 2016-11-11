@@ -67,6 +67,7 @@ site
 
 # python
 *.pyc
+.idea
 
 \#*#
 .\#*

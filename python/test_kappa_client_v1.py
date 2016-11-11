@@ -11,31 +11,31 @@ import kappa_client_v1
 
 class KappaClientTest(object):
 
-    # def test_version(self):
-    #     """ check version of api
-    #     """
-    #     runtime = self.getRuntime()
-    #     version = runtime.version()
-    #     self.assertIsNotNone('version' in version)
-    #     self.assertIsNotNone('build' in version)
+    def test_version(self):
+        """ check version of api
+        """
+        runtime = self.getRuntime()
+        version = runtime.version()
+        self.assertIsNotNone('version' in version)
+        self.assertIsNotNone('build' in version)
 
-    # def test_parse(self):
-    #     """ test if the api can parse
-    #     """
-    #     check = lambda parse: self.assertIsNotNone('contact_map' in parse)
-    #     runtime = self.getRuntime()
-    #     parse = runtime.parse("")
-    #     check(parse)
-    #     parse = runtime.parse("%var: 'one' 1")
-    #     check(parse)
-    #     parse = runtime.parse("A(x!1),B(x!1) -> A(x),B(x) @ 0.01")
-    #     check(parse)
-    #     try:
-    #         parse = runtime.parse("A(x)")
-    #         self.fail()
-    #     except kappa_common.KappaError as exception:
-    #         self.assertEqual(exception.errors[0]["message"],
-    #                          'Syntax error')
+    def test_parse(self):
+        """ test if the api can parse
+        """
+        check = lambda parse: self.assertIsNotNone('contact_map' in parse)
+        runtime = self.getRuntime()
+        parse = runtime.parse("")
+        check(parse)
+        parse = runtime.parse("%var: 'one' 1")
+        check(parse)
+        parse = runtime.parse("A(x!1),B(x!1) -> A(x),B(x) @ 0.01")
+        check(parse)
+        try:
+            parse = runtime.parse("A(x)")
+            self.fail()
+        except kappa_common.KappaError as exception:
+            self.assertEqual(exception.errors[0]["message"],
+                             'Syntax error')
 
     def test_start(self):
         """ test starting a simulation
@@ -118,6 +118,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
     def tearDownClass(self):
         """ tear down test by shutting down"""
         runtime = self.getRuntime(self)
+        runtime.shutdown(self.key)
 
     @classmethod
     def generate_key(cls):

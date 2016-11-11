@@ -80,40 +80,40 @@ class KappaClientTest(object):
             None
 
 
-# class RestClientTest(KappaClientTest,unittest.TestCase):
-#     """ Integration test for kappa client"""
-#     @classmethod
-#     def setUpClass(self):
-#         """ set up unit test by launching client"""
-#         self.websim = "../WebSim.native"
-#         self.key = self.generate_key()
-#         self.port = 6666
-#         command_format = "{0} --development --shutdown-key {1} --port {2} --level debug"
-#         subprocess.Popen(command_format.format(self.websim, self.key, self.port).split())
-#         time.sleep(1)
-#         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
-#     def getRuntime(self):
-#         return(kappa_client.KappaRest(self.endpoint))
-#     @classmethod
-#     def tearDownClass(self):
-#         """ tear down test by shutting down"""
-#         runtime = self.getRuntime(self)
-#         print(runtime.shutdown(self.key))
+class RestClientTest(KappaClientTest,unittest.TestCase):
+    """ Integration test for kappa client"""
+    @classmethod
+    def setUpClass(self):
+        """ set up unit test by launching client"""
+        self.websim = "../WebSim.native"
+        self.key = self.generate_key()
+        self.port = 6666
+        command_format = "{0} --development --shutdown-key {1} --port {2} --level debug"
+        subprocess.Popen(command_format.format(self.websim, self.key, self.port).split())
+        time.sleep(1)
+        self.endpoint = "http://127.0.0.1:{0}".format(self.port)
+    def getRuntime(self):
+        return(kappa_client.KappaRest(self.endpoint))
+    @classmethod
+    def tearDownClass(self):
+        """ tear down test by shutting down"""
+        runtime = self.getRuntime(self)
+        print(runtime.shutdown(self.key))
 
-#     @classmethod
-#     def generate_key(cls):
-#         """ generate random key for kappa server. """
-#         return ''.join(random.
-#                        SystemRandom().
-#                        choice(string.ascii_uppercase + string.digits)
-#                        for _ in range(100))
+    @classmethod
+    def generate_key(cls):
+        """ generate random key for kappa server. """
+        return ''.join(random.
+                       SystemRandom().
+                       choice(string.ascii_uppercase + string.digits)
+                       for _ in range(100))
 
-#     def __init__(self, *args, **kwargs):
-#         """ initalize test by launching kappa server """
-#         self.websim = "../WebSim.native"
-#         self.key = self.generate_key()
-#         self.port = 6666
-#         super(KappaClientTest, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        """ initalize test by launching kappa server """
+        self.websim = "../WebSim.native"
+        self.key = self.generate_key()
+        self.port = 6666
+        super(KappaClientTest, self).__init__(*args, **kwargs)
 
 class StdClientTest(KappaClientTest,unittest.TestCase):
     """ Integration test for kappa client"""
