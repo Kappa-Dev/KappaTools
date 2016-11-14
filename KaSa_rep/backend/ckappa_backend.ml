@@ -584,6 +584,8 @@ struct
       )
       site_map
 
+(* JF:  This is quite suspicious *)
+  (* You should test and check that if you start with an elt, you apply to_json, then of_json, you get back the initial elt without any warning*)
   let binding_opt_of_json json  =
     match json with
     (* x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x)) (*FIXME*)*)
