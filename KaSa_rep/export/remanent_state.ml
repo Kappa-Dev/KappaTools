@@ -820,15 +820,15 @@ let convert_refinement_internal_pair_list parameters error kappa_handler pattern
 
 (*******************************************************************)
 
-let convert_refinement_internal error list =
+(*let convert_refinement_internal error list =
   List.fold_left (fun (error, current_list) hyp ->
       error, hyp :: current_list
-    ) (error, []) list
+    ) (error, []) list*)
 
 (*******************************************************************)
 (*views domain*)
 
-let convert_refinement_views_constraints_list parameters error
+(*let convert_refinement_views_constraints_list parameters error
     handler_kappa agent_id site_type t state_list =
   List.fold_left (fun (error, current_list) state ->
       let error, t =
@@ -841,7 +841,7 @@ let convert_refinement_views_constraints_list parameters error
       in
       let error, site_graph = convert_site_graph error string_version in
       error, site_graph :: current_list
-    ) (error, []) state_list
+    ) (error, []) state_list*)
 
 (*******************************************************************)
 

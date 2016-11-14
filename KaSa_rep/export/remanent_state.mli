@@ -157,11 +157,11 @@ val convert_refinement :
      Wrapped_modules.LoggedStringMap.t)
     list list
 
-val convert_refinement_internal :
+(*val convert_refinement_internal :
   Exception.method_handler ->
   Ckappa_backend.Ckappa_backend.t list ->
   Exception.method_handler *
-  Ckappa_backend.Ckappa_backend.t list
+  Ckappa_backend.Ckappa_backend.t list*)
 
 val convert_refinement_pair_list :
   Remanent_parameters_sig.parameters ->
@@ -193,7 +193,7 @@ val convert_refinement_internal_pair_list :
   Exception.method_handler *
   Ckappa_backend.Ckappa_backend.t list
 
-val convert_refinement_views_constraints_list :
+(*val convert_refinement_views_constraints_list :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.kappa_handler ->
@@ -206,7 +206,7 @@ val convert_refinement_views_constraints_list :
    (string option *
     Ckappa_backend.Ckappa_backend.binding_state option)
      Wrapped_modules.LoggedStringMap.t)
-    list list
+    list list*)
 
 (*******************************************************************)
 

@@ -1426,8 +1426,8 @@ struct
                      in
                      let current_list = lemma :: current_list in
                      (*internal constraint list*)
-                     let error, refine =
-                       Remanent_state.convert_refinement_internal error
+                     let refine =
+                       List.rev
                          list_same
                      in
                      let lemma_internal =
@@ -1459,8 +1459,8 @@ struct
                    in
                    let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let error, refine =
-                     Remanent_state.convert_refinement_internal error
+                   let refine =
+                     List.rev
                        list_same
                    in
                    let lemma_internal =
@@ -1493,8 +1493,8 @@ struct
                    in
                    let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let error, refine =
-                     Remanent_state.convert_refinement_internal error
+                   let refine =
+                     List.rev
                        list_distinct
                    in
                    let lemma_internal =
@@ -1522,8 +1522,8 @@ struct
                    in
                    let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let error, refine =
-                     Remanent_state.convert_refinement_internal error
+                   let refine =
+                     List.rev
                        list_distinct
                    in
                    let lemma_internal =
@@ -1557,8 +1557,8 @@ struct
                  in
                  let current_list = lemma :: current_list in
                  (*internal*)
-                 let error, refine =
-                   Remanent_state.convert_refinement_internal error
+                 let refine =
+                   List.rev
                      list_same
                  in
                  let lemma_internal =
@@ -1585,8 +1585,8 @@ struct
                  in
                  let current_list = lemma :: current_list in
                  (*internal constraint list*)
-                 let error, refine =
-                   Remanent_state.convert_refinement_internal error
+                 let refine =
+                   List.rev
                      list_distinct
                  in
                  let lemma_internal =
