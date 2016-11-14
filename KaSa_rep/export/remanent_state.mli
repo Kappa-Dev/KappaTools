@@ -96,53 +96,44 @@ type 'site_graph lemma =
     refinement : 'site_graph list
   }
 
-type 'site_graph poly_constraint_list =
+type 'site_graph poly_constraints_list =
   (string * 'site_graph lemma list) list
 
-type internal_constraint_list =
-  Ckappa_backend.Ckappa_backend.t poly_constraint_list
+type internal_constraints_list =
+  Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
 (*
 (string * _list lemma list) list
 *)
 
-type constraint_list =
+type constraints_list =
   ((string *
     (string option * Ckappa_backend.Ckappa_backend.binding_state option)
        Wrapped_modules.LoggedStringMap.t)
      list)
-    poly_constraint_list
+    poly_constraints_list
 
-val constraint_list_to_json:
-  constraint_list -> Yojson.Basic.json
+val constraints_list_to_json:
+  constraints_list -> Yojson.Basic.json
 
-val internal_constraint_list_to_json:
-  internal_constraint_list -> Yojson.Basic.json
 
-val constraint_list_of_json : Yojson.Basic.json ->
-  constraint_list
+val constraints_list_of_json : Yojson.Basic.json ->
+  constraints_list
 
-val internal_constraint_list_of_json :
-  Yojson.Basic.json ->
-  (*string version*)
-    (string * (string *
-     (string option * Ckappa_backend.Ckappa_backend.binding_state option)
-       Wrapped_modules.LoggedStringMap.t)
-      Ckappa_sig.Agent_id_map_and_set.Map.t lemma list) list
 
-val print_constraint_list_list :
-  Loggers.t ->
+val print_constraints_list_list :
+  ?logger:Loggers.t ->
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.kappa_handler ->
-  constraint_list -> Exception.method_handler
+  constraints_list -> Exception.method_handler
 
-val print_internal_constraint_list_list :
-  Loggers.t ->
+val print_internal_constraints_list_list :
+  ?logger:Loggers.t ->
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.kappa_handler ->
-  internal_constraint_list -> Exception.method_handler
+  internal_constraints_list -> Exception.method_handler
 
 val convert_site_graph :
   Exception.method_handler ->
@@ -202,7 +193,7 @@ val convert_refinement_internal_pair_list :
   Exception.method_handler *
   Ckappa_backend.Ckappa_backend.t list
 
-val convert_refinement_views_constraint_list :
+val convert_refinement_views_constraints_list :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Cckappa_sig.kappa_handler ->
@@ -329,13 +320,13 @@ val get_log_info: ('static, 'compile) state ->
 
 (*TODO*)
 
-val get_internal_constraint_list : ('static, 'compile) state ->
-  internal_constraint_list option
+val get_internal_constraints_list : ('static, 'compile) state ->
+  internal_constraints_list option
 
-val set_internal_constraint_list : internal_constraint_list -> ('static, 'compile) state -> ('static, 'compile) state
+val set_internal_constraints_list : internal_constraints_list -> ('static, 'compile) state -> ('static, 'compile) state
 
-val get_constraint_list : ('static, 'compile) state ->
-  constraint_list option
+val get_constraints_list : ('static, 'compile) state ->
+  constraints_list option
 
-val set_constraint_list : constraint_list -> ('static, 'compile) state ->
+val set_constraints_list : constraints_list -> ('static, 'compile) state ->
   ('static, 'compile) state

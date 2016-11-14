@@ -48,6 +48,8 @@ type internal_influence_map =
 
 type handler = Cckappa_sig.kappa_handler
 
+type internal_constraints_list = Remanent_state.internal_constraints_list
+
 (******************************************************************)
 
 let string_of_influence_node x =
@@ -140,11 +142,7 @@ let init ?compil ~called_from () =
       | Remanent_parameters_sig.Internalised
       | Remanent_parameters_sig.Server
       | Remanent_parameters_sig.KaSim
-      | Remanent_parameters_sig.JS  -> assert false (*TODO*) (*->
-        let errors = Exception.empty_error_handler in
-        let errors, parameters, files  = Get_option.get_option errors in
-        Remanent_state.create_state ~errors parameters
-          (Remanent_state.Files files)*)
+      | Remanent_parameters_sig.JS
       | Remanent_parameters_sig.KaSa ->
         begin
           let errors = Exception.empty_error_handler in
@@ -1071,14 +1069,14 @@ let dump_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state
   | Some influence_map ->
     print_influence_map (Remanent_state.get_parameters state) influence_map
 
-let output_internal_influence_map ?loggers ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+let output_internal_influence_map ?logger ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let parameters = get_parameters state in
   let state, influence_map = get_internal_influence_map ~accuracy_level state in
   let state, c_compil = get_c_compilation state in
   let state, handler = get_handler state in
   let error = get_errors state in
   let error =
-    Print_quarks.dot_of_influence_map ?loggers parameters error handler c_compil influence_map
+    Print_quarks.dot_of_influence_map ?logger parameters error handler c_compil influence_map
   in
   set_errors error state
 
@@ -1099,13 +1097,13 @@ let dump_contact_map accuracy state =
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
-let output_internal_contact_map ?loggers ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+let output_internal_contact_map ?logger ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let parameters = Remanent_state.get_parameters state in
   let state, contact_map = get_internal_contact_map ~accuracy_level state in
   let state, handler = get_handler state in
   let error = get_errors state in
   let error =
-    Preprocess.dot_of_contact_map ?loggers parameters error handler contact_map
+    Preprocess.dot_of_contact_map ?logger parameters error handler contact_map
   in
   set_errors error state
 
@@ -1162,39 +1160,37 @@ let json_to_dead_rules =
 (******************************************************************)
 
 (* state -> ?: state, constraint_list*)
-let print_constraint_list state l =
+let output_constraints_list ?logger state l =
   let parameters = Remanent_state.get_parameters state in
-  let logger = Remanent_parameters.get_logger parameters in
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
   (*PRINT*)
   let error =
-    Remanent_state.print_constraint_list_list logger parameters error
+    Remanent_state.print_constraints_list_list ?logger parameters error
       kappa_handler
       l
   in
   let state = Remanent_state.set_errors error state in
   state
 
-let print_internal_constraint_list state l =
+let print_internal_constraints_list ?logger state l =
   (*let state, _ = get_reachability_analysis state in*)
   let parameters = Remanent_state.get_parameters state in
-  let logger = Remanent_parameters.get_logger parameters in
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
   (*PRINT*)
   let error =
-    Remanent_state.print_internal_constraint_list_list logger parameters error
+    Remanent_state.print_internal_constraints_list_list ?logger parameters error
       kappa_handler
       l
   in
   let state = Remanent_state.set_errors error state in
   state
 
-let compute_gen_constraint_list get_constraint_list show_title state =
+let compute_gen_constraints_list get_constraints_list show_title state =
   let state,_ = get_reachability_analysis state in
   match
-    get_constraint_list state
+    get_constraints_list state
   with
   | None ->
     let error = Remanent_state.get_errors state in
@@ -1204,25 +1200,31 @@ let compute_gen_constraint_list get_constraint_list show_title state =
     state, output
   | Some output -> state, output
 
-let compute_constraint_list x y =
-  compute_gen_constraint_list
-    Remanent_state.get_constraint_list x y
+let get_constraints_list x y =
+  compute_gen_constraints_list
+    Remanent_state.get_constraints_list x y
 
-let compute_internal_constraint_list x y =
-  compute_gen_constraint_list
-    Remanent_state.get_internal_constraint_list x y
+let get_internal_constraints_list x y =
+  compute_gen_constraints_list
+    Remanent_state.get_internal_constraints_list x y
 
-let get_constraint_list_to_json =
-  get_gen
-    ~dump_result:true
-    ~dump:print_constraint_list
-    Remanent_state.get_constraint_list
-    compute_constraint_list
+let empty_internal_constraints_list = []
+
+let get_constraints_list_to_json state =
+  let state, constraints_list = get_constraints_list "Extract refinement lemmas" state in
+  state, Remanent_state.constraints_list_to_json constraints_list
 
 (******************************************************************)
 
-let get_internal_constraint_list_to_json =
+let get_internal_constraints_list_to_json =
   get_gen
-    ~dump:print_internal_constraint_list
-    Remanent_state.get_internal_constraint_list
-    compute_internal_constraint_list
+    ~dump:print_internal_constraints_list
+    Remanent_state.get_internal_constraints_list
+    get_internal_constraints_list
+
+
+let get_internal_constraints_list = get_internal_constraints_list "Extract refinement lemmas"
+
+let output_internal_constraints_list ?logger (state:state) =
+  let state, constraints_list = get_internal_constraints_list state in
+  print_internal_constraints_list ?logger state constraints_list

@@ -89,36 +89,13 @@ EGFR(CR!1),EGFR(CR!1) =>
 EGFR(CR!EGFR.CR,N!EGFR.C) => EGFR(CR!1,N!2),EGFR(C!2,CR!1)
 EGFR(C!EGFR.N,CR!EGFR.CR) => EGFR(C!2,CR!1),EGFR(CR!1,N!2)
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (constraint_list):
-------------------------------------------------------------
-EGFR(C!EGFR.N,CR!EGFR.CR)  => [
-		  EGFR(C!2,CR!1),EGFR(CR!1,N!2) ]
-EGFR(CR!EGFR.CR,N!EGFR.C)  => [
-		  EGFR(CR!1,N!2),EGFR(C!2,CR!1) ]
-
-------------------------------------------------------------
-* Export Connected agents to JSon (constraint_list):
-------------------------------------------------------------
-EGFR(CR!1),EGFR(CR!1)  => [
-		  EGFR(C!EGFR.N,CR!1),EGFR(C,CR!1) 
-		v EGFR(C,CR!1),EGFR(C,CR!1) 
-		v EGFR(C,CR!1),EGFR(C!EGFR.N,CR!1) ]
-EGFR(CR!1),EGFR(CR!1)  => [
-		  EGFR(C!EGFR.N,CR!1),EGFR(CR!1,N!EGFR.C) 
-		v EGFR(C,CR!1),EGFR(CR!1,N) ]
-EGFR(CR!1),EGFR(CR!1)  => [
-		  EGFR(CR!1,N!EGFR.C),EGFR(CR!1,N) 
-		v EGFR(CR!1,N),EGFR(CR!1,N) 
-		v EGFR(CR!1,N),EGFR(CR!1,N!EGFR.C) ]
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraint_list):
+* Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 EGFR(C!EGFR.N,CR!EGFR.CR)=> [EGFR(C!2,CR!1),EGFR(CR!1,N!2)]
 EGFR(CR!EGFR.CR,N!EGFR.C)=> [EGFR(CR!1,N!2),EGFR(C!2,CR!1)]
 
 ------------------------------------------------------------
-* Export Connected agents to JSon (internal constraint_list):
+* Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 EGFR(CR!1),EGFR(CR!1)=> [
 		  EGFR(C!EGFR.N,CR!1),EGFR(C,CR!1)
@@ -132,4 +109,4 @@ EGFR(CR!1),EGFR(CR!1)=> [
 		v EGFR(CR!1,N),EGFR(CR!1,N)
 		v EGFR(CR!1,N),EGFR(CR!1,N!EGFR.C)]
 
-{"Parallel bonds":[{"hyp":{"EGFR":[{"key":"C","value":{"property states":null,"binding states":{"first":"EGFR","second":"N"}}},{"key":"CR","value":{"property states":null,"binding states":{"first":"EGFR","second":"CR"}}}]},"refinement":[{"EGFR":[{"key":"C","value":{"property states":null,"binding states":2}},{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":2}}]}]},{"hyp":{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":{"first":"EGFR","second":"CR"}}},{"key":"N","value":{"property states":null,"binding states":{"first":"EGFR","second":"C"}}}]},"refinement":[{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":2}}],"EGFR":[{"key":"C","value":{"property states":null,"binding states":2}},{"key":"CR","value":{"property states":null,"binding states":1}}]}]}],"Connected agents":[{"hyp":{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}}]},"refinement":[{"EGFR":[{"key":"C","value":{"property states":null,"binding states":""}},{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"C","value":{"property states":null,"binding states":{"first":"EGFR","second":"N"}}},{"key":"CR","value":{"property states":null,"binding states":1}}]},{"EGFR":[{"key":"C","value":{"property states":null,"binding states":""}},{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"C","value":{"property states":null,"binding states":""}},{"key":"CR","value":{"property states":null,"binding states":1}}]},{"EGFR":[{"key":"C","value":{"property states":null,"binding states":{"first":"EGFR","second":"N"}}},{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"C","value":{"property states":null,"binding states":""}},{"key":"CR","value":{"property states":null,"binding states":1}}]}]},{"hyp":{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}}]},"refinement":[{"EGFR":[{"key":"C","value":{"property states":null,"binding states":""}},{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":""}}]},{"EGFR":[{"key":"C","value":{"property states":null,"binding states":{"first":"EGFR","second":"N"}}},{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":{"first":"EGFR","second":"C"}}}]}]},{"hyp":{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}}]},"refinement":[{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":""}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":{"first":"EGFR","second":"C"}}}]},{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":""}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":""}}]},{"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":{"first":"EGFR","second":"C"}}}],"EGFR":[{"key":"CR","value":{"property states":null,"binding states":1}},{"key":"N","value":{"property states":null,"binding states":""}}]}]}]}execution finished without any exception
+execution finished without any exception

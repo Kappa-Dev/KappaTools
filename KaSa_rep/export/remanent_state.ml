@@ -275,19 +275,19 @@ type 'site_graph lemma =
     refinement : 'site_graph list
   }
 
-type 'site_graph poly_constraint_list =
+type 'site_graph poly_constraints_list =
   (string (*domain name*) * 'site_graph lemma list) list
 
-type internal_constraint_list =
-  Ckappa_backend.Ckappa_backend.t poly_constraint_list
+type internal_constraints_list =
+  Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
 type site_map =
   (string * (*site_string*)
    (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
      Wrapped_modules.LoggedStringMap.t) list
 
-type constraint_list =
-  site_map poly_constraint_list
+type constraints_list =
+  site_map poly_constraints_list
 
 (*
 string *
@@ -297,9 +297,9 @@ string *
         list Remanent_state.lemma list
 *)
 (*******************************************************************)
-(*internal_/constraint_list -> json*)
+(*internal_/constraints_list -> json*)
 
-let constraint_list_to_json_aux site_map =
+let constraints_list_to_json_aux site_map =
   Wrapped_modules.LoggedStringMap.to_json
     (fun site_string -> JsonUtil.of_string site_string)
     (fun (internal_opt, binding_opt) ->
@@ -336,18 +336,18 @@ let constraint_list_to_json_aux site_map =
     )
     site_map
 
-let constraint_list_hyp_to_json hyp =
+let constraints_list_hyp_to_json hyp =
   let json =
     JsonUtil.of_assoc (fun (agent_string, site_map) ->
-        agent_string, constraint_list_to_json_aux site_map
+        agent_string, constraints_list_to_json_aux site_map
       ) hyp
 in
 json
 
-let constraint_list_refinment_to_json refinement =
+let constraints_list_refinment_to_json refinement =
 let json =
   JsonUtil.of_list (fun t ->
-      constraint_list_hyp_to_json t
+      constraints_list_hyp_to_json t
     ) refinement
 in
 json
@@ -355,25 +355,25 @@ json
 let hyp = "hyp"
 let refinement = "refinement"
 
-let constraint_list_lemma_to_json lemma =
+let constraints_list_lemma_to_json lemma =
   `Assoc [
-    hyp, constraint_list_hyp_to_json lemma.hyp;
-    refinement, constraint_list_refinment_to_json lemma.refinement
+    hyp, constraints_list_hyp_to_json lemma.hyp;
+    refinement, constraints_list_refinment_to_json lemma.refinement
   ]
 
-let constraint_list_to_json constraint_list =
+let constraints_list_to_json constraints_list =
   JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
       let json =
         JsonUtil.of_list (fun lemma ->
-            constraint_list_lemma_to_json lemma
+            constraints_list_lemma_to_json lemma
           ) lemma_list
       in
       agent_string, json
-    ) constraint_list
+    ) constraints_list
 
 (*******************************************************************)
 
-let internal_constraint_list_hyp_to_json hyp =
+let internal_constraints_list_hyp_to_json hyp =
   let json =
     Ckappa_sig.Agent_id_map_and_set.Map.to_json
       (fun agent_id -> JsonUtil.of_int (Ckappa_sig.int_of_agent_id agent_id)
@@ -384,7 +384,7 @@ let internal_constraint_list_hyp_to_json hyp =
               JsonUtil.of_string agent_string
            )
            (fun site_map ->
-              constraint_list_to_json_aux site_map
+              constraints_list_to_json_aux site_map
            )
            (agent_string, site_map)
       )
@@ -392,34 +392,8 @@ let internal_constraint_list_hyp_to_json hyp =
   in
   json
 
-let internal_constraint_list_refinement_to_json refinement =
-  let json =
-    JsonUtil.of_list (fun t ->
-        internal_constraint_list_hyp_to_json
-          (Ckappa_backend.Ckappa_backend.get_string_version t)
-      ) refinement
-  in
-  json
-
-let internal_constraint_list_lemma_to_json lemma =
-  `Assoc [
-    hyp, internal_constraint_list_hyp_to_json
-      (Ckappa_backend.Ckappa_backend.get_string_version lemma.hyp);
-    refinement, internal_constraint_list_refinement_to_json lemma.refinement
-  ]
-
-let internal_constraint_list_to_json internal_constraint_list =
-  JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
-      let json =
-        JsonUtil.of_list (fun lemma ->
-            internal_constraint_list_lemma_to_json lemma
-          ) lemma_list
-      in
-      agent_string, json
-    ) internal_constraint_list
-
 (*******************************************************************)
-(*json -> contrainst_list/internal_constraint_list*)
+(*json -> contrainst_list/internal_constraints_list*)
 
 (*let binding_opt_of_json ?error_msg:(error_msg="Not a correct binding state") =
   function
@@ -485,13 +459,15 @@ let binding_opt_of_json json  =
          json)
     in
     Ckappa_backend.Ckappa_backend.Binding_type (agent_name, site_name)
+  | `Assoc (_::_) ->
+    assert false (* FIXME *)
 
 let pair_state = "pair state"
 let site_map = "site map"
 let internal = "internal state"
 let binding = "binding state"
 
-let constraint_list_of_json_aux json =
+let constraints_list_of_json_aux json =
   Wrapped_modules.LoggedStringMap.of_json ~lab_key:site
     ~lab_value:pair_state ~error_msg:"site_map"
     (fun json -> (*elt:site_string*)
@@ -513,7 +489,7 @@ let constraint_list_of_json_aux json =
          json)
     json
 
-let constraint_list_hyp_of_json json =
+let constraints_list_hyp_of_json json =
   JsonUtil.to_list (fun json ->
       JsonUtil.to_pair
         (fun json ->
@@ -521,25 +497,25 @@ let constraint_list_hyp_of_json json =
              ~error_msg:(JsonUtil.build_msg "agent name") json
         )
         (fun json ->
-           constraint_list_of_json_aux json
+           constraints_list_of_json_aux json
         )
         json
     ) json
 
 (*list *)
-let constraint_list_refinment_of_json json =
+let constraints_list_refinment_of_json json =
   JsonUtil.to_list ~error_msg:"refinement"
-    (fun json -> constraint_list_hyp_of_json json)
+    (fun json -> constraints_list_hyp_of_json json)
     json
 
 (*json -> lemma *)
-let constraint_list_lemma_of_json json =
+let constraints_list_lemma_of_json json =
   {
-    hyp = constraint_list_hyp_of_json json;
-    refinement = constraint_list_refinment_of_json json;
+    hyp = constraints_list_hyp_of_json json;
+    refinement = constraints_list_refinment_of_json json;
   }
 
-let constraint_list_of_json json =
+let constraints_list_of_json json =
   JsonUtil.to_list (fun json ->
       JsonUtil.to_pair
         (fun json ->
@@ -547,13 +523,13 @@ let constraint_list_of_json json =
              ~error_msg:(JsonUtil.build_msg "agent name") json)
         (fun json ->(*site graph lemma list*)
            JsonUtil.to_list (fun json ->
-               constraint_list_lemma_of_json json
+               constraints_list_lemma_of_json json
              ) json
         ) json) json
 
 (*******************************************************************)
 
-let internal_constraint_list_hyp_of_json json =
+let internal_constraints_list_hyp_of_json json =
   Ckappa_sig.Agent_id_map_and_set.Map.of_json
     (fun json -> (*elt*)
        let int =
@@ -568,47 +544,27 @@ let internal_constraint_list_hyp_of_json json =
              ~error_msg:(JsonUtil.build_msg "agent name") json
          )
          (fun json -> (*string_option * binding_option*)
-            constraint_list_of_json_aux json
+            constraints_list_of_json_aux json
          ) json
     )
     json
 
-let internal_constraint_list_refinement_of_json json =
-  JsonUtil.to_list ~error_msg:"refinement list"
-    (fun json ->
-       internal_constraint_list_hyp_of_json
-         json
-    ) json
-
-let internal_constraint_list_lemma_of_json json =
-  {
-    hyp = internal_constraint_list_hyp_of_json json;
-    refinement =
-      internal_constraint_list_refinement_of_json json
-  }
-
-let internal_constraint_list_of_json json =
-  JsonUtil.to_list (fun json ->
-      JsonUtil.to_pair ~error_msg:"internal_constraint_list"
-        (fun json -> (*string*)
-           JsonUtil.to_string
-             ~error_msg:(JsonUtil.build_msg "agent name") json)
-        (fun json -> (*t lemma list*)
-           JsonUtil.to_list (fun json -> (*lemma*)
-               internal_constraint_list_lemma_of_json json
-             ) json
-        ) json
-    ) json
-
 (***************************************************************************)
 
-let print_internal_constraint_list logger parameters error kappa_handler
-    internal_constraint_list =
-  let (domain_name, lemma_list) = internal_constraint_list in
+let print_internal_constraints_list ?logger parameters error kappa_handler
+    internal_constraints_list =
+  let logger =
+    match
+      logger
+    with
+    | None -> Remanent_parameters.get_logger parameters
+    | Some a -> a
+  in
+  let (domain_name, lemma_list) = internal_constraints_list in
   let () =
   Loggers.fprintf logger
     "------------------------------------------------------------\n";
-  Loggers.fprintf logger "* Export %s to JSon (internal constraint_list):\n"
+  Loggers.fprintf logger "* Export %s to JSon (internal constraints_list):\n"
     domain_name;
   Loggers.fprintf logger
     "------------------------------------------------------------\n";
@@ -652,17 +608,24 @@ let print_internal_constraint_list logger parameters error kappa_handler
     ) (error, false) lemma_list
 
 (*print the information as the output of non relational properties*)
-let print_internal_constraint_list_list logger parameters error kappa_handler
+let print_internal_constraints_list_list ?logger parameters error kappa_handler
     list =
+    let logger' =
+      match
+        logger
+      with
+      | None -> Remanent_parameters.get_logger parameters
+      | Some a -> a
+    in
     let error =
       List.fold_left (fun error pattern ->
           let error, _ =
-            print_internal_constraint_list
-              logger parameters error
+            print_internal_constraints_list
+              ?logger parameters error
               kappa_handler
               pattern
           in
-          let () = Loggers.print_newline logger in
+          let () = Loggers.print_newline logger' in
           error
         ) error list
     in
@@ -685,13 +648,20 @@ let print_for_list logger parameter error kappa_handler t =
   let () = Loggers.fprintf logger " " in
   error
 
-let print_constraint_list logger parameters error kappa_handler constraint_list
+let print_constraints_list ?logger parameters error kappa_handler constraints_list
   =
-  let (domain_name, lemma_list) = constraint_list in
+  let logger =
+    match
+      logger
+    with
+    | None -> Remanent_parameters.get_logger parameters
+    | Some a -> a
+  in
+  let (domain_name, lemma_list) = constraints_list in
   let () =
   Loggers.fprintf logger
     "------------------------------------------------------------\n";
-  Loggers.fprintf logger "* Export %s to JSon (constraint_list):\n" domain_name;
+  Loggers.fprintf logger "* Export %s to JSon (constraints_list):\n" domain_name;
   Loggers.fprintf logger
     "------------------------------------------------------------\n";
   in
@@ -732,13 +702,20 @@ let print_constraint_list logger parameters error kappa_handler constraint_list
       error, b
     ) (error, false) lemma_list
 
-let print_constraint_list_list logger parameters error kappa_handler list =
+let print_constraints_list_list ?logger parameters error kappa_handler list =
+  let logger' =
+    match
+      logger
+    with
+    | None -> Remanent_parameters.get_logger parameters
+    | Some a -> a
+  in
   let error =
     List.fold_left (fun error pattern ->
         let error, _ =
-          print_constraint_list logger parameters error kappa_handler pattern
+          print_constraints_list ?logger parameters error kappa_handler pattern
         in
-        let () = Loggers.print_newline logger in
+        let () = Loggers.print_newline logger' in
         error
       ) error list
   in
@@ -836,7 +813,7 @@ let convert_refinement_internal error list =
 (*******************************************************************)
 (*views domain*)
 
-let convert_refinement_views_constraint_list parameters error
+let convert_refinement_views_constraints_list parameters error
     handler_kappa agent_id site_type t state_list =
   List.fold_left (fun (error, current_list) state ->
       let error, t =
@@ -881,8 +858,8 @@ type ('static,'dynamic) state =
     ctmc_flow: flow option ;
     errors        : Exception.method_handler ;
     (*TODO*)
-    internal_constraint_list : internal_constraint_list option;
-    constraint_list : constraint_list option;
+    internal_constraints_list : internal_constraints_list option;
+    constraints_list : constraints_list option;
   }
 
 let create_state ?errors parameters init =
@@ -917,8 +894,8 @@ let create_state ?errors parameters init =
     dead_rules = None ;
     dead_agents = None ;
     errors = error ;
-    internal_constraint_list = None;
-    constraint_list = None
+    internal_constraints_list = None;
+    constraints_list = None
   }
 
 let do_event_gen f phase n state =
@@ -1053,13 +1030,13 @@ let get_log_info state = state.log_info
 
 let set_log_info log state = {state with log_info = log}
 
-let get_internal_constraint_list state =
-  state.internal_constraint_list
+let get_internal_constraints_list state =
+  state.internal_constraints_list
 
-let set_internal_constraint_list list state =
-  {state with internal_constraint_list = Some list}
+let set_internal_constraints_list list state =
+  {state with internal_constraints_list = Some list}
 
-let get_constraint_list state = state.constraint_list
+let get_constraints_list state = state.constraints_list
 
-let set_constraint_list list state =
-  {state with constraint_list = Some list}
+let set_constraints_list list state =
+  {state with constraints_list = Some list}

@@ -50,7 +50,7 @@ val print:
   token ->
   Exception.method_handler
 
-val convert_views_constraint_list :
+val convert_views_constraints_list :
   show_dep_with_dimmension_higher_than:int ->
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->

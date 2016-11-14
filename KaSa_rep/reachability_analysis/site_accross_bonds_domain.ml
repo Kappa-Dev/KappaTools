@@ -1721,7 +1721,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
-    let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let constraint_list = Remanent_state.get_constraints_list kasa_state in
     let error, constraint_list =
       match
         constraint_list
@@ -1732,25 +1732,25 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     in
     let pair_list = (domain_name, current_list1) :: constraint_list in
     let kasa_state =
-      Remanent_state.set_constraint_list pair_list kasa_state
+      Remanent_state.set_constraints_list pair_list kasa_state
     in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
-    let internal_constraint_list =
-      Remanent_state.get_internal_constraint_list
+    let internal_constraints_list =
+      Remanent_state.get_internal_constraints_list
         kasa_state
     in
-    let error, internal_constraint_list =
+    let error, internal_constraints_list =
       match
-        internal_constraint_list
+        internal_constraints_list
       with
       | None ->
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
-    let pair_list = (domain_name, current_list2) :: internal_constraint_list in
+    let pair_list = (domain_name, current_list2) :: internal_constraints_list in
     let kasa_state =
-      Remanent_state.set_internal_constraint_list pair_list kasa_state in
+      Remanent_state.set_internal_constraints_list pair_list kasa_state in
     error, dynamic, kasa_state
 
   let export static dynamic error kasa_state =

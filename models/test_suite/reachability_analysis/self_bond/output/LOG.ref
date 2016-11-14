@@ -2007,24 +2007,7 @@ B(t!B.z,z!B.t) => [ B(t!2,z!1),B(t!1,z!2) v B(t!1,z!1) ]
 C(t!C.z,z!C.t) => C(t!2,z!1),C(t!1),C(z!2)
 E(t!E.t,z!E.z) => E(t!2,z!1),E(z!1),E(t!2)
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (constraint_list):
-------------------------------------------------------------
-E(t!E.t,z!E.z)  => [
-		  E(t!2,z!1),E(z!1),E(t!2) ]
-C(t!C.z,z!C.t)  => [
-		  C(t!2,z!1),C(t!1),C(z!2) ]
-B(t!B.z,z!B.t)  => [
-		  B(t!2,z!1),B(t!1,z!2) 
-		v B(t!1,z!1) ]
-A(t!A.t,z!A.z)  => [
-		  A(t!2,z!1),A(t!2,z!1) ]
-
-------------------------------------------------------------
-* Export Connected agents to JSon (constraint_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraint_list):
+* Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 E(t!E.t,z!E.z)=> [E(t!2,z!1),E(z!1),E(t!2)]
 C(t!C.z,z!C.t)=> [C(t!2,z!1),C(t!1),C(z!2)]
@@ -2034,7 +2017,7 @@ B(t!B.z,z!B.t)=> [
 A(t!A.t,z!A.z)=> [A(t!2,z!1),A(t!2,z!1)]
 
 ------------------------------------------------------------
-* Export Connected agents to JSon (internal constraint_list):
+* Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-{"Parallel bonds":[{"hyp":{"E":[{"key":"t","value":{"property states":null,"binding states":{"first":"E","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":{"first":"E","second":"z"}}}]},"refinement":[{"E":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}],"E":[{"key":"z","value":{"property states":null,"binding states":1}}],"E":[{"key":"t","value":{"property states":null,"binding states":2}}]}]},{"hyp":{"C":[{"key":"t","value":{"property states":null,"binding states":{"first":"C","second":"z"}}},{"key":"z","value":{"property states":null,"binding states":{"first":"C","second":"t"}}}]},"refinement":[{"C":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}],"C":[{"key":"t","value":{"property states":null,"binding states":1}}],"C":[{"key":"z","value":{"property states":null,"binding states":2}}]}]},{"hyp":{"B":[{"key":"t","value":{"property states":null,"binding states":{"first":"B","second":"z"}}},{"key":"z","value":{"property states":null,"binding states":{"first":"B","second":"t"}}}]},"refinement":[{"B":[{"key":"t","value":{"property states":null,"binding states":1}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"B":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":1}},{"key":"z","value":{"property states":null,"binding states":2}}]}]},{"hyp":{"A":[{"key":"t","value":{"property states":null,"binding states":{"first":"A","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":{"first":"A","second":"z"}}}]},"refinement":[{"A":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}],"A":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}]}]}],"Connected agents":[]}execution finished without any exception
+execution finished without any exception

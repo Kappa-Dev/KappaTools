@@ -29,13 +29,5 @@ let get_dead_rules state =
   let state, rules = Export.get_dead_rules state in
   state, Export.dead_rules_to_json rules
 
-(*TODO*)
-let get_constraint_list state =
-  let state, constraint_list = Export.get_constraint_list_to_json state in
-  state, Remanent_state.constraint_list_to_json constraint_list
-
-let get_internal_constraint_list state =
-  let state, internal_constraint_list =
-    Export.get_internal_constraint_list_to_json state in
-  state, Remanent_state.internal_constraint_list_to_json
-    internal_constraint_list
+let get_constraints_list state = 
+  Export.get_constraints_list_to_json state

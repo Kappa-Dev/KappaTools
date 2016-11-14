@@ -207,19 +207,11 @@ C cannot occur in the model
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (constraint_list):
+* Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Export Connected agents to JSon (constraint_list):
+* Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraint_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraint_list):
-------------------------------------------------------------
-
-{"Parallel bonds":[],"Connected agents":[]}execution finished without any exception
+execution finished without any exception

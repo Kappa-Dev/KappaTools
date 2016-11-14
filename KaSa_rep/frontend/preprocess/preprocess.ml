@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Aug 15 2016>
+   * Last modification: Time-stamp: <Nov 14 2016>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -1965,13 +1965,13 @@ let export_contact_map parameters error handler =
   in
   error, sol
 
-let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) handler contact_map =
+let dot_of_contact_map ?logger parameters (error:Exception.method_handler) handler contact_map =
   let parameters_dot =
     match
-      loggers
+      logger
     with
     | None -> Remanent_parameters.open_contact_map_file parameters
-    | Some loggers -> Remanent_parameters.set_logger parameters loggers
+    | Some logger -> Remanent_parameters.set_logger parameters logger
   in
   let _ =
     List.iter
@@ -2140,7 +2140,7 @@ let dot_of_contact_map ?loggers parameters (error:Exception.method_handler) hand
   let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
   let () =
     match
-      loggers
+      logger
     with
     | None -> Loggers.close_logger (Remanent_parameters.get_logger parameters_dot)
     | Some _ -> Loggers.flush_logger (Remanent_parameters.get_logger parameters_dot)

@@ -244,7 +244,7 @@ debug:
 profiling:
 	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all
 
-all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
+all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE bin/KaSa_json
 
 clean_ide:
 	rm -f StdSim bin/StdSim

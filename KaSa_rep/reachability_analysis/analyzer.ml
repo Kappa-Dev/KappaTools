@@ -199,8 +199,8 @@ struct
     error, log_info, static, dynamic
 
   let export static dynamic error kasa_state =
-    let kasa_state = Remanent_state.set_constraint_list [] kasa_state in
-    let kasa_state = Remanent_state.set_internal_constraint_list [] kasa_state in
+    let kasa_state = Remanent_state.set_constraints_list [] kasa_state in
+    let kasa_state = Remanent_state.set_internal_constraints_list [] kasa_state in
     Domain.export static dynamic error kasa_state
 
 end

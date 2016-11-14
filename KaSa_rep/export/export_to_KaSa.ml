@@ -16,26 +16,8 @@ let init () = init ~called_from:Remanent_parameters_sig.KaSa ()
 
 let get_contact_map = get_internal_contact_map
 let get_influence_map = get_internal_influence_map
+let get_constraints_list = get_internal_constraints_list
 let output_contact_map = output_internal_contact_map
 let output_influence_map = output_internal_influence_map
-
-let get_constraint_list state = Remanent_state.get_constraint_list state
-
-let set_constraint_list list state =
-  Remanent_state.set_constraint_list list state
-
-let get_internal_constraint_list state =
-  Remanent_state.get_internal_constraint_list state
-
-let set_internal_constraint_list list state =
-    Remanent_state.set_internal_constraint_list list state
-
-let get_constraint_list_to_json state =
-  let state, constraint_list = Export.get_constraint_list_to_json state in
-  state, Remanent_state.constraint_list_to_json constraint_list
-
-let get_internal_constraint_list_to_json state =
-  let state, internal_constraint_list =
-    Export.get_internal_constraint_list_to_json state in
-  state, Remanent_state.internal_constraint_list_to_json
-    internal_constraint_list
+let output_constraints_list = output_internal_constraints_list
+let empty_constraints_list = []

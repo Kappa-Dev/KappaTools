@@ -20,6 +20,10 @@ type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
 
+type internal_constraints_list
+
+val empty_constraints_list : internal_constraints_list
+
 type handler = Cckappa_sig.kappa_handler
 
 type c_compilation = Cckappa_sig.compil
@@ -33,21 +37,21 @@ type ctmc_flow
 val init:
   unit -> state
 
-val get_parameters: state -> parameters
+val set_errors: errors -> state -> state
 
 val set_parameters: parameters -> state -> state
 
-val get_contact_map:
-  ?accuracy_level:Remanent_state.accuracy_level ->
-  state -> state * internal_contact_map
+val get_parameters: state -> parameters
 
 val get_handler: state -> state * handler
 
 val get_errors: state -> errors
 
-val set_errors: errors -> state -> state
-
 val get_c_compilation: state -> state * c_compilation
+
+val get_contact_map:
+  ?accuracy_level:Remanent_state.accuracy_level ->
+  state -> state * internal_contact_map
 
 val get_influence_map:
   ?accuracy_level:Remanent_state.accuracy_level ->
@@ -55,28 +59,17 @@ val get_influence_map:
 
 val get_reachability_analysis: state -> state * reachability_analysis
 
+val get_constraints_list : state -> state * internal_constraints_list
+
 val get_ctmc_flow: state -> state * ctmc_flow
 
 val get_ode_flow: state -> state * ode_flow
 
 val dump_c_compil: state -> c_compilation -> state
 
-val output_contact_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
+val output_contact_map: ?logger:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
 
-val output_influence_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
+val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
 
-(*TODO*)
-
-val get_constraint_list : state -> Remanent_state.constraint_list option
-
-val set_constraint_list : Remanent_state.constraint_list -> state -> state
-
-val get_internal_constraint_list : state ->
-  Remanent_state.internal_constraint_list option
-
-val set_internal_constraint_list :
-  Remanent_state.internal_constraint_list -> state -> state
-
-val get_constraint_list_to_json: state -> state * Yojson.Basic.json
-
-val get_internal_constraint_list_to_json: state -> state * Yojson.Basic.json
+val output_constraints_list: ?logger:Loggers.t ->
+  state -> state

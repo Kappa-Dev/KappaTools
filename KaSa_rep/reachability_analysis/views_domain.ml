@@ -3413,7 +3413,7 @@ struct
         (fun (error, current_list)
           (agent_string, agent_type, _, translation) ->
           let error', current_list =
-            Translation_in_natural_language.convert_views_constraint_list
+            Translation_in_natural_language.convert_views_constraints_list
               ~show_dep_with_dimmension_higher_than:dim_min
               parameters
               handler_kappa
@@ -3430,7 +3430,7 @@ struct
         ) (error, []) (List.rev list)
     in
     (*------------------------------------------------------------------*)
-    let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let constraint_list = Remanent_state.get_constraints_list kasa_state in
     let error, constraint_list =
       match
         constraint_list
@@ -3441,7 +3441,7 @@ struct
     in
     let pair_list = (domain_name, current_list) :: constraint_list in
     let kasa_state =
-      Remanent_state.set_constraint_list pair_list kasa_state
+      Remanent_state.set_constraints_list pair_list kasa_state
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, kasa_state

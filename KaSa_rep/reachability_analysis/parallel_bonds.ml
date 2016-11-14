@@ -1598,7 +1598,7 @@ struct
         ) store_value (error, ([], [])) (*name of domain*)
     in
     (*------------------------------------------------------------------*)
-    let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let constraint_list = Remanent_state.get_constraints_list kasa_state in
     let error, constraint_list =
       match
         constraint_list
@@ -1609,24 +1609,24 @@ struct
     in
     let pair_list = (domain_name, current_list) :: constraint_list in
     let kasa_state =
-      Remanent_state.set_constraint_list pair_list kasa_state
+      Remanent_state.set_constraints_list pair_list kasa_state
     in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
-    let internal_constraint_list =
-      Remanent_state.get_internal_constraint_list kasa_state
+    let internal_constraints_list =
+      Remanent_state.get_internal_constraints_list kasa_state
     in
-    let error, internal_constraint_list =
+    let error, internal_constraints_list =
       match
-        internal_constraint_list
+        internal_constraints_list
       with
       | None ->
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
-    let pair_list = (domain_name, current_list2) :: internal_constraint_list in
+    let pair_list = (domain_name, current_list2) :: internal_constraints_list in
     let kasa_state =
-      Remanent_state.set_internal_constraint_list pair_list kasa_state in
+      Remanent_state.set_internal_constraints_list pair_list kasa_state in
     error, dynamic, kasa_state
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

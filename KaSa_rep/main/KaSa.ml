@@ -62,13 +62,12 @@ let main () =
       state
   in
   (*-----------------------------------------------------------------------*)
-  let state, reachability_result_opt =
+  let state =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
-      let state, output = Export_to_KaSa.get_reachability_analysis state in
-      state, Some output
+      Export_to_KaSa.output_constraints_list state
     else
-      state, None
+      state
   in
   let state =
     if (Remanent_parameters.get_do_contact_map parameters)
@@ -104,39 +103,7 @@ let main () =
       state, None
   in
   (*-----------------------------------------------------------------------*)
-  let _ = state, reachability_result_opt, stochastic_flow_opt, ode_flow_opt in
-  (*Print constraint list*)
-  let error = Export_to_KaSa.get_errors state in
-  let error, l =
-    match Export_to_KaSa.get_constraint_list state with
-    | None -> Exception.warn parameters error __POS__ Exit []
-    | Some l -> error, l
-  in
-  let state, handler = Export_to_KaSa.get_handler state in
-  let error =
-    Remanent_state.print_constraint_list_list
-      (Remanent_parameters.get_logger parameters) parameters
-      error
-      handler
-      l
-  in
-  (*print internal constraint list*)
-  let error, l =
-    match Export_to_KaSa.get_internal_constraint_list state with
-    | None -> Exception.warn parameters error __POS__ Exit []
-    | Some l -> error, l
-  in
-  let error =
-    Remanent_state.print_internal_constraint_list_list
-      (Remanent_parameters.get_logger parameters) parameters
-      error
-      handler
-      l
-  in
-  let state = Export_to_KaSa.set_errors error state in
-  let state, json = Export_to_KaSa.get_constraint_list_to_json state in
-  (*print in the format of Json*)
-  let _ = Printf.fprintf stdout "%s" (Yojson.Basic.to_string json) in
+  let _ = state, stochastic_flow_opt, ode_flow_opt in
   let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
   ()
 

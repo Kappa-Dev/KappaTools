@@ -929,7 +929,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
 (*****************************************************************************)
 (*TODO:convert views to json*)
 
-let rec convert_views_constraint_list_aux
+let rec convert_views_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type agent_id translation t current_list =
@@ -1174,7 +1174,7 @@ let rec convert_views_constraint_list_aux
             in
             let error'', current_list =
               List.fold_left (fun (error, current_list) token ->
-                  convert_views_constraint_list_aux
+                  convert_views_constraints_list_aux
                     ~show_dep_with_dimmension_higher_than:0
                     parameters
                     handler_kappa
@@ -1277,7 +1277,7 @@ let rec convert_views_constraint_list_aux
   in
   error, current_list
 
-let convert_views_constraint_list
+let convert_views_constraints_list
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type translation current_list =
@@ -1291,7 +1291,7 @@ let convert_views_constraint_list
       Exception.warn  parameters error error'
       __POS__ Exit
   in
-  convert_views_constraint_list_aux
+  convert_views_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa
     error agent_string agent_type agent_id translation t current_list
