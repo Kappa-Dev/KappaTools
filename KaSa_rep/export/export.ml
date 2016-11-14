@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 10 2016>
+  * Last modification: Time-stamp: <Nov 14 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -56,22 +56,21 @@ let string_of_influence_node x =
   | Remanent_state.Var i -> "Var "^(string_of_int i)
 
 let print_influence_map parameters influence_map =
-  Loggers.fprintf (Remanent_parameters.get_logger parameters) "Influence map:" ;
-  Loggers.print_newline (Remanent_parameters.get_logger parameters);
+  let log = (Remanent_parameters.get_logger parameters) in
+  Loggers.fprintf log "Influence map:" ;
+  Loggers.print_newline log;
   Remanent_state.InfluenceNodeMap.iter
     (fun x y ->
        Remanent_state.InfluenceNodeMap.iter
          (fun y _labellist ->
             let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
+              Loggers.fprintf log
                 " %s->%s"
                 (string_of_influence_node x)
                 (string_of_influence_node y)
             in
             let () =
-              Loggers.print_newline
-                (Remanent_parameters.get_logger parameters) in
+              Loggers.print_newline log in
             ())
          y)
     influence_map.Remanent_state.positive;
@@ -80,17 +79,14 @@ let print_influence_map parameters influence_map =
        Remanent_state.InfluenceNodeMap.iter
          (fun y _labellist ->
             let () =
-              Loggers.fprintf
-                (Remanent_parameters.get_logger parameters)
+              Loggers.fprintf log
                 " %s-|%s"
                 (string_of_influence_node x) (string_of_influence_node y) in
-            let () = Loggers.print_newline
-                (Remanent_parameters.get_logger parameters) in
+            let () = Loggers.print_newline log in
             ())
          y)
     influence_map.Remanent_state.negative;
-  Loggers.print_newline
-    (Remanent_parameters.get_logger parameters)
+  Loggers.print_newline log
 
 let print_contact_map parameters contact_map =
   let log = (Remanent_parameters.get_logger parameters) in
@@ -107,20 +103,19 @@ let print_contact_map parameters contact_map =
                 let _ = List.fold_left
                     (fun bool x ->
                        (if bool then
-                          Loggers.fprintf (Remanent_parameters.get_logger parameters) ", ");
-                       Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x;
+                          Loggers.fprintf log ", ");
+                       Loggers.fprintf log "%s" x;
                        true)
                     false l1
                 in
-                Loggers.print_newline (Remanent_parameters.get_logger parameters)
+                Loggers.print_newline log
               end
             else ();
             List.iter
               (fun (z,t) ->
-                 Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                 Loggers.fprintf log
                    "%s@%s--%s@%s" x y z t;
-                 Loggers.print_newline
-                   (Remanent_parameters.get_logger parameters)
+                 Loggers.print_newline log
               ) l2
          )
     ) contact_map
@@ -145,25 +140,26 @@ let init ?compil ~called_from () =
       | Remanent_parameters_sig.Internalised
       | Remanent_parameters_sig.Server
       | Remanent_parameters_sig.KaSim
-      | Remanent_parameters_sig.JS (*-> assert false*) (*TODO*)
+      | Remanent_parameters_sig.JS  -> assert false (*TODO*) (*->
+        let errors = Exception.empty_error_handler in
+        let errors, parameters, files  = Get_option.get_option errors in
+        Remanent_state.create_state ~errors parameters
+          (Remanent_state.Files files)*)
       | Remanent_parameters_sig.KaSa ->
         begin
           let errors = Exception.empty_error_handler in
           let errors, parameters, files  = Get_option.get_option errors in
+          let log = (Remanent_parameters.get_logger parameters) in
           let _ =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+            Loggers.fprintf log "%s"
               (Remanent_parameters.get_full_version parameters)
           in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
+          let () = Loggers.print_newline log in
           let _ =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+            Loggers.fprintf log "%s"
               (Remanent_parameters.get_launched_when_and_where parameters)
           in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
+          let () = Loggers.print_newline log in
           Remanent_state.create_state ~errors parameters
             (Remanent_state.Files files)
         end
@@ -1164,128 +1160,69 @@ let json_to_dead_rules =
   JsonUtil.to_list json_to_rule_id
 
 (******************************************************************)
-(*TODO: internal_constraint_list, constraint_list*)
-
-let get_list_gen
-    ?debug_mode
-    ?dump_result
-    ?stack_title
-    ?do_we_show_title
-    ?log_title
-    ?log_main_title
-    ?log_prefix
-    ?phase
-    ?int
-    ?dump
-    get compute state =
-  let debug_mode =
-    match debug_mode with
-    | None | Some false -> false
-    | Some true -> true
-  in
-  let dump_result =
-    match dump_result with
-    | None | Some false -> false
-    | Some true -> true
-  in
-  let dump =
-    match dump with
-    | None -> (fun state _output -> state)
-    | Some f -> f
-  in
-  let do_we_show_title =
-    match do_we_show_title with
-    | None -> (fun _ -> true)
-    | Some f -> f
-  in
-  (*-------------------------------------------------------*)
-  match get state with
-  | [] ->
-    let parameters = Remanent_state.get_parameters state in
-    let parameters' =
-      Remanent_parameters.update_call_stack parameters
-        debug_mode stack_title
-    in
-    let parameters' =
-      match log_prefix with
-      | None -> parameters'
-      | Some prefix ->
-        Remanent_parameters.set_prefix parameters' prefix
-    in
-    let state = Remanent_state.set_parameters parameters' state in
-    (*-------------------------------------------------------*)
-    let () =
-      match log_main_title with
-      | None -> ()
-      | Some title ->
-        let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" title
-        in
-        Loggers.print_newline (Remanent_parameters.get_logger parameters')
-    in
-    let show_title = compute_show_title do_we_show_title log_title in
-    (*-------------------------------------------------------*)
-    let state =
-      match phase with
-      | None -> state
-      | Some phase -> Remanent_state.add_event phase int state
-    in
-    let state, output = compute show_title state in
-    (*-------------------------------------------------------*)
-    let state =
-      match phase with
-      | None -> state
-      | Some phase -> Remanent_state.close_event phase int state
-    in
-    (*-------------------------------------------------------*)
-    let state =
-      if Remanent_parameters.get_trace parameters' || dump_result
-      then dump state output
-      else state
-    in
-    Remanent_state.set_parameters parameters state, output
-  | l -> state, l
 
 (* state -> ?: state, constraint_list*)
-let compute_constraint_list show_title state =
-  let state, _ = get_reachability_analysis state in
+let print_constraint_list state l =
   let parameters = Remanent_state.get_parameters state in
-  let logger = (Remanent_parameters.get_logger parameters) in
+  let logger = Remanent_parameters.get_logger parameters in
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
-  let l = Remanent_state.get_constraint_list state in
   (*PRINT*)
-  let _error =
+  let error =
     Remanent_state.print_constraint_list_list logger parameters error
       kappa_handler
       l
   in
-  state, l
+  let state = Remanent_state.set_errors error state in
+  state
 
-let get_constraint_list =
-  get_list_gen
+let print_internal_constraint_list state l =
+  (*let state, _ = get_reachability_analysis state in*)
+  let parameters = Remanent_state.get_parameters state in
+  let logger = Remanent_parameters.get_logger parameters in
+  let error = Remanent_state.get_errors state in
+  let state, kappa_handler = get_handler state in
+  (*PRINT*)
+  let error =
+    Remanent_state.print_internal_constraint_list_list logger parameters error
+      kappa_handler
+      l
+  in
+  let state = Remanent_state.set_errors error state in
+  state
+
+let compute_gen_constraint_list get_constraint_list show_title state =
+  let state,_ = get_reachability_analysis state in
+  match
+    get_constraint_list state
+  with
+  | None ->
+    let error = Remanent_state.get_errors state in
+    let parameters = Remanent_state.get_parameters state in
+    let error, output = warn parameters error __POS__ Exit [] in
+    let state = Remanent_state.set_errors error state in
+    state, output
+  | Some output -> state, output
+
+let compute_constraint_list x y =
+  compute_gen_constraint_list
+    Remanent_state.get_constraint_list x y
+
+let compute_internal_constraint_list x y =
+  compute_gen_constraint_list
+    Remanent_state.get_internal_constraint_list x y
+
+let get_constraint_list_to_json =
+  get_gen
+    ~dump_result:true
+    ~dump:print_constraint_list
     Remanent_state.get_constraint_list
     compute_constraint_list
 
 (******************************************************************)
 
-let compute_internal_constraint_list show_title state =
-  let state, _ = get_reachability_analysis state in
-  let parameters = Remanent_state.get_parameters state in
-  let logger = (Remanent_parameters.get_logger parameters) in
-  let error = Remanent_state.get_errors state in
-  let state, kappa_handler = get_handler state in
-  let l = Remanent_state.get_internal_constraint_list state in
-  (*PRINT*)
-  let _error =
-    Remanent_state.print_internal_constraint_list_list logger
-      parameters error
-      kappa_handler
-      l
-  in
-  state, l
-
-let get_internal_constraint_list =
-  get_list_gen
+let get_internal_constraint_list_to_json =
+  get_gen
+    ~dump:print_internal_constraint_list
     Remanent_state.get_internal_constraint_list
     compute_internal_constraint_list

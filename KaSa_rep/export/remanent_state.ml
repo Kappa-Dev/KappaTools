@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 10 2016>
+  * Last modification: Time-stamp: <Nov 14 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -421,9 +421,43 @@ let internal_constraint_list_to_json internal_constraint_list =
 (*******************************************************************)
 (*json -> contrainst_list/internal_constraint_list*)
 
-let binding_opt_of_json ?error_msg:(error_msg="Not a correct binding state") =
+(*let binding_opt_of_json ?error_msg:(error_msg="Not a correct binding state") =
   function
-  | x ->  raise (Yojson.Basic.Util.Type_error (error_msg,x)) (*FIXME*)
+  | x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x)) (*FIXME*)
+  | `Assoc ["", json] -> Ckappa_backend.Ckappa_backend.Free
+  | `Assoc ["?", json] -> Ckappa_backend.Ckappa_backend.Wildcard
+  | `Assoc ["!_", json] -> Ckappa_backend.Ckappa_backend.Bound_to_unknown
+  | `Assoc ["bound_to", json] ->
+    let int = JsonUtil.to_int
+        ~error_msg:(JsonUtil.build_msg "bound to") json
+    in
+    let bond_index = Ckappa_backend.Ckappa_backend.bond_index_of_int int in
+    Ckappa_backend.Ckappa_backend.Bound_to bond_index
+  | `Assoc ["binding_type", json] ->
+    let agent_name =
+      (fun json ->
+         JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name")
+           json)
+    in
+    let site_name =
+      (fun json ->
+         JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name") json)
+    in
+    let (agent_name, site_name) =
+      (JsonUtil.to_pair
+         ~lab1:agent ~lab2:site ~error_msg:""
+         (fun json -> agent_name json)
+         (fun json -> site_name json)
+         json)
+    in
+    Ckappa_backend.Ckappa_backend.Binding_type (agent_name, site_name)*)
+
+let binding_opt_of_json json  =
+  match json with
+  (* x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x)) (*FIXME*)*)
+  | `Bool _ | `Float _
+  | `Int _ | `List _ | `Null | `String _
+  | `Assoc [] -> assert false (*FIXME*)
   | `Assoc ["", json] -> Ckappa_backend.Ckappa_backend.Free
   | `Assoc ["?", json] -> Ckappa_backend.Ckappa_backend.Wildcard
   | `Assoc ["!_", json] -> Ckappa_backend.Ckappa_backend.Bound_to_unknown
@@ -847,8 +881,8 @@ type ('static,'dynamic) state =
     ctmc_flow: flow option ;
     errors        : Exception.method_handler ;
     (*TODO*)
-    internal_constraint_list : internal_constraint_list;
-    constraint_list : constraint_list;
+    internal_constraint_list : internal_constraint_list option;
+    constraint_list : constraint_list option;
   }
 
 let create_state ?errors parameters init =
@@ -883,8 +917,8 @@ let create_state ?errors parameters init =
     dead_rules = None ;
     dead_agents = None ;
     errors = error ;
-    internal_constraint_list = [];
-    constraint_list = []
+    internal_constraint_list = None;
+    constraint_list = None
   }
 
 let do_event_gen f phase n state =
@@ -1023,10 +1057,9 @@ let get_internal_constraint_list state =
   state.internal_constraint_list
 
 let set_internal_constraint_list list state =
-  {state with internal_constraint_list = list}
+  {state with internal_constraint_list = Some list}
 
-let get_constraint_list state =
-  state.constraint_list
+let get_constraint_list state = state.constraint_list
 
 let set_constraint_list list state =
-  {state with constraint_list = list}
+  {state with constraint_list = Some list}

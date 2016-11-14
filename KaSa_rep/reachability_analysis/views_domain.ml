@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 10 2016>
+   * Last modification: Time-stamp: <Nov 14 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1830,7 +1830,9 @@ struct
           Remanent_parameters.get_dump_reachability_analysis_wl
             parameters
         then
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%sbot generated while fetching the potential state of a site %s" (Remanent_parameters.get_prefix parameters) a string in
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%sbot generated while fetching the potential state of a site %s"
+              (Remanent_parameters.get_prefix parameters) a string
+          in
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
       | Usual_domains.Any when also_scan_top ->
         if
@@ -1840,7 +1842,8 @@ struct
           let () =
             Loggers.fprintf
               (Remanent_parameters.get_logger parameters)
-              "%stop generated while fetching the potential state of a site %s" (Remanent_parameters.get_prefix parameters) string in
+              "%stop generated while fetching the potential state of a site %s"
+              (Remanent_parameters.get_prefix parameters) string in
           Loggers.print_newline
             (Remanent_parameters.get_logger parameters)
       | Usual_domains.Val _
@@ -2137,8 +2140,10 @@ struct
                  let error, dynamic, new_answer =
                    precondition_empty_step_list
                      kappa_handler parameters error dynamic
-                     rule_id path store_agent_name bdu_false bdu_true store_covering_classes_id
-                     site_correspondence fixpoint_result proj_bdu_test_restriction
+                     rule_id path store_agent_name bdu_false bdu_true
+                     store_covering_classes_id
+                     site_correspondence fixpoint_result
+                     proj_bdu_test_restriction
                  in
                  let error =
                    scan_bot
@@ -2872,13 +2877,15 @@ struct
     if
       smash
     then
-      let error,handler,output =
+      let error',handler,output =
         smash_map
           decomposition
           ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
           handler_kappa site_correspondence result
       in
-      let error, (handler, list) =
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit in
+      let error'', (handler, list) =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters
           error
@@ -2918,10 +2925,12 @@ struct
                      else
                        error, handler
                    in
-                   let error, (handler, translation) =
+                   let error', (handler, translation) =
                      Translation_in_natural_language.translate
                        parameters handler error (fun _ e i -> e, i) mvbdu
                    in
+                   let error = Exception.check_point
+                       Exception.warn parameters error error' __POS__ Exit in
                    (*-------------------------------------------------------*)
                    error,
                    (handler,
@@ -2931,6 +2940,8 @@ struct
                (error, (handler,list)))
           output (handler,[])
       in
+      let error = Exception.check_point
+          Exception.warn parameters error error'' __POS__ Exit in
       error, handler, List.rev list
     else
       begin
@@ -2966,16 +2977,20 @@ struct
                    Loggers.print_newline log
                in
                (*------------------------------------------------------------*)
-               let error, site_correspondence =
+               let error'', site_correspondence =
                  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
                    parameters error agent_type site_correspondence
                in
-               let error, site_correspondence =
+               let error = Exception.check_point
+                   Exception.warn parameters error error'' __POS__ Exit in
+               let error''', site_correspondence =
                  match site_correspondence with
                  | None -> Exception.warn parameters error __POS__ Exit []
                  | Some a -> error, a
                in
-               let error, site_correspondence =
+               let error = Exception.check_point
+                   Exception.warn parameters error error''' __POS__ Exit in
+               let error'''', site_correspondence =
                  let rec aux list =
                    match list with
                    | [] -> Exception.warn parameters error __POS__ Exit []
@@ -2983,15 +2998,21 @@ struct
                    | _ :: tail -> aux tail
                  in aux site_correspondence
                in
+               let error = Exception.check_point
+                   Exception.warn parameters error error'''' __POS__ Exit in
                (*------------------------------------------------------------*)
-               let error,(_, map2) =
+               let error_1,(_, map2) =
                  Bdu_static_views.new_index_pair_map parameters error
                    site_correspondence
                in
+               let error = Exception.check_point
+                   Exception.warn parameters error error_1 __POS__ Exit in
                (*-----------------------------------------------------------*)
-               let error, handler, list' =
+               let error_2, handler, list' =
                  decomposition parameters handler error bdu_update
                in
+               let error = Exception.check_point
+                   Exception.warn parameters error error_2 __POS__ Exit in
                (*-----------------------------------------------------------*)
                let error, (handler, list) =
                  List.fold_left
@@ -3028,7 +3049,7 @@ struct
                         in
                         error, site_type
                       in
-                      let error, (handler, translation) =
+                      let error', (handler, translation) =
                         Translation_in_natural_language.translate
                           parameters
                           handler
@@ -3036,6 +3057,8 @@ struct
                           rename_site
                           mvbdu
                       in
+                      let error = Exception.check_point
+                          Exception.warn parameters error error' __POS__ Exit in
                       (*----------------------------------------------------*)
                       error,
                       (handler,
@@ -3366,10 +3389,11 @@ struct
       ~show_dep_with_dimmension_higher_than:dim_min
       decomposition
       domain_name
-      parameters handler error handler_kappa
+      parameters dynamic error handler_kappa
       site_correspondence fixpoint_result kasa_state =
+    let handler = get_mvbdu_handler dynamic in
     (*convert result to list*)
-    let error, handler, list =
+    let error', handler, list =
       stabilise_bdu_update_map_gen_decomposition
         decomposition
         ~smash:smash
@@ -3381,12 +3405,14 @@ struct
         site_correspondence
         fixpoint_result
     in
+    let error = Exception.check_point
+        Exception.warn parameters error error' __POS__ Exit in
     (*store the information for relational properties*)
     let error, current_list =
       List.fold_left
         (fun (error, current_list)
           (agent_string, agent_type, _, translation) ->
-          let error, current_list =
+          let error', current_list =
             Translation_in_natural_language.convert_views_constraint_list
               ~show_dep_with_dimmension_higher_than:dim_min
               parameters
@@ -3397,18 +3423,30 @@ struct
               translation
               current_list
           in
+          let error = Exception.check_point
+              Exception.warn parameters error error' __POS__ Exit
+          in
           error, current_list
         ) (error, []) (List.rev list)
     in
     (*------------------------------------------------------------------*)
     let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let error, constraint_list =
+      match
+        constraint_list
+      with
+      | None ->
+        Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
+    in
     let pair_list = (domain_name, current_list) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraint_list pair_list kasa_state
     in
-    error, handler, kasa_state
+    let dynamic = set_mvbdu_handler handler dynamic in
+    error, dynamic, kasa_state
 
-  let export_relation_properties parameters handler error handler_kappa =
+  let export_relation_properties parameters dynamic error handler_kappa =
   let domain_name = "Views domain - relational properties" in
     export_relation_properties_aux
       ~smash:true
@@ -3420,79 +3458,85 @@ struct
         )
       Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
       domain_name
-      parameters handler error handler_kappa
+      parameters dynamic error handler_kappa
 
-  let export_non_relation_properties parameters handler error handler_kappa =
+  let export_non_relation_properties parameters dynamic error handler_kappa =
   let domain_name = "Views domain - non relational properties" in
     export_relation_properties_aux
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
       domain_name
-      parameters handler error handler_kappa
+      parameters dynamic error handler_kappa
 
   let export_views_properties_aux
-      parameters handler error handler_kappa
-      site_correspondence fixpoint_result kasa_state =
-    (*if Remanent_parameters.get_dump_reachability_analysis_result parameters
-    then*)
+      parameters error handler_kappa
+      site_correspondence fixpoint_result
+      dynamic
+      kasa_state =
       (*relational properties*)
-
-      (*non relational properties*)
-      let error, handler, kasa_state =
-        export_non_relation_properties
-          parameters handler error handler_kappa
-          site_correspondence
-          fixpoint_result
-          kasa_state
-      in
-      let error, handler, kasa_state =
+      let error', dynamic, kasa_state =
         export_relation_properties
-          parameters handler error handler_kappa
+          parameters dynamic error handler_kappa
           site_correspondence
           fixpoint_result
           kasa_state
       in
-      error, handler, kasa_state
-  (*else
-      error, handler, kasa_state*)
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit in
+      (*non relational properties*)
+      let error'', dynamic, kasa_state =
+        export_non_relation_properties
+          parameters dynamic error handler_kappa
+          site_correspondence
+          fixpoint_result
+          kasa_state
+      in
+      let error = Exception.check_point
+          Exception.warn parameters error error'' __POS__ Exit in
+      error, dynamic, kasa_state
 
   let export_views_properties static dynamic error kasa_state =
     let parameters = get_parameter static in
-    let handler = get_mvbdu_handler dynamic in
     let handler_kappa = get_kappa_handler static in
     let error, site_correspondence =
       get_store_remanent_triple static dynamic error in
     let fixpoint_result = get_fixpoint_result dynamic in
-    let error, handler, kasa_state =
-    if local_trace ||
+    let error, dynamic, kasa_state =
+      (*if local_trace ||
        Remanent_parameters.get_dump_reachability_analysis_result parameters
-    then
-      let error, handler, kasa_state =
+    then*)
+      let error', dynamic, kasa_state =
         export_views_properties_aux
-          parameters handler error handler_kappa
+          parameters error handler_kappa
           site_correspondence
           fixpoint_result
+          dynamic
           kasa_state
       in
-      error, handler, kasa_state
-    else error, handler, kasa_state
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit in
+      error, dynamic, kasa_state
+      (*else error, dynamic, kasa_state*)
     in
-    let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, kasa_state
 
   let export static dynamic error kasa_state =
+    let parameters = get_parameter static in
     (*export of contact map*)
-    let error, dynamic, kasa_state =
+    let error', dynamic, kasa_state =
       export_contact_map static dynamic error kasa_state
     in
+    let error = Exception.check_point
+        Exception.warn parameters error error' __POS__ Exit in
     (*TODO: this function generate error in the compile*)
-    (*export of relational properties*)
-    (*let error, dynamic, kasa_state =
+    (*export of (non)relational properties*)
+    (*let error'', dynamic, kasa_state =
       export_views_properties
         static dynamic error kasa_state
-    in*)
-    (*export of non relational properties*)
+    in
+    let error = Exception.check_point
+        Exception.warn parameters error error'' __POS__ Exit in*)
     error, dynamic, kasa_state
 
 (**************************************************************************)

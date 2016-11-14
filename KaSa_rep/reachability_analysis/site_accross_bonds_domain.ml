@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 08 2016>
+   * Last modification: Time-stamp: <Nov 14 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1722,6 +1722,14 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
     let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let error, constraint_list =
+      match
+        constraint_list
+      with
+      | None ->
+        Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
+    in
     let pair_list = (domain_name, current_list1) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraint_list pair_list kasa_state
@@ -1731,6 +1739,14 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
     let internal_constraint_list =
       Remanent_state.get_internal_constraint_list
         kasa_state
+    in
+    let error, internal_constraint_list =
+      match
+        internal_constraint_list
+      with
+      | None ->
+        Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
     in
     let pair_list = (domain_name, current_list2) :: internal_constraint_list in
     let kasa_state =

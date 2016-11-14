@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Aug 15 2016>
+  * Last modification: Time-stamp: <Nov 14 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -163,13 +163,24 @@ let reachability_map_0 =
  | x -> (x^"/")) ;
   }
 
-let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true;
-                                                   (*Remanent_parameters_sig.dump_reachability_analysis_parallel = true*)
-                         }
-let reachability_map_2 = { reachability_map_1 with Remanent_parameters_sig.dump_reachability_analysis_iteration = true }
-let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true }
-let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true ;
-                         }
+let reachability_map_1 =
+  { reachability_map_0 with
+    Remanent_parameters_sig.dump_reachability_analysis_result = true
+  }
+
+let reachability_map_2 =
+  { reachability_map_1 with
+    Remanent_parameters_sig.dump_reachability_analysis_iteration = true
+  }
+
+let reachability_map_3 =
+  { reachability_map_2 with
+    Remanent_parameters_sig.dump_reachability_analysis_diff = true }
+
+let reachability_map_4 =
+  { reachability_map_3 with
+    Remanent_parameters_sig.dump_reachability_analysis_wl = true ;
+  }
 
 let add_debugging_parameters_to_reachability_map reachability =
   let trace = !Config.trace in
@@ -177,7 +188,8 @@ let add_debugging_parameters_to_reachability_map reachability =
     {
       reachability
     with
-      Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = !Config.hide_one_d_relations_from_cartesian_decomposition;
+      Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
+      = !Config.hide_one_d_relations_from_cartesian_decomposition;
       Remanent_parameters_sig.smash_relations = !Config.smash_relations;
       Remanent_parameters_sig.use_natural_language =
         begin
@@ -188,10 +200,14 @@ let add_debugging_parameters_to_reachability_map reachability =
           Remanent_parameters_sig.Natural_language
         | _ -> Remanent_parameters_sig.Kappa
         end;
-      Remanent_parameters_sig.compute_local_traces = !Config.compute_local_traces;
-      Remanent_parameters_sig.ignore_trivial_losanges = !Config.do_not_compress_trivial_losanges;
-      Remanent_parameters_sig.add_singular_macrostates = !Config.add_singular_macrostates;
-      Remanent_parameters_sig.add_singular_microstates = !Config.add_singular_microstates;
+      Remanent_parameters_sig.compute_local_traces =
+        !Config.compute_local_traces;
+      Remanent_parameters_sig.ignore_trivial_losanges =
+        !Config.do_not_compress_trivial_losanges;
+      Remanent_parameters_sig.add_singular_macrostates =
+        !Config.add_singular_macrostates;
+      Remanent_parameters_sig.add_singular_microstates =
+        !Config.add_singular_microstates;
       Remanent_parameters_sig.show_rule_names_in_local_traces =
         !Config.show_rule_names_in_local_traces ;
       Remanent_parameters_sig.use_macrotransitions_in_local_traces =
@@ -211,8 +227,10 @@ let add_debugging_parameters_to_reachability_map reachability =
     with
       Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
         !Config.dump_reachability_analysis_covering_classes;
-      Remanent_parameters_sig.dump_reachability_analysis_static = !Config.dump_reachability_analysis_static;
-      Remanent_parameters_sig.dump_reachability_analysis_dynamic = !Config.dump_reachability_analysis_dynamic;
+      Remanent_parameters_sig.dump_reachability_analysis_static =
+        !Config.dump_reachability_analysis_static;
+      Remanent_parameters_sig.dump_reachability_analysis_dynamic =
+        !Config.dump_reachability_analysis_dynamic;
       }
   else reachability
 
@@ -253,7 +271,9 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
     | Remanent_parameters_sig.Internalised ->
       Some stdout,false || html_mode, Sys.argv
 
-    | Remanent_parameters_sig.KaSim -> Some (open_tasks_profiling ()), false || html_mode, Sys.argv
+    | Remanent_parameters_sig.KaSim ->
+      Some (open_tasks_profiling ()),
+      false || html_mode, Sys.argv
     | Remanent_parameters_sig.KaSa ->
        begin
 	 match
@@ -268,39 +288,49 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
       {
 	Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ;
 	Remanent_parameters_sig.do_influence_map = !Config.do_influence_map ;
-	Remanent_parameters_sig.do_ODE_flow_of_information = !Config.do_ODE_flow_of_information ;
-	Remanent_parameters_sig.do_stochastic_flow_of_information = !Config.do_stochastic_flow_of_information ;
+ Remanent_parameters_sig.do_ODE_flow_of_information =
+   !Config.do_ODE_flow_of_information ;
+ Remanent_parameters_sig.do_stochastic_flow_of_information =
+   !Config.do_stochastic_flow_of_information ;
 	Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
-	Remanent_parameters_sig.dump_site_dependencies = !Config.dump_site_dependencies ;
+ Remanent_parameters_sig.dump_site_dependencies =
+   !Config.dump_site_dependencies ;
         (*different reachability output*)
-	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
+ Remanent_parameters_sig.do_reachability_analysis =
+   !Config.do_reachability_analysis ;
 
         (**)
 	Remanent_parameters_sig.file = !Config.file ;
 	Remanent_parameters_sig.symbols = get_symbols () ;
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
 	Remanent_parameters_sig.contact_map_output = get_contact_map () ;
-        Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
+ Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
 
 	Remanent_parameters_sig.unsafe = !Config.unsafe ;
 	Remanent_parameters_sig.trace  = !Config.trace ;
-	Remanent_parameters_sig.dump_error_as_soon_as_they_occur = !Config.dump_error_as_soon_as_they_occur;
+ Remanent_parameters_sig.dump_error_as_soon_as_they_occur =
+   !Config.dump_error_as_soon_as_they_occur;
 	Remanent_parameters_sig.prefix = "" ;
 	Remanent_parameters_sig.call_stack = [];
 	Remanent_parameters_sig.link_mode = !Config.link_mode ;
 	Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state ;
-	Remanent_parameters_sig.launching_date = Unix.localtime (Unix.gettimeofday ()) ;
+ Remanent_parameters_sig.launching_date =
+   Unix.localtime (Unix.gettimeofday ()) ;
 	Remanent_parameters_sig.time_shift=(
 	  let x = Unix.gettimeofday () in
 	  (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour)  ;
-	Remanent_parameters_sig.hostname=begin try Unix.gethostname () with Failure _ -> "javascript" end;
+ Remanent_parameters_sig.hostname=
+   begin try Unix.gethostname () with Failure _ -> "javascript" end;
  Remanent_parameters_sig.command_line= command;
 	Remanent_parameters_sig.short_version=Version.version_string;
 	Remanent_parameters_sig.version=Version.version_kasa_full_name;
 	Remanent_parameters_sig.tk_interface=Tk_version.tk;
-	Remanent_parameters_sig.influence_map_accuracy_level = fetch_accuracy_level Config.influence_map_accuracy_level ;
-	Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level Config.contact_map_accuracy_level ;
-	Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level Config.view_accuracy_level ;
+ Remanent_parameters_sig.influence_map_accuracy_level = fetch_accuracy_level
+     Config.influence_map_accuracy_level ;
+ Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level
+     Config.contact_map_accuracy_level ;
+ Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level
+     Config.view_accuracy_level ;
         Remanent_parameters_sig.called_from = called_from ;
 	Remanent_parameters_sig.html_mode = html_mode ;
      } ;
@@ -605,6 +635,7 @@ let set_trace = upgrade_to_marshalisable set_trace_1
 
 let update_prefix parameters suffix =
   set_prefix parameters ((get_prefix parameters)^suffix)
+
 let update_call_stack parameters bool name =
   let rep_bool = get_trace parameters || bool in
     match name,get_trace parameters=bool  with

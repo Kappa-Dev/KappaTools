@@ -438,7 +438,23 @@ C() => [ C(z) v C(z!C.z) v C(z!C.t) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-Some exceptions have been raised
+------------------------------------------------------------
+* Export Parallel bonds to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraint_list):
+------------------------------------------------------------
+
+{"Parallel bonds":[],"Connected agents":[]}Some exceptions have been raised
 error: file_name: setMap.ml; message: line 659; exception:Not_found
 error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
 error: file_name: setMap.ml; message: line 659; exception:Not_found

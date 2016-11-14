@@ -58,4 +58,48 @@ R(c!1),R(c!1) =>
 ------------------------------------------------------------
 R(c!R.c,cr!R.n) => R(c!1,cr!2),R(c!1,n!2)
 R(c!R.c,n!R.cr) => R(c!1,n!2),R(c!1,cr!2)
-execution finished without any exception
+------------------------------------------------------------
+* Export Parallel bonds to JSon (constraint_list):
+------------------------------------------------------------
+R(c!R.c,n!R.cr)  => [
+		  R(c!1,n!2),R(c!1,cr!2) ]
+R(c!R.c,cr!R.n)  => [
+		  R(c!1,cr!2),R(c!1,n!2) ]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (constraint_list):
+------------------------------------------------------------
+R(c!1),R(c!1)  => [
+		  R(c!1,n!R.cr),R(c!1,n) 
+		v R(c!1,n),R(c!1,n) 
+		v R(c!1,n),R(c!1,n!R.cr) ]
+R(c!1),R(c!1)  => [
+		  R(c!1,cr!R.n),R(c!1,n!R.cr) 
+		v R(c!1,cr),R(c!1,n) ]
+R(c!1),R(c!1)  => [
+		  R(c!1,cr!R.n),R(c!1,cr) 
+		v R(c!1,cr),R(c!1,cr) 
+		v R(c!1,cr),R(c!1,cr!R.n) ]
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraint_list):
+------------------------------------------------------------
+R(c!R.c,n!R.cr)=> [R(c!1,n!2),R(c!1,cr!2)]
+R(c!R.c,cr!R.n)=> [R(c!1,cr!2),R(c!1,n!2)]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraint_list):
+------------------------------------------------------------
+R(c!1),R(c!1)=> [
+		  R(c!1,n!R.cr),R(c!1,n)
+		v R(c!1,n),R(c!1,n)
+		v R(c!1,n),R(c!1,n!R.cr)]
+R(c!1),R(c!1)=> [
+		  R(c!1,cr!R.n),R(c!1,n!R.cr)
+		v R(c!1,cr),R(c!1,n)]
+R(c!1),R(c!1)=> [
+		  R(c!1,cr!R.n),R(c!1,cr)
+		v R(c!1,cr),R(c!1,cr)
+		v R(c!1,cr),R(c!1,cr!R.n)]
+
+{"Parallel bonds":[{"hyp":{"R":[{"key":"c","value":{"property states":null,"binding states":{"first":"R","second":"c"}}},{"key":"n","value":{"property states":null,"binding states":{"first":"R","second":"cr"}}}]},"refinement":[{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":2}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":2}}]}]},{"hyp":{"R":[{"key":"c","value":{"property states":null,"binding states":{"first":"R","second":"c"}}},{"key":"cr","value":{"property states":null,"binding states":{"first":"R","second":"n"}}}]},"refinement":[{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":2}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":2}}]}]}],"Connected agents":[{"hyp":{"R":[{"key":"c","value":{"property states":null,"binding states":1}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}}]},"refinement":[{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":""}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":{"first":"R","second":"cr"}}}]},{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":""}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":""}}]},{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":{"first":"R","second":"cr"}}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":""}}]}]},{"hyp":{"R":[{"key":"c","value":{"property states":null,"binding states":1}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}}]},"refinement":[{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":""}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":""}}]},{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":{"first":"R","second":"n"}}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"n","value":{"property states":null,"binding states":{"first":"R","second":"cr"}}}]}]},{"hyp":{"R":[{"key":"c","value":{"property states":null,"binding states":1}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}}]},"refinement":[{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":""}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":{"first":"R","second":"n"}}}]},{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":""}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":""}}]},{"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":{"first":"R","second":"n"}}}],"R":[{"key":"c","value":{"property states":null,"binding states":1}},{"key":"cr","value":{"property states":null,"binding states":""}}]}]}]}execution finished without any exception

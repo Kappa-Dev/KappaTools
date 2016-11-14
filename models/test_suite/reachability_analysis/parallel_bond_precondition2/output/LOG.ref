@@ -960,4 +960,32 @@ A(z!1),B(z!1) =>
 ------------------------------------------------------------
 A(t!B.t,z!B.z) => A(t!2,z!1),B(z!1),B(t!2)
 B(t!A.t,z!A.z) => B(t!2,z!1),A(z!1),A(t!2)
-execution finished without any exception
+------------------------------------------------------------
+* Export Parallel bonds to JSon (constraint_list):
+------------------------------------------------------------
+B(t!A.t,z!A.z)  => [
+		  B(t!2,z!1),A(z!1),A(t!2) ]
+A(t!B.t,z!B.z)  => [
+		  A(t!2,z!1),B(z!1),B(t!2) ]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (constraint_list):
+------------------------------------------------------------
+A(z!1),B(z!1)  => [
+		  A(t!B.t,z!1),B(t!A.t,z!1) 
+		v A(t,z!1),B(t,z!1) ]
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraint_list):
+------------------------------------------------------------
+B(t!A.t,z!A.z)=> [B(t!2,z!1),A(z!1),A(t!2)]
+A(t!B.t,z!B.z)=> [A(t!2,z!1),B(z!1),B(t!2)]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraint_list):
+------------------------------------------------------------
+A(z!1),B(z!1)=> [
+		  A(t!B.t,z!1),B(t!A.t,z!1)
+		v A(t,z!1),B(t,z!1)]
+
+{"Parallel bonds":[{"hyp":{"B":[{"key":"t","value":{"property states":null,"binding states":{"first":"A","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":{"first":"A","second":"z"}}}]},"refinement":[{"B":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}],"A":[{"key":"z","value":{"property states":null,"binding states":1}}],"A":[{"key":"t","value":{"property states":null,"binding states":2}}]}]},{"hyp":{"A":[{"key":"t","value":{"property states":null,"binding states":{"first":"B","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":{"first":"B","second":"z"}}}]},"refinement":[{"A":[{"key":"t","value":{"property states":null,"binding states":2}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":2}}]}]}],"Connected agents":[{"hyp":{"A":[{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"z","value":{"property states":null,"binding states":1}}]},"refinement":[{"A":[{"key":"t","value":{"property states":null,"binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"t","value":{"property states":null,"binding states":{"first":"B","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":{"first":"A","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}]}]}]}execution finished without any exception

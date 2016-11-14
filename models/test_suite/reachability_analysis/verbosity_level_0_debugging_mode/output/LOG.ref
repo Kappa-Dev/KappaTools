@@ -669,4 +669,20 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 6:
 		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
-execution finished without any exception
+------------------------------------------------------------
+* Export Parallel bonds to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraint_list):
+------------------------------------------------------------
+
+{"Parallel bonds":[],"Connected agents":[]}execution finished without any exception

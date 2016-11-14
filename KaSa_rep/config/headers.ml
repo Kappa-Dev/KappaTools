@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 08/03/2010
- * Last modification: Time-stamp: <Jul 12 2016>
+ * Last modification: Time-stamp: <Nov 14 2016>
  * *
  * Some parameters
  * references can be tuned thanks to command-line options
@@ -17,7 +17,6 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 let dot_comment = "#"
-
 
 let head parameters = ["This file has been computed by KaSa: a Static Analyzer for Kappa ("^(Remanent_parameters.get_short_version parameters)^")";
 		       "Download sources/binaries at https://github.com/Kappa-Dev/KaSim";

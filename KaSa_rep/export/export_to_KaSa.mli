@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Nov 14 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -64,3 +64,19 @@ val dump_c_compil: state -> c_compilation -> state
 val output_contact_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
 
 val output_influence_map: ?loggers:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
+
+(*TODO*)
+
+val get_constraint_list : state -> Remanent_state.constraint_list option
+
+val set_constraint_list : Remanent_state.constraint_list -> state -> state
+
+val get_internal_constraint_list : state ->
+  Remanent_state.internal_constraint_list option
+
+val set_internal_constraint_list :
+  Remanent_state.internal_constraint_list -> state -> state
+
+val get_constraint_list_to_json: state -> state * Yojson.Basic.json
+
+val get_internal_constraint_list_to_json: state -> state * Yojson.Basic.json

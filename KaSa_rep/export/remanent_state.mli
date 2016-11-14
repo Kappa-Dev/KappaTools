@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 09 2016>
+  * Last modification: Time-stamp: <Nov 14 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -202,7 +202,6 @@ val convert_refinement_internal_pair_list :
   Exception.method_handler *
   Ckappa_backend.Ckappa_backend.t list
 
-
 val convert_refinement_views_constraint_list :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
@@ -217,7 +216,6 @@ val convert_refinement_views_constraint_list :
     Ckappa_backend.Ckappa_backend.binding_state option)
      Wrapped_modules.LoggedStringMap.t)
     list list
-
 
 (*******************************************************************)
 
@@ -332,12 +330,12 @@ val get_log_info: ('static, 'compile) state ->
 (*TODO*)
 
 val get_internal_constraint_list : ('static, 'compile) state ->
-  internal_constraint_list
+  internal_constraint_list option
 
 val set_internal_constraint_list : internal_constraint_list -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_constraint_list : ('static, 'compile) state ->
-  constraint_list
+  constraint_list option
 
 val set_constraint_list : constraint_list -> ('static, 'compile) state ->
   ('static, 'compile) state

@@ -1368,4 +1368,50 @@ A(z!1),B(z!1) =>
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-execution finished without any exception
+------------------------------------------------------------
+* Export Parallel bonds to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (constraint_list):
+------------------------------------------------------------
+A(z!1),B(z!1)  => [
+		  A(t!B.t,z!1),B(t!A.t,z!1) 
+		v A(t,z!1),B(t,z!1) ]
+A(z!1),B(z!1)  => [
+		  A(t!B.t,z!1),B(x~u,z!1) 
+		v A(t!B.t,z!1),B(x~p,z!1) 
+		v A(t,z!1),B(x~p,z!1) ]
+A(z!1),B(z!1)  => [
+		  A(x~p,z!1),B(t,z!1) 
+		v A(x~p,z!1),B(t!A.t,z!1) 
+		v A(x~u,z!1),B(t!A.t,z!1) ]
+A(z!1),B(z!1)  => [
+		  A(x~p,z!1),B(x~u,z!1) 
+		v A(x~p,z!1),B(x~p,z!1) 
+		v A(x~u,z!1),B(x~p,z!1) ]
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraint_list):
+------------------------------------------------------------
+A(z!1),B(z!1)=> [
+		  A(t!B.t,z!1),B(t!A.t,z!1)
+		v A(t,z!1),B(t,z!1)]
+A(z!1),B(z!1)=> [
+		  A(t!B.t,z!1),B(x~u,z!1)
+		v A(t!B.t,z!1),B(x~p,z!1)
+		v A(t,z!1),B(x~p,z!1)]
+A(z!1),B(z!1)=> [
+		  A(x~p,z!1),B(t,z!1)
+		v A(x~p,z!1),B(t!A.t,z!1)
+		v A(x~u,z!1),B(t!A.t,z!1)]
+A(z!1),B(z!1)=> [
+		  A(x~p,z!1),B(x~u,z!1)
+		v A(x~p,z!1),B(x~p,z!1)
+		v A(x~u,z!1),B(x~p,z!1)]
+
+{"Parallel bonds":[],"Connected agents":[{"hyp":{"A":[{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"z","value":{"property states":null,"binding states":1}}]},"refinement":[{"A":[{"key":"t","value":{"property states":null,"binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"t","value":{"property states":null,"binding states":{"first":"B","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":{"first":"A","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}]}]},{"hyp":{"A":[{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"z","value":{"property states":null,"binding states":1}}]},"refinement":[{"A":[{"key":"t","value":{"property states":null,"binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"t","value":{"property states":null,"binding states":{"first":"B","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"t","value":{"property states":null,"binding states":{"first":"B","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"x","value":{"property states":"~u","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]}]},{"hyp":{"A":[{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"z","value":{"property states":null,"binding states":1}}]},"refinement":[{"A":[{"key":"x","value":{"property states":"~u","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":{"first":"A","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":{"first":"A","second":"t"}}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"t","value":{"property states":null,"binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]}]},{"hyp":{"A":[{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"z","value":{"property states":null,"binding states":1}}]},"refinement":[{"A":[{"key":"x","value":{"property states":"~u","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]},{"A":[{"key":"x","value":{"property states":"~p","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}],"B":[{"key":"x","value":{"property states":"~u","binding states":""}},{"key":"z","value":{"property states":null,"binding states":1}}]}]}]}execution finished without any exception

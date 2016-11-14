@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 04 2016>
+  * Last modification: Time-stamp: <Nov 14 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1599,6 +1599,14 @@ struct
     in
     (*------------------------------------------------------------------*)
     let constraint_list = Remanent_state.get_constraint_list kasa_state in
+    let error, constraint_list =
+      match
+        constraint_list
+      with
+      | None ->
+        Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
+    in
     let pair_list = (domain_name, current_list) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraint_list pair_list kasa_state
@@ -1607,6 +1615,14 @@ struct
     (*internal constraint list*)
     let internal_constraint_list =
       Remanent_state.get_internal_constraint_list kasa_state
+    in
+    let error, internal_constraint_list =
+      match
+        internal_constraint_list
+      with
+      | None ->
+        Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
     in
     let pair_list = (domain_name, current_list2) :: internal_constraint_list in
     let kasa_state =

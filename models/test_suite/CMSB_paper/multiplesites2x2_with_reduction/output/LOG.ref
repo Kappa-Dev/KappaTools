@@ -45,4 +45,20 @@ K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-execution finished without any exception
+------------------------------------------------------------
+* Export Parallel bonds to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraint_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraint_list):
+------------------------------------------------------------
+
+{"Parallel bonds":[],"Connected agents":[]}execution finished without any exception

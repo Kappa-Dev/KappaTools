@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Nov 10 2016>
+ * Last modification: Time-stamp: <Nov 14 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -55,7 +55,8 @@ let non_relational parameters handler error mvbdu =
   error, handler,
   Ckappa_sig.Views_bdu.equal mvbdu recomposition
 
-let try_partitioning parameters handler error (rename_site_inverse:rename_sites) mvbdu =
+let try_partitioning parameters handler error
+    (rename_site_inverse:rename_sites) mvbdu =
   let error, handler, mvbdu_true =
     Ckappa_sig.Views_bdu.mvbdu_true parameters handler error
   in
@@ -219,7 +220,7 @@ let translate parameters handler error (rename_site_inverse: rename_sites)
       (error, [])
       (List.rev list)
   in
-  if Remanent_parameters.get_post_processing  parameters
+  if Remanent_parameters.get_post_processing parameters
   then
     begin
       let error, handler, vars =
@@ -239,7 +240,8 @@ let translate parameters handler error (rename_site_inverse: rename_sites)
           (List.rev var_list)
       in
       match var_list with
-      | [] -> error, (handler, No_known_translation list) (* OK if the agent has no sites *)
+      | [] -> error, (handler, No_known_translation list) (* OK if the agent
+                                                             has no sites *)
       | [x] ->
         let error, list =
           List.fold_left
@@ -535,8 +537,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
       if dim_min <= 2
       then
         begin
-          match Remanent_parameters.get_backend_mode parameters
-          with
+          match Remanent_parameters.get_backend_mode parameters with
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             let error, t' =
@@ -617,8 +618,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
       if dim_min <= 2
       then
         begin
-          match Remanent_parameters.get_backend_mode parameters
-          with
+          match Remanent_parameters.get_backend_mode parameters with
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
             let error, t =
@@ -710,8 +710,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
         List.fold_left
           (fun error (a,list) ->
              let error, parameters  =
-               match Remanent_parameters.get_backend_mode parameters
-               with
+               match Remanent_parameters.get_backend_mode parameters with
                | Remanent_parameters_sig.Natural_language ->
                  let error, state_string =
                    Handler.string_of_state_fully_deciphered
@@ -766,8 +765,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
       in error,()
     | No_known_translation list ->
       begin
-        match Remanent_parameters.get_backend_mode parameters
-        with
+        match Remanent_parameters.get_backend_mode parameters with
         | Remanent_parameters_sig.Kappa
         | Remanent_parameters_sig.Raw ->
           begin
@@ -929,12 +927,9 @@ let rec print ?beginning_of_sentence:(beggining=true)
   error
 
 (*****************************************************************************)
-(*convert views to json*)
+(*TODO:convert views to json*)
 
 let rec convert_views_constraint_list_aux
-    ?beginning_of_sentence:(beggining=true)
-    ?prompt_agent_type:(prompt_agent_type=true)
-    ?html_mode:(html_mode=false)
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type agent_id translation t current_list =
@@ -958,35 +953,41 @@ let rec convert_views_constraint_list_aux
                 Ckappa_backend.Ckappa_backend.get_string_version
                   t
               in
-              let error, site_graph =
+              let error', site_graph =
                 Remanent_state.convert_site_graph error string_version
               in
+              let error =
+                Exception.check_point
+                  Exception.warn  parameters error error'
+                  __POS__ Exit
+              in
               (*-----------------------------------------------------*)
-              let error, refinement =
+              let error'', refinement =
                 List.fold_left (fun (error, c_list) state ->
-                    let error, t' =
+                    let error', t' =
                       Ckappa_backend.Ckappa_backend.add_state parameters
                         error handler_kappa agent_id site_type state t
+                    in
+                    let error =
+                      Exception.check_point
+                        Exception.warn  parameters error error'
+                        __POS__ Exit
                     in
                     let string_version' =
                       Ckappa_backend.Ckappa_backend.get_string_version
                         t'
                     in
-                    let error, site_graph' =
+                    let error'', site_graph' =
                       Remanent_state.convert_site_graph error string_version'
+                    in
+                    let error =
+                      Exception.check_point
+                        Exception.warn  parameters error error''
+                        __POS__ Exit
                     in
                     error, site_graph' :: c_list
                   ) (error, []) state_list
               in
-              (*let error, refinement =
-                Remanent_state.convert_refinement_views_constraint_list
-                  parameters error
-                  handler_kappa
-                  agent_id
-                  site_type
-                  t
-                  state_list
-              in*)
               let lemma =
                 {
                   Remanent_state.hyp = site_graph;
@@ -994,6 +995,11 @@ let rec convert_views_constraint_list_aux
                 }
               in
               let current_list = lemma :: current_list in
+              let error =
+                Exception.check_point
+                  Exception.warn  parameters error error''
+                  __POS__ Exit
+              in
               error, current_list
             | Remanent_parameters_sig.Natural_language ->
               (*let _ =
@@ -1014,7 +1020,7 @@ let rec convert_views_constraint_list_aux
           match Remanent_parameters.get_backend_mode parameters with
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
-            let error, t' =
+            let error', t' =
               Ckappa_backend.Ckappa_backend.add_state
                 parameters error handler_kappa
                 agent_id
@@ -1022,15 +1028,25 @@ let rec convert_views_constraint_list_aux
                 state1
                 t
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error'
+                __POS__ Exit
+            in
             let string_version =
               Ckappa_backend.Ckappa_backend.get_string_version
                 t'
             in
-            let error, site_graph =
+            let error'', site_graph =
               Remanent_state.convert_site_graph error string_version
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error''
+                __POS__ Exit
+            in
             (*--------------------------------------------------*)
-            let error, t'' =
+            let error''', t'' =
               Ckappa_backend.Ckappa_backend.add_state
                 parameters error handler_kappa
                 agent_id
@@ -1038,13 +1054,23 @@ let rec convert_views_constraint_list_aux
                 state2
                 t
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error'''
+                __POS__ Exit
+            in
             (*check*)
             let string_version'' =
               Ckappa_backend.Ckappa_backend.get_string_version
                 t''
             in
-            let error, site_graph'' =
+            let error'''', site_graph'' =
               Remanent_state.convert_site_graph error string_version''
+            in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error''''
+                __POS__ Exit
             in
             (*--------------------------------------------------*)
             let lemma =
@@ -1067,7 +1093,7 @@ let rec convert_views_constraint_list_aux
           match Remanent_parameters.get_backend_mode parameters with
           | Remanent_parameters_sig.Kappa
           | Remanent_parameters_sig.Raw ->
-            let error, t =
+            let error', t =
               Ckappa_backend.Ckappa_backend.add_state
                 parameters error handler_kappa
                 agent_id
@@ -1075,15 +1101,25 @@ let rec convert_views_constraint_list_aux
                 state1
                 t
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error'
+                __POS__ Exit
+            in
             let string_version =
               Ckappa_backend.Ckappa_backend.get_string_version
                 t
             in
-            let error, site_graph =
+            let error'', site_graph =
               Remanent_state.convert_site_graph error string_version
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error''
+                __POS__ Exit
+            in
             (*--------------------------------------------------*)
-            let error, t' =
+            let error''', t' =
               Ckappa_backend.Ckappa_backend.add_state
                 parameters error handler_kappa
                 agent_id
@@ -1091,12 +1127,22 @@ let rec convert_views_constraint_list_aux
                 state2
                 t
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error'''
+                __POS__ Exit
+            in
             let string_version' =
               Ckappa_backend.Ckappa_backend.get_string_version
                 t'
             in
-            let error, site_graph' =
+            let error'''', site_graph' =
               Remanent_state.convert_site_graph error string_version'
+            in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error''''
+                __POS__ Exit
             in
             (*--------------------------------------------------*)
             let lemma =
@@ -1115,18 +1161,20 @@ let rec convert_views_constraint_list_aux
     | Partition (site_type, list) ->
       let error, current_list =
         List.fold_left (fun (error, current_list) (state, list) ->
-            let error, t' =
+            let error', t' =
               Ckappa_backend.Ckappa_backend.add_state
                 parameters error handler_kappa
                 agent_id
                 site_type state t
             in
-            let error, current_list =
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error'
+                __POS__ Exit
+            in
+            let error'', current_list =
               List.fold_left (fun (error, current_list) token ->
                   convert_views_constraint_list_aux
-                    ~beginning_of_sentence:false
-                    ~prompt_agent_type:false
-                    ~html_mode
                     ~show_dep_with_dimmension_higher_than:0
                     parameters
                     handler_kappa
@@ -1139,6 +1187,11 @@ let rec convert_views_constraint_list_aux
                     current_list (*FIXME*)
                 ) (error, current_list) list
             in
+            let error =
+              Exception.check_point
+                Exception.warn  parameters error error''
+                __POS__ Exit
+            in
             (*let _ =
               Loggers.fprintf (Remanent_parameters.get_logger parameters) "test1\n"
             in*)
@@ -1147,9 +1200,9 @@ let rec convert_views_constraint_list_aux
       in
       error, current_list
     | No_known_translation list ->
-    let _ =
+      (*let _ =
       Loggers.fprintf (Remanent_parameters.get_logger parameters) "test2\n"
-    in
+    in*)
       begin
         match Remanent_parameters.get_backend_mode parameters with
         | Remanent_parameters_sig.Kappa
@@ -1160,31 +1213,51 @@ let rec convert_views_constraint_list_aux
               Ckappa_backend.Ckappa_backend.get_string_version
                 t
               in
-              let error, site_graph =
+              let error', site_graph =
                 Remanent_state.convert_site_graph error
                 string_version
               in
-              let error, refinement =
+              let error =
+                Exception.check_point
+                  Exception.warn  parameters error error'
+                  __POS__ Exit
+              in
+              let error'', refinement =
                 List.fold_left (fun (error, current_list) state_list ->
                     List.fold_left
                       (fun (error, current_list) (site, state) ->
-                         let error, t' =
+                         let error', t' =
                            Ckappa_backend.Ckappa_backend.add_state
                              parameters error handler_kappa
                              agent_id site state t
+                         in
+                         let error =
+                           Exception.check_point
+                             Exception.warn  parameters error error'
+                             __POS__ Exit
                          in
                          let string_version' =
                            Ckappa_backend.Ckappa_backend.get_string_version
                              t'
                          in
-                         let error, site_graph' =
+                         let error'', site_graph' =
                            Remanent_state.convert_site_graph error
                              string_version'
+                         in
+                         let error =
+                           Exception.check_point
+                             Exception.warn  parameters error error''
+                             __POS__ Exit
                          in
                          let refinement = site_graph' :: current_list in
                          error, refinement
                       ) (error, current_list) state_list
                   ) (error, []) list
+              in
+              let error =
+                Exception.check_point
+                  Exception.warn  parameters error error''
+                  __POS__ Exit
               in
               (*----------------------------------------*)
               let lemma =
@@ -1205,20 +1278,20 @@ let rec convert_views_constraint_list_aux
   error, current_list
 
 let convert_views_constraint_list
-    ?beginning_of_sentence:(beggining=true)
-    ?prompt_agent_type:(prompt_agent_type=true)
-    ?html_mode:(html_mode=false)
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type translation current_list =
   let t = Ckappa_backend.Ckappa_backend.empty in
-  let error, agent_id, t =
+  let error', agent_id, t =
     Ckappa_backend.Ckappa_backend.add_agent
       parameters error handler_kappa agent_type t
   in
+  let error =
+    Exception.check_point
+      Exception.warn  parameters error error'
+      __POS__ Exit
+  in
   convert_views_constraint_list_aux
-    ~beginning_of_sentence:beggining
-    ~prompt_agent_type ~html_mode
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa
     error agent_string agent_type agent_id translation t current_list
@@ -1266,300 +1339,6 @@ let error, store_set =
     store_set2
 in
 error, store_set
-
-let rec print_store_views
-    ~show_dep_with_dimmension_higher_than:dim_min
-    parameters handler_kappa error agent_string agent_type
-    agent_id translation t =
-  let error, store_result =
-    match translation with
-    | Range (site_type, state_list) ->
-      begin
-        if dim_min <= 1
-        then
-          begin
-            match Remanent_parameters.get_backend_mode parameters with
-            | Remanent_parameters_sig.Kappa
-            | Remanent_parameters_sig.Raw ->
-              (*return the information store inside t from the beginning*)
-              let error, (internal_list, bound_to_list, binding_list) =
-                Ckappa_backend.Ckappa_backend.print_store_views
-                  error handler_kappa
-                  t
-              in
-              (*store the information into set*)
-              let error, store_set =
-                Triple_pair_list_map_and_set.Set.add_when_not_in
-                parameters error
-                (internal_list, bound_to_list, binding_list)
-                Triple_pair_list_map_and_set.Set.empty (*empty*)
-              in
-              (*store this information into agent_id set*)
-              let error, store_set =
-                List.fold_left (fun (error, store_set) state ->
-                    (*add state inside t*)
-                    let error, store_set =
-                      add_state_into_t parameters error
-                        handler_kappa
-                        agent_id site_type state
-                        t
-                        store_set
-                    in error, store_set
-                  ) (error, store_set) state_list
-              in
-              error, store_set
-            | Remanent_parameters_sig.Natural_language ->
-              let rec aux list store_set =
-                match list with
-                | [] -> error, store_set
-                | [state] ->
-                  let error, store_set =
-                    add_state_into_t parameters error
-                      handler_kappa
-                      agent_id site_type state t
-                      store_set
-                  in
-                  error, store_set
-                | state :: tail ->
-                let error, store_set =
-                  add_state_into_t parameters error
-                    handler_kappa
-                    agent_id site_type state t
-                    store_set
-                in
-                aux tail store_set
-              in
-              match state_list with
-              | [] -> Exception.warn parameters error __POS__ Exit
-                        Triple_pair_list_map_and_set.Set.empty
-              | [state] ->
-                (*add state into t*)
-                let error, store_set =
-                  add_state_into_t parameters error
-                    handler_kappa
-                    agent_id site_type state
-                    t
-                    Triple_pair_list_map_and_set.Set.empty
-                in
-                error, store_set
-              | [state1; state2] ->
-                let error, store_set =
-                  add_two_states_into_t
-                    parameters error handler_kappa
-                    agent_id site_type state1
-                    site_type state2
-                    t
-                    Triple_pair_list_map_and_set.Set.empty
-                    Triple_pair_list_map_and_set.Set.empty
-                in
-                error, store_set
-              | list ->
-                let error, store_set =
-                  aux list Triple_pair_list_map_and_set.Set.empty
-                in
-                aux list store_set
-          end
-        else
-          error, Triple_pair_list_map_and_set.Set.empty
-      end
-      | Equiv ((site1,state1),(site2,state2)) ->
-        if dim_min <= 2
-        then
-          begin
-            match Remanent_parameters.get_backend_mode parameters with
-            | Remanent_parameters_sig.Kappa
-            | Remanent_parameters_sig.Raw ->
-              let error, store_set =
-                add_two_states_into_t
-                  parameters error handler_kappa
-                  agent_id site1 state1
-                  site2 state2
-                  t
-                  Triple_pair_list_map_and_set.Set.empty
-                  Triple_pair_list_map_and_set.Set.empty
-              in
-              error, store_set
-            | Remanent_parameters_sig.Natural_language ->
-              let error, store_set =
-                add_two_states_into_t
-                  parameters error handler_kappa
-                  agent_id site1 state1
-                  site2 state2
-                  t
-                  Triple_pair_list_map_and_set.Set.empty
-                  Triple_pair_list_map_and_set.Set.empty
-              in
-              error, store_set
-          end
-        else error, Triple_pair_list_map_and_set.Set.empty
-      | Imply ((site1,state1),(site2,state2)) ->
-        if dim_min <= 2
-        then
-          begin
-            match Remanent_parameters.get_backend_mode parameters with
-            | Remanent_parameters_sig.Kappa
-            | Remanent_parameters_sig.Raw ->
-              let error, store_set =
-                add_two_states_into_t parameters error
-                  handler_kappa
-                  agent_id site1 state1
-                  site2 state2
-                  t
-                  Triple_pair_list_map_and_set.Set.empty
-                  Triple_pair_list_map_and_set.Set.empty
-              in
-              error, store_set
-            | Remanent_parameters_sig.Natural_language ->
-              let error, store_set =
-                add_two_states_into_t parameters error
-                  handler_kappa
-                  agent_id site1 state1
-                  site2 state2
-                  t
-                  Triple_pair_list_map_and_set.Set.empty
-                  Triple_pair_list_map_and_set.Set.empty
-              in
-              error, store_set
-          end
-        else error, Triple_pair_list_map_and_set.Set.empty
-      | Partition (v, list) ->
-        let error, store_set =
-          List.fold_left (fun (error, store_set) (a, list) ->
-              let error, store_set =
-                match Remanent_parameters.get_backend_mode parameters with
-                | Remanent_parameters_sig.Natural_language ->
-                  (*add state*)
-                  let error, store_set =
-                    add_state_into_t parameters error handler_kappa
-                      agent_id v a t
-                      Triple_pair_list_map_and_set.Set.empty
-                  in
-                  error, store_set
-                | Remanent_parameters_sig.Kappa
-                | Remanent_parameters_sig.Raw ->
-                  error, Triple_pair_list_map_and_set.Set.empty
-              in
-              let error, t' =
-                Ckappa_backend.Ckappa_backend.add_state
-                  parameters error
-                  handler_kappa
-                  agent_id
-                  v
-                  a
-                  t
-              in
-              let error, store_set =
-                List.fold_left (fun (error, store_set) token ->
-                    let error, store_set =
-                      print_store_views
-                        ~show_dep_with_dimmension_higher_than:0
-                        parameters
-                        handler_kappa
-                        error
-                        agent_string
-                        agent_type
-                        agent_id
-                        token
-                        t'
-                    in
-                    error, store_set
-                  ) (error, store_set) list
-              in
-              error, store_set
-            ) (error, Triple_pair_list_map_and_set.Set.empty) list
-        in
-        error, store_set
-      | No_known_translation list ->
-        begin
-          match Remanent_parameters.get_backend_mode parameters with
-          | Remanent_parameters_sig.Kappa
-          | Remanent_parameters_sig.Raw ->
-            let error, store_set =
-              List.fold_left (fun (error, store_set) state_list ->
-                  let error, store_set =
-                    List.fold_left (fun (error, store_set) (site, state) ->
-                        let error, store_set =
-                          add_state_into_t parameters error handler_kappa
-                            agent_id site state t
-                            store_set
-                        in
-                        error, store_set
-                      ) (error, store_set)
-                      state_list
-                  in
-                  error, store_set
-                ) (error, Triple_pair_list_map_and_set.Set.empty) list
-            in
-            error, store_set
-          | Remanent_parameters_sig.Natural_language ->
-            begin
-              match list with
-              | [] -> error, Triple_pair_list_map_and_set.Set.empty
-              | head :: _ ->
-                let n = List.length head in
-                if n >= dim_min
-                then
-                  let error, store_set =
-                    let rec aux l store_set =
-                      match l with
-                      | [] -> error, store_set
-                      | [site, state] ->
-                        let error, store_set =
-                          add_state_into_t
-                            parameters error handler_kappa
-                            agent_id site state t
-                            store_set
-                        in
-                        error, store_set
-                      | (site, state) :: tl ->
-                      let error, store_set =
-                        add_state_into_t
-                          parameters error handler_kappa
-                          agent_id site state t
-                          store_set
-                      in
-                      aux tl store_set
-                    in
-                    match head with
-                    | [] | [_] -> Exception.warn parameters error __POS__ Exit
-                                    Triple_pair_list_map_and_set.Set.empty
-                    | (_site, _state) :: tl ->
-                      aux tl Triple_pair_list_map_and_set.Set.empty
-                  in
-                  List.fold_left
-                    (fun (error, store_set) l ->
-                       List.fold_left
-                         (fun (error, store_set) (site_type, state) ->
-                           let error, store_set =
-                             add_state_into_t parameters error handler_kappa
-                               agent_id site_type state t
-                               store_set
-                           in error, store_set
-                         ) (error, store_set) l
-                    ) (error, store_set) list
-                else
-                  error,
-                  Triple_pair_list_map_and_set.Set.empty
-            end
-        end
-  in
-  error, store_result
-
-let store_views
-    ~show_dep_with_dimmension_higher_than:dim_min
-    parameters handler_kappa error agent_string agent_type
-    translation =
-  let t = Ckappa_backend.Ckappa_backend.empty in
-  let error, id, t =
-  Ckappa_backend.Ckappa_backend.add_agent
-    parameters error
-    handler_kappa
-    agent_type
-    t
-  in
-  print_store_views
-    ~show_dep_with_dimmension_higher_than:dim_min
-    parameters handler_kappa error agent_string agent_type id translation t
 
 (*****************************************************************************)
 
