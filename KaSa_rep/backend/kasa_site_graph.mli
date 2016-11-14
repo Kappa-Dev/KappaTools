@@ -1,6 +1,8 @@
 module type Site_graph =
 sig
   type t
+
+
   type agent_id
   type bond_index
 
@@ -116,8 +118,13 @@ sig
     t list -> Exception.method_handler
 
   val to_json:
-    Remanent_parameters_sig.parameters ->
-    Exception.method_handler ->
-    Cckappa_sig.kappa_handler ->
-    t -> Exception.method_handler * Yojson.Basic.json
+    t -> Yojson.Basic.json
+
+  type string_version = 
+      (string *
+     (string option * binding_state option)
+       Wrapped_modules.LoggedStringMap.t) list
+
+  val string_version_of_json:
+    Yojson.Basic.json -> string_version
 end

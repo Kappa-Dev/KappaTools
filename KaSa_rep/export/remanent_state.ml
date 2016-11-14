@@ -299,8 +299,21 @@ string *
 (*******************************************************************)
 (*internal_/constraints_list -> json*)
 
+let pair_state = "state"
+let site_map = "site map"
+let internal = "internal state"
+let binding = "binding state"
+let site_name = "site_name"
+let free = ""
+let wildcard = "?"
+let bound = "!_"
+let bound_to = "bound_to"
+let binding_type = "binding_type"
+
+
 let constraints_list_to_json_aux site_map =
   Wrapped_modules.LoggedStringMap.to_json
+    ~lab_key:site_name ~lab_value:pair_state
     (fun site_string -> JsonUtil.of_string site_string)
     (fun (internal_opt, binding_opt) ->
        JsonUtil.of_pair ~lab1:prop ~lab2:bind
@@ -313,11 +326,11 @@ let constraints_list_to_json_aux site_map =
             match binding_opt with
             | None
             | Some Ckappa_backend.Ckappa_backend.Free ->
-              JsonUtil.of_string ""
+              JsonUtil.of_string free
             | Some Ckappa_backend.Ckappa_backend.Wildcard ->
-              JsonUtil.of_string "?"
+              JsonUtil.of_string wildcard
             | Some Ckappa_backend.Ckappa_backend.Bound_to_unknown ->
-              JsonUtil.of_string "!_"
+              JsonUtil.of_string bound
             | Some (Ckappa_backend.Ckappa_backend.Bound_to b_int) ->
               JsonUtil.of_int
                 (Ckappa_backend.Ckappa_backend.int_of_bond_index b_int)
@@ -426,22 +439,25 @@ let internal_constraints_list_hyp_to_json hyp =
     in
     Ckappa_backend.Ckappa_backend.Binding_type (agent_name, site_name)*)
 
-let binding_opt_of_json json  =
+(*let binding_opt_of_json json  =
   match json with
   (* x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x)) (*FIXME*)*)
   | `Bool _ | `Float _
   | `Int _ | `List _ | `Null | `String _
   | `Assoc [] -> assert false (*FIXME*)
-  | `Assoc ["", json] -> Ckappa_backend.Ckappa_backend.Free
-  | `Assoc ["?", json] -> Ckappa_backend.Ckappa_backend.Wildcard
-  | `Assoc ["!_", json] -> Ckappa_backend.Ckappa_backend.Bound_to_unknown
-  | `Assoc ["bound_to", json] ->
-    let int = JsonUtil.to_int
+  | `Assoc [s, json] ->
+    if s = free then Ckappa_backend.Ckappa_backend.Free
+    else if s = wildcard then Ckappa_backend.Ckappa_backend.Wildcard
+    else if s = bound then Ckappa_backend.Ckappa_backend.Bound_to_unknown
+    else if s = bound_to
+    then
+      let int = JsonUtil.to_int
         ~error_msg:(JsonUtil.build_msg "bound to") json
-    in
-    let bond_index = Ckappa_backend.Ckappa_backend.bond_index_of_int int in
-    Ckappa_backend.Ckappa_backend.Bound_to bond_index
-  | `Assoc ["binding_type", json] ->
+      in
+      let bond_index = Ckappa_backend.Ckappa_backend.bond_index_of_int int in
+      Ckappa_backend.Ckappa_backend.Bound_to bond_index
+    else if s = binding_type
+    then
     let agent_name =
       (fun json ->
          JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name")
@@ -459,15 +475,14 @@ let binding_opt_of_json json  =
          json)
     in
     Ckappa_backend.Ckappa_backend.Binding_type (agent_name, site_name)
+    else
+      assert false (* FIXME *)
   | `Assoc (_::_) ->
-    assert false (* FIXME *)
+    assert false (* FIXME *)*)
 
-let pair_state = "pair state"
-let site_map = "site map"
-let internal = "internal state"
-let binding = "binding state"
 
-let constraints_list_of_json_aux json =
+
+(*let constraints_list_of_json_aux json =
   Wrapped_modules.LoggedStringMap.of_json ~lab_key:site
     ~lab_value:pair_state ~error_msg:"site_map"
     (fun json -> (*elt:site_string*)
@@ -487,9 +502,9 @@ let constraints_list_of_json_aux json =
                  binding_opt_of_json json)
               json)
          json)
-    json
+    json*)
 
-let constraints_list_hyp_of_json json =
+(*let constraints_list_hyp_of_json json =
   JsonUtil.to_list (fun json ->
       JsonUtil.to_pair
         (fun json ->
@@ -500,18 +515,18 @@ let constraints_list_hyp_of_json json =
            constraints_list_of_json_aux json
         )
         json
-    ) json
+    ) json*)
 
 (*list *)
 let constraints_list_refinment_of_json json =
   JsonUtil.to_list ~error_msg:"refinement"
-    (fun json -> constraints_list_hyp_of_json json)
+    (fun json -> Ckappa_backend.Ckappa_backend.string_version_of_json json)
     json
 
 (*json -> lemma *)
 let constraints_list_lemma_of_json json =
   {
-    hyp = constraints_list_hyp_of_json json;
+    hyp = Ckappa_backend.Ckappa_backend.string_version_of_json json;
     refinement = constraints_list_refinment_of_json json;
   }
 
@@ -529,7 +544,7 @@ let constraints_list_of_json json =
 
 (*******************************************************************)
 
-let internal_constraints_list_hyp_of_json json =
+(*let internal_constraints_list_hyp_of_json json =
   Ckappa_sig.Agent_id_map_and_set.Map.of_json
     (fun json -> (*elt*)
        let int =
@@ -547,7 +562,7 @@ let internal_constraints_list_hyp_of_json json =
             constraints_list_of_json_aux json
          ) json
     )
-    json
+    json*)
 
 (***************************************************************************)
 

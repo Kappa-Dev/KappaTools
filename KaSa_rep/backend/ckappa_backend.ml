@@ -38,6 +38,11 @@ struct
            let print _ _ = ()
          end))
 
+  type agent_string_version =
+    (string *
+     (string option * binding_state option)
+       Wrapped_modules.LoggedStringMap.t)
+
   type t =
     {
       views:
@@ -51,11 +56,11 @@ struct
           Ckappa_sig.Site_map_and_set.Map.t
           Ckappa_sig.Agent_id_map_and_set.Map.t;
       string_version:
-        (string *
-         (string option * binding_state option)
-           Wrapped_modules.LoggedStringMap.t)
+        agent_string_version
           Ckappa_sig.Agent_id_map_and_set.Map.t
     }
+
+  type string_version = agent_string_version list
 
   let get_string_version t = t.string_version
   let set_string_version s_v t =
@@ -527,8 +532,155 @@ struct
         ~message:"incompatible binding states"
         Exit t
 
-  let to_json parameter error kappa_handler t =
-    error, `Assoc []
+  let pair_state = "state"
+  let site_map = "site map"
+  let internal = "internal state"
+  let binding = "binding state"
+  let site_name = "site_name"
+  let site = site_name
+  let free = ""
+  let wildcard = "?"
+  let bound = "!_"
+  let bound_to = "bound_to"
+  let binding_type = "binding_type"
+  let agent="agent_name"
+  let interface="interface"
+
+  let interface_to_json site_map =
+    Wrapped_modules.LoggedStringMap.to_json
+      ~lab_key:site_name ~lab_value:pair_state
+      (fun site_string -> JsonUtil.of_string site_string)
+      (fun (internal_opt, binding_opt) ->
+         JsonUtil.of_pair ~lab1:internal ~lab2:binding
+           (fun internal_opt ->
+              JsonUtil.of_option (fun internal_state ->
+                  JsonUtil.of_string internal_state
+                ) internal_opt
+           )
+           (fun binding_opt ->
+              match binding_opt with
+              | None
+              | Some Free ->
+                JsonUtil.of_string free
+              | Some Wildcard ->
+                JsonUtil.of_string wildcard
+              | Some Bound_to_unknown ->
+                JsonUtil.of_string bound
+              | Some (Bound_to b_int) ->
+                JsonUtil.of_int
+                  (int_of_bond_index b_int)
+              | Some (Binding_type
+                        (agent_name, site_name)) ->
+                JsonUtil.of_pair ~lab1:agent ~lab2:site_name
+                  (fun agent_name ->
+                     JsonUtil.of_string agent_name
+                  )
+                  (fun site_name ->
+                     JsonUtil.of_string site_name
+                  )
+                  (agent_name, site_name)
+           )
+           (internal_opt, binding_opt)
+      )
+      site_map
+
+  let binding_opt_of_json json  =
+    match json with
+    (* x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x)) (*FIXME*)*)
+    | `Bool _ | `Float _
+    | `Int _ | `List _ | `Null | `String _
+    | `Assoc [] -> assert false (*FIXME*)
+    | `Assoc [s, json] ->
+      if s = free then Free
+      else if s = wildcard then Wildcard
+      else if s = bound then Bound_to_unknown
+      else if s = bound_to
+      then
+        let int = JsonUtil.to_int
+            ~error_msg:(JsonUtil.build_msg "bound to") json
+        in
+        let bond_index = bond_index_of_int int in
+        Bound_to bond_index
+      else if s = binding_type
+      then
+        let agent_name =
+          (fun json ->
+             JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name")
+               json)
+        in
+        let site_name =
+          (fun json ->
+             JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name") json)
+        in
+        let (agent_name, site_name) =
+          (JsonUtil.to_pair
+             ~lab1:agent ~lab2:site ~error_msg:""
+             (fun json -> agent_name json)
+             (fun json -> site_name json)
+             json)
+        in
+        Binding_type (agent_name, site_name)
+      else
+        assert false (* FIXME *)
+    | `Assoc (_::_) ->
+      assert false (* FIXME *)
+
+
+
+  let string_version_to_json string_version =
+    let list =
+      List.rev
+        (Ckappa_sig.Agent_id_map_and_set.Map.fold
+           (fun _ (agent_string, site_map) current_list ->
+              let site_graph =
+                (agent_string, site_map) :: current_list
+              in
+              site_graph
+           ) string_version [])
+    in
+    JsonUtil.of_assoc
+      (fun (agent_string, site_map) ->
+         agent_string, interface_to_json site_map
+      ) list
+
+  let interface_of_json json =
+    Wrapped_modules.LoggedStringMap.of_json ~lab_key:site_name
+      ~lab_value:pair_state ~error_msg:"site_map"
+      (fun json -> (*elt:site_string*)
+         JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name") json
+      )
+      (fun json -> (*internal_opt, binding_opt*)
+         JsonUtil.to_pair ~lab1:internal ~lab2:binding ~error_msg:""
+           (fun json ->
+              JsonUtil.to_option
+                (fun json ->
+                   JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "internal")
+                     json)
+                json)
+           (fun json ->
+              JsonUtil.to_option
+                (fun json ->
+                   binding_opt_of_json json)
+                json)
+           json)
+      json
+
+  let string_version_of_json json =
+    JsonUtil.to_list (fun json ->
+        JsonUtil.to_pair
+          (fun json ->
+             JsonUtil.to_string
+               ~error_msg:(JsonUtil.build_msg "agent name") json
+          )
+          (fun json ->
+             interface_of_json json
+          )
+          json
+      ) json
+
+  let to_json graph =
+    string_version_to_json graph.string_version
+
 
 (*
   type constraint_list =

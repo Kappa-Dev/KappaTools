@@ -1216,13 +1216,6 @@ let get_constraints_list_to_json state =
 
 (******************************************************************)
 
-let get_internal_constraints_list_to_json =
-  get_gen
-    ~dump:print_internal_constraints_list
-    Remanent_state.get_internal_constraints_list
-    get_internal_constraints_list
-
-
 let get_internal_constraints_list = get_internal_constraints_list "Extract refinement lemmas"
 
 let output_internal_constraints_list ?logger (state:state) =
