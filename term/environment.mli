@@ -62,8 +62,8 @@ val print :
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
 
-val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t
+val to_yojson : t -> Yojson.Basic.json
+val of_yojson : Yojson.Basic.json -> t
 
 val check_if_counter_is_filled_enough : Counter.t -> t -> unit
 

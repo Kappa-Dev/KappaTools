@@ -29,6 +29,41 @@ let print_id_internal_state sigs find_ty n =
   Signature.print_site_internal_state
     sigs (match n with Existing id -> find_ty id | Fresh (_,ty) -> ty)
 
+let id_up_to_alpha_to_yojson = function
+  | Existing i -> `Int i
+  | Fresh f -> Agent.to_json f
+let id_up_to_alpha_of_yojson = function
+  | `Int i -> Existing i
+  | x -> Fresh (Agent.of_json x)
+
+let port_to_yojson (a,s) = `List [id_up_to_alpha_to_yojson a; `Int s]
+let port_of_yojson = function
+  | `List [ a; `Int s] -> (id_up_to_alpha_of_yojson a,s)
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect navigation port",x))
+
+let arrow_to_yojson = function
+  | ToNode p -> port_to_yojson p
+  | ToNothing -> `Null
+  | ToInternal i -> `Int i
+let arrow_of_yojson = function
+  | `Null -> ToNothing
+  | `Int i -> ToInternal i
+  | x -> ToNode (port_of_yojson x)
+
+let step_to_yojson (p,a) = `List [port_to_yojson p; arrow_to_yojson a]
+let step_of_yojson = function
+  | `List [ p ; a ] ->
+    (port_of_yojson p, arrow_of_yojson a)
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect navigation step",x))
+
+let to_yojson l = `List (List.map step_to_yojson l)
+let of_yojson = function
+  | `List l -> List.map step_of_yojson l
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect navigation",x))
+
 let extend f = function
   | Existing _ -> f
   | Fresh (id,ty) -> fun x -> if x = id then ty else f x

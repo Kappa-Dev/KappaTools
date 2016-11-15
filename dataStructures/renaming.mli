@@ -39,3 +39,6 @@ val print : Format.formatter -> t -> unit
 (** prints only non identity points *)
 
 val print_full : Format.formatter -> t -> unit
+
+val to_yojson : t -> Yojson.Basic.json
+val of_yojson : Yojson.Basic.json -> t

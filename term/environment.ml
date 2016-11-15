@@ -192,12 +192,12 @@ let dummy_kappa_instance _ =
           f "KAPPA_INSTANCE not translated in json") in
   `Null
 
-let to_json env =
+let to_yojson env =
   let () =
     ExceptionDefn.warning
       (fun f -> Format.pp_print_string f "Environment.to_json is partial") in
   `Assoc [
-    "signatures", Signature.to_json (signatures env);
+    "update", Pattern.Env.to_yojson (domain env);
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
       (fun (x,_) ->
@@ -226,15 +226,11 @@ let kappa_instance_of_dummy = function
   | `Null -> []
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct kappa instance",x))
 
-let of_json = function
+let of_yojson = function
   | `Assoc l as x when List.length l = 5 ->
     begin
       try
-        { domain =
-            Pattern.PreEnv.finalize
-              (Pattern.minimal_env
-                 (Signature.of_json (List.assoc "signatures" l)) [||])
-        (*TODO*);
+        { domain = Pattern.Env.of_yojson (List.assoc "update" l);
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
               (fun x -> Location.dummy_annot

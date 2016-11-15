@@ -22,7 +22,7 @@ let finalize
         (fun c ->
            let () = Yojson.Basic.to_channel c
                (`Assoc [
-                   "env", Environment.to_json env;
+                   "env", Environment.to_yojson env;
                    "trace", Trace.to_json trace]) in
            output_char c '\n') in
     match stories_compression with
@@ -71,11 +71,6 @@ let () =
       | None -> ()
       | Some marshalizeOutFile ->
         Kappa_files.set_marshalized marshalizeOutFile
-    in
-    let () = match kasim_args.Kasim_args.domainOutputFile with
-      | None -> ()
-      | Some domainOutputFile ->
-        Kappa_files.set_ccFile domainOutputFile
     in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in
@@ -150,8 +145,11 @@ let () =
           Kappa_printer.env env
           Pattern.Env.print (Environment.domain env)
           (Rule_interpreter.print env) graph in
-    let () = Kappa_files.with_ccFile
-        (fun f -> Pattern.Env.print_dot f (Environment.domain env)) in
+    let () = match kasim_args.Kasim_args.domainOutputFile with
+      | None -> ()
+      | Some domainOutputFile ->
+        Yojson.Basic.to_file (Kappa_files.path domainOutputFile)
+          (Pattern.Env.to_yojson (Environment.domain env)) in
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then let () = remove_trace () in exit 0 else ();
 

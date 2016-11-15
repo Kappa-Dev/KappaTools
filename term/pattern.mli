@@ -29,7 +29,9 @@ module Env : sig
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
   val print : Format.formatter -> t -> unit
-  val print_dot : Format.formatter -> t -> unit
+
+  val to_yojson : t -> Yojson.Basic.json
+  val of_yojson : Yojson.Basic.json -> t
 end
 
 module PreEnv : sig

@@ -91,3 +91,23 @@ let print_full f i =
     (Pp.set Mods.IntMap.bindings Pp.comma
        (fun f (src,dst) -> if src<>dst then Format.fprintf f "%i->%i" src dst
          else Format.pp_print_int f src)) i.sigma
+
+let to_yojson i =
+  `List
+    (Mods.IntMap.fold
+       (fun src dst acc -> `List [`Int src; `Int dst] :: acc)
+       i.sigma [])
+
+let of_yojson = function
+  | `List l ->
+    List.fold_left (fun r -> function
+        | `List [ `Int src; `Int dst ] as x ->
+          begin match add src dst r with
+            | Some r' -> r'
+            | None ->
+              raise (Yojson.Basic.Util.Type_error ("Incorrect renaming item",x))
+          end
+        | x ->
+          raise (Yojson.Basic.Util.Type_error ("Incorrect renaming item",x))
+      ) empty l
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect renaming",x))

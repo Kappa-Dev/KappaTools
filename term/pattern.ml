@@ -11,7 +11,7 @@ type cc = {
   internals: int array Mods.IntMap.t;
   (*internal state id -> [|... state_j...|]
     i.e agent_id on site_j has internal state state_j (-1 means any) *)
-  recogn_nav: Navigation.step list;
+  recogn_nav: Navigation.t;
 }
 
 type t = cc
@@ -565,7 +565,7 @@ module Env : sig
     max_obs: int;
     domain: point array;
     elementaries: (Navigation.step * id) list array array;
-    single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
+    single_agent_points: (id*Operator.DepSet.t) option array;
   }
 
   val get : t -> int -> point
@@ -575,7 +575,8 @@ module Env : sig
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
   val print : Format.formatter -> t -> unit
-  val print_dot : Format.formatter -> t -> unit
+  val to_yojson : t -> Yojson.Basic.json
+  val of_yojson : Yojson.Basic.json -> t
 end = struct
   type transition = {
     next: Navigation.t;
@@ -596,7 +597,7 @@ end = struct
     max_obs: int;
     domain: point array;
     elementaries: (Navigation.step * id) list array array;
-    single_agent_points: (id*Operator.DepSet.t) Mods.IntMap.t;
+    single_agent_points: (id*Operator.DepSet.t) option array;
   }
 
   let signatures env = env.sig_decl
@@ -626,32 +627,114 @@ end = struct
       env.domain
 
   let get_single_agent ty env =
-    Mods.IntMap.find_option ty env.single_agent_points
+    env.single_agent_points.(ty)
 
   let get env cc_id = env.domain.(cc_id)
 
-  let print_sons_dot sigs cc_id cc f sons =
-    Pp.list Pp.space ~trailing:Pp.space
-      (fun f son -> Format.fprintf
-          f "@[cc%i -> cc%i [label=\"%a %a\"];@]" cc_id son.dst
-          (Navigation.print sigs (find_ty cc)) son.next
-          Renaming.print son.inj)
-      f sons
+  let transition_to_yojson t =
+    `Assoc [
+      "dst", `Int t.dst;
+      "inj", Renaming.to_yojson t.inj;
+      "nav", Navigation.to_yojson t.next;
+    ]
+  let transition_of_yojson = function
+    | `Assoc [ "dst", `Int dst; "inj", r; "nav", n ]
+    | `Assoc [ "dst", `Int dst; "nav", n; "inj", r ]
+    | `Assoc [ "inj", r; "nav", n; "dst", `Int dst ]
+    | `Assoc [ "nav", n; "inj", r; "dst", `Int dst ]
+    | `Assoc [ "inj", r; "dst", `Int dst; "nav", n ]
+    | `Assoc [ "nav", n; "dst", `Int dst; "inj", r ] ->
+      { dst; inj = Renaming.of_yojson r; next = Navigation.of_yojson n; }
+    | x ->
+      raise (Yojson.Basic.Util.Type_error ("Incorrect transition",x))
 
-  let print_point_dot sigs f (id,point) =
-    let style =
-      if Operator.DepSet.is_empty point.deps then "octagon" else "box" in
-    Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-      id (print_cc ~sigs ?cc_id:None) point.content
-      style (print_sons_dot sigs id point.content) point.sons
+  let point_to_yojson sigs p =
+    `Assoc [
+      "content",`String
+        (Format.asprintf "%a@." (print_cc ~sigs ?cc_id:None) p.content);
+      "roots", `List (List.map Agent.to_json p.roots);
+      "deps", `Bool (not @@ Operator.DepSet.is_empty p.deps);
+      "sons", `List (List.map transition_to_yojson p.sons);
+    ]
 
-  let print_dot f env =
-    let () = Format.fprintf f "@[<v>strict digraph G {@," in
-    let () =
-      Pp.array
-        ~trailing:Pp.space Pp.space
-        (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
-    Format.fprintf f "}@]@."
+  let point_of_yojson = function
+    | `Assoc l as x when List.length l = 4 ->
+      begin
+        try {
+          content =
+            {nodes_by_type = [||]; recogn_nav = [];
+             links = Mods.IntMap.empty; internals = Mods.IntMap.empty;};
+          roots = (match List.assoc "roots" l with
+              | `List l -> List.map Agent.of_json l | _ -> raise Not_found);
+          deps = Operator.DepSet.empty;
+          sons = (match List.assoc "sons" l with
+              | `List l -> List.map transition_of_yojson l
+              | _ -> raise Not_found);
+        }
+        with Not_found ->
+          raise (Yojson.Basic.Util.Type_error ("Incorrect domain point",x))
+      end
+    | x ->
+      raise (Yojson.Basic.Util.Type_error ("Incorrect domain point",x))
+
+  let to_yojson env =
+    `Assoc [
+      "signatures", Signature.to_json env.sig_decl;
+      "single_agents", `List
+        (Array.fold_right (fun x acc ->
+             (match x with None -> `Null | Some (id,_deps) -> `Int id)::acc)
+            env.single_agent_points []);
+      "elementaries", `List
+        (Array.fold_right (fun x acc ->
+             `List (Array.fold_right (fun x acc ->
+                 `List (List.map (fun (st,d) ->
+                     `List [Navigation.step_to_yojson st; `Int d]) x)
+                 ::acc) x [])
+             ::acc)
+            env.elementaries []);
+      "dag", `List
+        (Array.fold_right (fun x acc ->
+             (point_to_yojson env.sig_decl x)::acc) env.domain []);
+    ]
+
+  let of_yojson = function
+    | `Assoc l as x when List.length l = 4 ->
+      begin try
+          {
+            sig_decl = Signature.of_json (List.assoc "signatures" l);
+            single_agent_points = (match List.assoc "single_agents" l with
+                | `List l  ->
+                  Tools.array_map_of_list
+                    (Yojson.Basic.Util.to_option
+                       (function `Int i -> (i,Operator.DepSet.empty)
+                               | x ->
+                                 raise (Yojson.Basic.Util.Type_error
+                                          ("Wrong single_agent",x)))
+                    ) l
+                | _ -> raise Not_found);
+            elementaries = (match List.assoc "elementaries" l with
+                | `List l  ->
+                  Tools.array_map_of_list (function
+                      | `List l -> Tools.array_map_of_list (function
+                          | `List l -> List.map (function
+                              | `List [s; `Int d] ->
+                                (Navigation.step_of_yojson s,d)
+                              | _ -> raise Not_found) l
+                          | _ -> raise Not_found) l
+                      | _ -> raise Not_found) l
+                | _ -> raise Not_found);
+            domain =  (match List.assoc "dag" l with
+                | `List l  ->
+                  Tools.array_map_of_list point_of_yojson l
+                | _ -> raise Not_found);
+            id_by_type = [||];
+            max_obs = -1;
+          }
+        with Not_found ->
+          raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
+      end
+    | x ->
+      raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
 
   let new_obs_map env f = Mods.DynArray.init env.max_obs f
 end
@@ -1098,16 +1181,18 @@ end = struct
         complete_domain in
     let level0 = Mods.IntMap.find_default [] 0 complete_domain in
     let single_agent_points =
-      List.fold_left
-        (fun acc p ->
+      Array.make (Array.length env.id_by_type) None in
+    let () =
+      List.iter
+        (fun p ->
            match find_root p.element with
-           | None -> acc
+           | None -> ()
            | Some (_,ty) ->
              let () = domain.(p.p_id) <-
                  { Env.content = p.element; Env.roots = p.roots;
                    Env.deps = p.depending; Env.sons = []; } in
-             Mods.IntMap.add ty (p.p_id,p.depending) acc)
-        Mods.IntMap.empty level0 in
+             single_agent_points.(ty) <- Some (p.p_id,p.depending))
+        level0 in
     {
       Env.sig_decl = env.sig_decl;
       Env.id_by_type = env.id_by_type;

@@ -1,7 +1,6 @@
 let outputDirName = ref ""
 let marshalizedOutFile = ref ""
 let snapshotFileName = ref "snap"
-let ccFileName = ref ""
 let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
@@ -65,7 +64,6 @@ let set name ext_opt =
 let setOutputName () =
   set snapshotFileName (Some "dot");
   set influenceFileName (Some "dot") ;
-  set ccFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
   set odeFileName (Some "m") ;
   set marshalizedOutFile None;
@@ -183,6 +181,3 @@ let set_up_influence () =
   set_influence
     (if !influenceFileName = "" then "im.dot" else !influenceFileName)
 let with_influence f = with_formatter !influenceFileName f
-
-let set_ccFile f = ccFileName := f
-let with_ccFile f = with_formatter !ccFileName f

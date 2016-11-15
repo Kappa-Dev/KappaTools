@@ -31,7 +31,7 @@ let server_mode () =
       | `Json json ->
         begin
           try
-            let env = Environment.of_json (Yojson.Basic.Util.member "env" json) in
+            let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
             let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
             let none = match Yojson.Basic.Util.to_bool_option
                                (Yojson.Basic.Util.member "none" json)
@@ -79,7 +79,7 @@ let main () =
         "+ Loading trace@." in
     let json = Yojson.Basic.from_channel desc in
     let () = close_in desc in
-    let env = Environment.of_json (Yojson.Basic.Util.member "env" json) in
+    let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
     let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
     let dotFormat = if (!dotCflows) then Ast.Dot else Ast.Html in
     Compression_main.compress_and_print

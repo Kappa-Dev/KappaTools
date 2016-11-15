@@ -15,6 +15,12 @@ type t = step list
 val print : Signature.s -> (int -> int) -> Format.formatter -> t -> unit
 (** [print signatures find_existing_type nav] *)
 
+val step_to_yojson : step -> Yojson.Basic.json
+val step_of_yojson : Yojson.Basic.json -> step
+
+val to_yojson : t -> Yojson.Basic.json
+val of_yojson : Yojson.Basic.json -> t
+
 val rename : Renaming.t -> t -> Renaming.t * t
 
 val compatible_point : Renaming.t -> step -> step -> Renaming.t option
