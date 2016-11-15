@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 14 2016>
+   * Last modification: Time-stamp: <Nov 15 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1730,7 +1730,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
-    let pair_list = (domain_name, current_list1) :: constraint_list in
+    let pair_list = (domain_name, List.rev current_list1) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraints_list pair_list kasa_state
     in
@@ -1748,7 +1748,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
-    let pair_list = (domain_name, current_list2) :: internal_constraints_list in
+    let pair_list = (domain_name, List.rev current_list2) :: internal_constraints_list in
     let kasa_state =
       Remanent_state.set_internal_constraints_list pair_list kasa_state in
     error, dynamic, kasa_state
