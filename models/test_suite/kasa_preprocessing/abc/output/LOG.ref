@@ -1414,15 +1414,15 @@ A(c!1),C(x2!1) =>
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 A(c!1),C(x2!1)=> [
 		  A(c!1,x!B.x),C(x1,x2!1)
 		v A(c!1,x!B.x),C(x1!A.c,x2!1)
 		v A(c!1,x),C(x1,x2!1)]
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
 
 execution finished without any exception

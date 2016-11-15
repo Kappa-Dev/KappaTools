@@ -558,6 +558,10 @@ struct
               | Some Free
               | Some Wildcard
               | Some Bound_to_unknown -> `Null
+(* No, you have to distinguish among these cases *)
+(* For instance `Assoc [free,`Null] `Assoc [wildcard,`Null] `Assoc [bound_to_unknown,`Null]) *)
+(* free, wildcard, bound_to_unknown are strings. *)
+(* It is better to use string names, instead of strings so as to avoid mispelling *)
               | Some (Bound_to i) ->
                 `Assoc ["binding id", JsonUtil.of_int i]
               | Some (Binding_type (agent_name, site_name)) ->
@@ -577,7 +581,6 @@ struct
   let binding_opt_of_json
       ?error_msg:(error_msg = "Not an option binding of json") =
     function
-    | x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x))
     | `Assoc [s, json] ->
       if s = free then Free
       else if s = wildcard then Wildcard
@@ -610,6 +613,7 @@ struct
         Binding_type (agent_name, site_name)
       else
         assert false (* FIXME *)
+    | x ->  raise (Yojson.Basic.Util.Type_error (error_msg, x))
 
 
   let string_version_to_json string_version =

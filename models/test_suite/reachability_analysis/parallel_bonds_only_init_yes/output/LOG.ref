@@ -728,17 +728,17 @@ A(t!1),B(t!1) =>
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t!1),B(t!1)=> [
-		  A(t!1,z!B.z),B(t!1,z!A.z)
-		v A(t!1,z),B(t!1,z)]
 A(z!1),B(z!1)=> [
 		  A(t!B.t,z!1),B(t!A.t,z!1)
 		v A(t,z!1),B(t,z!1)]
+A(t!1),B(t!1)=> [
+		  A(t!1,z!B.z),B(t!1,z!A.z)
+		v A(t!1,z),B(t!1,z)]
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
 
 execution finished without any exception

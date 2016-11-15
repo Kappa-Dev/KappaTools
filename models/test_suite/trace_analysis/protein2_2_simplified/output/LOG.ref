@@ -45,14 +45,6 @@ K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-
 execution finished without any exception
 Parsing protein2x2.ka...
 done
@@ -101,12 +93,4 @@ K() => [ K(x) v K(x!P.g) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-
 execution finished without any exception

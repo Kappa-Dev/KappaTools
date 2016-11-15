@@ -843,11 +843,11 @@ B() => [ B(x~u) ]
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
+* Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
+* Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 execution finished without any exception

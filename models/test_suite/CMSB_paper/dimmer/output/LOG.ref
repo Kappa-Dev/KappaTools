@@ -58,25 +58,4 @@ R(c!1),R(c!1) =>
 ------------------------------------------------------------
 R(c!R.c,cr!R.n) => R(c!1,cr!2),R(c!1,n!2)
 R(c!R.c,n!R.cr) => R(c!1,n!2),R(c!1,cr!2)
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-R(c!R.c,n!R.cr)=> [R(c!1,n!2),R(c!1,cr!2)]
-R(c!R.c,cr!R.n)=> [R(c!1,cr!2),R(c!1,n!2)]
-
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-R(c!1),R(c!1)=> [
-		  R(c!1,n!R.cr),R(c!1,n)
-		v R(c!1,n),R(c!1,n)
-		v R(c!1,n),R(c!1,n!R.cr)]
-R(c!1),R(c!1)=> [
-		  R(c!1,cr!R.n),R(c!1,n!R.cr)
-		v R(c!1,cr),R(c!1,n)]
-R(c!1),R(c!1)=> [
-		  R(c!1,cr!R.n),R(c!1,cr)
-		v R(c!1,cr),R(c!1,cr)
-		v R(c!1,cr),R(c!1,cr!R.n)]
-
 execution finished without any exception

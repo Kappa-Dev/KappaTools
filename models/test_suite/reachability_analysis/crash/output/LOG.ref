@@ -439,11 +439,11 @@ C() => [ C(z) v C(z!C.z) v C(z!C.t) ]
 * Properties of pairs of bonds
 ------------------------------------------------------------
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
+* Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
+* Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 Some exceptions have been raised

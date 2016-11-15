@@ -670,11 +670,11 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 ------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
+* Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
+* Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
 execution finished without any exception
