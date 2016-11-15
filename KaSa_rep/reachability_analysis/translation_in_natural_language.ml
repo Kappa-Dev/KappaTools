@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Nov 14 2016>
+ * Last modification: Time-stamp: <Nov 15 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -26,15 +26,6 @@ type rename_sites =
    Exception.method_handler ->
    Ckappa_sig.Site_map_and_set.Map.elt ->
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
-
-module Triple_pair_list_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = Ckappa_backend.Ckappa_backend.triple_pair_list
-         let compare = compare
-         let print _ _ = ()
-       end))
 
 (****************************************************************************)
 
@@ -1299,7 +1290,7 @@ let convert_views_constraints_list
 (*****************************************************************************)
 (*store the print function*)
 
-let add_state_into_t parameters error handler_kappa agent_id site_type state
+(*let add_state_into_t parameters error handler_kappa agent_id site_type state
   t store_set =
   let error, t' =
     Ckappa_backend.Ckappa_backend.add_state
@@ -1307,10 +1298,10 @@ let add_state_into_t parameters error handler_kappa agent_id site_type state
       agent_id site_type state
       t
   in
-  let error, (internal_list, bound_to_list, binding_list) =
+  (*let error, (internal_list, bound_to_list, binding_list) =
     Ckappa_backend.Ckappa_backend.print_store_views
       error handler_kappa t
-  in
+  in*)
   let error, store_set =
     Triple_pair_list_map_and_set.Set.add_when_not_in
       parameters error
@@ -1338,7 +1329,7 @@ let error, store_set =
     store_set1
     store_set2
 in
-error, store_set
+error, store_set*)
 
 (*****************************************************************************)
 

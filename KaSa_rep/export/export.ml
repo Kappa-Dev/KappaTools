@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 14 2016>
+  * Last modification: Time-stamp: <Nov 15 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -964,7 +964,6 @@ let get_contact_map =
       get_internal_contact_map
       convert_contact_map
 
-
 (******************************************************************)
 
 let compute_signature show_title state =
@@ -1174,7 +1173,6 @@ let output_constraints_list ?logger state l =
   state
 
 let print_internal_constraints_list ?logger state l =
-  (*let state, _ = get_reachability_analysis state in*)
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
@@ -1211,12 +1209,14 @@ let get_internal_constraints_list x y =
 let empty_internal_constraints_list = []
 
 let get_constraints_list_to_json state =
-  let state, constraints_list = get_constraints_list "Extract refinement lemmas" state in
+  let state, constraints_list =
+    get_constraints_list "Extract refinement lemmas" state in
   state, Remanent_state.constraints_list_to_json constraints_list
 
 (******************************************************************)
 
-let get_internal_constraints_list = get_internal_constraints_list "Extract refinement lemmas"
+let get_internal_constraints_list =
+  get_internal_constraints_list "Extract refinement lemmas"
 
 let output_internal_constraints_list ?logger (state:state) =
   let state, constraints_list = get_internal_constraints_list state in

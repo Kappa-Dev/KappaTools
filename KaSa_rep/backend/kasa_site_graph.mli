@@ -2,7 +2,6 @@ module type Site_graph =
 sig
   type t
 
-
   type agent_id
   type bond_index
 
@@ -13,22 +12,6 @@ sig
 
   val int_of_bond_index : bond_index -> int
   val bond_index_of_int : int -> bond_index
-
-(*TODO*)
-  type internal_list = (Ckappa_sig.agent_name *
-                        Wrapped_modules.LoggedStringMap.elt *
-                        Ckappa_sig.internal_state) list
-
-  type bound_to_list =
-    (Ckappa_sig.agent_name * Wrapped_modules.LoggedStringMap.elt * bond_index)
-      list
-
-  type binding_list = (Ckappa_sig.agent_name *
-                       Wrapped_modules.LoggedStringMap.elt *
-                       (Ckappa_sig.agent_name * Ckappa_sig.site_name)) list
-
-  type triple_pair_list =
-    internal_list * bound_to_list * binding_list
 
   val empty: t
 
@@ -105,11 +88,6 @@ sig
     (string option * binding_state option)
       Wrapped_modules.LoggedStringMap.t -> bool -> bool
 
-  val print_store_views:
-    Exception.method_handler ->
-    Cckappa_sig.kappa_handler ->
-    t -> Exception.method_handler * triple_pair_list
-
   val print_list:
     Loggers.t ->
     Remanent_parameters_sig.parameters ->
@@ -120,7 +98,7 @@ sig
   val to_json:
     t -> Yojson.Basic.json
 
-  type string_version = 
+  type string_version =
       (string *
      (string option * binding_state option)
        Wrapped_modules.LoggedStringMap.t) list
