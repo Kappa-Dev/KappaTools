@@ -683,7 +683,6 @@ let pretty_print
            error,log_info,(x,y)::list)
         (error,log_info,[]) grid_list
     in
-    let grid_list = List.rev grid_list in
     let story_list = List.rev story_list in
     let _ =
       List.fold_left
