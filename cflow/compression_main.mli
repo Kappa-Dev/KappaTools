@@ -14,6 +14,6 @@ val build_parameter :
 val get_logger : secret_parameter -> Loggers.t
 
 val compress_and_print :
-  secret_parameter -> dotFormat:Ast.formatCflow ->
+  secret_parameter -> dotFormat:Causal.formatCflow ->
   ?js_interface:Cflow_js_interface.cflow_state ref ->
   Environment.t -> secret_log_info -> Trace.t -> unit

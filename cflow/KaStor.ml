@@ -1,5 +1,5 @@
 let file = ref ""
-let dotCflows = ref Ast.Dot
+let dotCflows = ref Causal.Dot
 let none_compression = ref false
 let weak_compression = ref false
 let strong_compression = ref false
@@ -21,9 +21,9 @@ let options = [
    "Outputs strongly compressed stories");
   ("-format", Arg.String
                 (function
-                   "true" | "yes" | "dot" -> dotCflows := Ast.Dot
-                   |"false" | "no" | "html" -> dotCflows := Ast.Html
-                   | "json" -> dotCflows := Ast.Json
+                   "true" | "yes" | "dot" -> dotCflows := Causal.Dot
+                   |"false" | "no" | "html"-> dotCflows := Causal.Html
+                   |"json" -> dotCflows := Causal.Json
                    | _ as error  ->
                       raise
                         (ExceptionDefn.Malformed_Decl
@@ -58,7 +58,7 @@ let server_mode () =
                 ~called_from:Remanent_parameters_sig.Server
                 ~none ~weak ~strong in
             Compression_main.compress_and_print
-              parameter ~dotFormat:Ast.Html
+              parameter ~dotFormat:Causal.Html
               env (Compression_main.init_secret_log_info ())
               steps
           with Yojson.Basic.Util.Type_error (e,x) ->

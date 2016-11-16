@@ -49,7 +49,6 @@ let we_shall_not = (fun _ -> false)
 let we_shall = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
-
 let compress_and_print
     parameter ~dotFormat ?js_interface env log_info step_list =
   (*let called_from = Remanent_parameters_sig.Server in*)

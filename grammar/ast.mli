@@ -1,10 +1,5 @@
 (** Kappa AST just after parsing *)
 
-type formatCflow =
-  | Dot
-  | Html
-  | Json
-
 type ('a,'annot) link =
   | LNK_VALUE of int * 'annot
   | FREE

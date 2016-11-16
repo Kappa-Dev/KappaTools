@@ -38,6 +38,10 @@ type enriched_grid =
     depth_of_event: int Mods.IntMap.t ;
     size:int;
   }
+type formatCflow =
+  | Dot
+  | Html
+  | Json
 
 val empty_grid : unit -> grid
 
@@ -99,7 +103,7 @@ val fold_over_causal_past_of_obs :
 
 val debug_print_grid : Format.formatter -> grid -> unit
 val pretty_print :
-  dotFormat:Ast.formatCflow ->
+  dotFormat:formatCflow ->
   Remanent_parameters_sig.parameters ->
   'a ->
   StoryProfiling.StoryStats.log_info ->

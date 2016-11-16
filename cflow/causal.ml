@@ -41,6 +41,10 @@ type enriched_grid =
     depth_of_event: int Mods.IntMap.t ;
     size:int;
   }
+type formatCflow =
+  | Dot
+  | Html
+  | Json
 
 let empty_config =
   { events_kind = Mods.IntMap.empty;
@@ -697,7 +701,7 @@ let pretty_print
            in
            let () =   (*dump grid fic state env ; *)
              match dotFormat with
-             | Ast.Dot ->
+             | Dot ->
                 let profiling desc =
                   Format.fprintf
                     desc "/* @[Compression of %d causal flows" n;
@@ -712,7 +716,7 @@ let pretty_print
                 Kappa_files.with_cflow_file
                   [compression_type;string_of_int cpt] "dot"
                   (dot_of_grid profiling env enriched_config)
-             | Ast.Json ->
+             | Json ->
                 let (grid_story,_) = List.nth grid_list cpt in
                 let filename = Kappa_files.get_cflow
                                  [compression_type;(string_of_int cpt)] "json"
@@ -720,7 +724,7 @@ let pretty_print
                 Yojson.Basic.to_file
                   filename
                   (json_of_grid enriched_config grid_story env)
-             | Ast.Html ->
+             | Html ->
                 let profiling desc =
                   Format.fprintf
                     desc
