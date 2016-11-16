@@ -1,5 +1,4 @@
 .DEFAULT_GOAL := all
-TEMPDIR := $(shell mktemp -d)
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
 MANREP= man/
@@ -107,12 +106,14 @@ site/external: site
 	mkdir -p $@
 
 site/external/bootstrap-3.3.5-dist:
-	curl -LsS -o $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
-	unzip -d site/external $(TEMPDIR)/bootstrap.zip
+	FILE=$$(mktemp -t bootstrapXXXX); \
+	curl -LsS -o $$FILE   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip && \
+	unzip -d site/external $$FILE && rm $$FILE
 
 site/external/codemirror-5.20.2:
-	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror-5.20.2.zip ;\
-	unzip -d site/external $(TEMPDIR)/codemirror.zip
+	FILE=$$(mktemp -t codemirrorXXXX); \
+	curl -LsS -o $$FILE  http://codemirror.net/codemirror-5.20.2.zip &&\
+	unzip -d site/external $$FILE && rm $$FILE
 
 site/external/d3:
 	mkdir -p $@ ;\
