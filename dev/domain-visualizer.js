@@ -18,7 +18,7 @@ var set_rootSelect = function () {
 	    l.forEach(function (v) {
 		var opt = document.createElement('option');
 		opt.value = v[1];
-		opt.innerHTML = domain.dag[v[1]].content;
+		opt.innerHTML = JSON.stringify(domain.dag[v[1]].content);
 		rootSelectDom.appendChild(opt);
 	    })
 	})
@@ -45,7 +45,7 @@ var dealWithFiles = function (files) {
 
 var addToGraph = function (cache,g,i) {
     if (cache.every(function (v) { return v !== i ; })) {
-	g.setNode(i, {label: domain.dag[i].content,
+	g.setNode(i, {label: JSON.stringify(domain.dag[i].content),
 		      style: "fill: #eee"});
 	domain.dag[i].sons.forEach(function (s) {
 	    addToGraph(cache,g,s.dst);

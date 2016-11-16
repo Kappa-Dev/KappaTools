@@ -335,6 +335,99 @@ let print_cc ?sigs ?cc_id f cc =
          true,out) cc.links (false,(1,Mods.Int2Map.empty)) in
   Format.pp_close_box f ()
 
+let to_yojson cc =
+  match Mods.IntMap.max_key cc.links with
+  | None -> `Null
+  | Some m ->
+    let s = succ m in
+    let sorts = Array.make s None in
+    let () =
+      Array.iteri
+        (fun ty -> List.iter (fun id -> sorts.(id) <- Some ty))
+        cc.nodes_by_type in
+    `Assoc [
+      "sorts",
+      `List
+        (Array.fold_right
+           (fun x acc -> (match x with None -> `Null | Some i -> `Int i)::acc)
+           sorts []);
+      "links",
+      `List (Tools.recti
+               (fun acc i -> (match Mods.IntMap.find_option i cc.links with
+                    | None -> `Null
+                    | Some a ->
+                      `List (Array.fold_right
+                               (fun x acc -> (match x with
+                                    | Free -> `Bool true
+                                    | Link (n,s) ->
+                                      `Assoc ["node",`Int n;"site",`Int s]
+                                    | UnSpec -> `Bool false)::acc)
+                               a []))::acc)
+               [] s);
+      "states",
+      `List (Tools.recti
+               (fun acc i -> (match Mods.IntMap.find_option i cc.internals with
+                    | None -> `Null
+                    | Some a ->
+                      `List (Array.fold_right
+                               (fun x acc ->
+                                  (if x < 0 then `Null else `Int x)::acc)
+                               a []))::acc)
+               [] s);
+
+    ]
+
+let of_yojson sig_decl = function
+  | `Assoc ["sorts",`List s;"links",`List l;"states",`List i]
+  | `Assoc ["sorts",`List s;"states",`List i;"links",`List l]
+  | `Assoc ["links",`List l;"sorts",`List s;"states",`List i]
+  | `Assoc ["states",`List i;"sorts",`List s;"links",`List l]
+  | `Assoc ["links",`List l;"states",`List i;"sorts",`List s]
+  | `Assoc ["states",`List i;"links",`List l;"sorts",`List s] ->
+    let _,links =
+      List.fold_left
+        (fun (i,acc) -> function
+           | `Null -> (succ i,acc)
+           | `List l ->
+             (succ i,
+              Mods.IntMap.add i
+                (Tools.array_map_of_list (function
+                     | `Bool b -> if b then Free else UnSpec
+                     | `Assoc ["node",`Int n;"site",`Int s]
+                     | `Assoc ["site",`Int s;"node",`Int n] -> Link (n,s)
+                     | x ->
+                       raise (Yojson.Basic.Util.Type_error ("Invalid link",x))
+                   ) l) acc)
+           | x -> raise (Yojson.Basic.Util.Type_error ("Invalid node links",x)))
+    (0,Mods.IntMap.empty) l in
+    let _,internals =
+      List.fold_left
+        (fun (i,acc) -> function
+           | `Null -> (succ i,acc)
+           | `List l ->
+             (succ i,
+              Mods.IntMap.add i
+                (Tools.array_map_of_list (function
+                     | `Null -> -1
+                     | `Int i -> i
+                     | x ->
+                       raise (Yojson.Basic.Util.Type_error ("Invalid link",x))
+                   ) l) acc)
+           | x -> raise (Yojson.Basic.Util.Type_error ("Invalid node links",x)))
+        (0,Mods.IntMap.empty) i in
+    let nodes_by_type = Array.make (Signature.size sig_decl) [] in
+    let () =
+      List.iteri (fun i -> function
+          | `Null -> ()
+          | `Int ty -> nodes_by_type.(ty) <- i :: nodes_by_type.(ty)
+          | x -> raise (Yojson.Basic.Util.Type_error ("Wrong node type",x)))
+        s in
+    {nodes_by_type;links;internals;
+     recogn_nav = raw_to_navigation false nodes_by_type internals links}
+  | `Null -> empty_cc sig_decl
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a pattern",x))
+
+
 let add_fully_specified_to_graph sigs graph cc =
   let e,g =
     Tools.array_fold_lefti
@@ -648,22 +741,19 @@ end = struct
     | x ->
       raise (Yojson.Basic.Util.Type_error ("Incorrect transition",x))
 
-  let point_to_yojson sigs p =
+  let point_to_yojson p =
     `Assoc [
-      "content",`String
-        (Format.asprintf "%a@." (print_cc ~sigs ?cc_id:None) p.content);
+      "content",to_yojson p.content;
       "roots", `List (List.map Agent.to_json p.roots);
       "deps", `Bool (not @@ Operator.DepSet.is_empty p.deps);
       "sons", `List (List.map transition_to_yojson p.sons);
     ]
 
-  let point_of_yojson = function
+  let point_of_yojson sig_decl = function
     | `Assoc l as x when List.length l = 4 ->
       begin
         try {
-          content =
-            {nodes_by_type = [||]; recogn_nav = [];
-             links = Mods.IntMap.empty; internals = Mods.IntMap.empty;};
+          content = of_yojson sig_decl (List.assoc "content" l);
           roots = (match List.assoc "roots" l with
               | `List l -> List.map Agent.of_json l | _ -> raise Not_found);
           deps = Operator.DepSet.empty;
@@ -694,14 +784,16 @@ end = struct
             env.elementaries []);
       "dag", `List
         (Array.fold_right (fun x acc ->
-             (point_to_yojson env.sig_decl x)::acc) env.domain []);
+             (point_to_yojson x)::acc) env.domain []);
     ]
 
   let of_yojson = function
     | `Assoc l as x when List.length l = 4 ->
-      begin try
+      begin
+        let sig_decl = Signature.of_json (List.assoc "signatures" l) in
+        try
           {
-            sig_decl = Signature.of_json (List.assoc "signatures" l);
+            sig_decl;
             single_agent_points = (match List.assoc "single_agents" l with
                 | `List l  ->
                   Tools.array_map_of_list
@@ -725,7 +817,7 @@ end = struct
                 | _ -> raise Not_found);
             domain =  (match List.assoc "dag" l with
                 | `List l  ->
-                  Tools.array_map_of_list point_of_yojson l
+                  Tools.array_map_of_list (point_of_yojson sig_decl) l
                 | _ -> raise Not_found);
             id_by_type = [||];
             max_obs = -1;
