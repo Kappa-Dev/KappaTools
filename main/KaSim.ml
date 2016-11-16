@@ -32,7 +32,7 @@ let finalize
       let args = if none then "--none" :: args else args in
       let args = if weak then "--weak" :: args else args in
       let args = if strong then "--strong" :: args else args in
-      let args = if dotFormat = Ast.Dot then args else "--html" :: args in
+      let args = "-format" :: dotFormat :: args in
       let args = match cflow_file with
         | None -> args
         | Some f -> "-o" :: f :: args in

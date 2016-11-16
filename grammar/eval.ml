@@ -444,20 +444,10 @@ let configurations_of_result result =
             ) Parameter.maxConsecutiveClash in
         acc
       | "dotCflows" ->
-         let formatCflow = get_value pos_p param value_list
-            (fun v p -> match v with
-                        | "true" | "yes" | "dot" -> Dot
-                        |"false" | "no" | "html" -> Html
-                        | "json" -> Json
-                        | _ as error  ->
-                           raise
-                             (ExceptionDefn.Malformed_Decl
-                                ("Value "^error^
-                                   " should be either \"html, dot\" or \"json\"", p))
-            ) in
+         let formatCflow = get_value pos_p param value_list (fun v _ -> v) in
          (unary_dist,story_compression,formatCflow,cflowFile)
 (*         if get_bool_value pos_p param value_list then
-           (unary_dist,story_compression, Dot) else 
+           (unary_dist,story_compression, Dot) else
            (unary_dist,story_compression, Html)*)
       | "colorDot" ->
         let () = set_value pos_p param value_list
@@ -476,7 +466,7 @@ let configurations_of_result result =
         acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) (None,(false,false,false), Dot, None) result.configurations
+    ) (None,(false,false,false), "dot", None) result.configurations
 
 let compile_alg_vars contact_map domain vars =
   Tools.array_fold_left_mapi

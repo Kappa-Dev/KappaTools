@@ -20,7 +20,7 @@ val compile_modifications_no_track:
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Environment.t * (bool*bool*bool) option *
-          bool option * Ast.formatCflow * string option (*cflowFile*) *
+          bool option * string (*cflowFormat*) * string option (*cflowFile*) *
           (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Signature.contact_map ->

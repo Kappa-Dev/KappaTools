@@ -54,7 +54,7 @@ let get_compilation ?max_event cli_args =
             unary_distances,formatCflow,cflowFile,init_l =
           (Marshal.from_channel d :
              Environment.t*Signature.contact_map*int list*
-             (bool*bool*bool) option*bool option*Ast.formatCflow*string option*
+             (bool*bool*bool) option*bool option*string*string option*
              (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
         let () = Pervasives.close_in d  in
         let alg_overwrite =

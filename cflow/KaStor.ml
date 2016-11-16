@@ -1,5 +1,5 @@
 let file = ref ""
-let dotCflows = ref true
+let dotCflows = ref Ast.Dot
 let none_compression = ref false
 let weak_compression = ref false
 let strong_compression = ref false
@@ -19,11 +19,22 @@ let options = [
   ("--strong",
    Arg.Set strong_compression,
    "Outputs strongly compressed stories");
-  ("--html", Arg.Clear dotCflows, "Print stories in html format");
-  ("--time-independent",
-   Arg.Set Parameter.time_independent,
-   "Disable the use of time is story heuritics (for test suite)")
-]
+  ("-format", Arg.String
+                (function
+                   "true" | "yes" | "dot" -> dotCflows := Ast.Dot
+                   |"false" | "no" | "html" -> dotCflows := Ast.Html
+                   | "json" -> dotCflows := Ast.Json
+                   | _ as error  ->
+                      raise
+                        (ExceptionDefn.Malformed_Decl
+                           (Location.dummy_annot
+                              ("Value "^error^
+                              " should be either \"html, dot\" or \"json\"")))),
+                      "Print stories in html format");
+   ("--time-independent",
+    Arg.Set Parameter.time_independent,
+    "Disable the use of time is story heuritics (for test suite)")
+  ]
 
 let server_mode () =
   Stream.iter (function
@@ -81,7 +92,7 @@ let main () =
     let () = close_in desc in
     let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
     let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
-    let dotFormat = if (!dotCflows) then Ast.Dot else Ast.Html in
+    let dotFormat = !dotCflows in
     Compression_main.compress_and_print
       parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
 
