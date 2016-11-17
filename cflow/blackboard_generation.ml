@@ -25,11 +25,23 @@ sig
   module A:GenArray.GenArray
   module CI:Pseudo_inverse.Cut_pseudo_inverse
 
-  type step_id = int
-  type step_short_id = int
+  type step_id
+  val zero_step_id: step_id
+  val dummy_step_id: step_id
+  val int_of_step_id: step_id -> int
+  val step_id_of_int: int -> step_id
+  val dec_step_id: step_id -> step_id
+  val inc_step_id: step_id -> step_id
 
-  (** blackboard predicates*)
+  type step_short_id
+  val zero_step_short_id: step_short_id
+  val dummy_step_short_id: step_short_id
+  val int_of_step_short_id: step_short_id -> int
+  val step_short_id_of_int: int -> step_short_id
+  val inc_step_short_id: step_short_id -> step_short_id
+  val dec_step_short_id: step_short_id -> step_short_id
 
+(** blackboard predicates*)
   type predicate_id = int
   type predicate_info
   type predicate_value
@@ -67,11 +79,11 @@ sig
   val n_events: (pre_blackboard, int) CI.Po.K.H.unary
   val n_predicates: (pre_blackboard, int) CI.Po.K.H.unary
   val n_events_per_predicate: (pre_blackboard, int, predicate_id) CI.Po.K.H.binary
-  val event_list_of_predicate: (pre_blackboard, predicate_id,  (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.binary
-  val mandatory_events: (pre_blackboard, ((int list * unit Trace.Simulation_info.t option) list)) CI.Po.K.H.unary
+  val event_list_of_predicate: (pre_blackboard, predicate_id,  (step_id * int * predicate_value * predicate_value ) list) CI.Po.K.H.binary
+  val mandatory_events: (pre_blackboard, ((step_id list * unit Trace.Simulation_info.t option) list)) CI.Po.K.H.unary
   val get_pre_event: (pre_blackboard,  Trace.step A.t) CI.Po.K.H.unary
   val get_side_effect: (pre_blackboard,  CI.Po.K.side_effect A.t) CI.Po.K.H.unary
-  val get_fictitious_observable: (pre_blackboard,  int option) CI.Po.K.H.unary
+  val get_fictitious_observable: (pre_blackboard,  step_id option) CI.Po.K.H.unary
   val get_level_of_event: (pre_blackboard, step_id, Priority.level) CI.Po.K.H.binary
   val levels: pre_blackboard -> Priority.level A.t
   val print_predicate_info: Loggers.t -> predicate_info -> unit
@@ -94,9 +106,23 @@ module Preblackboard =
     (** blackboard matrix*)
 
     type step_id = int       (** global id of an event *)
+    let zero_step_id = 0
+    let dummy_step_id = -1
+    let int_of_step_id i = i
+    let step_id_of_int i = i
+    let dec_step_id i = i-1
+    let inc_step_id i = i+1
+
     type step_short_id = int (** position of an event on a wire *)
 
-    (** blackboard predicates*)
+    let zero_step_short_id = 0
+    let dummy_step_short_id = -1
+    let int_of_step_short_id i = i
+    let step_short_id_of_int i = i
+    let inc_step_short_id i = i+1
+    let dec_step_short_id i = i-1
+
+(** blackboard predicates*)
 
     type rule_type = (** kind of events*)
       | Subs

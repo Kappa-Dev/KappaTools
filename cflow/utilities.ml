@@ -460,8 +460,14 @@ let causal_prefix_of_an_observable_hit
     | [] -> failwith ("no observable in that story"^string)
     | _ -> failwith  ("several observables in that story"^string)
   in
-  let event_id_list = Graph_closure.get_list_in_increasing_order_with_last_event (eid+1) enriched_grid.Causal.prec_star in
-  let error,profiling_info,output = translate parameter handler profiling_info error blackboard event_id_list in
+  let event_id_list =
+    Graph_closure.get_list_in_increasing_order_with_last_event
+      (S.PH.B.PB.int_of_step_id (S.PH.B.PB.inc_step_id eid))
+      enriched_grid.Causal.prec_star
+  in
+  let error,profiling_info,output =
+    translate parameter handler profiling_info error blackboard
+      (List.rev_map S.PH.B.PB.step_id_of_int (List.rev event_id_list)) in
   error,profiling_info,output
 
 
@@ -921,7 +927,10 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar
            in
            (* we translate the list of event ids into a trace thanks to the blackboad *)
            let error,log_info,trace =
-             translate parameter handler log_info error blackboard (List.rev (observable_hit::causal_past))
+             translate
+               parameter handler log_info error blackboard
+               (List.rev_map S.PH.B.PB.step_id_of_int
+                  (observable_hit::causal_past))
            in
            (* we collect run time info about the observable *)
            let info =

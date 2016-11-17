@@ -88,7 +88,7 @@ module Propagation_heuristic =
       let k_end = last blackboard p_id in
       match k_init,k_end
       with
-        | None,_|_,None-> error,log_info,k_init
+        | None,_|_,None-> error,log_info,None
         | Some i,Some j ->
           begin
             let rec aux i log_info error =
@@ -114,10 +114,18 @@ module Propagation_heuristic =
           end
 
     let get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level =
-      get_gen_unresolved_event_on_pid B.get_last_linked_event B.get_first_linked_event pred (fun i j -> i<j) parameter handler log_info error blackboard p_id level
+      get_gen_unresolved_event_on_pid
+        B.get_last_linked_event
+        B.get_first_linked_event
+        B.PB.dec_step_short_id (fun i j -> i<j) parameter handler log_info error
+        blackboard p_id level
 
     let get_first_unresolved_event_on_pid parameter handler log_info error blackboard p_id level =
-      get_gen_unresolved_event_on_pid B.get_first_linked_event B.get_last_linked_event succ (fun i j -> i>j) parameter handler log_info error blackboard p_id level
+      get_gen_unresolved_event_on_pid
+        B.get_first_linked_event
+        B.get_last_linked_event
+        B.PB.inc_step_short_id (fun i j -> i>j) parameter handler log_info error
+        blackboard p_id level
 
     let get_gen_unresolved_event first last succ stop parameter handler log_info error blackboard level =
       begin
@@ -141,10 +149,18 @@ module Propagation_heuristic =
       end
 
     let get_last_unresolved_event parameter handler log_info error blackboard level =
-      get_gen_unresolved_event (B.get_n_eid blackboard) 0 pred (fun i j -> i<j) parameter handler log_info error blackboard level
+      get_gen_unresolved_event
+        (B.PB.step_id_of_int (B.get_n_eid blackboard))
+        (B.PB.zero_step_id)
+        (B.PB.dec_step_id) (fun i j -> i<j) parameter handler log_info error
+        blackboard level
 
     let get_first_unresolved_event parameter handler log_info error blackboard level =
-      get_gen_unresolved_event 0 (B.get_n_eid blackboard) succ (fun i j -> i>j) parameter handler log_info error blackboard level
+      get_gen_unresolved_event
+        (B.PB.zero_step_id)
+        (B.PB.step_id_of_int (B.get_n_eid blackboard))
+        (B.PB.inc_step_id) (fun i j -> i>j) parameter handler log_info error
+        blackboard level
 
     let next_choice parameter handler log_info error blackboard =
       let bool,string=
@@ -280,8 +296,9 @@ module Propagation_heuristic =
       error,log_info,list
 
     let print_event_case_address parameter handler log_info error blackboard  case =
-      let error,log_info,(_,eid,_,_) = B.get_static parameter handler log_info error blackboard case in
-      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Event: %i, Predicate: %i" eid (B.predicate_id_of_case_address case) in
+      let error,log_info,(_,eid,_,_) =
+        B.get_static parameter handler log_info error blackboard case in
+      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Event: %i, Predicate: %i" (B.PB.int_of_step_id eid) (B.predicate_id_of_case_address case) in
       let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
       error,log_info,()
 
@@ -662,7 +679,7 @@ module Propagation_heuristic =
                                       let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
                                       let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
                                       let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We discard the next event (%i)" next_eid in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We discard the next event (%i)" (B.PB.int_of_step_id next_eid) in
                                       let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                       let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                                       let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -846,7 +863,7 @@ module Propagation_heuristic =
                                           let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
                                           let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
                                           let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Next event (%i) is discarded" next_eid in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Next event (%i) is discarded" (B.PB.int_of_step_id next_eid) in
                                           let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                                           let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -1288,7 +1305,8 @@ module Propagation_heuristic =
                                 let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
                                 let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
                                 let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Event before (%i) is discarded" eid in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Event before (%i) is discarded"
+                                    (B.PB.int_of_step_id eid) in
                                 let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                                 let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -1465,7 +1483,8 @@ module Propagation_heuristic =
                                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
                                               let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
                                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Discard the event before (%i)" eid in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Discard the event before (%i)"
+                                                  (B.PB.int_of_step_id eid) in
                                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -1540,7 +1559,8 @@ module Propagation_heuristic =
                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
                               let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Discard the event before (%i)" eid in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Discard the event before (%i)"
+                                  (B.PB.int_of_step_id eid) in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -1581,7 +1601,7 @@ module Propagation_heuristic =
                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Previous wire state: " in
                               let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) preview_predicate_value in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Select the event before (%i)" eid in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Select the event before (%i)" (B.PB.int_of_step_id eid) in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -1899,7 +1919,7 @@ module Propagation_heuristic =
             let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
             let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
             let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We keep event %i" step_id in
+            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We keep event %i" (B.PB.int_of_step_id step_id) in
             let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
             let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
             let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
@@ -1947,7 +1967,7 @@ module Propagation_heuristic =
               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
-              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We remove event %i" step_id in
+              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We remove event %i" (B.PB.int_of_step_id step_id) in
               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in

@@ -47,16 +47,16 @@ sig
   val predicate_id_of_case_address: event_case_address -> PB.predicate_id
   val build_pointer: PB.step_short_id -> pointer
   val is_before_blackboard: pointer -> bool
-  val get_event: blackboard -> int -> Trace.step
+  val get_event: blackboard -> PB.step_id -> Trace.step
   val get_n_eid: blackboard -> int
   val get_npredicate_id: blackboard -> int
   val get_n_unresolved_events_of_pid_by_level: blackboard -> PB.predicate_id -> Priority.level -> int
   val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id  -> int
   val get_n_unresolved_events: blackboard -> int
-  val get_first_linked_event: blackboard -> PB.predicate_id -> int option
-  val get_last_linked_event: blackboard -> PB.predicate_id -> int option
+  val get_first_linked_event: blackboard -> PB.predicate_id -> PB.step_short_id option
+  val get_last_linked_event: blackboard -> PB.predicate_id -> PB.step_short_id option
   val get_stack_depth: blackboard -> int
-  val is_selected_event: (int,blackboard,bool option) PB.CI.Po.K.H.binary
+  val is_selected_event: (PB.step_id,blackboard,bool option) PB.CI.Po.K.H.binary
   val case_address_of_case_event_address : event_case_address -> case_address
   val predicate_value_of_case_value: (case_value, PB.predicate_value) PB.CI.Po.K.H.unary
   val follow_pointer_up: (blackboard, event_case_address, event_case_address) PB.CI.Po.K.H.binary
@@ -152,10 +152,13 @@ module Blackboard =
       | Success -> true
       | Fail | Ignore -> false
 
-    let null_pointer = -1 (*Null_pointer*)
+    let null_pointer = PB.dummy_step_short_id
     let is_null_pointer x = x=null_pointer
-    let pointer_before_blackboard = 0
-    let is_before_blackboard x = x=0 (*Before_blackboard*)
+    let pointer_before_blackboard = PB.zero_step_short_id
+    let is_null_pointer_step_id x = x = PB.dummy_step_id
+
+    let is_before_blackboard x =
+      x= pointer_before_blackboard
     let build_pointer i = i
 
     type event_case_address =
@@ -217,7 +220,7 @@ module Blackboard =
         let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
         ()
       | Pointer i ->
-        let () = Loggers.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Pointer %i" i in
+        let () = Loggers.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Pointer %i" (PB.int_of_step_short_id i) in
         let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
         ()
       | Boolean b ->
@@ -225,7 +228,8 @@ module Blackboard =
         let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
         ()
 
-    let string_of_pointer seid = "event seid "^(string_of_int seid)
+    let string_of_pointer seid =
+      "event seid "^(string_of_int (PB.int_of_step_short_id seid))
     let print_pointer log seid =
       Loggers.fprintf log "%s" (string_of_pointer seid)
 
@@ -291,8 +295,8 @@ module Blackboard =
 
     let dummy_case_info_static =
       {
-        row_short_id = -1 ;
-        event_id = -1 ;
+        row_short_id = PB.dummy_step_short_id  ;
+        event_id = PB.dummy_step_id ;
         test = PB.unknown ;
         action = PB.unknown ;
       }
@@ -306,16 +310,17 @@ module Blackboard =
       }
 
     let correct_pointer seid size =
-      if seid < 0
+      let int_seid = PB.int_of_step_short_id seid in
+      if int_seid < 0
       then pointer_before_blackboard
-      else if seid>=size
-      then size
+      else if int_seid >= size
+      then PB.step_short_id_of_int size
       else seid
 
     let init_info_dynamic seid size=
       {
-        pointer_previous = correct_pointer (seid-1) size ;
-        pointer_next = correct_pointer (seid+1) size ;
+        pointer_previous = correct_pointer (PB.dec_step_short_id seid) size ;
+        pointer_next = correct_pointer (PB.inc_step_short_id seid) size ;
         state_after = PB.unknown ;
         selected = None ;
       }
@@ -342,7 +347,7 @@ module Blackboard =
                 with
                   state_after = PB.undefined ;
                   pointer_previous = pointer_before_blackboard ;
-                  pointer_next = 1 }}
+                  pointer_next = PB.inc_step_short_id (PB.zero_step_short_id) }}
 
     let init_info p_id seid size triple =
       {
@@ -356,7 +361,7 @@ module Blackboard =
       {
         event: Trace.step PB.A.t;
         pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
-        forced_events: (int list * unit Trace.Simulation_info.t option) list;
+        forced_events: (PB.step_id list * unit Trace.Simulation_info.t option) list;
         n_predicate_id: int ;
         n_eid:int;
         n_seid: int PB.A.t;
@@ -369,7 +374,7 @@ module Blackboard =
         used_predicate_id: bool PB.A.t ;
         n_unresolved_events: int ;
         n_unresolved_events_by_level: int Priority.LevelMap.t;
-        last_linked_event_of_predicate_id: int PB.A.t;
+        last_linked_event_of_predicate_id: PB.step_short_id PB.A.t;
         event_case_list: event_case_address list PB.A.t;
         side_effect_of_event: PB.CI.Po.K.side_effect PB.A.t;
         fictitious_observable: PB.step_id option;
@@ -380,21 +385,23 @@ module Blackboard =
     let tick profiling_info = StoryProfiling.StoryStats.tick profiling_info
     let level_of_event parameter _handler log_info error blackboard eid =
       try
-        error,log_info,PB.A.get blackboard.level_of_event eid
+        error,log_info,
+        PB.A.get blackboard.level_of_event (PB.int_of_step_id eid)
       with
         Not_found ->
         warn
           parameter log_info error __POS__ ~message:"Unknown event id" (Failure "Unknown event id") Priority.highest
 
-    let get_event blackboard k = PB.A.get blackboard.event k
+    let get_event blackboard k = PB.A.get blackboard.event (PB.int_of_step_id k)
     let get_n_eid blackboard = blackboard.n_eid
     let get_stack_depth blackboard = List.length blackboard.stack
     let forced_events blackboard = blackboard.forced_events
-    let side_effect_of_event blackboard i = PB.A.get blackboard.side_effect_of_event i
+    let side_effect_of_event blackboard i =
+      PB.A.get blackboard.side_effect_of_event (PB.int_of_step_id i)
 
     let case_list_of_eid parameter _handler log_info error blackboard eid =
       try
-        error,log_info,PB.A.get blackboard.event_case_list eid
+        error,log_info,PB.A.get blackboard.event_case_list (PB.int_of_step_id eid)
       with
       | _ ->
         warn
@@ -406,7 +413,7 @@ module Blackboard =
       try
         error,log_info,PB.A.get
           (PB.A.get blackboard.blackboard case_address.column_predicate_id)
-          (case_address.row_short_event_id)
+          (PB.int_of_step_short_id (case_address.row_short_event_id))
       with
       | _ ->
         warn
@@ -420,7 +427,7 @@ module Blackboard =
 
     let print_event_case_address parameter handler log_info error blackboard case =
       let error,log_info,(_,eid,_,_) = get_static parameter handler log_info error blackboard case in
-      let () = Loggers.fprintf (PB.CI.Po.K.H.get_logger parameter) "Event: %i, Predicate: %i@." eid (predicate_id_of_case_address case) in
+      let () = Loggers.fprintf (PB.CI.Po.K.H.get_logger parameter) "Event: %i, Predicate: %i@." (PB.int_of_step_id eid) (predicate_id_of_case_address case) in
       error,log_info,()
 
     let print_case_address parameter handler log_info error blackboard x =
@@ -494,7 +501,7 @@ module Blackboard =
         let () =
           Loggers.fprintf
             (PB.CI.Po.K.H.get_logger parameter)
-            "Keep %i" i
+            "Keep %i" (PB.int_of_step_id i)
         in
         error,log_info,()
 
@@ -525,7 +532,7 @@ module Blackboard =
       then
         None
       else
-        Some 0
+        Some (PB.zero_step_short_id)
 
     let get_last_linked_event blackboard pid =
       if pid<0 || pid >= blackboard.n_predicate_id
@@ -539,7 +546,7 @@ module Blackboard =
     let print_known_case log pref inf suf case =
       let _ = Loggers.fprintf log "%stest:" pref in
       let _ = PB.print_predicate_value log case.static.test in
-      let _ = Loggers.fprintf log "/eid:%i/action:" case.static.event_id in
+      let _ = Loggers.fprintf log "/eid:%i/action:" (PB.int_of_step_id case.static.event_id) in
       let _ = PB.print_predicate_value log case.static.action in
       let _ = Loggers.fprintf log "%s" inf in
       let _ = PB.print_predicate_value log case.dynamic.state_after in
@@ -561,7 +568,7 @@ module Blackboard =
       match address
       with
       | Keep_event i ->
-        let () = Loggers.fprintf log "Is the event %i selected ? " i in
+        let () = Loggers.fprintf log "Is the event %i selected ? " (PB.int_of_step_id i) in
         error,log_info,  ()
       | Exist i ->
         let () = Loggers.fprintf log "Is the case " in
@@ -655,11 +662,13 @@ module Blackboard =
                    let case = PB.A.get array j in
                    let () = print_case log case in
                    let j' = get_pointer_next case in
+                   let j' = PB.int_of_step_short_id j' in
                    if j=j'
                    then error
                    else aux j' error
                  in
-                 let error = aux pointer_before_blackboard (!err) in
+                 let error =
+                   aux (PB.int_of_step_short_id pointer_before_blackboard) (!err) in
                  let _ = err := error in
                  ()
                else
@@ -730,11 +739,11 @@ module Blackboard =
 
     let add_event eid (pid,seid) array level unsolved =
       let event_case_address = build_event_case_address pid seid in
-      let old = PB.A.get array eid in
+      let old = PB.A.get array (PB.int_of_step_id eid) in
       let unsolved =
         Priority.LevelMap.add
           level ((Priority.LevelMap.find_default 0 level unsolved)+1) unsolved in
-      PB.A.set array eid (event_case_address::old),unsolved
+      PB.A.set array (PB.int_of_step_id eid) (event_case_address::old),unsolved
 
     let empty_stack = []
 
@@ -773,7 +782,7 @@ module Blackboard =
       in
 
       let weigth_of_predicate_id = PB.A.make 0 0 in
-      let last_linked_event_of_predicate_id = PB.A.make n_predicates 0 in
+      let last_linked_event_of_predicate_id = PB.A.make n_predicates PB.zero_step_short_id in
       let error,log_info =
         let rec aux1 p_id log_info error =
           if p_id < 0
@@ -781,7 +790,7 @@ module Blackboard =
           else
             let error,log_info,size = PB.n_events_per_predicate parameter handler log_info error pre_blackboard p_id in
             let size = size + 1 in
-            let _ = PB.A.set last_linked_event_of_predicate_id p_id (size-1) in
+            let _ = PB.A.set last_linked_event_of_predicate_id p_id (PB.step_short_id_of_int (size-1)) in
             let _ = PB.A.set weigth_of_predicate_id p_id (size-2) in
             let _ = PB.A.set n_seid p_id size in
             let error,log_info,list = PB.event_list_of_predicate parameter handler log_info error pre_blackboard p_id in
@@ -794,32 +803,33 @@ module Blackboard =
                 let info =
                   {dynamic =
                      {
-                       pointer_previous = 0 ;
-                       pointer_next = 1 ;
+                       pointer_previous = PB.zero_step_short_id ;
+                       pointer_next = PB.inc_step_short_id (PB.zero_step_short_id) ;
                        state_after = PB.undefined ;
                        selected = Some true
                      };
                    static =
                      {
-                       row_short_id = 0 ;
-                       event_id = -1 ;
+                       row_short_id = PB.zero_step_short_id ;
+                       event_id = PB.dummy_step_id ;
                        test = PB.unknown ;
                        action = PB.unknown ;
                      }}
                 in
                 let _ = PB.A.set array 0 info in
+                let pred_size = PB.dec_step_short_id (PB.step_short_id_of_int size) in
                 let info =
                   {dynamic =
                      {
-                       pointer_previous = size-1 ;
-                       pointer_next = size-1 ;
+                       pointer_previous = pred_size ;
+                       pointer_next = pred_size ;
                        state_after = PB.unknown ;
                        selected = Some true
                      } ;
                    static =
                      {
-                       row_short_id = size-1 ;
-                       event_id = -1 ;
+                       row_short_id = pred_size ;
+                       event_id = PB.dummy_step_id ;
                        test = PB.unknown ;
                        action = PB.unknown ;
                      }}
@@ -833,10 +843,10 @@ module Blackboard =
                 let error,log_info,level = PB.get_level_of_event parameter handler log_info error pre_blackboard eid in
                 let () = inc_depth level p_id in
                 let (),_ = add_event eid (p_id,seid) event_case_list level Priority.LevelMap.empty in
-                let () = PB.A.set array seid info in
-                aux2 (seid-1) q log_info
+                let () = PB.A.set array (PB.int_of_step_short_id seid) info in
+                aux2 (PB.dec_step_short_id seid) q log_info
             in
-            let log_info = aux2 (size-2) list log_info in
+            let log_info = aux2 (PB.step_short_id_of_int (size-2)) list log_info in
             aux1 (p_id-1) log_info error
         in aux1 (n_predicates-1) log_info error
       in
@@ -848,7 +858,8 @@ module Blackboard =
           then
             error,log_info,map
           else
-            let error,log_info,level = PB.get_level_of_event parameter handler log_info error pre_blackboard k in
+            let error,log_info,level =
+              PB.get_level_of_event parameter handler log_info error pre_blackboard (PB.step_id_of_int k) in
             let map =
               Priority.LevelMap.add level ((Priority.LevelMap.find_default 0 level map)+1) map
             in aux (k-1) error log_info map
@@ -889,7 +900,9 @@ module Blackboard =
 
     let set_case parameter _handler log_info error case_address case_value blackboard =
       try
-        let _ = PB.A.set (PB.A.get blackboard.blackboard case_address.column_predicate_id) (case_address.row_short_event_id) case_value
+        let _ =
+          PB.A.set
+            (PB.A.get blackboard.blackboard case_address.column_predicate_id) (PB.int_of_step_short_id (case_address.row_short_event_id)) case_value
         in error,log_info,blackboard
       with
       | _ ->
@@ -1026,7 +1039,12 @@ module Blackboard =
           match case_value
           with
           | Boolean b ->
-            let _ = PB.A.set blackboard.selected_events step_id b in
+            let _ =
+              PB.A.set
+                blackboard.selected_events
+                (PB.int_of_step_id step_id)
+                b
+            in
             error,log_info,blackboard
           | Pointer _ | State _ | Counter _ ->
             warn
@@ -1051,14 +1069,20 @@ module Blackboard =
               blackboard
         end
 
-    let is_selected_event _parameter _handler log_info error step_id blackboard =
-      error, log_info, PB.A.get blackboard.selected_events step_id
+    let is_selected_event
+        _parameter _handler log_info error step_id  blackboard =
+      error, log_info, PB.A.get blackboard.selected_events (PB.int_of_step_id step_id)
 
     let rec get parameter handler log_info error case_address blackboard =
       match
         case_address
       with
-      | Keep_event step_id -> error,log_info,Boolean (PB.A.get blackboard.selected_events step_id)
+      | Keep_event step_id ->
+        error,log_info,
+        Boolean
+          (PB.A.get
+             blackboard.selected_events
+             (PB.int_of_step_id step_id))
       | N_unresolved_events_in_column_at_level (int,level) ->
         let n =
           match Priority.LevelMap.find_option
@@ -1182,7 +1206,9 @@ module Blackboard =
         with
         |  [list,_] ->
           List.iter
-            (fun eid -> PB.A.set colors eid (Some Color.Red))
+            (fun eid ->
+               PB.A.set
+                 colors (PB.int_of_step_id eid)  (Some Color.Red))
             list
         | _ -> ()
       in
@@ -1199,7 +1225,12 @@ module Blackboard =
         then error,log_info
         else
           begin
-            let error,log_info,list = case_list_of_eid parameter handler log_info error blackboard eid  in
+            let error,log_info,list =
+              case_list_of_eid
+                parameter handler log_info error
+                blackboard
+                (PB.step_id_of_int eid)
+            in
             let row_precondition = row_of_precondition eid in
             let row_postcondition = row_of_postcondition eid in
             let color,maybekept =
@@ -1246,12 +1277,20 @@ module Blackboard =
             in
             let print_test t =
               let column = PB.A.get blackboard.blackboard t.column_predicate_id in
-              let case = PB.A.get column t.row_short_event_id in
+              let case =
+                PB.A.get
+                  column
+                  (PB.int_of_step_short_id t.row_short_event_id)
+              in
               PB.string_of_predicate_value case.static.test
             in
             let print_action t =
               let column = PB.A.get blackboard.blackboard t.column_predicate_id in
-              let case = PB.A.get column t.row_short_event_id in
+              let case =
+                PB.A.get
+                  column
+                  (PB.int_of_step_short_id t.row_short_event_id)
+              in
               PB.string_of_predicate_value case.static.action
             in
             let string_eid error =
@@ -1593,7 +1632,7 @@ let useless_predicate_id parameter handler log_info error blackboard list =
         List.fold_left
           (fun kept_events i ->
              let _ =
-               PB.A.set event_array i true
+               PB.A.set event_array (PB.int_of_step_id i) true
              in i::kept_events)
           kept_events
           list
@@ -1608,7 +1647,11 @@ let useless_predicate_id parameter handler log_info error blackboard list =
             then
               aux log_info error q kept_events
             else
-              let list = PB.A.get blackboard.event_case_list eid in
+              let list =
+                PB.A.get
+                  blackboard.event_case_list
+                  (PB.int_of_step_id eid)
+              in
               let error,log_info,q,kept_events =
                 List.fold_left
                   (fun (error,log_info,q,kept_events) event_case_address ->
@@ -1624,7 +1667,7 @@ let useless_predicate_id parameter handler log_info error blackboard list =
                            in
                            let error,log_info,prev_case = get_case parameter handler log_info error prev_event_case_address blackboard in
                            let prev_eid = prev_case.static.event_id in
-                           if is_null_pointer prev_eid
+                           if is_null_pointer_step_id prev_eid
                            then None
                            else
                            if PB.is_unknown prev_case.static.action
@@ -1642,7 +1685,7 @@ let useless_predicate_id parameter handler log_info error blackboard list =
                        | Some prev_eid ->
                          let bool =
                            try
-                             PB.A.get event_array prev_eid
+                             PB.A.get event_array (PB.int_of_step_id prev_eid)
                            with
                            | _ -> false
                          in
@@ -1652,7 +1695,12 @@ let useless_predicate_id parameter handler log_info error blackboard list =
                            then
                              q,kept_events
                            else
-                             let _ = PB.A.set event_array prev_eid true in
+                             let _ =
+                               PB.A.set
+                                 event_array
+                                 (PB.int_of_step_id prev_eid)
+                                 true
+                             in
                              prev_eid::q,prev_eid::kept_events
                          in error,log_info,q,kept_events)
                   (error,log_info,q,kept_events)
@@ -1668,7 +1716,7 @@ let useless_predicate_id parameter handler log_info error blackboard list =
     let events_to_keep =
       let rec aux k list =
         if k<0 then list
-        else aux (k-1) (k::list)
+        else aux (k-1) ((PB.step_id_of_int k)::list)
       in
       aux (n_events-1) []
     in
@@ -1694,13 +1742,13 @@ let import ?heuristic parameter handler log_info error list =
       warn
         parameter log_info error __POS__
         ~message:"Compression mode has not been set up"
-        (Failure "Compression mode has not been set up.") (preblackboard,0,"None",false)
+        (Failure "Compression mode has not been set up.") (preblackboard,PB.zero_step_id,"None",false)
     | Some PB.CI.Po.K.H.Strong ->
       let error,log_info,(preblackboard,int) =
         List.fold_left
           (fun (error,log_info,(preblackboard,int)) refined_event  ->
              PB.add_step_up_to_iso parameter handler log_info error refined_event preblackboard int)
-          (error,log_info,(preblackboard,0))
+          (error,log_info,(preblackboard,PB.zero_step_id))
           list
       in
       error,log_info,(preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_strong_compression)
@@ -1709,7 +1757,7 @@ let import ?heuristic parameter handler log_info error list =
         List.fold_left
           (fun (error,log_info,(preblackboard,int)) refined_event  ->
              PB.add_step parameter handler log_info error refined_event preblackboard int)
-          (error,log_info,(preblackboard,0))
+          (error,log_info,(preblackboard,PB.zero_step_id))
           list
       in
       error,log_info,(preblackboard,int,Parameter.xlsweakFileName,Parameter.dump_grid_before_weak_compression)

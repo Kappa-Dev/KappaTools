@@ -223,7 +223,13 @@ struct
     error,log_info,events_to_keep
 
   let translate parameter handler log_info error blackboard list =
-    let list' = List.rev_map (fun k -> PH.B.get_event blackboard (pred k),PH.B.side_effect_of_event blackboard (pred k)) (List.rev list) in
+    let list' =
+      List.rev_map
+        (fun k ->
+           PH.B.get_event blackboard
+             (PH.B.PB.dec_step_id k),
+           PH.B.side_effect_of_event blackboard
+             (PH.B.PB.dec_step_id k)) (List.rev list) in
     let list = List.rev_map fst (List.rev list') in
     error,log_info,(list,list')
 
@@ -247,15 +253,16 @@ struct
             list
           with
             | t::q ->
-              if t=k
+              if (PH.B.PB.int_of_step_id t)=k
               then aux (k+1) q sol
-              else aux (k+1) list (k::sol)
+              else aux (k+1) list ((PH.B.PB.step_id_of_int k)::sol)
             | [] ->
-              aux (k+1) list (k::sol)
+              aux (k+1) list ((PH.B.PB.step_id_of_int k)::sol)
       in
       aux 0 events_to_keep []
     in
-    let error,log_info,forbidden_events = PH.forbidden_events parameter handler log_info error events_to_remove in
+    let error,log_info,forbidden_events =
+      PH.forbidden_events parameter handler log_info error events_to_remove in
     let () =
       if log_steps then
 	let () = Loggers.fprintf (PH.B.PB.CI.Po.K.H.get_logger parameter) "Start cutting" in
