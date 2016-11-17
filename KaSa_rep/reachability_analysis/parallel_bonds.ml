@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 15 2016>
+  * Last modification: Time-stamp: <Nov 17 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1413,11 +1413,13 @@ struct
                          t_precondition
                      in
                      let error, site_graph =
-                       Remanent_state.convert_site_graph
+                       Ckappa_site_graph.site_graph_to_list
                          error string_version
                      in
                      let error, refinement =
-                       Remanent_state.convert_refinement error list_same in
+                       Ckappa_site_graph.site_graph_list_to_list
+                         error list_same
+                     in
                      let lemma =
                        {
                          Remanent_state.hyp = site_graph;
@@ -1445,12 +1447,12 @@ struct
                        t_same
                    in
                    let error, site_graph =
-                     Remanent_state.convert_site_graph error
+                     Ckappa_site_graph.site_graph_to_list error
                        string_version
                    in
                    (*hyp*)
                    let error, refinement =
-                     Remanent_state.convert_refinement error list_same in
+                     Ckappa_site_graph.site_graph_list_to_list error list_same in
                    let lemma =
                      {
                        Remanent_state.hyp = site_graph;
@@ -1482,9 +1484,9 @@ struct
                        t_precondition
                    in
                    let error, site_graph =
-                     Remanent_state.convert_site_graph error string_version in
+                     Ckappa_site_graph.site_graph_to_list error string_version in
                    let error, refinement =
-                     Remanent_state.convert_refinement error list_distinct in
+                     Ckappa_site_graph.site_graph_list_to_list error list_distinct in
                    let lemma =
                      {
                        Remanent_state.hyp = site_graph;
@@ -1511,9 +1513,9 @@ struct
                        t_distinct
                    in
                    let error, site_graph =
-                     Remanent_state.convert_site_graph error string_version in
+                     Ckappa_site_graph.site_graph_to_list error string_version in
                    let error, refinement =
-                     Remanent_state.convert_refinement error list_distinct in
+                     Ckappa_site_graph.site_graph_list_to_list error list_distinct in
                    let lemma =
                      {
                        Remanent_state.hyp = site_graph;
@@ -1546,9 +1548,9 @@ struct
                      t_same
                  in
                  let error, site_graph =
-                   Remanent_state.convert_site_graph error string_version in
+                   Ckappa_site_graph.site_graph_to_list error string_version in
                  let error, refinement =
-                   Remanent_state.convert_refinement error list_same in
+                   Ckappa_site_graph.site_graph_list_to_list error list_same in
                  let lemma =
                    {
                      Remanent_state.hyp = site_graph;
@@ -1574,9 +1576,9 @@ struct
                      t_distinct
                  in
                  let error, site_graph =
-                   Remanent_state.convert_site_graph error string_version in
+                   Ckappa_site_graph.site_graph_to_list error string_version in
                  let error, refinement =
-                   Remanent_state.convert_refinement error list_distinct in
+                   Ckappa_site_graph.site_graph_list_to_list error list_distinct in
                  let lemma =
                    {
                      Remanent_state.hyp = site_graph;

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Nov 15 2016>
+ * Last modification: Time-stamp: <Nov 17 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -945,7 +945,8 @@ let rec convert_views_constraints_list_aux
                   t
               in
               let error', site_graph =
-                Remanent_state.convert_site_graph error string_version
+                (*Remanent_state.convert_site_graph error string_version*)
+                Ckappa_site_graph.site_graph_to_list error string_version
               in
               let error =
                 Exception.check_point
@@ -969,7 +970,8 @@ let rec convert_views_constraints_list_aux
                         t'
                     in
                     let error'', site_graph' =
-                      Remanent_state.convert_site_graph error string_version'
+                      (*Remanent_state.convert_site_graph error string_version'*)
+                      Ckappa_site_graph.site_graph_to_list error string_version'
                     in
                     let error =
                       Exception.check_point
@@ -1029,7 +1031,8 @@ let rec convert_views_constraints_list_aux
                 t'
             in
             let error'', site_graph =
-              Remanent_state.convert_site_graph error string_version
+              (*Remanent_state.convert_site_graph error string_version*)
+              Ckappa_site_graph.site_graph_to_list error string_version
             in
             let error =
               Exception.check_point
@@ -1056,7 +1059,7 @@ let rec convert_views_constraints_list_aux
                 t''
             in
             let error'''', site_graph'' =
-              Remanent_state.convert_site_graph error string_version''
+              Ckappa_site_graph.site_graph_to_list error string_version''
             in
             let error =
               Exception.check_point
@@ -1102,7 +1105,7 @@ let rec convert_views_constraints_list_aux
                 t
             in
             let error'', site_graph =
-              Remanent_state.convert_site_graph error string_version
+              Ckappa_site_graph.site_graph_to_list error string_version
             in
             let error =
               Exception.check_point
@@ -1128,7 +1131,7 @@ let rec convert_views_constraints_list_aux
                 t'
             in
             let error'''', site_graph' =
-              Remanent_state.convert_site_graph error string_version'
+              Ckappa_site_graph.site_graph_to_list error string_version'
             in
             let error =
               Exception.check_point
@@ -1205,7 +1208,7 @@ let rec convert_views_constraints_list_aux
                 t
               in
               let error', site_graph =
-                Remanent_state.convert_site_graph error
+                Ckappa_site_graph.site_graph_to_list error
                 string_version
               in
               let error =
@@ -1232,7 +1235,7 @@ let rec convert_views_constraints_list_aux
                              t'
                          in
                          let error'', site_graph' =
-                           Remanent_state.convert_site_graph error
+                           Ckappa_site_graph.site_graph_to_list error
                              string_version'
                          in
                          let error =

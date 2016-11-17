@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 15 2016>
+  * Last modification: Time-stamp: <Nov 17 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -109,98 +109,8 @@ type constraints_list =
      list)
     poly_constraints_list
 
-val constraints_list_to_json:
-  constraints_list -> Yojson.Basic.json
-
-val constraints_list_of_json : Yojson.Basic.json ->
-  constraints_list
-
-val print_constraints_list_list :
-  ?logger:Loggers.t ->
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Cckappa_sig.kappa_handler ->
-  constraints_list -> Exception.method_handler
-
-val print_internal_constraints_list_list :
-  ?logger:Loggers.t ->
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Cckappa_sig.kappa_handler ->
-  internal_constraints_list -> Exception.method_handler
-
-val convert_site_graph :
-  Exception.method_handler ->
-  (string *
-   (string option *
-    Ckappa_backend.Ckappa_backend.binding_state option)
-     Wrapped_modules.LoggedStringMap.t)
-    Ckappa_sig.Agent_id_map_and_set.Map.t ->
-  Exception.method_handler *
-  (string *
-   (string option *
-    Ckappa_backend.Ckappa_backend.binding_state option)
-     Wrapped_modules.LoggedStringMap.t) list
-
-val convert_refinement :
-  Exception.method_handler ->
-  Ckappa_backend.Ckappa_backend.t list ->
-  Exception.method_handler *
-  (string *
-   (string option * Ckappa_backend.Ckappa_backend.binding_state option)
-     Wrapped_modules.LoggedStringMap.t)
-    list list
-
-(*val convert_refinement_internal :
-  Exception.method_handler ->
-  Ckappa_backend.Ckappa_backend.t list ->
-  Exception.method_handler *
-  Ckappa_backend.Ckappa_backend.t list*)
-
-val convert_refinement_pair_list :
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Cckappa_sig.kappa_handler ->
-  Ckappa_backend.Ckappa_backend.t ->
-  Ckappa_backend.Ckappa_backend.agent_id ->
-  Ckappa_sig.c_site_name ->
-  Ckappa_backend.Ckappa_backend.agent_id ->
-  Ckappa_sig.c_site_name ->
-  (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list ->
-  Exception.method_handler *
-   (string *
-    (string option *
-     Ckappa_backend.Ckappa_backend.binding_state option)
-      Wrapped_modules.LoggedStringMap.t)
-     list list
-
-val convert_refinement_internal_pair_list :
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Cckappa_sig.kappa_handler ->
-  Ckappa_backend.Ckappa_backend.t ->
-  Ckappa_backend.Ckappa_backend.agent_id ->
-  Ckappa_sig.c_site_name ->
-  Ckappa_backend.Ckappa_backend.agent_id ->
-  Ckappa_sig.c_site_name ->
-  (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list ->
-  Exception.method_handler *
-  Ckappa_backend.Ckappa_backend.t list
-
-(*val convert_refinement_views_constraints_list :
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Cckappa_sig.kappa_handler ->
-  Ckappa_backend.Ckappa_backend.agent_id ->
-  Ckappa_sig.c_site_name ->
-  Ckappa_backend.Ckappa_backend.t ->
-  Ckappa_sig.c_state list ->
-  Exception.method_handler *
-  (string *
-   (string option *
-    Ckappa_backend.Ckappa_backend.binding_state option)
-     Wrapped_modules.LoggedStringMap.t)
-    list list*)
+val get_hyp : 'site_graph lemma -> 'site_graph
+val get_refinement : 'site_graph lemma -> 'site_graph list
 
 (*******************************************************************)
 
@@ -311,8 +221,6 @@ val set_log_info: StoryProfiling.StoryStats.log_info -> ('static, 'compile) stat
 
 val get_log_info: ('static, 'compile) state ->
   StoryProfiling.StoryStats.log_info
-
-(*TODO*)
 
 val get_internal_constraints_list : ('static, 'compile) state ->
   internal_constraints_list option

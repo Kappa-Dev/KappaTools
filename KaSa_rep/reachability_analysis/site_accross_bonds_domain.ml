@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 15 2016>
+   * Last modification: Time-stamp: <Nov 17 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1679,10 +1679,10 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
                      pattern
                  in
                  let error, site_graph =
-                   Remanent_state.convert_site_graph error string_version
+                   Ckappa_site_graph.site_graph_to_list error string_version
                  in
                  let error, refinement =
-                   Remanent_state.convert_refinement_pair_list parameters
+                   Ckappa_site_graph.pair_list_to_list parameters
                      error kappa_handler
                      pattern
                      agent_id1 site_type1'
@@ -1699,7 +1699,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
                  (*---------------------------------------------------*)
                  (*internal constraint list*)
                  let error, refine =
-                   Remanent_state.convert_refinement_internal_pair_list
+                   Ckappa_site_graph.internal_pair_list_to_list
                      parameters error kappa_handler
                      pattern
                      agent_id1 site_type1'

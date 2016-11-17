@@ -95,14 +95,4 @@ sig
     Cckappa_sig.kappa_handler ->
     t list -> Exception.method_handler
 
-  val to_json:
-    t -> Yojson.Basic.json
-
-  type string_version =
-      (string *
-     (string option * binding_state option)
-       Wrapped_modules.LoggedStringMap.t) list
-
-  val string_version_of_json:
-    Yojson.Basic.json -> string_version
 end
