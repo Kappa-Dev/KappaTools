@@ -264,9 +264,9 @@ let step_of_json = function
   | `Null -> Dummy ""
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect trace step",x))
 
-let to_json t = `List (List.rev_map step_to_json t)
+let to_json t = `List (List.rev_map step_to_json (List.rev t))
 let of_json = function
-  | `List l -> List.rev_map step_of_json l
+  | `List l -> List.rev (List.rev_map step_of_json l)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a trace",x))
 
 let step_is_obs = function
