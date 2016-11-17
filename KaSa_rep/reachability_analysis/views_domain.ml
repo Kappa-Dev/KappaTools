@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 14 2016>
+   * Last modification: Time-stamp: <Nov 17 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -2754,30 +2754,45 @@ struct
     in
     Covering_classes_type.AgentCV_map_and_set.Map.fold
       (fun (agent_type, cv_id) bdu (error,handler,output) ->
-         let error, handler, list =
+         let error', handler, list =
            decomposition parameters handler error bdu
+         in (*CHECK*)
+         let error = Exception.check_point
+             Exception.warn parameters error error' __POS__ Exit
          in
-         let error, site_correspondence =
+         let error_2, site_correspondence =
            Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
              parameters error agent_type site_correspondence
          in
-         let error, site_correspondence =
+         let error = Exception.check_point
+             Exception.warn parameters error error_2 __POS__ Exit
+         in
+         let error_3, site_correspondence =
            match site_correspondence with
            | None -> Exception.warn parameters error __POS__ Exit []
          | Some a -> error, a
-       in
-       let error, site_correspondence =
-         let rec aux list =
-           match list with
-           | [] -> Exception.warn parameters error __POS__ Exit []
-           | (h, list, _) :: _ when h = cv_id -> error, list
-           | _ :: tail -> aux tail
-         in aux site_correspondence
-       in
-       let error, (_map1, map2) =
-         Bdu_static_views.new_index_pair_map parameters error
-           site_correspondence
-       in
+         in
+         let error = Exception.check_point
+             Exception.warn parameters error error_3 __POS__ Exit
+         in
+         let error_4, site_correspondence =
+           let rec aux list =
+             match list with
+             | [] -> Exception.warn parameters error __POS__ Exit []
+             | (h, list, _) :: _ when h = cv_id -> error, list
+             | _ :: tail -> aux tail
+           in aux site_correspondence
+         in
+         let error = Exception.check_point
+             Exception.warn parameters error error_4 __POS__ Exit
+         in
+         let error_5, (_map1, map2) =
+           Bdu_static_views.new_index_pair_map parameters error
+             site_correspondence
+         in
+         let error = Exception.check_point
+             Exception.warn parameters error error_5 __POS__ Exit
+         in
        let rename_site parameters error site_type =
          let error, site_type =
            match Ckappa_sig.Site_map_and_set.Map.find_option
@@ -2792,19 +2807,25 @@ struct
        List.fold_left
          (fun (error, handler, output) bdu ->
             begin
-              let error, handler, lvar =
+              let error', handler, lvar =
                 Ckappa_sig.Views_bdu.variables_list_of_mvbdu
                   parameters handler error
                   bdu
               in
+              let error = Exception.check_point
+                  Exception.warn parameters error error' __POS__ Exit
+              in
               (*list: ckappa_sig.c_site_name list*)
-              let error, handler, list =
+              let error'', handler, list =
                 Ckappa_sig.Views_bdu.extensional_of_variables_list
                   parameters handler error
                   lvar
               in
+              let error = Exception.check_point
+                  Exception.warn parameters error error'' __POS__ Exit
+              in
               (*asso take (key * key) list *)
-              let error, asso =
+              let error''', asso =
                 List.fold_left
                   (fun (error, list) i ->
                      let error, new_name =
@@ -2814,23 +2835,38 @@ struct
                   (error, [])
                   (List.rev list)
               in
-              let error,handler,hconsed_asso =
+              let error = Exception.check_point
+                  Exception.warn parameters error error''' __POS__ Exit
+              in
+              let error_4,handler,hconsed_asso =
                 Ckappa_sig.Views_bdu.build_renaming_list
                   parameters handler error asso
               in
-              let error,handler,renamed_mvbdu =
+              let error = Exception.check_point
+                  Exception.warn parameters error error_4 __POS__ Exit
+              in
+              let error_5,handler,renamed_mvbdu =
                 Ckappa_sig.Views_bdu.mvbdu_rename
                   parameters handler error bdu hconsed_asso
               in
-              let error,handler,hconsed_vars =
+              let error = Exception.check_point
+                  Exception.warn parameters error error_5 __POS__ Exit
+              in
+              let error_6,handler,hconsed_vars =
                 Ckappa_sig.Views_bdu.variables_list_of_mvbdu
                   parameters handler error renamed_mvbdu
               in
-              let error, cv_map_opt =
+              let error = Exception.check_point
+                  Exception.warn parameters error error_6 __POS__ Exit
+              in
+              let error_7, cv_map_opt =
                 Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                   parameters error agent_type output
               in
-              let error,cv_map =
+              let error = Exception.check_point
+                  Exception.warn parameters error error_7 __POS__ Exit
+              in
+              let error_8,cv_map =
                 match
                   cv_map_opt
                 with
@@ -2838,7 +2874,10 @@ struct
                   error, Wrapped_modules.LoggedIntMap.empty
                 | Some map -> error, map
               in
-                let error, handler, cv_map' =
+              let error = Exception.check_point
+                  Exception.warn parameters error error_8 __POS__ Exit
+              in
+                let error_9, handler, cv_map' =
                   Ckappa_sig.Views_bdu.store_by_variables_list
                     Wrapped_modules.LoggedIntMap.find_default_without_logs
                     Wrapped_modules.LoggedIntMap.add_or_overwrite
@@ -2850,20 +2889,29 @@ struct
                     hconsed_vars
                     renamed_mvbdu
                     cv_map
-                in
-                let error,output =
+              in
+              let error = Exception.check_point
+                  Exception.warn parameters error error_9 __POS__ Exit
+              in
+                let error_10,output =
                   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
                     parameters error agent_type cv_map'
                     output
-                in
+              in
+              let error = Exception.check_point
+                  Exception.warn parameters error error_10 __POS__ Exit
+              in
                 error, handler, output
               end)
            (error, handler, output)
            list)
       result
-      (let error, agent_map =
+      (let error', agent_map =
          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
            parameters error 0
+       in
+       let error = Exception.check_point
+           Exception.warn parameters error error' __POS__ Exit
        in
        (error, handler, agent_map))
 
@@ -2877,14 +2925,18 @@ struct
     if
       smash
     then
-      let error',handler,output =
+      let error', handler, output =
         smash_map
           decomposition
-          ~show_dep_with_dimmension_higher_than:dim_min parameters handler error
-          handler_kappa site_correspondence result
-      in
+          ~show_dep_with_dimmension_higher_than:dim_min
+          parameters handler error
+          handler_kappa
+          site_correspondence
+          result
+      in (*CHECK*)
       let error = Exception.check_point
-          Exception.warn parameters error error' __POS__ Exit in
+          Exception.warn parameters error error' __POS__ Exit
+      in
       let error'', (handler, list) =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameters
@@ -2928,7 +2980,7 @@ struct
                    let error', (handler, translation) =
                      Translation_in_natural_language.translate
                        parameters handler error (fun _ e i -> e, i) mvbdu
-                   in
+                   in (*CHECK*)
                    let error = Exception.check_point
                        Exception.warn parameters error error' __POS__ Exit in
                    (*-------------------------------------------------------*)
@@ -2939,7 +2991,7 @@ struct
                map
                (error, (handler,list)))
           output (handler,[])
-      in
+      in (*CHECK*)
       let error = Exception.check_point
           Exception.warn parameters error error'' __POS__ Exit in
       error, handler, List.rev list
@@ -3404,11 +3456,12 @@ struct
         handler_kappa
         site_correspondence
         fixpoint_result
-    in
+    in (*CHECK*)
     let error = Exception.check_point
-        Exception.warn parameters error error' __POS__ Exit in
+        Exception.warn parameters error error' __POS__ Exit
+    in
     (*store the information for relational properties*)
-    let error, current_list =
+    let error', current_list =
       List.fold_left
         (fun (error, current_list)
           (agent_string, agent_type, _, translation) ->
@@ -3429,15 +3482,21 @@ struct
           error, current_list
         ) (error, []) (List.rev list)
     in
+    let error' = Exception.check_point
+        Exception.warn parameters error error' __POS__ Exit
+    in
     (*------------------------------------------------------------------*)
     let constraint_list = Remanent_state.get_constraints_list kasa_state in
-    let error, constraint_list =
+    let error', constraint_list =
       match
         constraint_list
       with
       | None ->
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
+    in
+    let error = Exception.check_point
+        Exception.warn parameters error error' __POS__ Exit
     in
     let pair_list = (domain_name, current_list) :: constraint_list in
     let kasa_state =
@@ -3500,24 +3559,19 @@ struct
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
     let error, site_correspondence =
-      get_store_remanent_triple static dynamic error in
+      get_store_remanent_triple static dynamic error
+    in
     let fixpoint_result = get_fixpoint_result dynamic in
-    let error, dynamic, kasa_state =
-      (*if local_trace ||
-       Remanent_parameters.get_dump_reachability_analysis_result parameters
-    then*)
-      let error', dynamic, kasa_state =
-        export_views_properties_aux
-          parameters error handler_kappa
-          site_correspondence
-          fixpoint_result
-          dynamic
-          kasa_state
-      in
-      let error = Exception.check_point
-          Exception.warn parameters error error' __POS__ Exit in
-      error, dynamic, kasa_state
-      (*else error, dynamic, kasa_state*)
+    let error', dynamic, kasa_state =
+      export_views_properties_aux
+        parameters error handler_kappa
+        site_correspondence
+        fixpoint_result
+        dynamic
+        kasa_state
+    in
+    let error = Exception.check_point
+        Exception.warn parameters error error' __POS__ Exit
     in
     error, dynamic, kasa_state
 
@@ -3528,15 +3582,16 @@ struct
       export_contact_map static dynamic error kasa_state
     in
     let error = Exception.check_point
-        Exception.warn parameters error error' __POS__ Exit in
-    (*TODO: this function generate error in the compile*)
+        Exception.warn parameters error error' __POS__ Exit
+    in
     (*export of (non)relational properties*)
     (*let error'', dynamic, kasa_state =
       export_views_properties
         static dynamic error kasa_state
     in
     let error = Exception.check_point
-        Exception.warn parameters error error'' __POS__ Exit in*)
+        Exception.warn parameters error error'' __POS__ Exit
+    in*)
     error, dynamic, kasa_state
 
 (**************************************************************************)

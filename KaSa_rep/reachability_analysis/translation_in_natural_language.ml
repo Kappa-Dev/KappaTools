@@ -64,23 +64,35 @@ let try_partitioning parameters handler error
     with
     | [] -> error, handler, None
     | head :: tail ->
-      let error, handler, singleton =
+      let error', handler, singleton =
         Ckappa_sig.Views_bdu.build_variables_list
           parameters handler error [head]
       in
-      let error, handler, mvbdu_ref =
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit
+      in
+      let error_2, handler, mvbdu_ref =
         Ckappa_sig.Views_bdu.mvbdu_project_abstract_away
           parameters handler error mvbdu singleton
       in
-      let error, handler, proj_in =
+      let error = Exception.check_point
+          Exception.warn parameters error error_2 __POS__ Exit
+      in
+      let error_3, handler, proj_in =
         Ckappa_sig.Views_bdu.mvbdu_project_keep_only
           parameters handler error mvbdu singleton
       in
-      let error, handler, list_asso =
+      let error = Exception.check_point
+          Exception.warn parameters error error_3 __POS__ Exit
+      in
+      let error_4, handler, list_asso =
         Ckappa_sig.Views_bdu.extensional_of_mvbdu
           parameters handler error proj_in
       in
-      let error, range =
+      let error = Exception.check_point
+          Exception.warn parameters error error_4 __POS__ Exit
+      in
+      let error_5, range =
         let rec aux2 list (error, output) =
           match
             list
@@ -93,6 +105,9 @@ let try_partitioning parameters handler error
               (Exception.warn parameters error __POS__ Exit output)
         in aux2 list_asso (error, [])
       in
+      let error = Exception.check_point
+          Exception.warn parameters error error_5 __POS__ Exit
+      in
       let rec aux3 list (error,handler,output) =
         match
           list
@@ -100,26 +115,41 @@ let try_partitioning parameters handler error
         | [] -> error, handler, Some output
         | h :: t ->
           begin
-            let error, handler, select =
+            let error_6, handler, select =
               Ckappa_sig.Views_bdu.build_association_list
                 parameters handler error [head, h]
             in
-            let error, handler, mvbdu_case =
+            let error = Exception.check_point
+                Exception.warn parameters error error_6 __POS__ Exit
+            in
+            let error_7, handler, mvbdu_case =
               Ckappa_sig.Views_bdu.mvbdu_redefine
                 parameters handler error mvbdu_true select
             in
-            let error, handler, case =
+            let error = Exception.check_point
+                Exception.warn parameters error error_7 __POS__ Exit
+            in
+            let error_8, handler, case =
               Ckappa_sig.Views_bdu.mvbdu_and
                 parameters handler error mvbdu_case mvbdu
             in
-            let error, handler, bool =
+            let error = Exception.check_point
+                Exception.warn parameters error error_8 __POS__ Exit
+            in
+            let error_9, handler, bool =
               non_relational parameters handler error case
+            in
+            let error = Exception.check_point
+                Exception.warn parameters error error_9 __POS__ Exit
             in
             if bool
             then
-              let error, handler, away =
+              let error_10, handler, away =
                 Ckappa_sig.Views_bdu.mvbdu_project_abstract_away
                   parameters handler error case singleton
+              in
+              let error = Exception.check_point
+                  Exception.warn parameters error error_10 __POS__ Exit
               in
               if
                 Ckappa_sig.Views_bdu.equal
@@ -127,23 +157,30 @@ let try_partitioning parameters handler error
               then
                 aux3 t (error, handler, output)
               else
-                let error, handler, list =
+                let error_11, handler, list =
                   Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
                     parameters handler error away
+                in
+                let error = Exception.check_point
+                    Exception.warn parameters error error_11 __POS__ Exit
                 in
                 let error, handler, list =
                   List.fold_left
                     (fun (error, handler, list) elt ->
-                       let error, handler, elt =
+                       let error_12, handler, elt =
                          Ckappa_sig.Views_bdu.extensional_of_mvbdu
                            parameters handler error elt
+                       in
+                       let error = Exception.check_point
+                           Exception.warn parameters error error_12 __POS__ Exit
                        in
                        begin
                          let error, var_list_opt =
                            match
                              elt
                            with
-                           | [] | [] :: _ | ((_, _) :: _ :: _) :: _ -> error, None
+                           | [] | [] :: _ | ((_, _) :: _ :: _) :: _ ->
+                             error, None
                            | [(a, b)] :: q ->
                              begin
                                let rec aux4 q output =
@@ -163,13 +200,13 @@ let try_partitioning parameters handler error
                            in
                            error, handler, list
                          | Some (a, l) ->
-                           let error, a' = rename_site_inverse parameters error a in
-                           (error, handler,
-                            (
-                              (Range
-                                 (a',
-                                  l))
-                              :: list))
+                           let error', a' =
+                             rename_site_inverse parameters error a in
+                             let error = Exception.check_point
+                                 Exception.warn parameters error error' __POS__
+                                 Exit
+                             in
+                           (error, handler, ((Range (a', l)) :: list))
                        end)
                     (error, handler, [])
                     (List.rev list)
@@ -179,11 +216,17 @@ let try_partitioning parameters handler error
               error, handler, None
           end
       in
-      let error, handler, output = aux3 range (error, handler, []) in
+      let error_13, handler, output = aux3 range (error, handler, []) in
+      let error = Exception.check_point
+          Exception.warn parameters error error_13 __POS__ Exit
+      in
       match output with
       | None -> aux tail (error, handler)
       | Some l ->
-        let error, head = rename_site_inverse parameters error head in
+        let error_14, head = rename_site_inverse parameters error head in
+        let error = Exception.check_point
+            Exception.warn parameters error error_14 __POS__ Exit
+        in
         error, handler, Some (head, l)
   in
   aux var_list (error, handler)
@@ -1289,50 +1332,6 @@ let convert_views_constraints_list
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa
     error agent_string agent_type agent_id translation t current_list
-
-(*****************************************************************************)
-(*store the print function*)
-
-(*let add_state_into_t parameters error handler_kappa agent_id site_type state
-  t store_set =
-  let error, t' =
-    Ckappa_backend.Ckappa_backend.add_state
-      parameters error handler_kappa
-      agent_id site_type state
-      t
-  in
-  (*let error, (internal_list, bound_to_list, binding_list) =
-    Ckappa_backend.Ckappa_backend.print_store_views
-      error handler_kappa t
-  in*)
-  let error, store_set =
-    Triple_pair_list_map_and_set.Set.add_when_not_in
-      parameters error
-      (internal_list, bound_to_list, binding_list)
-      store_set
-  in
-  error, store_set
-
-let add_two_states_into_t parameters error handler_kappa agent_id site1 state1
-    site2 state2 t store_set1 store_set2 =
-let error, store_set1 =
-  add_state_into_t parameters error
-    handler_kappa
-    agent_id site1 state1 t
-    store_set1
-in
-let error, store_set2 =
-  add_state_into_t parameters error handler_kappa
-    agent_id site2 state2 t
-    store_set2
-in
-let error, store_set =
-  Triple_pair_list_map_and_set.Set.union
-    parameters error
-    store_set1
-    store_set2
-in
-error, store_set*)
 
 (*****************************************************************************)
 

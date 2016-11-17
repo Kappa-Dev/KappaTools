@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 14 2016>
+  * Last modification: Time-stamp: <Nov 17 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -29,5 +29,8 @@ let get_dead_rules state =
   let state, rules = Export.get_dead_rules state in
   state, Export.dead_rules_to_json rules
 
-let get_constraints_list state = 
+let get_constraints_list state =
   Export.get_constraints_list_to_json state
+
+(*let get_internal_constraints_list state =
+  Export.output_internal_constraints_list state*)

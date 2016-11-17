@@ -244,7 +244,7 @@ let site_graph_lemma_to_json lemma =
     refinement, site_graph_list_to_json get_refinement
   ]
 
-let (*constraints_list*)pattern_to_json constraints_list =
+let pattern_to_json constraints_list =
   JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
       let json =
         JsonUtil.of_list (fun lemma ->
