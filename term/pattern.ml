@@ -6,11 +6,9 @@ type link = UnSpec | Free | Link of int * int (** node_id, site_id *)
     negative number means UnSpec. *)
 type cc = {
   nodes_by_type: int list array;
-  links: link array Mods.IntMap.t;
-  (*pattern graph id -> [|... link_j...|] i.e agent_id on site_j has a link*)
-  internals: int array Mods.IntMap.t;
-  (*internal state id -> [|... state_j...|]
-    i.e agent_id on site_j has internal state state_j (-1 means any) *)
+  nodes: (link * int) array Mods.IntMap.t;
+  (*pattern graph id -> [|... (link_j,state_j)...|] i.e agent_id on site_j has
+    a link link_j and internal state state_j (-1 means any) *)
   recogn_nav: Navigation.t;
 }
 
@@ -32,7 +30,7 @@ end
 let empty_cc sigs =
   let nbt = Array.make (Signature.size sigs) [] in
   {nodes_by_type = nbt; recogn_nav = [];
-   links = Mods.IntMap.empty; internals = Mods.IntMap.empty;}
+   nodes = Mods.IntMap.empty;}
 
 let raw_find_ty tys id =
   let rec aux i =
@@ -86,14 +84,12 @@ let weight cc =
     Mods.IntMap.fold
       (fun _ ->
          Array.fold_right
-           (fun i (l,d as acc) -> if i <> UnSpec then
-               (succ l,if i <> Free then succ d else d)
-             else acc))
-      cc.links (0,0) in
-  Mods.IntMap.fold
-    (fun _ ->
-       Array.fold_right (fun i acc -> if i <> -1 then succ acc else acc))
-    cc.internals (links - double/2)
+           (fun (i,s) (l,d) -> if i <> UnSpec then
+               (succ (if s <> -1 then succ l else l),
+               if i <> Free then succ d else d)
+             else ((if s <> -1 then succ l else l),d)))
+      cc.nodes (0,0) in
+  (links - double/2)
 
 let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
   let tick x =
@@ -104,28 +100,19 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
     | [] -> if at_least_one_edge then Some rename else None
     | (o,p as pair)::todos ->
       let () = tick pair in
-      let int1 = Mods.IntMap.find_default [||] o cc1.internals in
-      let int2 = Mods.IntMap.find_default [||] p cc2.internals in
-      if
-        Tools.array_fold_left2i
-          (fun _ b x y -> b && ((not strict && (x = -1||y = -1)) || x = y)) true
-          int1 int2 then
-        let one_edge =
-          at_least_one_edge ||
-          Tools.array_fold_left2i
-            (fun _ b x y -> b || ((x <> -1||y <> -1) && x = y)) false
-            int1 int2 in
-        match Tools.array_fold_left2i
-                (fun _ c x y ->
-                   match c with
-                   | None -> c
-                   | Some (_,todo,ren) ->
-                     match x, y with
+      match Tools.array_fold_left2i
+              (fun _ c (lx,ix) (ly,iy) ->
+                 match c with
+                 | None -> c
+                 | Some (one_edge,todo,ren) ->
+                   if ((not strict && (ix = -1||iy = -1)) || ix = iy) then
+                     match lx, ly with
                      | (Link _, Free| Free, Link _) -> None
                      | (UnSpec, Free| Free, UnSpec
                        | Link _, UnSpec |UnSpec, Link _) ->
-                       if strict then None else c
-                     | UnSpec, UnSpec -> c
+                       if strict then None
+                       else Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
+                     | UnSpec, UnSpec -> Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
                      | Free, Free -> Some (true,todo,ren)
                      | Link (n1,s1), Link (n2,s2) ->
                        if s1 = s2 then
@@ -140,26 +127,22 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
                              then Some (true,(n1,n2)::todo,r')
                              else None
                        else None
-                )
-                (Some (one_edge,todos,rename))
-                (Mods.IntMap.find_default [||] o cc1.links)
-                (Mods.IntMap.find_default [||] p cc2.links) with
-        | None -> None
-        | Some (one_edges',todos',ren') -> aux one_edges' ren' todos'
-      else None in
+                   else None
+              )
+              (Some (at_least_one_edge,todos,rename))
+              (Mods.IntMap.find_default [||] o cc1.nodes)
+              (Mods.IntMap.find_default [||] p cc2.nodes) with
+      | None -> None
+      | Some (one_edges',todos',ren') -> aux one_edges' ren' todos' in
   match Renaming.add root1 root2 Renaming.empty with
   | None -> assert false
   | Some r ->
     if
       (* is_single_agent *)
-      (Array.fold_left (fun b x -> b && x = -1)
-         true (Mods.IntMap.find_default [||] root1 cc1.internals) &&
-       Array.fold_left (fun b x -> b && x = UnSpec)
-         true (Mods.IntMap.find_default [||] root1 cc1.links)) &&
-      (Array.fold_left (fun b x -> b && x = -1)
-         true (Mods.IntMap.find_default [||] root2 cc2.internals) &&
-       Array.fold_left (fun b x -> b && x = UnSpec)
-         true (Mods.IntMap.find_default [||] root2 cc2.links))
+      Array.fold_left (fun b (l,i) -> b && i = -1 && l = UnSpec)
+        true (Mods.IntMap.find_default [||] root1 cc1.nodes) &&
+      Array.fold_left (fun b (l,i) -> b && i = -1 && l = UnSpec)
+        true (Mods.IntMap.find_default [||] root2 cc2.nodes)
     then Some r
     else aux false r [root1,root2]
 
@@ -206,56 +189,52 @@ let matchings a b =
   for_one_root []
 
 (*turns a cc into a path(:list) in the domain*)
-let raw_to_navigation (full:bool) nodes_by_type internals links =
-  let rec build_for (_,out as acc) don = function
+let raw_to_navigation (full:bool) nodes_by_type nodes =
+  let rec build_for (first,out) don = function
     | [] -> List.rev out
     | h :: t ->
-      let first_ints,out_ints =
+      let first',out',todo =
         Tools.array_fold_lefti
-          (fun i (first,out as acc) v ->
-             if (full || first) && v >= 0 then
-               (false,
-                (((if first
-                   then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
-                   else Navigation.Existing h),i),
-                 Navigation.ToInternal v)::out)
-             else acc)
-          acc (Mods.IntMap.find_default [||] h internals)
-      in
-      let first_lnk,out'',todo =
-        Tools.array_fold_lefti
-          (fun i (first,ans,re as acc) ->
-             function
-             | UnSpec -> acc
-             | Free ->
-               if full || first
-               then (false,
-                     (((if first
-                        then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
-                        else Navigation.Existing h),i),
-                      Navigation.ToNothing)::ans,re)
-               else acc
-             | Link (n,l) ->
-               if List.mem n don || (n = h && i > l) then acc
-               else if n = h || List.mem n re
-               then
-                 if full || first
-                 then (false,
-                       (((if first
-                          then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
-                          else Navigation.Existing h),i),
-                        Navigation.ToNode (Navigation.Existing n,l))::ans ,re)
-                 else acc
-               else
+          (fun i (first,ans,re as acc) (l,s) ->
+             let (first',ans',_ as acc') =
+               if (full || first) && s >= 0 then
                  (false,
                   (((if first
                      then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
                      else Navigation.Existing h),i),
+                   Navigation.ToInternal s)::ans,re)
+               else acc in
+             match l with
+             | UnSpec -> acc'
+             | Free ->
+               if full || first'
+               then (false,
+                     (((if first'
+                        then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
+                        else Navigation.Existing h),i),
+                      Navigation.ToNothing)::ans',re)
+               else acc'
+             | Link (n,l) ->
+               if List.mem n don || (n = h && i > l) then acc'
+               else if n = h || List.mem n re
+               then
+                 if full || first'
+                 then (false,
+                       (((if first'
+                          then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
+                          else Navigation.Existing h),i),
+                        Navigation.ToNode (Navigation.Existing n,l))::ans',re)
+                 else acc'
+               else
+                 (false,
+                  (((if first'
+                     then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
+                     else Navigation.Existing h),i),
                    Navigation.ToNode
-                     (Navigation.Fresh(n,raw_find_ty nodes_by_type n),l))::ans,
+                     (Navigation.Fresh(n,raw_find_ty nodes_by_type n),l))::ans',
                   n::re))
-          (first_ints,out_ints,t) (Mods.IntMap.find_default [||] h links) in
-      build_for (first_lnk,out'') (h::don) todo
+          (first,out,t) (Mods.IntMap.find_default [||] h nodes) in
+      build_for (first',out') (h::don) todo
   in
   match raw_find_root nodes_by_type with
   | None -> [] (*empty path for x0*)
@@ -263,40 +242,39 @@ let raw_to_navigation (full:bool) nodes_by_type internals links =
     build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
 let intersection renaming cc1 cc2 =
-  let links,internals,image =
+  let nodes,image =
     Renaming.fold
-      (fun i j (accl,acci,l as acc) ->
-         match Mods.IntMap.find_option i cc1.links with
+      (fun i j (accn,l as acc) ->
+         match Mods.IntMap.find_option i cc1.nodes with
          | None -> acc
-         | Some links1 ->
-           match Mods.IntMap.find_option j cc2.links with
+         | Some nodes1 ->
+           match Mods.IntMap.find_option j cc2.nodes with
            | None -> acc
-           | Some links2 ->
-             let int1 = Mods.IntMap.find_default [||] i cc1.internals in
-             let int2 = Mods.IntMap.find_default [||] j cc2.internals in
-             let outl = Array.mapi
-                 (fun k x -> if links1.(k) = UnSpec then UnSpec else x) links2 in
-             let outi = Array.mapi
-                 (fun k x -> if int1.(k) < 0 then -1 else x) int2 in
-             if Array.fold_left (fun b x -> b && x = UnSpec) true outl &&
-                Array.fold_left (fun b x -> b && x < 0) true outi then acc
-             else (Mods.IntMap.add j outl accl, Mods.IntMap.add j outi acci,j::l))
-      renaming (Mods.IntMap.empty,Mods.IntMap.empty,[]) in
+           | Some nodes2 ->
+             let out = Array.mapi
+                 (fun k (l2,i2) ->
+                    let (l1,i1) = nodes1.(k) in
+                    ((if l1 = UnSpec then UnSpec else l2),
+                     (if i1 = -1 then -1 else i2))) nodes2 in
+             if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true out
+             then acc
+             else (Mods.IntMap.add j out accn, j::l))
+      renaming (Mods.IntMap.empty,[]) in
   let nodes_by_type = Array.map
       (List.filter (fun a -> List.mem a image)) cc2.nodes_by_type in
-  { nodes_by_type; links; internals;
-    recogn_nav = raw_to_navigation false nodes_by_type internals links; }
+  { nodes_by_type; nodes;
+    recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
 let print_cc ?sigs ?cc_id f cc =
-  let print_intf (ag_i,_ as ag) link_ids internals neigh =
+  let print_intf (ag_i,_ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
-         (fun p (not_empty,(free,link_ids as out)) el ->
+         (fun p (not_empty,(free,link_ids as out)) (el,st) ->
             let () =
-              if internals.(p) >= 0
+              if st >= 0
               then Format.fprintf
                   f "%t%a" (if not_empty then Pp.comma else Pp.empty)
-                  (Agent.print_internal ?sigs ag p) internals.(p)
+                  (Agent.print_internal ?sigs ag p) st
               else
               if  el <> UnSpec then
                 Format.fprintf
@@ -304,8 +282,7 @@ let print_cc ?sigs ?cc_id f cc =
                   (Agent.print_site ?sigs ag) p in
             match el with
             | UnSpec ->
-              if internals.(p) >= 0
-              then let () = Format.fprintf f "?" in (true,out)
+              if st >= 0 then let () = Format.fprintf f "?" in (true,out)
               else (not_empty,out)
             | Free -> true,out
             | Link (dst_a,dst_p) ->
@@ -329,14 +306,13 @@ let print_cc ?sigs ?cc_id f cc =
              f "%t@[<h>%a("
              (if not_empty then Pp.comma else Pp.empty)
              (Agent.print ?sigs ~with_id:(cc_id<>None)) ag_x in
-         let out = print_intf
-             ag_x link_ids (Mods.IntMap.find_default [||] x cc.internals) el in
+         let out = print_intf ag_x link_ids el in
          let () = Format.fprintf f ")@]" in
-         true,out) cc.links (false,(1,Mods.Int2Map.empty)) in
+         true,out) cc.nodes (false,(1,Mods.Int2Map.empty)) in
   Format.pp_close_box f ()
 
 let to_yojson cc =
-  match Mods.IntMap.max_key cc.links with
+  match Mods.IntMap.max_key cc.nodes with
   | None -> `Null
   | Some m ->
     let s = succ m in
@@ -351,40 +327,27 @@ let to_yojson cc =
         (Array.fold_right
            (fun x acc -> (match x with None -> `Null | Some i -> `Int i)::acc)
            sorts []);
-      "links",
+      "nodes",
       `List (Tools.recti
-               (fun acc i -> (match Mods.IntMap.find_option i cc.links with
+               (fun acc i -> (match Mods.IntMap.find_option i cc.nodes with
                     | None -> `Null
                     | Some a ->
                       `List (Array.fold_right
-                               (fun x acc -> (match x with
-                                    | Free -> `Bool true
-                                    | Link (n,s) ->
-                                      `Assoc ["node",`Int n;"site",`Int s]
-                                    | UnSpec -> `Bool false)::acc)
+                               (fun (l,s) acc ->
+                                  `List [(match l with
+                                      | Free -> `Bool true
+                                      | Link (n,s) ->
+                                        `Assoc ["node",`Int n;"site",`Int s]
+                                      | UnSpec -> `Bool false);
+                                     if s < 0 then `Null else `Int s]::acc)
                                a []))::acc)
                [] s);
-      "states",
-      `List (Tools.recti
-               (fun acc i -> (match Mods.IntMap.find_option i cc.internals with
-                    | None -> `Null
-                    | Some a ->
-                      `List (Array.fold_right
-                               (fun x acc ->
-                                  (if x < 0 then `Null else `Int x)::acc)
-                               a []))::acc)
-               [] s);
-
     ]
 
 let of_yojson sig_decl = function
-  | `Assoc ["sorts",`List s;"links",`List l;"states",`List i]
-  | `Assoc ["sorts",`List s;"states",`List i;"links",`List l]
-  | `Assoc ["links",`List l;"sorts",`List s;"states",`List i]
-  | `Assoc ["states",`List i;"sorts",`List s;"links",`List l]
-  | `Assoc ["links",`List l;"states",`List i;"sorts",`List s]
-  | `Assoc ["states",`List i;"links",`List l;"sorts",`List s] ->
-    let _,links =
+  | `Assoc ["sorts",`List s;"nodes",`List n;]
+  | `Assoc ["nodes",`List n;"sorts",`List s] ->
+    let _,nodes =
       List.fold_left
         (fun (i,acc) -> function
            | `Null -> (succ i,acc)
@@ -392,29 +355,19 @@ let of_yojson sig_decl = function
              (succ i,
               Mods.IntMap.add i
                 (Tools.array_map_of_list (function
-                     | `Bool b -> if b then Free else UnSpec
-                     | `Assoc ["node",`Int n;"site",`Int s]
-                     | `Assoc ["site",`Int s;"node",`Int n] -> Link (n,s)
+                     | `List [`Bool b;`Null] -> (if b then Free else UnSpec),-1
+                     | `List [`Assoc ["node",`Int n;"site",`Int s]
+                             | `Assoc ["site",`Int s;"node",`Int n]; `Null] ->
+                       Link (n,s),-1
+                     | `List [`Bool b;`Int s] -> (if b then Free else UnSpec),s
+                     | `List [`Assoc ["node",`Int n;"site",`Int s]
+                             | `Assoc ["site",`Int s;"node",`Int n]; `Int st] ->
+                       Link (n,s),st
                      | x ->
-                       raise (Yojson.Basic.Util.Type_error ("Invalid link",x))
+                       raise (Yojson.Basic.Util.Type_error ("Invalid node",x))
                    ) l) acc)
            | x -> raise (Yojson.Basic.Util.Type_error ("Invalid node links",x)))
-    (0,Mods.IntMap.empty) l in
-    let _,internals =
-      List.fold_left
-        (fun (i,acc) -> function
-           | `Null -> (succ i,acc)
-           | `List l ->
-             (succ i,
-              Mods.IntMap.add i
-                (Tools.array_map_of_list (function
-                     | `Null -> -1
-                     | `Int i -> i
-                     | x ->
-                       raise (Yojson.Basic.Util.Type_error ("Invalid link",x))
-                   ) l) acc)
-           | x -> raise (Yojson.Basic.Util.Type_error ("Invalid node links",x)))
-        (0,Mods.IntMap.empty) i in
+    (0,Mods.IntMap.empty) n in
     let nodes_by_type = Array.make (Signature.size sig_decl) [] in
     let () =
       List.iteri (fun i -> function
@@ -422,8 +375,8 @@ let of_yojson sig_decl = function
           | `Int ty -> nodes_by_type.(ty) <- i :: nodes_by_type.(ty)
           | x -> raise (Yojson.Basic.Util.Type_error ("Wrong node type",x)))
         s in
-    {nodes_by_type;links;internals;
-     recogn_nav = raw_to_navigation false nodes_by_type internals links}
+    {nodes_by_type;nodes;
+     recogn_nav = raw_to_navigation false nodes_by_type nodes}
   | `Null -> empty_cc sig_decl
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a pattern",x))
 
@@ -438,19 +391,17 @@ let add_fully_specified_to_graph sigs graph cc =
               let emb' = Mods.IntMap.add x (a,ty) emb in
               let g'' =
                 Tools.array_fold_lefti
-                  (fun s acc i ->
-                     if i <> -1 then Edges.add_internal a s i acc else acc)
-                  g' (Mods.IntMap.find_default [||] x cc.internals) in
-              let g''' =
-                Tools.array_fold_lefti
-                  (fun s acc -> function
-                     | UnSpec | Free -> Edges.add_free a s acc
+                  (fun s acc (l,i) ->
+                     let acc' =
+                       if i <> -1 then Edges.add_internal a s i acc else acc in
+                     match l with
+                     | UnSpec | Free -> Edges.add_free a s acc'
                      | Link (x',s') ->
                        match Mods.IntMap.find_option x' emb' with
-                       | None -> acc
-                       | Some ag' -> fst @@ Edges.add_link (a,ty) s ag' s' acc)
-                  g'' (Mods.IntMap.find_default [||] x cc.links) in
-              (emb',g''')))
+                       | None -> acc'
+                       | Some ag' -> fst @@ Edges.add_link (a,ty) s ag' s' acc')
+                  g' (Mods.IntMap.find_default [||] x cc.nodes) in
+              (emb',g'')))
       (Mods.IntMap.empty,graph) cc.nodes_by_type in
   let r =
     Mods.IntMap.fold
@@ -508,61 +459,61 @@ let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
       img,
       (((match Renaming.add i img inj1 with Some x -> x | None -> assert false),
         free_id'),inj2,((i,img)::todos1,todos2)) in
-  let pack',internals,links =
-    let rec glue pack inj2 internals links = function
-      | [], [] -> (pack,internals,links)
+  let pack',nodes =
+    let rec glue pack inj2 nodes = function
+      | [], [] -> (pack,nodes)
       | [], (i,j) :: todos2 ->
-        let linksi = Mods.IntMap.find_default [||] i cc2.links in
-        let intso =
-          Array.copy (Mods.IntMap.find_default [||] i cc2.internals) in
-        let linkso = Array.copy linksi in
+        let nodesi = Mods.IntMap.find_default [||] i cc2.nodes in
+        let nodeso = Array.copy nodesi in
         let (pack',inj2',todos') =
         Tools.array_fold_lefti
           (fun k acc -> function
-             | (UnSpec | Free) -> acc
-             | Link (n,s) ->
+             | (UnSpec | Free), _ -> acc
+             | Link (n,s),st ->
                let n',acc' = get_cc2 n acc in
-               let () = linkso.(k) <- Link (n',s) in acc')
-          (pack,inj2,([],todos2)) linksi in
-        glue pack' inj2' (Mods.IntMap.add j intso internals)
-          (Mods.IntMap.add j linkso links) todos'
+               let () = nodeso.(k) <- (Link (n',s),st) in acc')
+          (pack,inj2,([],todos2)) nodesi in
+        glue pack' inj2' (Mods.IntMap.add j nodeso nodes) todos'
       | (i,j) :: todos1, todos2 ->
-        let linksi = Mods.IntMap.find_default [||] i cc1.links in
-        let intsi = Mods.IntMap.find_default [||] i cc1.internals in
-        let intso = Array.copy intsi in
-        let linkso = Array.copy linksi in
+        let nodesi = Mods.IntMap.find_default [||] i cc1.nodes in
+        let nodeso = Array.copy nodesi in
         let (pack',inj2',todos') =
-          match Mods.IntMap.find_option j cc2.links with
+          match Mods.IntMap.find_option j cc2.nodes with
           | None ->
             Tools.array_fold_lefti
               (fun k acc -> function
-                 | (UnSpec | Free) -> acc
-                 | Link (n,s) ->
+                 | (UnSpec | Free),_ -> acc
+                 | Link (n,s),st ->
                    let n',acc' = get_cc1 n acc in
-                   let () = linkso.(k) <- Link (n',s) in acc')
-              (pack,inj2,(todos1,todos2)) linksi
-          | Some linksj ->
-            let intsj = Mods.IntMap.find_default [||] j cc2.internals in
-            let () =
-              Array.iteri
-                (fun k v -> if v  <> -1 then intso.(k) <- v) intsj in
+                   let () = nodeso.(k) <- (Link (n',s),st) in acc')
+              (pack,inj2,(todos1,todos2)) nodesi
+          | Some nodesj ->
             Tools.array_fold_lefti
               (fun k acc -> function
-                 | Free -> acc
-                 | Link (n,s) ->
+                 | Free,_ ->
+                   let _,stj = nodesj.(k) in
+                   let () = if stj  <> -1 then nodeso.(k) <- (Free,stj) in acc
+                 | Link (n,s),sti ->
+                   let _,stj = nodesj.(k) in
+                   let sto = if stj  <> -1 then stj else sti in
                    let n',acc' = get_cc1 n acc in
-                   let () = linkso.(k) <- Link (n',s) in acc'
-                 | UnSpec -> match linksj.(k) with
-                   | UnSpec -> acc
-                   | Free -> let () = linkso.(k) <- Free in acc
-                   | Link (n,s) ->
+                   let () = nodeso.(k) <- (Link (n',s),sto) in acc'
+                 | UnSpec,sti -> match nodesj.(k) with
+                   | UnSpec,stj ->
+                     let () =
+                       if stj  <> -1 then nodeso.(k) <- (UnSpec,stj) in acc
+                   | Free,stj ->
+                     let () =
+                       nodeso.(k) <- (Free,if stj <> -1 then stj else sti) in
+                     acc
+                   | Link (n,s),stj ->
+                     let sto = if stj  <> -1 then stj else sti in
                      let n',acc' = get_cc2 n acc in
-                     let () = linkso.(k) <- Link (n',s) in acc')
-              (pack,inj2,(todos1,todos2)) linksi in
-        glue pack' inj2' (Mods.IntMap.add j intso internals)
-          (Mods.IntMap.add j linkso links) todos' in
+                     let () = nodeso.(k) <- (Link (n',s),sto) in acc')
+              (pack,inj2,(todos1,todos2)) nodesi in
+        glue pack' inj2' (Mods.IntMap.add j nodeso nodes) todos' in
     glue (inj1_to_2,free_id) (Renaming.identity (Mods.IntSet.elements img))
-         Mods.IntMap.empty Mods.IntMap.empty (Renaming.to_list inj1_to_2,[]) in
+         Mods.IntMap.empty (Renaming.to_list inj1_to_2,[]) in
   let nodes_by_type = Array.map (List.sort Mods.int_compare) used_ids in
   let () =
     Array.iteri
@@ -571,8 +522,8 @@ let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
       available_ids in
   (pack',
    {
-     nodes_by_type; links; internals;
-     recogn_nav = raw_to_navigation false nodes_by_type internals links;
+     nodes_by_type; nodes;
+     recogn_nav = raw_to_navigation false nodes_by_type nodes;
    })
 
 let build_navigation_between inj_d_to_o cc_o cc_d =
@@ -606,35 +557,30 @@ let build_navigation_between inj_d_to_o cc_o cc_d =
            (Mods.IntSet.add j discovered) next_round recogn' intern todos in
     let discov,all_links,intern =
       Renaming.fold
-      (fun j i (disc,links,inter) ->
-         let linksd = Mods.IntMap.find_default [||] j cc_d.links in
-         let intsd = Mods.IntMap.find_default [||] j cc_d.internals in
-         let disc',linkso,intso =
-           match Mods.IntMap.find_option i cc_o.links with
+        (fun j i (disc,links,inter) ->
+           let nodesd = Mods.IntMap.find_default [||] j cc_d.nodes in
+         let disc',nodeso =
+           match Mods.IntMap.find_option i cc_o.nodes with
            | None ->
              disc,
-             Array.make (Array.length linksd) UnSpec,
-             Array.make (Array.length linksd) (-1)
-           | Some linkso ->
-             Mods.IntSet.add j disc,
-             linkso,Mods.IntMap.find_default [||] i cc_o.internals in
-         let inter' =
-           Tools.array_fold_left2i
-             (fun s acc o d -> if o = -1 && d <> -1
-               then ((Navigation.Existing i,s),Navigation.ToInternal d)::acc
-               else acc)
-             inter intso intsd in
+             Array.make (Array.length nodesd) (UnSpec,-1)
+           | Some nodeso ->
+             Mods.IntSet.add j disc,nodeso in
          Tools.array_fold_left2i
-           (fun s (dis,li,int as acc) o d ->
-              if o <> UnSpec then acc else
-                match d with
-                | UnSpec -> acc
+           (fun s (dis,li,int as acc) (ol,os) (dl,ds) ->
+              let (_,_, int' as acc') =
+                if os = -1 && ds <> -1
+                then (dis,li,((Navigation.Existing i,s),Navigation.ToInternal ds)::int)
+                else acc in
+              if ol <> UnSpec then acc' else
+                match dl with
+                | UnSpec -> acc'
                 | Free ->
-                  dis,li,((Navigation.Existing i,s),Navigation.ToNothing)::int
+                  dis,li,((Navigation.Existing i,s),Navigation.ToNothing)::int'
                 | Link (n,s') ->
-                  if n > (*la*)j || (n = j && s > s') then acc
-                  else dis,((i,j,s),(n,s'))::li,int)
-         (disc',links,inter') linkso linksd)
+                  if n > (*la*)j || (n = j && s > s') then acc'
+                  else dis,((i,j,s),(n,s'))::li,int')
+         (disc',links,inter) nodeso nodesd)
       inj_d_to_o (Mods.IntSet.empty,[],[]) in
     handle_links discov [] [] intern all_links
 
@@ -1041,8 +987,7 @@ type work = {
   used_id: int list array;
   free_id: int;
   cc_id: int;
-  cc_links: link array Mods.IntMap.t;
-  cc_internals: int array Mods.IntMap.t;
+  cc_nodes: (link*int) array Mods.IntMap.t;
   dangling: int; (* node_id *)
 }
 
@@ -1112,8 +1057,7 @@ end = struct
       used_id = Array.make (Array.length env.id_by_type) [];
       free_id = env.nb_id;
       cc_id = fresh_id env;
-      cc_links = Mods.IntMap.empty;
-      cc_internals = Mods.IntMap.empty;
+      cc_nodes = Mods.IntMap.empty;
       dangling = 0;
     }
 
@@ -1329,42 +1273,37 @@ let finish_new ?origin wk =
           List.rev_append wk.used_id.(i) wk.reserved_id.(i))
       (Array.length wk.used_id) in
   let cc_candidate =
-    { nodes_by_type = wk.used_id;
-      links = wk.cc_links; internals = wk.cc_internals;
-      recogn_nav =
-        raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links} in
+    { nodes_by_type = wk.used_id; nodes = wk.cc_nodes;
+      recogn_nav = raw_to_navigation false wk.used_id wk.cc_nodes} in
   let preenv,r,out = PreEnv.add_cc ?origin wk.cc_env wk.cc_id cc_candidate in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out
 
 let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
-  let x_n = Mods.IntMap.find_default [||] x wk.cc_links in
-  let y_n = Mods.IntMap.find_default [||] y wk.cc_links in
-  if x_n.(i) <> UnSpec then
-    raise (already_specified ~sigs:wk.sigs n1 i)
-  else if y_n.(j) <> UnSpec then
-    raise (already_specified ~sigs:wk.sigs n2 j)
-  else
-    let () = x_n.(i) <- Link (y,j) in
-    let () = y_n.(j) <- Link (x,i) in
+  let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
+  let y_n = Mods.IntMap.find_default [||] y wk.cc_nodes in
+  match x_n.(i), y_n.(j) with
+  | (UnSpec, stx), (UnSpec,sty) ->
+    let () = x_n.(i) <- (Link (y,j),stx) in
+    let () = y_n.(j) <- (Link (x,i),sty) in
     if wk.dangling = x || wk.dangling = y
     then { wk with dangling = 0 }
     else wk
+  | ((Free | Link _),_), _ ->
+    raise (already_specified ~sigs:wk.sigs n1 i)
+  | _, ((Free | Link _),_) ->
+    raise (already_specified ~sigs:wk.sigs n2 j)
 
 let new_free wk ((x,_ as n),i) =
-  let x_n = Mods.IntMap.find_default [||] x wk.cc_links in
-  if x_n.(i) <> UnSpec then
-    raise (already_specified ~sigs:wk.sigs n i)
-  else
-    let () = x_n.(i) <- Free in
-    wk
+  let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
+  match x_n.(i) with
+  | UnSpec,st -> let () = x_n.(i) <- (Free,st) in wk
+  | (Free | Link _),_ -> raise (already_specified ~sigs:wk.sigs n i)
 
 let new_internal_state wk ((x,_ as n), i) va =
-  let x_n = Mods.IntMap.find_default [||] x wk.cc_internals in
-  if x_n.(i) >= 0 then
-    raise (already_specified ~sigs:wk.sigs n i)
-  else
-    let () = x_n.(i) <- va in
-    wk
+  let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
+  let (l,s) = x_n.(i) in
+  if s >= 0 then raise (already_specified ~sigs:wk.sigs n i)
+  else let () = x_n.(i) <- (l,va) in wk
 
 let new_node wk type_id =
   let () = check_dangling wk in
@@ -1376,9 +1315,8 @@ let new_node wk type_id =
     let node = (h,type_id) in
     (node,
      { wk with
-       dangling = if Mods.IntMap.is_empty wk.cc_links then 0 else h;
-       cc_links = Mods.IntMap.add h (Array.make arity UnSpec) wk.cc_links;
-       cc_internals = Mods.IntMap.add h (Array.make arity (-1)) wk.cc_internals;
+       dangling = if Mods.IntMap.is_empty wk.cc_nodes then 0 else h;
+       cc_nodes = Mods.IntMap.add h (Array.make arity (UnSpec,-1)) wk.cc_nodes;
      })
   | [] ->
     let () = wk.used_id.(type_id) <- wk.free_id :: wk.used_id.(type_id) in
@@ -1386,11 +1324,9 @@ let new_node wk type_id =
     (node,
      { wk with
        free_id = succ wk.free_id;
-       dangling = if Mods.IntMap.is_empty wk.cc_links then 0 else wk.free_id;
-       cc_links =
-         Mods.IntMap.add wk.free_id (Array.make arity UnSpec) wk.cc_links;
-       cc_internals =
-         Mods.IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
+       dangling = if Mods.IntMap.is_empty wk.cc_nodes then 0 else wk.free_id;
+       cc_nodes =
+         Mods.IntMap.add wk.free_id (Array.make arity (UnSpec,-1)) wk.cc_nodes;
      })
 
 let minimal_env sigs contact_map =
