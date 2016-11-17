@@ -43,6 +43,15 @@ var dealWithFiles = function (files) {
     }
 }
 
+var stringOfInj = function (inj) {
+    return inj.reduce(
+	function (acc,v) {
+	    if (v[0] === v[1])
+		return acc + v[0] + " ";
+	    else
+		return acc + v[0] + "->" + v[1] + " ";
+	},"")
+}
 var addToGraph = function (cache,g,i) {
     if (cache.every(function (v) { return v !== i ; })) {
 	g.setNode(i, {label: JSON.stringify(domain.dag[i].content),
@@ -50,7 +59,7 @@ var addToGraph = function (cache,g,i) {
 	domain.dag[i].sons.forEach(function (s) {
 	    addToGraph(cache,g,s.dst);
 	    g.setEdge(i,s.dst,
-		      {label: JSON.stringify(s.nav),
+		      {label: JSON.stringify(s.nav) + " ("+ stringOfInj(s.inj)  +")",
 		       style: "fill: none; stroke: #222; stroke-width: 1.5px"});
 	});
 	cache.push(i);
