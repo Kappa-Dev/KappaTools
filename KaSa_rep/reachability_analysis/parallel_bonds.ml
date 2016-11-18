@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 17 2016>
+  * Last modification: Time-stamp: <Nov 18 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -453,8 +453,7 @@ struct
             in
             (*matching the value on the lhs*)
             match value with
-            | Usual_domains.Undefined
-            | Usual_domains.Val false -> error, false
+            | Usual_domains.Undefined -> error, false
             (*if the value in the result is different than the value on the lhs, then returns false*)
             | Usual_domains.Val b when b <> parallel_or_not -> error, false
             (*otherwise continue until the rest of the list*)
