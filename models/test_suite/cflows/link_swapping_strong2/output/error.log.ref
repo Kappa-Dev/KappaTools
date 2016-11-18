@@ -6,3 +6,4 @@ File "link_swapping_strong2.ka", line 7, characters 19-20:
 Warning: rule induces a link permutation on site 'y' of agent 'B'
 File "link_swapping_strong2.ka", line 7, characters 44-45:
 Warning: rule induces a link permutation on site 'x' of agent 'A'
+Warning: Environment.to_json is partial

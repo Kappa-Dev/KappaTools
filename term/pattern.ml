@@ -19,6 +19,13 @@ type id = int
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
+let id_to_yojson cc = `Int cc
+let id_of_yojson = function
+  | `Int cc -> cc
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Not a pattern id",x))
+
+
 module Set = Mods.IntSet
 
 module ObsMap = struct

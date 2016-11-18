@@ -311,8 +311,6 @@ let rec print_alg_expr init_mode logger  alg_expr network
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) -> Loggers.fprintf logger "0"
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) -> Loggers.fprintf logger "event_max"
-      | Alg_expr.STATE_ALG_OP (Operator.PLOTPERIOD) ->
-        Loggers.fprintf logger "period_t_point"
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         begin

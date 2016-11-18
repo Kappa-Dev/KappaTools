@@ -27,7 +27,6 @@ let main () =
          cli_args.Run_cli_args.inputKappaFileNames <-
            fic::(cli_args.Run_cli_args.inputKappaFileNames))
       usage_msg;
-    let () = Kappa_files.set_data cli_args.Run_cli_args.outputDataFile in
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
     (*  let () = match kasim_args.Kasim_args.marshalizeOutFile with
         | None -> ()
@@ -131,7 +130,7 @@ let main () =
     let () = A.export_network
         ~command_line
         ~command_line_quotes
-        ~data_file:(Kappa_files.get_data ())
+        ~data_file:cli_args.Run_cli_args.outputDataFile
         ~init_t:cli_args.Run_cli_args.minTimeValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxTimeValue)
         ~plot_period logger compil network in

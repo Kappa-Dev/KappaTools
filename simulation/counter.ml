@@ -252,6 +252,15 @@ let rec tick f c =
   | Some pr ->
     Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) f pr
 
+  let current_simulation_info c =
+  { Trace.Simulation_info.story_id = current_story c;
+    Trace.Simulation_info.story_time = current_time c;
+    Trace.Simulation_info.story_event = current_event c;
+    Trace.Simulation_info.profiling_info = (); }
+  let next_story c =
+    let () = inc_stories c in
+    current_simulation_info c
+
 let complete_progress_bar f c =
   match c.progress_report with
   | None -> ()

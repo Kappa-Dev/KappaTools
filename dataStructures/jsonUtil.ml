@@ -31,6 +31,13 @@ let to_list ?error_msg:(error_msg=build_msg "list") of_json = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let of_array to_json a =
+  `List (Array.fold_right (fun x acc -> to_json x::acc) a [])
+
+let to_array ?error_msg:(error_msg=build_msg "array") of_json = function
+  | `List l -> Tools.array_map_of_list of_json l
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
 let of_assoc to_json l =
   `Assoc (List.rev_map to_json (List.rev l))
 

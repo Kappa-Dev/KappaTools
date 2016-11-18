@@ -27,15 +27,6 @@ module Simulation_info = struct
     story_event = 0 ; profiling_info = a;
   }
 
-  let current c =
-  { story_id = Counter.current_story c;
-    story_time = Counter.current_time c;
-    story_event = Counter.current_event c;
-    profiling_info = (); }
-  let next_story c =
-    let () = Counter.inc_stories c in
-    current c
-
   let to_json f x =
     `Assoc [
       ("id",`Int x.story_id);
@@ -232,7 +223,7 @@ let print_step ?(compact=false) ?env f = function
   | Obs a -> print_obs ~compact ?env f a
   | Dummy _  -> ()
 
-let step_to_json = function
+let step_to_yojson = function
   | Subs (a,b) -> `List [`String "Subs"; `Int a; `Int b]
   | Event (x,y,z) ->
     `List [`String "Event";
@@ -249,7 +240,7 @@ let step_to_json = function
            `List (List.map (Instantiation.test_to_json Agent.to_json) y);
            Simulation_info.to_json (fun () -> `Null) z]
   | Dummy _ -> `Null
-let step_of_json = function
+let step_of_yojson = function
   | `List [`String "Subs"; `Int a; `Int b] -> Subs (a,b)
   | `List [`String "Event";x;y;z] ->
     Event (event_kind_of_json x,
@@ -264,9 +255,9 @@ let step_of_json = function
   | `Null -> Dummy ""
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect trace step",x))
 
-let to_json t = `List (List.rev_map step_to_json (List.rev t))
-let of_json = function
-  | `List l -> List.rev (List.rev_map step_of_json l)
+let to_yojson t = `List (List.rev_map step_to_yojson (List.rev t))
+let of_yojson = function
+  | `List l -> List.rev (List.rev_map step_of_yojson l)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a trace",x))
 
 let step_is_obs = function
@@ -312,12 +303,3 @@ let actions_of_step = function
   | Init y -> (y,[])
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
-
-let store_event counter event step_list =
-  match event with
-  | INIT _,(_,(actions,_,_)) -> (Init actions)::step_list
-  | OBS _,_ -> assert false
-  | (RULE _ | PERT _ as k),x ->
-    (Event (k,x,Simulation_info.current counter))::step_list
-let store_obs counter (i,x) step_list =
-  Obs(i,x,Simulation_info.next_story counter)::step_list

@@ -11,7 +11,6 @@ let value_state_alg_op counter ?(time=Counter.current_time counter) = function
     (match Counter.max_time counter with
      | Some t -> Nbr.F t
      | None -> Nbr.F infinity)
-  | Operator.PLOTPERIOD -> Nbr.F (Counter.plot_period counter)
 
 type alg_stack_element =
   | TO_EXEC_ALG of Operator.bin_alg_op * Alg_expr.t

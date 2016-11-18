@@ -43,7 +43,7 @@ let empty env stopping_times alg_overwrite =
     flux = [];
   }
 
-let initialize ~bind ~return env counter graph0 state0 init_l =
+let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
   let get_alg i = get_alg env state0 i in
   let mgraph =
     List.fold_left
@@ -64,11 +64,11 @@ let initialize ~bind ~return env counter graph0 state0 init_l =
                 Nbr.iteri
                   (fun _ s ->
                      match Rule_interpreter.apply_rule
-                             ~get_alg env
+                             ~outputs ~get_alg env
                              (Environment.connected_components_of_unary_rules env)
                              counter s (Trace.INIT creations_sort)
                              compiled_rule with
-                     | Rule_interpreter.Success (_,s) -> s
+                     | Rule_interpreter.Success s -> s
                      | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
                        raise (ExceptionDefn.Internal_Error
                                 ("Bugged initial rule",pos)))
@@ -101,7 +101,7 @@ let do_modification ~outputs env counter graph state modification =
      Nbr.iteri
        (fun _ g ->
           Rule_interpreter.force_rule
-            ~get_alg env
+            ~outputs ~get_alg env
             (Environment.connected_components_of_unary_rules env)
             counter g (Trace.PERT "pert") r)
        graph n,state)
@@ -254,15 +254,15 @@ let one_rule ~outputs dt stop env counter graph state =
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
   let cause = Trace.RULE rule.Primitives.syntactic_rule in
-  let apply_rule ~rule_id =
+  let apply_rule =
     if choice mod 2 = 1
-    then Rule_interpreter.apply_unary_rule ~rule_id
-    else Rule_interpreter.apply_rule ~rule_id in
+    then Rule_interpreter.apply_unary_rule ~outputs ~rule_id
+    else Rule_interpreter.apply_rule ~outputs ~rule_id in
   match apply_rule
-          ~rule_id ~get_alg env
+          ~get_alg env
           (Environment.connected_components_of_unary_rules env)
           counter graph cause rule with
-  | Rule_interpreter.Success (distance,graph') ->
+  | Rule_interpreter.Success (graph') ->
     let graph'' =
       Rule_interpreter.update_outdated_activities
         ~get_alg register_new_activity env counter graph' in
@@ -270,15 +270,6 @@ let one_rule ~outputs dt stop env counter graph state =
       List.iter
         (fun (_,fl) -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
         state.flux in
-    let () =
-      match distance with
-      | None -> ()
-      | Some d ->
-        outputs (Data.UnaryDistance {
-            Data.distance_rule = rule.Primitives.syntactic_rule;
-            Data.distance_time = Counter.current_time counter;
-            Data.distance_length = d;
-          }) in
     let () =
       if !Parameter.debugModeOn then
         Format.printf "@[<v>Obtained@ %a@]@."
@@ -357,7 +348,7 @@ let a_loop ~outputs env counter graph state =
     (true,graph'',state'')
   else out
 
-let end_of_simulation ~outputs form env counter graph state =
+let end_of_simulation ~outputs form env counter state =
   let () =
     List.iter
       (fun (_,e) ->
@@ -369,8 +360,7 @@ let end_of_simulation ~outputs form env counter graph state =
                   (Fluxmap.get_flux_name e)) in
          outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
       state.flux in
-  let () = ExceptionDefn.flush_warning form in
-  Rule_interpreter.generate_stories graph
+  ExceptionDefn.flush_warning form
 
 let batch_loop ~outputs form env counter graph state =
   let rec iter graph state =

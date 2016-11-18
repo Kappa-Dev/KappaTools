@@ -7,7 +7,6 @@ let tasks_profilingName = ref "profiling.html"
 let influenceFileName = ref ""
 let odeFileName = ref "ode.m"
 let fluxFileName = ref ""
-let outputDataName = ref "data.out"
 let distancesFileName = ref "distances"
 
 let path f =
@@ -55,10 +54,9 @@ let set name ext_opt =
       match ext_opt with
       | None -> !name
       | Some ext ->
-  if (Filename.check_suffix !name ext) then !name
-  else
-    (!name^"."^ext)
-    in
+        if (Filename.check_suffix !name ext) then !name
+        else
+          (!name^"."^ext) in
     name:=fname
 
 let setOutputName () =
@@ -66,10 +64,9 @@ let setOutputName () =
   set influenceFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
   set odeFileName (Some "m") ;
-  set marshalizedOutFile None;
-  set outputDataName None
+  set marshalizedOutFile None
 
-let setCheckFileExists ~batchmode =
+let setCheckFileExists ~batchmode outputFile =
   let check file =
     match file with
     | "" -> ()
@@ -85,7 +82,7 @@ let setCheckFileExists ~batchmode =
   check !influenceFileName ;
   check !fluxFileName ;
   check !marshalizedOutFile ;
-  check !outputDataName
+  check outputFile
 
 let setCheckFileExistsODE ~batchmode =
     let check file =
@@ -125,9 +122,6 @@ let set_dir s =
   outputDirName := s
 
 let get_dir () = !outputDirName
-
-let set_data f = outputDataName := f
-let get_data () = !outputDataName
 
 let set_ode f = odeFileName := f
 let get_ode () = !odeFileName

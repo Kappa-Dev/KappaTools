@@ -135,9 +135,8 @@ let print pr_alg pr_rule pr_pert f env =
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
  *)
 
-let check_if_counter_is_filled_enough counter x =
-  if Counter.max_time counter = None && Counter.max_events counter = None
-     && not @@
+let check_if_counter_is_filled_enough x =
+  if not @@
      Primitives.exists_modification
        (function Primitives.STOP _ -> true
                | (Primitives.ITER_RULE _ | Primitives.UPDATE _ |
@@ -149,7 +148,7 @@ let check_if_counter_is_filled_enough counter x =
              (Location.dummy_annot
                 "There is no way for the simulation to stop."))
 
-let propagate_constant updated_vars counter x =
+let propagate_constant ?max_time ?max_events updated_vars x =
   let algs' =
     Array.map (fun (x,y) -> (Location.dummy_annot x,y))
       x.algs.NamedDecls.decls in
@@ -157,7 +156,8 @@ let propagate_constant updated_vars counter x =
     Array.iteri
       (fun i (na,v) ->
          algs'.(i) <-
-           (na,Alg_expr.propagate_constant updated_vars counter algs' v))
+           (na,Alg_expr.propagate_constant
+              ?max_time ?max_events updated_vars algs' v))
       algs' in
   {
     domain = x.domain;
@@ -165,18 +165,22 @@ let propagate_constant updated_vars counter x =
     algs = NamedDecls.create algs';
     observables =
       Array.map
-        (Alg_expr.propagate_constant updated_vars counter algs') x.observables;
+        (Alg_expr.propagate_constant
+           ?max_time ?max_events updated_vars algs') x.observables;
     ast_rules = x.ast_rules;
     rules =
       Array.map
         (Primitives.map_expr_rule
-           (Alg_expr.propagate_constant updated_vars counter algs')) x.rules;
+           (Alg_expr.propagate_constant
+              ?max_time ?max_events updated_vars algs')) x.rules;
     cc_of_unaries = x.cc_of_unaries;
     perturbations =
       Array.map
         (Primitives.map_expr_perturbation
-           (Alg_expr.propagate_constant updated_vars counter algs')
-           (Alg_expr.propagate_constant_bool updated_vars counter algs'))
+           (Alg_expr.propagate_constant
+              ?max_time ?max_events updated_vars algs')
+           (Alg_expr.propagate_constant_bool
+              ?max_time ?max_events updated_vars algs'))
         x.perturbations;
     need_update_each_loop = x.need_update_each_loop;
     dependencies_in_time = x.dependencies_in_time;
@@ -185,12 +189,8 @@ let propagate_constant updated_vars counter x =
     tokens_reverse_dependencies = x.tokens_reverse_dependencies;
   }
 
-let dummy_kappa_instance _ =
-  let () =
-    ExceptionDefn.warning
-      (fun f -> Format.pp_print_string
-          f "KAPPA_INSTANCE not translated in json") in
-  `Null
+let kappa_instance_to_yojson =
+  JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson)
 
 let to_yojson env =
   let () =
@@ -201,11 +201,11 @@ let to_yojson env =
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
       (fun (x,_) ->
-         Alg_expr.to_json dummy_kappa_instance JsonUtil.of_int x) env.algs;
+         Alg_expr.to_json kappa_instance_to_yojson JsonUtil.of_int x) env.algs;
     "observables",
     `List (Array.fold_right
              (fun (x,_) l ->
-                Alg_expr.to_json dummy_kappa_instance JsonUtil.of_int x :: l)
+                Alg_expr.to_json kappa_instance_to_yojson JsonUtil.of_int x :: l)
              env.observables []);
     "ast_rules",
     `List
@@ -222,9 +222,8 @@ let to_yojson env =
        tokens_reverse_dependencies : Operator.DepSet.t array;*)
   ]
 
-let kappa_instance_of_dummy = function
-  | `Null -> []
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct kappa instance",x))
+let kappa_instance_of_yojson =
+  JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
 let of_yojson = function
   | `Assoc l as x when List.length l = 5 ->
@@ -234,14 +233,14 @@ let of_yojson = function
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
               (fun x -> Location.dummy_annot
-                  (Alg_expr.of_json kappa_instance_of_dummy
+                  (Alg_expr.of_json kappa_instance_of_yojson
                      (JsonUtil.to_int ?error_msg:None) x))
               (List.assoc "algs" l);
           observables = (match List.assoc "observables" l with
               | `List o ->
                 Tools.array_map_of_list
                   (fun x -> Location.dummy_annot
-                      (Alg_expr.of_json kappa_instance_of_dummy
+                      (Alg_expr.of_json kappa_instance_of_yojson
                          (JsonUtil.to_int ?error_msg:None) x)) o
               | _ -> raise Not_found);
           ast_rules = (match List.assoc "ast_rules" l with

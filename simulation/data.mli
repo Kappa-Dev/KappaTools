@@ -28,6 +28,7 @@ type distance = {
 type t = Flux of flux_map
        | Plot of float * Nbr.t array
        | Print of file_line
+       | TraceStep of Trace.step
        | Snapshot of snapshot
        | Log of string
        | UnaryDistance of distance

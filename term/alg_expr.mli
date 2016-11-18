@@ -56,11 +56,11 @@ val setup_alg_vars_rev_dep :
 val extract_connected_components : ('a,'b) e Location.annot -> 'a list
 
 val propagate_constant :
-  int list -> Counter.t ->
+  ?max_time:float -> ?max_events:int -> int list ->
   (string Location.annot * ('a,int) e Location.annot) array ->
   ('a,int) e Location.annot -> ('a,int) e Location.annot
 val propagate_constant_bool :
-  int list -> Counter.t ->
+  ?max_time:float -> ?max_events:int -> int list ->
   (string Location.annot * ('a,int) e Location.annot) array ->
   ('a,int) bool_expr Location.annot -> ('a,int) bool_expr Location.annot
 

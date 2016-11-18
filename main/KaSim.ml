@@ -10,47 +10,39 @@ let rec waitpid_non_intr pid =
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
 let finalize
-    ~outputs dotFormat cflow_file env counter graph state stories_compression =
+    ~outputs dotFormat cflow_file trace_file
+    env counter state stories_compression =
   let () = Outputs.close () in
   let () = Counter.complete_progress_bar Format.std_formatter counter in
-  match State_interpreter.end_of_simulation
-          ~outputs Format.std_formatter env counter graph state with
-  | None -> ()
-  | Some (dump,trace) ->
-    let () =
-      Kappa_files.with_channel dump
-        (fun c ->
-           let () = Yojson.Basic.to_channel c
-               (`Assoc [
-                   "env", Environment.to_yojson env;
-                   "trace", Trace.to_json trace]) in
-           output_char c '\n') in
-    match stories_compression with
-    | None -> ()
-    | Some (none,weak,strong) ->
-      let args = ["-d"; Kappa_files.get_dir (); Kappa_files.path dump] in
-      let args = if none then "--none" :: args else args in
-      let args = if weak then "--weak" :: args else args in
-      let args = if strong then "--strong" :: args else args in
-      let args = "-format" :: dotFormat :: args in
-      let args = match cflow_file with
-        | None -> args
-        | Some f -> "-o" :: f :: args in
-      let args = if !Parameter.time_independent
-        then "--time-independent" :: args else args in
-      let prog =
-        let predir =
-          Filename.dirname Sys.executable_name in
-        let dir = if Filename.is_implicit Sys.executable_name &&
-                     predir = "." then "" else predir^"/" in
-        dir^"KaStor" in
-      let pid = Unix.create_process prog (Array.of_list (prog::args))
-          Unix.stdin Unix.stdout Unix.stderr in
-      match waitpid_non_intr pid with
-      | _, Unix.WEXITED 127 -> failwith "Unavailable KaStor"
-      | _, Unix.WEXITED n -> if n <> 0 then exit n
-      | _, Unix.WSIGNALED n -> failwith ("Killed with signal "^string_of_int n)
-      | _, Unix.WSTOPPED n -> failwith ("Stopped with signal "^string_of_int n)
+  let () = State_interpreter.end_of_simulation
+      ~outputs Format.std_formatter env counter state in
+  match trace_file,stories_compression with
+  | None,_ -> ()
+  | Some _, None -> ()
+  | Some dump, Some (none,weak,strong) ->
+    let args = ["-d"; Kappa_files.get_dir (); Kappa_files.path dump] in
+    let args = if none then "--none" :: args else args in
+    let args = if weak then "--weak" :: args else args in
+    let args = if strong then "--strong" :: args else args in
+    let args = "-format" :: dotFormat :: args in
+    let args = match cflow_file with
+      | None -> args
+      | Some f -> "-o" :: f :: args in
+    let args = if !Parameter.time_independent
+      then "--time-independent" :: args else args in
+    let prog =
+      let predir =
+        Filename.dirname Sys.executable_name in
+      let dir = if Filename.is_implicit Sys.executable_name &&
+                   predir = "." then "" else predir^"/" in
+      dir^"KaStor" in
+    let pid = Unix.create_process prog (Array.of_list (prog::args))
+        Unix.stdin Unix.stdout Unix.stderr in
+    match waitpid_non_intr pid with
+    | _, Unix.WEXITED 127 -> failwith "Unavailable KaStor"
+    | _, Unix.WEXITED n -> if n <> 0 then exit n
+    | _, Unix.WSIGNALED n -> failwith ("Killed with signal "^string_of_int n)
+    | _, Unix.WSTOPPED n -> failwith ("Stopped with signal "^string_of_int n)
 
 let () =
   let cli_args = Run_cli_args.default in
@@ -65,7 +57,6 @@ let () =
       (fun fic -> cli_args.Run_cli_args.inputKappaFileNames <-
           fic::(cli_args.Run_cli_args.inputKappaFileNames))
       usage_msg;
-    let () = Kappa_files.set_data cli_args.Run_cli_args.outputDataFile in
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
     let () = match kasim_args.Kasim_args.marshalizeOutFile with
       | None -> ()
@@ -114,14 +105,14 @@ let () =
         counter,alg_overwrite = Cli_init.get_compilation
         ?max_event:kasim_args.Kasim_args.maxEventValue cli_args in
     let () =
-      if cli_args.Run_cli_args.batchmode then
-        Environment.check_if_counter_is_filled_enough counter env0 in
-    let env = Environment.propagate_constant updated_vars counter env0 in
+      if cli_args.Run_cli_args.batchmode &&
+       Counter.max_time counter = None && Counter.max_events counter = None then
+        Environment.check_if_counter_is_filled_enough env0 in
+    let env = Environment.propagate_constant
+        ?max_time:(Counter.max_time counter)
+        ?max_events:(Counter.max_events counter) updated_vars env0 in
 
-    let () =
-      Kappa_files.with_marshalized
-        (fun d -> Marshal.to_channel d init_result []) in
-    let () = Format.printf "+ Building initial state@." in
+    let outputs = Outputs.go (Environment.signatures env) in
     let trace_file =
       match kasim_args.Kasim_args.traceFile with
       | Some _ as x -> x
@@ -131,11 +122,31 @@ let () =
         | Some _ ->
           let () = tmp_trace := Some (Filename.temp_file "trace" ".json") in
           !tmp_trace in
+    let plotPack =
+      let head =
+        Environment.map_observables
+          (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+          env in
+      if head <> [||] then
+        let title = "Output of " ^ command_line in
+        Some (cli_args.Run_cli_args.outputDataFile,title,head)
+      else None in
+
+
+    Kappa_files.setCheckFileExists
+      ~batchmode:cli_args.Run_cli_args.batchmode
+      cli_args.Run_cli_args.outputDataFile;
+    if not !Parameter.compileModeOn then Outputs.initialize trace_file plotPack env;
+
+    let () =
+      Kappa_files.with_marshalized
+        (fun d -> Marshal.to_channel d init_result []) in
+    let () = Format.printf "+ Building initial state@." in
     let (graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
-        alg_overwrite counter env
-        trace_file ~store_distances:(unary_distances<>None)
+        ~outputs alg_overwrite counter env
+        ~with_trace:(trace_file<>None) ~store_distances:(unary_distances<>None)
         random_state init_l in
     let () = Format.printf "Done@." in
     let () =
@@ -153,21 +164,14 @@ let () =
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then let () = remove_trace () in exit 0 else ();
 
-    Kappa_files.setCheckFileExists ~batchmode:cli_args.Run_cli_args.batchmode ;
+        let () = match plotPack with
+          | None -> ()
+          | Some _ ->
+            Outputs.go (Environment.signatures env)
+              (Data.Plot
+                 (Counter.current_time counter,
+                  State_interpreter.observables_values env counter graph state)) in
 
-    let () =
-      let head =
-        Environment.map_observables
-          (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
-          env in
-      if head <> [||] then
-        let title = "Output of " ^ command_line in
-        let () = Outputs.create_plot
-            (Kappa_files.get_data (),title,head) in
-        Outputs.go (Environment.signatures env)
-          (Data.Plot
-             (Counter.current_time counter,
-              State_interpreter.observables_values env counter graph state)) in
     let () =
       match unary_distances with
       | None -> ()
@@ -181,14 +185,13 @@ let () =
 
     Parameter.initSimTime () ;
     let () =
-      let outputs = Outputs.go (Environment.signatures env) in
       if cli_args.Run_cli_args.batchmode then
-        let (graph',state') =
+        let (_,state') =
           State_interpreter.batch_loop
             ~outputs Format.std_formatter env counter graph state in
         finalize
-          ~outputs formatCflows cflowFile
-          env counter graph' state' story_compression
+          ~outputs formatCflows cflowFile trace_file
+          env counter state' story_compression
       else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel env graph state =
@@ -269,8 +272,8 @@ let () =
               env,(false,graph,state) in
           if stop then
             finalize
-              ~outputs formatCflows cflowFile
-              env counter graph' state' story_compression
+              ~outputs formatCflows cflowFile trace_file
+              env counter state' story_compression
           else
             toplevel env' graph' state' in
         if cli_args.Run_cli_args.interactive then
@@ -287,8 +290,8 @@ let () =
               Alg_expr.FALSE env counter graph state in
           if stop then
             finalize
-              ~outputs formatCflows cflowFile
-              env counter graph' state' story_compression
+              ~outputs formatCflows cflowFile trace_file
+              env counter state' story_compression
           else
           let () =
             Format.printf

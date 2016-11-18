@@ -43,7 +43,7 @@ let server_mode () =
         begin
           try
             let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
-            let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
+            let steps = Trace.of_yojson (Yojson.Basic.Util.member "trace" json) in
             let none = match Yojson.Basic.Util.to_bool_option
                                (Yojson.Basic.Util.member "none" json)
               with None -> false | Some b -> b in
@@ -91,7 +91,7 @@ let main () =
     let json = Yojson.Basic.from_channel desc in
     let () = close_in desc in
     let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
-    let steps = Trace.of_json (Yojson.Basic.Util.member "trace" json) in
+    let steps = Trace.of_yojson (Yojson.Basic.Util.member "trace" json) in
     let dotFormat = !dotCflows in
     Compression_main.compress_and_print
       parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps

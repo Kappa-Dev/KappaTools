@@ -11,7 +11,6 @@ let get_desc file =
 let close_desc () =
   Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) print_desc
 
-
 let dot_of_flux flux =
   let printer desc =
     let () = Format.fprintf
@@ -220,23 +219,45 @@ let print_values_raw is_tsv f (time,l) =
     !Parameter.plotSepChar (string_of_float time) print_sep
     (Pp.array print_sep (fun _ -> Nbr.print)) l
 
-let create_plot (filename,title,head) =
-  let format =
-    if Filename.check_suffix filename ".svg" then
-      Svg {Pp_svg.file = filename;
-           Pp_svg.title = title;
-           Pp_svg.descr = "";
-           Pp_svg.legend = head;
-           Pp_svg.points = [];
-          }
-    else
-      let d_chan = Kappa_files.open_out filename in
-      let d = Format.formatter_of_out_channel d_chan in
-      let is_tsv = Filename.check_suffix filename ".tsv" in
-      let () = if not is_tsv then Format.fprintf d "# %s@." title in
-      let () = print_header_raw is_tsv d head in
-      Raw {desc=d_chan; form=d; is_tsv} in
-  plotDescr := Some format
+let traceDescr = ref None
+let traceNotEmpty = ref false
+
+let close_trace () =
+  match !traceDescr with
+  | None -> ()
+  | Some desc ->
+    let () = output_string desc "]}\n" in
+    close_out desc
+
+let initialize trace_file plotPack env =
+  let () =
+    match trace_file with
+    | None -> ()
+    | Some s ->
+      let desc = Kappa_files.open_out s in
+      let () = output_string desc "{\"env\":" in
+      let () = Yojson.Basic.to_channel desc (Environment.to_yojson env) in
+      let () = output_string desc ",\"trace\":[" in
+      traceDescr := Some desc in
+  match plotPack with
+  | None -> ()
+  | Some (filename,title,head) ->
+    let format =
+      if Filename.check_suffix filename ".svg" then
+        Svg {Pp_svg.file = filename;
+             Pp_svg.title = title;
+             Pp_svg.descr = "";
+             Pp_svg.legend = head;
+             Pp_svg.points = [];
+            }
+      else
+        let d_chan = Kappa_files.open_out filename in
+        let d = Format.formatter_of_out_channel d_chan in
+        let is_tsv = Filename.check_suffix filename ".tsv" in
+        let () = if not is_tsv then Format.fprintf d "# %s@." title in
+        let () = print_header_raw is_tsv d head in
+        Raw {desc=d_chan; form=d; is_tsv} in
+    plotDescr := Some format
 
 let plot_now l =
   match !plotDescr with
@@ -295,6 +316,14 @@ let go env = function
     in
     Format.fprintf desc "%s@." p.Data.file_line_text
   | Data.Log s -> Format.printf "%s@." s
+  | Data.TraceStep step ->
+    begin match !traceDescr with
+      | None -> ()
+      | Some d ->
+        let () =
+          if !traceNotEmpty then output_char d ',' else traceNotEmpty := true in
+        Yojson.Basic.to_channel d (Trace.step_to_yojson step)
+    end
   | Data.UnaryDistance d ->
     match !distances with
     | None -> ()
@@ -304,6 +333,7 @@ let go env = function
 
 let close () =
   let () = close_plot () in
+  let () = close_trace () in
   let () =
     match !distances with
     | None -> ()

@@ -596,8 +596,8 @@ let compile ~outputs ~pause ~return
           unary_distances, formatCflow, cflowFile, init_l)
 
 let build_initial_state
-    ~bind ~return alg_overwrite counter env
-    trace_file ~store_distances random_state init_l =
+    ~bind ~return ~outputs alg_overwrite counter env
+    ~with_trace ~store_distances random_state init_l =
   let stops = Environment.fold_perturbations
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation
@@ -605,7 +605,7 @@ let build_initial_state
          List.fold_left (fun acc s -> (s,i)::acc) acc s)
       [] env in
   let graph0 = Rule_interpreter.empty
-      ?trace_file ~store_distances random_state env in
+      ~with_trace ~store_distances random_state env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
   State_interpreter.initialize
-    ~bind ~return env counter graph0 state0 init_l
+    ~bind ~return ~outputs env counter graph0 state0 init_l

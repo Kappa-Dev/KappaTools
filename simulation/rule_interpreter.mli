@@ -2,14 +2,12 @@
 
 type t (**Abstract graph*)
 
-type result = Clash | Corrected | Success of (int option * t)
-(** the int option is the distance between patterns in unimolecular
-    instances of rule if you've asked for them *)
+type result = Clash | Corrected | Success of t
 
 (** {6 Initialisation} *)
 
 val empty :
-  ?trace_file:string -> store_distances:bool ->
+  with_trace:bool -> store_distances:bool ->
   Random.State.t -> Environment.t -> t
 
 (** {6 algebraic expression computation} *)
@@ -26,22 +24,23 @@ val value_bool :
 (** {6 Core} *)
 
 val apply_rule :
-  ?rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Pattern.Set.t -> Counter.t ->
+  outputs:(Data.t -> unit) -> ?rule_id:int -> get_alg:(int -> Alg_expr.t) ->
+  Environment.t -> Pattern.Set.t -> Counter.t ->
   t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rule has an unary rate.*)
 
 val apply_unary_rule :
-  rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Pattern.Set.t -> Counter.t ->
+  outputs:(Data.t -> unit) -> rule_id:int -> get_alg:(int -> Alg_expr.t) ->
+  Environment.t -> Pattern.Set.t -> Counter.t ->
   t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
     [rule_id] is mandatory if the rule has an unary rate.*)
 
 val force_rule :
-  get_alg:(int -> Alg_expr.t) -> Environment.t -> Pattern.Set.t ->
-  Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> t
+  outputs:(Data.t -> unit) -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
+  Pattern.Set.t -> Counter.t -> t -> Trace.event_kind ->
+  Primitives.elementary_rule -> t
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)
@@ -82,7 +81,6 @@ val add_tracked :
   Instantiation.abstract Instantiation.test list ->
   t -> t
 val remove_tracked : Pattern.id array -> t -> t
-val generate_stories : t -> (string*Trace.t) option
 
 (** {6 Debugging} *)
 

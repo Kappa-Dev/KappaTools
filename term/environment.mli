@@ -65,7 +65,7 @@ val print :
 val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
 
-val check_if_counter_is_filled_enough : Counter.t -> t -> unit
-
-val propagate_constant : int list -> Counter.t -> t -> t
-(** [propagate_constant updated_vars counter env] *)
+val check_if_counter_is_filled_enough : t -> unit
+val propagate_constant :
+  ?max_time:float -> ?max_events:int -> int list -> t -> t
+(** [propagate_constant updated_vars env] *)

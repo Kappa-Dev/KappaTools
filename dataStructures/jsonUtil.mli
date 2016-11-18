@@ -18,6 +18,11 @@ val of_list: ('a -> Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
 val to_list:
   ?error_msg:string -> (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a list
 
+val of_array: ('a -> Yojson.Basic.json) -> 'a array -> Yojson.Basic.json
+
+val to_array:
+  ?error_msg:string -> (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a array
+
 val of_assoc:
   ('a  -> string * Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
 

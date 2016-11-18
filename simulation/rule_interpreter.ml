@@ -19,17 +19,15 @@ type t =
 
     random_state : Random.State.t;
     story_machinery :
-      (string *
        (Trace.event_kind * Pattern.id array *
         Instantiation.abstract Instantiation.test list)
-         list Pattern.ObsMap.t (*currently tracked ccs *) *
-       Trace.t) option;
+         list Pattern.ObsMap.t (*currently tracked ccs *) option;
     store_distances: bool;
   }
 
-type result = Clash | Corrected | Success of (int option * t)
+type result = Clash | Corrected | Success of t
 
-let empty ?trace_file ~store_distances random_state env =
+let empty ~with_trace ~store_distances random_state env =
   let with_connected_components =
     not (Pattern.Set.is_empty
            (Environment.connected_components_of_unary_rules env)) in
@@ -46,10 +44,10 @@ let empty ?trace_file ~store_distances random_state env =
     outdated_elements = Operator.DepSet.empty,false;
     random_state;
     story_machinery =
-      Tools.option_map
-        (fun s -> (s, Pattern.Env.new_obs_map
-                     (Environment.domain env) (fun _ -> []),[]))
-        trace_file;
+      if with_trace then
+        Some (Pattern.Env.new_obs_map
+                (Environment.domain env) (fun _ -> []))
+    else None;
     store_distances;
   }
 
@@ -291,10 +289,17 @@ let add_path_to_tests path tests =
     (Tools.list_rev_map_append
        (fun (x,y) -> Instantiation.Is_Bound_to (x,y)) path tests')
 
+let step_of_event counter event =
+  match event with
+  | Trace.INIT _,(_,(actions,_,_)) -> (Trace.Init actions)
+  | Trace.OBS _,_ -> assert false
+  | (Trace.RULE _ | Trace.PERT _ as k),x ->
+    (Trace.Event (k,x,Counter.current_simulation_info counter))
+
 let store_event counter inj2graph new_tracked_obs_instances event_kind
-    ?path extra_side_effects rule = function
-  | None as x -> x
-  | Some (compressions,x,steps) ->
+    ?path extra_side_effects rule outputs = function
+  | None -> ()
+  | Some _ ->
     let (ctests,(ctransfs,cside_sites,csides)) =
       Instantiation.concretize_event
         inj2graph rule.Primitives.instantiations in
@@ -305,19 +310,18 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
       | None -> ctests,cactions
       | Some path ->
         add_path_to_tests path ctests,cactions in
-    let steps' =
-      Trace.store_event counter (event_kind,full_concrete_event) steps in
-    let steps'' =
-      List.fold_left
-        (fun steps x ->
-           Trace.store_obs counter x steps)
-        steps' new_tracked_obs_instances
-    in
-    Some (compressions,x,steps'')
+    let () =
+      outputs (Data.TraceStep
+                 (step_of_event counter (event_kind,full_concrete_event))) in
+      List.iter
+        (fun (i,x) ->
+           outputs (Data.TraceStep
+                      (Trace.Obs(i,x,Counter.next_story counter))))
+        new_tracked_obs_instances
 
 let store_obs domain edges roots obs acc = function
   | None -> acc
-  | Some (_,tracked,_) ->
+  | Some tracked ->
     List.fold_left
       (fun acc (pattern,(root,_)) ->
          try
@@ -335,8 +339,8 @@ let store_obs domain edges roots obs acc = function
          with Not_found -> acc)
       acc obs
 
-let update_edges
-    counter domain unary_patterns inj_nodes state event_kind ?path rule =
+let update_edges outputs counter domain unary_patterns inj_nodes
+    state event_kind ?path rule =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
   (*Negative update*)
@@ -390,10 +394,10 @@ let update_edges
   let new_tracked_obs_instances =
     store_obs domain edges'' state.roots_of_patterns
       new_obs [] state.story_machinery in
-  let story_machinery' =
+  let () =
     store_event
       counter final_inj2graph new_tracked_obs_instances event_kind
-      ?path remaining_side_effects rule state.story_machinery in
+      ?path remaining_side_effects rule outputs state.story_machinery in
 
   let former_deps,changed_connectivity  = state.outdated_elements in
   let rev_deps = Operator.DepSet.union
@@ -413,7 +417,7 @@ let update_edges
     edges = edges''; tokens = state.tokens;
     outdated_elements = rev_deps,mod_connectivity;
     random_state = state.random_state;
-    story_machinery = story_machinery';
+    story_machinery = state.story_machinery;
     store_distances = state.store_distances; }
 
 let raw_instance_number state patterns_l =
@@ -530,17 +534,17 @@ let update_tokens ~get_alg env counter state consumed injected =
       ) state l in
   let state' = do_op Nbr.sub state consumed in do_op Nbr.add state' injected
 
-let transform_by_a_rule
-    ~get_alg env unary_patterns counter state event_kind ?path rule inj =
+let transform_by_a_rule ~get_alg outputs env unary_patterns counter
+    state event_kind ?path rule inj =
   let state' =
     update_tokens
       ~get_alg env counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges
-    counter (Environment.domain env) unary_patterns inj state' event_kind ?path rule
+  update_edges outputs counter (Environment.domain env) unary_patterns inj
+    state' event_kind ?path rule
 
 let apply_unary_rule
-    ~rule_id ~get_alg env unary_ccs counter state event_kind rule =
+    ~outputs ~rule_id ~get_alg env unary_ccs counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let inj,path =
@@ -601,9 +605,15 @@ let apply_unary_rule
         domain rule.Primitives.connected_components inj in
     match path with
     | Some p ->
+      let () =
+        if state'.store_distances then
+          outputs (Data.UnaryDistance {
+              Data.distance_rule = rule.Primitives.syntactic_rule;
+              Data.distance_time = Counter.current_time counter;
+              Data.distance_length = (List.length p);
+            }) in
       Success
-        ((if state'.store_distances then Some (List.length p) else None),
-         transform_by_a_rule ~get_alg env unary_ccs counter state'
+        (transform_by_a_rule ~get_alg outputs env unary_ccs counter state'
            event_kind ?path rule inj)
     | None ->
       let max_distance = match rule.Primitives.unary_rate with
@@ -612,13 +622,19 @@ let apply_unary_rule
       match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
       | None -> Corrected
       | Some p as path ->
+        let () =
+          if state'.store_distances then
+            outputs (Data.UnaryDistance {
+                Data.distance_rule = rule.Primitives.syntactic_rule;
+                Data.distance_time = Counter.current_time counter;
+                Data.distance_length = (List.length p);
+              }) in
         Success
-          ((if state'.store_distances then Some (List.length p) else None),
-           transform_by_a_rule ~get_alg env unary_ccs counter state'
+          (transform_by_a_rule ~get_alg outputs env unary_ccs counter state'
              event_kind ?path rule inj)
 
 let apply_rule
-    ?rule_id ~get_alg env unary_patterns counter state event_kind rule =
+    ~outputs ?rule_id ~get_alg env unary_patterns counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let from_patterns () =
@@ -655,34 +671,32 @@ let apply_rule
     match rule.Primitives.unary_rate with
     | None ->
       let out =
-        transform_by_a_rule
-          ~get_alg env unary_patterns counter state event_kind rule inj in
-      Success (None,out)
+        transform_by_a_rule ~get_alg outputs env unary_patterns counter
+          state event_kind rule inj in
+      Success out
     | Some (_,max_distance) ->
       match max_distance with
       | None ->
         if Edges.in_same_connected_component roots.(0) roots.(1) state.edges then
           Corrected
         else
-          Success (None,transform_by_a_rule
-                     ~get_alg env unary_patterns counter state
-                     event_kind rule inj)
+          Success (transform_by_a_rule ~get_alg outputs env unary_patterns
+                     counter state event_kind rule inj)
       | Some _ ->
         let nodes = Pattern.Matching.elements_with_types
             domain rule.Primitives.connected_components inj in
         match
           Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
         | None ->
-          Success (None,transform_by_a_rule
-                     ~get_alg env unary_patterns counter state
-                     event_kind rule inj)
+          Success (transform_by_a_rule ~get_alg outputs env unary_patterns
+                     counter state event_kind rule inj)
         | Some _ -> Corrected
 
 let force_rule
-    ~get_alg env unary_patterns counter state event_kind rule =
+    ~outputs ~get_alg env unary_patterns counter state event_kind rule =
   match apply_rule
-          ~get_alg env unary_patterns counter state event_kind rule with
-  | Success (_,out) -> out
+          ~outputs ~get_alg env unary_patterns counter state event_kind rule with
+  | Success out -> out
   | Corrected | Clash ->
     let () = assert (not state.outdated) in
     match all_injections
@@ -693,7 +707,7 @@ let force_rule
     | l ->
       let (h,_) = Tools.list_random state.random_state l in
       (transform_by_a_rule
-         ~get_alg env unary_patterns counter state event_kind rule h)
+         ~get_alg outputs env unary_patterns counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
   let () = assert (not state.outdated) in
@@ -816,7 +830,7 @@ let add_tracked patterns event_kind tests state =
   let () = state.outdated <- true in
   match state.story_machinery with
   | None -> state
-  | Some (_,tpattern,_) ->
+  | Some tpattern ->
     let () =
       Array.iter
         (fun pattern ->
@@ -830,7 +844,7 @@ let remove_tracked patterns state =
   let () = state.outdated <- true in
   match state.story_machinery with
   | None -> state
-  | Some (_,tpattern,_) ->
+  | Some tpattern ->
     let tester (_,el,_) =
       not @@
       Tools.array_fold_lefti
@@ -843,9 +857,5 @@ let remove_tracked patterns state =
            Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
         patterns in
     { state with outdated = false }
-
-let generate_stories state =
-  Tools.option_map
-    (fun (comp,_,steps) -> (comp,List.rev steps)) state.story_machinery
 
 let get_random_state state = state.random_state

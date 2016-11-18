@@ -76,6 +76,9 @@ val print_cc :
 val print : ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
 
+val id_to_yojson : id -> Yojson.Basic.json
+val id_of_yojson : Yojson.Basic.json -> id
+
 val find_root_type : t -> int option
 
 val automorphisms : t -> Renaming.t list

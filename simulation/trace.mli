@@ -77,12 +77,8 @@ val creation_of_step : step -> int list
 val print_step:
   ?compact:bool -> ?env:Environment.t -> Format.formatter -> step -> unit
 
-val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t
+val step_to_yojson : step -> Yojson.Basic.json
+val step_of_yojson : Yojson.Basic.json -> step
 
-val store_event:
-  Counter.t -> (event_kind * Instantiation.concrete Instantiation.event) ->
-  t -> t
-val store_obs :
-  Counter.t -> (event_kind * Instantiation.concrete Instantiation.test list) ->
-  t -> t
+val to_yojson : t -> Yojson.Basic.json
+val of_yojson : Yojson.Basic.json -> t

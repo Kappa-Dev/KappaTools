@@ -7,7 +7,7 @@ val empty : Environment.t -> (Nbr.t * int) list -> (int * Alg_expr.t) list -> t
 
 val initialize :
   bind:('a -> (Rule_interpreter.t * t -> 'a) -> 'a) ->
-  return:(Rule_interpreter.t * t -> 'a) ->
+  return:(Rule_interpreter.t * t -> 'a) -> outputs:(Data.t -> unit) ->
   Environment.t -> Counter.t -> Rule_interpreter.t -> t ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
   'a
@@ -34,9 +34,8 @@ val a_loop :
 
 val end_of_simulation :
   outputs:(Data.t -> unit) -> Format.formatter ->
-  Environment.t -> Counter.t -> Rule_interpreter.t -> t ->
-  (string*Trace.t) option
-(** What to do after stopping simulation. Returns maybe a trace *)
+  Environment.t -> Counter.t -> t -> unit
+(** What to do after stopping simulation. *)
 
 val batch_loop :
   outputs:(Data.t -> unit) -> Format.formatter -> Environment.t -> Counter.t ->

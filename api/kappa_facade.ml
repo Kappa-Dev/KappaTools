@@ -167,11 +167,8 @@ let create_t
       ?max_time:None ?max_event:None ~plot_period:1. in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
-  { is_running = true ;
-    run_finalize = false ;
-    counter = counter ;
-    log_buffer = log_buffer ;
-    log_form = log_form ;
+  {
+    is_running = true; run_finalize = false; counter; log_buffer; log_form;
     plot = { Api_types_j.plot_legend = [] ;
              Api_types_j.plot_time_series = [] ; } ;
     distances = [];
@@ -179,15 +176,8 @@ let create_t
     flux_maps = [];
     files = [];
     error_messages = [];
-    contact_map = contact_map;
-    env = env ;
-    graph = graph;
-    state = state ;
-    store_distances = store_distances;
-    init_l = init_l;
-    has_tracking = has_tracking;
-    lastyield = lastyield;
-    file_indexes = file_indexes;
+    contact_map; env; graph; state; store_distances; init_l; has_tracking;
+    lastyield; file_indexes;
   }
 
 let clone_t t =
@@ -268,6 +258,7 @@ let build_ast
                         | Data.Snapshot _
                         | Data.Flux _
                         | Data.Plot _
+                        | Data.TraceStep _
                         | Data.Print _
                         | Data.UnaryDistance _ -> assert false)
                     sig_nd tk_nd contact_map result >>=
@@ -278,12 +269,10 @@ let build_ast
                          ~contact_map:contact_map
                          ~env:env
                          ~graph:(Rule_interpreter.empty
+                                   ~with_trace:(has_tracking <>None)
                                    ~store_distances random_state env)
                          ~state:(State_interpreter.empty env [] [])
-                         ~store_distances:store_distances
-                         ~init_l:init_l
-                         ~has_tracking:has_tracking
-                         ~lastyield:lastyield
+                         ~store_distances ~init_l ~has_tracking ~lastyield
                          ~file_indexes:(Some indexes)
                      in
                      Lwt.return (`Ok simulation)))))))
@@ -321,6 +310,7 @@ let outputs (simulation : t) =
        Api_types_j.distance_length = d.Data.distance_length}
       :: simulation.distances
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
+  | Data.TraceStep _ -> () (*TODO*)
 
 let parse
     ~(system_process : system_process)
@@ -346,15 +336,9 @@ let time_yield
     system_process#yield ()
   else Lwt.return_unit
 
-let finalize_simulation
-    ~(t : t) : unit =
-  let _ =
-    State_interpreter.end_of_simulation
-      ~outputs:(outputs t)
-      t.log_form t.env
-      t.counter t.graph
-      t.state
-  in ()
+let finalize_simulation ~(t : t) : unit =
+  State_interpreter.end_of_simulation
+    ~outputs:(outputs t) t.log_form t.env t.counter t.state
 
 let run_simulation
     ~(system_process : system_process)
@@ -406,10 +390,6 @@ let start
     Lwt.async
       (fun () ->
          Lwt.catch (fun () ->
-             let trace_file =
-               Tools.option_map
-                 (fun  _ -> "trace.json")
-                 t.has_tracking in
              let () =
                Counter.set_max_time
                  t.counter
@@ -433,10 +413,10 @@ let start
                ~bind:(fun x f ->
                    (time_yield ~system_process:system_process ~t:t) >>=
                    (fun () -> x >>= f))
-               ~return:Lwt.return []
+               ~return:Lwt.return ~outputs:(outputs t) []
+               ~with_trace:(t.has_tracking <> None)
                t.counter
                t.env
-               trace_file
                ~store_distances:t.store_distances
                random_state
                t.init_l >>=

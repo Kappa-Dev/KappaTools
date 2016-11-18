@@ -1,7 +1,7 @@
 type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS
 type state_alg_op = CPUTIME | TIME_VAR | EVENT_VAR | NULL_EVENT_VAR
-                  | TMAX_VAR | EMAX_VAR | PLOTPERIOD
+                  | TMAX_VAR | EMAX_VAR
 type bool_op = AND | OR
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
@@ -64,7 +64,6 @@ let state_alg_op_to_string = function
   | NULL_EVENT_VAR -> "[E-]"
   | TMAX_VAR -> "[Tmax]"
   | EMAX_VAR -> "[Emax]"
-  | PLOTPERIOD -> "[pp]"
 
 let print_state_alg_op f op =
   Format.pp_print_string f (state_alg_op_to_string op)
@@ -77,7 +76,6 @@ let state_alg_op_of_json = function
   | `String "[E-]" ->  NULL_EVENT_VAR
   | `String "[Tmax]" -> TMAX_VAR
   | `String "[Emax]" -> EMAX_VAR
-  | `String "[p]" -> PLOTPERIOD
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect state_alg_op",x))
 
 let bool_op_to_string = function
