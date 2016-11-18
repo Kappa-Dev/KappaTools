@@ -524,27 +524,27 @@ module Make (M:Nul)  =
     let mvbdu_keep_head_only = lift1_ __POS__ Boolean_mvbdu.keep_head_only
 
     let mvbdu_cartesian_abstraction parameters handler error bdu =
-      let error',handler,bdd_true = mvbdu_true parameters handler error in
-      let error = Exception.check_point
+      let error,handler,bdd_true = mvbdu_true parameters handler error in
+      (*let error = Exception.check_point
           Exception.warn parameters error error' __POS__ Exit
-      in
-      let error'',handler,bdd_false = mvbdu_false parameters handler error in
-      let error = Exception.check_point
+      in*)
+      let error,handler,bdd_false = mvbdu_false parameters handler error in
+      (*let error = Exception.check_point
           Exception.warn parameters error error'' __POS__ Exit
-      in
+      in*)
       let rec aux error handler bdu list =
         if equal bdu bdd_true || equal bdu bdd_false
         then
           error,handler,List.rev list
         else
-          let error',handler,head = mvbdu_keep_head_only parameters error handler  bdu in
-          let error = Exception.check_point
+          let error,handler,head = mvbdu_keep_head_only parameters error handler  bdu in
+          (*let error = Exception.check_point
               Exception.warn parameters error error' __POS__ Exit
-          in
-          let error'',handler,tail = mvbdu_clean_head parameters error handler bdu in
-          let error = Exception.check_point
+          in*)
+          let error,handler,tail = mvbdu_clean_head parameters error handler bdu in
+          (*let error = Exception.check_point
               Exception.warn parameters error error'' __POS__ Exit
-          in
+          in*)
           aux error handler tail (head::list)
       in aux error handler bdu []
 
@@ -552,24 +552,24 @@ module Make (M:Nul)  =
       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int
 
     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
-      let error',handler,l =
+      let error,handler,l =
         variables_list_of_mvbdu parameters handler error bdu in
-      let error = Exception.check_point
+      (*let error = Exception.check_point
           Exception.warn parameters error error' __POS__ Exit
-      in
-      let error'',handler,list =
+      in*)
+      let error,handler,list =
         extensional_of_variables_list parameters handler error l in
-      let error = Exception.check_point
+      (*let error = Exception.check_point
           Exception.warn parameters error error'' __POS__ Exit
-      in
+      in*)
       let size = List.length list in
-      let error_3,handler,(bdu_opt,list) =
+      let error,handler,(bdu_opt,list) =
         mvbdu_cartesian_decomposition_depth parameters handler error bdu
           (size/2)
       in
-      let error = Exception.check_point
+      (*let error = Exception.check_point
           Exception.warn parameters error error_3 __POS__ Exit
-      in
+      in*)
       match
         bdu_opt
       with
