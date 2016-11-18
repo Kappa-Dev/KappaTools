@@ -605,6 +605,106 @@ A() => [ A(x) v A(x!A.x) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=46
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=45
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=57
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=56
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=55
+     Node(site_type:0<2)
+      Id=44
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=14
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=44
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=48
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=47
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=46
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=45
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------

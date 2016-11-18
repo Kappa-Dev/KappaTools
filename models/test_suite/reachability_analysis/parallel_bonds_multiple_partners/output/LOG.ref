@@ -1579,6 +1579,231 @@ A() => [ A(b~u) v A(b~p) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=329
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=328
+   Node(site_type:0<1)
+    Id=320
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=319
+       Node(site_type:1<1)
+        Id=318
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=317
+           Node(site_type:2<1)
+            Id=314
+             Node(site_type:3<0)
+              Id=0
+               Leaf False 
+
+              Id=313
+               Node(site_type:3<1)
+                Id=9
+                 Node(site_type:4<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=8
+                   Node(site_type:4<1)
+                    Id=1
+                     Leaf True 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+            Id=316
+             Node(site_type:2<2)
+              Id=315
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=32
+                 Node(site_type:3<2)
+                  Id=9
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=0
+               Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=327
+     Node(site_type:0<2)
+      Id=326
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=325
+         Node(site_type:1<2)
+          Id=324
+           Node(site_type:2<0)
+            Id=0
+             Leaf False 
+
+            Id=323
+             Node(site_type:2<1)
+              Id=314
+               Node(site_type:3<0)
+                Id=0
+                 Leaf False 
+
+                Id=313
+                 Node(site_type:3<1)
+                  Id=9
+                   Node(site_type:4<0)
+                    Id=0
+                     Leaf False 
+
+                    Id=8
+                     Node(site_type:4<1)
+                      Id=1
+                       Leaf True 
+
+                      Id=0
+                       Leaf False 
+
+                  Id=0
+                   Leaf False 
+
+              Id=322
+               Node(site_type:2<2)
+                Id=321
+                 Node(site_type:3<0)
+                  Id=0
+                   Leaf False 
+
+                  Id=234
+                   Node(site_type:3<2)
+                    Id=190
+                     Node(site_type:4<0)
+                      Id=0
+                       Leaf False 
+
+                      Id=36
+                       Node(site_type:4<2)
+                        Id=1
+                         Leaf True 
+
+                        Id=0
+                         Leaf False 
+
+                    Id=0
+                     Leaf False 
+
+                Id=0
+                 Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=187
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=192
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=191
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=188
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=28
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=189
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=190
+ Node(site_type:4<0)
+  Id=0
+   Leaf False 
+
+  Id=36
+   Node(site_type:4<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------

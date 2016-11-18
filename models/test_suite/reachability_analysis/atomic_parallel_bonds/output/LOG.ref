@@ -526,6 +526,146 @@ B() => [ B(z) v B(z!A.z) ]
 ------------------------------------------------------------
 A(t!B.t,z!B.z) => A(t!2,z!1),B(t!2,z!1)
 B(t!A.t,z!A.z) => B(t!2,z!1),A(t!2,z!1)
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=24
+     Node(site_type:0<2)
+      Id=17
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=24
+     Node(site_type:0<2)
+      Id=17
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=18
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=18
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------

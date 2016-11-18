@@ -2469,6 +2469,406 @@ C() => [ C(x~u?) v C(x~p?) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:3<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=51
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=62
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=61
+   Node(site_type:1<1)
+    Id=59
+     Node(site_type:3<0)
+      Id=0
+       Leaf False 
+
+      Id=58
+       Node(site_type:3<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=60
+     Node(site_type:1<2)
+      Id=56
+       Node(site_type:3<0)
+        Id=0
+         Leaf False 
+
+        Id=55
+         Node(site_type:3<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=65
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=64
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=63
+     Node(site_type:0<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=10
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=62
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=61
+   Node(site_type:1<1)
+    Id=59
+     Node(site_type:3<0)
+      Id=0
+       Leaf False 
+
+      Id=58
+       Node(site_type:3<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=60
+     Node(site_type:1<2)
+      Id=56
+       Node(site_type:3<0)
+        Id=0
+         Leaf False 
+
+        Id=55
+         Node(site_type:3<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=65
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=64
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=63
+     Node(site_type:0<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=10
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:3<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=51
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=22
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=56
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=55
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=51
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=22
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=56
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=55
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=51
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------

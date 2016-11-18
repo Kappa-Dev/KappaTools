@@ -4,6 +4,7 @@ _____(1)
 A(x!1(*x.B*)>>⊥), B(x!1(*x.A*)>>⊥)
 _____(1)
  (+ν) B(x!1), A(x!1)
+File '/tmp/KaSim-test-blob-marshal' already exists do you want to erase (y/N)?
 Environment:
   Signatures:
     A(x)

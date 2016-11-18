@@ -438,6 +438,76 @@ C() => [ C(z) v C(z!C.z) v C(z!C.t) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=45
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=44
+   Node(site_type:0<2)
+    Id=40
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:1<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=43
+     Node(site_type:0<3)
+      Id=17
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<1)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=40
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=39
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=38
+   Node(site_type:0<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------

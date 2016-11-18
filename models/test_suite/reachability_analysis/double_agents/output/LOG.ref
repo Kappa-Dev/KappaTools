@@ -1431,6 +1431,241 @@ C() => [ C(x) v C(x!B.x) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=6
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=93
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=9
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=95
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=94
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=100
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=99
+   Node(site_type:2<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=115
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=114
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:1<1)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:1<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=113
+     Node(site_type:0<2)
+      Id=18
+       Node(site_type:1<2)
+        Id=0
+         Leaf False 
+
+        Id=17
+         Node(site_type:1<3)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=112
+       Node(site_type:0<3)
+        Id=3
+         Node(site_type:1<0)
+          Id=0
+           Leaf False 
+
+          Id=2
+           Node(site_type:1<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=95
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=94
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=6
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=93
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=9
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=95
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=94
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=96
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=17
+   Node(site_type:1<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=100
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=99
+   Node(site_type:2<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=102
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=101
+   Node(site_type:0<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=95
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=94
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------

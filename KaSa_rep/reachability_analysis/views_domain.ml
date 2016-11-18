@@ -3270,19 +3270,13 @@ struct
       if local_trace
       || Remanent_parameters.get_dump_reachability_analysis_result parameters
       then
-        let error =
-          let _ =
-            print_result_fixpoint_aux
-              parameters
-              handler
-              error
-              kappa_handler
-              store_remanent_triple
-              fixpoint_result
-          in
+        print_result_fixpoint_aux
+          parameters
+          handler
           error
-        in
-        error, handler
+          kappa_handler
+          store_remanent_triple
+          fixpoint_result
       else error, handler
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -3588,13 +3582,13 @@ struct
         Exception.warn parameters error error' __POS__ Exit
     in
     (*export of (non)relational properties*) (*CHECK ME*)
-    (*let error'', dynamic, kasa_state =
+    let error'', dynamic, kasa_state =
       export_views_properties
         static dynamic error kasa_state
     in
     let error = Exception.check_point
         Exception.warn parameters error error'' __POS__ Exit
-    in*)
+    in
     error, dynamic, kasa_state
 
 (**************************************************************************)

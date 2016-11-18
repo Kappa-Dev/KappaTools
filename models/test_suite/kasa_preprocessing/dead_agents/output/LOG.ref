@@ -786,6 +786,116 @@ B() => [ B(x~u) v B(x~p) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=23
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=22
+     Node(site_type:0<2)
+      Id=0
+       Leaf False 
+
+      Id=21
+       Node(site_type:0<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=23
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=22
+     Node(site_type:0<2)
+      Id=0
+       Leaf False 
+
+      Id=21
+       Node(site_type:0<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
