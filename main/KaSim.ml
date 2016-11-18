@@ -16,6 +16,7 @@ let finalize
   let () = Counter.complete_progress_bar Format.std_formatter counter in
   let () = State_interpreter.end_of_simulation
       ~outputs Format.std_formatter env counter state in
+  let () = ExceptionDefn.flush_warning Format.err_formatter in
   match trace_file,stories_compression with
   | None,_ -> ()
   | Some _, None -> ()
@@ -312,32 +313,38 @@ let () =
       Counter.print_efficiency Format.std_formatter counter ;
   with
   | ExceptionDefn.Malformed_Decl er ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let () = Outputs.close () in
     let () = remove_trace () in
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () = Pp.error Format.pp_print_string er in
     exit 2
   | ExceptionDefn.Internal_Error er ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let () = Outputs.close () in
     let () = remove_trace () in
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () =
       Pp.error
         (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
         er in
     exit 2
-  | Invalid_argument msg ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
-    let () = remove_trace () in
-    let s = "" (*Printexc.get_backtrace()*) in
-    let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
-    exit 2
   | Sys.Break ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let () = Outputs.close () in
     let () = remove_trace () in
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
     let () =
       Format.eprintf "@.***Interrupted by user out of simulation loop***@." in
     exit 1
-  | e ->
-    let () = ExceptionDefn.flush_warning Format.err_formatter in
+  | Invalid_argument msg ->
+    let () = Outputs.close () in
     let () = remove_trace () in
-    let () = Format.eprintf "%s@." (Printexc.to_string e) in
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let s = Printexc.get_backtrace() in
+    let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
+    exit 2
+  | e ->
+    let () = Outputs.close () in
+    let () = remove_trace () in
+    let () = ExceptionDefn.flush_warning Format.err_formatter in
+    let s = Printexc.get_backtrace() in
+    let () = Format.eprintf "@.@[<v>%s@,%s@]@." (Printexc.to_string e) s in
     exit 3
