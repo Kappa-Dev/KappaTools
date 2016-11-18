@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 17 2016>
+   * Last modification: Time-stamp: <Nov 18 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -2748,9 +2748,12 @@ struct
   let smash_map decomposition
       ~show_dep_with_dimmension_higher_than:_dim_min
       parameters handler error _handler_kappa site_correspondence result =
-    let error,handler,mvbdu_true =
+    let error',handler,mvbdu_true =
       Ckappa_sig.Views_bdu.mvbdu_true
         parameters handler error
+    in
+    let error = Exception.check_point
+        Exception.warn parameters error error' __POS__ Exit
     in
     Covering_classes_type.AgentCV_map_and_set.Map.fold
       (fun (agent_type, cv_id) bdu (error,handler,output) ->
@@ -3480,9 +3483,9 @@ struct
               Exception.warn parameters error error' __POS__ Exit
           in
           error, current_list
-        ) (error, []) (List.rev list)
+        ) (error, [])(* (List.rev list)*) list
     in
-    let error' = Exception.check_point
+    let error = Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
     (*------------------------------------------------------------------*)
@@ -3584,7 +3587,7 @@ struct
     let error = Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
-    (*export of (non)relational properties*)
+    (*export of (non)relational properties*) (*CHECK ME*)
     (*let error'', dynamic, kasa_state =
       export_views_properties
         static dynamic error kasa_state

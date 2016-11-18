@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Sep 14 2016>
+   * Last modification: Time-stamp: <Nov 18 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -426,8 +426,10 @@ module Make (M:Nul)  =
 
     let mvbdu_id _parameters handler error a = error, handler, a
 
-    let mvbdu_unary_true parameters handler error _ =  mvbdu_true parameters handler error
-    let mvbdu_unary_false parameters handler error _ = mvbdu_false parameters handler error
+    let mvbdu_unary_true parameters handler error _ =
+      mvbdu_true parameters handler error
+    let mvbdu_unary_false parameters handler error _ =
+      mvbdu_false parameters handler error
 
     let mvbdu_and = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_and
     let mvbdu_or = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_or
@@ -522,14 +524,27 @@ module Make (M:Nul)  =
     let mvbdu_keep_head_only = lift1_ __POS__ Boolean_mvbdu.keep_head_only
 
     let mvbdu_cartesian_abstraction parameters handler error bdu =
-      let error,handler,bdd_true = mvbdu_true parameters handler error in
-      let error,handler,bdd_false = mvbdu_false parameters handler error in
+      let error',handler,bdd_true = mvbdu_true parameters handler error in
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit
+      in
+      let error'',handler,bdd_false = mvbdu_false parameters handler error in
+      let error = Exception.check_point
+          Exception.warn parameters error error'' __POS__ Exit
+      in
       let rec aux error handler bdu list =
         if equal bdu bdd_true || equal bdu bdd_false
-        then error,handler,List.rev list
+        then
+          error,handler,List.rev list
         else
-          let error,handler,head = mvbdu_keep_head_only parameters error handler  bdu in
-          let error,handler,tail = mvbdu_clean_head parameters error handler bdu in
+          let error',handler,head = mvbdu_keep_head_only parameters error handler  bdu in
+          let error = Exception.check_point
+              Exception.warn parameters error error' __POS__ Exit
+          in
+          let error'',handler,tail = mvbdu_clean_head parameters error handler bdu in
+          let error = Exception.check_point
+              Exception.warn parameters error error'' __POS__ Exit
+          in
           aux error handler tail (head::list)
       in aux error handler bdu []
 
@@ -537,10 +552,24 @@ module Make (M:Nul)  =
       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int
 
     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
-      let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
-      let error,handler,list = extensional_of_variables_list parameters handler error l in
+      let error',handler,l =
+        variables_list_of_mvbdu parameters handler error bdu in
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit
+      in
+      let error'',handler,list =
+        extensional_of_variables_list parameters handler error l in
+      let error = Exception.check_point
+          Exception.warn parameters error error'' __POS__ Exit
+      in
       let size = List.length list in
-      let error,handler,(bdu_opt,list) = mvbdu_cartesian_decomposition_depth parameters handler error bdu (size/2) in
+      let error_3,handler,(bdu_opt,list) =
+        mvbdu_cartesian_decomposition_depth parameters handler error bdu
+          (size/2)
+      in
+      let error = Exception.check_point
+          Exception.warn parameters error error_3 __POS__ Exit
+      in
       match
         bdu_opt
       with
