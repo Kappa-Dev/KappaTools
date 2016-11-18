@@ -2,6 +2,7 @@ load_printer "str.cma"
 load_printer "easy_format.cmo"
 load_printer "biniou.cma"
 load_printer "yojson.cmo"
+load_printer "KappaLib.cma"
 load_printer "db_printers.cma"
 
 install_printer Mods.IntSetMap.Set.print

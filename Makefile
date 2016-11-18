@@ -240,7 +240,7 @@ doc: man/KaSim_manual.pdf
 doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
 debug:
-	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte KaDE.byte KaStor.byte WebSim.byte dev/db_printers.cma
+	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte KaDE.byte KaStor.byte WebSim.byte KappaLib.cma dev/db_printers.cma
 
 profiling:
 	@+$(MAKE) EXTRAFLAGS="-pkg landmarks.ppx -pkg landmarks" OCAML_LANDMARKS="auto,allocation" all
