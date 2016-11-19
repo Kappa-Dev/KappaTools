@@ -28,12 +28,12 @@ type rule = {
   k_def: (mixture,string) Alg_expr.e Location.annot ;
   k_un:
     ((mixture,string) Alg_expr.e Location.annot *
-     int Location.annot option) option;
+     (mixture,string) Alg_expr.e Location.annot option) option;
   (*k_1:radius_opt*)
   k_op: (mixture,string) Alg_expr.e Location.annot option ;
   k_op_un:
     ((mixture,string) Alg_expr.e Location.annot *
-     int Location.annot option) option;
+     (mixture,string) Alg_expr.e Location.annot option) option;
   (*rate for backward rule*)
 }
 

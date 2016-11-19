@@ -73,11 +73,9 @@ let rules_of_ast
     | Some ((_,pos as rate),dist) ->
       let dist' = match dist with
         | None -> None
-        | Some (dist, pos_dist) ->
-          if dist = 0 then
-            raise (ExceptionDefn.Malformed_Decl
-                     ("Unary rule canot be applied at distance 0. ",pos_dist))
-          else Some dist in
+        | Some d ->
+           let (d', _) = compile_pure_alg d in
+           Some d' in
       let unrate = compile_pure_alg rate in
       fun ccs uncc ->
         match Array.length ccs with

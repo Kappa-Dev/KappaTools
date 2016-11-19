@@ -444,6 +444,15 @@ let value_alg ~get_alg counter state alg =
     ~get_tok:(fun i -> state.tokens.(i))
     alg
 
+let max_dist_to_int ~get_alg counter state d =
+  match (value_alg ~get_alg counter state d) with
+  | Nbr.I d' -> d'
+  | Nbr.I64 _ | Nbr.F _ ->
+     raise
+       (ExceptionDefn.Internal_Error
+          (Location.dummy_annot
+             "Distance in unary rules is not an int"))
+
 let extra_outdated_var i state =
   let rdeps,changed_connectivity = state.outdated_elements in
   {state with
@@ -618,7 +627,10 @@ let apply_unary_rule
     | None ->
       let max_distance = match rule.Primitives.unary_rate with
         | None -> None
-        | Some (_, dist_opt) -> dist_opt in
+        | Some (_, dist_opt) ->
+           (match dist_opt with
+           | None -> None
+           | Some d -> Some (max_dist_to_int ~get_alg counter state' d)) in
       match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
       | None -> Corrected
       | Some p as path ->
@@ -681,16 +693,18 @@ let apply_rule
           Corrected
         else
           Success (transform_by_a_rule ~get_alg outputs env unary_patterns
-                     counter state event_kind rule inj)
-      | Some _ ->
-        let nodes = Pattern.Matching.elements_with_types
-            domain rule.Primitives.connected_components inj in
-        match
-          Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
-        | None ->
-          Success (transform_by_a_rule ~get_alg outputs env unary_patterns
-                     counter state event_kind rule inj)
-        | Some _ -> Corrected
+                                       counter state event_kind rule inj)
+      | Some dist ->
+         let dist' = Some (max_dist_to_int ~get_alg counter state dist) in
+         let nodes = Pattern.Matching.elements_with_types
+                       domain rule.Primitives.connected_components inj in
+         match
+           Edges.are_connected ?max_distance:dist' state.edges nodes.(0)
+                               nodes.(1) with
+         | None ->
+            Success (transform_by_a_rule ~get_alg outputs env unary_patterns
+                                         counter state event_kind rule inj)
+         | Some _ -> Corrected
 
 let force_rule
     ~outputs ~get_alg env unary_patterns counter state event_kind rule =
@@ -699,22 +713,36 @@ let force_rule
   | Success out -> out
   | Corrected | Clash ->
     let () = assert (not state.outdated) in
+    let max_distance = match rule.Primitives.unary_rate with
+      | None -> None
+      | Some (loc, dist_opt) ->
+         (match dist_opt with
+          | None -> Some (loc,None)
+          | Some d ->
+             Some (loc,Some (max_dist_to_int ~get_alg counter state d))) in
     match all_injections
-            ?unary_rate:rule.Primitives.unary_rate
+            ?unary_rate:max_distance
             (Environment.domain env) state.edges
             state.roots_of_patterns rule.Primitives.connected_components with
     | [] -> state
     | l ->
-      let (h,_) = Tools.list_random state.random_state l in
+       let (h,_) = Tools.list_random state.random_state l in
       (transform_by_a_rule
          ~get_alg outputs env unary_patterns counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
   let () = assert (not state.outdated) in
   let domain = Environment.domain env in
+  let max_distance = match rule.Primitives.unary_rate with
+    | None -> None
+    | Some (loc, dist_opt) ->
+       (match dist_opt with
+        | None -> Some (loc,None)
+        | Some d ->
+           Some (loc,Some (max_dist_to_int ~get_alg counter state d))) in
   let matches =
     all_injections
-      ?unary_rate:rule.Primitives.unary_rate domain state.edges
+      ?unary_rate:max_distance domain state.edges
       state.roots_of_patterns rule.Primitives.connected_components in
   let () =
     store_activity
@@ -755,11 +783,13 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
                          | Some (_, dist_opt) -> dist_opt in
                        match max_distance with
                        | None -> (inj',None)::list,succ len
-                       | Some _ ->
-                         let nodes =
-                           Pattern.Matching.elements_with_types
-                             domain rule.Primitives.connected_components inj' in
-                         match Edges.are_connected ?max_distance
+                       | Some dist ->
+                          let dist' = Some (max_dist_to_int
+                                           ~get_alg counter state dist) in
+                          let nodes =
+                            Pattern.Matching.elements_with_types
+                              domain rule.Primitives.connected_components inj' in
+                          match Edges.are_connected ?max_distance:dist'
                                  state.edges nodes.(0) nodes.(1) with
                          | None -> out
                          | Some _ as p -> (inj',p)::list,succ len)

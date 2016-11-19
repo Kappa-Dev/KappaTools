@@ -27,7 +27,7 @@ type rule =
       ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Location.annot;
     r_un_rate : ((rule_mixture,int) Alg_expr.e Location.annot
-                 * int Location.annot option) option;
+                 * (rule_mixture,int) Alg_expr.e Location.annot option) option;
   }
 
 let print_link_annot ~ltypes sigs f (s,a) =
@@ -233,8 +233,13 @@ let print_rates sigs pr_tok pr_var f r =
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
               pr_tok pr_var) ra
-           (Pp.option (fun f (md,_) ->
-                Format.fprintf f ":%a" Format.pp_print_int md)) max_dist)
+           (Pp.option
+              (fun f (md,_) ->
+                Format.fprintf f ":%a"
+                (Alg_expr.print
+                   (fun f m -> Format.fprintf f "|%a|"
+                                              (print_rule_mixture sigs) m)
+                   pr_tok pr_var) md)) max_dist)
 
 let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
   Format.fprintf
@@ -351,7 +356,7 @@ let rule_to_json r =
       JsonUtil.of_option
         (JsonUtil.of_pair
            (Location.annot_to_json lalg_expr_to_json)
-           (JsonUtil.of_option (Location.annot_to_json JsonUtil.of_int)))
+           (JsonUtil.of_option (Location.annot_to_json lalg_expr_to_json)))
         r.r_un_rate;
     ]
 let rule_of_json = function
@@ -380,7 +385,7 @@ let rule_of_json = function
                  (JsonUtil.to_pair
                     (Location.annot_of_json lalg_expr_of_json)
                     (JsonUtil.to_option (Location.annot_of_json
-                                           (JsonUtil.to_int ?error_msg:None))))
+                                           lalg_expr_of_json)))
                  (List.assoc "unary_rate" l)
              with Not_found -> None);
         }
@@ -1150,11 +1155,16 @@ let compil_of_ast overwrite c =
                  add_tk;
              r_rate = alg_expr_of_ast sigs tok algs rate;
              r_un_rate =
+               let r_dist d =
+                 alg_expr_of_ast sigs tok algs ?max_allowed_var:None d in
                Tools.option_map
                  (fun (un_rate',dist) ->
-                    ((alg_expr_of_ast
-                        sigs tok algs ?max_allowed_var:None)
-                       un_rate', dist))
+                   let un_rate'' =
+                     alg_expr_of_ast sigs tok algs
+                                     ?max_allowed_var:None un_rate' in
+                   match dist with
+                   | Some d -> (un_rate'', Some (r_dist d))
+                   | None -> (un_rate'', None))
                  un_rate;
            },r_pos)) cleaned_rules;
     Ast.observables =

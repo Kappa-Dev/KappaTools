@@ -73,8 +73,9 @@ let elementary_rule ?env f r =
          -> Format.fprintf
               f " (%a%a)" pr_alg rate
               (Pp.option (fun f md ->
-                   Format.fprintf f ":%a" Format.pp_print_int md))
+                           Format.fprintf f ":%a" (alg_expr ?env) md))
               dist)
+
 let modification ?env f m =
   let domain = match env with
     | None -> None

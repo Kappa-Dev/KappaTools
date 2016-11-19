@@ -47,7 +47,7 @@ type rule =
       ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Location.annot;
     r_un_rate : ((rule_mixture,int) Alg_expr.e Location.annot
-                 * int Location.annot option) option;
+                 * (rule_mixture,int) Alg_expr.e Location.annot option) option;
   }
 
 val print_rule :

@@ -357,7 +357,7 @@ rate:
 
 alg_with_radius:
     | alg_expr {($1,None)}
-    | alg_expr TYPE INT {($1,Some (add_pos $3))}
+    | alg_expr TYPE alg_expr {($1, Some $3)}
     ;
 
 multiple_mixture:

@@ -27,12 +27,12 @@ type rule = {
   k_def: (mixture,string) Alg_expr.e Location.annot ;
   k_un:
     ((mixture,string) Alg_expr.e Location.annot *
-     int Location.annot option) option;
+     (mixture,string) Alg_expr.e Location.annot option) option;
   (*k_1:radius_opt*)
   k_op: (mixture,string) Alg_expr.e Location.annot option ;
   k_op_un:
     ((mixture,string) Alg_expr.e Location.annot *
-     int Location.annot option) option;
+     (mixture,string) Alg_expr.e Location.annot option) option;
   (*rate for backward rule*)
 }
 
@@ -301,7 +301,13 @@ let print_rates un op f def =
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
               Format.pp_print_string Format.pp_print_string) d
-           (Pp.option (fun f (md,_) -> Format.pp_print_int f md)) max_dist)
+           (Pp.option (fun f (md,_) ->
+                        Format.fprintf f ":%a"
+                        (Alg_expr.print
+                           (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+                           Format.pp_print_string Format.pp_print_string) md))
+           max_dist)
+
 let print_ast_rule f r =
   Format.fprintf
     f "@[<h>%a %a %a @@ %a@]"
@@ -336,7 +342,8 @@ let rule_to_json f_mix f_var r =
     "k_un",
     JsonUtil.of_option
       (JsonUtil.of_pair (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
-         (JsonUtil.of_option (Location.annot_to_json JsonUtil.of_int)))
+         (JsonUtil.of_option (Location.annot_to_json
+                                (Alg_expr.to_json f_mix f_var))))
       r.k_un;
     "k_op",
     JsonUtil.of_option
@@ -344,7 +351,8 @@ let rule_to_json f_mix f_var r =
     "k_op_un",
     JsonUtil.of_option
       (JsonUtil.of_pair (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
-         (JsonUtil.of_option (Location.annot_to_json JsonUtil.of_int)))
+         (JsonUtil.of_option (Location.annot_to_json
+                                (Alg_expr.to_json f_mix f_var))))
       r.k_op_un;
   ]
 
@@ -376,7 +384,7 @@ let rule_of_json f_mix f_var = function
               (JsonUtil.to_pair
                  (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  (JsonUtil.to_option
-                    (Location.annot_of_json (JsonUtil.to_int ?error_msg:None))))
+                    (Location.annot_of_json (Alg_expr.of_json f_mix f_var))))
               (List.assoc "k_un" l);
           k_op = JsonUtil.to_option
               (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
@@ -386,7 +394,7 @@ let rule_of_json f_mix f_var = function
               (JsonUtil.to_pair
                  (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
                  (JsonUtil.to_option
-                    (Location.annot_of_json (JsonUtil.to_int ?error_msg:None))))
+                    (Location.annot_of_json (Alg_expr.of_json f_mix f_var))))
               (List.assoc "k_op_un" l);
         }
       with Not_found ->

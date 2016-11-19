@@ -29,7 +29,7 @@ end
 
 type elementary_rule = {
   rate : Alg_expr.t Location.annot;
-  unary_rate : (Alg_expr.t Location.annot * int option) option;
+  unary_rate : (Alg_expr.t Location.annot * Alg_expr.t option) option;
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
