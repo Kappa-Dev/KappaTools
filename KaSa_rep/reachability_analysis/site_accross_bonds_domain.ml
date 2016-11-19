@@ -1,10 +1,10 @@
 (**
    * site_accross_bonds_domain.ml
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 17 2016>
+   * Last modification: Time-stamp: <Nov 19 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -724,6 +724,12 @@ struct
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
         store_created_bonds
     in
+    let error, created_bonds_set =
+      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
+        (fun (t,u) (error,store_set) ->
+           Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in parameters error (u,t) store_set)
+        created_bonds_set (error, created_bonds_set)
+    in
     let store_partition_created_bonds_map =
       get_partition_created_bonds_map static in
     (*------------------------------------------------------*)
@@ -760,7 +766,7 @@ struct
            Site_accross_bonds_domain_type.PairSite_map_and_set.Set.fold
              (fun (site_type'_x, site_type'_y)
                (error, dynamic, precondition, store_set) ->
-                let error', dynamic, precondition, state'_list_x =
+               let error', dynamic, precondition, state'_list_x =
                   Communication.get_state_of_site_in_postcondition
                     get_global_static_information
                     get_global_dynamic_information
@@ -800,7 +806,7 @@ struct
                 let error, dynamic, precondition, store_set =
                   match state'_list_x, state'_list_y with
                   | _::_::_, _::_::_ ->
-                    (*we know for sure that none of the two sites have been
+                  (*we know for sure that none of the two sites have been
                       modified*)
                     error, dynamic, precondition, store_set
                   | [], _ | _, [] ->
@@ -1124,7 +1130,7 @@ struct
       Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
-    error, dynamic, precondition, store_set2
+    error, dynamic, precondition, store_set
 
   (***************************************************************)
   (*Side effects*)
@@ -1311,7 +1317,7 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
       (*1.a bonds on the rhs: not sure you need this test, it will be
         covered by 1.c and 1.d *)
       (*------------------------------------------------------*)
-      (*    let error, dynamic, precondition =
+      (*   let error, dynamic, precondition =
         apply_rule_bonds_rhs
           static dynamic error rule_id rule precondition
             in*)
@@ -1343,28 +1349,19 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
         else let () = dump_title () in true
       in
       let error, dynamic, precondition, event_list, store_set =
-        (*deal with create a binding sites, if it is not the first time then do
-          not apply the function.*)
-        let b = can_we_prove_this_is_not_the_first_application precondition in
-        if b
-        then
-          (*it is not applied for the first time*)
-          let error, dynamic, precondition, store_set =
+        (* deal with create a binding sites *)
+        let error, dynamic, precondition, store_set =
             apply_rule_created_bonds
               static dynamic error rule_id rule precondition
-          in
-          (*-----------------------------------------------------------*)
-          (*new event*)
-          let store_value = get_value dynamic in
-          let event_list =
-            discover_a_new_pair_of_modify_sites store_set event_list
-          in
-          let _ = cbool store_value in
-          error, dynamic, precondition, event_list, store_set
-        else
-            (*it is applied for the first time*)
-            error, dynamic, precondition, event_list,
-          Site_accross_bonds_domain_type.PairAgentSite_map_and_set.Set.empty
+        in
+        (*-----------------------------------------------------------*)
+        (*new event*)
+        let store_value = get_value dynamic in
+        let _ = cbool store_value in
+        error, dynamic, precondition, event_list, store_set
+      in
+      let event_list =
+        discover_a_new_pair_of_modify_sites store_set event_list
       in
       (*-----------------------------------------------------------*)
       (*1.c a site is modified (explicitly) *) (*FIX ME*)
@@ -1396,6 +1393,9 @@ let discover_a_new_pair_of_modify_sites store_set event_list =
       (*1.d a site is modified by side effect *)
       let error, dynamic, store_set = (*new event*)
         apply_rule_side_effects static dynamic error rule_id
+      in
+      let event_list =
+        discover_a_new_pair_of_modify_sites store_set event_list
       in
       let store_value = get_value dynamic in
       let () =

@@ -7,15 +7,8 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule 4: Shc.Grb2 will never be applied.
-rule 5: Shc/Grb2 will never be applied.
-rule 13: R/int will never be applied.
-rule 18: pY@Shc will never be applied.
-rule 19: uY@Shc will never be applied.
+every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -30,16 +23,9 @@ EGFR() =>
 	v EGFR(C!EGFR.N,CR!EGFR.CR,L!EGF.r,N)
 	v EGFR(C,CR,L,N)
    ]
-In agent EGFR: 
-EGFR(Y1172~p?) => [ EGFR(Y1172~p) v EGFR(Y1172~p!Shc.PTB) ]
-EGFR(Y1172~p?) => [ EGFR(C!EGFR.N,Y1172~p?) ]
-EGFR(Y1172~u?) => [ EGFR(Y1172~u) ]
-EGFR(Y1172~u?) => [ EGFR(C,Y1172~u?) v EGFR(C!EGFR.N,Y1172~u?) ]
-In agent EGFR: 
-EGFR(Y1092~p?) => [ EGFR(Y1092~p) v EGFR(Y1092~p!Grb2.SH2) ]
-EGFR(Y1092~p?) => [ EGFR(C!EGFR.N,Y1092~p?) ]
-EGFR(Y1092~u?) => [ EGFR(Y1092~u) ]
-EGFR(Y1092~u?) => [ EGFR(C,Y1092~u?) v EGFR(C!EGFR.N,Y1092~u?) ]
+EGFR(Y1172!Shc.PTB) => EGFR(Y1172~p!Shc.PTB)
+EGFR(Y1092!Grb2.SH2) => EGFR(Y1092~p!Grb2.SH2)
+Shc(Y!Grb2.SH2) => Shc(Y~p!Grb2.SH2)
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -57,10 +43,10 @@ EGFR() => [ EGFR(Y1092) v EGFR(Y1092!Grb2.SH2) ]
 SoS() => [ SoS(PR) v SoS(PR!Grb2.SH3n) ]
 SoS() => [ SoS(S~u) ]
 Shc() => [ Shc(PTB~u?) ]
-Shc() => [ Shc(Y) ]
-Shc() => [ Shc(Y~u?) ]
+Shc() => [ Shc(Y) v Shc(Y!Grb2.SH2) ]
+Shc() => [ Shc(Y~u?) v Shc(Y~p?) ]
 Shc() => [ Shc(PTB) v Shc(PTB!EGFR.Y1172) ]
-Grb2() => [ Grb2(SH2) v Grb2(SH2!EGFR.Y1092) ]
+Grb2() => [ Grb2(SH2) v Grb2(SH2!Shc.Y) v Grb2(SH2!EGFR.Y1092) ]
 Grb2() => [ Grb2(SH3n) v Grb2(SH3n!SoS.PR) ]
 Grb2() => [ Grb2(SH2~u?) ]
 ------------------------------------------------------------

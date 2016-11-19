@@ -100,6 +100,7 @@ Reachability analysis...
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -114,6 +115,7 @@ Reachability analysis...
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -139,9 +141,11 @@ Reachability analysis...
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 0:
 		the precondition is satisfied
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -150,6 +154,7 @@ Reachability analysis...
 	Applying rule 1:
 		the precondition is satisfied
 		Updating the views for A(x!)
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain

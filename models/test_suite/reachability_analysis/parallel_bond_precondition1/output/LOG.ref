@@ -809,7 +809,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -824,12 +824,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -854,7 +854,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -869,12 +869,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -903,7 +903,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -918,12 +918,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -948,7 +948,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -963,12 +963,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -986,6 +986,11 @@ B() => [ B(x~u) ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
+A(t!1),B(t!1) => 
+	[
+		  A(t!1,z!B.z),B(t!1,z)
+		v A(t!1,z),B(t!1,z!A.z)
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
@@ -1007,7 +1012,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1022,12 +1027,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1052,7 +1057,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1067,12 +1072,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1097,7 +1102,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1112,12 +1117,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1142,7 +1147,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1157,12 +1162,12 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=29
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=28
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1174,6 +1179,9 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(t!1),B(t!1)=> [
+		  A(t!1,z!B.z),B(t!1,z)
+		v A(t!1,z),B(t!1,z!A.z)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

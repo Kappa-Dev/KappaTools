@@ -5,6 +5,7 @@ digraph G{
 "Node_11" [label="Grb2(SH2!free)"];
 "Node_15" -> "Node_11" [label="rule 7: R/Grb2"];
 "Node_11" -> "Node_15" [label="rule 6: R.Grb2"];
+"Node_2" -> "Node_11" [label="rule 5: Shc/Grb2"];
 "Node_11" -> "Node_2" [label="rule 4: Shc.Grb2"];
 "Init_11" -> "Node_11" [label=""];
 }

@@ -1,10 +1,10 @@
 (**
    * site_accross_bonds_domain.ml
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 04 2016>
+   * Last modification: Time-stamp: <Nov 19 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -489,7 +489,8 @@ let add_link_common parameter error bdu_false handler
   (*check the freshness of the pair*)
   (*compare mvbdu and old mvbdu*)
   if Ckappa_sig.Views_bdu.equal new_bdu bdu_old
-  then error, handler, store_set, store_result
+  then
+      error, handler, store_set, store_result
   else
     (*-----------------------------------------------------------*)
     (*print each step*)

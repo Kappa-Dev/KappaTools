@@ -1,10 +1,10 @@
 (*
   * views_domain.mli
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 18 2016>
+  * Last modification: Time-stamp: <Nov 19 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -870,14 +870,14 @@ struct
       (*--------------------------------------------------------------*)
       (*fold with store_value above*)
       let error, map_value = error, store_value in
-      let () =
-        if not bool &&
+      let bool =
+        if bool ||
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
              store_non_parallel
         then
-          ()
+          bool
         else
-          dump_title ()
+          let () = dump_title () in true
       in
       let store_result = get_value dynamic in
       let error, (store_set, store_result) =
@@ -942,7 +942,7 @@ struct
       (*--------------------------------------------------------------*)
       (*fold over the store_value and parallel bond value *)
       let () =
-        if not bool &&
+        if bool ||
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
              store_parallel
         then
@@ -973,14 +973,51 @@ struct
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let apply_event_list_rule_in_lhs_rhs_aux error store_rule_double_bonds
+  let add_rule static error rule_id event_list =
+    let parameters = get_parameter static in
+    let compiled = get_compil static in
+    let kappa_handler = get_kappa_handler static in
+    let error =
+      if local_trace
+      || Remanent_parameters.get_dump_reachability_analysis_wl
+           parameters
+      then
+        let error, rule_id_string =
+          try
+            Handler.string_of_rule parameters error kappa_handler
+              compiled rule_id
+          with
+          | _ ->
+            Exception.warn
+              parameters error __POS__ Exit
+              (Ckappa_sig.string_of_rule_id rule_id)
+        in
+        let tab = "\t" in
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "%s%s(%s) should be investigated "
+            (Remanent_parameters.get_prefix parameters) tab
+            rule_id_string
+        in
+        let () =
+          Loggers.print_newline
+            (Remanent_parameters.get_logger parameters)
+        in
+        error
+      else
+        error
+    in
+    error, (Communication.Check_rule rule_id) :: event_list
+
+  let apply_event_list_rule_in_lhs_rhs_aux static error store_rule_double_bonds
       event_list tuple_pair_set =
   let error, event_list =
     Ckappa_sig.Rule_map_and_set.Map.fold
       (fun rule_id tuple_pair_map (error, event_list) ->
          let error, event_list =
            Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
-             (fun tuple_pair b (error, event_list) ->
+             (fun tuple_pair _ (error, event_list) ->
                 let proj (_,((b, c, d, e, f), (g, h, k, i, j))) =
                   (b, c, d, e, f), (g, h, k, i, j)
                 in
@@ -990,7 +1027,7 @@ struct
                     proj_tuple
                     tuple_pair_set
                 then
-                  error, (Communication.Check_rule rule_id) :: event_list
+                  add_rule static error rule_id event_list
                 else
                   error, event_list
              ) tuple_pair_map (error, event_list)
@@ -1000,7 +1037,7 @@ struct
   in
   error, event_list
 
-  let apply_event_list_rule_in_first_and_second_aux error
+  let apply_event_list_rule_in_first_and_second_aux static error
       store_site_create_parallel_bonds event_list tuple_pair_set =
     let error, event_list =
       Ckappa_sig.Rule_map_and_set.Map.fold
@@ -1016,7 +1053,7 @@ struct
                         (proj2 tuple)
                         tuple_pair_set
                     then
-                      error, (Communication.Check_rule rule_id) :: event_list
+                      add_rule static error rule_id event_list
                     else
                       error, event_list
                   ) (error, event_list) tuple_list
@@ -1055,7 +1092,7 @@ struct
                 get_rule_double_bonds_lhs static in
               let error, event_list =
                 apply_event_list_rule_in_lhs_rhs_aux
-                  error store_rule_double_bonds_lhs
+                  static error store_rule_double_bonds_lhs
                   event_list
                   tuple_pair_set
               in
@@ -1065,7 +1102,7 @@ struct
                 get_rule_double_bonds_rhs static in
               let error, event_list =
                 apply_event_list_rule_in_lhs_rhs_aux
-                  error
+                  static error
                   store_rule_double_bonds_rhs
                   event_list
                   tuple_pair_set
@@ -1076,7 +1113,7 @@ struct
                 get_fst_site_create_parallel_bonds_rhs static in
               let error, event_list =
                 apply_event_list_rule_in_first_and_second_aux
-                  error
+                  static error
                   store_fst_site_create_parallel_bonds_rhs
                   event_list
                   tuple_pair_set
@@ -1086,7 +1123,7 @@ struct
                 get_snd_site_create_parallel_bonds_rhs static in
               let error, event_list =
                 apply_event_list_rule_in_first_and_second_aux
-                  error
+                  static error
                   store_snd_site_create_parallel_bonds_rhs
                   event_list
                   tuple_pair_set

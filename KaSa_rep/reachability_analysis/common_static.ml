@@ -1,10 +1,10 @@
 (**
   * common_static_type.mli
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Sep 26 2016>
+  * Last modification: Time-stamp: <Nov 19 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -1011,9 +1011,20 @@ let collect_created_bonds parameter error rule rule_id store_result =
         (agent_id, agent_type, site_type, state),
         (agent_id1, agent_type1, site_type1, state1)
       in
+      let sym (x,y) = (y,x) in
       let error', new_set =
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
           parameter error pair old_set
+      in
+      let error =
+        Exception.check_point
+          Exception.warn parameter error error' __POS__ Exit
+      in
+      let error', new_set =
+        (* Be careful, in some domains bonds are oriented *)
+        (* Thus, when adding a bond, both direction should be considered *)
+        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+          parameter error (sym pair) new_set
       in
       let error =
         Exception.check_point
@@ -1028,7 +1039,7 @@ let collect_created_bonds parameter error rule rule_id store_result =
           store_result
       in
       error, store_result
-    )(error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
+    ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
 
 let collect_modified_map parameter error rule_id rule store_result =
   let error, store_result =

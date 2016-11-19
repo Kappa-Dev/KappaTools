@@ -471,17 +471,6 @@ let add_value parameters error kappa_handler x value store_result =
     error, store_result
   else
     (*check whether or not if this is a fresh value*)
-    let error =
-      if Remanent_parameters.get_dump_reachability_analysis_diff parameters
-      then
-        let parameters =
-          Remanent_parameters.update_prefix parameters "         " in
-        print_parallel_constraint
-          ~verbose:false
-          ~dump_any:true parameters error kappa_handler x value
-      else error
-    in
-    (*new value only compute when it is needed*)
     let error, store_result =
       PairAgentSitesStates_map_and_set.Map.add_or_overwrite
         parameters

@@ -1,10 +1,10 @@
 (*
   * domain_selection.ml
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Oct 25 2016>
+  * Last modification: Time-stamp: <Nov 19 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *

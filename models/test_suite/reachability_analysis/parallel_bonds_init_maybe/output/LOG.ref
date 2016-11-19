@@ -575,10 +575,50 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 
 	Applying rule 2: r2:
-		the precondition is not satisfied yet
+		the precondition is satisfied
+
+		rule 2: r2 is applied for the first time
+
+		Updating the views for A(z!,t!)
+		Updating the views for B(z!,t!)
+			
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+			B(z!A@z,t!A@t)
+
+	Wake-up rules
 
 	Applying rule 3: r3:
-		the precondition is not satisfied yet
+		the precondition is satisfied
+
+		rule 3: r3 is applied for the first time
+
+		Updating the views for A(z!,t!)
+		Updating the views for B(z!,t!)
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -590,11 +630,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
 
+	Applying rule 2: r2:
+		the precondition is satisfied
+		Updating the views for A(z!,t!)
+		Updating the views for B(z!,t!)
 ------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule 2: r2 will never be applied.
-rule 3: r3 will never be applied.
+every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -602,7 +643,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -626,13 +667,13 @@ Id=27
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=23
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=22
-   Node(site_type:1<1)
+  Id=24
+   Node(site_type:1<2)
     Id=21
      Node(site_type:2<0)
       Id=0
@@ -646,30 +687,15 @@ Id=23
         Id=0
          Leaf False 
 
-    Id=14
-     Node(site_type:1<2)
-      Id=5
-       Node(site_type:2<0)
-        Id=0
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
+    Id=0
+     Leaf False 
 
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -684,12 +710,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -699,52 +725,41 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=32
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=32
-   Node(site_type:0<1)
-    Id=28
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
+  Id=33
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
 
-      Id=12
-       Node(site_type:1<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=31
-     Node(site_type:0<2)
-      Id=3
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=2
-         Node(site_type:1<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
+    Id=0
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(z!A.z) => B(t,z!A.z)
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -759,12 +774,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -774,7 +789,7 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -789,12 +804,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -810,12 +825,25 @@ B() => [ B(z) v B(z!A.z) ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
+A(z!1),B(z!1) => 
+	[
+		  A(t!B.t,z!1),B(t,z!1)
+		v A(t!B.t,z!1),B(t!A.t,z!1)
+		v A(t,z!1),B(t,z!1)
+	]
+A(t!1),B(t!1) => 
+	[
+		  A(t!1,z!B.z),B(t!1,z)
+		v A(t!1,z!B.z),B(t!1,z!A.z)
+		v A(t!1,z),B(t!1,z)
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-A(t!B.t,z!B.z) => A(t!2,z!1),B(z!1),B(t!2)
+
+B(t!A.t,z!A.z) => B(t!2,z!1),A(t!2,z!1)
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -830,12 +858,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -845,47 +873,7 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=33
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=32
-   Node(site_type:0<1)
-    Id=28
-     Node(site_type:1<0)
-      Id=0
-       Leaf False 
-
-      Id=12
-       Node(site_type:1<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=31
-     Node(site_type:0<2)
-      Id=3
-       Node(site_type:1<0)
-        Id=0
-         Leaf False 
-
-        Id=2
-         Node(site_type:1<1)
-          Id=1
-           Leaf True 
-
-          Id=0
-           Leaf False 
-
-      Id=0
-       Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=28
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -900,12 +888,12 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -915,7 +903,7 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=28
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -930,12 +918,42 @@ Id=28
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=33
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=32
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=34
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -947,10 +965,18 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
+A(z!1),B(z!1)=> [
+		  A(t!B.t,z!1),B(t,z!1)
+		v A(t!B.t,z!1),B(t!A.t,z!1)
+		v A(t,z!1),B(t,z!1)]
+A(t!1),B(t!1)=> [
+		  A(t!1,z!B.z),B(t!1,z)
+		v A(t!1,z!B.z),B(t!1,z!A.z)
+		v A(t!1,z),B(t!1,z)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t!B.t,z!B.z)=> [A(t!2,z!1),B(z!1),B(t!2)]
+B(t!A.t,z!A.z)=> [B(t!2,z!1),A(t!2,z!1)]
 
 execution finished without any exception

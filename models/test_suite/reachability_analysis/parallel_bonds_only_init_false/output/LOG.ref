@@ -413,6 +413,8 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 
 		  A(t,z!1),B(t,z!1)
+
+		  B(t,z!1),A(t,z!1)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -461,6 +463,8 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z!,t!)
 
 		  A(t!1,z),B(t!1,z)
+
+		  B(t!1,z),A(t!1,z)
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
@@ -475,11 +479,13 @@ EXTENSIONAL DESCRIPTION:
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
+                Update information about potential sites accross domain
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 		Updating the views for A(z!,t!)
 		Updating the views for B(z!,t!)
+                Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain
                 Update information about potential sites accross domain

@@ -1,19 +1,19 @@
 digraph G{
-"Init_68" [label="" style="invis" width="0px" height="0px"];
-"Node_77" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!EGFR@N)"];
-"Node_74" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!EGFR@C,C!free)"];
-"Node_71" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!free)"];
-"Node_69" [label="EGFR(L!EGF@r,CR!free,N!free,C!free)"];
-"Node_68" [label="EGFR(L!free,CR!free,N!free,C!free)"];
-"Node_77" -> "Node_71" [label="rule 13: R/int"];
-"Node_74" -> "Node_71" [label="rule 13: R/int"];
-"Node_71" -> "Node_77" [label="rule 12: R.int"];
-"Node_71" -> "Node_74" [label="rule 12: R.int"];
-"Node_69" -> "Node_68" [label="rule 3: E/R"];
-"Node_68" -> "Node_69" [label="rule 2: E.R"];
-"Node_71" -> "Node_69" [label="rule 1: R/R"];
-"Node_71" -> "Node_69" [label="rule 1: R/R"];
-"Node_69" -> "Node_71" [label="rule 0: R.R"];
-"Node_69" -> "Node_71" [label="rule 0: R.R"];
-"Init_68" -> "Node_68" [label=""];
+"Init_70" [label="" style="invis" width="0px" height="0px"];
+"Node_79" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!EGFR@N)"];
+"Node_76" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!EGFR@C,C!free)"];
+"Node_73" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!free)"];
+"Node_71" [label="EGFR(L!EGF@r,CR!free,N!free,C!free)"];
+"Node_70" [label="EGFR(L!free,CR!free,N!free,C!free)"];
+"Node_79" -> "Node_73" [label="rule 13: R/int"];
+"Node_76" -> "Node_73" [label="rule 13: R/int"];
+"Node_73" -> "Node_79" [label="rule 12: R.int"];
+"Node_73" -> "Node_76" [label="rule 12: R.int"];
+"Node_71" -> "Node_70" [label="rule 3: E/R"];
+"Node_70" -> "Node_71" [label="rule 2: E.R"];
+"Node_73" -> "Node_71" [label="rule 1: R/R"];
+"Node_73" -> "Node_71" [label="rule 1: R/R"];
+"Node_71" -> "Node_73" [label="rule 0: R.R"];
+"Node_71" -> "Node_73" [label="rule 0: R.R"];
+"Init_70" -> "Node_70" [label=""];
 }
