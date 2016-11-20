@@ -1007,7 +1007,13 @@ struct
       rule_id event_list
 
 
-
+(* This is WAY too costly *)
+(* This function is called often *)
+(* Many times per rule application *)
+(* It should be done efficiently and only once. *)
+(* The result should be stored in a field of static *)
+(* with the type site -> rule set *)
+(* The results for each case should be merged in this field *)
   let apply_event_list_rule_in_lhs_rhs_aux static error store_rule_double_bonds
       event_list tuple_pair_set =
   let error, event_list =
@@ -1035,7 +1041,8 @@ struct
   in
   error, event_list
 
-
+(* The result should be stored in a field of static *)
+(* merged with the result of the previous function *)
   let apply_event_list_rule_in_first_and_second_aux static error
       store_site_create_parallel_bonds event_list tuple_pair_set =
     let error, event_list =

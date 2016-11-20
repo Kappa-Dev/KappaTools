@@ -1442,6 +1442,13 @@ struct
                 in error
               else error
             in
+            (* This is WAY too costly and too complicated *)
+            (* This function is called often *)
+            (* Many times per rule application *)
+            (* It should be done efficiently and only once. *)
+            (* The result should be stored in a field of static *)
+            (* with the type site -> rule set *)
+            (* The results for each case should be merged in this field *)
             let error, tuple_pair_modif_set =
               match
                 Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
