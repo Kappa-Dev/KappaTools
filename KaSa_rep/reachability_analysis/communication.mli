@@ -216,3 +216,20 @@ val add_rule:
   Exception.method_handler ->
   Ckappa_sig.c_rule_id ->
   event list -> Exception.method_handler * event list
+
+type site_working_list
+val init_sites_working_list:
+  Remanent_parameters_sig.parameters -> Exception.method_handler ->
+  Exception.method_handler * site_working_list
+
+val add_site:
+  Remanent_parameters_sig.parameters -> Exception.method_handler ->
+  Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
+  site_working_list ->
+  Exception.method_handler * site_working_list
+
+val fold_sites:
+  ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name,unit, 'a, 'a) Int_storage.ternary,
+   site_working_list,
+   'a,
+   'a) Int_storage.ternary

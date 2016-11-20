@@ -468,19 +468,12 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
 
 let add_sites_from_tuples parameters error tuple modified_sites =
   let (agent,site1,site2,_),(agent',site1',site2',_) = tuple in
-  let error, modified_sites =
-    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site1) () modified_sites
-  in
-  let error, modified_sites =
-    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site2) () modified_sites
-  in
-  let error, modified_sites =
-    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent',site1') () modified_sites
-  in
-  let error, modified_sites =
-    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent',site2') () modified_sites
-  in
-  error, modified_sites
+    List.fold_left
+      (fun (error, modified_sites) (agent,site) ->
+        Communication.add_site parameters error agent site modified_sites
+      )
+      (error, modified_sites)
+      [agent,site1;agent,site2;agent',site1';agent',site2']
 
 let add_link_and_check parameter error bdu_false handler
     kappa_handler bool dump_title x mvbdu modified_sites store_result =

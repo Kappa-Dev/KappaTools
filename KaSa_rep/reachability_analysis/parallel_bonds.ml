@@ -709,17 +709,18 @@ struct
       (error, dynamic, precondition,
        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty)
 
-  let discover_a_new_pair_of_modify_sites store_set event_list =
-  let event_list =
+  let discover_a_new_pair_of_modify_sites
+      parameters error store_set modified_sites =
     Parallel_bonds_type.PairAgentSite_map_and_set.Set.fold
-      (fun (x, y, z, t) event_list ->
-         (Communication.Modified_sites x) ::
-         (Communication.Modified_sites y) ::
-         (Communication.Modified_sites z) ::
-         (Communication.Modified_sites t) :: event_list
-      ) store_set event_list
-  in
-  event_list
+      (fun (x, y, z, t) (error, modified_sites)  ->
+         List.fold_left
+           (fun (error, modified_sites) (agent,site) ->
+              Communication.add_site parameters error agent site modified_sites
+           )
+           (error, modified_sites)
+           [x;y;z;t])
+      store_set
+      (error,modified_sites)
 
 (*if it is not the first time it is apply then do not apply *)
 
@@ -737,6 +738,9 @@ struct
     (*--------------------------------------------------------------*)
     let parameters = get_parameter static in
     let event_list = [] in
+    let error, modified_sites =
+      Communication.init_sites_working_list parameters error
+    in
     (*-----------------------------------------------------------*)
     let kappa_handler = get_kappa_handler static in
     let error, rule = get_rule parameters error static rule_id in
@@ -919,7 +923,9 @@ struct
       let dynamic = set_value store_result dynamic in
       (*---------------------------------------------------------------------*)
       (*check the new event*)
-      let event_list = discover_a_new_pair_of_modify_sites store_set event_list
+      let error, modified_sites  =
+        discover_a_new_pair_of_modify_sites
+          parameters error store_set modified_sites
       in
       (*--------------------------------------------------------------*)
       (*if it belongs to parallel bonds then true*)
@@ -969,13 +975,23 @@ struct
           (error, (store_set, store_result))
       in
       let dynamic = set_value store_result dynamic in
-      let event_list = discover_a_new_pair_of_modify_sites store_set event_list
+      let error, modified_sites =
+        discover_a_new_pair_of_modify_sites
+          parameters error store_set modified_sites
       in
       let () =
         if bool &&
            (local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameters)
         then
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
+      let error, event_list =
+        Communication.fold_sites
+          parameters error
+          (fun _ error s _ event_list ->
+             error, (Communication.Modified_sites s) :: event_list)
+          modified_sites
+          event_list
       in
       error, dynamic, (precondition, event_list)
 
@@ -989,6 +1005,8 @@ struct
     Communication.add_rule ~local_trace
       parameters compiled kappa_handler error
       rule_id event_list
+
+
 
   let apply_event_list_rule_in_lhs_rhs_aux static error store_rule_double_bonds
       event_list tuple_pair_set =
@@ -1016,6 +1034,7 @@ struct
       ) store_rule_double_bonds (error, event_list)
   in
   error, event_list
+
 
   let apply_event_list_rule_in_first_and_second_aux static error
       store_site_create_parallel_bonds event_list tuple_pair_set =

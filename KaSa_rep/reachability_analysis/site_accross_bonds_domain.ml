@@ -1287,7 +1287,8 @@ struct
           ()
       in
       let error, modified_sites =
-        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)  in
+        Communication.init_sites_working_list parameters error
+      in
       (*-----------------------------------------------------------*)
       let error, bool, dynamic, precondition, event_list, modified_sites =
         (* deal with create a binding sites *)
@@ -1320,7 +1321,8 @@ struct
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
       let error, event_list =
-        Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold parameters error
+        Communication.fold_sites
+          parameters error
           (fun _ error s _ event_list ->
              error, (Communication.Modified_sites s) :: event_list)
           modified_sites
