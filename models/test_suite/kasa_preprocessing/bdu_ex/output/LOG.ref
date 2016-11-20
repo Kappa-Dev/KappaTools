@@ -191,7 +191,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: create is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -229,9 +228,9 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~u,y~u,x!free)
+		A(x~u,y~u,x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 0: create:
 		the precondition is satisfied
@@ -242,7 +241,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 1: x is applied for the first time
 
 		Updating the views for A(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -279,9 +277,9 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,x!free)
+		A(x~p,y~u,x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 2: y:
 		the precondition is satisfied
@@ -289,7 +287,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 2: y is applied for the first time
 
 		Updating the views for A(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=22
@@ -326,9 +323,9 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~p,x!free)
+		A(x~p,y~p,x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 3: bind:
 		the precondition is satisfied
@@ -336,7 +333,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 3: bind is applied for the first time
 
 		Updating the views for A(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -398,11 +394,12 @@ Id=35
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,x!A@x)
-			A(x~p,y~p,x!A@x)
-			A(x~u,y~u,x!A@x)
+		A(x~p,y~u,x!A@x)
+		A(x~p,y~p,x!A@x)
+		A(x~u,y~u,x!A@x)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for A(x~,y~,x!)
 
 	Applying rule 0: create:
@@ -410,15 +407,19 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 1: x:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,x!)
 
 	Applying rule 2: y:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,x!)
 
 	Applying rule 3: bind:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,x!)
+
 		Updating the views for A(x~,y~,x!)
 ------------------------------------------------------------
 every rule may be applied

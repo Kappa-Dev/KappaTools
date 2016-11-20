@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 25 2016>
+   * Last modification: Time-stamp: <Nov 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -197,7 +197,6 @@ struct
             let () =
               Loggers.fprintf log "\t\t%s is applied for the first time" rule_id_string
             in
-            let () = Loggers.print_newline log in
             let () = Loggers.print_newline log in
             dynamic
           else

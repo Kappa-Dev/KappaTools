@@ -183,24 +183,20 @@ Reachability analysis...
 
 		rule 0 is applied for the first time
 
-
 	Applying rule 1:
 		the precondition is satisfied
 
 		rule 1 is applied for the first time
-
 
 	Applying rule 2:
 		the precondition is satisfied
 
 		rule 2 is applied for the first time
 
-
 	Applying rule 3:
 		the precondition is satisfied
 
 		rule 3 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -218,9 +214,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			D(x~u)
+		D(x~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 4:
 		the precondition is not satisfied yet

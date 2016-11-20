@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 19 2016>
+   * Last modification: Time-stamp: <Nov 20 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -352,7 +352,8 @@ let print_site_accross_domain
                      let () =
                        Loggers.fprintf
                          (Remanent_parameters.get_logger parameters)
-                         (if bool  then "\t\tv " else "\t\t  ")
+                         (if bool  then "\t\tv " else
+                          if final_result then "\t\t  " else "\t\t")
                      in
                      let error, pattern =
                        Ckappa_backend.Ckappa_backend.add_state
@@ -382,8 +383,6 @@ let print_site_accross_domain
                     (Remanent_parameters.get_logger parameters) "\t]" in
                 let () = Loggers.print_newline                    (Remanent_parameters.get_logger parameters) in
                 ()
-              else
-              let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in ()
             in
             error, handler
         end
@@ -468,7 +467,7 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
   error, handler, store_result
 
 let add_link_common parameter error bdu_false handler
-    kappa_handler x pair mvbdu store_set store_result =
+    kappa_handler bool dump_title x pair mvbdu store_set store_result =
   let error, bdu_old =
     match
       PairAgentSitesState_map_and_set.Map.find_option_without_logs
@@ -490,16 +489,20 @@ let add_link_common parameter error bdu_false handler
   (*compare mvbdu and old mvbdu*)
   if Ckappa_sig.Views_bdu.equal new_bdu bdu_old
   then
-      error, handler, store_set, store_result
+      error, bool, handler, store_set, store_result
   else
     (*-----------------------------------------------------------*)
     (*print each step*)
-    let error, handler =
+  let error, handler =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameter
       then
-        let parameter = Remanent_parameters.update_prefix parameter            "                "
+        let parameter = Remanent_parameters.update_prefix parameter            "\t\t"
         in
-        print_site_accross_domain
+        let () =
+          if bool then ()
+          else dump_title ()
+        in
+          print_site_accross_domain
           ~verbose:false
           ~dump_any:true parameter error kappa_handler handler x mvbdu
       else error, handler
@@ -523,11 +526,11 @@ let add_link_common parameter error bdu_false handler
         Exception.warn  parameter error error'
         __POS__ Exit
     in
-    error, handler, new_set, store_result
+    error, true, handler, new_set, store_result
 
 (*A(x!, _), B(x!, _)*)
 let add_link_and_event_in_created_bonds parameter error bdu_false handler
-    kappa_handler x mvbdu store_set store_result =
+    kappa_handler bool dump_title x mvbdu store_set store_result =
   let proj (a, b, _, _) = (a, b) in
   (*consider the first site that is bound*)
   let pair (x, y) = proj x, proj y in
@@ -535,6 +538,7 @@ let add_link_and_event_in_created_bonds parameter error bdu_false handler
     bdu_false
     handler
     kappa_handler
+    bool dump_title
     x
     pair
     mvbdu
@@ -543,7 +547,7 @@ let add_link_and_event_in_created_bonds parameter error bdu_false handler
 
 (*A(_ ,y), B(_, y)*)
 let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
-    x mvbdu store_set store_result =
+    bool dump_title x mvbdu store_set store_result =
     let proj (a, _, c, _) = (a, c) in
     (*consider the second site that is modified*)
     let pair (x, y) = proj x, proj y in
@@ -551,7 +555,7 @@ let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
       bdu_false
       handler
       kappa_handler
-      x
+      bool dump_title x
       pair
       mvbdu
       store_set

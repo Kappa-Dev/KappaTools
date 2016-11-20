@@ -433,7 +433,7 @@ Influence_map:Inhibition_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(7):'' A(z
 Influence_map:Inhibition_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
 Influence_map:Inhibition_map:rule(8):'' A(a~p)->A(a~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
 Reachability analysis...
-	Views in initial state
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -490,15 +490,14 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~u,y~u,z~u,a~u,b~u)
+		A(x~u,y~u,z~u,a~u,b~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 0:
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -506,7 +505,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 1 is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=49
@@ -563,9 +561,9 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,z~u,a~u,b~u)
+		A(x~p,y~u,z~u,a~u,b~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -573,7 +571,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 2 is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=54
@@ -630,9 +627,9 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~p,z~u,a~u,b~u)
+		A(x~p,y~p,z~u,a~u,b~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -654,7 +651,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 5 is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=65
@@ -756,11 +752,11 @@ Id=65
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,z~p,a~u,b~u)
-			A(x~p,y~p,z~p,a~u,b~u)
-			A(x~u,y~u,z~p,a~u,b~u)
+		A(x~p,y~u,z~p,a~u,b~u)
+		A(x~p,y~p,z~p,a~u,b~u)
+		A(x~u,y~u,z~p,a~u,b~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 6:
 		the precondition is satisfied
@@ -768,7 +764,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 6 is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=79
@@ -870,11 +865,11 @@ Id=79
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,z~p,a~p,b~u)
-			A(x~p,y~p,z~p,a~p,b~u)
-			A(x~u,y~u,z~p,a~p,b~u)
+		A(x~p,y~u,z~p,a~p,b~u)
+		A(x~p,y~p,z~p,a~p,b~u)
+		A(x~u,y~u,z~p,a~p,b~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 7:
 		the precondition is satisfied
@@ -896,7 +891,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 9 is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=98
@@ -953,9 +947,9 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~p,z~p,a~p,b~p)
+		A(x~p,y~p,z~p,a~p,b~p)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 10:
 		the precondition is satisfied
@@ -969,20 +963,23 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 1:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 2:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 3:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 4:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=133
@@ -1039,26 +1036,29 @@ Id=133
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,z~p,a~p,b~p)
+		A(x~p,y~u,z~p,a~p,b~p)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 5:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 6:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 7:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 8:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=167
@@ -1115,13 +1115,14 @@ Id=167
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,y~u,z~p,a~u,b~p)
-			A(x~p,y~p,z~p,a~u,b~p)
+		A(x~p,y~u,z~p,a~u,b~p)
+		A(x~p,y~p,z~p,a~u,b~p)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 9:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 0:
@@ -1129,38 +1130,47 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 1:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 2:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 3:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 4:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 10:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 5:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 6:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 7:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 8:
 		the precondition is satisfied
+
 		Updating the views for A(x~,y~,z~,a~,b~)
 ------------------------------------------------------------
 every rule may be applied

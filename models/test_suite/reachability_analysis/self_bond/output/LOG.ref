@@ -641,7 +641,7 @@ Influence_map:Inhibition_map:rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(
 Influence_map:Inhibition_map:rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2) -> rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2)[0->1];[0->2];[1->0];[2->0]
 Influence_map:Inhibition_map:rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2) -> rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
 Reachability analysis...
-	Views in initial state
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=7
@@ -668,40 +668,10 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!free,t!free)
+		A(z!free,t!free)
 
-	Wake-up rules
-	Views in initial state
-
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			B(z!free,t!free)
-
-	Wake-up rules
-	Views in initial state
+		Wake-up rules:
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=7
@@ -728,40 +698,10 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(z!free,t!free)
+		B(z!free,t!free)
 
-	Wake-up rules
-	Views in initial state
-
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			D(z!free,t!free)
-
-	Wake-up rules
-	Views in initial state
+		Wake-up rules:
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=7
@@ -788,10 +728,10 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!free,t!free)
+		C(z!free,t!free)
 
-	Wake-up rules
-	Views in initial state
+		Wake-up rules:
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=7
@@ -818,9 +758,69 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			F(z!free,t!free)
+		D(z!free,t!free)
 
-	Wake-up rules
+		Wake-up rules:
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!free,t!free)
+
+		Wake-up rules:
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		F(z!free,t!free)
+
+		Wake-up rules:
 
 	Applying rule 0: r1:
 		the precondition is satisfied
@@ -828,7 +828,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 0: r1 is applied for the first time
 
 		Updating the views for A(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -855,9 +854,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!A@z,t!A@t)
+		A(z!A@z,t!A@t)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for A(z!,t!)
 
 	Applying rule 1: r2:
@@ -866,7 +866,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 1: r2 is applied for the first time
 
 		Updating the views for B(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -893,9 +892,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(z!B@t,t!B@z)
+		B(z!B@t,t!B@z)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for B(z!,t!)
 
 	Applying rule 2: r3:
@@ -904,7 +904,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 2: r3 is applied for the first time
 
 		Updating the views for C(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -931,11 +930,11 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(z!C@t,t!C@z)
+		C(z!C@t,t!C@z)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for C(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -962,11 +961,11 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(z!free,t!C@z)
+		C(z!free,t!C@z)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for C(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -993,9 +992,9 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(z!C@t,t!free)
+		C(z!C@t,t!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 3: r4:
 		the precondition is satisfied
@@ -1003,7 +1002,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 3: r4 is applied for the first time
 
 		Updating the views for D(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=31
@@ -1030,11 +1028,11 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			D(z!D@t,t!D@t)
+		D(z!D@t,t!D@t)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for D(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1061,11 +1059,11 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			D(z!free,t!D@z)
+		D(z!free,t!D@z)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for D(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=37
@@ -1092,9 +1090,9 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			D(z!free,t!D@t)
+		D(z!free,t!D@t)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 4: r5:
 		the precondition is satisfied
@@ -1102,7 +1100,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 4: r5 is applied for the first time
 
 		Updating the views for E(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -1129,11 +1126,11 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!E@z,t!E@t)
+		E(z!E@z,t!E@t)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for E(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -1160,11 +1157,11 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!E@z,t!free)
+		E(z!E@z,t!free)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for E(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1191,9 +1188,9 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!free,t!E@t)
+		E(z!free,t!E@t)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 5: r6:
 		the precondition is satisfied
@@ -1201,7 +1198,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 5: r6 is applied for the first time
 
 		Updating the views for F(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -1228,11 +1224,11 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			F(z!F@z,t!F@z)
+		F(z!F@z,t!F@z)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for F(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -1259,11 +1255,11 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			F(z!F@z,t!free)
+		F(z!F@z,t!free)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for F(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=46
@@ -1290,42 +1286,58 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			F(z!F@t,t!free)
+		F(z!F@t,t!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 0: r1:
 		the precondition is satisfied
+
 		Updating the views for A(z!,t!)
+
 		Updating the views for A(z!,t!)
 
 	Applying rule 1: r2:
 		the precondition is satisfied
+
 		Updating the views for B(z!,t!)
+
 		Updating the views for B(z!,t!)
 
 	Applying rule 2: r3:
 		the precondition is satisfied
+
 		Updating the views for C(z!,t!)
+
 		Updating the views for C(z!,t!)
+
 		Updating the views for C(z!,t!)
 
 	Applying rule 3: r4:
 		the precondition is satisfied
+
 		Updating the views for D(z!,t!)
+
 		Updating the views for D(z!,t!)
+
 		Updating the views for D(z!,t!)
 
 	Applying rule 4: r5:
 		the precondition is satisfied
+
 		Updating the views for E(z!,t!)
+
 		Updating the views for E(z!,t!)
+
 		Updating the views for E(z!,t!)
 
 	Applying rule 5: r6:
 		the precondition is satisfied
+
 		Updating the views for F(z!,t!)
+
 		Updating the views for F(z!,t!)
+
 		Updating the views for F(z!,t!)
 ------------------------------------------------------------
 every rule may be applied

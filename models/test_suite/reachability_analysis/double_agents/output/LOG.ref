@@ -493,7 +493,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -511,9 +510,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x!free)
+		A(x!free)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -531,10 +530,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(y~u)
-			A(y~p)
+		A(y~u)
+		A(y~p)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -552,16 +551,15 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p)
-			A(x~u)
+		A(x~p)
+		A(x~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -629,16 +627,15 @@ Id=26
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~u,y~u,x!free)
-			B(x~p,y~p,x!free)
+		B(x~u,y~u,x!free)
+		B(x~p,y~p,x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 5: r5:
 		the precondition is satisfied
 
 		rule 5: r5 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -656,9 +653,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(x!free)
+		C(x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -669,7 +666,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 3: r3 is applied for the first time
 
 		Updating the views for A(x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -686,11 +682,11 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x!B@x)
+		A(x!B@x)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for B(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -757,10 +753,10 @@ Id=36
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~u,y~u,x!A@x)
-			B(x~p,y~p,x!A@x)
+		B(x~u,y~u,x!A@x)
+		B(x~p,y~p,x!A@x)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -781,7 +777,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 2: r2 is applied for the first time
 
 		Updating the views for B(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=51
@@ -818,9 +813,9 @@ Id=51
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~q,y~q,x!free)
+		B(x~q,y~q,x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -828,7 +823,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 6: r6 is applied for the first time
 
 		Updating the views for C(x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -845,11 +839,11 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(x!B@x)
+		C(x!B@x)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for B(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=67
@@ -936,11 +930,11 @@ Id=67
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~u,y~u,x!C@x)
-			B(x~q,y~q,x!C@x)
-			B(x~p,y~p,x!C@x)
+		B(x~u,y~u,x!C@x)
+		B(x~q,y~q,x!C@x)
+		B(x~p,y~p,x!C@x)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 5: r5:
 		the precondition is satisfied
@@ -950,9 +944,10 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 3: r3:
 		the precondition is satisfied
+
 		Updating the views for A(x!)
+
 		Updating the views for B(x~,y~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=92
@@ -989,19 +984,21 @@ Id=92
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~q,y~q,x!A@x)
+		B(x~q,y~q,x!A@x)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 
 	Applying rule 2: r2:
 		the precondition is satisfied
+
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 4: r4:
 		the precondition is satisfied
+
 		Updating the views for A(x!)
 
 	Applying rule 7: r7:
@@ -1010,16 +1007,21 @@ EXTENSIONAL DESCRIPTION:
 		rule 7: r7 is applied for the first time
 
 		Updating the views for B(x~,y~,x!)
+
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 6: r6:
 		the precondition is satisfied
+
 		Updating the views for C(x!)
+
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 3: r3:
 		the precondition is satisfied
+
 		Updating the views for A(x!)
+
 		Updating the views for B(x~,y~,x!)
 ------------------------------------------------------------
 every rule may be applied

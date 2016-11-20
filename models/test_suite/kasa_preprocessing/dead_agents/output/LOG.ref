@@ -415,7 +415,7 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(3):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Reachability analysis...
-	Views in initial state
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -442,10 +442,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~u,x!free)
+		A(x~u,x!free)
 
-	Wake-up rules
-	Views in initial state
+		Wake-up rules:
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -462,9 +462,9 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~u)
+		B(x~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 8:
 		the precondition is not satisfied yet
@@ -481,7 +481,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 3 is applied for the first time
 
 		Updating the views for A(x~,x!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -508,9 +507,9 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~p,x!free)
+		A(x~p,x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 4:
 		the precondition is satisfied
@@ -538,7 +537,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 1 is applied for the first time
 
 		Updating the views for B(x~)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -555,9 +553,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x~p)
+		B(x~p)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -571,6 +569,7 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 3:
 		the precondition is satisfied
+
 		Updating the views for A(x~,x!)
 
 	Applying rule 8:
@@ -581,6 +580,7 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 1:
 		the precondition is satisfied
+
 		Updating the views for B(x~)
 
 ------------------------------------------------------------

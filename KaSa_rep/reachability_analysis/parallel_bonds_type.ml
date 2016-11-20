@@ -505,8 +505,6 @@ let add_value_and_event parameters error kappa_handler x value store_set
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_diff parameters
       then
-        let parameters =
-          Remanent_parameters.update_prefix parameters "         " in
         print_parallel_constraint
           ~verbose:false
           ~dump_any:true parameters error kappa_handler x value

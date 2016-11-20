@@ -450,7 +450,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -478,9 +477,9 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x!free,y!free)
+		A(x!free,y!free)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -498,9 +497,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(y~u)
+		A(y~u)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -518,15 +517,14 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x~u)
+		A(x~u)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -554,9 +552,9 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x!B@x,y!free)
+		A(x!B@x,y!free)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -574,15 +572,14 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x!A@x)
+		B(x!A@x)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 2: r2:
 		the precondition is satisfied
 
 		rule 2: r2 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -610,9 +607,9 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x!free,y!C@x)
+		A(x!free,y!C@x)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -630,9 +627,9 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(x!A@y)
+		C(x!A@y)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -660,9 +657,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(x!free)
+		C(x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 5: r5:
 		the precondition is satisfied
@@ -687,9 +684,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(x!free)
+		B(x!free)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -697,7 +694,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 6: r6 is applied for the first time
 
 		Updating the views for A(x!,y!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=27
@@ -724,9 +720,10 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(x!B@x,y!C@x)
+		A(x!B@x,y!C@x)
 
-	Wake-up rules
+		Wake-up rules:
+
 		Updating the views for B(x!)
 
 	Applying rule 7: r7:
@@ -735,13 +732,13 @@ EXTENSIONAL DESCRIPTION:
 		rule 7: r7 is applied for the first time
 
 		Updating the views for A(x!,y!)
+
 		Updating the views for C(x!)
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 
 		rule 3: r3 is applied for the first time
-
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -751,10 +748,12 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 4: r4:
 		the precondition is satisfied
+
 		Updating the views for A(x!,y!)
 
 	Applying rule 5: r5:
 		the precondition is satisfied
+
 		Updating the views for A(x!,y!)
 
 	Applying rule 0: r0:
@@ -762,7 +761,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 6: r6:
 		the precondition is satisfied
+
 		Updating the views for A(x!,y!)
+
 		Updating the views for B(x!)
 ------------------------------------------------------------
 every rule may be applied

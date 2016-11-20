@@ -765,7 +765,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -793,9 +792,9 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!C@x,t!B@t)
+		A(z!C@x,t!B@t)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -823,9 +822,9 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(t!A@t,z!C@x)
+		B(t!A@t,z!C@x)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -843,10 +842,10 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(x!B@z)
-			C(x!A@z)
+		C(x!B@z)
+		C(x!A@z)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -854,8 +853,11 @@ EXTENSIONAL DESCRIPTION:
 		rule 1 is applied for the first time
 
 		Updating the views for C(x!)
+
 		Updating the views for A(z!,t!)
+
 		Updating the views for B(t!,z!)
+
 		Updating the views for C(x!)
 	Dealing with creation
 
@@ -884,9 +886,9 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!D@x,t!B@t)
+		A(z!D@x,t!B@t)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -914,9 +916,9 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(t!A@t,z!D@x)
+		B(t!A@t,z!D@x)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -934,16 +936,15 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			D(x!B@z)
-			D(x!A@z)
+		D(x!B@z)
+		D(x!A@z)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 3:
 		the precondition is satisfied
 
 		rule 3 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -971,9 +972,9 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!C@x,t!F@t)
+		E(z!C@x,t!F@t)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1001,9 +1002,9 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			F(t!E@t,z!D@x)
+		F(t!E@t,z!D@x)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1021,9 +1022,9 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			C(x!E@z)
+		C(x!E@z)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1041,9 +1042,9 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			D(x!F@z)
+		D(x!F@z)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 4:
 		the precondition is satisfied
@@ -1051,8 +1052,11 @@ EXTENSIONAL DESCRIPTION:
 		rule 4 is applied for the first time
 
 		Updating the views for C(x!)
+
 		Updating the views for E(z!,t!)
+
 		Updating the views for F(t!,z!)
+
 		Updating the views for D(x!)
 	Dealing with creation
 
@@ -1081,9 +1085,9 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!G@x,t!F@t)
+		E(z!G@x,t!F@t)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1111,9 +1115,9 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			F(t!E@t,z!H@x)
+		F(t!E@t,z!H@x)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1131,9 +1135,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			G(x!E@z)
+		G(x!E@z)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1151,9 +1155,9 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			H(x!F@z)
+		H(x!F@z)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -1162,7 +1166,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 2 is applied for the first time
-
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1190,9 +1193,9 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!free,t!B@t)
+		A(z!free,t!B@t)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1220,9 +1223,9 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(t!A@t,z!free)
+		B(t!A@t,z!free)
 
-	Wake-up rules
+		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1250,15 +1253,19 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			E(z!free,t!F@t)
+		E(z!free,t!F@t)
 
-	Wake-up rules
+		Wake-up rules:
 
 	Applying rule 1:
 		the precondition is satisfied
+
 		Updating the views for C(x!)
+
 		Updating the views for A(z!,t!)
+
 		Updating the views for B(t!,z!)
+
 		Updating the views for C(x!)
 
 	Applying rule 3:
@@ -1266,9 +1273,13 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 4:
 		the precondition is satisfied
+
 		Updating the views for C(x!)
+
 		Updating the views for E(z!,t!)
+
 		Updating the views for F(t!,z!)
+
 		Updating the views for D(x!)
 
 	Applying rule 0:
@@ -1456,12 +1467,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1471,7 +1482,7 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1486,12 +1497,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1516,12 +1527,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1546,12 +1557,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1561,12 +1572,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1576,12 +1587,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1591,12 +1602,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1606,12 +1617,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1640,12 +1651,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1655,7 +1666,7 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1670,12 +1681,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1700,12 +1711,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1730,12 +1741,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1745,12 +1756,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1760,12 +1771,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1775,12 +1786,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1790,12 +1801,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1822,16 +1833,12 @@ H() => [ H(x!F.z) ]
 A(t!1),B(t!1) => 
 	[
 		  A(t!1,z!D.x),B(t!1,z!D.x)
-		v A(t!1,z!C.x),B(t!1,z)
 		v A(t!1,z!C.x),B(t!1,z!C.x)
-		v A(t!1,z),B(t!1,z)
-		v A(t!1,z),B(t!1,z!C.x)
 	]
 E(t!1),F(t!1) => 
 	[
 		  E(t!1,z!G.x),F(t!1,z!H.x)
 		v E(t!1,z!C.x),F(t!1,z!D.x)
-		v E(t!1,z),F(t!1,z!D.x)
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1852,12 +1859,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1867,7 +1874,7 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1882,12 +1889,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1912,12 +1919,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1942,12 +1949,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1957,12 +1964,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1972,12 +1979,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1987,12 +1994,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2002,12 +2009,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2032,12 +2039,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -2047,7 +2054,7 @@ Id=51
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=49
+Id=42
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2062,12 +2069,12 @@ Id=49
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2092,12 +2099,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=51
+Id=44
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=50
+  Id=43
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -2122,12 +2129,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2137,12 +2144,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2152,12 +2159,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=48
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=47
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2167,12 +2174,12 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2182,12 +2189,12 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=46
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=52
+  Id=45
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2201,14 +2208,10 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 A(t!1),B(t!1)=> [
 		  A(t!1,z!D.x),B(t!1,z!D.x)
-		v A(t!1,z!C.x),B(t!1,z)
-		v A(t!1,z!C.x),B(t!1,z!C.x)
-		v A(t!1,z),B(t!1,z)
-		v A(t!1,z),B(t!1,z!C.x)]
+		v A(t!1,z!C.x),B(t!1,z!C.x)]
 E(t!1),F(t!1)=> [
 		  E(t!1,z!G.x),F(t!1,z!H.x)
-		v E(t!1,z!C.x),F(t!1,z!D.x)
-		v E(t!1,z),F(t!1,z!D.x)]
+		v E(t!1,z!C.x),F(t!1,z!D.x)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

@@ -203,7 +203,7 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Inhibition_map:rule(0):'r0' A(z,t),B(z,t)->A(z!1,t),B(z!1,t) -> rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1)[0->0];[1->1]
 Influence_map:Inhibition_map:rule(1):'r1' A(z,t),B(z,t)->A(z,t!1),B(z,t!1) -> rule(0):'r0' A(z,t),B(z,t)->A(z!1,t),B(z!1,t)[0->0];[1->1]
 Reachability analysis...
-	Views in initial state
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=7
@@ -230,13 +230,13 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!free,t!free)
+		A(z!free,t!free)
 
-	Wake-up rules
-		Updating the views for A(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
-	Views in initial state
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
+
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=7
@@ -263,46 +263,13 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(z!free,t!free)
+		B(z!free,t!free)
 
-	Wake-up rules
-		Updating the views for B(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
-	Views in initial state
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
 
-INTENSIONAL DESCRIPTION:
-Id=13
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-			A(z!B@z,t!B@t)
-
-	Wake-up rules
-		Updating the views for A(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
-	Views in initial state
+	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -329,28 +296,56 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(z!A@z,t!A@t)
+		A(z!B@z,t!B@t)
 
-	Wake-up rules
-		Updating the views for B(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
 
-		  A(t!B.t,z!1),B(t!A.t,z!1)
+	Views in initial state:
 
-		  A(t!1,z!B.z),B(t!1,z!A.z)
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
 
-		  B(t!A.t,z!1),A(t!B.t,z!1)
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
 
-		  B(t!1,z!A.z),A(t!1,z!B.z)
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
 
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		B(z!A@z,t!A@t)
+
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
+
+
+		A(t!B.t,z!1),B(t!A.t,z!1)
+		A(t!1,z!B.z),B(t!1,z!A.z)
+		B(t!A.t,z!1),A(t!B.t,z!1)
+		B(t!1,z!A.z),A(t!1,z!B.z)
 	Applying rule 0: r0:
 		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
 
 		Updating the views for A(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -377,14 +372,14 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!B@z,t!free)
+		A(z!B@z,t!free)
 
-	Wake-up rules
-		Updating the views for A(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
+
+
 		Updating the views for B(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -411,21 +406,57 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(z!A@z,t!free)
+		B(z!A@z,t!free)
 
-	Wake-up rules
-		Updating the views for B(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
 
-		  A(t,z!1),B(t,z!1)
+		Update information about potential sites accross domain
 
-		  B(t,z!1),A(t,z!1)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
+		A(t,z!1),B(t,z!1)
+		B(t,z!1),A(t,z!1)
+
+		Wake-up rules: (site accross bonds/agent:B/site:z)
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (site accross bonds/agent:A/site:z)
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (site accross bonds/agent:A/site:z)
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (site accross bonds/agent:B/site:z)
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (double bonds/agent:B/site:z)
+
+		Wake-up rules: (double bonds/agent:A/site:z)
+
+		Wake-up rules: (double bonds/agent:A/site:z)
+
+		Wake-up rules: (double bonds/agent:B/site:z)
+
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -433,7 +464,6 @@ EXTENSIONAL DESCRIPTION:
 		rule 1: r1 is applied for the first time
 
 		Updating the views for A(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=23
@@ -460,14 +490,14 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			A(z!free,t!B@t)
+		A(z!free,t!B@t)
 
-	Wake-up rules
-		Updating the views for A(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
+
+
 		Updating the views for B(z!,t!)
-			
 
 INTENSIONAL DESCRIPTION:
 Id=23
@@ -494,41 +524,71 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-			B(z!free,t!A@t)
+		B(z!free,t!A@t)
 
-	Wake-up rules
-		Updating the views for B(z!,t!)
-		(rule 0: r0) should be investigated 
-		(rule 1: r1) should be investigated 
+		Wake-up rules:
+				(rule 0: r0) should be investigated 
+				(rule 1: r1) should be investigated 
 
-		  A(t!1,z),B(t!1,z)
+		Update information about potential sites accross domain
 
-		  B(t!1,z),A(t!1,z)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
+		A(t!1,z),B(t!1,z)
+		B(t!1,z),A(t!1,z)
+
+		Wake-up rules: (site accross bonds/agent:B/site:t)
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (site accross bonds/agent:A/site:t)
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (site accross bonds/agent:A/site:t)
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (site accross bonds/agent:B/site:t)
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 0: r0) should be investigated 
+			(rule 1: r1) should be investigated 
+			(rule 1: r1) should be investigated 
+
+		Wake-up rules: (double bonds/agent:B/site:t)
+
+		Wake-up rules: (double bonds/agent:A/site:t)
+
+		Wake-up rules: (double bonds/agent:A/site:t)
+
+		Wake-up rules: (double bonds/agent:B/site:t)
+
 
 	Applying rule 0: r0:
 		the precondition is satisfied
+
 		Updating the views for A(z!,t!)
+
 		Updating the views for B(z!,t!)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 
 	Applying rule 1: r1:
 		the precondition is satisfied
+
 		Updating the views for A(z!,t!)
+
 		Updating the views for B(z!,t!)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

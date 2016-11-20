@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 19 2016>
+   * Last modification: Time-stamp: <Nov 20 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -420,6 +420,7 @@ struct
           | _ :: tail -> aux tail
         in aux site_correspondence
       in
+      let () = Loggers.print_newline log in
       let () = Loggers.fprintf log "\t\t%s %s(" prefix agent_string in
       let error, _ =
         List.fold_left
@@ -515,7 +516,7 @@ struct
                       (Ckappa_sig.string_of_rule_id rule_id)
                 in
                 let tab =
-                  if title = "" then "\t" else "\t\t"
+                  if title = "" then "\t\t\t\t" else "\t\t\t"
                 in
                 let () =
                   Loggers.fprintf log "%s%s(%s) should be investigated "
@@ -525,6 +526,7 @@ struct
                 let () = Loggers.print_newline log in error)
               s1 error
           in
+          let () = Loggers.print_newline log in
           error
         end
       else error
@@ -677,7 +679,7 @@ struct
                         Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
                       else
                         Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                          "\t\t\t%s%s(" prefix agent_string
+                          "\t\t%s%s(" prefix agent_string
                     in
                     let () = (*Print the information of views*)
                       Loggers.fprintf (Remanent_parameters.get_logger parameters)
@@ -712,9 +714,6 @@ struct
   let add_link ?title error static dynamic (agent_type, cv_id) bdu event_list =
     let parameters = get_parameter static in
     let log = Remanent_parameters.get_logger parameters in
-    (*let error, store_remanent_triple =
-      get_store_remanent_triple static dynamic error
-      in*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store = get_fixpoint_result dynamic in
     let error, bdu_old =
@@ -750,10 +749,12 @@ struct
                || Remanent_parameters.get_dump_reachability_analysis_diff parameters
                || Remanent_parameters.get_trace parameters)
             then
-              let () = Loggers.fprintf log "\t%s" s in
-              let () = Loggers.print_newline log in
-              let () = Loggers.print_newline log in
-              ()
+              if s =  "" then Loggers.print_newline log
+              else
+                let () = Loggers.fprintf log "\t%s" s in
+                let () = Loggers.print_newline log in
+                let () = Loggers.print_newline log in
+                ()
         in
         let error, dynamic =
           dump_view_diff
@@ -781,14 +782,13 @@ struct
         || Remanent_parameters.get_trace parameters
         || Remanent_parameters.get_dump_reachability_analysis_wl parameters
         then
-          let () = Loggers.fprintf log "\tWake-up rules" in
+          let () = Loggers.fprintf log "\t\tWake-up rules:" in
           let () = Loggers.print_newline log in
           ()
       in
       let error, event_list =
         List.fold_left (fun (error, event_list) (agent_type, cv_id) ->
             updates_list2event_list
-              ~title:"Dealing with"
               static
               dynamic
               error
@@ -799,14 +799,6 @@ struct
       in
       error, dynamic, event_list
     else
-      (*let () =
-        let () =
-        Loggers.fprintf log "\tInitial state is empty"
-        in
-        let () = Loggers.print_newline log in
-        let () = Loggers.print_newline log in
-        ()
-        in*)
       error, dynamic, event_list
 
   (***************************************************************************)
@@ -920,7 +912,7 @@ struct
                        (*----------------------------------------------------*)
                        let error, dynamic, event_list =
                          add_link
-                           ~title:"Views in initial state"
+                           ~title:"Views in initial state:"
                            error
                            static
                            dynamic
@@ -2338,25 +2330,14 @@ struct
              get_store_modif_list_restriction_map static dynamic error
            in
            (*print*)
-           (*let parameter_cv =
-             Remanent_parameters.update_prefix parameter "\t\tUpdating the views for"
-             in*)
-           let error = (*TODO: different title*)
+           let error =
              dump_cv_label
                static
                dynamic
                error
                (Remanent_parameters.get_dump_reachability_analysis_diff parameters)
                (agent_type, cv_id)
-               (*Bdu_fixpoint_iteration.dump_cv_label (*FIXME*)
-                 (Remanent_parameters.get_dump_reachability_analysis_diff parameter)
-                 parameter_cv
-                 kappa_handler
-                 error
-                 store_remanent_triple
-                 agent_type
-                 cv_id*)
-           in
+                 in
            (*-----------------------------------------------------*)
            let store_result = get_fixpoint_result dynamic in
            let error, bdu_X =
@@ -2388,7 +2369,7 @@ struct
            in
            let error, dynamic, event_list =
              add_link
-               ~title:"\t\t"
+               ~title:""
                error
                static
                dynamic

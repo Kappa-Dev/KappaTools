@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 19 2016>
+  * Last modification: Time-stamp: <Nov 20 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -748,7 +748,7 @@ struct
       error, dynamic, (precondition, event_list)
     | Some rule ->
       let parameters =
-        Remanent_parameters.update_prefix parameters "                "
+        Remanent_parameters.update_prefix parameters "\t\t"
       in
       let dump_title () =
         if local_trace ||
@@ -759,6 +759,9 @@ struct
               (Remanent_parameters.get_logger parameters)
               "%sUpdate information about potential double bindings"
               (Remanent_parameters.get_prefix parameters)
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters)
           in
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
         else
@@ -941,14 +944,14 @@ struct
       in
       (*--------------------------------------------------------------*)
       (*fold over the store_value and parallel bond value *)
-      let () =
+      let bool =
         if bool ||
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.is_empty
              store_parallel
         then
-          ()
+          bool
         else
-          dump_title ()
+          let () = dump_title () in true
       in
       let store_result = get_value dynamic in
       let error, (store_set, store_result) =
@@ -968,6 +971,12 @@ struct
       let dynamic = set_value store_result dynamic in
       let event_list = discover_a_new_pair_of_modify_sites store_set event_list
       in
+      let () =
+        if bool &&
+           (local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameters)
+        then
+          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
       error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
@@ -977,38 +986,9 @@ struct
     let parameters = get_parameter static in
     let compiled = get_compil static in
     let kappa_handler = get_kappa_handler static in
-    let error =
-      if local_trace
-      || Remanent_parameters.get_dump_reachability_analysis_wl
-           parameters
-      then
-        let error, rule_id_string =
-          try
-            Handler.string_of_rule parameters error kappa_handler
-              compiled rule_id
-          with
-          | _ ->
-            Exception.warn
-              parameters error __POS__ Exit
-              (Ckappa_sig.string_of_rule_id rule_id)
-        in
-        let tab = "\t" in
-        let () =
-          Loggers.fprintf
-            (Remanent_parameters.get_logger parameters)
-            "%s%s(%s) should be investigated "
-            (Remanent_parameters.get_prefix parameters) tab
-            rule_id_string
-        in
-        let () =
-          Loggers.print_newline
-            (Remanent_parameters.get_logger parameters)
-        in
-        error
-      else
-        error
-    in
-    error, (Communication.Check_rule rule_id) :: event_list
+    Communication.add_rule ~local_trace
+      parameters compiled kappa_handler error
+      rule_id event_list
 
   let apply_event_list_rule_in_lhs_rhs_aux static error store_rule_double_bonds
       event_list tuple_pair_set =
@@ -1063,7 +1043,8 @@ struct
   error, event_list
 
   let apply_event_list static dynamic error event_list =
-      let parameters = get_parameter static in
+    let parameters = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
       let store_sites_to_tuple = get_sites_to_tuple static in
       (*get a list tuple pair that the pair of modified sites belong to*)
       let error, event_list =
@@ -1073,6 +1054,31 @@ struct
             | Communication.Check_rule _
             | Communication.See_a_new_bond _ -> error, event_list
             | Communication.Modified_sites (agent_type, site_type) ->
+              let error =
+                if local_trace
+                || Remanent_parameters.get_dump_reachability_analysis_wl
+                 parameters
+                then
+                  let tab = "\t\t" in
+                  let error, agent =
+                    Handler.string_of_agent parameters error kappa_handler agent_type
+                  in
+                  let error, site =
+                    Handler.string_of_site_contact_map parameters error kappa_handler agent_type site_type
+                  in
+                  let () =
+                    Loggers.fprintf
+                      (Remanent_parameters.get_logger parameters)
+                      "%s%sWake-up rules: (double bonds/agent:%s/site:%s)"
+                      (Remanent_parameters.get_prefix parameters) tab
+                      agent site
+                  in
+                  let () =
+                    Loggers.print_newline
+                      (Remanent_parameters.get_logger parameters)
+                  in error
+                else error
+              in
               (*search with tuple that this pair of site belong to*)
               let error, tuple_pair_set =
                 match
@@ -1127,6 +1133,14 @@ struct
                   store_snd_site_create_parallel_bonds_rhs
                   event_list
                   tuple_pair_set
+              in
+              let () =
+                if local_trace
+                || Remanent_parameters.get_dump_reachability_analysis_wl
+                     parameters
+                then
+                  Loggers.print_newline
+                    (Remanent_parameters.get_logger parameters)
               in
               error, event_list
           ) (error, []) event_list

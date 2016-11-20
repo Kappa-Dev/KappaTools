@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Nov 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -633,3 +633,39 @@ let get_state_of_site_in_postcondition
     get_global_dynamic_information set_global_dynamic_information
     parameter error kappa_handler dynamic agent_id
     site_type defined_in precondition
+
+
+let add_rule ?local_trace:(local_trace=false)
+    parameters compiled kappa_handler  error rule_id event_list =
+  let error =
+    if local_trace
+    || Remanent_parameters.get_dump_reachability_analysis_wl
+         parameters
+    then
+      let error, rule_id_string =
+        try
+          Handler.string_of_rule parameters error kappa_handler
+            compiled rule_id
+        with
+        | _ ->
+          Exception.warn
+            parameters error __POS__ Exit
+            (Ckappa_sig.string_of_rule_id rule_id)
+      in
+      let tab = "\t\t\t" in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "%s%s(%s) should be investigated "
+          (Remanent_parameters.get_prefix parameters) tab
+          rule_id_string
+      in
+      let () =
+        Loggers.print_newline
+          (Remanent_parameters.get_logger parameters)
+      in
+      error
+    else
+      error
+  in
+  error, (Check_rule rule_id) :: event_list

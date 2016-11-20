@@ -5,46 +5,38 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-	Views in initial state
+	Views in initial state:
 
-			A(x!B@x)
+		A(x!B@x)
 
-	Wake-up rules
-		Updating the views for A(x!)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-	Views in initial state
+		Wake-up rules:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
 
-			A(x~u)
+	Views in initial state:
 
-	Wake-up rules
-		Updating the views for A(x~)
-		(rule 0) should be investigated 
-	Views in initial state
+		A(x~u)
 
-			B(x!A@x,x~u)
+		Wake-up rules:
+				(rule 0) should be investigated 
 
-	Wake-up rules
-		Updating the views for B(x!,x~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
+	Views in initial state:
 
-		  A(x~u!1),B(x~u!1)
+		B(x!A@x,x~u)
 
-		  B(x~u!1),A(x~u!1)
+		Wake-up rules:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
 
+
+		A(x~u!1),B(x~u!1)
+		B(x~u!1),A(x~u!1)
 	Applying rule 0:
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 
 	Applying rule 2:
 		the precondition is not satisfied yet
@@ -57,19 +49,14 @@ Reachability analysis...
 		Updating the views for A(x!)
 	Dealing with side effects
 
-			B(x!free,x~u)
+		B(x!free,x~u)
 
-	Wake-up rules
-		Updating the views for B(x!,x~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
+		Wake-up rules:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -77,49 +64,35 @@ Reachability analysis...
 		rule 3 is applied for the first time
 
 		Updating the views for B(x!,x~)
-		Updating the views for B(x!,x~)
-			
 
-			B(x!A@x,x~p)
-
-	Wake-up rules
 		Updating the views for B(x!,x~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
+
+		B(x!A@x,x~p)
+
+		Wake-up rules:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+
 
 	Applying rule 0:
 		the precondition is satisfied
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 
 	Applying rule 1:
 		the precondition is satisfied
+
 		Updating the views for A(x!)
 	Dealing with side effects
 
-			B(x!free,x~p)
+		B(x!free,x~p)
 
-	Wake-up rules
-		Updating the views for B(x!,x~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
+		Wake-up rules:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -127,38 +100,21 @@ Reachability analysis...
 		rule 2 is applied for the first time
 
 		Updating the views for B(x!,x~)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 
 	Applying rule 3:
 		the precondition is satisfied
+
 		Updating the views for B(x!,x~)
+
 		Updating the views for B(x!,x~)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 
 	Applying rule 0:
 		the precondition is satisfied
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 
 	Applying rule 1:
 		the precondition is satisfied
+
 		Updating the views for A(x!)
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
-                Update information about potential sites accross domain
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
