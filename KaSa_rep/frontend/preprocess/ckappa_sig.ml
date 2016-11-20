@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 20 2016>
+ * Last modification: Time-stamp: <Nov 20 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -110,6 +110,16 @@ module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
   (
     Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage
     with type key = c_agent_name * c_site_name
+     and type dimension = int * int
+  )
+
+module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
+  (
+    Int_storage.Quick_key_list
+      (Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif):
+         Int_storage.Storage
+    with type key = c_agent_name * c_site_name
+
      and type dimension = int * int
   )
 
