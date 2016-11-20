@@ -449,6 +449,8 @@ struct
 
   (**************************************************************************)
 
+
+  (*BUG to fix:  When a view is modified then any site in this view must be declared as modified *)
   let updates_list2event_list ?title:(title="") static dynamic error agent_type
       cv_id event_list =
     let parameters = get_parameter static in
@@ -2679,7 +2681,14 @@ struct
       in
       error, dynamic, event_list
     | Communication.Dummy | Communication.Check_rule _
-    | Communication.Modified_sites _ (*TODO?*) -> error, dynamic, event_list
+    | Communication.Modified_sites _ (*TODO?*) ->
+      (* You cannot leave this kind of TODO in the code *)
+      (* The analysis is unsound until this is done *)
+      (* When a site is modified, you have to
+         add all the rules that test or modify a views containing this site *)
+      (* site -> views, views -> rules *)
+      (* Thhe corresponding function from site to rules should be computed statically, once for all, in the initialization phase *)
+      error, dynamic, event_list
 
   (**************************************************************************)
 
