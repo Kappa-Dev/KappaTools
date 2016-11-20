@@ -466,8 +466,24 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
   in
   error, handler, store_result
 
-let add_link_common parameter error bdu_false handler
-    kappa_handler bool dump_title x pair mvbdu store_set store_result =
+let add_sites_from_tuples parameters error tuple modified_sites =
+  let (agent,site1,site2,_),(agent',site1',site2',_) = tuple in
+  let error, modified_sites =
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site1) () modified_sites
+  in
+  let error, modified_sites =
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site2) () modified_sites
+  in
+  let error, modified_sites =
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent',site1') () modified_sites
+  in
+  let error, modified_sites =
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent',site2') () modified_sites
+  in
+  error, modified_sites
+
+let add_link_and_check parameter error bdu_false handler
+    kappa_handler bool dump_title x mvbdu modified_sites store_result =
   let error, bdu_old =
     match
       PairAgentSitesState_map_and_set.Map.find_option_without_logs
@@ -489,7 +505,7 @@ let add_link_common parameter error bdu_false handler
   (*compare mvbdu and old mvbdu*)
   if Ckappa_sig.Views_bdu.equal new_bdu bdu_old
   then
-      error, bool, handler, store_set, store_result
+      error, bool, handler, modified_sites, store_result
   else
     (*-----------------------------------------------------------*)
     (*print each step*)
@@ -514,49 +530,12 @@ let add_link_common parameter error bdu_false handler
         new_bdu
         store_result
     in
-    let error', new_set =
-      PairAgentSite_map_and_set.Set.add_when_not_in
-        parameter
-        error
-        (pair x)
-        store_set
+    let error', modified_sites =
+      add_sites_from_tuples parameter error x modified_sites
     in
     let error =
       Exception.check_point
         Exception.warn  parameter error error'
         __POS__ Exit
     in
-    error, true, handler, new_set, store_result
-
-(*A(x!, _), B(x!, _)*)
-let add_link_and_event_in_created_bonds parameter error bdu_false handler
-    kappa_handler bool dump_title x mvbdu store_set store_result =
-  let proj (a, b, _, _) = (a, b) in
-  (*consider the first site that is bound*)
-  let pair (x, y) = proj x, proj y in
-  add_link_common parameter error
-    bdu_false
-    handler
-    kappa_handler
-    bool dump_title
-    x
-    pair
-    mvbdu
-    store_set
-    store_result
-
-(*A(_ ,y), B(_, y)*)
-let add_link_and_event_in_modif parameter error bdu_false handler kappa_handler
-    bool dump_title x mvbdu store_set store_result =
-    let proj (a, _, c, _) = (a, c) in
-    (*consider the second site that is modified*)
-    let pair (x, y) = proj x, proj y in
-    add_link_common parameter error
-      bdu_false
-      handler
-      kappa_handler
-      bool dump_title x
-      pair
-      mvbdu
-      store_set
-      store_result
+    error, true, handler, modified_sites, store_result
