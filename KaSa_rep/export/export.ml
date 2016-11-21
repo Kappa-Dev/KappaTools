@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 17 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -18,9 +18,13 @@ let warn parameters mh pos exn default =
 (******************************************************************************)
 (*module signatures*)
 
+module Export =
+  functor (Reachability:Analyzer.Analyzer) ->
+  struct
+
 type state =
-  (Domain_selection.Reachability_analysis.static_information,
-   Domain_selection.Reachability_analysis.dynamic_information)
+  (Reachability.static_information,
+   Reachability.dynamic_information)
     Remanent_state.state
 
 type contact_map = Remanent_state.contact_map
@@ -32,8 +36,8 @@ type ode_flow = Ode_fragmentation_type.ode_frag
 type c_compilation = Cckappa_sig.compil
 
 type reachability_analysis =
-  (Domain_selection.Reachability_analysis.static_information,
-   Domain_selection.Reachability_analysis.dynamic_information)
+  (Reachability.static_information,
+   Reachability.dynamic_information)
     Remanent_state.reachability_result
 
 type parameters = Remanent_parameters_sig.parameters
@@ -833,11 +837,11 @@ let compute_intermediary_internal_influence_map show_title state =
 
 let get_map_gen
     (get: ?accuracy_level:Remanent_state.accuracy_level ->
-     (Domain_selection.Reachability_analysis.static_information,
-      Domain_selection.Reachability_analysis.dynamic_information)
+     (Reachability.static_information,
+      Reachability.dynamic_information)
        Remanent_state.state ->
-     (Domain_selection.Reachability_analysis.static_information,
-      Domain_selection.Reachability_analysis.dynamic_information)
+     (Reachability.static_information,
+      Reachability.dynamic_information)
        Remanent_state.state * 'a )
     convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
     ?do_we_show_title:(do_we_show_title=(fun _ -> true))
@@ -888,11 +892,11 @@ let compute_reachability_result show_title state =
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
   let error, log_info, static, dynamic =
-    Domain_selection.Reachability_analysis.main
+    Reachability.main
       parameters log_info error bdu_handler c_compil handler
   in
   let error, dynamic, state =
-    Domain_selection.Reachability_analysis.export static dynamic
+    Reachability.export static dynamic
       error state in
   let state = Remanent_state.set_errors error state in
   let state = Remanent_state.set_log_info log_info state in
@@ -1224,3 +1228,5 @@ let get_internal_constraints_list =
 let output_internal_constraints_list ?logger (state:state) =
   let state, constraints_list = get_internal_constraints_list state in
   output_internal_constraints_list ?logger state constraints_list
+
+  end

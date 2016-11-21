@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 14 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -247,6 +247,15 @@ let get_reachability_map () =
       | Remanent_parameters_sig.Full -> reachability_map_4
     end
 
+let get_reachability_parameters () =
+  {
+    Remanent_parameters_sig.views = !Config.with_views_analysis;
+    Remanent_parameters_sig.site_accross_bonds =
+      !Config.with_site_accross_bonds_analysis ;
+    Remanent_parameters_sig.parallel_bonds =
+      !Config.with_parallel_bonds_analysis
+  }
+
 let open_tasks_profiling =
   let cache = ref None in
   let f () =
@@ -300,31 +309,31 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
    !Config.do_reachability_analysis ;
 
         (**)
-	Remanent_parameters_sig.file = !Config.file ;
-	Remanent_parameters_sig.symbols = get_symbols () ;
-	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
-	Remanent_parameters_sig.contact_map_output = get_contact_map () ;
+ Remanent_parameters_sig.file = !Config.file ;
+ Remanent_parameters_sig.symbols = get_symbols () ;
+ Remanent_parameters_sig.influence_map_output = get_influence_map () ;
+ Remanent_parameters_sig.contact_map_output = get_contact_map () ;
  Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
+ Remanent_parameters_sig.reachability_analysis_parameters = get_reachability_parameters ();
 
-	Remanent_parameters_sig.unsafe = !Config.unsafe ;
-	Remanent_parameters_sig.trace  = !Config.trace ;
- Remanent_parameters_sig.dump_error_as_soon_as_they_occur =
-   !Config.dump_error_as_soon_as_they_occur;
-	Remanent_parameters_sig.prefix = "" ;
-	Remanent_parameters_sig.call_stack = [];
-	Remanent_parameters_sig.link_mode = !Config.link_mode ;
-	Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state ;
+ Remanent_parameters_sig.unsafe = !Config.unsafe ;
+ Remanent_parameters_sig.trace  = !Config.trace ;
+ Remanent_parameters_sig.dump_error_as_soon_as_they_occur =   !Config.dump_error_as_soon_as_they_occur;
+ Remanent_parameters_sig.prefix = "" ;
+ Remanent_parameters_sig.call_stack = [];
+ Remanent_parameters_sig.link_mode = !Config.link_mode ;
+ Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state ;
  Remanent_parameters_sig.launching_date =
    Unix.localtime (Unix.gettimeofday ()) ;
-	Remanent_parameters_sig.time_shift=(
+ Remanent_parameters_sig.time_shift=(
 	  let x = Unix.gettimeofday () in
 	  (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour)  ;
  Remanent_parameters_sig.hostname=
    begin try Unix.gethostname () with Failure _ -> "javascript" end;
  Remanent_parameters_sig.command_line= command;
-	Remanent_parameters_sig.short_version=Version.version_string;
-	Remanent_parameters_sig.version=Version.version_kasa_full_name;
-	Remanent_parameters_sig.tk_interface=Tk_version.tk;
+ Remanent_parameters_sig.short_version=Version.version_string;
+ Remanent_parameters_sig.version=Version.version_kasa_full_name;
+ Remanent_parameters_sig.tk_interface=Tk_version.tk;
  Remanent_parameters_sig.influence_map_accuracy_level = fetch_accuracy_level
      Config.influence_map_accuracy_level ;
  Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level
@@ -332,7 +341,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
  Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level
      Config.view_accuracy_level ;
         Remanent_parameters_sig.called_from = called_from ;
-	Remanent_parameters_sig.html_mode = html_mode ;
+ Remanent_parameters_sig.html_mode = html_mode ;
      } ;
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
     Remanent_parameters_sig.save_progress_bar = (fun _ -> ());
@@ -445,12 +454,20 @@ let get_add_singular_microstates_1 r = r.Remanent_parameters_sig.add_singular_mi
 let get_local_trace_prefix_1 r = r.Remanent_parameters_sig.trace_prefix
 let get_local_trace_directory_1 r = r.Remanent_parameters_sig.trace_directory
 
+
+let get_view_analysis_1 r = r.Remanent_parameters_sig.views
+let get_site_accross_bonds_analysis_1 r = r.Remanent_parameters_sig.site_accross_bonds
+let get_parallel_bonds_analysis_1 r =
+  r.Remanent_parameters_sig.parallel_bonds
+
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
 let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output
 let get_contact_map_1                      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_output
 (*add reachability*)
 let get_reachability_map_1                      marshalisable = marshalisable.Remanent_parameters_sig.reachability_map_output
+let get_reachability_analysis_parameters_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.reachability_analysis_parameters
 
 let get_unsafe_1                           marshalisable = marshalisable.Remanent_parameters_sig.unsafe
 let get_trace_1                            marshalisable = marshalisable.Remanent_parameters_sig.trace
@@ -521,6 +538,8 @@ let get_influence_map = upgrade_from_marshal_field get_influence_map_1
 let get_contact_map = upgrade_from_marshal_field get_contact_map_1
 (*add reachability*)
 let get_reachability_map = upgrade_from_marshal_field get_reachability_map_1
+let get_reachability_analysis_parameters =
+  upgrade_from_marshal_field get_reachability_analysis_parameters_1
 let get_unsafe = upgrade_from_marshal_field get_unsafe_1
 let get_trace = upgrade_from_marshal_field get_trace_1
 let get_dump_error_as_soon_as_they_occur = upgrade_from_marshal_field get_dump_error_as_soon_as_they_occur_1
@@ -536,7 +555,7 @@ let upgrade_from_contact_map_field f = compose f get_contact_map
 let upgrade_from_symbols_field f = compose f get_symbols
 (*add reachability*)
 let upgrade_from_reachability_map_field f = compose f get_reachability_map
-
+let upgrade_from_reachability_analysis_parameters_field f = compose f get_reachability_analysis_parameters
 let get_btype_sep_symbol = upgrade_from_symbols_field get_btype_sep_symbol_1
 let get_bound_symbol = upgrade_from_symbols_field get_bound_symbol_1
 let get_at_symbol = upgrade_from_symbols_field get_at_symbol_1
@@ -555,6 +574,7 @@ let get_uni_arrow_symbol = upgrade_from_symbols_field get_uni_arrow_symbol_1
 let get_rev_arrow_symbol = upgrade_from_symbols_field get_rev_arrow_symbol_1
 let get_bi_arrow_symbol = upgrade_from_symbols_field get_bi_arrow_symbol_1
 let get_uni_arrow_no_poly_symbol = upgrade_from_symbols_field get_uni_arrow_no_poly_symbol_1
+
 
 let get_im_format = upgrade_from_influence_map_field get_im_format_1
 let get_im_file = upgrade_from_influence_map_field get_im_file_1
@@ -613,6 +633,17 @@ let get_add_singular_microstates =
         get_add_singular_microstates_1
 let get_local_trace_prefix = upgrade_from_reachability_map_field get_local_trace_prefix_1
 let get_local_trace_directory = upgrade_from_reachability_map_field get_local_trace_directory_1
+
+
+let get_view_analysis = upgrade_from_reachability_analysis_parameters_field
+    get_view_analysis_1
+let get_parallel_bonds_analysis =
+  upgrade_from_reachability_analysis_parameters_field
+    get_parallel_bonds_analysis_1
+let get_site_accross_bonds_analysis =
+  upgrade_from_reachability_analysis_parameters_field
+    get_site_accross_bonds_analysis_1
+
 let get_do_reachability_analysis p =
   upgrade_from_marshal_field get_do_reachability_analysis_1 p
   || get_compute_local_traces p

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Aug 15 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -107,6 +107,11 @@ let local_trace_prefix = ref "Agent_trace_"
 let local_trace_format = ref "DOT"
 
 (** accuracy *)
+let with_views_analysis = ref true
+let with_site_accross_bonds_analysis = ref true
+let with_parallel_bonds_analysis = ref true 
+
+
 let view_accuracy_level = ref "High"
 let influence_map_accuracy_level = ref "Medium"
 let contact_map_accuracy_level = ref "Low"

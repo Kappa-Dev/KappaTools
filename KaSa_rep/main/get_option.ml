@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Aug 15 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   * *
   * primitive to parse command-line options
   *
@@ -35,7 +35,6 @@ let options =
           "--no-compute-stochastic-flow-of-information";
           "--no-compute-reachability-analysis";
         ],[]),"launch nothing",["0_Actions"],Normal;
-
       "--compute-contact-map",
       Bool Config.do_contact_map,
       "compute the contact map",
@@ -61,13 +60,13 @@ let options =
       "--compute-ODE-flow-of-information",
       Bool Config.do_ODE_flow_of_information,
       "Compute an approximation of the flow of information in the ODE semantics",
-      ["0_Actions";"6_Flow_of_information"],
+      ["0_Actions";"6_FLow_of_information"],
       Expert;
 
       "--compute-stochastic-flow-of-information",
       Bool Config.do_stochastic_flow_of_information,
       "Compute an approximation of the flow of information in the stochastic semantics",
-      ["0_Actions";"6_Flow_of_information"],
+      ["0_Actions";"6_FLow_of_information"],
       Expert;
 
       "--compute-reachability-analysis",
@@ -75,7 +74,32 @@ let options =
       "Compute an approximation of the states of agent sites",
       ["0_Actions";"2_Reachability_analysis"],
       Normal;
-
+      "--enable-every-domain",
+      Multi(
+        [
+          "--views-domain";
+          "--double-bonds-domain";
+          "--sites-accross-bonds-domain";
+        ],[]),"enable every abstract domain",["2_Reachability_analysis"],Normal;
+      "--disable-every-domain",
+      Multi(
+        [
+          "--no-views-domain";
+          "--no-double-bonds-domain";
+          "--no-sites-accross-bonds-domain";
+        ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
+      "--views-domain",
+      Bool Config.with_views_analysis,
+      "enable local views analysis",
+      ["0_Actions";"2_Reachability_analysis"],Normal;
+      "--double-bonds-domain",
+      Bool Config.with_parallel_bonds_analysis,
+      "enable double bonds analysis",
+      ["0_Actions";"2_Reachability_analysis"],Normal;
+      "--sites-accross-bonds-domain",
+      Bool Config.with_site_accross_bonds_analysis,
+      "enable the analysis of the relation amond the states of sites in connected agents",
+      ["0_Actions";"2_Reachability_analysis"],Normal;
       "--view-analysis",
       (Choice
          ([

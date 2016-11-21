@@ -1,10 +1,10 @@
 (**
   * parameters.ml
   * openkappa
-  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
+  * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 14 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -105,6 +105,10 @@ val get_backend_mode: Remanent_parameters_sig.parameters ->
   Remanent_parameters_sig.reachability_output
 val get_hide_one_d_relations_from_cartesian_decomposition: Remanent_parameters_sig.parameters -> bool
 val get_smash_relations: Remanent_parameters_sig.parameters -> bool
+
+val get_view_analysis:  Remanent_parameters_sig.parameters -> bool
+val get_site_accross_bonds_analysis: Remanent_parameters_sig.parameters -> bool
+val get_parallel_bonds_analysis: Remanent_parameters_sig.parameters -> bool
 
 (** local traces *)
 val get_local_trace_format: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.graph_format
