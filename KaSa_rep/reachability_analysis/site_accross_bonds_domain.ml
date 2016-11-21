@@ -1,10 +1,10 @@
 (**
    * site_accross_bonds_domain.ml
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 20 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -565,6 +565,12 @@ struct
         error
     in
     error, static, dynamic
+
+(* TO DO, look up in static *)
+(* fold over all the rules, all the tuples of interest, all the sites in these
+   tuples, and apply the function Common_static.add_dependency_site_rule to update the wake_up relation *)
+  let complete_wake_up_relation static error wake_up =
+    error, wake_up
 
   (*------------------------------------------------------------*)
   (* take into account bounds that may occur in initial states *)

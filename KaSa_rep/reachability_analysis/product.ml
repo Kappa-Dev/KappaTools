@@ -1,10 +1,10 @@
 (**
    * analyzer_sig.mli
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 25 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -91,6 +91,13 @@ module Product
       },
       smash_dynamic underlying_domain_dynamic_information
         new_domain_dynamic_information
+
+    let complete_wake_up_relation static error wake_up =
+      let error, wake_up =
+        Underlying_domain.complete_wake_up_relation
+          static.underlying_domain error wake_up
+      in
+      New_domain.complete_wake_up_relation static.new_domain error wake_up
 
     type 'a zeroary =
       static_information

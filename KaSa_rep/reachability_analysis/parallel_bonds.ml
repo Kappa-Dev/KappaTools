@@ -1,10 +1,10 @@
 (*
   * views_domain.mli
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 20 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -377,6 +377,11 @@ struct
         init_global_dynamic_information error
     in
     error, static, dynamic
+
+  (* TO DO, look up in static *)
+  (* fold over all the rules, all the tuples of interest, all the sites in these tuples, and apply the function Common_static.add_dependency_site_rule to update the wake_up relation *)
+    let complete_wake_up_relation static error wake_up =
+      error, wake_up
 
   (***************************************************************)
   (*a map of parallel bonds in the initial states, if the set

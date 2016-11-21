@@ -1,10 +1,10 @@
 (**
   * common_static_type.mli
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Nov 19 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -1258,3 +1258,48 @@ let scan_rule_set parameter error handler_kappa compil =
    with
     store_potential_side_effects_per_rule = potential_side_effects_per_rule
   }
+
+type site_to_rules_tmp =
+  Ckappa_sig.Rule_map_and_set.Set.t
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
+
+type site_to_rules =
+  Ckappa_sig.c_rule_id list
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
+
+let add_dependency_site_rule parameter error agent site rule_id site_to_rules =
+  let error, oldset =
+    match
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+        parameter error (agent,site) site_to_rules
+    with
+    | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+    | error, Some old -> error, old
+  in
+  let error, newset =
+    Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
+      parameter error rule_id oldset
+  in
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+    parameter error (agent,site) newset site_to_rules
+
+let empty_site_to_rules parameter error =
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create
+    parameter error (0,0)
+
+let consolidate_site_rule_dependencies parameter error site_to_rules =
+  let error, output = empty_site_to_rules parameter error in
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold parameter error
+    (fun parameter error key set output ->
+      let list = Ckappa_sig.Rule_map_and_set.Set.elements  set in
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+        parameter error key list output
+    )
+    site_to_rules
+    output
+
+let wake_up parameter error agent site site_to_rules =
+  match Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get parameter error (agent,site) site_to_rules
+  with
+  | error, None -> error, []
+  | error, Some l -> error, l

@@ -1,10 +1,10 @@
 (**
    * agent_domain.ml
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Abstract domain to record live rules
    *
@@ -277,6 +277,9 @@ struct
       scan_rule_set init_global_static_information init_global_dynamic_information error
     in
     error, static, dynamic
+
+  let complete_wake_up_relation _static error wake_up =
+    error, wake_up
 
   (************************************************************************************)
   (*JF: Here, you should add in the event list, each rule that test for an

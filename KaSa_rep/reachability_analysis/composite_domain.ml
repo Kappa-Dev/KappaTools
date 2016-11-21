@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 20 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -105,6 +105,8 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  let get_wake_up_relation static = lift Analyzer_headers.get_wake_up_relation static
+
   let empty_working_list = Ckappa_sig.Rule_FIFO.empty
 
   type 'a zeroary =
@@ -156,6 +158,18 @@ struct
     in
     let dynamic = set_working_list rule_working_list dynamic in
     error, dynamic
+
+
+  let push_modified_site static dynamic error agent site =
+    let wake_up = get_wake_up_relation static in
+    let parameter = get_parameter static in
+    let error, rules_list =
+      Common_static.wake_up parameter error agent site wake_up
+    in
+    List.fold_left
+      (fun (error, dynamic) r_id ->
+         push_rule static dynamic error r_id)
+      (error, dynamic) rules_list
 
   (**[next_rule static dynamic] returns a rule_id inside a working list
      if it is not empty*)
@@ -229,7 +243,19 @@ struct
     let error, domain_static, domain_dynamic =
       Domain.initialize static dynamic error
     in
-    let static = static, domain_static in
+    let parameters = get_parameter (static,domain_static) in
+    let error, wake_up_tmp =
+      Common_static.empty_site_to_rules parameters error in
+    let error, wake_up_tmp =
+      Domain.complete_wake_up_relation domain_static error wake_up_tmp
+    in
+    let error, wake_up =
+      Common_static.consolidate_site_rule_dependencies
+        parameters error wake_up_tmp
+    in
+    let static =
+      Analyzer_headers.add_wake_up_relation static wake_up, domain_static
+    in
     let working_list = empty_working_list in
     let dynamic =
       {
@@ -321,15 +347,16 @@ struct
             match event with
             | Communication.Check_rule rule_id ->
               push_rule
-                static
-                dynamic
-                error
+                static dynamic error
                 rule_id
+            | Communication.Modified_sites (agent,site) ->
+              push_modified_site
+                static dynamic error
+                agent site
             | Communication.See_a_new_bond _
-            | Communication.Dummy
-            | Communication.Modified_sites _ ->
+            | Communication.Dummy ->
               error, dynamic
-          )(error, dynamic) event_list
+          ) (error, dynamic) event_list
       in
       apply_event_list static dynamic error event_list'
 

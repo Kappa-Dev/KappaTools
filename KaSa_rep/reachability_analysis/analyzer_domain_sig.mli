@@ -1,10 +1,10 @@
 (*
   * analyzer_sig.mli
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -35,6 +35,12 @@ sig
     Analyzer_headers.global_dynamic_information ->
     Exception.method_handler ->
     Exception.method_handler * static_information * dynamic_information
+
+  val complete_wake_up_relation:
+    static_information ->
+    Exception.method_handler ->
+    Common_static.site_to_rules_tmp ->
+    Exception.method_handler * Common_static.site_to_rules_tmp
 
   type 'a zeroary =
     static_information

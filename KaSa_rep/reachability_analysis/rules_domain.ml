@@ -1,10 +1,10 @@
 (**
    * rule_domain.ml
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 20 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Abstract domain to record live rules
    *
@@ -118,6 +118,9 @@ struct
       }
     in
     error, init_global_static_information, init_global_dynamic_information
+
+  let complete_wake_up_relation _static error wake_up =
+      error, wake_up
 
   let add_initial_state _static dynamic error _species =
     let event_list = [] in

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Sep 26 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -45,11 +45,19 @@ val initialize_global_information:
   Cckappa_sig.kappa_handler ->
   Exception.method_handler * global_static_information * global_dynamic_information
 
+val add_wake_up_relation:
+  global_static_information ->
+  Common_static.site_to_rules ->
+  global_static_information
+
+val get_wake_up_relation: global_static_information -> Common_static.site_to_rules
+
 val get_parameter: global_static_information -> Remanent_parameters_sig.parameters
 
 val get_compilation_information: global_static_information -> compilation_result
 
 val get_bdu_common_static : global_static_information -> Common_static.bdu_common_static
+
 
 val set_bdu_common_static:
   Common_static.bdu_common_static ->

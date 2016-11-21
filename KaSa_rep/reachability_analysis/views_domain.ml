@@ -1,10 +1,10 @@
 (**
    * analyzer_sig.mli
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 20 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -346,6 +346,11 @@ struct
     in
     let dynamic = set_log_info log_info dynamic in
     error, static, dynamic
+
+(* TO DO, look up in static *)
+(* fold over all the rules, all the tuples of interest, all the sites in these tuples, and apply the function Common_static.add_dependency_site_rule to update the wake_up relation *)
+  let complete_wake_up_relation static error wake_up =
+    error, wake_up
 
   (** get type bdu_analysis_static*)
   let get_bdu_analysis_static static _dynamic error =

@@ -1,10 +1,10 @@
 (**
   * analyzer_headers.mli
   * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Nov 21 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -24,7 +24,11 @@ type global_static_information =
     global_compilation_result : compilation_result;
     global_parameter : Remanent_parameters_sig.parameters;
     global_bdu_common_static : Common_static.bdu_common_static;
+    global_wake_up_relation: Common_static.site_to_rules ;
   }
+
+let add_wake_up_relation static wake =
+  {static with global_wake_up_relation = wake }
 
 type global_dynamic_information =
   {
@@ -92,6 +96,8 @@ module PathMap =
 type ('static, 'dynamic) kasa_state = ('static, 'dynamic) Remanent_state.state
 
 type initial_state = Cckappa_sig.enriched_init
+
+let get_wake_up_relation static = static.global_wake_up_relation
 
 let get_parameter static = static.global_parameter
 
@@ -271,6 +277,7 @@ let scan_rule static error =
 
 let initialize_global_information parameters log_info error mvbdu_handler compilation kappa_handler =
   let init_common = Common_static.init_bdu_common_static in
+  let error, wake_up  = Common_static.empty_site_to_rules parameters error in
   let init_global_static =
     {
       global_compilation_result =
@@ -279,7 +286,8 @@ let initialize_global_information parameters log_info error mvbdu_handler compil
           kappa_handler = kappa_handler;
         };
       global_parameter     = parameters;
-      global_bdu_common_static = init_common
+      global_bdu_common_static = init_common;
+      global_wake_up_relation = wake_up;
     }
   in
   let init_dynamic =
