@@ -17,7 +17,9 @@ let local_trace = false
 
 type bdu_analysis_dynamic =
   {
-    store_update : Ckappa_sig.Rule_map_and_set.Set.t Covering_classes_type.AgentCV_map_and_set.Map.t;
+    store_update :
+      Ckappa_sig.Rule_map_and_set.Set.t
+        Covering_classes_type.AgentCV_map_and_set.Map.t;
     (*FIXME: compute dual contact map here*)
     store_dual_contact_map :
       Ckappa_sig.AgentSiteState_map_and_set.Set.t Ckappa_sig.AgentSiteState_map_and_set.Map.t
@@ -53,6 +55,7 @@ let add_link parameters error (agent_type, cv_id) rule_id_set store_result =
   error, store_result
 
 (**************************************************************************)
+
 
 let store_covering_classes_modification_update_aux parameters error
     agent_type_cv
@@ -234,7 +237,8 @@ let store_update
       (fun parameters error (agent_type, cv_id) rule_id_set store_result ->
          let error, store_result =
            add_link parameters error
-             (agent_type, cv_id) rule_id_set store_result
+             (agent_type, cv_id)
+             rule_id_set store_result
          in
          error, store_result
       )
@@ -269,7 +273,7 @@ let store_update
   in
   error, log_info, store_result
 
-(************************************************************************************)
+(**************************************************************************)
 (*compute dual contact map*)
 
 (*compute dual in contact map to be used to check the bond in the pattern
@@ -282,25 +286,32 @@ let collect_dual_map parameters error handler store_result =
       (fun parameters error (agent_type, (site_type, state))
         (agent_type', site_type', state') store_result ->
         let error, old_set =
-          match Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs parameters error
-                  (agent_type, site_type, state) store_result
+          match
+            Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs
+              parameters error
+              (agent_type, site_type, state) store_result
           with
-          | error, None -> error, Ckappa_sig.AgentSiteState_map_and_set.Set.empty
+          | error, None ->
+            error, Ckappa_sig.AgentSiteState_map_and_set.Set.empty
           | error, Some s -> error, s
         in
         let error', set =
-          Ckappa_sig.AgentSiteState_map_and_set.Set.add_when_not_in parameters error
+          Ckappa_sig.AgentSiteState_map_and_set.Set.add_when_not_in parameters
+            error
             (agent_type', site_type', state')
             Ckappa_sig.AgentSiteState_map_and_set.Set.empty
         in
         let error =
-          Exception.check_point Exception.warn parameters error error' __POS__ Exit
+          Exception.check_point Exception.warn parameters error error' __POS__
+            Exit
         in
         let error', new_set =
-          Ckappa_sig.AgentSiteState_map_and_set.Set.union parameters error set old_set
+          Ckappa_sig.AgentSiteState_map_and_set.Set.union parameters error set
+            old_set
         in
         let error =
-          Exception.check_point Exception.warn parameters error error' __POS__ Exit
+          Exception.check_point Exception.warn parameters error error' __POS__
+            Exit
         in
         let error, store_result =
           Ckappa_sig.AgentSiteState_map_and_set.Map.add_or_overwrite
@@ -314,7 +325,6 @@ let collect_dual_map parameters error handler store_result =
       ) handler.Cckappa_sig.dual store_result
   in
   error, store_result
-
 
 (****************************************************************************)
 
@@ -362,7 +372,7 @@ let init_bdu_analysis_dynamic =
   in
   init_bdu_analysis_dynamic
 
-(************************************************************************************)
+(**************************************************************************)
 (*rules*)
 
 let scan_rule_set_dynamic
@@ -376,17 +386,11 @@ let scan_rule_set_dynamic
     covering_classes
     store_covering_classes_id
     store_potential_side_effects =
-  (*  let error, (handler_bdu, log_info, store_result) =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-      parameters error
-      (fun parameters error rule_id rule (handler_bdu, log_info, store_result) ->*)
   let error, handler_bdu, log_info, store_result =
     scan_rule_dynamic
       parameters
       log_info
       error
-      (*  rule_id
-          rule.Cckappa_sig.e_rule_c_rule*)
       compiled
       kappa_handler
       handler_bdu
@@ -397,7 +401,3 @@ let scan_rule_set_dynamic
       init_bdu_analysis_dynamic
   in
   error, (handler_bdu, log_info, store_result)
-(*store_result)
-  ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init_bdu_analysis_dynamic)*)
-(*in
-  error, (handler_bdu, log_info, store_result)*)

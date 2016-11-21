@@ -671,10 +671,12 @@ let add_rule ?local_trace:(local_trace=false)
   error, (Check_rule rule_id) :: event_list
 
 type site_working_list =
-  unit       Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
+  unit
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t
 
 let init_sites_working_list parameters error =
   Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)
+
 let add_site parameters error agent site sites_wl =
   Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site) () sites_wl
 

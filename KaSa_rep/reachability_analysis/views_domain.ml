@@ -22,7 +22,6 @@ let new_computation = false
 let domain_name = "View domain"
 
 let local_trace = false
-(*  let compute_local_trace = false*)
 
 module Domain =
 struct
@@ -98,6 +97,11 @@ struct
 
   let get_covering_classes static =
     (get_domain_static static).Bdu_static_views.store_covering_classes
+
+  (*TODO*)
+  let get_list_of_site_type_in_covering_classes static =
+    (get_domain_static
+       static).Bdu_static_views.store_list_of_site_type_in_covering_classes
 
   let get_covering_classes_id static =
     (get_domain_static static).Bdu_static_views.store_covering_classes_id
@@ -348,7 +352,9 @@ struct
     error, static, dynamic
 
 (* TO DO, look up in static *)
-(* fold over all the rules, all the tuples of interest, all the sites in these tuples, and apply the function Common_static.add_dependency_site_rule to update the wake_up relation *)
+(* fold over all the rules, all the tuples of interest, all the sites in these
+   tuples, and apply the function Common_static.add_dependency_site_rule to
+   update the wake_up relation *)
   let complete_wake_up_relation static error wake_up =
     error, wake_up
 
@@ -454,6 +460,29 @@ struct
 
   (**************************************************************************)
 
+  (*TO BE CHECKED*)
+  let discover_a_modify_sites parameters error covering_classes_modified_map
+      store_list_of_site_type_in_covering_classes
+      modified_sites =
+    (*in a covering classes of modified site, return the list of list*)
+    Covering_classes_type.AgentCV_map_and_set.Map.fold
+      (fun (agent_type, cv_id) _rule_id_set (error, modified_sites) ->
+         let error, list_of_site_type =
+           match
+             Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+               parameters error
+               (agent_type, cv_id)
+               store_list_of_site_type_in_covering_classes
+           with
+           | error, None -> error, []
+           | error, Some l -> error, l
+         in
+         List.fold_left (fun (error, modified_sites) site ->
+             Communication.add_site parameters error agent_type site
+               modified_sites
+           ) (error, modified_sites) list_of_site_type
+      ) covering_classes_modified_map (error, modified_sites)
+
 
 (*BUG to fix:  When a view is modified then any site in this view must be
   declared as modified *)
@@ -461,9 +490,20 @@ struct
       cv_id event_list =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
+    (*a covering classses that contains modified sites*)
     let error, store_covering_classes_modification_update_full =
       get_store_covering_classes_modification_update_full dynamic error
     in
+    (*a list of site_type in a covering classes*)
+    let store_list_of_site_type_in_covering_classes =
+      get_list_of_site_type_in_covering_classes static
+    in
+    (*TODO:the initialize set of modified sites*)
+    let error, modified_sites =
+      Communication.init_sites_working_list parameters error
+    in
+    (*-----------------------------------------------------------------------*)
+    (*REMOVE*)
     let error, s1 =
       match
         Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
@@ -474,6 +514,21 @@ struct
       with
       | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
       | error, Some s -> error, s
+    in
+    (*-----------------------------------------------------------------------*)
+    (*TODO:check the new event*)
+    let error, modified_sites =
+      discover_a_modify_sites parameters error
+        store_covering_classes_modification_update_full
+        store_list_of_site_type_in_covering_classes
+        modified_sites
+    in
+    let error, _event_list =
+      Communication.fold_sites
+        parameters error
+        (fun _ error s _ event_list ->
+           error, (Communication.Modified_sites s) :: event_list
+        ) modified_sites event_list
     in
     (*-----------------------------------------------------------------------*)
     (*print working list information*)
@@ -1000,7 +1055,8 @@ struct
   (*compute condition of bdu whether or not it is enable by doing the
     intersection of bdu_test and bdu_X*)
 
-  let collect_bdu_enabled parameters error dynamic bdu_false fixpoint_result proj_bdu_test_restriction =
+  let collect_bdu_enabled parameters error dynamic bdu_false fixpoint_result
+      proj_bdu_test_restriction =
     let error, dynamic, _ =
       Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
@@ -2090,7 +2146,8 @@ struct
     let precondition =
       Communication.refine_information_about_state_of_sites_in_precondition
         precondition
-        (fun parameters error dynamic (current_path:Communication.path) former_answer ->
+        (fun parameters error dynamic (current_path:Communication.path)
+          former_answer ->
            (*-----------------------------------------------------*)
            (*typing*)
            let error =
@@ -2349,7 +2406,8 @@ struct
       (*deal with views*)
       Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) _ (error, dynamic, event_list) ->
-           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+           let error, dynamic, bdu_false =
+             get_mvbdu_false static dynamic error in
            let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
            let error, store_modif_list_restriction_map =
              get_store_modif_list_restriction_map static dynamic error
@@ -2360,14 +2418,16 @@ struct
                static
                dynamic
                error
-               (Remanent_parameters.get_dump_reachability_analysis_diff parameters)
+               (Remanent_parameters.get_dump_reachability_analysis_diff
+                  parameters)
                (agent_type, cv_id)
-                 in
+           in
            (*-----------------------------------------------------*)
            let store_result = get_fixpoint_result dynamic in
            let error, bdu_X =
-             match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                     parameters error (agent_type, cv_id) store_result
+             match
+               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                 parameters error (agent_type, cv_id) store_result
              with
              | error, None -> error, bdu_false
              | error, Some bdu -> error, bdu
@@ -2380,15 +2440,17 @@ struct
              | Some bdu -> error, bdu
            in
            let error, dynamic, bdu_update =
-             match Covering_classes_type.AgentsRuleCV_map_and_set.Map.find_option_without_logs
-                     parameters error
-                     (agent_id, agent_type, rule_id, cv_id)
-                     store_modif_list_restriction_map
+             match
+               Covering_classes_type.AgentsRuleCV_map_and_set.Map.find_option_without_logs
+                 parameters error
+                 (agent_id, agent_type, rule_id, cv_id)
+                 store_modif_list_restriction_map
              with
              | error, None -> error, dynamic, bdu_X
              | error, Some list_a ->
                let error, dynamic, bdu_update =
-                 compute_bdu_update_views static dynamic error bdu_test list_a bdu_X
+                 compute_bdu_update_views static dynamic error bdu_test list_a
+                   bdu_X
                in
                error, dynamic, bdu_update
            in
@@ -2426,11 +2488,13 @@ struct
     let error, dynamic, event_list =
       Covering_classes_type.AgentCV_setmap.Map.fold
         (fun (agent_type, cv_id) bdu_creation (error, dynamic, event_list) ->
-           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+           let error, dynamic, bdu_false =
+             get_mvbdu_false static dynamic error in
            let fixpoint_result = get_fixpoint_result dynamic in
            let error, bdu_X =
-             match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                     parameters error (agent_type, cv_id) fixpoint_result
+             match
+               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                 parameters error (agent_type, cv_id) fixpoint_result
              with
              | error, None -> error, bdu_false
              | error, Some bdu -> error, bdu
@@ -2474,17 +2538,19 @@ struct
         (fun (agent_type, _new_site_id, cv_id) (bdu_test, list)
           (error, dynamic, event_list) ->
           let fixpoint_result = get_fixpoint_result dynamic in
-          let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+          let error, dynamic, bdu_false =
+            get_mvbdu_false static dynamic error in
           let error, bdu_X =
             match
               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                    parameters error (agent_type, cv_id) fixpoint_result
+                parameters error (agent_type, cv_id) fixpoint_result
             with
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
           in
           let error, dynamic, bdu_update =
-            compute_bdu_update_side_effects static dynamic error bdu_test list bdu_X
+            compute_bdu_update_side_effects static dynamic error bdu_test list
+              bdu_X
           in
           let error, dynamic, event_list =
             add_link

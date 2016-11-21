@@ -1271,7 +1271,9 @@ let add_dependency_site_rule parameter error agent site rule_id site_to_rules =
   let error, oldset =
     match
       Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
-        parameter error (agent,site) site_to_rules
+        parameter error
+        (agent, site)
+        site_to_rules
     with
     | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
     | error, Some old -> error, old
@@ -1281,7 +1283,10 @@ let add_dependency_site_rule parameter error agent site rule_id site_to_rules =
       parameter error rule_id oldset
   in
   Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
-    parameter error (agent,site) newset site_to_rules
+    parameter error
+    (agent, site)
+    newset
+    site_to_rules
 
 let empty_site_to_rules parameter error =
   Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create
@@ -1289,9 +1294,10 @@ let empty_site_to_rules parameter error =
 
 let consolidate_site_rule_dependencies parameter error site_to_rules =
   let error, output = empty_site_to_rules parameter error in
-  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold parameter error
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
+    parameter error
     (fun parameter error key set output ->
-      let list = Ckappa_sig.Rule_map_and_set.Set.elements  set in
+      let list = Ckappa_sig.Rule_map_and_set.Set.elements set in
       Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
         parameter error key list output
     )
@@ -1299,7 +1305,10 @@ let consolidate_site_rule_dependencies parameter error site_to_rules =
     output
 
 let wake_up parameter error agent site site_to_rules =
-  match Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get parameter error (agent,site) site_to_rules
+  match
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get parameter error
+      (agent,site)
+      site_to_rules
   with
   | error, None -> error, []
   | error, Some l -> error, l

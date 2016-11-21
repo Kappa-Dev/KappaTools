@@ -35,27 +35,16 @@ type pre_static =
         Ckappa_sig.AgentSite_map_and_set.Map.t;
   }
 
-  let init_pre_static =
-    (*let init_modification        = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
-    let init_test                = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
-    let init_test_modification   = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
-    let init_modif_map           = Ckappa_sig.AgentSite_map_and_set.Map.empty in
-    let init_test_map            = Ckappa_sig.AgentSite_map_and_set.Map.empty in
-    let init_test_modif_map      = Ckappa_sig.AgentSite_map_and_set.Map.empty in*)
-    let init_pre_static =
-      {
-        store_modification_sites      = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-        store_test_sites              =
-          Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-        store_test_modification_sites =
-          Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-        store_modif_map               =
-          Ckappa_sig.AgentSite_map_and_set.Map.empty;
-        store_test_map                =
-          Ckappa_sig.AgentSite_map_and_set.Map.empty;
-        store_test_modif_map          = Ckappa_sig.AgentSite_map_and_set.Map.empty
-      }
-    in init_pre_static
+let init_pre_static =
+  {
+    store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+    store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+    store_test_modification_sites =
+      Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+    store_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;
+    store_test_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;
+    store_test_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty
+  }
 
 type bdu_analysis_static =
   {
@@ -96,16 +85,13 @@ type bdu_analysis_static =
 
 let init_bdu_analysis_static parameters error =
   let error, init_covering_classes =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 0
   in
-  (*let init_covering_classes_id = Ckappa_sig.AgentSite_map_and_set.Map.empty in*)
   let error, init_remanent_triple =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 0
   in
-  (*let init_proj_bdu_creation_restriction_map = Ckappa_sig.Rule_setmap.Map.empty in
-  let init_modif_list_restriction_map        = Covering_classes_type.AgentsRuleCV_map_and_set.Map.empty in
-  let init_proj_bdu_potential_restriction_map  = Ckappa_sig.Rule_setmap.Map.empty in
-  let init_proj_bdu_test_restriction           = Ckappa_sig.Rule_setmap.Map.empty in*)
   let init_bdu_analysis_static =
     {
       store_pre_static = init_pre_static;
@@ -314,7 +300,8 @@ let collect_test_modification_sites
        error, store_result
     )
     (*exists in both*)
-    (fun parameters error (agent_id, agent_type, site_type) s1 s2 store_result ->
+    (fun parameters error (agent_id, agent_type, site_type) s1 s2 store_result
+      ->
        let error',union =
          Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
        in
@@ -798,9 +785,11 @@ let collect_modif_list_restriction_map
     error, result_map
   in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
+    error
     (fun parameters error agent_id agent_modif (handler, store_result) ->
-       if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
+       if Ckappa_sig.Site_map_and_set.Map.is_empty
+           agent_modif.Cckappa_sig.agent_interface
        then error, (handler, store_result)
        else
          let agent_type = agent_modif.Cckappa_sig.agent_name in
@@ -866,7 +855,8 @@ let collect_modif_list_restriction_map
                 then error, handler, store_result
                 else
                   begin
-                    (*get a list of pair (site, state) in a map of new indexes of site.*)
+                    (*get a list of pair (site, state) in a map of new indexes
+                      of site.*)
                     let error, pair_list =
                       Ckappa_sig.Site_map_and_set.Map.fold
                         (fun site' state (error, current_list) ->
@@ -909,7 +899,8 @@ let store_bdu_potential_restriction_map_aux parameters handler error
     (*build a list_a*)
     let error, handler, list =
       Ckappa_sig.Views_bdu.build_reverse_sorted_association_list
-        parameters handler error [new_site_type, Ckappa_sig.dummy_state_index] (*state is 0*)
+        parameters handler error [new_site_type, Ckappa_sig.dummy_state_index]
+(*state is 0*)
     in
     let result_map =
       Covering_classes_type.AgentSiteRuleCV_setmap.Map.add
@@ -918,11 +909,13 @@ let store_bdu_potential_restriction_map_aux parameters handler error
     error, handler, result_map
   in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
+    error
     (fun parameters error agent_type' triple_list (handler, store_result) ->
        (*map of potential partner side_effect with site is bond*)
        Ckappa_sig.AgentRule_map_and_set.Map.fold
-         (fun (agent_type, rule_id) pair_list (error, (handler, store_result)) ->
+         (fun (agent_type, rule_id) pair_list (error, (handler, store_result))
+           ->
             if agent_type' = agent_type
             then
               let error, get_pair_list =
@@ -954,14 +947,16 @@ let store_bdu_potential_restriction_map_aux parameters handler error
                                  map_res
                              in
                              let error, map_res =
-                               Ckappa_sig.Site_map_and_set.Map.add_or_overwrite parameters error
+                               Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+                                 parameters error
                                  site'
                                  (state :: old)
                                  map_res
                              in
                              error, map_res
                            else error, map_res
-                        ) (error, Ckappa_sig.Site_map_and_set.Map.empty) pair_list
+                        ) (error, Ckappa_sig.Site_map_and_set.Map.empty)
+                        pair_list
                     in
                     (*------------------------------------------------------*)
                     let error =
@@ -1095,7 +1090,8 @@ let collect_bdu_test_restriction_map parameters handler error rule_id rule
     (fun parameters error agent_id agent (handler,store_result) ->
        match agent with
        | Cckappa_sig.Unknown_agent _
-       (* Unfortunatly, we can do nothing with undefined agents in the views domain *)
+(* Unfortunatly, we can do nothing with undefined agents in the views
+   domain *)
        (* They will be handled with properly in the agents domain *)
        | Cckappa_sig.Ghost -> error, (handler, store_result)
        | Cckappa_sig.Dead_agent (agent, _, _, _) ->
@@ -1370,10 +1366,6 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
   }
 
 (***************************************************************************)
-(*rule*)
-
-
-(***************************************************************************)
 
 let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
     store_potential_side_effects =
@@ -1381,7 +1373,8 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
   let error, (handler_bdu, log_info, store_results) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
-      (fun parameters error rule_id rule (handler_bdu, log_info, store_result) ->
+      (fun parameters error rule_id rule (handler_bdu, log_info, store_result)
+        ->
          let error, log_info, handler_bdu, store_result =
            scan_rule_static
              parameters

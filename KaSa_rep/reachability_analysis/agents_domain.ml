@@ -281,7 +281,7 @@ struct
   let complete_wake_up_relation _static error wake_up =
     error, wake_up
 
-  (************************************************************************************)
+  (***************************************************************************)
   (*JF: Here, you should add in the event list, each rule that test for an
     agent with a type among the ones you have newly see, and with an empty
     interface (no test).  For instance, if you see an agent of type A for
