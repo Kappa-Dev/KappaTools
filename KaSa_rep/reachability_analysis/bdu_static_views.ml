@@ -39,8 +39,7 @@ let init_pre_static =
   {
     store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-    store_test_modification_sites =
-      Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+    store_test_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;
     store_test_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;
     store_test_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty
@@ -267,7 +266,8 @@ let collect_test_modification_sites
   let add_link error (agent_id, agent_type, site_type) rule_id_set store_result
     =
     let error, old =
-      match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs parameters error
+      match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs
+              parameters error
               (agent_id, agent_type, site_type) store_result
       with
       | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty

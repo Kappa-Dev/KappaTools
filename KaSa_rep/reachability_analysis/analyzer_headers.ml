@@ -43,7 +43,8 @@ type event =
   | See_a_new_bond of
       (
         (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-        * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+        * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+           Ckappa_sig.c_state)
       )
 
 type 'a bot_or_not =
@@ -275,7 +276,8 @@ let scan_rule static error =
   let static = set_bdu_common_static store_result static in
   error, static
 
-let initialize_global_information parameters log_info error mvbdu_handler compilation kappa_handler =
+let initialize_global_information parameters log_info error mvbdu_handler
+    compilation kappa_handler =
   let init_common = Common_static.init_bdu_common_static in
   let error, wake_up  = Common_static.empty_site_to_rules parameters error in
   let init_global_static =

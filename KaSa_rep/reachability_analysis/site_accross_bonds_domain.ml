@@ -573,7 +573,8 @@ struct
 
 (* TO DO, look up in static *)
 (* fold over all the rules, all the tuples of interest, all the sites in these
-   tuples, and apply the function Common_static.add_dependency_site_rule to update the wake_up relation *)
+   tuples, and apply the function Common_static.add_dependency_site_rule to
+   update the wake_up relation *)
   let complete_wake_up_relation static error wake_up =
     error, wake_up
 
@@ -633,9 +634,12 @@ struct
   (* check for each bond that occur in the lhs, whether
      the constraints in the lhs are consistent *)
   (* For each bond in the lhs of the rule rule_id *)
-  (* For each tuple (x,y) of interest that gives information about this kind of bonds *)
-  (* Fetch the state of the two other sites in the lhs and in the precondition if they are not available (take the meet)*)
-(* Check that there exists at least one such pair of state in the image of the pair (x,y) in dynamic *)
+(* For each tuple (x,y) of interest that gives information about this kind of
+   bonds *)
+(* Fetch the state of the two other sites in the lhs and in the precondition
+   if they are not available (take the meet)*)
+(* Check that there exists at least one such pair of state in the image of the
+   pair (x,y) in dynamic *)
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =

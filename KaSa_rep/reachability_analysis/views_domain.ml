@@ -82,6 +82,10 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
+  (*TODO:wake up*)
+  let get_wake_up_relation static =
+    lift Analyzer_headers.get_wake_up_relation static
+
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_bdu_common_static static = Analyzer_headers.get_bdu_common_static static
@@ -108,6 +112,10 @@ struct
 
   let get_pre_static static =
     (get_domain_static static).Bdu_static_views.store_pre_static
+
+  (*TODO*)
+  let get_test_modif_map static =
+    (get_pre_static static).Bdu_static_views.store_test_modif_map
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -356,6 +364,28 @@ struct
    tuples, and apply the function Common_static.add_dependency_site_rule to
    update the wake_up relation *)
   let complete_wake_up_relation static error wake_up =
+    (*let parameters = get_parameter static in
+    (*test and modify in a views*)
+    let store_test_modif_map = get_test_modif_map static in
+    (*CHECK ME*)
+    let error, wake_up =
+      Ckappa_sig.AgentSite_map_and_set.Map.fold
+        (fun (agent_type, site_type) rule_id_set (error, wake_up) ->
+           Ckappa_sig.Rule_map_and_set.Set.fold
+             (fun rule_id (error, wake_up) ->
+                let error, wake_up =
+                  Common_static.add_dependency_site_rule
+                  parameters
+                  error
+                  agent_type
+                  site_type
+                  rule_id
+                  wake_up
+                in
+                error, wake_up
+             ) rule_id_set (error, wake_up)
+        ) store_test_modif_map (error, wake_up)
+    in*)
     error, wake_up
 
   (** get type bdu_analysis_static*)
@@ -387,7 +417,8 @@ struct
   (**************************************************************************)
   (* add updates_list into an event_list *)
 
-  let dump_cv_label static dynamic error bool (agent_type, cv_id) = (*TODO: put title*)
+  let dump_cv_label static dynamic error bool (agent_type, cv_id) =
+    (*TODO: put title*)
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
     let error, site_correspondence =
@@ -461,7 +492,7 @@ struct
   (**************************************************************************)
 
   (*TO BE CHECKED*)
-  let discover_a_modify_sites parameters error covering_classes_modified_map
+  (*let discover_a_modify_sites parameters error covering_classes_modified_map
       store_list_of_site_type_in_covering_classes
       modified_sites =
     (*in a covering classes of modified site, return the list of list*)
@@ -481,7 +512,7 @@ struct
              Communication.add_site parameters error agent_type site
                modified_sites
            ) (error, modified_sites) list_of_site_type
-      ) covering_classes_modified_map (error, modified_sites)
+      ) covering_classes_modified_map (error, modified_sites)*)
 
 
 (*BUG to fix:  When a view is modified then any site in this view must be
@@ -495,13 +526,13 @@ struct
       get_store_covering_classes_modification_update_full dynamic error
     in
     (*a list of site_type in a covering classes*)
-    let store_list_of_site_type_in_covering_classes =
+    (*let store_list_of_site_type_in_covering_classes =
       get_list_of_site_type_in_covering_classes static
     in
     (*TODO:the initialize set of modified sites*)
     let error, modified_sites =
       Communication.init_sites_working_list parameters error
-    in
+    in*)
     (*-----------------------------------------------------------------------*)
     (*REMOVE*)
     let error, s1 =
@@ -517,7 +548,7 @@ struct
     in
     (*-----------------------------------------------------------------------*)
     (*TODO:check the new event*)
-    let error, modified_sites =
+    (*let error, modified_sites =
       discover_a_modify_sites parameters error
         store_covering_classes_modification_update_full
         store_list_of_site_type_in_covering_classes
@@ -529,7 +560,7 @@ struct
         (fun _ error s _ event_list ->
            error, (Communication.Modified_sites s) :: event_list
         ) modified_sites event_list
-    in
+    in*)
     (*-----------------------------------------------------------------------*)
     (*print working list information*)
     let error =
@@ -664,29 +695,26 @@ struct
       (*----------------------------------------------------------------*)
       (*  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in*)
       (*-------------------------------------------------------------------*)
+      let log = Remanent_parameters.get_logger parameters in
       let error, dynamic =
         if local_trace
         || Remanent_parameters.get_trace parameters
         then
           let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters)
+            Loggers.fprintf log
               "%sINTENSIONAL DESCRIPTION:" prefix
           in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
+          let () = Loggers.print_newline log in
           (*print bdu different: this will print in a format of bdu*)
           let () =
             Ckappa_sig.Views_bdu.print parameters bdu_diff
           in
           (*print a list of relations: this will print in a format readable*)
           let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameters)
+            Loggers.fprintf log
               "%sEXTENSIONAL DESCRIPTION:" prefix
           in
-          let () =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters)
-          in
+          let () = Loggers.print_newline log in
           error, dynamic
         else
           error, dynamic
@@ -729,7 +757,8 @@ struct
                     in
                     let error, state_string =
                       try
-                        Handler.string_of_state_fully_deciphered parameters error
+                        Handler.string_of_state_fully_deciphered parameters
+                          error
                           handler_kappa agent_type site_type state
                       with
                       | _ ->
@@ -741,14 +770,13 @@ struct
                     let () =
                       if bool
                       then
-                        Loggers.fprintf (Remanent_parameters.get_logger parameters) ","
+                        Loggers.fprintf log ","
                       else
-                        Loggers.fprintf (Remanent_parameters.get_logger
-                                           parameters)
+                        Loggers.fprintf log
                           "\t\t%s%s(" prefix agent_string
                     in
                     let () = (*Print the information of views*)
-                      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                      Loggers.fprintf log
                         "%s%s" site_string state_string
                     in
                     error, true
@@ -760,8 +788,8 @@ struct
                if bool
                then
                  let () =
-                   Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
-                 Loggers.print_newline (Remanent_parameters.get_logger parameters)
+                   Loggers.fprintf log ")" in
+                 Loggers.print_newline log
              in error)
           error list
       in
@@ -769,7 +797,7 @@ struct
         if list = []
         then ()
         else
-          Loggers.print_newline (Remanent_parameters.get_logger parameters)
+          Loggers.print_newline log
       in
       error, dynamic
     else
@@ -812,7 +840,8 @@ struct
           | Some s ->
             if
               (local_trace
-               || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+               || Remanent_parameters.get_dump_reachability_analysis_diff
+                 parameters
                || Remanent_parameters.get_trace parameters)
             then
               if s =  "" then Loggers.print_newline log
@@ -1002,7 +1031,8 @@ struct
                | error, None -> error, (dynamic, event_list)
              in
              error, (dynamic, event_list)
-        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views (dynamic, [])
+        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
+        (dynamic, [])
     in
     error, dynamic, event_list
 
@@ -2289,7 +2319,8 @@ struct
     try
       (*check the condition whether or not the bdu is enabled, do the
         intersection of bdu_test and bdu_X.*)
-      (* JF: You do not use the result, of this function, I comment the function call *)
+      (* JF: You do not use the result, of this function, I comment the
+         function call *)
       let error, dynamic =
         collect_bdu_enabled
           parameters
@@ -2777,7 +2808,8 @@ struct
       (* When a site is modified, you have to
          add all the rules that test or modify a views containing this site *)
       (* site -> views, views -> rules *)
-      (* The corresponding function from site to rules should be computed statically, once for all, in the initialization phase *)
+      (* The corresponding function from site to rules should be computed
+         statically, once for all, in the initialization phase *)
       error, dynamic, event_list
 
   (**************************************************************************)

@@ -246,7 +246,6 @@ let last_agent_type parameters error rule path =
   | head::_ ->
     error, head.agent_type_in
 
-
 let may_be_modified parameters error rule path =
   let error, agent_name = last_agent_type parameters error rule path in
   let site_name = path.site in
@@ -274,15 +273,8 @@ let may_be_modified parameters error rule path =
          error, list
     ) modif []
 
-
-(*  Ckappa_sig.c_state
-      interval
-      port
-      Ckappa_sig.Site_map_and_set.Map.t
-      proper_agent
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t*)
-
-let may_get_free_by_side_effect parameters error static _precondition rule_id rule path =
+let may_get_free_by_side_effect parameters error static _precondition rule_id
+    rule path =
   let error, agent_name = last_agent_type parameters error rule path in
   let error, list =
     Ckappa_sig.AgentRule_map_and_set.Map.find_default_without_logs
@@ -355,8 +347,6 @@ let check_state_compatibility parameters error kappa_handler
         in aux error
           (min_not_free interv)
     end
-
-
 
 let rec follow_path_inside_cc
     parameters error kappa_handler cc path

@@ -24,7 +24,8 @@ struct
       domain_static_information :
         (Ckappa_sig.c_agent_name list Usual_domains.bot_or_not *
          Ckappa_sig.c_agent_name list) Ckappa_sig.Rule_map_and_set.Map.t;
-      agents_without_interface  : Ckappa_sig.c_rule_id list Ckappa_sig.Agent_map_and_set.Map.t
+      agents_without_interface  : Ckappa_sig.c_rule_id list
+          Ckappa_sig.Agent_map_and_set.Map.t
     }
 
   (*--------------------------------------------------------------------*)
@@ -78,7 +79,9 @@ struct
   (** global static/dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
+  let set_global_dynamic_information gdynamic dynamic =
+    {dynamic with global = gdynamic}
 
   (** dead rule local dynamic information*)
   let get_seen_agent dynamic = dynamic.local
@@ -127,7 +130,8 @@ struct
 
   let map_to_list parameters error map =
     let error, list =
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameters error
         (fun _ error _ a current_list ->
            let list = a :: current_list in
            error, list

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -64,7 +64,6 @@ type basic_static_information =
     store_rule_partition_modified_map_2 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-
   }
 
 (****************************************************************)
@@ -305,7 +304,7 @@ let collect_partition_created_bonds_map_aux parameters error x tuple_set
 let collect_partition_created_bonds_map_1 parameters error
     store_partition_created_bonds_map store_result =
   Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.fold
-    (fun (x, _y) tuple_set (error, store_result) ->
+    (fun (x, _) tuple_set (error, store_result) ->
        let proj (b, c, _) = (b, c) in
        collect_partition_created_bonds_map_aux parameters error
          (proj x)
@@ -317,7 +316,7 @@ let collect_partition_created_bonds_map_1 parameters error
 let collect_partition_created_bonds_map_2 parameters error
     store_partition_created_bonds_map store_result =
   Site_accross_bonds_domain_type.PairAgentSiteState_map_and_set.Map.fold
-    (fun (_x, y) tuple_set (error, store_result) ->
+    (fun (_, y) tuple_set (error, store_result) ->
        let proj (b, c, _) = (b, c) in
        collect_partition_created_bonds_map_aux parameters error
          (proj y)
