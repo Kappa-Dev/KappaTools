@@ -88,10 +88,10 @@ let options =
           "--no-double-bonds-domain";
           "--no-sites-accross-bonds-domain";
         ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
-      "--views-domain",
+      (*  "--views-domain",
       Bool Config.with_views_analysis,
-      "enable local views analysis",
-      ["0_Actions";"2_Reachability_analysis"],Normal;
+          "enable local views analysis",
+          ["0_Actions";"2_Reachability_analysis"],Normal;*)
       "--double-bonds-domain",
       Bool Config.with_parallel_bonds_analysis,
       "enable double bonds analysis",
