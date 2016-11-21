@@ -77,14 +77,14 @@ let options =
       "--enable-every-domain",
       Multi(
         [
-          "--views-domain";
+          (*  "--views-domain"; *)
           "--double-bonds-domain";
           "--sites-accross-bonds-domain";
         ],[]),"enable every abstract domain",["2_Reachability_analysis"],Normal;
       "--disable-every-domain",
       Multi(
         [
-          "--no-views-domain";
+          (*  "--no-views-domain"; *)
           "--no-double-bonds-domain";
           "--no-sites-accross-bonds-domain";
         ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
@@ -100,7 +100,7 @@ let options =
       Bool Config.with_site_accross_bonds_analysis,
       "enable the analysis of the relation amond the states of sites in connected agents",
       ["0_Actions";"2_Reachability_analysis"],Normal;
-      "--view-analysis",
+      (*"--view-analysis",
       (Choice
          ([
            (*"None","No view analysis";*)
@@ -109,7 +109,7 @@ let options =
            Config.view_accuracy_level)),
       "Tune the accuracy level of the view analysis",
       ["2_Reachability_analysis"],
-      Expert;
+        Hidden ;*)
 
 
       "--verbosity-level-for-view-analysis",
@@ -293,9 +293,11 @@ let options =
     ]
 
 let get_option error =
-  let parameters = Remanent_parameters.get_parameters
+  let parameters =
+    Remanent_parameters.get_parameters
       ~called_from:Remanent_parameters_sig.Internalised () in
   let () = SuperargTk.parse parameters options FileNames.input in
-  let parameters = Remanent_parameters.get_parameters
+  let parameters =
+    Remanent_parameters.get_parameters
       ~called_from:Remanent_parameters_sig.KaSa () in
   error,parameters,!FileNames.input
