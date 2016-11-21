@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -17,22 +17,59 @@ let local_trace = false
 
 type pre_static =
   {
-    store_modification_sites  : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentsSite_map_and_set.Map.t;
-    store_test_sites : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentsSite_map_and_set.Map.t;
-    store_test_modification_sites : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentsSite_map_and_set.Map.t;
+    store_modification_sites  :
+      Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentsSite_map_and_set.Map.t;
+    store_test_sites : Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentsSite_map_and_set.Map.t;
+    store_test_modification_sites : Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentsSite_map_and_set.Map.t;
     (*views that are tested and modificated without agent_id, will be used in
       update function*)
-    store_modif_map: Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentSite_map_and_set.Map.t;
-    store_test_map : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentSite_map_and_set.Map.t;
-    store_test_modif_map: Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_modif_map: Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_test_map : Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_test_modif_map:
+      Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentSite_map_and_set.Map.t;
   }
+
+  let init_pre_static =
+    (*let init_modification        = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
+    let init_test                = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
+    let init_test_modification   = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
+    let init_modif_map           = Ckappa_sig.AgentSite_map_and_set.Map.empty in
+    let init_test_map            = Ckappa_sig.AgentSite_map_and_set.Map.empty in
+    let init_test_modif_map      = Ckappa_sig.AgentSite_map_and_set.Map.empty in*)
+    let init_pre_static =
+      {
+        store_modification_sites      = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+        store_test_sites              =
+          Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+        store_test_modification_sites =
+          Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+        store_modif_map               =
+          Ckappa_sig.AgentSite_map_and_set.Map.empty;
+        store_test_map                =
+          Ckappa_sig.AgentSite_map_and_set.Map.empty;
+        store_test_modif_map          = Ckappa_sig.AgentSite_map_and_set.Map.empty
+      }
+    in init_pre_static
 
 type bdu_analysis_static =
   {
     store_pre_static : pre_static;
-    store_covering_classes: Covering_classes_type.remanent
+    store_covering_classes:
+      Covering_classes_type.remanent
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-    store_covering_classes_id : Covering_classes_type.cv_id list Ckappa_sig.AgentSite_map_and_set.Map.t;
+    (*TODO*)
+    store_list_of_site_type_in_covering_classes:
+      Ckappa_sig.c_site_name list
+        Covering_classes_type.AgentCV_map_and_set.Map.t;
+    store_covering_classes_id :
+      Covering_classes_type.cv_id list
+        Ckappa_sig.AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
     store_remanent_triple:
       ((Covering_classes_type.Dictionary_of_List_sites.key *
@@ -47,7 +84,8 @@ type bdu_analysis_static =
       Ckappa_sig.Views_bdu.hconsed_association_list
         Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
     store_proj_bdu_potential_restriction_map :
-      (Ckappa_sig.Views_bdu.mvbdu * Ckappa_sig.Views_bdu.hconsed_association_list)
+      (Ckappa_sig.Views_bdu.mvbdu *
+       Ckappa_sig.Views_bdu.hconsed_association_list)
         Covering_classes_type.AgentSiteCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
     store_proj_bdu_test_restriction :
@@ -55,6 +93,39 @@ type bdu_analysis_static =
         Covering_classes_type.AgentsCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
   }
+
+let init_bdu_analysis_static parameters error =
+  let error, init_covering_classes =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+  in
+  (*let init_covering_classes_id = Ckappa_sig.AgentSite_map_and_set.Map.empty in*)
+  let error, init_remanent_triple =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+  in
+  (*let init_proj_bdu_creation_restriction_map = Ckappa_sig.Rule_setmap.Map.empty in
+  let init_modif_list_restriction_map        = Covering_classes_type.AgentsRuleCV_map_and_set.Map.empty in
+  let init_proj_bdu_potential_restriction_map  = Ckappa_sig.Rule_setmap.Map.empty in
+  let init_proj_bdu_test_restriction           = Ckappa_sig.Rule_setmap.Map.empty in*)
+  let init_bdu_analysis_static =
+    {
+      store_pre_static = init_pre_static;
+      store_covering_classes = init_covering_classes;
+      store_list_of_site_type_in_covering_classes =
+        Covering_classes_type.AgentCV_map_and_set.Map.empty;
+      store_covering_classes_id =
+        Ckappa_sig.AgentSite_map_and_set.Map.empty;
+      store_remanent_triple = init_remanent_triple;
+      store_proj_bdu_creation_restriction_map =
+        Ckappa_sig.Rule_setmap.Map.empty;
+      store_modif_list_restriction_map =
+        Covering_classes_type.AgentsRuleCV_map_and_set.Map.empty;
+      store_proj_bdu_potential_restriction_map =
+        Ckappa_sig.Rule_setmap.Map.empty;
+      store_proj_bdu_test_restriction =
+        Ckappa_sig.Rule_setmap.Map.empty;
+    }
+  in
+  error, init_bdu_analysis_static
 
 (***************************************************************************)
 (*implementation of pre_static*)
@@ -274,7 +345,7 @@ let collect_test_modif_map parameters error store_test_modification_sites =
          Exception.check_point
            Exception.warn parameters error error' __POS__ Exit
        in
-       error, (new_set)
+       error, new_set
     )
     store_test_modification_sites
 
@@ -353,21 +424,26 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule ha
 let site_covering_classes parameters error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
     let error, old =
-      match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameters error
-              (agent_type, site_type) store_result
+      match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+              parameters error
+              (agent_type, site_type)
+              store_result
       with
       | error, None -> error, []
       | error, Some l -> error, l
     in
     let error, result =
       Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameters error
-        (agent_type, site_type) (cv_id :: old) store_result
+        (agent_type, site_type)
+        (cv_id :: old)
+        store_result
     in
     error, result
   in
   let error, store_result =
     (*From sites return a list of covering_class_id*)
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
       (fun _parameters error agent_type_cv remanent store_result ->
          (*get a list of covering_class_id from remanent*)
          let cv_dic = remanent.Covering_classes_type.store_dic in
@@ -378,7 +454,10 @@ let site_covering_classes parameters error covering_classes =
                 (*get site_cv in value*)
                 List.fold_left (fun (_error, store_result) site_type_cv ->
                     let error, result =
-                      add_link (agent_type_cv, site_type_cv) cv_id store_result
+                      add_link
+                        (agent_type_cv, site_type_cv)
+                        cv_id
+                        store_result
                     in
                     error, result
                   ) (error, store_result) list_of_site_type
@@ -395,14 +474,57 @@ let site_covering_classes parameters error covering_classes =
   error, store_result
 
 (******************************************************************)
+(*TODO: from (agent_type, cv_id) collect a list of site_type*)
 
-let new_index_pair_map parameters error l = (*JF:  it should be computed only once *)
+let list_of_site_type_in_covering_class parameters error covering_classes =
+  let error, store_result =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters
+      error
+      (fun parameters error agent_type_cv remenent store_result ->
+         let cv_dic = remenent.Covering_classes_type.store_dic in
+         Covering_classes_type.Dictionary_of_List_sites.fold
+           (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
+              let error, old =
+                match
+                  Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                    parameters error
+                    (agent_type_cv, cv_id)
+                    store_result
+                with
+                | error, None -> error, []
+                | error, Some l -> error, l
+              in
+              let new_list = List.append list_of_site_type old in
+              let error, store_result =
+                Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
+                  parameters
+                  error
+                  (agent_type_cv, cv_id)
+                  new_list
+                  store_result
+              in
+              error, store_result
+           ) cv_dic (error, store_result)
+      ) covering_classes Covering_classes_type.AgentCV_map_and_set.Map.empty
+  in
+  let store_result =
+    Covering_classes_type.AgentCV_map_and_set.Map.map (fun x -> x) store_result
+  in
+  error, store_result
+
+(******************************************************************)
+
+let new_index_pair_map parameters error l =
+  (*JF:  it should be computed only once *)
   let rec aux acc k map1 map2 error =
     match acc with
     | [] -> error, (map1, map2)
     | h :: tl ->
-      let error, map1 = Ckappa_sig.Site_map_and_set.Map.add parameters error h k map1 in
-      let error, map2 = Ckappa_sig.Site_map_and_set.Map.add parameters error k h map2 in
+      let error, map1 =
+        Ckappa_sig.Site_map_and_set.Map.add parameters error h k map1 in
+      let error, map2 =
+        Ckappa_sig.Site_map_and_set.Map.add parameters error k h map2 in
       aux
         tl
         (Ckappa_sig.site_name_of_int ((Ckappa_sig.int_of_site_name k)+1))
@@ -491,7 +613,7 @@ let build_bdu parameters handler error (pair_list: (Ckappa_sig.c_site_name * Cka
   in
   error, handler, bdu_result
 
-(************************************************************************************)
+(****************************************************************************)
 
 let collect_bdu_creation_restriction_map parameters handler error
     rule_id rule
@@ -523,7 +645,8 @@ let collect_bdu_creation_restriction_map parameters handler error
     error, handler, result_map
   in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
+    error
     (fun parameters error agent_type' triple_list (handler,store_result) ->
        List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
            let error, agent =
@@ -704,7 +827,8 @@ let collect_modif_list_restriction_map
                in
                (*-----------------------------------------------------------*)
                let error', map_res =
-                 Ckappa_sig.Site_map_and_set.Map.fold_restriction parameters error
+                 Ckappa_sig.Site_map_and_set.Map.fold_restriction parameters
+                   error
                    (fun site port (error, store_result) ->
                       let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
                       let error, site' =
@@ -773,7 +897,8 @@ let collect_modif_list_restriction_map
 (**************************************************************************)
 (*build bdu for potential side effects*)
 
-let store_bdu_potential_restriction_map_aux parameters handler error store_remanent_triple
+let store_bdu_potential_restriction_map_aux parameters handler error
+    store_remanent_triple
     store_potential_side_effects store_result =
   let error, handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false
@@ -1155,7 +1280,16 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
       compil
   in
   (*-----------------------------------------------------------------------*)
-  (*static information of covering classes: from sites -> covering_class id list*)
+  (*TODO*)
+  let error, store_list_of_site_type_in_covering_classes =
+    list_of_site_type_in_covering_class
+      parameters
+      error
+      store_covering_classes
+  in
+  (*-----------------------------------------------------------------------*)
+  (*static information of covering classes: from sites -> covering_class id
+    list*)
   let error, store_covering_classes_id =
     site_covering_classes
       parameters
@@ -1223,60 +1357,21 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
   {
     store_pre_static = store_pre_static;
     store_covering_classes = store_covering_classes;
+    store_list_of_site_type_in_covering_classes =
+      store_list_of_site_type_in_covering_classes;
     store_covering_classes_id = store_covering_classes_id;
-    store_remanent_triple     = store_remanent_triple;
-    store_proj_bdu_creation_restriction_map = store_proj_bdu_creation_restriction_map;
-    store_modif_list_restriction_map        = store_modif_list_restriction_map;
-    store_proj_bdu_potential_restriction_map = store_proj_bdu_potential_restriction_map;
-    store_proj_bdu_test_restriction          = store_proj_bdu_test_restriction;
+    store_remanent_triple = store_remanent_triple;
+    store_proj_bdu_creation_restriction_map =
+      store_proj_bdu_creation_restriction_map;
+    store_modif_list_restriction_map = store_modif_list_restriction_map;
+    store_proj_bdu_potential_restriction_map =
+      store_proj_bdu_potential_restriction_map;
+    store_proj_bdu_test_restriction = store_proj_bdu_test_restriction;
   }
 
 (***************************************************************************)
 (*rule*)
 
-let init_pre_static =
-  let init_modification        = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
-  let init_test                = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
-  let init_test_modification   = Ckappa_sig.AgentsSite_map_and_set.Map.empty in
-  let init_modif_map           = Ckappa_sig.AgentSite_map_and_set.Map.empty in
-  let init_test_map            = Ckappa_sig.AgentSite_map_and_set.Map.empty in
-  let init_test_modif_map      = Ckappa_sig.AgentSite_map_and_set.Map.empty in
-  let init_pre_static =
-    {
-      store_modification_sites      = init_modification;
-      store_test_sites              = init_test;
-      store_test_modification_sites = init_test_modification;
-      store_modif_map               = init_modif_map;
-      store_test_map                = init_test_map;
-      store_test_modif_map          = init_test_modif_map;
-    }
-  in init_pre_static
-
-let init_bdu_analysis_static parameters error =
-  let error, init_covering_classes =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
-  in
-  let init_covering_classes_id = Ckappa_sig.AgentSite_map_and_set.Map.empty in
-  let error, init_remanent_triple =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
-  in
-  let init_proj_bdu_creation_restriction_map = Ckappa_sig.Rule_setmap.Map.empty in
-  let init_modif_list_restriction_map        = Covering_classes_type.AgentsRuleCV_map_and_set.Map.empty in
-  let init_proj_bdu_potential_restriction_map  = Ckappa_sig.Rule_setmap.Map.empty in
-  let init_proj_bdu_test_restriction           = Ckappa_sig.Rule_setmap.Map.empty in
-  let init_bdu_analysis_static =
-    {
-      store_pre_static = init_pre_static;
-      store_covering_classes    = init_covering_classes;
-      store_covering_classes_id = init_covering_classes_id;
-      store_remanent_triple     = init_remanent_triple;
-      store_proj_bdu_creation_restriction_map = init_proj_bdu_creation_restriction_map;
-      store_modif_list_restriction_map        = init_modif_list_restriction_map;
-      store_proj_bdu_potential_restriction_map = init_proj_bdu_potential_restriction_map;
-      store_proj_bdu_test_restriction = init_proj_bdu_test_restriction;
-    }
-  in
-  error, init_bdu_analysis_static
 
 (***************************************************************************)
 

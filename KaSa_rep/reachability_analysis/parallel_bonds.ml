@@ -424,7 +424,9 @@ struct
     let store_rule_has_parallel_bonds_lhs = get_rule_double_bonds_lhs static in
     let error, parallel_map =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-              parameters error rule_id store_rule_has_parallel_bonds_lhs
+              parameters error
+              rule_id
+              store_rule_has_parallel_bonds_lhs
       with
       | error, None ->
         error,
@@ -432,7 +434,8 @@ struct
       | error, Some s -> error, s
     in
     let list =
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings parallel_map
+      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings
+        parallel_map
     in
     (*-----------------------------------------------------------*)
     let store_value = get_value dynamic in
@@ -986,7 +989,8 @@ struct
       in
       let () =
         if bool &&
-           (local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameters)
+           (local_trace ||
+            Remanent_parameters.get_dump_reachability_analysis_diff parameters)
         then
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
@@ -1017,7 +1021,7 @@ struct
 (* Many times per rule application *)
 (* It should be done efficiently and only once. *)
 (* The result should be stored in a field of static *)
-(* with the type site -> rule set *)
+  (* a common map between the domain: with the type site -> rule set *)
 (* The results for each case should be merged in this field *)
   let apply_event_list_rule_in_lhs_rhs_aux static error store_rule_double_bonds
       event_list tuple_pair_set =

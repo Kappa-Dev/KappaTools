@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 20 2016>
+ * Last modification: Time-stamp: <Nov 21 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -354,6 +354,7 @@ module AgentsSiteState_map_and_set =
          let compare = compare
          let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d
        end))
+
 (***************************************************************************)
 (*bonds in rhs and lhs*)
 

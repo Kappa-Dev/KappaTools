@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -23,14 +23,15 @@ type bdu_analysis_dynamic =
       Ckappa_sig.AgentSiteState_map_and_set.Set.t Ckappa_sig.AgentSiteState_map_and_set.Map.t
   }
 
-(************************************************************************************)
+(************************************************************************)
 (*implementation*)
 
 let add_link parameters error (agent_type, cv_id) rule_id_set store_result =
   let error, old_set =
     match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
             parameters error
-            (agent_type, cv_id) store_result
+            (agent_type, cv_id)
+            store_result
     with
     | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
     | error, Some s -> error, s
@@ -44,17 +45,19 @@ let add_link parameters error (agent_type, cv_id) rule_id_set store_result =
   in
   let error, store_result =
     Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
-      parameters error (agent_type, cv_id)
+      parameters error
+      (agent_type, cv_id)
       new_set
       store_result
   in
   error, store_result
 
-(************************************************************************************)
+(**************************************************************************)
 
-let store_covering_classes_modification_update_aux parameters error agent_type_cv
+let store_covering_classes_modification_update_aux parameters error
+    agent_type_cv
     site_type_cv cv_id store_test_modification_map store_result =
-  (*-------------------------------------------------------------------------------*)
+  (*----------------------------------------------------------------------*)
   let error, rule_id_set =
     match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
             parameters error
@@ -67,14 +70,14 @@ let store_covering_classes_modification_update_aux parameters error agent_type_c
   let error, result =
     add_link parameters error (agent_type_cv, cv_id) rule_id_set store_result
   in
-  (*-------------------------------------------------------------------------------*)
+  (*----------------------------------------------------------------------*)
   (*map this map*)
   let store_result =
     Covering_classes_type.AgentCV_map_and_set.Map.map (fun x -> x) result
   in
   error, store_result
 
-(************************************************************************************)
+(***************************************************************************)
 
 let store_covering_classes_modification_update parameters error
     store_test_modification_map
@@ -107,10 +110,10 @@ let store_covering_classes_modification_update parameters error
   in
   error, store_result
 
-(************************************************************************************)
+(**************************************************************************)
 (*combine update(c) and update(c') of side effects together*)
 
-(************************************************************************************)
+(***************************************************************************)
 (*update function added information of rule_id in side effects*)
 
 let store_covering_classes_modification_side_effects parameters error
@@ -118,18 +121,19 @@ let store_covering_classes_modification_side_effects parameters error
     store_potential_side_effects
     covering_classes
     store_result =
-  (*-------------------------------------------------------------------------------*)
+  (*------------------------------------------------------------------------*)
   let _, store_potential_side_effects_bind = store_potential_side_effects in
   let error, store_result =
     Ckappa_sig.AgentRule_map_and_set.Map.fold
-      (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result) ->
+      (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result)
+        ->
          List.fold_left
            (fun (error, store_result) (site_type_partner, _state) ->
               let error, rule_id_set =
                 match
                   Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                     parameters error
-                    (agent_type_partner,site_type_partner)
+                    (agent_type_partner, site_type_partner)
                     store_test_modification_map
                 with
                 | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
@@ -148,11 +152,14 @@ let store_covering_classes_modification_side_effects parameters error
                      let cv_dic = remanent.Covering_classes_type.store_dic in
                      let error, store_result =
                        Covering_classes_type.Dictionary_of_List_sites.fold
-                         (fun _list_of_site_type ((), ()) cv_id (error, store_result) ->
+                         (fun _list_of_site_type ((), ()) cv_id
+                           (error, store_result) ->
                             (*get a set of rule_id in update(c)*)
                             let error, store_result =
                               add_link parameters error
-                                (agent_type_partner, cv_id) new_rule_id_set store_result
+                                (agent_type_partner, cv_id)
+                                new_rule_id_set
+                                store_result
                             in
                             error, store_result
                          ) cv_dic (error, store_result)
@@ -166,7 +173,7 @@ let store_covering_classes_modification_side_effects parameters error
   in
   error, store_result
 
-(************************************************************************************)
+(**************************************************************************)
 
 let store_update
     parameters
@@ -217,7 +224,7 @@ let store_update
       (StoryProfiling.Merge_influences)
       None log_info
   in
-  (*---------------------------------------------------------------------------*)
+  (*-------------------------------------------------------------------*)
   (*fold 2 map*)
   let error, store_result =
     Covering_classes_type.AgentCV_map_and_set.Map.fold2
@@ -226,14 +233,18 @@ let store_update
       (*exists in 'a t*)
       (fun parameters error (agent_type, cv_id) rule_id_set store_result ->
          let error, store_result =
-           add_link parameters error (agent_type, cv_id) rule_id_set store_result
+           add_link parameters error
+             (agent_type, cv_id) rule_id_set store_result
          in
          error, store_result
       )
       (*exists in 'b t*)
       (fun parameters error (agent_type, cv_id) rule_id_set store_result ->
          let error, store_result =
-           add_link parameters error (agent_type, cv_id) rule_id_set store_result
+           add_link parameters error
+             (agent_type, cv_id)
+             rule_id_set
+             store_result
          in
          error, store_result
       )
@@ -243,7 +254,8 @@ let store_update
            Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
          in
          let error, store_result =
-           add_link parameters error (agent_type, cv_id) union_set store_result
+           add_link parameters error
+             (agent_type, cv_id) union_set store_result
          in
          error, store_result
       )
@@ -304,7 +316,7 @@ let collect_dual_map parameters error handler store_result =
   error, store_result
 
 
-(************************************************************************************)
+(****************************************************************************)
 
 let scan_rule_dynamic parameters log_info error _compiled
     kappa_handler
@@ -339,7 +351,7 @@ let scan_rule_dynamic parameters log_info error _compiled
     store_dual_contact_map = store_dual_contact_map
   }
 
-(************************************************************************************)
+(**************************************************************************)
 
 let init_bdu_analysis_dynamic =
   let init_bdu_analysis_dynamic =

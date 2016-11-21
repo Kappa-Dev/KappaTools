@@ -40,7 +40,8 @@ struct
 
   type local_static_information =
     {
-      store_basic_static_information: Site_accross_bonds_domain_static.basic_static_information;
+      store_basic_static_information:
+        Site_accross_bonds_domain_static.basic_static_information;
       dummy:unit;
     }
 
@@ -345,11 +346,15 @@ struct
     let error, store_potential_tuple_pair =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair
         parameters error
-        rule_id store_bonds_rhs store_views_rhs
+        rule_id
+        store_bonds_rhs
+        store_views_rhs
         store_potential_tuple_pair
     in
-    let static = set_potential_tuple_pair store_potential_tuple_pair
-        static in
+    let static =
+      set_potential_tuple_pair store_potential_tuple_pair
+        static
+    in
     (*------------------------------------------------------------*)
     (*rule in the potential rhs*)
     let store_potential_tuple_pair = get_potential_tuple_pair static in
