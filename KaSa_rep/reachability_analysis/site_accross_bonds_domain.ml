@@ -918,8 +918,19 @@ struct
       | Usual_domains.Val l -> error, l
       | Usual_domains.Undefined -> error, []
       | Usual_domains.Any ->
-        Exception.warn
-          (get_parameter static) error __POS__ Exit []
+        let parameter = get_parameter static in
+        let error, () =
+          if Remanent_parameters.get_view_analysis parameter
+          then
+
+            Exception.warn
+            (get_parameter static) error __POS__ Exit ()
+          else
+            error, ()
+        in
+        let kappa_handler = get_kappa_handler static in
+        Handler.state_list
+          parameter kappa_handler error agent_type_y site_type_y
     in
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list

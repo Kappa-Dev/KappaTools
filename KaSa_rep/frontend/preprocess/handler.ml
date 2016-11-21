@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Aug 15 2016>
+   * Last modification: Time-stamp: <Nov 21 2016>
    * *
    * Primitives to use a kappa handler
    *
@@ -600,3 +600,16 @@ let id_of_binding_type
         | error, (bool, (Some (a,_,_,_))) ->
           error, a
     end
+
+let state_list parameter handler error agent_type site_type =
+  let error, n =
+    last_state_of_site
+      parameter error handler agent_type site_type
+  in
+  let rec aux k l =
+    if Ckappa_sig.compare_state_index Ckappa_sig.dummy_state_index k > 0
+    then l
+    else
+    aux (Ckappa_sig.pred_state_index k) (k::l)
+  in
+  error, aux n []

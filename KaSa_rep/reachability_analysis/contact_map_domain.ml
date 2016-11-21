@@ -21,6 +21,7 @@ struct
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
+      bonds_to_rules: unit ; (* TO DO *)
     }
 
   type local_dynamic_information =
@@ -55,12 +56,14 @@ struct
 
   let set_bond_rhs bonds static =
     {
-      global_static_information = Analyzer_headers.set_bonds_rhs bonds static
+      global_static_information = Analyzer_headers.set_bonds_rhs bonds static;
+      bonds_to_rules = () (* TO DO *)
     }
 
   let set_bond_lhs bonds static =
     {
-      global_static_information = Analyzer_headers.set_bonds_lhs bonds static
+      global_static_information = Analyzer_headers.set_bonds_lhs bonds static;
+      bonds_to_rules = () (* TODO *)
     }
 
   (*--------------------------------------------------------------------*)
@@ -105,6 +108,7 @@ struct
     let init_global_static_information =
       {
         global_static_information = static;
+        bonds_to_rules = () (* TO DO *)
       }
     in
     let init_local =

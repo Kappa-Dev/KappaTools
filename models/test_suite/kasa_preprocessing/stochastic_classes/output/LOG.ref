@@ -411,6 +411,7 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
+
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -456,6 +457,7 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 3: r3 is applied for the first time
+
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:

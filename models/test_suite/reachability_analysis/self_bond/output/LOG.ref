@@ -641,6 +641,9 @@ Influence_map:Inhibition_map:rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(
 Influence_map:Inhibition_map:rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2) -> rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2)[0->1];[0->2];[1->0];[2->0]
 Influence_map:Inhibition_map:rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2) -> rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
 Reachability analysis...
+				(rule 0: r1) should be investigated 
+				(rule 0: r1) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -671,6 +674,9 @@ EXTENSIONAL DESCRIPTION:
 		A(z!free,t!free)
 
 		Wake-up rules:
+				(rule 1: r2) should be investigated 
+				(rule 1: r2) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -701,6 +707,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z!free,t!free)
 
 		Wake-up rules:
+				(rule 2: r3) should be investigated 
+				(rule 2: r3) should be investigated 
+				(rule 2: r3) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -731,6 +741,10 @@ EXTENSIONAL DESCRIPTION:
 		C(z!free,t!free)
 
 		Wake-up rules:
+				(rule 3: r4) should be investigated 
+				(rule 3: r4) should be investigated 
+				(rule 3: r4) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -761,6 +775,10 @@ EXTENSIONAL DESCRIPTION:
 		D(z!free,t!free)
 
 		Wake-up rules:
+				(rule 4: r5) should be investigated 
+				(rule 4: r5) should be investigated 
+				(rule 4: r5) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -791,6 +809,10 @@ EXTENSIONAL DESCRIPTION:
 		E(z!free,t!free)
 
 		Wake-up rules:
+				(rule 5: r6) should be investigated 
+				(rule 5: r6) should be investigated 
+				(rule 5: r6) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:

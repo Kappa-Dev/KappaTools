@@ -867,6 +867,15 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
+				(rule 11: r11) should be investigated 
+				(rule 10: r10) should be investigated 
+				(rule 9: r9) should be investigated 
+				(rule 8: r8) should be investigated 
+				(rule 6: r6) should be investigated 
+				(rule 5: r5) should be investigated 
+				(rule 4: r4) should be investigated 
+				(rule 3: r3) should be investigated 
+
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -932,6 +941,11 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
+				(rule 10: r10) should be investigated 
+				(rule 9: r9) should be investigated 
+				(rule 5: r5) should be investigated 
+				(rule 4: r4) should be investigated 
+
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -997,6 +1011,13 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 2: r2 is applied for the first time
+				(rule 12: r12) should be investigated 
+				(rule 11: r11) should be investigated 
+				(rule 10: r10) should be investigated 
+				(rule 7: r7) should be investigated 
+				(rule 6: r6) should be investigated 
+				(rule 5: r5) should be investigated 
+
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:

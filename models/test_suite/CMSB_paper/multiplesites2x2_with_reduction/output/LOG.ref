@@ -5,6 +5,20 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+				(rule 9: P/K) should be investigated 
+				(rule 8: P.K) should be investigated 
+				(rule 7: b2-) should be investigated 
+				(rule 6: b2+) should be investigated 
+				(rule 5: a2-) should be investigated 
+				(rule 4: a2+) should be investigated 
+				(rule 3: b1-) should be investigated 
+				(rule 2: a1-) should be investigated 
+				(rule 1: b1+) should be investigated 
+				(rule 0: a1+) should be investigated 
+
+				(rule 9: P/K) should be investigated 
+				(rule 8: P.K) should be investigated 
+
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

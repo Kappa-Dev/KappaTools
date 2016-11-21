@@ -1,0 +1,51 @@
+Parsing ../dimmer.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+				(rule 1: E/R) should be investigated 
+				(rule 0: E.R) should be investigated 
+
+				(rule 6: obs) should be investigated 
+				(rule 5: R/int) should be investigated 
+				(rule 5: R/int) should be investigated 
+				(rule 4: R.int) should be investigated 
+				(rule 4: R.int) should be investigated 
+				(rule 3: R/R) should be investigated 
+				(rule 3: R/R) should be investigated 
+				(rule 2: R.R) should be investigated 
+				(rule 2: R.R) should be investigated 
+				(rule 1: E/R) should be investigated 
+				(rule 0: E.R) should be investigated 
+
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule 6: obs will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+R() =>
+   [
+	  R(c,cr,n,x!E.x)
+	v R(c!R.c,cr!R.n,n,x!E.x)
+	v R(c!R.c,cr,n,x!E.x)
+	v R(c!R.c,cr,n!R.cr,x!E.x)
+	v R(c,cr,n,x)
+   ]
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(x) v E(x!R.x) ]
+R() => [ R(c) v R(c!R.c) ]
+R() => [ R(x) v R(x!E.x) ]
+R() => [ R(cr) v R(cr!R.n) ]
+R() => [ R(n) v R(n!R.cr) ]
+execution finished without any exception

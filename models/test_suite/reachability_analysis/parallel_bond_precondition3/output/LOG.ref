@@ -371,6 +371,11 @@ Influence_map:Inhibition_map:rule(2):'r3' A(z!_,t!2),B(t!2)-> -> rule(2):'r3' A(
 Influence_map:Inhibition_map:rule(2):'r3' A(z!_,t!2),B(t!2)-> -> rule(3):'r4' A(z!1,t!2),B(z!1,t!2)->[1*->0];[0*->1];[0->0];[1->1]
 Influence_map:Inhibition_map:rule(3):'r4' A(z!1,t!2),B(z!1,t!2)-> -> rule(2):'r3' A(z!_,t!2),B(t!2)->[0->0];[1->1]
 Reachability analysis...
+				(rule 3: r4) should be investigated 
+				(rule 2: r3) should be investigated 
+				(rule 1: r2) should be investigated 
+				(rule 0: r1) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -421,6 +426,11 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u)
 
 		Wake-up rules:
+				(rule 3: r4) should be investigated 
+				(rule 2: r3) should be investigated 
+				(rule 1: r2) should be investigated 
+				(rule 0: r1) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:

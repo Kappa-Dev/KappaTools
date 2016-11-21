@@ -182,7 +182,7 @@ struct
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let agent_interface = agent.Cckappa_sig.agent_interface in
-            if Ckappa_sig.Site_map_and_set.Map.is_empty agent_interface
+            if true (*Ckappa_sig.Site_map_and_set.Map.is_empty agent_interface*)
             then
               aux tl (error, agent_type :: output)
             else
@@ -301,7 +301,9 @@ struct
 
   let add_event_list static dynamic error (agent_type: Ckappa_sig.c_agent_name) event_list =
     let parameters = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     let map = get_agents_without_interface static in
+    let log = Remanent_parameters.get_logger parameters in
     let local = get_seen_agent dynamic in
     let error, bool =
       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get parameters error agent_type local in
@@ -323,6 +325,32 @@ struct
         | error, None -> error, []
         | error, Some l -> error, l
       in
+      let error =
+        List.fold_left  (fun error rule_id ->
+            let compiled = get_compil static in
+            let error, rule_id_string =
+              try
+                Handler.string_of_rule parameters error kappa_handler
+                  compiled rule_id
+              with
+              | _ ->
+                Exception.warn
+                  parameters error __POS__ Exit
+                  (Ckappa_sig.string_of_rule_id rule_id)
+            in
+            let title = "" in
+            let tab =
+              if title = "" then "\t\t\t\t" else "\t\t\t"
+            in
+            let () =
+              Loggers.fprintf log "%s%s(%s) should be investigated "
+                (Remanent_parameters.get_prefix parameters) tab
+                rule_id_string
+            in
+            let () = Loggers.print_newline log in error)
+          error rule_id_list
+      in
+      let () = Loggers.print_newline log in
       let event_list =
         List.fold_left (fun event_list rule_id ->
             Communication.Check_rule rule_id :: event_list

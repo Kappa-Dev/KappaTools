@@ -5,6 +5,21 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+				(rule 1: E/R) should be investigated 
+				(rule 0: E.R) should be investigated 
+
+				(rule 6: obs) should be investigated 
+				(rule 5: R/int) should be investigated 
+				(rule 5: R/int) should be investigated 
+				(rule 4: R.int) should be investigated 
+				(rule 4: R.int) should be investigated 
+				(rule 3: R/R) should be investigated 
+				(rule 3: R/R) should be investigated 
+				(rule 2: R.R) should be investigated 
+				(rule 2: R.R) should be investigated 
+				(rule 1: E/R) should be investigated 
+				(rule 0: E.R) should be investigated 
+
 
 ------------------------------------------------------------
 * There are some non applyable rules

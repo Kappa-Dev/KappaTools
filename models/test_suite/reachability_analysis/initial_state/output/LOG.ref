@@ -152,6 +152,10 @@ Influence_map:Wake_up_map:rule(0):'' A(x~u,y~u)->A(x~p,y~u) -> rule(2):'' A(x~p,
 Influence_map:Inhibition_map:rule(0):'' A(x~u,y~u)->A(x~p,y~u) -> rule(1):'' A(x~u,y~u)->A(x~u,y~p)[0->0]
 Influence_map:Inhibition_map:rule(1):'' A(x~u,y~u)->A(x~u,y~p) -> rule(0):'' A(x~u,y~u)->A(x~p,y~u)[0->0]
 Reachability analysis...
+				(rule 2) should be investigated 
+				(rule 1) should be investigated 
+				(rule 0) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -267,6 +271,7 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 2 is applied for the first time
+
 
 		Updating the views for A(x~,y~)
 	Dealing with creation

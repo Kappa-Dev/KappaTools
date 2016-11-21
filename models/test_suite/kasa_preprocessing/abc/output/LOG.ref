@@ -527,6 +527,16 @@ Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> var(3)
 Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(4):'Cuu' C(x1~u?,x2~u?)[0->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
 Reachability analysis...
+				(rule 5: mod x2) should be investigated 
+				(rule 4: a.c) should be investigated 
+				(rule 3: mod x1) should be investigated 
+				(rule 2: ab.c) should be investigated 
+				(rule 1: a.b_op) should be investigated 
+				(rule 0: a.b) should be investigated 
+
+				(rule 1: a.b_op) should be investigated 
+				(rule 0: a.b) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -577,6 +587,11 @@ EXTENSIONAL DESCRIPTION:
 		B(x!free)
 
 		Wake-up rules:
+				(rule 5: mod x2) should be investigated 
+				(rule 4: a.c) should be investigated 
+				(rule 3: mod x1) should be investigated 
+				(rule 2: ab.c) should be investigated 
+
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:

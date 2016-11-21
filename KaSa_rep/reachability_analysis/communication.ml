@@ -496,8 +496,8 @@ let rec post_condition error rule_id r precondition static dynamic path  =
       if List.exists (fun (a,_) -> a=path.agent_id)
           rule.Cckappa_sig.actions.Cckappa_sig.creation
       then
-        (* try to exist from a site that is unspecified in a created agent *)
-        (* this site is free, thus the path is not reaslisable *)
+        (* try to exit from a site that is unspecified in a created agent *)
+        (* this site is free, thus the path is not realisable *)
         error, dynamic, Usual_domains.Undefined
       else
         let path =
@@ -576,15 +576,18 @@ let get_state_of_site_in_pre_post_condition
     agent_id site_type defined_in precondition =
   let static = get_global_static_information static in
   let parameter = Analyzer_headers.get_parameter static in
+  let path_in_pattern =
+    {
+      agent_id = agent_id;
+      relative_address = [];
+      site = site_type;
+    }
+  in
   let path =
     {
       defined_in = defined_in ;
-      path =
-        {
-          agent_id = agent_id;
-          relative_address = [];
-          site = site_type;
-        }}
+      path = path_in_pattern
+    }
   in
   (*get a list of site_type2 state in the precondition*)
   let error, global_dynamic, precondition, state_list_lattice =
@@ -598,8 +601,34 @@ let get_state_of_site_in_pre_post_condition
   let error, state_list =
     match state_list_lattice with
     | Usual_domains.Val l -> error, l
-    | Usual_domains.Any | Usual_domains.Undefined ->
+    | Usual_domains.Undefined ->
       Exception.warn parameter error __POS__ Exit []
+    | Usual_domains.Any ->
+      let error, () =
+        if Remanent_parameters.get_view_analysis parameter
+        then
+          Exception.warn parameter error __POS__ Exit ()
+        else
+          error, ()
+      in
+      let error, l =
+        match defined_in with
+        | RHS (_,r) | LHS (_,r) ->
+          let rule = r.Cckappa_sig.e_rule_c_rule in
+          let error, agent_type =
+            last_agent_type parameter error rule path_in_pattern
+          in
+          let error, l =
+          Handler.state_list parameter
+            (Analyzer_headers.get_kappa_handler static)
+            error agent_type site_type in
+          if l = []
+          then Exception.warn parameter error __POS__ Exit []
+          else error, l
+        | Pattern ->
+          Exception.warn parameter error __POS__ Exit []
+      in
+      error, l
   in
   let dynamic = set_global_dynamic_information global_dynamic dynamic in
   error, dynamic, precondition, state_list

@@ -77,21 +77,21 @@ let options =
       "--enable-every-domain",
       Multi(
         [
-          (*  "--views-domain"; *)
+          "--views-domain";
           "--double-bonds-domain";
           "--sites-accross-bonds-domain";
         ],[]),"enable every abstract domain",["2_Reachability_analysis"],Normal;
       "--disable-every-domain",
       Multi(
         [
-          (*  "--no-views-domain"; *)
+          "--no-views-domain";
           "--no-double-bonds-domain";
           "--no-sites-accross-bonds-domain";
         ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
-      (*  "--views-domain",
+       "--views-domain",
       Bool Config.with_views_analysis,
           "enable local views analysis",
-          ["0_Actions";"2_Reachability_analysis"],Normal;*)
+          ["0_Actions";"2_Reachability_analysis"],Normal;
       "--double-bonds-domain",
       Bool Config.with_parallel_bonds_analysis,
       "enable double bonds analysis",
