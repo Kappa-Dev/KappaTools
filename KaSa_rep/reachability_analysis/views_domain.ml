@@ -357,7 +357,7 @@ struct
         None log_info
     in
     let dynamic = set_log_info log_info dynamic in
-    error, static, dynamic
+    error, static, dynamic, []
 
 (* TO DO, look up in static *)
 (* fold over all the rules, all the tuples of interest, all the sites in these

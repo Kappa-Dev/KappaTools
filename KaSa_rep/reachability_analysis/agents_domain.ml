@@ -181,12 +181,7 @@ struct
           | Cckappa_sig.Dead_agent _ -> error, Usual_domains.Bot
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
-            let agent_interface = agent.Cckappa_sig.agent_interface in
-            if true (*Ckappa_sig.Site_map_and_set.Map.is_empty agent_interface*)
-            then
               aux tl (error, agent_type :: output)
-            else
-              aux tl (error, output)
         end
     in
     match aux agents_lhs_list (error, []) with
@@ -280,7 +275,7 @@ struct
     let error, static, dynamic =
       scan_rule_set init_global_static_information init_global_dynamic_information error
     in
-    error, static, dynamic
+    error, static, dynamic, []
 
   let complete_wake_up_relation _static error wake_up =
     error, wake_up

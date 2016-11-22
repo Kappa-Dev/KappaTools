@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 22 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -253,7 +253,13 @@ let get_reachability_parameters () =
     Remanent_parameters_sig.site_accross_bonds =
       !Config.with_site_accross_bonds_analysis ;
     Remanent_parameters_sig.parallel_bonds =
-      !Config.with_parallel_bonds_analysis
+      !Config.with_parallel_bonds_analysis ;
+        Remanent_parameters_sig.dynamic_contact_map =
+      match String.lowercase !Config.with_dynamic_contact_map
+      with
+      | "dynamic" -> true
+      | "static" -> false
+      | _ -> true
   }
 
 let open_tasks_profiling =
@@ -459,6 +465,7 @@ let get_view_analysis_1 r = r.Remanent_parameters_sig.views
 let get_site_accross_bonds_analysis_1 r = r.Remanent_parameters_sig.site_accross_bonds
 let get_parallel_bonds_analysis_1 r =
   r.Remanent_parameters_sig.parallel_bonds
+let get_dynamic_contact_map_1 r = r.Remanent_parameters_sig.dynamic_contact_map
 
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
@@ -643,6 +650,8 @@ let get_parallel_bonds_analysis =
 let get_site_accross_bonds_analysis =
   upgrade_from_reachability_analysis_parameters_field
     get_site_accross_bonds_analysis_1
+let get_dynamic_contact_map =
+  upgrade_from_reachability_analysis_parameters_field get_dynamic_contact_map_1
 
 let get_do_reachability_analysis p =
   upgrade_from_marshal_field get_do_reachability_analysis_1 p

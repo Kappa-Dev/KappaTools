@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -72,13 +72,13 @@ module Product
 
     let initialize global_static_information global_dynamic_information error =
       let error, underlying_domain_static_information,
-          underlying_domain_dynamic_information =
+          underlying_domain_dynamic_information, event_list =
         Underlying_domain.initialize
           global_static_information
           global_dynamic_information
           error
       in
-      let error, new_domain_static_information, new_domain_dynamic_information =
+      let error, new_domain_static_information, new_domain_dynamic_information, event_list' =
         New_domain.initialize
           global_static_information
           underlying_domain_dynamic_information.Underlying_domain.global
@@ -90,7 +90,8 @@ module Product
         underlying_domain = underlying_domain_static_information
       },
       smash_dynamic underlying_domain_dynamic_information
-        new_domain_dynamic_information
+        new_domain_dynamic_information,
+      List.fold_left (fun list a -> a :: list) event_list event_list'
 
     let complete_wake_up_relation static error wake_up =
       let error, wake_up =

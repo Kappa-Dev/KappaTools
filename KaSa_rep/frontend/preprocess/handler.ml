@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    * *
    * Primitives to use a kappa handler
    *
@@ -89,7 +89,6 @@ let translate_state
   in
   check_pos parameter ka_pos ml_pos message error error',
   a
-
 
 let dual
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)

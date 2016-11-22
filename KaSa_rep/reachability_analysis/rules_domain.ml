@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Abstract domain to record live rules
    *
@@ -117,7 +117,7 @@ struct
         local = init_dead_rule_array;
       }
     in
-    error, init_global_static_information, init_global_dynamic_information
+    error, init_global_static_information, init_global_dynamic_information, []
 
   let complete_wake_up_relation _static error wake_up =
       error, wake_up

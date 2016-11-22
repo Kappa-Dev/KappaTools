@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa ../dimmer.ka  --output-directory output || exit 0

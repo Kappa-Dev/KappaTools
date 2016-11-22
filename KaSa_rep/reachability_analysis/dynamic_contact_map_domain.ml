@@ -154,7 +154,7 @@ struct
         bonds_to_rules = bonds_to_rules;
       }
     in
-    error, init_global_static_information, init_global_dynamic_information
+    error, init_global_static_information, init_global_dynamic_information, []
 
   let complete_wake_up_relation _static error wake_up =
       error, wake_up

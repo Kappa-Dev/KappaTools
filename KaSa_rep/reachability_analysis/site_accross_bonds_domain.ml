@@ -573,7 +573,7 @@ struct
         init_global_dynamic_information
         error
     in
-    error, static, dynamic
+    error, static, dynamic, []
 
   let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
       wake_up =

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 22 2016>
   * *
   * primitive to parse command-line options
   *
@@ -77,6 +77,7 @@ let options =
       "--enable-every-domain",
       Multi(
         [
+          "--contact-map-domain";"dynamic";
           "--views-domain";
           "--double-bonds-domain";
           "--sites-accross-bonds-domain";
@@ -84,10 +85,17 @@ let options =
       "--disable-every-domain",
       Multi(
         [
+        "--contact-map-domain";"static";
           "--no-views-domain";
           "--no-double-bonds-domain";
           "--no-sites-accross-bonds-domain";
         ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
+      "--contact-map-domain",
+      Choice
+         (["static","Very coarse static abstraction: every bond that occurs in initial states and rhs of rules is considered";
+           "dynamic","More accurate abstraction: only the bonds that occur in the initial state or a rule that has already been applied successfully, are considered"],
+          Config.with_dynamic_contact_map),"contact map domain is used to over-approximate side-effects",
+       ["2_Reachability_analysis"],Normal;
        "--views-domain",
       Bool Config.with_views_analysis,
           "enable local views analysis",

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 22 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -18,24 +18,37 @@ let select_domain
     ?with_views_domain:(with_views_domain=true)
     ?with_parallel_bonds_domain:(with_parallel_bonds_domain=true)
     ?with_site_accross_bonds_domain:(with_site_accross_bonds_domain=true)
+    ?with_dynamic_contact_map_domain:(with_dynamic_contact_map_domain=true)
     ()
   =
   let base =
     (module
       Product.Product
-        (Contact_map_domain.Domain)
-        (Product.Product
-           (Agents_domain.Domain)
-           (Rules_domain.Domain)):Analyzer_domain_sig.Domain)
+         (Agents_domain.Domain)
+         (Rules_domain.Domain):Analyzer_domain_sig.Domain)
   in
   let module Base = (val base: Analyzer_domain_sig.Domain) in
+  let with_cm =
+    if with_dynamic_contact_map_domain
+    then
+      (module
+        Product.Product
+        (Dynamic_contact_map_domain.Domain)
+        (Base) : Analyzer_domain_sig.Domain)
+    else
+      (module
+        Product.Product
+          (Static_contact_map_domain.Domain)
+          (Base) : Analyzer_domain_sig.Domain)
+  in
+  let module With_cm = (val with_cm: Analyzer_domain_sig.Domain) in
   let with_views =
     if with_views_domain
     then
       (module
-        Product.Product(Views_domain.Domain)(Base) : Analyzer_domain_sig.Domain)
+        Product.Product(Views_domain.Domain)(With_cm) : Analyzer_domain_sig.Domain)
     else
-      (module Base : Analyzer_domain_sig.Domain)
+      (module With_cm : Analyzer_domain_sig.Domain)
   in
   let module With_views = (val with_views: Analyzer_domain_sig.Domain) in
   let with_site_accross =

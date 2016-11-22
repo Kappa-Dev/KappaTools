@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 22 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -239,37 +239,7 @@ struct
     in
     error, dynamic
 
-  let initialize static dynamic error =
-    let error, domain_static, domain_dynamic =
-      Domain.initialize static dynamic error
-    in
-    let parameters = get_parameter (static,domain_static) in
-    let error, wake_up_tmp =
-      Common_static.empty_site_to_rules parameters error in
-    let error, wake_up_tmp =
-      Domain.complete_wake_up_relation domain_static error wake_up_tmp
-    in
-    let error, wake_up =
-      Common_static.consolidate_site_rule_dependencies
-        parameters error wake_up_tmp
-    in
-    let static =
-      Analyzer_headers.add_wake_up_relation static wake_up, domain_static
-    in
-    let working_list = empty_working_list in
-    let dynamic =
-      {
-        rule_working_list = working_list;
-        domain = domain_dynamic
-      }
-    in
-    let error, dynamic =
-      scan_rule_creation
-        static
-        dynamic
-        error
-    in
-    error, static, dynamic
+
 
   (**[lift_unary f static dynamic] is a function lifted of unary type,
      returns information of dynamic information and its output*)
@@ -359,6 +329,39 @@ struct
           ) (error, dynamic) event_list
       in
       apply_event_list static dynamic error event_list'
+
+      let initialize static dynamic error =
+        let error, domain_static, domain_dynamic, event_list =
+          Domain.initialize static dynamic error
+        in
+        let parameters = get_parameter (static,domain_static) in
+        let error, wake_up_tmp =
+          Common_static.empty_site_to_rules parameters error in
+        let error, wake_up_tmp =
+          Domain.complete_wake_up_relation domain_static error wake_up_tmp
+        in
+        let error, wake_up =
+          Common_static.consolidate_site_rule_dependencies
+            parameters error wake_up_tmp
+        in
+        let static =
+          Analyzer_headers.add_wake_up_relation static wake_up, domain_static
+        in
+        let working_list = empty_working_list in
+        let dynamic =
+          {
+            rule_working_list = working_list;
+            domain = domain_dynamic
+          }
+        in
+        let error, dynamic =
+          scan_rule_creation
+            static
+            dynamic
+            error
+        in
+        let error, dynamic, () = apply_event_list static dynamic error event_list in
+        error, static, dynamic
 
   (** add initial state then apply a list of event starts from this new
       list*)
