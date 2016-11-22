@@ -31,7 +31,7 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: -1 events 
+	- removing events occurring after the last observable: -44 events 
 + Producing causal compressions
 	- splitting initial events: +1000 events 
 	 - blackboard generation

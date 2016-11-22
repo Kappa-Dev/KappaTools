@@ -650,36 +650,38 @@ let apply_rule
   let () = assert (not state.outdated) in
   let domain = Environment.domain env in
   let from_patterns () =
-    Tools.array_fold_left_mapi
-      (fun id inj pattern ->
-         let root =
-           match Mods.IntSet.random state.random_state
-                   (Pattern.ObsMap.get state.roots_of_patterns pattern) with
-           | None -> failwith "Tried to apply_rule with no root"
-           | Some x -> x in
-         (match inj with
-          | Some inj -> Pattern.Matching.reconstruct
-                          domain state.edges inj id pattern root
-          | None -> None),root)
-      (Some Pattern.Matching.empty)
+    Tools.array_fold_lefti
+      (fun id inj_rev_roots pattern ->
+         match inj_rev_roots with
+         | None -> None
+         | Some (inj,rev_roots) ->
+           match
+             Mods.IntSet.random state.random_state
+               (Pattern.ObsMap.get state.roots_of_patterns pattern) with
+           | None -> None
+           | Some root ->
+             match Pattern.Matching.reconstruct
+                     domain state.edges inj id pattern root with
+             | None -> None
+             | Some inj' -> Some (inj',root::rev_roots))
+      (Some (Pattern.Matching.empty,[]))
       rule.Primitives.connected_components in
-  let inj,roots =
+  let inj_roots =
     match rule_id with
     | None -> from_patterns ()
     | Some id ->
       match Mods.IntMap.find_option id state.matchings_of_rule with
-      | Some [] -> assert false
-      | Some l ->
-        let (inj,rev_roots) = Tools.list_random state.random_state l in
-        Some inj, Tools.array_rev_of_list rev_roots
+      | Some [] -> None
+      | Some l -> Some (Tools.list_random state.random_state l)
       | None -> from_patterns () in
-  let () =
-    if !Parameter.debugModeOn then
-      Format.printf "@[On roots:@ @[%a@]@]@."
-        (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
-  match inj with
+  match inj_roots with
   | None -> Clash
-  | Some inj ->
+  | Some (inj,rev_roots) ->
+    let roots = Tools.array_rev_of_list rev_roots in
+    let () =
+      if !Parameter.debugModeOn then
+        Format.printf "@[On roots:@ @[%a@]@]@."
+          (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
     match rule.Primitives.unary_rate with
     | None ->
       let out =

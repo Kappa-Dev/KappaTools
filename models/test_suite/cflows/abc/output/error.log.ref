@@ -25,6 +25,8 @@ C(x1~p?, x2~u?)
 _____(1)
 C(x1~p?, x2~p?)
 _____(1)
+C(x1~p--?--, x2~p--?--)
+_____(1)
  (+ν) C(x1~u, x2~u)
 _____(1)
  (+ν) B(x), A(x, c)
@@ -68,7 +70,8 @@ Environment:
     /*1*/%mod: [true] do $TRACK C(x1~p?, x2~u?) [true]
     /*2*/%mod: [true] do $TRACK C(x1~p?, x2~p?) [true]
     /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
-    /*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false]
+    /*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false];
+      $DEL 10000 0: C(x1~p?, x2~p?)
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) [rate_of_rule [0]]
