@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 22 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -378,9 +378,73 @@ struct
     in
     error, static, dynamic
 
+  let add_rules_tuples_into_wake_up_relation parameters error
+      rule_tuples wake_up =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rule_id map (error, wake_up) ->
+         Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
+           (fun _ list (error, wake_up) ->
+              List.fold_left (fun (error, wake_up) (u, v) ->
+                  let (_, agent_type, site_type1, site_type2, _, _) = u in
+                  let (_, agent_type', site_type1', site_type2', _, _) = v in
+                  let error, wake_up =
+                    Common_static.add_dependency_site_rule
+                      parameters error
+                      agent_type
+                      site_type1
+                      rule_id
+                      wake_up
+                  in
+                  let error, wake_up =
+                    Common_static.add_dependency_site_rule
+                      parameters error
+                      agent_type
+                      site_type2
+                      rule_id
+                      wake_up
+                  in
+                  let error, wake_up =
+                    Common_static.add_dependency_site_rule
+                      parameters error
+                      agent_type'
+                      site_type1'
+                      rule_id
+                      wake_up
+                  in
+                  let error, wake_up =
+                    Common_static.add_dependency_site_rule
+                      parameters error
+                      agent_type'
+                      site_type2'
+                      rule_id
+                      wake_up
+                  in
+                  error, wake_up
+                ) (error, wake_up) list
+           ) map (error, wake_up)
+      ) rule_tuples (error, wake_up)
+
   (* TO DO, look up in static *)
-  (* fold over all the rules, all the tuples of interest, all the sites in these tuples, and apply the function Common_static.add_dependency_site_rule to update the wake_up relation *)
+  (* fold over all the rules, all the tuples of interest, all the sites in
+   these tuples, and apply the function Common_static.add_dependency_site_rule
+   to update the wake_up relation *)
     let complete_wake_up_relation static error wake_up =
+      let parameters = get_parameter static in
+      (*fst site created a parallel bonds*)
+      let store_fst_site_create_parallel_bonds_rhs =
+        get_fst_site_create_parallel_bonds_rhs static in
+      let store_snd_site_create_parallel_bonds_rhs =
+        get_snd_site_create_parallel_bonds_rhs static in
+      let error, wake_up =
+      add_rules_tuples_into_wake_up_relation parameters error
+        store_fst_site_create_parallel_bonds_rhs
+        wake_up
+      in
+      let error, wake_up =
+      add_rules_tuples_into_wake_up_relation parameters error
+        store_snd_site_create_parallel_bonds_rhs
+        wake_up
+      in
       error, wake_up
 
   (***************************************************************)

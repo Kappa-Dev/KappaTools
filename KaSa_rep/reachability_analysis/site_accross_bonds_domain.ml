@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -571,11 +571,107 @@ struct
     in
     error, static, dynamic
 
+  let add_rules_tuples_into_wake_up_relation parameters error rule_tuples
+      wake_up =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rule_id tuple_pairs (error, wake_up) ->
+         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
+           (fun (x, y) (error, wake_up) ->
+             let (agent_type, site_type1, site_type2, _) = x in
+             let (agent_type', site_type1', site_type2', _) = y in
+             let error, wake_up =
+               Common_static.add_dependency_site_rule
+                 parameters error
+                 agent_type
+                 site_type1
+                 rule_id
+                 wake_up
+             in
+             let error, wake_up =
+               Common_static.add_dependency_site_rule
+                 parameters error
+                 agent_type
+                 site_type2
+                 rule_id
+                 wake_up
+             in
+             let error, wake_up =
+               Common_static.add_dependency_site_rule
+                 parameters error
+                 agent_type'
+                 site_type1'
+                 rule_id
+                 wake_up
+             in
+             let error, wake_up =
+               Common_static.add_dependency_site_rule
+                 parameters error
+                 agent_type'
+                 site_type2'
+                 rule_id
+                 wake_up
+             in
+             error, wake_up
+           ) tuple_pairs (error, wake_up)
+      ) rule_tuples (error, wake_up)
+
 (* TO DO, look up in static *)
 (* fold over all the rules, all the tuples of interest, all the sites in these
    tuples, and apply the function Common_static.add_dependency_site_rule to
    update the wake_up relation *)
   let complete_wake_up_relation static error wake_up =
+    let parameters = get_parameter static in
+    (*dealing with create a binding sites *)
+    let store_rule_partition_created_bonds_map_1 =
+      get_rule_partition_created_bonds_map_1 static
+    in
+    let store_rule_partition_created_bonds_map_2 =
+      get_rule_partition_created_bonds_map_2 static
+    in
+    let store_rule_partition_modified_map_1 =
+      get_rule_partition_modified_map_1 static in
+    let store_rule_partition_modified_map_2 =
+      get_rule_partition_modified_map_2 static in
+    let store_potential_side_effects =
+      get_potential_side_effects static in
+    (*----------------------------------------------------*)
+    let error, wake_up =
+      add_rules_tuples_into_wake_up_relation parameters error
+        store_rule_partition_created_bonds_map_1
+        wake_up
+    in
+    let error, wake_up =
+      add_rules_tuples_into_wake_up_relation parameters error
+        store_rule_partition_created_bonds_map_2
+        wake_up
+    in
+    (*----------------------------------------------------*)
+    (*dealing with site that is modified*)
+    let error, wake_up =
+      add_rules_tuples_into_wake_up_relation parameters error
+        store_rule_partition_modified_map_1
+        wake_up
+    in
+    let error, wake_up =
+    add_rules_tuples_into_wake_up_relation parameters error
+      store_rule_partition_modified_map_2
+      wake_up
+    in
+    (*----------------------------------------------------*)
+    (*dealing with side effects*)
+    let error, wake_up =
+      Ckappa_sig.Rule_map_and_set.Map.fold
+        (fun rule_id list (error, wake_up) ->
+           List.fold_left (fun (error, wake_up) (agent_type, site_type, _) ->
+               Common_static.add_dependency_site_rule
+                 parameters error
+                 agent_type
+                 site_type
+                 rule_id
+                 wake_up
+             ) (error, wake_up) list
+        ) store_potential_side_effects (error, wake_up)
+    in
     error, wake_up
 
   (*------------------------------------------------------------*)
@@ -647,9 +743,7 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     (*look into the lhs whether or not there exists a site accross pattern or
       not *)
-    let store_potential_tuple_pair_lhs =
-      get_potential_tuple_pair_lhs static
-    in
+    let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
     let error, tuple_set =
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
               parameters error rule_id store_potential_tuple_pair_lhs
@@ -660,8 +754,7 @@ struct
       | error, Some s -> error, s
     in
     let list =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements
-        tuple_set
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements tuple_set
     in
     let store_value = get_value dynamic in
     (*check if this pattern belong to the set of the patterns in the result*)
@@ -727,7 +820,8 @@ struct
   (***************************************************************)
   (*there is an action binding in the domain of a rule*)
 
-  let apply_rule_created_bonds static dynamic error bool dump_title rule_id rule precondition modified_sites =
+  let apply_rule_created_bonds static dynamic error bool dump_title rule_id
+      rule precondition modified_sites =
     let parameters  = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -742,11 +836,13 @@ struct
     let error, created_bonds_set =
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
         (fun (t,u) (error,modified_sites) ->
-           Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in parameters error (u,t) modified_sites)
+           Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+             parameters error (u,t) modified_sites)
         created_bonds_set (error, created_bonds_set)
     in
     let store_partition_created_bonds_map =
-      get_partition_created_bonds_map static in
+      get_partition_created_bonds_map static
+    in
     (*------------------------------------------------------*)
     let error, bool, dynamic, precondition, modified_sites =
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
@@ -852,7 +948,8 @@ struct
                                 Ckappa_sig.Views_bdu.mvbdu_of_association_list
                                   parameters handler error pair_list
                               in
-                              let error, bool, handler, modified_sites, store_result =
+                              let error, bool, handler, modified_sites,
+                                  store_result =
                                 Site_accross_bonds_domain_type.add_link_and_check
                                   parameters error bdu_false handler
                                   kappa_handler
@@ -865,9 +962,11 @@ struct
                               let dynamic = set_value store_result dynamic in
                               let dynamic = set_mvbdu_handler handler dynamic in
                               error, bool, dynamic, precondition, modified_sites
-                           ) (error, bool, dynamic, precondition, modified_sites)
+                           ) (error, bool, dynamic, precondition,
+                              modified_sites)
                            state'_list_y
-                      ) (error, bool, dynamic, precondition, modified_sites) state'_list_x
+                      ) (error, bool, dynamic, precondition, modified_sites)
+                      state'_list_x
                 in
                 error, bool, dynamic, precondition, modified_sites
              ) proj_potential_tuple_pair_set
@@ -1222,7 +1321,8 @@ struct
       ) potential_tuple_pair_set (error, bool, dynamic, modified_sites)
 
 
-  let free_site static dynamic error bool dump_title agent' site_name' state' modified_sites =
+  let free_site static dynamic error bool dump_title agent' site_name' state'
+      modified_sites =
     let error, bool, dynamic, modified_sites =
       free_site_gen
         ~pos:Fst static dynamic error bool dump_title
@@ -1232,7 +1332,8 @@ struct
       ~pos:Snd static dynamic error bool dump_title
       agent' site_name' state' modified_sites
 
-  let apply_rule_side_effects static dynamic error bool dump_title rule_id modified_sites =
+  let apply_rule_side_effects static dynamic error bool dump_title rule_id
+      modified_sites =
     let parameters = get_parameter static in
     let error, list =
       Ckappa_sig.Rule_map_and_set.Map.find_default_without_logs
@@ -1300,7 +1401,8 @@ struct
         Remanent_parameters.update_prefix parameters "\t\t"
       in
       let dump_title () =
-        if local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameters
+        if local_trace ||
+           Remanent_parameters.get_dump_reachability_analysis_diff parameters
         then
           let () =
             Loggers.fprintf
@@ -1320,7 +1422,8 @@ struct
         (* deal with create a binding sites *)
         let error, bool, dynamic, precondition, modified_sites =
             apply_rule_created_bonds
-              static dynamic error false dump_title rule_id rule precondition modified_sites
+              static dynamic error false dump_title rule_id rule precondition
+              modified_sites
         in
         (*-----------------------------------------------------------*)
         (*new event*)
@@ -1330,20 +1433,24 @@ struct
       (*1.c a site is modified (explicitly) *)
       let error, bool, dynamic, precondition, modified_sites =
         apply_rule_modified_explicity
-          static dynamic error bool dump_title rule_id rule precondition modified_sites
+          static dynamic error bool dump_title rule_id rule precondition
+          modified_sites
       in
       (*-----------------------------------------------------------*)
       (*new event*)
       (*-----------------------------------------------------------*)
       (*1.d a site is modified by side effect *)
       let error, bool, dynamic, modified_sites = (*new event*)
-        apply_rule_side_effects static dynamic error bool dump_title rule_id modified_sites
+        apply_rule_side_effects static dynamic error bool dump_title rule_id
+          modified_sites
       in
       let () =
         if bool &&
-           (local_trace || Remanent_parameters.get_dump_reachability_analysis_diff parameters)
+           (local_trace ||
+            Remanent_parameters.get_dump_reachability_analysis_diff parameters)
         then
-          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+          let () = Loggers.print_newline
+              (Remanent_parameters.get_logger parameters) in
           Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
       let error, event_list =
@@ -1354,7 +1461,6 @@ struct
           modified_sites
           event_list
       in
-
       (*-----------------------------------------------------------*)
       error, dynamic, (precondition, event_list)
 

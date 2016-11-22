@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -29,6 +29,7 @@ type basic_static_information =
     store_potential_tuple_pair_lhs :
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
+    (**)
     store_potential_tuple_pair_rule_rhs :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -45,6 +46,7 @@ type basic_static_information =
     store_partition_created_bonds_map_2 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
+    (**)
     store_rule_partition_created_bonds_map_1 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -58,6 +60,7 @@ type basic_static_information =
     store_partition_modified_map_2 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.t;
+    (**)
     store_rule_partition_modified_map_1 :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;

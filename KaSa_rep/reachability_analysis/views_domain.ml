@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -364,7 +364,7 @@ struct
    tuples, and apply the function Common_static.add_dependency_site_rule to
    update the wake_up relation *)
   let complete_wake_up_relation static error wake_up =
-    (*let parameters = get_parameter static in
+    let parameters = get_parameter static in
     (*test and modify in a views*)
     let store_test_modif_map = get_test_modif_map static in
     (*CHECK ME*)
@@ -385,7 +385,7 @@ struct
                 error, wake_up
              ) rule_id_set (error, wake_up)
         ) store_test_modif_map (error, wake_up)
-    in*)
+    in
     error, wake_up
 
   (** get type bdu_analysis_static*)
@@ -492,7 +492,7 @@ struct
   (**************************************************************************)
 
   (*TO BE CHECKED*)
-  (*let discover_a_modify_sites parameters error covering_classes_modified_map
+  let discover_a_modify_sites parameters error covering_classes_modified_map
       store_list_of_site_type_in_covering_classes
       modified_sites =
     (*in a covering classes of modified site, return the list of list*)
@@ -512,8 +512,7 @@ struct
              Communication.add_site parameters error agent_type site
                modified_sites
            ) (error, modified_sites) list_of_site_type
-      ) covering_classes_modified_map (error, modified_sites)*)
-
+      ) covering_classes_modified_map (error, modified_sites)
 
 (*BUG to fix:  When a view is modified then any site in this view must be
   declared as modified *)
@@ -526,13 +525,13 @@ struct
       get_store_covering_classes_modification_update_full dynamic error
     in
     (*a list of site_type in a covering classes*)
-    (*let store_list_of_site_type_in_covering_classes =
+    let store_list_of_site_type_in_covering_classes =
       get_list_of_site_type_in_covering_classes static
     in
     (*TODO:the initialize set of modified sites*)
     let error, modified_sites =
       Communication.init_sites_working_list parameters error
-    in*)
+    in
     (*-----------------------------------------------------------------------*)
     (*REMOVE*)
     let error, s1 =
@@ -548,7 +547,7 @@ struct
     in
     (*-----------------------------------------------------------------------*)
     (*TODO:check the new event*)
-    (*let error, modified_sites =
+    let error, modified_sites =
       discover_a_modify_sites parameters error
         store_covering_classes_modification_update_full
         store_list_of_site_type_in_covering_classes
@@ -560,7 +559,7 @@ struct
         (fun _ error s _ event_list ->
            error, (Communication.Modified_sites s) :: event_list
         ) modified_sites event_list
-    in*)
+    in
     (*-----------------------------------------------------------------------*)
     (*print working list information*)
     let error =
