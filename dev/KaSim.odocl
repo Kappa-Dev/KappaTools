@@ -68,7 +68,8 @@ Usual_domains
 Rules_domain
 Views_domain
 Agents_domain
-Contact_map_domain
+Static_contact_map_domain
+Dynamic_contact_map_domain
 Parallel_bonds
 Site_accross_bonds_domain
 
