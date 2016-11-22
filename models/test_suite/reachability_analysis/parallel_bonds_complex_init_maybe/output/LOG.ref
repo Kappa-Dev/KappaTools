@@ -1063,30 +1063,19 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
+	Applying rule 0: r0:
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
+
 	Applying rule 3: r3:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
 
-<<<<<<< ceda90ccc5218209c25741dc723df142b9d507be
-	Applying rule 3: r3:
-=======
 		Updating the views for B(x~,z!,t!)
 
 	Applying rule 4: r4:
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
-
-		Updating the views for B(x~,z!,t!)
-
-	Applying rule 0: r0:
->>>>>>> making the contact map domain sound even without the view domain
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
-
-	Applying rule 2: r2:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
