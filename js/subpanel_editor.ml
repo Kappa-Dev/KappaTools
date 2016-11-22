@@ -120,7 +120,7 @@ let setup_lint codemirror update_linting =
       (fun (e : Ui_state.localized_errors option)->
          let () =
            match e with
-           | None -> ()
+           | None -> ignore (update_linting codemirror (error_lint []))
            | Some e ->
              let () =
                Common.debug (Js.string e.Ui_state.model_error_location) in
