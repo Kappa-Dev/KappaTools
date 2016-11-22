@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa ../dimmer.ka --verbosity-level-for-view-analysis Full --disable-every-domain --sites-accross-bonds-domain --output-directory output || exit 0
+"${KAPPABIN}"KaSa ../dimmer.ka  --disable-every-domain --sites-accross-bonds-domain --output-directory output || exit 0

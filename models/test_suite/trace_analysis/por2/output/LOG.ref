@@ -5,16 +5,6 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-				(rule 9: t-) should be investigated 
-				(rule 8: w-) should be investigated 
-				(rule 7: z-) should be investigated 
-				(rule 6: y-) should be investigated 
-				(rule 5: x-) should be investigated 
-				(rule 4: t+) should be investigated 
-				(rule 3: w+) should be investigated 
-				(rule 2: z+) should be investigated 
-				(rule 1: y+) should be investigated 
-				(rule 0: x+) should be investigated 
 
 ------------------------------------------------------------
 every rule may be applied
@@ -394,16 +384,6 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-				(rule 9: t-) should be investigated 
-				(rule 8: w-) should be investigated 
-				(rule 7: z-) should be investigated 
-				(rule 6: y-) should be investigated 
-				(rule 5: x-) should be investigated 
-				(rule 4: t+) should be investigated 
-				(rule 3: w+) should be investigated 
-				(rule 2: z+) should be investigated 
-				(rule 1: y+) should be investigated 
-				(rule 0: x+) should be investigated 
 
 ------------------------------------------------------------
 every rule may be applied

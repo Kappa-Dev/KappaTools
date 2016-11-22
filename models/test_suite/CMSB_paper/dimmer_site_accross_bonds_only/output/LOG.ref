@@ -5,21 +5,9 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-				(rule 1: E/R) should be investigated 
-				(rule 0: E.R) should be investigated 
 
-				(rule 6: obs) should be investigated 
-				(rule 5: R/int) should be investigated 
-				(rule 5: R/int) should be investigated 
-				(rule 4: R.int) should be investigated 
-				(rule 4: R.int) should be investigated 
-				(rule 3: R/R) should be investigated 
-				(rule 3: R/R) should be investigated 
-				(rule 2: R.R) should be investigated 
-				(rule 2: R.R) should be investigated 
-				(rule 1: E/R) should be investigated 
-				(rule 0: E.R) should be investigated 
 
+<<<<<<< ceda90ccc5218209c25741dc723df142b9d507be
 
 	Applying rule 1: E/R:
 		the precondition is not satisfied yet
@@ -151,11 +139,10 @@ Reachability analysis...
 
 ------------------------------------------------------------
 * There are some non applyable rules
+=======
+>>>>>>> making the contact map domain sound even without the view domain
 ------------------------------------------------------------
-rule 1: E/R will never be applied.
-rule 3: R/R will never be applied.
-rule 4: R.int will never be applied.
-rule 5: R/int will never be applied.
+every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
 ------------------------------------------------------------

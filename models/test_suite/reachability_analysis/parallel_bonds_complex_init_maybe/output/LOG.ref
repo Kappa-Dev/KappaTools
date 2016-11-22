@@ -460,12 +460,6 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p)->A(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
-				(rule 6: r6) should be investigated 
-				(rule 5: r5) should be investigated 
-				(rule 4: r4) should be investigated 
-				(rule 3: r3) should be investigated 
-				(rule 2: r2) should be investigated 
-				(rule 0: r0) should be investigated 
 
 	Views in initial state:
 
@@ -507,12 +501,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,z!free,t!free)
 
 		Wake-up rules:
-				(rule 7: r7) should be investigated 
-				(rule 5: r5) should be investigated 
-				(rule 4: r4) should be investigated 
-				(rule 3: r3) should be investigated 
-				(rule 2: r2) should be investigated 
-				(rule 1: r1) should be investigated 
 
 	Views in initial state:
 
@@ -981,12 +969,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=99
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=98
+  Id=99
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1037,12 +1025,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=99
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=98
+  Id=99
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1075,19 +1063,30 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
-	Applying rule 0: r0:
+	Applying rule 3: r3:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
 
+<<<<<<< ceda90ccc5218209c25741dc723df142b9d507be
 	Applying rule 3: r3:
+=======
+		Updating the views for B(x~,z!,t!)
+
+	Applying rule 4: r4:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
 
 		Updating the views for B(x~,z!,t!)
 
-	Applying rule 4: r4:
+	Applying rule 0: r0:
+>>>>>>> making the contact map domain sound even without the view domain
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
+
+	Applying rule 2: r2:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
@@ -1131,7 +1130,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=97
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1165,7 +1164,7 @@ Id=97
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=97
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1412,11 +1411,6 @@ A(z!1),B(z!1) =>
 		  A(t!B.t,z!1),B(t!A.t,z!1)
 		v A(t,z!1),B(t,z!1)
 	]
-A(t!1),B(t!1) => 
-	[
-		  A(t!1,z!B.z),B(t!1,z!A.z)
-		v A(t!1,z),B(t!1,z)
-	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
@@ -1616,9 +1610,6 @@ A(z!1),B(z!1)=> [
 A(z!1),B(z!1)=> [
 		  A(t!B.t,z!1),B(t!A.t,z!1)
 		v A(t,z!1),B(t,z!1)]
-A(t!1),B(t!1)=> [
-		  A(t!1,z!B.z),B(t!1,z!A.z)
-		v A(t!1,z),B(t!1,z)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

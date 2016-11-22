@@ -433,16 +433,6 @@ Influence_map:Inhibition_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(7):'' A(z
 Influence_map:Inhibition_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
 Influence_map:Inhibition_map:rule(8):'' A(a~p)->A(a~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
 Reachability analysis...
-				(rule 10) should be investigated 
-				(rule 9) should be investigated 
-				(rule 8) should be investigated 
-				(rule 7) should be investigated 
-				(rule 6) should be investigated 
-				(rule 5) should be investigated 
-				(rule 4) should be investigated 
-				(rule 3) should be investigated 
-				(rule 2) should be investigated 
-				(rule 1) should be investigated 
 
 	Views in initial state:
 

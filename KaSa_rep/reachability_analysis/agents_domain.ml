@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Abstract domain to record live rules
    *
@@ -326,29 +326,35 @@ struct
         | error, Some l -> error, l
       in
       let error =
-        List.fold_left  (fun error rule_id ->
-            let compiled = get_compil static in
-            let error, rule_id_string =
-              try
-                Handler.string_of_rule parameters error kappa_handler
-                  compiled rule_id
-              with
-              | _ ->
-                Exception.warn
-                  parameters error __POS__ Exit
-                  (Ckappa_sig.string_of_rule_id rule_id)
-            in
-            let title = "" in
-            let tab =
-              if title = "" then "\t\t\t\t" else "\t\t\t"
-            in
-            let () =
-              Loggers.fprintf log "%s%s(%s) should be investigated "
-                (Remanent_parameters.get_prefix parameters) tab
-                rule_id_string
-            in
-            let () = Loggers.print_newline log in error)
-          error rule_id_list
+        if local_trace
+        || Remanent_parameters.get_dump_reachability_analysis_wl parameters
+        then
+          List.fold_left
+            (fun error rule_id ->
+              let compiled = get_compil static in
+              let error, rule_id_string =
+                try
+                  Handler.string_of_rule parameters error kappa_handler
+                    compiled rule_id
+                with
+                | _ ->
+                  Exception.warn
+                    parameters error __POS__ Exit
+                    (Ckappa_sig.string_of_rule_id rule_id)
+              in
+              let title = "" in
+              let tab =
+                if title = "" then "\t\t\t\t" else "\t\t\t"
+              in
+              let () =
+                Loggers.fprintf log "%s%s(%s) should be investigated "
+                  (Remanent_parameters.get_prefix parameters) tab
+                  rule_id_string
+              in
+              let () = Loggers.print_newline log in error)
+            error rule_id_list
+        else
+          error
       in
       let () = Loggers.print_newline log in
       let event_list =

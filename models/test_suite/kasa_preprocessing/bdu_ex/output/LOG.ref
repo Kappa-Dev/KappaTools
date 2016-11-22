@@ -191,10 +191,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: create is applied for the first time
-				(rule 3: bind) should be investigated 
-				(rule 3: bind) should be investigated 
-				(rule 2: y) should be investigated 
-				(rule 1: x) should be investigated 
 
 	Dealing with creation
 

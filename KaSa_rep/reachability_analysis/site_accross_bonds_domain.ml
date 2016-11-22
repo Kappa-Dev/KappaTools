@@ -916,17 +916,17 @@ struct
                 (*-----------------------------------------------------------*)
                 let error, bool, dynamic, precondition, modified_sites =
                   match state'_list_x, state'_list_y with
-                  | _::_::_, _::_::_ ->
+                  (*  | _::_::_, _::_::_ ->
                   (*we know for sure that none of the two sites have been
                       modified*)
-                    error, bool, dynamic, precondition, modified_sites
+                      error, bool, dynamic, precondition, modified_sites*)
                   | [], _ | _, [] ->
                     let error, () =
                       Exception.warn parameters error __POS__
                         ~message: "empty list in potential states in post condition" Exit ()
                     in
                     error, bool, dynamic, precondition, modified_sites
-                  | [_], _ | _, [_] -> (*general case*)
+                  | _::_ , _::_  -> (*general case*)
                     List.fold_left
                       (fun (error, bool, dynamic, precondition, modified_sites) state'_x ->
                          List.fold_left

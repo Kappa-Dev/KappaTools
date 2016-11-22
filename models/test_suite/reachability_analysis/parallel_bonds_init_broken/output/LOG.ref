@@ -171,8 +171,6 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'' A(t!_)->A(t) -> rule(1):'' A(t),B(t)->A(t!1),B(t!1)[0*->1];[0->0]
 Influence_map:Wake_up_map:rule(1):'' A(t),B(t)->A(t!1),B(t!1) -> rule(0):'' A(t!_)->A(t)[0->0]
 Reachability analysis...
-				(rule 1) should be investigated 
-				(rule 0) should be investigated 
 
 	Views in initial state:
 
@@ -214,7 +212,6 @@ EXTENSIONAL DESCRIPTION:
 		A(z!free)
 
 		Wake-up rules:
-				(rule 1) should be investigated 
 
 	Views in initial state:
 

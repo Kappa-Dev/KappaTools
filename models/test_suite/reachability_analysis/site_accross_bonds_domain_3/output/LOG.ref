@@ -765,14 +765,8 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-				(rule 4) should be investigated 
-				(rule 2) should be investigated 
-				(rule 1) should be investigated 
-				(rule 1) should be investigated 
 
-				(rule 1) should be investigated 
 
-				(rule 1) should be investigated 
 
 	Dealing with creation
 
@@ -860,7 +854,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 1 is applied for the first time
-				(rule 4) should be investigated 
 
 
 		Updating the views for C(x!)
@@ -956,9 +949,7 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		rule 3 is applied for the first time
-				(rule 4) should be investigated 
 
-				(rule 4) should be investigated 
 
 	Dealing with creation
 

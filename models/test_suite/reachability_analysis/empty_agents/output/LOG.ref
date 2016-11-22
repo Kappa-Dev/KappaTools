@@ -182,21 +182,18 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-				(rule 1) should be investigated 
 
 
 	Applying rule 1:
 		the precondition is satisfied
 
 		rule 1 is applied for the first time
-				(rule 2) should be investigated 
 
 
 	Applying rule 2:
 		the precondition is satisfied
 
 		rule 2 is applied for the first time
-				(rule 3) should be investigated 
 
 
 	Applying rule 3:

@@ -21,8 +21,9 @@ struct
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      bonds_to_rules: unit ; (* TO DO *)
-    }
+      bonds_to_rules:
+        Ckappa_sig.Rule_map_and_set.Set.t
+          Ckappa_sig.PairAgentSiteState_map_and_set.Map.t  }
 
   type local_dynamic_information =
     {
@@ -56,18 +57,12 @@ struct
 
   let get_bond_lhs static = lift Analyzer_headers.get_bonds_lhs static
 
-  let set_bond_rhs bonds static =
+  let get_bounds_to_rule static = static.bonds_to_rules
+  let set_bounds_to_rule map static =
     {
-      global_static_information = Analyzer_headers.set_bonds_rhs bonds static;
-      bonds_to_rules = () (* TO DO *)
+      static with
+      bonds_to_rules = map
     }
-
-  let set_bond_lhs bonds static =
-    {
-      global_static_information = Analyzer_headers.set_bonds_lhs bonds static;
-      bonds_to_rules = () (* TODO *)
-    }
-
   (*--------------------------------------------------------------------*)
   (** dynamic information*)
 
@@ -106,13 +101,27 @@ struct
   (**************************************************************************)
   (*implementations*)
 
-  let initialize static dynamic error =
-    let init_global_static_information =
-      {
-        global_static_information = static;
-        bonds_to_rules = () (* TO DO *)
-      }
+  let add_oriented_relation parameter error r_id site1 site2 map =
+    let error, old_set =
+      match
+        Ckappa_sig.PairAgentSiteState_map_and_set.Map.find_option_without_logs
+          parameter error (site1,site2) map
+      with
+      | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+      | error, Some s -> error, s
     in
+    let error, new_set =
+      Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
+        parameter error r_id old_set
+    in
+    Ckappa_sig.PairAgentSiteState_map_and_set.Map.add_or_overwrite
+      parameter error (site1,site2) new_set map
+
+  let add_relation parameter error r_id site1 site2 map =
+    let error, map = add_oriented_relation parameter error r_id site1 site2 map in
+    add_oriented_relation parameter error r_id site2 site1 map
+
+  let initialize static dynamic error =
     let init_local =
       {
         contact_map_dynamic = Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty;
@@ -123,6 +132,26 @@ struct
       {
         local  = init_local;
         global = dynamic
+      }
+    in
+    let parameter = Analyzer_headers.get_parameter static in
+    let bonds_lhs = Analyzer_headers.get_bonds_lhs static in
+    let bonds_to_rules = Ckappa_sig.PairAgentSiteState_map_and_set.Map.empty in
+    let p (_,a,b,c) = (a,b,c) in
+    let error, bonds_to_rules =
+      Ckappa_sig.Rule_map_and_set.Map.fold
+        (fun r_id set (error,bonds_to_rules) ->
+           Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
+             (fun (site1,site2) (error,bonds_to_rules) ->
+                add_relation
+                  parameter error r_id (p site1) (p site2) bonds_to_rules
+             ) set (error,bonds_to_rules))
+        bonds_lhs (error,bonds_to_rules)
+    in
+    let init_global_static_information =
+      {
+        global_static_information = static;
+        bonds_to_rules = bonds_to_rules;
       }
     in
     error, init_global_static_information, init_global_dynamic_information
@@ -258,14 +287,82 @@ struct
 
   (**************************************************************************)
 
+  let collect_events static error map_diff event_list =
+    let bonds_to_rules = get_bounds_to_rule static in
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
+      (fun pair (error,event_list) ->
+         let error, event_list =
+           match
+             Ckappa_sig.PairAgentSiteState_map_and_set.Map.find_option_without_logs
+               parameter error pair bonds_to_rules
+           with error, None ->
+             error, event_list
+              | error, Some r_set ->
+                let error =
+                  if local_trace
+                  || Remanent_parameters.get_dump_reachability_analysis_wl parameter
+                  then
+                    begin
+                      let log = Remanent_parameters.get_logger parameter in
+                      (*---------------------------------------------------------------*)
+                      let error =
+                        Ckappa_sig.Rule_map_and_set.Set.fold
+                          (fun rule_id error ->
+                            let compiled = get_compil static in
+                            let error, rule_id_string =
+                              try
+                                Handler.string_of_rule parameter error kappa_handler
+                                  compiled rule_id
+                              with
+                              | _ ->
+                                Exception.warn
+                                  parameter error __POS__ Exit
+                                  (Ckappa_sig.string_of_rule_id rule_id)
+                            in
+                            let title = "" in
+                            let tab =
+                              if title = "" then "\t\t\t\t" else "\t\t\t"
+                            in
+                            let () =
+                              Loggers.fprintf log "%s%s(%s) should be investigated "
+                                (Remanent_parameters.get_prefix parameter) tab
+                                rule_id_string
+                            in
+                            let () = Loggers.print_newline log in error)
+                          r_set error
+                      in
+                      let () = Loggers.print_newline log in
+                      error
+                    end
+                  else
+                    error
+                in
+                error,
+                Ckappa_sig.Rule_map_and_set.Set.fold
+                  (fun r_id event_list ->
+                     (Communication.Check_rule r_id) :: event_list)
+                  r_set event_list
+         in
+         error,(Communication.See_a_new_bond pair) :: event_list)
+      map_diff (error, event_list)
+
   let add_initial_state static dynamic error species =
-    let event_list = [] in
+    let parameter = get_parameter static in
+    let set_before = get_contact_map_dynamic dynamic in
     let error, dynamic =
       collect_bonds_initial
         static
         dynamic
         error
         species
+    in
+    let set_after = get_contact_map_dynamic dynamic in
+    let error, set_diff = Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff
+        parameter error set_after set_before in
+    let error, event_list =
+      collect_events static error set_diff []
     in
     error, dynamic, event_list
 
@@ -389,7 +486,8 @@ struct
       | error, Some s -> error, s
     in
     let error, bond_rhs_set =
-      proj_bonds_aux parameters error bond_rhs_set in
+      proj_bonds_aux parameters error bond_rhs_set
+    in
     let error', union =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.union
         parameters error contact_map bond_rhs_set
@@ -417,11 +515,8 @@ struct
     in
     (*check if it is seen for the first time, if not update the contact
       map, and raise an event*)
-    let event_list =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
-        (fun pair event_list ->
-          (Communication.See_a_new_bond pair) :: event_list
-        ) map_diff event_list
+    let error, event_list =
+      collect_events static error map_diff event_list
     in
     error, dynamic, (precondition, event_list)
 

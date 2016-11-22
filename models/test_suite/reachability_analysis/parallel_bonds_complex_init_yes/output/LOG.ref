@@ -477,12 +477,6 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p,z)->A(x~u,z) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
-				(rule 6: r6) should be investigated 
-				(rule 5: r5) should be investigated 
-				(rule 4: r4) should be investigated 
-				(rule 3: r3) should be investigated 
-				(rule 2: r2) should be investigated 
-				(rule 0: r0) should be investigated 
 
 	Views in initial state:
 
@@ -524,12 +518,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,z!free,t!free)
 
 		Wake-up rules:
-				(rule 7: r7) should be investigated 
-				(rule 5: r5) should be investigated 
-				(rule 4: r4) should be investigated 
-				(rule 3: r3) should be investigated 
-				(rule 2: r2) should be investigated 
-				(rule 1: r1) should be investigated 
 
 	Views in initial state:
 
@@ -1046,12 +1034,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=99
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=98
+  Id=99
    Node(site_type:1<1)
     Id=23
      Node(site_type:2<1)
@@ -1228,7 +1216,7 @@ Id=78
        Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=97
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1273,12 +1261,12 @@ Id=111
 
   Id=110
    Node(site_type:0<1)
-    Id=91
+    Id=94
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=90
+      Id=93
        Node(site_type:1<1)
         Id=69
          Node(site_type:2<0)
@@ -1313,7 +1301,7 @@ Id=111
 
     Id=109
      Node(site_type:0<2)
-      Id=100
+      Id=90
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1500,12 +1488,6 @@ B() => [ B(x~u) v B(x~p) ]
 ------------------------------------------------------------
 A(z!1),B(z!1) => 
 	[
-		  A(x~p,z!1),B(x~u,z!1)
-		v A(x~p,z!1),B(x~p,z!1)
-		v A(x~u,z!1),B(x~u,z!1)
-	]
-A(z!1),B(z!1) => 
-	[
 		  A(x~p,z!1),B(t,z!1)
 		v A(x~p,z!1),B(t!A.t,z!1)
 		v A(x~u,z!1),B(t!A.t,z!1)
@@ -1540,12 +1522,12 @@ Id=111
 
   Id=110
    Node(site_type:0<1)
-    Id=91
+    Id=94
      Node(site_type:1<0)
       Id=0
        Leaf False 
 
-      Id=90
+      Id=93
        Node(site_type:1<1)
         Id=69
          Node(site_type:2<0)
@@ -1580,7 +1562,7 @@ Id=111
 
     Id=109
      Node(site_type:0<2)
-      Id=100
+      Id=90
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1745,10 +1727,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z!1),B(z!1)=> [
-		  A(x~p,z!1),B(x~u,z!1)
-		v A(x~p,z!1),B(x~p,z!1)
-		v A(x~u,z!1),B(x~u,z!1)]
 A(z!1),B(z!1)=> [
 		  A(x~p,z!1),B(t,z!1)
 		v A(x~p,z!1),B(t!A.t,z!1)

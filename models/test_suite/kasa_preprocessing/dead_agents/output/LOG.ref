@@ -415,10 +415,6 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(3):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Reachability analysis...
-				(rule 5) should be investigated 
-				(rule 4) should be investigated 
-				(rule 3) should be investigated 
-				(rule 0) should be investigated 
 
 	Views in initial state:
 
@@ -450,9 +446,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,x!free)
 
 		Wake-up rules:
-				(rule 2) should be investigated 
-				(rule 1) should be investigated 
-				(rule 0) should be investigated 
 
 	Views in initial state:
 
