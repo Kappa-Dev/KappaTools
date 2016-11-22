@@ -1,1 +1,1093 @@
 Warning: Environment.to_json is partial
+**BLACKBOARD**
+104 wires, 55 events
+*wires:*
+0
+*wires 0: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Present)  * 2:
+?(test:Present/eid:1/action:)  * 3:
+test:/eid:-1/action:  
+1
+*wires 1: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Free)  * 2:
+?(test:Free/eid:1/action:)  * 3:
+test:/eid:-1/action:  
+2
+*wires 2: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Present)  * 2:
+?(test:Present/eid:4/action:)  * 3:
+test:/eid:-1/action:  
+3
+*wires 3: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Free)  * 2:
+?(test:Free/eid:4/action:)  * 3:
+test:/eid:-1/action:  
+4
+*wires 4: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:1/action:Undefined)  * 2:
+test:/eid:-1/action:  
+5
+*wires 5: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:1/action:Undefined)  * 2:
+test:/eid:-1/action:  
+6
+*wires 6: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+7
+*wires 7: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:3/action:)  * 2:
+test:/eid:-1/action:  
+8
+*wires 8: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:2/action:Counter 0)  * 2:
+?(test:Counter 1/eid:3/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+9
+*wires 9: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:3/action:Undefined)  * 2:
+test:/eid:-1/action:  
+10
+*wires 10: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:3/action:Undefined)  * 2:
+test:/eid:-1/action:  
+11
+*wires 11: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:4/action:Undefined)  * 2:
+test:/eid:-1/action:  
+12
+*wires 12: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:4/action:Undefined)  * 2:
+test:/eid:-1/action:  
+13
+*wires 13: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+14
+*wires 14: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:6/action:)  * 2:
+test:/eid:-1/action:  
+15
+*wires 15: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:5/action:Counter 0)  * 2:
+?(test:Counter 1/eid:6/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+16
+*wires 16: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:6/action:Undefined)  * 2:
+test:/eid:-1/action:  
+17
+*wires 17: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:6/action:Undefined)  * 2:
+test:/eid:-1/action:  
+18
+*wires 18: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+19
+*wires 19: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:8/action:)  * 2:
+test:/eid:-1/action:  
+20
+*wires 20: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:7/action:Counter 0)  * 2:
+?(test:Counter 1/eid:8/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+21
+*wires 21: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:8/action:Undefined)  * 2:
+test:/eid:-1/action:  
+22
+*wires 22: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:8/action:Undefined)  * 2:
+test:/eid:-1/action:  
+23
+*wires 23: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+24
+*wires 24: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:10/action:)  * 2:
+test:/eid:-1/action:  
+25
+*wires 25: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:9/action:Counter 0)  * 2:
+?(test:Counter 1/eid:10/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+26
+*wires 26: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:10/action:Undefined)  * 2:
+test:/eid:-1/action:  
+27
+*wires 27: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:10/action:Undefined)  * 2:
+test:/eid:-1/action:  
+28
+*wires 28: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:11/action:)  * 2:
+?(test:Present/eid:12/action:)  * 3:
+?(test:Present/eid:13/action:)  * 4:
+?(test:Present/eid:17/action:)  * 5:
+test:/eid:-1/action:  
+29
+*wires 29: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Free/eid:11/action:Bound(31,1(1)@0))  * 2:
+?(test:Bound(31,1(1)@0)/eid:12/action:)  * 3:
+?(test:Bound(31,1(1)@0)/eid:13/action:Free)  * 4:
+?(test:Bound(31,1(1)@0)/eid:15/action:)  * 5:
+?(test:Free/eid:16/action:)  * 6:
+?(test:Bound(31,1(1)@0)/eid:19/action:Free)  * 7:
+test:/eid:-1/action:  
+30
+*wires 30: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:11/action:)  * 2:
+?(test:Present/eid:12/action:)  * 3:
+?(test:Present/eid:13/action:)  * 4:
+?(test:Present/eid:21/action:)  * 5:
+test:/eid:-1/action:  
+31
+*wires 31: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Free/eid:11/action:Bound(29,0(0)@0))  * 2:
+?(test:Bound(29,0(0)@0)/eid:12/action:)  * 3:
+?(test:Bound(29,0(0)@0)/eid:13/action:Free)  * 4:
+?(test:Bound(29,0(0)@0)/eid:15/action:Free)  * 5:
+?(test:Bound(29,0(0)@0)/eid:19/action:)  * 6:
+?(test:Free/eid:20/action:)  * 7:
+test:/eid:-1/action:  
+32
+*wires 32: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:14/action:Counter 0)  * 2:
+?(test:Counter 0/eid:15/action:Counter 1)  * 3:
+?(test:Counter 0/eid:16/action:Counter 1)  * 4:
+?(test:Counter 1/eid:17/action:Undefined)  * 5:
+?(test:Undefined/eid:54/action:)  * 6:
+test:/eid:-1/action:  
+33
+*wires 33: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:17/action:Undefined)  * 2:
+test:/eid:-1/action:  
+34
+*wires 34: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:17/action:Undefined)  * 2:
+test:/eid:-1/action:  
+35
+*wires 35: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:18/action:Counter 0)  * 2:
+?(test:Counter 0/eid:19/action:Counter 1)  * 3:
+?(test:Counter 0/eid:20/action:Counter 1)  * 4:
+?(test:Counter 1/eid:21/action:Undefined)  * 5:
+?(test:Undefined/eid:54/action:)  * 6:
+test:/eid:-1/action:  
+36
+*wires 36: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:21/action:Undefined)  * 2:
+test:/eid:-1/action:  
+37
+*wires 37: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:21/action:Undefined)  * 2:
+test:/eid:-1/action:  
+38
+*wires 38: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+39
+*wires 39: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:23/action:)  * 2:
+test:/eid:-1/action:  
+40
+*wires 40: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:22/action:Counter 0)  * 2:
+?(test:Counter 1/eid:23/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+41
+*wires 41: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:23/action:Undefined)  * 2:
+test:/eid:-1/action:  
+42
+*wires 42: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:23/action:Undefined)  * 2:
+test:/eid:-1/action:  
+43
+*wires 43: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+44
+*wires 44: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:25/action:)  * 2:
+test:/eid:-1/action:  
+45
+*wires 45: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:24/action:Counter 0)  * 2:
+?(test:Counter 1/eid:25/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+46
+*wires 46: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:25/action:Undefined)  * 2:
+test:/eid:-1/action:  
+47
+*wires 47: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:25/action:Undefined)  * 2:
+test:/eid:-1/action:  
+48
+*wires 48: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+49
+*wires 49: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:27/action:)  * 2:
+test:/eid:-1/action:  
+50
+*wires 50: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:26/action:Counter 0)  * 2:
+?(test:Counter 1/eid:27/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+51
+*wires 51: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:27/action:Undefined)  * 2:
+test:/eid:-1/action:  
+52
+*wires 52: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:27/action:Undefined)  * 2:
+test:/eid:-1/action:  
+53
+*wires 53: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+54
+*wires 54: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:29/action:)  * 2:
+test:/eid:-1/action:  
+55
+*wires 55: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:28/action:Counter 0)  * 2:
+?(test:Counter 1/eid:29/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+56
+*wires 56: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:29/action:Undefined)  * 2:
+test:/eid:-1/action:  
+57
+*wires 57: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:29/action:Undefined)  * 2:
+test:/eid:-1/action:  
+58
+*wires 58: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+59
+*wires 59: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:31/action:)  * 2:
+test:/eid:-1/action:  
+60
+*wires 60: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:30/action:Counter 0)  * 2:
+?(test:Counter 1/eid:31/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+61
+*wires 61: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:31/action:Undefined)  * 2:
+test:/eid:-1/action:  
+62
+*wires 62: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:31/action:Undefined)  * 2:
+test:/eid:-1/action:  
+63
+*wires 63: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+64
+*wires 64: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:33/action:)  * 2:
+test:/eid:-1/action:  
+65
+*wires 65: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:32/action:Counter 0)  * 2:
+?(test:Counter 1/eid:33/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+66
+*wires 66: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:33/action:Undefined)  * 2:
+test:/eid:-1/action:  
+67
+*wires 67: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:33/action:Undefined)  * 2:
+test:/eid:-1/action:  
+68
+*wires 68: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+69
+*wires 69: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:35/action:)  * 2:
+test:/eid:-1/action:  
+70
+*wires 70: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:34/action:Counter 0)  * 2:
+?(test:Counter 1/eid:35/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+71
+*wires 71: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:35/action:Undefined)  * 2:
+test:/eid:-1/action:  
+72
+*wires 72: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:35/action:Undefined)  * 2:
+test:/eid:-1/action:  
+73
+*wires 73: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+74
+*wires 74: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:37/action:)  * 2:
+test:/eid:-1/action:  
+75
+*wires 75: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:36/action:Counter 0)  * 2:
+?(test:Counter 1/eid:37/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+76
+*wires 76: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:37/action:Undefined)  * 2:
+test:/eid:-1/action:  
+77
+*wires 77: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:37/action:Undefined)  * 2:
+test:/eid:-1/action:  
+78
+*wires 78: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+79
+*wires 79: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:39/action:)  * 2:
+test:/eid:-1/action:  
+80
+*wires 80: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:38/action:Counter 0)  * 2:
+?(test:Counter 1/eid:39/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+81
+*wires 81: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:39/action:Undefined)  * 2:
+test:/eid:-1/action:  
+82
+*wires 82: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:39/action:Undefined)  * 2:
+test:/eid:-1/action:  
+83
+*wires 83: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+84
+*wires 84: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:41/action:)  * 2:
+test:/eid:-1/action:  
+85
+*wires 85: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:40/action:Counter 0)  * 2:
+?(test:Counter 1/eid:41/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+86
+*wires 86: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:41/action:Undefined)  * 2:
+test:/eid:-1/action:  
+87
+*wires 87: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:41/action:Undefined)  * 2:
+test:/eid:-1/action:  
+88
+*wires 88: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:42/action:)  * 2:
+?(test:Present/eid:43/action:)  * 3:
+?(test:Present/eid:47/action:)  * 4:
+?(test:Present/eid:48/action:)  * 5:
+?(test:Present/eid:53/action:)  * 6:
+test:/eid:-1/action:  
+89
+*wires 89: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Free/eid:42/action:Bound(91,0(1)@0))  * 2:
+?(test:Bound(91,0(1)@0)/eid:43/action:)  * 3:
+?(test:Bound(91,0(1)@0)/eid:44/action:Free)  * 4:
+?(test:Free/eid:47/action:Bound(100,0(1)@0))  * 5:
+?(test:Bound(100,0(1)@0)/eid:48/action:)  * 6:
+?(test:Bound(100,0(1)@0)/eid:50/action:)  * 7:
+?(test:Bound(91,0(1)@0)/eid:51/action:)  * 8:
+?(test:Free/eid:52/action:)  * 9:
+test:/eid:-1/action:  
+90
+*wires 90: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:42/action:)  * 2:
+?(test:Present/eid:43/action:)  * 3:
+?(test:Present/eid:44/action:)  * 4:
+test:/eid:-1/action:  
+91
+*wires 91: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Free/eid:42/action:Bound(89,1(0)@0))  * 2:
+?(test:Bound(89,1(0)@0)/eid:43/action:)  * 3:
+?(test:Bound(89,1(0)@0)/eid:44/action:)  * 4:
+?(test:Bound(89,1(0)@0)/eid:51/action:Free)  * 5:
+test:/eid:-1/action:  
+92
+*wires 92: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:44/action:Undefined)  * 2:
+test:/eid:-1/action:  
+93
+*wires 93: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:44/action:Undefined)  * 2:
+test:/eid:-1/action:  
+94
+*wires 94: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+test:/eid:-1/action:  
+95
+*wires 95: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:46/action:)  * 2:
+test:/eid:-1/action:  
+96
+*wires 96: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:45/action:Counter 0)  * 2:
+?(test:Counter 1/eid:46/action:Undefined)  * 3:
+?(test:Undefined/eid:54/action:)  * 4:
+test:/eid:-1/action:  
+97
+*wires 97: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:46/action:Undefined)  * 2:
+test:/eid:-1/action:  
+98
+*wires 98: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:46/action:Undefined)  * 2:
+test:/eid:-1/action:  
+99
+*wires 99: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Present/eid:47/action:)  * 2:
+?(test:Present/eid:48/action:)  * 3:
+test:/eid:-1/action:  
+100
+*wires 100: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Free/eid:47/action:Bound(89,1(0)@0))  * 2:
+?(test:Bound(89,1(0)@0)/eid:48/action:)  * 3:
+?(test:Bound(89,1(0)@0)/eid:50/action:Free)  * 4:
+test:/eid:-1/action:  
+101
+*wires 101: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:49/action:Counter 0)  * 2:
+?(test:Counter 0/eid:50/action:Counter 1)  * 3:
+?(test:Counter 0/eid:51/action:Counter 1)  * 4:
+?(test:Counter 0/eid:52/action:Counter 1)  * 5:
+?(test:Counter 1/eid:53/action:Undefined)  * 6:
+?(test:Undefined/eid:54/action:)  * 7:
+test:/eid:-1/action:  
+102
+*wires 102: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:53/action:Undefined)  * 2:
+test:/eid:-1/action:  
+103
+*wires 103: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:53/action:Undefined)  * 2:
+test:/eid:-1/action:  
+*stacks*
+
+*selected_events*
+*unsolved_events*
+ 55
+*weight of predicate_id*
+ 0:2
+ 1:2
+ 2:2
+ 3:2
+ 4:1
+ 5:1
+ 6:0
+ 7:1
+ 8:3
+ 9:1
+ 10:1
+ 11:1
+ 12:1
+ 13:0
+ 14:1
+ 15:3
+ 16:1
+ 17:1
+ 18:0
+ 19:1
+ 20:3
+ 21:1
+ 22:1
+ 23:0
+ 24:1
+ 25:3
+ 26:1
+ 27:1
+ 28:4
+ 29:6
+ 30:4
+ 31:6
+ 32:5
+ 33:1
+ 34:1
+ 35:5
+ 36:1
+ 37:1
+ 38:0
+ 39:1
+ 40:3
+ 41:1
+ 42:1
+ 43:0
+ 44:1
+ 45:3
+ 46:1
+ 47:1
+ 48:0
+ 49:1
+ 50:3
+ 51:1
+ 52:1
+ 53:0
+ 54:1
+ 55:3
+ 56:1
+ 57:1
+ 58:0
+ 59:1
+ 60:3
+ 61:1
+ 62:1
+ 63:0
+ 64:1
+ 65:3
+ 66:1
+ 67:1
+ 68:0
+ 69:1
+ 70:3
+ 71:1
+ 72:1
+ 73:0
+ 74:1
+ 75:3
+ 76:1
+ 77:1
+ 78:0
+ 79:1
+ 80:3
+ 81:1
+ 82:1
+ 83:0
+ 84:1
+ 85:3
+ 86:1
+ 87:1
+ 88:5
+ 89:8
+ 90:3
+ 91:4
+ 92:1
+ 93:1
+ 94:0
+ 95:1
+ 96:3
+ 97:1
+ 98:1
+ 99:2
+ 100:3
+ 101:6
+ 102:1
+ 103:1
+ 104:0
+ 105:0
+ 106:0
+ 107:0
+ 108:0
+ 109:0
+ 110:0
+ 111:0
+ 112:0
+ 113:0
+ 114:0
+ 115:0
+ 116:0
+ 117:0
+ 118:0
+ 119:0
+ 120:0
+ 121:0
+ 122:0
+ 123:0
+ 124:0
+ 125:0
+ 126:0
+ 127:0
+*weight of predicate_id_by_level* Level:highest
+ 0:1
+ 1:1
+ 2:1
+ 3:1
+ 4:1
+ 5:1
+ 6:0
+ 7:1
+ 8:1
+ 9:1
+ 10:1
+ 11:1
+ 12:1
+ 13:0
+ 14:1
+ 15:1
+ 16:1
+ 17:1
+ 18:0
+ 19:1
+ 20:1
+ 21:1
+ 22:1
+ 23:0
+ 24:1
+ 25:1
+ 26:1
+ 27:1
+ 28:4
+ 29:3
+ 30:4
+ 31:3
+ 32:1
+ 33:1
+ 34:1
+ 35:1
+ 36:1
+ 37:1
+ 38:0
+ 39:1
+ 40:1
+ 41:1
+ 42:1
+ 43:0
+ 44:1
+ 45:1
+ 46:1
+ 47:1
+ 48:0
+ 49:1
+ 50:1
+ 51:1
+ 52:1
+ 53:0
+ 54:1
+ 55:1
+ 56:1
+ 57:1
+ 58:0
+ 59:1
+ 60:1
+ 61:1
+ 62:1
+ 63:0
+ 64:1
+ 65:1
+ 66:1
+ 67:1
+ 68:0
+ 69:1
+ 70:1
+ 71:1
+ 72:1
+ 73:0
+ 74:1
+ 75:1
+ 76:1
+ 77:1
+ 78:0
+ 79:1
+ 80:1
+ 81:1
+ 82:1
+ 83:0
+ 84:1
+ 85:1
+ 86:1
+ 87:1
+ 88:5
+ 89:5
+ 90:3
+ 91:3
+ 92:1
+ 93:1
+ 94:0
+ 95:1
+ 96:1
+ 97:1
+ 98:1
+ 99:2
+ 100:2
+ 101:1
+ 102:1
+ 103:1
+ 104:0
+ 105:0
+ 106:0
+ 107:0
+ 108:0
+ 109:0
+ 110:0
+ 111:0
+ 112:0
+ 113:0
+ 114:0
+ 115:0
+ 116:0
+ 117:0
+ 118:0
+ 119:0
+ 120:0
+ 121:0
+ 122:0
+ 123:0
+ 124:0
+ 125:0
+ 126:0
+ 127:0
+ Level:high
+ 0:1
+ 1:1
+ 2:1
+ 3:1
+ 4:0
+ 5:0
+ 6:0
+ 7:0
+ 8:2
+ 9:0
+ 10:0
+ 11:0
+ 12:0
+ 13:0
+ 14:0
+ 15:2
+ 16:0
+ 17:0
+ 18:0
+ 19:0
+ 20:2
+ 21:0
+ 22:0
+ 23:0
+ 24:0
+ 25:2
+ 26:0
+ 27:0
+ 28:0
+ 29:3
+ 30:0
+ 31:3
+ 32:4
+ 33:0
+ 34:0
+ 35:4
+ 36:0
+ 37:0
+ 38:0
+ 39:0
+ 40:2
+ 41:0
+ 42:0
+ 43:0
+ 44:0
+ 45:2
+ 46:0
+ 47:0
+ 48:0
+ 49:0
+ 50:2
+ 51:0
+ 52:0
+ 53:0
+ 54:0
+ 55:2
+ 56:0
+ 57:0
+ 58:0
+ 59:0
+ 60:2
+ 61:0
+ 62:0
+ 63:0
+ 64:0
+ 65:2
+ 66:0
+ 67:0
+ 68:0
+ 69:0
+ 70:2
+ 71:0
+ 72:0
+ 73:0
+ 74:0
+ 75:2
+ 76:0
+ 77:0
+ 78:0
+ 79:0
+ 80:2
+ 81:0
+ 82:0
+ 83:0
+ 84:0
+ 85:2
+ 86:0
+ 87:0
+ 88:0
+ 89:3
+ 90:0
+ 91:1
+ 92:0
+ 93:0
+ 94:0
+ 95:0
+ 96:2
+ 97:0
+ 98:0
+ 99:0
+ 100:1
+ 101:5
+ 102:0
+ 103:0
+ 104:0
+ 105:0
+ 106:0
+ 107:0
+ 108:0
+ 109:0
+ 110:0
+ 111:0
+ 112:0
+ 113:0
+ 114:0
+ 115:0
+ 116:0
+ 117:0
+ 118:0
+ 119:0
+ 120:0
+ 121:0
+ 122:0
+ 123:0
+ 124:0
+ 125:0
+ 126:0
+ 127:0
+ Level:above average
+ Level:average
+ Level:bellow average
+ Level:low
+ Level:lowest
+**

@@ -7,3 +7,94 @@ Warning: rule induces a link permutation on site 'y' of agent 'A'
 File "link_swapping.ka", line 5, characters 44-45:
 Warning: rule induces a link permutation on site 'x' of agent 'A'
 Warning: Environment.to_json is partial
+**BLACKBOARD**
+6 wires, 7 events
+*wires:*
+0
+*wires 0: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Present)  * 2:
+?(test:Present/eid:2/action:)  * 3:
+?(test:Present/eid:3/action:)  * 4:
+?(test:Present/eid:4/action:)  * 5:
+?(test:Present/eid:5/action:)  * 6:
+?(test:Present/eid:6/action:)  * 7:
+test:/eid:-1/action:  
+1
+*wires 1: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Free)  * 2:
+?(test:Free/eid:2/action:Bound(4,1(0)@0))  * 3:
+?(test:Bound(4,1(0)@0)/eid:4/action:Bound(5,1(0)@1))  * 4:
+?(test:Bound(5,1(0)@1)/eid:5/action:)  * 5:
+test:/eid:-1/action:  
+2
+*wires 2: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:0/action:Free)  * 2:
+?(test:Free/eid:3/action:Bound(5,1(0)@1))  * 3:
+?(test:Bound(5,1(0)@1)/eid:4/action:Bound(4,1(0)@0))  * 4:
+?(test:Bound(4,1(0)@0)/eid:6/action:)  * 5:
+test:/eid:-1/action:  
+3
+*wires 3: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:1/action:Present)  * 2:
+?(test:Present/eid:2/action:)  * 3:
+?(test:Present/eid:3/action:)  * 4:
+?(test:Present/eid:4/action:)  * 5:
+?(test:Present/eid:5/action:)  * 6:
+?(test:Present/eid:6/action:)  * 7:
+test:/eid:-1/action:  
+4
+*wires 4: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:1/action:Free)  * 2:
+?(test:Free/eid:2/action:Bound(1,0(0)@0))  * 3:
+?(test:Bound(1,0(0)@0)/eid:4/action:Bound(2,0(0)@1))  * 4:
+?(test:Bound(2,0(0)@1)/eid:6/action:)  * 5:
+test:/eid:-1/action:  
+5
+*wires 5: 
+* 0:
+test:/eid:-1/action: Undefined * 1:
+?(test:Undefined/eid:1/action:Free)  * 2:
+?(test:Free/eid:3/action:Bound(2,0(0)@1))  * 3:
+?(test:Bound(2,0(0)@1)/eid:4/action:Bound(1,0(0)@0))  * 4:
+?(test:Bound(1,0(0)@0)/eid:5/action:)  * 5:
+test:/eid:-1/action:  
+*stacks*
+
+*selected_events*
+*unsolved_events*
+ 7
+*weight of predicate_id*
+ 0:6
+ 1:4
+ 2:4
+ 3:6
+ 4:4
+ 5:4
+ 6:0
+ 7:0
+*weight of predicate_id_by_level* Level:highest
+ 0:6
+ 1:4
+ 2:4
+ 3:6
+ 4:4
+ 5:4
+ 6:0
+ 7:0
+ Level:high
+ Level:above average
+ Level:average
+ Level:bellow average
+ Level:low
+ Level:lowest
+**
