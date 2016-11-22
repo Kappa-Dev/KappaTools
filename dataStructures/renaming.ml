@@ -62,12 +62,9 @@ let compose extensible i i' =
 let inverse i =
   if i.is_identity then i
   else
-    let sigma =
-      Mods.IntMap.fold (fun x y out ->
-          if Mods.IntMap.mem y out then raise NotBijective
-          else Mods.IntMap.add y x out) i.sigma Mods.IntMap.empty
-    in
-    {sigma = sigma ; is_identity = i.is_identity ; dsts = i.dsts}
+    Mods.IntMap.fold (fun x y out ->
+        if Mods.IntMap.mem y out.sigma then raise NotBijective
+        else unsafe_add y x out) i.sigma empty
 
 let compare i i' = Mods.IntMap.compare Mods.int_compare i.sigma i'.sigma
 let equal i i' = (compare i i') = 0

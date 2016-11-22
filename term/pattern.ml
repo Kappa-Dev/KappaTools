@@ -1099,24 +1099,25 @@ end = struct
     bottom in
     elementaries
 
-  let insert_navigation domain dst inj_dst2nav p_id nav =
-    let rec insert_nav_aux inj_point2nav p_id nav =
-      let point = domain.(p_id) in
-      let rec insert_nav_sons = function
-        | [] ->
-          let full_inj_n2p,next =
-            Navigation.rename (Renaming.inverse inj_point2nav) nav in
-          let inj = Renaming.compose false inj_dst2nav full_inj_n2p in
-          point.Env.sons <- {Env.dst; Env.inj; Env.next} :: point.Env.sons
-        | h :: t ->
-          match Navigation.is_subnavigation inj_point2nav nav h.Env.next with
-          | None -> insert_nav_sons t
-          | Some (inj,nav') ->
-            if h.Env.dst <> dst then
-              insert_nav_aux
-                (Renaming.compose false h.Env.inj inj) h.Env.dst nav' in
-        insert_nav_sons point.Env.sons in
-    insert_nav_aux (identity_injection domain.(p_id).Env.content) p_id nav
+  let rec insert_navigation domain dst inj_dst2nav p_id nav =
+    let point = domain.(p_id) in
+    let rec insert_nav_sons = function
+      | [] ->
+        point.Env.sons <-
+          {Env.dst; Env.inj = inj_dst2nav; Env.next = nav} :: point.Env.sons
+      | h :: t ->
+        match Navigation.is_subnavigation
+                (identity_injection point.Env.content) nav h.Env.next with
+        | None -> insert_nav_sons t
+        | Some (_,[]) -> assert (h.Env.dst = dst)
+        | Some (inj_nav'2p,nav') ->
+          let pre_inj_nav'2q =
+            Renaming.compose false inj_nav'2p (Renaming.inverse h.Env.inj) in
+          let (inj_nav''2q,nav'') =
+            Navigation.rename pre_inj_nav'2q nav' in
+          insert_navigation domain dst
+            (Renaming.compose false inj_dst2nav inj_nav''2q) h.Env.dst nav'' in
+    insert_nav_sons point.Env.sons
 
   let add_cc ?origin env p_id element =
     let w = weight element in

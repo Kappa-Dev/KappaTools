@@ -28,7 +28,7 @@ val compatible_point : Renaming.t -> step -> step -> Renaming.t option
     is the image of the first *)
 
 val is_subnavigation : Renaming.t -> t -> t -> (Renaming.t * t) option
-(** [is_subnavigation inj_sub2nav nav subpart] *)
+(** [is_subnavigation inj_nav2sub nav subpart] *)
 
 val check_edge : Edges.t -> step -> bool
 val injection_for_one_more_edge :

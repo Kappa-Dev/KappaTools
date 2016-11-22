@@ -89,20 +89,23 @@ let rec print sigs find_ty f = function
 let compatible_point inj e e' =
   match e,e' with
   | ((Existing id,site), ToNothing), e ->
-    if e = ((Existing (Renaming.apply inj id),site),ToNothing)
+    if Renaming.mem id inj &&
+       e = ((Existing (Renaming.apply inj id),site),ToNothing)
     then Some inj
     else None
   | ((Existing id,site), ToInternal i), e ->
-    if e = ((Existing (Renaming.apply inj id),site),ToInternal i)
+    if Renaming.mem id inj &&
+       e = ((Existing (Renaming.apply inj id),site),ToInternal i)
     then Some inj
     else None
   | ((Existing id,site), ToNode (Existing id',site')), e ->
-    if e =
-       ((Existing (Renaming.apply inj id),site),
-        ToNode (Existing (Renaming.apply inj id'),site'))
-    || e =
-       ((Existing (Renaming.apply inj id'),site'),
-        ToNode (Existing (Renaming.apply inj id),site))
+    if Renaming.mem id inj && Renaming.mem id' inj &&
+       (e =
+        ((Existing (Renaming.apply inj id),site),
+         ToNode (Existing (Renaming.apply inj id'),site'))
+        || e =
+           ((Existing (Renaming.apply inj id'),site'),
+            ToNode (Existing (Renaming.apply inj id),site)))
     then Some inj
     else None
   | (((Existing id,site),ToNode (Fresh (id',ty),site')),
@@ -116,7 +119,8 @@ let compatible_point inj e e' =
     if  ssite = site && ty' = ty && ssite' = site'
         && not (Renaming.mem id' inj) then
       match Renaming.add id' sid' inj with
-      | Some inj' when sid = Renaming.apply inj' id  -> Some inj'
+      | Some inj' when Renaming.mem id inj' && sid = Renaming.apply inj' id  ->
+        Some inj'
       | _ -> None
    else None
   | ((Existing _,_), ToNode (Fresh _,_)),
@@ -153,7 +157,7 @@ let compatible_point inj e e' =
 
 let rec aux_sub inj goal acc = function
   | [] -> None
-  | h :: t -> match compatible_point inj goal h with
+  | h :: t -> match compatible_point inj h goal with
     | None -> aux_sub inj goal (h::acc) t
     | Some inj' -> Some (inj',List.rev_append acc t)
 let rec is_subnavigation inj nav = function
@@ -161,7 +165,6 @@ let rec is_subnavigation inj nav = function
   | h :: t -> match aux_sub inj h [] nav with
     | None -> None
     | Some (inj',nav') -> is_subnavigation inj' nav' t
-
 
 let rename_id inj2cc = function
   | Existing n -> inj2cc,Existing (Renaming.apply inj2cc n)
