@@ -80,6 +80,10 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
+  (*TODO*)
+  let get_wake_up_relation static =
+    lift Analyzer_headers.get_wake_up_relation static
+
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
@@ -424,6 +428,50 @@ struct
            ) map (error, wake_up)
       ) rule_tuples (error, wake_up)
 
+  let add_rules_tuples_into_wake_up_relation' parameters error
+      store_map wake_up =
+    Ckappa_sig.Rule_map_and_set.Map.fold
+      (fun rule_id map (error, wake_up) ->
+         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
+           (fun (_, ((agent_type, site_type1, site_type2, _, _),
+                     (agent_type', site_type1', site_type2', _, _)))
+             _b (error, wake_up) ->
+              let error, wake_up =
+                Common_static.add_dependency_site_rule
+                  parameters error
+                  agent_type
+                  site_type1
+                  rule_id
+                  wake_up
+              in
+              let error, wake_up =
+                Common_static.add_dependency_site_rule
+                  parameters error
+                  agent_type
+                  site_type2
+                  rule_id
+                  wake_up
+              in
+              let error, wake_up =
+                Common_static.add_dependency_site_rule
+                  parameters error
+                  agent_type'
+                  site_type1'
+                  rule_id
+                  wake_up
+              in
+              let error, wake_up =
+                Common_static.add_dependency_site_rule
+                  parameters error
+                  agent_type'
+                  site_type2'
+                  rule_id
+                  wake_up
+              in
+              error, wake_up
+           ) map (error, wake_up)
+      ) store_map (error, wake_up )
+
   (* TO DO, look up in static *)
   (* fold over all the rules, all the tuples of interest, all the sites in
    these tuples, and apply the function Common_static.add_dependency_site_rule
@@ -431,15 +479,35 @@ struct
     let complete_wake_up_relation static error wake_up =
       let parameters = get_parameter static in
       (*fst site created a parallel bonds*)
+      let store_rule_double_bonds_rhs =
+        get_rule_double_bonds_rhs static in
+      let store_rule_double_bonds_lhs =
+        get_rule_double_bonds_lhs static in
+      (*----------------------------------------------------*)
       let store_fst_site_create_parallel_bonds_rhs =
         get_fst_site_create_parallel_bonds_rhs static in
       let store_snd_site_create_parallel_bonds_rhs =
         get_snd_site_create_parallel_bonds_rhs static in
+      (*----------------------------------------------------*)
+      let error, wake_up =
+        add_rules_tuples_into_wake_up_relation'
+          parameters error
+          store_rule_double_bonds_rhs
+          wake_up
+      in
+      let error, wake_up =
+        add_rules_tuples_into_wake_up_relation'
+          parameters error
+          store_rule_double_bonds_lhs
+          wake_up
+      in
+      (*----------------------------------------------------*)
       let error, wake_up =
       add_rules_tuples_into_wake_up_relation parameters error
         store_fst_site_create_parallel_bonds_rhs
         wake_up
       in
+      (*----------------------------------------------------*)
       let error, wake_up =
       add_rules_tuples_into_wake_up_relation parameters error
         store_snd_site_create_parallel_bonds_rhs
@@ -481,7 +549,8 @@ struct
   (*************************************************************)
   (* if a parallel bound occurs on the lhs, check that this is possible *)
 
-  let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
+  let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
+      precondition =
     let parameters = get_parameter static in
     (*-----------------------------------------------------------*)
     (*look into the lhs, whether or not there exists a double bound.*)
@@ -1144,6 +1213,7 @@ struct
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let store_sites_to_tuple = get_sites_to_tuple static in
+    let wake_up_relation = get_wake_up_relation static in
       (*get a list tuple pair that the pair of modified sites belong to*)
     let error, event_list =
         List.fold_left (fun (error, event_list) event ->
@@ -1179,8 +1249,24 @@ struct
                   in error
                 else error
               in
+              (*TODO*)
+              let error, rule_id_list =
+                Common_static.wake_up
+                  parameters error
+                  agent_type
+                  site_type
+                  wake_up_relation
+              in
+              let error, event_list =
+              List.fold_left (fun (error, event_list) rule_id ->
+                  add_rule static error
+                    rule_id event_list
+                ) (error, event_list) rule_id_list
+              in
+
+
               (*search with tuple that this pair of site belong to*)
-              let error, tuple_pair_set =
+              (*let error, tuple_pair_set =
                 match
                   Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
                     parameters error
@@ -1198,7 +1284,8 @@ struct
                 get_rule_double_bonds_lhs static in
               let error, event_list =
                 apply_event_list_rule_in_lhs_rhs_aux
-                  static error store_rule_double_bonds_lhs
+                  static error
+                  store_rule_double_bonds_lhs
                   event_list
                   tuple_pair_set
               in
@@ -1233,7 +1320,7 @@ struct
                   store_snd_site_create_parallel_bonds_rhs
                   event_list
                   tuple_pair_set
-              in
+              in*)
               let () =
                 if local_trace
                 || Remanent_parameters.get_dump_reachability_analysis_wl

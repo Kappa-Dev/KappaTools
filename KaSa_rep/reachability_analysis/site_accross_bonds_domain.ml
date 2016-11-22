@@ -89,6 +89,10 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
+  (*TODO*)
+  let get_wake_up_relation static =
+    lift Analyzer_headers.get_wake_up_relation static
+
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_potential_side_effects static =
@@ -1543,6 +1547,7 @@ struct
     let store_partition_created_bonds_map =
       get_partition_created_bonds pos static
     in
+    let wake_up_relation = get_wake_up_relation static in
     (*-----------------------------------------------------------*)
     let error, event_list =
       List.fold_left (fun (error, event_list) event ->
@@ -1579,6 +1584,19 @@ struct
                 in error
               else error
             in
+            let error, rule_id_list =
+              Common_static.wake_up
+                parameters error
+                agent_type
+                site_type
+                wake_up_relation
+            in
+            let error, event_list =
+              List.fold_left (fun (error, event_list) rule_id ->
+                  add_rule static error
+                    rule_id event_list
+                ) (error, event_list) rule_id_list
+            in
             (* This is WAY too costly and too complicated *)
             (* This function is called often *)
             (* Many times per rule application *)
@@ -1586,7 +1604,7 @@ struct
             (* The result should be stored in a field of static *)
             (* with the type site -> rule set *)
             (* The results for each case should be merged in this field *)
-            let error, tuple_pair_modif_set =
+            (*let error, tuple_pair_modif_set =
               match
                 Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
                   parameters error
@@ -1688,7 +1706,7 @@ struct
                 (fun rule_id _list (error, event_list) ->
                    add_rule static error rule_id event_list)
                 store_potential_side_effects (error, event_list)
-            in
+            in*)
             let () =
               if local_trace
               || Remanent_parameters.get_dump_reachability_analysis_wl
