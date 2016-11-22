@@ -109,6 +109,57 @@ let init_basic_static_information =
 (***************************************************************)
 (*collect a set of tuple pair (A.x.y, B.z.t) on the rhs*)
 
+let collect_tuple error (agent_id, agent_type, site_type, state) views_set =
+  let error, list =
+    Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
+      (fun v (error, current_list) ->
+         let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
+         if agent_id = agent_id_v &&
+            agent_type = agent_type_v &&
+            site_type <> site_type_v
+         then
+           let list =
+             (agent_type, site_type, site_type_v, state) ::
+             current_list
+           in
+           error, list
+         else error, current_list
+      ) views_set (error, [])
+  in
+  error, list
+
+  let collect_tuples error (agent_id, agent_type, site_type, state) views_set =
+    let error, list =
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
+        (fun v (error, current_list) ->
+           let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
+           if agent_id = agent_id_v &&
+              agent_type = agent_type_v &&
+              site_type <> site_type_v
+           then
+             let list =
+               (agent_type, site_type, site_type_v, state, state_v) ::
+               current_list
+             in
+             error, list
+           else error, current_list
+        ) views_set (error, [])
+    in
+    error, list
+
+let store_set parameters error fst_list snd_list store_result =
+  List.fold_left (fun (error, store_result) x ->
+      List.fold_left (fun (error, store_result) y ->
+          let error, store_result =
+            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
+              parameters error
+              (x, y)
+              store_result
+          in
+          error, store_result
+        ) (error, store_result) snd_list
+    ) (error, store_result) fst_list
+
 let collect_potential_tuple_pair parameters error
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_set =
@@ -123,14 +174,24 @@ let collect_potential_tuple_pair parameters error
   in
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
-       let (agent_id, agent_type, site_type, state) = x in
-       let (agent_id1, agent_type1, site_type1, state1) = y in
+       (*let (agent_id, agent_type, site_type, state) = x in
+       let (agent_id1, agent_type1, site_type1, state1) = y in*)
        let error, fst_list =
-         Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
+         collect_tuple error
+           x
+           views_set
+       in
+       let error, snd_list =
+         collect_tuple error
+           y
+           views_set
+       in
+       (*   Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id = agent_id_v &&
-                 agent_type = agent_type_v && site_type <> site_type_v
+                 agent_type = agent_type_v &&
+                 site_type <> site_type_v
               then
                 let fst_list =
                   (agent_type, site_type, site_type_v, state) ::
@@ -145,7 +206,8 @@ let collect_potential_tuple_pair parameters error
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
               if agent_id1 = agent_id_v &&
-                 agent_type1 = agent_type_v && site_type1 <> site_type_v
+                 agent_type1 = agent_type_v &&
+                 site_type1 <> site_type_v
               then
                 let snd_list =
                   (agent_type1, site_type1, site_type_v, state1) ::
@@ -154,7 +216,7 @@ let collect_potential_tuple_pair parameters error
                 error, snd_list
               else error, current_list
            ) views_set (error, [])
-       in
+            in*)
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
              List.fold_left (fun (error, store_result) y ->
@@ -198,9 +260,13 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
        (*binding information*)
-       let (agent_id, agent_type, site_type, state) = x in
-       let (agent_id1, agent_type1, site_type1, state1) = y in
        let error, fst_list =
+         collect_tuples error x views_lhs_set
+       in
+       let error, snd_list =
+         collect_tuples error y views_lhs_set
+       in
+       (* let error, fst_list =
          Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               (*views information*)
@@ -216,8 +282,8 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
                 error, fst_list
               else error, current_list
            ) views_lhs_set (error, [])
-       in
-       let error, snd_list =
+       in*)
+       (*let error, snd_list =
          Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
            (fun v (error, current_list) ->
               let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
@@ -232,9 +298,11 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
                 error, snd_list
               else error, current_list
            ) views_lhs_set (error, [])
-       in
+         in*)
        let error, store_result =
-         List.fold_left (fun (error, store_result) x ->
+         store_set parameters error fst_list snd_list store_result
+       in
+       (* List.fold_left (fun (error, store_result) x ->
              List.fold_left (fun (error, store_result) y ->
                  let error, store_result =
                    Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
@@ -245,7 +313,7 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
                  error, store_result
                ) (error, store_result) snd_list
            ) (error, store_result) fst_list
-       in
+  in*)
        error, store_result
     ) bonds_lhs_set
     (error,

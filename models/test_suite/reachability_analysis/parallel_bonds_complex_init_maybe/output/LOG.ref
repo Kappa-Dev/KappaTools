@@ -966,27 +966,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,z!,t!)
 
-	Applying rule 1: r1:
-		the precondition is satisfied
-
-		Updating the views for B(x~,z!,t!)
-
 	Applying rule 5: r5:
 		the precondition is satisfied
 
 		rule 5: r5 is applied for the first time
-
-		Updating the views for A(x~,z!,t!)
-
-		Updating the views for B(x~,z!,t!)
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
-
-	Applying rule 2: r2:
-		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
 
@@ -1035,6 +1018,18 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,z!B@z,t!free)
 
 		Wake-up rules:
+
+	Applying rule 1: r1:
+		the precondition is satisfied
+
+		Updating the views for B(x~,z!,t!)
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
+
+		Updating the views for B(x~,z!,t!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -1085,13 +1080,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,z!,t!)
 
-	Applying rule 2: r2:
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
-
-		Updating the views for B(x~,z!,t!)
-
 	Applying rule 3: r3:
 		the precondition is satisfied
 
@@ -1120,6 +1108,13 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
+
+		Updating the views for B(x~,z!,t!)
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
 
 		Updating the views for B(x~,z!,t!)
 

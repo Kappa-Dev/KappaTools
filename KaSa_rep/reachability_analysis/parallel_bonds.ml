@@ -1079,7 +1079,6 @@ struct
       parameters compiled kappa_handler error
       rule_id event_list
 
-
 (* This is WAY too costly *)
 (* This function is called often *)
 (* Many times per rule application *)
@@ -1144,9 +1143,9 @@ struct
   let apply_event_list static dynamic error event_list =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-      let store_sites_to_tuple = get_sites_to_tuple static in
+    let store_sites_to_tuple = get_sites_to_tuple static in
       (*get a list tuple pair that the pair of modified sites belong to*)
-      let error, event_list =
+    let error, event_list =
         List.fold_left (fun (error, event_list) event ->
             match event with
             | Communication.Dummy
@@ -1160,10 +1159,12 @@ struct
                 then
                   let tab = "\t\t" in
                   let error, agent =
-                    Handler.string_of_agent parameters error kappa_handler agent_type
+                    Handler.string_of_agent parameters error kappa_handler
+                      agent_type
                   in
                   let error, site =
-                    Handler.string_of_site_contact_map parameters error kappa_handler agent_type site_type
+                    Handler.string_of_site_contact_map parameters error
+                      kappa_handler agent_type site_type
                   in
                   let () =
                     Loggers.fprintf

@@ -134,6 +134,21 @@ Reachability analysis...
 			(rule 6: obs) should be investigated 
 
 
+	Applying rule 2: R.R:
+		the precondition is satisfied
+
+	Applying rule 3: R/R:
+		the precondition is not satisfied yet
+
+	Applying rule 4: R.int:
+		the precondition is not satisfied yet
+
+	Applying rule 5: R/int:
+		the precondition is not satisfied yet
+
+	Applying rule 6: obs:
+		the precondition is satisfied
+
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------

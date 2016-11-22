@@ -1035,6 +1035,13 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x!)
 
+	Applying rule 2: ab.c:
+		the precondition is satisfied
+
+		Updating the views for A(x!,c!)
+
+		Updating the views for C(x1~,x2~,x1!,x2!)
+
 	Applying rule 1: a.b_op:
 		the precondition is satisfied
 
@@ -1071,13 +1078,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x!)
 
-	Applying rule 2: ab.c:
-		the precondition is satisfied
-
-		Updating the views for A(x!,c!)
-
-		Updating the views for C(x1~,x2~,x1!,x2!)
-
 	Applying rule 3: mod x1:
 		the precondition is satisfied
 
@@ -1106,6 +1106,13 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x!)
 
+	Applying rule 2: ab.c:
+		the precondition is satisfied
+
+		Updating the views for A(x!,c!)
+
+		Updating the views for C(x1~,x2~,x1!,x2!)
+
 	Applying rule 1: a.b_op:
 		the precondition is satisfied
 
@@ -1121,7 +1128,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=129
+Id=131
  Node(site_type:1<0)
   Id=0
    Leaf False 

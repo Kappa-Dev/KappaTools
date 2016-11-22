@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 22 2016>
    *
    * Abstract domain to record live rules
    *
@@ -27,8 +27,10 @@ struct
   type local_dynamic_information =
     {
       contact_map_dynamic : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t;
-      bonds_per_site : (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
-          Ckappa_sig.State_map_and_set.Map.t Ckappa_sig.AgentSite_map_and_set.Map.t
+      bonds_per_site :
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+          Ckappa_sig.State_map_and_set.Map.t
+          Ckappa_sig.AgentSite_map_and_set.Map.t
     }
 
   type dynamic_information =
@@ -291,7 +293,8 @@ struct
     let error, bond_lhs_set =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters error
-          rule_id bond_lhs
+          rule_id
+          bond_lhs
       with
       | error, None ->
         error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
@@ -315,10 +318,12 @@ struct
           (fun error agent_type site_type state ->
              (* Here you should fetch the partner in the dynamic contact
                 map, if defined, *)
-             let error, statemap_bottop = (* JF: error should be propagated, Please correct !!! *)
+             let error, statemap_bottop =
+               (* JF: error should be propagated, Please correct !!! *)
                Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                  parameters error
-                 (agent_type, site_type) dynamic.local.bonds_per_site
+                 (agent_type, site_type)
+                 dynamic.local.bonds_per_site
              in
              match statemap_bottop with
              | None ->
@@ -335,7 +340,6 @@ struct
                with
                | error, None -> error, Usual_domains.Undefined
                | error, Some tuple -> error, Usual_domains.Val tuple)
-
           {
             Communication.fold =
               begin
@@ -343,7 +347,8 @@ struct
                   let error, statemap_bottop =
                     Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                       parameters error
-                      (agent_type, site_type) dynamic.local.bonds_per_site
+                      (agent_type, site_type)
+                      dynamic.local.bonds_per_site
                   in
                   match statemap_bottop with
                   | None -> error,
@@ -374,7 +379,8 @@ struct
     let error, bond_rhs_set =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters
-          error rule_id
+          error
+          rule_id
           bond_rhs_map
       with
       | error, None ->
@@ -412,7 +418,8 @@ struct
     (*check if it is seen for the first time, if not update the contact
       map, and raise an event*)
     let event_list =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold (fun pair event_list ->
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
+        (fun pair event_list ->
           (Communication.See_a_new_bond pair) :: event_list
         ) map_diff event_list
     in
@@ -430,7 +437,8 @@ struct
   let print_contact_map_rhs static _dynamic error store_result =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    Loggers.fprintf (Remanent_parameters.get_logger parameters) "Contact map in the rhs:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      "Contact map in the rhs:\n";
     Ckappa_sig.Rule_map_and_set.Map.fold
       (fun rule_id pair error ->
          let () =
@@ -439,9 +447,11 @@ struct
          in
          let error =
            Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
-             (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) error ->
+             (fun ((agent_type1, site_type1, state1),
+                   (agent_type2, site_type2, state2)) error ->
                 let error, agent_type1_string =
-                  try Handler.string_of_agent parameters error kappa_handler agent_type1
+                  try Handler.string_of_agent parameters error kappa_handler
+                        agent_type1
                   with
                   | _ ->
                     Exception.warn
@@ -450,7 +460,8 @@ struct
                 in
                 let error, site_type1_string =
                   try
-                    Handler.string_of_site parameters error kappa_handler agent_type1 site_type1
+                    Handler.string_of_site parameters error kappa_handler
+                      agent_type1 site_type1
                   with
                     _ ->
                     Exception.warn
@@ -516,12 +527,15 @@ struct
   let print_contact_map static _dynamic error store_result =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    Loggers.fprintf (Remanent_parameters.get_logger parameters) "Contact map:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      "Contact map:\n";
     let _ =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
-        (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) error ->
+        (fun ((agent_type1, site_type1, state1),
+              (agent_type2, site_type2, state2)) error ->
            let error, agent_type1_string =
-             try Handler.string_of_agent parameters error kappa_handler agent_type1
+             try Handler.string_of_agent parameters error kappa_handler
+                   agent_type1
              with
              | _ ->
                Exception.warn
@@ -530,7 +544,8 @@ struct
            in
            let error, site_type1_string =
              try
-               Handler.string_of_site parameters error kappa_handler agent_type1 site_type1
+               Handler.string_of_site parameters error kappa_handler
+                 agent_type1 site_type1
              with
              | _ ->
                Exception.warn
@@ -539,7 +554,8 @@ struct
            in
            let error, state1_string =
              try
-               Handler.string_of_state_fully_deciphered parameters error kappa_handler
+               Handler.string_of_state_fully_deciphered parameters error
+                 kappa_handler
                  agent_type1 site_type1 state1
              with
                _ ->
@@ -548,7 +564,8 @@ struct
                  (Ckappa_sig.string_of_state_index state1)
            in
            let error, agent_type2_string =
-             try Handler.string_of_agent parameters error kappa_handler agent_type2
+             try Handler.string_of_agent parameters error kappa_handler
+                   agent_type2
              with
              | _ ->
                Exception.warn
@@ -557,7 +574,8 @@ struct
            in
            let error, site_type2_string =
              try
-               Handler.string_of_site parameters error kappa_handler agent_type2 site_type2
+               Handler.string_of_site parameters error kappa_handler
+                 agent_type2 site_type2
              with
                _ ->
                Exception.warn
@@ -566,7 +584,8 @@ struct
            in
            let error, state2_string =
              try
-               Handler.string_of_state_fully_deciphered parameters error kappa_handler
+               Handler.string_of_state_fully_deciphered parameters error
+                 kappa_handler
                  agent_type2 site_type2 state2
              with
                _ ->

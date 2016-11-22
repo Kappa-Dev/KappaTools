@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 22 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -134,7 +134,8 @@ let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
   let add_link error (agent_type, site_type) (r, state) store_result =
     let error, (l, old) =
-      match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
+      match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+              parameter error
               (agent_type, site_type) store_result
       with
       | error, None -> error, ([], [])
@@ -636,9 +637,12 @@ let collect_side_effects parameter error handler rule_id half_break remove
 let collect_agent_type_state parameter error agent site_type =
   match agent with
   | Cckappa_sig.Ghost
-  | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+  | Cckappa_sig.Unknown_agent _ ->
+    error,
+    (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
   | Cckappa_sig.Dead_agent _ ->
-    Exception.warn parameter error __POS__ Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+    Exception.warn parameter error __POS__ Exit
+      (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
   | Cckappa_sig.Agent agent1 ->
     let agent_type1 = agent1.Cckappa_sig.agent_name in
     let error, state1 =
@@ -1336,3 +1340,39 @@ let wake_up parameter error agent site site_to_rules =
   with
   | error, None -> error, []
   | error, Some l -> error, l
+
+(*Ckappa_sig?*)
+module PairAgentSitesState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state) *
+           (Ckappa_sig.c_agent_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module AgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+let get_tuple_of_interest parameters error agent site map =
+  match
+    AgentSite_map_and_set.Map.find_option_without_logs
+      parameters error
+      (agent, site)
+      map
+  with
+  | error, None -> error, PairAgentSitesState_map_and_set.Set.empty
+  | error, Some s -> error, s

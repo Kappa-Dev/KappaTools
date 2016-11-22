@@ -1055,7 +1055,10 @@ struct
     let defined_in = Communication.RHS rule in
     get_state_of_site_in_pre_post_condition_2
       error static dynamic
-      agent_id (site_type_x, agent_type_y, site_type_y) site_type'_y defined_in
+      agent_id
+      (site_type_x, agent_type_y, site_type_y)
+      site_type'_y
+      defined_in
       precondition
 
   type pos = Fst | Snd
@@ -1556,10 +1559,12 @@ struct
               then
                 let tab = "\t\t" in
                 let error, agent =
-                  Handler.string_of_agent parameters error kappa_handler agent_type
+                  Handler.string_of_agent parameters error kappa_handler
+                    agent_type
                 in
                 let error, site =
-                  Handler.string_of_site_contact_map parameters error kappa_handler agent_type site_type
+                  Handler.string_of_site_contact_map parameters error
+                    kappa_handler agent_type site_type
                 in
                 let () =
                   Loggers.fprintf
