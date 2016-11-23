@@ -488,10 +488,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~)
 
-	Applying rule 6:
+	Applying rule 7:
 		the precondition is not satisfied yet
 
-	Applying rule 7:
+	Applying rule 6:
 		the precondition is not satisfied yet
 
 	Applying rule 1:
@@ -513,16 +513,16 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~)
 
-	Applying rule 3:
-		the precondition is satisfied
-
-		Updating the views for A(x~)
+	Applying rule 9:
+		the precondition is not satisfied yet
 
 	Applying rule 8:
 		the precondition is not satisfied yet
 
-	Applying rule 9:
-		the precondition is not satisfied yet
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for A(x~)
 
 ------------------------------------------------------------
 * There are some non applyable rules

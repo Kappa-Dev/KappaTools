@@ -423,22 +423,6 @@ EXTENSIONAL DESCRIPTION:
 		A(t,z!1),B(t,z!1)
 		B(t,z!1),A(t,z!1)
 
-		Wake-up rules: (site accross bonds/agent:A/site:z)
-
-		Wake-up rules: (site accross bonds/agent:A/site:t)
-
-		Wake-up rules: (site accross bonds/agent:B/site:z)
-
-		Wake-up rules: (site accross bonds/agent:B/site:t)
-
-		Wake-up rules: (double bonds/agent:A/site:z)
-
-		Wake-up rules: (double bonds/agent:A/site:t)
-
-		Wake-up rules: (double bonds/agent:B/site:z)
-
-		Wake-up rules: (double bonds/agent:B/site:t)
-
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -516,22 +500,6 @@ EXTENSIONAL DESCRIPTION:
 
 		A(t!1,z),B(t!1,z)
 		B(t!1,z),A(t!1,z)
-
-		Wake-up rules: (site accross bonds/agent:A/site:t)
-
-		Wake-up rules: (site accross bonds/agent:A/site:z)
-
-		Wake-up rules: (site accross bonds/agent:B/site:t)
-
-		Wake-up rules: (site accross bonds/agent:B/site:z)
-
-		Wake-up rules: (double bonds/agent:A/site:t)
-
-		Wake-up rules: (double bonds/agent:A/site:z)
-
-		Wake-up rules: (double bonds/agent:B/site:t)
-
-		Wake-up rules: (double bonds/agent:B/site:z)
 
 
 	Applying rule 0: r0:

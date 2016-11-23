@@ -790,15 +790,8 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t~)
 
-	Applying rule 1: r1:
+	Applying rule 6: r6:
 		the precondition is satisfied
-
-		Updating the views for B(z~,z!,t~)
-
-	Applying rule 2: r2:
-		the precondition is satisfied
-
-		rule 2: r2 is applied for the first time
 
 		Updating the views for A(z!,t~)
 
@@ -811,10 +804,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 6: r6:
+	Applying rule 2: r2:
 		the precondition is satisfied
 
+		rule 2: r2 is applied for the first time
+
 		Updating the views for A(z!,t~)
+
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule 1: r1:
+		the precondition is satisfied
 
 		Updating the views for B(z~,z!,t~)
 

@@ -16,9 +16,6 @@ Reachability analysis...
 		A(x~u,y~u,z~u)
 
 
-	Applying rule 0:
-		the precondition is satisfied
-
 	Applying rule 1:
 		the precondition is satisfied
 

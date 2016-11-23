@@ -527,10 +527,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 6:
+	Applying rule 7:
 		the precondition is not satisfied yet
 
-	Applying rule 7:
+	Applying rule 6:
 		the precondition is not satisfied yet
 
 	Applying rule 1:
@@ -566,7 +566,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~)
 
-	Applying rule 0:
+	Applying rule 9:
+		the precondition is not satisfied yet
+
+	Applying rule 8:
 		the precondition is not satisfied yet
 
 	Applying rule 3:
@@ -574,10 +577,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 8:
-		the precondition is not satisfied yet
-
-	Applying rule 9:
+	Applying rule 0:
 		the precondition is not satisfied yet
 
 	Applying rule 1:

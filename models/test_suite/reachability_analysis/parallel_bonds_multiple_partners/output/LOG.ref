@@ -959,20 +959,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 0:
-		the precondition is satisfied
-
 	Applying rule 1:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 0:
+		the precondition is satisfied
 
 	Applying rule 2:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 3:
+	Applying rule 5:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1041,7 +1041,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
-	Applying rule 5:
+	Applying rule 3:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1051,7 +1051,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 7:
+	Applying rule 9:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1121,30 +1121,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
-	Applying rule 9:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 0:
-		the precondition is satisfied
-
-	Applying rule 1:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 2:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 3:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 4:
+	Applying rule 7:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1159,17 +1136,40 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 6:
+	Applying rule 4:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 7:
+	Applying rule 2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 9:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
 	Applying rule 8:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 6:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 3:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)

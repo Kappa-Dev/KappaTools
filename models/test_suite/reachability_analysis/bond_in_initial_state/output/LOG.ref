@@ -47,6 +47,9 @@ Reachability analysis...
 	Applying rule 2:
 		the precondition is not satisfied yet
 
+	Applying rule 3:
+		the precondition is not satisfied yet
+
 	Applying rule 1:
 		the precondition is satisfied
 
@@ -82,8 +85,8 @@ Reachability analysis...
 				(rule 3) should be investigated 
 
 
-	Applying rule 0:
-		the precondition is satisfied
+	Applying rule 2:
+		the precondition is not satisfied yet
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -100,12 +103,8 @@ Reachability analysis...
 				(rule 3) should be investigated 
 
 
-	Applying rule 2:
+	Applying rule 0:
 		the precondition is satisfied
-
-		rule 2 is applied for the first time
-
-		Updating the views for B(x!,x~)
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -114,8 +113,12 @@ Reachability analysis...
 
 		Updating the views for B(x!,x~)
 
-	Applying rule 0:
+	Applying rule 2:
 		the precondition is satisfied
+
+		rule 2 is applied for the first time
+
+		Updating the views for B(x!,x~)
 
 	Applying rule 1:
 		the precondition is satisfied

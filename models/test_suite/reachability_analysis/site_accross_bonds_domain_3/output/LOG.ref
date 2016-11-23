@@ -1167,9 +1167,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
-	Applying rule 0:
-		the precondition is satisfied
-
 	Applying rule 2:
 		the precondition is satisfied
 
@@ -1265,6 +1262,9 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
+	Applying rule 0:
+		the precondition is satisfied
+
 	Applying rule 1:
 		the precondition is satisfied
 
@@ -1289,9 +1289,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for F(t!,z!)
 
 		Updating the views for D(x!)
-
-	Applying rule 0:
-		the precondition is satisfied
 
 	Applying rule 2:
 		the precondition is satisfied

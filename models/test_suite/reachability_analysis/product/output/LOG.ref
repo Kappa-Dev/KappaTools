@@ -894,26 +894,26 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 8: r7:
 		the precondition is not satisfied yet
 
-	Applying rule 0: r0:
-		the precondition is not satisfied yet
-
-	Applying rule 1: r1:
-		the precondition is not satisfied yet
-
 	Applying rule 2: r2:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 3: r3:
-		the precondition is satisfied
+	Applying rule 1: r1:
+		the precondition is not satisfied yet
 
-		Updating the views for A(z~,z!,t!)
+	Applying rule 0: r0:
+		the precondition is not satisfied yet
 
 	Applying rule 4: r3:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
+
+		Updating the views for A(z~,z!,t!)
+
+	Applying rule 3: r3:
+		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 

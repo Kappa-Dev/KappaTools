@@ -233,9 +233,6 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
-	Applying rule 0: create:
-		the precondition is satisfied
-
 	Applying rule 1: x:
 		the precondition is satisfied
 

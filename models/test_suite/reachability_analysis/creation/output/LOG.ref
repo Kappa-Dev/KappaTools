@@ -246,9 +246,6 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 3:
 		the precondition is not satisfied yet
 
-	Applying rule 0:
-		the precondition is satisfied
-
 	Applying rule 1:
 		the precondition is satisfied
 
@@ -324,11 +321,6 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 0:
 		the precondition is satisfied
 
-	Applying rule 1:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~)
-
 	Applying rule 3:
 		the precondition is satisfied
 
@@ -357,12 +349,12 @@ EXTENSIONAL DESCRIPTION:
 
 		Wake-up rules:
 
-	Applying rule 2:
+	Applying rule 1:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule 3:
+	Applying rule 2:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
