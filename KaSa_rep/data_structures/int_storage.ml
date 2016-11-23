@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Nov 23 2016>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -34,6 +34,7 @@ sig
   val expand_and_copy: ('a t,dimension,'a t) binary
   val init: (dimension, (key, 'a) unary, 'a t) binary
   val set: (key,'a,'a t,'a t) ternary
+  val free: (key,'a t,'a t) binary
   val get: (key,'a t,'a option) binary
   val unsafe_get: (key,'a t,'a option) binary
   val dimension: ('a t, dimension) unary
@@ -43,7 +44,7 @@ sig
   val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
-
+  val free_all: ('a t,'a t) unary
 end
 
 let invalid_arg parameters mh pos exn value  =
@@ -127,6 +128,20 @@ module Int_storage_imperatif =
         match array.array.(key) with
         | None -> invalid_arg parameters error __POS__ Exit None
         | a -> error,a
+
+    let free parameters error key array =
+      if key>array.size || key<0 then
+        let error, _ = invalid_arg parameters error __POS__ Exit None in
+        error, array
+      else
+      match array.array.(key) with
+      | None ->
+        let error, _ = invalid_arg parameters error __POS__ Exit None in
+        error, array
+      | _ ->
+        let () = array.array.(key)<-None in
+        error, array
+
 
     let unsafe_get _parameters error key array =
       if key>array.size || key<0 then
@@ -224,6 +239,12 @@ module Int_storage_imperatif =
       in
       aux 0  (error,init)
 
+    let free_all parameter error t =
+      fold parameter error
+        (fun parameter error a _ t -> free parameter error a t)
+        t t
+
+
   end:Storage with type key = int and type dimension = int)
 
 module Nearly_infinite_arrays =
@@ -251,7 +272,7 @@ module Nearly_infinite_arrays =
       let unsafe_get = Basic.unsafe_get
       let expand_and_copy = Basic.expand_and_copy
       let init = Basic.init
-
+      let free = Basic.free
       let rec set parameters error key value array =
         let error,dimension = dimension parameters error array in
         if key>=dimension
@@ -272,7 +293,7 @@ module Nearly_infinite_arrays =
       let fold = Basic.fold
       let fold_with_interruption = Basic.fold_with_interruption
       let fold2_common = Basic.fold2_common
-
+      let free_all = Basic.free_all
     end:Storage with type key = int and type dimension = int)
 
 module Extend =
@@ -363,6 +384,19 @@ module Extend =
         | Some underlying -> Underlying.unsafe_get parameters error j underlying
         | _ -> error,None
 
+      let free parameters error (i,j) array =
+        let error,old_underlying = Extension.unsafe_get parameters error i array.matrix in
+
+          match old_underlying with
+          | None ->
+            let error, _ = invalid_arg parameters error __POS__ Exit None in
+            error,  array
+          | Some old_underlying ->
+            let error,new_underlying = Underlying.free parameters error j  old_underlying in
+            let error,new_matrix = Extension.set parameters error i
+                new_underlying array.matrix in
+            error,{array with matrix = new_matrix}
+
       let dimension _ error a = error,a.dimension
 
 
@@ -428,6 +462,10 @@ module Extend =
           a
           c
 
+      let free_all parameter error t =
+        fold parameter error
+          (fun parameter error a _ t -> free parameter error a t)
+          t t
 
     end:Storage with type key = Extension.key * Underlying.key and type dimension = Extension.dimension * Underlying.dimension )
 
@@ -476,6 +514,11 @@ module Quick_key_list =
         let error,new_basic = Basic.set parameters error key value new_array.basic in
         error, {new_array with basic = new_basic}
 
+      let free parameters error key array =
+        let error, basic = Basic.free parameters error key array.basic in
+        error, {array with basic = basic}
+
+
       let get parameters error key array =
         Basic.get parameters error key array.basic
 
@@ -514,6 +557,14 @@ module Quick_key_list =
              | Some im -> f parameters error k im b)
           (error,b)
           (List.rev list)
+
+      let free_all parameter error t =
+        let error, t =
+          fold parameter error
+              (fun parameter error a _ t -> free parameter error a t)
+              t t
+        in
+        error, {t with keys = []}
 
       let fold_with_interruption parameters error f a b =
         let error,list = key_list parameters error a in

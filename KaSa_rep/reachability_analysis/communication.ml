@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 21 2016>
+   * Last modification: Time-stamp: <Nov 23 2016>
    *
    * Abstract domain to record live rules
    *
@@ -696,8 +696,16 @@ type site_working_list =
 let init_sites_working_list parameters error =
   Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0)
 
+let clear_sites_working_list parameters error sites_wl =
+  Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.free_all parameters error sites_wl 
+
 let add_site parameters error agent site sites_wl =
-  Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site) () sites_wl
+  match
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get parameters error (agent,site) sites_wl
+  with
+  | error, None ->
+    Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set parameters error (agent,site) () sites_wl
+  | error, Some _ -> error, sites_wl
 
 let fold_sites p e f (acc:site_working_list) =
   Ckappa_sig.Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold p e f acc

@@ -2,7 +2,7 @@
    * int_storage.mli
    *
    * Creation:                      <2016-03-14 feret>
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Nov 23 2016>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -36,6 +36,7 @@ sig
   val expand_and_copy: ('a t,dimension,'a t) binary
   val init: (dimension, (key, 'a) unary, 'a t) binary
   val set: (key,'a,'a t,'a t) ternary
+  val free: (key,'a t,'a t) binary
   val get: (key,'a t,'a option) binary
   val unsafe_get: (key,'a t,'a option) binary
   val dimension: ('a t, dimension) unary
@@ -45,7 +46,7 @@ sig
   val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
-
+  val free_all: ('a t,'a t) unary
 end
 
 (** Cartesian product *)

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 22 2016>
+  * Last modification: Time-stamp: <Nov 23 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -91,10 +91,21 @@ struct
 
   type dynamic_information =
     {
+      modified_sites_blackboard: Communication.site_working_list;
       rule_working_list: working_list;
+      bonds:
+        Ckappa_sig.AgentSite_map_and_set.Set.t
+          Ckappa_sig.AgentSite_map_and_set.Map.t ;
       domain           : Domain.dynamic_information
     }
 
+  let get_modified_sites_blackboard dynamic = dynamic.modified_sites_blackboard
+  let set_modified_sites_blackboard modified_sites_blackboard dynamic =
+    {dynamic with modified_sites_blackboard = modified_sites_blackboard}
+
+  let get_bonds dynamic = dynamic.bonds
+  let set_bonds bonds dynamic =
+    {dynamic with bonds = bonds}
   let get_global_static_information = fst
 
   let get_domain_static_information = snd
@@ -149,6 +160,7 @@ struct
   let push_rule static dynamic error r_id =
     let working_list = get_working_list dynamic in
     let parameters = get_parameter static in
+    (*  let _ = Printf.fprintf stdout "RULE: %i \n" (Ckappa_sig.int_of_rule_id r_id) in*)
     let error, rule_working_list =
       Ckappa_sig.Rule_FIFO.push
         parameters
@@ -298,12 +310,71 @@ struct
      through this list and at each event push rule_id inside a working
      list and apply this list of event with new dynamic information*)
 
+  let get_partner parameter error site bonds =
+    match
+      Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+        parameter error site bonds
+    with
+    | error, None -> error, Ckappa_sig.AgentSite_map_and_set.Set.empty
+    | error, Some set -> error, set
+
+  let p (a,b,_) = (a,b)
+  let add_oriented_bond parameter error (site,site') bonds =
+    let site = p site in
+    let site' = p site' in
+    let error, old = get_partner parameter error site bonds in
+    let error, newset =
+      Ckappa_sig.AgentSite_map_and_set.Set.add_when_not_in
+        parameter error site' old
+    in
+    Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
+      parameter error site newset bonds
+
+  let add_bond parameter error (site,site') bonds =
+    let error, bonds = add_oriented_bond parameter error (site,site') bonds in
+    add_oriented_bond parameter error (site',site) bonds
+
+
   let rec apply_event_list (static:static_information) dynamic error event_list
     =
+    let parameter = get_parameter static in
     if event_list = []
     then
       error, dynamic, ()
     else
+      let split event_list =
+        List.fold_left
+          (fun (check_rules, modified_sites, bonds, others) event ->
+             match
+               event
+             with
+             | Communication.Check_rule r_id ->
+               r_id::check_rules, modified_sites, bonds, others
+             | Communication.Modified_sites site ->
+               check_rules, site::modified_sites, bonds, others
+             | Communication.See_a_new_bond bond ->
+               check_rules, modified_sites, bond::bonds, event::others
+             | Communication.Dummy ->
+               check_rules, modified_sites, bonds, event::others)
+          ([],[],[],[]) event_list
+      in
+      let check_rules, modified_sites, bonds, event_list =
+        split event_list
+      in
+      (*  let _ =
+        List.iter
+          (fun r_id -> Printf.fprintf stdout "RRULE: %i\n "
+              (Ckappa_sig.int_of_rule_id r_id))
+          check_rules
+          in*)
+      let dyn_bonds = get_bonds dynamic in
+      let error, dyn_bonds =
+        List.fold_left
+          (fun (error, dyn_bonds) bond ->
+             add_bond parameter error bond dyn_bonds)
+          (error, dyn_bonds) bonds
+      in
+      let dynamic = set_bonds dyn_bonds dynamic in
       let error, dynamic, event_list' =
         lift_unary
           Domain.apply_event_list
@@ -311,6 +382,49 @@ struct
           dynamic
           error
           event_list
+      in
+      let modified_sites_blackboard = get_modified_sites_blackboard dynamic in
+      let error, modified_sites_blackboard =
+        List.fold_left
+          (fun (error, modified_sites_blackboard) (agent,site) ->
+             let error, modified_sites_blackboard =
+               Communication.add_site
+                 parameter error agent site modified_sites_blackboard
+             in
+             let (error:Exception.method_handler), set =
+               get_partner parameter error (agent,site) dyn_bonds
+             in
+             Ckappa_sig.AgentSite_map_and_set.Set.fold
+               (fun (agent,site) (error, modified_sites_blackboard) ->
+                  Communication.add_site
+                    parameter
+                    error
+                    agent
+                    site modified_sites_blackboard)
+               set
+               (error, modified_sites_blackboard)
+          )
+          (error, modified_sites_blackboard)
+          modified_sites
+      in
+      let f l error dynamic =
+        List.fold_left
+          (fun (error, dynamic) r_id ->
+             push_rule
+               static dynamic error r_id)
+          (error, dynamic) l
+      in
+      let error, dynamic = f check_rules error dynamic in
+      let wake_up =
+        Analyzer_headers.get_wake_up_relation (fst static)
+      in
+      let error, dynamic =
+        Communication.fold_sites
+          parameter error
+          (fun parameter error (agent,site) () dynamic  ->
+             let error, list_r_id  = Common_static.wake_up parameter error agent site wake_up in
+             f list_r_id error dynamic)
+        modified_sites_blackboard dynamic
       in
       let error, dynamic =
         List.fold_left (fun (error, dynamic) event ->
@@ -330,38 +444,45 @@ struct
       in
       apply_event_list static dynamic error event_list'
 
-      let initialize static dynamic error =
-        let error, domain_static, domain_dynamic, event_list =
-          Domain.initialize static dynamic error
-        in
-        let parameters = get_parameter (static,domain_static) in
-        let error, wake_up_tmp =
-          Common_static.empty_site_to_rules parameters error in
-        let error, wake_up_tmp =
-          Domain.complete_wake_up_relation domain_static error wake_up_tmp
-        in
-        let error, wake_up =
-          Common_static.consolidate_site_rule_dependencies
-            parameters error wake_up_tmp
-        in
-        let static =
-          Analyzer_headers.add_wake_up_relation static wake_up, domain_static
-        in
-        let working_list = empty_working_list in
-        let dynamic =
-          {
-            rule_working_list = working_list;
-            domain = domain_dynamic
-          }
-        in
-        let error, dynamic =
-          scan_rule_creation
-            static
-            dynamic
-            error
-        in
-        let error, dynamic, () = apply_event_list static dynamic error event_list in
-        error, static, dynamic
+
+  let initialize static dynamic error =
+    let error, domain_static, domain_dynamic, event_list =
+      Domain.initialize static dynamic error
+    in
+    let parameters = get_parameter (static,domain_static) in
+    let error, wake_up_tmp =
+      Common_static.empty_site_to_rules parameters error
+    in
+    let error, wake_up_tmp =
+      Domain.complete_wake_up_relation domain_static error wake_up_tmp
+    in
+    let error, wake_up =
+      Common_static.consolidate_site_rule_dependencies
+        parameters error wake_up_tmp
+    in
+    let static =
+      Analyzer_headers.add_wake_up_relation static wake_up, domain_static
+    in
+    let working_list = empty_working_list in
+    let error, sites_blackboard =
+      Communication.init_sites_working_list parameters error
+    in
+    let dynamic =
+      {
+        rule_working_list = working_list;
+        domain = domain_dynamic;
+        modified_sites_blackboard = sites_blackboard;
+        bonds = Ckappa_sig.AgentSite_map_and_set.Map.empty;
+      }
+    in
+    let error, dynamic =
+      scan_rule_creation
+        static
+        dynamic
+        error
+    in
+    let error, dynamic, () = apply_event_list static dynamic error event_list in
+    error, static, dynamic
 
   (** add initial state then apply a list of event starts from this new
       list*)

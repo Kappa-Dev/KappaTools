@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 20 2016>
+   * Last modification: Time-stamp: <Nov 23 2016>
    *
    * Abstract domain to record live rules
    *
@@ -221,7 +221,9 @@ type site_working_list
 val init_sites_working_list:
   Remanent_parameters_sig.parameters -> Exception.method_handler ->
   Exception.method_handler * site_working_list
-
+val clear_sites_working_list:
+  Remanent_parameters_sig.parameters -> Exception.method_handler ->
+  site_working_list ->  Exception.method_handler * site_working_list
 val add_site:
   Remanent_parameters_sig.parameters -> Exception.method_handler ->
   Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
