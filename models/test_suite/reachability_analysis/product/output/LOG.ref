@@ -1227,19 +1227,5 @@ Id=61
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-A(z!1),A(z!1)=> [
-		  A(z~p!1),A(z~p!1)
-		v A(z~u!1),A(z~u!1)]
-A(t!1),A(t!1)=> [
-		  A(t!1,z~p?),A(t!1,z~p?)
-		v A(t!1,z~u?),A(t!1,z~u?)]
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
 Some exceptions have been raised
 error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 24: Label 'r3' is already used; exception:Exit

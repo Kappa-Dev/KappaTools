@@ -2909,12 +2909,4 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
 execution finished without any exception

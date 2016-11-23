@@ -1258,15 +1258,4 @@ Id=75
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-------------------------------------------------------------
-* Export Connected agents to JSon (internal constraints_list):
-------------------------------------------------------------
-A(z!1),B(z!1)=> [
-		  A(t~p,z!1),B(t~p,z!1)
-		v A(t~u,z!1),B(t~u,z!1)]
-
-------------------------------------------------------------
-* Export Parallel bonds to JSon (internal constraints_list):
-------------------------------------------------------------
-
 execution finished without any exception
