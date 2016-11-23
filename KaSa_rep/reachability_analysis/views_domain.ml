@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 22 2016>
+   * Last modification: Time-stamp: <Nov 23 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3588,13 +3588,14 @@ struct
               Exception.warn parameters error error' __POS__ Exit
           in
           error, current_list
-        ) (error, [])(* (List.rev list)*) list
+        ) (error, []) list
     in
     let error = Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
     (*------------------------------------------------------------------*)
-    let constraint_list = Remanent_state.get_constraints_list kasa_state in
+    let constraint_list =
+      Remanent_state.get_constraints_list kasa_state in
     let error', constraint_list =
       match
         constraint_list
@@ -3692,7 +3693,7 @@ struct
     let error = Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
-    (*export of (non)relational properties*) (*CHECK ME*)
+    (*export of (non)relational properties*)
     let error'', dynamic, kasa_state =
       export_views_properties
         static dynamic error kasa_state

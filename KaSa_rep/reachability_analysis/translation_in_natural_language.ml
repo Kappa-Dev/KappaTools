@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Nov 18 2016>
+ * Last modification: Time-stamp: <Nov 23 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -967,14 +967,9 @@ let rec convert_views_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type agent_id translation t current_list =
-  (*TODO*)
   let error, current_list =
     match translation with
-    | Range (site_type, state_list) -> (*FIXME*)
-      (*let log = Remanent_parameters.get_logger parameters in*)
-      (*let _ =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "test3\n"
-      in*)
+    | Range (site_type, state_list) ->
       begin
         if dim_min <= 1
         then
@@ -1020,6 +1015,7 @@ let rec convert_views_constraints_list_aux
                         __POS__ Exit
                     in
                     error, site_graph' :: c_list
+                    (*error, t' :: c_list *)
                   ) (error, []) state_list
               in
               let lemma =
@@ -1181,7 +1177,7 @@ let rec convert_views_constraints_list_aux
             (*--------------------------------------------------*)
             let lemma =
               {
-                Remanent_state.hyp = site_graph;
+                Remanent_state.hyp = site_graph ;
                 Remanent_state.refinement = [site_graph']
               }
             in
@@ -1284,6 +1280,7 @@ let rec convert_views_constraints_list_aux
                              __POS__ Exit
                          in
                          let refinement = site_graph' :: current_list in
+                         (*let refinement = t' :: current_list in*)
                          error, refinement
                       ) (error, current_list) state_list
                   ) (error, []) list
@@ -1296,7 +1293,7 @@ let rec convert_views_constraints_list_aux
               (*----------------------------------------*)
               let lemma =
                 {
-                  Remanent_state.hyp = site_graph;
+                  Remanent_state.hyp = site_graph (*t*) ;
                   Remanent_state.refinement = refinement
                 }
               in

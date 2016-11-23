@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 23 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -555,8 +555,10 @@ let convert_id x nrules =
 let convert_half_influence_map influence nrules  =
   Ckappa_sig.PairRule_setmap.Map.fold
     (fun (x,y) list map ->
-       let x = convert_id (int_of_string (Ckappa_sig.string_of_rule_id x)) nrules in
-       let y = convert_id (int_of_string (Ckappa_sig.string_of_rule_id y)) nrules in
+       let x = convert_id (int_of_string (Ckappa_sig.string_of_rule_id x))
+           nrules in
+       let y = convert_id (int_of_string (Ckappa_sig.string_of_rule_id y))
+           nrules in
        let old =
          match
            Remanent_state.InfluenceNodeMap.find_option x map
@@ -706,7 +708,8 @@ let convert_contact_map show_title state contact_map =
       (fun parameters error _ ag sitemap->
          SiteProj.monadic_proj_map_i
            (fun parameters errors site ->
-              let error, site = Handler.translate_site parameters errors handler ag (site:Ckappa_sig.c_site_name) in
+              let error, site = Handler.translate_site parameters errors
+                  handler ag (site:Ckappa_sig.c_site_name) in
               error, Handler.print_site_contact_map site)
            parameters error
            ([],[])
@@ -714,7 +717,8 @@ let convert_contact_map show_title state contact_map =
               let error, list_a'' =
                 List.fold_left
                   (fun (error, list) state ->
-                     let error, state = Handler.translate_state parameters error handler ag site state in
+                     let error, state = Handler.translate_state parameters
+                         error handler ag site state in
                      match state with
                      | Ckappa_sig.Internal state -> error, state::list
                      | Ckappa_sig.Binding _ ->
@@ -729,7 +733,8 @@ let convert_contact_map show_title state contact_map =
                          ~message:"unknown agent type" ~ml_pos:(Some __POS__)
                          parameters error handler agent
                      in
-                     let error, site = Handler.translate_site parameters error handler agent site in
+                     let error, site = Handler.translate_site parameters error
+                         handler agent site in
                      let st = Handler.print_site_contact_map site in
                      error, (ag,st)::list)
                   (error, list_b) (List.rev list_b')
@@ -795,8 +800,10 @@ let compute_intermediary_internal_influence_map show_title state =
   let state =
     Remanent_state.set_influence_map Remanent_state.Medium
       {
-        Remanent_state.positive = convert_half_influence_map wake_up_map nrules ;
-        Remanent_state.negative = convert_half_influence_map inhibition_map nrules ;
+        Remanent_state.positive =
+          convert_half_influence_map wake_up_map nrules;
+        Remanent_state.negative =
+          convert_half_influence_map inhibition_map nrules ;
       }
       state
   in
@@ -946,7 +953,8 @@ let get_intermediary_internal_contact_map =
     (Remanent_state.get_internal_contact_map Remanent_state.Medium)
     compute_intermediary_internal_contact_map
 
-let get_internal_contact_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+let get_internal_contact_map
+    ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   match
     accuracy_level
   with
@@ -1072,14 +1080,16 @@ let dump_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state
   | Some influence_map ->
     print_influence_map (Remanent_state.get_parameters state) influence_map
 
-let output_internal_influence_map ?logger ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+let output_internal_influence_map ?logger
+    ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let parameters = get_parameters state in
   let state, influence_map = get_internal_influence_map ~accuracy_level state in
   let state, c_compil = get_c_compilation state in
   let state, handler = get_handler state in
   let error = get_errors state in
   let error =
-    Print_quarks.dot_of_influence_map ?logger parameters error handler c_compil influence_map
+    Print_quarks.dot_of_influence_map ?logger parameters error handler c_compil
+      influence_map
   in
   set_errors error state
 
@@ -1100,7 +1110,8 @@ let dump_contact_map accuracy state =
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
-let output_internal_contact_map ?logger ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+let output_internal_contact_map ?logger
+    ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let parameters = Remanent_state.get_parameters state in
   let state, contact_map = get_internal_contact_map ~accuracy_level state in
   let state, handler = get_handler state in

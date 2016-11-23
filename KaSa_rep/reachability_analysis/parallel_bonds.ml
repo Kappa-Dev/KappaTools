@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 22 2016>
+  * Last modification: Time-stamp: <Nov 23 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1148,71 +1148,12 @@ struct
       parameters compiled kappa_handler error
       rule_id event_list
 
-(* This is WAY too costly *)
-(* This function is called often *)
-(* Many times per rule application *)
-(* It should be done efficiently and only once. *)
-(* The result should be stored in a field of static *)
-  (* a common map between the domain: with the type site -> rule set *)
-(* The results for each case should be merged in this field *)
-  let apply_event_list_rule_in_lhs_rhs_aux static error store_rule_double_bonds
-      event_list tuple_pair_set =
-  let error, event_list =
-    Ckappa_sig.Rule_map_and_set.Map.fold
-      (fun rule_id tuple_pair_map (error, event_list) ->
-         let error, event_list =
-           Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.fold
-             (fun tuple_pair _ (error, event_list) ->
-                let proj (_,((b, c, d, e, f), (g, h, k, i, j))) =
-                  (b, c, d, e, f), (g, h, k, i, j)
-                in
-                let proj_tuple = proj tuple_pair in
-                (*check if the tuple belongs to the good tuple*)
-                if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
-                    proj_tuple
-                    tuple_pair_set
-                then
-                  add_rule static error rule_id event_list
-                else
-                  error, event_list
-             ) tuple_pair_map (error, event_list)
-         in
-         error, event_list
-      ) store_rule_double_bonds (error, event_list)
-  in
-  error, event_list
-
-(* The result should be stored in a field of static *)
-(* merged with the result of the previous function *)
-  let apply_event_list_rule_in_first_and_second_aux static error
-      store_site_create_parallel_bonds event_list tuple_pair_set =
-    let error, event_list =
-      Ckappa_sig.Rule_map_and_set.Map.fold
-        (fun rule_id tuple_pair_map (error, event_list) ->
-           Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
-             (fun tuple_pair tuple_list (error, event_list) ->
-                List.fold_left (fun (error, event_list) tuple ->
-                    let proj (_,b, c, d, e, f) = (b, c, d, e, f) in
-                    let proj2 (x, y) = proj x, proj y in
-                    (*check if the tuple belongs to the good tuple*)
-                    if
-                      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
-                        (proj2 tuple)
-                        tuple_pair_set
-                    then
-                      add_rule static error rule_id event_list
-                    else
-                      error, event_list
-                  ) (error, event_list) tuple_list
-             ) tuple_pair_map (error, event_list)
-      ) store_site_create_parallel_bonds (error, event_list)
-  in
-  error, event_list
+  (*-----------------------------------------------------------*)
 
   let apply_event_list static dynamic error event_list =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let store_sites_to_tuple = get_sites_to_tuple static in
+    (*let store_sites_to_tuple = get_sites_to_tuple static in*)
     let wake_up_relation = get_wake_up_relation static in
       (*get a list tuple pair that the pair of modified sites belong to*)
     let error, event_list =
@@ -1249,7 +1190,7 @@ struct
                   in error
                 else error
               in
-              (*TODO*)
+              (*-----------------------------------------------------------*)
               let error, rule_id_list =
                 Common_static.wake_up
                   parameters error
@@ -1257,68 +1198,14 @@ struct
                   site_type
                   wake_up_relation
               in
+              (*-----------------------------------------------------------*)
               let error, event_list =
               List.fold_left (fun (error, event_list) rule_id ->
                   add_rule static error
                     rule_id event_list
                 ) (error, event_list) rule_id_list
               in
-              (*search with tuple that this pair of site belong to*)
-              (*let error, tuple_pair_set =
-                match
-                  Parallel_bonds_type.AgentSite_map_and_set.Map.find_option_without_logs
-                    parameters error
-                    (agent_type, site_type)
-                    store_sites_to_tuple (*tuple from lhs and rhs*)
-                with
-                | error, None ->
-                  error,
-                  Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
-                | error, Some s -> error, s
-              in
               (*-----------------------------------------------------------*)
-              (*get rule_id from tuple on the lhs*)
-              let store_rule_double_bonds_lhs =
-                get_rule_double_bonds_lhs static in
-              let error, event_list =
-                apply_event_list_rule_in_lhs_rhs_aux
-                  static error
-                  store_rule_double_bonds_lhs
-                  event_list
-                  tuple_pair_set
-              in
-              (*-----------------------------------------------------------*)
-              (*get rule_id from tuple on the rhs*)
-              let store_rule_double_bonds_rhs =
-                get_rule_double_bonds_rhs static in
-              let error, event_list =
-                apply_event_list_rule_in_lhs_rhs_aux
-                  static error
-                  store_rule_double_bonds_rhs
-                  event_list
-                  tuple_pair_set
-              in
-              (*-----------------------------------------------------------*)
-              (*rule_id in the case when the first site created the tuple*)
-              let store_fst_site_create_parallel_bonds_rhs =
-                get_fst_site_create_parallel_bonds_rhs static in
-              let error, event_list =
-                apply_event_list_rule_in_first_and_second_aux
-                  static error
-                  store_fst_site_create_parallel_bonds_rhs
-                  event_list
-                  tuple_pair_set
-              in
-              (*-----------------------------------------------------------*)
-              let store_snd_site_create_parallel_bonds_rhs =
-                get_snd_site_create_parallel_bonds_rhs static in
-              let error, event_list =
-                apply_event_list_rule_in_first_and_second_aux
-                  static error
-                  store_snd_site_create_parallel_bonds_rhs
-                  event_list
-                  tuple_pair_set
-              in*)
               let () =
                 if local_trace
                 || Remanent_parameters.get_dump_reachability_analysis_wl
@@ -2029,7 +1916,7 @@ struct
                    | Remanent_parameters_sig.Raw ->
                      begin
                        (*hyp*)
-                       (*let string_version =
+                       let string_version =
                          Ckappa_backend.Ckappa_backend.get_string_version
                            t_precondition
                        in
@@ -2047,20 +1934,20 @@ struct
                            Remanent_state.refinement = refinement
                          }
                        in
-                       let current_list = lemma :: current_list in*)
+                       let current_list = lemma :: current_list in
                        (*internal constraint list*)
-                       let refine = List.rev list_same in
+                       (*let refine = List.rev list_same in
                        let lemma_internal =
                          {
                            Remanent_state.hyp = t_precondition;
                            Remanent_state.refinement = refine;
                          }
                        in
-                       let current_list = lemma_internal :: current_list in
+                       let current_list = lemma_internal :: current_list in*)
                        error, current_list
                      end
                    | Remanent_parameters_sig.Natural_language ->
-                     (*let string_version =
+                     let string_version =
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_same
                      in
@@ -2077,16 +1964,16 @@ struct
                          Remanent_state.refinement = refinement
                        }
                      in
-                     let current_list = lemma :: current_list in*)
+                     let current_list = lemma :: current_list in
                      (*internal constraint list*)
-                     let refine = List.rev list_same in
+                     (*let refine = List.rev list_same in
                      let lemma_internal =
                        {
                          Remanent_state.hyp = t_same;
                          Remanent_state.refinement = refine
                        }
                      in
-                     let current_list = lemma_internal :: current_list in
+                     let current_list = lemma_internal :: current_list in*)
                      error, current_list
                  end
                | Usual_domains.Val false ->
@@ -2094,7 +1981,7 @@ struct
                    match Remanent_parameters.get_backend_mode parameters with
                    | Remanent_parameters_sig.Kappa
                    | Remanent_parameters_sig.Raw ->
-                     (*let string_version =
+                     let string_version =
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_precondition
                      in
@@ -2108,19 +1995,19 @@ struct
                          Remanent_state.refinement = refinement
                        }
                      in
-                     let current_list = lemma :: current_list in*)
+                     let current_list = lemma :: current_list in
                      (*internal constraint list*)
-                     let refine = List.rev list_distinct in
+                     (*let refine = List.rev list_distinct in
                      let lemma_internal =
                        {
                          Remanent_state.hyp = t_precondition;
                          Remanent_state.refinement = refine
                        }
                      in
-                     let current_list = lemma_internal :: current_list in
+                     let current_list = lemma_internal :: current_list in*)
                      error, current_list
                    | Remanent_parameters_sig.Natural_language ->
-                     (*let string_version =
+                     let string_version =
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_distinct
                      in
@@ -2134,16 +2021,16 @@ struct
                          Remanent_state.refinement = refinement
                        }
                      in
-                     let current_list = lemma :: current_list in*)
+                     let current_list = lemma :: current_list in
                      (*internal constraint list*)
-                     let refine = List.rev list_distinct in
+                     (*let refine = List.rev list_distinct in
                      let lemma_internal =
                        {
                          Remanent_state.hyp = t_distinct;
                          Remanent_state.refinement = refine
                        }
                      in
-                     let current_list = lemma_internal :: current_list in
+                     let current_list = lemma_internal :: current_list in*)
                      error, current_list
                  end
                | Usual_domains.Any ->
@@ -2152,7 +2039,7 @@ struct
                  | Remanent_parameters_sig.Raw ->
                    error, current_list
                  | Remanent_parameters_sig.Natural_language ->
-                   (*let string_version =
+                   let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_same
                    in
@@ -2166,18 +2053,18 @@ struct
                        Remanent_state.refinement = refinement
                      }
                    in
-                   let current_list = lemma :: current_list in*)
+                   let current_list = lemma :: current_list in
                    (*internal*)
-                   let refine = List.rev list_same in
+                   (*let refine = List.rev list_same in
                    let lemma_internal =
                      {
                        Remanent_state.hyp = t_same;
                        Remanent_state.refinement = refine
                      }
                    in
-                   let current_list = lemma_internal :: current_list in
+                   let current_list = lemma_internal :: current_list in*)
                    (*----------------------------------------------*)
-                   (*let string_version =
+                   let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_distinct
                    in
@@ -2191,9 +2078,9 @@ struct
                        Remanent_state.refinement = refinement
                      }
                    in
-                   let current_list = lemma :: current_list in*)
+                   let current_list = lemma :: current_list in
                    (*internal constraint list*)
-                   let refine =
+                   (*let refine =
                      List.rev
                        list_distinct
                    in
@@ -2201,12 +2088,12 @@ struct
                      {Remanent_state.hyp = t_distinct;
                       Remanent_state.refinement = refine}
                    in
-                   let current_list = lemma_internal :: current_list in
+                   let current_list = lemma_internal :: current_list in*)
                    error, current_list
           ) store_value (error, []) (*name of domain*)
       in
       (*------------------------------------------------------------------*)
-      (*let constraint_list = Remanent_state.get_constraints_list kasa_state in
+      let constraint_list = Remanent_state.get_constraints_list kasa_state in
       let error, constraint_list =
         match
           constraint_list
@@ -2218,10 +2105,10 @@ struct
       let pair_list = (domain_name, List.rev current_list) :: constraint_list in
       let kasa_state =
         Remanent_state.set_constraints_list pair_list kasa_state
-      in*)
+      in
       (*------------------------------------------------------------------*)
       (*internal constraint list*)
-      let internal_constraints_list =
+      (*let internal_constraints_list =
         Remanent_state.get_internal_constraints_list kasa_state
       in
       let error, internal_constraints_list =
@@ -2233,8 +2120,60 @@ struct
       let pair_list =
         (domain_name, List.rev current_list) :: internal_constraints_list in
       let kasa_state =
-        Remanent_state.set_internal_constraints_list pair_list kasa_state in
+        Remanent_state.set_internal_constraints_list pair_list kasa_state in*)
       error, dynamic, kasa_state
+
+  (*let export static dynamic error kasa_state =
+    let error, dynamic, kasa_state =
+      export_internal_constraints_list static dynamic error kasa_state
+    in
+    let parameters = get_parameter static in
+    let internal_constraints_list =
+      Remanent_state.get_internal_constraints_list kasa_state
+    in
+    let error, internal_constraints_list =
+      match internal_constraints_list with
+      | None -> Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
+    in
+    let constraint_list = Remanent_state.get_constraints_list kasa_state in
+    let error, constraint_list =
+      match constraint_list with
+      | None -> Exception.warn parameters error __POS__ Exit []
+      | Some l -> error, l
+    in
+    let error, kasa_state =
+      List.fold_left (fun (error, kasa_state) (domain_name, lemma_list) ->
+          let error, current_list =
+            List.fold_left (fun (error, current_list) lem ->
+                let hyp = Remanent_state.get_hyp lem in
+                let refine = Remanent_state.get_refinement lem in
+                let string_version =
+                  Ckappa_backend.Ckappa_backend.get_string_version
+                    hyp
+                in
+                let error, site_graph =
+                  Ckappa_site_graph.site_graph_to_list error string_version
+                in
+                let error, refinement =
+                  Ckappa_site_graph.site_graph_list_to_list error refine in
+                let lemma =
+                  {Remanent_state.hyp = site_graph;
+                   Remanent_state.refinement = refinement}
+                in
+                let current_list = lemma :: current_list in
+                error, current_list
+              ) (error, []) lemma_list
+          in
+          (*----------------------------------------------------------*)
+          let pair_list =
+            (domain_name, List.rev current_list) :: constraint_list in
+          let kasa_state =
+            Remanent_state.set_constraints_list pair_list kasa_state in
+          error, kasa_state
+        ) (error, kasa_state) internal_constraints_list
+    in
+    error, dynamic, kasa_state*)
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)

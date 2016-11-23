@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 22 2016>
+   * Last modification: Time-stamp: <Nov 23 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1072,10 +1072,10 @@ struct
     | Fst -> get_partition_modified_map_1 static
     | Snd -> get_partition_modified_map_2 static
 
-  let get_rule_partition_modified pos static =
+  (*let get_rule_partition_modified pos static =
     match pos with
     | Fst -> get_rule_partition_modified_map_1 static
-    | Snd -> get_rule_partition_modified_map_2 static
+    | Snd -> get_rule_partition_modified_map_2 static*)
 
   let get_state_of_site_in_postcondition_gen
       pos error static dynamic
@@ -1484,28 +1484,9 @@ struct
            parameters compiled kappa_handler error
            rule_id event_list
 
-  let apply_event_rule_aux static error store_rule_map tuple_pair_set event_list
-    =
-    let error, event_list =
-    Ckappa_sig.Rule_map_and_set.Map.fold
-      (fun rule_id tuple_set (error, event_list) ->
-         Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.fold
-           (fun tuple (error, event_list) ->
-              if
-                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem
-                  tuple
-                  tuple_pair_set
-              then
-                add_rule static error rule_id event_list
-              else error, event_list
-           ) tuple_set (error, event_list)
-      ) store_rule_map (error, event_list)
-  in
-  error, event_list
-
   (*-----------------------------------------------------------*)
 
-  let get_partition_created_bonds pos static =
+  (*let get_partition_created_bonds pos static =
     match pos with
     | Fst -> get_partition_created_bonds_map_1 static
     | Snd -> get_partition_created_bonds_map_2 static
@@ -1513,40 +1494,13 @@ struct
   let get_rule_partition_created_bonds pos static =
     match pos with
     | Fst -> get_rule_partition_created_bonds_map_1 static
-    | Snd -> get_rule_partition_created_bonds_map_2 static
+    | Snd -> get_rule_partition_created_bonds_map_2 static*)
 
   (*-----------------------------------------------------------*)
-
-  let apply_event_rule_lhs_aux static error store_potential_tuple_pair_lhs
-      tuple_pair_set event_list =
-    let error, event_list =
-      Ckappa_sig.Rule_map_and_set.Map.fold
-        (fun rule_id tuple_set (error, event_list) ->
-           Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.fold
-             (fun tuple (error, event_list) ->
-                let proj (a, b, c, d, _) = (a, b, c, d) in
-                let proj2 (x, y) = proj x, proj y in
-                if
-                  Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem (*CHECK ME*)
-                    (proj2 tuple)
-                    tuple_pair_set
-                then
-                  add_rule static error rule_id event_list
-                else error, event_list
-             ) tuple_set (error, event_list)
-        ) store_potential_tuple_pair_lhs (error, event_list)
-    in
-    error, event_list
-
-(*-----------------------------------------------------------*)
 
   let apply_event_list_aux ~pos static dynamic error event_list  =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let store_partition_modified_map = get_partition_modified pos static in
-    let store_partition_created_bonds_map =
-      get_partition_created_bonds pos static
-    in
     let wake_up_relation = get_wake_up_relation static in
     (*-----------------------------------------------------------*)
     let error, event_list =
@@ -1597,116 +1551,6 @@ struct
                     rule_id event_list
                 ) (error, event_list) rule_id_list
             in
-            (* This is WAY too costly and too complicated *)
-            (* This function is called often *)
-            (* Many times per rule application *)
-            (* It should be done efficiently and only once. *)
-            (* The result should be stored in a field of static *)
-            (* with the type site -> rule set *)
-            (* The results for each case should be merged in this field *)
-            (*let error, tuple_pair_modif_set =
-              match
-                Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
-                  parameters error
-                  (agent_type, site_type)
-                  store_partition_modified_map
-              with
-              | error, None ->
-                error,
-                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
-              | error, Some s -> error, s
-            in
-            (*-----------------------------------------------------------*)
-            let error, tuple_pair_created_set =
-              match
-                Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.find_option_without_logs
-                  parameters error
-                  (agent_type, site_type)
-                  store_partition_created_bonds_map
-              with
-              | error, None ->
-                error,
-                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
-              | error, Some s -> error, s
-            in
-            (*-----------------------------------------------------------*)
-            (*get rule_id from tuple on the lhs*)
-            let store_potential_tuple_pair_lhs =
-              get_potential_tuple_pair_lhs static
-            in
-            let error, event_list =
-              apply_event_rule_lhs_aux
-                static
-                error
-                store_potential_tuple_pair_lhs
-                tuple_pair_modif_set
-                event_list
-            in
-            let error, event_list =
-              apply_event_rule_lhs_aux
-                static
-                error
-                store_potential_tuple_pair_lhs
-                tuple_pair_created_set
-                event_list
-            in
-            (*-----------------------------------------------------------*)
-            (*get rule_id from tuple on the rhs*)
-            let store_potential_tuple_pair_rule_rhs =
-              get_potential_tuple_pair_rule_rhs static
-            in
-            let error, event_list =
-              apply_event_rule_aux
-                static
-                error
-                store_potential_tuple_pair_rule_rhs
-                tuple_pair_modif_set
-                event_list
-            in
-            let error, event_list =
-              apply_event_rule_aux
-                static
-                error
-                store_potential_tuple_pair_rule_rhs
-                tuple_pair_created_set
-                event_list
-            in
-            (*-----------------------------------------------------------*)
-            (*rule_id modified *)
-            let store_rule_partition_modified_map =
-              get_rule_partition_modified pos static
-            in
-            let error, event_list =
-              apply_event_rule_aux
-                static
-                error
-                store_rule_partition_modified_map
-                tuple_pair_modif_set
-                event_list
-            in
-            (*-----------------------------------------------------------*)
-            (*rule created bond*)
-            let store_rule_partition_created_bonds =
-              get_rule_partition_created_bonds pos static in
-            let error, event_list =
-              apply_event_rule_aux
-                static
-                error
-                store_rule_partition_created_bonds
-                tuple_pair_created_set
-                event_list
-            in
-            (*-----------------------------------------------------------*)
-            (*side effects rule_id*)
-            let store_potential_side_effects =
-              get_potential_side_effects static
-            in
-            let error, event_list =
-              Ckappa_sig.Rule_map_and_set.Map.fold
-                (fun rule_id _list (error, event_list) ->
-                   add_rule static error rule_id event_list)
-                store_potential_side_effects (error, event_list)
-            in*)
             let () =
               if local_trace
               || Remanent_parameters.get_dump_reachability_analysis_wl
@@ -1742,9 +1586,9 @@ struct
     let handler = get_mvbdu_handler dynamic in
     let store_value = get_value dynamic in
     let domain_name = "Connected agents" in
-    let error, (handler, current_list1, current_list2) =
+    let error, (handler, current_list) =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.fold
-        (fun tuple mvbdu (error, (handler, current_list1, current_list2)) ->
+        (fun tuple mvbdu (error, (handler, current_list)) ->
            let (agent_type1, site_type1, site_type1', _),
                (agent_type2, site_type2, site_type2', _) = tuple
            in
@@ -1754,7 +1598,7 @@ struct
            in
            (*this test remove the relation: B.A*)
            if compare (agent1,site1,site1') (agent2,site2,site2') > 0
-           then error, (handler, current_list1, current_list2)
+           then error, (handler, current_list)
            else
              (*this test remove the relation when their states are not the
                same: for instance: A(x~p), B(x~u)*)
@@ -1770,7 +1614,7 @@ struct
                  error, handler, false
              in
              if non_relational
-             then error, (handler, current_list1, current_list2)
+             then error, (handler, current_list)
              else
                (*----------------------------------------------------*)
                let error, handler, pair_list =
@@ -1825,15 +1669,17 @@ struct
                      Remanent_state.refinement = refinement
                    }
                  in
-                 let current_list1 = lemma :: current_list1 in
+                 let current_list = lemma :: current_list in
                  (*---------------------------------------------------*)
                  (*internal constraint list*)
-                 let error, refine =
+                 (*let error, refine =
                    Ckappa_site_graph.internal_pair_list_to_list
                      parameters error kappa_handler
                      pattern
-                     agent_id1 site_type1'
-                     agent_id2 site_type2'
+                     agent_id1
+                     site_type1'
+                     agent_id2
+                     site_type2'
                      pair_list
                  in
                  let lemma_internal =
@@ -1842,12 +1688,12 @@ struct
                      Remanent_state.refinement = refine;
                    }
                  in
-                 let current_list2 = lemma_internal :: current_list2 in
+                 let current_list = lemma_internal :: current_list in*)
                  (*---------------------------------------------------*)
-                 error, (handler, current_list1, current_list2)
+                 error, (handler, current_list)
                | Remanent_parameters_sig.Natural_language ->
-                 error, (handler, current_list1, current_list2)
-        ) store_value (error, (handler, [], []))
+                 error, (handler, current_list)
+        ) store_value (error, (handler, []))
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -1860,13 +1706,13 @@ struct
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
-    let pair_list = (domain_name, List.rev current_list1) :: constraint_list in
+    let pair_list = (domain_name, List.rev current_list) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraints_list pair_list kasa_state
     in
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
-    let internal_constraints_list =
+    (*let internal_constraints_list =
       Remanent_state.get_internal_constraints_list
         kasa_state
     in
@@ -1878,9 +1724,10 @@ struct
         Exception.warn parameters error __POS__ Exit []
       | Some l -> error, l
     in
-    let pair_list = (domain_name, List.rev current_list2) :: internal_constraints_list in
+    let pair_list =
+      (domain_name, List.rev current_list) :: internal_constraints_list in
     let kasa_state =
-      Remanent_state.set_internal_constraints_list pair_list kasa_state in
+      Remanent_state.set_internal_constraints_list pair_list kasa_state in*)
     error, dynamic, kasa_state
 
   let export static dynamic error kasa_state =
@@ -1888,7 +1735,6 @@ struct
         static dynamic error kasa_state
 
   (****************************************************************)
-  (* to do *)
 
   let print static dynamic (error:Exception.method_handler) loggers =
     let parameters = get_parameter static in
@@ -1920,7 +1766,9 @@ struct
                  ~verbose:true
                  ~sparse:true
                  ~final_result:true
-                 ~dump_any:true parameters error kappa_handler handler (x, y) mvbdu
+                 ~dump_any:true parameters error kappa_handler handler
+                 (x, y)
+                 mvbdu
             ) store_value (error, handler)
         in
         error, handler

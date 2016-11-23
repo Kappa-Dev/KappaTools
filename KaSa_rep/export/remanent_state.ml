@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 17 2016>
+  * Last modification: Time-stamp: <Nov 23 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -285,8 +285,7 @@ type site_map =
    (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
      Wrapped_modules.LoggedStringMap.t) list
 
-type constraints_list =
-  site_map poly_constraints_list
+type constraints_list = site_map poly_constraints_list
 
 let get_hyp h = h.hyp
 
@@ -321,7 +320,6 @@ type ('static,'dynamic) state =
     ode_flow: Ode_fragmentation_type.ode_frag option ;
     ctmc_flow: flow option ;
     errors        : Exception.method_handler ;
-    (*TODO*)
     internal_constraints_list : internal_constraints_list option;
     constraints_list : constraints_list option;
   }
