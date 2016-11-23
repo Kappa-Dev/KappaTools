@@ -368,6 +368,24 @@ struct
     (*test and modify in a views*)
     let store_test_modif_map = get_test_modif_map static in
     (*CHECK ME*)
+    (* This is not what I asked, you should fold over modules about tuples of interest (ie covering classes) that is to say (in bdu_static_views) )
+       store_proj_bdu_creation_restriction_map:
+       Ckappa_sig.Views_bdu.mvbdu
+        Covering_classes_type.AgentCV_setmap.Map.t
+        Ckappa_sig.Rule_setmap.Map.t;
+       store_modif_list_restriction_map:
+       Ckappa_sig.Views_bdu.hconsed_association_list
+        Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
+       store_proj_bdu_potential_restriction_map :
+       (Ckappa_sig.Views_bdu.mvbdu *
+       Ckappa_sig.Views_bdu.hconsed_association_list)
+        Covering_classes_type.AgentSiteCV_setmap.Map.t
+        Ckappa_sig.Rule_setmap.Map.t;
+       store_proj_bdu_test_restriction :
+       Ckappa_sig.Views_bdu.mvbdu
+        Covering_classes_type.AgentsCV_setmap.Map.t
+        Ckappa_sig.Rule_setmap.Map.t;*)
+
     let error, wake_up =
       Ckappa_sig.AgentSite_map_and_set.Map.fold
         (fun (agent_type, site_type) rule_id_set (error, wake_up) ->
