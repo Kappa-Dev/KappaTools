@@ -1263,8 +1263,6 @@ struct
                     rule_id event_list
                 ) (error, event_list) rule_id_list
               in
-
-
               (*search with tuple that this pair of site belong to*)
               (*let error, tuple_pair_set =
                 match
