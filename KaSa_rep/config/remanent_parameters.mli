@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 22 2016>
+  * Last modification: Time-stamp: <Nov 23 2016>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -110,6 +110,14 @@ val get_view_analysis:  Remanent_parameters_sig.parameters -> bool
 val get_site_accross_bonds_analysis: Remanent_parameters_sig.parameters -> bool
 val get_parallel_bonds_analysis: Remanent_parameters_sig.parameters -> bool
 val get_dynamic_contact_map: Remanent_parameters_sig.parameters -> bool
+val get_view_analysis_1:  Remanent_parameters_sig.reachability_parameters-> bool
+
+val get_reachability_analysis_parameters: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.reachability_parameters
+val get_site_accross_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
+val get_parallel_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
+val get_dynamic_contact_map_1: Remanent_parameters_sig.reachability_parameters -> bool
+val get_reachability_parameters: unit -> Remanent_parameters_sig.reachability_parameters 
+
 (** local traces *)
 val get_local_trace_format: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.graph_format
 val get_compute_local_traces: Remanent_parameters_sig.parameters -> bool

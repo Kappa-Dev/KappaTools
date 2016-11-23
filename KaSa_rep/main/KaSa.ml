@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 21 2016>
+ * Last modification: Time-stamp: <Nov 23 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -16,11 +16,7 @@ let main () =
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
     (val Domain_selection.select_domain
-      ~with_views_domain:(Remanent_parameters.get_view_analysis parameters)
-      ~with_parallel_bonds_domain:(Remanent_parameters.get_parallel_bonds_analysis parameters)
-      ~with_site_accross_bonds_domain:(Remanent_parameters.get_site_accross_bonds_analysis parameters)
-      ()
-        )
+        ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
   in
   let export_to_kasa =
     (module Export_to_KaSa.Export(A) : Export_to_KaSa.Type) in
@@ -127,4 +123,4 @@ let main () =
 
 let () = main ()
 
-module A = Export_to_KaSim.Export 
+module A = Export_to_KaSim.Export

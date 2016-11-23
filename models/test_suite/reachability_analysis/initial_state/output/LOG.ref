@@ -580,4 +580,28 @@ Id=24
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+A(x~p)=> [A(x~p,y~u)]
+
+------------------------------------------------------------
+* Export Views domain - non relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+D()=> [D(x~u)]
+A()=> [
+		  A(x~u)
+		v A(x~p)]
+A()=> [
+		  A(y~u)
+		v A(y~p)]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
 execution finished without any exception

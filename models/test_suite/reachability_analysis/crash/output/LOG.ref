@@ -513,6 +513,30 @@ Id=39
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+C(z!C.t)=> [C(t,z!C.t)]
+
+------------------------------------------------------------
+* Export Views domain - non relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+C()=> [
+		  C(z)
+		v C(z!C.z)
+		v C(z!C.t)]
+C()=> [
+		  C(t)
+		v C(t!C.z)]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
 Some exceptions have been raised
 error: file_name: setMap.ml; message: line 659; exception:Not_found
 error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit

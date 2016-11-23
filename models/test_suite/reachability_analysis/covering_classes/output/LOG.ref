@@ -2909,4 +2909,62 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+C(y!A.y)=> [C(y~p!A.y)]
+B(y!A.y)=> [B(y~p!A.y)]
+B(x!A.x)=> [B(x~p!A.x)]
+C(x!A.x)=> [C(x~p!A.x)]
+
+------------------------------------------------------------
+* Export Views domain - non relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+C()=> [
+		  C(x~u?)
+		v C(x~p?)]
+C()=> [
+		  C(y)
+		v C(y!A.y)]
+C()=> [
+		  C(x)
+		v C(x!A.x)]
+C()=> [
+		  C(y~u?)
+		v C(y~p?)]
+B()=> [
+		  B(x~u?)
+		v B(x~p?)]
+B()=> [
+		  B(y)
+		v B(y!A.y)]
+B()=> [
+		  B(x)
+		v B(x!A.x)]
+B()=> [
+		  B(y~u?)
+		v B(y~p?)]
+A()=> [
+		  A(x~u?)
+		v A(x~p?)]
+A()=> [
+		  A(y)
+		v A(y!B.y)
+		v A(y!C.y)]
+A()=> [
+		  A(x)
+		v A(x!B.x)
+		v A(x!C.x)]
+A()=> [
+		  A(y~u?)
+		v A(y~p?)]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
 execution finished without any exception

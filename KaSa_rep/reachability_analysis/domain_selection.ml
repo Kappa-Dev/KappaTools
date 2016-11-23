@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Nov 22 2016>
+  * Last modification: Time-stamp: <Nov 23 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -15,12 +15,17 @@
 
 
 let select_domain
-    ?with_views_domain:(with_views_domain=true)
-    ?with_parallel_bonds_domain:(with_parallel_bonds_domain=true)
-    ?with_site_accross_bonds_domain:(with_site_accross_bonds_domain=true)
-    ?with_dynamic_contact_map_domain:(with_dynamic_contact_map_domain=true)
+    ?reachability_parameters
     ()
   =
+  let parameters =
+    match
+      reachability_parameters
+    with
+    | None ->
+      Remanent_parameters.get_reachability_parameters ()
+    | Some p -> p
+  in
   let base =
     (module
       Product.Product
@@ -29,7 +34,7 @@ let select_domain
   in
   let module Base = (val base: Analyzer_domain_sig.Domain) in
   let with_cm =
-    if with_dynamic_contact_map_domain
+    if Remanent_parameters.get_dynamic_contact_map_1 parameters
     then
       (module
         Product.Product
@@ -43,7 +48,7 @@ let select_domain
   in
   let module With_cm = (val with_cm: Analyzer_domain_sig.Domain) in
   let with_views =
-    if with_views_domain
+    if Remanent_parameters.get_view_analysis_1 parameters
     then
       (module
         Product.Product(Views_domain.Domain)(With_cm) : Analyzer_domain_sig.Domain)
@@ -52,7 +57,7 @@ let select_domain
   in
   let module With_views = (val with_views: Analyzer_domain_sig.Domain) in
   let with_site_accross =
-    if with_site_accross_bonds_domain
+    if Remanent_parameters.get_site_accross_bonds_analysis_1 parameters
     then
       (module
         Product.Product(Site_accross_bonds_domain.Domain)(With_views) : Analyzer_domain_sig.Domain)
@@ -63,7 +68,7 @@ let select_domain
     (val with_site_accross: Analyzer_domain_sig.Domain)
   in
   let with_parallel_bonds =
-    if with_parallel_bonds_domain
+    if Remanent_parameters.get_parallel_bonds_analysis_1 parameters
     then
       (module
         Product.Product(Parallel_bonds.Domain)(With_site_accross) :
