@@ -312,7 +312,7 @@ function observable_plot(configuration){
         var line = d3.line()
             .curve(d3.curveLinear)
             .defined(function(d,i) { return !that.getXAxisLog() || xState.values[i] > 0; })
-            .defined(function(d,i) { return !that.getYAxisLog() || d > 0; })
+            .defined(function(d,i) { return !isNaN(d) && (!that.getYAxisLog() || d > 0); })
             .x(function(d,i) {
                 var value = xState.values[i];
                     value = x(value);

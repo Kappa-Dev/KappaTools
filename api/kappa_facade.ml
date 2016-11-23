@@ -280,14 +280,20 @@ let build_ast
        (fun range -> localize_range range indexes)
        (fun e -> Lwt.return (`Error e)))
 
+let prepare_plot_value x =
+  Array.fold_right
+    (fun nbr acc -> let c = Nbr.to_float nbr in
+      match classify_float c with
+      | FP_infinite | FP_nan -> None :: acc
+      | FP_zero | FP_normal | FP_subnormal -> Some c::acc)
+    x []
+
 let outputs (simulation : t) =
   function
   | Data.Flux flux_map ->
     simulation.flux_maps <- flux_map::simulation.flux_maps
   | Data.Plot (time,new_observables) ->
-    let new_values =
-      List.map (fun nbr -> Nbr.to_float nbr)
-        (Array.to_list new_observables) in
+    let new_values = prepare_plot_value new_observables in
     simulation.plot <-
       {simulation.plot with
        Api_types_j.plot_time_series =
@@ -441,9 +447,7 @@ let start
                 let first_obs =
                   State_interpreter.observables_values
                     t.env t.counter graph state in
-                let first_values =
-                  List.map (fun nbr -> Nbr.to_float nbr)
-                    (Array.to_list first_obs) in
+                let first_values = prepare_plot_value first_obs in
 
                 let () =
                   t.plot <-

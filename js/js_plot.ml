@@ -67,7 +67,7 @@ let create_dimension ~(height : int)
 class type plot_observable =
   object
     val time : float Js.t Js.prop
-    val values : (float Js.t) Js.js_array Js.t Js.prop
+    val values : float Js.t Js.opt Js.js_array Js.t Js.prop
   end
 let constructor_observable : plot_observable Js.t Js.constr =
   (Js.Unsafe.variable "Object")
@@ -79,7 +79,8 @@ let create_observable ~(observable : ApiTypes.observable)
              time := observable.ApiTypes.observation_time;
     (Js.Unsafe.coerce configuration)
     ##.
-      values := Js.array (Array.of_list observable.ApiTypes.observation_values);
+      values := Js.array (Tools.array_map_of_list
+                            Js.Opt.option observable.ApiTypes.observation_values);
     ()
   in configuration
 

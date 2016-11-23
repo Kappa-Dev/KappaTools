@@ -17,7 +17,8 @@ let plot_pg_store
           (fun (observable : Api_types_v1_j.observable) ->
              (observable.Api_types_v1_j.observation_time ,
               Tools.array_map_of_list
-                (fun x -> Nbr.F x) observable.Api_types_v1_j.observation_values))
+                (function Some x -> Nbr.F x | None -> Nbr.F nan)
+                observable.Api_types_v1_j.observation_values))
           plot.Api_types_v1_j.time_series
     }
 
@@ -33,8 +34,8 @@ let plot_values
        (fun (observable : Api_types_v1_j.observable) ->
           Format.asprintf "%a"
             (Pp.list (fun f -> Format.pp_print_string f separator)
-               (fun f -> Format.fprintf f "%e"))
-            (observable.Api_types_v1_j.observation_time
+               (Pp.option (fun f -> Format.fprintf f "%e")))
+            (Some observable.Api_types_v1_j.observation_time
              ::observable.Api_types_v1_j.observation_values)
        )
     plot.Api_types_v1_j.time_series)

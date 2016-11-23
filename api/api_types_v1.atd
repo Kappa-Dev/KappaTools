@@ -42,7 +42,7 @@ type ('l,'r) either = [ Left of 'l | Right of 'r ] <json repr="object">
 type ('r) result = (errors,'r) either
 
 type observable = { observation_time : float <json name="time">;
-                    observation_values : float list <json name="values">; }
+                    observation_values : float nullable list <json name="values">; }
 
 type plot = { legend: string list;
       	      time_series : observable list }
