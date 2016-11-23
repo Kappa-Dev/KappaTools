@@ -130,16 +130,16 @@ let create n =
 
 let add i w t =
   let i = mask t i in
-  let w =
-    if w = infinity then
-      let () = t.inf_list <- Mods.IntSet.add i t.inf_list in 0.
-    else
-      let () = t.inf_list <- Mods.IntSet.remove i t.inf_list in w
-  in
-  (*	let total = t.total -. t.weight_of_nodes.(i) +. w in*)
-  let () = t.weight_of_nodes.(i) <- w in
-  let () = declare_unbalanced i t
-  in
+  if w < 0. then failwith "Negative value forbidden in Random_tree"
+  else
+    let w =
+      if w = infinity then
+        let () = t.inf_list <- Mods.IntSet.add i t.inf_list in 0.
+      else
+        let () = t.inf_list <- Mods.IntSet.remove i t.inf_list in w in
+    (*	let total = t.total -. t.weight_of_nodes.(i) +. w in*)
+    let () = t.weight_of_nodes.(i) <- w in
+    let () = declare_unbalanced i t in
   () (*t.total <- (max 0.0 total) (*not satisfactory*)*)
 
 let total t =
@@ -155,8 +155,7 @@ let random rs t =
   | None ->
     let t = update_structure t in
     let a = total t in
-    if a = 0.0
-    then raise Not_found
+    if a <= 0. then raise Not_found
     else
       let r = Random.State.float rs a in
       let rec find i r =
