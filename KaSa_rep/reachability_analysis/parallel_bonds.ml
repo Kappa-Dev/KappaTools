@@ -1916,7 +1916,7 @@ struct
                    | Remanent_parameters_sig.Raw ->
                      begin
                        (*hyp*)
-                       let string_version =
+                       (*let string_version =
                          Ckappa_backend.Ckappa_backend.get_string_version
                            t_precondition
                        in
@@ -1934,20 +1934,20 @@ struct
                            Remanent_state.refinement = refinement
                          }
                        in
-                       let current_list = lemma :: current_list in
+                       let current_list = lemma :: current_list in*)
                        (*internal constraint list*)
-                       (*let refine = List.rev list_same in
+                       let refine = List.rev list_same in
                        let lemma_internal =
                          {
                            Remanent_state.hyp = t_precondition;
                            Remanent_state.refinement = refine;
                          }
                        in
-                       let current_list = lemma_internal :: current_list in*)
+                       let current_list = lemma_internal :: current_list in
                        error, current_list
                      end
                    | Remanent_parameters_sig.Natural_language ->
-                     let string_version =
+                     (*let string_version =
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_same
                      in
@@ -1964,16 +1964,16 @@ struct
                          Remanent_state.refinement = refinement
                        }
                      in
-                     let current_list = lemma :: current_list in
+                     let current_list = lemma :: current_list in*)
                      (*internal constraint list*)
-                     (*let refine = List.rev list_same in
+                     let refine = List.rev list_same in
                      let lemma_internal =
                        {
                          Remanent_state.hyp = t_same;
                          Remanent_state.refinement = refine
                        }
                      in
-                     let current_list = lemma_internal :: current_list in*)
+                     let current_list = lemma_internal :: current_list in
                      error, current_list
                  end
                | Usual_domains.Val false ->
@@ -1981,7 +1981,7 @@ struct
                    match Remanent_parameters.get_backend_mode parameters with
                    | Remanent_parameters_sig.Kappa
                    | Remanent_parameters_sig.Raw ->
-                     let string_version =
+                     (*let string_version =
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_precondition
                      in
@@ -1995,19 +1995,19 @@ struct
                          Remanent_state.refinement = refinement
                        }
                      in
-                     let current_list = lemma :: current_list in
+                     let current_list = lemma :: current_list in*)
                      (*internal constraint list*)
-                     (*let refine = List.rev list_distinct in
+                     let refine = List.rev list_distinct in
                      let lemma_internal =
                        {
                          Remanent_state.hyp = t_precondition;
                          Remanent_state.refinement = refine
                        }
                      in
-                     let current_list = lemma_internal :: current_list in*)
+                     let current_list = lemma_internal :: current_list in
                      error, current_list
                    | Remanent_parameters_sig.Natural_language ->
-                     let string_version =
+                     (*let string_version =
                        Ckappa_backend.Ckappa_backend.get_string_version
                          t_distinct
                      in
@@ -2021,16 +2021,16 @@ struct
                          Remanent_state.refinement = refinement
                        }
                      in
-                     let current_list = lemma :: current_list in
+                     let current_list = lemma :: current_list in*)
                      (*internal constraint list*)
-                     (*let refine = List.rev list_distinct in
+                     let refine = List.rev list_distinct in
                      let lemma_internal =
                        {
                          Remanent_state.hyp = t_distinct;
                          Remanent_state.refinement = refine
                        }
                      in
-                     let current_list = lemma_internal :: current_list in*)
+                     let current_list = lemma_internal :: current_list in
                      error, current_list
                  end
                | Usual_domains.Any ->
@@ -2039,7 +2039,7 @@ struct
                  | Remanent_parameters_sig.Raw ->
                    error, current_list
                  | Remanent_parameters_sig.Natural_language ->
-                   let string_version =
+                   (*let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_same
                    in
@@ -2053,18 +2053,18 @@ struct
                        Remanent_state.refinement = refinement
                      }
                    in
-                   let current_list = lemma :: current_list in
+                   let current_list = lemma :: current_list in*)
                    (*internal*)
-                   (*let refine = List.rev list_same in
+                   let refine = List.rev list_same in
                    let lemma_internal =
                      {
                        Remanent_state.hyp = t_same;
                        Remanent_state.refinement = refine
                      }
                    in
-                   let current_list = lemma_internal :: current_list in*)
+                   let current_list = lemma_internal :: current_list in
                    (*----------------------------------------------*)
-                   let string_version =
+                   (*let string_version =
                      Ckappa_backend.Ckappa_backend.get_string_version
                        t_distinct
                    in
@@ -2078,9 +2078,9 @@ struct
                        Remanent_state.refinement = refinement
                      }
                    in
-                   let current_list = lemma :: current_list in
+                   let current_list = lemma :: current_list in*)
                    (*internal constraint list*)
-                   (*let refine =
+                   let refine =
                      List.rev
                        list_distinct
                    in
@@ -2088,12 +2088,12 @@ struct
                      {Remanent_state.hyp = t_distinct;
                       Remanent_state.refinement = refine}
                    in
-                   let current_list = lemma_internal :: current_list in*)
+                   let current_list = lemma_internal :: current_list in
                    error, current_list
           ) store_value (error, []) (*name of domain*)
       in
       (*------------------------------------------------------------------*)
-      let constraint_list = Remanent_state.get_constraints_list kasa_state in
+      (*let constraint_list = Remanent_state.get_constraints_list kasa_state in
       let error, constraint_list =
         match
           constraint_list
@@ -2105,10 +2105,10 @@ struct
       let pair_list = (domain_name, List.rev current_list) :: constraint_list in
       let kasa_state =
         Remanent_state.set_constraints_list pair_list kasa_state
-      in
+      in*)
       (*------------------------------------------------------------------*)
       (*internal constraint list*)
-      (*let internal_constraints_list =
+      let internal_constraints_list =
         Remanent_state.get_internal_constraints_list kasa_state
       in
       let error, internal_constraints_list =
@@ -2120,7 +2120,7 @@ struct
       let pair_list =
         (domain_name, List.rev current_list) :: internal_constraints_list in
       let kasa_state =
-        Remanent_state.set_internal_constraints_list pair_list kasa_state in*)
+        Remanent_state.set_internal_constraints_list pair_list kasa_state in
       error, dynamic, kasa_state
 
   (*let export static dynamic error kasa_state =

@@ -963,7 +963,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
 (*****************************************************************************)
 (*TODO:convert views to json*)
 
-let rec convert_views_constraints_list_aux
+let rec convert_views_internal_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type agent_id translation t current_list =
@@ -1014,13 +1014,14 @@ let rec convert_views_constraints_list_aux
                         Exception.warn  parameters error error''
                         __POS__ Exit
                     in
-                    error, site_graph' :: c_list
-                    (*error, t' :: c_list *)
+                    (*error, site_graph' :: c_list*)
+                    error, t' :: c_list
                   ) (error, []) state_list
               in
               let lemma =
                 {
-                  Remanent_state.hyp = site_graph;
+                  (*Remanent_state.hyp = site_graph;*)
+                  Remanent_state.hyp = t;
                   Remanent_state.refinement = refinement
                 }
               in
@@ -1105,8 +1106,10 @@ let rec convert_views_constraints_list_aux
             (*--------------------------------------------------*)
             let lemma =
               {
-                Remanent_state.hyp = site_graph;
-                Remanent_state.refinement = [site_graph'']
+                (*Remanent_state.hyp = site_graph;
+                  Remanent_state.refinement = [site_graph'']*)
+                Remanent_state.hyp = t';
+                Remanent_state.refinement = [t'']
               }
             in
             let current_list = lemma :: current_list in
@@ -1177,8 +1180,10 @@ let rec convert_views_constraints_list_aux
             (*--------------------------------------------------*)
             let lemma =
               {
-                Remanent_state.hyp = site_graph ;
-                Remanent_state.refinement = [site_graph']
+                (*Remanent_state.hyp = site_graph ;
+                  Remanent_state.refinement = [site_graph']*)
+                Remanent_state.hyp = t;
+                Remanent_state.refinement = [t']
               }
             in
             let current_list = lemma :: current_list in
@@ -1204,7 +1209,7 @@ let rec convert_views_constraints_list_aux
             in
             let error'', current_list =
               List.fold_left (fun (error, current_list) token ->
-                  convert_views_constraints_list_aux
+                  convert_views_internal_constraints_list_aux
                     ~show_dep_with_dimmension_higher_than:0
                     parameters
                     handler_kappa
@@ -1214,7 +1219,7 @@ let rec convert_views_constraints_list_aux
                     agent_id
                     token
                     t'
-                    current_list (*FIXME*)
+                    current_list
                 ) (error, current_list) list
             in
             let error =
@@ -1279,8 +1284,8 @@ let rec convert_views_constraints_list_aux
                              Exception.warn  parameters error error''
                              __POS__ Exit
                          in
-                         let refinement = site_graph' :: current_list in
-                         (*let refinement = t' :: current_list in*)
+                         (*let refinement = site_graph' :: current_list in*)
+                         let refinement = t' :: current_list in
                          error, refinement
                       ) (error, current_list) state_list
                   ) (error, []) list
@@ -1293,7 +1298,8 @@ let rec convert_views_constraints_list_aux
               (*----------------------------------------*)
               let lemma =
                 {
-                  Remanent_state.hyp = site_graph (*t*) ;
+                  (*Remanent_state.hyp = site_graph (*t*) ;*)
+                  Remanent_state.hyp = t ;
                   Remanent_state.refinement = refinement
                 }
               in
@@ -1308,7 +1314,7 @@ let rec convert_views_constraints_list_aux
   in
   error, current_list
 
-let convert_views_constraints_list
+let convert_views_internal_constraints_list
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa error
     agent_string agent_type translation current_list =
@@ -1319,10 +1325,10 @@ let convert_views_constraints_list
   in
   let error =
     Exception.check_point
-      Exception.warn  parameters error error'
+      Exception.warn parameters error error'
       __POS__ Exit
   in
-  convert_views_constraints_list_aux
+  convert_views_internal_constraints_list_aux
     ~show_dep_with_dimmension_higher_than:dim_min
     parameters handler_kappa
     error agent_string agent_type agent_id translation t current_list

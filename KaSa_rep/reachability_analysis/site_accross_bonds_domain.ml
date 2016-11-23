@@ -1648,7 +1648,7 @@ struct
                      site_type2
                      pattern
                  in
-                 let string_version =
+                 (*let string_version =
                    Ckappa_backend.Ckappa_backend.get_string_version
                      pattern
                  in
@@ -1669,10 +1669,10 @@ struct
                      Remanent_state.refinement = refinement
                    }
                  in
-                 let current_list = lemma :: current_list in
+                 let current_list = lemma :: current_list in*)
                  (*---------------------------------------------------*)
                  (*internal constraint list*)
-                 (*let error, refine =
+                 let error, refine =
                    Ckappa_site_graph.internal_pair_list_to_list
                      parameters error kappa_handler
                      pattern
@@ -1688,7 +1688,7 @@ struct
                      Remanent_state.refinement = refine;
                    }
                  in
-                 let current_list = lemma_internal :: current_list in*)
+                 let current_list = lemma_internal :: current_list in
                  (*---------------------------------------------------*)
                  error, (handler, current_list)
                | Remanent_parameters_sig.Natural_language ->
@@ -1697,7 +1697,7 @@ struct
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
-    let constraint_list = Remanent_state.get_constraints_list kasa_state in
+    (*let constraint_list = Remanent_state.get_constraints_list kasa_state in
     let error, constraint_list =
       match
         constraint_list
@@ -1709,10 +1709,10 @@ struct
     let pair_list = (domain_name, List.rev current_list) :: constraint_list in
     let kasa_state =
       Remanent_state.set_constraints_list pair_list kasa_state
-    in
+    in*)
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
-    (*let internal_constraints_list =
+    let internal_constraints_list =
       Remanent_state.get_internal_constraints_list
         kasa_state
     in
@@ -1727,7 +1727,7 @@ struct
     let pair_list =
       (domain_name, List.rev current_list) :: internal_constraints_list in
     let kasa_state =
-      Remanent_state.set_internal_constraints_list pair_list kasa_state in*)
+      Remanent_state.set_internal_constraints_list pair_list kasa_state in
     error, dynamic, kasa_state
 
   let export static dynamic error kasa_state =

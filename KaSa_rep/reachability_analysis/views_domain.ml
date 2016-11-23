@@ -3574,7 +3574,7 @@ struct
         (fun (error, current_list)
           (agent_string, agent_type, _, translation) ->
           let error', current_list =
-            Translation_in_natural_language.convert_views_constraints_list
+            Translation_in_natural_language.convert_views_internal_constraints_list
               ~show_dep_with_dimmension_higher_than:dim_min
               parameters
               handler_kappa
@@ -3594,11 +3594,11 @@ struct
         Exception.warn parameters error error' __POS__ Exit
     in
     (*------------------------------------------------------------------*)
-    let constraint_list =
-      Remanent_state.get_constraints_list kasa_state in
-    let error', constraint_list =
+    let internal_constraints_list =
+      Remanent_state.get_internal_constraints_list kasa_state in
+    let error', internal_constraints_list =
       match
-        constraint_list
+        internal_constraints_list
       with
       | None ->
         Exception.warn parameters error __POS__ Exit []
@@ -3607,9 +3607,9 @@ struct
     let error = Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
-    let pair_list = (domain_name, current_list) :: constraint_list in
+    let pair_list = (domain_name, current_list) :: internal_constraints_list in
     let kasa_state =
-      Remanent_state.set_constraints_list pair_list kasa_state
+      Remanent_state.set_internal_constraints_list pair_list kasa_state
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, kasa_state

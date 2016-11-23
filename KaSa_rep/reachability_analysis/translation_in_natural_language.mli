@@ -47,8 +47,8 @@ val print:
   token ->
   Exception.method_handler
 
-val convert_views_constraints_list :
-  (*show_dep_with_dimmension_higher_than:int ->
+val convert_views_internal_constraints_list :
+  show_dep_with_dimmension_higher_than:int ->
        Remanent_parameters_sig.parameters ->
        Cckappa_sig.kappa_handler ->
        Exception.method_handler ->
@@ -57,9 +57,9 @@ val convert_views_constraints_list :
        token ->
        Ckappa_backend.Ckappa_backend.t Remanent_state.lemma list ->
        Exception.method_handler *
-       Ckappa_backend.Ckappa_backend.t Remanent_state.lemma list*)
+       Ckappa_backend.Ckappa_backend.t Remanent_state.lemma list
 
-show_dep_with_dimmension_higher_than:int ->
+  (*show_dep_with_dimmension_higher_than:int ->
   Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
@@ -76,4 +76,4 @@ show_dep_with_dimmension_higher_than:int ->
    (string option *
     Ckappa_backend.Ckappa_backend.binding_state option)
      Wrapped_modules.LoggedStringMap.t)
-    list Remanent_state.lemma list
+    list Remanent_state.lemma list*)

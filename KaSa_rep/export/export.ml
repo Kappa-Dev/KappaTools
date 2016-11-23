@@ -1205,6 +1205,70 @@ let get_constraints_list x y =
   compute_gen_constraints_list
     Remanent_state.get_constraints_list x y
 
+(**)
+let get_internal_constraints_list' x y =
+  compute_gen_constraints_list
+    Remanent_state.get_internal_constraints_list x y
+
+let get_internal_constraints_list' =
+  get_internal_constraints_list' "Extract refinement lemmas"
+
+let get_constraints_list' x y =
+  compute_gen_constraints_list
+    Remanent_state.get_constraints_list x y
+
+let get_constraints_list' =
+  get_constraints_list' "Extract refinement lemmas"
+
+let convert_constraint_map state =
+  let error = Remanent_state.get_errors state in
+  let state, internal_constraints_list = get_internal_constraints_list' state in
+  let state, constraint_list = get_constraints_list' state in
+  let error, state =
+    List.fold_left (fun (error, state) (domain_name, lemma_list) ->
+        let error, current_list =
+          List.fold_left (fun (error, current_list) lem ->
+              let hyp = Remanent_state.get_hyp lem in
+              let refine = Remanent_state.get_refinement lem in
+              let string_version =
+                Ckappa_backend.Ckappa_backend.get_string_version
+                  hyp
+              in
+              let error, site_graph =
+                Ckappa_site_graph.site_graph_to_list error string_version
+              in
+              let error, refinement =
+                Ckappa_site_graph.site_graph_list_to_list error refine in
+              let lemma =
+                {Remanent_state.hyp = site_graph;
+                 Remanent_state.refinement = refinement}
+              in
+              let current_list = lemma :: current_list in
+              error, current_list
+            ) (error, []) lemma_list
+        in
+        (*----------------------------------------------------------*)
+        let pair_list =
+          (domain_name, List.rev current_list) :: constraint_list in
+        let state =
+          Remanent_state.set_constraints_list pair_list state in
+        error, state
+      ) (error, state) internal_constraints_list
+  in
+  let state, constraint_list =
+    get_constraints_list' state
+  in
+  state, constraint_list
+
+(*let get_constraints_list'' =
+  get_map_gen
+    get_internal_constraints_list'
+    convert_constraint_map*)
+
+
+
+(**)
+
 let get_constraints_list_to_json state =
   let state, constraints_list =
     get_constraints_list "Extract refinement lemmas" state in
