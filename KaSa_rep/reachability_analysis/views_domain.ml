@@ -466,6 +466,12 @@ struct
     let error, store_proj_bdu_potential_restriction_map =
       get_store_proj_bdu_potential_restriction static error
     in
+    (* I really don't understand what you do here *)
+    (* You want to collect the relation between the rules and the sites
+       that are containted in a covering class that contain a site that may
+       be tested or modified by these rules *)
+    (* For this, you have to iterate over the content of the covering class *)
+    (* and this is the only information that you ignore *)
     let error, wake_up =
       Ckappa_sig.Rule_setmap.Map.fold
         (fun rule_id map (error, wake_up) ->
