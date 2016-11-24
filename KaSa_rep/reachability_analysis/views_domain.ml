@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 23 2016>
+   * Last modification: Time-stamp: <Nov 24 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -49,7 +49,8 @@ struct
       subviews: unit option ;
       ranges:
         Ckappa_sig.Views_bdu.mvbdu Wrapped_modules.LoggedIntMap.t
-          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option ;
+          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option
+    ;
     }
 
   type dynamic_information =
@@ -82,7 +83,6 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
-  (*TODO:wake up*)
   let get_wake_up_relation static =
     lift Analyzer_headers.get_wake_up_relation static
 
@@ -207,6 +207,53 @@ struct
         (get_domain_dynamic_information dynamic) with
         Bdu_dynamic_views.store_dual_contact_map = dual
       } dynamic
+
+  (****************************************************************)
+
+  (** get type bdu_analysis_static*)
+  let get_bdu_analysis_static static error =
+    let result = static.domain_static_information in
+    error, result
+
+  (**get type bdu_analysis_dynamic*)
+  let get_bdu_analysis_dynamic dynamic error =
+    let result = get_domain_dynamic_information dynamic in
+    error, result
+
+  let get_store_remanent_triple static error =
+    let error, result_static =
+      get_bdu_analysis_static static error
+    in
+    let store_remanent_triple =
+      result_static.Bdu_static_views.store_remanent_triple
+    in
+    error, store_remanent_triple
+
+  let get_store_proj_bdu_test_restriction static error =
+    let error, result_static =
+      get_bdu_analysis_static static error
+    in
+    error, result_static.Bdu_static_views.store_proj_bdu_test_restriction
+
+  let get_store_proj_bdu_creation_restriction static error =
+    let error, result_static =
+      get_bdu_analysis_static static error
+    in
+    error,
+    result_static.Bdu_static_views.store_proj_bdu_creation_restriction_map
+
+  let get_store_proj_bdu_potential_restriction static error =
+    let error, result_static =
+      get_bdu_analysis_static static error
+    in
+    error,
+    result_static.Bdu_static_views.store_proj_bdu_potential_restriction_map
+
+  let get_store_modif_list_restriction_map static error =
+    let error, result_static =
+      get_bdu_analysis_static static error
+    in
+    error, result_static.Bdu_static_views.store_modif_list_restriction_map
 
   (*--------------------------------------------------------------------*)
 
@@ -363,19 +410,19 @@ struct
 (* fold over all the rules, all the tuples of interest, all the sites in these
    tuples, and apply the function Common_static.add_dependency_site_rule to
    update the wake_up relation *)
+
   let complete_wake_up_relation static error wake_up =
     let parameters = get_parameter static in
     (*test and modify in a views*)
+    (*let handler = get_mvbdu_handler dynamic in*)
     let store_test_modif_map = get_test_modif_map static in
     (*CHECK ME*)
     (* This is not what I asked, you should fold over modules about tuples of interest (ie covering classes) that is to say (in bdu_static_views) )
-       store_proj_bdu_creation_restriction_map:
-       Ckappa_sig.Views_bdu.mvbdu
-        Covering_classes_type.AgentCV_setmap.Map.t
-        Ckappa_sig.Rule_setmap.Map.t;
+
        store_modif_list_restriction_map:
        Ckappa_sig.Views_bdu.hconsed_association_list
         Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
+
        store_proj_bdu_potential_restriction_map :
        (Ckappa_sig.Views_bdu.mvbdu *
        Ckappa_sig.Views_bdu.hconsed_association_list)
@@ -385,29 +432,100 @@ struct
        Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentsCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;*)
-
+    (*let error, store_modif_list_restriction_map =
+      get_store_modif_list_restriction_map static error
+    in
     let error, wake_up =
-      Ckappa_sig.AgentSite_map_and_set.Map.fold
-        (fun (agent_type, site_type) rule_id_set (error, wake_up) ->
-           Ckappa_sig.Rule_map_and_set.Set.fold
-             (fun rule_id (error, wake_up) ->
+      Covering_classes_type.AgentsRuleCV_map_and_set.Map.fold
+        (fun (_, agent_type, rule_id, _cv_id) list_a (error, wake_up) ->
+           let error, handler, list =
+             Ckappa_sig.Views_bdu.extensional_of_association_list
+               parameters
+               handler
+               error
+               list_a
+           in
+           let error, wake_up =
+             List.fold_left (fun (error, wake_up) (site_type, _state) ->
+                 let error, wake_up =
+                   Common_static.add_dependency_site_rule
+                     parameters
+                     error
+                     agent_type
+                     site_type
+                     rule_id
+                     wake_up
+                 in
+                 error, wake_up
+               ) (error, wake_up) list
+           in
+           error, wake_up
+        ) store_modif_list_restriction_map (error, wake_up)
+      in*)
+    (*-------------------------------------------------------------------*)
+    let error, store_proj_bdu_potential_restriction_map =
+      get_store_proj_bdu_potential_restriction static error
+    in
+    let error, wake_up =
+      Ckappa_sig.Rule_setmap.Map.fold
+        (fun rule_id map (error, wake_up) ->
+           Covering_classes_type.AgentSiteCV_setmap.Map.fold
+             (fun (agent_type, site_type, _) _pair (error, wake_up) ->
                 let error, wake_up =
                   Common_static.add_dependency_site_rule
-                  parameters
-                  error
-                  agent_type
-                  site_type
-                  rule_id
-                  wake_up
+                    parameters
+                    error
+                    agent_type
+                    site_type
+                    rule_id
+                    wake_up
                 in
                 error, wake_up
-             ) rule_id_set (error, wake_up)
-        ) store_test_modif_map (error, wake_up)
+             ) map (error, wake_up)
+        ) store_proj_bdu_potential_restriction_map (error, wake_up)
     in
+    (*-------------------------------------------------------------------*)
+    (*let error, store_proj_bdu_test_restriction =
+      get_store_proj_bdu_test_restriction static error
+    in
+    let error, wake_up =
+      Ckappa_sig.Rule_setmap.Map.fold
+        (fun rule_id map (error, wake_up) ->
+           Covering_classes_type.AgentsCV_setmap.Map.fold
+             (fun (_, agent_type, _) mvbdu (error, wake_up) ->
+                let error, handler, list =
+                  Ckappa_sig.Views_bdu.extensional_of_mvbdu
+                    parameters
+                    handler
+                    error
+                    mvbdu
+                in
+                let dynamic = set_mvbdu_handler handler dynamic in
+                let error, wake_up =
+                  List.fold_left (fun (error, wake_up) l ->
+                      List.fold_left (fun (error, wake_up) (site_type, _) ->
+                          let error, wake_up =
+                            Common_static.add_dependency_site_rule
+                              parameters
+                              error
+                              agent_type
+                              site_type
+                              rule_id
+                              wake_up
+                          in
+                          error, wake_up
+                        ) (error, wake_up) l
+                    ) (error, wake_up) list
+                in
+                error, wake_up
+             ) map (error, wake_up)
+        ) store_proj_bdu_test_restriction (error, wake_up)
+    in*)
+    (*-------------------------------------------------------------------*)
     error, wake_up
 
   (** get type bdu_analysis_static*)
-  let get_bdu_analysis_static static _dynamic error =
+  (*let get_bdu_analysis_static static _dynamic error =
     let result = static.domain_static_information in
     error, result
 
@@ -423,7 +541,7 @@ struct
     let store_remanent_triple =
       result_static.Bdu_static_views.store_remanent_triple
     in
-    error, store_remanent_triple
+    error, store_remanent_triple*)
 
   (**************************************************************************)
   (**get type bdu_analysis_dynamic*)
@@ -440,7 +558,7 @@ struct
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
     let error, site_correspondence =
-      get_store_remanent_triple static dynamic error
+      get_store_remanent_triple static error
     in
     if local_trace
     || Remanent_parameters.get_trace parameters
@@ -657,7 +775,7 @@ struct
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
     let error, site_correspondence =
-      get_store_remanent_triple static dynamic error
+      get_store_remanent_triple static error
     in
     if local_trace
     || Remanent_parameters.get_dump_reachability_analysis_diff parameters
@@ -770,7 +888,8 @@ struct
                       with
                       | _ ->
                         Exception.warn
-                          parameters error __POS__ Exit (Ckappa_sig.string_of_site_name site_type)
+                          parameters error __POS__ Exit
+                          (Ckappa_sig.string_of_site_name site_type)
                     in
                     let error, state_string =
                       try
@@ -988,7 +1107,7 @@ struct
   let build_init_restriction static dynamic error init_state =
     let parameters = get_parameter static in
     let error, store_remanent_triple =
-      get_store_remanent_triple static dynamic error
+      get_store_remanent_triple static error
     in
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -1068,7 +1187,7 @@ struct
 
   (****************************************************************)
 
-  let get_store_proj_bdu_test_restriction static dynamic error =
+  (*let get_store_proj_bdu_test_restriction static dynamic error =
     let error, result_static =
       get_bdu_analysis_static static dynamic error
     in
@@ -1092,7 +1211,7 @@ struct
     let error, result_static =
       get_bdu_analysis_static static dynamic error
     in
-    error, result_static.Bdu_static_views.store_modif_list_restriction_map
+    error, result_static.Bdu_static_views.store_modif_list_restriction_map*)
 
   (*****************************************************************)
 
@@ -1410,7 +1529,6 @@ struct
   (* checking the binding information whether or not path belong to the
      current contact map*)
 
-  (*TODO*)
   (* if not an empty list *)
   (* follow the path while it is within the pattern *)
   (* 1) if you remain inside the pattern for ever, identify the
@@ -2317,11 +2435,11 @@ struct
     let fixpoint_result = get_fixpoint_result dynamic in
     let dual_contact_map = get_store_dual_contact_map dynamic in
     let error, store_proj_bdu_test_restriction =
-      get_store_proj_bdu_test_restriction static dynamic error
+      get_store_proj_bdu_test_restriction static error
     in
     let store_agent_name = get_agent_name static in
     let error, site_correspondence =
-      get_store_remanent_triple static dynamic error
+      get_store_remanent_triple static error
     in
     let store_covering_classes_id = get_covering_classes_id static in
     let error, proj_bdu_test_restriction =
@@ -2438,7 +2556,7 @@ struct
   let compute_views_test_enabled static dynamic error rule_id event_list =
     let parameters = get_parameter static in
     let error, store_proj_bdu_test_restriction =
-      get_store_proj_bdu_test_restriction static dynamic error
+      get_store_proj_bdu_test_restriction static error
     in
     let error, proj_bdu_test_restriction =
       match
@@ -2458,7 +2576,7 @@ struct
              get_mvbdu_false static dynamic error in
            let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
            let error, store_modif_list_restriction_map =
-             get_store_modif_list_restriction_map static dynamic error
+             get_store_modif_list_restriction_map static error
            in
            (*print*)
            let error =
@@ -2523,7 +2641,7 @@ struct
   let compute_views_creation_enabled static dynamic error rule_id event_list =
     let parameters = get_parameter static in
     let error, store_bdu_creation =
-      get_store_proj_bdu_creation_restriction static dynamic error
+      get_store_proj_bdu_creation_restriction static error
     in
     let error, bdu_creation_map =
       match Ckappa_sig.Rule_setmap.Map.find_option rule_id
@@ -2571,7 +2689,7 @@ struct
   let compute_side_effects_enabled static dynamic error rule_id event_list =
     let parameters = get_parameter static in
     let error, store_bdu_potential =
-      get_store_proj_bdu_potential_restriction static dynamic error
+      get_store_proj_bdu_potential_restriction static error
     in
     let error, proj_bdu_potential_restriction =
       match Ckappa_sig.Rule_setmap.Map.find_option rule_id
@@ -3392,7 +3510,7 @@ struct
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, store_remanent_triple =
-      get_store_remanent_triple static dynamic error in
+      get_store_remanent_triple static error in
     let fixpoint_result = get_fixpoint_result dynamic in
     let handler = get_mvbdu_handler dynamic in
     let error, handler =
@@ -3432,7 +3550,7 @@ struct
         let handler = get_mvbdu_handler dynamic in
         let compil = get_compil static in
         let error, site_correspondence =
-          get_store_remanent_triple static dynamic error in
+          get_store_remanent_triple static error in
         let error, handler, output =
           smash_map
             (fun _parameters handler error a -> error, handler, [a])
@@ -3686,7 +3804,7 @@ struct
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
     let error, site_correspondence =
-      get_store_remanent_triple static dynamic error
+      get_store_remanent_triple static error
     in
     let fixpoint_result = get_fixpoint_result dynamic in
     let error', dynamic, kasa_state =
@@ -3730,7 +3848,7 @@ struct
     let handler_kappa = get_kappa_handler static in
     let result = get_fixpoint_result dynamic in
     let error, site_correspondence =
-      get_store_remanent_triple static dynamic error in
+      get_store_remanent_triple static error in
     let error, handler, ranges =
       smash_map
         Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction

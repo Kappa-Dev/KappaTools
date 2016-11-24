@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -57,6 +57,5 @@ functor (A:Analyzer.Analyzer) ->
 
     let get_constraints_list state =
       get_constraints_list_to_json state
+
   end
-(*let get_internal_constraints_list state =
-  Export.output_internal_constraints_list state*)

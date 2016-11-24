@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 23 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts

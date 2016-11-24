@@ -5,7 +5,7 @@
  *
  * Creation: 2015, the 23th of Feburary
 <<<<<<< 9d19502c910420cc42bf5de36ec1126ff169633c
- * Last modification: Time-stamp: <Oct 25 2016>
+ * Last modification: Time-stamp: <Nov 24 2016>
 =======
  * Last modification: Time-stamp: <Aug 04 2016>
 >>>>>>> continue to use project in apply rule
@@ -73,7 +73,7 @@ type remanent =
     store_dic                 : pair_dic;
   }
 
-(************************************************************************************)
+(***************************************************************************)
 (* cckappa_sig is the signature for an intermediary representation of
    Kappa, there is no covering class, thus this type should not be defined
    here *)
@@ -108,7 +108,7 @@ module AgentsRuleCV_map_and_set =
         let print _ _ = ()
       end))
 
-(************************************************************************************)
+(******************************************************************************)
 
 module AgentCV_setmap =
   SetMap.Make (

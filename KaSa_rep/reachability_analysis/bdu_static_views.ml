@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Nov 22 2016>
+   * Last modification: Time-stamp: <Nov 24 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -64,18 +64,22 @@ type bdu_analysis_static =
         Covering_classes_type.Dictionary_of_List_sites.value *
         Ckappa_sig.Site_map_and_set.Set.t) list)
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
+    (**)
     store_proj_bdu_creation_restriction_map:
       Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
+
     store_modif_list_restriction_map:
       Ckappa_sig.Views_bdu.hconsed_association_list
         Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
+
     store_proj_bdu_potential_restriction_map :
       (Ckappa_sig.Views_bdu.mvbdu *
        Ckappa_sig.Views_bdu.hconsed_association_list)
         Covering_classes_type.AgentSiteCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
+
     store_proj_bdu_test_restriction :
       Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentsCV_setmap.Map.t
@@ -555,7 +559,8 @@ let list2set parameters error list =
 *)
 
 let collect_remanent_triple parameters error store_remanent store_result =
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
+    error
     (fun parameters error agent_type remanent store_result ->
        let store_dic = remanent.Covering_classes_type.store_dic in
        (*-----------------------------------------------------------------*)
@@ -776,11 +781,15 @@ let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
 
 let collect_modif_list_restriction_map
     parameters handler error rule_id rule store_remanent_triple store_result =
-  let add_link error (agent_id, agent_type, rule_id, cv_id) list_a store_result =
+  let add_link error (agent_id, agent_type, rule_id, cv_id) list_a store_result
+    =
     (*the association must be unique *)
     let error, result_map =
-      Covering_classes_type.AgentsRuleCV_map_and_set.Map.add_or_overwrite parameters error
-        (agent_id, agent_type, rule_id, cv_id) list_a store_result
+      Covering_classes_type.AgentsRuleCV_map_and_set.Map.add_or_overwrite
+        parameters error
+        (agent_id, agent_type, rule_id, cv_id)
+        list_a
+        store_result
     in
     error, result_map
   in
@@ -874,7 +883,8 @@ let collect_modif_list_restriction_map
                         pair_list
                     in
                     let error, store_result =
-                      add_link error (agent_id, agent_type, rule_id, cv_id) list_a store_result
+                      add_link error (agent_id, agent_type, rule_id, cv_id)
+                        list_a store_result
                     in
                     error, handler, store_result
                   end

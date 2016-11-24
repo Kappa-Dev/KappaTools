@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 22 2016>
+   * Last modification: Time-stamp: <Nov 24 2016>
    *
    * Abstract domain to record live rules
    *
@@ -23,6 +23,7 @@ struct
       global_static_information : Analyzer_headers.global_static_information;
     }
   type local_dynamic_information = unit
+
   type dynamic_information =
     {
       local : local_dynamic_information ;
@@ -81,7 +82,7 @@ struct
   let initialize static dynamic error =
     let init_global_dynamic_information =
       {
-        local = () ; 
+        local = () ;
         global = dynamic
       }
     in
@@ -105,7 +106,7 @@ struct
       init_global_static_information,
       init_global_dynamic_information, event_list
 
-  let complete_wake_up_relation _static error wake_up =
+  let complete_wake_up_relation _static error wake_up = (*FIXME*)
       error, wake_up
 
   (**************************************************************************)

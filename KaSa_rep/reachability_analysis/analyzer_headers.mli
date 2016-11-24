@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -50,7 +50,8 @@ val add_wake_up_relation:
   Common_static.site_to_rules ->
   global_static_information
 
-val get_wake_up_relation: global_static_information -> Common_static.site_to_rules
+val get_wake_up_relation: global_static_information ->
+  Common_static.site_to_rules
 
 val get_parameter: global_static_information -> Remanent_parameters_sig.parameters
 

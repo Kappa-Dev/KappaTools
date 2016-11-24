@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1273,7 +1273,7 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                           SiteSet.inter parameters error modif site_set
                         in
                         if SiteSet.is_empty modif
-                        then   error, map
+                        then error, map
                         else
                           let asso_modif =
                             Ckappa_sig.Views_intbdu.extensional_of_association_list

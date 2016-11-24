@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Nov 23 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 23 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -170,7 +170,6 @@ struct
     in
     let dynamic = set_working_list rule_working_list dynamic in
     error, dynamic
-
 
   let push_modified_site static dynamic error agent site =
     let wake_up = get_wake_up_relation static in
@@ -422,7 +421,8 @@ struct
         Communication.fold_sites
           parameter error
           (fun parameter error (agent,site) () dynamic  ->
-             let error, list_r_id  = Common_static.wake_up parameter error agent site wake_up in
+             let error, list_r_id  =
+               Common_static.wake_up parameter error agent site wake_up in
              f list_r_id error dynamic)
         modified_sites_blackboard dynamic
       in
@@ -454,7 +454,8 @@ struct
       Common_static.empty_site_to_rules parameters error
     in
     let error, wake_up_tmp =
-      Domain.complete_wake_up_relation domain_static error wake_up_tmp
+      Domain.complete_wake_up_relation domain_static
+        error wake_up_tmp
     in
     let error, wake_up =
       Common_static.consolidate_site_rule_dependencies

@@ -1172,7 +1172,6 @@ let dead_rules_to_json =
 let json_to_dead_rules =
   JsonUtil.to_list json_to_rule_id
 
-
 (*************************************************************************)
 
 let compute_internal_constraints_list _show_title state =
@@ -1239,7 +1238,6 @@ let compute_constraints_list _show_title state =
       Remanent_state.get_constraints_list
       compute_constraints_list
 
-
 (******************************************************************)
 
 let output_internal_constraints_list ?logger state =
@@ -1257,13 +1255,13 @@ let output_internal_constraints_list ?logger state =
   let state = Remanent_state.set_errors error state in
   state
 
-
-
 let get_constraints_list_to_json state =
   let state, constraints_list =
     get_constraints_list state
   in
     state,
     Ckappa_site_graph.pattern_to_json constraints_list
+
+(*TODO: test of_json*)
 
   end
