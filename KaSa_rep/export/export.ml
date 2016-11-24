@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 23 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -284,7 +284,8 @@ let get_gen
         state
     in
     Remanent_state.set_parameters parameters state, output
-  | Some a -> state, a
+  | Some a ->
+  state, a
 
 let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
 
@@ -1171,27 +1172,13 @@ let dead_rules_to_json =
 let json_to_dead_rules =
   JsonUtil.to_list json_to_rule_id
 
-(******************************************************************)
-
-let output_constraints_list ?logger state l =
-  let parameters = Remanent_state.get_parameters state in
-  let error = Remanent_state.get_errors state in
-  let state, kappa_handler = get_handler state in
-  (*PRINT*)
-  let error =
-    Ckappa_site_graph.print_pattern ?logger parameters error
-      kappa_handler
-      l
-  in
-  let state = Remanent_state.set_errors error state in
-  state
 
 (*************************************************************************)
 
-let compute_gen_constraints_list get_constraints_list show_title state =
+let compute_internal_constraints_list _show_title state =
   let state,_ = get_reachability_analysis state in
   match
-    get_constraints_list state
+    Remanent_state.get_internal_constraints_list state
   with
   | None ->
     let error = Remanent_state.get_errors state in
@@ -1201,31 +1188,19 @@ let compute_gen_constraints_list get_constraints_list show_title state =
     state, output
   | Some output -> state, output
 
-let get_constraints_list x y =
-  compute_gen_constraints_list
-    Remanent_state.get_constraints_list x y
+let get_internal_constraints_list =
+  get_gen
+    ~do_we_show_title:title_only_in_kasa
+    ~log_title:"Extract refinement lemmas"
+    Remanent_state.get_internal_constraints_list
+    compute_internal_constraints_list
 
-(**)
-let get_internal_constraints_list' x y =
-  compute_gen_constraints_list
-    Remanent_state.get_internal_constraints_list x y
-
-let get_internal_constraints_list' =
-  get_internal_constraints_list' "Extract refinement lemmas"
-
-let get_constraints_list' x y =
-  compute_gen_constraints_list
-    Remanent_state.get_constraints_list x y
-
-let get_constraints_list' =
-  get_constraints_list' "Extract refinement lemmas"
-
-let convert_constraint_map state =
+let compute_constraints_list _show_title state =
   let error = Remanent_state.get_errors state in
-  let state, internal_constraints_list = get_internal_constraints_list' state in
-  let state, constraint_list = get_constraints_list' state in
-  let error, state =
-    List.fold_left (fun (error, state) (domain_name, lemma_list) ->
+  let state, internal_constraints_list = get_internal_constraints_list state in
+  let error, constraints_list =
+    List.fold_left
+      (fun (error, constraints_list) (domain_name, lemma_list) ->
         let error, current_list =
           List.fold_left (fun (error, current_list) lem ->
               let hyp = Remanent_state.get_hyp lem in
@@ -1249,35 +1224,26 @@ let convert_constraint_map state =
         in
         (*----------------------------------------------------------*)
         let pair_list =
-          (domain_name, List.rev current_list) :: constraint_list in
-        let state =
-          Remanent_state.set_constraints_list pair_list state in
-        error, state
-      ) (error, state) internal_constraints_list
+          (domain_name, List.rev current_list) :: constraints_list in
+        error, pair_list
+      ) (error, []) internal_constraints_list
   in
-  let state, constraint_list =
-    get_constraints_list' state
-  in
-  state, constraint_list
+  let state = Remanent_state.set_constraints_list constraints_list state in
+  let state = Remanent_state.set_errors error state in
+  state, constraints_list
 
-(*let get_constraints_list'' =
-  get_map_gen
-    get_internal_constraints_list'
-    convert_constraint_map*)
+  let get_constraints_list =
+    get_gen
+      ~do_we_show_title:title_only_in_kasa
+      ~log_title:"translate refinement lemmas"
+      Remanent_state.get_constraints_list
+      compute_constraints_list
 
-
-
-(**)
-
-let get_constraints_list_to_json state =
-  let state, constraints_list =
-    get_constraints_list "Extract refinement lemmas" state in
-  state,
-  Ckappa_site_graph.pattern_to_json constraints_list
 
 (******************************************************************)
 
-let output_internal_constraints_list ?logger state l =
+let output_internal_constraints_list ?logger state =
+  let state, constraints_list = get_internal_constraints_list state in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
   let state, kappa_handler = get_handler state in
@@ -1286,22 +1252,18 @@ let output_internal_constraints_list ?logger state l =
     Ckappa_site_graph.print_internal_pattern
       ?logger parameters error
       kappa_handler
-      l
+      constraints_list
   in
   let state = Remanent_state.set_errors error state in
   state
 
-let get_internal_constraints_list x y =
-  compute_gen_constraints_list
-    Remanent_state.get_internal_constraints_list x y
 
-let empty_internal_constraints_list = []
 
-let get_internal_constraints_list =
-  get_internal_constraints_list "Extract refinement lemmas"
-
-let output_internal_constraints_list ?logger (state:state) =
-  let state, constraints_list = get_internal_constraints_list state in
-  output_internal_constraints_list ?logger state constraints_list
+let get_constraints_list_to_json state =
+  let state, constraints_list =
+    get_constraints_list state
+  in
+    state,
+    Ckappa_site_graph.pattern_to_json constraints_list
 
   end

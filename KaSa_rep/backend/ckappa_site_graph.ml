@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Nov 17 2016>
+   * Last modification: Time-stamp: <Nov 24 2016>
    *
    * Site graph
    *
@@ -17,20 +17,25 @@
 
 let agent="agent name"
 let site = "site name"
-let stateslist="states list"
-let prop="property states"
-let bind="binding states"
+let interface = "interface"
+let stateslist="state"
+let prop="internal state"
+let bind="binding state"
+let binding_type="binding type"
 let free = ""
 let wildcard = "?"
 let bound = "!_"
+let bond_id = "bond id"
 let bound_to = "bound to"
+let hyp = "site graph"
+let refinement = "site graph list"
 
 (***************************************************************************)
 
 let pair_to_json (p: string * string): Yojson.Basic.json =
   JsonUtil.of_pair ~lab1:agent ~lab2:site
-    (fun a ->  `Assoc [agent,JsonUtil.of_string a])
-    (fun b -> `Assoc [site, JsonUtil.of_string b])
+    (fun a ->  JsonUtil.of_string a)
+    (fun b ->  JsonUtil.of_string b)
     p
 
 let pair_of_json (json:Yojson.Basic.json) : string * string  =
@@ -47,12 +52,13 @@ let pair_of_json (json:Yojson.Basic.json) : string * string  =
 let interface_to_json site_map : Yojson.Basic.json =
   Wrapped_modules.LoggedStringMap.to_json
     ~lab_key:site ~lab_value:stateslist
-    (fun site_string -> `Assoc [site, JsonUtil.of_string site_string])
+    JsonUtil.of_string
     (fun (internal_opt, binding_opt) ->
        JsonUtil.of_pair ~lab1:prop ~lab2:bind
          (fun internal_opt ->
-            JsonUtil.of_option (fun internal_state ->
-                `Assoc [prop, JsonUtil.of_string internal_state]
+            JsonUtil.of_option
+              (fun internal_state ->
+                JsonUtil.of_string internal_state
               ) internal_opt
          )
          (fun binding_opt ->
@@ -63,10 +69,10 @@ let interface_to_json site_map : Yojson.Basic.json =
             | Some Ckappa_backend.Ckappa_backend.Wildcard -> `Assoc [wildcard, `Null]
             | Some Ckappa_backend.Ckappa_backend.Bound_to_unknown -> `Assoc [bound_to, `Null]
             | Some (Ckappa_backend.Ckappa_backend.Bound_to i) ->
-              `Assoc ["binding id", JsonUtil.of_int
+              `Assoc [bond_id, JsonUtil.of_int
                         (Ckappa_backend.Ckappa_backend.int_of_bond_index i)]
             | Some (Ckappa_backend.Ckappa_backend.Binding_type (agent_name, site_name)) ->
-              `Assoc [bind, pair_to_json (agent_name, site_name)]
+              `Assoc [binding_type, pair_to_json (agent_name, site_name)]
          )
          (internal_opt, binding_opt)
     )
@@ -113,6 +119,11 @@ let binding_opt_of_json
 
 (***************************************************************************)
 
+let agent_to_json =
+  JsonUtil.of_pair ~lab1:agent ~lab2:interface
+    JsonUtil.of_string
+    interface_to_json
+
 let string_version_to_json string_version =
   let list =
     List.rev
@@ -124,10 +135,7 @@ let string_version_to_json string_version =
             site_graph
          ) string_version [])
   in
-  JsonUtil.of_assoc
-    (fun (agent_string, site_map) ->
-       agent_string, interface_to_json site_map
-    ) list
+  JsonUtil.of_list agent_to_json list
 
 (***************************************************************************)
 
@@ -175,73 +183,16 @@ let to_json graph =
 (***************************************************************************)
 (*site graph to json*)
 
-let site_graph_to_json_aux site_map =
-  Wrapped_modules.LoggedStringMap.to_json
-    ~lab_key:site ~lab_value:stateslist
-    (fun site_string ->
-       `Assoc ["site name",
-               JsonUtil.of_string site_string])
-    (fun (internal_opt, binding_opt) ->
-       JsonUtil.of_pair ~lab1:prop ~lab2:bind
-         (fun internal_opt ->
-            JsonUtil.of_option (fun internal_state ->
-                `Assoc[prop,
-                       JsonUtil.of_string internal_state]
-              ) internal_opt
-         )
-         (fun binding_opt ->
-            match binding_opt with
-            | None
-            | Some Ckappa_backend.Ckappa_backend.Free
-            | Some Ckappa_backend.Ckappa_backend.Wildcard
-            | Some Ckappa_backend.Ckappa_backend.Bound_to_unknown -> `Null
-            | Some (Ckappa_backend.Ckappa_backend.Bound_to b_int) ->
-              `Assoc [bound_to,
-                      JsonUtil.of_int
-                        (Ckappa_backend.Ckappa_backend.int_of_bond_index b_int)]
-            | Some (Ckappa_backend.Ckappa_backend.Binding_type
-                      (agent_name, site_name)) ->
-              JsonUtil.of_pair ~lab1:agent ~lab2:site
-                (fun agent_name ->
-                   `Assoc [agent,
-                           JsonUtil.of_string agent_name]
-                )
-                (fun site_name ->
-                   `Assoc [site,
-                           JsonUtil.of_string site_name]
-                )
-                (agent_name, site_name)
-         )
-         (internal_opt, binding_opt)
-    )
-    site_map
+let site_graph_to_json = JsonUtil.of_list agent_to_json
 
-let site_graph_to_json hyp =
-  let json =
-    JsonUtil.of_assoc
-      (fun (agent_string, site_map) ->
-         agent_string, site_graph_to_json_aux site_map
-      ) hyp
-  in
-  json
-
-let site_graph_list_to_json refinement =
-  let json =
-    JsonUtil.of_list (fun t ->
-        site_graph_to_json t
-      ) refinement
-  in
-  json
-
-let hyp = "site graph"
-let refinement = "site graph list"
+let site_graphs_list_to_json = JsonUtil.of_list site_graph_to_json
 
 let site_graph_lemma_to_json lemma =
   let get_hyp = Remanent_state.get_hyp lemma in
   let get_refinement = Remanent_state.get_refinement lemma in
   `Assoc [
     hyp, site_graph_to_json get_hyp;
-    refinement, site_graph_list_to_json get_refinement
+    refinement, site_graphs_list_to_json get_refinement
   ]
 
 let pattern_to_json constraints_list =
@@ -255,34 +206,10 @@ let pattern_to_json constraints_list =
     ) constraints_list
 
 (*******************************************************************)
-
-let internal_site_graph_to_json hyp =
-  let json =
-    Ckappa_sig.Agent_id_map_and_set.Map.to_json
-      (fun agent_id ->
-         `Assoc ["agent id",
-                 JsonUtil.of_int (Ckappa_sig.int_of_agent_id agent_id)]
-      )
-      (fun (agent_string, site_map) ->
-         JsonUtil.of_pair
-           (fun agent_string ->
-              `Assoc [agent,
-                      JsonUtil.of_string agent_string]
-           )
-           (fun site_map ->
-              site_graph_to_json_aux site_map
-           )
-           (agent_string, site_map)
-      )
-      hyp
-  in
-  json
-
-(*******************************************************************)
 (*json -> contrainst_list/internal_constraints_list*)
 
 let site_graph_list_of_json json =
-  JsonUtil.to_list ~error_msg:"list of site graph"
+  JsonUtil.to_list ~error_msg:"list of site graphs"
     (fun json -> string_version_of_json json)
     json
 
