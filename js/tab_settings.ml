@@ -576,7 +576,7 @@ let onload (t : Ui_simulation.t) : unit =
       | _ -> default_runtime ()
     with _ -> default_runtime () in
   let run_pertubation () : unit =
-    Lwt_js_events.async
+    Common.async
       (fun _ ->
          let code : string =
            Js.to_string perturbation_code_input_dom##.value
@@ -595,7 +595,7 @@ let onload (t : Ui_simulation.t) : unit =
       Dom.handler
         (fun _ ->
            let () =
-             Lwt_js_events.async
+             Common.async
                (fun _ -> Ui_simulation.continue_simulation t) in
            Js._true)
   in
@@ -603,7 +603,7 @@ let onload (t : Ui_simulation.t) : unit =
       Dom.handler
         (fun _ ->
            let () =
-             Lwt_js_events.async
+             Common.async
                (fun _ -> Ui_simulation.pause_simulation t) in
            Js._true)
   in
@@ -611,7 +611,7 @@ let onload (t : Ui_simulation.t) : unit =
       Dom.handler
         (fun _ ->
            let () =
-             Lwt_js_events.async
+             Common.async
                (fun _ -> Ui_simulation.stop_simulation t)
            in
            Js._true)
@@ -619,7 +619,7 @@ let onload (t : Ui_simulation.t) : unit =
   let () = start_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let () = Lwt_js_events.async
+           let () = Common.async
                (fun _ -> Ui_simulation.start_simulation t) in
            Js._true)
   in

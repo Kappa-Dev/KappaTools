@@ -210,7 +210,7 @@ let onload (t : Ui_simulation.t) : unit =
     Codemirror.fromTextArea textarea configuration in
   let () = codemirror##setValue(Js.string "") in
   let () = setup_lint codemirror update_linting in
-  let _ = Lwt_js_events.async (initialize codemirror) in
+  let _ = Common.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let () = has_been_modified := true in
@@ -275,7 +275,7 @@ let onload (t : Ui_simulation.t) : unit =
     let filename = to_string file##.name in
     let () = set_file_label filename in
     let () =
-      Lwt_js_events.async
+      Common.async
         ((fun _ ->
             File.readAsText file >>=
             (fun  (va : Js.js_string Js.t) ->
@@ -294,7 +294,7 @@ let onload (t : Ui_simulation.t) : unit =
          (Js.string "Modifications will be lost, do you wish to continue?"))
   in
   let ()  =
-    Lwt.async
+    Common.async
       (fun () ->
          Lwt_js_events.changes
            file_select_dom

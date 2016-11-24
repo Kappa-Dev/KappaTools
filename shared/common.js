@@ -246,3 +246,14 @@ function inputEnter(id,handler){
 	}
     });
 }
+
+function ajaxRequest(url,type,data,handler){
+    var parameter = { url : url , type : type };
+    if(data){ parameter.data = data; }
+    debug(parameter);
+    $.ajax(parameter).done(function( data, textStatus, jqXHR )
+			   { var status = jqXHR.status;
+			     var response_text = jqXHR.responseText;
+			     wrap(handler(status,response_text));
+			   });
+}

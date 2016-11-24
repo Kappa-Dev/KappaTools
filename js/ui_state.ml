@@ -79,7 +79,10 @@ class embedded_manager () : Api.manager =
 end
 
 let parse_remote url : remote option =
-  let () = Common.debug ("parse_remote:"^url) in
+  let () =
+    Common.debug
+      (Js.string
+         (Format.sprintf "parse_remote: %s" url)) in
   let format_url url =
     let length = String.length url in
     if length > 0 && String.get url (length - 1) == '/' then
@@ -95,7 +98,10 @@ let parse_remote url : remote option =
         http.Url.hu_port
         http.Url.hu_path_string
     in
-    let () = Common.debug ("cleaned"^cleaned) in
+    let () =
+      Common.debug
+        (Js.string
+         (Format.sprintf "cleaned : %s" cleaned)) in
     format_url cleaned
   in
   match Url.url_of_string url with
@@ -160,18 +166,23 @@ let synch_lwt () : unit Lwt.t =
        match !runtime_state with
        | None -> Lwt.return_unit
        | Some manager ->
-       (manager#project_info ())
+         (let () = Common.debug 1 in
+           manager#project_info ())
        >>=
        (* synch project *)
-       (Api_common.result_bind_lwt
+       (let () = Common.debug 2 in
+        Api_common.result_bind_lwt
           ~ok:(fun (project_info : Api_types_j.project_info) ->
+              let () = Common.debug 3 in
               match React.S.value current_project_id with
               | Some project_id ->
                 if List.mem project_id project_info then
                   Lwt.return (Api_common.result_ok project_id)
                 else
-                  (manager#project_create { Api_types_j.project_id = project_id } )
-              | None -> Lwt.return (Api_common.result_error_msg "missing project")
+                  (manager#project_create
+                     { Api_types_j.project_id = project_id } )
+              | None ->
+                Lwt.return (Api_common.result_error_msg "missing project")
             )
        )
        >>=
@@ -181,39 +192,39 @@ let synch_lwt () : unit Lwt.t =
               | Some current_file ->
                 (manager#file_info project_id) >>=
                 (Api_common.result_bind_lwt
-                   ~ok:(fun (file_info : Api_types_j.file_info) ->
-                       match
-                         List.filter
-                           (fun metadata ->
-                              metadata.Api_types_j.file_metadata_id =
-                              current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_id)
-                           file_info
-                       with
-                       | h::_ ->
-                         (manager#file_update
-                            project_id
-                            h.Api_types_j.file_metadata_id
-                            { Api_types_j.file_modification_compile =
-                                Some current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_compile ;
-                              Api_types_j.file_modification_id =
+                    ~ok:(fun (file_info : Api_types_j.file_info) ->
+                        match
+                          List.filter
+                            (fun metadata ->
+                               metadata.Api_types_j.file_metadata_id =
+                               current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_id)
+                            file_info
+                        with
+                        | h::_ ->
+                          (manager#file_update
+                             project_id
+                             h.Api_types_j.file_metadata_id
+                             { Api_types_j.file_modification_compile =
+                                 Some current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_compile ;
+                               Api_types_j.file_modification_id =
                                 None ;
-                              Api_types_j.file_modification_position =
-                                Some current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_position ;
-                              Api_types_j.file_modification_patch =
-                                Some { Api_types_j.file_patch_start = None ;
-                                       Api_types_j.file_patch_end = None;
-                                       Api_types_j.file_patch_content =
-                                         current_file.Api_types_j.file_content;
-                                     } ;
-                              Api_types_j.file_modification_hash =
-                                current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_hash ; })
-                       | [] ->
-                         (format_file ()) >>=
-                         (fun _ ->
-                         manager#file_create
-                           project_id
-                           current_file)
-                     )
+                               Api_types_j.file_modification_position =
+                                 Some current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_position ;
+                               Api_types_j.file_modification_patch =
+                                 Some { Api_types_j.file_patch_start = None ;
+                                        Api_types_j.file_patch_end = None;
+                                        Api_types_j.file_patch_content =
+                                          current_file.Api_types_j.file_content;
+                                      } ;
+                               Api_types_j.file_modification_hash =
+                                 current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_hash ; })
+                        | [] ->
+                          (format_file ()) >>=
+                          (fun _ ->
+                             manager#file_create
+                               project_id
+                               current_file)
+                      )
                 )
                 >>=
                 (Api_common.result_bind_lwt
@@ -223,7 +234,8 @@ let synch_lwt () : unit Lwt.t =
                        Lwt.return
                          (Api_common.result_ok ()))
                 )
-              | None -> Lwt.return (Api_common.result_ok ()))
+              | None ->
+                Lwt.return (Api_common.result_ok ()))
        ) >>=
        (Api_common.result_map
           ~ok:(fun _ _ -> Lwt.return_unit)
@@ -235,10 +247,10 @@ let synch_lwt () : unit Lwt.t =
 
 let _ =
   React.S.l1
-    (fun _ -> Lwt_js_events.async synch_lwt)
+    (fun _ -> Common.async synch_lwt)
     current_file
 
-let force_synch () = Lwt_js_events.async synch_lwt
+let force_synch () = Common.async synch_lwt
 
 (* update everything at once *)
 let set_file (filename : string) (filecontent : string) : unit =
@@ -276,11 +288,16 @@ let toggle_compile () : unit =
   | None -> ()
   | Some file ->
     set_current_file
-      (Some { file with Api_types_j.file_metadata =
-                          { file.Api_types_j.file_metadata with
-                            Api_types_j.file_metadata_compile =
-                              not file.Api_types_j.file_metadata.Api_types_j.file_metadata_compile
-                          } }
+      (Some
+         { file
+           with
+             Api_types_j.file_metadata =
+               { file.Api_types_j.file_metadata
+                 with
+                   Api_types_j.file_metadata_compile =
+                     not file.Api_types_j.file_metadata.Api_types_j.file_metadata_compile
+               }
+         }
       )
 
 let set_runtime_url
@@ -304,9 +321,9 @@ let set_runtime_url
       let () = Common.debug ("parse_remote:1") in
       match parse_remote url with
       | Some { label = _ ; protocol = HTTP url } ->
-        let version_url : string = Format.sprintf "%s/v1/version" url in
+        let version_url : string = Format.sprintf "%s/v2" url in
         let () = Common.debug ("set_runtime_url:"^version_url) in
-        Lwt.async
+        Common.async
           (fun () ->
              (XmlHttpRequest.perform_raw
                 ~response_type:XmlHttpRequest.Text

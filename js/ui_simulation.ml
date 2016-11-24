@@ -114,7 +114,7 @@ let manager_operation
      Api_types_j.project_id ->
      Api_types_j.simulation_id ->
      unit Lwt.t) : unit =
-    Lwt_js_events.async
+    Common.async
       (fun () ->
          ready_simulation
            ~stopped:(fun _ -> Lwt.return_unit) (* ignore state errors *)
@@ -207,12 +207,12 @@ let continue_simulation
          (Api_common.result_map
             ~ok:(fun _  _ ->
                 let () = Ui_state.clear_model_error () in
-                let () = Lwt.async (fun _ -> update_simulation t) in
+                let () = Common.async (fun _ -> update_simulation t) in
                 let () = Common.debug (Js.string "continue_simulation.3") in
                 Lwt.return_unit)
             ~error:(fun _ _ ->
                 let () = Ui_state.clear_model_error () in
-                let () = Lwt.async (fun _ -> update_simulation t) in
+                let () = Common.async (fun _ -> update_simulation t) in
                 let () = Common.debug (Js.string "continue_simulation.3") in
                 Lwt.return_unit))
       )
@@ -323,11 +323,33 @@ let perturb_simulation
       )
     t
 
-let simulation_sequence : int ref = ref 0
-let simulation_next () : string =
-  let temp : int = !simulation_sequence in
-  let () = simulation_sequence := temp + 1 in
-  string_of_int temp
+let rec simulation_next_id
+    (catalog : Api_types_j.simulation_catalog)
+    (salt: int) : Api_types_j.simulation_id =
+  (* lower the probability of race conditions and
+     reduce probes of catalog *)
+  let n = salt + Random.int 1000 in
+  let simulation_id = string_of_int n in
+  if List.mem simulation_id catalog then
+    simulation_next_id catalog n
+  else
+    simulation_id
+
+let simulation_next (runtime_state : Api.manager) :
+  Api_types_j.project_id Api.result ->
+  (Api_types_j.project_id * Api_types_j.simulation_id) Api.result Lwt.t =
+  Api_common.result_bind_lwt
+    ~ok:(fun (project_id : Api_types_j.project_id) ->
+        (runtime_state#simulation_list project_id)
+        >>=
+        (Api_common.result_bind_lwt
+           ~ok:(fun (catalog : Api_types_j.simulation_catalog)  ->
+               let simulation_id  : Api_types_j.simulation_id = simulation_next_id catalog 0 in
+               Lwt.return (Api_common.result_ok (project_id,simulation_id))
+
+             )
+        )
+      )
 
 let start_simulation
     (t : t)
@@ -345,11 +367,12 @@ let start_simulation
               let () = Ui_state.clear_model_error () in
               let () = t.setter SIMULATION_INITALIZING in
               (return_project ()) >>=
+              (simulation_next runtime_state)>>=
               (Api_common.result_bind_lwt
-                 ~ok:(fun project_id ->
+                 ~ok:(fun (project_id,simulation_id) ->
                      (runtime_state#simulation_start
                         project_id
-                        (create_parameter (simulation_next ())))
+                        (create_parameter simulation_id))
                      >>=
                      (Api_common.result_bind_lwt
                          ~ok:(fun simulation_id ->
@@ -369,7 +392,7 @@ let start_simulation
                                              simulation_id
                                              simulation_status)) in
                                    let () =
-                                     Lwt.async
+                                     Common.async
                                        (fun _ -> update_simulation t) in
                                    Lwt.return (Api_common.result_ok ())
                                    )
