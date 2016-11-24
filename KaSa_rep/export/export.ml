@@ -1260,7 +1260,7 @@ let get_constraints_list_to_json state =
     get_constraints_list state
   in
     state,
-    Ckappa_site_graph.pattern_to_json constraints_list
+    Ckappa_site_graph.lemmas_list_to_json constraints_list
 
 (*TODO: test of_json*)
 

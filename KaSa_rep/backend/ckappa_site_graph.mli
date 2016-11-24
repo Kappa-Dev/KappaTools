@@ -1,8 +1,8 @@
 
-val pattern_to_json:
+val lemmas_list_to_json:
 Remanent_state.constraints_list -> Yojson.Basic.json
 
-val pattern_of_json : Yojson.Basic.json ->
+val lemmas_list_of_json : Yojson.Basic.json ->
   Remanent_state.constraints_list
 
 val print_internal_pattern :

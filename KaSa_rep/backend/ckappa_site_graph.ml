@@ -30,6 +30,11 @@ let bound_to = "bound to"
 let hyp = "site graph"
 let refinement = "site graph list"
 
+let sanity of_json to_json elt =
+  let output = to_json elt in
+  let _ = of_json output in
+  output
+
 (***************************************************************************)
 
 let pair_to_json (p: string * string): Yojson.Basic.json =
@@ -121,14 +126,14 @@ let site_graph_lemma_to_json lemma =
     hyp, site_graph_to_json get_hyp;
     refinement, site_graphs_list_to_json get_refinement]
 
-let pattern_to_json constraints_list =
-  JsonUtil.of_assoc (fun (agent_string, lemma_list) ->
+let lemmas_list_to_json constraints_list =
+  JsonUtil.of_assoc (fun (abstract_domain,lemma_list) ->
       let json =
         JsonUtil.of_list (fun lemma ->
             site_graph_lemma_to_json lemma
           ) lemma_list
       in
-      agent_string, json
+      abstract_domain, json
     ) constraints_list
 
 (*******************************************************************)
@@ -223,7 +228,7 @@ let site_graph_list_of_json json =
     Remanent_state.refinement = site_graph_list_of_json json;
   }
 
-  let pattern_of_json json =
+  let lemmas_list_of_json json =
     JsonUtil.to_list (* No, pattern_to_json uses association list (not list),
                         you should use to_assoc instead and provide an error message ~error_msg to help debugging *)
       (fun json ->
@@ -335,12 +340,9 @@ let pattern_of_json json =
 (*******************************************************************)
 (*TODO*)
 
-let sanity of_json to_json elt =
-  let output = to_json elt in
-  let _ = of_json output in
-  output
 
-let pattern_to_json = sanity pattern_of_json pattern_to_json
+
+let lemmas_list_to_json = sanity lemmas_list_of_json lemmas_list_to_json
 
 (*******************************************************************)
 
