@@ -199,7 +199,7 @@ let interface_of_json json =
     json
 
 let string_version_of_json json =
-  JsonUtil.to_list (fun json ->
+  JsonUtil.to_list ~error_msg:"string_version" (fun json ->
       JsonUtil.to_pair
         (fun json ->
            JsonUtil.to_string
@@ -224,13 +224,15 @@ let site_graph_list_of_json json =
   }
 
   let pattern_of_json json =
-  JsonUtil.to_list (fun json ->
-      JsonUtil.to_pair
-        (fun json ->
-           JsonUtil.to_string
-             ~error_msg:(JsonUtil.build_msg agent) json)
-        (fun json ->(*site graph lemma list*)
-           JsonUtil.to_list (fun json ->
+    JsonUtil.to_list (* No, pattern_to_json uses association list (not list),
+                        you should use to_assoc instead and provide an error message ~error_msg to help debugging *)
+      (fun json ->
+         JsonUtil.to_pair
+           (fun json ->
+              JsonUtil.to_string
+                ~error_msg:(JsonUtil.build_msg agent) json)
+           (fun json ->(*site graph lemma list*)
+              JsonUtil.to_list (fun json ->
                site_graph_lemma_of_json json
              ) json
         ) json) json
@@ -333,12 +335,12 @@ let pattern_of_json json =
 (*******************************************************************)
 (*TODO*)
 
-(*let sensity of_json to_json elt =
-  let output = pattern_to_json elt in
-  let _ = pattern_of_json output in
+let sanity of_json to_json elt =
+  let output = to_json elt in
+  let _ = of_json output in
   output
 
-let to_json = sensity pattern_to_json pattern_to_json*)
+let pattern_to_json = sanity pattern_of_json pattern_to_json
 
 (*******************************************************************)
 
