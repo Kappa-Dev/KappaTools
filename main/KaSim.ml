@@ -40,7 +40,11 @@ let finalize
     let pid = Unix.create_process prog (Array.of_list (prog::args))
         Unix.stdin Unix.stdout Unix.stderr in
     match waitpid_non_intr pid with
-    | _, Unix.WEXITED 127 -> failwith "Unavailable KaStor"
+    | _, Unix.WEXITED 127 ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           (Location.dummy_annot
+              ("Executable '"^prog^"' can not be found to compute stories.")))
     | _, Unix.WEXITED n -> if n <> 0 then exit n
     | _, Unix.WSIGNALED n -> failwith ("Killed with signal "^string_of_int n)
     | _, Unix.WSTOPPED n -> failwith ("Stopped with signal "^string_of_int n)
