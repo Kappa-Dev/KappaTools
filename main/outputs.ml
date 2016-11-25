@@ -227,7 +227,8 @@ let close_trace () =
   | None -> ()
   | Some desc ->
     let () = output_string desc "]}\n" in
-    close_out desc
+    let () = close_out desc in
+    traceDescr := None
 
 let initialize trace_file plotPack env =
   let () =
