@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Nov 24 2016>
+   * Last modification: Time-stamp: <Nov 26 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -51,7 +51,7 @@ type bdu_analysis_static =
     store_covering_classes:
       Covering_classes_type.remanent
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-    (*TODO*)
+
     store_list_of_site_type_in_covering_classes:
       Ckappa_sig.c_site_name list
         Covering_classes_type.AgentCV_map_and_set.Map.t;
@@ -84,6 +84,18 @@ type bdu_analysis_static =
       Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentsCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
+
+    store_wake_up_modif_list_restriction_map :
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+       Ckappa_sig.c_rule_id) list;
+
+    store_wake_up_proj_bdu_potential_restriction_map :
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+       Ckappa_sig.c_rule_id) list;
+
+    store_wake_up_bdu_test_restriction :
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+       Ckappa_sig.c_rule_id) list;
   }
 
 let init_bdu_analysis_static parameters error =
@@ -112,6 +124,9 @@ let init_bdu_analysis_static parameters error =
         Ckappa_sig.Rule_setmap.Map.empty;
       store_proj_bdu_test_restriction =
         Ckappa_sig.Rule_setmap.Map.empty;
+      store_wake_up_modif_list_restriction_map = [];
+      store_wake_up_proj_bdu_potential_restriction_map = [];
+      store_wake_up_bdu_test_restriction = []
     }
   in
   error, init_bdu_analysis_static
@@ -909,12 +924,15 @@ let store_bdu_potential_restriction_map_aux parameters handler error
     (*build a list_a*)
     let error, handler, list =
       Ckappa_sig.Views_bdu.build_reverse_sorted_association_list
-        parameters handler error [new_site_type, Ckappa_sig.dummy_state_index]
-(*state is 0*)
+        parameters handler error
+        [new_site_type, Ckappa_sig.dummy_state_index]
+    (*state is 0*)
     in
     let result_map =
       Covering_classes_type.AgentSiteRuleCV_setmap.Map.add
-        (agent_type, new_site_type, rule_id, cv_id) (bdu, list) store_result
+        (agent_type, new_site_type, rule_id, cv_id)
+        (bdu, list)
+        store_result
     in
     error, handler, result_map
   in
@@ -1003,7 +1021,9 @@ let store_bdu_potential_restriction_map_aux parameters handler error
                      in
                      let error, handler, store_result =
                        add_link handler error
-                         (agent_type, site', rule_id, cv_id) bdu store_result
+                         (agent_type, site', rule_id, cv_id)
+                         bdu
+                         store_result
                      in
                      error, handler, store_result
                   )
@@ -1257,6 +1277,77 @@ let collect_proj_bdu_test_restriction parameters handler error
   in
   (error, handler), store_result
 
+(*TODO*)
+
+let collect_wake_up_modif_list_restriction_map
+    parameters error handler store_result =
+  Covering_classes_type.AgentsRuleCV_map_and_set.Map.fold
+    (fun (_, agent_type, rule_id, _cv_id) list_a
+      (error, (handler, current_list)) ->
+       let error, handler, list =
+         Ckappa_sig.Views_bdu.extensional_of_association_list
+           parameters
+           handler
+           error
+           list_a
+       in
+       let error, current_list =
+         List.fold_left (fun (error, current_list) (site_type, _state) ->
+             error, (agent_type, site_type, rule_id) :: current_list
+           ) (error, current_list) list
+       in
+       error, (handler,current_list)
+    ) store_result (error, (handler, []))
+
+let collect_wake_up_proj_bdu_potential_restriction_map
+    parameters handler error store_result =
+    Ckappa_sig.Rule_setmap.Map.fold
+      (fun rule_id map (error, (handler, current_list)) ->
+         Covering_classes_type.AgentSiteCV_setmap.Map.fold
+           (fun (agent_type, _, _) (mvbdu, list_a) (error, (handler, current_list)) ->
+              (*iterate over the content of the covering class*)
+              let error, handler, list =
+                Ckappa_sig.Views_bdu.extensional_of_association_list
+                  parameters
+                  handler
+                  error
+                  list_a
+              in
+              let error, current_list =
+                List.fold_left (fun (error, current_list) (site_type, _state) ->
+                    error, (agent_type, site_type, rule_id) ::
+                           current_list
+                  ) (error, current_list) list
+              in
+              error, (handler, current_list)
+           ) map (error, (handler,current_list))
+      ) store_result (error, (handler,[]))
+
+let collect_wake_up_proj_bdu_test_restriction
+    parameters handler error store_result =
+  Ckappa_sig.Rule_setmap.Map.fold
+    (fun rule_id map (error, (handler, current_list)) ->
+       Covering_classes_type.AgentsCV_setmap.Map.fold
+         (fun (_, agent_type, _) mvbdu (error, (handler,current_list)) ->
+            let error, handler, list =
+              Ckappa_sig.Views_bdu.extensional_of_mvbdu
+                parameters
+                handler
+                error
+                mvbdu
+            in
+            let error, current_list =
+              List.fold_left (fun (error, current_list) l ->
+                  List.fold_left (fun (error, current_list) (site_type, _) ->
+                        error, (agent_type, site_type, rule_id) ::
+                               current_list
+                    ) (error, current_list) l
+                ) (error, current_list) list
+            in
+            error, (handler, current_list)
+         ) map (error, (handler, current_list))
+    ) store_result (error, (handler,[]))
+
 (***************************************************************************)
 
 let scan_rule_static parameters log_info error handler_kappa handler_bdu
@@ -1354,6 +1445,29 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
       store_remanent_triple
       store_result.store_proj_bdu_test_restriction
   in
+  (*TODO*)
+  let error, (handler_bdu, store_wake_up_modif_list_restriction_map) =
+    collect_wake_up_modif_list_restriction_map
+      parameters
+      error
+      handler_bdu
+      store_modif_list_restriction_map
+  in
+  let error, (handler_bdu, store_wake_up_proj_bdu_potential_restriction_map) =
+    collect_wake_up_proj_bdu_potential_restriction_map
+      parameters
+      handler_bdu
+      error
+      store_proj_bdu_potential_restriction_map
+  in
+  let error, (handler_bdu, store_wake_up_bdu_test_restriction) =
+    collect_wake_up_proj_bdu_test_restriction
+      parameters
+      handler_bdu
+      error
+      store_proj_bdu_test_restriction
+  in
+
   (*------------------------------------------------------------------------*)
   let error, log_info = StoryProfiling.StoryStats.close_event parameters error
       (StoryProfiling.Scan_rule_static (Ckappa_sig.int_of_rule_id rule_id))
@@ -1373,6 +1487,12 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
     store_proj_bdu_potential_restriction_map =
       store_proj_bdu_potential_restriction_map;
     store_proj_bdu_test_restriction = store_proj_bdu_test_restriction;
+    store_wake_up_modif_list_restriction_map =
+      store_wake_up_modif_list_restriction_map;
+    store_wake_up_proj_bdu_potential_restriction_map =
+      store_wake_up_proj_bdu_potential_restriction_map;
+    store_wake_up_bdu_test_restriction =
+      store_wake_up_bdu_test_restriction
   }
 
 (***************************************************************************)

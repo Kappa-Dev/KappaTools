@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 17 2016>
+  * Last modification: Time-stamp: <Nov 25 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -102,12 +102,19 @@ type 'site_graph poly_constraints_list =
 type internal_constraints_list =
   Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
-type constraints_list =
+type site_map =
+    (string * (*site_string*)
+     (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
+       Wrapped_modules.LoggedStringMap.t) list
+
+type constraints_list = site_map poly_constraints_list
+
+(*type constraints_list =
   ((string *
     (string option * Ckappa_backend.Ckappa_backend.binding_state option)
        Wrapped_modules.LoggedStringMap.t)
      list)
-    poly_constraints_list
+    poly_constraints_list*)
 
 val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
