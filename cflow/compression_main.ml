@@ -108,9 +108,6 @@ let compress_and_print
   in
   let empty_compression = error, log_info, table1,table2,table3,table4 in
   let step_list = U.trace_of_pretrace step_list in
-  let parameter_weak  = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in
-  let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter_weak handler log_info error step_list in
-  let error,log_info,() = U.print_musical_grid parameter_weak handler log_info error blackboard in
   let error, log_info, causal,_trivial,weak,strong =
     if (not causal_trace_on)
     && (not weak_compression_on)
