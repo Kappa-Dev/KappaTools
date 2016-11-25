@@ -528,12 +528,12 @@ let update_outdated_activities ~get_alg store env counter state =
   {state''' with outdated_elements = Operator.DepSet.empty,false }
 
 let update_tokens ~get_alg env counter state consumed injected =
+  let compute_them = List.rev_map
+      (fun  ((expr,_),i) -> (value_alg ~get_alg counter state expr,i)) in
   let do_op op state l =
     List.fold_left
-      (fun st ((expr,_),i) ->
-         let () =
-           st.tokens.(i) <-
-             op st.tokens.(i) (value_alg ~get_alg counter st expr) in
+      (fun st (va,i) ->
+         let () = st.tokens.(i) <- op st.tokens.(i) va in
          let deps' = Environment.get_token_reverse_dependencies env i in
          if Operator.DepSet.is_empty deps' then st
          else
@@ -541,7 +541,9 @@ let update_tokens ~get_alg env counter state consumed injected =
            { st with outdated_elements =
                        Operator.DepSet.union rdeps deps',changed_connectivity }
       ) state l in
-  let state' = do_op Nbr.sub state consumed in do_op Nbr.add state' injected
+  let consumed' = compute_them consumed in
+  let injected' = compute_them injected in
+  let state' = do_op Nbr.sub state consumed' in do_op Nbr.add state' injected'
 
 let transform_by_a_rule ~get_alg outputs env unary_patterns counter
     state event_kind ?path rule inj =
