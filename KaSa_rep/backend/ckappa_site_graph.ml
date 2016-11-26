@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Nov 25 2016>
+   * Last modification: Time-stamp: <Nov 26 2016>
    *
    * Site graph
    *
@@ -195,13 +195,13 @@ let interface_of_json json :
                        (*Ckappa_backend.Ckappa_backend.binding_state*)
                        match json with
                        (* `Null -> None*)
-                       | `Assoc [free, `Null] ->
+                       | `Assoc [s, `Null] when s = free ->
                          Ckappa_backend.Ckappa_backend.Free
-                       | `Assoc [wildcard, `Null] ->
+                       | `Assoc [s, `Null] when s = wildcard ->
                          Ckappa_backend.Ckappa_backend.Wildcard
-                       | `Assoc [bound_to, `Null] ->
+                       | `Assoc [s, `Null] when s = bound_to ->
                          Ckappa_backend.Ckappa_backend.Bound_to_unknown
-                       | `Assoc [bond_id, j] ->
+                       | `Assoc [s, j] when s = bond_id ->
                          let i =
                            JsonUtil.to_int ~error_msg:"wrong binding id" j
                          in
@@ -210,12 +210,15 @@ let interface_of_json json :
                          in
                            (Ckappa_backend.Ckappa_backend.Bound_to
                               bond_index)
-                       | `Assoc [binding_type, j] ->
+                       | `Assoc [s, j] when s = binding_type ->
                          let (agent_name, site_name) =
                            pair_of_json j
                          in
                            (Ckappa_backend.Ckappa_backend.Binding_type
                               (agent_name, site_name))
+                       | x -> raise
+                                (Yojson.Basic.Util.Type_error ("wrong binding state",x))
+
                     ) json
                 in
                 binding_opt
@@ -251,17 +254,30 @@ Yojson.Basic.json ->
   = JsonUtil.to_list site_graph_of_json
 
 let site_graph_lemma_of_json json =
-  {
-    Remanent_state.hyp = site_graph_of_json json;
-    Remanent_state.refinement = site_graphs_list_of_json json
-  }
+  match
+    json
+  with
+  | `Assoc  l as x when List.length l = 2 ->
+    begin
+      try
+        {
+          Remanent_state.hyp = site_graph_of_json (List.assoc hyp l);
+          Remanent_state.refinement = site_graphs_list_of_json (List.assoc refinement l)
+        }
+      with Not_found ->
+        raise
+          (Yojson.Basic.Util.Type_error ("lemma",x))
+    end
+     | x ->
+       raise
+         (Yojson.Basic.Util.Type_error ("lemma",x))
 
 let lemmas_list_of_json json : Remanent_state.constraints_list =
-  JsonUtil.to_assoc ~error_msg:""
+  JsonUtil.to_assoc ~error_msg:"lemmas list"
     (fun (s, json) ->
       (*'a list*)
        let l =
-         JsonUtil.to_list ~error_msg:""
+         JsonUtil.to_list ~error_msg:"lemma"
            (fun json ->
               site_graph_lemma_of_json json
            ) json

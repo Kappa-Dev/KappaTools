@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 25 2016>
+  * Last modification: Time-stamp: <Nov 26 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -127,6 +127,33 @@ let location_of_json
 
 type 'a pair = 'a * 'a
 
+let json_of_accuracy accuracy =
+  JsonUtil.of_string
+    (
+      match
+        accuracy
+      with
+      | Low ->
+        "low"
+      | Medium ->
+        "medium"
+      | High ->
+        "high"
+      | Full ->
+        "full"
+    )
+
+let json_to_accuracy json =
+  match
+    JsonUtil.to_string json
+  with
+  | "low" -> Low
+  | "medium" -> Medium
+  | "high" -> High
+  | "full" -> Full
+  | _ ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "accuracy level",json))
+
 type influence_map =
   {
     positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
@@ -141,6 +168,17 @@ let target = "target"
 let location_pair_list = "location pair list"
 let rhs = "RHS"
 let lhs = "LHS"
+let agent="agent name"
+let interface="interface"
+let site="site name"
+let stateslist="states list"
+let prop="property states"
+let bind="binding states"
+let contactmap="contact map"
+let influencemap="influence map"
+let refinement_lemmas="refinement lemmas"
+let map = "map"
+let accuracy_string = "accuracy"
 
 let half_influence_map_to_json =
   InfluenceNodeMap.to_json
@@ -175,77 +213,123 @@ let half_influence_map_of_json =
              (location_of_json ~error_msg:(JsonUtil.build_msg "location")))))
 
 let influence_map_to_json influence_map =
-  `Assoc
-    [
-      wakeup,half_influence_map_to_json influence_map.positive;
-      inhibition,half_influence_map_to_json
-        influence_map.negative;]
+`Assoc
+  [influencemap,
+   JsonUtil.of_pair
+     ~lab1:accuracy_string ~lab2:map
+     json_of_accuracy
+     (fun influence_map ->
+        `Assoc
+          [
+            wakeup,half_influence_map_to_json influence_map.positive;
+            inhibition,half_influence_map_to_json
+              influence_map.negative;]) influence_map]
 
-let influence_map_of_json ?error_msg:(error_msg=JsonUtil.build_msg "influence map") =
-  function
-  | `Assoc l as x when List.length l = 2 ->
+let influence_map_of_json ?error_msg:(error_msg=JsonUtil.build_msg "influence map") json =
+  match
+    json
+  with
+  | `Assoc l as x ->
     begin
       try
-        {positive =
-           half_influence_map_of_json (List.assoc wakeup l);
-         negative =
-           half_influence_map_of_json (List.assoc inhibition l)}
-      with Not_found ->
-        raise (Yojson.Basic.Util.Type_error (error_msg,x))
+        let json = List.assoc influencemap l in
+        JsonUtil.to_pair
+        ~lab1:accuracy_string ~lab2:map
+        ~error_msg:(JsonUtil.build_msg "influence map")
+        json_to_accuracy
+      (function
+        | `Assoc l as x when List.length l = 2 ->
+          begin
+            try
+              {positive =
+                 half_influence_map_of_json (List.assoc wakeup l);
+               negative =
+                 half_influence_map_of_json (List.assoc inhibition l)}
+            with Not_found ->
+              raise (Yojson.Basic.Util.Type_error (error_msg,x))
+          end
+        | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x)))
+      json
+      with
+      | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
     end
-  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+  | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
 
-let agent="agent name"
-let interface="interface"
-let site="site name"
-let stateslist="states list"
-let prop="property states"
-let bind="binding states"
+
+
+
+type contact_map =
+      ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
+
+
 
 (******************************************************************)
 
-let contact_map_to_json =
-  Mods.StringMap.to_json
-    ~lab_key:agent ~lab_value:interface
-    JsonUtil.of_string
-    (Mods.StringMap.to_json
-       ~lab_key:site ~lab_value:stateslist
+let contact_map_to_json contact_map=
+  `Assoc
+    [contactmap,
+     JsonUtil.of_pair
+       ~lab1:accuracy_string ~lab2:map
+       json_of_accuracy
+       (Mods.StringMap.to_json
+       ~lab_key:agent ~lab_value:interface
        JsonUtil.of_string
-       (JsonUtil.of_pair
-          ~lab1:prop ~lab2:bind
-          (JsonUtil.of_list JsonUtil.of_string)
-          (JsonUtil.of_list
-             (JsonUtil.of_pair
-                ~lab1:agent ~lab2:site
-                JsonUtil.of_string
-                JsonUtil.of_string)
-          )))
+       (Mods.StringMap.to_json
+          ~lab_key:site ~lab_value:stateslist
+          JsonUtil.of_string
+          (JsonUtil.of_pair
+             ~lab1:prop ~lab2:bind
+             (JsonUtil.of_list JsonUtil.of_string)
+             (JsonUtil.of_list
+                (JsonUtil.of_pair
+                   ~lab1:agent ~lab2:site
+                   JsonUtil.of_string
+                   JsonUtil.of_string)
+             )))) contact_map]
 
-let contact_map_of_json =
-  Mods.StringMap.of_json
-    ~lab_key:agent ~lab_value:interface
-    (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
-    (Mods.StringMap.of_json
-       ~error_msg:(JsonUtil.build_msg "interface")
-       ~lab_key:site ~lab_value:stateslist
-       (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
-       (JsonUtil.to_pair
-          ~error_msg:(JsonUtil.build_msg "pair of lists of sites")
-          ~lab1:prop ~lab2:bind
-          (JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "list of internal states")
-             (JsonUtil.to_string
-                ~error_msg:(JsonUtil.build_msg "internal state")))
-          (JsonUtil.to_list
-             ~error_msg:(JsonUtil.build_msg "list of binding states")
-             (JsonUtil.to_pair
-                ~error_msg:(JsonUtil.build_msg "binding type")
-                ~lab1:agent ~lab2:site
-                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
-                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site"))))))
+let contact_map_of_json json =
+  match
+    json
+  with
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc contactmap l in
+        JsonUtil.to_pair
+          ~lab1:accuracy_string ~lab2:map
+          ~error_msg:(JsonUtil.build_msg "contact map")
+          json_to_accuracy
+          (Mods.StringMap.of_json
+             ~lab_key:agent ~lab_value:interface
+             (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
+             (Mods.StringMap.of_json
+                ~error_msg:(JsonUtil.build_msg "interface")
+                ~lab_key:site ~lab_value:stateslist
+                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
+                  (JsonUtil.to_pair
+                     ~error_msg:(JsonUtil.build_msg "pair of lists of sites")
+                     ~lab1:prop ~lab2:bind
+                     (JsonUtil.to_list
+                        ~error_msg:(JsonUtil.build_msg "list of internal states")
+                        (JsonUtil.to_string
+                           ~error_msg:(JsonUtil.build_msg "internal state")))
+                     (JsonUtil.to_list
+                        ~error_msg:(JsonUtil.build_msg "list of binding states")
+                        (JsonUtil.to_pair
+                           ~error_msg:(JsonUtil.build_msg "binding type")
+                           ~lab1:agent ~lab2:site
+                           (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
+                                                             "agent name"))
+                           (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
+                                                             "site")))))))
+          json
+      with
+      | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
 
-type contact_map =
-  ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
+
+
 
 type internal_contact_map =
   (Ckappa_sig.c_state list *

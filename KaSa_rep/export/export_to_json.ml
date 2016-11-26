@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Nov 26 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -44,12 +44,12 @@ functor (A:Analyzer.Analyzer) ->
     let get_contact_map
         ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
       let state, cm = get_contact_map ~accuracy_level state in
-      state, Remanent_state.contact_map_to_json cm
+      state, Remanent_state.contact_map_to_json (accuracy_level,cm)
 
     let get_influence_map
         ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
       let state, influence_map = get_influence_map ~accuracy_level state in
-      state, Remanent_state.influence_map_to_json influence_map
+      state, Remanent_state.influence_map_to_json (accuracy_level,influence_map)
 
     let get_dead_rules state =
       let state, rules = get_dead_rules state in

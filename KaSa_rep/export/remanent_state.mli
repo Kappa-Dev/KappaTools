@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 25 2016>
+  * Last modification: Time-stamp: <Nov 26 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -28,10 +28,10 @@ type contact_map =
   ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
 val contact_map_to_json:
-  contact_map -> Yojson.Basic.json
+  accuracy_level * contact_map -> Yojson.Basic.json
 
 val contact_map_of_json:
-  Yojson.Basic.json -> contact_map
+  Yojson.Basic.json -> accuracy_level * contact_map
 
 type quark_map = Quark_type.quarks
 
@@ -61,10 +61,10 @@ type influence_map =
   }
 
 val influence_map_to_json:
-  influence_map -> Yojson.Basic.json
+  accuracy_level * influence_map -> Yojson.Basic.json
 
 val influence_map_of_json:
-  ?error_msg:string -> Yojson.Basic.json -> influence_map
+  ?error_msg:string -> Yojson.Basic.json -> accuracy_level * influence_map
 
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
