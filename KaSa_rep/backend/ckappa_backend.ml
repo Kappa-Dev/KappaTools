@@ -9,11 +9,56 @@ struct
     | Binding_type of Ckappa_sig.agent_name * Ckappa_sig.site_name
     | Bound_to of bond_index
 
+  let agent = "agent"
+  let site = "site"
+  let free = ""
+  let wildcard = "?"
+  let bound = "!_"
+  let bond_id = "bond id"
+  let bound_to = "bound to"
+  let binding_type = "binding type"
   let int_of_bond_index (a:bond_index) : int = a
-
   let bond_index_of_int (a:int) : bond_index = a
 
-  type agent_string_version =
+
+  let binding_state_to_json =
+    function
+    | Free -> `Assoc [free, `Null]
+    | Wildcard -> `Assoc [wildcard, `Null]
+    | Bound_to_unknown -> `Assoc [bound_to, `Null]
+    | (Bound_to i) ->
+      `Assoc [bond_id, JsonUtil.of_int (int_of_bond_index i)]
+    | (Binding_type (agent_name, site_name)) ->
+      `Assoc [binding_type,
+              JsonUtil.of_pair ~lab1:agent ~lab2:site
+                JsonUtil.of_string
+                JsonUtil.of_string
+                (agent_name, site_name)]
+
+
+  let binding_state_of_json =
+    function
+    | `Assoc [s, `Null] when s = free -> Free
+    | `Assoc [s, `Null] when s = wildcard -> Wildcard
+    | `Assoc [s, `Null] when s = bound_to -> Bound_to_unknown
+    | `Assoc [s, j] when s = bond_id ->
+      let i =
+        JsonUtil.to_int ~error_msg:"wrong binding id" j
+      in
+      let bond_index = bond_index_of_int i in
+      Bound_to bond_index
+    | `Assoc [s, j] when s = binding_type ->
+               let (agent_name, site_name) =
+                 JsonUtil.to_pair
+                   ~lab1:agent ~lab2:site ~error_msg:"binding type"
+                   (JsonUtil.to_string ~error_msg:"agent name") (JsonUtil.to_string ~error_msg:"site name")
+                   j
+               in
+               Binding_type (agent_name, site_name)
+    | x -> raise
+             (Yojson.Basic.Util.Type_error ("wrong binding state",x))
+
+  type agent =
     (string *
      (string option * binding_state option)
        Wrapped_modules.LoggedStringMap.t)
@@ -31,11 +76,11 @@ struct
           Ckappa_sig.Site_map_and_set.Map.t
           Ckappa_sig.Agent_id_map_and_set.Map.t;
       string_version:
-        agent_string_version
+        agent
           Ckappa_sig.Agent_id_map_and_set.Map.t
     }
 
-  type string_version = agent_string_version list
+  type string_version = agent list
 
   let get_string_version t = t.string_version
   let set_string_version s_v t =

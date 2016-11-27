@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Nov 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -763,12 +763,6 @@ let convert_influence_map show_title state (wake_up_map, inhibition_map) =
         convert_half_influence_map inhibition_map nrules ;
     }
   in
-  let state =
-    Remanent_state.set_influence_map
-      Remanent_state.Low
-      output
-      state
-  in
   state,
   output
 
@@ -843,7 +837,7 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   Remanent_state.set_errors error state, (wake_up_map, inhibition_map)
 
-let get_map_gen
+let compute_map_gen
     (get: ?accuracy_level:Remanent_state.accuracy_level ->
      (Reachability.static_information,
       Reachability.dynamic_information)
@@ -851,7 +845,7 @@ let get_map_gen
      (Reachability.static_information,
       Reachability.dynamic_information)
        Remanent_state.state * 'a )
-    convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    store convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
     ?do_we_show_title:(do_we_show_title=(fun _ -> true))
     ?log_title
     state =
@@ -863,9 +857,11 @@ let get_map_gen
   in
   let () = show_title state in
   let state, internal =
-    get ~accuracy_level:accuracy_level state
+    get ~accuracy_level state
   in
-  convert (fun _ -> ()) state internal
+  let state, rep = convert (fun _ -> ()) state internal in
+  store accuracy_level rep state, rep
+
 
 let get_intermediary_internal_influence_map =
   get_gen
@@ -884,10 +880,30 @@ let get_internal_influence_map
   | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
     get_intermediary_internal_influence_map state
 
-let get_influence_map =
-  get_map_gen
+let compute_influence_map
+    ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title =
+  compute_map_gen
     get_internal_influence_map
+    Remanent_state.set_influence_map
     convert_influence_map
+    ~accuracy_level
+
+let get_influence_map
+    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title:(log_title=
+                (fun x ->
+                    match x with
+                    | Remanent_state.Low ->
+                      Some "Compute the influence map"
+                    | Remanent_state.Medium
+                    | Remanent_state.High | Remanent_state.Full ->
+                      Some "Refine the influence map"))
+     =
+     get_gen
+       (Remanent_state.get_influence_map accuracy_level)
+       (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
+
 
 (******************************************************************)
 
@@ -964,18 +980,39 @@ let get_internal_contact_map
   | Remanent_state.High
   | Remanent_state.Full -> get_intermediary_internal_contact_map state
 
-let get_contact_map =
-    get_map_gen
-      ~do_we_show_title:(fun _ -> true)
-      ~log_title:(fun x ->
-          match x with
-          | Remanent_state.Low ->
-            Some "Compute the contact map"
-          | Remanent_state.Medium
-          | Remanent_state.High | Remanent_state.Full ->
-            Some "Refine the contact map")
-      get_internal_contact_map
-      convert_contact_map
+
+let compute_contact_map
+    ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title =
+  compute_map_gen
+    get_internal_contact_map
+    Remanent_state.set_contact_map
+    convert_contact_map
+    ~accuracy_level
+
+let get_contact_map
+    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+  =
+  get_gen
+    (Remanent_state.get_contact_map accuracy_level)
+    (compute_contact_map
+       ~accuracy_level
+       ~do_we_show_title:(fun _ -> true)
+       ~log_title:(fun x ->
+         match x with
+         | Remanent_state.Low ->
+           Some "Compute the contact map"
+         | Remanent_state.Medium
+         | Remanent_state.High | Remanent_state.Full ->
+           Some "Refine the contact map"))
+
+let get_internal_contact_map
+      ?accuracy_level:(accuracy_level=Remanent_state.Low)
+      state =
+  match accuracy_level with
+  | Remanent_state.Low ->
+    get_raw_internal_contact_map state
+  | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
+    get_intermediary_internal_contact_map state
 
 (******************************************************************)
 
@@ -1156,21 +1193,6 @@ let get_dead_rules  =
     Remanent_state.get_dead_rules
     compute_dead_rules
 
-(******************************************************************)
-
-let rule_id_to_json rule_id =
-  `Assoc ["rule id", `Int (Ckappa_sig.int_of_rule_id rule_id)]
-
-let json_to_rule_id =
-  function
-  | `Assoc ["rule id",`Int i] -> Ckappa_sig.rule_id_of_int i
-  | x -> raise (Yojson.Basic.Util.Type_error (("Not a correct rule_id"),x))
-
-let dead_rules_to_json =
-  JsonUtil.of_list rule_id_to_json
-
-let json_to_dead_rules =
-  JsonUtil.to_list json_to_rule_id
 
 (*************************************************************************)
 
@@ -1260,8 +1282,6 @@ let get_constraints_list_to_json state =
     get_constraints_list state
   in
     state,
-    Ckappa_site_graph.lemmas_list_to_json constraints_list
-
-(*TODO: test of_json*)
+    Remanent_state.lemmas_list_to_json constraints_list
 
   end

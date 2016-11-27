@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 22 2016>
+ * Last modification: Time-stamp: <Nov 27 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -30,6 +30,19 @@ type c_state      = int
 type c_rule_id    = int
 
 (****************************************************************************)
+
+let rule_id_to_json x =
+      `Assoc ["rule_id", `Int x]
+
+let rule_id_of_json json =
+  match
+    json
+  with
+  | `Assoc [s,json] when s = "rule_id"
+    -> Yojson.Basic.Util.to_int json
+  | _ ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "rule id",json))
+
 
 let dummy_agent_name = 0
 let dummy_site_name = 0

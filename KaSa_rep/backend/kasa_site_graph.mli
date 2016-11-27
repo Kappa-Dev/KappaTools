@@ -10,6 +10,10 @@ sig
     | Binding_type of Ckappa_sig.agent_name * Ckappa_sig.site_name
     | Bound_to of bond_index
 
+  val binding_state_to_json : binding_state -> Yojson.Basic.json
+  val binding_state_of_json : Yojson.Basic.json -> binding_state
+
+
   val int_of_bond_index : bond_index -> int
   val bond_index_of_int : int -> bond_index
 

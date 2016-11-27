@@ -1,10 +1,3 @@
-
-val lemmas_list_to_json:
-Remanent_state.constraints_list -> Yojson.Basic.json
-
-val lemmas_list_of_json : Yojson.Basic.json ->
-  Remanent_state.constraints_list
-
 val print_internal_pattern :
   ?logger:Loggers.t ->
   Remanent_parameters_sig.parameters ->

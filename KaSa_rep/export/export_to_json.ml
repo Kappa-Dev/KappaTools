@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 26 2016>
+  * Last modification: Time-stamp: <Nov 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -30,6 +30,9 @@ sig
   val get_dead_rules: state -> state * Yojson.Basic.json
 
   val get_constraints_list: state -> state * Yojson.Basic.json
+
+  val to_json: state -> Yojson.Basic.json
+
 end
 
 module Export =
@@ -53,9 +56,11 @@ functor (A:Analyzer.Analyzer) ->
 
     let get_dead_rules state =
       let state, rules = get_dead_rules state in
-      state, dead_rules_to_json rules
+      state, Remanent_state.dead_rules_to_json rules
 
     let get_constraints_list state =
       get_constraints_list_to_json state
+
+    let to_json = Remanent_state.to_json
 
   end

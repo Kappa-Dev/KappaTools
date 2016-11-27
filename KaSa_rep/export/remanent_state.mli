@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 26 2016>
+  * Last modification: Time-stamp: <Nov 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -76,6 +76,9 @@ type subviews_info = unit
 
 type dead_rules = Ckappa_sig.c_rule_id list
 
+val dead_rules_to_json : dead_rules -> Yojson.Basic.json
+val dead_rules_of_json : Yojson.Basic.json -> dead_rules
+
 type dead_agents = Ckappa_sig.c_agent_name list
 
 type flow =
@@ -83,12 +86,6 @@ type flow =
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
 (*******************************************************************)
-(*TODO*)
-
-(*Ex:
-  "views", hyp: A(x~p) -> refinment: [A(x~p, y~p)]
-  "parallel", hyp: A(x!_, y!_) -> refinment: [A(x!1, y!2), B(x!1, y!2)]
-*)
 
 type 'site_graph lemma =
   {
@@ -102,19 +99,16 @@ type 'site_graph poly_constraints_list =
 type internal_constraints_list =
   Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
-type site_map =
-    (string * (*site_string*)
+type agent =
+    string * (*agent name*)
      (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
-       Wrapped_modules.LoggedStringMap.t) list
+       Wrapped_modules.LoggedStringMap.t
 
-type constraints_list = site_map poly_constraints_list
+type constraints_list = agent list poly_constraints_list
 
-(*type constraints_list =
-  ((string *
-    (string option * Ckappa_backend.Ckappa_backend.binding_state option)
-       Wrapped_modules.LoggedStringMap.t)
-     list)
-    poly_constraints_list*)
+val lemmas_list_to_json : constraints_list -> Yojson.Basic.json
+
+val lemmas_list_of_json : Yojson.Basic.json -> constraints_list
 
 val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
@@ -124,6 +118,7 @@ val get_refinement : 'site_graph lemma -> 'site_graph list
 type ('static, 'dynamic) state
 
 (*******************************************************************)
+val to_json: ('static, 'dynamic) state -> Yojson.Basic.json 
 
 val create_state:
   ?errors:Exception.method_handler -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state

@@ -4,18 +4,59 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 26 2016>
+  * Last modification: Time-stamp: <Nov 27 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+(**********************)
+(* compilation result *)
+(**********************)
+
+type compilation =
+    ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule)
+      Ast.compil
+
 type init =
-    Compil of ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+  | Compil of compilation
   | Files of string list
 
+type refined_compilation =
+  (Ckappa_sig.agent, Ckappa_sig.mixture, string,
+   Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
+
+
+(*******************)
+(* Accuracy levels *)
+(*******************)
+
 type accuracy_level = Low | Medium | High | Full
+
+let json_of_accuracy accuracy =
+  JsonUtil.of_string
+    (
+      match
+        accuracy
+      with
+      | Low -> "low"
+      | Medium -> "medium"
+      | High -> "high"
+      | Full -> "full"
+    )
+
+let json_to_accuracy json =
+  match
+    JsonUtil.to_string json
+  with
+  | "low" -> Low
+  | "medium" -> Medium
+  | "high" -> High
+  | "full" -> Full
+  | _ ->
+    raise
+      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "accuracy level",json))
 
 (******************************************************************)
 
@@ -47,118 +88,16 @@ module AccuracyMap = AccuracySetMap.Map
 
 (******************************************************************)
 
-type compilation =
-  ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule)
-    Ast.compil
-
-type refined_compilation =
-  (Ckappa_sig.agent, Ckappa_sig.mixture, string,
-   Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
 
 type quark_map = Quark_type.quarks
 
 type rule_id = int
 type var_id =  int
 
-type influence_node =
-  | Rule of rule_id
-  | Var of var_id
 
-(******************************************************************)
-
-let influence_node_to_json a =
-  match a with
-  | Var i ->
-    `Assoc ["variable",JsonUtil.of_int i]
-  | Rule i  ->
-    `Assoc ["rule",JsonUtil.of_int i]
-
-let influence_node_of_json
-    ?error_msg:(error_msg="Not a correct influence node")
-  =
-  function
-  | `Assoc ["variable",json] ->
-    Var (JsonUtil.to_int json)
-  | `Assoc ["rule",json] ->
-    Rule (JsonUtil.to_int json)
-  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
-
-(******************************************************************)
-
-module InfluenceNodeSetMap =
-  SetMap.Make
-    (struct
-      type t = influence_node
-      let compare = compare
-      let print f = function
-        | Rule r -> Format.fprintf f "Rule %i" r
-        | Var r -> Format.fprintf f "Var %i" r
-    end)
-
-module InfluenceNodeMap = InfluenceNodeSetMap.Map
-
-(******************************************************************)
-
-type internal_influence_map =
-  Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
-  * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
-
-type location =
-  | Direct of int
-  | Side_effect of int
-
-(******************************************************************)
-
-let location_to_json a =
-  match a with
-  | Direct i -> `Assoc ["direct",JsonUtil.of_int i]
-  | Side_effect i  -> `Assoc ["side_effects",JsonUtil.of_int i]
-
-let location_of_json
-    ?error_msg:(error_msg="Not a correct location")
-  =
-  function
-  | `Assoc ["direct",json] -> Direct (JsonUtil.to_int json)
-  | `Assoc ["side_effect",json] -> Side_effect (JsonUtil.to_int json)
-  | x ->
-    raise (Yojson.Basic.Util.Type_error (error_msg,x))
-
-(******************************************************************)
-
-type 'a pair = 'a * 'a
-
-let json_of_accuracy accuracy =
-  JsonUtil.of_string
-    (
-      match
-        accuracy
-      with
-      | Low ->
-        "low"
-      | Medium ->
-        "medium"
-      | High ->
-        "high"
-      | Full ->
-        "full"
-    )
-
-let json_to_accuracy json =
-  match
-    JsonUtil.to_string json
-  with
-  | "low" -> Low
-  | "medium" -> Medium
-  | "high" -> High
-  | "full" -> Full
-  | _ ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "accuracy level",json))
-
-type influence_map =
-  {
-    positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
-    negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
-  }
+(**************)
+(* JSon labels*)
+(**************)
 
 let wakeup = "wake-up map"
 let inhibition = "inhibition map"
@@ -172,13 +111,93 @@ let agent="agent name"
 let interface="interface"
 let site="site name"
 let stateslist="states list"
-let prop="property states"
-let bind="binding states"
+let props="property states"
+let binds="binding states"
 let contactmap="contact map"
+let contactmaps="contact maps"
 let influencemap="influence map"
+let influencemaps="influence maps"
 let refinement_lemmas="refinement lemmas"
 let map = "map"
 let accuracy_string = "accuracy"
+let variable = "variable"
+let rule = "rule"
+let direct = "direct"
+let prop="property state"
+let bind="binding state"
+let side_effect = "side effect"
+let hyp = "site graph"
+let refinement = "site graph list"
+let domain_name = "domain name"
+let refinements_list = "refinements list"
+let dead_rules = "dead rules"
+
+(*****************)
+(* Influence map *)
+(*****************)
+
+(* Influence Node *)
+type influence_node =
+  | Rule of rule_id
+  | Var of var_id
+
+let influence_node_to_json a =
+  match a with
+  | Var i ->
+    `Assoc [variable,JsonUtil.of_int i]
+  | Rule i  ->
+    `Assoc [rule,JsonUtil.of_int i]
+
+let influence_node_of_json
+    ?error_msg:(error_msg="Not a correct influence node")
+  =
+  function
+  | `Assoc [s,json] when s = variable ->
+    Var (JsonUtil.to_int json)
+  | `Assoc [s,json] when s = rule ->
+    Rule (JsonUtil.to_int json)
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+(* Location labels *)
+
+type location =
+  | Direct of int
+  | Side_effect of int
+
+
+let location_to_json a =
+  match a with
+  | Direct i -> `Assoc [direct,JsonUtil.of_int i]
+  | Side_effect i  -> `Assoc [side_effect,JsonUtil.of_int i]
+
+let location_of_json
+    ?error_msg:(error_msg="Not a correct location")
+  =
+  function
+  | `Assoc [s,json] when s=direct -> Direct (JsonUtil.to_int json)
+  | `Assoc [s,json] when s=side_effect -> Side_effect (JsonUtil.to_int json)
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+
+module InfluenceNodeSetMap =
+  SetMap.Make
+    (struct
+      type t = influence_node
+      let compare = compare
+      let print f = function
+        | Rule r -> Format.fprintf f "Rule %i" r
+        | Var r -> Format.fprintf f "Var %i" r
+    end)
+
+module InfluenceNodeMap = InfluenceNodeSetMap.Map
+
+(* Relations *)
+
+type 'a pair = 'a * 'a
+
+type half_influence_map =
+  location pair list InfluenceNodeMap.t InfluenceNodeMap.t
 
 let half_influence_map_to_json =
   InfluenceNodeMap.to_json
@@ -212,6 +231,14 @@ let half_influence_map_of_json =
              (location_of_json ~error_msg:(JsonUtil.build_msg "location"))
              (location_of_json ~error_msg:(JsonUtil.build_msg "location")))))
 
+(* Influence map *)
+
+type influence_map =
+  {
+    positive: half_influence_map ;
+    negative: half_influence_map ;
+  }
+
 let influence_map_to_json influence_map =
 `Assoc
   [influencemap,
@@ -225,7 +252,9 @@ let influence_map_to_json influence_map =
             inhibition,half_influence_map_to_json
               influence_map.negative;]) influence_map]
 
-let influence_map_of_json ?error_msg:(error_msg=JsonUtil.build_msg "influence map") json =
+let influence_map_of_json
+    ?error_msg:(error_msg=JsonUtil.build_msg "influence map") json
+  =
   match
     json
   with
@@ -251,19 +280,22 @@ let influence_map_of_json ?error_msg:(error_msg=JsonUtil.build_msg "influence ma
         | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x)))
       json
       with
-      | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+      | _ ->
+        raise
+          (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
     end
-  | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
 
+(******************************************************************************)
+(******************************************************************************)
 
-
+(***************)
+(* Contact map *)
+(***************)
 
 type contact_map =
       ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
-
-
-
-(******************************************************************)
 
 let contact_map_to_json contact_map=
   `Assoc
@@ -278,7 +310,7 @@ let contact_map_to_json contact_map=
           ~lab_key:site ~lab_value:stateslist
           JsonUtil.of_string
           (JsonUtil.of_pair
-             ~lab1:prop ~lab2:bind
+             ~lab1:props ~lab2:binds
              (JsonUtil.of_list JsonUtil.of_string)
              (JsonUtil.of_list
                 (JsonUtil.of_pair
@@ -308,7 +340,7 @@ let contact_map_of_json json =
                 (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
                   (JsonUtil.to_pair
                      ~error_msg:(JsonUtil.build_msg "pair of lists of sites")
-                     ~lab1:prop ~lab2:bind
+                     ~lab1:props ~lab2:binds
                      (JsonUtil.to_list
                         ~error_msg:(JsonUtil.build_msg "list of internal states")
                         (JsonUtil.to_string
@@ -328,29 +360,119 @@ let contact_map_of_json json =
     end
   | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
 
+(******************************************************************************)
+(******************************************************************************)
 
-
-
-type internal_contact_map =
-  (Ckappa_sig.c_state list *
-   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
-    Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
-
-(******************************************************************)
-
-type ('static, 'dynamic) reachability_result = 'static * 'dynamic
-
-type subviews_info = unit
+(**************)
+(* dead rules *)
+(**************)
 
 type dead_rules = Ckappa_sig.c_rule_id list
 
+let dead_rules_to_json json =
+  `Assoc
+    [dead_rules, JsonUtil.of_list Ckappa_sig.rule_id_to_json json]
+
+let dead_rules_of_json =
+  function
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc dead_rules l in
+        JsonUtil.to_list
+          ~error_msg:"list of dead rules" Ckappa_sig.rule_id_of_json json
+      with
+      | _ ->
+        raise
+          (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead  rules",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
+
+(***************)
+(* dead agents *)
+(***************)
+
 type dead_agents = Ckappa_sig.c_agent_name list
 
-type flow =
-  Ckappa_sig.Site_union_find.t
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+(*********************)
+(* refinement lemmas *)
+(*********************)
 
-(*******************************************************************)
+type interface =
+  (string option (* internal state *) *
+   Ckappa_backend.Ckappa_backend.binding_state option (*binding state*) )
+    Wrapped_modules.LoggedStringMap.t
+
+let interface_to_json =
+  Wrapped_modules.LoggedStringMap.to_json
+    ~lab_key:site ~lab_value:stateslist
+    JsonUtil.of_string
+    (fun (internal_opt, binding_opt) ->
+       JsonUtil.of_pair ~lab1:prop ~lab2:bind
+         (fun internal_opt ->
+            JsonUtil.of_option
+              (fun internal_state ->
+                JsonUtil.of_string internal_state
+              ) internal_opt
+         )
+         (JsonUtil.of_option
+            Ckappa_backend.Ckappa_backend.binding_state_to_json)
+        (internal_opt, binding_opt)
+    )
+
+let interface_of_json
+      =
+      Wrapped_modules.LoggedStringMap.of_json
+        ~lab_key:site ~lab_value:stateslist ~error_msg:interface
+          (*json -> elt*)
+        (fun json -> JsonUtil.to_string ~error_msg:site json)
+          (*json -> 'value*)
+        (JsonUtil.to_pair
+           ~lab1:prop ~lab2:bind ~error_msg:"wrong binding state"
+           (JsonUtil.to_option
+              (JsonUtil.to_string ~error_msg:prop)
+
+           )
+           (JsonUtil.to_option
+              Ckappa_backend.Ckappa_backend.binding_state_of_json)
+        )
+
+type agent =
+  (string * (* agent name *)
+   (string option (* internal state *) *
+    Ckappa_backend.Ckappa_backend.binding_state option (*binding state*) )
+     Wrapped_modules.LoggedStringMap.t)
+
+let agent_to_json =
+  JsonUtil.of_pair
+    ~lab1:agent ~lab2:interface
+    JsonUtil.of_string
+    interface_to_json
+
+let agent_of_json =
+  JsonUtil.to_pair
+    ~lab1:agent ~lab2:interface ~error_msg:"agent"
+    (JsonUtil.to_string ~error_msg:"agent name")
+    interface_of_json
+(***************************************************************************)
+
+let pair_to_json (p: string * string): Yojson.Basic.json =
+  JsonUtil.of_pair ~lab1:agent ~lab2:site
+    (fun a ->  JsonUtil.of_string a)
+    (fun b ->  JsonUtil.of_string b)
+    p
+
+let pair_of_json (json:Yojson.Basic.json) : string * string  =
+  let (agent_name, site_name) =
+    JsonUtil.to_pair ~lab1:agent ~lab2:site
+      (fun json_a -> JsonUtil.to_string json_a)
+      (fun json_b -> JsonUtil.to_string json_b)
+      json
+  in
+  (agent_name,site_name)
+
+
 
 type 'site_graph lemma =
   {
@@ -358,23 +480,105 @@ type 'site_graph lemma =
     refinement : 'site_graph list
   }
 
-type 'site_graph poly_constraints_list =
-  (string (*domain name*) * 'site_graph lemma list) list
+let lemma_to_json site_graph_to_json json =
+  JsonUtil.of_pair
+    ~lab1:hyp ~lab2:refinement
+    site_graph_to_json
+    (JsonUtil.of_list site_graph_to_json)
+    (json.hyp,json.refinement)
 
-type internal_constraints_list =
-  Ckappa_backend.Ckappa_backend.t poly_constraints_list
-
-type site_map =
-  (string * (*site_string*)
-   (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
-     Wrapped_modules.LoggedStringMap.t) list
-
-type constraints_list = site_map poly_constraints_list
+let lemma_of_json site_graph_of_json json =
+  let a,b =
+    JsonUtil.to_pair
+    ~lab1:hyp ~lab2:refinement ~error_msg:"lemma"
+    site_graph_of_json
+    (JsonUtil.to_list  ~error_msg:"refinements list" site_graph_of_json)
+    json
+  in
+  {
+    hyp =  a;
+    refinement =  b
+  }
 
 let get_hyp h = h.hyp
 
 let get_refinement r = r.refinement
 
+type 'site_graph poly_constraints_list =
+  (string (*domain name*) * 'site_graph lemma list) list
+
+let poly_constraints_list_to_json site_graph_to_json =
+  JsonUtil.of_list
+    (JsonUtil.of_pair
+       ~lab1:domain_name ~lab2:refinements_list
+       JsonUtil.of_string
+       (JsonUtil.of_list (lemma_to_json site_graph_to_json))
+    )
+
+let poly_constraints_list_of_json site_graph_of_json =
+  JsonUtil.to_list
+    (JsonUtil.to_pair ~error_msg:"constraints list"
+       ~lab1:domain_name ~lab2:refinements_list
+       (JsonUtil.to_string ~error_msg:"abstract domain")
+       (JsonUtil.to_list (lemma_of_json site_graph_of_json)))
+
+type constraints_list = agent list poly_constraints_list
+
+let lemmas_list_to_json constraints =
+  `Assoc
+    [
+      refinement_lemmas,
+      poly_constraints_list_to_json
+        (JsonUtil.of_list agent_to_json) constraints
+    ]
+let lemmas_list_of_json =
+function
+| `Assoc l as x ->
+  begin
+    try
+      let json =
+        List.assoc refinement_lemmas l
+      in
+      poly_constraints_list_of_json
+        (JsonUtil.to_list ~error_msg:"site graph" agent_of_json)
+        json
+    with
+    | _ ->
+      raise
+        (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
+  end
+| x ->
+  raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
+
+
+(******************************************************************************)
+(******************************************************************************)
+
+(****************************)
+(* Internal representations *)
+(****************************)
+
+type internal_influence_map =
+    Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+    * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+
+type internal_contact_map =
+  (Ckappa_sig.c_state list *
+   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
+    Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
+
+type ('static, 'dynamic) reachability_result = 'static * 'dynamic
+
+type subviews_info = unit
+
+type flow =
+  Ckappa_sig.Site_union_find.t
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
+
+type internal_constraints_list =
+      Ckappa_backend.Ckappa_backend.t poly_constraints_list
+
+(*******************************************************************)
 (*******************************************************************)
 
 type ('static,'dynamic) state =
@@ -388,10 +592,7 @@ type ('static,'dynamic) state =
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;
     quark_map: quark_map option ;
-    internal_influence_map:
-      (Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
-       Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t)
-        AccuracyMap.t ;
+    internal_influence_map: internal_influence_map AccuracyMap.t ;
     influence_map : influence_map AccuracyMap.t ;
     internal_contact_map: internal_contact_map AccuracyMap.t;
     contact_map   : contact_map AccuracyMap.t ;
@@ -443,6 +644,79 @@ let create_state ?errors parameters init =
     internal_constraints_list = None;
     constraints_list = None
   }
+
+(**************)
+(* JSON: main *)
+(**************)
+
+let add_to_json f state l =
+  (f state) :: l
+
+let annotate map =
+  AccuracyMap.fold
+    (fun x y l -> (x,(x,y))::l)
+    map
+    []
+
+let add_map get title label to_json state l =
+  let map = get state in
+  if AccuracyMap.is_empty map then l
+  else
+    let y = annotate (get state) in
+      (title, JsonUtil.of_list
+         (JsonUtil.of_pair
+            ~lab1:accuracy_string
+            ~lab2:label
+            json_of_accuracy
+            (fun x ->
+               match to_json x with
+               | `Assoc [s,m] when s = label -> m
+              | x ->
+                raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "title",x)))
+         )
+         (List.rev y))::l
+
+let get_contact_map_map state = state.contact_map
+let get_influence_map_map state = state.influence_map
+let get_constraints_list state = state.constraints_list
+let add_contact_map_to_json state l
+     =
+  add_map get_contact_map_map
+    contactmaps contactmap contact_map_to_json
+    state l
+
+
+let add_influence_map_to_json state l =
+  add_map get_influence_map_map
+    influencemaps influencemap influence_map_to_json
+    state l
+
+
+let add_dead_rules_to_json state l =
+  match
+    state.dead_rules
+  with
+  | None -> l
+  | Some rules ->
+    (dead_rules , dead_rules_to_json rules)::l
+
+let add_refinements_lemmas_to_json state l =
+  match
+    get_constraints_list state
+  with
+  | None -> l
+  | Some constraints ->
+    (
+      refinement_lemmas,
+      lemmas_list_to_json constraints)::l
+
+let to_json state =
+  let l = [] in
+  let l = add_refinements_lemmas_to_json state l in
+  let l = add_dead_rules_to_json state l in
+  let l = add_influence_map_to_json state l in
+  let l = add_contact_map_to_json state l in
+  ((`Assoc  l): Yojson.Basic.json)
 
 let do_event_gen f phase n state =
   let error, log_info =
@@ -566,7 +840,7 @@ let get_ctmc_flow state = state.ctmc_flow
 
 let get_influence_map_map state = state.influence_map
 
-let get_contact_map_map state = state.contact_map
+
 
 let get_internal_contact_map_map state = state.internal_contact_map
 

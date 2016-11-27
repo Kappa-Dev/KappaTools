@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 22 2016>
+ * Last modification: Time-stamp: <Nov 27 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -30,6 +30,9 @@ type c_rule_id
 type c_agent_id
 
 (****************************************************************************)
+
+val rule_id_to_json : c_rule_id -> Yojson.Basic.json
+val rule_id_of_json : Yojson.Basic.json -> c_rule_id
 
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
