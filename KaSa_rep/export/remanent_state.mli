@@ -64,7 +64,7 @@ val influence_map_to_json:
   accuracy_level * influence_map -> Yojson.Basic.json
 
 val influence_map_of_json:
-  ?error_msg:string -> Yojson.Basic.json -> accuracy_level * influence_map
+  Yojson.Basic.json -> accuracy_level * influence_map
 
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t

@@ -70,7 +70,8 @@ let to_pair ?lab1:(lab1="first") ?lab2:(lab2="second")
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error (error_msg,x))
     end
-  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
 let of_map
     ?lab_key:(lab_key="key")
