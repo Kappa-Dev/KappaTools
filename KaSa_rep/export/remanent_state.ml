@@ -676,6 +676,23 @@ let add_map get title label to_json state l =
          )
          (List.rev y))::l
 
+let get_map empty add of_json label json =
+  let l =
+    JsonUtil.to_list
+      (fun x ->
+         snd ((JsonUtil.to_pair
+         ~lab1:accuracy_string
+         ~lab2:label
+         json_to_accuracy
+         of_json) x))
+      json
+  in
+  List.fold_left
+    (fun map (x,y) -> add x y map)
+    empty l
+
+
+
 let get_contact_map_map state = state.contact_map
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
@@ -717,6 +734,42 @@ let to_json state =
   let l = add_influence_map_to_json state l in
   let l = add_contact_map_to_json state l in
   ((`Assoc  l): Yojson.Basic.json)
+
+let of_json =
+  function
+  | `Assoc l ->
+    let contact_maps = AccuracyMap.empty in
+    let influence_maps = AccuracyMap.empty in 
+    (*  let contact_maps =
+      try
+        get_map AccuracyMap.empty AccuracyMap.add
+          contact_map_of_json contactmap (List.assoc contactmaps l)
+      with
+      | Not_found -> AccuracyMap.empty
+    in
+    let influence_maps =
+      try
+        get_map AccuracyMap.empty AccuracyMap.add
+          (influence_map_of_json ~error_msg:"influence maps map")
+          influencemap (List.assoc influencemaps l)
+      with
+      | Not_found -> AccuracyMap.empty
+        in*)
+    let dead_rules =
+      try
+        Some (dead_rules_of_json (List.assoc dead_rules l))
+      with
+      | Not_found -> None
+    in
+    let constraints =
+      try
+        Some (lemmas_list_of_json (List.assoc refinement_lemmas l))
+      with
+      | Not_found -> None
+    in
+        contact_maps, influence_maps, dead_rules, constraints
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "remanent state",x))
 
 let do_event_gen f phase n state =
   let error, log_info =

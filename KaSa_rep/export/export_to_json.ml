@@ -33,6 +33,10 @@ sig
 
   val to_json: state -> Yojson.Basic.json
 
+  val of_json:
+    Yojson.Basic.json ->
+    Remanent_state.contact_map Remanent_state.AccuracyMap.t * Remanent_state.influence_map Remanent_state.AccuracyMap.t * Ckappa_sig.c_rule_id list option * Remanent_state.constraints_list option
+
 end
 
 module Export =
@@ -63,4 +67,5 @@ functor (A:Analyzer.Analyzer) ->
 
     let to_json = Remanent_state.to_json
 
+    let of_json = Remanent_state.of_json
   end

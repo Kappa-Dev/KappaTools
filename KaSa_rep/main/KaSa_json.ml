@@ -31,6 +31,7 @@ let main () =
   let state,_constraints = Export_to_json.get_constraints_list state in
   let json = Export_to_json.to_json state in
   let () = Printf.fprintf stdout "%s\n" (Yojson.Basic.to_string json) in
+  let _ = Export_to_json.of_json json in 
   ()
 
 let () = main ()

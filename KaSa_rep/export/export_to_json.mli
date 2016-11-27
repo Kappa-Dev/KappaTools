@@ -33,6 +33,11 @@ module type Type =
 
     val to_json: state -> Yojson.Basic.json
 
+    val of_json:
+      Yojson.Basic.json ->
+      Remanent_state.contact_map Remanent_state.AccuracyMap.t * Remanent_state.influence_map Remanent_state.AccuracyMap.t * Ckappa_sig.c_rule_id list option * Remanent_state.constraints_list option
+
+
   end
 
 module Export:

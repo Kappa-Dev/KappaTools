@@ -118,7 +118,13 @@ val get_refinement : 'site_graph lemma -> 'site_graph list
 type ('static, 'dynamic) state
 
 (*******************************************************************)
-val to_json: ('static, 'dynamic) state -> Yojson.Basic.json 
+val to_json: ('static, 'dynamic) state -> Yojson.Basic.json
+
+val of_json: Yojson.Basic.json ->
+   contact_map AccuracyMap.t *
+   influence_map AccuracyMap.t *
+  Ckappa_sig.c_rule_id list option *
+  constraints_list option
 
 val create_state:
   ?errors:Exception.method_handler -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
