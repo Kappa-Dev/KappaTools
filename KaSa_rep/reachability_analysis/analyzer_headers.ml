@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Nov 28 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -96,7 +96,7 @@ module PathMap =
 
 type ('static, 'dynamic) kasa_state = ('static, 'dynamic) Remanent_state.state
 
-type initial_state = Cckappa_sig.enriched_init
+type initial_state = Cckappa_sig.mixture
 
 let get_wake_up_relation static = static.global_wake_up_relation
 
@@ -252,12 +252,26 @@ let compute_initial_state error static =
   let parameters = get_parameter static in
   let compil = get_cc_code static in
   let error, init =
-    (Int_storage.Nearly_inf_Imperatif.fold
+    Int_storage.Nearly_inf_Imperatif.fold
        parameters
        error
-       (fun _parameters error _ i l -> error, i :: l)
+       (fun _parameters error _ i l -> error, i.Cckappa_sig.e_init_c_mixture :: l)
        compil.Cckappa_sig.init
-       [])
+       []
+  in
+  let error, init =
+    Int_storage.Nearly_inf_Imperatif.fold
+       parameters
+       error
+       (fun _parameters error _ perturbation l ->
+          let list =
+            Ckappa_sig.introduceable_species_in_pertubation perturbation
+          in
+          error, List.fold_left
+            (fun l elt -> elt::l)
+            l list)
+       compil.Cckappa_sig.perturbations
+       init
   in
   error, List.rev init
 

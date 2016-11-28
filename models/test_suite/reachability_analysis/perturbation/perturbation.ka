@@ -1,0 +1,5 @@
+%agent: A(x)
+
+A() -> @ 1
+
+%mod: [true] do ($ADD A(x!1),B(x!1))

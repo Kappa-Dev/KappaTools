@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 24 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Abstract domain to record live rules
    *
@@ -272,7 +272,7 @@ struct
                       site_add
                       agent_id
                       site_type_source
-                      init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
+                      init_state.Cckappa_sig.views
                   in
                   (*use the oriented bonds, when given the bond (x, y), the
                     bond (y, x) is given as well*)
@@ -281,7 +281,7 @@ struct
                ) bonds_map (error, dynamic)
            in
            error, dynamic
-        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds dynamic
+        ) init_state.Cckappa_sig.bonds dynamic
     in
     error, dynamic
 
