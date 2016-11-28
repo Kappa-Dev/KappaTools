@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Nov 22 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -659,6 +659,13 @@ let collect_sites_init parameters error store_views_init =
 (***************************************************************)
 (*(A.x.y, B.z.t)*)
 
+(* You should not compute this *)
+(* This set is way too big and it is useless *)
+(* When enumerating, always start by the most discriminating criterion *)
+(* And then enumerate over further criterion within the elts that satisfy the previous ones *)
+(* Stop doing two separate enumerations before crossing the results *)
+(* It does not scale *)
+
 let collect_pair_sites_init parameters error store_sites_init =
   let error, store_result =
     Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
@@ -731,6 +738,11 @@ let collect_bonds_init parameters error init_state =
     Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
 
 (***************************************************************)
+
+(* JF: this function is too slow *)
+(* You should first enumerate over bonds *)
+(* Then one you have a bond, you have two agent ids *)
+(* Then you have to fold over the sites of this two agents (only) *)
 
 let collect_pair_tuple_init parameters error bdu_false handler kappa_handler
    store_bonds_init store_pair_sites_init tuples_of_interest store_result =

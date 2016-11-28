@@ -102,7 +102,7 @@ let string_of_step_kind x =
     | KaSim_compilation -> Printf.sprintf "KaSim frontend"
     | KaSa_precompilation -> Printf.sprintf "KaSa precompilation"
     | KaSa_lexing -> Printf.sprintf "KaSa Lexing"
-    | KaSa_linking -> Printf.sprintf "KaSa Linkind"
+    | KaSa_linking -> Printf.sprintf "KaSa Linking"
     | Influence_map string -> Printf.sprintf "Influence map (%s)" string
     | Internal_influence_map string -> Printf.sprintf "Influence map (internal %s)" string
 

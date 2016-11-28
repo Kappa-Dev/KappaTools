@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Nov 22 2016>
+  * Last modification: Time-stamp: <Nov 28 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -667,6 +667,9 @@ let collect_agent_type_state parameter error agent site_type =
     error, (agent_type1, state1)
 
 (**************************************************************************)
+
+(* JF: the name of this function is misleading *)
+(* What you collect is the type fingerprint of a bond *)
 
 let collect_pair_of_bonds parameter error site_add agent_id site_type_source
     views =
