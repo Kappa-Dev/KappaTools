@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 28 2016>
+ * Last modification: Time-stamp: <Nov 27 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -679,6 +679,7 @@ let compare_unit _ _ = 0
 let compare_unit_agent_name _ _ = dummy_agent_name
 let compare_unit_site_name _ _ = dummy_site_name
 let compare_unit_state_index _ _ = dummy_state_index
+
 let array_of_list_rule_id create set parameters error list =
   let n = List.length list in
   let a = create parameters error n in
@@ -692,29 +693,3 @@ let array_of_list_rule_id create set parameters error list =
           (set parameters (fst a) k t (snd a))
       end
   in aux list dummy_rule_id a
-
-let mixture_of_modif =
-  function
-  | Ast.INTRO (_,(a,b)) -> Some a
-  | Ast.DELETE _
-  | Ast.UPDATE _
-  | Ast.UPDATE_TOK _
-  | Ast.STOP _
-  | Ast.SNAPSHOT _
-    (*maybe later of mixture too*)
-  | Ast.PRINT _
-  | Ast.PLOTENTRY
-  | Ast.CFLOWLABEL _
-  | Ast.CFLOWMIX _
-  | Ast.FLUX _
-  | Ast.FLUXOFF _ -> None
-
-let introduceable_species_in_pertubation ((_,list,_),_) =
-  List.fold_left
-    (fun list a ->
-       match mixture_of_modif a
-       with
-       | Some a -> a::list
-       | None -> list)
-    []
-    list

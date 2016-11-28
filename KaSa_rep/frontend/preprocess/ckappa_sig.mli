@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 28 2016>
+ * Last modification: Time-stamp: <Nov 27 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -472,6 +472,3 @@ val array_of_list_rule_id:
   Exception.method_handler ->
   'a list ->
   Exception.method_handler * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
-
-val introduceable_species_in_pertubation:
-  'a perturbation -> 'a list 

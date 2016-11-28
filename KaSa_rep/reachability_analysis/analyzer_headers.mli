@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Nov 24 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -34,7 +34,7 @@ type ('static,'dynamic) kasa_state =
 (** This is the type of the encoding of a chemical mixture as a result of
     compilation *)
 
-type initial_state = Cckappa_sig.mixture
+type initial_state = Cckappa_sig.enriched_init
 
 val initialize_global_information:
   Remanent_parameters_sig.parameters ->

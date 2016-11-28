@@ -612,7 +612,7 @@ let collect_views_init parameters error init_state =
              (error, store_result)
          in
          error, store_result
-    ) init_state.Cckappa_sig.views
+    ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
     Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
 
 (***************************************************************)
@@ -697,7 +697,7 @@ let collect_bonds_init parameters error init_state =
                    (agent_type_target, site_type_target, state_target)) =
                 Common_static.collect_pair_of_bonds
                   parameters error site_add agent_id site_type_source
-                  init_state.Cckappa_sig.views
+                  init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
               in
               let pair =
                 ((agent_id, agent_type_source, site_type_source, state_source),
@@ -726,7 +726,7 @@ let collect_bonds_init parameters error init_state =
            ) bonds_map (error, store_result)
        in
        error, store_result
-    ) init_state.Cckappa_sig.bonds
+    ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds
     Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
 
 (***************************************************************)

@@ -394,7 +394,7 @@ struct
                  event_list
              in
              error, (dynamic, event_list)
-        ) init_state.Cckappa_sig.views (dynamic, event_list)
+        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views (dynamic, event_list)
     in
     error, (dynamic, event_list)
 
