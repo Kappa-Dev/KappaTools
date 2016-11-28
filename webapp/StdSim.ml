@@ -39,9 +39,7 @@ let process_comand_v2
   Mpi_api.on_message
     manager
     (fun message ->
-       Lwt_io.write Lwt_io.stdout message >>=
-       (fun () ->
-          Lwt_io.write Lwt_io.stdout (String.make 1 message_delimter)))
+       Lwt_io.write Lwt_io.stdout (message^(String.make 1 message_delimter)))
 
 (*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
 let serve () : unit Lwt.t =
