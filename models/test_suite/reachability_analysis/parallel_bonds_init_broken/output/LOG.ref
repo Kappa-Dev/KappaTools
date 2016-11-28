@@ -171,7 +171,6 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'' A(t!_)->A(t) -> rule(1):'' A(t),B(t)->A(t!1),B(t!1)[0*->1];[0->0]
 Influence_map:Wake_up_map:rule(1):'' A(t),B(t)->A(t!1),B(t!1) -> rule(0):'' A(t!_)->A(t)[0->0]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -191,7 +190,6 @@ Id=5
 EXTENSIONAL DESCRIPTION:
 		A(t!free)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -210,8 +208,6 @@ Id=5
 
 EXTENSIONAL DESCRIPTION:
 		A(z!free)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -232,7 +228,6 @@ Id=5
 EXTENSIONAL DESCRIPTION:
 		B(t!free)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -252,7 +247,6 @@ Id=5
 EXTENSIONAL DESCRIPTION:
 		B(z!free)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -272,7 +266,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		A(t!B@t)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -292,7 +285,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -312,7 +304,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		B(t!A@t)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -332,7 +323,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		B(z!A@z)
 
-		Wake-up rules:
 
 	Applying rule 0:
 		the precondition is satisfied

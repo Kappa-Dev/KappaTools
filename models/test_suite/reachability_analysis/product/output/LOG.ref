@@ -597,7 +597,6 @@ Influence_map:Inhibition_map:rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!
 Influence_map:Inhibition_map:rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1];[1->0];[1->1]
 Influence_map:Inhibition_map:rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->1];[1->0]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -636,8 +635,6 @@ Id=23
 
 EXTENSIONAL DESCRIPTION:
 		A(z~u,z!free,t!free)
-
-		Wake-up rules:
 
 
 	Applying rule 0: r0:
@@ -690,7 +687,6 @@ Id=25
 EXTENSIONAL DESCRIPTION:
 		A(z~p,z!free,t!free)
 
-		Wake-up rules:
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -743,7 +739,6 @@ Id=36
 EXTENSIONAL DESCRIPTION:
 		A(z~u,z!A@z,t!free)
 
-		Wake-up rules:
 
 		Updating the views for A(z~,z!,t!)
 
@@ -791,7 +786,6 @@ Id=29
 EXTENSIONAL DESCRIPTION:
 		A(z~u,z!free,t!A@t)
 
-		Wake-up rules:
 
 		Updating the views for A(z~,z!,t!)
 
@@ -839,7 +833,6 @@ Id=48
 EXTENSIONAL DESCRIPTION:
 		A(z~p,z!A@z,t!free)
 
-		Wake-up rules:
 
 		Updating the views for A(z~,z!,t!)
 
@@ -887,11 +880,16 @@ Id=31
 EXTENSIONAL DESCRIPTION:
 		A(z~p,z!free,t!A@t)
 
-		Wake-up rules:
 
 		Updating the views for A(z~,z!,t!)
 
 	Applying rule 8: r7:
+		the precondition is not satisfied yet
+
+	Applying rule 0: r0:
+		the precondition is not satisfied yet
+
+	Applying rule 1: r1:
 		the precondition is not satisfied yet
 
 	Applying rule 2: r2:
@@ -899,21 +897,15 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 1: r1:
-		the precondition is not satisfied yet
+	Applying rule 3: r3:
+		the precondition is satisfied
 
-	Applying rule 0: r0:
-		the precondition is not satisfied yet
+		Updating the views for A(z~,z!,t!)
 
 	Applying rule 4: r3:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
-
-		Updating the views for A(z~,z!,t!)
-
-	Applying rule 3: r3:
-		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 

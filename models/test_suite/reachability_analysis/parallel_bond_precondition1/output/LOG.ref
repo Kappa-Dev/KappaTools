@@ -376,7 +376,6 @@ Influence_map:Inhibition_map:rule(0):'r1' A(z,t),B(z,t)->A(z!1,t),B(z!1,t) -> ru
 Influence_map:Inhibition_map:rule(1):'r2' A(z!1,t),B(z!1),B(z,t)->A(z!1,t!2),B(z!1),B(z,t!2) -> rule(0):'r1' A(z,t),B(z,t)->A(z!1,t),B(z!1,t)[2->1]
 Influence_map:Inhibition_map:rule(2):'r3' B(z!1,t),A(z!1),A(z,t)->B(z!1,t!2),A(z!1),A(z,t!2) -> rule(0):'r1' A(z,t),B(z,t)->A(z!1,t),B(z!1,t)[2->0]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -406,7 +405,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t!free)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -425,8 +423,6 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 		A(x~u)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -457,7 +453,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		B(z!free,t!free)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -477,7 +472,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
-		Wake-up rules:
 
 	Applying rule 0: r1:
 		the precondition is satisfied
@@ -513,7 +507,6 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t!free)
 
-		Wake-up rules:
 
 		Updating the views for B(z!,t!)
 
@@ -544,7 +537,6 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 		B(z!A@z,t!free)
 
-		Wake-up rules:
 
 	Applying rule 1: r2:
 		the precondition is satisfied
@@ -580,7 +572,6 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t!B@t)
 
-		Wake-up rules:
 
 		Updating the views for B(z!,t!)
 
@@ -613,7 +604,6 @@ Id=22
 EXTENSIONAL DESCRIPTION:
 		B(z!free,t!A@t)
 
-		Wake-up rules:
 
 	Applying rule 2: r3:
 		the precondition is satisfied
@@ -649,7 +639,6 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		B(z!A@z,t!A@t)
 
-		Wake-up rules:
 
 		Updating the views for A(z!,t!)
 
@@ -682,7 +671,6 @@ Id=22
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t!B@t)
 
-		Wake-up rules:
 
 	Applying rule 3: r4:
 		the precondition is not satisfied yet

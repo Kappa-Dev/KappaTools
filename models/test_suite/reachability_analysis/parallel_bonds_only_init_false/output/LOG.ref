@@ -237,10 +237,8 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t!free)
 
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
-
+			(rule 0: r0) should be investigated
+			(rule 1: r1) should be investigated
 				(rule 1: r1) should be investigated 
 				(rule 0: r0) should be investigated 
 
@@ -273,10 +271,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		B(z!free,t!free)
 
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -305,10 +299,6 @@ Id=13
 
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t!B@t)
-
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
 
 	Views in initial state:
 
@@ -339,10 +329,6 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		B(z!A@z,t!free)
 
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -371,10 +357,6 @@ Id=20
 
 EXTENSIONAL DESCRIPTION:
 		B(z!free,t!A@t)
-
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
 
 
 	Applying rule 0: r0:
@@ -411,10 +393,6 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t!free)
 
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
-
 
 		Updating the views for B(z!,t!)
 		Update information about potential sites accross domain
@@ -422,6 +400,7 @@ EXTENSIONAL DESCRIPTION:
 		A(t,z!1),B(t,z!1)
 		B(t,z!1),A(t,z!1)
 
+			(rule 0: r0) should be investigated
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -457,10 +436,6 @@ Id=20
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t!B@t)
 
-		Wake-up rules:
-				(rule 0: r0) should be investigated 
-				(rule 1: r1) should be investigated 
-
 
 		Updating the views for B(z!,t!)
 		Update information about potential sites accross domain
@@ -468,6 +443,7 @@ EXTENSIONAL DESCRIPTION:
 		A(t!1,z),B(t!1,z)
 		B(t!1,z),A(t!1,z)
 
+			(rule 1: r1) should be investigated
 
 	Applying rule 0: r0:
 		the precondition is satisfied

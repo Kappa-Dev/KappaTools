@@ -460,7 +460,6 @@ Influence_map:Inhibition_map:rule(5):'r5' A(t,z!1),B(t,z!1)->A(t!2,z!1),B(t!2,z!
 Influence_map:Inhibition_map:rule(6):'r6' A(x~p)->A(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -499,8 +498,6 @@ Id=23
 
 EXTENSIONAL DESCRIPTION:
 		A(x~u,z!free,t!free)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -541,7 +538,6 @@ Id=23
 EXTENSIONAL DESCRIPTION:
 		B(x~u,z!free,t!free)
 
-		Wake-up rules:
 
 	Applying rule 0: r0:
 		the precondition is satisfied
@@ -587,7 +583,6 @@ Id=13
 EXTENSIONAL DESCRIPTION:
 		A(x~p,z!free,t!free)
 
-		Wake-up rules:
 
 	Applying rule 2: r2:
 		the precondition is not satisfied yet
@@ -637,7 +632,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,z!free,t!B@t)
 		A(x~u,z!free,t!B@t)
 
-		Wake-up rules:
 
 		Updating the views for B(x~,z!,t!)
 
@@ -678,7 +672,6 @@ Id=37
 EXTENSIONAL DESCRIPTION:
 		B(x~u,z!free,t!A@t)
 
-		Wake-up rules:
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -725,7 +718,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,z!B@z,t!B@t)
 		A(x~u,z!B@z,t!B@t)
 
-		Wake-up rules:
 
 		Updating the views for B(x~,z!,t!)
 
@@ -766,7 +758,6 @@ Id=50
 EXTENSIONAL DESCRIPTION:
 		B(x~u,z!A@z,t!A@t)
 
-		Wake-up rules:
 
 	Applying rule 5: r5:
 		the precondition is not satisfied yet
@@ -839,7 +830,6 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p,z!free,t!free)
 		B(x~p,z!A@z,t!A@t)
 
-		Wake-up rules:
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -852,13 +842,6 @@ EXTENSIONAL DESCRIPTION:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
-
-	Applying rule 3: r3:
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
-
-		Updating the views for B(x~,z!,t!)
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -904,7 +887,6 @@ Id=78
 EXTENSIONAL DESCRIPTION:
 		A(x~p,z!B@z,t!free)
 
-		Wake-up rules:
 
 		Updating the views for B(x~,z!,t!)
 
@@ -945,12 +927,23 @@ Id=78
 EXTENSIONAL DESCRIPTION:
 		B(x~p,z!A@z,t!free)
 
-		Wake-up rules:
+
+	Applying rule 3: r3:
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
+
+		Updating the views for B(x~,z!,t!)
 
 	Applying rule 4: r4:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
+
+		Updating the views for B(x~,z!,t!)
+
+	Applying rule 1: r1:
+		the precondition is satisfied
 
 		Updating the views for B(x~,z!,t!)
 
@@ -963,23 +956,18 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,z!,t!)
 
-	Applying rule 1: r1:
-		the precondition is satisfied
-
-		Updating the views for B(x~,z!,t!)
-
 	Applying rule 6: r6:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=92
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=91
+  Id=99
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1010,7 +998,13 @@ Id=92
 EXTENSIONAL DESCRIPTION:
 		A(x~u,z!B@z,t!free)
 
-		Wake-up rules:
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
+
+		Updating the views for B(x~,z!,t!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -1018,12 +1012,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=92
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=91
+  Id=99
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1054,7 +1048,11 @@ Id=92
 EXTENSIONAL DESCRIPTION:
 		B(x~u,z!A@z,t!free)
 
-		Wake-up rules:
+
+	Applying rule 0: r0:
+		the precondition is satisfied
+
+		Updating the views for A(x~,z!,t!)
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -1063,19 +1061,19 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,z!,t!)
 
-	Applying rule 2: r2:
+	Applying rule 4: r4:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
 
 		Updating the views for B(x~,z!,t!)
 
-	Applying rule 0: r0:
+	Applying rule 1: r1:
 		the precondition is satisfied
 
-		Updating the views for A(x~,z!,t!)
+		Updating the views for B(x~,z!,t!)
 
-	Applying rule 4: r4:
+	Applying rule 5: r5:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
@@ -1087,7 +1085,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,z!,t!)
 
-	Applying rule 5: r5:
+	Applying rule 2: r2:
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
@@ -1096,18 +1094,6 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 7: r7:
 		the precondition is satisfied
-
-		Updating the views for B(x~,z!,t!)
-
-	Applying rule 1: r1:
-		the precondition is satisfied
-
-		Updating the views for B(x~,z!,t!)
-
-	Applying rule 3: r3:
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
 
 		Updating the views for B(x~,z!,t!)
 ------------------------------------------------------------
@@ -1119,7 +1105,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=90
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1153,7 +1139,7 @@ Id=90
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=90
+Id=98
  Node(site_type:1<0)
   Id=0
    Leaf False 

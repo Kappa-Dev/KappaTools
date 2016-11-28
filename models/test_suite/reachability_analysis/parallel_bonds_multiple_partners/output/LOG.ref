@@ -433,7 +433,6 @@ Influence_map:Inhibition_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(7):'' A(z
 Influence_map:Inhibition_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
 Influence_map:Inhibition_map:rule(8):'' A(a~p)->A(a~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -493,7 +492,6 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~u,a~u,b~u)
 
-		Wake-up rules:
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -564,7 +562,6 @@ Id=49
 EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~u,a~u,b~u)
 
-		Wake-up rules:
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -630,7 +627,6 @@ Id=54
 EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~u,a~u,b~u)
 
-		Wake-up rules:
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -757,7 +753,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~p,a~u,b~u)
 		A(x~u,y~u,z~p,a~u,b~u)
 
-		Wake-up rules:
 
 	Applying rule 6:
 		the precondition is satisfied
@@ -870,7 +865,6 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~p,a~p,b~u)
 		A(x~u,y~u,z~p,a~p,b~u)
 
-		Wake-up rules:
 
 	Applying rule 7:
 		the precondition is satisfied
@@ -950,7 +944,6 @@ Id=98
 EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~p,a~p,b~p)
 
-		Wake-up rules:
 
 	Applying rule 10:
 		the precondition is satisfied
@@ -959,20 +952,20 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
+	Applying rule 0:
+		the precondition is satisfied
+
 	Applying rule 1:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 0:
-		the precondition is satisfied
 
 	Applying rule 2:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 5:
+	Applying rule 3:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1039,9 +1032,8 @@ Id=133
 EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~p,a~p,b~p)
 
-		Wake-up rules:
 
-	Applying rule 3:
+	Applying rule 5:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1051,7 +1043,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 9:
+	Applying rule 7:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1119,9 +1111,31 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~p,a~u,b~p)
 		A(x~p,y~p,z~p,a~u,b~p)
 
-		Wake-up rules:
 
-	Applying rule 7:
+	Applying rule 9:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 4:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1136,40 +1150,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 4:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 2:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 1:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 0:
-		the precondition is satisfied
-
-	Applying rule 9:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule 8:
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
 	Applying rule 6:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule 3:
+	Applying rule 7:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule 8:
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)

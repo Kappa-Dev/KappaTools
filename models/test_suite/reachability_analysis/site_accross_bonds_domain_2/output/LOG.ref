@@ -375,7 +375,6 @@ Influence_map:Inhibition_map:rule(2):'r2' B(z~p)->B(z~u) -> rule(0):'r0' A(z,t~u
 Influence_map:Inhibition_map:rule(4):'r4' A(z!1,t~p),B(z!1,t~p)->A(z!1,t~u),B(z!1,t~u) -> rule(5):'r5' A(t~p)->A(t~q)[0->0]
 Influence_map:Inhibition_map:rule(5):'r5' A(t~p)->A(t~q) -> rule(4):'r4' A(z!1,t~p),B(z!1,t~p)->A(z!1,t~u),B(z!1,t~u)[0->0]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -404,8 +403,6 @@ Id=7
 
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t~u)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -446,7 +443,6 @@ Id=29
 EXTENSIONAL DESCRIPTION:
 		B(z~u,z!free,t~u)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -476,7 +472,6 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t~u)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -516,7 +511,6 @@ Id=32
 EXTENSIONAL DESCRIPTION:
 		B(z~p,z!A@z,t~u)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -546,7 +540,6 @@ Id=23
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t~p)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -586,7 +579,6 @@ Id=42
 EXTENSIONAL DESCRIPTION:
 		B(z~p,z!A@z,t~p)
 
-		Wake-up rules:
 
 	Applying rule 0: r0:
 		the precondition is not satisfied yet
@@ -643,7 +635,6 @@ Id=58
 EXTENSIONAL DESCRIPTION:
 		A(z!B@z,t~q)
 
-		Wake-up rules:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -689,7 +680,6 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		B(z~p,z!free,t~u)
 
-		Wake-up rules:
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -698,13 +688,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 5: r5:
+	Applying rule 0: r0:
 		the precondition is satisfied
 
-		Updating the views for A(z!,t~)
-
-	Applying rule 4: r4:
-		the precondition is satisfied
+		rule 0: r0 is applied for the first time
 
 		Updating the views for A(z!,t~)
 
@@ -717,14 +704,17 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 0: r0:
+	Applying rule 4: r4:
 		the precondition is satisfied
-
-		rule 0: r0 is applied for the first time
 
 		Updating the views for A(z!,t~)
 
 		Updating the views for B(z~,z!,t~)
+
+	Applying rule 5: r5:
+		the precondition is satisfied
+
+		Updating the views for A(z!,t~)
 
 	Applying rule 1: r1:
 		the precondition is satisfied

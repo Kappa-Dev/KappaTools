@@ -527,8 +527,6 @@ Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> var(3)
 Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(4):'Cuu' C(x1~u?,x2~u?)[0->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
 Reachability analysis...
-
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -558,7 +556,6 @@ Id=21
 EXTENSIONAL DESCRIPTION:
 		A(x!free,c!free)
 
-		Wake-up rules:
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -577,8 +574,6 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 		B(x!free)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -629,7 +624,6 @@ Id=43
 EXTENSIONAL DESCRIPTION:
 		C(x1~u,x2~u,x1!free,x2!free)
 
-		Wake-up rules:
 
 	Applying rule 0: a.b:
 		the precondition is satisfied
@@ -665,7 +659,6 @@ Id=9
 EXTENSIONAL DESCRIPTION:
 		A(x!B@x,c!free)
 
-		Wake-up rules:
 
 		Updating the views for B(x!)
 
@@ -686,7 +679,6 @@ Id=5
 EXTENSIONAL DESCRIPTION:
 		B(x!A@x)
 
-		Wake-up rules:
 
 	Applying rule 1: a.b_op:
 		the precondition is satisfied
@@ -731,7 +723,6 @@ Id=65
 EXTENSIONAL DESCRIPTION:
 		A(x!B@x,c!C@x1)
 
-		Wake-up rules:
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
@@ -782,7 +773,6 @@ Id=75
 EXTENSIONAL DESCRIPTION:
 		C(x1~u,x2~u,x1!A@c,x2!free)
 
-		Wake-up rules:
 
 	Applying rule 3: mod x1:
 		the precondition is satisfied
@@ -838,7 +828,6 @@ Id=29
 EXTENSIONAL DESCRIPTION:
 		C(x1~p,x2~u,x1!free,x2!free)
 
-		Wake-up rules:
 
 		Updating the views for A(x!,c!)
 
@@ -876,7 +865,6 @@ Id=33
 EXTENSIONAL DESCRIPTION:
 		A(x!free,c!C@x2)
 
-		Wake-up rules:
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
@@ -927,7 +915,6 @@ Id=41
 EXTENSIONAL DESCRIPTION:
 		C(x1~p,x2~u,x1!free,x2!A@c)
 
-		Wake-up rules:
 
 	Applying rule 5: mod x2:
 		the precondition is satisfied
@@ -985,7 +972,6 @@ Id=110
 EXTENSIONAL DESCRIPTION:
 		C(x1~p,x2~p,x1!free,x2!free)
 
-		Wake-up rules:
 
 	Applying rule 0: a.b:
 		the precondition is satisfied
@@ -1019,7 +1005,6 @@ Id=125
 EXTENSIONAL DESCRIPTION:
 		A(x!B@x,c!C@x2)
 
-		Wake-up rules:
 
 		Updating the views for B(x!)
 
@@ -1062,7 +1047,6 @@ Id=82
 EXTENSIONAL DESCRIPTION:
 		A(x!free,c!C@x1)
 
-		Wake-up rules:
 
 		Updating the views for B(x!)
 

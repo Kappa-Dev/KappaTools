@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 24 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Abstract domain to record live rules
    *
@@ -320,12 +320,12 @@ struct
         | error, None -> error, []
         | error, Some l -> error, l
       in
-      let error =
+      let error, bool  =
         if local_trace
         || Remanent_parameters.get_dump_reachability_analysis_wl parameters
         then
           List.fold_left
-            (fun error rule_id ->
+            (fun (error,bool)  rule_id ->
               let compiled = get_compil static in
               let error, rule_id_string =
                 try
@@ -346,12 +346,16 @@ struct
                   (Remanent_parameters.get_prefix parameters) tab
                   rule_id_string
               in
-              let () = Loggers.print_newline log in error)
-            error rule_id_list
+              let () = Loggers.print_newline log in (error, true))
+            (error,false) rule_id_list
         else
-          error
+          error,false
       in
-      let () = Loggers.print_newline log in
+      let () =
+        if bool
+        then
+          Loggers.print_newline log
+      in
       let event_list =
         List.fold_left (fun event_list rule_id ->
             Communication.Check_rule rule_id :: event_list

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 24 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -128,17 +128,17 @@ module Product
           (underlying_domain_dynamic_information dynamic)
           error
           initial_state
-      in
-      let error, new_domain_dynamic, event_list' =
-        New_domain.add_initial_state
-          static.new_domain
-          (new_domain_dynamic_information underlying_domain_dynamic dynamic)
-          error
-          initial_state
-      in
-      error,
-      smash_dynamic underlying_domain_dynamic new_domain_dynamic,
-      List.fold_left (fun list a -> a :: list) event_list event_list'
+    in
+    let error, new_domain_dynamic, event_list' =
+      New_domain.add_initial_state
+        static.new_domain
+        (new_domain_dynamic_information underlying_domain_dynamic dynamic)
+        error
+        initial_state
+    in
+    error,
+    smash_dynamic underlying_domain_dynamic new_domain_dynamic,
+    List.fold_left (fun list a -> a :: list) event_list event_list'
     (* be careful, the concatenation should be done in the correct order to
        get a linear time complexity instead of a quadratic one*)
 

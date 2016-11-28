@@ -313,7 +313,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -353,7 +352,6 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~u)
 
-		Wake-up rules:
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -399,7 +397,6 @@ Id=35
 EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~u)
 
-		Wake-up rules:
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -445,7 +442,6 @@ Id=21
 EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~u)
 
-		Wake-up rules:
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -491,7 +487,6 @@ Id=48
 EXTENSIONAL DESCRIPTION:
 		A(x~0,y~p,z~q)
 
-		Wake-up rules:
 
 	Applying rule 4:
 		the precondition is satisfied
@@ -537,7 +532,6 @@ Id=53
 EXTENSIONAL DESCRIPTION:
 		A(x~q,y~u,z~u)
 
-		Wake-up rules:
 
 	Applying rule 5:
 		the precondition is satisfied
@@ -583,7 +577,6 @@ Id=59
 EXTENSIONAL DESCRIPTION:
 		A(x~q,y~q,z~u)
 
-		Wake-up rules:
 
 	Applying rule 6:
 		the precondition is satisfied
@@ -629,7 +622,6 @@ Id=70
 EXTENSIONAL DESCRIPTION:
 		A(x~q,y~q,z~q)
 
-		Wake-up rules:
 
 	Applying rule 7: KO:
 		the precondition is not satisfied yet

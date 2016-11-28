@@ -862,15 +862,6 @@ struct
     if is_new_views
     then
       (*print*)
-      let () =
-        if local_trace
-        || Remanent_parameters.get_trace parameters
-        || Remanent_parameters.get_dump_reachability_analysis_wl parameters
-        then
-          let () = Loggers.fprintf log "\t\tWake-up rules:" in
-          let () = Loggers.print_newline log in
-          ()
-      in
       let error, event_list =
         List.fold_left (fun (error, event_list) (agent_type, cv_id) ->
             updates_list2event_list
@@ -1974,7 +1965,7 @@ struct
                 then
                   let () =   Loggers.fprintf
                       (Remanent_parameters.get_logger parameters)
-                      "Try to neavigate through a free site: bottom reduction"
+                      "Try to navigate through a free site: bottom reduction"
                   in
                   Loggers.print_newline (Remanent_parameters.get_logger parameters)
               in

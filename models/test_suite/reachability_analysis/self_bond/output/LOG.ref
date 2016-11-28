@@ -641,7 +641,6 @@ Influence_map:Inhibition_map:rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(
 Influence_map:Inhibition_map:rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2) -> rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2)[0->1];[0->2];[1->0];[2->0]
 Influence_map:Inhibition_map:rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2) -> rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -670,8 +669,6 @@ Id=7
 
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t!free)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -702,8 +699,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		B(z!free,t!free)
 
-		Wake-up rules:
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -732,8 +727,6 @@ Id=7
 
 EXTENSIONAL DESCRIPTION:
 		C(z!free,t!free)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -764,8 +757,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		D(z!free,t!free)
 
-		Wake-up rules:
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -794,8 +785,6 @@ Id=7
 
 EXTENSIONAL DESCRIPTION:
 		E(z!free,t!free)
-
-		Wake-up rules:
 
 	Views in initial state:
 
@@ -826,7 +815,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		F(z!free,t!free)
 
-		Wake-up rules:
 
 	Applying rule 0: r1:
 		the precondition is satisfied
@@ -862,341 +850,8 @@ Id=13
 EXTENSIONAL DESCRIPTION:
 		A(z!A@z,t!A@t)
 
-		Wake-up rules:
 
 		Updating the views for A(z!,t!)
-
-	Applying rule 1: r2:
-		the precondition is satisfied
-
-		rule 1: r2 is applied for the first time
-
-		Updating the views for B(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=13
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		B(z!B@t,t!B@z)
-
-		Wake-up rules:
-
-		Updating the views for B(z!,t!)
-
-	Applying rule 2: r3:
-		the precondition is satisfied
-
-		rule 2: r3 is applied for the first time
-
-		Updating the views for C(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=13
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		C(z!C@t,t!C@z)
-
-		Wake-up rules:
-
-		Updating the views for C(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		C(z!free,t!C@z)
-
-		Wake-up rules:
-
-		Updating the views for C(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=9
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		C(z!C@t,t!free)
-
-		Wake-up rules:
-
-	Applying rule 3: r4:
-		the precondition is satisfied
-
-		rule 3: r4 is applied for the first time
-
-		Updating the views for D(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=31
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=30
-   Node(site_type:1<2)
-    Id=29
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=28
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		D(z!D@t,t!D@t)
-
-		Wake-up rules:
-
-		Updating the views for D(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		D(z!free,t!D@z)
-
-		Wake-up rules:
-
-		Updating the views for D(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=37
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=36
-   Node(site_type:1<1)
-    Id=29
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=28
-       Node(site_type:2<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		D(z!free,t!D@t)
-
-		Wake-up rules:
-
-	Applying rule 4: r5:
-		the precondition is satisfied
-
-		rule 4: r5 is applied for the first time
-
-		Updating the views for E(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=13
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		E(z!E@z,t!E@t)
-
-		Wake-up rules:
-
-		Updating the views for E(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=9
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		E(z!E@z,t!free)
-
-		Wake-up rules:
-
-		Updating the views for E(z!,t!)
-
-INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=11
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=10
-       Node(site_type:2<2)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-		E(z!free,t!E@t)
-
-		Wake-up rules:
 
 	Applying rule 5: r6:
 		the precondition is satisfied
@@ -1232,7 +887,6 @@ Id=13
 EXTENSIONAL DESCRIPTION:
 		F(z!F@z,t!F@z)
 
-		Wake-up rules:
 
 		Updating the views for F(z!,t!)
 
@@ -1263,17 +917,16 @@ Id=9
 EXTENSIONAL DESCRIPTION:
 		F(z!F@z,t!free)
 
-		Wake-up rules:
 
 		Updating the views for F(z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=23
  Node(site_type:1<2)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=22
    Node(site_type:1<3)
     Id=5
      Node(site_type:2<0)
@@ -1294,7 +947,328 @@ Id=46
 EXTENSIONAL DESCRIPTION:
 		F(z!F@t,t!free)
 
-		Wake-up rules:
+
+	Applying rule 4: r5:
+		the precondition is satisfied
+
+		rule 4: r5 is applied for the first time
+
+		Updating the views for E(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!E@z,t!E@t)
+
+
+		Updating the views for E(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!E@z,t!free)
+
+
+		Updating the views for E(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!free,t!E@t)
+
+
+	Applying rule 3: r4:
+		the precondition is satisfied
+
+		rule 3: r4 is applied for the first time
+
+		Updating the views for D(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=35
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=34
+   Node(site_type:1<2)
+    Id=33
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=32
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!D@t,t!D@t)
+
+
+		Updating the views for D(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!free,t!D@z)
+
+
+		Updating the views for D(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=41
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=40
+   Node(site_type:1<1)
+    Id=33
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=32
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!free,t!D@t)
+
+
+	Applying rule 2: r3:
+		the precondition is satisfied
+
+		rule 2: r3 is applied for the first time
+
+		Updating the views for C(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!C@t,t!C@z)
+
+
+		Updating the views for C(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=30
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!free,t!C@z)
+
+
+		Updating the views for C(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!C@t,t!free)
+
+
+	Applying rule 1: r2:
+		the precondition is satisfied
+
+		rule 1: r2 is applied for the first time
+
+		Updating the views for B(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		B(z!B@t,t!B@z)
+
+
+		Updating the views for B(z!,t!)
 
 	Applying rule 0: r1:
 		the precondition is satisfied
@@ -1303,30 +1277,14 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t!)
 
-	Applying rule 1: r2:
+	Applying rule 5: r6:
 		the precondition is satisfied
 
-		Updating the views for B(z!,t!)
+		Updating the views for F(z!,t!)
 
-		Updating the views for B(z!,t!)
+		Updating the views for F(z!,t!)
 
-	Applying rule 2: r3:
-		the precondition is satisfied
-
-		Updating the views for C(z!,t!)
-
-		Updating the views for C(z!,t!)
-
-		Updating the views for C(z!,t!)
-
-	Applying rule 3: r4:
-		the precondition is satisfied
-
-		Updating the views for D(z!,t!)
-
-		Updating the views for D(z!,t!)
-
-		Updating the views for D(z!,t!)
+		Updating the views for F(z!,t!)
 
 	Applying rule 4: r5:
 		the precondition is satisfied
@@ -1337,14 +1295,30 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for E(z!,t!)
 
-	Applying rule 5: r6:
+	Applying rule 3: r4:
 		the precondition is satisfied
 
-		Updating the views for F(z!,t!)
+		Updating the views for D(z!,t!)
 
-		Updating the views for F(z!,t!)
+		Updating the views for D(z!,t!)
 
-		Updating the views for F(z!,t!)
+		Updating the views for D(z!,t!)
+
+	Applying rule 2: r3:
+		the precondition is satisfied
+
+		Updating the views for C(z!,t!)
+
+		Updating the views for C(z!,t!)
+
+		Updating the views for C(z!,t!)
+
+	Applying rule 1: r2:
+		the precondition is satisfied
+
+		Updating the views for B(z!,t!)
+
+		Updating the views for B(z!,t!)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1432,14 +1406,14 @@ Id=15
        Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=19
    Node(site_type:1<2)
-    Id=20
+    Id=18
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1456,19 +1430,19 @@ Id=27
      Leaf False 
 
 agent_type:3:D:cv_id:0
-Id=40
+Id=44
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=43
    Node(site_type:1<1)
-    Id=38
+    Id=42
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=28
+      Id=32
        Node(site_type:2<3)
         Id=1
          Leaf True 
@@ -1476,14 +1450,14 @@ Id=40
         Id=0
          Leaf False 
 
-    Id=30
+    Id=34
      Node(site_type:1<2)
-      Id=29
+      Id=33
        Node(site_type:2<2)
         Id=0
          Leaf False 
 
-        Id=28
+        Id=32
          Node(site_type:2<3)
           Id=1
            Leaf True 
@@ -1495,14 +1469,14 @@ Id=40
        Leaf False 
 
 agent_type:4:E:cv_id:0
-Id=27
+Id=29
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=19
    Node(site_type:1<2)
-    Id=20
+    Id=18
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -1519,12 +1493,12 @@ Id=27
      Leaf False 
 
 agent_type:5:F:cv_id:0
-Id=49
+Id=26
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=25
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1539,9 +1513,9 @@ Id=49
         Id=0
          Leaf False 
 
-    Id=47
+    Id=24
      Node(site_type:1<2)
-      Id=20
+      Id=18
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -1554,7 +1528,7 @@ Id=49
           Id=0
            Leaf False 
 
-      Id=45
+      Id=22
        Node(site_type:1<3)
         Id=5
          Node(site_type:2<0)

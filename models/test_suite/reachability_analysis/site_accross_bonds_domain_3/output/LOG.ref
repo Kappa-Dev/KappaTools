@@ -765,9 +765,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0 is applied for the first time
-
-
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -797,7 +794,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		A(z!C@x,t!B@t)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -827,7 +823,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		B(t!A@t,z!C@x)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -848,13 +843,11 @@ EXTENSIONAL DESCRIPTION:
 		C(x!B@z)
 		C(x!A@z)
 
-		Wake-up rules:
 
 	Applying rule 1:
 		the precondition is satisfied
 
 		rule 1 is applied for the first time
-
 
 		Updating the views for C(x!)
 
@@ -892,7 +885,6 @@ Id=12
 EXTENSIONAL DESCRIPTION:
 		A(z!D@x,t!B@t)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -922,7 +914,6 @@ Id=16
 EXTENSIONAL DESCRIPTION:
 		B(t!A@t,z!D@x)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -943,14 +934,11 @@ EXTENSIONAL DESCRIPTION:
 		D(x!B@z)
 		D(x!A@z)
 
-		Wake-up rules:
 
 	Applying rule 3:
 		the precondition is satisfied
 
 		rule 3 is applied for the first time
-
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -980,7 +968,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		E(z!C@x,t!F@t)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1010,7 +997,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		F(t!E@t,z!D@x)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1030,7 +1016,6 @@ Id=18
 EXTENSIONAL DESCRIPTION:
 		C(x!E@z)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1050,14 +1035,11 @@ Id=18
 EXTENSIONAL DESCRIPTION:
 		D(x!F@z)
 
-		Wake-up rules:
 
 	Applying rule 4:
 		the precondition is satisfied
 
 		rule 4 is applied for the first time
-
-
 
 		Updating the views for C(x!)
 
@@ -1095,7 +1077,6 @@ Id=12
 EXTENSIONAL DESCRIPTION:
 		E(z!G@x,t!F@t)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1125,7 +1106,6 @@ Id=16
 EXTENSIONAL DESCRIPTION:
 		F(t!E@t,z!H@x)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1145,7 +1125,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		G(x!E@z)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1165,7 +1144,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		H(x!F@z)
 
-		Wake-up rules:
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -1200,7 +1178,6 @@ Id=29
 EXTENSIONAL DESCRIPTION:
 		A(z!free,t!B@t)
 
-		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1230,7 +1207,6 @@ Id=34
 EXTENSIONAL DESCRIPTION:
 		B(t!A@t,z!free)
 
-		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1260,7 +1236,6 @@ Id=29
 EXTENSIONAL DESCRIPTION:
 		E(z!free,t!F@t)
 
-		Wake-up rules:
 
 	Applying rule 0:
 		the precondition is satisfied

@@ -634,7 +634,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -664,13 +663,11 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		A(x~u,x!free)
 
-		Wake-up rules:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -700,13 +697,11 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		B(x~u,x!free)
 
-		Wake-up rules:
 
 	Applying rule 2: r2:
 		the precondition is satisfied
 
 		rule 2: r2 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -736,13 +731,11 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		C(x~u,x!free)
 
-		Wake-up rules:
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 
 		rule 3: r3 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -772,13 +765,11 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		D(x~u,x!free)
 
-		Wake-up rules:
 
 	Applying rule 4: r4:
 		the precondition is satisfied
 
 		rule 4: r4 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -808,7 +799,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		E(x~u,x!free)
 
-		Wake-up rules:
 
 	Applying rule 5: r5:
 		the precondition is not satisfied yet
@@ -847,7 +837,6 @@ Id=21
 EXTENSIONAL DESCRIPTION:
 		A(x~u,x!B@x)
 
-		Wake-up rules:
 
 		Updating the views for B(x~,x!)
 
@@ -878,27 +867,12 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		B(x~p,x!A@x)
 
-		Wake-up rules:
 
 	Applying rule 7: r7:
 		the precondition is not satisfied yet
 
 	Applying rule 8: r8:
 		the precondition is not satisfied yet
-
-	Applying rule 9: r9:
-		the precondition is satisfied
-
-		rule 9: r9 is applied for the first time
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-
-	Applying rule 1: r1:
-		the precondition is satisfied
-
-	Applying rule 2: r2:
-		the precondition is satisfied
 
 	Applying rule 10: r10:
 		the precondition is satisfied
@@ -934,7 +908,6 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		D(x~p,x!E@x)
 
-		Wake-up rules:
 
 		Updating the views for E(x~,x!)
 
@@ -965,7 +938,6 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		E(x~p,x!D@x)
 
-		Wake-up rules:
 
 	Applying rule 11: r11:
 		the precondition is satisfied
@@ -1001,7 +973,6 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		D(x~p,x!free)
 
-		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1031,20 +1002,26 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		E(x~p,x!free)
 
-		Wake-up rules:
+
+	Applying rule 9: r9:
+		the precondition is satisfied
+
+		rule 9: r9 is applied for the first time
+
+	Applying rule 0: r0:
+		the precondition is satisfied
+
+	Applying rule 1: r1:
+		the precondition is satisfied
+
+	Applying rule 2: r2:
+		the precondition is satisfied
 
 	Applying rule 3: r3:
 		the precondition is satisfied
 
 	Applying rule 4: r4:
 		the precondition is satisfied
-
-	Applying rule 6: r6:
-		the precondition is satisfied
-
-		Updating the views for A(x~,x!)
-
-		Updating the views for B(x~,x!)
 
 	Applying rule 5: r5:
 		the precondition is satisfied
@@ -1081,7 +1058,13 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		B(x~p,x!free)
 
-		Wake-up rules:
+
+	Applying rule 6: r6:
+		the precondition is satisfied
+
+		Updating the views for A(x~,x!)
+
+		Updating the views for B(x~,x!)
 
 	Applying rule 10: r10:
 		the precondition is satisfied
@@ -1089,9 +1072,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for D(x~,x!)
 
 		Updating the views for E(x~,x!)
-
-	Applying rule 8: r8:
-		the precondition is not satisfied yet
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -1127,7 +1107,6 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 		A(x~u,x!C@x)
 
-		Wake-up rules:
 
 		Updating the views for B(x~,x!)
 
@@ -1160,36 +1139,6 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		C(x~p,x!A@x)
 
-		Wake-up rules:
-
-	Applying rule 2: r2:
-		the precondition is satisfied
-
-	Applying rule 1: r1:
-		the precondition is satisfied
-
-	Applying rule 9: r9:
-		the precondition is satisfied
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-
-	Applying rule 11: r11:
-		the precondition is satisfied
-
-		Updating the views for D(x~,x!)
-
-	Applying rule 6: r6:
-		the precondition is satisfied
-
-		Updating the views for A(x~,x!)
-
-		Updating the views for B(x~,x!)
-
-	Applying rule 5: r5:
-		the precondition is satisfied
-
-		Updating the views for A(x~,x!)
 
 	Applying rule 8: r8:
 		the precondition is satisfied
@@ -1227,23 +1176,11 @@ Id=36
 EXTENSIONAL DESCRIPTION:
 		A(x~p,x!C@x)
 
-		Wake-up rules:
 
-	Applying rule 7: r7:
-		the precondition is satisfied
-
-		Updating the views for A(x~,x!)
-
-		Updating the views for B(x~,x!)
-
-		Updating the views for C(x~,x!)
-
-	Applying rule 10: r10:
+	Applying rule 11: r11:
 		the precondition is satisfied
 
 		Updating the views for D(x~,x!)
-
-		Updating the views for E(x~,x!)
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -1251,10 +1188,8 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 3: r3:
 		the precondition is satisfied
 
-	Applying rule 11: r11:
+	Applying rule 2: r2:
 		the precondition is satisfied
-
-		Updating the views for D(x~,x!)
 
 	Applying rule 9: r9:
 		the precondition is satisfied
@@ -1287,14 +1222,33 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		A(x~p,x!free)
 
-		Wake-up rules:
 
-	Applying rule 8: r8:
+	Applying rule 1: r1:
 		the precondition is satisfied
 
-		Updating the views for C(x~,x!)
+	Applying rule 5: r5:
+		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
+
+	Applying rule 0: r0:
+		the precondition is satisfied
+
+	Applying rule 10: r10:
+		the precondition is satisfied
+
+		Updating the views for D(x~,x!)
+
+		Updating the views for E(x~,x!)
+
+	Applying rule 7: r7:
+		the precondition is satisfied
+
+		Updating the views for A(x~,x!)
+
+		Updating the views for B(x~,x!)
+
+		Updating the views for C(x~,x!)
 
 	Applying rule 6: r6:
 		the precondition is satisfied
@@ -1328,22 +1282,17 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		A(x~p,x!B@x)
 
-		Wake-up rules:
 
 		Updating the views for B(x~,x!)
 
-	Applying rule 5: r5:
+	Applying rule 8: r8:
 		the precondition is satisfied
+
+		Updating the views for C(x~,x!)
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 0: r0:
-		the precondition is satisfied
-
-	Applying rule 2: r2:
-		the precondition is satisfied
-
-	Applying rule 1: r1:
+	Applying rule 4: r4:
 		the precondition is satisfied
 
 	Applying rule 11: r11:
@@ -1351,8 +1300,21 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for D(x~,x!)
 
+	Applying rule 3: r3:
+		the precondition is satisfied
+
+	Applying rule 2: r2:
+		the precondition is satisfied
+
 	Applying rule 9: r9:
 		the precondition is satisfied
+
+	Applying rule 10: r10:
+		the precondition is satisfied
+
+		Updating the views for D(x~,x!)
+
+		Updating the views for E(x~,x!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
@@ -1363,10 +1325,11 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x~,x!)
 
-	Applying rule 8: r8:
+	Applying rule 0: r0:
 		the precondition is satisfied
 
-		Updating the views for C(x~,x!)
+	Applying rule 5: r5:
+		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
@@ -1376,6 +1339,9 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,x!)
 
 		Updating the views for B(x~,x!)
+
+	Applying rule 1: r1:
+		the precondition is satisfied
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1385,12 +1351,12 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=49
+Id=52
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=48
+  Id=51
    Node(site_type:1<2)
     Id=30
      Node(site_type:2<0)
@@ -1584,12 +1550,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1621,7 +1587,7 @@ Id=58
 
     Id=56
      Node(site_type:0<2)
-      Id=50
+      Id=48
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1701,7 +1667,7 @@ Id=58
 
     Id=56
      Node(site_type:0<2)
-      Id=50
+      Id=48
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1741,7 +1707,7 @@ Id=58
 
     Id=56
      Node(site_type:0<2)
-      Id=50
+      Id=48
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1782,12 +1748,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1797,7 +1763,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1812,12 +1778,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1827,7 +1793,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1842,12 +1808,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1857,7 +1823,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1872,12 +1838,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1887,7 +1853,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1902,12 +1868,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1948,12 +1914,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1985,7 +1951,7 @@ Id=58
 
     Id=56
      Node(site_type:0<2)
-      Id=50
+      Id=48
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -2065,7 +2031,7 @@ Id=58
 
     Id=56
      Node(site_type:0<2)
-      Id=50
+      Id=48
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -2105,7 +2071,7 @@ Id=58
 
     Id=56
      Node(site_type:0<2)
-      Id=50
+      Id=48
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -2138,12 +2104,12 @@ Id=54
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2153,7 +2119,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2168,12 +2134,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2183,7 +2149,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2198,12 +2164,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2213,7 +2179,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2228,12 +2194,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2243,7 +2209,7 @@ Id=52
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2258,12 +2224,12 @@ Id=50
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=52
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=51
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 

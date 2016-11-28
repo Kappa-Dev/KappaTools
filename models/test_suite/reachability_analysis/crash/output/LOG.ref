@@ -167,7 +167,6 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(z!1),C(z!2) -> rule(0):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(z!1),C(z!2)[2*->0];[2*->2];[1*->0];[1*->1];[1*->2];[1->1];[2->1]
 Influence_map:Inhibition_map:rule(0):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(z!1),C(z!2) -> rule(0):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(z!1),C(z!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
 Reachability analysis...
-
 	Views in initial state:
 
 INTENSIONAL DESCRIPTION:
@@ -197,7 +196,6 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 		C(z!free,t!free)
 
-		Wake-up rules:
 
 	Applying rule 0: r3:
 		the precondition is satisfied
@@ -233,7 +231,6 @@ Id=21
 EXTENSIONAL DESCRIPTION:
 		C(z!C@z,t!C@z)
 
-		Wake-up rules:
 
 		Updating the views for C(z!,t!)
 
@@ -268,7 +265,6 @@ EXTENSIONAL DESCRIPTION:
 		C(z!C@t,t!free)
 		C(z!C@z,t!free)
 
-		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -298,7 +294,6 @@ Id=33
 EXTENSIONAL DESCRIPTION:
 		C(z!free,t!C@z)
 
-		Wake-up rules:
 
 	Applying rule 0: r3:
 		the precondition is satisfied

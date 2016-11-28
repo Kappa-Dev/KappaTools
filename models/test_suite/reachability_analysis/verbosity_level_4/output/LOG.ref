@@ -5,6 +5,7 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+			(rule 0) should be investigated
 
 	Applying rule 0:
 		the precondition is satisfied
@@ -22,16 +23,14 @@ Reachability analysis...
 
 		A(x~u,y~u,z~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 1) should be investigated
+			(rule 2) should be investigated
+			(rule 3) should be investigated
+			(rule 4) should be investigated
+			(rule 5) should be investigated
+			(rule 6) should be investigated
+			(rule 7: KO) should be investigated
+			(rule 0) should be investigated
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -42,16 +41,7 @@ Reachability analysis...
 
 		A(x~p,y~u,z~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 1) should be investigated
 
 	Applying rule 2:
 		the precondition is satisfied
@@ -62,16 +52,7 @@ Reachability analysis...
 
 		A(x~p,y~p,z~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 2) should be investigated
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -82,16 +63,7 @@ Reachability analysis...
 
 		A(x~0,y~p,z~q)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 3) should be investigated
 
 	Applying rule 4:
 		the precondition is satisfied
@@ -102,16 +74,7 @@ Reachability analysis...
 
 		A(x~q,y~u,z~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 4) should be investigated
 
 	Applying rule 5:
 		the precondition is satisfied
@@ -122,16 +85,7 @@ Reachability analysis...
 
 		A(x~q,y~q,z~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 5) should be investigated
 
 	Applying rule 6:
 		the precondition is satisfied
@@ -142,16 +96,7 @@ Reachability analysis...
 
 		A(x~q,y~q,z~q)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-				(rule 4) should be investigated 
-				(rule 5) should be investigated 
-				(rule 6) should be investigated 
-				(rule 7: KO) should be investigated 
-
+			(rule 6) should be investigated
 
 	Applying rule 7: KO:
 		the precondition is not satisfied yet

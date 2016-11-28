@@ -450,7 +450,6 @@ Reachability analysis...
 		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -480,7 +479,6 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 		A(x!free,y!free)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -500,7 +498,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		A(y~u)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -520,13 +517,11 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		A(x~u)
 
-		Wake-up rules:
 
 	Applying rule 1: r1:
 		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -556,7 +551,6 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 		A(x!B@x,y!free)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -576,13 +570,11 @@ Id=9
 EXTENSIONAL DESCRIPTION:
 		B(x!A@x)
 
-		Wake-up rules:
 
 	Applying rule 2: r2:
 		the precondition is satisfied
 
 		rule 2: r2 is applied for the first time
-
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -612,7 +604,6 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 		A(x!free,y!C@x)
 
-		Wake-up rules:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -632,7 +623,6 @@ Id=9
 EXTENSIONAL DESCRIPTION:
 		C(x!A@y)
 
-		Wake-up rules:
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -657,7 +647,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		B(x!free)
 
-		Wake-up rules:
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -677,7 +666,6 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 		C(x!free)
 
-		Wake-up rules:
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -727,7 +715,6 @@ Id=27
 EXTENSIONAL DESCRIPTION:
 		A(x!B@x,y!C@x)
 
-		Wake-up rules:
 
 		Updating the views for B(x!)
 
@@ -752,22 +739,22 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 3: r3:
 		the precondition is satisfied
 
-	Applying rule 6: r6:
+	Applying rule 4: r4:
 		the precondition is satisfied
 
 		Updating the views for A(x!,y!)
-
-		Updating the views for B(x!)
 
 	Applying rule 5: r5:
 		the precondition is satisfied
 
 		Updating the views for A(x!,y!)
 
-	Applying rule 4: r4:
+	Applying rule 6: r6:
 		the precondition is satisfied
 
 		Updating the views for A(x!,y!)
+
+		Updating the views for B(x!)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

@@ -5,6 +5,8 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+			(rule 0) should be investigated
+			(rule 2) should be investigated
 				(rule 1) should be investigated 
 
 				(rule 3) should be investigated 
@@ -15,30 +17,19 @@ Reachability analysis...
 
 		A(x!B@x)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-
 	Views in initial state:
 
 		A(x~u)
-
-		Wake-up rules:
-				(rule 0) should be investigated 
 
 	Views in initial state:
 
 		B(x!A@x,x~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
-
 
 		A(x~u!1),B(x~u!1)
-		B(x~u!1),A(x~u!1)
+		B(x~u!1),A(x~u!1)			(rule 3) should be investigated
+			(rule 1) should be investigated
+
 	Applying rule 0:
 		the precondition is satisfied
 
@@ -60,12 +51,21 @@ Reachability analysis...
 
 		B(x!free,x~u)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
+			(rule 0) should be investigated
+			(rule 1) should be investigated
+			(rule 2) should be investigated
+			(rule 3) should be investigated
 
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x!)
+
+	Applying rule 2:
+		the precondition is not satisfied yet
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -78,15 +78,13 @@ Reachability analysis...
 
 		B(x!A@x,x~p)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
+			(rule 0) should be investigated
+			(rule 1) should be investigated
+			(rule 2) should be investigated
+			(rule 3) should be investigated
 
-
-	Applying rule 2:
-		the precondition is not satisfied yet
+	Applying rule 0:
+		the precondition is satisfied
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -96,15 +94,15 @@ Reachability analysis...
 
 		B(x!free,x~p)
 
-		Wake-up rules:
-				(rule 0) should be investigated 
-				(rule 1) should be investigated 
-				(rule 2) should be investigated 
-				(rule 3) should be investigated 
+			(rule 0) should be investigated
+			(rule 1) should be investigated
 
-
-	Applying rule 0:
+	Applying rule 2:
 		the precondition is satisfied
+
+		rule 2 is applied for the first time
+
+		Updating the views for B(x!,x~)
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -113,12 +111,8 @@ Reachability analysis...
 
 		Updating the views for B(x!,x~)
 
-	Applying rule 2:
+	Applying rule 0:
 		the precondition is satisfied
-
-		rule 2 is applied for the first time
-
-		Updating the views for B(x!,x~)
 
 	Applying rule 1:
 		the precondition is satisfied
