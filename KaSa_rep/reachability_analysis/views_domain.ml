@@ -406,12 +406,7 @@ struct
     let dynamic = set_log_info log_info dynamic in
     error, static, dynamic, []
 
-(* TO DO, look up in static *)
-(* fold over all the rules, all the tuples of interest, all the sites in these
-   tuples, and apply the function Common_static.add_dependency_site_rule to
-   update the wake_up relation *)
-
-  let  add_wake_up_common parameters error rule_id
+  let add_wake_up_common parameters error rule_id
       (agent_type, cv_id)
       store_list_of_site_type_in_covering_classes wake_up =
     let error, list_of_site_type =
@@ -502,8 +497,6 @@ struct
     error, result.Bdu_dynamic_views.store_update
 
   (**************************************************************************)
-  (* add updates_list into an event_list *)
-
   let dump_cv_label static dynamic error bool (agent_type, cv_id) =
     (*TODO: put title*)
     let parameters = get_parameter static in
@@ -578,7 +571,6 @@ struct
 
   (**************************************************************************)
 
-  (*TO BE CHECKED*)
   let discover_a_modify_sites parameters error covering_classes_modified_map
       store_list_of_site_type_in_covering_classes
       modified_sites =
@@ -601,8 +593,6 @@ struct
            ) (error, modified_sites) list_of_site_type
       ) covering_classes_modified_map (error, modified_sites)
 
-(*BUG to fix:  When a view is modified then any site in this view must be
-  declared as modified *)
   let updates_list2event_list ?title:(_title="") static dynamic error _agent_type _cv_id event_list =
     let parameters = get_parameter static in
     (*a covering classses that contains modified sites*)
@@ -613,25 +603,9 @@ struct
     let store_list_of_site_type_in_covering_classes =
       get_list_of_site_type_in_covering_classes static
     in
-    (*TODO:the initialize set of modified sites*)
     let error, modified_sites =
       Communication.init_sites_working_list parameters error
     in
-    (*-----------------------------------------------------------------------*)
-    (*REMOVE*)
-    (*  let error, s1 =
-      match
-        Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-          parameters
-          error
-          (agent_type, cv_id)
-          store_covering_classes_modification_update_full
-      with
-      | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
-      | error, Some s -> error, s
-        in*)
-    (*-----------------------------------------------------------------------*)
-    (*TODO:check the new event*)
     let error, modified_sites =
       discover_a_modify_sites parameters error
         store_covering_classes_modification_update_full
@@ -645,77 +619,7 @@ struct
            error, (Communication.Modified_sites s) :: event_list
         ) modified_sites event_list
     in
-    (*-----------------------------------------------------------------------*)
-    (*print working list information*)
-    (*  let error =
-      if local_trace
-      || Remanent_parameters.get_dump_reachability_analysis_wl parameters
-      then
-        begin
-          let log = Remanent_parameters.get_logger parameters in
-          (*---------------------------------------------------------------*)
-          (*let error, _agent_string =
-            try
-              Handler.string_of_agent parameters error kappa_handler agent_type
-            with
-            | _ -> Exception.warn
-                     parameters error __POS__ Exit
-                     (Ckappa_sig.string_of_agent_name agent_type)
-          in*)
-          (*---------------------------------------------------------------*)
-          (*dump covering class label*)
-          let error =
-            if title <> ""
-            then
-              let error = (*TODO: different title*)
-                dump_cv_label
-                  static
-                  dynamic
-                  error
-                  true
-                  (agent_type, cv_id)
-              in
-              error
-            else
-              error
-          in
-          (*----------------------------------------------------------------*)
-          let error =
-            Ckappa_sig.Rule_map_and_set.Set.fold (fun rule_id error ->
-                let compiled = get_compil static in
-                let error, rule_id_string =
-                  try
-                    Handler.string_of_rule parameters error kappa_handler
-                      compiled rule_id
-                  with
-                  | _ ->
-                    Exception.warn
-                      parameters error __POS__ Exit
-                      (Ckappa_sig.string_of_rule_id rule_id)
-                in
-                let tab =
-                  if title = "" then "\t\t\t\t" else "\t\t\t"
-                in
-                let () =
-                  Loggers.fprintf log "%s%s(%s) should be investigated "
-                    (Remanent_parameters.get_prefix parameters) tab
-                    rule_id_string
-                in
-                let () = Loggers.print_newline log in error)
-              s1 error
-          in
-          let () = Loggers.print_newline log in
-          error
-        end
-      else error
-        in*)
-    (*-------------------------------------------------------------*)
-    (*convert into an event list*)
     error, event_list
-(*  Ckappa_sig.Rule_map_and_set.Set.fold
-      (fun rule_id event_list ->
-         (Communication.Check_rule rule_id) :: event_list)
-      s1 event_list*)
 
   (***************************************************************)
 
@@ -776,8 +680,6 @@ struct
       let error, (_map1, map2) =
         Bdu_static_views.new_index_pair_map parameters error site_correspondence
       in
-      (*----------------------------------------------------------------*)
-      (*  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in*)
       (*-------------------------------------------------------------------*)
       let log = Remanent_parameters.get_logger parameters in
       let error, dynamic =
@@ -1136,33 +1038,6 @@ struct
 
   (****************************************************************)
 
-  (*let get_store_proj_bdu_test_restriction static dynamic error =
-    let error, result_static =
-      get_bdu_analysis_static static dynamic error
-    in
-    error, result_static.Bdu_static_views.store_proj_bdu_test_restriction
-
-  let get_store_proj_bdu_creation_restriction static dynamic error =
-    let error, result_static =
-      get_bdu_analysis_static static dynamic error
-    in
-    error,
-    result_static.Bdu_static_views.store_proj_bdu_creation_restriction_map
-
-  let get_store_proj_bdu_potential_restriction static dynamic error =
-    let error, result_static =
-      get_bdu_analysis_static static dynamic error
-    in
-    error,
-    result_static.Bdu_static_views.store_proj_bdu_potential_restriction_map
-
-  let get_store_modif_list_restriction_map static dynamic error =
-    let error, result_static =
-      get_bdu_analysis_static static dynamic error
-    in
-    error, result_static.Bdu_static_views.store_modif_list_restriction_map*)
-
-  (*****************************************************************)
 
   exception False of Exception.method_handler * dynamic_information
 
@@ -1268,16 +1143,6 @@ struct
                  parameters error __POS__ Exit
                  (Ckappa_sig.string_of_site_name site_name)
            in
-           (*print for test*)
-           (*let _ =
-             Loggers.fprintf (Remanent_parameterss.get_logger parameters)
-               "path:cv_id:%i:agent_type:%i:site_name:%i:%s:new_site_name:%i\n"
-               (Covering_classes_type.int_of_cv_id cv_id)
-               (Ckappa_sig.int_of_agent_name agent_type)
-               (Ckappa_sig.int_of_site_name site_name)
-               new_site_string
-               (Ckappa_sig.int_of_site_name new_site_name)
-             in*)
            (*--------------------------------------------------------------*)
            (* fetch the bdu for the agent type and the cv_id in
               the current state of the iteration *)
@@ -1308,10 +1173,6 @@ struct
              Ckappa_sig.Views_bdu.mvbdu_and
                parameters handler error bdu_X bdu_test
            in
-           (*let _ =
-             Loggers.fprintf (Remanent_parameterss.get_logger parameters) "BDU_test_fixpoint:\n" ;
-             Ckappa_sig.Views_bdu.print parameters bdu_test_X
-             in*)
            (* compute the projection over new_site_name *)
            let error, handler, singleton =
              Ckappa_sig.Views_bdu.build_variables_list
@@ -1395,18 +1256,7 @@ struct
                    parameters error __POS__ Exit
                    (Ckappa_sig.string_of_state_index state)
              in
-             (*let _ =
-               Loggers.fprintf (Remanent_parameterss.get_logger parameters)
-                 "List of state in the precondition:\
-                  rule_id:%i:agent_type:%i:site_type:%i:%s:%i:%s\n"
-                 (Ckappa_sig.int_of_rule_id rule_id)
-                 (Ckappa_sig.int_of_agent_name agent_type)
-                 (Ckappa_sig.int_of_site_name site)
-                 site_string
-                 (Ckappa_sig.int_of_state_index state)
-                 state_string
-               in*)
-             error, state :: output
+               error, state :: output
            | _ ->
              Exception.warn
                parameters error __POS__ ~message:"state is empty" Exit output)
@@ -1639,7 +1489,7 @@ struct
       parameters error dynamic kappa_handler path
       agent_type (*agent_type inside the pattern*)
       bdu_false bdu_true site_correspondence store_covering_classes_id
-      fixpoint_result = (*CHECK ME*)
+      fixpoint_result =
     (*get the information of the path,
       A - x - y - B - z
       (agent_type', site_out, site_in, agent_type_in, site_path)
@@ -2282,7 +2132,7 @@ struct
                store_agent_name
                dual_contact_map
            in
-           let error = (*FIXME*)
+           let error =
              scan_bot_warn
                ~also_scan_top:false
                __POS__ parameters error
@@ -2312,7 +2162,7 @@ struct
                      store_covering_classes_id
                      fixpoint_result
                  in
-                 let error = (*FIXME*)
+                 let error =
                    scan_bot
                      ~also_scan_top:false
                      __POS__ parameters error
@@ -2403,8 +2253,6 @@ struct
     try
       (*check the condition whether or not the bdu is enabled, do the
         intersection of bdu_test and bdu_X.*)
-      (* JF: You do not use the result, of this function, I comment the
-         function call *)
       let error, dynamic =
         collect_bdu_enabled
           parameters
@@ -2439,10 +2287,7 @@ struct
     in
     if is_enable
     then
-      (*the information about the dynamic contact map is available?, if
-        yes, use them, otherwise use the static contact map instead*)
       error, dynamic, Some precondition
-      (* TO DO, update the function state_of_site in precondition *)
     else
       error, dynamic, None
 

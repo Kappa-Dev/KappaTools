@@ -118,6 +118,8 @@ struct
 
   let get_wake_up_relation static = lift Analyzer_headers.get_wake_up_relation static
 
+  let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
+
   let empty_working_list = Ckappa_sig.Rule_FIFO.empty
 
   type 'a zeroary =
@@ -160,13 +162,36 @@ struct
   let push_rule static dynamic error r_id =
     let working_list = get_working_list dynamic in
     let parameters = get_parameter static in
-    (*  let _ = Printf.fprintf stdout "RULE: %i \n" (Ckappa_sig.int_of_rule_id r_id) in*)
+    let compiled = get_compil static in
+    let kappa_handler = get_kappa_handler static in
     let error, rule_working_list =
       Ckappa_sig.Rule_FIFO.push
         parameters
         error
         r_id
         working_list
+    in
+    let () =
+      if
+        not (rule_working_list == working_list)
+        &&
+        Remanent_parameters.get_dump_reachability_analysis_wl
+          parameters
+      then
+        let error, rule_id_string =
+          try
+            Handler.string_of_rule parameters error kappa_handler
+              compiled r_id
+          with
+          | _ ->
+            Exception.warn
+              parameters error __POS__ Exit
+              (Ckappa_sig.string_of_rule_id r_id)
+        in
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "\t\t\t(%s) should be investigated\n"
+          rule_id_string
     in
     let dynamic = set_working_list rule_working_list dynamic in
     error, dynamic
@@ -348,10 +373,6 @@ struct
                event
              with
              | Communication.Check_rule r_id ->
-               (*let () =
-                 Printf.fprintf stdout "SRULE: %i\n "
-                   (Ckappa_sig.int_of_rule_id r_id)
-                 in*)
                r_id::check_rules, modified_sites, bonds, others
              | Communication.Modified_sites site ->
                check_rules, site::modified_sites, bonds, others
@@ -364,13 +385,7 @@ struct
       let check_rules, modified_sites, bonds, event_list =
         split event_list
       in
-      (*  let _ =
-        List.iter
-          (fun r_id -> Printf.fprintf stdout "RRULE: %i\n "
-              (Ckappa_sig.int_of_rule_id r_id))
-          check_rules
-          in*)
-      let dyn_bonds = get_bonds dynamic in
+    let dyn_bonds = get_bonds dynamic in
       let error, dyn_bonds =
         List.fold_left
           (fun (error, dyn_bonds) bond ->
