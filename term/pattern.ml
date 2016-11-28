@@ -248,62 +248,29 @@ let raw_to_navigation (full:bool) nodes_by_type nodes =
   | Some (x,_) -> (*(ag_sort,ag_id)*)
     build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
-let infs cc1 cc2 =
-  let possibilities =
-    ref (potential_pairing cc1.nodes_by_type cc2.nodes_by_type) in
-  let rec aux rename nodes = function
-    | [] -> nodes
-    | (o,p as pair)::todos ->
-      let () = possibilities := Mods.Int2Set.remove pair !possibilities in
-      let lnk1 = Mods.IntMap.find_default [||] o cc1.nodes in
-      let (todos',ren'),outl =
-        Tools.array_fold_left_mapi
-          (fun k (todo,ren as acc) (ly,iy) ->
-             let (lx,ix) = lnk1.(k) in
-             match lx, ly with
-             | (Link _, Free| Free, Link _
-               | Link _, UnSpec |UnSpec, Link _
-               | UnSpec, Free| Free, UnSpec
-               | UnSpec, UnSpec) ->
-               acc,(UnSpec,if ix = iy then iy else -1)
-             | Free, Free -> acc,(Free,if ix = iy then iy else -1)
-             | Link (n1,s1) as x, Link (n2,s2) ->
-               if s1 = s2 then
-                 if Renaming.mem n1 ren then
-                   (acc,
-                    ((if Renaming.apply ren n1 = n2 then x else UnSpec),
-                     if ix = iy then iy else -1))
-                 else match Renaming.add n1 n2 ren with
-                   | None -> acc,(UnSpec,if ix = iy then iy else -1)
-                   | Some r' ->
-                     if find_ty cc1 n1 = find_ty cc2 n2
-                     then ((n1,n2)::todo,r'),(x,if ix = iy then iy else -1)
-                     else acc,(UnSpec,if ix = iy then iy else -1)
-               else (acc,(UnSpec,if ix = iy then iy else -1))
-          )
-          (todos,rename)
-          (Mods.IntMap.find_default [||] p cc2.nodes) in
-      if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true outl
-      then aux ren' nodes todos'
-      else aux ren' (Mods.IntMap.add o outl nodes) todos' in
-  let rec for_one_root acc =
-    match Mods.Int2Set.choose !possibilities with
-    | None -> acc
-    | Some (root1,root2) ->
-      match Renaming.add root1 root2 Renaming.empty with
-      | None -> assert false
-      | Some r ->
-        let nodes = aux r Mods.IntMap.empty [root1,root2] in
-        let acc' =
-          if Mods.IntMap.is_empty nodes then acc else
-            let nodes_by_type = Array.map
-                (List.filter (fun a -> Mods.IntMap.mem a nodes))
-                cc1.nodes_by_type in
-            { nodes_by_type; nodes;
-              recogn_nav =
-                raw_to_navigation false nodes_by_type nodes; }::acc in
-        for_one_root acc'
-  in for_one_root []
+let intersection renaming cc1 cc2 =
+  let nodes,image =
+    Renaming.fold
+      (fun i j (accn,l as acc) ->
+         match Mods.IntMap.find_option i cc1.nodes with
+         | None -> acc
+         | Some nodes1 ->
+           match Mods.IntMap.find_option j cc2.nodes with
+           | None -> acc
+           | Some nodes2 ->
+             let out = Array.mapi
+                 (fun k (l2,i2) ->
+                    let (l1,i1) = nodes1.(k) in
+                    ((if l1 = UnSpec then UnSpec else l2),
+                     (if i1 = -1 then -1 else i2))) nodes2 in
+             if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true out
+             then acc
+             else (Mods.IntMap.add j out accn, j::l))
+      renaming (Mods.IntMap.empty,[]) in
+  let nodes_by_type = Array.map
+      (List.filter (fun a -> List.mem a image)) cc2.nodes_by_type in
+  { nodes_by_type; nodes;
+    recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
 let print_cc ?sigs ?cc_id f cc =
   let print_intf (ag_i,_ as ag) link_ids neigh =
@@ -1190,12 +1157,16 @@ end = struct
       else acc
     | h :: t ->
       let acc' =
-        List.fold_left
-          (fun (mid,acc) cc ->
-             let id' = succ mid in
-             let x,_,id = add_cc acc id' cc in
-             ((if id = id' then id else mid),x))
-          acc (infs this.element h.element) in
+        match matchings this.element h.element with
+        | [] -> acc
+        | list ->
+          List.fold_left
+            (fun (mid,acc) r ->
+               let id' = succ mid in
+               let x,_,id =
+                 add_cc acc id' (intersection r this.element h.element) in
+              ((if id = id' then id else mid),x))
+            acc list in
        saturate_one this max_l level acc' t
   let rec saturate_level max_l level (_,domain as acc) =
     match Mods.IntMap.find_option level domain with
