@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Nov 28 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -348,6 +348,10 @@ struct
                event
              with
              | Communication.Check_rule r_id ->
+               (*let () =
+                 Printf.fprintf stdout "SRULE: %i\n "
+                   (Ckappa_sig.int_of_rule_id r_id)
+                 in*)
                r_id::check_rules, modified_sites, bonds, others
              | Communication.Modified_sites site ->
                check_rules, site::modified_sites, bonds, others

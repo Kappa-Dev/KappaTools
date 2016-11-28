@@ -1513,82 +1513,9 @@ struct
 
   (*-----------------------------------------------------------*)
 
-  let apply_event_list_aux ~pos static dynamic error event_list  =
-    let parameters = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
-    let wake_up_relation = get_wake_up_relation static in
-    (*-----------------------------------------------------------*)
-    let error, event_list =
-      List.fold_left (fun (error, event_list) event ->
-          match event with
-          | Communication.Dummy
-          | Communication.Check_rule _
-          | Communication.See_a_new_bond _ -> error, event_list
-          | Communication.Modified_sites (agent_type, site_type) ->
-            (*search tuple pair that this pair of site belong to*)
-            let error =
-              if local_trace
-              || Remanent_parameters.get_dump_reachability_analysis_wl
-               parameters
-              then
-                let tab = "\t\t" in
-                let error, agent =
-                  Handler.string_of_agent parameters error kappa_handler
-                    agent_type
-                in
-                let error, site =
-                  Handler.string_of_site_contact_map parameters error
-                    kappa_handler agent_type site_type
-                in
-                let () =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameters)
-                    "%s%sWake-up rules: (site accross bonds/agent:%s/site:%s)"
-                    (Remanent_parameters.get_prefix parameters) tab
-                    agent site
-                in
-                let () =
-                  Loggers.print_newline
-                    (Remanent_parameters.get_logger parameters)
-                in error
-              else error
-            in
-            let error, rule_id_list =
-              Common_static.wake_up
-                parameters error
-                agent_type
-                site_type
-                wake_up_relation
-            in
-            let error, event_list =
-              List.fold_left (fun (error, event_list) rule_id ->
-                  add_rule static error
-                    rule_id event_list
-                ) (error, event_list) rule_id_list
-            in
-            let () =
-              if local_trace
-              || Remanent_parameters.get_dump_reachability_analysis_wl
-                   parameters
-              then
-                Loggers.print_newline
-                  (Remanent_parameters.get_logger parameters)
-            in
-            error, event_list
-        ) (error, []) event_list
-    in
-    error, dynamic, event_list
 
-  (*-----------------------------------------------------------*)
-
-  let apply_event_list static dynamic error event_list  =
-    let error, dynamic, event_list =
-      apply_event_list_aux ~pos:Fst static dynamic error event_list
-    in
-    let error, dynamic, event_list =
-      apply_event_list_aux ~pos:Snd static dynamic error event_list
-    in
-    error, dynamic, event_list
+  let apply_event_list static dynamic error _event_list  =
+    error, dynamic, []
 
   let stabilize _static dynamic error =
     error, dynamic, ()

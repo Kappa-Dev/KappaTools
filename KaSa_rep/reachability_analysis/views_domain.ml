@@ -603,10 +603,8 @@ struct
 
 (*BUG to fix:  When a view is modified then any site in this view must be
   declared as modified *)
-  let updates_list2event_list ?title:(title="") static dynamic error agent_type
-      cv_id event_list =
+  let updates_list2event_list ?title:(_title="") static dynamic error _agent_type _cv_id event_list =
     let parameters = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
     (*a covering classses that contains modified sites*)
     let error, store_covering_classes_modification_update_full =
       get_store_covering_classes_modification_update_full dynamic error
@@ -621,7 +619,7 @@ struct
     in
     (*-----------------------------------------------------------------------*)
     (*REMOVE*)
-    let error, s1 =
+    (*  let error, s1 =
       match
         Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
           parameters
@@ -631,7 +629,7 @@ struct
       with
       | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
       | error, Some s -> error, s
-    in
+        in*)
     (*-----------------------------------------------------------------------*)
     (*TODO:check the new event*)
     let error, modified_sites =
@@ -640,7 +638,7 @@ struct
         store_list_of_site_type_in_covering_classes
         modified_sites
     in
-    let error, _event_list =
+    let error, event_list =
       Communication.fold_sites
         parameters error
         (fun _ error s _ event_list ->
@@ -649,7 +647,7 @@ struct
     in
     (*-----------------------------------------------------------------------*)
     (*print working list information*)
-    let error =
+    (*  let error =
       if local_trace
       || Remanent_parameters.get_dump_reachability_analysis_wl parameters
       then
@@ -710,14 +708,14 @@ struct
           error
         end
       else error
-    in
+        in*)
     (*-------------------------------------------------------------*)
     (*convert into an event list*)
-    error,
-    Ckappa_sig.Rule_map_and_set.Set.fold
+    error, event_list
+(*  Ckappa_sig.Rule_map_and_set.Set.fold
       (fun rule_id event_list ->
          (Communication.Check_rule rule_id) :: event_list)
-      s1 event_list
+      s1 event_list*)
 
   (***************************************************************)
 
@@ -2256,7 +2254,7 @@ struct
   (*------------------------------------------------------------*)
 
   let compute_precondition_enable
-      parameters error kappa_handler rule rule_id precondition
+      _parameters error kappa_handler rule rule_id precondition
       bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
@@ -2752,166 +2750,9 @@ struct
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let apply_event static (error, dynamic, event_list) event =
-    let parameters = get_parameter static in
-    let side_effects = get_side_effects static in
-    let store_update = get_store_update dynamic in
-    let (half_break, remove) = side_effects in
-    match event with
-    | Communication.See_a_new_bond ((agent_type, site_type, _state),
-                                    (_agent_type', _site_type', state')) ->
-      (*--------------------------------------------------------------------*)
-      (* get the pairs (r, state) compatible with the second site:half_break *)
-      let error, pair_list =
-        match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                parameters error (agent_type, site_type) half_break with
-        | error, None -> error, []
-        | error, Some (_, l) -> error, l
-      in
-      (*--------------------------------------------------------------------*)
-      (*get rule_id in remove side effects *)
-      let error, rule_list =
-        match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                parameters error (agent_type, site_type) remove with
-        | error, None -> error, []
-        | error, Some (_, l) -> error, l
-      in
-      (*---------------------------------------------------------------------*)
-      (* store result with half_break action: for each add the rule r in
-         update of (c) for any covering class that documents this second
-         site *)
-      let error, store_update_half_break =
-        Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) rule_id_set (error, store_result) ->
-             let error, new_rule_id_set =
-               List.fold_left (fun (error, store) (rule, state) ->
-                   (*state is compatible with B.x*)
-                   if state = state'
-                   then
-                     (* A rule may be added several time *)
-                     let error, new_update =
-                       Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
-                         parameters error rule store
-                     in
-                     error, new_update
-                   else error, store
-                 ) (error, rule_id_set) pair_list
-             in
-             let error, store_result =
-               Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
-                 parameters error
-                 (agent_type, cv_id)
-                 new_rule_id_set
-                 store_result
-             in
-             error, store_result
-          ) store_update
-          (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
-      in
-      (*---------------------------------------------------------------------*)
-      (*store result with remove action*)
-      let error, store_update_remove =
-        Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) rule_id_set (error, store_result) ->
-             let error, new_rule_id_set =
-               List.fold_left (fun (error, store) rule ->
-                   let error, new_update =
-                     Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
-                       parameters error rule store
-                   in
-                   error, new_update
-                 ) (error, rule_id_set) rule_list
-             in
-             let error, store_result =
-               Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
-                 parameters error
-                 (agent_type, cv_id)
-                 new_rule_id_set
-                 store_result
-             in
-             error, store_result
-          ) store_update
-          (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
-      in
-      (*---------------------------------------------------------------------*)
-      (*fold2*)
-      let error, store_update =
-        Covering_classes_type.AgentCV_map_and_set.Map.fold2
-          parameters
-          error
-          (fun parameters error (agent_type, cv_id) rule_id_set store_result ->
-             let error, store_result =
-               Bdu_dynamic_views.add_link parameters error (agent_type, cv_id)
-                 rule_id_set store_result
-             in
-             error, store_result
-          )
-          (fun parameters error (agent_type, cv_id) rule_id_set store_result ->
-             let error, store_result =
-               Bdu_dynamic_views.add_link parameters error (agent_type, cv_id)
-                 rule_id_set store_result
-             in
-             error, store_result
-          )
-          (fun parameters error (agent_type, cv_id) s1 s2 store_result ->
-             let error', union_set =
-               Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
-             in
-             let error =
-               Exception.check_point
-                 Exception.warn  parameters error error' __POS__ Exit
-             in
-             let error, store_result =
-               Bdu_dynamic_views.add_link parameters error (agent_type, cv_id)
-                 union_set store_result
-             in
-             error, store_result
-          )
-          store_update_half_break
-          store_update_remove
-          store_update
-      in
-      (* update is in local dynamic information *)
-      let dynamic = set_store_update store_update dynamic in
-      (*-------------------------------------------------------------------*)
-      (* when doing so, add any such rules r in the event list with an
-         event of kind Check_rule *)
-      let store_update = get_store_update dynamic in
-      let event_list =
-        Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun _ rule_id_set event_list ->
-             Ckappa_sig.Rule_map_and_set.Set.fold
-               (fun rule_id event_list ->
-                  (Communication.Check_rule rule_id) :: event_list
-               ) rule_id_set event_list
-          ) store_update event_list
-      in
-      error, dynamic, event_list
-    | Communication.Dummy | Communication.Check_rule _
-    | Communication.Modified_sites _ (*TODO?*) ->
-      (* You cannot leave this kind of TODO in the code *)
-      (* The analysis is unsound until this is done *)
-      (* When a site is modified, you have to
-         add all the rules that test or modify a views containing this site *)
-      (* site -> views, views -> rules *)
-      (* The corresponding function from site to rules should be computed
-         statically, once for all, in the initialization phase *)
-      error, dynamic, event_list
+  let apply_event_list static dynamic error _event_list =
+    error, dynamic, []
 
-  (**************************************************************************)
-
-  let apply_event_list static dynamic error event_list =
-    let error, dynamic, event_list =
-      List.fold_left (fun (error, dynamic, event_list) event ->
-          let error, dynamic, event_list =
-            apply_event static
-              (error, dynamic, event_list)
-              event
-          in
-          error, dynamic, event_list
-        ) (error, dynamic, []) event_list
-    in
-    error, dynamic, event_list
 
   (**************************************************************************)
   (*main print of fixpoint*)

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Nov 28 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1150,74 +1150,8 @@ struct
 
   (*-----------------------------------------------------------*)
 
-  let apply_event_list static dynamic error event_list =
-    let parameters = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
-    (*let store_sites_to_tuple = get_sites_to_tuple static in*)
-    let wake_up_relation = get_wake_up_relation static in
-      (*get a list tuple pair that the pair of modified sites belong to*)
-    let error, event_list =
-        List.fold_left (fun (error, event_list) event ->
-            match event with
-            | Communication.Dummy
-            | Communication.Check_rule _
-            | Communication.See_a_new_bond _ -> error, event_list
-            | Communication.Modified_sites (agent_type, site_type) ->
-              let error =
-                if local_trace
-                || Remanent_parameters.get_dump_reachability_analysis_wl
-                 parameters
-                then
-                  let tab = "\t\t" in
-                  let error, agent =
-                    Handler.string_of_agent parameters error kappa_handler
-                      agent_type
-                  in
-                  let error, site =
-                    Handler.string_of_site_contact_map parameters error
-                      kappa_handler agent_type site_type
-                  in
-                  let () =
-                    Loggers.fprintf
-                      (Remanent_parameters.get_logger parameters)
-                      "%s%sWake-up rules: (double bonds/agent:%s/site:%s)"
-                      (Remanent_parameters.get_prefix parameters) tab
-                      agent site
-                  in
-                  let () =
-                    Loggers.print_newline
-                      (Remanent_parameters.get_logger parameters)
-                  in error
-                else error
-              in
-              (*-----------------------------------------------------------*)
-              let error, rule_id_list =
-                Common_static.wake_up
-                  parameters error
-                  agent_type
-                  site_type
-                  wake_up_relation
-              in
-              (*-----------------------------------------------------------*)
-              let error, event_list =
-              List.fold_left (fun (error, event_list) rule_id ->
-                  add_rule static error
-                    rule_id event_list
-                ) (error, event_list) rule_id_list
-              in
-              (*-----------------------------------------------------------*)
-              let () =
-                if local_trace
-                || Remanent_parameters.get_dump_reachability_analysis_wl
-                     parameters
-                then
-                  Loggers.print_newline
-                    (Remanent_parameters.get_logger parameters)
-              in
-              error, event_list
-          ) (error, []) event_list
-      in
-      error, dynamic, event_list
+  let apply_event_list static dynamic error _event_list =
+    error, dynamic, []
 
   (****************************************************************)
 

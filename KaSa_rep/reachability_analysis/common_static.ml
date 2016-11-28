@@ -1330,7 +1330,7 @@ let consolidate_site_rule_dependencies parameter error site_to_rules =
     (fun parameter error key set output ->
       let list = Ckappa_sig.Rule_map_and_set.Set.elements set in
       Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
-        parameter error key list output
+        parameter error key (List.rev list) output
     )
     site_to_rules
     output
