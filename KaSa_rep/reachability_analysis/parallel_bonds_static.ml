@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Oct 13 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -81,7 +81,7 @@ let translate_bond parameters error site_add agent_id site_type_source views =
   let error, pair =
     let agent_index_target = site_add.Cckappa_sig.agent_index in
     let site_type_target = site_add.Cckappa_sig.site in
-    let error, agent_source =
+    let error', agent_source =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameters error agent_id views
@@ -90,7 +90,12 @@ let translate_bond parameters error site_add agent_id site_type_source views =
         Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
-    let error, agent_target =
+    let error =
+      Exception.check_point
+        Exception.warn parameters error error'
+        __POS__ Exit
+    in
+    let error'', agent_target =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameters error agent_index_target views
@@ -99,19 +104,34 @@ let translate_bond parameters error site_add agent_id site_type_source views =
         Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
-    let error, (agent_type1, state1) =
+    let error =
+      Exception.check_point
+        Exception.warn parameters error error''
+        __POS__ Exit
+    in
+    let error''', (agent_type1, state1) =
       Common_static.collect_agent_type_state
         parameters
         error
         agent_source
         site_type_source
     in
-    let error, (agent_type2, state2) =
+    let error =
+      Exception.check_point
+        Exception.warn parameters error error'''
+        __POS__ Exit
+    in
+    let error'''', (agent_type2, state2) =
       Common_static.collect_agent_type_state
         parameters
         error
         agent_target
         site_type_target
+    in
+    let error =
+      Exception.check_point
+        Exception.warn parameters error error''''
+        __POS__ Exit
     in
     let pair = ((agent_type1, site_type_source, state1),
                 (agent_type2, site_type_target, state2))
@@ -138,7 +158,7 @@ let collect_double_bonds_in_pattern
         Ckappa_sig.Site_map_and_set.Map.fold
           (fun site_type_source site_add
             (error, store_result) ->
-            let error,
+            let error',
                 ((agent_type_source, site_type_source, state_source),
                  (agent_type_target, site_type_target, state_target)) =
               translate_bond
@@ -147,6 +167,11 @@ let collect_double_bonds_in_pattern
                 agent_id_source
                 site_type_source
                 pattern.Cckappa_sig.views
+            in
+            let error =
+              Exception.check_point
+                Exception.warn parameters error error'
+                __POS__ Exit
             in
             Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source' site_add'
@@ -163,7 +188,7 @@ let collect_double_bonds_in_pattern
                     (* if the ids of the targets is the same, we have a parallel bond, other with it is a non parallel bond *)
                     agent_id_target = agent_id_target'
                   in
-                  let error,
+                  let error',
                       ((_,_,state_source'),
                        (_, site_type_target', state_target')) =
                     translate_bond
@@ -172,6 +197,11 @@ let collect_double_bonds_in_pattern
                       agent_id_source
                       site_type_source'
                       pattern.Cckappa_sig.views
+                  in
+                  let error =
+                    Exception.check_point
+                      Exception.warn parameters error error'
+                      __POS__ Exit
                   in
                   (* the two target sites  should also have different types *)
                   if site_type_target <> site_type_target'
@@ -283,7 +313,7 @@ let collect_site_create_parallel_bonds_gen pos parameters error
                | error, None -> error, []
                | error, Some l -> error, l
              in
-             let error, new_list =
+             let error', new_list =
                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold_inv
                  (fun ((agent_type1, site_type1, site_type2, state1, state2),
                        (agent_type1', site_type1', site_type2', state1', state2'))
@@ -304,6 +334,11 @@ let collect_site_create_parallel_bonds_gen pos parameters error
                    else
                      error, current_list
                  ) store_parallel_bonds (error, old_list)
+             in
+             let error =
+               Exception.check_point
+                 Exception.warn parameters error error'
+                 __POS__ Exit
              in
              let error, store_result =
                Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.add_or_overwrite
@@ -390,11 +425,16 @@ let compare_first_pair parameters error x tuple_set store_result =
        if agent_type_x = agent_type && site_type_x = site_type
        || agent_type_x = agent_type1  && site_type_x = site_type1
        then
-         let error, new_set =
+         let error', new_set =
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
              parameters error
              (u, v)
              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
+         in
+         let error =
+           Exception.check_point
+             Exception.warn parameters error error'
+             __POS__ Exit
          in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
@@ -416,11 +456,16 @@ let compare_snd_pair parameters error y tuple_pair store_result =
        if agent_type_y = agent_type && site_type_y = site_type'
        || agent_type_y = agent_type1 && site_type_y = site_type1'
        then
-         let error, new_set =
+         let error', new_set =
            Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
              parameters error
              (u, v)
              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.empty
+         in
+         let error =
+           Exception.check_point
+             Exception.warn parameters error error'
+             __POS__ Exit
          in
          let error, store_result =
            Parallel_bonds_type.AgentSite_map_and_set.Map.add_or_overwrite
@@ -439,11 +484,16 @@ let collect_sites_to_tuple parameters error map_of_sites store_result =
   Parallel_bonds_type.PairAgentSite_map_and_set.Map.fold
     (fun (x, y, _z, _t) tuple_set (error, store_result) ->
        (*---------------------------------------------------------------*)
-       let error, store_result1 =
+       let error', store_result1 =
          compare_first_pair parameters error
            x
            tuple_set
            Parallel_bonds_type.AgentSite_map_and_set.Map.empty
+       in
+       let error =
+         Exception.check_point
+           Exception.warn parameters error error'
+           __POS__ Exit
        in
        (*---------------------------------------------------------------*)
        let error, store_result2 =
