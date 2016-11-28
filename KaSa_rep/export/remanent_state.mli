@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 27 2016>
+  * Last modification: Time-stamp: <Nov 28 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -121,8 +121,9 @@ type ('static, 'dynamic) state
 val to_json: ('static, 'dynamic) state -> Yojson.Basic.json
 
 val of_json: Yojson.Basic.json ->
-   contact_map AccuracyMap.t *
-   influence_map AccuracyMap.t *
+  Exception_without_parameter.method_handler * 
+  contact_map AccuracyMap.t *
+  influence_map AccuracyMap.t *
   Ckappa_sig.c_rule_id list option *
   constraints_list option
 

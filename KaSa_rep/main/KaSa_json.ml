@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 27 2016>
+ * Last modification: Time-stamp: <Nov 28 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -30,9 +30,11 @@ let main () =
   let state,im = Export_to_json.get_influence_map state in
   let _ = Remanent_state.influence_map_of_json im in
   let state,dr = Export_to_json.get_dead_rules state in
-  let _ = Remanent_state.dead_rules_of_json dr in 
+  let _ = Remanent_state.dead_rules_of_json dr in
   let state,constraints = Export_to_json.get_constraints_list state in
   let _ = Remanent_state.lemmas_list_of_json constraints in
+  let errors = Export_to_json.get_errors state in
+  let _ = Exception_without_parameter.of_json errors in  
   let json = Export_to_json.to_json state in
   let () = Printf.fprintf stdout "%s\n" (Yojson.Basic.to_string json) in
   let _ = Export_to_json.of_json json in

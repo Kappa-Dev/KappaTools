@@ -54,3 +54,16 @@ val to_map:
   (Yojson.Basic.json -> 'key) ->
   (Yojson.Basic.json -> 'value) ->
   Yojson.Basic.json -> 'map
+
+
+val of_unix_label:
+  UnixLabels.error -> Yojson.Basic.json
+
+val to_unix_label:
+  Yojson.Basic.json -> UnixLabels.error
+
+val of_unix_error:
+    Unix.error -> Yojson.Basic.json
+
+val to_unix_error:
+    Yojson.Basic.json -> Unix.error

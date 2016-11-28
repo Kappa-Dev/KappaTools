@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 27 2016>
+  * Last modification: Time-stamp: <Nov 28 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -131,6 +131,7 @@ let refinement = "site graph list"
 let domain_name = "domain name"
 let refinements_list = "refinements list"
 let dead_rules = "dead rules"
+let errors = "errors"
 
 (*****************)
 (* Influence map *)
@@ -696,6 +697,11 @@ let get_map empty add of_json label json =
 let get_contact_map_map state = state.contact_map
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
+
+
+let add_errors state l =
+  (errors, Exception_without_parameter.to_json state.errors)::l
+
 let add_contact_map_to_json state l
      =
   add_map get_contact_map_map
@@ -729,6 +735,7 @@ let add_refinements_lemmas_to_json state l =
 
 let to_json state =
   let l = [] in
+  let l = add_errors state l in
   let l = add_refinements_lemmas_to_json state l in
   let l = add_dead_rules_to_json state l in
   let l = add_influence_map_to_json state l in
@@ -737,8 +744,16 @@ let to_json state =
 
 let of_json =
   function
-  | `Assoc l ->
-   let contact_maps =
+  | `Assoc l as json->
+    let errors =
+      try
+        Exception_without_parameter.of_json (List.assoc errors l)
+      with
+      | Not_found ->
+        raise (Yojson.Basic.Util.Type_error
+                 (JsonUtil.build_msg "no error handler",json))
+    in
+    let contact_maps =
       try
         get_map AccuracyMap.empty AccuracyMap.add
           contact_map_of_json
@@ -746,29 +761,29 @@ let of_json =
           (List.assoc contactmaps l)
       with
       | Not_found -> AccuracyMap.empty
-   in
-   let influence_maps =
-     try
-       get_map AccuracyMap.empty AccuracyMap.add
-         influence_map_of_json
-         influencemap
-         (List.assoc influencemaps l)
-     with
+    in
+    let influence_maps =
+      try
+        get_map AccuracyMap.empty AccuracyMap.add
+          influence_map_of_json
+          influencemap
+          (List.assoc influencemaps l)
+      with
       | Not_found -> AccuracyMap.empty
-   in
-   let dead_rules =
-     try
-       Some (dead_rules_of_json (List.assoc dead_rules l))
-     with
-     | Not_found -> None
-   in
-   let constraints =
-     try
-       Some (lemmas_list_of_json (List.assoc refinement_lemmas l))
-     with
-     | Not_found -> None
-   in
-   contact_maps, influence_maps, dead_rules, constraints
+    in
+    let dead_rules =
+      try
+        Some (dead_rules_of_json (List.assoc dead_rules l))
+      with
+      | Not_found -> None
+    in
+    let constraints =
+      try
+        Some (lemmas_list_of_json (List.assoc refinement_lemmas l))
+      with
+      | Not_found -> None
+    in
+    errors, contact_maps, influence_maps, dead_rules, constraints
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "remanent state",x))
 

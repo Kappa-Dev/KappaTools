@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/03/2010
- * Last modification: Time-stamp: <Jul 02 2016>
+ * Last modification: Time-stamp: <Nov 27 2016>
     * *
     * This library declares exceptions
     *
@@ -34,4 +34,6 @@ val stringlist_of_caught_light: caught_exception -> string list -> string list
 val empty_error_handler: method_handler
 val get_caught_exception_list: method_handler -> caught_exception list
 val get_uncaught_exception_list: method_handler -> uncaught_exception list
-(*val handle_errors: method_handler -> unit -> unit -> unit -> unit * method_handler*)
+
+val to_json: method_handler -> Yojson.Basic.json
+val of_json: Yojson.Basic.json -> method_handler 
