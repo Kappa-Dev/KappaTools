@@ -536,7 +536,7 @@ let perturbation
            let graph' =
              if cc_preenv == cc_preenv' then t.graph
              else
-               let domain' = Pattern.PreEnv.finalize cc_preenv' in
+               let domain',_ = Pattern.PreEnv.finalize cc_preenv' in
                let () =
                  t.env <- Environment.new_domain domain' t.env in
                List.fold_left

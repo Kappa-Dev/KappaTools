@@ -12,6 +12,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
+	 0 (sub)observables 0 navigation steps
 	 -initial conditions
 + Building initial state
 Done

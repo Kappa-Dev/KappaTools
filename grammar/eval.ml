@@ -577,7 +577,11 @@ let compile ~outputs ~pause ~return
 
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
-  let domain = Pattern.PreEnv.finalize preenv in
+  let domain,dom_stats = Pattern.PreEnv.finalize preenv in
+  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
+                     " (sub)observables "^
+                     string_of_int dom_stats.Pattern.PreEnv.nav_steps^
+                     " navigation steps"));
 
   let env =
     Environment.init domain tk_nd alg_nd alg_deps'

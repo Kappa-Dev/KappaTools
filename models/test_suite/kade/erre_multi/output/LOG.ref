@@ -9,6 +9,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
+	 11 (sub)observables 10 navigation steps
 	 -initial conditions
 + generate the network... 
 	 -initial states 

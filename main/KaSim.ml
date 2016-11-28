@@ -217,7 +217,7 @@ let () =
                   if cc_preenv == cc_preenv' then env
                   else
                     Environment.new_domain
-                      (Pattern.PreEnv.finalize cc_preenv')
+                      (fst @@ Pattern.PreEnv.finalize cc_preenv')
                       env in
                 env',
                 if try Alg_expr.stops_of_bool_expr
@@ -254,7 +254,7 @@ let () =
                 let env',graph' =
                   if cc_preenv == cc_preenv' then (env,graph)
                   else
-                    let fenv = Pattern.PreEnv.finalize cc_preenv' in
+                    let fenv,_ = Pattern.PreEnv.finalize cc_preenv' in
                     (Environment.new_domain fenv env,
                      List.fold_left
                        (Rule_interpreter.incorporate_extra_pattern fenv)

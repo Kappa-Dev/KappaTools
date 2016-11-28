@@ -1034,6 +1034,8 @@ type work = {
 module PreEnv : sig
   type t
 
+  type stat = { nodes: int; nav_steps: int }
+
   val empty : Signature.s -> t
   val fresh :
     Signature.s -> int list array -> int -> prepoint list Mods.IntMap.t -> t
@@ -1046,7 +1048,7 @@ module PreEnv : sig
 
   val sigs : t -> Signature.s
 
-  val finalize : t -> Env.t
+  val finalize : t -> Env.t * stat
   val of_env : Env.t -> t
 end = struct
   type t = {
@@ -1056,6 +1058,8 @@ end = struct
     domain: prepoint list Mods.IntMap.t;
     mutable used_by_a_begin_new: bool;
   }
+
+  type stat = { nodes: int; nav_steps: int }
 
   let fresh sigs id_by_type nb_id domain =
     {
@@ -1136,13 +1140,15 @@ end = struct
     let point = domain.(p_id) in
     let rec insert_nav_sons = function
       | [] ->
-        point.Env.sons <-
-          {Env.dst; Env.inj = inj_dst2nav; Env.next = nav} :: point.Env.sons
+        let () =
+          point.Env.sons <-
+            {Env.dst; Env.inj = inj_dst2nav; Env.next = nav} :: point.Env.sons
+        in List.length nav
       | h :: t ->
         match Navigation.is_subnavigation
                 (identity_injection point.Env.content) nav h.Env.next with
         | None -> insert_nav_sons t
-        | Some (_,[]) -> assert (h.Env.dst = dst)
+        | Some (_,[]) -> let () = assert (h.Env.dst = dst) in 0
         | Some (inj_nav'2p,nav') ->
           let pre_inj_nav'2q =
             Renaming.compose false inj_nav'2p (Renaming.inverse h.Env.inj) in
@@ -1221,20 +1227,20 @@ end = struct
              { Env.content = x.element; Env.sons = [];
                Env.deps = x.depending; Env.roots = x.roots; })
         singles in
-    let () =
-      Mods.IntMap.iter
-        (fun level l ->
-           if level > 1 then
-             List.iter (fun x ->
+    let nav_steps =
+      Mods.IntMap.fold
+        (fun level l acc ->
+           if level <= 1 then acc else
+             List.fold_left (fun acc x ->
                  let () =  domain.(x.p_id) <-
                      { Env.content = x.element; Env.sons = [];
                        Env.roots = x.roots; Env.deps = x.depending;} in
-                 List.iter (fun e ->
+                 List.fold_left (fun acc e ->
                      match matchings e.element x.element with
-                     | [] -> ()
+                     | [] -> acc
                      | injs ->
-                       List.iter
-                         (fun inj_e_x ->
+                       List.fold_left
+                         (fun acc inj_e_x ->
                             let (inj_e2sup,_),sup =
                               merge_compatible env.id_by_type env.nb_id
                                 inj_e_x e.element x.element in
@@ -1248,10 +1254,11 @@ end = struct
                               let nav = build_navigation_between
                                   inj e.element x.element in
                               insert_navigation domain x.p_id inj e.p_id nav
+                              + acc
                          )
-                           injs
-                   ) singles) l)
-        complete_domain in
+                           acc injs
+                   ) acc singles) acc l)
+        complete_domain 0 in
     let level0 = Mods.IntMap.find_default [] 0 complete_domain in
     let single_agent_points =
       Array.make (Array.length env.id_by_type) None in
@@ -1273,7 +1280,7 @@ end = struct
       Env.domain;
       Env.elementaries;
       Env.single_agent_points;
-    }
+    },{ nodes = si; nav_steps }
 
   let of_env env =
     let add_cc acc p =

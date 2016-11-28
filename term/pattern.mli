@@ -37,11 +37,13 @@ end
 module PreEnv : sig
   type t
 
+  type stat = { nodes: int; nav_steps: int }
+
   val sigs : t -> Signature.s
 
   val get : t -> id -> cc (** Awfully inefficient *)
 
-  val finalize : t -> Env.t
+  val finalize : t -> Env.t * stat
   val of_env : Env.t -> t
 end
 
