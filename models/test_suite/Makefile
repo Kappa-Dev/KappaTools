@@ -62,10 +62,10 @@ all: error
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
-	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff -and -not -name \*profiling.txt \
-		-and -not -name \*profiling.html -and -not -name \*compression_status.txt -and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
-	find "$(CURDIR)" -name \*.ref -exec file \{\} \; | grep text | cut -d: -f1 | xargs sed -i"" -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d'
-	@+$(MAKE) clean
+	find "$(CURDIR)" \( -name profiling.txt -or -name profiling.html -or -name compression_status.txt \) -delete
+	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff -and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
+	find "$(CURDIR)" -name \*.ref -exec file \{\} \; | grep text | cut -d: -f1 | xargs sed -i.rewritten -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d'
+	find "$(CURDIR)" -name \*.rewritten -delete
 
 .PHONY: clean clean_all
 
