@@ -531,6 +531,7 @@ let lemmas_list_to_json constraints =
       poly_constraints_list_to_json
         (JsonUtil.of_list agent_to_json) constraints
     ]
+
 let lemmas_list_of_json =
 function
 | `Assoc l as x ->

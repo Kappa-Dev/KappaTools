@@ -1098,6 +1098,11 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,z!,t!)
 
+	Applying rule 1: r1:
+		the precondition is satisfied
+
+		Updating the views for B(x~,z!,t!)
+
 	Applying rule 5: r5:
 		the precondition is satisfied
 
@@ -1115,10 +1120,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,z!,t!)
 
-	Applying rule 1: r1:
+	Applying rule 0: r0:
 		the precondition is satisfied
 
-		Updating the views for B(x~,z!,t!)
+		Updating the views for A(x~,z!,t!)
 
 	Applying rule 3: r3:
 		the precondition is satisfied
@@ -1126,11 +1131,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 		Updating the views for B(x~,z!,t!)
-
-	Applying rule 0: r0:
-		the precondition is satisfied
-
-		Updating the views for A(x~,z!,t!)
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------

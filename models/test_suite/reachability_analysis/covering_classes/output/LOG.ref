@@ -1804,6 +1804,9 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y~,y!)
 
+	Applying rule 1: r1:
+		the precondition is satisfied
+
 	Applying rule 8: r8:
 		the precondition is satisfied
 

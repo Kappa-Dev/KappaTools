@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 24 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -692,16 +692,17 @@ struct
 
   let add_initial_state static dynamic error species =
     let parameters = get_parameter static in
-    (*views in the initial state that has two agents and their sites are different*)
+    (*views in the initial state that has two agents and their sites are
+      different*)
     let error, store_views_init =
       Site_accross_bonds_domain_static.collect_views_init
         parameters error species in
-    let error, store_sites_init =
+    (*let error, store_sites_init =
       Site_accross_bonds_domain_static.collect_sites_init
         parameters error store_views_init in
     let error, store_pair_sites_init =
       Site_accross_bonds_domain_static.collect_pair_sites_init
-        parameters error store_sites_init in
+        parameters error store_sites_init in*)
     (*a set of site that can be bounds*)
     let error, store_bonds_init =
       Site_accross_bonds_domain_static.collect_bonds_init
@@ -713,8 +714,22 @@ struct
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let handler = get_mvbdu_handler dynamic in
-    let tuple_of_interest = get_potential_tuple_pair static in
+    (*let tuple_of_interest = get_potential_tuple_pair static in*)
+    (*CHECK ME*)
+    let error, tuple_init =
+      Site_accross_bonds_domain_static.collect_tuple_pair_init
+        parameters error store_bonds_init
+        store_views_init
+    in
     let error, handler, store_result =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair_init
+        parameters
+        error bdu_false handler kappa_handler
+        tuple_init
+        (*tuple_of_interest*)
+        store_result
+    in
+    (*let error, handler, store_result =
       Site_accross_bonds_domain_static.collect_pair_tuple_init
         parameters
         error
@@ -725,7 +740,7 @@ struct
         store_pair_sites_init
         tuple_of_interest
         store_result
-    in
+    in*)
     let dynamic = set_mvbdu_handler handler dynamic in
     let dynamic = set_value store_result dynamic in
     let event_list = [] in

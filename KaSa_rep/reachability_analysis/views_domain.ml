@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 26 2016>
+   * Last modification: Time-stamp: <Nov 28 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -255,29 +255,6 @@ struct
     in
     error, result_static.Bdu_static_views.store_modif_list_restriction_map
 
-(*TODO*)
-  let get_wake_up_modif_list_restriction_map static error =
-    let error, result_static =
-      get_bdu_analysis_static static error
-    in
-    error,
-    result_static.Bdu_static_views.store_wake_up_modif_list_restriction_map
-
-  let get_wake_up_proj_bdu_potential_restriction static error =
-    let error, result_static =
-      get_bdu_analysis_static static error
-    in
-    error,
-    result_static.Bdu_static_views.store_wake_up_proj_bdu_potential_restriction_map
-
-  let get_wake_up_bdu_test_restriction static error =
-    let error, result_static =
-      get_bdu_analysis_static static error
-    in
-    error,
-    result_static.Bdu_static_views.store_wake_up_bdu_test_restriction
-
-
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -434,190 +411,88 @@ struct
    tuples, and apply the function Common_static.add_dependency_site_rule to
    update the wake_up relation *)
 
-  let add_wake_up_common parameters error list wake_up =
-    List.fold_left (fun (error, wake_up)
-                     (agent_type, site_type, rule_id) ->
-                     Common_static.add_dependency_site_rule
-                       parameters
-                       error
-                       agent_type
-                       site_type
-                       rule_id
-                       wake_up
-      ) (error, wake_up) list
+  let  add_wake_up_common parameters error rule_id
+      (agent_type, cv_id)
+      store_list_of_site_type_in_covering_classes wake_up =
+    let error, list_of_site_type =
+      match
+        Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+          parameters error
+          (agent_type, cv_id)
+          store_list_of_site_type_in_covering_classes
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let error, wake_up =
+      List.fold_left (fun (error, wake_up) site_type ->
+          Common_static.add_dependency_site_rule
+            parameters
+            error
+            agent_type
+            site_type
+            rule_id
+            wake_up
+        ) (error, wake_up) list_of_site_type
+    in
+    error, wake_up
 
   let complete_wake_up_relation static error wake_up =
     let parameters = get_parameter static in
-    let error, store_wake_up_modif_list_restriction_map =
-      get_wake_up_modif_list_restriction_map static error
+    let store_list_of_site_type_in_covering_classes =
+      get_list_of_site_type_in_covering_classes static
     in
-    let error, wake_up =
-      add_wake_up_common parameters error
-        store_wake_up_modif_list_restriction_map
-        wake_up
-    in
-    let error, store_wake_up_proj_bdu_potential_restriction_map =
-      get_wake_up_proj_bdu_potential_restriction static error in
-    let error, wake_up =
-      add_wake_up_common
-        parameters error
-        store_wake_up_proj_bdu_potential_restriction_map
-        wake_up
-    in
-    let error, store_wake_up_bdu_test_restriction =
-      get_wake_up_bdu_test_restriction static error in
-    let error, wake_up =
-      add_wake_up_common
-        parameters error
-        store_wake_up_bdu_test_restriction
-        wake_up
-    in
-    error, wake_up
-    (*test and modify in a views*)
-    (*CHECK ME*)
-    (* This is not what I asked, you should fold over modules about tuples of interest (ie covering classes) that is to say (in bdu_static_views) )
-
-       store_modif_list_restriction_map:
-       Ckappa_sig.Views_bdu.hconsed_association_list
-        Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
-
-       store_proj_bdu_potential_restriction_map :
-       (Ckappa_sig.Views_bdu.mvbdu *
-       Ckappa_sig.Views_bdu.hconsed_association_list)
-        Covering_classes_type.AgentSiteCV_setmap.Map.t
-        Ckappa_sig.Rule_setmap.Map.t;
-       store_proj_bdu_test_restriction :
-       Ckappa_sig.Views_bdu.mvbdu
-        Covering_classes_type.AgentsCV_setmap.Map.t
-        Ckappa_sig.Rule_setmap.Map.t;*)
-    (*let error, store_modif_list_restriction_map =
+    let error, store_modif_list_restriction_map =
       get_store_modif_list_restriction_map static error
     in
     let error, wake_up =
       Covering_classes_type.AgentsRuleCV_map_and_set.Map.fold
-        (fun (_, agent_type, rule_id, _cv_id) list_a (error, wake_up) ->
-           let error, handler, list =
-             Ckappa_sig.Views_bdu.extensional_of_association_list
-               parameters
-               handler
-               error
-               list_a
-           in
+        (fun (_, agent_type, rule_id, cv_id) _ (error, wake_up) ->
            let error, wake_up =
-             List.fold_left (fun (error, wake_up) (site_type, _state) ->
-                 let error, wake_up =
-                   Common_static.add_dependency_site_rule
-                     parameters
-                     error
-                     agent_type
-                     site_type
-                     rule_id
-                     wake_up
-                 in
-                 error, wake_up
-               ) (error, wake_up) list
+             add_wake_up_common parameters error rule_id
+               (agent_type, cv_id)
+               store_list_of_site_type_in_covering_classes wake_up
            in
            error, wake_up
         ) store_modif_list_restriction_map (error, wake_up)
-      in*)
-    (*-------------------------------------------------------------------*)
-    (*let error, store_proj_bdu_potential_restriction_map =
+    in
+    let error, store_proj_bdu_potential_restriction_map =
       get_store_proj_bdu_potential_restriction static error
-    in*)
-    (* I really don't understand what you do here *)
-    (* You want to collect the relation between the rules and the sites
-       that are containted in a covering class that contain a site that may
-       be tested or modified by these rules *)
-    (* For this, you have to iterate over the content of the covering class *)
-    (* and this is the only information that you ignore *)
-    (*let error, wake_up =
+    in
+    let error, wake_up =
       Ckappa_sig.Rule_setmap.Map.fold
         (fun rule_id map (error, wake_up) ->
            Covering_classes_type.AgentSiteCV_setmap.Map.fold
-             (fun (agent_type, _, _) (mvbdu, list_a) (error, wake_up) ->
-                (*iterate over the content of the covering class*)
-                let error, handler, list =
-                  Ckappa_sig.Views_bdu.extensional_of_association_list
-                    parameters
-                    handler
-                    error
-                    list_a
-                in
+             (fun (agent_type, _, cv_id) _ (error, wake_up) ->
                 let error, wake_up =
-                  List.fold_left (fun (error, wake_up) (site_type, _state) ->
-                      let error, wake_up =
-                        Common_static.add_dependency_site_rule
-                          parameters
-                          error
-                          agent_type
-                          site_type
-                          rule_id
-                          wake_up
-                      in
-                      error, wake_up
-                    ) (error, wake_up) list
+                  add_wake_up_common parameters error rule_id
+                    (agent_type, cv_id)
+                    store_list_of_site_type_in_covering_classes wake_up
                 in
                 error, wake_up
              ) map (error, wake_up)
         ) store_proj_bdu_potential_restriction_map (error, wake_up)
-    in*)
-    (*-------------------------------------------------------------------*)
-    (*let error, store_proj_bdu_test_restriction =
+    in
+    let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static error
     in
     let error, wake_up =
       Ckappa_sig.Rule_setmap.Map.fold
         (fun rule_id map (error, wake_up) ->
            Covering_classes_type.AgentsCV_setmap.Map.fold
-             (fun (_, agent_type, _) mvbdu (error, wake_up) ->
-                let error, handler, list =
-                  Ckappa_sig.Views_bdu.extensional_of_mvbdu
-                    parameters
-                    handler
-                    error
-                    mvbdu
-                in
-                let dynamic = set_mvbdu_handler handler dynamic in
+             (fun (_, agent_type, cv_id) _ (error, wake_up) ->
                 let error, wake_up =
-                  List.fold_left (fun (error, wake_up) l ->
-                      List.fold_left (fun (error, wake_up) (site_type, _) ->
-                          let error, wake_up =
-                            Common_static.add_dependency_site_rule
-                              parameters
-                              error
-                              agent_type
-                              site_type
-                              rule_id
-                              wake_up
-                          in
-                          error, wake_up
-                        ) (error, wake_up) l
-                    ) (error, wake_up) list
+                  add_wake_up_common parameters error rule_id
+                    (agent_type, cv_id)
+                    store_list_of_site_type_in_covering_classes wake_up
                 in
                 error, wake_up
              ) map (error, wake_up)
         ) store_proj_bdu_test_restriction (error, wake_up)
-    in*)
-    (*-------------------------------------------------------------------*)
-
-  (** get type bdu_analysis_static*)
-  (*let get_bdu_analysis_static static _dynamic error =
-    let result = static.domain_static_information in
-    error, result
-
-  (**get type bdu_analysis_dynamic*)
-  let get_bdu_analysis_dynamic _static dynamic error =
-    let result = get_domain_dynamic_information dynamic in
-    error, result
-
-  let get_store_remanent_triple static dynamic error =
-    let error, result_static =
-      get_bdu_analysis_static static dynamic error
     in
-    let store_remanent_triple =
-      result_static.Bdu_static_views.store_remanent_triple
-    in
-    error, store_remanent_triple*)
+    error, wake_up
+
+
 
   (**************************************************************************)
   (**get type bdu_analysis_dynamic*)
