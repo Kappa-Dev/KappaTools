@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Nov 29 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -250,14 +250,41 @@ let set_project_modified_map sites static =
 
 let compute_initial_state error static =
   let parameters = get_parameter static in
+  let kappa_handler  = get_kappa_handler static in
   let compil = get_cc_code static in
   let error, init =
-    (Int_storage.Nearly_inf_Imperatif.fold
+    Int_storage.Nearly_inf_Imperatif.fold
        parameters
        error
        (fun _parameters error _ i l -> error, i :: l)
        compil.Cckappa_sig.init
-       [])
+       []
+  in
+  let error, init =
+    Int_storage.Nearly_inf_Imperatif.fold
+       parameters
+       error
+       (fun parameters error _ perturbation l ->
+          let error, list =
+            Ckappa_sig.introduceable_species_in_pertubation
+              parameters
+              error
+              (fun p e a (alg,pos) (mixture,pos')->
+                 let mixture' = mixture.Cckappa_sig.c_mixture in
+                 let e,alg' =
+                   Prepreprocess.alg_map
+                     (fun e m -> e,m.Cckappa_sig.c_mixture) e alg in
+                 Preprocess.translate_pert
+                   p e kappa_handler a
+                   (alg',pos)
+                   (mixture',pos') )
+                perturbation
+          in
+          error, List.fold_left
+            (fun l elt -> elt::l)
+            l list)
+       compil.Cckappa_sig.perturbations
+       init
   in
   error, List.rev init
 
@@ -276,8 +303,8 @@ let scan_rule static error =
   let static = set_bdu_common_static store_result static in
   error, static
 
-let initialize_global_information parameters log_info error mvbdu_handler
-    compilation kappa_handler =
+let initialize_global_information
+    parameters log_info error mvbdu_handler compilation kappa_handler =
   let init_common = Common_static.init_bdu_common_static in
   let error, wake_up  = Common_static.empty_site_to_rules parameters error in
   let init_global_static =

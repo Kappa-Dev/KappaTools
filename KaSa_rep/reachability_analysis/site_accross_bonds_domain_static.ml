@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Nov 28 2016>
+   * Last modification: Time-stamp: <Nov 29 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -248,9 +248,9 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_views_lhs
   in
-  let error'' =
+  let error =
     Exception.check_point
-      Exception.warn parameters error error'
+      Exception.warn parameters error error''
       __POS__ Exit
   in
   let error, pair_set =

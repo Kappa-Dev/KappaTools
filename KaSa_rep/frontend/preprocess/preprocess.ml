@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Nov 14 2016>
+   * Last modification: Time-stamp: <Nov 29 2016>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -1710,27 +1710,42 @@ let lift_allowing_question_marks parameters handler =
      let a,b,c = translate_mixture parameters error handler x in
      clean_question_marks parameters a c b)
 
-let translate_init parameters error handler (a,(alg,_),init_t) =
-  let error,c_alg =
-    Prepreprocess.alg_map
-      (lift_allowing_question_marks parameters handler) error alg in
-  match
-    init_t
-  with Ast.INIT_MIX mixture,_pos' ->
-    let error,c_mixture,_ = translate_mixture parameters error handler mixture in
+
+let translate_pert_init error a (alg,_) (c_alg,_) mixture c_mixture  pos' =
     error,
     {Cckappa_sig.e_init_factor = alg ;
      Cckappa_sig.e_init_c_factor = c_alg ;
      Cckappa_sig.e_init_mixture = mixture ;
      Cckappa_sig.e_init_c_mixture = c_mixture ;
      Cckappa_sig.e_init_string_pos = a}
-     | Ast.INIT_TOK _,_ -> (*TO DO*)
+
+let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
+
+
+let translate_pert parameters error handler a alg (mixture,pos') =
+  (*  let mixture = c_mixture.Cckappa_sig.c_mixture in*)
+  let error,c_mixture,_ = translate_mixture parameters error handler mixture in
+  let error, c_alg = alg_with_pos_map (lift_allowing_question_marks parameters handler) error alg in
+  translate_pert_init error a alg c_alg mixture c_mixture pos'
+
+
+let translate_init parameters error handler (a,(alg,pos_alg),init_t) =
+  let error,c_alg =
+    Prepreprocess.alg_map
+      (lift_allowing_question_marks parameters handler) error alg in
+  match
+    init_t
+    with
+    | Ast.INIT_MIX mixture,pos' ->
+    let error,c_mixture,_ = translate_mixture parameters error handler mixture in
+    translate_pert_init error a
+      (alg,pos_alg) (c_alg,pos_alg) mixture c_mixture pos'
+    | Ast.INIT_TOK _,_ -> (*TO DO*)
        let error,dft = Cckappa_sig.dummy_init parameters error in
        Exception.warn
          parameters error __POS__
          ~message:"token are not supported yet" Exit dft
 
-let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 let translate_var parameters error handler (a,b) =
   let error,b' = alg_with_pos_map (lift_allowing_question_marks parameters handler) error b in
