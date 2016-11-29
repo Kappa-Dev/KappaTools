@@ -904,6 +904,90 @@ Id=73
 
 
 ------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=74
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=75
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=56
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=74
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=39
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=75
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=56
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(t~u) v A(t~p) ]
+A() => [ A(z) v A(z!B.z) ]
+B() => [ B(z) v B(z!A.z) ]
+B() => [ B(t~u) v B(t~p) ]
+B() => [ B(z~u?) v B(z~p?) ]
+
+------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
@@ -992,9 +1076,16 @@ Id=81
 
 EXTENSIONAL DESCRIPTION:
 B(z!A.z) => B(z~p!A.z)
-
 ------------------------------------------------------------
-* Non relational properties:
+* Properties in connected agents
+------------------------------------------------------------
+A(z!1),B(z!1) => 
+	[
+		  A(t~p,z!1),B(t~p,z!1)
+		v A(t~u,z!1),B(t~u,z!1)
+	]
+------------------------------------------------------------
+* Properties of pairs of bonds
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 Id=74
@@ -1071,22 +1162,6 @@ Id=75
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t~u) v A(t~p) ]
-A() => [ A(z) v A(z!B.z) ]
-B() => [ B(z) v B(z!A.z) ]
-B() => [ B(t~u) v B(t~p) ]
-B() => [ B(z~u?) v B(z~p?) ]
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-A(z!1),B(z!1) => 
-	[
-		  A(t~p,z!1),B(t~p,z!1)
-		v A(t~u,z!1),B(t~u,z!1)
-	]
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 Id=74
  Node(site_type:1<0)
@@ -1172,86 +1247,6 @@ Id=81
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=74
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=75
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=56
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=74
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=75
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=56
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-B(z!A.z)=> [B(z~p!A.z)]
-
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
@@ -1270,6 +1265,11 @@ A()=> [
 A()=> [
 		  A(t~u)
 		v A(t~p)]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+B(z!A.z)=> [B(z~p!A.z)]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

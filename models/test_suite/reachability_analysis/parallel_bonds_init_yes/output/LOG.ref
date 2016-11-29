@@ -679,70 +679,6 @@ Id=24
 
 
 ------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=25
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=25
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=27
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=26
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-
-------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
@@ -809,6 +745,70 @@ A() => [ A(t) v A(t!B.t) ]
 A() => [ A(z) v A(z!B.z) ]
 B() => [ B(t) v B(t!A.t) ]
 B() => [ B(z) v B(z!A.z) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=25
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=27
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=26
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=25
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=27
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=26
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -948,10 +948,6 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
@@ -966,6 +962,10 @@ A()=> [
 A()=> [
 		  A(t)
 		v A(t!B.t)]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

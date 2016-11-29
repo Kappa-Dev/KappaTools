@@ -253,25 +253,6 @@ Id=3
 
 
 ------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-
-------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
@@ -290,6 +271,25 @@ Id=5
 
 EXTENSIONAL DESCRIPTION:
 D() => [ D(x~u) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -327,13 +327,13 @@ Id=5
 
 EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 D()=> [D(x~u)]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

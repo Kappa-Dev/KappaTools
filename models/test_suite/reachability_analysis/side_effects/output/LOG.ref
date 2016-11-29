@@ -1532,6 +1532,170 @@ Id=29
 
 
 ------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:1<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=49
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=48
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=49
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=48
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=49
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=48
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=49
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=48
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=50
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=49
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
+A() => [ A(x~u?) v A(x~p?) ]
+B() => [ B(x) v B(x!A.x) ]
+B() => [ B(x~u?) v B(x~p?) ]
+C() => [ C(x) v C(x!A.x) ]
+C() => [ C(x~u?) v C(x~p?) ]
+D() => [ D(x) v D(x!E.x) ]
+D() => [ D(x~u?) v D(x~p?) ]
+E() => [ E(x) v E(x!D.x) ]
+E() => [ E(x~u?) v E(x~p?) ]
+
+------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
@@ -1728,9 +1892,11 @@ B(x!A.x) => B(x~p!A.x)
 C(x~p?) <=> C(x!A.x)
 D(x!E.x) => D(x~p!E.x)
 E(x!D.x) => E(x~p!D.x)
-
 ------------------------------------------------------------
-* Non relational properties:
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 Id=54
@@ -1882,22 +2048,6 @@ Id=50
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
-A() => [ A(x~u?) v A(x~p?) ]
-B() => [ B(x) v B(x!A.x) ]
-B() => [ B(x~u?) v B(x~p?) ]
-C() => [ C(x) v C(x!A.x) ]
-C() => [ C(x~u?) v C(x~p?) ]
-D() => [ D(x) v D(x!E.x) ]
-D() => [ D(x~u?) v D(x~p?) ]
-E() => [ E(x) v E(x!D.x) ]
-E() => [ E(x~u?) v E(x~p?) ]
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
 Id=54
  Node(site_type:1<0)
@@ -2088,164 +2238,6 @@ Id=58
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=54
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=53
-   Node(site_type:1<3)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=48
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=48
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=48
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=48
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=50
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=49
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-D(x!E.x)=> [D(x~p!E.x)]
-B(x!A.x)=> [B(x~p!A.x)]
-C(x~p?)=> [C(x!A.x)]
-E(x!D.x)=> [E(x~p!D.x)]
-
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
@@ -2280,6 +2272,14 @@ A()=> [
 		  A(x)
 		v A(x!B.x)
 		v A(x!C.x)]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+D(x!E.x)=> [D(x~p!E.x)]
+B(x!A.x)=> [B(x~p!A.x)]
+C(x~p?)=> [C(x!A.x)]
+E(x!D.x)=> [E(x~p!D.x)]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

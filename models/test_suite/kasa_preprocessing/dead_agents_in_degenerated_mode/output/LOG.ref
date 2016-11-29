@@ -561,40 +561,6 @@ Id=6
 
 
 ------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=8
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=7
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=8
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=7
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-
-------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
@@ -629,6 +595,40 @@ Id=8
 EXTENSIONAL DESCRIPTION:
 A() => [ A(x~u) v A(x~p) ]
 B() => [ B(x~u) v B(x~p) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=8
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=7
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=8
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=7
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -696,10 +696,6 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
-* Export Views domain - relational properties to JSon (internal constraints_list):
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
@@ -708,6 +704,10 @@ B()=> [
 A()=> [
 		  A(x~u)
 		v A(x~p)]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
