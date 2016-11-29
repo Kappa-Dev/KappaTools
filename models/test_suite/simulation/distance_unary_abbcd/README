@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -e 200 -seed 718860825 -o data.svg -d output -pp 0.012 abbcd.ka || exit 0
+"${KAPPABIN}"KaSim -u event -l 200 -seed 718860825 -o data.svg -d output -pp 2 abbcd.ka || exit 0

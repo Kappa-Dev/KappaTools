@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'link_passing_strong4.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'link_passing_strong4.ka' '-seed' '924556145' '-u' 'e' '-l' '10000' '-d' 'output' '--time-independent'
 Parsing link_passing_strong4.ka...
 done
 + Sanity checks

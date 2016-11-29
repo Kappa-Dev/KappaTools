@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-t' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka'
++ Command line to rerun is: 'KaSim' '-l' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka'
 Parsing del_pert.ka...
 done
 + Sanity checks

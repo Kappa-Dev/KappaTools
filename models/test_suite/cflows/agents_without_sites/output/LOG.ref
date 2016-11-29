@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'agents_without_sites.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-pp' '0.02' '--time-independent'
++ Command line to rerun is: 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-pp' '100' '--time-independent'
 Parsing agents_without_sites.ka...
 done
 + Sanity checks

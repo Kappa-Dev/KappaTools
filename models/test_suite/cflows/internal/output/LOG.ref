@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'internal.ka' '-seed' '240056667' '-e' '30000' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'internal.ka' '-seed' '240056667' '-u' 'event' '-l' '30000' '-d' 'output' '--time-independent'
 Parsing internal.ka...
 done
 + Sanity checks

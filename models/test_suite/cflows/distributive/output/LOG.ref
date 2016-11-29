@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'distributive.ka' '-seed' '240056667' '-e' '1000' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'distributive.ka' '-seed' '240056667' '-u' 'event' '-l' '1000' '-d' 'output' '--time-independent'
 Parsing distributive.ka...
 done
 + Sanity checks

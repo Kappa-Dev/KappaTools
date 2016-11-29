@@ -1,9 +1,12 @@
-let get_compilation ?max_event cli_args =
-  let plot_period =
-    match cli_args.Run_cli_args.maxTimeValue,
+type directive_unit = Time | Event
+
+let get_compilation ?(unit=Time) cli_args =
+  let pre_plot_period =
+    match cli_args.Run_cli_args.maxValue,
           cli_args.Run_cli_args.nb_points with
-    | Some max_t, Some points when cli_args.Run_cli_args.plotPeriod = 1. ->
-      (max_t -. cli_args.Run_cli_args.minTimeValue) /. float_of_int points
+    | Some max_l, Some points when
+        points > 0 && cli_args.Run_cli_args.plotPeriod = 1. ->
+      (max_l -. cli_args.Run_cli_args.minValue) /. float_of_int points
     | _, _ ->
       let () =
         if cli_args.Run_cli_args.nb_points <> None then
@@ -11,12 +14,18 @@ let get_compilation ?max_event cli_args =
             (fun f ->
                Format.pp_print_string f "-p has been ignored") in
       cli_args.Run_cli_args.plotPeriod in
+  let init_t,max_time,init_e,max_event,plot_period =
+    match unit with
+    | Time ->
+      Some cli_args.Run_cli_args.minValue, cli_args.Run_cli_args.maxValue,
+      None,None,Counter.DT pre_plot_period
+    | Event ->
+      None,None,
+      Some (int_of_float cli_args.Run_cli_args.minValue),
+      Tools.option_map int_of_float cli_args.Run_cli_args.maxValue,
+      Counter.DE (int_of_float pre_plot_period) in
   let counter =
-    Counter.create
-      ~init_t:cli_args.Run_cli_args.minTimeValue
-      ~init_e:0
-      ?max_time:cli_args.Run_cli_args.maxTimeValue
-      ?max_event ~plot_period in
+    Counter.create ?init_t ?init_e ?max_time ?max_event ~plot_period in
   let (env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflows, cflowFile, init_l),
       counter,alg_overwrite =

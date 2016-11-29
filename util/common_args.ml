@@ -10,7 +10,7 @@ let options t : (string * Arg.spec * string) list = [
     ("--version",
      Arg.Unit (fun () -> Format.print_string Version.version_msg;
 			 Format.print_newline () ; exit 0),
-     "display KaSim version");
+     "display version number");
     ("--debug", Arg.Unit (fun () -> t.debug <- true),
      "Enable debug mode") ;
     ("--backtrace", Arg.Unit (fun () -> t.backtrace <- true),

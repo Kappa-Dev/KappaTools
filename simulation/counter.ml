@@ -129,7 +129,7 @@ struct
     Format.pp_print_newline form ()
 end
 
-
+type period = DE of int | DT of float
 type t = {
     mutable time:float ;
     mutable events:int ;
@@ -139,7 +139,7 @@ type t = {
     init_time : float ;
     init_event : int ;
     mutable progress_report : Progress_report.t option ;
-    mutable plot_period : float ;
+    mutable plot_period : period;
     mutable max_time : float option ;
     mutable max_event : int option ;
   }
@@ -182,12 +182,15 @@ let one_time_correction_event c ti =
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
 let max_events c = c.max_event
-let plot_period c = c.plot_period
+let plot_period c = match c.plot_period with DT dt -> dt | DE de -> float de
 
 let time_ratio t =
   match t.max_time with
   | None -> 0.
-  | Some tmax -> (t.time -. t.init_time) /. (tmax -. t.init_time)
+  | Some tmax ->
+    if tmax > t.init_time then
+      (t.time -. t.init_time) /. (tmax -. t.init_time)
+    else 0.
 
   let event_ratio t =
     match t.max_event with
@@ -267,21 +270,35 @@ let complete_progress_bar f c =
   | Some pr -> Progress_report.complete_progress_bar c.time c.events f pr
 
 let next_point counter =
-    int_of_float
-      ((min (Tools.unsome infinity (max_time counter)) (current_time counter)
-       -. counter.init_time) /. counter.plot_period)
+  match counter.plot_period with
+  | DT dT ->
+    if dT <= 0. then 0 else
+      int_of_float
+        ((min (Tools.unsome infinity (max_time counter)) (current_time counter)
+          -. counter.init_time) /. dT)
+  | DE dE ->
+    if dE <= 0 then 0 else
+      (current_event counter - counter.init_event) / dE
 
 let to_plot_points counter =
   let next = next_point counter in
   let last = counter.last_point in
   let () = counter.last_point <- next in
   let n = next - last in
-  snd
-    (Tools.recti
-       (fun (time,acc) _ ->
-          time -. counter.plot_period,
-          if check_output_time counter time then time::acc else acc)
-       ((float_of_int next) *. counter.plot_period,[]) n),counter
+  match counter.plot_period with
+  | DT dT ->
+    snd
+      (Tools.recti
+         (fun (time,acc) _ ->
+            time -. dT,
+            if check_output_time counter time then time::acc else acc)
+         ((float_of_int next) *. dT,[]) n),counter
+  | DE _ ->
+    if n>1 then
+      invalid_arg
+        ("Counter.to_plot_points: invalid increment "^string_of_int n)
+    else
+      (if n <> 0 then [counter.time] else []),counter
 
 let fill ~outputs counter observables_values =
   let points, _counter =

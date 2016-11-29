@@ -164,7 +164,7 @@ let create_t
   let counter =
     Counter.create
       ~init_t:(0. : float) ~init_e:(0 : int)
-      ?max_time:None ?max_event:None ~plot_period:1. in
+      ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   {
@@ -409,7 +409,7 @@ let start
              let () =
                Counter.set_plot_period
                  t.counter
-                 parameter.Api_types_j.simulation_plot_period
+                 (Counter.DT parameter.Api_types_j.simulation_plot_period)
              in
              let random_state =
                match parameter.Api_types_j.simulation_seed with

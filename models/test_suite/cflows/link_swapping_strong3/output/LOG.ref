@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'link_swapping_strong3.ka' '-seed' '924556145' '-e' '30' '-d' 'output' '--debug' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'link_swapping_strong3.ka' '-seed' '924556145' '-u' 'event' '-l' '30' '-d' 'output' '--debug' '--time-independent'
 Parsing link_swapping_strong3.ka...
 done
 + Sanity checks

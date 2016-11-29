@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'empty.ka' '-e' '18' '-t' '10' '-d' 'output' '-seed' '126704914' '-pp' '0.2' '--time-independent'
++ Command line to rerun is: 'KaSim' 'empty.ka' '-l' '6' '-d' 'output' '-seed' '126704914' '-pp' '0.2' '--time-independent'
 Parsing empty.ka...
 done
 + Sanity checks
@@ -17,7 +17,7 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: nothing has changed 
+	- removing events occurring after the last observable: -1 events 
 + Producing causal compressions
 	- splitting initial events: nothing has changed 
 	 - blackboard generation

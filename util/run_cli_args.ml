@@ -1,7 +1,7 @@
 type t = {
   mutable alg_var_overwrite   : (string * Nbr.t) list;
-  mutable minTimeValue        : float;
-  mutable maxTimeValue        : float option;
+  mutable minValue        : float;
+  mutable maxValue        : float option;
   mutable plotPeriod          : float;
   mutable nb_points           : int option;
   mutable rescale             : float option;
@@ -15,8 +15,8 @@ type t = {
 
 let default : t = {
   alg_var_overwrite = [];
-  minTimeValue = 0. ;
-  maxTimeValue = None;
+  minValue = 0. ;
+  maxValue = None;
   nb_points = None;
   plotPeriod = 1.;
   rescale = None;
@@ -33,15 +33,12 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.String (fun fic ->
        t.inputKappaFileNames <- fic::t.inputKappaFileNames),
    "name of a kappa file to use as input (can be used multiple times for multiple input files)");
-  ("-t-init",
-   Arg.Float (fun time -> t.minTimeValue <- time),
+  ("-initial",
+   Arg.Float (fun time -> t.minValue <- time),
    "Min time of simulation (arbitrary time unit)");
-  ("-t",
-   Arg.Float(fun time -> t.maxTimeValue <- Some time),
-   "Max time of simulation (arbitrary time unit)");
-  ("-pp",
-   Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
-   "plot period: time interval between points in plot (default: 1.0)");
+  ("-l",
+   Arg.Float(fun time -> t.maxValue <- Some time),
+   "Limit of the simulation");
   ("-pp",
    Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
    "plot period: time interval between points in plot (default: 1.0)");

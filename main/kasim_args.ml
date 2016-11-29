@@ -1,6 +1,6 @@
 type t = {
-  mutable seedValue           : int option;
-  mutable maxEventValue       : int option;
+  mutable seedValue : int option;
+  mutable unit : Cli_init.directive_unit;
 
   mutable marshalizeOutFile : string option;
   mutable domainOutputFile : string option;
@@ -11,7 +11,7 @@ type t = {
 
 let default : t = {
   seedValue  = None;
-  maxEventValue = None;
+  unit = Cli_init.Time;
 
   marshalizeOutFile = None;
   domainOutputFile = None;
@@ -21,14 +21,14 @@ let default : t = {
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
-  ("-e",
-   Arg.Int
-     (fun i ->
-        if i < 0 then
-          t.maxEventValue <- None
-        else
-          t.maxEventValue <- Some i),
-   "Number of total simulation events, including null events (negative value for unbounded simulation)");
+  ("-u",
+   Arg.String
+     (function
+       | "time" | "Time" | "t" -> t.unit <- Cli_init.Time
+       | "event" | "events" | "e" | "Event" | "Events" -> t.unit <-
+           Cli_init.Event
+       | s -> raise (Arg.Bad ("Unrecognized unit: "^s))),
+   "unit (time/event) in which limit and plot period are specified");
   ("-make-sim",
    Arg.String
      (fun marshalizeOutFile -> t.marshalizeOutFile <- Some marshalizeOutFile),
@@ -37,7 +37,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.String
      (fun domainOutputFile -> t.domainOutputFile <- Some domainOutputFile),
    "file name for dumping the domain of observables") ;
-  ("-dump-trace",
+  ("-trace",
    Arg.String
      (fun traceFile -> t.traceFile <- Some traceFile),
    "file name for dumping the simulation trace") ;

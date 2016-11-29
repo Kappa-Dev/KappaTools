@@ -108,7 +108,7 @@ let () =
     let (env0, contact_map, updated_vars, story_compression,
          unary_distances, formatCflows, cflowFile, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
-        ?max_event:kasim_args.Kasim_args.maxEventValue cli_args in
+        ~unit:kasim_args.Kasim_args.unit cli_args in
     let () =
       if cli_args.Run_cli_args.batchmode &&
        Counter.max_time counter = None && Counter.max_events counter = None then
@@ -172,10 +172,12 @@ let () =
         let () = match plotPack with
           | None -> ()
           | Some _ ->
-            Outputs.go (Environment.signatures env)
-              (Data.Plot
-                 (Counter.current_time counter,
-                  State_interpreter.observables_values env counter graph state)) in
+            (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
+              Outputs.go (Environment.signatures env)
+                (Data.Plot
+                   (Counter.current_time counter,
+                    State_interpreter.observables_values
+                      env counter graph state)) in
 
     let () =
       match unary_distances with

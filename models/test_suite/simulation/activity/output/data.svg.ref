@@ -4,7 +4,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
-<title>Output of 'KaSim' '-e' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-pp' '0.04' 'activity.ka'</title>
+<title>Output of 'KaSim' '-u' 'event' '-l' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-pp' '20' 'activity.ka'</title>
 <descr></descr>
 
 <style type="text/css" >
@@ -29,23 +29,23 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <path d="M 70,10 L 70,575"/>
   <text x="62.000000" y="575.000000">0</text>
   <line x1="65.000000" y1="575.000000" x2="75.000000" y2="575.000000"/>
-  <text x="62.000000" y="512.222222">76.6</text>
+  <text x="62.000000" y="512.222222">77.9</text>
   <line x1="65.000000" y1="512.222222" x2="75.000000" y2="512.222222"/>
-  <text x="62.000000" y="449.444444">153</text>
+  <text x="62.000000" y="449.444444">156</text>
   <line x1="65.000000" y1="449.444444" x2="75.000000" y2="449.444444"/>
-  <text x="62.000000" y="386.666667">230</text>
+  <text x="62.000000" y="386.666667">234</text>
   <line x1="65.000000" y1="386.666667" x2="75.000000" y2="386.666667"/>
-  <text x="62.000000" y="323.888889">306</text>
+  <text x="62.000000" y="323.888889">312</text>
   <line x1="65.000000" y1="323.888889" x2="75.000000" y2="323.888889"/>
-  <text x="62.000000" y="261.111111">383</text>
+  <text x="62.000000" y="261.111111">389</text>
   <line x1="65.000000" y1="261.111111" x2="75.000000" y2="261.111111"/>
-  <text x="62.000000" y="198.333333">459</text>
+  <text x="62.000000" y="198.333333">467</text>
   <line x1="65.000000" y1="198.333333" x2="75.000000" y2="198.333333"/>
-  <text x="62.000000" y="135.555556">536</text>
+  <text x="62.000000" y="135.555556">545</text>
   <line x1="65.000000" y1="135.555556" x2="75.000000" y2="135.555556"/>
-  <text x="62.000000" y="72.777778">612</text>
+  <text x="62.000000" y="72.777778">623</text>
   <line x1="65.000000" y1="72.777778" x2="75.000000" y2="72.777778"/>
-  <text x="62.000000" y="10.000000">689</text>
+  <text x="62.000000" y="10.000000">701</text>
   <line x1="65.000000" y1="10.000000" x2="75.000000" y2="10.000000"/>
   </g>
 <g id="axis_t">
@@ -53,27 +53,27 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <path d="M 70,575 L 790,575"/>
   <text x="70.000000" y="583.000000">0</text>
   <line x1="70.000000" y1="570.000000" x2="70.000000" y2="580.000000"/>
-  <text x="135.454545" y="583.000000">0.36</text>
+  <text x="135.454545" y="583.000000">0.362</text>
   <line x1="135.454545" y1="570.000000" x2="135.454545" y2="580.000000"/>
-  <text x="200.909091" y="583.000000">0.72</text>
+  <text x="200.909091" y="583.000000">0.724</text>
   <line x1="200.909091" y1="570.000000" x2="200.909091" y2="580.000000"/>
-  <text x="266.363636" y="583.000000">1.08</text>
+  <text x="266.363636" y="583.000000">1.09</text>
   <line x1="266.363636" y1="570.000000" x2="266.363636" y2="580.000000"/>
-  <text x="331.818182" y="583.000000">1.44</text>
+  <text x="331.818182" y="583.000000">1.45</text>
   <line x1="331.818182" y1="570.000000" x2="331.818182" y2="580.000000"/>
-  <text x="397.272727" y="583.000000">1.8</text>
+  <text x="397.272727" y="583.000000">1.81</text>
   <line x1="397.272727" y1="570.000000" x2="397.272727" y2="580.000000"/>
-  <text x="462.727273" y="583.000000">2.16</text>
+  <text x="462.727273" y="583.000000">2.17</text>
   <line x1="462.727273" y1="570.000000" x2="462.727273" y2="580.000000"/>
-  <text x="528.181818" y="583.000000">2.52</text>
+  <text x="528.181818" y="583.000000">2.53</text>
   <line x1="528.181818" y1="570.000000" x2="528.181818" y2="580.000000"/>
-  <text x="593.636364" y="583.000000">2.88</text>
+  <text x="593.636364" y="583.000000">2.89</text>
   <line x1="593.636364" y1="570.000000" x2="593.636364" y2="580.000000"/>
-  <text x="659.090909" y="583.000000">3.24</text>
+  <text x="659.090909" y="583.000000">3.26</text>
   <line x1="659.090909" y1="570.000000" x2="659.090909" y2="580.000000"/>
-  <text x="724.545455" y="583.000000">3.6</text>
+  <text x="724.545455" y="583.000000">3.62</text>
   <line x1="724.545455" y1="570.000000" x2="724.545455" y2="580.000000"/>
-  <text x="790.000000" y="583.000000">3.96</text>
+  <text x="790.000000" y="583.000000">3.98</text>
   <line x1="790.000000" y1="570.000000" x2="790.000000" y2="580.000000"/>
   </g>
 </g>
@@ -88,406 +88,210 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 <g id="data">
 <g id="data_0" style="color:blue">
   <use xlink:href="#plus" x="790.000000" y="10.000000">
-  <title>'t' t=3.96 v=689</title></use>
-  <use xlink:href="#plus" x="782.727273" y="28.860668">
-  <title>'t' t=3.92 v=666</title></use>
-  <use xlink:href="#plus" x="775.454545" y="48.541364">
-  <title>'t' t=3.88 v=642</title></use>
-  <use xlink:href="#plus" x="768.181818" y="75.602322">
-  <title>'t' t=3.84 v=609</title></use>
-  <use xlink:href="#plus" x="760.909091" y="96.923077">
-  <title>'t' t=3.8 v=583</title></use>
-  <use xlink:href="#plus" x="753.636364" y="117.423803">
-  <title>'t' t=3.76 v=558</title></use>
-  <use xlink:href="#plus" x="746.363636" y="137.104499">
-  <title>'t' t=3.72 v=534</title></use>
-  <use xlink:href="#plus" x="739.090909" y="155.145138">
-  <title>'t' t=3.68 v=512</title></use>
-  <use xlink:href="#plus" x="731.818182" y="178.105951">
-  <title>'t' t=3.64 v=484</title></use>
-  <use xlink:href="#plus" x="724.545455" y="192.866473">
-  <title>'t' t=3.6 v=466</title></use>
-  <use xlink:href="#plus" x="717.272727" y="208.447025">
-  <title>'t' t=3.56 v=447</title></use>
-  <use xlink:href="#plus" x="710.000000" y="223.207547">
-  <title>'t' t=3.52 v=429</title></use>
-  <use xlink:href="#plus" x="702.727273" y="237.968070">
-  <title>'t' t=3.48 v=411</title></use>
-  <use xlink:href="#plus" x="695.454545" y="248.628447">
-  <title>'t' t=3.44 v=398</title></use>
-  <use xlink:href="#plus" x="688.181818" y="258.468795">
-  <title>'t' t=3.4 v=386</title></use>
-  <use xlink:href="#plus" x="680.909091" y="271.589260">
-  <title>'t' t=3.36 v=370</title></use>
-  <use xlink:href="#plus" x="673.636364" y="284.709724">
-  <title>'t' t=3.32 v=354</title></use>
-  <use xlink:href="#plus" x="666.363636" y="299.470247">
-  <title>'t' t=3.28 v=336</title></use>
-  <use xlink:href="#plus" x="659.090909" y="310.130624">
-  <title>'t' t=3.24 v=323</title></use>
-  <use xlink:href="#plus" x="651.818182" y="318.330914">
-  <title>'t' t=3.2 v=313</title></use>
-  <use xlink:href="#plus" x="644.545455" y="327.351234">
-  <title>'t' t=3.16 v=302</title></use>
-  <use xlink:href="#plus" x="637.272727" y="337.191582">
-  <title>'t' t=3.12 v=290</title></use>
-  <use xlink:href="#plus" x="630.000000" y="346.211901">
-  <title>'t' t=3.08 v=279</title></use>
-  <use xlink:href="#plus" x="622.727273" y="356.052250">
-  <title>'t' t=3.04 v=267</title></use>
-  <use xlink:href="#plus" x="615.454545" y="368.352685">
-  <title>'t' t=3 v=252</title></use>
-  <use xlink:href="#plus" x="608.181818" y="376.552975">
-  <title>'t' t=2.96 v=242</title></use>
-  <use xlink:href="#plus" x="600.909091" y="384.753266">
-  <title>'t' t=2.92 v=232</title></use>
-  <use xlink:href="#plus" x="593.636364" y="392.133527">
-  <title>'t' t=2.88 v=223</title></use>
-  <use xlink:href="#plus" x="586.363636" y="398.693759">
-  <title>'t' t=2.84 v=215</title></use>
-  <use xlink:href="#plus" x="579.090909" y="406.894049">
-  <title>'t' t=2.8 v=205</title></use>
-  <use xlink:href="#plus" x="571.818182" y="416.734398">
-  <title>'t' t=2.76 v=193</title></use>
-  <use xlink:href="#plus" x="564.545455" y="424.114659">
-  <title>'t' t=2.72 v=184</title></use>
-  <use xlink:href="#plus" x="557.272727" y="430.674891">
-  <title>'t' t=2.68 v=176</title></use>
-  <use xlink:href="#plus" x="550.000000" y="435.595065">
-  <title>'t' t=2.64 v=170</title></use>
-  <use xlink:href="#plus" x="542.727273" y="438.875181">
-  <title>'t' t=2.6 v=166</title></use>
-  <use xlink:href="#plus" x="535.454545" y="446.255443">
-  <title>'t' t=2.56 v=157</title></use>
-  <use xlink:href="#plus" x="528.181818" y="451.995646">
-  <title>'t' t=2.52 v=150</title></use>
-  <use xlink:href="#plus" x="520.909091" y="455.275762">
-  <title>'t' t=2.48 v=146</title></use>
-  <use xlink:href="#plus" x="513.636364" y="457.735849">
-  <title>'t' t=2.44 v=143</title></use>
-  <use xlink:href="#plus" x="506.363636" y="461.015965">
-  <title>'t' t=2.4 v=139</title></use>
-  <use xlink:href="#plus" x="499.090909" y="465.936139">
-  <title>'t' t=2.36 v=133</title></use>
-  <use xlink:href="#plus" x="491.818182" y="469.216255">
-  <title>'t' t=2.32 v=129</title></use>
-  <use xlink:href="#plus" x="484.545455" y="474.956459">
-  <title>'t' t=2.28 v=122</title></use>
-  <use xlink:href="#plus" x="477.272727" y="484.796807">
-  <title>'t' t=2.24 v=110</title></use>
-  <use xlink:href="#plus" x="470.000000" y="489.716981">
-  <title>'t' t=2.2 v=104</title></use>
-  <use xlink:href="#plus" x="462.727273" y="491.357039">
-  <title>'t' t=2.16 v=102</title></use>
-  <use xlink:href="#plus" x="455.454545" y="495.457184">
-  <title>'t' t=2.12 v=97</title></use>
-  <use xlink:href="#plus" x="448.181818" y="500.377358">
-  <title>'t' t=2.08 v=91</title></use>
-  <use xlink:href="#plus" x="440.909091" y="506.117562">
-  <title>'t' t=2.04 v=84</title></use>
-  <use xlink:href="#plus" x="433.636364" y="506.937591">
-  <title>'t' t=2 v=83</title></use>
-  <use xlink:href="#plus" x="426.363636" y="511.037736">
-  <title>'t' t=1.96 v=78</title></use>
-  <use xlink:href="#plus" x="419.090909" y="515.137881">
-  <title>'t' t=1.92 v=73</title></use>
-  <use xlink:href="#plus" x="411.818182" y="518.417997">
-  <title>'t' t=1.88 v=69</title></use>
-  <use xlink:href="#plus" x="404.545455" y="523.338171">
-  <title>'t' t=1.84 v=63</title></use>
-  <use xlink:href="#plus" x="397.272727" y="523.338171">
-  <title>'t' t=1.8 v=63</title></use>
-  <use xlink:href="#plus" x="390.000000" y="524.978229">
-  <title>'t' t=1.76 v=61</title></use>
-  <use xlink:href="#plus" x="382.727273" y="526.618287">
-  <title>'t' t=1.72 v=59</title></use>
-  <use xlink:href="#plus" x="375.454545" y="528.258345">
-  <title>'t' t=1.68 v=57</title></use>
-  <use xlink:href="#plus" x="368.181818" y="531.538462">
-  <title>'t' t=1.64 v=53</title></use>
-  <use xlink:href="#plus" x="360.909091" y="531.538462">
-  <title>'t' t=1.6 v=53</title></use>
-  <use xlink:href="#plus" x="353.636364" y="533.178520">
-  <title>'t' t=1.56 v=51</title></use>
-  <use xlink:href="#plus" x="346.363636" y="534.818578">
-  <title>'t' t=1.52 v=49</title></use>
-  <use xlink:href="#plus" x="339.090909" y="534.818578">
-  <title>'t' t=1.48 v=49</title></use>
-  <use xlink:href="#plus" x="331.818182" y="535.638607">
-  <title>'t' t=1.44 v=48</title></use>
-  <use xlink:href="#plus" x="324.545455" y="536.458636">
-  <title>'t' t=1.4 v=47</title></use>
-  <use xlink:href="#plus" x="317.272727" y="538.918723">
-  <title>'t' t=1.36 v=44</title></use>
-  <use xlink:href="#plus" x="310.000000" y="538.918723">
-  <title>'t' t=1.32 v=44</title></use>
-  <use xlink:href="#plus" x="302.727273" y="540.558781">
-  <title>'t' t=1.28 v=42</title></use>
-  <use xlink:href="#plus" x="295.454545" y="541.378810">
-  <title>'t' t=1.24 v=41</title></use>
-  <use xlink:href="#plus" x="288.181818" y="544.658926">
-  <title>'t' t=1.2 v=37</title></use>
-  <use xlink:href="#plus" x="280.909091" y="547.119013">
-  <title>'t' t=1.16 v=34</title></use>
-  <use xlink:href="#plus" x="273.636364" y="547.939042">
-  <title>'t' t=1.12 v=33</title></use>
-  <use xlink:href="#plus" x="266.363636" y="547.939042">
-  <title>'t' t=1.08 v=33</title></use>
-  <use xlink:href="#plus" x="259.090909" y="549.579100">
-  <title>'t' t=1.04 v=31</title></use>
-  <use xlink:href="#plus" x="251.818182" y="552.859216">
-  <title>'t' t=1 v=27</title></use>
-  <use xlink:href="#plus" x="244.545455" y="552.859216">
-  <title>'t' t=0.96 v=27</title></use>
-  <use xlink:href="#plus" x="237.272727" y="554.499274">
-  <title>'t' t=0.92 v=25</title></use>
-  <use xlink:href="#plus" x="230.000000" y="556.139332">
-  <title>'t' t=0.88 v=23</title></use>
-  <use xlink:href="#plus" x="222.727273" y="556.139332">
-  <title>'t' t=0.84 v=23</title></use>
-  <use xlink:href="#plus" x="215.454545" y="556.959361">
-  <title>'t' t=0.8 v=22</title></use>
-  <use xlink:href="#plus" x="208.181818" y="556.959361">
-  <title>'t' t=0.76 v=22</title></use>
-  <use xlink:href="#plus" x="200.909091" y="557.779390">
-  <title>'t' t=0.72 v=21</title></use>
-  <use xlink:href="#plus" x="193.636364" y="557.779390">
-  <title>'t' t=0.68 v=21</title></use>
-  <use xlink:href="#plus" x="186.363636" y="557.779390">
-  <title>'t' t=0.64 v=21</title></use>
-  <use xlink:href="#plus" x="179.090909" y="558.599419">
-  <title>'t' t=0.6 v=20</title></use>
-  <use xlink:href="#plus" x="171.818182" y="558.599419">
-  <title>'t' t=0.56 v=20</title></use>
-  <use xlink:href="#plus" x="164.545455" y="561.059507">
-  <title>'t' t=0.52 v=17</title></use>
-  <use xlink:href="#plus" x="157.272727" y="561.059507">
-  <title>'t' t=0.48 v=17</title></use>
-  <use xlink:href="#plus" x="150.000000" y="561.059507">
-  <title>'t' t=0.44 v=17</title></use>
-  <use xlink:href="#plus" x="142.727273" y="562.699565">
-  <title>'t' t=0.4 v=15</title></use>
-  <use xlink:href="#plus" x="135.454545" y="562.699565">
-  <title>'t' t=0.36 v=15</title></use>
-  <use xlink:href="#plus" x="128.181818" y="562.699565">
-  <title>'t' t=0.32 v=15</title></use>
-  <use xlink:href="#plus" x="120.909091" y="562.699565">
-  <title>'t' t=0.28 v=15</title></use>
-  <use xlink:href="#plus" x="113.636364" y="564.339623">
-  <title>'t' t=0.24 v=13</title></use>
-  <use xlink:href="#plus" x="106.363636" y="564.339623">
-  <title>'t' t=0.2 v=13</title></use>
-  <use xlink:href="#plus" x="99.090909" y="565.159652">
-  <title>'t' t=0.16 v=12</title></use>
-  <use xlink:href="#plus" x="91.818182" y="565.159652">
-  <title>'t' t=0.12 v=12</title></use>
-  <use xlink:href="#plus" x="84.545455" y="565.159652">
-  <title>'t' t=0.08 v=12</title></use>
-  <use xlink:href="#plus" x="77.272727" y="565.159652">
-  <title>'t' t=0.04 v=12</title></use>
-  <use xlink:href="#plus" x="70.000000" y="566.799710">
+  <title>'t' t=3.97941 v=701</title></use>
+  <use xlink:href="#plus" x="785.350827" y="20.477889">
+  <title>'t' t=3.95372 v=688</title></use>
+  <use xlink:href="#plus" x="781.744481" y="30.955777">
+  <title>'t' t=3.93378 v=675</title></use>
+  <use xlink:href="#plus" x="778.242853" y="41.433666">
+  <title>'t' t=3.91443 v=662</title></use>
+  <use xlink:href="#plus" x="774.819249" y="51.105563">
+  <title>'t' t=3.89551 v=650</title></use>
+  <use xlink:href="#plus" x="771.486331" y="59.165478">
+  <title>'t' t=3.87709 v=640</title></use>
+  <use xlink:href="#plus" x="768.324357" y="70.449358">
+  <title>'t' t=3.85961 v=626</title></use>
+  <use xlink:href="#plus" x="765.651212" y="81.733238">
+  <title>'t' t=3.84484 v=612</title></use>
+  <use xlink:href="#plus" x="761.877202" y="94.629101">
+  <title>'t' t=3.82398 v=596</title></use>
+  <use xlink:href="#plus" x="757.506061" y="105.912981">
+  <title>'t' t=3.79982 v=582</title></use>
+  <use xlink:href="#plus" x="754.385180" y="118.002853">
+  <title>'t' t=3.78257 v=567</title></use>
+  <use xlink:href="#plus" x="748.651382" y="130.898716">
+  <title>'t' t=3.75088 v=551</title></use>
+  <use xlink:href="#plus" x="744.965669" y="139.764622">
+  <title>'t' t=3.73051 v=540</title></use>
+  <use xlink:href="#plus" x="741.007607" y="150.242511">
+  <title>'t' t=3.70863 v=527</title></use>
+  <use xlink:href="#plus" x="737.352413" y="158.302425">
+  <title>'t' t=3.68843 v=517</title></use>
+  <use xlink:href="#plus" x="733.122611" y="167.168331">
+  <title>'t' t=3.66505 v=506</title></use>
+  <use xlink:href="#plus" x="729.875868" y="180.064194">
+  <title>'t' t=3.64711 v=490</title></use>
+  <use xlink:href="#plus" x="724.913195" y="191.348074">
+  <title>'t' t=3.61968 v=476</title></use>
+  <use xlink:href="#plus" x="719.790321" y="201.825963">
+  <title>'t' t=3.59137 v=463</title></use>
+  <use xlink:href="#plus" x="714.953579" y="213.915835">
+  <title>'t' t=3.56463 v=448</title></use>
+  <use xlink:href="#plus" x="710.316254" y="224.393723">
+  <title>'t' t=3.539 v=435</title></use>
+  <use xlink:href="#plus" x="702.872429" y="236.483595">
+  <title>'t' t=3.49786 v=420</title></use>
+  <use xlink:href="#plus" x="696.638845" y="249.379458">
+  <title>'t' t=3.46341 v=404</title></use>
+  <use xlink:href="#plus" x="689.030876" y="255.827389">
+  <title>'t' t=3.42136 v=396</title></use>
+  <use xlink:href="#plus" x="682.557839" y="267.111270">
+  <title>'t' t=3.38558 v=382</title></use>
+  <use xlink:href="#plus" x="677.443416" y="278.395150">
+  <title>'t' t=3.35732 v=368</title></use>
+  <use xlink:href="#plus" x="671.153621" y="289.679030">
+  <title>'t' t=3.32255 v=354</title></use>
+  <use xlink:href="#plus" x="664.710342" y="302.574893">
+  <title>'t' t=3.28694 v=338</title></use>
+  <use xlink:href="#plus" x="657.797303" y="312.246790">
+  <title>'t' t=3.24873 v=326</title></use>
+  <use xlink:href="#plus" x="647.876175" y="323.530670">
+  <title>'t' t=3.1939 v=312</title></use>
+  <use xlink:href="#plus" x="640.231476" y="334.814551">
+  <title>'t' t=3.15165 v=298</title></use>
+  <use xlink:href="#plus" x="632.614270" y="344.486448">
+  <title>'t' t=3.10955 v=286</title></use>
+  <use xlink:href="#plus" x="624.577067" y="354.964337">
+  <title>'t' t=3.06513 v=273</title></use>
+  <use xlink:href="#plus" x="614.608398" y="369.472183">
+  <title>'t' t=3.01003 v=255</title></use>
+  <use xlink:href="#plus" x="604.695928" y="381.562054">
+  <title>'t' t=2.95524 v=240</title></use>
+  <use xlink:href="#plus" x="596.517011" y="392.039943">
+  <title>'t' t=2.91004 v=227</title></use>
+  <use xlink:href="#plus" x="582.628222" y="404.935806">
+  <title>'t' t=2.83328 v=211</title></use>
+  <use xlink:href="#plus" x="571.496743" y="416.219686">
+  <title>'t' t=2.77175 v=197</title></use>
+  <use xlink:href="#plus" x="559.577418" y="428.309558">
+  <title>'t' t=2.70587 v=182</title></use>
+  <use xlink:href="#plus" x="545.173993" y="439.593438">
+  <title>'t' t=2.62627 v=168</title></use>
+  <use xlink:href="#plus" x="532.743131" y="449.265335">
+  <title>'t' t=2.55756 v=156</title></use>
+  <use xlink:href="#plus" x="511.974085" y="459.743224">
+  <title>'t' t=2.44277 v=143</title></use>
+  <use xlink:href="#plus" x="490.605373" y="471.027104">
+  <title>'t' t=2.32467 v=129</title></use>
+  <use xlink:href="#plus" x="475.578717" y="485.534950">
+  <title>'t' t=2.24162 v=111</title></use>
+  <use xlink:href="#plus" x="454.637011" y="496.818830">
+  <title>'t' t=2.12587 v=97</title></use>
+  <use xlink:href="#plus" x="430.441089" y="509.714693">
+  <title>'t' t=1.99214 v=81</title></use>
+  <use xlink:href="#plus" x="407.078709" y="522.610556">
+  <title>'t' t=1.86302 v=65</title></use>
+  <use xlink:href="#plus" x="369.894460" y="530.670471">
+  <title>'t' t=1.6575 v=55</title></use>
+  <use xlink:href="#plus" x="292.488585" y="542.760342">
+  <title>'t' t=1.22969 v=40</title></use>
+  <use xlink:href="#plus" x="230.202006" y="556.462197">
+  <title>'t' t=0.88543 v=23</title></use>
+  <use xlink:href="#plus" x="70.000000" y="566.940086">
   <title>'t' t=0 v=10</title></use>
   </g>
 <g id="data_1" style="color:purple">
-  <use xlink:href="#cross" x="790.000000" y="318.330914">
-  <title>'T' t=3.96 v=313</title></use>
-  <use xlink:href="#cross" x="782.727273" y="328.991292">
-  <title>'T' t=3.92 v=300</title></use>
-  <use xlink:href="#cross" x="775.454545" y="344.571843">
-  <title>'T' t=3.88 v=281</title></use>
-  <use xlink:href="#cross" x="768.181818" y="355.232221">
-  <title>'T' t=3.84 v=268</title></use>
-  <use xlink:href="#cross" x="760.909091" y="363.432511">
-  <title>'T' t=3.8 v=258</title></use>
-  <use xlink:href="#cross" x="753.636364" y="370.812772">
-  <title>'T' t=3.76 v=249</title></use>
-  <use xlink:href="#cross" x="746.363636" y="380.653120">
-  <title>'T' t=3.72 v=237</title></use>
-  <use xlink:href="#cross" x="739.090909" y="396.233672">
-  <title>'T' t=3.68 v=218</title></use>
-  <use xlink:href="#cross" x="731.818182" y="402.793904">
-  <title>'T' t=3.64 v=210</title></use>
-  <use xlink:href="#cross" x="724.545455" y="412.634253">
-  <title>'T' t=3.6 v=198</title></use>
-  <use xlink:href="#cross" x="717.272727" y="419.194485">
-  <title>'T' t=3.56 v=190</title></use>
-  <use xlink:href="#cross" x="710.000000" y="425.754717">
-  <title>'T' t=3.52 v=182</title></use>
-  <use xlink:href="#cross" x="702.727273" y="428.214804">
-  <title>'T' t=3.48 v=179</title></use>
-  <use xlink:href="#cross" x="695.454545" y="434.775036">
-  <title>'T' t=3.44 v=171</title></use>
-  <use xlink:href="#cross" x="688.181818" y="442.975327">
-  <title>'T' t=3.4 v=161</title></use>
-  <use xlink:href="#cross" x="680.909091" y="450.355588">
-  <title>'T' t=3.36 v=152</title></use>
-  <use xlink:href="#cross" x="673.636364" y="456.095791">
-  <title>'T' t=3.32 v=145</title></use>
-  <use xlink:href="#cross" x="666.363636" y="459.375907">
-  <title>'T' t=3.28 v=141</title></use>
-  <use xlink:href="#cross" x="659.090909" y="465.116110">
-  <title>'T' t=3.24 v=134</title></use>
-  <use xlink:href="#cross" x="651.818182" y="468.396226">
-  <title>'T' t=3.2 v=130</title></use>
-  <use xlink:href="#cross" x="644.545455" y="473.316401">
-  <title>'T' t=3.16 v=124</title></use>
-  <use xlink:href="#cross" x="637.272727" y="478.236575">
-  <title>'T' t=3.12 v=118</title></use>
-  <use xlink:href="#cross" x="630.000000" y="486.436865">
-  <title>'T' t=3.08 v=108</title></use>
-  <use xlink:href="#cross" x="622.727273" y="488.896952">
-  <title>'T' t=3.04 v=105</title></use>
-  <use xlink:href="#cross" x="615.454545" y="488.896952">
-  <title>'T' t=3 v=105</title></use>
-  <use xlink:href="#cross" x="608.181818" y="492.997097">
-  <title>'T' t=2.96 v=100</title></use>
-  <use xlink:href="#cross" x="600.909091" y="496.277213">
-  <title>'T' t=2.92 v=96</title></use>
-  <use xlink:href="#cross" x="593.636364" y="500.377358">
-  <title>'T' t=2.88 v=91</title></use>
-  <use xlink:href="#cross" x="586.363636" y="502.017417">
-  <title>'T' t=2.84 v=89</title></use>
-  <use xlink:href="#cross" x="579.090909" y="504.477504">
-  <title>'T' t=2.8 v=86</title></use>
-  <use xlink:href="#cross" x="571.818182" y="507.757620">
-  <title>'T' t=2.76 v=82</title></use>
-  <use xlink:href="#cross" x="564.545455" y="511.037736">
-  <title>'T' t=2.72 v=78</title></use>
-  <use xlink:href="#cross" x="557.272727" y="511.857765">
-  <title>'T' t=2.68 v=77</title></use>
-  <use xlink:href="#cross" x="550.000000" y="515.137881">
-  <title>'T' t=2.64 v=73</title></use>
-  <use xlink:href="#cross" x="542.727273" y="517.597968">
-  <title>'T' t=2.6 v=70</title></use>
-  <use xlink:href="#cross" x="535.454545" y="522.518142">
-  <title>'T' t=2.56 v=64</title></use>
-  <use xlink:href="#cross" x="528.181818" y="523.338171">
-  <title>'T' t=2.52 v=63</title></use>
-  <use xlink:href="#cross" x="520.909091" y="525.798258">
-  <title>'T' t=2.48 v=60</title></use>
-  <use xlink:href="#cross" x="513.636364" y="528.258345">
-  <title>'T' t=2.44 v=57</title></use>
-  <use xlink:href="#cross" x="506.363636" y="529.078374">
-  <title>'T' t=2.4 v=56</title></use>
-  <use xlink:href="#cross" x="499.090909" y="529.898403">
-  <title>'T' t=2.36 v=55</title></use>
-  <use xlink:href="#cross" x="491.818182" y="533.998549">
-  <title>'T' t=2.32 v=50</title></use>
-  <use xlink:href="#cross" x="484.545455" y="533.998549">
-  <title>'T' t=2.28 v=50</title></use>
-  <use xlink:href="#cross" x="477.272727" y="534.818578">
-  <title>'T' t=2.24 v=49</title></use>
-  <use xlink:href="#cross" x="470.000000" y="537.278665">
-  <title>'T' t=2.2 v=46</title></use>
-  <use xlink:href="#cross" x="462.727273" y="537.278665">
-  <title>'T' t=2.16 v=46</title></use>
-  <use xlink:href="#cross" x="455.454545" y="539.738752">
-  <title>'T' t=2.12 v=43</title></use>
-  <use xlink:href="#cross" x="448.181818" y="540.558781">
-  <title>'T' t=2.08 v=42</title></use>
-  <use xlink:href="#cross" x="440.909091" y="541.378810">
-  <title>'T' t=2.04 v=41</title></use>
-  <use xlink:href="#cross" x="433.636364" y="543.018868">
-  <title>'T' t=2 v=39</title></use>
-  <use xlink:href="#cross" x="426.363636" y="543.838897">
-  <title>'T' t=1.96 v=38</title></use>
-  <use xlink:href="#cross" x="419.090909" y="545.478955">
-  <title>'T' t=1.92 v=36</title></use>
-  <use xlink:href="#cross" x="411.818182" y="545.478955">
-  <title>'T' t=1.88 v=36</title></use>
-  <use xlink:href="#cross" x="404.545455" y="547.939042">
-  <title>'T' t=1.84 v=33</title></use>
-  <use xlink:href="#cross" x="397.272727" y="548.759071">
-  <title>'T' t=1.8 v=32</title></use>
-  <use xlink:href="#cross" x="390.000000" y="550.399129">
-  <title>'T' t=1.76 v=30</title></use>
-  <use xlink:href="#cross" x="382.727273" y="553.679245">
-  <title>'T' t=1.72 v=26</title></use>
-  <use xlink:href="#cross" x="375.454545" y="554.499274">
-  <title>'T' t=1.68 v=25</title></use>
-  <use xlink:href="#cross" x="368.181818" y="554.499274">
-  <title>'T' t=1.64 v=25</title></use>
-  <use xlink:href="#cross" x="360.909091" y="554.499274">
-  <title>'T' t=1.6 v=25</title></use>
-  <use xlink:href="#cross" x="353.636364" y="555.319303">
-  <title>'T' t=1.56 v=24</title></use>
-  <use xlink:href="#cross" x="346.363636" y="556.959361">
-  <title>'T' t=1.52 v=22</title></use>
-  <use xlink:href="#cross" x="339.090909" y="556.959361">
-  <title>'T' t=1.48 v=22</title></use>
-  <use xlink:href="#cross" x="331.818182" y="557.779390">
-  <title>'T' t=1.44 v=21</title></use>
-  <use xlink:href="#cross" x="324.545455" y="557.779390">
-  <title>'T' t=1.4 v=21</title></use>
-  <use xlink:href="#cross" x="317.272727" y="557.779390">
-  <title>'T' t=1.36 v=21</title></use>
-  <use xlink:href="#cross" x="310.000000" y="557.779390">
-  <title>'T' t=1.32 v=21</title></use>
-  <use xlink:href="#cross" x="302.727273" y="557.779390">
-  <title>'T' t=1.28 v=21</title></use>
-  <use xlink:href="#cross" x="295.454545" y="557.779390">
-  <title>'T' t=1.24 v=21</title></use>
-  <use xlink:href="#cross" x="288.181818" y="558.599419">
-  <title>'T' t=1.2 v=20</title></use>
-  <use xlink:href="#cross" x="280.909091" y="559.419448">
-  <title>'T' t=1.16 v=19</title></use>
-  <use xlink:href="#cross" x="273.636364" y="559.419448">
-  <title>'T' t=1.12 v=19</title></use>
-  <use xlink:href="#cross" x="266.363636" y="559.419448">
-  <title>'T' t=1.08 v=19</title></use>
-  <use xlink:href="#cross" x="259.090909" y="559.419448">
-  <title>'T' t=1.04 v=19</title></use>
-  <use xlink:href="#cross" x="251.818182" y="559.419448">
-  <title>'T' t=1 v=19</title></use>
-  <use xlink:href="#cross" x="244.545455" y="560.239478">
-  <title>'T' t=0.96 v=18</title></use>
-  <use xlink:href="#cross" x="237.272727" y="561.059507">
-  <title>'T' t=0.92 v=17</title></use>
-  <use xlink:href="#cross" x="230.000000" y="561.059507">
-  <title>'T' t=0.88 v=17</title></use>
-  <use xlink:href="#cross" x="222.727273" y="561.059507">
-  <title>'T' t=0.84 v=17</title></use>
-  <use xlink:href="#cross" x="215.454545" y="561.059507">
-  <title>'T' t=0.8 v=17</title></use>
-  <use xlink:href="#cross" x="208.181818" y="561.879536">
-  <title>'T' t=0.76 v=16</title></use>
-  <use xlink:href="#cross" x="200.909091" y="561.879536">
-  <title>'T' t=0.72 v=16</title></use>
-  <use xlink:href="#cross" x="193.636364" y="561.879536">
-  <title>'T' t=0.68 v=16</title></use>
-  <use xlink:href="#cross" x="186.363636" y="561.879536">
-  <title>'T' t=0.64 v=16</title></use>
-  <use xlink:href="#cross" x="179.090909" y="561.879536">
-  <title>'T' t=0.6 v=16</title></use>
-  <use xlink:href="#cross" x="171.818182" y="561.879536">
-  <title>'T' t=0.56 v=16</title></use>
-  <use xlink:href="#cross" x="164.545455" y="562.699565">
-  <title>'T' t=0.52 v=15</title></use>
-  <use xlink:href="#cross" x="157.272727" y="562.699565">
-  <title>'T' t=0.48 v=15</title></use>
-  <use xlink:href="#cross" x="150.000000" y="563.519594">
-  <title>'T' t=0.44 v=14</title></use>
-  <use xlink:href="#cross" x="142.727273" y="563.519594">
-  <title>'T' t=0.4 v=14</title></use>
-  <use xlink:href="#cross" x="135.454545" y="563.519594">
-  <title>'T' t=0.36 v=14</title></use>
-  <use xlink:href="#cross" x="128.181818" y="563.519594">
-  <title>'T' t=0.32 v=14</title></use>
-  <use xlink:href="#cross" x="120.909091" y="564.339623">
-  <title>'T' t=0.28 v=13</title></use>
-  <use xlink:href="#cross" x="113.636364" y="564.339623">
-  <title>'T' t=0.24 v=13</title></use>
-  <use xlink:href="#cross" x="106.363636" y="564.339623">
-  <title>'T' t=0.2 v=13</title></use>
-  <use xlink:href="#cross" x="99.090909" y="565.159652">
-  <title>'T' t=0.16 v=12</title></use>
-  <use xlink:href="#cross" x="91.818182" y="565.979681">
-  <title>'T' t=0.12 v=11</title></use>
-  <use xlink:href="#cross" x="84.545455" y="565.979681">
-  <title>'T' t=0.08 v=11</title></use>
-  <use xlink:href="#cross" x="77.272727" y="566.799710">
-  <title>'T' t=0.04 v=10</title></use>
-  <use xlink:href="#cross" x="70.000000" y="566.799710">
+  <use xlink:href="#cross" x="790.000000" y="317.888730">
+  <title>'T' t=3.97941 v=319</title></use>
+  <use xlink:href="#cross" x="785.350827" y="323.530670">
+  <title>'T' t=3.95372 v=312</title></use>
+  <use xlink:href="#cross" x="781.744481" y="329.172611">
+  <title>'T' t=3.93378 v=305</title></use>
+  <use xlink:href="#cross" x="778.242853" y="334.814551">
+  <title>'T' t=3.91443 v=298</title></use>
+  <use xlink:href="#cross" x="774.819249" y="341.262482">
+  <title>'T' t=3.89551 v=290</title></use>
+  <use xlink:href="#cross" x="771.486331" y="349.322397">
+  <title>'T' t=3.87709 v=280</title></use>
+  <use xlink:href="#cross" x="768.324357" y="354.158345">
+  <title>'T' t=3.85961 v=274</title></use>
+  <use xlink:href="#cross" x="765.651212" y="358.994294">
+  <title>'T' t=3.84484 v=268</title></use>
+  <use xlink:href="#cross" x="761.877202" y="362.218260">
+  <title>'T' t=3.82398 v=264</title></use>
+  <use xlink:href="#cross" x="757.506061" y="367.054208">
+  <title>'T' t=3.79982 v=258</title></use>
+  <use xlink:href="#cross" x="754.385180" y="371.084165">
+  <title>'T' t=3.78257 v=253</title></use>
+  <use xlink:href="#cross" x="748.651382" y="374.308131">
+  <title>'T' t=3.75088 v=249</title></use>
+  <use xlink:href="#cross" x="744.965669" y="381.562054">
+  <title>'T' t=3.73051 v=240</title></use>
+  <use xlink:href="#cross" x="741.007607" y="387.203994">
+  <title>'T' t=3.70863 v=233</title></use>
+  <use xlink:href="#cross" x="737.352413" y="395.263909">
+  <title>'T' t=3.68843 v=223</title></use>
+  <use xlink:href="#cross" x="733.122611" y="402.517832">
+  <title>'T' t=3.66505 v=214</title></use>
+  <use xlink:href="#cross" x="729.875868" y="405.741797">
+  <title>'T' t=3.64711 v=210</title></use>
+  <use xlink:href="#cross" x="724.913195" y="410.577746">
+  <title>'T' t=3.61968 v=204</title></use>
+  <use xlink:href="#cross" x="719.790321" y="416.219686">
+  <title>'T' t=3.59137 v=197</title></use>
+  <use xlink:href="#cross" x="714.953579" y="420.249643">
+  <title>'T' t=3.56463 v=192</title></use>
+  <use xlink:href="#cross" x="710.316254" y="425.891583">
+  <title>'T' t=3.539 v=185</title></use>
+  <use xlink:href="#cross" x="702.872429" y="429.921541">
+  <title>'T' t=3.49786 v=180</title></use>
+  <use xlink:href="#cross" x="696.638845" y="433.145506">
+  <title>'T' t=3.46341 v=176</title></use>
+  <use xlink:href="#cross" x="689.030876" y="442.817404">
+  <title>'T' t=3.42136 v=164</title></use>
+  <use xlink:href="#cross" x="682.557839" y="447.653352">
+  <title>'T' t=3.38558 v=158</title></use>
+  <use xlink:href="#cross" x="677.443416" y="452.489301">
+  <title>'T' t=3.35732 v=152</title></use>
+  <use xlink:href="#cross" x="671.153621" y="457.325250">
+  <title>'T' t=3.32255 v=146</title></use>
+  <use xlink:href="#cross" x="664.710342" y="460.549215">
+  <title>'T' t=3.28694 v=142</title></use>
+  <use xlink:href="#cross" x="657.797303" y="466.997147">
+  <title>'T' t=3.24873 v=134</title></use>
+  <use xlink:href="#cross" x="647.876175" y="471.833096">
+  <title>'T' t=3.1939 v=128</title></use>
+  <use xlink:href="#cross" x="640.231476" y="476.669044">
+  <title>'T' t=3.15165 v=122</title></use>
+  <use xlink:href="#cross" x="632.614270" y="483.116976">
+  <title>'T' t=3.10955 v=114</title></use>
+  <use xlink:href="#cross" x="624.577067" y="488.758916">
+  <title>'T' t=3.06513 v=107</title></use>
+  <use xlink:href="#cross" x="614.608398" y="490.370899">
+  <title>'T' t=3.01003 v=105</title></use>
+  <use xlink:href="#cross" x="604.695928" y="494.400856">
+  <title>'T' t=2.95524 v=100</title></use>
+  <use xlink:href="#cross" x="596.517011" y="500.042796">
+  <title>'T' t=2.91004 v=93</title></use>
+  <use xlink:href="#cross" x="582.628222" y="503.266762">
+  <title>'T' t=2.83328 v=89</title></use>
+  <use xlink:href="#cross" x="571.496743" y="508.102710">
+  <title>'T' t=2.77175 v=83</title></use>
+  <use xlink:href="#cross" x="559.577418" y="512.132668">
+  <title>'T' t=2.70587 v=78</title></use>
+  <use xlink:href="#cross" x="545.173993" y="516.968616">
+  <title>'T' t=2.62627 v=72</title></use>
+  <use xlink:href="#cross" x="532.743131" y="523.416548">
+  <title>'T' t=2.55756 v=64</title></use>
+  <use xlink:href="#cross" x="511.974085" y="529.058488">
+  <title>'T' t=2.44277 v=57</title></use>
+  <use xlink:href="#cross" x="490.605373" y="533.894437">
+  <title>'T' t=2.32467 v=51</title></use>
+  <use xlink:href="#cross" x="475.578717" y="535.506419">
+  <title>'T' t=2.24162 v=49</title></use>
+  <use xlink:href="#cross" x="454.637011" y="540.342368">
+  <title>'T' t=2.12587 v=43</title></use>
+  <use xlink:href="#cross" x="430.441089" y="543.566334">
+  <title>'T' t=1.99214 v=39</title></use>
+  <use xlink:href="#cross" x="407.078709" y="546.790300">
+  <title>'T' t=1.86302 v=35</title></use>
+  <use xlink:href="#cross" x="369.894460" y="554.850214">
+  <title>'T' t=1.6575 v=25</title></use>
+  <use xlink:href="#cross" x="292.488585" y="558.880171">
+  <title>'T' t=1.22969 v=20</title></use>
+  <use xlink:href="#cross" x="230.202006" y="561.298146">
+  <title>'T' t=0.88543 v=17</title></use>
+  <use xlink:href="#cross" x="70.000000" y="566.940086">
   <title>'T' t=0 v=10</title></use>
   </g></g>
 

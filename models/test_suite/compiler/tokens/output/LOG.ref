@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' 'tokens.ka' '-seed' '580151237' '--compile' '-d' 'output' '-t' '0'
++ Command line to rerun is: 'KaSim' 'tokens.ka' '-seed' '580151237' '--compile' '-d' 'output' '-l' '0'
 Parsing tokens.ka...
 done
 + Sanity checks

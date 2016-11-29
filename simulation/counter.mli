@@ -1,9 +1,11 @@
 (** Simulation progress keeper *)
 
+type period = DE of int | DT of float
+
 type t
 val create : ?init_t:float -> ?init_e:int ->
   ?max_time:float -> ?max_event:int ->
-  plot_period:float -> t
+  plot_period:period -> t
 
 val reinitialize : t -> unit
 
@@ -33,7 +35,7 @@ val time : t -> float
 val tracked_events : t -> int option
 
 val plot_period : t -> float
-val set_plot_period : t -> float -> unit
+val set_plot_period : t -> period -> unit
 
 val current_time : t -> float
 val current_event : t -> int

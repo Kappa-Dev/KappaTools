@@ -77,7 +77,7 @@
 \def\version{3.90}
 
 \title{KaSim~\& KaSa~reference manual\\ \small (release \version)}
-\author{Pierre Boutillier, J\'er\^ome Feret, Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
+\author{Pierre Boutillier, J\'er\^ome Feret, Jean Krivine\thanks{corresponding author: jean.krivine@irif.fr} and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
 
 \date{}
                                     % Activate to display a given date or no date
@@ -101,9 +101,6 @@ Although this manual contains a self-contained description of Kappa, it is \emph
 %
 
 To get an idea of how Kappa is used in a modeling context, the reader can consult the following note \href{http://www.pps.univ-paris-diderot.fr/~danos/pdf/eov.pdf}{Agile modelling of cellular signalling (SOS'08)}. A longer article, expounding on causal analysis is also available: \href{http://www.pps.univ-paris-diderot.fr/~danos/pdf/ka-fix.pdf}{Rule-based modelling of cellular signalling (CONCUR'07)}. See also this tutorial: \href{http://www.pps.univ-paris-diderot.fr/~danos/pdf/mytdg.pdf}{Modelling epigenetic information maintenance: a Kappa tutorial (CAV'09)}.
-
-
-
 
 \section{The \KaSim~engine}
 \KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. The Kappa language describes site graphs and their local transformations. \KaSim~takes one or several \hyperref[chap:kappa]{Kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos \textit{et al}'s implicit state simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models.
@@ -140,7 +137,7 @@ A graphical interface is proposed to navigate through the various options and ut
 \item[-] Kappa language tutorials and downloads: \url{http://kappalanguage.org}
 \item[-] Bug reports should be posted on github: \url{https://github.com/Kappa-Dev/KaSim/issues}
 \item[-] Questions and answers on the kappa-user mailing list: \url{http://groups.google.com/group/kappa-users}
-\item[-] Want to contribute to the project? \ttt{jean.krivine@pps.univ-paris-diderot.fr}
+\item[-] Want to contribute to the project? \ttt{jean.krivine@irif.fr}
 }
 
 \chapter{Installation}\label{chap:install}
@@ -697,11 +694,11 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 \ttt{[E]} & the total number of (productive) simulation events\index{event}\\
 & since the beginning of the simulation \\
 \ttt{[E-]} & the total number of null events\index{null event}\\
-\ttt{[Emax]} & the max (productive) event limit as set by the option \ttt{-e}. \\ &Note that if unset \ttt{Emax}$=\infty$\\
+\ttt{[Emax]} & the max (productive) event limit as set by \ttt{-l} (in \ttt{-u event} mode}. \\ &Note that if unset \ttt{Emax}$=\infty$\\
 \ttt{[T]} & the bio-time of the simulation \\
 \ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
-\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-t}. \\ &Note that if unset \ttt{Tmax}$=\infty$\\
-\ttt{[p]} & the number of requested plotting points set by the option \ttt{-p}. \\
+\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l}. \\ &Note that if unset \ttt{Tmax}$=\infty$\\
+\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-pp}. \\
 
 \ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
@@ -736,7 +733,7 @@ define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!
 'ab' A(x),A(x) -> A(x!1),A(x!1) @ 'k_on'/2
 \end{lstlisting}
 %%
-\KaSim~may output values of variables in the data file\index{data file} (see option \ttt{-p} in Chapter~\ref{chap:cl}) using plot do:
+\KaSim~may output values of variables in the data file\index{data file} (see option \ttt{-pp} in Chapter~\ref{chap:cl}) using plot do:
 \begin{lstlisting}[language=kappa]
 %plot: 'var_name'
 \end{lstlisting}
@@ -778,7 +775,15 @@ where \ttt{file\_i} are the input Kappa files containing the rules, initial cond
 
 \section{Main options}
 
-Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that expects an argument are preceded by a single dash, options that do not need any argument start with a double dash. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events. Be careful that the \emph{event density}, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the instants at which observables are recorded even if they specify the same number of observations.
+Table~\ref{tab:options} summarizes the main options that are
+accessible through the command line. Options that expects an argument
+are preceded by a single dash, options that do not need any argument
+start with a double dash.
+
+Two key options are the plot period \ttt{-pp} (how often you want a
+line in the data file) and the limit \ttt{-l} of simulation. These
+quantities can expressed in simulated time (the default) or in number
+of event (using \ttt{-u event}).
 
 \begin{table}[h!]
 \caption{Command line: main options}
@@ -786,11 +791,12 @@ Table~\ref{tab:options} summarizes the main options that are accessible through 
 \begin{tabular}{|l|l|}
 \hline
 Argument & Description \\ \hline
-\ttt{-e $e_{\mit{max}}$} & Terminates simulation after $e_{\mit{max}}\geq 0$ events\\
-\ttt{-t $t_{\mit{max}}$} & Terminates simulation after $t_{\mit{max}}\geq 0.0$ time units\\
-\ttt{-p $n$} & Produces a data file\index{data file} (default: \ttt{data.out}) with $n\geq 0$ data points\\
+\ttt{-u $unit$} & unit of options (time/event)\\
+\ttt{-l $max$} & Terminates simulation after $max \geq 0$ $unit$\\
+\ttt{-initial $min$} & starts the simulation at $min$ $unit$ (data outputs convienience only)\\
+\ttt{-pp $x$} & plot a line in the data file every $x$ $unit$\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
-&Generate an image instead of a raw file when it ends by \verb$.svg$\\
+&Use the extension to determine the format ('.tsv', '.svg' or space separeted value else)\\
 \ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
 & (for compatibility with \KaSim <= 3 and filenames starting by -)\\
 \ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
@@ -826,13 +832,13 @@ Argument & Description \\ \hline
 \section{Example}
 The command
 \ITE{
-\item[\$] \ttt{KaSim model.ka -e 1000000 -p 1000 -o model.out}
+\item[\$] \ttt{KaSim model.ka -u event -l 1000000 -pp 1000 -o model.out}
 }
-will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. The file \ttt{model.out} will contain 1000 data points (\ie in this case, a measure will be taken every 1000 events). The command
+will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. A measure will be taken every 1000 events in file \ttt{model.out}. The command
 \ITE{
-\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -t 1.5 -p 1000}
+\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -l 1.5 -pp 0.0015}
 }
-will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
+will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). %The order in which the files are given does not matter.
 
 \chapter{A simple model}\label{chap:abc}
 
@@ -874,12 +880,12 @@ There are two main points to notice about this model: \ttt{A} can modify both si
 We try first a coarse simulation of $100,000$ events (10 times the number of agents in the initial system).
 \ttt{
 \ITE{
-\item[\$] KaSim ABC.ka -e 100000 -p 1000 -o abc.out
+\item[\$] KaSim ABC.ka -u event -l 100000 -pp 1000 -o abc.out
 }}
 Plotting the content of the \ttt{abc.out} file one notices that nothing of significant interest happen to the observables after 250s. So we can now specify a meaningful time limit by running
 \ttt{
 \ITE{
-\item[\$] KaSim ABC.ka -e 100000 -t 250 -p 1000 -o abc.out
+\item[\$] KaSim ABC.ka -l 250 -pp 0.25 -o abc.out
 }}
 which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
 \begin{figure}[htbp]
@@ -971,7 +977,7 @@ The modified kappa file is available in the source repository, in the \ttt{model
 Running again a simulation (a bit longer) by entering in the command line:
 \ttt{
 \ITE{
-\item[\$] KaSim ABC-pert.ka -e 100000 -t 300 -p 1000 -o abc2.out
+\item[\$] KaSim ABC-pert.ka -l 300 -pp 0.3 -o abc2.out
 }}
 one obtains the curve given in Fig.~\ref{fig:abc2}.
 
@@ -1094,11 +1100,11 @@ will store the value of observables every 10 productive events.
 
 The simulation algorithm that is implemented in \KaSim~requires an initialization phase whose complexity is proportional to $R*G$ where $R$ is the cardinal of the rule set and $G$ the size of the initial mixture\index{mixture}. Thus for large systems, initialization may take a while. Whenever a user wishes to run several simulations of the \emph{same} kappa model, it is possible to skip this initialization phase by creating a \emph{simulation package}\index{simulation package}. For instance:
 \ttt{\ITE{
-\item [] KaSim abc.ka -t $n$ -make-sim abc.kasim
+\item [] KaSim abc.ka -l $n$ -make-sim abc.kasim
 }}
 will generate a standard simulation of the \ttt{abc.ka} model, but in addition, will create the simulation package \ttt{abc.kasim} (.kasim extension is not mandatory). This package is a binary file, \ie not human readable, that can be used as input of a new simulation using the command:
 \ttt{\ITE{
-\item [] KaSim -load-sim abc.kasim -t $k$
+\item [] KaSim -load-sim abc.kasim -l $k$
 }}
 Note that this simulation is now run for $k$ time units instead of $n$. Importantly, simulation packages can only be given as input to the \emph{same} \KaSim~that produced it. As a consequence, recompiling the code, or obtaining different binaries, will cause the simulation package to become useless.
 
@@ -1595,7 +1601,7 @@ Lastly, KaSa\ computes an over-approximation of the influence map. They may show
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
-If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}.
+If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-l} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}.
 
 In order to make sure that \KaSim~is not incorrectly blocked you may wish to plot the event clock against time clock using the observable \ttt{\%obs: {\textquotesingle}events{\textquotesingle} [E]} or run the simulation using an event limit (\ttt{-e} option of the command line) instead of a time limit.
 
@@ -1604,7 +1610,7 @@ In order to make sure that \KaSim~is not incorrectly blocked you may wish to plo
 Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E]}) should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
-Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves.
+Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use a reasonable value for the \ttt{-pp} option in the command line to tell KaSim how often you wish to have points on your curves.
 
 \section*{Too many instances of an observable}
 The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}.

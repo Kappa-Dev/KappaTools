@@ -1,3 +1,3 @@
-"${KAPPABIN}"KaSim ../kappa/abc-pert.ka -seed 822295616 -e 100000 -t 300 -pp 0.3 -o abc-pert.out -mode batch && \
+"${KAPPABIN}"KaSim ../kappa/abc-pert.ka -seed 822295616 -l 90 -pp 0.3 -o abc-pert.out -mode batch && \
 gnuplot abc-pert.gplot && \
 rm -f  *.out

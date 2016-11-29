@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaDE erre.ka  -d output -t 1 -pp 0.01 || exit 0
+"${KAPPABIN}"KaDE erre.ka  -d output -l 1 -pp 0.01 || exit 0
 
 #We test what happens in case of ambiguous side effect
 

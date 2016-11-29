@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'bonds_in_init.ka' '-t' '40' '-seed' '611463625' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'bonds_in_init.ka' '-l' '40' '-seed' '611463625' '-d' 'output' '--time-independent'
 Parsing bonds_in_init.ka...
 done
 + Sanity checks

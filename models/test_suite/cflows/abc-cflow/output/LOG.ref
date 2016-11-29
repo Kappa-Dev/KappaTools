@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-i' 'abc-cflow.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '-pp' '8' '--time-independent'
++ Command line to rerun is: 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-pp' '1000' '--time-independent'
 Parsing abc-cflow.ka...
 done
 + Sanity checks

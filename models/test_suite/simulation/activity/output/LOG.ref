@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-e' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-pp' '0.04' 'activity.ka'
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-pp' '20' 'activity.ka'
 Parsing activity.ka...
 done
 + Sanity checks

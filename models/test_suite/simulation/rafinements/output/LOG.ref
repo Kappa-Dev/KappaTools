@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-t' '2' '-pp' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-seed' '16602'
++ Command line to rerun is: 'KaSim' '-u' 't' '-l' '2' '-pp' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-seed' '16602'
 Parsing rafinements.ka...
 done
 + Sanity checks

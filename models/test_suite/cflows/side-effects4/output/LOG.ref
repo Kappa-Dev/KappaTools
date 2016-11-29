@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'side-effects.ka' '-u' 'e' '-l' '25' '-seed' '253329392' '-d' 'output' '--time-independent'
 Parsing side-effects.ka...
 done
 + Sanity checks
