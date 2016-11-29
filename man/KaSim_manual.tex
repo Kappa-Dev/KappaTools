@@ -1179,7 +1179,8 @@ There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
 In expert modes, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the tab. There are currently five sub-tabs available: \texttt{0\_Actions}, \texttt{1\_Output}, \texttt{2\_Reachability\_analysis}, \texttt{3\_Influence\_map}, \texttt{4\_debugging\_information}.
+\item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{0\_Actions}, \texttt{1\_Output}, \texttt{2\_Reachability\_analysis}, \texttt{3\_Trace\_analysis}, \texttt{4\_Contact\_map}, \texttt{5\_Influence\_map}.
+
 \item Center: The options of the selected sub-tab are displayed and can be tuned.
 
 Contextual help is provided when the mouse is hovered over an element.
@@ -1242,19 +1243,30 @@ When a file already exists, it is overwritten without any warning.
 \end{figure}
 
 Reachability analysis aimed at detecting statically properties about the bio-molecular species that can be formed in a model.
-Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08}, the abstraction consists in:
+Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret-SASB2016}, the abstraction consists in:
 \begin{enumerate}
 \item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary),
-\item secondly, abstracting a bio-molecular species by the set of its local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
+\item secondly, abstracting a bio-molecular species by the set of its properties.
 \end{enumerate}
+The classes of properties of interest are encoded in so called abstract domains, which can be independently enabled/disabled. The whole analysis can be understood as a mutual recursion between smaller analyses (one per abstract domain), that communicates information between each other at each step of the analysis. We took the same scheme of collaboration between abstract domains as in  \cite{Cousot-ASIAN2006}.
+% local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
+%\end{enumerate}
 
 As an example, we consider the following model:
 \begin{lstlisting}[language=kappa]
-'A.p'   A(x~u,y) -> A(x~p,y)
-'dimer' A(x~p,y),A(x~p,y) -> A(x~p,y!1),A(x~p,y!1)
-'dead'  A(x~u,y!_) -> A(x~q,y)
+%agent: E(x)
+%agent: R(x,c,cr,n)
 
-%init: 1 A(x~u,y~u)
+%init: 1 E()
+%init: 1 R()
+
+'E.R' E(x),R(x) -> E(x!1),R(x!1) @1
+'E/R' E(x!1),R(x!1,c) -> E(x),R(x,c) @1
+'R.R' R(x!_,c),R(x!_,c) -> R(x!_,c!1),R(x!_,c!1) @1
+'R/R' R(c!1,cr,n),R(c!1,cr,n) -> R(c,cr,n),R(c,cr,n) @1
+'R.int' R(c!1,cr,n),R(c!1,cr,n) -> R(c!1,cr!2,n),R(c!1,cr,n!2) @1
+'R/int' R(cr!1),R(n!1) -> R(cr),R(n) @1
+'obs' R(x,c,cr!_,n!_) -> R(x,c,cr,n) @1
 \end{lstlisting}
 
 Typing the following instruction:
@@ -1264,91 +1276,144 @@ KaSa reachability.ka --reset-all --compute-reachability-analysis
 
 will perform the reachability analysis on the model \texttt{reachability.ka}.
 
+We obtain the following result:
 
-The result (eg.~see Fig.~\ref{fig:reachability_low}) is displayed in the standard output, and it is made of three parts:
+\input{generated_img/LOG_low.txt}
+
+
+This result is displayed in the standard output, and it is made of six parts.
+
+The first two parts provide an enumeration of dead rules and dead agents.
+The next parts display what we call refinement lemmas.
+A refinement lemma is made of a precondition (on the left of the implication symbol) that is a site graph, and a postcondition (on the right of the implication symbol) that is a list of site graphs. Each site graph in the post-condition is a refinement of the precondition (the position of agent matters: the $n$-th agent in the precondition corresponds to the $n$-th agent in each site graph in the postcondition, but site graphs in a postcondition may have more agents than the site graph in the corresponding precondition).
+The meaning of a refinement lemma is that every embedding between its precondition into a reachable state can be refined/extended into
+an embedding from one site graph in its postcondition into the same reachable state. This way, a refinement lemma provides an enumeration of all the potential contexts for the precondition.
+
+We now detail the six different parts:
 \begin{itemize}
-\item \textbf{Detection of dead rules.} A rule is called dead, if there is no trace starting from the initial state in which this rule is applied. The analysis reports the list of the rules it has detected to be dead. Due to the over-approximation, it may happen that a dead rule is not discovered by the analysis. Yet, any rule that is reported as dead, is dead indeed.
+\item \textbf{Detection of dead rules.} A rule is called dead, if there is no trace starting from the initial state in which this rule is applied. The analysis reports the list of the rules it has detected to be dead. Due to the over-approximation, it may happen that a dead rule is not discovered by the analysis. Yet, every rule that is reported as dead, is dead indeed.
 
-\item \textbf{Relational properties.} The analysis detects some relationships among the states of the sites of each agent. Simple properties are reported in natural languages. More complex properties are reported in extension, by enumerating the states that these site can take simultaneously within a given instance of an agent. Due to the over-approximation of the analysis, the analysis may fail in discovering a relationship. But each relationship that is found by the analysis, is satisfied.
+In our example, we notice that the rule `\texttt{obs}' can never be trigered.
 
-\item \textbf{Non-relational properties.} The analysis detects for each kind of site, the set of states this site can take. This set is described in natural language. Due to the over-approximation, the analysis reports a super-set of the set of the potential states. Yet, we are sure that a given site only take states within this set.
+\item \textbf{Detection of dead agents.} An agent is called dead, if there is no trace starting from the initial state with at least one state in which this agent occurs. The analysis reports the list of the agents it has detected to be dead. Due to the over-approximation, it may happen that a dead agent is not discovered by the analysis. Yet, every agent that is reported as dead, is dead indeed.
+
+In our example, there are no dead agent.
+
+\item \textbf{Non-relational properties.} The analysis detects for each kind of site, the set of states this site can take.
+Due to the over-approximation, the analysis reports a super-set of the set of the potential states. Yet, we are sure that a given site only take states within this set.
+
+In our example, the site \texttt{cr} of \texttt{R} may be free, or bound to the site \texttt{n} of an agent \texttt{R}.
+
+\item \textbf{Relational properties.} The analysis detects some relationships among the states of packs of sites within each agent, hence capturing potential valuations for local views \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08}.
+ %Simple properties are reported in natural languages. More complex properties are reported in extension, by enumerating the states that these site can take simultaneously within a given instance of an agent.
+Due to the over-approximation of the analysis, the analysis may fail in discovering a relationship. But each relationship that is found by the analysis, is satisfied.
+
+In our example, the states of the sites \texttt{c}, \texttt{cr}, \texttt{n}, and \texttt{x} of \texttt{R} are entangled with a relational property (othewise, we would have $5^2$ elements in the post-condition).
+
+
+\item \textbf{Properties in connected agent.}
+When two agents are connected, there may be a relation among the states of theirs respective sites.  This abstraction \cite{Feret:SASB2016} collects for each kind of bonds, the relation between the state of one site in the first agent and the state of one site in the second agent.  Due to the over-approximation, the analysis reports a super-set of the set of the potential pairs of states.
+
+This abstraction aimed at capturing information about protein transportation.
+It is quite common to model the location of a protein as the internal state of  a fictitious site. With such an encoding, it might be important to ensure that two connected proteins, are always located in the same location. This abstraction focuses on this kind of properties.
+
+\item \textbf{Properties of pairs of bonds.}
+
+It might be interesting to know whether a protein can be bound to another protein twice simultaneously, and whether a protein can be bound to two instances of a same protein simultaneously. This abstraction \cite{Feret:SASB2016} captures this kind of constraint. It can be used to prove that some proteins do not polymerize.
+
+In our example, when a \texttt{R} has its sites \texttt{cr} and \texttt{c} bound, they are necessarily bound to the same instance of \texttt{R}. The same statement holds for the sites \texttt{cr} and \texttt{n}.
 \end{itemize}
+
+
+
 
 \begin{figure}[t]
 \input{generated_img/LOG_mute.txt}
 \caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Mute''.}
 \label{fig:reachability_mute}
 \end{figure}
-\begin{figure}[p]
-\input{generated_img/LOG_low.txt}
-\caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Low''.}
-\label{fig:reachability_low}
-\end{figure}
-\begin{figure}[p]
+%\begin{figure}[p]
+%\input{generated_img/LOG_low.txt}
+%\caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Low''.}
+%\label{fig:reachability_low}
+%\end{figure}
+\begin{figure}[t]
 \input{generated_img/LOG_medium_KO.txt}
 \caption{Reachability analysis: one rule that cannot be applied yet, according to the bio-molecular species already constructed.}
 \label{fig:reachability_medium_ko}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[t]
 \input{generated_img/LOG_medium_OK.txt}
 \caption{Reachability analysis: one rule successfully applied}
 \label{fig:reachability_medium_ok}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[t]
 \input{generated_img/LOG_high_init.txt}
 \caption{Reachability analysis: extensional description of initial states.}
 \label{fig:reachability_high_init}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[t]
 \input{generated_img/LOG_high_rule.txt}
-\caption{Reachability analysis: extensional description of the new views created when applying a rule.}
+\caption{Reachability analysis: extensional description of the new patterns  created when applying a rule.}
 \label{fig:reachability_high_rule}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[t]
 \input{generated_img/LOG_full.txt}
-\caption{Reachability analysis: discovering new views force the analysis to apply some rules again, until reaching a fix-point.}
+\caption{Reachability analysis: discovering new patterns force the analysis to apply some rules again, until reaching a fix-point.}
 \label{fig:reachability_full}
 \end{figure}
 
-The option \verb?--use-natural-language? can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension.
+Now we describe the options that are available on this sub-tab.
+
+The option \verb?--compute-reachability-analysis? can be used to switch on/off then reachability analysis.
+
+The option \verb?--enable-every-domain? can be used to switch on every abstract domain, whereas the option \verb?--disable-every-domain? can be used to switch off every abstract domain.
+
+The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in initial state, in the rhs of a rule, or in a introduction directive of a perturbation, may be released by side-effects.
+In \verb?dynamic? mode, only the bond that has been encountered so far during the analysis are considered.
+
+The option \verb?--views-domain? can be used to switch on/off the views domains that combine the non-relational analysis and the relational analysis.
+
+The option \verb?--double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between between proteins.
+
+The option \verb?--site-accross-bonds-domain? can be used to switch on/off the analysis of the relations among the states of the sites in connected proteins.
+
 
 It is possible to get more details about the computation of the analysis by tuning the verbosity level of the view analysis:
 \begin{itemize}
-\item With the option \verb?--use-natural-language Mute?, nothing is displayed. Even the result of the analysis is omitted (eg.~see Fig.~\ref{fig:reachability_mute}).
+\item With the option \verb?--verbosity-level-for-reachability-analysis Mute?, nothing is displayed. Even the result of the analysis is omitted (eg.~see Fig.~\ref{fig:reachability_mute}).
 
+\item With the option \verb?--verbosity-level-for-reachability-analysis Low?, only the result of the analysis is displayed (by default).
 
-
-
-\item With the option \verb?--use-natural-language Low?, only the result of the analysis is displayed (eg.~see Fig.~\ref{fig:reachability_low}).
-
-
-
-\item With the option \verb?--use-natural-language Medium?, the analysis also describes which rules are applied and in which order.
+\item With the option \verb?--verbosity-level-for-reachability-analysis Medium?, the analysis also describes which rules are applied and in which order.
 
 When trying to apply a rule, the analysis may detect that the rule cannot be applied yet because the precondition is not satisfied at the current state of the iteration (eg.~see Fig.~\ref{fig:reachability_medium_ko}). Otherwise, the analysis can apply the rule and update the state of the iteration accordingly (eg.~see Fig.~\ref{fig:reachability_medium_ok}).
 
 
 
-\item With the option \verb?--use-natural-language High?, the analysis also describes which views are discovered.
+\item With the option \verb?--verbosity-level-for-reachability-analysis High?, the analysis also describes which patterns are discovered.
 
-In particular, at the beginning of the iteration, the analysis prompts the views that occur in initial state (eg.~see Fig.~\ref{fig:reachability_high_init}). Then, each time a rule is applied successfully, the analysis shows which new views have been discovered (eg.~see Fig.~\ref{fig:reachability_high_rule}).
-
-
-
-\item When new views are discovered, then, it is necessary to apply again any rule that may operate over these views. With the option \verb?--use-natural-language Full?, the analysis also describes which rules are awaken by the discovery of a new view (see Fig.~\ref{fig:reachability_full}).
+In particular, at the beginning of the iteration, the analysis prompts the patterns of interest that occur in initial state (eg.~see Fig.~\ref{fig:reachability_high_init}). Then, each time a rule is applied successfully, the analysis shows which new patterns have been discovered (eg.~see Fig.~\ref{fig:reachability_high_rule}).
 
 
+\item When new patterns are discovered, then, it is necessary to apply again any rule that may operate over these patterns.
+
+With the option \verb?--verbosity-level-for-reachability-analysis Full?, the analysis also describes which rules are awaken by the discovery of a new pattern (see Fig.~\ref{fig:reachability_full}).
 
 \end{itemize}
+
+The option \verb?--output-mode-for-reachability-analysis? can be used to tune the output of the analysis. The default mode is \verb?kappa?.
+In mode, \verb?raw?, patterns of interest are displayed extensionally.
+In mode, \verb?english?, properties of interest are explained in English.
+The option \verb?--use-natural-language? can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension.
 
 \section{Local traces}
 \label{sec:local-traces}
 
-This section is under construction.
 
 \begin{figure}[htbp]
 \centering
@@ -1435,6 +1500,13 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 
 \section{Contact map}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_4.png}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{4\_Contact\_map}}
+\label{fig:kasa:4}
+\end{figure}
+
 The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions.
 
 
@@ -1445,7 +1517,7 @@ Typing the following instruction:
 will produce a dot format file named \texttt{contact.dot}.
 The name of the output file and the directory can be changed to the command line options \texttt{--output-contact-map} and \texttt{--output-directory}.
 The directory is assumed to exist. The file will be overwritten if it exists. All the options related to the computation of the contact map can be accessed on the
-sub-tab \texttt{3\_Reachability\_analysis} of the graphical interface (see Fig.~\ref{fig:kasa:3}).
+sub-tab \texttt{4\_Contact\_map} of the graphical interface (see Fig.~\ref{fig:kasa:4}).
 
 
 
@@ -1479,8 +1551,8 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_4.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{4\_Influence\_map}}
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_5.png}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{5\_Influence\_map}}
 \label{fig:kasa:4}
 \end{figure}
 

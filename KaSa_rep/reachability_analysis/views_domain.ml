@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 28 2016>
+   * Last modification: Time-stamp: <Nov 29 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -3094,14 +3094,14 @@ struct
         Loggers.fprintf log
           "------------------------------------------------------------" in
       let () = Loggers.print_newline log in
-      let () = Loggers.fprintf log "* Relational properties:" in
+      let () = Loggers.fprintf log "* Non relational properties:" in
       let () = Loggers.print_newline log in
       let () = Loggers.fprintf log
           "------------------------------------------------------------"
       in
       let () = Loggers.print_newline log in
       let error, handler =
-        print_bdu_update_map_cartesian_decomposition
+        print_bdu_update_map_cartesian_abstraction
           parameters
           handler
           error
@@ -3114,14 +3114,14 @@ struct
         Loggers.fprintf log
           "------------------------------------------------------------" in
       let () = Loggers.print_newline log in
-      let () = Loggers.fprintf log "* Non relational properties:" in
+      let () = Loggers.fprintf log "* Relational properties:" in
       let () = Loggers.print_newline log in
       let () = Loggers.fprintf log
           "------------------------------------------------------------"
       in
       let () = Loggers.print_newline log in
       let error, handler =
-        print_bdu_update_map_cartesian_abstraction
+        print_bdu_update_map_cartesian_decomposition
           parameters
           handler
           error
@@ -3406,16 +3406,6 @@ struct
       site_correspondence fixpoint_result
       dynamic
       kasa_state =
-      (*relational properties*)
-      let error', dynamic, kasa_state =
-        export_relation_properties
-          parameters dynamic error handler_kappa
-          site_correspondence
-          fixpoint_result
-          kasa_state
-      in
-      let error = Exception.check_point
-          Exception.warn parameters error error' __POS__ Exit in
       (*non relational properties*)
       let error'', dynamic, kasa_state =
         export_non_relation_properties
@@ -3426,6 +3416,16 @@ struct
       in
       let error = Exception.check_point
           Exception.warn parameters error error'' __POS__ Exit in
+      (*relational properties*)
+      let error', dynamic, kasa_state =
+        export_relation_properties
+          parameters dynamic error handler_kappa
+          site_correspondence
+          fixpoint_result
+          kasa_state
+      in
+      let error = Exception.check_point
+          Exception.warn parameters error error' __POS__ Exit in      
       error, dynamic, kasa_state
 
   let export_views_properties static dynamic error kasa_state =
