@@ -121,19 +121,13 @@ let main () =
     let network = A.network_from_compil compil in
     let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
-    let plot_period =
-      match cli_args.Run_cli_args.maxValue,
-            cli_args.Run_cli_args.nb_points with
-      | Some max_t, Some points when cli_args.Run_cli_args.plotPeriod = 1. ->
-        (max_t -. cli_args.Run_cli_args.minValue) /. float_of_int points
-      | _, _ -> cli_args.Run_cli_args.plotPeriod in
     let () = A.export_network
         ~command_line
         ~command_line_quotes
         ~data_file:cli_args.Run_cli_args.outputDataFile
         ~init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxValue)
-        ~plot_period logger compil network in
+        ~plot_period:cli_args.Run_cli_args.plotPeriod logger compil network in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in
     ()
