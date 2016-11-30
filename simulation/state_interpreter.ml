@@ -236,10 +236,11 @@ let one_rule ~outputs dt stop env counter graph state =
                  match classify_float cand with
                 | (FP_nan | FP_infinite) ->
                   let () =
+                    let ct = Counter.current_time counter in
                     ExceptionDefn.warning
                       (fun f -> Format.fprintf
                           f "An infinite (or NaN) activity variation has been ignored at t=%f"
-                          (Counter.current_time counter)) in 0.
+                          ct) in 0.
                 | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
           l
     in Random_tree.add rd_id new_act state.activities in
