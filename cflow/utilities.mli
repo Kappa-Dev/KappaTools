@@ -53,6 +53,11 @@ type ('a,'b,'c,'d,'e,'f,'g) sexternary =
 
 val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) binary,'a,'b list,'a) ternary
 
+(* Json buffer *)
+
+val pop_json: parameter -> Yojson.Basic.json option 
+
+
 (** traces *)
 type trace
 
@@ -218,7 +223,5 @@ val export_musical_grid_to_xls:
 (** Show the current status of the branch and cut assumptions in ASCII *)
 val print_musical_grid:
   (musical_grid,unit) unary
-
-
 
 val get_counter: story_table -> int (* to be removed from the interface*)
