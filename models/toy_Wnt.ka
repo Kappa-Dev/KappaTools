@@ -1,3 +1,11 @@
+/* This model contains the core machinery of the destruction complex
+of beta-catenin, key actors in the canonical Wnt signaling cascade.
+The perturbations at the end are meant to simulate two
+regimes: a first regime where the concentration of APC increases
+by bursts, then a second regime where APC is degraded. This
+transition shows how the complex grows in size as APC increases,
+how this increase leads to increased enzymatic activity, and how
+this collapses with the loss of APC. */
 %agent: Axn(GSK,Cat,Ax1,Ax2,APC)
 %agent: APC(Ax1,Ax2,Ax3)
 %agent: GSK(Axn)
