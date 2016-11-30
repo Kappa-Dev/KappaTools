@@ -42,16 +42,16 @@ their respective Axn and GSK sites. This binding is independent
 of the state of all other sites on either agent. Since they can
 not be connected elsewhere, the binding rule has not ambiguous
 molecularity.*/
-'GSK.Axn+' GSK(Axn),Axn(GSK) -> GSK(Axn!1),Axn(GSK!1) @ 1.0e-4
-'GSK.Axn-' GSK(Axn!1),Axn(GSK!1) -> GSK(Axn),Axn(GSK) @ 1.0e-2
+'GSK.Axn+' GSK(Axn),Axn(GSK) -> GSK(Axn!1),Axn(GSK!1) @ 'Kon'('pF')
+'GSK.Axn-' GSK(Axn!1),Axn(GSK!1) -> GSK(Axn),Axn(GSK) @ 'Koff'
 
 /* Binding rules for Cat and Axn. These guys bind through their
 respective Axn and Cat sites. They can only bind if the site S of
 Cat is in state 'x', i.e. unmodified. This means there is no
 product inhibition in the system. As for the unbinding rule, it
 happens regardless of the state of site 'S'.*/
-'Cat|x.Axn+' Cat(Axn,S~x),Axn(Cat) -> Cat(Axn!1,S~x),Axn(Cat!1) @ 1.0e-4
-'Cat|x.Axn-' Cat(Axn!1),Axn(Cat!1) -> Cat(Axn),Axn(Cat) @ 1.0e-2
+'Cat|x.Axn+' Cat(Axn,S~x),Axn(Cat) -> Cat(Axn!1,S~x),Axn(Cat!1) @ 'Kon'('pF')
+'Cat|x.Axn-' Cat(Axn!1),Axn(Cat!1) -> Cat(Axn),Axn(Cat) @ 'Koff'
 
 /* Recycling rules and mass conservation. The token 'CatGhost'
 is used to track the cumulative number of degradation events.
