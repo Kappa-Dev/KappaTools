@@ -206,17 +206,17 @@ let close_plot () =
 let print_header_raw is_tsv f a =
   let print_sep =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
-    else !Parameter.plotSepChar in
+    else Pp.comma in
   Format.fprintf f "@[<h>%s%t%a@]@."
-    (if is_tsv then "time" else "# time") print_sep
+    "[T]" print_sep
     (Pp.array print_sep (fun _ -> Format.pp_print_string)) a
 
 let print_values_raw is_tsv f (time,l) =
   let print_sep =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
-    else !Parameter.plotSepChar in
-  Format.fprintf f "@[<h>%t%s%t%a@]@."
-    !Parameter.plotSepChar (string_of_float time) print_sep
+    else Pp.comma in
+  Format.fprintf f "@[<h>%s%t%a@]@."
+    (string_of_float time) print_sep
     (Pp.array print_sep (fun _ -> Nbr.print)) l
 
 let traceDescr = ref None

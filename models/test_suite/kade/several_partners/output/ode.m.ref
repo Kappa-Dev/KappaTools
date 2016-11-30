@@ -97,7 +97,7 @@ else
 end
 
 
-filename = 'data.out';
+filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE several_partners.ka -d output -l 1 -pp 0.01\n')
 fprintf(fid,'# t')

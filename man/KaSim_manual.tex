@@ -796,7 +796,7 @@ Argument & Description \\ \hline
 \ttt{-initial $min$} & starts the simulation at $min$ $unit$ (data outputs convienience only)\\
 \ttt{-pp $x$} & plot a line in the data file every $x$ $unit$\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
-&Use the extension to determine the format ('.tsv', '.svg' or space separeted value else)\\
+&Use the extension to determine the format ('.tsv', '.svg' or comma separeted value else)\\
 \ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
 & (for compatibility with \KaSim <= 3 and filenames starting by -)\\
 \ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
@@ -838,7 +838,7 @@ will generate a file \ttt{model.out} containing the trajectories of the observab
 \ITE{
 \item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -l 1.5 -pp 0.0015}
 }
-will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). %The order in which the files are given does not matter.
+will generate a file \ttt{data.csv} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). %The order in which the files are given does not matter.
 
 \chapter{A simple model}\label{chap:abc}
 
@@ -1129,7 +1129,6 @@ parameter & possible values & description \\
 & \ttt{"yes", "dot"} & \small generate causal flows in dot \\
 & \ttt{"json"} & \small generate causal flows in json \\
 \textit{Pretty printing}& &\\
-\ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
 \ttt{"colorDot"} &  \ttt{"no", "yes"} & \small use colors in dot format files\\
 \ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
 \ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\ &&\\

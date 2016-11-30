@@ -1,5 +1,4 @@
 (*Expert mode values*)
-let interrupt_on_exception = false
 let defaultExtArraySize = ref 5
 let defaultGraphSize = ref 5
 let defaultLiftSetSize = ref 5
@@ -7,7 +6,6 @@ let defaultHeapSize = ref 5
 let debugModeOn = ref false
 let progressBarSymbol = ref '#'
 let progressBarSize = ref 60
-let plotSepChar = ref (fun f -> Format.pp_print_space f ())
 let dumpIfDeadlocked = ref false
 let maxConsecutiveClash = ref 2
 let eclipseMode = ref false
@@ -53,10 +51,5 @@ let dump_grid_after_branching_during_weak_compression = false
 let dump_grid_after_branching_during_strong_compression = false
 let xlsweakFileName = "grid_weak_compression"
 let xlsstrongFileName = "grid_strong_compression"
-
-
-(*Computed values*)
-let cpuTime = ref 0.0
-let initSimTime () = cpuTime := Sys.time ()
 
 let get_cache_size () = !cache_size

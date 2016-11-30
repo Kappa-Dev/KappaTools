@@ -1,7 +1,7 @@
 type t = {
   mutable alg_var_overwrite   : (string * Nbr.t) list;
-  mutable minValue        : float;
-  mutable maxValue        : float option;
+  mutable minValue            : float;
+  mutable maxValue            : float option;
   mutable plotPeriod          : float;
   mutable rescale             : float option;
   mutable marshalizedInFile   : string;
@@ -20,7 +20,7 @@ let default : t = {
   rescale = None;
   marshalizedInFile = "";
   inputKappaFileNames = [];
-  outputDataFile = "data.out";
+  outputDataFile = "data.csv";
   outputDirectory = ".";
   batchmode  = false;
   interactive = false;

@@ -427,11 +427,6 @@ let configurations_of_result result =
         let () =
           Parameter.dumpIfDeadlocked := get_bool_value pos_p param value_list in
         acc
-      | "plotSepChar" ->
-        let () = set_value pos_p param value_list
-            (fun v _ -> fun f ->  Format.fprintf f "%s" v)
-            Parameter.plotSepChar in
-        acc
       | "maxConsecutiveClash" ->
         let () = set_value pos_p param value_list
             (fun v p ->

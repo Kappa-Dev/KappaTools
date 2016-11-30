@@ -190,7 +190,6 @@ let () =
             (Format.asprintf "%a" (Environment.print_ast_rule ~env)) in
         Outputs.create_distances names inJson in
 
-    Parameter.initSimTime () ;
     let () =
       if cli_args.Run_cli_args.batchmode then
         let (_,state') =
