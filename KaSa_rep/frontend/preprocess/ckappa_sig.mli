@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 29 2016>
+ * Last modification: Time-stamp: <Nov 30 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -148,7 +148,7 @@ module Site_union_find: Union_find.Union_find
 (******************************************************************************)
 (*FIFO*)
 
-module Rule_FIFO : Fifo.Work_list
+module Rule_FIFO : Working_list.Work_list
   with type elt = c_rule_id
 
 (******************************************************************************)

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 29 2016>
+ * Last modification: Time-stamp: <Nov 30 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -201,7 +201,7 @@ struct
   let print = Format.pp_print_int
 end
 
-module Rule_FIFO = Fifo.WlMake (Rule)
+module Rule_FIFO = Working_list.WlMake (Rule)
 
 (****************************************************************************)
 

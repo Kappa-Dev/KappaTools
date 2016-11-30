@@ -219,7 +219,7 @@ let compress_and_print
                           "\t\t * causal compression @."
                     in
                     let () =
-                      S.PH.B.PB.CI.Po.K.H.dump_json parameter
+                      S.PH.B.PB.CI.Po.K.H.push_json parameter
                         (Story_json.status_to_json {
                             Story_json.phase=Story_json.Inprogress;
                             Story_json.message="Start one causal compression"
@@ -382,7 +382,7 @@ let compress_and_print
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
                          let () =
-                           S.PH.B.PB.CI.Po.K.H.dump_json parameter
+                           S.PH.B.PB.CI.Po.K.H.push_json parameter
                              (Story_json.status_to_json {
                                  Story_json.phase=Story_json.Inprogress;
                                  Story_json.message="Start collecting one new trace"
@@ -447,7 +447,7 @@ let compress_and_print
                       (fun parameter handler log_info error trace  ->
                          (* we remove pseudo inverse events *)
                          let () =
-                           S.PH.B.PB.CI.Po.K.H.dump_json parameter
+                           S.PH.B.PB.CI.Po.K.H.push_json parameter
                              (Story_json.status_to_json {
                                  Story_json.phase=Story_json.Inprogress;
                                  Story_json.message="Start collecting one new trace"
@@ -606,7 +606,7 @@ let compress_and_print
       error,log_info
   in
   let () =
-    S.PH.B.PB.CI.Po.K.H.dump_json parameter
+    S.PH.B.PB.CI.Po.K.H.push_json parameter
       (Story_json.status_to_json {
           Story_json.phase=Story_json.Success;
           Story_json.message="Compression completed"

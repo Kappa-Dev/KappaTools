@@ -163,7 +163,7 @@ let print_graph logger parameter _handler error id story_info graph =
             Story_json.id = id
           }}
   in
-  let () = H.dump_json parameter (Story_json.to_json result) in
+  let () = H.push_json parameter (Story_json.to_json result) in
   error
 
 let print_elt log elt =
@@ -771,7 +771,7 @@ module BucketTable =
             }
           in
           let () =
-            S.PH.B.PB.CI.Po.K.H.dump_json
+            S.PH.B.PB.CI.Po.K.H.push_json
               parameter
               (Story_json.to_json result)
           in

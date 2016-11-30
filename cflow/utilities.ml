@@ -637,7 +637,7 @@ let compress
   | None -> error,log_info,[trace]
   | Some S.PH.B.PB.CI.Po.K.H.Causal ->
     let () =
-      S.PH.B.PB.CI.Po.K.H.dump_json
+      S.PH.B.PB.CI.Po.K.H.push_json
         parameter
         (Story_json.status_to_json
            {
@@ -653,7 +653,7 @@ let compress
          | _ -> StoryProfiling.Strong_compression,"Start one string compression"
     in
     let () =
-      S.PH.B.PB.CI.Po.K.H.dump_json
+      S.PH.B.PB.CI.Po.K.H.push_json
         parameter
         (Story_json.status_to_json
            {
@@ -1057,3 +1057,5 @@ let last_eid_in_pretrace trace =
         | Some eid -> eid
       end
   in aux l
+
+let pop_json = S.PH.B.PB.CI.Po.K.H.pop_json
