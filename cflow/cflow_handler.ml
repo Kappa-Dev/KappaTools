@@ -46,7 +46,6 @@ sig
       logger_profiling : Loggers.t ;
       logger_out : Loggers.t ;
       logger_server: Loggers.t ;
-      json_buffer: Yojson.Basic.json Fifo.t ref option ;
       log_step : bool ;
       debug_mode : bool ;
       logger_step: Loggers.t ;
@@ -120,8 +119,7 @@ sig
   val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
   val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
   val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
-  val push_json: parameter -> Yojson.Basic.json -> unit
-  val pop_json: parameter -> Yojson.Basic.json option
+  val dump_json: parameter -> Yojson.Basic.json -> unit
 end
 
 module Cflow_handler =
@@ -155,7 +153,6 @@ module Cflow_handler =
         logger_profiling: Loggers.t;
         logger_out : Loggers.t;
         logger_server : Loggers.t ;
-        json_buffer: Yojson.Basic.json Fifo.t ref option ;
         log_step : bool ;
         debug_mode: bool ;
         logger_step : Loggers.t ;
@@ -168,7 +165,7 @@ module Cflow_handler =
       }
 
     let build_parameter ~called_from ~none ~weak ~strong =
-      let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel,json_buffer =
+      let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel =
         match
           called_from
         with
@@ -178,16 +175,14 @@ module Cflow_handler =
           Loggers.dummy_html_logger,
           Loggers.dummy_html_logger,
           Loggers.dummy_html_logger,
-          Loggers.dummy_html_logger,
-          Some (ref Fifo.empty)
+          Loggers.dummy_html_logger
         | Remanent_parameters_sig.JS ->
           false,
           Loggers.dummy_txt_logger,
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_circular_buffer ~mode:Loggers.HTML (),
-          Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular (),
-          None
+          Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular ()
         | Remanent_parameters_sig.KaSa
         | Remanent_parameters_sig.KaSim
         | Remanent_parameters_sig.Internalised  ->
@@ -197,8 +192,7 @@ module Cflow_handler =
           Loggers.open_logger_from_formatter Format.err_formatter,
           Loggers.open_logger_from_formatter Format.err_formatter,
           Loggers.open_logger_from_formatter (Format.formatter_of_out_channel channel),
-          Loggers.open_logger_from_formatter Format.std_formatter,
-          None
+          Loggers.open_logger_from_formatter Format.std_formatter
       in
       {
         server = server ;
@@ -212,7 +206,6 @@ module Cflow_handler =
         logger_out = out_channel ;
         logger_err = out_channel_err ;
         logger_profiling = out_channel_profiling ;
-        json_buffer = json_buffer ;
         compression_mode = {
           causal_trace = none;
           weak_compression = weak;
@@ -371,21 +364,6 @@ module Cflow_handler =
               {parameter.kasa
                with Remanent_parameters_sig.save_error_list = f}}
 
-    let push_json parameter json =
-      match
-        parameter.json_buffer
-      with
-      | None -> dump_json parameter json 
-      | Some ref -> ref := Fifo.push json !ref
 
-    let pop_json parameter =
-      match
-        parameter.json_buffer
-      with
-      | None -> None
-      | Some ref ->
-        let fifo, elt_opt = Fifo.pop !ref in
-        let () = ref := fifo in
-        elt_opt
 
   end:Cflow_handler)
