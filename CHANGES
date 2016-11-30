@@ -1,0 +1,57 @@
+From KaSim 3 to KaSim 4
+=======================
+
+- Options '-t' '-e' and '-p' have deappeared!
+
+You should specify the limit of simulation by '-l' and the plot period
+(how often you want a data line) by '-pp'. These options are by
+default in "simulated time unit" but you can switch to event using '-u
+event'.
+
+Motivation is interactivity. You can now not specifing any limit and
+your simulation will run forever ... (well until a Ctrl-c).
+
+- Data files are comma separeted value (instead of space separeted
+  value) by default.
+
+The default name of the output file is therefore 'data.csv'.
+
+KaSim can also generate (based on the extension of the output file)
+tsv or svg files.
+
+Motivation is to deal with weird values (infinity, not a number) in a
+way understood by (at least Gnuplot, Python, Matlab, ...)
+
+- There is no special case for "observables"
+
+Number of occurence of the pattern pat is now written |pat| and it can
+be putted in any algebraic expression.
+
+To be concrete, you need to write
+%var: 'o' |A(x!1),B(x!1)|
+instead of
+%var: 'o' A(x!1),B(x!1)
+But you can write directly
+%var: 'o' 1 + |A(x!1),B(x!1)| / 2
+instead of
+%var: 'tmp_o' A(x!1),B(x!1)
+%var: 'o' 1 + 'tmp_o' / 2
+
+As a (more or less direct) consequence, you can write
+%init: "any algebraic expression" "mixture"
+and
+$TRACK "pattern" [true]
+
+- Ctrl-c does not stop the simulation
+
+It pauses it and launch a toplevel in which you can do modification
+(as in perturbations) and then (optionnaly) continue the simulation.
+
+You can use '-mode batch' if you want Ctrl-c to kill the simulation
+(and more generally KaSim to never ask questions) or '-mode
+interactive' to pause the simulation just after the initialisation
+phase.
+
+Concretly the old behavior of Ctrl-c and then y(es I want a snapshot)
+is recovered by Ctrl-c and the modification
+$SNAPSHOT "dump.ka"; $STOP
