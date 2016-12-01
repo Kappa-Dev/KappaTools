@@ -33,6 +33,8 @@ struct
     {
       global_static_information : Analyzer_headers.global_static_information;
       domain_static_information : Bdu_static_views.bdu_analysis_static;
+      domain_static_information_pattern :
+        Bdu_static_views.bdu_analysis_static_pattern;
     }
 
   (*--------------------------------------------------------------------*)
@@ -76,6 +78,21 @@ struct
 
   let get_domain_static static = static.domain_static_information
 
+  (*TODO*)
+  let set_domain_static_pattern domain static =
+    {
+      static with
+      domain_static_information_pattern = domain
+    }
+
+  let get_domain_static_pattern static =
+    static.domain_static_information_pattern
+
+  let get_store_proj_bdu_test_restriction_pattern static =
+    (get_domain_static_pattern
+       static).Bdu_static_views.store_proj_bdu_test_restriction_pattern
+  (**)
+
   let lift f x = f (get_global_static_information x)
 
   let get_compilation_information static =
@@ -102,7 +119,6 @@ struct
   let get_covering_classes static =
     (get_domain_static static).Bdu_static_views.store_covering_classes
 
-  (*TODO*)
   let get_list_of_site_type_in_covering_classes static =
     (get_domain_static
        static).Bdu_static_views.store_list_of_site_type_in_covering_classes
@@ -113,7 +129,6 @@ struct
   let get_pre_static static =
     (get_domain_static static).Bdu_static_views.store_pre_static
 
-  (*TODO*)
   let get_test_modif_map static =
     (get_pre_static static).Bdu_static_views.store_test_modif_map
 
@@ -329,6 +344,20 @@ struct
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
     let static = set_domain_static result static in
+    (*pattern*)
+    let error, store_remanent_triple = get_store_remanent_triple static error
+    in
+    let error, (handler_bdu, result) =
+      Bdu_static_views.scan_rule_set_pattern
+        parameters
+        store_remanent_triple
+        handler_bdu
+        error
+        kappa_handler
+        compiled
+    in
+    let dynamic = set_mvbdu_handler handler_bdu dynamic in
+    let static = set_domain_static_pattern result static in
     error, static, dynamic
 
   let scan_rule_set_dynamic static dynamic error =
@@ -372,10 +401,14 @@ struct
     let error, init_bdu_analysis_static =
       Bdu_static_views.init_bdu_analysis_static parameters error
     in
+    let init_bdu_analysis_static_pattern =
+      Bdu_static_views.init_bdu_analysis_static_pattern
+    in
     let init_global_static =
       {
         global_static_information = static;
-        domain_static_information = init_bdu_analysis_static
+        domain_static_information = init_bdu_analysis_static;
+        domain_static_information_pattern = init_bdu_analysis_static_pattern;
       }
     in
     let init_fixpoint = AgentCV_map_and_set.Map.empty in
@@ -1068,7 +1101,9 @@ struct
              let error, map =
                Covering_classes_type.AgentIDCV_map_and_set.Map.add parameters
                  error
-                 (agent_id, cv_id) bdu_inter map
+                 (agent_id, cv_id)
+                 bdu_inter
+                 map
              in
              error, dynamic, map
         ) proj_bdu_test_restriction
@@ -1113,7 +1148,7 @@ struct
 
   (*****************************************************************)
 
-  let step_list_empty kappa_handler dynamic parameters error _rule_id agent_id
+  let step_list_empty kappa_handler dynamic parameters error agent_id
       agent_type site_name cv_list fixpoint_result proj_bdu_test_restriction
       bdu_false bdu_true site_correspondence =
     (*------------------------------------------------------------*)
@@ -1305,7 +1340,7 @@ struct
     (*---------------------------------------------------------------------*)
     let error, dynamic, new_answer =
       step_list_empty
-        kappa_handler dynamic parameters error rule_id
+        kappa_handler dynamic parameters error
         path.Communication.agent_id
         agent_type path.Communication.site cv_list fixpoint_result
         proj_bdu_test_restriction
@@ -2095,7 +2130,7 @@ struct
   (*------------------------------------------------------------*)
 
   let compute_precondition_enable
-      _parameters error kappa_handler rule rule_id precondition
+       error kappa_handler rule rule_id precondition
       bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
       store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
@@ -2168,8 +2203,15 @@ struct
                | [] ->
                  let error, dynamic, new_answer =
                    precondition_empty_step_list
-                     kappa_handler parameters error dynamic
-                     rule_id path store_agent_name bdu_false bdu_true
+                     kappa_handler
+                     parameters
+                     error
+                     dynamic
+                     rule_id
+                     path
+                     store_agent_name
+                     bdu_false
+                     bdu_true
                      store_covering_classes_id
                      site_correspondence fixpoint_result
                      proj_bdu_test_restriction
@@ -2256,9 +2298,19 @@ struct
       (*-----------------------------------------------------*)
       (*get a set of sites in a covering class: later with state list*)
       let error, precondition =
-        compute_precondition_enable parameters error kappa_handler rule rule_id
-          precondition bdu_false bdu_true dual_contact_map store_agent_name
-          site_correspondence store_covering_classes_id fixpoint_result
+        compute_precondition_enable
+          error
+          kappa_handler
+          rule
+          rule_id
+          precondition
+          bdu_false
+          bdu_true
+          dual_contact_map
+          store_agent_name
+          site_correspondence
+          store_covering_classes_id
+          fixpoint_result
           proj_bdu_test_restriction
       in
       error, (dynamic, precondition), true
@@ -2285,8 +2337,52 @@ struct
   (***********************************************************)
   (*TODO*)
 
-  let maybe_reachable _static dynamic error _pattern precondition =
-    error, dynamic, Some precondition
+  let maybe_reachable_aux static dynamic error (pattern: Cckappa_sig.mixture)
+      precondition =
+    let parameters = get_parameter static in
+    let error, dynamic, bdu_false =
+      get_mvbdu_false static dynamic error
+    in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    let store_proj_bdu_test_restriction_pattern = (**)
+      get_store_proj_bdu_test_restriction_pattern static
+    in
+    let error, proj_bdu_test_restriction_pattern =
+      match
+        Cckappa_sig.Mixture_setmap.Map.find_option
+          pattern
+          store_proj_bdu_test_restriction_pattern
+      with
+      | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
+      | Some m -> error, m
+    in
+    try
+      let error, dynamic =
+        collect_bdu_enabled
+          parameters
+          error
+          dynamic
+          bdu_false
+          fixpoint_result
+          proj_bdu_test_restriction_pattern
+      in
+      (*let error, precondition =
+        compute_precondition_reachable
+
+      in*)
+      error, (dynamic, precondition), true
+    with
+      False (error, dynamic) -> error, (dynamic, precondition), false
+
+
+  let maybe_reachable static dynamic error pattern precondition =
+    let error, (dynamic, precondition), maybe_reachable =
+      maybe_reachable_aux static dynamic error pattern precondition
+    in
+    if maybe_reachable
+    then error, dynamic, Some precondition
+    else
+      error, dynamic, None
 
   (***********************************************************)
   (*deal with views*)
@@ -2594,7 +2690,6 @@ struct
 
   let apply_event_list static dynamic error _event_list =
     error, dynamic, []
-
 
   (**************************************************************************)
   (*main print of fixpoint*)

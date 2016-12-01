@@ -182,7 +182,7 @@ module Product
     (*TODO*)
 
     let maybe_reachable _static dynamic error _pattern precondition =
-      error, dynamic, Some precondition
+      error, dynamic, None
 
     (***********************************************************)
 
