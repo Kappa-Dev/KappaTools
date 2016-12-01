@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' 'bonds_in_creation.ka' '-u' 'time' '-l' '40' '-pp' '0.4' '-seed' '611463625' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'bonds_in_creation.ka' '-u' 'time' '-l' '40' '-p' '0.4' '-seed' '611463625' '-d' 'output' '--time-independent'
 Parsing bonds_in_creation.ka...
 done
 + Sanity checks

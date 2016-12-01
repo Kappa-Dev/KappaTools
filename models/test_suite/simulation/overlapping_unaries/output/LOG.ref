@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-l' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-pp' '0.84' 'overlapping_unaries.ka'
++ Command line to rerun is: 'KaSim' '-l' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-p' '0.84' 'overlapping_unaries.ka'
 Parsing overlapping_unaries.ka...
 done
 + Sanity checks

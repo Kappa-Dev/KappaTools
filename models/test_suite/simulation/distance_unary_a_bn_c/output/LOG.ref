@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-pp' '2' 'a_bn_c.ka'
++ Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka'
 Parsing a_bn_c.ka...
 done
 + Sanity checks

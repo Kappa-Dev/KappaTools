@@ -10,7 +10,7 @@ let get_compilation ?(unit=Time) cli_args =
       None,None,
       Some (int_of_float cli_args.Run_cli_args.minValue),
       Tools.option_map int_of_float cli_args.Run_cli_args.maxValue,
-      Counter.DE (int_of_float cli_args.Run_cli_args.plotPeriod) in
+      Counter.DE (int_of_float (ceil cli_args.Run_cli_args.plotPeriod)) in
   let counter =
     Counter.create ?init_t ?init_e ?max_time ?max_event ~plot_period in
   let (env, contact_map, updated_vars, story_compression,

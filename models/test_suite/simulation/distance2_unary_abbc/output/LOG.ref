@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '200' '-seed' '438438234' '-o' 'data.svg' '-d' 'output' '-pp' '2' 'abbc.ka'
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '200' '-seed' '438438234' '-o' 'data.svg' '-d' 'output' '-p' '2' 'abbc.ka'
 Parsing abbc.ka...
 done
 + Sanity checks

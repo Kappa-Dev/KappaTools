@@ -37,7 +37,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("-l",
    Arg.Float(fun time -> t.maxValue <- Some time),
    "Limit of the simulation");
-  ("-pp",
+  ("-p",
    Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
    "plot period: time interval between points in plot (default: 1.0)");
   ("-var",

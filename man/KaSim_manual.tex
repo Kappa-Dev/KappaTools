@@ -698,7 +698,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 \ttt{[T]} & the bio-time of the simulation \\
 \ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
 \ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l}. \\ &Note that if unset \ttt{Tmax}$=\infty$\\
-\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-pp}. \\
+\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-p}. \\
 
 \ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
@@ -733,7 +733,7 @@ define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!
 'ab' A(x),A(x) -> A(x!1),A(x!1) @ 'k_on'/2
 \end{lstlisting}
 %%
-\KaSim~may output values of variables in the data file\index{data file} (see option \ttt{-pp} in Chapter~\ref{chap:cl}) using plot do:
+\KaSim~may output values of variables in the data file\index{data file} (see option \ttt{-p} in Chapter~\ref{chap:cl}) using plot do:
 \begin{lstlisting}[language=kappa]
 %plot: 'var_name'
 \end{lstlisting}
@@ -780,7 +780,7 @@ accessible through the command line. Options that expects an argument
 are preceded by a single dash, options that do not need any argument
 start with a double dash.
 
-Two key options are the plot period \ttt{-pp} (how often you want a
+Two key options are the plot period \ttt{-p} (how often you want a
 line in the data file) and the limit \ttt{-l} of simulation. These
 quantities can expressed in simulated time (the default) or in number
 of event (using \ttt{-u event}).
@@ -794,7 +794,7 @@ Argument & Description \\ \hline
 \ttt{-u $unit$} & unit of options (time/event)\\
 \ttt{-l $max$} & Terminates simulation after $max \geq 0$ $unit$\\
 \ttt{-initial $min$} & starts the simulation at $min$ $unit$ (data outputs convienience only)\\
-\ttt{-pp $x$} & plot a line in the data file every $x$ $unit$\\
+\ttt{-p $x$} & plot a line in the data file every $x$ $unit$\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
 &Use the extension to determine the format ('.tsv', '.svg' or comma separeted value else)\\
 \ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
@@ -832,11 +832,11 @@ Argument & Description \\ \hline
 \section{Example}
 The command
 \ITE{
-\item[\$] \ttt{KaSim model.ka -u event -l 1000000 -pp 1000 -o model.out}
+\item[\$] \ttt{KaSim model.ka -u event -l 1000000 -p 1000 -o model.out}
 }
 will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. A measure will be taken every 1000 events in file \ttt{model.out}. The command
 \ITE{
-\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -l 1.5 -pp 0.0015}
+\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -l 1.5 -p 0.0015}
 }
 will generate a file \ttt{data.csv} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). %The order in which the files are given does not matter.
 
@@ -880,12 +880,12 @@ There are two main points to notice about this model: \ttt{A} can modify both si
 We try first a coarse simulation of $100,000$ events (10 times the number of agents in the initial system).
 \ttt{
 \ITE{
-\item[\$] KaSim ABC.ka -u event -l 100000 -pp 1000 -o abc.out
+\item[\$] KaSim ABC.ka -u event -l 100000 -p 1000 -o abc.csv
 }}
-Plotting the content of the \ttt{abc.out} file one notices that nothing of significant interest happen to the observables after 250s. So we can now specify a meaningful time limit by running
+Plotting the content of the \ttt{abc.csv} file one notices that nothing of significant interest happen to the observables after 250s. So we can now specify a meaningful time limit by running
 \ttt{
 \ITE{
-\item[\$] KaSim ABC.ka -l 250 -pp 0.25 -o abc.out
+\item[\$] KaSim ABC.ka -l 250 -p 0.25 -o abc.out
 }}
 which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
 \begin{figure}[htbp]
@@ -977,7 +977,7 @@ The modified kappa file is available in the source repository, in the \ttt{model
 Running again a simulation (a bit longer) by entering in the command line:
 \ttt{
 \ITE{
-\item[\$] KaSim ABC-pert.ka -l 300 -pp 0.3 -o abc2.out
+\item[\$] KaSim ABC-pert.ka -l 300 -p 0.3 -o abc2.out
 }}
 one obtains the curve given in Fig.~\ref{fig:abc2}.
 
@@ -1609,7 +1609,7 @@ In order to make sure that \KaSim~is not incorrectly blocked you may wish to plo
 Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E]}) should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
-Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use a reasonable value for the \ttt{-pp} option in the command line to tell KaSim how often you wish to have points on your curves.
+Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use a reasonable value for the \ttt{-p} option in the command line to tell KaSim how often you wish to have points on your curves.
 
 \section*{Too many instances of an observable}
 The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}.

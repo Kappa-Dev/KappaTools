@@ -1,4 +1,4 @@
-+ Command line to rerun is: 'KaSim' 'empty.ka' '-l' '6' '-d' 'output' '-seed' '126704914' '-pp' '0.2' '--time-independent'
++ Command line to rerun is: 'KaSim' 'empty.ka' '-l' '6' '-d' 'output' '-seed' '126704914' '-p' '0.2' '--time-independent'
 Parsing empty.ka...
 done
 + Sanity checks

@@ -1,3 +1,4 @@
-# Output of 'KaSim' 'lpc2.ka' '-seed' '924556145' '-u' 'event' '-l' '2' '-pp' '0.1' '-d' 'output'
+# Output of 'KaSim' 'lpc2.ka' '-seed' '924556145' '-u' 'event' '-l' '2' '-d' 'output'
 [T], 'free A'
 0., 0
+0.185735899376, 1

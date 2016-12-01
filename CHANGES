@@ -1,12 +1,12 @@
 From KaSim 3 to KaSim 4
 =======================
 
-- Options '-t' '-e' and '-p' have deappeared!
+- Options '-t' '-e' and '-p' have desappeared!
 
 You should specify the limit of simulation by '-l' and the plot period
-(how often you want a data line) by '-pp'. These options are by
-default in "simulated time unit" but you can switch to event using '-u
-event'.
+(how often you want a data line) by the "new" '-p'. These options are
+by default in "simulated time unit" but you can switch to event using
+'-u event'.
 
 Motivation is interactivity. You can now not specifing any limit and
 your simulation will run forever ... (well until a Ctrl-c).
