@@ -38,7 +38,7 @@ module type StoryTable =
     val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,table,table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.quaternary
     val hash_list: (table, table) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
 
-    val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
+    val sort_list: (table, (Trace.t * Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) Generic_branch_and_cut_solver.Solver.PH.B.PB.CI.Po.K.H.unary
   end
 
 module StoryTable:StoryTable

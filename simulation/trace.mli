@@ -32,9 +32,6 @@ val print_event_kind :
   ?env:Environment.t -> Format.formatter -> event_kind -> unit
 val print_event_kind_dot_annot :
   Environment.t -> Format.formatter -> event_kind -> unit
-val log_event_kind :
-  Environment.t -> int -> (int * (int *int*int)) list ->
-  event_kind -> Yojson.Basic.json
 
 type event =
   event_kind *
@@ -82,3 +79,6 @@ val step_of_yojson : Yojson.Basic.json -> step
 
 val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
+
+val log_event :
+  int -> (int * (int *int*int)) list -> event_kind -> t -> Yojson.Basic.json

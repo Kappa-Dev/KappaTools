@@ -37,7 +37,7 @@ sig
   val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list,table,table) S.PH.B.PB.CI.Po.K.H.quaternary
   val hash_list: (table, table) S.PH.B.PB.CI.Po.K.H.unary
 
-  val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) S.PH.B.PB.CI.Po.K.H.unary
+  val sort_list: (table, (Trace.t * Causal.grid * StoryProfiling.StoryStats.log_info Trace.Simulation_info.t list) list) S.PH.B.PB.CI.Po.K.H.unary
 end
 
 module H=S.PH.B.PB.CI.Po.K.H
@@ -615,8 +615,8 @@ module ListTable =
       let error,log_info,list = visit2 list log_info error [] in
       error,log_info,list
 
-    let project_tuple (grid,_,_,_,list) =
-      List.hd list,grid,list
+    let project_tuple (grid,_,_,trace,list) =
+      List.hd list,trace,grid,list
 
     let sort_list _parameter _handler log_info error list =
       let flat_list =
@@ -629,10 +629,10 @@ module ListTable =
                list_out list)
           [] list
       in
-      let compare_pair (a,_,_) (c,_,_) =
+      let compare_pair (a,_,_,_) (c,_,_,_) =
         Trace.Simulation_info.compare_by_story_id a c in
       let flat_list = List.sort compare_pair flat_list in
-      error, log_info, List.rev_map (fun (_a,b,c) -> b,c) (List.rev flat_list)
+      error, log_info, List.rev_map (fun (_a,b,c,d) -> b,c,d) (List.rev flat_list)
 
     let count_stories list =
       List.fold_left
@@ -1048,7 +1048,7 @@ let rec print_outer_tree parameter handler error prefix outer_tree =
         Int_storage.Nearly_inf_Imperatif.fold
           (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
           error
-          (fun _parameter error _ (a,_b,_c,_d,e) l -> error,(a,e)::l)
+          (fun _parameter error _ (a,_b,_c,d,e) l -> error,(d,a,e)::l)
           table.array
           []
       in error,log_info,l

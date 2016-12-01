@@ -111,7 +111,7 @@ val pretty_print :
   Environment.t ->
   Graph_closure.config ->
   string ->
-  string -> (grid * 'b Trace.Simulation_info.t list) list ->
+  string -> (Trace.t * grid * 'b Trace.Simulation_info.t list) list ->
   Exception.method_handler*StoryProfiling.StoryStats.log_info
 (** [pretty_print err_fmt env config_closure compression_type label story_list
                   state env] *)

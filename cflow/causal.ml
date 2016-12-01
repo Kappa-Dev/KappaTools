@@ -576,7 +576,7 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
          f "@[<v 2><script>@,%t@]@,</script>"
          (js_of_grid env enriched_grid))
 
-let json_of_grid enriched_grid grid_story env =
+let json_of_grid enriched_grid grid_story steps =
   let config = enriched_grid.config in
   let prec_star = enriched_grid.prec_star in
   let depth_of_event = enriched_grid.depth_of_event in
@@ -599,7 +599,7 @@ let json_of_grid enriched_grid grid_story env =
     | Some atom_kind ->
        if eid <> 0 then
          let quarks = Hashtbl.find_all tbl eid in
-         Trace.log_event_kind env eid quarks atom_kind
+         Trace.log_event eid quarks atom_kind steps
        else `Null in
   let nodes_to_list =
     Mods.IntMap.fold
@@ -682,15 +682,15 @@ let pretty_print
       if compression_type = "" then "none" else compression_type in
     let error,log_info,story_list =
       List.fold_left
-        (fun (error,log_info,list) (x,y) ->
+        (fun (error,log_info,list) (z,x,y) ->
            let error,log_info,x = enrich_grid parameter handler log_info error config_closure x in
-           error,log_info,(x,y)::list)
+           error,log_info,(z,x,y)::list)
         (error,log_info,[]) grid_list
     in
     let story_list = List.rev story_list in
     let _ =
       List.fold_left
-        (fun cpt (enriched_config,stories) ->
+        (fun cpt (steps,enriched_config,stories) ->
            let av_t,ids,n =
              List.fold_left
                (fun (av_t,ids,n) info ->
@@ -717,13 +717,13 @@ let pretty_print
                   [compression_type;string_of_int cpt] "dot"
                   (dot_of_grid profiling env enriched_config)
              | Json ->
-                let (grid_story,_) = List.nth grid_list cpt in
+                let (_,grid_story,_) = List.nth grid_list cpt in
                 let filename = Kappa_files.get_cflow
                                  [compression_type;(string_of_int cpt)] "json"
                 in
                 Yojson.Basic.to_file
                   filename
-                  (json_of_grid enriched_config grid_story env)
+                  (json_of_grid enriched_config grid_story steps)
              | Html ->
                 let profiling desc =
                   Format.fprintf
@@ -745,6 +745,11 @@ let pretty_print
            cpt+1
         ) 0 story_list
     in
+    let () = match dotFormat with
+        Json -> let env_filename =
+                  Kappa_files.get_cflow [compression_type;"env"] "json" in
+                Yojson.Basic.to_file env_filename (Environment.to_yojson env)
+      | Dot | Html -> () in
     let _ =
       Kappa_files.with_cflow_file
         [compression_type;"Summary"] "dat"
@@ -752,7 +757,7 @@ let pretty_print
            let () = Format.fprintf form "@[<v>#id\tE\tT\t\tdepth\tsize\t@," in
            let () =
              Pp.listi Pp.empty
-               (fun cpt f (enriched_config,story) ->
+               (fun cpt f (_,enriched_config,story) ->
                   let depth = enriched_config.depth in
                   let size = enriched_config.size in
                   List.iter

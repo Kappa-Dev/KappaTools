@@ -170,7 +170,7 @@ val fold_story_table_without_progress_bar:
 val flatten_story_table: (story_table,story_table) unary
 
 (** convert a table into a list of grid (with runtime information)*)
-val export_story_table: (story_table,(Causal.grid*trace_runtime_info list) list) unary
+val export_story_table: (story_table,(Trace.t*Causal.grid*trace_runtime_info list) list) unary
 
 
 (** The following functions are for expert only *)

@@ -76,38 +76,6 @@ let print_event_kind ?env f x =
         f "Intro @[<h>%a@]"
         (Pp.list Pp.comma (Environment.print_agent ~env)) s
 
-let log_event_kind env id quarks event_kind =
-  let quarks_to_json =
-    JsonUtil.of_list
-      (fun (c,(ni,qi,s)) ->
-        let impact = if (c=1) then "tested"
-                     else if (c=2) then "modified"
-                     else "tested + modified" in
-        let state = if (s=1) then "link" else "internal state" in
-        (`List [
-            `String impact;
-            (`Assoc ["node", `Int ni]);
-            (`Assoc ["site", `Int qi]);
-            `String state;
-      ])) quarks in
-  match event_kind with
-  | RULE r_id  ->
-     let _ = Environment.print_ast_rule ~env (Format.str_formatter) r_id in
-     let na = Format.flush_str_formatter () in
-     `List [`Int id; `String "RULE"; `String na;
-            (`Assoc ["quarks", quarks_to_json])]
-  | INIT l ->
-     let agent_type x =
-       let _ = Environment.print_agent ~env (Format.str_formatter) x in
-       Format.flush_str_formatter () in
-     `List [`Int id; `String "INIT";
-            `List (List.map (fun x -> `String (agent_type x)) l);
-            (`Assoc ["quarks", quarks_to_json])]
-  | PERT s -> `List [`Int id; `String "PERT"; `String s;
-                     (`Assoc ["quarks", quarks_to_json])]
-  | OBS s -> `List [`Int id; `String "OBS"; `String s;
-                    (`Assoc ["quarks", quarks_to_json])]
-
 let event_kind_to_json = function
   | OBS s -> `List [`String "OBS"; `String s]
   | RULE i -> `List [`String "RULE"; `Int i]
@@ -303,3 +271,113 @@ let actions_of_step = function
   | Init y -> (y,[])
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
+
+let quarks_to_json quarks =
+  let impact c = if (c=1) then "tested" else
+                   (if (c=2) then "modified" else "tested + modified") in
+  let state s = if (s=1) then "link" else "internal state" in
+  JsonUtil.of_list
+    (fun (c,(ni,qi,s)) ->
+      (`List [ `String (impact c); (`Assoc ["node", `Int ni]);
+               (`Assoc ["site", `Int qi]);`String (state s);])) quarks
+
+let check_create_quarks aid sites quarks =
+  List.for_all
+    (fun (site,internal) ->
+      match internal with
+      | Some _ -> ((List.mem (2,(aid,site,0)) quarks)&&
+                     (List.mem (2,(aid,site,1)) quarks))
+      | None -> (List.mem (2,(aid,site,1)) quarks)) sites
+
+let check_modified_quarks ((aid,_),site) modif quarks =
+  List.exists
+    (fun (c,(n,s,m)) ->
+      ((c=2)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
+
+let check_tested_quarks ((aid,_),site) modif quarks =
+  List.exists
+    (fun (c,(n,s,m)) ->
+      ((c=1)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
+
+let check_event_quarks actions tests quarks =
+  (List.for_all
+    (function
+     | Instantiation.Create ((aid,_),sites) ->
+        check_create_quarks aid sites quarks
+     | Instantiation.Free asite ->
+        check_modified_quarks asite 1 quarks
+     | Instantiation.Bind_to (asite1,asite2)
+       | Instantiation.Bind (asite1,asite2) ->
+        (check_modified_quarks asite1 1 quarks)&&
+          (check_modified_quarks asite2 1 quarks)
+     | Instantiation.Mod_internal (asite,_) ->
+        check_modified_quarks asite 0 quarks
+     | Instantiation.Remove (aid,_) ->
+        List.exists
+          (fun (c,(n,_,_)) ->
+            ((c=2)||(c=3))&&(n=aid)) quarks)
+    actions)&&
+  (List.for_all
+    (function
+     | Instantiation.Is_Here (aid,_) ->
+        List.exists
+          (fun (c,(n,_,_)) ->
+            ((c=1)||(c=3))&&(n=aid)) quarks
+     | Instantiation.Has_Internal (asite,_) ->
+        check_tested_quarks asite 0 quarks
+     | Instantiation.Is_Free asite | Instantiation.Is_Bound asite
+       | Instantiation.Has_Binding_type (asite,_) ->
+        check_tested_quarks asite 1 quarks
+     | Instantiation.Is_Bound_to (asite1,asite2) ->
+        (check_tested_quarks asite1 1 quarks)&&
+          (check_tested_quarks asite2 1 quarks))
+    tests)
+
+let log_event id quarks event_kind steps =
+  match event_kind with
+  | INIT _ ->
+     let stp =
+       List.find
+         (function
+          | Init actions ->
+             List.for_all
+               (function
+                | Instantiation.Create ((aid,_),sites) ->
+                   check_create_quarks aid sites quarks
+                | Instantiation.Free _ | Instantiation.Bind_to _
+                  | Instantiation.Bind _-> true
+                | Instantiation.Mod_internal _ | Instantiation.Remove _ ->
+                   raise (ExceptionDefn.Internal_Error
+                            (Location.dummy_annot
+                               "init event has actions not allowed"))) actions
+          | Event _ | Obs _ | Subs _ | Dummy _ -> false) steps in
+     `List [`Int id; step_to_yojson stp ]
+  | RULE rid ->
+     let stp =
+       List.find
+         (function
+          | Event (ekind,(tests,(actions,_,_)),_) ->
+             (match ekind with
+              | RULE rid' ->
+                 ((rid=rid')&&(check_event_quarks actions tests quarks))
+             | PERT _ | OBS _ | INIT _ -> false)
+          | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
+     `List [`Int id; step_to_yojson stp]
+  | OBS _ ->
+     let stp =
+       List.find
+         (function
+          |  Obs _ -> true
+          | Subs _ | Dummy _ | Init _ | Event _ -> false) steps in
+     `List [`Int id; step_to_yojson stp]
+  | PERT pert ->
+     let stp =
+       List.find
+         (function
+          | Event (ekind,(tests,(actions,_,_)),_) ->
+             (match ekind with
+              | PERT pert' ->((pert=pert')&&
+                                (check_event_quarks actions tests quarks))
+              | OBS _ | INIT _ | RULE _ -> false)
+          | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
+     `List [`Int id; step_to_yojson stp]
