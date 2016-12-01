@@ -55,6 +55,7 @@ before_install:
 
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
+  - opam install -y conf-which #Hack so that opam choose a version of yojson recent enough
   - opam install -y ocamlbuild yojson
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData markup tyxml js_of_ocaml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
