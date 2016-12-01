@@ -215,9 +215,8 @@ let print_values_raw is_tsv f (time,l) =
   let print_sep =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
     else Pp.comma in
-  Format.fprintf f "@[<h>%s%t%a@]@."
-    (string_of_float time) print_sep
-    (Pp.array print_sep (fun _ -> Nbr.print)) l
+  Format.fprintf f "@[<h>%s%t%a@]@." (string_of_float time) print_sep
+    (Pp.array print_sep (fun _ -> Nbr.print_option)) l
 
 let traceDescr = ref None
 let traceNotEmpty = ref false
@@ -330,7 +329,8 @@ let go env = function
     | None -> ()
     | Some (_,tab) ->
       tab.(d.Data.distance_rule) <-
-        (d.Data.distance_time,d.Data.distance_length)::tab.(d.Data.distance_rule)
+        (d.Data.distance_time,d.Data.distance_length)
+        ::tab.(d.Data.distance_rule)
 
 let close () =
   let () = close_plot () in

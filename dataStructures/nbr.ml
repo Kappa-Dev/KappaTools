@@ -82,9 +82,12 @@ let neg n = cast_un_op ~op_f:(~-.) ~op_i:(~-) ~op_i64:Int64.neg n
 
 let to_float n =
   match n with
-  | F x -> x
-  | I x -> float_of_int x
-  | I64 x -> Int64.to_float x
+  | I x -> Some (float_of_int x)
+  | I64 x -> Some (Int64.to_float x)
+  | F x -> match classify_float x with
+    | FP_zero | FP_normal | FP_subnormal -> Some x
+    | FP_infinite | FP_nan -> None
+
 
 let to_int n =
   match n with
@@ -111,6 +114,15 @@ let print f = function
   | F x -> Format.fprintf f "%s" (string_of_float x)
   | I64 x -> Format.fprintf f "%Ld" x
   | I x -> Format.fprintf f "%d" x
+
+let print_option f = function
+  | I x -> Format.fprintf f "%d" x
+  | I64 x -> Format.fprintf f "%Ld" x
+  | F x ->
+    match classify_float x with
+    | FP_zero | FP_normal | FP_subnormal ->
+       Format.fprintf f "%s" (string_of_float x)
+    | FP_infinite | FP_nan -> ()
 
 let to_string = function
   | F x -> string_of_float x
@@ -149,13 +161,6 @@ let of_bin_alg_op = function
   | Operator.SUM -> add
   | Operator.DIV -> fun x y -> cast_bin_op ~op_f:(/.) x y
   | Operator.MINUS -> sub
-  | Operator.POW ->
-    fun x n ->
-      let f =
-        cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
-      if is_zero n || is_strictly_positive n
-      then f x n
-      else f (F (1. /. to_float x)) (neg n)
   | Operator.MODULO ->
     cast_bin_op ~op_i:(mod)  ~op_i64:Int64.rem
       ~op_f:(fun a b ->
@@ -163,6 +168,15 @@ let of_bin_alg_op = function
             (int_of_float a mod int_of_float b))
   | Operator.MIN -> min
   | Operator.MAX -> max
+  | Operator.POW ->
+    fun x n ->
+      let f =
+        cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
+      if is_zero n || is_strictly_positive n
+      then f x n
+      else match to_float x with
+        | Some x -> f (F (1. /. x)) (neg n)
+        | None -> F nan
 
 let of_un_alg_op = function
   | Operator.LOG -> fun x -> cast_un_op ~op_f:log x

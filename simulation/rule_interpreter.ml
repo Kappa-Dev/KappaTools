@@ -460,15 +460,15 @@ let extra_outdated_var i state =
      (Operator.DepSet.add (Operator.ALG i) rdeps,changed_connectivity)}
 
 let store_activity ~get_alg store env counter state id syntax_id rate cc_va =
-  let rate =
-    Nbr.to_float @@ value_alg counter state ~get_alg rate in
   let () =
     if !Parameter.debugModeOn then
       Format.printf "@[%sule %a has now %i instances.@]@."
         (if id mod 2 = 1 then "Unary r" else "R")
         (Environment.print_rule ~env) (id/2) cc_va in
   let act =
-    if cc_va = 0 then 0. else rate *. float_of_int cc_va in
+    match Nbr.to_float @@ value_alg counter state ~get_alg rate with
+    | None -> if cc_va = 0 then 0. else infinity
+    | Some rate -> rate *. float_of_int cc_va in
   store id syntax_id act
 
 let update_outdated_activities ~get_alg store env counter state =

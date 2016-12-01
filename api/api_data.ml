@@ -72,7 +72,8 @@ let label_snapshot
         (fun (agent,mixture) -> (agent,api_mixture sigs mixture))
         snapshot.Data.snapshot_agents
   ; Api_types_j.snapshot_tokens =
-      Array.map (fun (token,value) -> (Nbr.to_float value,token))
+      Array.map
+        (fun (token,value) -> (Tools.unsome infinity (Nbr.to_float value),token))
         snapshot.Data.snapshot_tokens
   }
 

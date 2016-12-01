@@ -176,9 +176,12 @@ let one_clashing_instance_event c dt =
   let () = inc_time c dt in
   check_time c && check_events c
 let one_time_correction_event c ti =
-  let () = c.time <- Nbr.to_float ti in
-  let () = c.stat_null <- Stat_null_events.incr_time_correction c.stat_null in
-  check_time c && check_events c
+  match Nbr.to_float ti with
+  | None -> false
+  | Some ti ->
+    let () = c.time <- ti in
+    let () = c.stat_null <- Stat_null_events.incr_time_correction c.stat_null in
+    check_time c && check_events c
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
 let max_events c = c.max_event

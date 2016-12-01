@@ -281,12 +281,7 @@ let build_ast
        (fun e -> Lwt.return (`Error e)))
 
 let prepare_plot_value x =
-  Array.fold_right
-    (fun nbr acc -> let c = Nbr.to_float nbr in
-      match classify_float c with
-      | FP_infinite | FP_nan -> None :: acc
-      | FP_zero | FP_normal | FP_subnormal -> Some c::acc)
-    x []
+  Array.fold_right (fun nbr acc -> Nbr.to_float nbr :: acc) x []
 
 let outputs (simulation : t) =
   function

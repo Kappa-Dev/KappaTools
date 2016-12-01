@@ -111,7 +111,8 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types_v1_j.snapshot =
         (fun (agent,mixture) -> (agent,api_mixture sigs mixture))
         snapshot.Data.snapshot_agents
   ; Api_types_v1_j.tokens =
-      List.map (fun (token,value) -> (Nbr.to_float value,token))
+      List.map
+        (fun (token,value) -> (Tools.unsome infinity (Nbr.to_float value),token))
         (Array.to_list snapshot.Data.snapshot_tokens)
   }
 

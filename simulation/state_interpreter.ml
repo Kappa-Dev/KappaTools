@@ -19,9 +19,12 @@ let initial_activity get_alg env counter graph activities =
   Environment.fold_rules
     (fun i () rule ->
        if Array.length rule.Primitives.connected_components = 0 then
-         let rate = Rule_interpreter.value_alg
-             counter graph ~get_alg (fst rule.Primitives.rate) in
-         Random_tree.add (2*i) (Nbr.to_float rate) activities)
+         match Nbr.to_float @@ Rule_interpreter.value_alg
+             counter graph ~get_alg (fst rule.Primitives.rate) with
+         | None ->
+           ExceptionDefn.warning ~pos:(snd rule.Primitives.rate)
+             (fun f -> Format.fprintf f "Problematic rule rate replaced by 0")
+         | Some rate -> Random_tree.add (2*i) rate activities)
     () env
 
 let empty env stopping_times alg_overwrite =
