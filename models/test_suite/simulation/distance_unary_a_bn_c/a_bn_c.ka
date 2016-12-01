@@ -16,7 +16,7 @@
 %obs: 'Ap' |A(a~p?)|
 %obs: 'Cp' |C(c~u?)|
 
-%def: "storeUnaryDistance" "true"
+%def: "storeUnaryHorizon" "true"
 
 
 %init: 100 A(a~u)

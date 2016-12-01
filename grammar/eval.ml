@@ -392,11 +392,11 @@ let configurations_of_result result =
                      ("Unkown value "^error^" for compression mode", pos))
         in
         parse story_compression value_list
-      | "jsonUnaryDistance" ->
+      | "jsonUnaryHorizon" ->
         if get_bool_value pos_p param value_list
         then (Some true,story_compression,formatCflow,cflowFile)
         else acc
-      | "storeUnaryDistance" ->
+      | "storeUnaryHorizon" ->
         ((if get_bool_value pos_p param value_list then Some false else None),
          story_compression,formatCflow,cflowFile)
       | "cflowFileName" ->

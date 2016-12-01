@@ -443,7 +443,7 @@ thought of for now as positive real numbers).
   \caption{Rate expressions}
   \begin{tabular}{@{} lcl @{}}
     \textit{rate\_expression} &::=& \textit{algebraic\_expression} \\
-&&| \textit{algebraic\_expression} \tcb{(}\textit{algebraic\_expression}\tcb{)}
+&&| \textit{algebraic\_expression} \tcb{\{}\textit{algebraic\_expression}:\textit{algebraic\_expression}\tcb{\}}
     \end{tabular}
   \label{tab:rates}
 \end{table}
@@ -654,6 +654,15 @@ and that we give Figure~\ref{fig:species}.
 \end{center}
 \end{figure}
 
+For rules with unary rates, one can also specify an \emph{horizon}.
+For example in the rule
+\begin{lstlisting}[language=kappa]
+'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k_1'\{'k_2':5\}
+\end{lstlisting}
+the unary rate is applied only when the agents $A$ and $B$ are at an
+horizon $5$ (or closer), of each other. Horizon is an algebraic expression
+but during simulation, it is always truncated to a positive integer.
+This feature \emph{can change in the future}.
 
 \section{Variables}\label{sec:var}
 
@@ -1132,7 +1141,7 @@ parameter & possible values & description \\
 \ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\
 && \small before giving up \\
 && \small square approximation\\
-\ttt{"storeUnaryDistance"} & \ttt{"true", "false"} & \small Record distance between connected components\\
+\ttt{"storeUnaryHorizon"} & \ttt{"true", "false"} & \small Record distance between connected components\\
 && \small when unary rule applies\\
 \end{tabular}
 \label{tab:parameters}
