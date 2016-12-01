@@ -1,6 +1,6 @@
 let usage_msg =
   "KaSim "^Version.version_string^":\n"^
-  "Usage is KaSim [-e events | -t time] [-pp delta_t] [-o output_file] input_files\n"
+  "Usage is KaSim [-l time] [-p delta_t] [-o output_file] input_files\n"
 
 let tmp_trace = ref(None:string option)
 let remove_trace () = match !tmp_trace with None -> () | Some d -> Sys.remove d
