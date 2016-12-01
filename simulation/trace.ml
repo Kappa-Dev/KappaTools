@@ -272,15 +272,6 @@ let actions_of_step = function
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
 
-let quarks_to_json quarks =
-  let impact c = if (c=1) then "tested" else
-                   (if (c=2) then "modified" else "tested + modified") in
-  let state s = if (s=1) then "link" else "internal state" in
-  JsonUtil.of_list
-    (fun (c,(ni,qi,s)) ->
-      (`List [ `String (impact c); (`Assoc ["node", `Int ni]);
-               (`Assoc ["site", `Int qi]);`String (state s);])) quarks
-
 let check_create_quarks aid sites quarks =
   List.for_all
     (fun (site,internal) ->

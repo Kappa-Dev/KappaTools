@@ -445,13 +445,7 @@ let value_alg ~get_alg counter state alg =
     alg
 
 let max_dist_to_int ~get_alg counter state d =
-  match (value_alg ~get_alg counter state d) with
-  | Nbr.I d' -> d'
-  | Nbr.I64 _ | Nbr.F _ ->
-     raise
-       (ExceptionDefn.Internal_Error
-          (Location.dummy_annot
-             "Distance in unary rules is not an int"))
+  Nbr.to_int (value_alg ~get_alg counter state d)
 
 let extra_outdated_var i state =
   let rdeps,changed_connectivity = state.outdated_elements in
