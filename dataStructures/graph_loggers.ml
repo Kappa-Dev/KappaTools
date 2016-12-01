@@ -226,7 +226,7 @@ let print_graph_foot logger =
     end
   | Loggers.Json  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
-  
+
 let print_comment
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])

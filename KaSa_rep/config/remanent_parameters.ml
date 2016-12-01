@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 23 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -281,7 +281,6 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
     match
       called_from
     with
-    | Remanent_parameters_sig.JS -> None,true,[|"KaSa";"(javascript mode)"|]
     | Remanent_parameters_sig.Server -> None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
     | Remanent_parameters_sig.Internalised ->
       Some stdout,false || html_mode, Sys.argv

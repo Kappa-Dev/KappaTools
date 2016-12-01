@@ -175,19 +175,11 @@ module Cflow_handler =
         | Remanent_parameters_sig.Server ->
           true,
           Loggers.open_logger_from_channel ~mode:Loggers.Json stdout,
-          Loggers.dummy_html_logger,
-          Loggers.dummy_html_logger,
-          Loggers.dummy_html_logger,
-          Loggers.dummy_html_logger,
-          Some (ref Fifo.empty)
-        | Remanent_parameters_sig.JS ->
-          false,
-          Loggers.dummy_txt_logger,
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_circular_buffer ~mode:Loggers.HTML (),
           Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular (),
-          None
+          Some (ref Fifo.empty)
         | Remanent_parameters_sig.KaSa
         | Remanent_parameters_sig.KaSim
         | Remanent_parameters_sig.Internalised  ->
@@ -375,7 +367,7 @@ module Cflow_handler =
       match
         parameter.json_buffer
       with
-      | None -> dump_json parameter json 
+      | None -> dump_json parameter json
       | Some ref -> ref := Fifo.push json !ref
 
     let pop_json parameter =

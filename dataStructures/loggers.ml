@@ -382,3 +382,33 @@ let dump_json logger json =
       ()
   in
   ()
+
+
+let line_to_json line =
+  `Assoc ["line", JsonUtil.of_string line]
+
+let line_of_json json =
+  match
+    json
+  with
+  | `Assoc ["line", `String s] -> s
+  | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "line" ,json))
+
+
+let gen_iter iter list =
+  let output = ref [] in
+  let () = iter (fun line -> output:=line::!output) list in
+  JsonUtil.of_list line_to_json (List.rev !output)
+
+let to_json logger =
+  match
+    logger.logger
+  with
+  | DEVNUL
+  | Formatter _ -> `List []
+  | Circular_buffer a ->
+    gen_iter Circular_buffers.iter !a
+  | Infinite_buffer b ->
+    gen_iter Infinite_buffers.iter !b
+
+let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json

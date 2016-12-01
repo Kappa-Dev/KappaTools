@@ -53,10 +53,12 @@ type ('a,'b,'c,'d,'e,'f,'g) sexternary =
 
 val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) binary,'a,'b list,'a) ternary
 
-(* Json buffer *)
+(* Json interactions *)
 
-val pop_json: parameter -> Yojson.Basic.json option 
-
+val pop_json: parameter -> Yojson.Basic.json option
+val profiling_state_to_json: parameter -> Yojson.Basic.json
+val error_list_to_json: parameter -> Yojson.Basic.json
+val computation_steps_to_json: parameter -> Yojson.Basic.json 
 
 (** traces *)
 type trace

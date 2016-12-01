@@ -1059,3 +1059,23 @@ let last_eid_in_pretrace trace =
   in aux l
 
 let pop_json = S.PH.B.PB.CI.Po.K.H.pop_json
+let profiling_state_to_json parameters =
+  `Assoc
+    [
+      "profiling information",
+      Loggers.to_json (S.PH.B.PB.CI.Po.K.H.get_profiling_logger parameters)
+    ]
+
+let error_list_to_json parameters =
+  `Assoc
+    [
+      "errors",
+      Loggers.to_json (S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters)
+    ]
+
+let computation_steps_to_json parameters =
+  `Assoc
+    [
+      "computation steps",
+      Loggers.to_json (S.PH.B.PB.CI.Po.K.H.get_logger parameters)
+    ]

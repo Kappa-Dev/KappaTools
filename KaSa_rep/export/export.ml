@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 27 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -146,7 +146,6 @@ let init ?compil ~called_from () =
       | Remanent_parameters_sig.Internalised
       | Remanent_parameters_sig.Server
       | Remanent_parameters_sig.KaSim
-      | Remanent_parameters_sig.JS
       | Remanent_parameters_sig.KaSa ->
         begin
           let errors = Exception.empty_error_handler in
@@ -176,7 +175,6 @@ let title_only_in_kasa parameters =
   match
     Remanent_parameters.get_called_from parameters
   with
-  | Remanent_parameters_sig.JS
   | Remanent_parameters_sig.Server
   | Remanent_parameters_sig.Internalised
   | Remanent_parameters_sig.KaSim -> false
