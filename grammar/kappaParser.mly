@@ -359,6 +359,10 @@ birate:
 rate:
     | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3)}
     | alg_expr {($1,None)}
+    | OP_CUR alg_with_radius CL_CUR
+      {(Location.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
+    | alg_expr OP_CUR CL_CUR
+      {($1,Some (Location.dummy_annot (Alg_expr.CONST Nbr.zero),None))}
     ;
 
 alg_with_radius:
