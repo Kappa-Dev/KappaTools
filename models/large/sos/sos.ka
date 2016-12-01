@@ -58,9 +58,9 @@
 #
 #		observables
 
-%obs: 'long'			Shc(PTB!_,Y!1),Grb2(SH2!1,SH3n!2),SoS(PR!2)
-%obs: 'short'			EGFR(Y1092~p!2),Grb2(SH2!2,SH3n!1),SoS(PR!1)
-%var: 'sos recruited'		Grb2(SH2!_,SH3n!2),SoS(PR!2)
+%obs: 'long'			|Shc(PTB!_,Y!1),Grb2(SH2!1,SH3n!2),SoS(PR!2)|
+%obs: 'short'			|EGFR(Y1092~p!2),Grb2(SH2!2,SH3n!1),SoS(PR!1)|
+%var: 'sos recruited'		|Grb2(SH2!_,SH3n!2),SoS(PR!2)|
 
 
 #//////////////////////////////////////////////////////////////////////////////

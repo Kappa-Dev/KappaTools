@@ -10,6 +10,6 @@
 
 #### Variables
 
-%obs: 'Auu' A(x~u?, y~u?)
-%obs: 'Apu' A(x~p?, y~u?)
-%obs: 'App' A(x~p?, y~p?)
+%obs: 'Auu' |A(x~u?, y~u?)|
+%obs: 'Apu' |A(x~p?, y~u?)|
+%obs: 'App' |A(x~p?, y~p?)|
