@@ -55,3 +55,7 @@ phase.
 Concretly the old behavior of Ctrl-c and then y(es I want a snapshot)
 is recovered by Ctrl-c and the modification
 $SNAPSHOT "dump.ka"; $STOP
+
+- Rates for unary instances of rule involving ambiguous molecularity
+  are in {} instead of ()
+

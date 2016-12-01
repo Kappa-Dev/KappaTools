@@ -351,7 +351,7 @@ birate:
     ;
 
 rate:
-    | alg_expr OP_PAR alg_with_radius CL_PAR {($1,Some $3)}
+    | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3)}
     | alg_expr {($1,None)}
     ;
 

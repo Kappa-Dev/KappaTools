@@ -617,38 +617,33 @@ This sort of ambiguity should be resolved, if possible, by refining the ambiguou
 'unary AB' A(x,c!1),C(a!1,b!2),B(y,c!2) -> ... @ 'k_1'
 \end{lstlisting}
 
-There are however systems where even enumerating unary cases becomes impossible. As an alternative, one should use the kappa notation for ambiguous rules:
+There are however systems where even enumerating unary cases becomes
+impossible or the approximation on binary instances is wrong. As an
+alternative, one should use the kappa notation for ambiguous rules:
 \ITE{
-\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2(k_1)$
+\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2 \{k_1\}$
 }
-which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary instances and a rate $k_1$ for unary instances. The obtained model will behave exactly as a model in which the ambiguous rule has been replaced by unambiguous refinements. However the usage of such rule might \emph{slowdown simulation in a significant manner} depending on various parameters (such as the presence of large polymers in the model). We give below an example of a model utilizing binary/unary rates for rules\footnote{This model is available in the source repository \ttt{models/poly.ka}.}.
+which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for
+binary instances and a rate $k_1$ for unary instances. The obtained
+model will behave exactly as a model in which the ambiguous rule has
+been replaced by unambiguous refinements. However the usage of such
+rule \emph{slowdowns simulation in a significant manner}
+depending on various parameters (such as the presence of large
+polymers in the model). We give below an example of a model utilizing
+binary/unary rates for rules\footnote{This model is available in the
+  source repository \ttt{models/poly.ka}.}.
 
-\begin{lstlisting}[language=kappa]
-%agent: A(b,c)
-%agent: B(a,c)
-%agent: C(b,a)
-##
-%var: 'V'  1
-%var: 'k1'  inf
-%var: 'k2' 1.0E-4/'V'
-%var: 'k_off' 0.1
-##
-'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k2' ('k1')
-'a.c' A(c),C(a) -> A(c!1),C(a!1) @ 'k2' ('k1')
-'b.c' B(c),C(b) -> B(c!1),C(b!1) @ 'k2' ('k1')
-##
-'a..b' A(b!a.B) -> A(b) @ 'k_off'
-'a..c' A(c!a.C) -> A(c) @ 'k_off'
-'b..c' B(c!b.C) -> B(c) @ 'k_off'
-##
-%var: 'n' 1000
-##
-%init: 'n' A(),B(),C()
-%mod: [E] > 10000 do \$STOP
-%def: "dotSnapshots" "true"
-\end{lstlisting}
+\lstinputlisting[language=kappa]{../models/poly.ka}
 
-Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between  freely floating agents will occur at rate \ttt{{\textquotesingle}k2{\textquotesingle}} while binding between agents that are part of the same complex will occur at rate \ttt{{\textquotesingle}k1{\textquotesingle}}. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture\index{mixture} as a dot file (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
+Notice at lines 10-12 the use of binary/unary notation for rules. As a
+result binding between freely floating agents will occur at rate
+\ttt{{\textquotesingle}k2{\textquotesingle}} while binding between
+agents that are part of the same complex will occur at rate
+\ttt{{\textquotesingle}k1{\textquotesingle}}. Line 21 contains a
+\emph{perturbation} that requires \KaSim~to stop the simulation after
+10,000 events and output the list of molecular species present in the
+final mixture\index{mixture} as a dot file (see Section~\ref{sec:mod})
+and that we give Figure~\ref{fig:species}.
 
 \begin{figure}[htbp]
 \begin{center}
