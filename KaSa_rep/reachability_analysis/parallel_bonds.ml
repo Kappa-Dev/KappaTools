@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -607,6 +607,13 @@ struct
     if bool
     then error, dynamic, Some precondition
     else error, dynamic, None
+
+  (***********************************************************)
+  (*TODO*)
+
+  let maybe_reachable _static dynamic error _pattern precondition =
+    error, dynamic, Some precondition
+
 
   (***************************************************************)
   (* when one bond is created, check in the precondition, whether the two

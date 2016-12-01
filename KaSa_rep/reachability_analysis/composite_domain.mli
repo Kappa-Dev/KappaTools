@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -54,6 +54,11 @@ sig
   val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 
   val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
+
+  val maybe_reachable: (*TODO*)
+    (*(Cckappa_sig.mixture, Communication.precondition option) unary*)
+    (Cckappa_sig.mixture,
+     Communication.precondition, Communication.precondition option) binary
 
   val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition, unit) binary
 

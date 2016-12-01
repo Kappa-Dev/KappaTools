@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -28,13 +28,20 @@ sig
     }
 
   val get_parameter: static_information -> Remanent_parameters_sig.parameters
-  val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
-  val set_global_dynamic_information:  Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
+
+  val get_global_dynamic_information: dynamic_information ->
+    Analyzer_headers.global_dynamic_information
+
+  val set_global_dynamic_information:
+    Analyzer_headers.global_dynamic_information -> dynamic_information ->
+    dynamic_information
+
   val initialize:
     Analyzer_headers.global_static_information ->
     Analyzer_headers.global_dynamic_information ->
     Exception.method_handler ->
-    Exception.method_handler * static_information * dynamic_information * Communication.event list
+    Exception.method_handler * static_information * dynamic_information *
+    Communication.event list
 
   val complete_wake_up_relation:
     static_information ->
@@ -69,6 +76,10 @@ sig
     (Ckappa_sig.c_rule_id,
      Communication.precondition,
      Communication.precondition option) binary
+
+  val maybe_reachable: (*TODO*)
+    (Cckappa_sig.mixture,
+     Communication.precondition, Communication.precondition option) binary
 
   val apply_rule:
     (Ckappa_sig.c_rule_id,

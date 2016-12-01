@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 24 2016>
+   * Last modification: Time-stamp: <Dec 01 2016>
    *
    * Abstract domain to record live rules
    *
@@ -464,6 +464,12 @@ struct
       in
       error, dynamic, Some precondition
     else error, dynamic, None
+
+    (***********************************************************)
+    (*TODO*)
+
+    let maybe_reachable _static dynamic error _pattern precondition =
+      error, dynamic, Some precondition
 
   (**************************************************************************)
 

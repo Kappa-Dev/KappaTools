@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -51,6 +51,10 @@ sig
 
   val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
 
+  val maybe_reachable: (*TODO*)
+    (Cckappa_sig.mixture,
+     Communication.precondition, Communication.precondition option) binary
+
   val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition,unit) binary
 
   val stabilize: unit zeroary
@@ -78,7 +82,7 @@ sig
     Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
 end
 
-(*****************************************************************************************)
+(****************************************************************************)
 (*Analyzer is a functor takes a module Domain as its parameters.*)
 
 module Make (Domain:Analyzer_domain_sig.Domain) =
@@ -319,6 +323,22 @@ struct
       error
       a
       Communication.dummy_precondition
+
+  (***********************************************************)
+  (*TODO*)
+
+  let maybe_reachable _static dynamic error _pattern precondition =
+    error, dynamic, Some precondition
+
+    (*lift_binary
+    Domain.maybe_reachable
+    static
+    dynamic
+    error
+    a
+    Communication.dummy_precondition*)
+
+(***********************************************************)
 
   (**[pre_apply_rule static dynamic error a b] *)
   let pre_apply_rule static dynamic error a b =

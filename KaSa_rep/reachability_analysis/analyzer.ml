@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Dec 01 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -155,6 +155,7 @@ struct
               error
           in
           begin
+            (*TODO: from option -> different type*)
             let error, dynamic, is_enabled =
               Domain.is_enabled static dynamic error rule_id
             in

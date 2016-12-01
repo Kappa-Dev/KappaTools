@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 28 2016>
+   * Last modification: Time-stamp: <Dec 01 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -828,6 +828,13 @@ struct
     if bool
     then error, dynamic, Some precondition
     else error, dynamic, None
+
+  (***********************************************************)
+  (*TODO*)
+
+  let maybe_reachable _static dynamic error _pattern precondition =
+    error, dynamic, Some precondition
+
 
   (****************************************************************)
 

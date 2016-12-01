@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 28 2016>
+   * Last modification: Time-stamp: <Dec 01 2016>
    *
    * Abstract domain to record live rules
    *
@@ -398,7 +398,7 @@ struct
     in
     error, (dynamic, event_list)
 
-  (************************************************************************************)
+  (**************************************************************************)
 
   let add_initial_state static dynamic error species =
     let event_list = [] in
@@ -453,7 +453,13 @@ struct
         )
         (error, dynamic, Some precondition) l
 
-  (************************************************************************************)
+  (***********************************************************)
+  (*TODO*)
+
+  let maybe_reachable _static dynamic error _pattern precondition =
+    error, dynamic, Some precondition
+
+  (*********************************************************************)
   (** fold a list of creation each time update the array when agent is
       seen for the first time, add list of rule inside event list that
       contain the list of rules in the lhs.  a map from agent to

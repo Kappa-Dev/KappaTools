@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Nov 29 2016>
+   * Last modification: Time-stamp: <Dec 01 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -2283,6 +2283,12 @@ struct
       error, dynamic, None
 
   (***********************************************************)
+  (*TODO*)
+
+  let maybe_reachable _static dynamic error _pattern precondition =
+    error, dynamic, Some precondition
+
+  (***********************************************************)
   (*deal with views*)
 
   let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X =
@@ -3425,7 +3431,7 @@ struct
           kasa_state
       in
       let error = Exception.check_point
-          Exception.warn parameters error error' __POS__ Exit in      
+          Exception.warn parameters error error' __POS__ Exit in
       error, dynamic, kasa_state
 
   let export_views_properties static dynamic error kasa_state =
