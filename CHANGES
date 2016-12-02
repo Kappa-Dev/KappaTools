@@ -11,7 +11,7 @@ by default in "simulated time unit" but you can switch to event using
 The motivation is interactivity. If you don't specify any limit, the
 simulation will run forever.  (Use Ctrl-c to stop).
 
-- Data files are comma separeted value (instead of space separeted
+- Data files are printed using the comma separated value format (instead of space separated
   value) by default.
 
 The default name of the output file is therefore 'data.csv'.
@@ -19,13 +19,13 @@ The default name of the output file is therefore 'data.csv'.
 KaSim can also generate (based on the extension of the output file)
 tsv or svg files.
 
-The motivation is to deal with weird values (infinity, not a number) in a
-way understood by (at least Gnuplot, Python, Matlab, ...)
+The motivation is to deal with weird values (e.g. infinity, not a number) in a
+way understood by (at least) Gnuplot, Python, Matlab, ...
 
 - There is no special case for "observables"
 
-Number of occurence of the pattern pat is now written |pat| and it can
-be putted in any algebraic expression.
+Number of occurrences of the pattern pat is now written |pat| and it can
+be placed in any algebraic expression.
 
 To be concrete, you need to write
 %var: 'o' |A(x!1),B(x!1)|
@@ -44,17 +44,18 @@ $TRACK "pattern" [true]
 
 - Ctrl-c does not stop the simulation
 
-It pauses and launch a toplevel in which you can do modification
-(as in perturbations) and then (optionnaly) continue the simulation.
+It pauses and launches a toplevel in which you can do modification
+(as in perturbations) and then (optionally) continue the simulation.
 
-You can use '-mode batch' to get a killing simulation Ctrl-c
-(and more generally KaSim to never ask questions) or '-mode
-interactive' to pause the simulation just after the initialisation
+You can use '-mode batch' to get a Ctrl-c that does kill the simulation
+(and more generally to get a KaSim that never asks questions) or '-mode
+interactive' to pause the simulation just after the initialization
 phase.
 
-Concretly the old behavior of Ctrl-c and then y(es I want a snapshot)
+Concretely the old behavior of Ctrl-c and then y(es I want a snapshot)
 is recovered by Ctrl-c and the modification
 $SNAPSHOT "dump.ka"; $STOP
 
 - Rates for unary instances of rule involving ambiguous molecularity
   are in {} instead of ()
+
