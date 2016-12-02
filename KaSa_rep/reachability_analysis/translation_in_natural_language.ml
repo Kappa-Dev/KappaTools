@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Nov 23 2016>
+ * Last modification: Time-stamp: <Dec 02 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -167,47 +167,60 @@ let try_partitioning parameters handler error
                 let error, handler, list =
                   List.fold_left
                     (fun (error, handler, list) elt ->
-                       let error_12, handler, elt =
-                         Ckappa_sig.Views_bdu.extensional_of_mvbdu
-                           parameters handler error elt
+                       let error, handler, mvbdu_test =
+                         Ckappa_sig.Views_bdu.mvbdu_and
+                           parameters handler error
+                           mvbdu_ref elt
                        in
-                       let error = Exception.check_point
-                           Exception.warn parameters error error_12 __POS__ Exit
-                       in
-                       begin
-                         let error, var_list_opt =
-                           match
-                             elt
-                           with
-                           | [] | [] :: _ | ((_, _) :: _ :: _) :: _ ->
-                             error, None
-                           | [(a, b)] :: q ->
-                             begin
-                               let rec aux4 q output =
-                                 match q with
-                                 | [] -> error, Some (a, output)
-                                 | [(c, d)] :: q when c = a ->
-                                   aux4 q (d :: output)
-                                 | _ -> error, None
-                               in aux4 q [b]
-                             end
+                       if Ckappa_sig.Views_bdu.equal
+                           mvbdu_test mvbdu_ref
+                       then error, handler, list
+                       else
+                         let error_12, handler, elt =
+                           Ckappa_sig.Views_bdu.extensional_of_mvbdu
+                             parameters handler error elt
                          in
-                         match var_list_opt with
-                         | None ->
-                           let error, () =
-                             Exception.warn
-                               parameters error __POS__ Exit ()
+                         let error =
+                           Exception.check_point
+                             Exception.warn parameters error error_12
+                             __POS__ Exit
+                         in
+                         begin
+                           let error, var_list_opt =
+                             match
+                               elt
+                             with
+                             | [] | [] :: _ | ((_, _) :: _ :: _) :: _ ->
+                               error, None
+                             | [(a, b)] :: q ->
+                               begin
+                                 let rec aux4 q output =
+                                   match q with
+                                   | [] -> error, Some (a, output)
+                                   | [(c, d)] :: q when c = a ->
+                                     aux4 q (d :: output)
+                                   | _ -> error, None
+                                 in aux4 q [b]
+                               end
                            in
-                           error, handler, list
-                         | Some (a, l) ->
-                           let error', a' =
-                             rename_site_inverse parameters error a in
-                             let error = Exception.check_point
-                                 Exception.warn parameters error error' __POS__
-                                 Exit
+                           match var_list_opt with
+                           | None ->
+                             let error, () =
+                               Exception.warn
+                                 parameters error __POS__ Exit ()
                              in
-                           (error, handler, ((Range (a', l)) :: list))
-                       end)
+                             error, handler, list
+                           | Some (a, l) ->
+                             let error', a' =
+                               rename_site_inverse parameters error a
+                             in
+                             let error =
+                               Exception.check_point
+                                 Exception.warn parameters error error'
+                                 __POS__ Exit
+                             in
+                             (error, handler, ((Range (a', l)) :: list))
+                         end)
                     (error, handler, [])
                     (List.rev list)
                 in
@@ -217,7 +230,8 @@ let try_partitioning parameters handler error
           end
       in
       let error_13, handler, output = aux3 range (error, handler, []) in
-      let error = Exception.check_point
+      let error =
+        Exception.check_point
           Exception.warn parameters error error_13 __POS__ Exit
       in
       match output with
@@ -432,7 +446,21 @@ let rec print ?beginning_of_sentence:(beggining=true)
                   t
               in
               let () =
-                Loggers.fprintf log " => [ " in
+                Loggers.fprintf log " => "
+              in
+              let should_use_bracket =
+                match
+                  state_list
+                with
+                | [] | [_] -> false
+                | _::_ -> true
+              in
+              let () =
+                if
+                  should_use_bracket
+                then
+                  Loggers.fprintf log "[ "
+              in
               let error, _bool =
                 List.fold_left
                   (fun (error, bool) state ->
@@ -454,7 +482,11 @@ let rec print ?beginning_of_sentence:(beggining=true)
                   (error, false) state_list
               in
               let () =
-                Loggers.fprintf log " ]" in
+                if
+                  should_use_bracket
+                then
+                  Loggers.fprintf log " ]"
+              in
               let () = Loggers.print_newline log in
               error, ()
             | Remanent_parameters_sig.Natural_language ->
@@ -730,11 +762,11 @@ let rec print ?beginning_of_sentence:(beggining=true)
       else
         error,()
     | Partition (v, list) ->
-      let () =
+      (*let () =
         Loggers.fprintf log
           "%s%s%s" (Remanent_parameters.get_prefix parameters)
           (cap (in_agent_colon agent_string)) endofline
-      in
+        in*)
       let error, site_string =
         Handler.string_of_site_in_natural_language parameters error handler_kappa agent_type
           v
