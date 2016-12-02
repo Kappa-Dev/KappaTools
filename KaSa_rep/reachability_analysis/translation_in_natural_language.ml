@@ -425,7 +425,6 @@ let rec print ?beginning_of_sentence:(beggining=true)
   let cap s = if beggining then String.capitalize s else s in
   let in_agent s = if prompt_agent_type then "in agent "^s^" " else "" in
   let in_agent_comma s = if prompt_agent_type then "in agent "^s^", " else "" in
-  let in_agent_colon s = if prompt_agent_type then "in agent "^s^": " else "" in
   let log = Remanent_parameters.get_logger parameters in
   let error, () =
     match
