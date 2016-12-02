@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Dec 02 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -33,6 +33,9 @@ type potential_partner_bind = bind_partner
 type bdu_common_static =
   {
     store_agent_name             : Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t;
+    store_agent_name_from_pattern :
+      Ckappa_sig.c_agent_name Cckappa_sig.MixtureAgent_map_and_set.Map.t
+  ;
     store_side_effects           : half_break_action * remove_action;
     store_potential_side_effects :
       potential_partner_free *  potential_partner_bind;
@@ -84,6 +87,8 @@ let init_bdu_common_static =
   let init_common_static =
     {
       store_agent_name              = init_agent_name;
+      store_agent_name_from_pattern =
+        Cckappa_sig.MixtureAgent_map_and_set.Map.empty;
       store_side_effects            = (init_half_break, init_remove);
       store_potential_side_effects  = (init_potential_free, init_potential_bind);
       store_potential_side_effects_per_rule = inite_potential_side_effects_per_rule;
@@ -124,6 +129,33 @@ let collect_agent_name parameter error rule_id rule store_result =
            in
            error, store_result
       ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
+  in
+  error, store_result
+
+(*TODO*)
+
+let collect_agent_name_from_pattern parameters error pattern store_result =
+  let error, store_result =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters
+      error
+      (fun parameters error agent_id agent store_result ->
+         match agent with
+         | Cckappa_sig.Ghost
+         | Cckappa_sig.Unknown_agent _ -> error, store_result
+         | Cckappa_sig.Dead_agent (agent, _, _, _)
+         | Cckappa_sig.Agent agent ->
+           let agent_type = agent.Cckappa_sig.agent_name in
+           let error, store_result =
+             Cckappa_sig.MixtureAgent_map_and_set.Map.add_or_overwrite
+               parameters
+               error
+               (pattern, agent_id)
+               agent_type
+               store_result
+           in
+           error, store_result
+      ) pattern.Cckappa_sig.views store_result
   in
   error, store_result
 
@@ -1168,6 +1200,14 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       rule
       store_result.store_agent_name
   in
+  (*TODO*)
+  let error, store_agent_name_from_pattern =
+    collect_agent_name_from_pattern
+      parameter
+      error
+      rule.Cckappa_sig.rule_lhs
+      store_result.store_agent_name_from_pattern
+  in
   (*-------------------------------------------------------------------------*)
   (*side effects*)
   let error, store_side_effects =
@@ -1239,6 +1279,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   error,
   {store_result with
    store_agent_name = store_agent_name;
+   store_agent_name_from_pattern = store_agent_name_from_pattern;
    store_side_effects = store_side_effects;
    store_potential_side_effects = store_potential_side_effects;
    store_bonds_rhs = store_bonds_rhs;

@@ -270,7 +270,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D() => [ D(x~u) ]
+D() => D(x~u)
 
 ------------------------------------------------------------
 * Relational properties:

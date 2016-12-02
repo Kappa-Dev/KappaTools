@@ -1611,18 +1611,18 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t!B.t) ]
+A() => A(t!B.t)
 A() => [ A(z) v A(z!C.x) v A(z!D.x) ]
 B() => [ B(z) v B(z!C.x) v B(z!D.x) ]
-B() => [ B(t!A.t) ]
-E() => [ E(t!F.t) ]
+B() => B(t!A.t)
+E() => E(t!F.t)
 E() => [ E(z) v E(z!C.x) v E(z!G.x) ]
 F() => [ F(z!D.x) v F(z!H.x) ]
-F() => [ F(t!E.t) ]
+F() => F(t!E.t)
 C() => [ C(x!A.z) v C(x!B.z) v C(x!E.z) ]
 D() => [ D(x!A.z) v D(x!B.z) v D(x!F.z) ]
-G() => [ G(x!E.z) ]
-H() => [ H(x!F.z) ]
+G() => G(x!E.z)
+H() => H(x!F.z)
 
 ------------------------------------------------------------
 * Relational properties:

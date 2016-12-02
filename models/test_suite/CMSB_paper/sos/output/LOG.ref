@@ -18,7 +18,7 @@ every agent may occur in the model
 EGF() => [ EGF(r) v EGF(r!EGFR.L) ]
 EGFR() => [ EGFR(Y1092~u?) v EGFR(Y1092~p?) ]
 EGFR() => [ EGFR(Y1172~u?) v EGFR(Y1172~p?) ]
-EGFR() => [ EGFR(Y1016~u) ]
+EGFR() => EGFR(Y1016~u)
 EGFR() => [ EGFR(L) v EGFR(L!EGF.r) ]
 EGFR() => [ EGFR(CR) v EGFR(CR!EGFR.CR) ]
 EGFR() => [ EGFR(N) v EGFR(N!EGFR.C) ]
@@ -26,14 +26,14 @@ EGFR() => [ EGFR(C) v EGFR(C!EGFR.N) ]
 EGFR() => [ EGFR(Y1172) v EGFR(Y1172!Shc.PTB) ]
 EGFR() => [ EGFR(Y1092) v EGFR(Y1092!Grb2.SH2) ]
 SoS() => [ SoS(PR) v SoS(PR!Grb2.SH3n) ]
-SoS() => [ SoS(S~u) ]
-Shc() => [ Shc(PTB~u?) ]
+SoS() => SoS(S~u)
+Shc() => Shc(PTB~u?)
 Shc() => [ Shc(Y) v Shc(Y!Grb2.SH2) ]
 Shc() => [ Shc(Y~u?) v Shc(Y~p?) ]
 Shc() => [ Shc(PTB) v Shc(PTB!EGFR.Y1172) ]
 Grb2() => [ Grb2(SH2) v Grb2(SH2!Shc.Y) v Grb2(SH2!EGFR.Y1092) ]
 Grb2() => [ Grb2(SH3n) v Grb2(SH3n!SoS.PR) ]
-Grb2() => [ Grb2(SH2~u?) ]
+Grb2() => Grb2(SH2~u?)
 
 ------------------------------------------------------------
 * Relational properties:

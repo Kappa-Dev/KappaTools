@@ -874,10 +874,10 @@ Id=32
 EXTENSIONAL DESCRIPTION:
 A() => [ A(z) v A(z!B.z) ]
 A() => [ A(t) v A(t!B.t) ]
-A() => [ A(x~u) ]
+A() => A(x~u)
 B() => [ B(z) v B(z!A.z) ]
 B() => [ B(t) v B(t!A.t) ]
-B() => [ B(x~u) ]
+B() => B(x~u)
 
 ------------------------------------------------------------
 * Relational properties:

@@ -662,10 +662,10 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B() => [ B(y~u) ]
-B() => [ B(x~u) ]
-D() => [ D(y~u) ]
-D() => [ D(x~u) ]
+B() => B(y~u)
+B() => B(x~u)
+D() => D(y~u)
+D() => D(x~u)
 
 ------------------------------------------------------------
 * Relational properties:

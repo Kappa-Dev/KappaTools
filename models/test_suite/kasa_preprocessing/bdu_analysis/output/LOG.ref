@@ -937,10 +937,10 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y~u?) ]
+A() => A(y~u?)
 A() => [ A(x) v A(x!B.x) ]
 A() => [ A(y) v A(y!C.x) ]
-A() => [ A(x~u?) ]
+A() => A(x~u?)
 B() => [ B(x) v B(x!A.x) ]
 C() => [ C(x) v C(x!A.y) ]
 

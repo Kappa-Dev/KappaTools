@@ -430,8 +430,7 @@ Id=45
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C: 
-C(z!C.t) => [ C(t,z!C.t) ]
+C(z!C.t) => C(t,z!C.t)
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

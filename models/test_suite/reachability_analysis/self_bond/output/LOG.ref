@@ -1983,11 +1983,9 @@ Id=71
 EXTENSIONAL DESCRIPTION:
 A(z!A.z) <=> A(t!A.t)
 B(z!B.t) <=> B(t!B.z)
-In agent D: 
-D(z!D.t) => [ D(t!D.t,z!D.t) ]
-In agent F: 
-F(z!F.t) => [ F(t,z!F.t) ]
-F(z) => [ F(t,z) ]
+D(z!D.t) => D(t!D.t,z!D.t)
+F(z!F.t) => F(t,z!F.t)
+F(z) => F(t,z)
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

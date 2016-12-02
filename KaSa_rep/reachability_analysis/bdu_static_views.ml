@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Dec 01 2016>
+   * Last modification: Time-stamp: <Dec 02 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *

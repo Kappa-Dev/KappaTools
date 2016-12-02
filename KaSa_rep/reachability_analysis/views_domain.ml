@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 01 2016>
+   * Last modification: Time-stamp: <Dec 02 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -110,6 +110,10 @@ struct
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
   let get_agent_name static = lift Analyzer_headers.get_agent_name static
+
+  (*TODO*)
+  let get_agent_name_from_pattern static =
+    lift Analyzer_headers.get_agent_name_from_pattern static
 
   let get_side_effects static = lift Analyzer_headers.get_side_effects static
 
@@ -2335,7 +2339,118 @@ struct
       error, dynamic, None
 
   (***********************************************************)
-  (*TODO*)
+(*TODO*)
+
+  let precondition_typing_pattern parameters error kappa_handler pattern
+      step_list path store_agent_name_from_pattern dual_contact_map =
+    let rec aux acc error =
+      match acc with
+      | [] -> error, Usual_domains.Any
+      | step :: tl ->
+        let error, agent_type =
+          match
+            Cckappa_sig.MixtureAgent_map_and_set.Map.find_option_without_logs
+              parameters
+              error
+              (pattern, path.Communication.agent_id)
+              store_agent_name_from_pattern
+          with
+          | error, None -> error, Ckappa_sig.dummy_agent_name
+          | error, Some a -> error, a
+        in
+        let error, state_dic =
+          Misc_sa.unsome
+            (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+               parameters
+               error
+               (agent_type, step.Communication.site_out)
+               kappa_handler.Cckappa_sig.states_dic)
+            (fun error ->
+               Exception.warn
+                 parameters error __POS__ Exit
+                 (Ckappa_sig.Dictionary_of_States.init ()))
+        in
+        let state =
+          Ckappa_sig.C_Lnk_type (step.Communication.agent_type_in,
+                                 step.Communication.site_in)
+        in
+        let error, b =
+          Ckappa_sig.Dictionary_of_States.member
+            parameters
+            error
+            (Ckappa_sig.Binding state)
+            state_dic
+        in
+        if b
+        then
+          let error, answer_contact_map =
+            match Ckappa_sig.Dictionary_of_States.allocate
+                    parameters
+                    error
+                    Ckappa_sig.compare_unit_state_index
+                    (Ckappa_sig.Binding state)
+                    ()
+                    Misc_sa.const_unit
+                    state_dic
+            with
+            | error, None ->
+              Exception.warn parameters error __POS__ Exit
+                Usual_domains.Undefined
+            | error, Some (state, _, _, _) ->
+              match
+                Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs
+                  parameters
+                  error
+                  (agent_type, step.Communication.site_out, state)
+                  dual_contact_map
+              with
+              | error, None -> Exception.warn
+                                 parameters error __POS__ Exit
+                                 Usual_domains.Undefined
+              | error, Some _ -> aux tl error
+          in
+          error, answer_contact_map
+        else
+          Exception.warn parameters error __POS__ Exit Usual_domains.Undefined
+    in aux step_list error
+
+  let compute_precondition_reachable error kappa_handler pattern
+      precondition dual_contact_map store_agent_name_from_pattern
+    =
+    let precondition =
+      Communication.refine_information_about_state_of_sites_in_precondition
+        precondition
+        (fun parameters error dynamic (current_path:Communication.path)
+          former_answer ->
+          let error = scan_bot
+              ~also_scan_top:false
+              __POS__ parameters error
+              former_answer
+              " from overlying domain"
+          in
+          let error, answer_contact_map =
+            precondition_typing_pattern
+              parameters
+              error
+              kappa_handler
+              pattern
+              current_path.Communication.relative_address
+              current_path
+              store_agent_name_from_pattern
+              dual_contact_map
+          in
+          let error =
+            scan_bot_warn
+              ~also_scan_top:false
+              __POS__ parameters error
+              answer_contact_map
+              " in the contact map"
+          in
+          (*TODO*)
+          error, dynamic, answer_contact_map
+        )
+    in
+    error, precondition
 
   let maybe_reachable_aux static dynamic error (pattern: Cckappa_sig.mixture)
       precondition =
@@ -2343,10 +2458,16 @@ struct
     let error, dynamic, bdu_false =
       get_mvbdu_false static dynamic error
     in
+    let kappa_handler = get_kappa_handler static in
     let fixpoint_result = get_fixpoint_result dynamic in
     let store_proj_bdu_test_restriction_pattern = (**)
       get_store_proj_bdu_test_restriction_pattern static
     in
+    let dual_contact_map = get_store_dual_contact_map dynamic in
+    let store_agent_name_from_pattern =
+      get_agent_name_from_pattern static
+    in
+    (*-----------------------------------------------------------*)
     let error, proj_bdu_test_restriction_pattern =
       match
         Cckappa_sig.Mixture_setmap.Map.find_option
@@ -2356,6 +2477,7 @@ struct
       | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some m -> error, m
     in
+    (*-----------------------------------------------------------*)
     try
       let error, dynamic =
         collect_bdu_enabled
@@ -2366,10 +2488,16 @@ struct
           fixpoint_result
           proj_bdu_test_restriction_pattern
       in
-      (*let error, precondition =
+      (*-----------------------------------------------------------*)
+      let error, precondition =
         compute_precondition_reachable
-
-      in*)
+          error
+          kappa_handler
+          pattern
+          precondition
+          dual_contact_map
+          store_agent_name_from_pattern
+      in
       error, (dynamic, precondition), true
     with
       False (error, dynamic) -> error, (dynamic, precondition), false

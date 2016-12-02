@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 29 2016>
+  * Last modification: Time-stamp: <Dec 02 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -124,6 +124,18 @@ let set_agent_name agent_name static =
     {
       (get_bdu_common_static static) with
       Common_static.store_agent_name = agent_name
+    }
+    static
+
+(*TODO*)
+let get_agent_name_from_pattern static =
+  (get_bdu_common_static static).Common_static.store_agent_name_from_pattern
+
+let set_agent_name_from_pattern agent_name static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+      Common_static.store_agent_name_from_pattern = agent_name
     }
     static
 
