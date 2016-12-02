@@ -1,15 +1,15 @@
 From KaSim 3 to KaSim 4
 =======================
 
-- Options '-t' '-e' and '-p' have desappeared!
+- Options '-t' '-e' and '-p' are removed!
 
 You should specify the limit of simulation by '-l' and the plot period
 (how often you want a data line) by the "new" '-p'. These options are
 by default in "simulated time unit" but you can switch to event using
 '-u event'.
 
-Motivation is interactivity. You can now not specifing any limit and
-your simulation will run forever ... (well until a Ctrl-c).
+The motivation is interactivity. If you don't specify any limit, the
+simulation will run forever.  (Use Ctrl-c to stop).
 
 - Data files are comma separeted value (instead of space separeted
   value) by default.
@@ -19,7 +19,7 @@ The default name of the output file is therefore 'data.csv'.
 KaSim can also generate (based on the extension of the output file)
 tsv or svg files.
 
-Motivation is to deal with weird values (infinity, not a number) in a
+The motivation is to deal with weird values (infinity, not a number) in a
 way understood by (at least Gnuplot, Python, Matlab, ...)
 
 - There is no special case for "observables"
@@ -44,10 +44,10 @@ $TRACK "pattern" [true]
 
 - Ctrl-c does not stop the simulation
 
-It pauses it and launch a toplevel in which you can do modification
+It pauses and launch a toplevel in which you can do modification
 (as in perturbations) and then (optionnaly) continue the simulation.
 
-You can use '-mode batch' if you want Ctrl-c to kill the simulation
+You can use '-mode batch' to get a killing simulation Ctrl-c
 (and more generally KaSim to never ask questions) or '-mode
 interactive' to pause the simulation just after the initialisation
 phase.
@@ -58,4 +58,3 @@ $SNAPSHOT "dump.ka"; $STOP
 
 - Rates for unary instances of rule involving ambiguous molecularity
   are in {} instead of ()
-
