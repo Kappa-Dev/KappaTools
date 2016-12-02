@@ -29,6 +29,10 @@ let options (t :t)  : (string * Arg.spec * string) list = [
            Cli_init.Event
        | s -> raise (Arg.Bad ("Unrecognized unit: "^s))),
    "unit (time/event) in which limit and plot period are specified");
+  ("-e",
+   Arg.Int (fun e ->
+       raise (Arg.Bad ("Option '-e' has been replace by '-u event -l "^
+                       string_of_int e^"'"))),"Deprecated option");
   ("-make-sim",
    Arg.String
      (fun marshalizeOutFile -> t.marshalizeOutFile <- Some marshalizeOutFile),

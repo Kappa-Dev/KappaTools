@@ -37,6 +37,10 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("-l",
    Arg.Float(fun time -> t.maxValue <- Some time),
    "Limit of the simulation");
+  ("-t",
+   Arg.Float (fun f ->
+       raise (Arg.Bad ("Option '-t' has been replace by '[-u time] -l "^
+                       string_of_float f^"'"))),"Deprecated option");
   ("-p",
    Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
    "plot period: time interval between points in plot (default: 1.0)");
