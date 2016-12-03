@@ -11,7 +11,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN ASSIGN2 PRINTF STOP SNAPSHOT RUN
+%token FLUX ASSIGN ASSIGN2 PRINTF STOP SNAPSHOT RUN THEN ELSE
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -239,16 +239,19 @@ variable_declaration:
 	    }
     ;
 
-bool_expr:
+small_bool_expr:
     | OP_PAR bool_expr CL_PAR {$2}
+    | TRUE {add_pos Alg_expr.TRUE}
+    | FALSE {add_pos Alg_expr.FALSE}
+
+bool_expr:
+    | small_bool_expr {$1}
     | bool_expr AND bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.AND,$1,$3))}
     | bool_expr OR bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.OR,$1,$3))}
     | alg_expr GREATER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.GREATER,$1,$3))}
     | alg_expr SMALLER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.SMALLER,$1,$3))}
     | alg_expr EQUAL alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.EQUAL,$1,$3))}
     | alg_expr DIFF alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.DIFF,$1,$3))}
-    | TRUE {add_pos Alg_expr.TRUE}
-    | FALSE {add_pos Alg_expr.FALSE}
     ;
 
 rule_label:
@@ -341,6 +344,7 @@ alg_expr:
     | alg_expr MINUS alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MINUS,$1,$3))}
     | alg_expr POW alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.POW,$1,$3))}
     | alg_expr MODULO alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MODULO,$1,$3))}
+    | small_bool_expr THEN alg_expr ELSE small_alg_expr {add_pos (Alg_expr.IF($1,$3,$5))}
 
 birate:
     | AT rate {let (k2,k1) = $2 in (k2,k1,None,None)}

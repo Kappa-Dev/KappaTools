@@ -288,9 +288,19 @@ let string_of_un_op _logger op =
   | Operator.TAN -> "tan"
   | Operator.INT -> "floor"
 
-let rec print_alg_expr init_mode logger  alg_expr network
-  =
-  let var = if init_mode then "init" else "y" in
+let string_of_compare_op _logger = function
+  | Operator.EQUAL -> "=="
+  | Operator.DIFF -> "!="
+  | Operator.SMALLER -> "<"
+  | Operator.GREATER -> ">"
+let string_of_bool_op _logger = function
+  | Operator.AND -> "&"
+  | Operator.OR -> "|"
+
+let rec print_alg_expr ?init_mode logger alg_expr network =
+  let var = match init_mode with
+    | None -> "y"
+    |Some init_mode -> if init_mode then "init" else "y" in
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -319,24 +329,24 @@ let rec print_alg_expr init_mode logger  alg_expr network
           with
           | INFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr init_mode logger a network in
+            let () = print_alg_expr ?init_mode logger a network in
             let () = Loggers.fprintf logger "%s" string_op in
-            let () = print_alg_expr init_mode logger b network in
+            let () = print_alg_expr ?init_mode logger b network in
             let () = Loggers.fprintf logger ")" in
             ()
           | PREFIX ->
             let () = Loggers.fprintf logger "%s" string_op in
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr init_mode logger a network in
+            let () = print_alg_expr ?init_mode logger a network in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr init_mode logger b network in
+            let () = print_alg_expr ?init_mode logger b network in
             let () = Loggers.fprintf logger ")" in
             ()
           | POSTFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr init_mode logger a network in
+            let () = print_alg_expr ?init_mode logger a network in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr init_mode logger b network in
+            let () = print_alg_expr ?init_mode logger b network in
             let () = Loggers.fprintf logger ")" in
             let () = Loggers.fprintf logger "%s" string_op in
             ()
@@ -347,8 +357,44 @@ let rec print_alg_expr init_mode logger  alg_expr network
         let string_op = string_of_un_op logger op in
         let () = Loggers.fprintf logger "%s" string_op in
         let () = if is_fun logger op then Loggers.fprintf logger "(" in
-        let () = print_alg_expr init_mode logger a network in
+        let () = print_alg_expr ?init_mode logger a network in
         let () = if is_fun logger op then Loggers.fprintf logger ")" in
+        let () = Loggers.fprintf logger ")" in
+        ()
+      | Alg_expr.IF (cond, yes, no) ->
+        let () = Loggers.fprintf logger "merge(" in
+        let () = print_bool_expr ?init_mode logger cond network in
+        let () = Loggers.fprintf logger "," in
+        let () = print_alg_expr ?init_mode logger yes network in
+        let () = Loggers.fprintf logger "," in
+        let () = print_alg_expr ?init_mode logger no network in
+        let () = Loggers.fprintf logger ")" in
+            ()
+    end
+  | Loggers.Maple -> ()
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+and print_bool_expr ?init_mode logger expr network =
+ match Loggers.get_encoding_format logger with
+  | Loggers.Matlab  | Loggers.Octave ->
+    begin
+      match fst expr with
+      | Alg_expr.TRUE -> Loggers.fprintf logger "true"
+      | Alg_expr.FALSE -> Loggers.fprintf logger "false"
+      | Alg_expr.COMPARE_OP (op,a,b) ->
+        let () = Loggers.fprintf logger "(" in
+        let () = print_alg_expr ?init_mode logger a network in
+        let () = Loggers.fprintf logger "%s" (string_of_compare_op logger op) in
+        let () = print_alg_expr ?init_mode logger b network in
+        let () = Loggers.fprintf logger ")" in
+        ()
+      | Alg_expr.BOOL_OP (op,a,b) ->
+        let () = Loggers.fprintf logger "(" in
+        let () = print_bool_expr ?init_mode logger a network in
+        let () = Loggers.fprintf logger "%s" (string_of_bool_op logger op) in
+        let () = print_bool_expr ?init_mode logger b network in
         let () = Loggers.fprintf logger ")" in
         ()
     end
@@ -357,10 +403,6 @@ let rec print_alg_expr init_mode logger  alg_expr network
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
-
-let print_alg_expr ?init_mode:(init_mode=false) logger  alg_expr network
-  = print_alg_expr init_mode logger alg_expr network
-
 let print_comment
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])

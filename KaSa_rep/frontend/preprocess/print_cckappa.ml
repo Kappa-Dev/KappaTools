@@ -309,6 +309,7 @@ let rec print_short_alg parameters error handler alg =
                           | Operator.CPUTIME
                           ),_
   | Alg_expr.CONST (Nbr.I64 _),_
+  | Alg_expr.IF _,_
   | Alg_expr.TOKEN_ID _,_
   | Alg_expr.KAPPA_INSTANCE _,_ ->  (*to do*) error
  (* | Ast.INFINITY _ ->

@@ -689,6 +689,7 @@ let scan_var parameter error handler var_id var quarks =
     | Alg_expr.TOKEN_ID _
     | Alg_expr.STATE_ALG_OP _
     | Alg_expr.ALG_VAR _
+    | Alg_expr.IF _
       ->
       begin (* to do *)
         error,list_pos,list_neg

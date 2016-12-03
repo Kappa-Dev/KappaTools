@@ -45,7 +45,7 @@ val batch_loop :
 
 val interactive_loop :
   outputs:(Data.t -> unit) -> Format.formatter ->
-  (Pattern.id array list,int) Alg_expr.bool_expr ->
+  (Pattern.id array list,int) Alg_expr.bool ->
   Environment.t -> Counter.t -> Rule_interpreter.t -> t ->
   (bool * Rule_interpreter.t * t)
 (** [interactive_loop message_formatter env counter graph]

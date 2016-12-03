@@ -296,6 +296,7 @@ let filter_influence parameters error handler compilation map bool =
       snd (v.Cckappa_sig.e_variable)
     with
     | Alg_expr.KAPPA_INSTANCE(mixture), _ -> error,mixture
+    | Alg_expr.IF _,_
     | Alg_expr.BIN_ALG_OP (_,_,_),_
     | Alg_expr.UN_ALG_OP (_,_),_
     | Alg_expr.STATE_ALG_OP _, _

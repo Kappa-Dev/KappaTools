@@ -67,9 +67,9 @@ type ('mixture,'id) modif_expr =
   | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
 
 type ('mixture,'id) perturbation =
-  (('mixture,'id) Alg_expr.bool_expr Location.annot *
+  (('mixture,'id) Alg_expr.bool Location.annot *
    (('mixture,'id) modif_expr list) *
-   ('mixture,'id) Alg_expr.bool_expr Location.annot option)
+   ('mixture,'id) Alg_expr.bool Location.annot option)
     Location.annot
 
 type configuration = string Location.annot * (string Location.annot list)
@@ -97,7 +97,7 @@ type ('mixture,'id) instruction =
   | CONFIG   of configuration
 
 type ('mixture,'id) command =
-  | RUN of ('mixture,'id) Alg_expr.bool_expr
+  | RUN of ('mixture,'id) Alg_expr.bool
   | MODIFY of ('mixture,'id) modif_expr list
   | QUIT
 

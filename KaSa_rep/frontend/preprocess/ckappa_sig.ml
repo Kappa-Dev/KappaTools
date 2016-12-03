@@ -610,9 +610,9 @@ type c_rule =
   }
 
 type c_perturbation =
-  ((((c_mixture,string) Alg_expr.bool_expr) * position)
+  ((((c_mixture,string) Alg_expr.bool) * position)
    * (c_modif_expr list)
-   * ((c_mixture,string) Alg_expr.bool_expr * position) option)
+   * ((c_mixture,string) Alg_expr.bool * position) option)
   * position
 
 and c_modif_expr =

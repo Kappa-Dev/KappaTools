@@ -61,10 +61,10 @@ type modification =
 
 type perturbation =
   { precondition:
-      (Pattern.id array list,int) Alg_expr.bool_expr Location.annot;
+      (Pattern.id array list,int) Alg_expr.bool Location.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
-        Alg_expr.bool_expr Location.annot option;
+        Alg_expr.bool Location.annot option;
   }
 
 val exists_modification : (modification -> bool) -> perturbation array -> bool
@@ -76,8 +76,8 @@ val map_expr_rule : (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
   elementary_rule -> elementary_rule
 val map_expr_perturbation :
   (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
-  ((Pattern.id array list,int) Alg_expr.bool_expr Location.annot ->
-   (Pattern.id array list,int) Alg_expr.bool_expr Location.annot) ->
+  ((Pattern.id array list,int) Alg_expr.bool Location.annot ->
+   (Pattern.id array list,int) Alg_expr.bool Location.annot) ->
   perturbation -> perturbation
 
 val stops_of_perturbation :

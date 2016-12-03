@@ -19,7 +19,7 @@ val value_alg :
 
 val value_bool :
   get_alg:(int -> Alg_expr.t) -> Counter.t -> t ->
-  (Pattern.id array list,int) Alg_expr.bool_expr -> bool
+  (Pattern.id array list,int) Alg_expr.bool -> bool
 
 (** {6 Core} *)
 

@@ -464,7 +464,20 @@ struct
       end
     | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
       |Alg_expr.STATE_ALG_OP _),_ as a -> a
-
+    | Alg_expr.IF (cond,yes,no),pos ->
+      Alg_expr.IF (convert_bool_expr compil network cond,
+                   convert_alg_expr compil network yes,
+                   convert_alg_expr compil network no),pos
+  and convert_bool_expr compil network = function
+    | (Alg_expr.TRUE | Alg_expr.FALSE),_ as a -> a
+    | Alg_expr.COMPARE_OP (op,a,b),pos ->
+      Alg_expr.COMPARE_OP (op,
+                           convert_alg_expr compil network a,
+                           convert_alg_expr compil network b),pos
+    | Alg_expr.BOOL_OP (op,a,b),pos ->
+      Alg_expr.BOOL_OP (op,
+                        convert_bool_expr compil network a,
+                        convert_bool_expr compil network b),pos
   let add_reaction
       compil enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
@@ -788,12 +801,14 @@ struct
       let () = Mods.DynArray.set lsucc i (j::(Mods.DynArray.get lsucc i)) in
       ()
     in
-    let rec aux id expr =
+    let rec aux_alg id expr =
       match expr with
       | Alg_expr.CONST _,_ -> ()
-      | Alg_expr.BIN_ALG_OP (_,a,b),_ -> (aux id a;aux id b)
-      | Alg_expr.UN_ALG_OP (_,a),_ -> aux id a
+      | Alg_expr.BIN_ALG_OP (_,a,b),_ -> (aux_alg id a;aux_alg id b)
+      | Alg_expr.UN_ALG_OP (_,a),_ -> aux_alg id a
       | Alg_expr.STATE_ALG_OP _,_ -> ()
+      | Alg_expr.IF (cond,yes,no),_ ->
+        aux_bool id cond; aux_alg id yes; aux_alg id no
       | Alg_expr.TOKEN_ID s,_ ->
         let id' = translate_token s network in
         let list = Mods.DynArray.get init_tab id' in
@@ -806,6 +821,12 @@ struct
         match id_opt with
         | Some id'' -> add_succ id id''
         | None -> ()
+    and aux_bool id = function
+      | (Alg_expr.TRUE | Alg_expr.FALSE),_ -> ()
+      | Alg_expr.COMPARE_OP (_,a,b),_ ->
+        aux_alg id a; aux_alg id b
+      | Alg_expr.BOOL_OP (_,a,b),_ ->
+        aux_bool id a; aux_bool id b
     in
     let () =
       List.iter
@@ -815,10 +836,10 @@ struct
            | Dummy_decl -> ()
            | Init_expr (id,b,_) ->
              let () = Mods.DynArray.set dec_tab id (decl,None,b)
-             in aux id b
+             in aux_alg id b
            | Var (id,a,b) ->
              let () = Mods.DynArray.set dec_tab id (decl,a,b) in
-             aux id b) list in
+             aux_alg id b) list in
     let top_sort =
       let clean k to_be_visited =
         let l = Mods.DynArray.get lsucc k in
@@ -904,6 +925,7 @@ struct
     | Alg_expr.UN_ALG_OP _,_
     | Alg_expr.ALG_VAR _,_
     | Alg_expr.STATE_ALG_OP _,_
+    | Alg_expr.IF _,_
     | Alg_expr.TOKEN_ID _,_
     | Alg_expr.KAPPA_INSTANCE _,_ -> false
 

@@ -201,12 +201,14 @@ let to_yojson env =
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
       (fun (x,_) ->
-         Alg_expr.to_json kappa_instance_to_yojson JsonUtil.of_int x) env.algs;
+         Alg_expr.e_to_yojson kappa_instance_to_yojson JsonUtil.of_int x)
+      env.algs;
     "observables",
-    `List (Array.fold_right
-             (fun (x,_) l ->
-                Alg_expr.to_json kappa_instance_to_yojson JsonUtil.of_int x :: l)
-             env.observables []);
+    `List
+      (Array.fold_right
+         (fun (x,_) l ->
+            Alg_expr.e_to_yojson kappa_instance_to_yojson JsonUtil.of_int x :: l)
+         env.observables []);
     "ast_rules",
     `List
       (Array.fold_right (fun (n,(r,_)) l ->
@@ -233,14 +235,14 @@ let of_yojson = function
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
               (fun x -> Location.dummy_annot
-                  (Alg_expr.of_json kappa_instance_of_yojson
+                  (Alg_expr.e_of_yojson kappa_instance_of_yojson
                      (JsonUtil.to_int ?error_msg:None) x))
               (List.assoc "algs" l);
           observables = (match List.assoc "observables" l with
               | `List o ->
                 Tools.array_map_of_list
                   (fun x -> Location.dummy_annot
-                      (Alg_expr.of_json kappa_instance_of_yojson
+                      (Alg_expr.e_of_yojson kappa_instance_of_yojson
                          (JsonUtil.to_int ?error_msg:None) x)) o
               | _ -> raise Not_found);
           ast_rules = (match List.assoc "ast_rules" l with

@@ -114,10 +114,10 @@ type modification =
 
 type perturbation =
   { precondition:
-      (Pattern.id array list,int) Alg_expr.bool_expr Location.annot;
+      (Pattern.id array list,int) Alg_expr.bool Location.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
-      Alg_expr.bool_expr Location.annot option;
+      Alg_expr.bool Location.annot option;
   }
 
 let exists_modification check l =
@@ -201,7 +201,7 @@ let map_expr_perturbation f_alg f_bool x =
 
 let stops_of_perturbation algs_deps x =
   let stopping_time =
-    try Alg_expr.stops_of_bool_expr algs_deps (fst x.precondition)
+    try Alg_expr.stops_of_bool algs_deps (fst x.precondition)
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl
@@ -211,7 +211,7 @@ let stops_of_perturbation algs_deps x =
   match x.abort with
   | None -> stopping_time
   | Some (x,pos) ->
-    try stopping_time@Alg_expr.stops_of_bool_expr algs_deps x
+    try stopping_time@Alg_expr.stops_of_bool algs_deps x
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl

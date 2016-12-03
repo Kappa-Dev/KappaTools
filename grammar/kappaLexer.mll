@@ -87,6 +87,8 @@ rule token = parse
 		| "min" -> MIN
 		| "Emax" -> EMAX
 		| "Tmax" -> TMAX
+		| "?" -> THEN
+		| ":" -> ELSE
 		| _ as s ->
 		   raise (ExceptionDefn.Syntax_Error
 			    ("Symbol \""^s^"\" is not defined",

@@ -60,9 +60,10 @@ val rule_of_json : Yojson.Basic.json -> rule
 
 val bool_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
+   ?max_allowed_var: int ->
   (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
-    Alg_expr.bool_expr Location.annot ->
-  (rule_agent list, int) Alg_expr.bool_expr Location.annot
+    Alg_expr.bool Location.annot ->
+  (rule_agent list, int) Alg_expr.bool Location.annot
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   Signature.contact_map ->

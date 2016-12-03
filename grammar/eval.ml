@@ -26,6 +26,22 @@ let rec compile_alg domain (alg,pos) =
   | Alg_expr.UN_ALG_OP (op,a) ->
     let domain',a' = compile_alg domain a in
     (domain',(Alg_expr.UN_ALG_OP (op,a'),pos))
+  | Alg_expr.IF (cond,yes,no) ->
+    let domain',cond' = compile_bool domain cond in
+    let domain'',yes' = compile_alg domain' yes in
+    let domain''',no' = compile_alg domain'' no in
+    (domain''',(Alg_expr.IF (cond',yes',no'),pos))
+and compile_bool domain = function
+  | Alg_expr.TRUE,pos -> (domain,(Alg_expr.TRUE,pos))
+  | Alg_expr.FALSE,pos -> (domain,(Alg_expr.FALSE,pos))
+  | Alg_expr.BOOL_OP (op,a,b), pos ->
+    let domain',a' = compile_bool domain a in
+    let domain'',b' = compile_bool domain' b in
+    (domain'',(Alg_expr.BOOL_OP (op,a',b'),pos))
+  | Alg_expr.COMPARE_OP (op,a,b),pos ->
+    let (domain',a') = compile_alg domain a in
+    let (domain'',b') = compile_alg domain' b in
+    (domain'',(Alg_expr.COMPARE_OP (op,a',b'), pos))
 
 let compile_pure_alg (alg,pos) = snd @@ compile_alg None (alg,pos)
 
@@ -34,17 +50,10 @@ let compile_alg ?origin contact_map domain (alg,pos) =
   | Some (_, _,domain),alg -> domain,alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
-let rec compile_bool contact_map domain = function
-  | Alg_expr.TRUE,pos -> (domain,(Alg_expr.TRUE,pos))
-  | Alg_expr.FALSE,pos -> (domain,(Alg_expr.FALSE,pos))
-  | Alg_expr.BOOL_OP (op,a,b), pos ->
-    let domain',a' = compile_bool contact_map domain a in
-    let domain'',b' = compile_bool contact_map domain' b in
-    (domain'',(Alg_expr.BOOL_OP (op,a',b'),pos))
-  | Alg_expr.COMPARE_OP (op,a,b),pos ->
-    let (domain',a') = compile_alg contact_map domain a in
-    let (domain'',b') = compile_alg contact_map domain' b in
-    (domain'',(Alg_expr.COMPARE_OP (op,a',b'), pos))
+let compile_bool contact_map domain (alg,pos) =
+  match compile_bool (Some (None,contact_map,domain)) (alg,pos) with
+  | Some (_, _,domain),alg -> domain,alg
+  | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
 let tokenify contact_map domain l =
   List.fold_right
@@ -164,7 +173,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
       match var with
       | Alg_expr.KAPPA_INSTANCE mix -> mix
       | (Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ ) ->
+        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _) ->
         raise Not_found
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl

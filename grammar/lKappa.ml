@@ -330,9 +330,9 @@ let rule_agent_of_json = function
 let rule_mixture_to_json = JsonUtil.of_list rule_agent_to_json
 let rule_mixture_of_json = JsonUtil.to_list rule_agent_of_json
 
-let lalg_expr_to_json = Alg_expr.to_json rule_mixture_to_json JsonUtil.of_int
+let lalg_expr_to_json = Alg_expr.e_to_yojson rule_mixture_to_json JsonUtil.of_int
 let lalg_expr_of_json =
-  Alg_expr.of_json rule_mixture_of_json (JsonUtil.to_int ?error_msg:None)
+  Alg_expr.e_of_yojson rule_mixture_of_json (JsonUtil.to_int ?error_msg:None)
 
 let rule_to_json r =
   `Assoc
@@ -556,6 +556,12 @@ let rec ast_alg_has_mix = function
      Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ ), _ ->
     false
   | Alg_expr.KAPPA_INSTANCE _, _ -> true
+  | Alg_expr.IF (cond,yes,no), _ ->
+    ast_alg_has_mix yes || ast_alg_has_mix no || bool_has_mix cond
+and bool_has_mix = function
+  | (Alg_expr.TRUE | Alg_expr.FALSE), _ -> false
+  | Alg_expr.COMPARE_OP (_,a,b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
+  | Alg_expr.BOOL_OP (_,a,b), _ -> bool_has_mix a || bool_has_mix b
 
 let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -994,18 +1000,25 @@ let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
            alg_expr_of_ast sigs tok algs ?max_allowed_var b)
       | Alg_expr.UN_ALG_OP (op,a) ->
         Alg_expr.UN_ALG_OP
-          (op,alg_expr_of_ast sigs tok algs ?max_allowed_var a)),
+          (op,alg_expr_of_ast sigs tok algs ?max_allowed_var a)
+      | Alg_expr.IF (cond,yes,no) ->
+        Alg_expr.IF
+          (bool_expr_of_ast sigs tok algs ?max_allowed_var cond,
+           alg_expr_of_ast sigs tok algs ?max_allowed_var yes,
+           alg_expr_of_ast sigs tok algs ?max_allowed_var no)
+    ),
    pos)
-
-let rec bool_expr_of_ast sigs tok algs = function
+and bool_expr_of_ast sigs tok algs ?max_allowed_var = function
   | (Alg_expr.TRUE | Alg_expr.FALSE),_ as x -> x
   | Alg_expr.BOOL_OP (op,x,y),pos ->
     Alg_expr.BOOL_OP
-      (op, bool_expr_of_ast sigs tok algs x, bool_expr_of_ast sigs tok algs y),
+      (op, bool_expr_of_ast sigs tok algs ?max_allowed_var x,
+       bool_expr_of_ast sigs tok algs ?max_allowed_var y),
     pos
   | Alg_expr.COMPARE_OP (op,x,y),pos ->
     Alg_expr.COMPARE_OP
-      (op,alg_expr_of_ast sigs tok algs x, alg_expr_of_ast sigs tok algs y),pos
+      (op,alg_expr_of_ast sigs tok algs ?max_allowed_var  x,
+       alg_expr_of_ast sigs tok algs ?max_allowed_var y),pos
 
 let print_expr_of_ast sigs tok algs = function
   | Ast.Str_pexpr _ as x -> x

@@ -11,4 +11,4 @@ val value_alg :
 val value_bool :
   Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
   get_mix:(Pattern.id array list -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
-  (Pattern.id array list,int) Alg_expr.bool_expr -> bool
+  (Pattern.id array list,int) Alg_expr.bool -> bool

@@ -7,50 +7,86 @@ type ('mix,'id) e =
   | KAPPA_INSTANCE of 'mix
   | TOKEN_ID of 'id
   | CONST of Nbr.t
-
-type t = (Pattern.id array list, int) e
-
-type ('mix,'id) bool_expr =
+  | IF of ('mix,'id) bool Location.annot *
+          ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
+and ('mix,'id) bool =
   | TRUE
   | FALSE
   | BOOL_OP of
       Operator.bool_op *
-      ('mix,'id) bool_expr Location.annot * ('mix,'id) bool_expr Location.annot
+      ('mix,'id) bool Location.annot * ('mix,'id) bool Location.annot
   | COMPARE_OP of Operator.compare_op *
                   ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
 
-let rec to_json f_mix f_id = function
+type t = (Pattern.id array list, int) e
+
+let rec e_to_yojson f_mix f_id = function
   | BIN_ALG_OP (op,a,b) ->
     `List [Operator.bin_alg_op_to_json op;
-           Location.annot_to_json (to_json f_mix f_id) a;
-           Location.annot_to_json (to_json f_mix f_id) b]
+           Location.annot_to_json (e_to_yojson f_mix f_id) a;
+           Location.annot_to_json (e_to_yojson f_mix f_id) b]
   | UN_ALG_OP (op,a) ->
     `List [Operator.un_alg_op_to_json op;
-           Location.annot_to_json (to_json f_mix f_id) a]
+           Location.annot_to_json (e_to_yojson f_mix f_id) a]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [`String "VAR"; f_id i]
   | KAPPA_INSTANCE cc -> `List [`String "MIX"; f_mix cc]
   | TOKEN_ID i -> `List [`String "TOKEN"; f_id i]
   | CONST n -> Nbr.to_json n
+  | IF (cond,yes,no) ->
+    `List [`String "IF";
+           Location.annot_to_json (bool_to_yojson f_mix f_id) cond;
+           Location.annot_to_json (e_to_yojson f_mix f_id) yes;
+           Location.annot_to_json (e_to_yojson f_mix f_id) no]
+and bool_to_yojson f_mix f_id = function
+  | TRUE -> `Bool true
+  | FALSE -> `Bool false
+  | BOOL_OP (op,a,b) ->
+    `List [ Operator.bool_op_to_json op;
+            Location.annot_to_json (bool_to_yojson f_mix f_id) a;
+            Location.annot_to_json (bool_to_yojson f_mix f_id) b ]
+  | COMPARE_OP (op,a,b) ->
+    `List [ Operator.compare_op_to_json op;
+            Location.annot_to_json (e_to_yojson f_mix f_id) a;
+            Location.annot_to_json (e_to_yojson f_mix f_id) b ]
 
-let rec of_json f_mix f_id = function
+let rec e_of_yojson f_mix f_id = function
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
-       Location.annot_of_json (of_json f_mix f_id) a,
-       Location.annot_of_json (of_json f_mix f_id) b)
+       Location.annot_of_json (e_of_yojson f_mix f_id) a,
+       Location.annot_of_json (e_of_yojson f_mix f_id) b)
   | `List [`String "VAR"; i] -> ALG_VAR (f_id i)
   | `List [`String "TOKEN"; i] -> TOKEN_ID (f_id i)
   | `List [`String "MIX"; cc] -> KAPPA_INSTANCE (f_mix cc)
   | `List [op;a] ->
     UN_ALG_OP (Operator.un_alg_op_of_json op,
-               Location.annot_of_json (of_json f_mix f_id) a)
+               Location.annot_of_json (e_of_yojson f_mix f_id) a)
+  | `List [`String "IF"; cond; yes; no] ->
+    IF (Location.annot_of_json (bool_of_yojson f_mix f_id) cond,
+        Location.annot_of_json (e_of_yojson f_mix f_id) yes,
+        Location.annot_of_json (e_of_yojson f_mix f_id) no)
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
     try  CONST (Nbr.of_json x)
     with Yojson.Basic.Util.Type_error _ ->
       raise (Yojson.Basic.Util.Type_error ("Invalid Alg_expr",x))
+and bool_of_yojson f_mix f_id = function
+  | `Bool b -> if b then TRUE else FALSE
+  | `List [op; a; b] as x ->
+    begin
+      try BOOL_OP (Operator.bool_op_of_json op,
+                   Location.annot_of_json (bool_of_yojson f_mix f_id) a,
+                   Location.annot_of_json (bool_of_yojson f_mix f_id) b)
+      with Yojson.Basic.Util.Type_error _ ->
+      try COMPARE_OP (Operator.compare_op_of_json op,
+                      Location.annot_of_json (e_of_yojson f_mix f_id) a,
+                      Location.annot_of_json (e_of_yojson f_mix f_id) b)
+      with Yojson.Basic.Util.Type_error _ ->
+        raise (Yojson.Basic.Util.Type_error ("Incorrect bool expr",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect bool_expr",x))
 
 let rec print pr_mix pr_tok pr_var f = function
   | CONST n -> Nbr.print f n
@@ -63,11 +99,13 @@ let rec print pr_mix pr_tok pr_var f = function
       (print pr_mix pr_tok pr_var) a
       Operator.print_bin_alg_op op
       (print pr_mix pr_tok pr_var) b
-  |UN_ALG_OP (op, (a,_)) ->
+  | UN_ALG_OP (op, (a,_)) ->
     Format.fprintf f "(%a %a)" Operator.print_un_alg_op op
       (print pr_mix pr_tok pr_var) a
-
-let rec print_bool pr_mix pr_tok pr_var f = function
+  | IF ((cond,_),(yes,_),(no,_)) ->
+    Format.fprintf f "%a [?] %a [:] %a" (print_bool pr_mix pr_tok pr_var) cond
+      (print pr_mix pr_tok pr_var) yes (print pr_mix pr_tok pr_var) no
+and print_bool pr_mix pr_tok pr_var f = function
   | TRUE -> Format.fprintf f "[true]"
   | FALSE -> Format.fprintf f "[false]"
   | BOOL_OP (op,(a,_), (b,_)) ->
@@ -79,34 +117,6 @@ let rec print_bool pr_mix pr_tok pr_var f = function
       Operator.print_compare_op op
       (print pr_mix pr_tok pr_var) b
 
-let rec bool_to_json f_mix f_id = function
-  | TRUE -> `Bool true
-  | FALSE -> `Bool false
-  | BOOL_OP (op,a,b) ->
-    `List [ Operator.bool_op_to_json op;
-            Location.annot_to_json (bool_to_json f_mix f_id) a;
-            Location.annot_to_json (bool_to_json f_mix f_id) b ]
-  | COMPARE_OP (op,a,b) ->
-    `List [ Operator.compare_op_to_json op;
-            Location.annot_to_json (to_json f_mix f_id) a;
-            Location.annot_to_json (to_json f_mix f_id) b ]
-
-let rec bool_of_json f_mix f_id = function
-  | `Bool b -> if b then TRUE else FALSE
-  | `List [op; a; b] as x ->
-    begin
-      try BOOL_OP (Operator.bool_op_of_json op,
-                   Location.annot_of_json (bool_of_json f_mix f_id) a,
-                   Location.annot_of_json (bool_of_json f_mix f_id) b)
-      with Yojson.Basic.Util.Type_error _ ->
-      try COMPARE_OP (Operator.compare_op_of_json op,
-                      Location.annot_of_json (of_json f_mix f_id) a,
-                      Location.annot_of_json (of_json f_mix f_id) b)
-      with Yojson.Basic.Util.Type_error _ ->
-        raise (Yojson.Basic.Util.Type_error ("Incorrect bool expr",x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect bool_expr",x))
-
 let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
   | UN_ALG_OP (_, a), _ -> add_dep x d a
@@ -117,18 +127,30 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | TOKEN_ID i, _ ->
     let () = toks_d.(i) <- Operator.DepSet.add d toks_d.(i) in
     x
+  | IF (cond,yes,no), _ -> add_dep (add_dep (add_dep_bool x d cond) d yes) d no
   | STATE_ALG_OP op, _ ->
     match op with
     | (Operator.EMAX_VAR | Operator.TMAX_VAR) -> x
     | Operator.TIME_VAR -> (Operator.DepSet.add d in_t,in_e,toks_d,out)
     | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR) ->
       (in_t,Operator.DepSet.add d in_e,toks_d,out)
+and add_dep_bool x d = function
+  | (TRUE | FALSE), _ -> x
+  | BOOL_OP (_,a, b), _ -> add_dep_bool (add_dep_bool x d a) d b
+  | COMPARE_OP (_,a, b), _ -> add_dep (add_dep x d a) d b
 
 let rec aux_extract_cc acc = function
   | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
   | UN_ALG_OP (_, a), _ -> aux_extract_cc acc a
   | (ALG_VAR _ | CONST _ | TOKEN_ID _ | STATE_ALG_OP _), _ -> acc
   | KAPPA_INSTANCE i, _ -> i :: acc
+  | IF (cond,yes,no), _ ->
+    aux_extract_cc (aux_extract_cc (extract_cc_bool acc cond) yes) no
+and extract_cc_bool acc = function
+  | (TRUE | FALSE), _ -> acc
+  | BOOL_OP (_,a, b), _ -> extract_cc_bool (extract_cc_bool acc a) b
+  | COMPARE_OP (_,a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
+
 let extract_connected_components x = aux_extract_cc [] x
 
 let setup_alg_vars_rev_dep toks vars =
@@ -145,14 +167,14 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
            propagate_constant ?max_time ?max_events updated_vars vars b with
     | (CONST c1,_),(CONST c2,_) -> CONST (Nbr.of_bin_alg_op op c1 c2),pos
     | ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | TOKEN_ID _ | ALG_VAR _ | CONST _),_),
+       | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_),
       ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | TOKEN_ID _ | ALG_VAR _ | CONST _),_) -> x)
+       | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_) -> x)
   | UN_ALG_OP (op,a),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
      | CONST c,_ -> CONST (Nbr.of_un_alg_op op c),pos
      | (BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | TOKEN_ID _ | ALG_VAR _),_ -> x)
+       | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
   | STATE_ALG_OP (Operator.EMAX_VAR),pos ->
     CONST
       (match max_events with
@@ -180,10 +202,19 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
      else match vars.(i) with
        | _,((CONST _ | ALG_VAR _ as y),_) -> y,pos
        | _,((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-            | TOKEN_ID _),_) -> x)
+            | TOKEN_ID _ | IF _),_) -> x)
   | (KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_ as x -> x
-
-let rec propagate_constant_bool
+  | IF (cond,yes,no),pos ->
+    match propagate_constant_bool
+            ?max_time ?max_events updated_vars vars cond with
+    | TRUE, _ ->
+      propagate_constant ?max_time ?max_events updated_vars vars yes
+    | FALSE,_ ->
+            propagate_constant ?max_time ?max_events updated_vars vars no
+    | (BOOL_OP _ | COMPARE_OP _),_ as cond' ->
+      (IF (cond', propagate_constant ?max_time ?max_events updated_vars vars yes,
+           propagate_constant ?max_time ?max_events updated_vars vars no),pos)
+and propagate_constant_bool
     ?max_time ?max_events updated_vars vars = function
   | (TRUE | FALSE),_ as x -> x
   | BOOL_OP (op,a,b),pos ->
@@ -211,7 +242,7 @@ let rec propagate_constant_bool
     | (CONST n1,_), (CONST n2,_) ->
       (if Nbr.of_compare_op op n1 n2 then TRUE,pos else FALSE,pos)
     | (( BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _
-       | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_), _ ->
+       | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_), _ ->
       COMPARE_OP (op,a',b'),pos
 
 let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
@@ -230,12 +261,21 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
         (function Operator.ALG k -> aux k
                 | (Operator.RULE _ | Operator.PERT _) -> false) deps.(j) in
     aux i
+  | IF (cond,yes,no),_ ->
+    bool_has_time_dep vars_deps cond ||
+    has_time_dep vars_deps yes||has_time_dep vars_deps no
+and bool_has_time_dep vars_deps = function
+  | (TRUE | FALSE), _ -> false
+  | COMPARE_OP (_,a,b),_ ->
+    has_time_dep vars_deps a||has_time_dep vars_deps b
+  | BOOL_OP (_,a,b),_ ->
+    bool_has_time_dep vars_deps a||bool_has_time_dep vars_deps b
 
-let rec stops_of_bool_expr vars_deps = function
+let rec stops_of_bool vars_deps = function
   | TRUE | FALSE -> []
   | BOOL_OP (op,(a,_),(b,_)) ->
-    let st1 = stops_of_bool_expr vars_deps a in
-    let st2 = stops_of_bool_expr vars_deps b in
+    let st1 = stops_of_bool vars_deps a in
+    let st2 = stops_of_bool vars_deps b in
     (match op,st1,st2 with
      | _, [], _ -> st2
      | _, _, [] -> st1
@@ -252,7 +292,7 @@ let rec stops_of_bool_expr vars_deps = function
           | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                           Operator.TIME_VAR | Operator.NULL_EVENT_VAR |
                           Operator.EMAX_VAR |Operator.TMAX_VAR)
-          | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
+          | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _), _ ->
           raise ExceptionDefn.Unsatisfiable
       end
     | (Operator.EQUAL | Operator.SMALLER | Operator.GREATER | Operator.DIFF) -> []

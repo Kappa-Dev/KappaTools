@@ -512,24 +512,12 @@ let rec alg_map f error alg =
     let error,mixture' = f error mixture in
     error,Alg_expr.KAPPA_INSTANCE mixture'
   | Alg_expr.CONST x -> error,Alg_expr.CONST x
-
-let print_expr_map  f error alg =
-  match
-    alg
-  with
-  | Ast.Str_pexpr(s) -> error,Ast.Str_pexpr(s)
-  | Ast.Alg_pexpr (alg,pos) ->
-    let error,alg' = alg_map f error alg in
-    error,Ast.Alg_pexpr (alg',pos)
-
-let map_with_pos map =
-  (fun f error (x,pos) ->
-     let error,x' = map f error x in
-     error,(x',pos) )
-
-let alg_with_pos_map = map_with_pos alg_map
-
-let rec bool_map f error alg =
+  | Alg_expr.IF ((cond,cond_pos),(yes,yes_pos),(no,no_pos)) ->
+    let error,cond' = bool_map f error cond in
+    let error,yes' = alg_map f error yes in
+    let error,no' = alg_map f error no in
+    (error,Alg_expr.IF ((cond',cond_pos),(yes',yes_pos),(no',no_pos)))
+and bool_map f error alg =
   match
     alg
   with
@@ -559,6 +547,22 @@ let rec bool_map f error alg =
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in
     error,Alg_expr.COMPARE_OP(Operator.DIFF,(m1',pos1),(m2',pos2))
+
+let print_expr_map  f error alg =
+  match
+    alg
+  with
+  | Ast.Str_pexpr(s) -> error,Ast.Str_pexpr(s)
+  | Ast.Alg_pexpr (alg,pos) ->
+    let error,alg' = alg_map f error alg in
+    error,Ast.Alg_pexpr (alg',pos)
+
+let map_with_pos map =
+  (fun f error (x,pos) ->
+     let error,x' = map f error x in
+     error,(x',pos) )
+
+let alg_with_pos_map = map_with_pos alg_map
 
 let modif_map f_forbidding_question_marks f_allowing_question_marks error alg =
   match

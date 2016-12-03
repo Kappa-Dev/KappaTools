@@ -8,9 +8,9 @@
 *)
 val compile_bool:
   Signature.contact_map -> Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, int) Alg_expr.bool_expr Location.annot ->
+  (LKappa.rule_mixture, int) Alg_expr.bool Location.annot ->
   Pattern.PreEnv.t *
-  (Pattern.id array list,int) Alg_expr.bool_expr Location.annot
+  (Pattern.id array list,int) Alg_expr.bool Location.annot
 
 val compile_modifications_no_track:
   Signature.contact_map -> Pattern.PreEnv.t ->

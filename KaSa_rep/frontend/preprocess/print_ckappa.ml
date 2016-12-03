@@ -211,6 +211,46 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
   | Alg_expr.CONST t ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "%s" (Nbr.to_string t)
     in error
+  | Alg_expr.IF (cond,(yes,_),(no,_)) ->
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
+    let error = print_bool parameter error cond in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "[?]" in
+    let error = print_alg parameter error yes in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "[:]" in
+    let error = print_alg parameter error no in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+    error
+and print_bool parameter (error:Exception.method_handler) = function
+  | Alg_expr.TRUE,_ ->
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "[true]"
+    in error
+  | Alg_expr.FALSE,_ ->
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "[false]"
+    in error
+  | Alg_expr.COMPARE_OP (op,(alg1,_),(alg2,_)),_ ->
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
+    let error = print_alg parameter error alg1 in
+    let () =
+      match
+        Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
+      with
+      | None -> ()
+      | Some formatter -> Operator.print_compare_op formatter op in
+    let error = print_alg parameter error alg2 in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+    error
+  | Alg_expr.BOOL_OP (op,b1,b2),_ ->
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
+    let error = print_bool parameter error b1 in
+    let () =
+      match
+        Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
+      with
+      | None -> ()
+      | Some formatter -> Operator.print_bool_op formatter op in
+    let error = print_bool parameter error b2 in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+    error
 
 let print_rule parameter error rule =
   let error = print_mixture parameter error rule.Ckappa_sig.lhs in

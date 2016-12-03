@@ -66,9 +66,9 @@ type ('mixture,'id) modif_expr =
   | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
 
 type ('mixture,'id) perturbation =
-  (('mixture,'id) Alg_expr.bool_expr Location.annot *
+  (('mixture,'id) Alg_expr.bool Location.annot *
    (('mixture,'id) modif_expr list) *
-   ('mixture,'id) Alg_expr.bool_expr Location.annot option) Location.annot
+   ('mixture,'id) Alg_expr.bool Location.annot option) Location.annot
 
 type configuration = string Location.annot * (string Location.annot list)
 
@@ -95,7 +95,7 @@ type ('mixture,'id) instruction =
   | CONFIG   of configuration
 
 type ('mixture,'id) command =
-  | RUN of ('mixture,'id) Alg_expr.bool_expr
+  | RUN of ('mixture,'id) Alg_expr.bool
   | MODIFY of ('mixture,'id) modif_expr list
   | QUIT
 
@@ -327,7 +327,7 @@ let rule_to_json f_mix f_var r =
     "rm_token",
     JsonUtil.of_list
       (JsonUtil.of_pair
-         (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
+         (Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var))
          string_annot_to_json)
       r.rm_token;
     "bidirectional", `Bool r.bidirectional;
@@ -335,24 +335,26 @@ let rule_to_json f_mix f_var r =
     "add_token",
     JsonUtil.of_list
       (JsonUtil.of_pair
-         (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
+         (Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var))
          string_annot_to_json)
       r.add_token;
-    "k_def", Location.annot_to_json (Alg_expr.to_json f_mix f_var) r.k_def;
+    "k_def", Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) r.k_def;
     "k_un",
     JsonUtil.of_option
-      (JsonUtil.of_pair (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
+      (JsonUtil.of_pair
+         (Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var))
          (JsonUtil.of_option (Location.annot_to_json
-                                (Alg_expr.to_json f_mix f_var))))
+                                (Alg_expr.e_to_yojson f_mix f_var))))
       r.k_un;
     "k_op",
     JsonUtil.of_option
-      (Location.annot_to_json (Alg_expr.to_json f_mix f_var)) r.k_op;
+      (Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var)) r.k_op;
     "k_op_un",
     JsonUtil.of_option
-      (JsonUtil.of_pair (Location.annot_to_json (Alg_expr.to_json f_mix f_var))
+      (JsonUtil.of_pair
+         (Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var))
          (JsonUtil.of_option (Location.annot_to_json
-                                (Alg_expr.to_json f_mix f_var))))
+                                (Alg_expr.e_to_yojson f_mix f_var))))
       r.k_op_un;
   ]
 
@@ -365,7 +367,7 @@ let rule_of_json f_mix f_var = function
           rm_token =
             JsonUtil.to_list
               (JsonUtil.to_pair
-                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))
                  string_annot_of_json)
               (List.assoc "rm_token" l);
           bidirectional =
@@ -374,27 +376,27 @@ let rule_of_json f_mix f_var = function
           add_token =
             JsonUtil.to_list
               (JsonUtil.to_pair
-                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))
                  string_annot_of_json)
               (List.assoc "add_token" l);
           k_def = Location.annot_of_json
-              (Alg_expr.of_json f_mix f_var) (List.assoc "k_def" l);
+              (Alg_expr.e_of_yojson f_mix f_var) (List.assoc "k_def" l);
           k_un =
             JsonUtil.to_option
               (JsonUtil.to_pair
-                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))
                  (JsonUtil.to_option
-                    (Location.annot_of_json (Alg_expr.of_json f_mix f_var))))
+                    (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))))
               (List.assoc "k_un" l);
           k_op = JsonUtil.to_option
-              (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
+              (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))
               (List.assoc "k_op" l);
           k_op_un =
             JsonUtil.to_option
               (JsonUtil.to_pair
-                 (Location.annot_of_json (Alg_expr.of_json f_mix f_var))
+                 (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))
                  (JsonUtil.to_option
-                    (Location.annot_of_json (Alg_expr.of_json f_mix f_var))))
+                    (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var))))
               (List.assoc "k_op_un" l);
         }
       with Not_found ->
@@ -404,32 +406,32 @@ let rule_of_json f_mix f_var = function
 
 let print_expr_to_json f_mix f_var = function
   | Str_pexpr s -> string_annot_to_json s
-  | Alg_pexpr a -> Location.annot_to_json (Alg_expr.to_json f_mix f_var) a
+  | Alg_pexpr a -> Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) a
 
 let print_expr_of_json f_mix f_var x =
   try Str_pexpr (string_annot_of_json x)
   with Yojson.Basic.Util.Type_error _ ->
-  try Alg_pexpr (Location.annot_of_json (Alg_expr.of_json f_mix f_var) x)
+  try Alg_pexpr (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) x)
   with Yojson.Basic.Util.Type_error _ ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
 
 let modif_to_json f_mix f_var = function
   | INTRO (alg,mix) ->
     `List [ `String "INTRO";
-            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg;
+            Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) alg;
             Location.annot_to_json f_mix mix ]
   | DELETE (alg,mix) ->
     `List [ `String "DELETE";
-            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg;
+            Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) alg;
             Location.annot_to_json f_mix mix ]
   | UPDATE (id,alg) ->
     `List [ `String "UPDATE";
             Location.annot_to_json f_var id;
-            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg ]
+            Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) alg ]
   | UPDATE_TOK (id,alg) ->
     `List [ `String "UPDATE_TOK";
             Location.annot_to_json f_var id;
-            Location.annot_to_json (Alg_expr.to_json f_mix f_var) alg ]
+            Location.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) alg ]
   | STOP l ->
     `List (`String "STOP" :: List.map (print_expr_to_json f_mix f_var) l)
   | SNAPSHOT l ->
@@ -452,20 +454,20 @@ let modif_to_json f_mix f_var = function
 let modif_of_json f_mix f_var = function
   | `List [ `String "INTRO"; alg; mix ] ->
      INTRO
-       (Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg,
+       (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) alg,
         Location.annot_of_json f_mix mix)
   | `List [ `String "DELETE"; alg; mix ] ->
     DELETE
-      (Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg,
+      (Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) alg,
        Location.annot_of_json f_mix mix)
   | `List [ `String "UPDATE"; id; alg ] ->
     UPDATE
       (Location.annot_of_json f_var id,
-       Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg)
+       Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) alg)
   | `List [ `String "UPDATE_TOK"; id; alg ] ->
      UPDATE_TOK
        (Location.annot_of_json f_var id,
-        Location.annot_of_json (Alg_expr.of_json f_mix f_var) alg)
+        Location.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) alg)
   | `List (`String "STOP" :: l) ->
     STOP (List.map (print_expr_of_json f_mix f_var) l)
   | `List (`String "SNAPSHOT" :: l) ->
@@ -567,7 +569,8 @@ let compil_to_json c =
       "variables", JsonUtil.of_list
         (JsonUtil.of_pair
            string_annot_to_json
-           (Location.annot_to_json (Alg_expr.to_json mix_to_json var_to_json)))
+           (Location.annot_to_json
+              (Alg_expr.e_to_yojson mix_to_json var_to_json)))
         c.variables;
       "rules", JsonUtil.of_list
         (JsonUtil.of_pair
@@ -576,12 +579,13 @@ let compil_to_json c =
         c.rules;
       "observables",
       JsonUtil.of_list
-        (Location.annot_to_json (Alg_expr.to_json mix_to_json var_to_json))
+        (Location.annot_to_json (Alg_expr.e_to_yojson mix_to_json var_to_json))
         c.observables;
       "init",
       JsonUtil.of_list
         (JsonUtil.of_pair
-           (Location.annot_to_json (Alg_expr.to_json mix_to_json var_to_json))
+           (Location.annot_to_json
+              (Alg_expr.e_to_yojson mix_to_json var_to_json))
            (Location.annot_to_json (init_to_json mix_to_json var_to_json)))
         (List.map (fun (_,a,i) -> (a,i)) c.init);
       "perturbations", JsonUtil.of_list
@@ -589,11 +593,11 @@ let compil_to_json c =
            (fun (pre,modif,post) ->
               `List [
                 Location.annot_to_json
-                  (Alg_expr.bool_to_json mix_to_json var_to_json) pre;
+                  (Alg_expr.bool_to_yojson mix_to_json var_to_json) pre;
                 JsonUtil.of_list (modif_to_json mix_to_json var_to_json) modif;
                 JsonUtil.of_option
                   (Location.annot_to_json
-                     (Alg_expr.bool_to_json mix_to_json var_to_json)) post;
+                     (Alg_expr.bool_to_yojson mix_to_json var_to_json)) post;
               ])) c.perturbations;
       "configurations",
       JsonUtil.of_list
@@ -619,7 +623,8 @@ let compil_of_json = function
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST variables")
               (JsonUtil.to_pair
                  string_annot_of_json
-                 (Location.annot_of_json (Alg_expr.of_json mix_of_json var_of_json)))
+                 (Location.annot_of_json
+                    (Alg_expr.e_of_yojson mix_of_json var_of_json)))
               (List.assoc "variables" l);
           rules =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST rules")
@@ -630,7 +635,8 @@ let compil_of_json = function
               (List.assoc "rules" l);
           observables =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST observables")
-              (Location.annot_of_json (Alg_expr.of_json mix_of_json var_of_json))
+              (Location.annot_of_json
+                 (Alg_expr.e_of_yojson mix_of_json var_of_json))
               (List.assoc "observables" l);
           init =
             List.map
@@ -638,7 +644,7 @@ let compil_of_json = function
               (JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST init")
                  (JsonUtil.to_pair
                     (Location.annot_of_json
-                       (Alg_expr.of_json mix_of_json var_of_json))
+                       (Alg_expr.e_of_yojson mix_of_json var_of_json))
                     (Location.annot_of_json
                        (init_of_json mix_of_json var_of_json)))
                  (List.assoc "init" l));
@@ -648,13 +654,13 @@ let compil_of_json = function
                  (function
                    | `List [pre; modif; post] ->
                      (Location.annot_of_json
-                        (Alg_expr.bool_of_json mix_of_json var_of_json)
+                        (Alg_expr.bool_of_yojson mix_of_json var_of_json)
                         pre,
                       JsonUtil.to_list
                         (modif_of_json mix_of_json var_of_json) modif,
                       JsonUtil.to_option
                         (Location.annot_of_json
-                           (Alg_expr.bool_of_json mix_of_json var_of_json))
+                           (Alg_expr.bool_of_yojson mix_of_json var_of_json))
                         post)
                    | x ->
                      raise

@@ -221,7 +221,7 @@ let () =
                       (fst @@ Pattern.PreEnv.finalize cc_preenv')
                       env in
                 env',
-                if try Alg_expr.stops_of_bool_expr
+                if try Alg_expr.stops_of_bool
                          (Environment.all_dependencies env) b'' <> []
                   with ExceptionDefn.Unsatisfiable -> true then
                   let () =

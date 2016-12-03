@@ -149,9 +149,9 @@ type rule =
   }
 
 type perturbation =
-  ((((mixture,string) Alg_expr.bool_expr) * Ckappa_sig.position) *
+  ((((mixture,string) Alg_expr.bool) * Ckappa_sig.position) *
    (modif_expr list) *
-   (((mixture,string) Alg_expr.bool_expr * Ckappa_sig.position)  option)) *
+   (((mixture,string) Alg_expr.bool * Ckappa_sig.position)  option)) *
   Ckappa_sig.position
 
 and modif_expr =
