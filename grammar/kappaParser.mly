@@ -27,6 +27,8 @@
 %left OR
 %left AND
 
+%nonassoc THEN
+
 %start start_rule
 %type <(Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil -> (Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil> start_rule
 
@@ -207,9 +209,9 @@ effect:
 
 nonempty_print_expr:
     | STRING {[Ast.Str_pexpr (add_pos $1)]}
-    | alg_expr {[Ast.Alg_pexpr $1]}
+    | mid_alg_expr {[Ast.Alg_pexpr $1]}
     | STRING DOT nonempty_print_expr {Ast.Str_pexpr ($1, rhs_pos 1)::$3}
-    | alg_expr DOT nonempty_print_expr {Ast.Alg_pexpr $1::$3}
+    | mid_alg_expr DOT nonempty_print_expr {Ast.Alg_pexpr $1::$3}
     ;
 print_expr:
     /*empty*/ {[]}
@@ -239,13 +241,10 @@ variable_declaration:
 	    }
     ;
 
-small_bool_expr:
+bool_expr:
     | OP_PAR bool_expr CL_PAR {$2}
     | TRUE {add_pos Alg_expr.TRUE}
     | FALSE {add_pos Alg_expr.FALSE}
-
-bool_expr:
-    | small_bool_expr {$1}
     | bool_expr AND bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.AND,$1,$3))}
     | bool_expr OR bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.OR,$1,$3))}
     | alg_expr GREATER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.GREATER,$1,$3))}
@@ -326,25 +325,28 @@ small_alg_expr:
 	  {add_pos (Alg_expr.BIN_ALG_OP(Operator.MAX,$2,$3))}
     | MIN small_alg_expr small_alg_expr
 	  {add_pos (Alg_expr.BIN_ALG_OP(Operator.MIN,$2,$3))}
-    | EXPONENT alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.EXP,$2))}
-    | SINUS alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.SINUS,$2))}
-    | COSINUS alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.COSINUS,$2))}
-    | TAN alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.TAN,$2))}
-    | ABS alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.INT,$2))}
-    | SQRT alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.SQRT,$2))}
-    | LOG alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.LOG,$2))}
+    | EXPONENT mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.EXP,$2))}
+    | SINUS mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.SINUS,$2))}
+    | COSINUS mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.COSINUS,$2))}
+    | TAN mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.TAN,$2))}
+    | ABS mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.INT,$2))}
+    | SQRT mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.SQRT,$2))}
+    | LOG mid_alg_expr {add_pos (Alg_expr.UN_ALG_OP(Operator.LOG,$2))}
     ;
 
-alg_expr:
-    | MINUS alg_expr { add_pos (Alg_expr.UN_ALG_OP(Operator.UMINUS,$2)) }
+mid_alg_expr:
+    | MINUS mid_alg_expr { add_pos (Alg_expr.UN_ALG_OP(Operator.UMINUS,$2)) }
     | small_alg_expr { $1 }
-    | alg_expr MULT alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MULT,$1,$3))}
-    | alg_expr PLUS alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.SUM,$1,$3))}
-    | alg_expr DIV alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.DIV,$1,$3))}
-    | alg_expr MINUS alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MINUS,$1,$3))}
-    | alg_expr POW alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.POW,$1,$3))}
-    | alg_expr MODULO alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MODULO,$1,$3))}
-    | small_bool_expr THEN alg_expr ELSE small_alg_expr {add_pos (Alg_expr.IF($1,$3,$5))}
+    | mid_alg_expr MULT mid_alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MULT,$1,$3))}
+    | mid_alg_expr PLUS mid_alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.SUM,$1,$3))}
+    | mid_alg_expr DIV mid_alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.DIV,$1,$3))}
+    | mid_alg_expr MINUS mid_alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MINUS,$1,$3))}
+    | mid_alg_expr POW mid_alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.POW,$1,$3))}
+    | mid_alg_expr MODULO mid_alg_expr {add_pos (Alg_expr.BIN_ALG_OP(Operator.MODULO,$1,$3))}
+
+alg_expr:
+    | mid_alg_expr {$1}
+    | bool_expr THEN alg_expr ELSE small_alg_expr {add_pos (Alg_expr.IF($1,$3,$5))}
 
 birate:
     | AT rate {let (k2,k1) = $2 in (k2,k1,None,None)}

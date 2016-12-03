@@ -680,11 +680,16 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
     \textit{algebraic\_expression} & ::= & \tcb{$x\in\Real$} $\mid$ \tcb{variable} \\
      &  & $\mid$ \textit{algebraic\_expression} \tcb{binary\_op} \textit{algebraic\_expression}\\
      &  & $\mid$ \tcb{unary\_op} \tcb{(}\textit{algebraic\_expression}\tcb{)} \\
-    \end{tabular}
+     &  & $\mid$ \textit{boolean\_expression}  \ttt{[?]} \textit{algebraic\_expression} \ttt{[:]} \textit{algebraic\_expression}\\
+  \end{tabular}
+  Last item of the list is an
+  if-expression. \textit{boolean\_expression} are described in
+  Table~\ref{tab:pert}. Think very carefully whether it is the correct
+  think to do before using it. Mecanistic conditions have to be
+  expressed in rule bodies not in rule rates!
   \label{tab:alg}
 \end{table}
 %%
-
 
 
 \begin{table}[htbp]

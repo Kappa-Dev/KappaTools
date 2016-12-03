@@ -13,8 +13,7 @@ let value_state_alg_op counter ?(time=Counter.current_time counter) = function
      | None -> Nbr.F infinity)
 
 type (_,_) stack =
-  | TO_NBR : (Nbr.t,Nbr.t) stack
-  | TO_BOOL : (bool,bool) stack
+  | RETURN : ('a,'a) stack
   | TO_EXEC_ALG :
       Operator.bin_alg_op * Alg_expr.t * (Nbr.t,'a) stack -> (Nbr.t,'a) stack
   | TO_EXEC_COMP :
@@ -77,8 +76,7 @@ and with_value :
   get_mix:(Pattern.id array list -> Nbr.t) ->
   get_tok:(int -> Nbr.t) -> a -> (a,b) stack -> b =
   fun counter ?time ~get_alg ~get_mix ~get_tok n -> function
-  | TO_NBR -> n
-  | TO_BOOL -> n
+  | RETURN -> n
   | TO_EXEC_ALG (op,alg, sk) ->
     exec_alg counter ?time ~get_alg ~get_mix ~get_tok alg (TO_COMPUTE_ALG (op,n,sk))
   | TO_COMPUTE_ALG (op,n1,sk) ->
@@ -101,6 +99,6 @@ and with_value :
     exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr sk
 
 let value_bool counter ?time ~get_alg ~get_mix ~get_tok expr =
-  exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr TO_BOOL
+  exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr RETURN
 let value_alg counter ?time ~get_alg ~get_mix ~get_tok alg =
-  exec_alg counter ?time ~get_alg ~get_mix ~get_tok alg TO_NBR
+  exec_alg counter ?time ~get_alg ~get_mix ~get_tok alg RETURN
