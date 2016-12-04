@@ -37,27 +37,24 @@ end =
       t
 
     let incr_no_more_binary t = incr_one t no_more_binary
-    let incr_no_more_unary t = incr_one  t no_more_unary
+    let incr_no_more_unary t = incr_one t no_more_unary
     let incr_clashing_instance t = incr_one t clashing_instance
     let incr_time_correction t = incr_one t time_correction
 
     let print_detail f t =
       let () = Format.pp_open_vbox f 0 in
-      let () = Format.fprintf
-                 f "\tValid embedding but no longer unary when required: %f@,"
-                 ((float_of_int t.(no_more_unary)) /. (float_of_int t.(all))) in
-      let () = Format.fprintf
-                 f "\tValid embedding but not binary when required: %f@,"
-                 ((float_of_int t.(no_more_binary)) /. (float_of_int t.(all))) in
-      let () = Format.fprintf
-                 f "\tClashing instance: %f@,"
-                 ((float_of_int t.(clashing_instance)) /. (float_of_int t.(all))) in
-      (*let () =
-        Format.fprintf f "\tLazy negative update of non local instances: %f@,"
-                       ((float_of_int n) /. (float_of_int t.(all))) in*)
-      Format.fprintf
-        f "\tPerturbation interrupting time advance: %f@]@."
-        ((float_of_int t.(time_correction)) /. (float_of_int t.(all)))
+      let () = if t.(no_more_unary) > 0 then Format.fprintf
+            f "\tValid embedding but no longer unary when required: %.2f%%@,"
+            (100. *. (float_of_int t.(no_more_unary)) /. (float_of_int t.(all))) in
+      let () = if t.(no_more_binary) > 0 then Format.fprintf
+            f "\tValid embedding but not binary when required: %f.2%%@,"
+            (100. *. (float_of_int t.(no_more_binary)) /. (float_of_int t.(all))) in
+      let () = if t.(clashing_instance) > 0 then Format.fprintf
+            f "\tClashing instance: %.2f%%@,"
+            (100. *. (float_of_int t.(clashing_instance)) /. (float_of_int t.(all))) in
+      if t.(time_correction) > 0 then Format.fprintf
+          f "\tPerturbation interrupting time advance: %.2f%%@]@."
+          (100. *. (float_of_int t.(time_correction)) /. (float_of_int t.(all)))
   end
 
 module Progress_report =

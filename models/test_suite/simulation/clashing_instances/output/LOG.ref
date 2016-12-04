@@ -937,7 +937,4 @@ Rule rule has now 0 instances.
 ###########
 Warning: A deadlock was reached after 99 events and 4.857865E+00s (Activity = 0.00000)
 Simulation ended (eff.: 0.925234, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 1.000000
-	Perturbation interrupting time advance: 0.000000
+	Clashing instance: 100.00%
