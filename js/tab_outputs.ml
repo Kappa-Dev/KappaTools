@@ -68,7 +68,7 @@ let file_count
   match state with
     None -> 0
   | Some state ->
-    state.Api_types_t.simulation_info_output.Api_types_t.simulation_output_flux_maps
+    state.Api_types_t.simulation_info_output.Api_types_t.simulation_output_file_lines
 (* Careful this defaults to None which a valid file identifier.
    The idea is to always give a valid file identifier.
  *)
