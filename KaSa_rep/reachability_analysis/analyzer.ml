@@ -162,7 +162,6 @@ struct
               error
           in
           begin
-            (*TODO: from option -> different type*)
             let error, dynamic, is_enabled =
               Domain.is_enabled static dynamic error rule_id
             in

@@ -859,53 +859,6 @@ struct
         dynamic
         store_value
         list
-
-      (*begin
-      let rec scan list error =
-        match list with
-        | [] -> error, true, dynamic
-        | tuple :: tail ->
-          let proj (b,c,d,e,f) = (b,c,d,e) in
-          let proj2 (x, y) = proj x, proj y in
-          let tuple' = proj2 tuple in
-          let error, mvbdu_value =
-            match
-              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-                parameters error
-                tuple'
-                store_value
-          with
-          | error, None -> error, bdu_false
-          | error, Some mvbdu -> error, mvbdu
-          in
-          (*build mvbdu for the tuple in the lhs, then do the
-            intersection with the result*)
-          let ((_, _, _, _, state2),
-               (_, _, _, _, state2')) = tuple in
-          let pair_list =
-            [Ckappa_sig.fst_site, state2;
-            Ckappa_sig.snd_site, state2']
-          in
-          let handler = get_mvbdu_handler dynamic in
-          let error, handler, mvbdu =
-            Ckappa_sig.Views_bdu.mvbdu_of_association_list
-              parameters handler error pair_list
-          in
-          (*intersection*)
-          let error, handler, new_mvbdu =
-            Ckappa_sig.Views_bdu.mvbdu_and
-              parameters handler error mvbdu mvbdu_value
-          in
-          let dynamic = set_mvbdu_handler handler dynamic in
-          (*check*)
-          if Ckappa_sig.Views_bdu.equal new_mvbdu bdu_false
-          then
-            error, false, dynamic
-          else
-            scan tail error
-      in
-      scan list error
-      end*)
     in
     if bool
     then error, dynamic, Some precondition
@@ -946,52 +899,6 @@ struct
         dynamic
         store_value
         list
-      (*begin
-        let rec scan list error =
-          match list with
-          | [] -> error, true, dynamic
-          | tuple :: tail ->
-            let proj (b,c,d,e,f) = (b,c,d,e) in
-            let proj2 (x, y) = proj x, proj y in
-            let tuple' = proj2 tuple in
-            let error, mvbdu_value =
-              match
-                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
-                  parameters error
-                  tuple'
-                  store_value
-              with
-              | error, None -> error, bdu_false
-              | error, Some mvbdu -> error, mvbdu
-            in
-            (*build mvbdu for the tuple in the lhs, then do the
-              intersection with the result*)
-            let ((_, _, _, _, state2),
-                 (_, _, _, _, state2')) = tuple in
-            let pair_list =
-              [Ckappa_sig.fst_site, state2;
-               Ckappa_sig.snd_site, state2']
-            in
-            let handler = get_mvbdu_handler dynamic in
-            let error, handler, mvbdu =
-              Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                parameters handler error pair_list
-            in
-            (*intersection*)
-            let error, handler, new_mvbdu =
-              Ckappa_sig.Views_bdu.mvbdu_and
-                parameters handler error mvbdu mvbdu_value
-            in
-            let dynamic = set_mvbdu_handler handler dynamic in
-            (*check*)
-            if Ckappa_sig.Views_bdu.equal new_mvbdu bdu_false
-            then
-              error, false, dynamic
-            else
-              scan tail error
-        in
-        scan list error
-      end*)
     in
     if bool
     then error, dynamic, Some precondition
