@@ -1,4 +1,4 @@
-(** Trace of a rule exactly as the user wrote it (before
+(** A rule exactly as the user wrote it (before
 compilation) *)
 
 type agent_name = int
@@ -38,6 +38,10 @@ type 'a binding_state =
 type 'a event =
   'a test list *
     ('a action list * ('a site * 'a binding_state) list * 'a site list)
+(** [(The tests asked by the user, (The modifications asked by the
+    user, the site of the agents mentioned by the users where trere is
+    a side effects, the site of agents not mentionned by the users
+    that have been freed by side effect)) *)
 
 val rename_abstract_test :
   int -> Renaming.t -> abstract test -> abstract test

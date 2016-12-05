@@ -6,6 +6,8 @@ type t = cc (**type for domain points*)
 type id
 
 module ObsMap : sig
+  (** Maps from patterns to something *)
+
   type 'a t
 
   val dummy : 'a -> 'a t
@@ -19,8 +21,6 @@ module ObsMap : sig
     ?trailing:(Format.formatter -> unit) -> (Format.formatter -> unit) ->
     (id -> Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 end
-
-type work (**type for partial domain*)
 
 module Env : sig
   type t
@@ -48,6 +48,7 @@ module PreEnv : sig
 end
 
 (** {6 Create a connected component} *)
+type work (** type of a PreEnv during a pattern construction *)
 
 val empty_cc : Signature.s -> cc
 
@@ -86,6 +87,8 @@ val find_root_type : t -> int option
 val automorphisms : t -> Renaming.t list
 
 module Matching : sig
+  (** Injection from a pattern in the mixture *)
+
   type t
   val empty : t
   val debug_print : Format.formatter -> t -> unit
