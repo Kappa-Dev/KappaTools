@@ -2,18 +2,3 @@
 Parsing lpc2.ka...
 done
 + Sanity checks
-+ Compiling...
-+ Building initial simulation conditions...
-	 -simulation parameters
-	 -variable declarations
-	 -rules
-	 -perturbations
-	 -observables
-	 -update_domain construction
-	 8 (sub)observables 6 navigation steps
-	 -initial conditions
-+ Building initial state
-Done
-____________________________________________________________
-############################################################
-Simulation ended

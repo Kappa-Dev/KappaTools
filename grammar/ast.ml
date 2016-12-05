@@ -136,22 +136,16 @@ type ('agent,'mixture,'id,'rule) compil =
       (string * float * string) list
   }
 
-let no_more_site_on_right warning left right =
+let no_more_site_on_right error left right =
   List.for_all
     (fun p ->
        List.exists (fun p' -> fst p.port_nme = fst p'.port_nme) left
        || let () =
-            if warning then
-              ExceptionDefn.warning
-                ~pos:(snd p.port_nme)
-                (fun f ->
-                   Format.fprintf
-                     f "@[Site@ '%s'@ was@ not@ mentionned in@ the@ left-hand@ side."
-                     (fst p.port_nme);
-                   Format.fprintf
-                     f "This@ agent@ and@ the@ following@ will@ be@ removed@ and@ ";
-                   Format.fprintf
-                     f "recreated@ (probably@ causing@ side@ effects).@]")
+            if error then
+              raise (ExceptionDefn.Malformed_Decl
+                       ("Site '"^fst p.port_nme^
+                        "' was not mentionned in the left-hand side.",
+                        snd p.port_nme))
        in false)
     right
 
