@@ -847,13 +847,25 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
     | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
-      when String.compare lag_na rag_na = 0 &&
+      when String.equal lag_na rag_na &&
            Ast.no_more_site_on_right true lag_p rag_p ->
       let ra,links_annot' =
         annotate_agent_with_diff
           sigs ?contact_map ag_ty links_annot lag_p rag_p in
       aux links_annot' (ra::acc) lt rt
     | erased, added ->
+      let () =
+        if added <> [] then
+          List.iter (fun ((lag,pos),lag_p) ->
+              if List.exists
+                  (fun ((rag,_),rag_p) ->
+                     String.equal lag rag &&
+                     Ast.no_more_site_on_right false lag_p rag_p) added then
+                ExceptionDefn.warning ~pos
+                  (fun f ->
+                     Format.fprintf
+                       f "Rule induced deletion AND creation of the agent %s" lag))
+            erased in
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
           (fun (acc,lannot) x ->
