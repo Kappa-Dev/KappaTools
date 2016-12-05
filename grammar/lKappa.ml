@@ -549,20 +549,6 @@ let of_raw_mixture x =
        ra_syntax = Some (Array.copy ports, Array.copy internals); })
     x
 
-let rec ast_alg_has_mix = function
-  | Alg_expr.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
-  | Alg_expr.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
-  | (Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ |
-     Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ ), _ ->
-    false
-  | Alg_expr.KAPPA_INSTANCE _, _ -> true
-  | Alg_expr.IF (cond,yes,no), _ ->
-    ast_alg_has_mix yes || ast_alg_has_mix no || bool_has_mix cond
-and bool_has_mix = function
-  | (Alg_expr.TRUE | Alg_expr.FALSE), _ -> false
-  | Alg_expr.COMPARE_OP (_,a,b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
-  | Alg_expr.BOOL_OP (_,a,b), _ -> bool_has_mix a || bool_has_mix b
-
 let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
@@ -900,7 +886,7 @@ let add_un_variable k_un acc rate_var =
   match k_un with
   | None -> (acc,None)
   | Some (k,dist) ->
-    let acc_un,k' = if ast_alg_has_mix k then
+    let acc_un,k' = if Alg_expr.has_mix (fst k) then
         ((Location.dummy_annot rate_var,k)::acc,
          Location.dummy_annot (Alg_expr.ALG_VAR rate_var))
       else (acc,k) in
@@ -926,7 +912,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
         else (id,set''),lab
       else (id,set'),lab in
   let acc',k_def =
-    if ast_alg_has_mix r.Ast.k_def then
+    if Alg_expr.has_mix (fst r.Ast.k_def) then
       let rate_var = label^"_rate" in
       ((Location.dummy_annot rate_var,r.Ast.k_def)::acc,
        Location.dummy_annot (Alg_expr.ALG_VAR rate_var))
@@ -934,7 +920,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
   let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
   let acc''',rules' =
     match r.Ast.bidirectional,r.Ast.k_op with
-    | true, Some k when ast_alg_has_mix k ->
+    | true, Some k when Alg_expr.has_mix (fst k) ->
       let rate_var = (Ast.flip_label label)^"_rate" in
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in

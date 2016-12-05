@@ -1,3 +1,5 @@
+type pervasives_bool = bool
+
 type ('mix,'id) e =
     BIN_ALG_OP of Operator.bin_alg_op *
                   ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
@@ -53,6 +55,8 @@ val setup_alg_vars_rev_dep :
   unit NamedDecls.t ->
   (string Location.annot * ('a,int) e Location.annot) array ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+
+val has_mix : ?var_decls:('b -> ('c,'b) e) -> ('a,'b) e -> pervasives_bool
 
 val extract_connected_components : ('a,'b) e Location.annot -> 'a list
 

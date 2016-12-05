@@ -315,7 +315,13 @@ let pert_of_result ast_algs ast_rules contact_map domain res =
 let inits_of_result ?rescale contact_map env preenv res =
   let init_l,preenv' =
     Tools.list_fold_right_map
-      (fun (_opt_vol,alg,init_t) preenv -> (*TODO dealing with volumes*)
+      (fun (_opt_vol,alg,init_t) preenv -> (*TODO deal with volumes*)
+         let () =
+           if Alg_expr.has_mix ~var_decls:(Environment.get_alg env) (fst alg) then
+             raise
+               (ExceptionDefn.Malformed_Decl
+                  ("Initial quantities cannot depend on a number of occurence",
+                   snd alg)) in
          let alg = match rescale with
            | None -> alg
            | Some r ->
@@ -326,8 +332,7 @@ let inits_of_result ?rescale contact_map env preenv res =
          match init_t with
          | INIT_MIX ast,mix_pos ->
            let sigs = Environment.signatures env in
-           let (preenv',alg') =
-             compile_alg contact_map preenv alg in
+           let (preenv',alg') = compile_alg contact_map preenv alg in
            let fake_rule =
              { LKappa.r_mix = [];
                LKappa.r_created = LKappa.to_raw_mixture sigs ast;

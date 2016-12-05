@@ -1,3 +1,5 @@
+type pervasives_bool = bool
+
 type ('mix,'id) e =
     BIN_ALG_OP of Operator.bin_alg_op *
                   ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
@@ -138,6 +140,29 @@ and add_dep_bool x d = function
   | (TRUE | FALSE), _ -> x
   | BOOL_OP (_,a, b), _ -> add_dep_bool (add_dep_bool x d a) d b
   | COMPARE_OP (_,a, b), _ -> add_dep (add_dep x d a) d b
+
+let rec has_mix :
+  type a. ?var_decls:('b -> ('c,'b) e) -> (a,'b) e -> pervasives_bool =
+  fun ?var_decls -> function
+  | BIN_ALG_OP (_, (a,_), (b,_)) -> has_mix ?var_decls a || has_mix ?var_decls b
+  | UN_ALG_OP (_, (a,_))  -> has_mix ?var_decls a
+  | STATE_ALG_OP _ | CONST _ -> false
+  | TOKEN_ID _ | KAPPA_INSTANCE _ -> true
+  | IF ((cond,_),(yes,_),(no,_)) ->
+    has_mix ?var_decls yes || has_mix ?var_decls no
+    || bool_has_mix ?var_decls cond
+  | ALG_VAR i ->
+    match var_decls with
+    | None -> false
+    | Some f -> has_mix ?var_decls (f i)
+and bool_has_mix :
+  type a. ?var_decls:('b -> ('c,'b) e) -> (a,'b) bool -> pervasives_bool =
+  fun ?var_decls -> function
+  | TRUE | FALSE -> false
+  | COMPARE_OP (_,(a,_),(b,_)) ->
+    has_mix ?var_decls a || has_mix ?var_decls b
+  | BOOL_OP (_,(a,_),(b,_)) ->
+    bool_has_mix ?var_decls a || bool_has_mix ?var_decls b
 
 let rec aux_extract_cc acc = function
   | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
