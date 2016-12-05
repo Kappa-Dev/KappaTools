@@ -638,7 +638,7 @@ let onload (t : Ui_simulation.t) : unit =
       set_simulation_limit simulation_limit
     | None ->
       let () = Common.debug "handle_simulation_limit_selector" in
-      failwith "handle_simulation_limit_selector"
+      () (* failwith "handle_simulation_limit_selector" *)
   in
   let () = handle_simulation_limit_selector () in
   let () = simulation_limit_selector_dom ##.onchange :=

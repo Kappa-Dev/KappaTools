@@ -149,7 +149,7 @@ let content (t : Ui_simulation.t) =
                               id="toggle_rule_selection">
                       Toggle selected rules
                       </button>
-                      <p id="rules-checkboxes"></p>
+                      <p id="|} rules_checkboxes_id {|"></p>
                    </li>
                    <li class="list-group-item">
                     <div class="input-group">

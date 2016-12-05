@@ -64,7 +64,9 @@ let simulation_output (t : t) :
 
 (* Sugar for error message *)
 let set_error loc msg =
+  let () = Common.debug (Js.string msg) in
   Ui_state.set_model_error loc (Api_data.api_message_errors msg)
+
 let lwt_error loc msg _ =
   let () = set_error loc msg in
   Lwt.return_unit
@@ -129,9 +131,8 @@ let manager_operation
                              project_id
                              ready_state.simulation_id)
                        ~error:(fun _ _ ->
-                           let msg = "unable to create context" in
-                           let () = set_error  __LOC__ msg in
-                           let () = Common.debug (Js.string msg) in
+                               let msg = "unable to create context" in
+                               let () = set_error  __LOC__ msg in
                            Lwt.return_unit))
                  )
                t

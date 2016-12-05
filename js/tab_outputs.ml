@@ -132,7 +132,9 @@ let content (t : Ui_simulation.t) =
                          let () = ReactiveData.RList.set handle file_options in
                          Lwt.return_unit
                        )
-                     ~error:(failwith "")
+                     ~error:(fun _ errors  ->
+                         let () = Ui_state.set_model_error __LOC__ errors in
+                         Lwt.return_unit)
                   )
                 )
            )
