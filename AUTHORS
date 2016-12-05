@@ -1,18 +1,19 @@
-The Kappa language was defined by Vincent Danos and Cosimo Laneve
-[...]. Its further development involved HMS INRIA and CNRS (in nominal
-order). The teams at CNRS, INRIA, and HMS were lead by Jean Krivine,
-Jérôme Feret, and Walter Fontana, respectively.
+The Kappa language was defined by Vincent Danos and Cosimo Laneve. Its
+further development involved CNRS, HMS and, INRIA (in nominal
+order). The teams were lead by Jean Krivine, Walter Fontana, and
+Jérôme Feret respectively.
 
-The simulator was implemented by Jean Krivine (CNRS) and Pierre
-Boutillier (PPS and HMS).
+The simulator was implemented by Jean Krivine (CNRS 2010-2016) and
+Pierre Boutillier (PPS 2015 and HMS 2016).
 
-The computation of stories was implemented by Jérôme Feret (INRIA).
+The computation of stories was implemented by Jérôme Feret (INRIA
+2010-2016).
 
-The static analyser was implemented by Jérôme Feret (INRIA) and Kim
-Quyên Lý (INRIA).
+The static analyser was implemented by Jérôme Feret (INRIA 2010-2016)
+and Kim Quyên Lý (INRIA 2015-2016).
 
 The interactive aspects of the simulator were the work of Mutaamba
-Maasha (HMS) and Pierre Boutillier (HMS).
+Maasha (HMS 2016) and Pierre Boutillier (HMS 2016).
 
 ######################################################################
 HMS = Harvard Medical School.
