@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 02 2016>
+  * Last modification: Time-stamp: <Dec 05 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -114,16 +114,25 @@ val set_potential_side_effects_per_rule:
 
 val get_bonds_rhs :
   global_static_information ->
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t
 
 val set_bonds_rhs :
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
 
 val get_bonds_lhs :
   global_static_information ->
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t
+
+(*TODO*)
+val get_bonds_lhs_pattern :
+  global_static_information ->
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+    Cckappa_sig.Mixture_map_and_set.Map.t
 
 val set_bonds_lhs :
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
@@ -154,6 +163,11 @@ val get_views_lhs :
   global_static_information ->
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t
+
+val get_views_lhs_pattern :
+  global_static_information ->
+  Ckappa_sig.AgentsSiteState_map_and_set.Set.t
+    Cckappa_sig.Mixture_map_and_set.Map.t
 
 val set_views_lhs :
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t

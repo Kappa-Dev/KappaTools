@@ -2897,7 +2897,8 @@ struct
       (*-----------------------------------------------------------*)
       let error, precondition =
         compute_precondition_reachable
-          error kappa_handler pattern
+          error kappa_handler
+          pattern
           precondition
           bdu_false
           bdu_true dual_contact_map

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Dec 02 2016>
+  * Last modification: Time-stamp: <Dec 05 2016>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -155,6 +155,15 @@ module Mixture_setmap =
       let compare = compare
       let print _ _ = ()
     end)
+
+module Mixture_map_and_set =
+  Map_wrapper.Make (SetMap.Make
+                      (struct
+                        type t = mixture
+                        let compare = compare
+                        let print _ _ = ()
+                      end
+                      ))
 
 module MixtureAgent_map_and_set =
   Map_wrapper.Make (SetMap.Make
