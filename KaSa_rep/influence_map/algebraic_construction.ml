@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Dec 05 2016>
    * *
    * algebraic check for the influence map.
    *
@@ -239,33 +239,6 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
               | Cckappa_sig.Agent ag2 ->
                 deal_with error Ckappa_sig.Site_map_and_set.Map.iter2_sparse
                   ag1 ag2 bonds1 bonds2 (to_do,already_done)
-                  (* begin let bonds1 = match bonds1 with Some bonds1 ->
-                     bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
-                     in let bonds2 = match bonds2 with Some bonds2 -> bonds2
-                     | None -> Cckappa_sig.Site_map_and_set.Map.empty in let
-                     error,bool = try let error =
-                     Cckappa_sig.Site_map_and_set.Map.iter2_sparse parameters
-                     error (fun _ error _ port1 port2 -> let range1 =
-                     port1.Cckappa_sig.site_state in let range2 =
-                     port2.Cckappa_sig.site_state in if not
-                     (range1.Cckappa_sig.max < range2.Cckappa_sig.min ||
-                     range2.Cckappa_sig.max < range1.Cckappa_sig.min) then
-                     error else raise (False error))
-                     ag1.Cckappa_sig.agent_interface
-                     ag2.Cckappa_sig.agent_interface in error,true with False
-                     error -> error,false in if bool then try let
-                     error,(to_do,already_done) =
-                     Cckappa_sig.Site_map_and_set.Map.fold2_sparse parameters
-                     error (fun _ error _ port1 port2 (to_do,already_done) ->
-                     if port1.Cckappa_sig.site = port2.Cckappa_sig.site then
-                     match add (port1.Cckappa_sig.agent_index,
-                     port2.Cckappa_sig.agent_index) error to_do already_done
-                     with | error,None -> raise (False error) | error,Some
-                     (todo,inj1,inj2) -> (error,(todo,(inj1,inj2))) else
-                     raise (False error) ) bonds1 bonds2 (to_do,already_done)
-                     in error,(true,(to_do,already_done)) with False error ->
-                     error,(false,(to_do,already_done)) else
-                     error,(bool,(to_do,already_done)) end*)
             end
         end
     in

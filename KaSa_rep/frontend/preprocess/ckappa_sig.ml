@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 30 2016>
+ * Last modification: Time-stamp: <Dec 05 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -439,6 +439,240 @@ and link =
   | LNK_ANY   of position
   | LNK_SOME  of position
   | LNK_TYPE  of (string Location.annot * string Location.annot)
+
+let dummy_agent =
+  {
+    ag_nme = "" ;
+    ag_intf = EMPTY_INTF ;
+    ag_nme_pos = Location.dummy
+  }
+
+let rename_link parameters error f link =
+  match
+    link
+  with
+  | LNK_VALUE (ag,x,y,ag',position) ->
+    let error, ag = f parameters error ag in
+    let error, ag' = f parameters error ag' in
+    error, LNK_VALUE (ag,x,y,ag',position)
+  | FREE
+  | LNK_ANY _
+  | LNK_SOME _
+  | LNK_TYPE _ -> error, link
+
+let join_link parameters error link1 link2 =
+  if link1 = link2
+  then error, link1
+  else
+    match link1, link2 with
+    | LNK_ANY _, _ -> error, link2
+    | _, LNK_ANY _ -> error, link1
+    | FREE, _ | _, FREE ->
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Location.dummy)
+    | LNK_SOME _, _ -> error, link2
+    | _, LNK_SOME _ -> error, link1
+    | LNK_TYPE ((a,_),(b,_)), LNK_TYPE ((a',_),(b',_)) when a=a' && b=b' ->
+      error, link1
+    | LNK_TYPE _, LNK_TYPE _ -> Exception.warn parameters error __POS__ Exit (LNK_ANY Location.dummy)
+    | LNK_VALUE(_,x,y,_,_), LNK_TYPE((a,_),(b,_)) when x=a && b=y -> error, link1
+    | LNK_TYPE((a,_),(b,_)), LNK_VALUE(_,x,y,_,_) when x=a && b=y -> error, link2
+    | LNK_VALUE(ag,x,y,ag1,_), LNK_VALUE(ag',x',y',ag1',_) when
+        ag=ag' && x=x' && y=y' && ag1=ag1'
+      -> error, link1
+
+
+let rename_port parameters error f port =
+  let error, port_lnk = rename_link parameters error f port.port_lnk in
+  error,
+  {
+    port with
+    port_lnk = port_lnk
+  }
+
+let join_port parameters error port1 port2 =
+  if port1.port_nme = port2.port_nme
+  && port1.port_int = port2.port_int
+  && port1.port_free = port2.port_free
+  then
+    let error, lnk = join_link parameters error port1.port_lnk port2.port_lnk in
+    error,
+    {
+      port1
+      with
+        port_lnk = lnk
+    }
+  else
+    Exception.warn parameters error __POS__ Exit port1
+
+let rec rename_interface parameters error f interface =
+  match
+    interface
+  with
+  | EMPTY_INTF -> error, EMPTY_INTF
+  | PORT_SEP (port, interface) ->
+    let error, port = rename_port parameters error f port in
+    let error, interface = rename_interface parameters error f interface in
+    error, PORT_SEP (port, interface)
+
+let rev_list_of_interface x =
+  let rec aux x output =
+    match x with
+    | PORT_SEP (port, interface) -> aux interface (port::output)
+    | EMPTY_INTF -> output
+  in
+  aux x []
+
+let rev_interface_of_list x =
+  let rec aux list x =
+    match list with [] -> x
+                  | t::q -> aux q (PORT_SEP(t,x))
+  in
+  aux x EMPTY_INTF
+
+let list_of_interface x = List.rev (rev_list_of_interface x)
+
+let join_interface parameters error interface1 interface2 =
+  let rec collect interface map =
+    match interface with
+    | EMPTY_INTF -> map
+    | PORT_SEP (port, interface) ->
+      let map = Mods.StringMap.add port.port_nme port map in
+      collect interface map
+  in
+  let map1 = collect interface1 Mods.StringMap.empty in
+  let map2 = collect interface2 Mods.StringMap.empty in
+  let error, map3 =
+    Mods.StringMap.monadic_fold2
+      parameters error
+      (fun parameters error key port1 port2 map ->
+         let error, port = join_port parameters error port1 port2 in
+         error, Mods.StringMap.add key port map)
+      (fun _parameters error key port map ->
+         error, Mods.StringMap.add key port map)
+      (fun _parameters error key port map ->
+         error, Mods.StringMap.add key port map)
+      map1
+      map2
+      Mods.StringMap.empty
+  in
+  let list = Mods.StringMap.bindings map3 in
+  let list = List.rev_map snd list in
+  error, rev_interface_of_list list
+
+
+let rename_agent parameters error f agent =
+  let error, interface = rename_interface parameters error f agent.ag_intf in
+  error, { agent with ag_intf = interface}
+
+let join_agent parameters error agent1 agent2 =
+  if  agent1.ag_nme = agent2.ag_nme
+  then
+    let error, interface =
+      join_interface parameters error agent1.ag_intf agent2.ag_intf
+    in
+    error, {agent1 with ag_intf = interface}
+  else
+    Exception.warn parameters error __POS__ Exit dummy_agent
+
+let rename_mixture parameters error f mixture =
+  let rec aux parameters error f pos mixture =
+  match
+    mixture
+  with
+  | SKIP m ->
+    let error, map, dot, plus = aux parameters error f (pos+1) m in
+    error, map, dot, plus
+  | COMMA (agent,m) ->
+   let error, agent = rename_agent parameters error f agent in
+   let error, m, dot, plus = aux  parameters error f (pos+1) m in
+   let error, pos = f parameters error pos in
+   error, Mods.IntMap.add pos agent m, dot, plus
+  | DOT (id, agent, mixture) ->
+    let error, id = f parameters error id in
+    let error, agent = rename_agent parameters error f agent in
+    let error, m, dot, plus = aux parameters error f (pos+1) mixture in
+    let error, pos = f parameters error pos in
+    let min,max = if compare id pos < 0 then (id,pos) else (pos,id) in
+    error, Mods.IntMap.add pos agent m, Mods.IntMap.add min max dot, plus
+  | PLUS (id, agent, mixture) ->
+    let error, id = f parameters error id in
+    let error, agent = rename_agent parameters error f agent in
+    let error, m, dot, plus = aux parameters error f (pos+1) mixture in
+    let error, pos = f parameters error pos in
+    let min,max = if compare id pos < 0 then (id,pos) else (pos,id) in
+    error, Mods.IntMap.add pos agent m, dot, Mods.IntMap.add min max plus
+  | EMPTY_MIX -> error, Mods.IntMap.empty, Mods.IntMap.empty, Mods.IntMap.empty
+  in
+  let error, m, dot, plus = aux parameters error f 0 mixture in (* first agent has id 0 ???*)
+  let list_m = Mods.IntMap.bindings m in
+  let dot = Mods.IntMap.bindings dot in
+  let plus = Mods.IntMap.bindings plus in
+  let rec aux parameters error pos list_m dot plus =
+    match
+      list_m
+    with
+    | [] -> error, EMPTY_MIX
+    | (pos',agent)::tail->
+      if compare pos pos' >= 0
+      then
+        let opt1, dot =
+          match dot
+          with
+            (pos',pos'')::q when pos=pos' -> Some pos'', q
+          | _ -> None, dot
+        in
+        let opt2, plus =
+          match plus
+          with
+            (pos',pos'')::q when pos=pos' -> Some pos'', q
+          | _ -> None, plus
+        in
+        let error, mixture = aux parameters error (pos+1) tail dot plus in
+        match
+          opt1, opt2
+        with
+        | Some _ , Some _
+          -> Exception.warn parameters error __POS__ Exit (SKIP(mixture))
+        | Some pos'', None ->
+          error,
+          DOT (pos'', agent, mixture)
+        | None, Some pos'' ->
+          error,
+          PLUS (pos'',agent, mixture)
+        | None, None ->
+          error,
+          COMMA (agent,mixture)
+      else aux parameters error (pos+1) list_m dot plus
+  in
+  aux parameters error 0 list_m dot plus
+
+
+let rec join_mixture parameters error mixture1 mixture2 =
+  match
+    mixture1, mixture2
+  with
+  | EMPTY_MIX, _ -> error, mixture2
+  | _, EMPTY_MIX -> error, mixture1
+  | SKIP m, SKIP m'->
+    let error, m'' = join_mixture parameters error m m' in
+    error, SKIP m''
+  | SKIP m, COMMA (ag, m') | COMMA(ag,m), SKIP m'->
+    let error, m'' = join_mixture parameters error m m' in
+    error, COMMA (ag, m'')
+  | SKIP m, DOT(id, ag, m') | DOT(id,ag,m), SKIP m' ->
+    let error, m'' = join_mixture parameters error m m' in
+    error, DOT(id, ag, m'')
+  | SKIP m, PLUS(id, ag, m') | PLUS(id,ag,m), SKIP m' ->
+    let error, m'' = join_mixture parameters error m m' in
+    error, PLUS(id, ag, m'')
+  | COMMA(ag,m), COMMA(ag',m') ->
+    let error, ag = join_agent parameters error ag ag' in
+    let error, m'' = join_mixture parameters error m m' in
+    error, COMMA(ag,m'')
+  | DOT(_), _
+  | PLUS(_), _ ->
+    Exception.warn parameters error __POS__ Exit EMPTY_MIX
+
 
 type 'mixture rule =
   {

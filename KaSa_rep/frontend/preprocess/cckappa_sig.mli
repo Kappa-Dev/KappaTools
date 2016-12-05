@@ -25,7 +25,8 @@ type kappa_handler =
     nvars                 : int;
     nagents               : Ckappa_sig.c_agent_name;
     agents_dic            : Ckappa_sig.agent_dic;
-    interface_constraints : Ckappa_sig.agent_specification
+    interface_constraints :
+      Ckappa_sig.agent_specification
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
     sites                 : Ckappa_sig.site_dic
         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
@@ -110,6 +111,28 @@ type mixture =
     plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list;
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
+
+val rename_mixture: Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.c_agent_id ->
+   Exception.method_handler * Ckappa_sig.c_agent_id) ->
+  mixture ->
+  Exception.method_handler * mixture
+
+val join_mixture: Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.c_agent_id ->
+   Exception.method_handler * Ckappa_sig.c_agent_id) ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.c_agent_id ->
+   Exception.method_handler * Ckappa_sig.c_agent_id) ->
+   mixture -> mixture ->
+  Exception.method_handler * mixture
 
 (*TODO*)
 module Mixture_setmap: SetMap.S with type elt = mixture

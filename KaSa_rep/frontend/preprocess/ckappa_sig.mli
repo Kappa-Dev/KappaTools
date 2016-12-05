@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 30 2016>
+ * Last modification: Time-stamp: <Dec 05 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -276,6 +276,38 @@ and link =
   | LNK_ANY   of position
   | LNK_SOME  of position
   | LNK_TYPE  of (string Location.annot * string Location.annot)
+
+val rename_link:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   c_agent_id ->
+   Exception.method_handler * c_agent_id) ->
+  link ->
+  Exception.method_handler * link
+
+val rename_mixture:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   c_agent_id ->
+   Exception.method_handler * c_agent_id) ->
+  mixture ->
+  Exception.method_handler * mixture
+
+val join_link:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  link -> link ->
+  Exception.method_handler * link
+
+val join_mixture:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  mixture -> mixture ->
+  Exception.method_handler * mixture
 
 type 'mixture rule =
   {
