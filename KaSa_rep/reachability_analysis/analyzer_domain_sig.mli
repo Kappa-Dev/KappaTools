@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 01 2016>
+  * Last modification: Time-stamp: <Dec 05 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -97,7 +97,10 @@ sig
 
   val print: (Loggers.t, unit) unary
 
-  val cc_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-  val lkappa_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+  val maybe_reachable:
+    (Cckappa_sig.mixture,
+     Communication.precondition,
+     Communication.precondition option)
+      binary
 
 end

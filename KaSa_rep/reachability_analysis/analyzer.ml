@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 01 2016>
+  * Last modification: Time-stamp: <Dec 05 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -44,6 +44,13 @@ sig
     Exception.method_handler ->
     Loggers.t ->
     Exception.method_handler * dynamic_information
+
+    val maybe_reachable:
+      static_information ->
+      dynamic_information ->
+      Exception.method_handler ->
+      Cckappa_sig.mixture ->
+      Exception.method_handler * dynamic_information * bool
 
 end
 
@@ -229,4 +236,14 @@ struct
     in
     error, dynamic, kasa_state
 
+
+  let maybe_reachable static dynamic error pattern =
+    let error, dynamic, precondition =
+      Domain.maybe_reachable static dynamic error pattern
+    in
+    match
+      precondition
+    with
+    | None -> error, dynamic, false
+    | Some _ -> error, dynamic, true
 end

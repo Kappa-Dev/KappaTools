@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 01 2016>
+   * Last modification: Time-stamp: <Dec 05 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -179,11 +179,56 @@ module Product
         error, dynamic, output_opt
 
     (***********************************************************)
-    (*TODO*)
 
-    let maybe_reachable _static dynamic error _pattern precondition =
-      error, dynamic, None
+    let gen_predicate
+        underlying new_domain
+        static dynamic error a precondition =
+        let error, underlying_domain_dynamic_information, output_opt =
+          underlying
+            static.underlying_domain
+            (underlying_domain_dynamic_information dynamic)
+            error
+            a
+            precondition
+        in
+        let new_domain_dynamic_information =
+          new_domain_dynamic_information
+            underlying_domain_dynamic_information
+            dynamic
+        in
+        match output_opt with
+        | None ->
+          error,
+          smash_dynamic
+            underlying_domain_dynamic_information
+            new_domain_dynamic_information, None
+        | Some precondition ->
+          let error, new_domain_dynamic_information, output_opt =
+            new_domain
+              static.new_domain
+              new_domain_dynamic_information
+              error
+              a
+              precondition
+          in
+          let dynamic =
+            smash_dynamic
+              underlying_domain_dynamic_information
+              new_domain_dynamic_information
+          in
+          error,
+          dynamic,
+          output_opt
 
+    let is_enabled =
+      gen_predicate
+        Underlying_domain.is_enabled
+        New_domain.is_enabled
+
+    let maybe_reachable =
+      gen_predicate
+        Underlying_domain.maybe_reachable
+        New_domain.maybe_reachable
     (***********************************************************)
 
     let apply_rule static dynamic error rule_id precondition =
@@ -307,55 +352,6 @@ module Product
       smash_dynamic
         underlying_domain_dynamic_information
         new_domain_dynamic_information,
-      ()
-
-    let mixture_is_reachable_gen get_under get_new_d static dynamic error lkappa_mixture =
-      let error, underlying_domain_dynamic_information, maybe_under =
-        get_under
-          static.underlying_domain
-          (underlying_domain_dynamic_information dynamic)
-          error
-          lkappa_mixture
-      in
-      let error, new_domain_dynamic_information, maybe_new =
-        get_new_d
-          static.new_domain
-          (new_domain_dynamic_information
-             underlying_domain_dynamic_information
-             dynamic)
-          error
-          lkappa_mixture
-      in
-      let error, output =
-        match maybe_under, maybe_new
-        with
-        | Usual_domains.Maybe,_ -> error, maybe_new
-        | _,Usual_domains.Maybe -> error, maybe_under
-        | _ ->
-          if maybe_under = maybe_new
-          then error, maybe_under
-          else
-            warn
-              static error
-              __POS__ "inconsistent computation in three-values logic"
-              Exit (Usual_domains.Sure_value false)
-      in
-      error,
-      smash_dynamic
-        underlying_domain_dynamic_information
-        new_domain_dynamic_information,
-      output
-
-    let lkappa_mixture_is_reachable static dynamic error lkappa =
-      mixture_is_reachable_gen
-        Underlying_domain.lkappa_mixture_is_reachable
-        New_domain.lkappa_mixture_is_reachable
-        static dynamic error lkappa
-
-    let cc_mixture_is_reachable static dynamic error ccmixture =
-      mixture_is_reachable_gen
-        Underlying_domain.cc_mixture_is_reachable
-        New_domain.cc_mixture_is_reachable
-        static dynamic error ccmixture
+      ()  
 
   end:Analyzer_domain_sig.Domain)

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 01 2016>
+  * Last modification: Time-stamp: <Dec 05 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -51,10 +51,6 @@ sig
 
   val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
 
-  val maybe_reachable: (*TODO*)
-    (Cckappa_sig.mixture,
-     Communication.precondition, Communication.precondition option) binary
-
   val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition,unit) binary
 
   val stabilize: unit zeroary
@@ -68,13 +64,8 @@ sig
 
   val print: (Loggers.t, unit) unary
 
-  val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-
-  val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
-
-  val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
-
-  val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
+  val maybe_reachable:
+    (Cckappa_sig.mixture, Communication.precondition option) unary
 
   val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
 
@@ -324,19 +315,6 @@ struct
       a
       Communication.dummy_precondition
 
-  (***********************************************************)
-  (*TODO*)
-
-  let maybe_reachable _static dynamic error _pattern precondition =
-    error, dynamic, None
-
-    (*lift_binary
-    Domain.maybe_reachable
-    static
-    dynamic
-    error
-    a
-    Communication.dummy_precondition*)
 
 (***********************************************************)
 
@@ -560,17 +538,15 @@ struct
   let print static dynamic error loggers =
     lift_unary Domain.print static dynamic error loggers
 
-  let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do, via domains.ml *)
 
-  let cc_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do, via domains.ml  *)
-
-  let c_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do via cc_is_reachable *)
-
-  let ast_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do via c_is_reachable *)
+  let maybe_reachable (static:static_information) dynamic error mixture =
+    lift_binary
+      Domain.maybe_reachable
+      static
+      dynamic
+      error
+      mixture
+      Communication.dummy_precondition
 
   let get_global_dynamic_information dynamic = Domain.get_global_dynamic_information dynamic.domain
 

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 28 2016>
+  * Last modification: Time-stamp: <Dec 05 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -35,7 +35,7 @@ sig
     dynamic_information ->
     Exception.method_handler ->
     ('static, 'dynamic) Analyzer_headers.kasa_state ->
-    Exception.method_handler * dynamic_information * 
+    Exception.method_handler * dynamic_information *
     ('static, 'dynamic) Analyzer_headers.kasa_state
 
   val print:
@@ -45,6 +45,12 @@ sig
     Loggers.t ->
     Exception.method_handler * dynamic_information
 
+  val maybe_reachable:
+    static_information ->
+    dynamic_information ->
+    Exception.method_handler ->
+    Cckappa_sig.mixture ->
+    Exception.method_handler * dynamic_information * bool 
 end
 
 module Make : functor (Domain:Composite_domain.Composite_domain) -> Analyzer
