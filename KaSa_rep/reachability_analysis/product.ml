@@ -229,6 +229,7 @@ module Product
       gen_predicate
         Underlying_domain.maybe_reachable
         New_domain.maybe_reachable
+
     (***********************************************************)
 
     let apply_rule static dynamic error rule_id precondition =
@@ -352,6 +353,6 @@ module Product
       smash_dynamic
         underlying_domain_dynamic_information
         new_domain_dynamic_information,
-      ()  
+      ()
 
   end:Analyzer_domain_sig.Domain)

@@ -983,7 +983,6 @@ let collect_bonds_lhs_pattern parameters error pattern store_result =
     pattern.Cckappa_sig.bonds
     store_result
 
-
 (***************************************************************************)
 (*action binding in the rhs*)
 

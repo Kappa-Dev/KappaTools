@@ -827,7 +827,7 @@ struct
     in
     scan list error
 
-
+  (***********************************************************)
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =
@@ -1011,7 +1011,7 @@ struct
                 (*-----------------------------------------------------------*)
                 let error, bool, dynamic, precondition, modified_sites =
                   match state'_list_x, state'_list_y with
-                  (*  | _::_::_, _::_::_ ->
+                  (*   _::_::_, _::_::_ ->
                   (*we know for sure that none of the two sites have been
                       modified*)
                       error, bool, dynamic, precondition, modified_sites*)
@@ -1116,7 +1116,6 @@ struct
         let error, () =
           if Remanent_parameters.get_view_analysis parameter
           then
-
             Exception.warn
             (get_parameter static) error __POS__ Exit ()
           else
@@ -1269,7 +1268,8 @@ struct
                   error, bool, dynamic, precondition, modified_sites
                 | [_] -> (*general case, singleton*)
                   List.fold_left
-                    (fun (error, bool, dynamic, precondition, modified_sites) state'_other ->
+                    (fun (error, bool, dynamic, precondition, modified_sites)
+                      state'_other ->
                        let store_result = get_value dynamic in
                        let pair_list =
                          match pos
@@ -1302,7 +1302,8 @@ struct
                        let dynamic = set_mvbdu_handler handler dynamic in
                        error, bool, dynamic, precondition, modified_sites
                     )
-                    (error, bool, dynamic, precondition, modified_sites) state'_list_other
+                    (error, bool, dynamic, precondition, modified_sites)
+                    state'_list_other
               in
               error, bool, dynamic, precondition, modified_sites
            )
@@ -1335,7 +1336,6 @@ struct
         ~pos:Snd bdu_false parameters error kappa_handler bool dump_title
         static dynamic
         rule_id rule precondition modified_set modified_sites
-
     in
     error, bool, dynamic, precondition, modified_sites
 
@@ -1389,7 +1389,8 @@ struct
            let error, handler, mvbdu_cap =
              Ckappa_sig.Views_bdu.mvbdu_and
                parameters handler error
-               mvbdu cap
+               mvbdu
+               cap
            in
            let error, handler, mvbdu' =
              Ckappa_sig.Views_bdu.mvbdu_redefine
@@ -1406,10 +1407,14 @@ struct
            (*check the freshness of the value *)
            let error, bool, handler, modified_sites, result =
              Site_accross_bonds_domain_type.add_link_and_check
-               parameters error bdu_false handler
-               kappa_handler bool dump_title
+               parameters error
+               bdu_false
+               handler
+               kappa_handler
+               bool
+               dump_title
                (x,y)
-               mvbdu
+               mvbdu (*FIXME: mvbdu_or?*)
                modified_sites
                result
            in
@@ -1417,7 +1422,6 @@ struct
            let dynamic = set_value result dynamic in
            error, bool, dynamic, modified_sites
       ) potential_tuple_pair_set (error, bool, dynamic, modified_sites)
-
 
   let free_site static dynamic error bool dump_title agent' site_name' state'
       modified_sites =
@@ -1456,8 +1460,8 @@ struct
     error, bool, dynamic, modified_sites
 
 (***************************************************************)
+(*if it is not the first time it is apply then do not apply *)
 
-  (*if it is not the first time it is apply then do not apply *)
   let can_we_prove_this_is_not_the_first_application precondition =
     match
       Communication.is_the_rule_applied_for_the_first_time precondition

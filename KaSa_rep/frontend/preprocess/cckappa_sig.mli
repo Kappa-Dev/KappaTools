@@ -71,7 +71,8 @@ type site_address =
 
 type bond = site_address * site_address
 
-val build_address: Ckappa_sig.c_agent_id -> Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> site_address
+val build_address: Ckappa_sig.c_agent_id -> Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_site_name -> site_address
 
 module Address_map_and_set: Map_wrapper.S_with_logs with type elt = site_address
 

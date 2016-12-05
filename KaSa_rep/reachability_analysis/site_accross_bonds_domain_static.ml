@@ -357,7 +357,7 @@ let collect_potential_tuple_pair_lhs_pattern parameters error
       Exception.warn parameters error error'
       __POS__ Exit
   in
-  Cckappa_sig.Mixture_map_and_set.Map.add_or_overwrite (*TODO*)
+  Cckappa_sig.Mixture_map_and_set.Map.add_or_overwrite
     parameters error
     pattern
     pair_set

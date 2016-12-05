@@ -147,7 +147,6 @@ type mixture =
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
 
-(*TODO*)
 module Mixture_setmap =
   SetMap.Make
     (struct

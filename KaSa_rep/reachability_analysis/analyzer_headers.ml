@@ -127,7 +127,6 @@ let set_agent_name agent_name static =
     }
     static
 
-(*TODO*)
 let get_agent_name_from_pattern static =
   (get_bdu_common_static static).Common_static.store_agent_name_from_pattern
 
@@ -224,7 +223,7 @@ let set_views_rhs sites static =
 let get_views_lhs static =
   (get_bdu_common_static static).Common_static.store_views_lhs
 
-let get_views_lhs_pattern static = (*TODO*)
+let get_views_lhs_pattern static =
   (get_bdu_common_static static).Common_static.store_views_lhs_pattern
 
 let set_views_lhs sites static =

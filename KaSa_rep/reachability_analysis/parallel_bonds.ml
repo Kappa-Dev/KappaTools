@@ -628,36 +628,6 @@ struct
     let store_value = get_value dynamic in
     let error, bool =
       common_scan parameters error store_value list
-      (*begin
-        let rec scan list error =
-          match
-            list
-          with
-          | [] -> error, true
-          | (tuple, parallel_or_not) :: tail ->
-            let pair = Parallel_bonds_type.project2 tuple in
-            let error, value =
-              match
-                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                  parameters error
-                  pair
-                  store_value
-              with
-              (*if we do not find the pair on the lhs inside the result, then return undefined, if there is a double bound then returns its value.*)
-              | error, None -> error, Usual_domains.Undefined
-              | error, Some v -> error, v
-            in
-            (*matching the value on the lhs*)
-            match value with
-            | Usual_domains.Undefined -> error, false
-            (*if the value in the result is different than the value on the lhs, then returns false*)
-            | Usual_domains.Val b when b <> parallel_or_not -> error, false
-            (*otherwise continue until the rest of the list*)
-            | Usual_domains.Val _
-            |  Usual_domains.Any -> scan tail error
-        in
-        scan list error
-      end*)
     in
     if bool
     then error, dynamic, Some precondition
@@ -691,42 +661,11 @@ struct
     let store_value = get_value dynamic in
     let error, bool =
       common_scan parameters error store_value list
-      (*begin
-        let rec scan list error =
-          match
-            list
-          with
-          | [] -> error, true
-          | (tuple, parallel_or_not) :: tail ->
-            let pair = Parallel_bonds_type.project2 tuple in
-            let error, value =
-              match
-                Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_option_without_logs
-                  parameters error
-                  pair
-                  store_value
-              with
-              (*if we do not find the pair on the lhs inside the result, then return undefined, if there is a double bound then returns its value.*)
-              | error, None -> error, Usual_domains.Undefined
-              | error, Some v -> error, v
-            in
-            (*matching the value on the lhs*)
-            match value with
-            | Usual_domains.Undefined -> error, false
-            (*if the value in the result is different than the value on the lhs, then returns false*)
-            | Usual_domains.Val b when b <> parallel_or_not -> error, false
-            (*otherwise continue until the rest of the list*)
-            | Usual_domains.Val _
-            |  Usual_domains.Any -> scan tail error
-        in
-        scan list error
-      end*)
     in
     if bool
     then error, dynamic, Some precondition
     else
     error, dynamic, None
-
 
   (***************************************************************)
   (* when one bond is created, check in the precondition, whether the two

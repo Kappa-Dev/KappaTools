@@ -45,12 +45,12 @@ sig
     Loggers.t ->
     Exception.method_handler * dynamic_information
 
-    val maybe_reachable:
-      static_information ->
-      dynamic_information ->
-      Exception.method_handler ->
-      Cckappa_sig.mixture ->
-      Exception.method_handler * dynamic_information * bool
+  val maybe_reachable:
+    static_information ->
+    dynamic_information ->
+    Exception.method_handler ->
+    Cckappa_sig.mixture ->
+    Exception.method_handler * dynamic_information * bool
 
 end
 
@@ -213,8 +213,10 @@ struct
     | Some l -> Some (List.rev l)
 
   let export static dynamic error kasa_state =
-    let kasa_state = Remanent_state.set_internal_constraints_list [] kasa_state in
-    let error, dynamic, kasa_state = Domain.export static dynamic error kasa_state in
+    let kasa_state =
+      Remanent_state.set_internal_constraints_list [] kasa_state in
+    let error, dynamic, kasa_state =
+      Domain.export static dynamic error kasa_state in
     let kasa_state =
       match
         Remanent_state.get_constraints_list kasa_state
@@ -234,7 +236,6 @@ struct
         (List.rev l) kasa_state
     in
     error, dynamic, kasa_state
-
 
   let maybe_reachable static dynamic error pattern =
     let error, dynamic, precondition =

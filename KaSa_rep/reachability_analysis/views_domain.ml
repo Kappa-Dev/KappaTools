@@ -1930,7 +1930,7 @@ struct
           path.Communication.agent_id (*#1:A*)
           rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       with
-      | error, None -> (*FIXME*)
+      | error, None ->
         Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some a -> error, a
     in
@@ -1938,7 +1938,7 @@ struct
       match agent with
       | Cckappa_sig.Ghost
       | Cckappa_sig.Unknown_agent _
-      | Cckappa_sig.Dead_agent _ -> (*FIXME dead agent*)
+      | Cckappa_sig.Dead_agent _ ->
         Exception.warn
           parameters error __POS__ Exit (dynamic, Usual_domains.Undefined)
       | Cckappa_sig.Agent agent ->
@@ -2549,7 +2549,7 @@ struct
       match agent with
       | Cckappa_sig.Ghost
       | Cckappa_sig.Unknown_agent _
-      | Cckappa_sig.Dead_agent _ -> (*FIXME dead agent*)
+      | Cckappa_sig.Dead_agent _ ->
         Exception.warn
           parameters error __POS__ Exit (dynamic, Usual_domains.Undefined)
       | Cckappa_sig.Agent agent ->
@@ -2604,10 +2604,6 @@ struct
             match port.Cckappa_sig.site_free with
             | Some true ->
               (*then it is inconsistent, undefined*)
-              (*Exception.warn
-                parameter error __POS__ Exit
-                ~message:"try to navigate through a free site"
-                (dynamic, Usual_domains.Undefined)*)
               let () =
                 if
                   (local_trace
@@ -2629,7 +2625,6 @@ struct
               (*get the information of the agent partner *)
               let agent_type_partner = step.Communication.agent_type_in in
               let site_x_partner = step.Communication.site_in in
-              (*  let site_type_y_partner = path.Communication.site in*)
               (*get information of the agent*)
               let agent_id = path.Communication.agent_id in
               let agent_type = agent.Cckappa_sig.agent_name in
@@ -2901,7 +2896,8 @@ struct
           pattern
           precondition
           bdu_false
-          bdu_true dual_contact_map
+          bdu_true
+          dual_contact_map
           store_agent_name_from_pattern
           site_correspondence
           store_covering_classes_id
@@ -2920,8 +2916,7 @@ struct
     in
     if maybe_reachable
     then error, dynamic, Some precondition
-    else
-      error, dynamic, None
+    else error, dynamic, None
 
   (***********************************************************)
   (*deal with views*)

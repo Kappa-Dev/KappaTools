@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Dec 02 2016>
+   * Last modification: Time-stamp: <Dec 05 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1779,6 +1779,7 @@ let scan_rule_set parameters log_info handler_bdu error handler_kappa compiled
 
 (***************************************************************************)
 (*PATTERN*)
+(***************************************************************************)
 
 let scan_rule_static_pattern parameters store_remanent_triple error
     handler_kappa handler_bdu rule store_result =
