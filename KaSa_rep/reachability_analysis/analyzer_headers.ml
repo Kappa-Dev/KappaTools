@@ -193,8 +193,6 @@ let set_bonds_lhs bonds static =
     }
     static
 
-(*TODO*)
-
 let get_bonds_lhs_pattern static =
   (get_bdu_common_static static).Common_static.store_bonds_lhs_pattern
 
