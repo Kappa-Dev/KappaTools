@@ -847,7 +847,7 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
     | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
-      when String.equal lag_na rag_na &&
+      when String.compare lag_na rag_na = 0 &&
            Ast.no_more_site_on_right true lag_p rag_p ->
       let ra,links_annot' =
         annotate_agent_with_diff
@@ -859,7 +859,7 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
           List.iter (fun ((lag,pos),lag_p) ->
               if List.exists
                   (fun ((rag,_),rag_p) ->
-                     String.equal lag rag &&
+                     String.compare lag rag = 0 &&
                      Ast.no_more_site_on_right false lag_p rag_p) added then
                 ExceptionDefn.warning ~pos
                   (fun f ->
