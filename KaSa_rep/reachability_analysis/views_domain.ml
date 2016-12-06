@@ -2874,6 +2874,14 @@ struct
         Cckappa_sig.Mixture_setmap.Map.find_option
           pattern
           store_proj_bdu_test_restriction_pattern
+(* This makes no sens *)
+(* Why an arbitrary patterns would be stored in that map *)
+(* For each view, you have to collect the set of sites *)
+(* Then to collect the set of covering class that overlaps with at least one site (you should have the relation site -> cv_id list somewhere in static) *)
+(* Then, for each covering class, you have to compute the bdu *)
+(* If it doens not overlap with the corresponding bdu in the fixpoint *)
+(* Then, answer false *)
+(* Othewise keep on iterating *)
       with
       | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some m -> error, m
