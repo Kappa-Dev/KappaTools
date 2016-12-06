@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 06 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -290,15 +290,12 @@ struct
     in
     let static = set_rule_double_bonds_rhs store_result static in
     (*------------------------------------------------------*)
-    let store_result = get_double_bonds_lhs_pattern static in
     let error, store_result =
       Parallel_bonds_static.collect_double_bonds_lhs_pattern
         parameters error
         rule.Cckappa_sig.rule_lhs
-        store_result
     in
-    let static = set_double_bonds_lhs_pattern store_result static
-    in
+    let static = set_double_bonds_lhs_pattern store_result static in
     error, static
 
 (****************************************************************)
@@ -639,9 +636,9 @@ struct
   let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
-    let store_parallel_bonds_lhs_pattern =
+    let parallel_map =
       get_double_bonds_lhs_pattern static in
-    let error, parallel_map =
+    (*let error, parallel_map =
       match
         Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
           parameters
@@ -653,7 +650,7 @@ struct
         error,
         Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
       | error, Some s -> error, s
-    in
+    in*)
     let list =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings
         parallel_map

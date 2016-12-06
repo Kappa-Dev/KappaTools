@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Dec 05 2016>
+   * Last modification: Time-stamp: <Dec 06 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -31,8 +31,7 @@ type basic_static_information =
         Ckappa_sig.Rule_map_and_set.Map.t;
     (*TODO*)
     store_potential_tuple_pair_lhs_pattern :
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
-        Cckappa_sig.Mixture_map_and_set.Map.t;
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
     (**)
     store_potential_tuple_pair_rule_rhs :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
@@ -85,7 +84,7 @@ let init_basic_static_information =
     store_potential_tuple_pair_lhs =
       Ckappa_sig.Rule_map_and_set.Map.empty;
     store_potential_tuple_pair_lhs_pattern =
-      Cckappa_sig.Mixture_map_and_set.Map.empty;
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_potential_tuple_pair_rule_rhs =
       Ckappa_sig.Rule_map_and_set.Map.empty;
     (*-------------------------------------------------------*)
@@ -323,7 +322,7 @@ let collect_potential_tuple_pair_lhs_pattern parameters error
       Exception.warn parameters error error''
       __POS__ Exit
   in
-  let error', pair_set =
+  let error, store_result =
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->
          (*binding information*)
@@ -347,12 +346,10 @@ let collect_potential_tuple_pair_lhs_pattern parameters error
            store_set parameters error fst_list snd_list store_result
          in
          error, store_result
-      ) bonds_lhs_set
-      (error,
-       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty
-      )
+      ) bonds_lhs_set (error, store_result)
   in
-  let error =
+  error, store_result
+  (*let error =
     Exception.check_point
       Exception.warn parameters error error'
       __POS__ Exit
@@ -361,7 +358,7 @@ let collect_potential_tuple_pair_lhs_pattern parameters error
     parameters error
     pattern
     pair_set
-    store_result
+    store_result*)
 
 (***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)

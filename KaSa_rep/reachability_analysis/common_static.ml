@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 06 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -32,10 +32,10 @@ type potential_partner_bind = bind_partner
 
 type bdu_common_static =
   {
-    store_agent_name             : Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t;
+    store_agent_name             : Ckappa_sig.c_agent_name
+        Ckappa_sig.RuleAgent_map_and_set.Map.t;
     store_agent_name_from_pattern :
-      Ckappa_sig.c_agent_name Cckappa_sig.MixtureAgent_map_and_set.Map.t
-  ;
+      Ckappa_sig.c_agent_name Ckappa_sig.Agent_id_map_and_set.Map.t;
     store_side_effects           : half_break_action * remove_action;
     store_potential_side_effects :
       potential_partner_free *  potential_partner_bind;
@@ -93,10 +93,12 @@ let init_bdu_common_static =
     {
       store_agent_name              = init_agent_name;
       store_agent_name_from_pattern =
-        Cckappa_sig.MixtureAgent_map_and_set.Map.empty;
+        Ckappa_sig.Agent_id_map_and_set.Map.empty;
       store_side_effects            = (init_half_break, init_remove);
-      store_potential_side_effects  = (init_potential_free, init_potential_bind);
-      store_potential_side_effects_per_rule = inite_potential_side_effects_per_rule;
+      store_potential_side_effects  =
+        (init_potential_free, init_potential_bind);
+      store_potential_side_effects_per_rule =
+        inite_potential_side_effects_per_rule;
       store_bonds_rhs = init_bonds_rhs;
       store_bonds_lhs = init_bonds_lhs;
       store_bonds_lhs_pattern = Cckappa_sig.Mixture_map_and_set.Map.empty;
@@ -154,10 +156,10 @@ let collect_agent_name_from_pattern parameters error pattern store_result =
          | Cckappa_sig.Agent agent ->
            let agent_type = agent.Cckappa_sig.agent_name in
            let error, store_result =
-             Cckappa_sig.MixtureAgent_map_and_set.Map.add_or_overwrite
+             Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
                parameters
                error
-               (pattern, agent_id)
+               agent_id
                agent_type
                store_result
            in
@@ -240,7 +242,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
 (***************************************************************************)
 (*compute remove action: r0 and r1 are remove action *)
 
-(*FIXME: state = 0 or there is no state?*)
+(*state = 0 or there is no state?*)
 
 let remove_action parameter error rule_id remove store_result =
   let add_link error (agent_type, site_type) r store_result =

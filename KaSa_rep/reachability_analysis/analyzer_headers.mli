@@ -77,10 +77,10 @@ val set_agent_name :
 (*TODO*)
 val get_agent_name_from_pattern :
   global_static_information ->
-  Ckappa_sig.c_agent_name Cckappa_sig.MixtureAgent_map_and_set.Map.t
+  Ckappa_sig.c_agent_name Ckappa_sig.Agent_id_map_and_set.Map.t
 
 val set_agent_name_from_pattern :
-  Ckappa_sig.c_agent_name Cckappa_sig.MixtureAgent_map_and_set.Map.t ->
+  Ckappa_sig.c_agent_name Ckappa_sig.Agent_id_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
 

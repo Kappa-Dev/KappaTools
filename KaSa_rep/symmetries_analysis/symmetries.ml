@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Dec 05 2016>
+   * Last modification: Time-stamp: <Dec 06 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *

@@ -2351,10 +2351,10 @@ struct
       | step :: tl ->
         let error, agent_type =
           match
-            Cckappa_sig.MixtureAgent_map_and_set.Map.find_option_without_logs
+            Ckappa_sig.Agent_id_map_and_set.Map.find_option_without_logs
               parameters
               error
-              (pattern, path.Communication.agent_id)
+              path.Communication.agent_id
               store_agent_name_from_pattern
           with
           | error, None -> error, Ckappa_sig.dummy_agent_name
@@ -2424,10 +2424,10 @@ struct
       site_correspondence fixpoint_result proj_bdu_test_restriction_pattern =
     let error, agent_type =
       match
-        Cckappa_sig.MixtureAgent_map_and_set.Map.find_option_without_logs
+        Ckappa_sig.Agent_id_map_and_set.Map.find_option_without_logs
           parameters
           error
-          (pattern, path.Communication.agent_id)
+          path.Communication.agent_id
           store_agent_name_from_pattern
       with
       | error, None -> error, Ckappa_sig.dummy_agent_name
@@ -2861,7 +2861,7 @@ struct
     let kappa_handler = get_kappa_handler static in
     let fixpoint_result = get_fixpoint_result dynamic in
     (*-----------------------------------------------------------*)
-    let store_proj_bdu_test_restriction_pattern =
+    let proj_bdu_test_restriction_pattern =
       get_store_proj_bdu_test_restriction_pattern static
     in
     let dual_contact_map = get_store_dual_contact_map dynamic in
@@ -2869,7 +2869,8 @@ struct
     let error, site_correspondence = get_store_remanent_triple static error in
     let store_covering_classes_id = get_covering_classes_id static in
     (*-----------------------------------------------------------*)
-    let error, proj_bdu_test_restriction_pattern =
+
+    (*let error, proj_bdu_test_restriction_pattern =
       match
         Cckappa_sig.Mixture_setmap.Map.find_option
           pattern
@@ -2885,7 +2886,7 @@ struct
       with
       | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some m -> error, m
-    in
+    in*)
     (*-----------------------------------------------------------*)
     try
       let error, dynamic =

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 05 2016>
+   * Last modification: Time-stamp: <Dec 06 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -872,9 +872,9 @@ struct
     let parameters = get_parameter static in
     let error, dynamic, bdu_false =
       get_mvbdu_false static dynamic error in
-    let store_potential_tuple_pair_lhs_pattern =
+    let tuple_set =
       get_potential_tuple_pair_lhs_pattern static in
-    let error, tuple_set =
+    (*let error, tuple_set =
       match
         Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
           parameters
@@ -886,7 +886,7 @@ struct
         error,
         Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty
       | error, Some s -> error, s
-    in
+    in*)
     let list =
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements
         tuple_set
