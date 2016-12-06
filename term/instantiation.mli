@@ -1,5 +1,6 @@
-(** A rule exactly as the user wrote it (before
-compilation) *)
+(** What users wrote when writing its rules *)
+
+(** All names refers to the one from the signature *)
 
 type agent_name = int
 type site_name = int
@@ -7,8 +8,8 @@ type internal_state  = int
 
 type binding_type = agent_name * site_name
 
-type abstract = Agent_place.t
-type concrete = Agent.t
+type abstract = Agent_place.t (** in a rule *)
+type concrete = Agent.t (** in a simulation state *)
 
 type 'a site = 'a * site_name
 
@@ -38,7 +39,7 @@ type 'a binding_state =
 type 'a event =
   'a test list *
     ('a action list * ('a site * 'a binding_state) list * 'a site list)
-(** [(The tests asked by the user, (The modifications asked by the
+(** (The tests asked by the user, (The modifications asked by the
     user, the site of the agents mentioned by the users where trere is
     a side effects, the site of agents not mentionned by the users
     that have been freed by side effect)) *)
