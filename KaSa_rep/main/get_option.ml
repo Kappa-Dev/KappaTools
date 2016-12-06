@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Nov 22 2016>
+  * Last modification: Time-stamp: <Dec 06 2016>
   * *
   * primitive to parse command-line options
   *
@@ -49,9 +49,9 @@ let options =
 
       "--influence-map-accuracy-level",
       (Choice
-         (["Low","Ignore relations among site";
+         (["Low","Ignore gluing compatibility";
            "Medium","Ignore reachable states";
-           (*    "High",""*) ],
+           "High","Take into account reachable states" ],
           Config.influence_map_accuracy_level)),
       "Tune the accuracy level of the influence map",
       ["5_Influence_map"],

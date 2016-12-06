@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 7th 2011
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Dec 05 2016>
  * *
  * Labels to be associated with influence relations
  *
@@ -63,7 +63,8 @@ sig
   val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> bool -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
   val dump:        Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler
   val dump_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple -> Exception.method_handler
-  val filter_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> (Exception.method_handler ->label -> label -> Exception.method_handler *  bool) -> label_set_couple -> Exception.method_handler * label_set_couple
+  val filter_couple: Remanent_parameters_sig.parameters ->
+    'a -> Cckappa_sig.kappa_handler -> ('a ->label -> label -> 'a *  bool) -> label_set_couple -> 'a * label_set_couple
   val to_string :  Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set -> Exception.method_handler * string list
   val to_string_couple : Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple  -> Exception.method_handler * string list
   val convert_label_set_couple : label_set_couple -> (int * int) list

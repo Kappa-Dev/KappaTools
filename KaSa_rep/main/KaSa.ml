@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 23 2016>
+ * Last modification: Time-stamp: <Dec 06 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -65,9 +65,10 @@ let main () =
                          | Remanent_parameters_sig.None
                          | Remanent_parameters_sig.Low ->
                            Remanent_state.Low
-                         | Remanent_parameters_sig.Medium
+                         | Remanent_parameters_sig.Medium ->
+                           Remanent_state.Medium
                          | Remanent_parameters_sig.High
-                         | Remanent_parameters_sig.Full -> Remanent_state.Medium)
+                         | Remanent_parameters_sig.Full -> Remanent_state.High)
         state
     else
       state

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 06 2016>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -50,6 +50,30 @@ let port_equal port1 port2 =
   port1.site_name = port2.site_name
   && port1.site_free = port2.site_free
   && state_equal port1.site_state port2.site_state
+
+let join_port parameters error a b =
+  if a.site_name == b.site_name
+  then
+    let error, site_free =
+      match a.site_free, b.site_free with
+      | None, x | x,None  -> error, x
+      | Some b1, Some b2 when b1=b2 -> error, a.site_free
+      | Some _ , Some _ ->
+        Exception.warn parameters error __POS__ Exit None
+    in
+    let site_state =
+      {min = max a.site_state.min b.site_state.min ;
+       max = min a.site_state.max b.site_state.max
+      }
+    in
+    error,
+    {
+      a
+      with
+        site_free = site_free ;
+        site_state = site_state }
+  else
+    Exception.warn parameters error __POS__ Exit a
 
 type 'state interface = 'state port Ckappa_sig.Site_map_and_set.Map.t
 
@@ -97,16 +121,28 @@ let rename_proper_agent parameters error f agent =
       agent_kasim_id = id
   }
 
+exception False of Exception.method_handler
+
 let join_proper_agent parameters error agent1 agent2 =
-  if agent1.agent_kasim_id = agent2.agent_kasim_id
-  && agent1.agent_name = agent2.agent_name
-  && Ckappa_sig.Site_map_and_set.Map.equal
-       port_equal
-       agent1.agent_interface agent2.agent_interface
-  then
-    error, agent1
+  let bool =
+    (*agent1.agent_kasim_id = agent2.agent_kasim_id
+      &&*) agent1.agent_name = agent2.agent_name
+  in
+  if bool then
+    let error, map =
+      Ckappa_sig.Site_map_and_set.Map.fold2
+        parameters error
+        Ckappa_sig.Site_map_and_set.Map.add
+        Ckappa_sig.Site_map_and_set.Map.add
+        (fun parameters error key a b map ->
+           let error, c = join_port parameters error a b in
+           Ckappa_sig.Site_map_and_set.Map.add parameters error key c map)
+        agent1.agent_interface agent2.agent_interface
+        Ckappa_sig.Site_map_and_set.Map.empty
+    in
+    error, {agent1 with agent_interface = map}
   else
-    Exception.warn parameters error __POS__ Exit agent1
+      Exception.warn parameters error __POS__ Exit agent1
 
 let upgrade_interface ag interface  =
   {
@@ -199,11 +235,9 @@ let join_bonds' parameters error map1 map2 =
     Ckappa_sig.Site_map_and_set.Map.add
     Ckappa_sig.Site_map_and_set.Map.add
     (fun parameters error key value1 value2 map ->
-       if value1=value2
-       then
-         Ckappa_sig.Site_map_and_set.Map.add parameters error key value1 map
-       else
-         Exception.warn parameters error __POS__ Exit map)
+       let error, value3 = Ckappa_sig.join_link parameters error value1 value2 in
+          Ckappa_sig.Site_map_and_set.Map.add parameters error key value3 map
+      )
     map1
     map2
     Ckappa_sig.Site_map_and_set.Map.empty
@@ -251,6 +285,12 @@ let join_agent parameters error agent1 agent2 =
     let error, props3 = join_props parameters error props1 props2 in
     let error, bonds3 = join_bonds' parameters error bonds1 bonds2 in
     error, Dead_agent (proper_agent3, intf3, props3, bonds3)
+  | Dead_agent (proper_agent1, intf1, props1, bonds1),
+    Agent (proper_agent)
+  | Agent (proper_agent),
+    Dead_agent(proper_agent1, intf1, props1, bonds1) ->
+    let error, proper_agent = join_proper_agent parameters error proper_agent proper_agent1 in
+    error, Dead_agent (proper_agent, intf1, props1, bonds1)
   | Unknown_agent (string1, id1), Unknown_agent (string2, id2) when string1=string2 && id1=id2 -> error, agent1
   | (Agent _ | Dead_agent _ | Unknown_agent _),
     (Agent _ | Dead_agent _ | Unknown_agent _)
@@ -271,9 +311,13 @@ let rename_views parameters error f views =
     (fun parameters error id agent v ->
        let error, id = f parameters error id in
        let error, agent = rename_agent parameters error f agent in
-       let error, v =
+       let error', v =
          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
            parameters error id agent v
+       in
+       let error =
+         Exception.check_point Exception.warn parameters error error'
+           __POS__ Exit
        in
        error, v)
     views
@@ -292,8 +336,14 @@ let join_views parameters error views1 views2 =
          | Some agent2 ->
            join_agent parameters error agent1 agent2
        in
-       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
-         parameters error id agent3 v)
+       let error', v =
+         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+           parameters error id agent3 v in
+       let error =
+             Exception.check_point Exception.warn parameters error error'
+               __POS__ Exit
+       in
+       error, v)
     views1
     views2
 
@@ -362,8 +412,15 @@ let join_bonds parameters error bond1 bond2 =
            bond2
            Ckappa_sig.Site_map_and_set.Map.empty
      in
-     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
-       parameters error id bond3 b)
+     let error', b =
+       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+         parameters error id bond3 b in
+     let error =
+           Exception.check_point Exception.warn parameters error error'
+             __POS__ Exit
+     in
+     error, b
+    )
     bond1
     bond2
 
@@ -417,9 +474,15 @@ let rename_bonds parameters error f bonds =
            value
            (error, Ckappa_sig.Site_map_and_set.Map.empty)
        in
+       let error', map =
        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
          parameters error
-         key value map)
+         key value map in
+         let error =
+           Exception.check_point Exception.warn parameters error error'
+             __POS__ Exit
+       in
+       error, map)
     bonds
     empty
 
@@ -440,19 +503,47 @@ let rename_mixture parameters error f mixture =
   }
 
 let join_mixture parameters error f g mixture1 mixture2 =
-  let error, mixture1 = rename_mixture parameters error f mixture1 in
-  let error, mixture2 = rename_mixture parameters error g mixture2 in
-  let error, c_mixture =
+  let error', mixture1 = rename_mixture parameters error f mixture1 in
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
+  let error', mixture2 = rename_mixture parameters error g mixture2 in
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
+  let error', c_mixture =
     Ckappa_sig.join_mixture parameters error mixture1.c_mixture mixture2.c_mixture
   in
-  let error, views =
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
+  let error', views =
     join_views parameters error mixture1.views mixture2.views
   in
-  let error, bonds =
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
+  let error', bonds =
     join_bonds parameters error mixture1.bonds mixture2.bonds
   in
-  let error, plus = join_rel parameters error mixture1.plus mixture2.plus in
-  let error, dot = join_rel parameters error mixture1.dot mixture2.dot in
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
+  let error', plus = join_rel parameters error mixture1.plus mixture2.plus in
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
+  let error', dot = join_rel parameters error mixture1.dot mixture2.dot in
+  let error =
+    Exception.check_point Exception.warn parameters error error'
+      __POS__ Exit
+  in
   error,
   {c_mixture = c_mixture ;
    views = views ;

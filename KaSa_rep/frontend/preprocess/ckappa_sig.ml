@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Dec 05 2016>
+ * Last modification: Time-stamp: <Dec 06 2016>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -479,7 +479,8 @@ let join_link parameters error link1 link2 =
     | LNK_VALUE(ag,x,y,ag1,_), LNK_VALUE(ag',x',y',ag1',_) when
         ag=ag' && x=x' && y=y' && ag1=ag1'
       -> error, link1
-
+    | (LNK_VALUE _ | LNK_TYPE _ ), (LNK_VALUE _ | LNK_TYPE _ ) ->
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Location.dummy)
 
 let rename_port parameters error f port =
   let error, port_lnk = rename_link parameters error f port.port_lnk in
@@ -670,9 +671,13 @@ let rec join_mixture parameters error mixture1 mixture2 =
     let error, m'' = join_mixture parameters error m m' in
     error, COMMA(ag,m'')
   | DOT(_), _
-  | PLUS(_), _ ->
+  | PLUS(_), _
+  | _,DOT(_)
+  | _,PLUS(_)->
     Exception.warn parameters error __POS__ Exit EMPTY_MIX
 
+let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX 
+(*TO DO*)
 
 type 'mixture rule =
   {

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 01 2016>
+  * Last modification: Time-stamp: <Dec 06 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -841,6 +841,8 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   Remanent_state.set_errors error state, (wake_up_map, inhibition_map)
 
+
+
 let compute_map_gen
     (get: ?accuracy_level:Remanent_state.accuracy_level ->
      (Reachability.static_information,
@@ -875,14 +877,130 @@ let get_intermediary_internal_influence_map =
     (Remanent_state.get_internal_influence_map Remanent_state.Medium)
     compute_intermediary_internal_influence_map
 
+
+let compute_reachability_result show_title state =
+  let state, c_compil = get_c_compilation state in
+  let state, handler = get_handler state in
+  let () = show_title state in
+  let bdu_handler = Remanent_state.get_bdu_handler state in
+  let log_info = Remanent_state.get_log_info state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error, log_info, static, dynamic =
+    Reachability.main
+      parameters log_info error bdu_handler c_compil handler
+  in
+  let error, dynamic, state =
+    Reachability.export static dynamic
+      error state
+  in
+  let state = Remanent_state.set_errors error state in
+  let state = Remanent_state.set_log_info log_info state in
+  let state = Remanent_state.set_bdu_handler bdu_handler state in
+  let state = Remanent_state.set_reachability_result (static, dynamic) state in
+  state, (static, dynamic)
+
+let get_reachability_analysis =
+  get_gen
+    ~log_title:"Reachability analysis"
+    (Remanent_state.get_reachability_result)
+    compute_reachability_result
+
+let compute_high_res_internal_influence_map show_title state =
+  let state, handler = get_handler state in
+  let state, compil = get_c_compilation state in
+  let state,(wake_up_map,inhibition_map) =
+    get_intermediary_internal_influence_map state
+  in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let state, (static, dynamic) = get_reachability_analysis state in
+  let () = show_title state in
+  let (error,dynamic), wake_up_map =
+    Algebraic_construction.filter_influence_high
+      Reachability.maybe_reachable
+      parameters handler error compil
+      static dynamic wake_up_map true
+  in
+  let (error,dynamic), inhibition_map =
+    Algebraic_construction.filter_influence_high
+      Reachability.maybe_reachable
+      parameters handler error compil
+      static dynamic inhibition_map false
+  in
+  let state = Remanent_state.set_reachability_result (static, dynamic) state in
+  let state =
+    Remanent_state.set_internal_influence_map Remanent_state.High
+      (wake_up_map,inhibition_map)
+      state
+  in
+  let state = Remanent_state.set_errors error state in
+  let state, handler = get_handler state in
+  let error = Remanent_state.get_errors state in
+  let nrules = Handler.nrules parameters error handler in
+  let state =
+    Remanent_state.set_influence_map Remanent_state.High
+      {
+        Remanent_state.positive =
+          convert_half_influence_map wake_up_map nrules;
+        Remanent_state.negative =
+          convert_half_influence_map inhibition_map nrules ;
+      }
+      state
+  in
+  let error =
+    if Remanent_parameters.get_trace parameters || Print_quarks.trace
+    then
+      Print_quarks.print_wake_up_map
+        parameters
+        error
+        handler
+        compil
+        Handler.print_rule_txt
+        Handler.print_var_txt
+        Handler.get_label_of_rule_txt
+        Handler.get_label_of_var_txt
+        Handler.print_labels "\n"
+        wake_up_map
+    else error
+  in
+  let error =
+    if
+      Remanent_parameters.get_trace parameters
+      || Print_quarks.trace
+    then
+      Print_quarks.print_inhibition_map
+        parameters error handler
+        compil
+        Handler.print_rule_txt
+        Handler.print_var_txt
+        Handler.get_label_of_rule_txt
+        Handler.get_label_of_var_txt
+        Handler.print_labels
+        "\n"
+        inhibition_map
+    else error
+  in
+  Remanent_state.set_errors error state, (wake_up_map, inhibition_map)
+
+  let get_high_res_internal_influence_map =
+    get_gen
+      ~log_prefix:"Influence_map:"
+      ~log_title:"Refining further the influence map"
+      ~phase:(StoryProfiling.Internal_influence_map "high")
+      (Remanent_state.get_internal_influence_map Remanent_state.High)
+      compute_high_res_internal_influence_map
+
+
 let get_internal_influence_map
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
     state =
   match accuracy_level with
   | Remanent_state.Low ->
     get_raw_internal_influence_map state
-  | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
-    get_intermediary_internal_influence_map state
+  | Remanent_state.Medium -> get_intermediary_internal_influence_map state
+  | Remanent_state.High | Remanent_state.Full ->
+    get_high_res_internal_influence_map state
 
 let compute_influence_map
     ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title =
@@ -911,32 +1029,7 @@ let get_influence_map
 
 (******************************************************************)
 
-let compute_reachability_result show_title state =
-  let state, c_compil = get_c_compilation state in
-  let state, handler = get_handler state in
-  let () = show_title state in
-  let bdu_handler = Remanent_state.get_bdu_handler state in
-  let log_info = Remanent_state.get_log_info state in
-  let parameters = Remanent_state.get_parameters state in
-  let error = Remanent_state.get_errors state in
-  let error, log_info, static, dynamic =
-    Reachability.main
-      parameters log_info error bdu_handler c_compil handler
-  in
-  let error, dynamic, state =
-    Reachability.export static dynamic
-      error state in
-  let state = Remanent_state.set_errors error state in
-  let state = Remanent_state.set_log_info log_info state in
-  let state = Remanent_state.set_bdu_handler bdu_handler state in
-  let state = Remanent_state.set_reachability_result (static, dynamic) state in
-  state, (static, dynamic)
 
-let get_reachability_analysis =
-  get_gen
-    ~log_title:"Reachability analysis"
-    (Remanent_state.get_reachability_result)
-    compute_reachability_result
 
 (******************************************************************)
 
