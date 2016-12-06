@@ -17,7 +17,7 @@ module type Type =
 
 
     type contact_map =
-      (string list * (string * string) list) Mods.StringMap.t Mods.StringSetMap.Map.t
+      (string list * (string * string) list) Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
 
 
     val init:

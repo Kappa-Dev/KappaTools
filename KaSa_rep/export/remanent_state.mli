@@ -25,7 +25,8 @@ type internal_contact_map =
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
 type contact_map =
-  ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
+  ((string list) * (string*string) list)
+    Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
 
 val contact_map_to_json:
   accuracy_level * contact_map -> Yojson.Basic.json

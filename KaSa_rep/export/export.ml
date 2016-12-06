@@ -98,9 +98,9 @@ let print_contact_map parameters contact_map =
   let log = (Remanent_parameters.get_logger parameters) in
   Loggers.fprintf log  "Contact map: ";
   Loggers.print_newline log;
-  Mods.StringMap.iter
+  Mods.StringSetMap.Map.iter
     (fun x ->
-       Mods.StringMap.iter
+       Mods.StringSetMap.Map.iter
          (fun y (l1,l2) ->
             if l1<>[]
             then
@@ -446,23 +446,28 @@ let get_raw_internal_contact_map  =
     compute_raw_internal_contact_map
 
 let compute_raw_contact_map show_title state =
-  let sol        = ref Mods.StringMap.empty in
+  let sol        = ref Mods.StringSetMap.Map.empty in
   let state, handler = get_prehandler state in
   let parameters = Remanent_state.get_parameters state in
   let error      = Remanent_state.get_errors state in
   let add_link (a,b) (c,d) sol =
-    let sol_a = Mods.StringMap.find_default Mods.StringMap.empty a sol in
-    let l,old = Mods.StringMap.find_default ([],[]) b sol_a in
-    Mods.StringMap.add a (Mods.StringMap.add b (l,((c,d)::old)) sol_a) sol
+    let sol_a = Mods.StringSetMap.Map.find_default
+        Mods.StringSetMap.Map.empty a sol in
+    let l,old = Mods.StringSetMap.Map.find_default
+        ([],[]) b sol_a in
+    Mods.StringSetMap.Map.add a
+      (Mods.StringSetMap.Map.add b (l,((c,d)::old)) sol_a) sol
   in
   (*----------------------------------------------------------------*)
   let add_internal_state (a,b) c sol =
     match c with
     | Ckappa_sig.Binding _ -> sol
     | Ckappa_sig.Internal state ->
-      let sol_a = Mods.StringMap.find_default Mods.StringMap.empty a sol in
-      let old,l = Mods.StringMap.find_default ([],[]) b sol_a in
-      Mods.StringMap.add a (Mods.StringMap.add b (state::old,l) sol_a) sol
+      let sol_a = Mods.StringSetMap.Map.find_default
+          Mods.StringSetMap.Map.empty a sol in
+      let old,l = Mods.StringSetMap.Map.find_default ([],[]) b sol_a in
+      Mods.StringSetMap.Map.add a
+        (Mods.StringSetMap.Map.add b (state::old,l) sol_a) sol
   in
   (*----------------------------------------------------------------*)
   let simplify_site site =
@@ -527,7 +532,8 @@ let compute_raw_contact_map show_title state =
       handler.Cckappa_sig.dual sol
   in
   let sol =
-    Mods.StringMap.map (Mods.StringMap.map (fun (l,x) -> List.rev l,x)) sol
+    Mods.StringSetMap.Map.map
+      (Mods.StringSetMap.Map.map (fun (l,x) -> List.rev l,x)) sol
   in
   Remanent_state.set_errors error
     (Remanent_state.set_contact_map Remanent_state.Low sol state),
@@ -703,7 +709,7 @@ let convert_contact_map show_title state contact_map =
            ~message:"unknown agent type" ~ml_pos:(Some __POS__)
            parameters error handler ag)
       parameters error
-      Mods.StringMap.empty
+      Mods.StringSetMap.Map.empty
       (fun parameters error _ ag sitemap->
          SiteProj.monadic_proj_map_i
            (fun parameters errors site ->
@@ -1018,12 +1024,12 @@ let compute_signature show_title state =
   let state,l = get_contact_map state in
   let () = show_title state in
   let l =
-    Mods.StringMap.fold
+    Mods.StringSetMap.Map.fold
       (fun a interface list ->
          (Location.dummy_annot a,
           NamedDecls.create
             (Array.of_list
-               (Mods.StringMap.fold
+               (Mods.StringSetMap.Map.fold
                   (fun x (states,binding) acc ->
                      let binding' =
                        List.map

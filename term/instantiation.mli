@@ -9,6 +9,7 @@ type internal_state  = int
 type binding_type = agent_name * site_name
 
 type abstract = Agent_place.t (** in a rule *)
+
 type concrete = Agent.t (** in a simulation state *)
 
 type 'a site = 'a * site_name

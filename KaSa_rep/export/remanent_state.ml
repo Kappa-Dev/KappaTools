@@ -297,7 +297,8 @@ let influence_map_of_json =
 (***************)
 
 type contact_map =
-      ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
+  ((string list) * (string*string) list)
+    Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
 
 let contact_map_to_json contact_map=
   `Assoc
@@ -305,10 +306,10 @@ let contact_map_to_json contact_map=
      JsonUtil.of_pair
        ~lab1:accuracy_string ~lab2:map
        json_of_accuracy
-       (Mods.StringMap.to_json
+       (Mods.StringSetMap.Map.to_json
        ~lab_key:agent ~lab_value:interface
        JsonUtil.of_string
-       (Mods.StringMap.to_json
+       (Mods.StringSetMap.Map.to_json
           ~lab_key:site ~lab_value:stateslist
           JsonUtil.of_string
           (JsonUtil.of_pair
@@ -331,10 +332,10 @@ let contact_map_of_json =
           ~lab1:accuracy_string ~lab2:map
           ~error_msg:(JsonUtil.build_msg "contact map")
           json_to_accuracy
-          (Mods.StringMap.of_json
+          (Mods.StringSetMap.Map.of_json
              ~lab_key:agent ~lab_value:interface
              (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
-             (Mods.StringMap.of_json
+             (Mods.StringSetMap.Map.of_json
                 ~error_msg:(JsonUtil.build_msg "interface")
                 ~lab_key:site ~lab_value:stateslist
                 (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
