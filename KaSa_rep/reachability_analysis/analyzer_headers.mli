@@ -59,7 +59,6 @@ val get_compilation_information: global_static_information -> compilation_result
 
 val get_bdu_common_static : global_static_information -> Common_static.bdu_common_static
 
-
 val set_bdu_common_static:
   Common_static.bdu_common_static ->
   global_static_information ->
@@ -74,7 +73,6 @@ val set_agent_name :
   global_static_information ->
   global_static_information
 
-(*TODO*)
 val get_agent_name_from_pattern :
   global_static_information ->
   Ckappa_sig.c_agent_name Ckappa_sig.Agent_id_map_and_set.Map.t
@@ -132,10 +130,10 @@ val get_bonds_lhs :
 val get_bonds_lhs_pattern :
   global_static_information ->
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
-    Cckappa_sig.Mixture_map_and_set.Map.t
 
 val set_bonds_lhs :
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+    Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
 
@@ -167,7 +165,6 @@ val get_views_lhs :
 val get_views_lhs_pattern :
   global_static_information ->
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t
-    Cckappa_sig.Mixture_map_and_set.Map.t
 
 val set_views_lhs :
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t

@@ -2000,7 +2000,8 @@ struct
               let () =
                 if
                   (local_trace
-                   || Remanent_parameters.get_dump_reachability_analysis_wl parameters
+                   || Remanent_parameters.get_dump_reachability_analysis_wl
+                     parameters
                    || Remanent_parameters.get_trace parameters)
                 then
                   let () =   Loggers.fprintf
@@ -2769,7 +2770,6 @@ struct
               parameters
               error
               kappa_handler
-              (*pattern*)
               current_path.Communication.relative_address
               current_path
               store_agent_name_from_pattern
@@ -2819,7 +2819,6 @@ struct
                     parameters
                     error
                     dynamic
-                    (*pattern*)
                     path
                     store_agent_name_from_pattern
                     bdu_false
@@ -2870,24 +2869,6 @@ struct
     let error, site_correspondence = get_store_remanent_triple static error in
     let store_covering_classes_id = get_covering_classes_id static in
     (*-----------------------------------------------------------*)
-    (*let error, proj_bdu_test_restriction_pattern =
-      match
-        Cckappa_sig.Mixture_setmap.Map.find_option
-          pattern
-          store_proj_bdu_test_restriction_pattern
-(* This makes no sens *)
-(* Why an arbitrary patterns would be stored in that map *)
-(* For each view, you have to collect the set of sites *)
-(* Then to collect the set of covering class that overlaps with at least one site (you should have the relation site -> cv_id list somewhere in static) *)
-(* Then, for each covering class, you have to compute the bdu *)
-(* If it doens not overlap with the corresponding bdu in the fixpoint *)
-(* Then, answer false *)
-(* Othewise keep on iterating *)
-      with
-      | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
-      | Some m -> error, m
-    in*)
-    (*-----------------------------------------------------------*)
     try
       let error, dynamic =
         collect_bdu_enabled
@@ -2919,9 +2900,12 @@ struct
 
  (***********************************************************)
 
-  let maybe_reachable static dynamic error pattern precondition =
+  let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
+      precondition =
     let error, (dynamic, precondition), maybe_reachable =
-      maybe_reachable_aux static dynamic error pattern precondition
+      maybe_reachable_aux static dynamic error
+        pattern
+        precondition
     in
     if maybe_reachable
     then error, dynamic, Some precondition

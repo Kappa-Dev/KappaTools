@@ -80,7 +80,6 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
-  (*TODO*)
   let get_wake_up_relation static =
     lift Analyzer_headers.get_wake_up_relation static
 
@@ -636,21 +635,7 @@ struct
   let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
-    let parallel_map =
-      get_double_bonds_lhs_pattern static in
-    (*let error, parallel_map =
-      match
-        Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
-          parameters
-          error
-          pattern
-          store_parallel_bonds_lhs_pattern
-      with
-      | error, None ->
-        error,
-        Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty
-      | error, Some s -> error, s
-    in*)
+    let parallel_map = get_double_bonds_lhs_pattern static in
     let list =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings
         parallel_map

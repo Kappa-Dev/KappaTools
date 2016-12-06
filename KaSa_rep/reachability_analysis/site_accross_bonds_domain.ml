@@ -89,7 +89,6 @@ struct
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
-  (*TODO*)
   let get_wake_up_relation static =
     lift Analyzer_headers.get_wake_up_relation static
 

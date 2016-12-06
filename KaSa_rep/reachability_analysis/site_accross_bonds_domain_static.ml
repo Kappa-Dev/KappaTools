@@ -297,16 +297,17 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
 (*TODO*)
 
 let collect_potential_tuple_pair_lhs_pattern parameters error
-    pattern store_bonds_lhs store_views_lhs store_result =
-  let error', bonds_lhs_set =
+    pattern (*store_bonds_lhs*) bonds_lhs_set
+    (*store_views_lhs*) views_lhs_set store_result =
+  (*let error', bonds_lhs_set =
     Common_static.get_set_pattern
       parameters
       error
       pattern
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       store_bonds_lhs
-  in
-  let error =
+  in*)
+  (*let error =
     Exception.check_point
       Exception.warn parameters error error'
       __POS__ Exit
@@ -321,7 +322,7 @@ let collect_potential_tuple_pair_lhs_pattern parameters error
     Exception.check_point
       Exception.warn parameters error error''
       __POS__ Exit
-  in
+  in*)
   let error, store_result =
     Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->

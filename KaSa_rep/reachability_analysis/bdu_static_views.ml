@@ -1113,7 +1113,8 @@ let collect_proj_bdu_potential_restriction_map parameters handler error
 
 (**************************************************************************)
 
-let collect_bdu_test_restriction_map parameters handler error rule_id rule
+let collect_bdu_test_restriction_map parameters handler_kappa
+    handler error rule_id rule
     store_remanent_triple store_result =
   let error, handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false
@@ -1220,6 +1221,20 @@ let collect_bdu_test_restriction_map parameters handler error rule_id rule
                     let error, handler, bdu_test =
                       build_bdu parameters handler error pair_list
                     in
+                    let error', agent_string =
+                      Handler.string_of_agent parameters error handler_kappa agent_type
+                    in
+                    (*let _ =
+                      Loggers.fprintf
+                        (Remanent_parameters.get_logger parameters)
+                        "T:%i:%i:%i:%s:%i\n"
+                        (Ckappa_sig.int_of_rule_id rule_id)
+                        (Ckappa_sig.int_of_agent_id agent_id)
+                        (Ckappa_sig.int_of_agent_name agent_type)
+                        agent_string
+                        (Covering_classes_type.int_of_cv_id cv_id)
+                    in*)
+
                     let error, store_result =
                       error, Covering_classes_type.AgentsRuleCV_setmap.Map.add
                         (agent_id, agent_type, rule_id, cv_id)
@@ -1236,7 +1251,7 @@ let collect_bdu_test_restriction_map parameters handler error rule_id rule
 
 (***************************************************************************)
 
-let collect_proj_bdu_test_restriction parameters handler error
+let collect_proj_bdu_test_restriction parameters handler_kappa handler error
     rule_id rule store_remanent_triple
     store_result =
   let store_init_bdu_test_restriction_map =
@@ -1246,6 +1261,7 @@ let collect_proj_bdu_test_restriction parameters handler error
     (* collect should work directly on the partitioned map (store_result) *)
     collect_bdu_test_restriction_map
       parameters
+      handler_kappa
       handler
       error
       rule_id
@@ -1270,6 +1286,11 @@ let collect_proj_bdu_test_restriction parameters handler error
            Ckappa_sig.Views_bdu.mvbdu_and
              parameters handler error bdu bdu'
          in
+         (*let _ =
+           Loggers.fprintf (Remanent_parameters.get_logger parameters) "BDU_UNION:\n";
+           Ckappa_sig.Views_bdu.print parameters bdu_union
+         in
+         *)
          (error, handler), bdu_union
       )
       store_bdu_test_restriction_map
@@ -1285,10 +1306,13 @@ let collect_proj_bdu_test_restriction parameters handler error
 (***************************************************************************)
 (*Pattern*)
 
-let collect_proj_bdu_test_restriction_pattern parameters handler error
-    (pattern : Cckappa_sig.mixture) store_remanent_triple store_result =
+let collect_proj_bdu_test_restriction_pattern parameters handler_kappa
+    handler error
+    (pattern : Cckappa_sig.mixture) store_remanent_triple =
   let error, handler, bdu_false =
     Ckappa_sig.Views_bdu.mvbdu_false parameters handler error in
+  let error, handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true parameters handler error in
   let error, (handler, store_result) =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
@@ -1393,18 +1417,40 @@ let collect_proj_bdu_test_restriction_pattern parameters handler error
                      let error, handler, bdu_test =
                        build_bdu parameters handler error pair_list
                      in
+                     (*let error', agent_string =
+                       Handler.string_of_agent parameters error handler_kappa agent_type
+                     in
+                     (*let error, site_string =
+                         Handler.string_of_site parameters error handler_kappa
+                           agent_type site_type
+                     in*)
+                     let _ =
+                       Loggers.fprintf
+                         (Remanent_parameters.get_logger parameters)
+                         "E:%i:%i:%s:%i\n"
+                         (Ckappa_sig.int_of_agent_id agent_id)
+                         (Ckappa_sig.int_of_agent_name agent_type)
+                         agent_string
+                         (Covering_classes_type.int_of_cv_id cv_id)
+                     in*)
                      let store_result =
                        Covering_classes_type.AgentsCV_setmap.Map.add
                          (agent_id, agent_type, cv_id)
                          bdu_test
                          store_result
                      in
+                     (*let _ =
+                       Loggers.fprintf (Remanent_parameters.get_logger parameters) "BDU_TEST:\n";
+                       Ckappa_sig.Views_bdu.print parameters bdu_test
+                     in*)
                      error, handler, store_result
                    end
                )(error, handler, store_result) get_pair_list
            in
            error, (handler, store_result)
-      ) pattern.Cckappa_sig.views (handler, store_result)
+      ) pattern.Cckappa_sig.views
+      (handler,
+       Covering_classes_type.AgentsCV_setmap.Map.empty)
   in
   error, handler, store_result
 
@@ -1497,6 +1543,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
   let (error, handler_bdu), store_proj_bdu_test_restriction =
     collect_proj_bdu_test_restriction
       parameters
+      handler_kappa
       handler_bdu
       error
       rule_id
@@ -1562,11 +1609,12 @@ let scan_rule_static_pattern parameters store_remanent_triple error
   let error, handler, store_proj_bdu_test_restriction_pattern =
     collect_proj_bdu_test_restriction_pattern
       parameters
+      handler_kappa
       handler_bdu
       error
       rule.Cckappa_sig.rule_lhs (*pattern*)
       store_remanent_triple
-      store_result.store_proj_bdu_test_restriction_pattern
+      (*store_result.store_proj_bdu_test_restriction_pattern*)
   in
   error, handler_bdu,
   {

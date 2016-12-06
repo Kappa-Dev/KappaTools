@@ -158,8 +158,7 @@ let collect_double_bonds_in_pattern
   in
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameters error
-    (fun parameters error agent_id_source bonds_map store_result
-      ->
+    (fun parameters error agent_id_source bonds_map store_result ->
         Ckappa_sig.Site_map_and_set.Map.fold
           (fun site_type_source site_add
             (error, store_result) ->
