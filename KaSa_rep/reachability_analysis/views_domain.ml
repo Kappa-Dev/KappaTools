@@ -348,7 +348,9 @@ struct
     let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
     let static = set_domain_static result static in
+    (*-----------------------------------------------------------------------*)
     (*pattern*)
+    (*-----------------------------------------------------------------------*)
     let error, store_remanent_triple = get_store_remanent_triple static error
     in
     let error, (handler_bdu, result) =
@@ -524,8 +526,6 @@ struct
     in
     error, wake_up
 
-
-
   (**************************************************************************)
   (**get type bdu_analysis_dynamic*)
 
@@ -533,7 +533,8 @@ struct
     let result = get_domain_dynamic_information dynamic in
     error, result.Bdu_dynamic_views.store_update
 
-  (**************************************************************************)
+(**************************************************************************)
+
   let dump_cv_label static dynamic error bool (agent_type, cv_id) =
     (*TODO: put title*)
     let parameters = get_parameter static in
@@ -1065,7 +1066,6 @@ struct
     error, dynamic, event_list
 
   (****************************************************************)
-
 
   exception False of Exception.method_handler * dynamic_information
 
@@ -2343,7 +2343,7 @@ struct
   (*Precondition inside pattern*)
   (***********************************************************)
 
-  let precondition_typing_pattern parameters error kappa_handler pattern
+  let precondition_typing_pattern parameters error kappa_handler
       step_list path store_agent_name_from_pattern dual_contact_map =
     let rec aux acc error =
       match acc with
@@ -2419,7 +2419,7 @@ struct
   (***********************************************************)
 
   let precondition_empty_step_list_pattern kappa_handler parameters
-      error dynamic pattern path store_agent_name_from_pattern
+      error dynamic path store_agent_name_from_pattern
       bdu_false bdu_true store_covering_classes_id
       site_correspondence fixpoint_result proj_bdu_test_restriction_pattern =
     let error, agent_type =
@@ -2742,7 +2742,8 @@ struct
 
 (***********************************************************)
 
-  let compute_precondition_reachable error kappa_handler pattern
+  let compute_precondition_reachable error kappa_handler
+      pattern
       precondition
       bdu_false
       bdu_true dual_contact_map
@@ -2768,7 +2769,7 @@ struct
               parameters
               error
               kappa_handler
-              pattern
+              (*pattern*)
               current_path.Communication.relative_address
               current_path
               store_agent_name_from_pattern
@@ -2818,7 +2819,7 @@ struct
                     parameters
                     error
                     dynamic
-                    pattern
+                    (*pattern*)
                     path
                     store_agent_name_from_pattern
                     bdu_false
@@ -2869,7 +2870,6 @@ struct
     let error, site_correspondence = get_store_remanent_triple static error in
     let store_covering_classes_id = get_covering_classes_id static in
     (*-----------------------------------------------------------*)
-
     (*let error, proj_bdu_test_restriction_pattern =
       match
         Cckappa_sig.Mixture_setmap.Map.find_option
