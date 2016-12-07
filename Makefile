@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := all
 
 NWJS_VERSION:=0.19.0
+CODEMIRROR_VERSION:=5.21.0
 
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
@@ -123,11 +124,11 @@ site/external/codemirror-5.20.2:
 	unzip -d site/external $$FILE && rm $$FILE
 
 site/external/d3:
-	mkdir -p $@ ;\
+	mkdir -p $@
 	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
 
 site/external/jquery:
-	mkdir -p $@ ;\
+	mkdir -p $@
 	curl -LsS -o site/external/jquery/jquery.js https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js
 
 site/JsSim.js: JsSim.byte site
@@ -148,7 +149,7 @@ TestWebSim: TestWebSim.byte
 	./TestWebSim.byte -runner sequential
 
 site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js site/WebWorkerV1.js
-	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > $@
+	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" > $@
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
@@ -310,7 +311,7 @@ Kappapp.app:
 	+$(MAKE) ide/Kappa.icns ide/Info.plist
 	FILE=$$(mktemp -t nwjsXXXX); \
 	curl -LsS -o $$FILE https://dl.nwjs.io/v0.19.0/nwjs-v$(NWJS_VERSION)-osx-x64.zip && \
-	unzip $$FILE ; rm -f $$FILE
+	unzip $$FILE && rm -f $$FILE
 	mv nwjs-v$(NWJS_VERSION)-osx-x64/nwjs.app $@
 	rm -r nwjs-v$(NWJS_VERSION)-osx-x64/
 	rm -r $@/Contents/Resources/*.lproj/

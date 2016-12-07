@@ -72,7 +72,7 @@ let xml (_ : Ui_simulation.t) =
                 <textarea id="code-mirror"> </textarea>
              </div>|}]]
 
-let setup_lint codemirror update_linting =
+let setup_lint () =
   let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
     let position p =
       Codemirror.create_position
@@ -112,25 +112,15 @@ let setup_lint codemirror update_linting =
       (Js.Unsafe.js_expr "CodeMirror.registerHelper")
       [| Js.Unsafe.inject (Js.string "lint") ;
          Js.Unsafe.inject (Js.string "Kappa") ;
-         Js.Unsafe.inject (fun _ -> ())
-      |]
-  in
-  let _ =
-    React.S.l1
-      (fun (e : Ui_state.localized_errors option)->
-         let () =
-           match e with
-           | None -> ignore (update_linting codemirror (error_lint []))
-           | Some e ->
-             let () =
-               Common.debug (Js.string e.Ui_state.model_error_location) in
-             let e : Api_types_j.errors = e.Ui_state.model_error_messages in
-             ignore (update_linting codemirror (error_lint e))
-         in
-         ()
-      )
-      Ui_state.model_error
-  in
+         Js.Unsafe.inject (fun _ ->
+             match React.S.value Ui_state.model_error with
+             | None -> Js.array [||]
+             | Some e ->
+               let () =
+                 Common.debug (Js.string e.Ui_state.model_error_location) in
+               let e : Api_types_j.errors = e.Ui_state.model_error_messages in
+               error_lint e)
+      |] in
   ()
 
 let initialize codemirror () =
@@ -180,15 +170,7 @@ let initialize codemirror () =
     return_unit
 
 let onload (t : Ui_simulation.t) : unit =
-  (* this needs to be called before code mirror is created *)
-  let update_linting : codemirror Js.t
-    -> Codemirror.lint Js.t Js.js_array Js.t
-    -> Codemirror.lint Js.t Js.js_array Js.t =
-    Js.Unsafe.fun_call (Js.Unsafe.js_expr "load_lint")
-      [| |]
-  in
-  let configuration : configuration Js.t = Codemirror.create_configuration
-      () in
+  let configuration : configuration Js.t = Codemirror.create_configuration () in
   let gutter_options =
     Js.string "breakpoints,CodeMirror-lint-markers,CodeMirror-linenumbers" in
   let gutter_option : Js.string_array Js.t =
@@ -209,7 +191,7 @@ let onload (t : Ui_simulation.t) : unit =
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea textarea configuration in
   let () = codemirror##setValue(Js.string "") in
-  let () = setup_lint codemirror update_linting in
+  let () = setup_lint () in
   let _ = Common.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
