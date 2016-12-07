@@ -1,4 +1,7 @@
 .DEFAULT_GOAL := all
+
+NWJS_VERSION:=0.19.0
+
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
 MANREP= man/
@@ -10,7 +13,6 @@ MANGENREP = $(MANREP)$(GENIMG)/
 
 KASAREP = KaSa_rep/
 RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
-TERM = $(shell echo $$TERM)
 
 OCAMLBUILDFLAGS = $(EXTRAFLAGS)
 
@@ -32,15 +34,6 @@ SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
 SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness)
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
-.PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check build-tests doc clean_doc fetch_version KappaBin.zip debug
-.PHONY: profiling
-
-.PRECIOUS: $(SCRIPTSWITNESS)
-
-$(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
-	rm -rf $@
-	mkdir $@
 VERSION=generated/version.ml
 RESOURCE=generated/resource_strings.ml
 GENERATED=$(VERSION) \
@@ -60,6 +53,16 @@ else
 SITE_EXTRAS=
 INDEX_HTML=js/use-cdn.html
 endif
+
+.PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
+.PHONY: check build-tests doc clean_doc fetch_version KappaBin.zip debug
+.PHONY: profiling Kappapp.app
+
+.PRECIOUS: $(SCRIPTSWITNESS)
+
+$(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
+	rm -rf $@
+	mkdir $@
 
 generated:
 	mkdir -p generated
@@ -95,6 +98,10 @@ $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
+ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*) generated
+	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
+	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
+
 %.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
@@ -107,12 +114,12 @@ site/external: site
 
 site/external/bootstrap-3.3.5-dist:
 	FILE=$$(mktemp -t bootstrapXXXX); \
-	curl -LsS -o $$FILE   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip && \
+	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip && \
 	unzip -d site/external $$FILE && rm $$FILE
 
 site/external/codemirror-5.20.2:
 	FILE=$$(mktemp -t codemirrorXXXX); \
-	curl -LsS -o $$FILE  http://codemirror.net/codemirror-5.20.2.zip &&\
+	curl -LsS -o $$FILE http://codemirror.net/codemirror-5.20.2.zip &&\
 	unzip -d site/external $$FILE && rm $$FILE
 
 site/external/d3:
@@ -250,7 +257,8 @@ all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE bin/KaSa_json
 clean_ide:
 	rm -f StdSim bin/StdSim
 	rm -rf ide/Kappa.iconset
-	rm -f ide/Kappa.icns
+	rm -f ide/Kappa.icns ide/Info.plist
+	rm -rf Kappapp.app
 
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
@@ -263,7 +271,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
-	rm -f KaDE bin/KaDE StdSim bin/StdSim
+	rm -f KaDE bin/KaDE
 	rm -rf KappaBin KappaBin.zip
 	rm -rf site generated
 	find . -name \*~ -delete
@@ -294,6 +302,22 @@ KappaBin.zip:
 	mv _build/webapp/StdSim.native KappaBin/bin/StdSim.exe
 	zip -r $@ KappaBin
 	rm -r KappaBin
+
+Kappapp.app:
+	+$(MAKE) clean
+	+$(MAKE) NO_CDN=1 site/index.html
+	+$(MAKE) all bin/StdSim
+	+$(MAKE) ide/Kappa.icns ide/Info.plist
+	FILE=$$(mktemp -t nwjsXXXX); \
+	curl -LsS -o $$FILE https://dl.nwjs.io/v0.19.0/nwjs-v$(NWJS_VERSION)-osx-x64.zip && \
+	unzip $$FILE ; rm -f $$FILE
+	mv nwjs-v$(NWJS_VERSION)-osx-x64/nwjs.app $@
+	rm -r nwjs-v$(NWJS_VERSION)-osx-x64/
+	rm -r $@/Contents/Resources/*.lproj/
+	mv bin $@/Contents/Resources/
+	mv site $@/Contents/Resources/app.nw
+	mv ide/Kappa.icns $@/Contents/Resources/
+	mv ide/Info.plist $@/Contents/
 
 full:
 	$(MAKE) clean

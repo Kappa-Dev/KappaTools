@@ -16,6 +16,7 @@ bin/
 _build/
 ._d/
 ._ncdi/
+Kappapp.app
 
 #js
 JaSim.byte

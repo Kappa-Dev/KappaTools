@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>org.executableknowledge.kappapp</string>
+	<key>CFBundleExecutable</key>
+	<string>nwjs</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.education</string>
+	<key>CFBundleName</key>
+	<string>Kappapp</string>
+	<key>CFBundleDisplayName</key>
+	<string>Kappapp</string>
+	<key>CFBundleVersion</key>
+	<string>$Format:%D$</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$Format:%D$</string>
+	<key>CFBundleGetInfoString</key>
+	<string>See http://www.kappalanguage.org/</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>2010-2016 CNRS - Harvard Medical School - INRIA - IRIF</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>NWJS</string>
+	<key>CFBundleIconFile</key>
+	<string>Kappa.icns</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Kappa File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>KAPPA</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ka</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Local file URL</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>file</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.9.0</string>
+	<key>NSUserNotificationAlertStyle</key>
+	<string>banner</string>
+</dict>
+</plist>
