@@ -184,9 +184,10 @@ effect:
     | TRACK non_empty_mixture boolean
 	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
     | FLUX nonempty_print_expr boolean
-	   {if $3 then Ast.FLUX (false,$2) else Ast.FLUXOFF $2}
+	   {if $3 then Ast.FLUX (true,$2) else Ast.FLUXOFF $2}
     | FLUX nonempty_print_expr STRING boolean
-	   {if $4 && $3 = "relative" then Ast.FLUX (true,$2)
+	   {if $4 && $3 = "absolute" then Ast.FLUX (false,$2)
+	   else if $4 && $3 = "relative" then Ast.FLUX (true,$2)
 	     else raise (ExceptionDefn.Syntax_Error
 	       ("Incorrect FLUX expression",rhs_pos 3))}
     | INTRO multiple_mixture

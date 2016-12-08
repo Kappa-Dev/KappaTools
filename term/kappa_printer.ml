@@ -117,7 +117,7 @@ let modification ?env f m =
   | Primitives.FLUX (relative,fn) ->
     Format.fprintf
       f "$FLUX %a %t[true]" (print_expr ?env) fn
-      (fun f -> if relative then Format.fprintf f "\"relative\" ")
+      (fun f -> if not relative then Format.fprintf f "\"absolute\" ")
   | Primitives.FLUXOFF fn ->
     Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
   | Primitives.CFLOW (_name,cc,_) ->
