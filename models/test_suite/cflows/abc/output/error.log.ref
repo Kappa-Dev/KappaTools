@@ -69,7 +69,7 @@ Environment:
     /*0*/%mod: [true] do $TRACK C(x1~u?, x2~u?) [true]
     /*1*/%mod: [true] do $TRACK C(x1~p?, x2~u?) [true]
     /*2*/%mod: [true] do $TRACK C(x1~p?, x2~p?) [true]
-    /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
+    /*3*/%mod: [true] do $FLUX "flux_map.dot" "absolute" [true]
     /*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false];
       $DEL 10000 0: C(x1~p?, x2~p?)
 Domain:

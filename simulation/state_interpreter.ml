@@ -234,17 +234,21 @@ let one_rule ~outputs dt stop env counter graph state =
                rule.Primitives.syntactic_rule syntax_rd_id
                (
                  let cand =
-                   if fl.Data.flux_normalized then (new_act -. old_act) /. old_act
-                  else (new_act -. old_act) in
+                   if fl.Data.flux_normalized &&
+                      (match classify_float old_act with
+                       | (FP_zero | FP_nan | FP_infinite) -> false
+                       | (FP_normal | FP_subnormal) -> true)
+                   then (new_act -. old_act) /. old_act
+                   else (new_act -. old_act) in
                  match classify_float cand with
-                | (FP_nan | FP_infinite) ->
-                  let () =
-                    let ct = Counter.current_time counter in
-                    ExceptionDefn.warning
-                      (fun f -> Format.fprintf
-                          f "An infinite (or NaN) activity variation has been ignored at t=%f"
-                          ct) in 0.
-                | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
+                 | (FP_nan | FP_infinite) ->
+                   let () =
+                     let ct = Counter.current_time counter in
+                     ExceptionDefn.warning
+                       (fun f -> Format.fprintf
+                           f "An infinite (or NaN) activity variation has been ignored at t=%f"
+                           ct) in 0.
+                 | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
           l
     in Random_tree.add rd_id new_act state.activities in
   let () =
