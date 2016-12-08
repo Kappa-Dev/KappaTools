@@ -635,7 +635,7 @@ struct
   let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
-    let parallel_map = get_double_bonds_lhs_pattern static in
+    let parallel_map = get_double_bonds_lhs_pattern static in (*FIXME*)
     let list =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings
         parallel_map
