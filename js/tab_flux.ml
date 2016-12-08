@@ -287,25 +287,9 @@ let onload (t : Ui_simulation.t) =
     Common.jquery_on
       (Format.sprintf "#%s" select_id)
       ("change")
-      (fun _ ->
-	 let () = select_fluxmap t flux in Js._true)
+      (fun _ -> let () = select_fluxmap t flux in Js._true)
   in
 
-  (* TODO
-  let select_dom : Dom_html.inputElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get
-          (Ui_common.document##getElementById
-             (Js.string select_id))
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
-
-  let () = select_dom##.onchange := Dom_html.handler
-        (fun _ ->
-           let () = select_fluxmap t flux
-           in Js._true)
-  in
-  *)
   let div : Dom_html.element Js.t =
     Js.Opt.get
       (Ui_common.document##getElementById

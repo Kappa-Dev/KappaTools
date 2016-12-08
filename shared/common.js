@@ -109,8 +109,13 @@ function spawnProcess(param){
 }
 
 function jqueryOn(selector,event,handler){
+    $(document.body).on(event,
+			selector,
+			function (e) { handler(e); });
+    /*
     $(selector).on(event, function (e) {
         handler(e); });
+*/
 }
 
 // http://stackoverflow.com/questions/22395357/how-to-compare-two-arrays-are-equal-using-javascript-or-jquery
