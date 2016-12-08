@@ -216,14 +216,14 @@ let update_flux_map
       ) >>=
       (Api_common.result_map
          ~ok:(fun _ (flux_map : Api_types_j.flux_map) ->
-             let flux_map = Api_data_v1.api_flux_map flux_map in
              let flux_data : Js_flux.flux_data Js.t =
-               Js_flux.create_data ~flux_begin_time:flux_map.Api_types_v1_j.flux_begin_time
-                 ~flux_end_time:flux_map.Api_types_v1_j.flux_end_time
-                 ~flux_rules:flux_map.Api_types_v1_j.flux_rules
-                 ~flux_hits:flux_map.Api_types_v1_j.flux_hits
-                 ~flux_fluxs:flux_map.Api_types_v1_j.flux_fluxs
-             in
+               Js_flux.create_data
+                 ~flux_begin_time:flux_map.Api_types_j.flux_data.Data.flux_start
+                 ~flux_end_time:flux_map.Api_types_j.flux_end
+                 ~normalized:flux_map.Api_types_j.flux_data.Data.flux_normalized
+                 ~flux_rules:flux_map.Api_types_j.flux_rules
+                 ~flux_hits:flux_map.Api_types_j.flux_data.Api_types_j.flux_hits
+                 ~flux_fluxs:flux_map.Data.flux_data.Data.flux_fluxs in
              let () = flux_js##setFlux(flux_data) in
             Lwt.return_unit)
         ~error:(fun _ errors  ->

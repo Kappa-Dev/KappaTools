@@ -53,6 +53,7 @@ type distances = distance list
 type flux_map =
   { flux_begin_time : float;
     flux_end_time : float;
+    flux_normalized : bool;
     flux_rules : string list;
     flux_hits : int list;
     flux_fluxs : float list list;

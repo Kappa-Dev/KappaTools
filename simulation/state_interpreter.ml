@@ -7,7 +7,7 @@ type t = {
   activities : Random_tree.tree;
   (* pair numbers are regular rule, odd unary instances *)
   variables_overwrite: Alg_expr.t option array;
-  mutable flux: (bool * Data.flux_data) list;
+  mutable flux: (Data.flux_data) list;
 }
 
 let get_alg env state i =
@@ -160,7 +160,8 @@ let do_modification ~outputs env counter graph state modification =
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =
       if List.exists
-          (fun (_,x) -> Fluxmap.flux_has_name file x) state.flux
+          (fun x -> Fluxmap.flux_has_name file x && x.Data.flux_normalized = rel)
+          state.flux
       then ExceptionDefn.warning
           (fun f ->
              Format.fprintf
@@ -169,15 +170,14 @@ let do_modification ~outputs env counter graph state modification =
                (Counter.current_event counter) file)
     in
     let () = state.flux <-
-        (rel,Fluxmap.create_flux env counter file)::state.flux in
+        Fluxmap.create_flux env counter rel file::state.flux in
     (false, graph, state)
   | Primitives.FLUXOFF s ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let (these,others) =
-      List.partition
-        (fun (_,x) -> Fluxmap.flux_has_name file x) state.flux in
+      List.partition (Fluxmap.flux_has_name file) state.flux in
     let () = List.iter
-        (fun (_,x) -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
+        (fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
         these in
     let () = state.flux <- others in
     (false, graph, state)
@@ -229,12 +229,12 @@ let one_rule ~outputs dt stop env counter graph state =
       | l ->
         let old_act = Random_tree.find rd_id state.activities in
         List.iter
-          (fun (relative,fl) ->
+          (fun fl ->
              Fluxmap.incr_flux_flux
                rule.Primitives.syntactic_rule syntax_rd_id
                (
                  let cand =
-                   if relative then (new_act -. old_act) /. old_act
+                   if fl.Data.flux_normalized then (new_act -. old_act) /. old_act
                   else (new_act -. old_act) in
                  match classify_float cand with
                 | (FP_nan | FP_infinite) ->
@@ -272,7 +272,7 @@ let one_rule ~outputs dt stop env counter graph state =
         ~get_alg register_new_activity env counter graph' in
     let () =
       List.iter
-        (fun (_,fl) -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
+        (fun fl -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
         state.flux in
     let () =
       if !Parameter.debugModeOn then
@@ -355,7 +355,7 @@ let a_loop ~outputs env counter graph state =
 let end_of_simulation ~outputs form env counter state =
   let () =
     List.iter
-      (fun (_,e) ->
+      (fun e ->
          let () =
            ExceptionDefn.warning
              (fun f ->

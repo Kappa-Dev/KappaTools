@@ -48,6 +48,7 @@ let api_file_line (file_line : Data.file_line) : Api_types_v1_j.file_line =
 let api_flux_map (flux_map : Data.flux_map) : Api_types_v1_j.flux_map =
   { Api_types_v1_j.flux_begin_time = flux_map.Data.flux_data.Data.flux_start;
     Api_types_v1_j.flux_end_time = flux_map.Data.flux_end ;
+    Api_types_v1_j.flux_normalized = flux_map.Data.flux_data.Data.flux_normalized ;
     Api_types_v1_j.flux_rules = Array.to_list flux_map.Data.flux_rules;
     Api_types_v1_j.flux_hits = Array.to_list flux_map.Data.flux_data.Data.flux_hits;
     Api_types_v1_j.flux_fluxs =
@@ -387,17 +388,6 @@ let api_distance (distance)  =
 let api_files (f : Api_types_j.file_line) : Api_types_v1_j.file_line =
   { Api_types_v1_j.file_name = f.Api_types_j.file_line_name ;
     Api_types_v1_j.line = f.Api_types_j.file_line_text ; }
-
-let api_flux_map (flux_map : Api_types_j.flux_map) : Api_types_v1_j.flux_map =
-  { Api_types_v1_j.flux_begin_time = flux_map.Api_types_j.flux_data.Data.flux_start;
-    Api_types_v1_j.flux_end_time = flux_map.Api_types_j.flux_end ;
-    Api_types_v1_j.flux_rules = Array.to_list flux_map.Api_types_j.flux_rules;
-    Api_types_v1_j.flux_hits = Array.to_list flux_map.Api_types_j.flux_data.Api_types_j.flux_hits;
-    Api_types_v1_j.flux_fluxs =
-      List.map
-        Array.to_list (Array.to_list flux_map.Data.flux_data.Data.flux_fluxs);
-    Api_types_v1_j.flux_name = flux_map.Data.flux_data.Data.flux_name
-  }
 
 let api_plot (p) =
   { Api_types_v1_j.legend = p.Api_types_j.plot_legend ;

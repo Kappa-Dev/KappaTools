@@ -43,6 +43,9 @@ let print_json_of_flux f flux =
   let () = Format.fprintf
       f "@[<v>{@ \"bioBeginTime\" : %e,@ \"bioEndTime\" : %e,@ "
       flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
+  let () = Format.fprintf
+      f "@[<v>{@ \"normalized\" : %b,@ "
+      flux.Data.flux_data.Data.flux_normalized in
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "

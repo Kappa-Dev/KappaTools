@@ -68,6 +68,7 @@ let create_configuration
 class type flux_data = object
   val bioBeginTime : float Js.t Js.prop
   val bioEndTime : float Js.t Js.prop
+  val normalized : bool Js.t Js.prop
   val rules : Js.js_string Js.js_array Js.t Js.prop
   val hits : int Js.js_array Js.t Js.prop
   val fluxs : int Js.js_array Js.js_array Js.t Js.prop
@@ -76,16 +77,18 @@ end
 let constructor_data : flux_data Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_data ~(flux_begin_time : float)
     ~(flux_end_time : float)
-    ~(flux_rules : string list)
-    ~(flux_hits: int list)
-    ~(flux_fluxs : float list list)
+    ~(normalized : bool)
+    ~(flux_rules : string array)
+    ~(flux_hits: int array)
+    ~(flux_fluxs : float array array)
   : flux_data Js.t  =
   let data : flux_data Js.t = new%js constructor_data in
   let () = (Js.Unsafe.coerce data)##.bioBeginTime := flux_begin_time;
     (Js.Unsafe.coerce data)##.bioEndTime := flux_end_time;
-    (Js.Unsafe.coerce data)##.rules := Js.array (Array.of_list (List.map Js.string flux_rules));
-    (Js.Unsafe.coerce data)##.hits := Js.array (Array.of_list flux_hits);
-    (Js.Unsafe.coerce data)##.fluxs := Js.array (Array.of_list (List.map (fun a -> Js.array (Array.of_list a)) flux_fluxs));
+    (Js.Unsafe.coerce data)##.normalized := normalized;
+    (Js.Unsafe.coerce data)##.rules := Js.array (Array.map Js.string flux_rules);
+    (Js.Unsafe.coerce data)##.hits := Js.array flux_hits;
+    (Js.Unsafe.coerce data)##.fluxs := Js.array (Array.map Js.array flux_fluxs);
     ()
   in
   data

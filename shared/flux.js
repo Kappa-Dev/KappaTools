@@ -5,6 +5,7 @@ function fluxMap(configuration) {
     this.configuration = configuration;
     this.selfInfluence = false;
     this.flux = { "bioBeginTime" : 0.0, "bioEndTime" : 0.0,
+		  "normalized" : true,
 		  "rules" : [],
 		  "hits" : [],
 		  "fluxs" : [] };
@@ -155,6 +156,13 @@ function fluxMap(configuration) {
         while (rulesCheckboxes.hasChildNodes()){
             rulesCheckboxes.removeChild(rulesCheckboxes.lastChild);
         };
+        var correction_select =
+	    document.getElementById(that.configuration.selectCorrectionId);
+	correction_select.value = "none";
+	if (that.flux.normalized)
+	    correction_select.style.visibility="hidden";
+	else
+	    correction_select.style.visibility="visible";
         that.selectedRules.forEach(function (val,id,a) {
             var group = document.createElement("div")
             group.setAttribute("class","input-group");
