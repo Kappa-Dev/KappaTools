@@ -193,9 +193,6 @@ let set_bonds_lhs bonds static =
     }
     static
 
-let get_bonds_lhs_pattern static =
-  (get_bdu_common_static static).Common_static.store_bonds_lhs_pattern
-
 let get_action_binding static =
   (get_bdu_common_static static).Common_static.store_action_binding
 
@@ -220,9 +217,6 @@ let set_views_rhs sites static =
 
 let get_views_lhs static =
   (get_bdu_common_static static).Common_static.store_views_lhs
-
-let get_views_lhs_pattern static =
-  (get_bdu_common_static static).Common_static.store_views_lhs_pattern
 
 let set_views_lhs sites static =
   set_bdu_common_static

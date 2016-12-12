@@ -1224,17 +1224,6 @@ let collect_bdu_test_restriction_map parameters handler_kappa
                     let error', agent_string =
                       Handler.string_of_agent parameters error handler_kappa agent_type
                     in
-                    (*let _ =
-                      Loggers.fprintf
-                        (Remanent_parameters.get_logger parameters)
-                        "T:%i:%i:%i:%s:%i\n"
-                        (Ckappa_sig.int_of_rule_id rule_id)
-                        (Ckappa_sig.int_of_agent_id agent_id)
-                        (Ckappa_sig.int_of_agent_name agent_type)
-                        agent_string
-                        (Covering_classes_type.int_of_cv_id cv_id)
-                    in*)
-
                     let error, store_result =
                       error, Covering_classes_type.AgentsRuleCV_setmap.Map.add
                         (agent_id, agent_type, rule_id, cv_id)

@@ -22,8 +22,6 @@ type local_static_information =
     store_rule_double_bonds_lhs :
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
         Ckappa_sig.Rule_map_and_set.Map.t ;
-    store_double_bonds_lhs_pattern :
-      (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t);
     (*rule has two bonds (parallel or not) on the rhs*)
     store_rule_double_bonds_rhs : (*use this*)
       (bool Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.t)
@@ -72,8 +70,6 @@ let init_local_static =
     store_fst_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_snd_site_create_parallel_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_rule_double_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_double_bonds_lhs_pattern =
-      Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.empty;
     store_tuple_to_sites =
       Parallel_bonds_type.PairAgentSite_map_and_set.Map.empty;
     store_sites_to_tuple =
@@ -275,22 +271,6 @@ let collect_rule_double_bonds_lhs
   in
   Ckappa_sig.Rule_map_and_set.Map.add
     parameters error rule_id map store_result
-
-(*TODO*)
-let collect_double_bonds_lhs_pattern
-    parameters error (pattern:Cckappa_sig.mixture) =
-  let error, store_result =
-    collect_double_bonds_in_pattern
-      parameters error
-      pattern
-  in
-  error ,store_result
-  (*Cckappa_sig.Mixture_map_and_set.Map.add_or_overwrite
-    parameters
-    error
-    pattern
-    map
-    store_result*)
 
 let collect_rule_double_bonds_rhs
     parameters error rule_id rule store_result  =

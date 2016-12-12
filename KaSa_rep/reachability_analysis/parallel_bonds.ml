@@ -176,20 +176,7 @@ struct
       }
       static
 
-  (*TODO*)
-  let get_double_bonds_lhs_pattern static =
-    (get_local_static_information
-       static).Parallel_bonds_static.store_double_bonds_lhs_pattern
-
-  let set_double_bonds_lhs_pattern bonds static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-        Parallel_bonds_static.store_double_bonds_lhs_pattern = bonds
-      }
-      static
-
-  (*map tuple to sites*)
+(*map tuple to sites*)
 
   let get_tuple_to_sites static =
     (get_local_static_information
@@ -288,13 +275,6 @@ struct
         parameters error rule_id rule store_result
     in
     let static = set_rule_double_bonds_rhs store_result static in
-    (*------------------------------------------------------*)
-    let error, store_result =
-      Parallel_bonds_static.collect_double_bonds_lhs_pattern
-        parameters error
-        rule.Cckappa_sig.rule_lhs
-    in
-    let static = set_double_bonds_lhs_pattern store_result static in
     error, static
 
 (****************************************************************)
@@ -630,12 +610,15 @@ struct
     else error, dynamic, None
 
   (***********************************************************)
-  (*TODO*)
 
   let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
-    let parallel_map = get_double_bonds_lhs_pattern static in (*FIXME*)
+    let error, parallel_map =
+      Parallel_bonds_static.collect_double_bonds_in_pattern
+        parameters error
+        pattern
+    in
     let list =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings
         parallel_map

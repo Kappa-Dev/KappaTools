@@ -1,5 +1,5 @@
-Kappa Static Analyzer () (without Tk interface)
-Analysis launched at 2016/12/12 15:47:02 (GMT+1) on mezcal
+Kappa Static Analyzer (DomainBased-2389-gd511228-dirty) (without Tk interface)
+Analysis launched at 2016/12/12 16:32:22 (GMT+1) on mezcal
 Parsing ../contact_map.ka...
 done
 Compiling...

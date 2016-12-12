@@ -29,10 +29,6 @@ type basic_static_information =
     store_potential_tuple_pair_lhs :
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    (*TODO*)
-    store_potential_tuple_pair_lhs_pattern :
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.t;
-    (**)
     store_potential_tuple_pair_rule_rhs :
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -83,8 +79,6 @@ let init_basic_static_information =
       Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty;
     store_potential_tuple_pair_lhs =
       Ckappa_sig.Rule_map_and_set.Map.empty;
-    store_potential_tuple_pair_lhs_pattern =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty;
     store_potential_tuple_pair_rule_rhs =
       Ckappa_sig.Rule_map_and_set.Map.empty;
     (*-------------------------------------------------------*)
@@ -292,74 +286,6 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
   (*add the set of tuple to rule_id map*)
     Ckappa_sig.Rule_map_and_set.Map.add
       parameters error rule_id pair_set store_result
-
-(***************************************************************)
-(*TODO*)
-
-let collect_potential_tuple_pair_lhs_pattern parameters error
-    pattern (*store_bonds_lhs*) bonds_lhs_set
-    (*store_views_lhs*) views_lhs_set store_result =
-  (*let error', bonds_lhs_set =
-    Common_static.get_set_pattern
-      parameters
-      error
-      pattern
-      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-      store_bonds_lhs
-  in*)
-  (*let error =
-    Exception.check_point
-      Exception.warn parameters error error'
-      __POS__ Exit
-  in
-  let error'', views_lhs_set =
-    Common_static.get_set_pattern parameters error
-      pattern
-      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-      store_views_lhs
-  in
-  let error =
-    Exception.check_point
-      Exception.warn parameters error error''
-      __POS__ Exit
-  in*)
-  let error, store_result =
-    Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
-      (fun (x, y) (error, store_result) ->
-         (*binding information*)
-         let error', fst_list =
-           collect_tuples error x views_lhs_set
-         in
-         let error =
-           Exception.check_point
-             Exception.warn parameters error error'
-             __POS__ Exit
-         in
-         let error'', snd_list =
-           collect_tuples error y views_lhs_set
-         in
-         let error =
-           Exception.check_point
-             Exception.warn parameters error error''
-             __POS__ Exit
-         in
-         let error, store_result =
-           store_set parameters error fst_list snd_list store_result
-         in
-         error, store_result
-      ) bonds_lhs_set (error, store_result)
-  in
-  error, store_result
-  (*let error =
-    Exception.check_point
-      Exception.warn parameters error error'
-      __POS__ Exit
-  in
-  Cckappa_sig.Mixture_map_and_set.Map.add_or_overwrite
-    parameters error
-    pattern
-    pair_set
-    store_result*)
 
 (***************************************************************)
 (*collect a map of rule that store a set of sites can created bonds*)

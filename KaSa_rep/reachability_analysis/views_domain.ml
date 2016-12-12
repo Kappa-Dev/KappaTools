@@ -2556,6 +2556,53 @@ struct
 
   (************************************************************************)
 
+  let common_map_res parameters error site_correspondence agent =
+    (*let agent_type = agent.Cckappa_sig.agent_name in*)
+    let error, get_pair_list =
+      List.fold_left
+        (fun (error, current_list) (cv_id, list, set) ->
+         (*--------------------------------------*)
+         (*new index for site type in covering class*)
+           let error, (map_new_index_forward, _) =
+             Bdu_static_views.new_index_pair_map
+               parameters error list
+           in
+         (*---------------------------------------*)
+           let error', map_res =
+             Ckappa_sig.Site_map_and_set.Map.fold_restriction
+               parameters error
+               (fun site port (error, store_result) ->
+                  let state =
+                    port.Cckappa_sig.site_state.Cckappa_sig.min
+                  in
+                  let error, site' =
+                    Ckappa_sig.Site_map_and_set.Map.find_default
+                      parameters
+                      error
+                      Ckappa_sig.dummy_site_name
+                      site map_new_index_forward
+                  in
+                  let error, map_res =
+                    Ckappa_sig.Site_map_and_set.Map.add
+                      parameters error
+                      site'
+                      state
+                      store_result
+                  in
+                  error, map_res
+               ) set agent.Cckappa_sig.agent_interface
+               Ckappa_sig.Site_map_and_set.Map.empty
+           in
+           let error =
+             Exception.check_point
+               Exception.warn parameters error error'
+               __POS__ Exit
+           in
+           error, (cv_id, map_res) :: current_list)
+        (error, []) site_correspondence
+    in
+    error, get_pair_list
+
   let build_bdu_test_pattern parameters error pattern
       site_correspondence dynamic
     =
@@ -2570,47 +2617,7 @@ struct
          | Cckappa_sig.Agent agent ->
            let agent_type = agent.Cckappa_sig.agent_name in
            let error, get_pair_list =
-             List.fold_left
-               (fun (error, current_list) (cv_id, list, set) ->
-                  (*--------------------------------------*)
-                  (*new index for site type in covering class*)
-                  let error, (map_new_index_forward, _) =
-                    Bdu_static_views.new_index_pair_map
-                      parameters error list
-                  in
-                  (*---------------------------------------*)
-                  let error', map_res =
-                    Ckappa_sig.Site_map_and_set.Map.fold_restriction
-                      parameters error
-                      (fun site port (error, store_result) ->
-                         let state =
-                           port.Cckappa_sig.site_state.Cckappa_sig.min
-                         in
-                         let error, site' =
-                           Ckappa_sig.Site_map_and_set.Map.find_default
-                             parameters
-                             error
-                             Ckappa_sig.dummy_site_name
-                             site map_new_index_forward
-                         in
-                         let error, map_res =
-                           Ckappa_sig.Site_map_and_set.Map.add
-                             parameters error
-                             site'
-                             state
-                             store_result
-                         in
-                         error, map_res
-                      ) set agent.Cckappa_sig.agent_interface
-                      Ckappa_sig.Site_map_and_set.Map.empty
-                  in
-                  let error =
-                    Exception.check_point
-                      Exception.warn parameters error error'
-                      __POS__ Exit
-                  in
-                  error, (cv_id, map_res) :: current_list)
-               (error, []) site_correspondence
+             common_map_res parameters error site_correspondence agent
            in
            (*build bdu_test*)
            let error, (dynamic, list) =
@@ -2863,6 +2870,13 @@ struct
                   | error, Some l -> error, l
                 in
                 let error, get_pair_list =
+                  common_map_res parameters error
+                    site_correspondence
+                    agent
+                in
+
+                (*
+                let error, get_pair_list =
                   List.fold_left
                     (fun (error, current_list) (cv_id, list, set) ->
                      (*----------------------------------------------------------*)
@@ -2901,7 +2915,7 @@ struct
                        in
                        error, (cv_id, map_res) :: current_list)
                     (error, []) site_correspondence
-                in
+                in*)
                 (*build bdu_test*)
                 let error, dynamic =
                   List.fold_left (fun (error, dynamic) (cv_id, map_res) ->
@@ -3092,7 +3106,7 @@ struct
                    let update_answer =
                      Usual_domains.glb_list new_answer former_answer
                    in
-                  error, dynamic, former_answer
+                  error, dynamic, update_answer
               in
               aux dynamic current_path
             in
@@ -3109,7 +3123,6 @@ struct
 
   let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
       precondition =
-    let parameters = get_parameter static in
     let error, (dynamic, precondition), maybe_reachable =
       maybe_reachable_aux static dynamic error
         pattern
@@ -4209,7 +4222,6 @@ struct
     error, dynamic, kasa_state
 
   let export static dynamic error kasa_state =
-    let parameters = get_parameter static in
     (*export of contact map*)
     let error, dynamic, kasa_state =
       export_contact_map static dynamic error kasa_state

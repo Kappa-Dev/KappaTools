@@ -47,8 +47,6 @@ type bdu_common_static =
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_lhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_bonds_lhs_pattern :
-      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t; (*TODO*)
     store_action_binding : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_views_rhs :
@@ -57,8 +55,6 @@ type bdu_common_static =
     store_views_lhs :
       Ckappa_sig.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_views_lhs_pattern :
-      Ckappa_sig.AgentsSiteState_map_and_set.Set.t;
     store_created_bonds :
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -100,13 +96,9 @@ let init_bdu_common_static =
         inite_potential_side_effects_per_rule;
       store_bonds_rhs = init_bonds_rhs;
       store_bonds_lhs = init_bonds_lhs;
-      store_bonds_lhs_pattern =
-        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty;
       store_action_binding = init_action_binding;
       store_views_rhs = init_views_rhs;
       store_views_lhs = init_views_lhs;
-      store_views_lhs_pattern =
-        Ckappa_sig.AgentsSiteState_map_and_set.Set.empty;
       store_created_bonds = init_created_bonds;
       store_modified_map = init_modified_map;
       store_project_modified_map = init_project_modified_map;
@@ -877,19 +869,7 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
 (***************************************************************************)
 (*TODO: pattern*)
 
-(*FIXME*)
-(*let get_set_pattern parameters error pattern empty_set store_result =
-  match
-    Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
-      parameters
-      error
-      pattern
-      store_result
-  with
-  | error, None -> error, empty_set
-  | error, Some s -> error, s*)
-
-let collect_bonds_pattern parameters error pattern views bonds store_result =
+let collect_bonds_pattern parameters error views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameters error
     (fun parameters error agent_id bonds_map store_result ->
@@ -935,19 +915,6 @@ let collect_bonds_pattern parameters error pattern views bonds store_result =
              agent_target
              site_type_target
          in
-         (*let error, old_set =
-           match
-             Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
-               parameters
-               error
-               pattern
-               store_result
-           with
-           | error, None ->
-             error,
-             Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-           | error, Some s -> error, s
-         in*)
          let error', new_set =
            Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
              parameters error
@@ -962,30 +929,9 @@ let collect_bonds_pattern parameters error pattern views bonds store_result =
               (agent_id, agent_type1, site_type_source, state1))
              new_set
          in
-         (*let error =
-           Exception.check_point
-             Exception.warn parameters error error' __POS__ Exit
-         in
-         let error, store_result =
-           Cckappa_sig.Mixture_map_and_set.Map.add_or_overwrite
-             parameters
-             error
-             pattern
-             new_set
-             store_result
-         in*)
          error, store_result
          ) bonds_map (error, store_result)
     ) bonds store_result
-
-let collect_bonds_lhs_pattern parameters error pattern store_result =
-  collect_bonds_pattern
-    parameters
-    error
-    pattern
-    pattern.Cckappa_sig.views
-    pattern.Cckappa_sig.bonds
-    store_result
 
 (***************************************************************************)
 (*action binding in the rhs*)
@@ -1145,8 +1091,7 @@ let collect_views_lhs parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     store_result
 
-(*TODO:FIXME*)
-let collect_views_pattern_aux parameter error pattern views store_result =
+let collect_views_pattern_aux parameter error views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
       error
@@ -1157,16 +1102,6 @@ let collect_views_pattern_aux parameter error pattern views store_result =
          | Cckappa_sig.Dead_agent (agent,_,_,_)
          | Cckappa_sig.Agent agent ->
            let agent_type = agent.Cckappa_sig.agent_name in
-           (*let error, old_set =
-             match
-               Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
-                 parameter error pattern store_result
-             with
-             | error, None ->
-               error,
-               Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-             | error, Some s -> error, s
-           in*)
            let error, store_result =
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type port (error, store_result) ->
@@ -1181,29 +1116,10 @@ let collect_views_pattern_aux parameter error pattern views store_result =
                ) agent.Cckappa_sig.agent_interface
                (error, store_result)
            in
-           (*let error =
-             Exception.check_point
-               Exception.warn parameter error error'
-               __POS__ Exit
-           in
-           let error, store_result =
-             Cckappa_sig.Mixture_map_and_set.Map.add_or_overwrite
-               parameter error
-               pattern
-               set
-               store_result
-           in*)
            error, store_result
       ) views store_result
   in
   error, store_result
-
-let collect_views_lhs_pattern parameter error pattern store_result =
-  collect_views_pattern_aux
-    parameter error
-    pattern
-    pattern.Cckappa_sig.views
-    store_result
 
 let collect_created_bonds parameter error rule rule_id store_result =
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
@@ -1438,15 +1354,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       store_result.store_bonds_lhs
   in
   (*------------------------------------------------------------------------*)
-  (*TODO*)
-  let error, store_bonds_lhs_pattern =
-    collect_bonds_lhs_pattern
-      parameter
-      error
-      rule.Cckappa_sig.rule_lhs
-      store_result.store_bonds_lhs_pattern
-  in
-  (*------------------------------------------------------------------------*)
   let error, store_action_binding =
     collect_action_binding
       parameter
@@ -1460,13 +1367,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   in
   let error, store_views_lhs =
     collect_views_lhs parameter error rule_id rule store_result.store_views_lhs
-  in
-  (*TODO*)
-  let error, store_views_lhs_pattern =
-    collect_views_lhs_pattern
-      parameter error
-      rule.Cckappa_sig.rule_lhs
-      store_result.store_views_lhs_pattern
   in
   let error, store_created_bonds =
     collect_created_bonds parameter error rule rule_id
@@ -1488,7 +1388,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_potential_side_effects = store_potential_side_effects;
    store_bonds_rhs = store_bonds_rhs;
    store_bonds_lhs = store_bonds_lhs;
-   store_bonds_lhs_pattern = store_bonds_lhs_pattern;
    store_action_binding = store_action_binding;
    store_views_rhs = store_views_rhs;
    store_views_lhs = store_views_lhs;

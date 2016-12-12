@@ -126,11 +126,6 @@ val get_bonds_lhs :
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t
 
-(*TODO*)
-val get_bonds_lhs_pattern :
-  global_static_information ->
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
-
 val set_bonds_lhs :
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t ->
@@ -161,10 +156,6 @@ val get_views_lhs :
   global_static_information ->
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t
-
-val get_views_lhs_pattern :
-  global_static_information ->
-  Ckappa_sig.AgentsSiteState_map_and_set.Set.t
 
 val set_views_lhs :
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t

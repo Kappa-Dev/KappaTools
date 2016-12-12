@@ -103,10 +103,6 @@ struct
 
   let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
 
-  (*TODO*)
-  let get_views_lhs_pattern static =
-    lift Analyzer_headers.get_views_lhs_pattern static
-
   let get_created_bonds static = lift Analyzer_headers.get_created_bonds static
 
   let get_modified_map static = lift Analyzer_headers.get_modified_map static
@@ -114,10 +110,6 @@ struct
   let get_bonds_rhs static = lift Analyzer_headers.get_bonds_rhs static
 
   let get_bonds_lhs static = lift Analyzer_headers.get_bonds_lhs static
-
-  (*TODO*)
-  let get_bonds_lhs_pattern static =
-    lift Analyzer_headers.get_bonds_lhs_pattern static
 
   let get_rule parameters error static r_id =
     let compil = get_compil static in
@@ -172,20 +164,6 @@ struct
       {
         (get_basic_static_information static) with
         Site_accross_bonds_domain_static.store_potential_tuple_pair_lhs = l
-      } static
-
-  (*TODO*)
-
-  let get_potential_tuple_pair_lhs_pattern static =
-    (get_basic_static_information
-       static).Site_accross_bonds_domain_static.store_potential_tuple_pair_lhs_pattern
-
-  let set_potential_tuple_pair_lhs_pattern l static =
-    set_basic_static_information
-      {
-        (get_basic_static_information static) with
-        Site_accross_bonds_domain_static.store_potential_tuple_pair_lhs_pattern
-        = l
       } static
 
   let get_potential_tuple_pair_rule_rhs static =
@@ -414,7 +392,7 @@ struct
     in
     (*------------------------------------------------------------*)
     (*TODO*)
-    let store_bonds_lhs_pattern = get_bonds_lhs_pattern static in
+    (*let store_bonds_lhs_pattern = get_bonds_lhs_pattern static in
     let store_views_lhs_pattern = get_views_lhs_pattern static in
     let store_potential_tuple_pair_lhs_pattern =
       get_potential_tuple_pair_lhs_pattern static in
@@ -430,7 +408,7 @@ struct
       set_potential_tuple_pair_lhs_pattern
         store_potential_tuple_pair_lhs_pattern
         static
-    in
+    in*)
     (*------------------------------------------------------------*)
     error, static
 
@@ -864,28 +842,47 @@ struct
     else error, dynamic, None
 
   (***********************************************************)
-  (*TODO*)
 
   let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
     let error, dynamic, bdu_false =
       get_mvbdu_false static dynamic error in
-    let tuple_set =
-      get_potential_tuple_pair_lhs_pattern static in
-    (*let error, tuple_set =
-      match
-        Cckappa_sig.Mixture_map_and_set.Map.find_option_without_logs
-          parameters
-          error
-          pattern
-          store_potential_tuple_pair_lhs_pattern
-      with
-      | error, None ->
-        error,
-        Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty
-      | error, Some s -> error, s
-    in*)
+    let error, bonds_lhs =
+      Common_static.collect_bonds_pattern
+        parameters
+        error
+        pattern.Cckappa_sig.views
+        pattern.Cckappa_sig.bonds
+        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
+    in
+    let error, views_lhs =
+      Common_static.collect_views_pattern_aux
+        parameters
+        error
+        pattern.Cckappa_sig.views
+        Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
+    in
+    let error, tuple_set =
+      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
+        (fun (x, y) (error, store_result) ->
+           let error, fst_list =
+             Site_accross_bonds_domain_static.collect_tuples error x views_lhs
+           in
+           let error, snd_list =
+             Site_accross_bonds_domain_static.collect_tuples error y views_lhs
+           in
+           let error, store_result =
+             Site_accross_bonds_domain_static.store_set
+               parameters error
+               fst_list snd_list
+               store_result
+           in
+           error, store_result
+        ) bonds_lhs
+        (error,
+         Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
+    in
     let list =
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements
         tuple_set
@@ -901,8 +898,7 @@ struct
     in
     if bool
     then error, dynamic, Some precondition
-    else
-      error, dynamic, None
+    else error, dynamic, None
 
   (****************************************************************)
 
