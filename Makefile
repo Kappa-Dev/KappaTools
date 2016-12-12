@@ -1,7 +1,6 @@
 .DEFAULT_GOAL := all
 
-NWJS_VERSION:=0.19.0
-CODEMIRROR_VERSION:=5.21.0
+include externals.mk
 
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
@@ -48,7 +47,7 @@ RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
 		$(wildcard js/*.css) js/favicon.ico js/package.json
 
 ifeq ($(NO_CDN),1)
-SITE_EXTRAS= site/external site/external/bootstrap-3.3.5-dist site/external/codemirror-5.20.2 site/external/d3 site/external/jquery
+SITE_EXTRAS= site/external site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist site/external/codemirror-$(CODEMIRROR_VERSION) site/external/d3 site/external/jquery
 INDEX_HTML=js/no-cdn.html
 else
 SITE_EXTRAS=
@@ -108,37 +107,34 @@ ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*) generated
 
 site: $(RESOURCES_HTML)
 	mkdir -p $@
-	cp $^ site
+	cp $^ $@
 
 site/external: site
 	mkdir -p $@
 
-site/external/bootstrap-3.3.5-dist:
+site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: externals.mk
 	FILE=$$(mktemp -t bootstrapXXXX); \
-	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip && \
-	unzip -d site/external $$FILE && rm $$FILE
+	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
+	rm -rf $@ && unzip -D -d $(dir $@) $$FILE && rm $$FILE
 
-site/external/codemirror-5.20.2:
+site/external/codemirror-$(CODEMIRROR_VERSION): externals.mk
 	FILE=$$(mktemp -t codemirrorXXXX); \
-	curl -LsS -o $$FILE http://codemirror.net/codemirror-5.20.2.zip &&\
-	unzip -d site/external $$FILE && rm $$FILE
+	curl -LsS -o $$FILE http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip &&\
+	rm -rf $@ && unzip -D -d $(dir $@) $$FILE && rm $$FILE
 
-site/external/d3:
+site/external/d3: externals.mk
 	mkdir -p $@
 	curl -LsS -o $@/d3.v4.min.js http://d3js.org/d3.v4.min.js
 
-site/external/jquery:
+site/external/jquery: externals.mk
 	mkdir -p $@
-	curl -LsS -o site/external/jquery/jquery.js https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js
+	curl -LsS -o site/external/jquery/jquery.js https://code.jquery.com/jquery-$(JQUERY_VERSION).min.js
 
 site/JsSim.js: JsSim.byte site
 	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
 	sed -i.bak 's/.process.argv.length>0/.process.argv.length>1/' site/JsSim.js
 
 site/WebWorker.js: WebWorker.byte site
-	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
-
-site/WebWorkerV1.js: WebWorkerV1.byte site
 	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
 
 ounit: TestJsSim TestWebSim
@@ -148,8 +144,8 @@ TestJsSim: TestJsSim.byte
 TestWebSim: TestWebSim.byte
 	./TestWebSim.byte -runner sequential
 
-site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js site/WebWorkerV1.js
-	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" > $@
+site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js
+	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
