@@ -72,56 +72,44 @@ let xml (_ : Ui_simulation.t) =
                 <textarea id="code-mirror"> </textarea>
              </div>|}]]
 
-let setup_lint () =
-  let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
-    let position p =
-      Codemirror.create_position
-        ~ch:p.Location.chr
-        ~line:(p.Location.line-1)
-    in
-    let hydrate (error  : Api_types_j.message) : lint Js.t option =
-      match error.Api_types_j.message_range with
-      | None -> None
-      | Some range ->
-        Some (Codemirror.create_lint
-                ~message:error.Api_types_j.message_text
-                (* This is a bit of a hack ... i am trying to keep
+let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
+  let position p =
+    new%js Codemirror.position (p.Location.line-1) (p.Location.chr) in
+  let hydrate (error  : Api_types_j.message) : lint Js.t option =
+    match error.Api_types_j.message_range with
+    | None -> None
+    | Some range ->
+      Some (Codemirror.create_lint
+              ~message:error.Api_types_j.message_text
+              (* This is a bit of a hack ... i am trying to keep
                    the code mirror code independent of the api code.
-                *)
-                ~severity:( match error.Api_types_j.message_severity with
-                    | `Error -> Codemirror.Error
-                    | `Warning -> Codemirror.Warning
-                    | `Info -> Codemirror.Warning
-                  )
-                ~from:(position range.Location.from_position)
-                ~to_:(position range.Location.to_position))
-    in
-    Js.array
-      (Array.of_list
-         (List.fold_left
-            (fun acc value ->
-               match hydrate value with
-               | None -> acc
-               | Some value -> value::acc)
-            []
-            errors
-         ))
-  in
-  let () =
-    Js.Unsafe.fun_call
-      (Js.Unsafe.js_expr "CodeMirror.registerHelper")
-      [| Js.Unsafe.inject (Js.string "lint") ;
-         Js.Unsafe.inject (Js.string "Kappa") ;
-         Js.Unsafe.inject (fun _ ->
-             match React.S.value Ui_state.model_error with
-             | None -> Js.array [||]
-             | Some e ->
-               let () =
-                 Common.debug (Js.string e.Ui_state.model_error_location) in
-               let e : Api_types_j.errors = e.Ui_state.model_error_messages in
-               error_lint e)
-      |] in
-  ()
+              *)
+              ~severity:( match error.Api_types_j.message_severity with
+                  | `Error -> Codemirror.Error
+                  | `Warning -> Codemirror.Warning
+                  | `Info -> Codemirror.Warning
+                )
+              ~from:(position range.Location.from_position)
+              ~to_:(position range.Location.to_position)) in
+  Js.array
+    (Array.of_list
+       (List.fold_left
+          (fun acc value ->
+             match hydrate value with
+             | None -> acc
+             | Some value -> value::acc)
+          []
+          errors))
+
+
+let setup_lint _ _ _ =
+  match React.S.value Ui_state.model_error with
+  | None -> Js.array [||]
+  | Some e ->
+    let () =
+      Common.debug (Js.string e.Ui_state.model_error_location) in
+    let e : Api_types_j.errors = e.Ui_state.model_error_messages in
+    error_lint e
 
 let initialize codemirror () =
   let args = Url.Current.arguments in
@@ -170,7 +158,11 @@ let initialize codemirror () =
     return_unit
 
 let onload (t : Ui_simulation.t) : unit =
-  let configuration : configuration Js.t = Codemirror.create_configuration () in
+  let lint_config =
+    Codemirror.create_lint_configuration () in
+  let () = lint_config##.getAnnotations := setup_lint in
+  let () = lint_config##.lintOnChange := Js._false in
+  let configuration = Codemirror.default_configuration in
   let gutter_options =
     Js.string "breakpoints,CodeMirror-lint-markers,CodeMirror-linenumbers" in
   let gutter_option : Js.string_array Js.t =
@@ -180,18 +172,20 @@ let onload (t : Ui_simulation.t) : unit =
     Js.Opt.get (document##getElementById (Js.string "code-mirror"))
       (fun () -> assert false) in
   let () =
-    (Js.Unsafe.coerce configuration)##.lineNumbers := Js._true;
-    (Js.Unsafe.coerce configuration)##.lineWrapping := Js._true;
-    (Js.Unsafe.coerce configuration)##.styleActiveLine := Js._true;
-    (Js.Unsafe.coerce configuration)##.autofocus := Js._true;
-    (Js.Unsafe.coerce configuration)##.gutters := gutter_option;
-    (Js.Unsafe.coerce configuration)##.lint := Js._true;
-    (Js.Unsafe.coerce configuration)##.mode := (Js.string "Kappa")
+    configuration##.lineNumbers := Js._true;
+    configuration##.lineWrapping := Js._true;
+    configuration##.styleActiveLine := Js._true;
+    configuration##.autofocus := Js._true;
+    configuration##.gutters := gutter_option;
+    configuration##.lint := lint_config;
+    configuration##.mode := (Js.string "Kappa")
   in
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea textarea configuration in
   let () = codemirror##setValue(Js.string "") in
-  let () = setup_lint () in
+  let _ =
+    React.S.map (fun _ -> codemirror##performLint)
+      Ui_state.model_error in
   let _ = Common.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
@@ -281,7 +275,7 @@ let onload (t : Ui_simulation.t) : unit =
          Lwt_js_events.changes
            file_select_dom
            (fun _ _ ->
-              if not !has_been_modified || confirm ()
+              if (not !has_been_modified) || confirm ()
               then file_select_handler ()
               else return_unit))
   in ()

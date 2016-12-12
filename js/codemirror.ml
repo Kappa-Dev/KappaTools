@@ -3,9 +3,6 @@
    http://toss.sourceforge.net/ocaml.html
    http://peppermint.jp/temp/ao/ao.ml
 *)
-open Js
-module Html5 = Tyxml_js.Html5
-
 let prototype = Js.Unsafe.js_expr "CodeMirror.prototype"
 let create_handler label =
   let head : char = Char.uppercase (String.get label 0) in
@@ -39,123 +36,40 @@ let () = List.iter create_handler
     ;"unhide";"update"
     ;"viewportChange";"change"
     ;"keydown"]
-class type lint_configuration =
-  object
-    val delay : int Js.t Js.prop
-    val async : bool Js.t Js.prop
-  end
-let constructor_lint_configuration : lint_configuration Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
-let create_lint_configuration () : lint_configuration Js.t  =
-  new%js constructor_lint_configuration
-
-class type configuration =
-  object
-    (* The starting value of the editor. *)
-    val value: Js.js_string Js.t Js.prop
-    (* The mode to use. *)
-    val mode : Js.js_string Js.t Js.prop
-    (* Explicitly set the line separator for the editor.  *)
-    val lineSeparator : Js.js_string Js.opt Js.t Js.prop
-    (* The theme to style the editor with. *)
-    val theme: Js.js_string Js.t Js.prop
-    (* How many spaces a block should be indented.  *)
-    val indentUnit: int Js.t Js.prop
-    (* Whether to use the context-sensitive indentation *)
-    val smartIndent: bool Js.t Js.prop
-    (* The width of a tab character. *)
-    val tabSize: int Js.t Js.prop
-    (* The first N*tabSize in indentation should N tabs. *)
-    val indentWithTabs: bool Js.t Js.prop
-    (* The editor should re-indent the current line. *)
-    val electricChars: bool Js.t Js.prop
-    (* A regular expression used to determine special placeholder. *)
-    val specialChars: Js.regExp Js.t Js.prop
-    (* A function identifies specialChars and produces a DOM node *)
-    val specialCharPlaceholder: (int -> Dom_html.element Js.t) Js.prop
-    (* Horizontal cursor movement through right-to-left. *)
-    val rtlMoveVisually: bool Js.t Js.prop
-    (* Configures the key map to use. *)
-    val keyMap: string Js.t Js.prop
-    (* specify extra key bindings for the editor *)
-    val extraKeys : 'a Js.prop
-    (* Scroll or wrap for long lines *)
-    val lineWrapping: bool Js.t Js.prop
-    (*  Show line numbers to the left of the editor *)
-    val lineNumbers : bool Js.t Js.prop
-    (* A function used to format line numbers. *)
-    val lineNumberFormatter: (int Js.t -> Js.js_string) Js.t Js.prop
-    (* Add extra gutters *)
-    val gutters : Js.string_array Js.t Js.prop
-    (* Gutter scrolls along with the content horizontally *)
-    val fixedGutter: bool Js.t Js.prop
-    (* Chooses a scrollbar implementation. *)
-    val scrollbarStyle: string Js.t Js.prop
-    (* cover gutter with with class CodeMirror-gutter-filler. *)
-    val coverGutterNextToScrollbar: bool Js.t Js.prop
-    (* Selects the way CodeMirror handles input and focus. *)
-    val inputStyle: string Js.t Js.prop
-    (* disable editing of the editor content *)
-    val readOnly: bool Js.t Js.prop
-    (* the cursor should be drawn when a selection is active. *)
-    val showCursorWhenSelecting: bool Js.t Js.prop
-    (* copy or cut when there is no selection will copy or cut whole lines *)
-    val lineWiseCopyCut: bool Js.t Js.prop
-    (* maximum number of undo *)
-    val undoDepth: int Js.t Js.prop
-    (* milliseconds of inactivity to create a new history event *)
-    val historyEventDelay: int Js.t Js.prop
-    (* tab index of editor *)
-    val tabindex: int Js.t Js.prop
-    (* CodeMirror focus itself on initialization *)
-    val autofocus: bool Js.t Js.prop
-    (* enable drag-and-drop *)
-    val dragDrop: bool Js.t Js.prop
-    (* when set files wit mime type can be dropped into the editor *)
-    val allowDropFileTypes: Js.string_array Js.opt Js.t Js.prop
-    (* Half-period in milliseconds used for cursor blinking. *)
-    val cursorBlinkRate: int Js.t Js.prop
-    (* How much extra space to always keep above and below the cursor *)
-    val cursorScrollMargin: int Js.t Js.prop
-    (* Determines the height of the cursor. *)
-    val cursorHeight: int Js.t Js.prop
-    (* the context menu is opened with a click outside of the
-       current selection, move cursor to the point of the click*)
-    val resetSelectionOnContextMenu: bool Js.t Js.prop
-    (* time to run highlighting thread *)
-    val workTime: int Js.t Js.prop
-    (* delay to run highlighting thread *)
-    val workDelay: int Js.t Js.prop
-    (* how often to poll for changes *)
-    val pollInterval: int Js.t Js.prop
-    (* combine tokens to a single span *)
-    val flattenSpans: bool Js.t Js.prop
-    (* prefix css *)
-    val addModeClass: bool Js.t Js.prop
-    (* length to highlight *)
-    val maxHighlightLength: bool Js.t Js.prop
-    (* amount of lines that are rendered above and below the
-       visible document*)
-    val viewportMargin: int Js.t Js.prop
-    val lint : lint_configuration Js.t Js.prop
-  end
-let constructor_configuration : configuration Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
-let create_configuration () : configuration Js.t  =
-  new%js constructor_configuration
 
 class type position =
   object
-    val ch : int Js.t Js.prop
-    val line : int Js.t Js.prop
+    method ch : int Js.t Js.readonly_prop
+    method line : int Js.t Js.readonly_prop
   end
 
-let constructor_position : position Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
-let create_position ~(ch : int) ~(line : int) : position Js.t  =
-  let result = new%js constructor_position in
-  let () = (Js.Unsafe.coerce result)##.ch := ch in
-  let () = (Js.Unsafe.coerce result)##.line := line in
+let position : (int -> int -> position Js.t) Js.constr =
+  (Js.Unsafe.js_expr "CodeMirror")##._Pos
+
+type severity = Error | Warning
+class type lint =
+  object
+    method message: Js.js_string Js.t Js.prop
+    method severity: Js.js_string Js.t Js.prop
+    method from : position Js.t Js.prop
+    method to_ : position Js.t Js.prop
+  end
+
+let constructor_lint : lint Js.t Js.constr = (Js.Unsafe.variable "Object")
+let create_lint ~(message : string)
+    ~(severity : severity)
+    ~(from : position Js.t)
+    ~(to_ :  position Js.t) : lint Js.t  =
+  let result = new%js constructor_lint in
+  let () = result##.message := Js.string message
+  in
+  let () = result##.severity :=
+      match severity with
+      | Error -> Js.string "error"
+      | Warning -> Js.string "warning"
+  in
+  let () = result##.from := from in
+  let () = result##.to_ := to_ in
   result
 
 class type change =
@@ -170,37 +84,10 @@ class type change =
 let constructor_change : change Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_change () : change Js.t  = new%js constructor_change
 
-type severity = Error | Warning
-class type lint =
-  object
-    val message: Js.js_string Js.t Js.prop
-    val severity: Js.js_string Js.t Js.prop
-    val from : position Js.t Js.prop
-    val to_ : position Js.t Js.prop
-  end
-
-let constructor_lint : lint Js.t Js.constr = (Js.Unsafe.variable "Object")
-let create_lint ~(message : string)
-    ~(severity : severity)
-    ~(from : position Js.t)
-    ~(to_ :  position Js.t) : lint Js.t  =
-  let result = new%js constructor_lint in
-  let () = (Js.Unsafe.coerce result)##.message :=
-      message
-  in
-  let () = (Js.Unsafe.coerce result)##.severity :=
-      match severity with
-      | Error -> Js.string "error"
-      | Warning -> Js.string "warning"
-  in
-  let () = (Js.Unsafe.coerce result)##.from := from in
-  let () = (Js.Unsafe.coerce result)##.to_ := to_ in
-  result
-
 class type codemirror =
   object
-    method getValue : Js.js_string Js.t meth
-    method setValue : Js.js_string Js.t -> unit meth
+    method getValue : Js.js_string Js.t Js.meth
+    method setValue : Js.js_string Js.t -> unit Js.meth
     method focus    : unit Js.t Js.meth
 
     method on :
@@ -376,7 +263,118 @@ class type codemirror =
       (unit ->
        unit) -> unit Js.meth
 
+    method performLint : unit Js.t Js.meth
   end;;
+
+class type lint_configuration =
+  object
+    method delay : int Js.t Js.prop
+    method async : bool Js.t Js.prop
+    method getAnnotations :
+      (Js.js_string -> lint_configuration Js.t -> codemirror Js.t -> lint Js.t Js.js_array Js.t) Js.writeonly_prop
+    method lintOnChange : bool Js.t Js.prop
+  end
+let constructor_lint_configuration : lint_configuration Js.t Js.constr =
+  (Js.Unsafe.variable "Object")
+let create_lint_configuration () : lint_configuration Js.t  =
+  new%js constructor_lint_configuration
+
+class type configuration =
+  object
+    (* The starting value of the editor. *)
+    method value: Js.js_string Js.t Js.prop
+    (* The mode to use. *)
+    method mode : Js.js_string Js.t Js.prop
+    (* Explicitly set the line separator for the editor.  *)
+    method lineSeparator : Js.js_string Js.opt Js.t Js.prop
+    (* The theme to style the editor with. *)
+    method theme: Js.js_string Js.t Js.prop
+    (* How many spaces a block should be indented.  *)
+    method indentUnit: int Js.t Js.prop
+    (* Whether to use the context-sensitive indentation *)
+    method smartIndent: bool Js.t Js.prop
+    (* The width of a tab character. *)
+    method tabSize: int Js.t Js.prop
+    (* The first N*tabSize in indentation should N tabs. *)
+    method indentWithTabs: bool Js.t Js.prop
+    (* The editor should re-indent the current line. *)
+    method electricChars: bool Js.t Js.prop
+    (* A regular expression used to determine special placeholder. *)
+    method specialChars: Js.regExp Js.t Js.prop
+    (* A function identifies specialChars and produces a DOM node *)
+    method specialCharPlaceholder: (int -> Dom_html.element Js.t) Js.prop
+    (* Horizontal cursor movement through right-to-left. *)
+    method rtlMoveVisually: bool Js.t Js.prop
+    (* Configures the key map to use. *)
+    method keyMap: string Js.t Js.prop
+    (* specify extra key bindings for the editor *)
+    method extraKeys : 'a Js.prop
+    (* Scroll or wrap for long lines *)
+    method lineWrapping: bool Js.t Js.prop
+    (*  Show line numbers to the left of the editor *)
+    method lineNumbers : bool Js.t Js.prop
+    (* A function used to format line numbers. *)
+    method lineNumberFormatter: (int Js.t -> Js.js_string) Js.t Js.prop
+    (* Add extra gutters *)
+    method gutters : Js.string_array Js.t Js.prop
+    (* Gutter scrolls along with the content horizontally *)
+    method fixedGutter: bool Js.t Js.prop
+    (* Chooses a scrollbar implementation. *)
+    method scrollbarStyle: string Js.t Js.prop
+    (* cover gutter with with class CodeMirror-gutter-filler. *)
+    method coverGutterNextToScrollbar: bool Js.t Js.prop
+    (* Selects the way CodeMirror handles input and focus. *)
+    method inputStyle: string Js.t Js.prop
+    (* disable editing of the editor content *)
+    method readOnly: bool Js.t Js.prop
+    (* the cursor should be drawn when a selection is active. *)
+    method showCursorWhenSelecting: bool Js.t Js.prop
+    (* copy or cut when there is no selection will copy or cut whole lines *)
+    method lineWiseCopyCut: bool Js.t Js.prop
+    (* maximum number of undo *)
+    method undoDepth: int Js.t Js.prop
+    (* milliseconds of inactivity to create a new history event *)
+    method historyEventDelay: int Js.t Js.prop
+    (* tab index of editor *)
+    method tabindex: int Js.t Js.prop
+    (* CodeMirror focus itself on initialization *)
+    method autofocus: bool Js.t Js.prop
+    (* enable drag-and-drop *)
+    method dragDrop: bool Js.t Js.prop
+    (* when set files wit mime type can be dropped into the editor *)
+    method allowDropFileTypes: Js.string_array Js.opt Js.t Js.prop
+    (* Half-period in milliseconds used for cursor blinking. *)
+    method cursorBlinkRate: int Js.t Js.prop
+    (* How much extra space to always keep above and below the cursor *)
+    method cursorScrollMargin: int Js.t Js.prop
+    (* Determines the height of the cursor. *)
+    method cursorHeight: int Js.t Js.prop
+    (* the context menu is opened with a click outside of the
+       current selection, move cursor to the point of the click*)
+    method resetSelectionOnContextMenu: bool Js.t Js.prop
+    (* time to run highlighting thread *)
+    method workTime: int Js.t Js.prop
+    (* delay to run highlighting thread *)
+    method workDelay: int Js.t Js.prop
+    (* how often to poll for changes *)
+    method pollInterval: int Js.t Js.prop
+    (* combine tokens to a single span *)
+    method flattenSpans: bool Js.t Js.prop
+    (* prefix css *)
+    method addModeClass: bool Js.t Js.prop
+    (* length to highlight *)
+    method maxHighlightLength: bool Js.t Js.prop
+    (* amount of lines that are rendered above and below the
+       visible document*)
+    method viewportMargin: int Js.t Js.prop
+
+    (* ADDON selection/active-line.js *)
+    method styleActiveLine: bool Js.t Js.prop
+    (* ADDON lint/lint.js *)
+    method lint : lint_configuration Js.t Js.prop
+  end
+let default_configuration : configuration Js.t  =
+  (Js.Unsafe.js_expr "CodeMirror")##.defaults
 
 let fromTextArea
     (dom : Dom_html.element Js.t)
