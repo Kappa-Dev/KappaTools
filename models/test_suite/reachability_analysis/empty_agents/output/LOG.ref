@@ -233,7 +233,6 @@ rule 4 will never be applied.
 ------------------------------------------------------------
 E cannot occur in the model
 F cannot occur in the model
-Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

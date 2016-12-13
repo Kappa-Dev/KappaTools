@@ -19,7 +19,6 @@ rule 3 will never be applied.
 ------------------------------------------------------------
 A cannot occur in the model
 B cannot occur in the model
-Contact map:
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -56,7 +55,6 @@ rule 3 will never be applied.
 ------------------------------------------------------------
 A cannot occur in the model
 B cannot occur in the model
-Contact map:
 
 ------------------------------------------------------------
 * Non relational properties:

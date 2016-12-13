@@ -603,7 +603,6 @@ rule 9 will never be applied.
 ------------------------------------------------------------
 D cannot occur in the model
 E cannot occur in the model
-Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

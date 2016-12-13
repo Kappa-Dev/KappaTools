@@ -170,7 +170,6 @@ rule 1: remove will never be applied.
 ------------------------------------------------------------
 A cannot occur in the model
 B cannot occur in the model
-Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

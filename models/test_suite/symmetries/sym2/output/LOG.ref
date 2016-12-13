@@ -826,11 +826,6 @@ EXTENSIONAL DESCRIPTION:
 every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
-Contact map:
-agent_type1:A:site_type1:x!:state1:A@x -> agent_type2:A:site_type2:x!:state2:A@x
-agent_type1:A:site_type1:x!:state1:A@y -> agent_type2:A:site_type2:y!:state2:A@x
-agent_type1:A:site_type1:y!:state1:A@x -> agent_type2:A:site_type2:x!:state2:A@y
-agent_type1:A:site_type1:y!:state1:A@y -> agent_type2:A:site_type2:y!:state2:A@y
 
 ------------------------------------------------------------
 * Fixpoint iteration :

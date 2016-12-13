@@ -155,7 +155,6 @@ rule 3: \0 will never be applied.
 * There are some non creatable agents 
 ------------------------------------------------------------
 A cannot occur in the model
-Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

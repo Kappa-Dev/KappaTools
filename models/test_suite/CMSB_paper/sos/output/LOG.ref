@@ -11,20 +11,6 @@ Reachability analysis...
 every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
-Contact map:
-agent_type1:EGF:site_type1:r!:state1:EGFR@L -> agent_type2:EGFR:site_type2:L!:state2:EGF@r
-agent_type1:EGFR:site_type1:L!:state1:EGF@r -> agent_type2:EGF:site_type2:r!:state2:EGFR@L
-agent_type1:EGFR:site_type1:CR!:state1:EGFR@CR -> agent_type2:EGFR:site_type2:CR!:state2:EGFR@CR
-agent_type1:EGFR:site_type1:Y1092!:state1:Grb2@SH2 -> agent_type2:Grb2:site_type2:SH2!:state2:EGFR@Y1092
-agent_type1:EGFR:site_type1:Y1172!:state1:Shc@PTB -> agent_type2:Shc:site_type2:PTB!:state2:EGFR@Y1172
-agent_type1:EGFR:site_type1:N!:state1:EGFR@C -> agent_type2:EGFR:site_type2:C!:state2:EGFR@N
-agent_type1:EGFR:site_type1:C!:state1:EGFR@N -> agent_type2:EGFR:site_type2:N!:state2:EGFR@C
-agent_type1:SoS:site_type1:PR!:state1:Grb2@SH3n -> agent_type2:Grb2:site_type2:SH3n!:state2:SoS@PR
-agent_type1:Shc:site_type1:Y!:state1:Grb2@SH2 -> agent_type2:Grb2:site_type2:SH2!:state2:Shc@Y
-agent_type1:Shc:site_type1:PTB!:state1:EGFR@Y1172 -> agent_type2:EGFR:site_type2:Y1172!:state2:Shc@PTB
-agent_type1:Grb2:site_type1:SH2!:state1:Shc@Y -> agent_type2:Shc:site_type2:Y!:state2:Grb2@SH2
-agent_type1:Grb2:site_type1:SH2!:state1:EGFR@Y1092 -> agent_type2:EGFR:site_type2:Y1092!:state2:Grb2@SH2
-agent_type1:Grb2:site_type1:SH3n!:state1:SoS@PR -> agent_type2:SoS:site_type2:PR!:state2:Grb2@SH3n
 
 ------------------------------------------------------------
 * Non relational properties:

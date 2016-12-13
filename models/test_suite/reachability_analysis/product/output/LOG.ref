@@ -938,9 +938,6 @@ rule 1: r1 will never be applied.
 rule 8: r7 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
-Contact map:
-agent_type1:A:site_type1:z!:state1:A@z -> agent_type2:A:site_type2:z!:state2:A@z
-agent_type1:A:site_type1:t!:state1:A@t -> agent_type2:A:site_type2:t!:state2:A@t
 
 ------------------------------------------------------------
 * Fixpoint iteration :
