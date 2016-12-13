@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Dec 13 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1221,6 +1221,9 @@ let collect_bdu_test_restriction_map parameters handler_kappa
                     let error, handler, bdu_test =
                       build_bdu parameters handler error pair_list
                     in
+                    (*  let error, agent_string =
+                      Handler.string_of_agent parameters error handler_kappa agent_type
+                        in*)
                     let error, store_result =
                       error, Covering_classes_type.AgentsRuleCV_setmap.Map.add
                         (agent_id, agent_type, rule_id, cv_id)
