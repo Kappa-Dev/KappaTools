@@ -745,7 +745,8 @@ let print_interpolate logger =
     let () =
       print_list logger
         [
-          "t = linspace(tinit, tend, period_t_point*(tend-tinit)+1);";
+          "n_points = floor ((tend-tinit)/period_t_point)+1;";
+          "t = linspace(tinit, tend, n_points);";
           "obs = zeros(nrows,nobs);";
           "";
           "for j=1:nrows";
@@ -799,7 +800,7 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
       print_list logger
         [
           "fprintf(fid,'\\n')";
-          "for j=1:period_t_point*(tend-tinit)+1";
+          "for j=1:n_points";
           "    fprintf(fid,'%f',t(j));";
           "    for i=1:nobs";
           "        fprintf(fid,' %f',y(j,i));";
