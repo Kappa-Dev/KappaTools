@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Dec 13 2016>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1376,12 +1376,12 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                       ext_list
                   in
                   let transition_system = empty_transition_system file_name agent_string agent_type in
-                  let file_name =
-                    file_name^(Remanent_parameters.ext_format
-                                 (Remanent_parameters.get_local_trace_format
-                                    parameters))
+                  let fic = 
+                    Remanent_parameters.open_out file_name
+                      (Remanent_parameters.ext_format
+                         (Remanent_parameters.get_local_trace_format
+                            parameters))
                   in
-                  let fic = Remanent_parameters.open_out file_name in
                   let error', init_list =
                     Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
                       parameters error [] agent_type init
