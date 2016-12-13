@@ -30,7 +30,9 @@ digraph G{
 "4:A(x~p?)->A(x~u?)" -> "6:A(x~u!_)->A(x~p)" [label="[0->0]" color="green"];
 "4:A(x~p?)->A(x~u?)" -> "7:A(x~u!_)->A(x~p)" [label="[0->0]" color="green"];
 "5:A(x~u?)->A(x~p?)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
+"6:A(x~u!_)->A(x~p)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->0]" color="green"];
 "6:A(x~u!_)->A(x~p)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
+"7:A(x~u!_)->A(x~p)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->0]" color="green"];
 "7:A(x~u!_)->A(x~p)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
 "8:D(x)->A(x~u)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->0]" color="green"];
 "8:D(x)->A(x~u)" -> "3:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];

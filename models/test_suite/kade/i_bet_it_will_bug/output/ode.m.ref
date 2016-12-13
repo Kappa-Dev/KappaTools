@@ -76,7 +76,8 @@ end
 nrows = length(soln.x);
 tmp = zeros(nodevar,1);
 
-t = linspace(tinit, tend, period_t_point*(tend-tinit)+1);
+n_points = floor ((tend-tinit)/period_t_point)+1;
+t = linspace(tinit, tend, n_points);
 obs = zeros(nrows,nobs);
 
 for j=1:nrows
@@ -100,7 +101,7 @@ fid = fopen (filename,'w');
 fprintf(fid,'# KaDE bet.ka -d output -l 1 -p 0.01\n')
 fprintf(fid,'# t')
 fprintf(fid,'\n')
-for j=1:period_t_point*(tend-tinit)+1
+for j=1:n_points
     fprintf(fid,'%f',t(j));
     for i=1:nobs
         fprintf(fid,' %f',y(j,i));
