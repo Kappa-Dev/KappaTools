@@ -213,26 +213,20 @@ let options =
       "Default repository for outputs",
       ["1_Output"],
       Normal;
+
+      (* CONTACT MAP *)
       "--output-contact-map-directory",
       String Config.output_cm_directory,
       "put the contact map file in this directory",
       ["1_Output";"4_Contact_map"],
       Normal;
-      "--output-influence-map-directory",
-      String Config.output_im_directory,
-      "put the influence map file in this directory",
-      ["1_Output";"5_Influence_map"],
+
+      "--output-contact-map",
+      String Config.contact_map_file,
+      "file name for the contact map output",
+      ["1_Output";"4_Contact_map"],
       Normal;
-      "--output-local-traces-directory",
-      String Config.output_local_trace_directory,
-      "put the files about local traces in this directory",
-      ["1_Output";"3_Trace_analysis"],
-      Normal;
-      "--output-log-directory",
-      String Config.output_directory,
-      "put the log files in this directory",
-      ["1_Output";"7_Debugging_info"],
-      Expert;
+
       "--contact-map-format",
       (Choice (["DOT","dot format";
                 (*"HTML","HTML format"*)],
@@ -240,25 +234,7 @@ let options =
       "Tune the output format for the contact map",
       ["1_Output";"4_Contact_map"],
       Expert;
-      "--influence-map-format",
-      (Choice ([
-           "DOT","dot format";
-           "HTML","HTML format"
-         ],
-           Config.influence_map_format)),
-      "Tune the output format for the influence map",
-      ["1_Output";"5_Influence_map"],
-      Normal;
-      "--local-traces-format",
-      (Choice (
-          [
-            "DOT","dot format";
-            "HTML","HTML format"
-          ],
-          Config.local_trace_format)),
-      "Tune the output format for the local transition systems",
-      ["1_Output";"3_Trace_analysis"],
-      Normal;
+
       "--contact-map-accuracy-level",
       (Choice
          (["Low","Collect info from rhs of rules and initial state";
@@ -275,10 +251,13 @@ let options =
       ["4_Contact_map"],
       Expert;
 
-      "--output-contact-map",
-      String Config.contact_map_file,
-      "file name for the contact map output",
-      ["1_Output";"4_Contact_map"],
+
+
+      (* INFLUENCE MAP *)
+      "--output-influence-map-directory",
+      String Config.output_im_directory,
+      "put the influence map file in this directory",
+      ["1_Output";"5_Influence_map"],
       Normal;
 
       "--output-influence-map",
@@ -286,6 +265,48 @@ let options =
       "file name for the influence map",
       ["1_Output";"5_Influence_map"],
       Normal;
+
+      "--influence-map-format",
+      (Choice ([
+           "DOT","dot format";
+           "HTML","HTML format"
+         ],
+           Config.influence_map_format)),
+      "Tune the output format for the influence map",
+      ["1_Output";"5_Influence_map"],
+      Normal;
+
+
+
+      (* LOCAL TRACES *)
+      "--output-local-traces-directory",
+      String Config.output_local_trace_directory,
+      "put the files about local traces in this directory",
+      ["1_Output";"3_Trace_analysis"],
+      Normal;
+
+      "--local-traces-format",
+      (Choice (
+          [
+            "DOT","dot format";
+            "HTML","HTML format"
+          ],
+          Config.local_trace_format)),
+      "Tune the output format for the local transition systems",
+      ["1_Output";"3_Trace_analysis"],
+      Normal;
+
+      (* LOG *)
+      "--output-log-directory",
+      String Config.output_directory,
+      "put the log files in this directory",
+      ["1_Output";"7_Debugging_info"],
+      Expert;
+
+
+
+
+
 
       "--debugging-mode",
       Bool Config.trace,

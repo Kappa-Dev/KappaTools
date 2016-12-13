@@ -1234,15 +1234,19 @@ The sub-tab \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main ac
 \end{figure}
 
 
-The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files.
+The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
 
 \begin{itemize}
 \item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
 \item The field \texttt{--output-contact-map-directory} can be used to set the reporitory where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{--output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
 \item The field \texttt{--output-influence-map-directory} can be used to set the reporitory where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{--output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
+\item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--influence-map-format}.
 \item The field \texttt{--output-local-traces-directory} can be used to set the reporitory where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
-\item The field \texttt{--output-contact-map} contains the name of the file for the contact map.
-\item The field \texttt{--output-influence-map} contains the name of the file for the influence map.
+\item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--local-traces-format}.
+
+
 \end{itemize}
 
 When a file already exists, it is overwritten without any warning.
@@ -1257,12 +1261,14 @@ When a file already exists, it is overwritten without any warning.
 \end{figure}
 
 Reachability analysis aimed at detecting statically properties about the bio-molecular species that can be formed in a model.
-Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret-SASB2016}, the abstraction consists in:
+Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret:SASB2016}, the abstraction consists in:
 \begin{enumerate}
 \item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary),
 \item secondly, abstracting a bio-molecular species by the set of its properties.
 \end{enumerate}
-The classes of properties of interest are encoded in so called abstract domains, which can be independently enabled/disabled. The whole analysis can be understood as a mutual recursion between smaller analyses (one per abstract domain), that communicates information between each other at each step of the analysis. We took the same scheme of collaboration between abstract domains as in  \cite{Cousot-ASIAN2006}.
+The analysis takes into account also the chemical species that may be introduced in a perturbation.
+
+The classes of properties of interest are encoded in so called abstract domains, which can be independently enabled/disabled. The whole analysis can be understood as a mutual recursion between smaller analyses (one per abstract domain), that communicates information between each other at each step of the analysis. We took the same scheme of collaboration between abstract domains as in  \cite{CousotEtAl06-ASIAN}.
 % local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
 %\end{enumerate}
 
@@ -1529,7 +1535,7 @@ Typing the following instruction:
 \texttt{KaSa abc.ka --reset-all --compute-contact-map}
 
 will produce a dot format file named \texttt{contact.dot}.
-The name of the output file and the directory can be changed to the command line options \texttt{--output-contact-map} and \texttt{--output-directory}.
+The name of the output file and the directory can be changed thanks to the command line options \texttt{--output-contact-map} and \texttt{--output-directory}.
 The directory is assumed to exist. The file will be overwritten if it exists. All the options related to the computation of the contact map can be accessed on the
 sub-tab \texttt{4\_Contact\_map} of the graphical interface (see Fig.~\ref{fig:kasa:4}).
 
@@ -1560,8 +1566,8 @@ Typing the following instruction:
 \texttt{KaSa abc.ka --reset-all --compute-influence-map}
 
 will produce a dot format file named \texttt{influence.dot}.
-The name of the output file and the directory can be changed to the command line options \texttt{--output-influence-map} and \texttt{--output-directory}.
-The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{4\_Influence\_map} of the graphical interface (see Fig.~\ref{fig:kasa:4}).
+The name of the output file and the directory can be changed thanks to the command line options \texttt{--output-influence-map} and \texttt{--output-directory}.
+The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{5\_Influence\_map} of the graphical interface (see Fig.~\ref{fig:kasa:4}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{--influence-map-format}.
 
 \begin{figure}[htbp]
 \centering
@@ -1570,7 +1576,7 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 \label{fig:kasa:4}
 \end{figure}
 
-Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise it is made of a unique identifier allocated by \KaSa~followed by the kappa definition of the rule/observable.
+Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor the quantities in initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise it is made of a unique identifier allocated by \KaSa~followed by the kappa definition of the rule/observable.
 Edges are decorated with the list of embeddings (separated by a semi-colon) allowing the identification of agents in both rules{\textquotesingle}s right hand sides/left hand sides.
 More precisely, for positive influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s right hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side; for negative influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s left hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side;
  Observables have no influence, but they can be influenced by rules, if the rule can increase or decrease their value.
@@ -1607,6 +1613,74 @@ The current implementation has the following limitations:
 
 Lastly, KaSa\ computes an over-approximation of the influence map. They may show an influence despite the fact that there can be no actual one. But if it shows no influence it means that either there are NO such influence, or that we are in a case that is not covered yet as itemised previously.
 
+Three levels of precision are available: \texttt{Low}, \texttt{Medium}, and
+\texttt{High}. The level of precision can be changed thanks to the command line option \texttt{--influence-map-accuracy-level}.
+
+At low precision, an influence is detected if one rule change at least one bit of information (the internal state of a site, the binding state of a site), in favor/defavor of the application another rule. This abstraction level ignore completely the context of application of rules, and just focuses on modifications.
+
+At medium precision, the analysis checks that both rules have a common context.
+
+At high precision, the analysis checks that such common context is realizable taking into account the species that have been declared as initial states
+and the potential species introduction in perturbations. High resolution influence is parameterized by the accuracy of the reachability analysis.
+It may happen that a given context is infeasible, but that this is not detected by the analysis.
+
+Let us illustrate these three levels of accuracy by a case study.
+
+We consider the following model.
+\begin{lstlisting}[language=kappa]
+  %agent: A(w~u~p,x~u~p,y~u~p,z~u~p)
+
+  A(x~u) -> A(x~p) @1
+  A(x~p,y~u) -> A(x~p,y~p) @1
+  A(y~p,z~u) -> A(y~p,z~p) @1
+  A(x~u,z~p,w~u) -> A(x~u,z~p,w~p) @1
+  A(x~u,z~u) -> A(x~u,z~p) @1
+  A(x~p,w~p) -> A(x~p,w~u) @1
+
+  %init: 10 A()
+\end{lstlisting}
+
+The low resolution influence map is given in Fig.~\ref{fig:low-res}.
+There is a positive arc (in green) from a rule to another one whenever the application of the former pushes at least one bit of information towards the application of the later; whereas there is a negative arc (in red) from a rule to another one whenever the former pulls at least one bit of information away from the application of the later.
+
+The medium resolution influence map is given in Fig.~\ref{fig:medium-res}.
+Every arc corresponding to incompatible contexts have been removed.
+In our example, these are the arcs from the rule $3$ and the rule $5$ (in both direction). Despite the fact that the rule $3$ may phosphorylate the site \texttt{w} which is required to apply the rule $5$, no instance of the rule $5$ may be applied thanks to the application of the rule $3$ right after, because after the application of the rule $3$ the state of the site $x$ is necessarily unphosphorylated, whereas it has to be phosphorylated for the rule $5$ to be applied. The same kind of explanation holds to remove the arc from the rule $5$ to the rule $3$.
+
+There are some structural invariants in these models. We give in Fig.~\ref{fig:reachability_influence} the log of the computation of the high resolution contact map. It turns out that whenever the site \texttt{y} of an agent is phosphorylated, then the site \texttt{x} of this protein is phosphorylated as well. Thus we can deduce that the positive arc from the rules $2$ and $3$, and the negative arcs from the rules $2$ and $4$ (in both direction) are false positive unless we change the set of the species in the initial state or in the perturbations. Thus we obtain the high resolution influence map given in Fig.~\ref{fig:high-res}.
+
+
+
+
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=10cm]{generated_img/inf_map_low_res.png}
+\caption{Low resolution influence map}
+\label{fig:low-res}
+\end{center}
+\end{figure}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=10cm]{generated_img/inf_map_medium_res.png}
+\caption{Medium resolution influence map}
+\label{fig:medium-res}
+\end{center}
+\end{figure}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=10cm]{generated_img/inf_map_high_res.png}
+\caption{High resolution influence map}
+\label{fig:high-res}
+\end{center}
+\end{figure}
+
+\begin{figure}[t]
+\input{generated_img/LOG_influence_reachability.txt}
+\caption{Log of the reachability analysis.}
+\label{fig:reachability_influence}
+\end{figure}
+
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
 If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-l} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}.
@@ -1624,8 +1698,8 @@ Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kap
 The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}.
 \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
 
-\section*{The computed influence map is incorrect, it misses some activation or has too much of them}
-The influence map\index{influence map} computed by \KaSim~contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible with a given model, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. This context might simply never be realized with the given rules or initial conditions.
+%\section*{The computed influence map is incorrect, it misses some activation or has too much of them}
+%The influence map\index{influence map} computed by \KaSim~contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible with a given model, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. This context might simply never be realized with the given rules or initial conditions.
 
 \section*{Value \ttt{nan} in the data file\index{data file} at the end of the simulation}
 The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.

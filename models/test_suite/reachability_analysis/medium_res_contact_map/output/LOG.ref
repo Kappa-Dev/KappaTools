@@ -1,5 +1,13 @@
+<<<<<<< 26ea021b86c143b5cd425de42c0236570c02317f
 Kappa Static Analyzer (DomainBased-2394-gf07d88b-dirty) (without Tk interface)
 Analysis launched at 2016/12/13 13:28:21 (GMT+1) on mezcal
+=======
+<<<<<<< a2e2ae5deff6e999d15039112fe3ca5d8449e697
+Kappa Static Analyzer (DomainBased-2393-gd69ddb6-dirty) (without Tk interface)
+Analysis launched at 2016/12/13 13:19:55 (GMT+1) on mezcal
+=======
+>>>>>>> Manual: high res influence map.
+>>>>>>> Manual: high res influence map.
 Parsing ../contact_map.ka...
 done
 Compiling...

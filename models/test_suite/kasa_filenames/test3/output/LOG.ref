@@ -1,47 +1,46 @@
-<<<<<<< 26ea021b86c143b5cd425de42c0236570c02317f
-Kappa Static Analyzer (DomainBased-2394-gf07d88b-dirty) (without Tk interface)
-Analysis launched at 2016/12/13 13:28:21 (GMT+1) on mezcal
-=======
-<<<<<<< a2e2ae5deff6e999d15039112fe3ca5d8449e697
-Kappa Static Analyzer (DomainBased-2393-gd69ddb6-dirty) (without Tk interface)
-Analysis launched at 2016/12/13 13:19:55 (GMT+1) on mezcal
-=======
->>>>>>> Manual: high res influence map.
->>>>>>> Manual: high res influence map.
-Parsing ../contact_map.ka...
+Parsing ../../cflows/abc/abc.ka...
 done
 Compiling...
 Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule 2: r2 will never be applied.
-rule 3: r3 will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-C cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-A() => [ A(z~u?) v A(z~p?) ]
-A() => [ A(y~u?) v A(y~p?) ]
-A() => A(z)
-A() => A(y)
+A() => [ A(c) v A(c!C.x1) v A(c!C.x2) ]
+A() => [ A(x) v A(x!B.x) ]
+B() => [ B(x) v B(x!A.x) ]
+C() => [ C(x2~u?) v C(x2~p?) ]
+C() => [ C(x1) v C(x1!A.c) ]
+C() => [ C(x2) v C(x2!A.c) ]
+C() => [ C(x1~u?) v C(x1~p?) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-A(y~p?) <=> A(z~p?)
+C() =>
+   [
+	  C(x1~p,x2~u)
+	v C(x1~p,x2~u!A.c)
+	v C(x1~p,x2~p)
+	v C(x1~u!A.c,x2~u)
+	v C(x1~u,x2~u)
+   ]
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
+A(c!1),C(x2!1) => 
+	[
+		  A(c!1,x!B.x),C(x1,x2!1)
+		v A(c!1,x!B.x),C(x1!A.c,x2!1)
+		v A(c!1,x),C(x1,x2!1)
+	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
