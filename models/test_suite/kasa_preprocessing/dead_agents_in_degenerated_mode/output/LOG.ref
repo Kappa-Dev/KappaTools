@@ -611,16 +611,8 @@ rule 9 will never be applied.
 ------------------------------------------------------------
 * There are some non creatable agents 
 ------------------------------------------------------------
-<<<<<<< ded9cca02ffd61786bf750176c96053c4c6b8407
-every agent may occur in the model
-<<<<<<< 92f44a6d873d3d7699615f081bad577da3bbceb4
-=======
-Contact map:
-=======
 D cannot occur in the model
 E cannot occur in the model
->>>>>>> Test suite. @
->>>>>>> Test suite. @
 
 ------------------------------------------------------------
 * Fixpoint iteration :
