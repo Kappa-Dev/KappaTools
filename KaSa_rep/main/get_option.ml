@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Dec 06 2016>
+  * Last modification: Time-stamp: <Dec 13 2016>
   * *
   * primitive to parse command-line options
   *
@@ -248,7 +248,7 @@ let options =
            Config.influence_map_format)),
       "Tune the output format for the influence map",
       ["1_Output";"5_Influence_map"],
-      Expert;
+      Normal;
       "--local-traces-format",
       (Choice (
           [
