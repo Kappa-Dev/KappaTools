@@ -240,6 +240,7 @@ rule 2: r2 will never be applied.
 ------------------------------------------------------------
 A cannot occur in the model
 B cannot occur in the model
+Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

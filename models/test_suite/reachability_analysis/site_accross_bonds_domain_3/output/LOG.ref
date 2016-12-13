@@ -1271,6 +1271,31 @@ EXTENSIONAL DESCRIPTION:
 every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
+Contact map:
+agent_type1:A:site_type1:z!:state1:free -> agent_type2:A:site_type2:z!:state2:D@x
+agent_type1:A:site_type1:z!:state1:free -> agent_type2:E:site_type2:z!:state2:G@x
+agent_type1:A:site_type1:z!:state1:C@x -> agent_type2:C:site_type2:x!:state2:A@z
+agent_type1:A:site_type1:z!:state1:D@x -> agent_type2:A:site_type2:z!:state2:free
+agent_type1:A:site_type1:z!:state1:D@x -> agent_type2:D:site_type2:x!:state2:A@z
+agent_type1:A:site_type1:t!:state1:B@t -> agent_type2:B:site_type2:t!:state2:A@t
+agent_type1:B:site_type1:t!:state1:A@t -> agent_type2:A:site_type2:t!:state2:B@t
+agent_type1:B:site_type1:z!:state1:C@x -> agent_type2:C:site_type2:x!:state2:B@z
+agent_type1:B:site_type1:z!:state1:D@x -> agent_type2:D:site_type2:x!:state2:B@z
+agent_type1:E:site_type1:z!:state1:C@x -> agent_type2:C:site_type2:x!:state2:E@z
+agent_type1:E:site_type1:z!:state1:G@x -> agent_type2:A:site_type2:z!:state2:free
+agent_type1:E:site_type1:z!:state1:G@x -> agent_type2:G:site_type2:x!:state2:E@z
+agent_type1:E:site_type1:t!:state1:F@t -> agent_type2:F:site_type2:t!:state2:E@t
+agent_type1:F:site_type1:t!:state1:E@t -> agent_type2:E:site_type2:t!:state2:F@t
+agent_type1:F:site_type1:z!:state1:D@x -> agent_type2:D:site_type2:x!:state2:F@z
+agent_type1:F:site_type1:z!:state1:H@x -> agent_type2:H:site_type2:x!:state2:F@z
+agent_type1:C:site_type1:x!:state1:A@z -> agent_type2:A:site_type2:z!:state2:C@x
+agent_type1:C:site_type1:x!:state1:B@z -> agent_type2:B:site_type2:z!:state2:C@x
+agent_type1:C:site_type1:x!:state1:E@z -> agent_type2:E:site_type2:z!:state2:C@x
+agent_type1:D:site_type1:x!:state1:A@z -> agent_type2:A:site_type2:z!:state2:D@x
+agent_type1:D:site_type1:x!:state1:B@z -> agent_type2:B:site_type2:z!:state2:D@x
+agent_type1:D:site_type1:x!:state1:F@z -> agent_type2:F:site_type2:z!:state2:D@x
+agent_type1:G:site_type1:x!:state1:E@z -> agent_type2:E:site_type2:z!:state2:G@x
+agent_type1:H:site_type1:x!:state1:F@z -> agent_type2:F:site_type2:z!:state2:H@x
 
 ------------------------------------------------------------
 * Fixpoint iteration :

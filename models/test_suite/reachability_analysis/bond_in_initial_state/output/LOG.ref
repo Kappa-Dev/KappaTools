@@ -122,6 +122,9 @@ Reachability analysis...
 every rule may be applied
 ------------------------------------------------------------
 every agent may occur in the model
+Contact map:
+agent_type1:A:site_type1:x!:state1:B@x -> agent_type2:B:site_type2:x!:state2:A@x
+agent_type1:B:site_type1:x!:state1:A@x -> agent_type2:A:site_type2:x!:state2:B@x
 
 ------------------------------------------------------------
 * Non relational properties:

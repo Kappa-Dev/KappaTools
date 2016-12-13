@@ -527,6 +527,7 @@ rule 8 will never be applied.
 rule 9 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
+Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

@@ -12,6 +12,12 @@ Reachability analysis...
 rule 6: obs will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
+Contact map:
+agent_type1:E:site_type1:x!:state1:R@x -> agent_type2:R:site_type2:x!:state2:E@x
+agent_type1:R:site_type1:x!:state1:E@x -> agent_type2:E:site_type2:x!:state2:R@x
+agent_type1:R:site_type1:c!:state1:R@c -> agent_type2:R:site_type2:c!:state2:R@c
+agent_type1:R:site_type1:cr!:state1:R@n -> agent_type2:R:site_type2:n!:state2:R@cr
+agent_type1:R:site_type1:n!:state1:R@cr -> agent_type2:R:site_type2:cr!:state2:R@n
 
 ------------------------------------------------------------
 * Non relational properties:

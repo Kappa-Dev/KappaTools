@@ -665,6 +665,7 @@ EXTENSIONAL DESCRIPTION:
 rule 7: KO will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
+Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

@@ -13,6 +13,13 @@ rule 1 will never be applied.
 rule 3 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
+Contact map:
+agent_type1:C:site_type1:a!:state1:A@x -> agent_type2:A:site_type2:x!:state2:C@a
+agent_type1:C:site_type1:a!:state1:B@x -> agent_type2:B:site_type2:x!:state2:C@a
+agent_type1:A:site_type1:x!:state1:C@a -> agent_type2:C:site_type2:a!:state2:A@x
+agent_type1:A:site_type1:y!:state1:B@y -> agent_type2:B:site_type2:y!:state2:A@y
+agent_type1:B:site_type1:y!:state1:A@y -> agent_type2:A:site_type2:y!:state2:B@y
+agent_type1:B:site_type1:x!:state1:C@a -> agent_type2:C:site_type2:a!:state2:B@x
 
 ------------------------------------------------------------
 * Non relational properties:

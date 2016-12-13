@@ -707,11 +707,12 @@ struct
         ) store_result error
     in error
 
-  let print _static dynamic error _loggers =
-    (*let store_contact_map = get_contact_map_dynamic dynamic in
-      let _ =
+  let print static dynamic error _loggers =
+    (*TEST*)
+    let store_contact_map = get_contact_map_dynamic dynamic in
+    let _ =
       print_contact_map static dynamic error store_contact_map
-      in*)
+    in
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

@@ -147,6 +147,7 @@ rule 0: r1 will never be applied.
 A cannot occur in the model
 B cannot occur in the model
 C cannot occur in the model
+Contact map:
 
 ------------------------------------------------------------
 * Fixpoint iteration :
