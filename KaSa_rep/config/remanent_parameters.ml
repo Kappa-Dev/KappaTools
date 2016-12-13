@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Dec 01 2016>
+  * Last modification: Time-stamp: <Dec 13 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -14,7 +14,21 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-let open_out a =
+let add_extension_if_not_already_mentioned a ext =
+  let size_a = String.length a in
+  let size_ext = String.length ext in
+  try
+    if
+      size_a < size_ext ||
+        (String.sub a (size_a - size_ext) size_ext = ext)
+    then a
+    else  a^ext
+  with
+  | _ -> a^ext
+
+let open_out a ext =
+  (* it would be easier with OCaml 3.04 *)
+  let a = add_extension_if_not_already_mentioned a ext in
   let d = Filename.dirname a in
   let () = try
 	     if not (Sys.is_directory d)
@@ -290,12 +304,12 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
       false || html_mode, Sys.argv
     | Remanent_parameters_sig.KaSa ->
        begin
-	 match
-	   !Config.output_directory,"profiling.html" (*temporary, to do: provide a parameterisable filename*)
-	 with
-	 | _,"" -> Some stdout
-	 | "",a -> Some (open_out a)
-	 | a,b -> Some (open_out (a^"/"^b))
+         match
+           !Config.output_directory,"profiling",".html" (*temporary, to do: provide a parameterisable filename*)
+         with
+         | _,"",_ -> Some stdout
+         | "",a,ext -> Some (open_out a ext)
+         | a,b,ext -> Some (open_out (a^"/"^b) ext)
        end, false || html_mode, Sys.argv
   in
   { Remanent_parameters_sig.marshalisable_parameters =
@@ -691,8 +705,8 @@ let open_influence_map_file  parameters =
     match get_im_file parameters,get_im_directory parameters,ext_format (get_im_format parameters)
     with
       | None,_,_  -> stdout
-      | Some a,None,ext -> open_out (a^ext)
-      | Some a,Some d,ext -> open_out (d^a^ext)
+      | Some a,None,ext -> open_out a ext
+      | Some a,Some d,ext -> open_out (d^a) ext
   in
   let format =
       match get_im_format parameters with
@@ -709,8 +723,8 @@ let open_contact_map_file parameters =
       ext_format (get_cm_format parameters)
     with
       | None,_,_ -> stdout
-      | Some a,None,ext -> open_out (a^ext)
-      | Some a,Some d,ext -> open_out (d^a^ext)
+      | Some a,None,ext -> open_out a ext
+      | Some a,Some d,ext -> open_out (d^a) ext
   in
     {
       parameters
@@ -721,7 +735,13 @@ let open_contact_map_file parameters =
  let persistent_mode = false
 
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter =
-   (get_influence_map_accuracy_level parameter = Remanent_parameters_sig.Medium) &&
+   (match
+        get_influence_map_accuracy_level parameter
+      with
+      | Remanent_parameters_sig.Medium
+      | Remanent_parameters_sig.High 
+      | Remanent_parameters_sig.Low -> true)
+   &&
      (get_do_influence_map parameter)
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode _ =
    persistent_mode

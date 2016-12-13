@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 23 2016>
+  * Last modification: Time-stamp: <Dec 13 2016>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -15,7 +15,7 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-val open_out: string -> out_channel
+val open_out: string -> string -> out_channel
 val ext_format: Remanent_parameters_sig.graph_format -> string
 val get_parameters:
   ?html_mode:bool ->
@@ -116,7 +116,7 @@ val get_reachability_analysis_parameters: Remanent_parameters_sig.parameters -> 
 val get_site_accross_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
 val get_parallel_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
 val get_dynamic_contact_map_1: Remanent_parameters_sig.reachability_parameters -> bool
-val get_reachability_parameters: unit -> Remanent_parameters_sig.reachability_parameters 
+val get_reachability_parameters: unit -> Remanent_parameters_sig.reachability_parameters
 
 (** local traces *)
 val get_local_trace_format: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.graph_format
