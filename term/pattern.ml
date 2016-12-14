@@ -913,11 +913,12 @@ module Matching = struct
       | [] -> acc,cache
       | (pid,point,inj_point2graph) :: remains ->
         let acc' =
-          (List.fold_left
-             (fun acc (id,ty) ->
-                (pid,(Renaming.apply inj_point2graph id,ty))::acc)
-             obs point.Env.roots,
-           Operator.DepSet.union rev_deps point.Env.deps) in
+          if Operator.DepSet.is_empty point.Env.deps then acc else
+            (List.fold_left
+               (fun acc (id,ty) ->
+                  (pid,(Renaming.apply inj_point2graph id,ty))::acc)
+               obs point.Env.roots,
+             Operator.DepSet.union rev_deps point.Env.deps) in
         let remains' =
           List.fold_left
             (fun re son ->
