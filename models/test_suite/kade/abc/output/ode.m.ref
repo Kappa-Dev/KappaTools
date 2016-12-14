@@ -111,15 +111,15 @@ filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE ../../cflows/abc/abc.ka -d output -l 1 -p 0.1\n')
 fprintf(fid,'# t')
-fprintf(fid,' |AB|')
-fprintf(fid,' |Cuu|')
-fprintf(fid,' |Cpu|')
-fprintf(fid,' |Cpp|')
+fprintf(fid,',|AB|')
+fprintf(fid,',|Cuu|')
+fprintf(fid,',|Cpu|')
+fprintf(fid,',|Cpp|')
 fprintf(fid,'\n')
 for j=1:n_points
     fprintf(fid,'%f',t(j));
     for i=1:nobs
-        fprintf(fid,' %f',y(j,i));
+        fprintf(fid,',%f',y(j,i));
     end
     fprintf(fid,'\n');
 end

@@ -106,7 +106,7 @@ fprintf(fid,'\n')
 for j=1:n_points
     fprintf(fid,'%f',t(j));
     for i=1:nobs
-        fprintf(fid,' %f',y(j,i));
+        fprintf(fid,',%f',y(j,i));
     end
     fprintf(fid,'\n');
 end

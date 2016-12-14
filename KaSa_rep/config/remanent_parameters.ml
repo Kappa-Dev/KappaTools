@@ -737,10 +737,12 @@ let open_contact_map_file parameters =
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter =
    (match
         get_influence_map_accuracy_level parameter
-      with
-      | Remanent_parameters_sig.Medium
-      | Remanent_parameters_sig.High 
-      | Remanent_parameters_sig.Low -> true)
+    with
+    | Remanent_parameters_sig.Full
+    | Remanent_parameters_sig.Medium
+    | Remanent_parameters_sig.High
+    | Remanent_parameters_sig.Low -> true
+    | Remanent_parameters_sig.None -> false )
    &&
      (get_do_influence_map parameter)
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode _ =

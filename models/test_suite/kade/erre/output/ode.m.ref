@@ -112,13 +112,13 @@ filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE erre.ka -d output -l 1 -p 0.01\n')
 fprintf(fid,'# t')
-fprintf(fid,' |dimmers|')
-fprintf(fid,' |monomers|')
+fprintf(fid,',|dimmers|')
+fprintf(fid,',|monomers|')
 fprintf(fid,'\n')
 for j=1:n_points
     fprintf(fid,'%f',t(j));
     for i=1:nobs
-        fprintf(fid,' %f',y(j,i));
+        fprintf(fid,',%f',y(j,i));
     end
     fprintf(fid,'\n');
 end
