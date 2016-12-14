@@ -113,6 +113,23 @@ let print_ode_preamble
         let () = Loggers.print_newline logger in
         ()
       end
+    | Loggers.SBML ->
+      begin
+        let () = print_list logger
+            [
+              "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+              "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
+              "<model metaid=\"untitled\" id=\"\">";
+              "<annotation>";
+              "<celldesigner:extension>";
+              "<celldesigner:modelVersion>4.0</celldesigner:modelVersion>";
+              "<celldesigner:modelDisplay sizeX=\"600\" sizeY=\"400\"/>";
+              "<celldesigner:listOfCompartmentAliases/>";
+              "<celldesigner:listOfComplexSpeciesAliases/>";
+              "<celldesigner:listOfSpeciesAliases>"
+            ]
+        in ()
+      end
     | Loggers.Maple -> ()
     | Loggers.Json
     | Loggers.DOT
@@ -181,7 +198,7 @@ let declare_global logger string =
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple -> ()
+  | Loggers.SBML | Loggers.Maple -> ()
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
@@ -194,7 +211,6 @@ let initialize logger variable =
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
-
       let () =
         match variable with
         | Rate _ -> Loggers.fprintf logger "k=zeros(nrules,1)"
@@ -245,7 +261,7 @@ let initialize logger variable =
       ()
     end
   | Loggers.Json
-  | Loggers.Maple -> ()
+  | Loggers.Maple | Loggers.SBML -> ()
   | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -277,25 +293,280 @@ let is_fun _logger op =
   | Operator.SINUS | Operator.COSINUS | Operator.TAN
   | Operator.INT-> true
 
-let string_of_un_op _logger op =
+let string_of_un_op logger op =
+  let format = Loggers.get_encoding_format logger in
   match op with
-  | Operator.UMINUS-> "-"
-  | Operator.LOG -> "log"
-  | Operator.SQRT -> "sqrt"
-  | Operator.EXP -> "exp"
-  | Operator.SINUS -> "sin"
-  | Operator.COSINUS -> "cos"
-  | Operator.TAN -> "tan"
-  | Operator.INT -> "floor"
+  | Operator.UMINUS->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<minus/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "-"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.LOG ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<log/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "log"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.SQRT ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<root/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "sqrt"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.EXP ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<exp/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "exp"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.SINUS ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<sin/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "sin"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.COSINUS ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<cos/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "cos"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.TAN ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<tan/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "tan"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.INT ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<floor/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "floor"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
 
-let string_of_compare_op _logger = function
-  | Operator.EQUAL -> "=="
-  | Operator.DIFF -> "!="
-  | Operator.SMALLER -> "<"
-  | Operator.GREATER -> ">"
-let string_of_bool_op _logger = function
-  | Operator.AND -> "&"
-  | Operator.OR -> "|"
+let string_of_compare_op logger op =
+  let format = Loggers.get_encoding_format logger in
+  match op with
+  | Operator.EQUAL ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<eq/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "=="
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.DIFF ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<neq/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "!="
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.SMALLER ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<lt/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        "<"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+  | Operator.GREATER ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<gt/>"
+      | Loggers.Octave | Loggers.Matlab ->
+        ">"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+
+let string_of_bool_op logger op =
+  let format = Loggers.get_encoding_format logger in
+  match op with
+  | Operator.AND ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<and/>"
+      | Loggers.Octave | Loggers.Matlab -> "&"
+      | Loggers.Maple
+      | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+    | Operator.OR ->
+      begin
+        match
+          format
+        with
+        | Loggers.SBML -> "<or/>"
+        | Loggers.Octave | Loggers.Matlab -> "|"
+        | Loggers.Maple
+        | Loggers.Json
+        | Loggers.DOT
+        | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+        | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+      end
+
+let rec print_alg_expr_in_sbml logger alg_expr network =
+  match fst alg_expr with
+  | Alg_expr.CONST (Nbr.I n)  ->
+    Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
+  | Alg_expr.CONST (Nbr.I64 n) ->
+    Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" (Int64.to_int n)
+  | Alg_expr.CONST (Nbr.F f) ->
+    Loggers.fprintf logger "<cn type=\"real\"> %f </cn>" f
+  | Alg_expr.ALG_VAR x ->
+    Loggers.fprintf logger "<ci>v%i</ci>" (network.int_of_obs x)
+  | Alg_expr.KAPPA_INSTANCE x ->
+    Loggers.fprintf logger "<ci>y%i</ci>" (network.int_of_kappa_instance x)
+  | Alg_expr.TOKEN_ID x ->
+    Loggers.fprintf logger "<ci>y%i</ci>" (network.int_of_token_id x)
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
+    Loggers.fprintf logger "<ci>tend</ci>"
+  | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
+    Loggers.fprintf logger "<ci>0</ci>"
+  | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
+    Loggers.fprintf logger "<ci>t</ci>"
+  | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
+    Loggers.fprintf logger "<ci>0</ci>"
+  | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
+    Loggers.fprintf logger "<ci>event_max</ci>"
+  | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
+    Loggers.fprintf logger "<ci>0</ci>"
+  | Alg_expr.BIN_ALG_OP (op, a, b) ->
+    let string_op = string_of_bin_op logger op in
+    let () = Loggers.fprintf logger "<apply>" in
+    let () = Loggers.fprintf logger "%s" string_op in
+    let () = print_alg_expr_in_sbml logger a network in
+    let () = print_alg_expr_in_sbml logger b network in
+    let () = Loggers.fprintf logger "</apply>" in
+    ()
+  | Alg_expr.UN_ALG_OP (op, a) ->
+    let string_op = string_of_un_op logger op in
+    let () = Loggers.fprintf logger "<apply>" in
+    let () = Loggers.fprintf logger "%s" string_op in
+    let () = print_alg_expr_in_sbml logger a network in
+    let () = Loggers.fprintf logger "</apply>" in
+    ()
+  | Alg_expr.IF (cond, yes, no) ->
+    let () = Loggers.fprintf logger "<apply>" in
+    let () = Loggers.fprintf logger "<if-then-else>"  in
+    let () = print_bool_expr_in_sbml logger cond network in
+    let () = print_alg_expr_in_sbml logger yes network in
+    let () = print_alg_expr_in_sbml logger no network in
+    let () = Loggers.fprintf logger "</apply>" in
+    ()
+and
+  print_bool_expr_in_sbml logger cond network =
+  match fst cond with
+  | Alg_expr.TRUE -> Loggers.fprintf logger "<true/>"
+  | Alg_expr.FALSE -> Loggers.fprintf logger "<false/>"
+  | Alg_expr.COMPARE_OP (op,a,b) ->
+    let () = Loggers.fprintf logger "<apply>" in
+    let () = Loggers.fprintf logger "%s" (string_of_compare_op logger op) in
+    let () = print_alg_expr_in_sbml logger a network in
+    let () = print_alg_expr_in_sbml logger b network in
+    let () = Loggers.fprintf logger "</apply>" in
+    ()
+  | Alg_expr.BOOL_OP (op,a,b) ->
+    let () = Loggers.fprintf logger "<apply>" in
+    let () = Loggers.fprintf logger "%s" (string_of_bool_op logger op) in
+    let () = print_bool_expr_in_sbml logger a network in
+    let () = print_bool_expr_in_sbml logger b network in
+    let () = Loggers.fprintf logger "</apply>" in
+    ()
 
 let rec print_alg_expr ?init_mode logger alg_expr network =
   let var = match init_mode with
@@ -371,6 +642,11 @@ let rec print_alg_expr ?init_mode logger alg_expr network =
         let () = Loggers.fprintf logger ")" in
             ()
     end
+  | Loggers.SBML ->
+    let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
+    let () = print_alg_expr_in_sbml logger alg_expr network in
+    let () = Loggers.fprintf logger "</math>" in
+    ()
   | Loggers.Maple -> ()
   | Loggers.Json
   | Loggers.DOT
@@ -398,11 +674,16 @@ and print_bool_expr ?init_mode logger expr network =
         let () = Loggers.fprintf logger ")" in
         ()
     end
+  | Loggers.SBML ->
+    let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
+    let () = print_bool_expr_in_sbml logger expr network in
+    let () = Loggers.fprintf logger "</math>" in ()
   | Loggers.Maple -> ()
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
 let print_comment
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
@@ -420,7 +701,8 @@ let print_comment
       with
       | Loggers.Matlab
       | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
-      | Loggers.Maple -> ()
+      | Loggers.Maple
+      | Loggers.SBML
       | Loggers.Json
       | Loggers.DOT
       | Loggers.HTML_Graph
@@ -444,7 +726,8 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -456,7 +739,8 @@ let associate_nrows logger =
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "nrows = length(soln.x);" in
     Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -470,7 +754,8 @@ let associate_t logger n =
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "t = y(%i);" n in
     Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -484,7 +769,8 @@ let init_time logger n =
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "y(%i) = t;" n in
     Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -506,7 +792,8 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") logger variable
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -566,7 +853,8 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -611,7 +899,8 @@ let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -634,7 +923,8 @@ let print_options logger =
     in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -660,7 +950,8 @@ let declare_init ?comment:(comment="") logger i =
     in
     let () = print_comment logger comment in
     Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.SBML
+  | Loggers.Maple
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -697,7 +988,8 @@ let print_license_check logger =
           "end";
         ]
     in Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -726,7 +1018,8 @@ let print_integrate logger =
     in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -765,7 +1058,8 @@ let print_interpolate logger =
           "end"
         ]
     in Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -809,7 +1103,8 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
           "end";
           "fclose(fid);"]
     in Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -839,7 +1134,8 @@ let open_procedure logger name name' arg =
     in
     let () = Loggers.fprintf logger ")" in
     Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -858,7 +1154,8 @@ let close_procedure logger =
   | Loggers.Octave ->
     let () = Loggers.fprintf logger "end" in
     Loggers.print_newline logger
-  | Loggers.Maple -> ()
+  | Loggers.Maple
+  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -875,6 +1172,7 @@ let launch_main logger =
   | Loggers.Octave ->
     let () = Loggers.fprintf logger "main();" in
     Loggers.print_newline logger
+  | Loggers.SBML 
   | Loggers.Matlab
   | Loggers.Maple
   | Loggers.Json

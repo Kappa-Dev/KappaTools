@@ -187,7 +187,9 @@ let print_graph_preamble
             Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
           ()
       end
-      | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+    | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
+    | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
+    | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_graph_foot logger =
   match
@@ -225,7 +227,8 @@ let print_graph_foot logger =
         ()
     end
   | Loggers.Json  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
-  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.SBML | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_comment
     logger
@@ -241,18 +244,19 @@ let print_comment
     | Loggers.DOT -> Loggers.fprintf logger "#%s" string
     | Loggers.HTML_Graph -> Loggers.fprintf logger "//%s" string
     | Loggers.Json
-    | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+    | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let open_asso logger =
   match Loggers.get_encoding_format logger with
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t<p><dl>\n"
-  | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Json | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave
   | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let close_asso logger =
   match Loggers.get_encoding_format logger with
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t</dl></p>\n"
-  | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Json
+  | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -260,7 +264,8 @@ let print_asso logger string1 string2 =
   match Loggers.get_encoding_format logger with
   | Loggers.DOT -> Loggers.fprintf logger "/*%s %s*/" string1 string2
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
-  | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Json
+  | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
 
@@ -352,7 +357,7 @@ let print_node logger ?directives:(directives=[]) id =
         attributes
         directives
     | Loggers.Json
-    | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+    | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML
       -> attributes
   in
@@ -547,7 +552,7 @@ let print_node logger ?directives:(directives=[]) id =
         ()
     end
   | Loggers.Json -> Loggers.add_node logger id directives
-  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
@@ -573,7 +578,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
         )
         attributes
         directives
-    | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+    | Loggers.Json
+    | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular -> attributes
   in
   match Loggers.get_encoding_format logger with
@@ -741,7 +747,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let () = Loggers.print_newline logger in
     ()
   | Loggers.Json -> Loggers.add_edge logger id1 id2 directives
-  | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_one_to_n_relation
@@ -756,7 +762,10 @@ let print_one_to_n_relation
     with
     | Loggers.HTML_Graph ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Circle)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(Graph_loggers_sig.FillColor Graph_loggers_sig.Black)::(List.rev directives))
-    | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS ->
+    | Loggers.Json
+    | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
+    | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular
+    | Loggers.TXT_Tabular | Loggers.XLS ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Invisible)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(List.rev directives))
   in
   let directives_one =

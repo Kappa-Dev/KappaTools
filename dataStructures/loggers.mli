@@ -18,7 +18,7 @@
 
 type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
-  | Matlab | Maple | Json
+  | Matlab | Maple | Json | SBML
 type t
 
 val refresh_id: t -> unit

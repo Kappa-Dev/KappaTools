@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Sep 01 2016>
+  * Last modification: Time-stamp: <Dec 14 2016>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -9,8 +9,8 @@ let lowercase = String.lowercase(*_ascii  : ocaml 4.03*)
 let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave]
-[--rate-convention KaSim ][-t-init time] [-t time] [-p points] [-o output_file]\n"
+    "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave | SBML]
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -28,34 +28,18 @@ let main () =
            fic::(cli_args.Run_cli_args.inputKappaFileNames))
       usage_msg;
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
-    (*  let () = match kasim_args.Kasim_args.marshalizeOutFile with
-        | None -> ()
-        | Some marshalizeOutFile ->
-        Kappa_files.set_marshalized marshalizeOutFile
-        in*)
-    (*  let () = match kasim_args.Kasim_args.domainOutputFile with
-        | None -> ()
-        | Some domainOutputFile ->
-        Kappa_files.set_ccFile domainOutputFile
-        in*)
-    (*  let () = match kasim_args.Kasim_args.traceFile with
-        | None -> ()
-        | Some traceFile ->
-        Kappa_files.set_traceFile traceFile
-        in*)
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
-    (*let () =
-      Parameter.time_independent := common_args.Common_args.timeIndependent*)
     let backend =
       match lowercase ode_args.Ode_args.backend with
       | "octave" -> Loggers.Octave
       | "matlab" -> Loggers.Matlab
+      | "sbml" -> Loggers.SBML
       | s ->
         begin
           Arg.usage options usage_msg;
           Debug.tag
             Format.std_formatter
-            ("Wrong option "^s^".\nOnly Matlab and Octave backends are supported.");
+            ("Wrong option "^s^".\nOnly Matlab, Octave, and SBML backends are supported.");
           exit 0
         end
     in
