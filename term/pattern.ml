@@ -1,8 +1,8 @@
 type link = UnSpec | Free | Link of int * int (** node_id, site_id *)
 
-(** The link of site k of node i is stored in links(i).(k).
+(** The link of site k of node i is [fst nodes(i).(k)].
 
-    The internal state of site k of node i is store in internals(i).(k). A
+    The internal state of site k of node i is [snd nodes(i).(k)]. A
     negative number means UnSpec. *)
 type cc = {
   nodes_by_type: int list array;
@@ -24,7 +24,6 @@ let id_of_yojson = function
   | `Int cc -> cc
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Not a pattern id",x))
-
 
 module Set = Mods.IntSet
 
@@ -919,23 +918,22 @@ module Matching = struct
                   (pid,(Renaming.apply inj_point2graph id,ty))::acc)
                obs point.Env.roots,
              Operator.DepSet.union rev_deps point.Env.deps) in
-        let remains' =
+        let remains',cache' =
           List.fold_left
-            (fun re son ->
+            (fun (re,ca as pair) son ->
                match survive_nav inj_point2graph graph son.Env.next with
-               | None -> re
+               | None -> pair
                | Some inj' ->
                  let p' = Env.get domain son.Env.dst in
                  let rename = Renaming.compose false son.Env.inj inj' in
                  let next = (son.Env.dst,p',rename) in
-                 if CacheSetMap.Set.mem
-                     (son.Env.dst,Renaming.min_elt rename) cache
-                 then re
-                 else next::re)
-            remains point.Env.sons in
-        aux_from_edges
-          (CacheSetMap.Set.add (pid,Renaming.min_elt inj_point2graph) cache)
-          acc' remains' in
+                 let ca' = CacheSetMap.Set.add
+                     (son.Env.dst,Renaming.min_elt rename) ca in
+                 if ca == ca'
+                 then pair
+                 else (next::re,ca'))
+            (remains,cache) point.Env.sons in
+        aux_from_edges cache' acc' remains' in
     match edge with
     | (Navigation.Existing _,_),_ -> assert false
     | (Navigation.Fresh (_,ty),s),_ ->
@@ -946,8 +944,10 @@ module Matching = struct
           match Navigation.compatible_point Renaming.empty st edge with
           | None ->  find_good_edge tail
           | Some inj' ->
-            let dst = domain.Env.domain.(cc_id) in
-            aux_from_edges cache out [(cc_id,dst,inj')] in
+            let dst = Env.get domain cc_id in
+            aux_from_edges
+              (*(*unnecessary*)CacheSetMap.Set.add (cc_id,Renaming.min_elt inj')*)
+              cache out [(cc_id,dst,inj')] in
       find_good_edge sa.(s)
 
   let observables_from_agent
