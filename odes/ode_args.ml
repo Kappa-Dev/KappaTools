@@ -1,6 +1,8 @@
 type rate_convention =
-  | KaSim | Divide_by_nbr_of_autos_in_lhs
+  | KaSim
+  | Divide_by_nbr_of_autos_in_lhs
   | Biochemist
+
 type count = Embeddings | Occurrences
 
 type t = {
