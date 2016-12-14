@@ -3,7 +3,7 @@
 
 %obs: 'species_2' |Kss1(dock!0, T183~u, Y185~u),Gpa1(ste2!1, ste4, nuc~GDP),Ste2(pheromone!2, gpa1!1, sst2!3),Sst2(ste2!3, mapk!0, S539~p),Pheromone(ste2!2)|
 
-%obs: 'species_4' |Gpa1(ste2!0, ste4, nuc~GDP),Ste2(pheromone, gpa1!0, sst2)
+%obs: 'species_4' |Gpa1(ste2!0, ste4, nuc~GDP),Ste2(pheromone, gpa1!0, sst2)|
 
 %obs: 'species_6' |Ste5(ste11, ste7, ste4!0, mapk!1, ste5!2, loc~c, T287~u),Ste11(mapk, ste5!3, degradation~p, S302_S306_S307~ppp),Ste20(ste4!4),Ste20(ste4!5),Kss1(dock!1, T183~u, Y185~u),Ste5(ste11!3, ste7, ste4!6, mapk, ste5!2, loc~c, T287~u),Ste4(ste5!0, gpa1, state~reg, ste20!5),Ste4(ste5!6, gpa1, state~reg, ste20!4)|
 
