@@ -26,7 +26,8 @@ let find_implicit_infos contact_map ags =
              let () =
                ports.(i) <-
                  (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
-             (succ free_id, ports, ags, (free_id,(p,a),or_ty,new_switch s)::cor))
+             (succ free_id, ports, ags,
+              (free_id,(p,a),or_ty,new_switch s)::cor))
           (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
       | (Ast.LNK_SOME,_), s ->
         Tools.list_map_flatten
@@ -36,7 +37,8 @@ let find_implicit_infos contact_map ags =
                   let ports' = Array.copy ports in
                   let () =
                     ports'.(i) <-
-                      (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+                      (Location.dummy_annot
+                         (Ast.LNK_VALUE (free_id,(p,a))),s) in
                   (succ free_id, ports', ags,
                    (free_id,(p,a),or_ty,new_switch s)::cor))
                (ports_from_contact_map contact_map ty_id i))
@@ -102,7 +104,8 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
                ports'.(i) <-
-                 (Location.dummy_annot (Ast.LNK_VALUE (id,dst_info)),p_switch) in
+                 (Location.dummy_annot
+                    (Ast.LNK_VALUE (id,dst_info)),p_switch) in
              ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                 LKappa.ra_ints = ag.LKappa.ra_ints;
                 LKappa.ra_erased = ag.LKappa.ra_erased;
@@ -138,9 +141,9 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
              |[], _ -> acc
              | _ :: _ :: _, _ -> assert false
            end
-         | ((Ast.LNK_VALUE _ | Ast.LNK_TYPE _ | Ast.FREE | Ast.LNK_SOME),_), _ ->
-           acc
-    ) [] ag.LKappa.ra_ports
+         | ((Ast.LNK_VALUE _ | Ast.LNK_TYPE _ |
+             Ast.FREE | Ast.LNK_SOME),_), _ -> acc)
+    [] ag.LKappa.ra_ports
 
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
   let arity = Signature.arity sigs ty_id in
@@ -200,7 +203,7 @@ let define_full_transformation
         match cand_pos with
         | None -> ()
         | Some pos ->
-          let sort = Agent_place.get_type place in
+          let sort = Matching.Agent.get_type place in
           ExceptionDefn.warning
             ~pos
             (fun f ->
@@ -219,7 +222,7 @@ let define_full_transformation
         match cand_pos with
         | None -> ()
         | Some pos' ->
-          let sort = Agent_place.get_type place in
+          let sort = Matching.Agent.get_type place in
           let () =
             ExceptionDefn.warning
               ~pos:pos'
@@ -230,7 +233,7 @@ let define_full_transformation
                    (Signature.print_agent sigs) sort) in
           match risk with
           | Some _ ->
-            let sort = Agent_place.get_type place' in
+            let sort = Matching.Agent.get_type place' in
             ExceptionDefn.warning
               ~pos
               (fun f ->
@@ -259,7 +262,7 @@ let define_positive_transformation
       (transf,links_transf')
     | Some (dst',_) ->
       let links_transf' = Mods.IntMap.remove i links_transf in
-      let sort = Agent_place.get_type place in
+      let sort = Matching.Agent.get_type place in
       let () =
         ExceptionDefn.warning
           ~pos
@@ -375,7 +378,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
     end
   | ag :: ag_l ->
     let (node,wk) = Pattern.new_node wk ag.LKappa.ra_type in
-    let place = Agent_place.Existing (node,id) in
+    let place = Matching.Agent.Existing (node,id) in
     let transf' =
       if ag.LKappa.ra_erased
       then Primitives.Transformation.Agent place::removed,added
@@ -431,7 +434,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
         | (Ast.LNK_VALUE (i,_),pos),s ->
           match Mods.IntMap.find_option i r_l with
           | Some (node',site' as dst) ->
-            let dst_place = Agent_place.Existing (node',id),site' in
+            let dst_place = Matching.Agent.Existing (node',id),site' in
             let wk'' = Pattern.new_link wk' (node,site_id) dst in
             let c_l' =
               Mods.IntMap.add
@@ -502,7 +505,7 @@ let rec complete_with_creation
       | Some (i,_) -> link_occurence_failure i Location.dummy
     end
   | ag :: ag_l ->
-    let place = Agent_place.Fresh (ag.Raw_mixture.a_type,fresh) in
+    let place = Matching.Agent.Fresh (ag.Raw_mixture.a_type,fresh) in
     let rec handle_ports added l_t actions intf site_id =
       if site_id = Array.length ag.Raw_mixture.a_ports then
         let create_actions' =
@@ -529,7 +532,7 @@ let rec complete_with_creation
               let () =
                 match risk with
                 | Some pos ->
-                  let sort = Agent_place.get_type place' in
+                  let sort = Matching.Agent.get_type place' in
                   ExceptionDefn.warning
                     ~pos
                     (fun f ->
@@ -563,8 +566,8 @@ let connected_components_of_mixture created mix (env,origin) =
         List.fold_left
           (fun acs -> function
              | Primitives.Transformation.Linked (x,y)
-               when Agent_place.is_site_from_fresh x ||
-                    Agent_place.is_site_from_fresh y ->
+               when Matching.Agent.is_site_from_fresh x ||
+                    Matching.Agent.is_site_from_fresh y ->
                Instantiation.Bind_to (x,y) :: acs
              | Primitives.Transformation.Linked (x,y) ->
                Instantiation.Bind (x,y) :: acs
@@ -599,7 +602,7 @@ let connected_components_of_mixture created mix (env,origin) =
         Instantiation.rename_abstract_event id inj event in
       let l_t' = Mods.IntMap.map
           (fun (((p,s),b) as x) ->
-             let p' = Agent_place.rename id inj p in
+             let p' = Matching.Agent.rename id inj p in
              if p == p' then x else ((p',s),b)) l_t in
       aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
   in aux env ([],[]) ([],([],[],[]))

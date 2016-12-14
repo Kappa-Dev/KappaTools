@@ -4,7 +4,7 @@ type internal_state  = int
 
 type binding_type = agent_name * site_name
 
-type abstract = Agent_place.t
+type abstract = Matching.Agent.t
 type concrete = Agent.t
 
 type 'a site = 'a * site_name
@@ -41,43 +41,43 @@ let concretize_binding_state inj2graph = function
   | FREE -> FREE
   | BOUND -> BOUND
   | BOUND_TYPE bt -> BOUND_TYPE bt
-  | BOUND_to (pl,s) -> BOUND_to (Agent_place.concretize inj2graph pl,s)
+  | BOUND_to (pl,s) -> BOUND_to (Matching.Agent.concretize inj2graph pl,s)
 
 let concretize_test inj2graph = function
-  | Is_Here pl -> Is_Here (Agent_place.concretize inj2graph  pl)
+  | Is_Here pl -> Is_Here (Matching.Agent.concretize inj2graph  pl)
   | Has_Internal ((pl,s),i) ->
-    Has_Internal((Agent_place.concretize inj2graph pl,s),i)
-  | Is_Free (pl,s) -> Is_Free (Agent_place.concretize inj2graph pl,s)
-  | Is_Bound (pl,s) -> Is_Bound (Agent_place.concretize inj2graph pl,s)
+    Has_Internal((Matching.Agent.concretize inj2graph pl,s),i)
+  | Is_Free (pl,s) -> Is_Free (Matching.Agent.concretize inj2graph pl,s)
+  | Is_Bound (pl,s) -> Is_Bound (Matching.Agent.concretize inj2graph pl,s)
   | Has_Binding_type ((pl,s),t) ->
-    Has_Binding_type ((Agent_place.concretize inj2graph pl,s),t)
+    Has_Binding_type ((Matching.Agent.concretize inj2graph pl,s),t)
   | Is_Bound_to ((pl,s),(pl',s')) ->
-    Is_Bound_to ((Agent_place.concretize inj2graph pl,s),
-                 (Agent_place.concretize inj2graph pl',s'))
+    Is_Bound_to ((Matching.Agent.concretize inj2graph pl,s),
+                 (Matching.Agent.concretize inj2graph pl',s'))
 
 let concretize_action inj2graph = function
-  | Create (pl,i) -> Create (Agent_place.concretize inj2graph pl,i)
+  | Create (pl,i) -> Create (Matching.Agent.concretize inj2graph pl,i)
   | Mod_internal ((pl,s),i) ->
-    Mod_internal ((Agent_place.concretize inj2graph pl,s),i)
+    Mod_internal ((Matching.Agent.concretize inj2graph pl,s),i)
   | Bind ((pl,s),(pl',s')) ->
-    Bind ((Agent_place.concretize inj2graph pl,s),
-          (Agent_place.concretize inj2graph pl',s'))
+    Bind ((Matching.Agent.concretize inj2graph pl,s),
+          (Matching.Agent.concretize inj2graph pl',s'))
   | Bind_to ((pl,s),(pl',s')) ->
-    Bind_to ((Agent_place.concretize inj2graph pl,s),
-             (Agent_place.concretize inj2graph pl',s'))
-  | Free (pl,s) -> Free (Agent_place.concretize inj2graph pl,s)
-  | Remove pl -> Remove (Agent_place.concretize inj2graph pl)
+    Bind_to ((Matching.Agent.concretize inj2graph pl,s),
+             (Matching.Agent.concretize inj2graph pl',s'))
+  | Free (pl,s) -> Free (Matching.Agent.concretize inj2graph pl,s)
+  | Remove pl -> Remove (Matching.Agent.concretize inj2graph pl)
 
 let concretize_event inj2graph (tests,(actions,kasa_side,kasim_side)) =
   (List.rev_map (concretize_test inj2graph) tests,
    (List.rev_map (concretize_action inj2graph) actions,
     List.rev_map
       (fun ((pl,s),b) ->
-         ((Agent_place.concretize inj2graph pl,s),
+         ((Matching.Agent.concretize inj2graph pl,s),
           concretize_binding_state inj2graph b))
       kasa_side,
     List.rev_map
-      (fun (pl,s) -> (Agent_place.concretize inj2graph pl,s)) kasim_side))
+      (fun (pl,s) -> (Matching.Agent.concretize inj2graph pl,s)) kasim_side))
 
 let subst_map_concrete_agent f (id,na as agent) =
   try if f id == id then agent else (f id,na)
@@ -114,7 +114,7 @@ let subst_agent_in_concrete_test id id' x =
   subst_map_agent_in_concrete_test
     (fun j -> if j = id then id' else j) x
 let rename_abstract_test id inj x =
-  subst_map_agent_in_test (Agent_place.rename id inj) x
+  subst_map_agent_in_test (Matching.Agent.rename id inj) x
 
 let subst_map2_agent_in_action f f' = function
   | Create (agent,list) as x ->
@@ -146,7 +146,7 @@ let subst_agent_in_concrete_action id id' x =
   subst_map_agent_in_concrete_action
     (fun j -> if j = id then id' else j) x
 let rename_abstract_action id inj x =
-  subst_map_agent_in_action (Agent_place.rename id inj) x
+  subst_map_agent_in_action (Matching.Agent.rename id inj) x
 
 let subst_map_binding_state f = function
   | (ANY | FREE | BOUND | BOUND_TYPE _ as x) -> x
@@ -162,7 +162,7 @@ let subst_agent_in_concrete_side_effect id id' x =
   subst_map_agent_in_concrete_side_effect
     (fun j -> if j = id then id' else j) x
 let rename_abstract_side_effect id inj x =
-  subst_map_agent_in_side_effect (Agent_place.rename id inj) x
+  subst_map_agent_in_side_effect (Matching.Agent.rename id inj) x
 
 let subst_map_agent_in_event f (tests,(acs,kasa_side,kasim_side)) =
   (Tools.list_smart_map (subst_map_agent_in_test f) tests,
@@ -185,7 +185,7 @@ let subst_agent_in_concrete_event id id' x =
   subst_map_agent_in_concrete_event
     (fun j -> if j = id then id' else j) x
 let rename_abstract_event id inj x =
-  subst_map_agent_in_event (Agent_place.rename id inj) x
+  subst_map_agent_in_event (Matching.Agent.rename id inj) x
 
 let print_concrete_agent_site ?sigs f (agent,id) =
   Format.fprintf f "%a.%a" (Agent.print ?sigs ~with_id:true) agent

@@ -10,62 +10,62 @@ module Transformation = struct
 
   let rename id inj = function
     | Freed (p,s) as x ->
-      let p' = Agent_place.rename id inj p in
+      let p' = Matching.Agent.rename id inj p in
       if p == p' then x else Freed (p',s)
     | NegativeWhatEver (p,s) as x ->
-      let p' = Agent_place.rename id inj p in
+      let p' = Matching.Agent.rename id inj p in
       if p == p' then x else NegativeWhatEver (p',s)
     | Linked ((p1,s1),(p2,s2)) as x ->
-      let p1' = Agent_place.rename id inj p1 in
-      let p2' = Agent_place.rename id inj p2 in
+      let p1' = Matching.Agent.rename id inj p1 in
+      let p2' = Matching.Agent.rename id inj p2 in
       if p1 == p1' && p2 == p2' then x else Linked ((p1',s1),(p2',s2))
     | PositiveInternalized (p,s,i) as x ->
-      let p' = Agent_place.rename id inj p in
+      let p' = Matching.Agent.rename id inj p in
       if p == p' then x else PositiveInternalized (p',s,i)
     | NegativeInternalized (p,s) as x ->
-      let p' = Agent_place.rename id inj p in
+      let p' = Matching.Agent.rename id inj p in
       if p == p' then x else NegativeInternalized (p',s)
     | Agent p as x ->
-      let p' = Agent_place.rename id inj p in
+      let p' = Matching.Agent.rename id inj p in
       if p == p' then x else Agent p'
 
   let concretize inj2graph = function
-    | Agent n -> Agent (Agent_place.concretize inj2graph n)
-    | Freed (n,s) -> Freed (Agent_place.concretize inj2graph n,s)
+    | Agent n -> Agent (Matching.Agent.concretize inj2graph n)
+    | Freed (n,s) -> Freed (Matching.Agent.concretize inj2graph n,s)
     | Linked ((n,s),(n',s')) ->
-      Linked ((Agent_place.concretize inj2graph n,s),
-              (Agent_place.concretize inj2graph n',s'))
+      Linked ((Matching.Agent.concretize inj2graph n,s),
+              (Matching.Agent.concretize inj2graph n',s'))
     | NegativeWhatEver (n,s) ->
-      NegativeWhatEver (Agent_place.concretize inj2graph n,s)
+      NegativeWhatEver (Matching.Agent.concretize inj2graph n,s)
     | PositiveInternalized (n,s,i) ->
-      PositiveInternalized (Agent_place.concretize inj2graph n,s,i)
+      PositiveInternalized (Matching.Agent.concretize inj2graph n,s,i)
     | NegativeInternalized (n,s) ->
-      NegativeInternalized (Agent_place.concretize inj2graph n,s)
+      NegativeInternalized (Matching.Agent.concretize inj2graph n,s)
 
   let print ?sigs f = function
     | Agent p ->
-      Format.fprintf f "@[%a@]" (Agent_place.print ?sigs) p
+      Format.fprintf f "@[%a@]" (Matching.Agent.print ?sigs) p
     | Freed (p,s) ->
       Format.fprintf
-        f "@[%a.%a = %t@]" (Agent_place.print ?sigs) p
-        (Agent_place.print_site ?sigs p) s Pp.bottom
+        f "@[%a.%a = %t@]" (Matching.Agent.print ?sigs) p
+        (Matching.Agent.print_site ?sigs p) s Pp.bottom
     | NegativeWhatEver (p,s) ->
       Format.fprintf
-        f "@[%a.%a = ???@]" (Agent_place.print ?sigs) p
-        (Agent_place.print_site ?sigs p) s
+        f "@[%a.%a = ???@]" (Matching.Agent.print ?sigs) p
+        (Matching.Agent.print_site ?sigs p) s
     | Linked ((p1,s1),(p2,s2)) ->
       Format.fprintf
         f "@[%a.%a = %a.%a@]"
-        (Agent_place.print ?sigs) p1 (Agent_place.print_site ?sigs p1) s1
-        (Agent_place.print ?sigs) p2 (Agent_place.print_site ?sigs p2) s2
+        (Matching.Agent.print ?sigs) p1 (Matching.Agent.print_site ?sigs p1) s1
+        (Matching.Agent.print ?sigs) p2 (Matching.Agent.print_site ?sigs p2) s2
     | PositiveInternalized (p,s,i) ->
       Format.fprintf
-        f "@[%a.%a =@]" (Agent_place.print ?sigs) p
-        (Agent_place.print_internal ?sigs p s) i
+        f "@[%a.%a =@]" (Matching.Agent.print ?sigs) p
+        (Matching.Agent.print_internal ?sigs p s) i
     | NegativeInternalized (p,s) ->
       Format.fprintf
-        f "@[%a.%a~ =@]" (Agent_place.print ?sigs) p
-        (Agent_place.print_site ?sigs p) s
+        f "@[%a.%a~ =@]" (Matching.Agent.print ?sigs) p
+        (Matching.Agent.print_site ?sigs p) s
 
   let fresh_bindings ~short_branch_agents =
     List.fold_left
@@ -74,9 +74,9 @@ module Transformation = struct
          | (Freed _ | Agent _ | PositiveInternalized _) -> unaries_to_expl
          | (NegativeWhatEver _ | NegativeInternalized _) -> assert false
          | Linked ((n,s),(n',s')) ->
-           if Agent_place.same_connected_component n n'
+           if Matching.Agent.same_connected_component n n'
            then unaries_to_expl
-           else (if List.mem (Agent_place.get_type n') short_branch_agents
+           else (if List.mem (Matching.Agent.get_type n') short_branch_agents
                  then ((n',s'),(n,s))
                  else ((n,s),(n',s')))::unaries_to_expl) []
 end

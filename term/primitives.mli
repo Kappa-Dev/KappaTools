@@ -16,7 +16,7 @@ sig
     int -> Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t
 
   val concretize :
-    Pattern.Matching.t * int Mods.IntMap.t ->
+    Matching.t * int Mods.IntMap.t ->
     Instantiation.abstract t -> Instantiation.concrete t
   val print :
     ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit

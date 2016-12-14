@@ -9,9 +9,9 @@ type t =
 
     (* Without rectangular approximation *)
     matchings_of_rule:
-      (Pattern.Matching.t * int list) list Mods.IntMap.t;
+      (Matching.t * int list) list Mods.IntMap.t;
     unary_candidates:
-      (Pattern.Matching.t * Edges.path option) list Mods.IntMap.t;
+      (Matching.t * Edges.path option) list Mods.IntMap.t;
 
     edges: Edges.t;
     tokens: Nbr.t array;
@@ -103,8 +103,8 @@ let update_roots is_add unary_ccs edges map unary_map pattern root =
     Pattern.ObsMap.set unary_map pattern cc_map'
 
 let new_place free_id (inj_nodes,inj_fresh) = function
-  | Agent_place.Existing _ -> failwith "Rule_interpreter.new_place"
-  | Agent_place.Fresh (_,id) ->
+  | Matching.Agent.Existing _ -> failwith "Rule_interpreter.new_place"
+  | Matching.Agent.Fresh (_,id) ->
     (inj_nodes,Mods.IntMap.add id free_id inj_fresh)
 
 let all_injections ?excp ?unary_rate domain edges roots patterna =
@@ -122,13 +122,13 @@ let all_injections ?excp ?unary_rate domain edges roots patterna =
             (fun root new_injs ->
                List.fold_left
                  (fun corrects (inj,roots) ->
-                    match Pattern.Matching.reconstruct
+                    match Matching.reconstruct
                             domain edges inj id pattern root with
                     | None -> corrects
                     | Some new_inj -> (new_inj,root::roots) :: corrects)
                  new_injs inj_list)
             cands []))
-      (excp,[Pattern.Matching.empty,[]]) patterna in
+      (excp,[Matching.empty,[]]) patterna in
   match unary_rate with
   | None -> out
   | Some (_,None) ->
@@ -140,7 +140,7 @@ let all_injections ?excp ?unary_rate domain edges roots patterna =
   | Some (_,(Some _ as max_distance)) ->
     List.filter
       (fun (inj,_) ->
-         let nodes = Pattern.Matching.elements_with_types
+         let nodes = Matching.elements_with_types
              domain patterna inj in
          None =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
@@ -207,21 +207,21 @@ let apply_positive_transformation
     sigs (inj2graph,side_effects,roots_by_cc,edges) = function
   | Primitives.Transformation.Agent n ->
     let nc, inj2graph',edges' =
-      let ty = Agent_place.get_type n in
+      let ty = Matching.Agent.get_type n in
       let id,edges' = Edges.add_agent sigs ty edges in
       (id,ty),new_place id inj2graph n,edges' in
     (inj2graph',side_effects,roots_by_cc,edges'),
     Primitives.Transformation.Agent nc
   | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
-    let (id,_ as nc) = Agent_place.concretize inj2graph n in (*(A,23)*)
+    let (id,_ as nc) = Matching.Agent.concretize inj2graph n in (*(A,23)*)
     let edges' = Edges.add_free id s edges in
     let side_effects' =
       Tools.list_smart_filter (fun x -> x <> (nc,s)) side_effects in
     (inj2graph,side_effects',roots_by_cc,edges'),
     Primitives.Transformation.Freed (nc,s)
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
-    let nc = Agent_place.concretize inj2graph n in
-    let nc' = Agent_place.concretize inj2graph n' in
+    let nc = Matching.Agent.concretize inj2graph n in
+    let nc' = Matching.Agent.concretize inj2graph n' in
     let edges',modif_cc = Edges.add_link nc s nc' s' edges in
     let side_effects' = Tools.list_smart_filter
         (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
@@ -232,7 +232,7 @@ let apply_positive_transformation
       (ExceptionDefn.Internal_Error
          (Location.dummy_annot "NegativeWhatEver in positive update"))
   | Primitives.Transformation.PositiveInternalized (n,s,i) ->
-    let (id,_ as nc) = Agent_place.concretize inj2graph n in
+    let (id,_ as nc) = Matching.Agent.concretize inj2graph n in
     let edges' = Edges.add_internal id s i edges in
     (inj2graph,side_effects,roots_by_cc,edges'),
     Primitives.Transformation.PositiveInternalized (nc,s,i)
@@ -243,25 +243,25 @@ let apply_positive_transformation
 
 let obs_from_transformation domain edges acc = function
   | Primitives.Transformation.Agent nc ->
-    Pattern.Matching.observables_from_agent domain edges acc nc
+    Matching.observables_from_agent domain edges acc nc
   | Primitives.Transformation.Freed (nc,s) -> (*(n,s)-bottom*)
-    Pattern.Matching.observables_from_free domain edges acc nc s
+    Matching.observables_from_free domain edges acc nc s
   | Primitives.Transformation.Linked ((nc,s),(nc',s')) ->
-    Pattern.Matching.observables_from_link
+    Matching.observables_from_link
       domain edges acc nc s nc' s'
   | Primitives.Transformation.PositiveInternalized (nc,s,i) ->
-    Pattern.Matching.observables_from_internal
+    Matching.observables_from_internal
       domain edges acc nc s i
   | Primitives.Transformation.NegativeInternalized ((id,_ as nc),s) ->
     let i  = Edges.get_internal id s edges in
-    Pattern.Matching.observables_from_internal
+    Matching.observables_from_internal
       domain edges acc nc s i
   | Primitives.Transformation.NegativeWhatEver ((id,_ as nc),s) ->
     match Edges.link_destination id s edges with
     | None ->
-      Pattern.Matching.observables_from_free domain edges acc nc s
+      Matching.observables_from_free domain edges acc nc s
     | Some (nc',s') ->
-      Pattern.Matching.observables_from_link
+      Matching.observables_from_link
         domain edges acc nc s nc' s'
 
 let add_path_to_tests path tests =
@@ -350,7 +350,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
   let ((del_obs,del_deps),_) =
     List.fold_left
       (obs_from_transformation domain state.edges)
-      (([],Operator.DepSet.empty),Pattern.Matching.empty_cache)
+      (([],Operator.DepSet.empty),Matching.empty_cache)
       concrete_removed in
   let (side_effects,roots_by_cc,edges_after_neg) =
     List.fold_left
@@ -382,7 +382,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
   let ((new_obs,new_deps),_) =
     List.fold_left
       (obs_from_transformation domain edges'')
-      (([],Operator.DepSet.empty),Pattern.Matching.empty_cache)
+      (([],Operator.DepSet.empty),Matching.empty_cache)
       concrete_inserted' in
   let () =
     List.iter
@@ -591,12 +591,12 @@ let apply_unary_rule
       let pattern1 = rule.Primitives.connected_components.(0) in
       let pattern2 = rule.Primitives.connected_components.(1) in
       let inj1 =
-        Pattern.Matching.reconstruct
+        Matching.reconstruct
           domain state.edges
-          Pattern.Matching.empty 0 pattern1 root1 in
+          Matching.empty 0 pattern1 root1 in
       match inj1 with
       | None -> None,None
-      | Some inj -> Pattern.Matching.reconstruct
+      | Some inj -> Matching.reconstruct
                       domain state.edges inj 1 pattern2 root2,None in
   let rdeps,changed_c = state.outdated_elements in
   let state' =
@@ -606,7 +606,7 @@ let apply_unary_rule
   match inj with
   | None -> Clash
   | Some inj ->
-    let nodes = Pattern.Matching.elements_with_types
+    let nodes = Matching.elements_with_types
         domain rule.Primitives.connected_components inj in
     match path with
     | Some p ->
@@ -656,11 +656,11 @@ let apply_rule
                (Pattern.ObsMap.get state.roots_of_patterns pattern) with
            | None -> None
            | Some root ->
-             match Pattern.Matching.reconstruct
+             match Matching.reconstruct
                      domain state.edges inj id pattern root with
              | None -> None
              | Some inj' -> Some (inj',root::rev_roots))
-      (Some (Pattern.Matching.empty,[]))
+      (Some (Matching.empty,[]))
       rule.Primitives.connected_components in
   let inj_roots =
     match rule_id with
@@ -694,7 +694,7 @@ let apply_rule
                                        counter state event_kind rule inj)
       | Some dist ->
          let dist' = Some (max_dist_to_int ~get_alg counter state dist) in
-         let nodes = Pattern.Matching.elements_with_types
+         let nodes = Matching.elements_with_types
                        domain rule.Primitives.connected_components inj in
          match
            Edges.are_connected ?max_distance:dist' state.edges nodes.(0)
@@ -766,13 +766,13 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
               Mods.IntSet.fold
                 (fun root2 (list,len as out) ->
                    let inj1 =
-                     Pattern.Matching.reconstruct
-                       domain state.edges Pattern.Matching.empty 0
+                     Matching.reconstruct
+                       domain state.edges Matching.empty 0
                        pattern1 root1 in
                    match inj1 with
                    | None -> out
                    | Some inj ->
-                     match Pattern.Matching.reconstruct
+                     match Matching.reconstruct
                              domain state.edges inj 1 pattern2 root2 with
                      | None -> out
                      | Some inj' ->
@@ -785,7 +785,7 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
                           let dist' = Some (max_dist_to_int
                                            ~get_alg counter state dist) in
                           let nodes =
-                            Pattern.Matching.elements_with_types
+                            Matching.elements_with_types
                               domain rule.Primitives.connected_components inj' in
                           match Edges.are_connected ?max_distance:dist'
                                  state.edges nodes.(0) nodes.(1) with
@@ -815,7 +815,7 @@ let incorporate_extra_pattern domain state pattern =
       Pattern.ObsMap.set
       state.roots_of_patterns
       pattern
-      (Pattern.Matching.roots_of domain state.edges pattern) in
+      (Matching.roots_of domain state.edges pattern) in
   { state with outdated = false }
 
 let snapshot env counter fn state = {

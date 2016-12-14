@@ -50,6 +50,8 @@ let add_origin deps = function
   | None -> deps
   | Some x -> Operator.DepSet.add x deps
 
+let reconstruction_navigation cc = cc.recogn_nav
+
 (** Errors *)
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
@@ -83,7 +85,6 @@ let raw_find_root nodes_by_type =
         Some(x,ty)
   in aux 0
 let find_root cc = raw_find_root cc.nodes_by_type
-let find_root_type cc = Tools.option_map snd (find_root cc)
 
 let weight cc =
   let links,double =
@@ -118,7 +119,8 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
                        | Link _, UnSpec |UnSpec, Link _) ->
                        if strict then None
                        else Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
-                     | UnSpec, UnSpec -> Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
+                     | UnSpec, UnSpec ->
+                       Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
                      | Free, Free -> Some (true,todo,ren)
                      | Link (n1,s1), Link (n2,s2) ->
                        if s1 = s2 then
@@ -262,7 +264,8 @@ let intersection renaming cc1 cc2 =
                     let (l1,i1) = nodes1.(k) in
                     ((if l1 = UnSpec then UnSpec else l2),
                      (if i1 = -1 then -1 else i2))) nodes2 in
-             if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true out
+             if Array.fold_left
+                 (fun b (l,i) -> b && l = UnSpec && i < 0) true out
              then acc
              else (Mods.IntMap.add j out accn, j::l))
       renaming (Mods.IntMap.empty,[]) in
@@ -599,10 +602,15 @@ module Env : sig
 
   type point = {
     content: cc;
-    roots: Agent.t list;
+    roots: (int list (*ids*) * int (*ty*)) option;
     deps: Operator.DepSet.t;
     mutable sons: transition list;
   }
+
+   val content: point -> cc
+   val roots: point -> (int list (*ids*) * int (*ty*)) option
+   val deps: point -> Operator.DepSet.t
+   val sons: point -> transition list
 
   type t = {
     sig_decl: Signature.s;
@@ -615,6 +623,8 @@ module Env : sig
 
   val get : t -> int -> point
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
+
+  val get_elementary : t -> Navigation.step -> (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
@@ -631,10 +641,15 @@ end = struct
 
   type point = {
     content: cc;
-    roots: Agent.t list;
+    roots: (int list (*ids*) * int (*ty*)) option;
     deps: Operator.DepSet.t;
     mutable sons: transition list;
   }
+
+  let content p = p.content
+  let roots p = p.roots
+  let deps p = p.deps
+  let sons p = p.sons
 
   type t = {
     sig_decl: Signature.s;
@@ -671,8 +686,7 @@ end = struct
       (Pp.array Pp.space pp_point)
       env.domain
 
-  let get_single_agent ty env =
-    env.single_agent_points.(ty)
+  let get_single_agent ty env = env.single_agent_points.(ty)
 
   let get env cc_id = env.domain.(cc_id)
 
@@ -696,7 +710,9 @@ end = struct
   let point_to_yojson p =
     `Assoc [
       "content",to_yojson p.content;
-      "roots", `List (List.map Agent.to_json p.roots);
+      "roots", JsonUtil.of_option
+        (fun (ids,ty) ->
+           `List [`List (List.map JsonUtil.of_int ids); `Int ty]) p.roots;
       "deps", `Bool (not @@ Operator.DepSet.is_empty p.deps);
       "sons", `List (List.map transition_to_yojson p.sons);
     ]
@@ -707,7 +723,10 @@ end = struct
         try {
           content = of_yojson sig_decl (List.assoc "content" l);
           roots = (match List.assoc "roots" l with
-              | `List l -> List.map Agent.of_json l | _ -> raise Not_found);
+              | `Null -> None
+              | `List [ `List ids; `Int ty ] ->
+                Some (List.map Yojson.Basic.Util.to_int ids,ty)
+              | _ -> raise Not_found);
           deps = Operator.DepSet.empty;
           sons = (match List.assoc "sons" l with
               | `List l -> List.map transition_of_yojson l
@@ -781,6 +800,21 @@ end = struct
       raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
 
   let new_obs_map env f = Mods.DynArray.init env.max_obs f
+
+  let get_elementary domain = function
+    | (Navigation.Existing _,_),_ -> assert false
+    | (Navigation.Fresh (_,ty),s),_ as edge ->
+      let sa = domain.elementaries.(ty) in
+      let rec find_good_edge = function (*one should use a hash here*)
+        | [] -> None
+        | (st,cc_id) :: tail ->
+          match Navigation.compatible_point Renaming.empty st edge with
+          | None ->  find_good_edge tail
+          | Some inj' ->
+            let dst = get domain cc_id in
+            Some (cc_id,dst,inj') in
+      find_good_edge sa.(s)
+
 end
 
 let print ?domain ~with_id f id =
@@ -789,187 +823,6 @@ let print ?domain ~with_id f id =
   | Some env ->
     let cc_id = if with_id then Some id else None in
     print_cc ~sigs:(Env.signatures env) ?cc_id f env.Env.domain.(id).Env.content
-
-module Matching = struct
-  type t = Renaming.t Mods.IntMap.t * Mods.IntSet.t
-  (* (map,set)
-      map: point_i -> (node_j(i) -> id_node_graph_in_current_matching)
-      set:codomain of current matching *)
-
-  let empty = (Mods.IntMap.empty, Mods.IntSet.empty)
-
-  let add_cc (inj,co) id r =
-    let c = Renaming.image r in
-    match Mods.IntSet.disjoint_union co c with
-    | Some co' -> Some (Mods.IntMap.add id r inj, co')
-    | None -> None
-
-  let debug_print f (m,_co) =
-    Format.fprintf
-      f "@[(%a)@]"
-      (Pp.set Mods.IntMap.bindings Pp.comma
-         (fun f (ccid,nm) ->
-            Pp.set Renaming.to_list Pp.comma
-              (fun f (node,dst) ->
-                 Format.fprintf f "%i:%i->%i" ccid node dst) f nm)) m
-
-  (*- rm - reconstruct: Edges.t -> t -> int -> cc -> int -> t option*)
-  let reconstruct domain graph inj id cc_id root =
-    let cc = domain.Env.domain.(cc_id).Env.content in
-    match find_root cc with
-    | None -> failwith "Matching.reconstruct cc error"
-    (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
-    | Some (rid,rty) ->
-      (* -rm - full_rename: Renaming.t option *)
-      let _,full_rename =
-        (*- rm - to_navigation: bool -> cc -> list *)
-        match cc.recogn_nav with
-        | _::_ as nav ->
-          List.fold_left
-            (fun (root,inj_op) nav ->
-               match inj_op with
-               | None -> None,None
-               | Some inj ->
-                 None,Navigation.injection_for_one_more_edge ?root inj graph nav)
-            (Some (root,rty),Some Renaming.empty) nav
-        (*- rm - find_root: cc -> (type, node) option *)
-        | [] -> None, Renaming.add rid root Renaming.empty in
-      match full_rename with
-      | None -> failwith "Matching.reconstruct renaming error"
-      | Some rename ->
-        match Mods.IntSet.disjoint_union (Renaming.image rename) (snd inj) with
-        | None -> None
-        | Some co -> Some (Mods.IntMap.add id rename (fst inj),co)
-
-  let rec aux_is_root_of graph root inj = function
-    | [] -> true
-    | h :: t ->
-      match Navigation.injection_for_one_more_edge ?root inj graph h with
-      | None -> false
-      | Some inj' -> aux_is_root_of graph None inj' t
-  let is_root_of domain graph (_,rty as root) cc_id =
-    let cc = domain.Env.domain.(cc_id).Env.content in
-    match cc.recogn_nav with
-    | [] ->
-      (match find_root cc with
-       | Some (_,rty') -> rty = rty'
-       | None -> false)
-    | nav -> aux_is_root_of graph (Some root) Renaming.empty nav
-
-  let roots_of domain graph cc =
-    Edges.all_agents_where (fun x -> is_root_of domain graph x cc) graph
-
-  (* get : (ContentAgent.t * int) -> t -> int *)
-  let get ((node,_),id) (t,_) =
-    Renaming.apply (Mods.IntMap.find_default Renaming.empty id t) node
-
-  let elements_with_types domain ccs (t,_) =
-    let out = Array.make (Mods.IntMap.size t) [] in
-    let () =
-      Mods.IntMap.iter
-        (fun id map ->
-           out.(id) <- Renaming.fold
-               (fun i out acc ->
-                  (out,find_ty domain.Env.domain.(ccs.(id)).Env.content i)::acc)
-               map [])
-        t in
-    out
-
-  module Cache =
-  struct
-    type t = int * (int * int) option
-    let compare (a,a') (b,b') =
-      let c = Mods.int_compare a b in
-      if c = 0 then
-        match a',b' with
-        | None, None -> 0
-        | None,Some _ -> 1
-        | Some _, None -> -1
-        | Some x, Some y -> Mods.int_pair_compare x y
-      else c
-    let print f (a,a') =
-      Format.fprintf f "%i%a"
-        a (Pp.option (Pp.pair Format.pp_print_int Format.pp_print_int)) a'
-  end
-  module CacheSetMap = SetMap.Make(Cache)
-
-  type cache = CacheSetMap.Set.t
-  let empty_cache = CacheSetMap.Set.empty
-
-  let survive_nav inj graph =
-    List.fold_left
-      (fun inj step ->
-         match inj with
-         | None -> inj
-         | Some inj ->
-           Navigation.injection_for_one_more_edge inj graph step)
-      (Some inj)
-
-  (*edges: list of concrete edges,
-    returns the roots of observables that are above in the domain*)
-  let from_edge domain graph (out,cache as acc) edge =
-    let rec aux_from_edges cache (obs,rev_deps as acc) = function
-      | [] -> acc,cache
-      | (pid,point,inj_point2graph) :: remains ->
-        let acc' =
-          if Operator.DepSet.is_empty point.Env.deps then acc else
-            (List.fold_left
-               (fun acc (id,ty) ->
-                  (pid,(Renaming.apply inj_point2graph id,ty))::acc)
-               obs point.Env.roots,
-             Operator.DepSet.union rev_deps point.Env.deps) in
-        let remains',cache' =
-          List.fold_left
-            (fun (re,ca as pair) son ->
-               match survive_nav inj_point2graph graph son.Env.next with
-               | None -> pair
-               | Some inj' ->
-                 let p' = Env.get domain son.Env.dst in
-                 let rename = Renaming.compose false son.Env.inj inj' in
-                 let next = (son.Env.dst,p',rename) in
-                 let ca' = CacheSetMap.Set.add
-                     (son.Env.dst,Renaming.min_elt rename) ca in
-                 if ca == ca'
-                 then pair
-                 else (next::re,ca'))
-            (remains,cache) point.Env.sons in
-        aux_from_edges cache' acc' remains' in
-    match edge with
-    | (Navigation.Existing _,_),_ -> assert false
-    | (Navigation.Fresh (_,ty),s),_ ->
-      let sa = domain.Env.elementaries.(ty) in
-      let rec find_good_edge = function (*one should use a hash here*)
-        | [] -> acc
-        | (st,cc_id) :: tail ->
-          match Navigation.compatible_point Renaming.empty st edge with
-          | None ->  find_good_edge tail
-          | Some inj' ->
-            let dst = Env.get domain cc_id in
-            aux_from_edges
-              (*(*unnecessary*)CacheSetMap.Set.add (cc_id,Renaming.min_elt inj')*)
-              cache out [(cc_id,dst,inj')] in
-      find_good_edge sa.(s)
-
-  let observables_from_agent
-      domain graph ((obs,rdeps),cache as acc) (_,ty as node) =
-    if Edges.is_agent node graph
-    then match Env.get_single_agent ty domain with
-      | Some (cc,deps) ->
-        ((cc,node)::obs,Operator.DepSet.union rdeps deps),cache
-      | None -> acc
-    else acc
-
-  let observables_from_free domain graph acc node site =
-    from_edge domain graph acc
-      ((Navigation.Fresh node,site),Navigation.ToNothing)
-  let observables_from_internal domain graph acc node site id =
-    from_edge domain graph acc
-      ((Navigation.Fresh node,site),Navigation.ToInternal id)
-  let observables_from_link domain graph acc n site  n' site' =
-    from_edge domain graph acc
-      ((Navigation.Fresh n,site),
-       Navigation.ToNode (Navigation.Fresh n',site'))
-end
 
 let embeddings_to_fully_specified domain a_id b =
   let a = domain.Env.domain.(a_id).Env.content in
@@ -985,7 +838,7 @@ type prepoint = {
   p_id: id;
   element: cc;
   depending: Operator.DepSet.t;
-  roots: Agent.t list;
+  roots: (int list (*ids*) * int (*ty*)) option;
 }
 
 type work = {
@@ -1076,7 +929,7 @@ end = struct
   let sigs env = env.sig_decl
 
   let empty_point sigs =
-    {Env.content = empty_cc sigs; Env.roots = [];
+    {Env.content = empty_cc sigs; Env.roots = None;
      Env.deps = Operator.DepSet.empty; Env.sons = [];}
 
   let fill_elem sigs bottom =
@@ -1131,13 +984,13 @@ end = struct
     let rec aux = function
       | [] ->
         let roots =
-          match find_root element with
-          | None -> assert false
-          | Some (rid,rty) ->
-            List.sort Agent.compare
-              (List.map
-                 (fun r -> (Renaming.apply r rid,rty))
-                 (automorphisms element)) in
+          match origin,find_root element with
+          | _, None | None, _ -> None
+          | Some _, Some (rid,rty) ->
+            Some (List.sort Mods.int_compare
+                    (List.map
+                       (fun r -> Renaming.apply r rid)
+                       (automorphisms element)),rty) in
         [{p_id; element;roots;
           depending=add_origin Operator.DepSet.empty origin}],
         identity_injection element,p_id

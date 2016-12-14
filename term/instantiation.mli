@@ -8,7 +8,7 @@ type internal_state  = int
 
 type binding_type = agent_name * site_name
 
-type abstract = Agent_place.t (** in a rule *)
+type abstract = Matching.Agent.t (** in a rule *)
 
 type concrete = Agent.t (** in a simulation state *)
 
@@ -53,17 +53,14 @@ val rename_abstract_event :
   int -> Renaming.t -> abstract event -> abstract event
 val rename_abstract_side_effect:
   int -> Renaming.t ->
-  (Agent_place.t * 'a) * Agent_place.t binding_state ->
-  (Agent_place.t * 'a) * Agent_place.t binding_state
+  (Matching.Agent.t * 'a) * Matching.Agent.t binding_state ->
+  (Matching.Agent.t * 'a) * Matching.Agent.t binding_state
 val concretize_test :
-  (Pattern.Matching.t * int Mods.IntMap.t) ->
-  abstract test -> concrete test
+  (Matching.t * int Mods.IntMap.t) -> abstract test -> concrete test
 val concretize_action :
-  (Pattern.Matching.t * int Mods.IntMap.t) ->
-  abstract action -> concrete action
+  (Matching.t * int Mods.IntMap.t) -> abstract action -> concrete action
 val concretize_event :
-  (Pattern.Matching.t * int Mods.IntMap.t) ->
-  abstract event -> concrete event
+  (Matching.t * int Mods.IntMap.t) -> abstract event -> concrete event
 
 val subst_map_agent_in_concrete_test :
   (int -> int) -> concrete test -> concrete test

@@ -92,13 +92,13 @@ let connected_components_of_mixture compil cache e =
     (cache,[]) snap
 
 type embedding = Renaming.t (* the domain is connected *)
-type embedding_forest = Pattern.Matching.t
+type embedding_forest = Matching.t
 (* the domain may be not connected *)
 
 let lift_embedding x =
   Tools.unsome
-    Pattern.Matching.empty
-    (Pattern.Matching.add_cc Pattern.Matching.empty 0 x)
+    Matching.empty
+    (Matching.add_cc Matching.empty 0 x)
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
@@ -108,11 +108,9 @@ let find_embeddings_unary_binary compil p x =
        let em = find_embeddings compil cc x in
        Tools.list_map_flatten
          (fun m ->
-            Tools.list_map_option
-              (fun r -> Pattern.Matching.add_cc m i r)
-              em)
+            Tools.list_map_option (fun r -> Matching.add_cc m i r) em)
          acc)
-    [Pattern.Matching.empty]
+    [Matching.empty]
     p
 
 let disjoint_union compil l =
@@ -127,10 +125,10 @@ let disjoint_union compil l =
          let r'' = Renaming.compose false r r' in
          (i,
           Tools.unsome
-            Pattern.Matching.empty
-            (Pattern.Matching.add_cc em i r''),
+            Matching.empty
+            (Matching.add_cc em i r''),
           mix'))
-      (List.length l,Pattern.Matching.empty,
+      (List.length l,Matching.empty,
        Edges.empty ~with_connected_components:false)
       l in
   (pat,em,mix)

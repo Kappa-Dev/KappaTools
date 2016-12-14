@@ -54,12 +54,14 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
          bind
            mstate
            (fun (state,state0) ->
-              let value = Rule_interpreter.value_alg counter state ~get_alg alg in
+              let value =
+                Rule_interpreter.value_alg counter state ~get_alg alg in
               let actions,_,_ = snd compiled_rule.Primitives.instantiations in
               let creations_sort =
                 List.fold_left
                   (fun l -> function
-                     | Instantiation.Create (x,_) -> Agent_place.get_type x :: l
+                     | Instantiation.Create (x,_) ->
+                       Matching.Agent.get_type x :: l
                      | Instantiation.Mod_internal _ | Instantiation.Bind _
                      | Instantiation.Bind_to _ | Instantiation.Free _
                      | Instantiation.Remove _ -> l) [] actions in

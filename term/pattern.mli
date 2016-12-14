@@ -23,7 +23,28 @@ module ObsMap : sig
 end
 
 module Env : sig
+  type transition = private {
+    next: Navigation.t;
+    dst: id; (** id of cc and also address in the Env.domain map *)
+    inj: Renaming.t; (** From dst To ("this" cc + extra edge) *)
+  }
+
+  type point
+
+  val content: point -> cc
+
+  val roots: point -> (int list * int) option (** (ids,ty) *)
+
+  val deps: point -> Operator.DepSet.t
+
+  val sons: point -> transition list
+
   type t
+
+  val get : t -> id -> point
+  val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
+
+  val get_elementary : t -> Navigation.step -> (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
@@ -82,59 +103,11 @@ val print : ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
 val id_to_yojson : id -> Yojson.Basic.json
 val id_of_yojson : Yojson.Basic.json -> id
 
-val find_root_type : t -> int option
+val reconstruction_navigation : t -> Navigation.t
+
+val find_ty : cc -> int -> int (** Abstraction leak, please do not use *)
 
 val automorphisms : t -> Renaming.t list
-
-module Matching : sig
-  (** Injection from a pattern in the mixture *)
-
-  type t
-  val empty : t
-  val debug_print : Format.formatter -> t -> unit
-  val get : (Agent.t * int) -> t -> int
-  val reconstruct : Env.t -> Edges.t -> t -> int -> id -> int -> t option
-  (** [reconstruct graph matching_of_previous_cc cc_id_in_rule cc root ]*)
-
-  val add_cc : t -> int -> Renaming.t -> t option
-
-  val is_root_of : Env.t -> Edges.t -> Agent.t -> id -> bool
-
-  val roots_of : Env.t -> Edges.t -> id -> Mods.IntSet.t
-
-  val elements_with_types : Env.t -> id array -> t -> Agent.t list array
-
-  type cache
-  val empty_cache : cache
-
-  val observables_from_agent :
-    Env.t -> Edges.t ->
-    (((id * (int * int)) list * Operator.DepSet.t) * cache) -> Agent.t ->
-    (((id * (int * int)) list * Operator.DepSet.t) * cache)
-  (** [observables_from_free domain graph sort agent]
-    the int * int in the return list and the following ones
-    is a Instantiation.concrete *)
-
-  val observables_from_free :
-    Env.t -> Edges.t ->
-    (((id * (int * int)) list * Operator.DepSet.t) * cache) ->
-    Agent.t -> int -> (((id * (int * int)) list * Operator.DepSet.t) * cache)
-  (** [observables_from_free domain graph sort agent site] *)
-
-  val observables_from_internal :
-    Env.t -> Edges.t ->
-    (((id * (int * int)) list * Operator.DepSet.t) * cache) ->
-     Agent.t -> int -> int -> (((id * (int * int)) list * Operator.DepSet.t) * cache)
-  (** [observables_from_internal domain graph sort agent site internal_state] *)
-
-  val observables_from_link :
-    Env.t -> Edges.t ->
-    (((id * (int * int)) list * Operator.DepSet.t) * cache) ->
-     Agent.t -> int -> Agent.t -> int ->
-    (((id * (int * int)) list * Operator.DepSet.t) * cache)
-  (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
-end
-
 
 val embeddings_to_fully_specified : Env.t -> id -> cc -> Renaming.t list
 
