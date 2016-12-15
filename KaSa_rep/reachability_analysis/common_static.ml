@@ -134,8 +134,6 @@ let collect_agent_name parameter error rule_id rule store_result =
   in
   error, store_result
 
-(*TODO*)
-
 let collect_agent_name_from_pattern parameters error pattern store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -705,7 +703,7 @@ let collect_agent_type_state parameter error agent site_type =
 (* JF: the name of this function is misleading *)
 (* What you collect is the type fingerprint of a bond *)
 
-let collect_pair_of_bonds parameter error site_add agent_id site_type_source
+let collect_fingerprint_of_bond parameter error site_add agent_id site_type_source
     views =
   let error, pair =
     let agent_index_target = site_add.Cckappa_sig.agent_index in

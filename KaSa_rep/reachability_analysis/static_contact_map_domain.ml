@@ -106,7 +106,7 @@ struct
       init_global_static_information,
       init_global_dynamic_information, event_list
 
-  let complete_wake_up_relation _static error wake_up = (*FIXME*)
+  let complete_wake_up_relation _static error wake_up =
       error, wake_up
 
   (**************************************************************************)
@@ -144,7 +144,6 @@ struct
     error, dynamic, Some precondition
 
   (***********************************************************)
-  (*TODO*)
 
   let maybe_reachable _static dynamic error _pattern precondition =
     error, dynamic, Some precondition

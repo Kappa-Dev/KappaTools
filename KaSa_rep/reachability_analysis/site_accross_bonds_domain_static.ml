@@ -631,7 +631,7 @@ let collect_bonds_init parameters error init_state =
               let error,
                   ((agent_type_source, site_type_source, state_source),
                    (agent_type_target, site_type_target, state_target)) =
-                Common_static.collect_pair_of_bonds
+                Common_static.collect_fingerprint_of_bond
                   parameters error site_add agent_id site_type_source
                   init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
               in

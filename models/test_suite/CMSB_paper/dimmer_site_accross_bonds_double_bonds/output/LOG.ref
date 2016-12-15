@@ -13,3 +13,13 @@ every agent may occur in the model
 * Properties in connected agents
 ------------------------------------------------------------
 execution finished without any exception
+agent_type:0:site_type:0
+agent_type:0:site_type:0
+agent_type:1:site_type:3
+agent_type:1:site_type:2
+agent_type:1:site_type:2
+agent_type:1:site_type:3
+agent_type:1:site_type:1
+agent_type:1:site_type:1
+agent_type:1:site_type:0
+agent_type:1:site_type:0

@@ -45,3 +45,16 @@ A(c!1),C(x2!1) =>
 * Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception
+agent_type:0:site_type:1
+agent_type:0:site_type:3
+agent_type:0:site_type:2
+agent_type:0:site_type:0
+agent_type:0:site_type:0
+agent_type:1:site_type:0
+agent_type:1:site_type:0
+agent_type:2:site_type:3
+agent_type:2:site_type:1
+agent_type:2:site_type:2
+agent_type:2:site_type:1
+agent_type:2:site_type:1
+agent_type:2:site_type:0

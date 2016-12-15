@@ -266,7 +266,7 @@ struct
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type_source site_add (error, dynamic) ->
                   let error, pair =
-                    Common_static.collect_pair_of_bonds
+                    Common_static.collect_fingerprint_of_bond
                       parameters
                       error
                       site_add
@@ -351,6 +351,7 @@ struct
   let add_initial_state static dynamic error species =
     let parameter = get_parameter static in
     let set_before = get_contact_map_dynamic dynamic in
+    (*------------------------------------------------------*)
     let error, dynamic =
       collect_bonds_initial
         static
@@ -359,8 +360,11 @@ struct
         species
     in
     let set_after = get_contact_map_dynamic dynamic in
-    let error, set_diff = Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff
-        parameter error set_after set_before in
+    (*------------------------------------------------------*)
+    let error, set_diff =
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff
+        parameter error set_after set_before
+    in
     let error, event_list =
       collect_events static error set_diff []
     in
@@ -383,10 +387,11 @@ struct
 
   let is_enabled static dynamic error rule_id precondition =
     (*test if the bond in the lhs has already in the contact map, if not
-      None, *)
+      None*)
     let parameters = get_parameter static in
     let bond_lhs = get_bond_lhs static in
     let contact_map = get_contact_map_dynamic dynamic in
+    (*------------------------------------------------------*)
     let error, bond_lhs_set =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters error
@@ -398,6 +403,7 @@ struct
       | error, Some s -> error, s
     in
     let error, bond_lhs_set = proj_bonds_aux parameters error bond_lhs_set in
+    (*------------------------------------------------------*)
     if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set
         contact_map
     then
@@ -466,10 +472,9 @@ struct
     else error, dynamic, None
 
     (***********************************************************)
-    (*TODO*)
 
-    let maybe_reachable _static dynamic error _pattern precondition =
-      error, dynamic, Some precondition
+  let maybe_reachable _static dynamic error _pattern precondition =
+    error, dynamic, Some precondition
 
   (**************************************************************************)
 
@@ -479,6 +484,7 @@ struct
     (*add the bonds in the rhs into the contact map*)
     let contact_map = get_contact_map_dynamic dynamic in
     let bond_rhs_map = get_bond_rhs static in
+    (*------------------------------------------------------*)
     let error, bond_rhs_set =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameters
@@ -494,6 +500,7 @@ struct
     let error, bond_rhs_set =
       proj_bonds_aux parameters error bond_rhs_set
     in
+    (*------------------------------------------------------*)
     let error', union =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.union
         parameters error contact_map bond_rhs_set
@@ -503,6 +510,7 @@ struct
         Exception.warn parameters error error' __POS__ Exit
     in
     let dynamic = set_contact_map_dynamic union dynamic in
+    (*------------------------------------------------------*)
     let new_contact_map = get_contact_map_dynamic dynamic in
     let error', map_diff =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff
@@ -512,6 +520,7 @@ struct
       Exception.check_point
         Exception.warn parameters error error' __POS__ Exit
     in
+    (*------------------------------------------------------*)
     (*update the second field*)
     let error, dynamic =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold

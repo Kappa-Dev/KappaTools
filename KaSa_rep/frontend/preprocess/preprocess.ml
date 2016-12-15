@@ -1907,7 +1907,8 @@ let add_link_in_contact_map parameters error (a,b) (c,d) sol =
     sol
 
 (*----------------------------------------------------------------*)
-let add_internal_state_in_contact_map parameters error (a,b) c sol =
+
+let add_internal_state_in_contact_map parameters error (a,b) state sol =
   let error, sol_a =
     Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs parameters error
       Ckappa_sig.Site_map_and_set.Map.empty a sol
@@ -1918,12 +1919,13 @@ let add_internal_state_in_contact_map parameters error (a,b) c sol =
   in
   let error, sol'_a =
     Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters error b (c::old,l) sol_a
+      parameters error b (state::old,l) sol_a
   in
   Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters error
     a  sol'_a sol
 
 let init_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty
+
 let export_contact_map parameters error handler =
   let sol = init_contact_map in
   (*----------------------------------------------------------------*)

@@ -59,3 +59,13 @@ R(c!1),R(c!1) =>
 R(c!R.c,cr!R.n) => R(c!1,cr!2),R(c!1,n!2)
 R(c!R.c,n!R.cr) => R(c!1,n!2),R(c!1,cr!2)
 execution finished without any exception
+agent_type:0:site_type:0
+agent_type:0:site_type:0
+agent_type:1:site_type:3
+agent_type:1:site_type:2
+agent_type:1:site_type:2
+agent_type:1:site_type:3
+agent_type:1:site_type:1
+agent_type:1:site_type:1
+agent_type:1:site_type:0
+agent_type:1:site_type:0

@@ -292,3 +292,7 @@ B cannot occur in the model
 ------------------------------------------------------------
 
 execution finished without any exception
+agent_type:0:site_type:0
+agent_type:0:site_type:0
+agent_type:1:site_type:0
+agent_type:1:site_type:0

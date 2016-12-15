@@ -26,3 +26,7 @@ B() => [ B(x) v B(x!A.x) ]
 * Properties of pairs of bonds
 ------------------------------------------------------------
 execution finished without any exception
+agent_type:0:site_type:0
+agent_type:0:site_type:0
+agent_type:1:site_type:0
+agent_type:1:site_type:0

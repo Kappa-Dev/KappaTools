@@ -501,3 +501,24 @@ E cannot occur in the model
 ------------------------------------------------------------
 
 execution finished without any exception
+agent_type:0:site_type:0
+agent_type:0:site_type:1
+agent_type:1:site_type:2
+agent_type:1:site_type:0
+agent_type:1:site_type:1
+agent_type:1:site_type:0
+agent_type:1:site_type:0
+agent_type:2:site_type:4
+agent_type:2:site_type:1
+agent_type:2:site_type:3
+agent_type:2:site_type:0
+agent_type:2:site_type:2
+agent_type:2:site_type:1
+agent_type:2:site_type:1
+agent_type:2:site_type:2
+agent_type:2:site_type:0
+agent_type:2:site_type:2
+agent_type:3:site_type:1
+agent_type:3:site_type:4
+agent_type:3:site_type:0
+agent_type:3:site_type:3

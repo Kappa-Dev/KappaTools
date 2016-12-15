@@ -120,6 +120,14 @@ let main () =
   (*-----------------------------------------------------------------------*)
   let _ = state, stochastic_flow_opt, ode_flow_opt in
   let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
+  (*-----------------------------------------------------------------------*)
+  (*symmetries*)
+  let state, handler = Export_to_KaSa.get_handler state in
+  let _ =
+    Symmetries.scan_rule parameters errors handler
+  in
+
+
   ()
 
 let () = main ()

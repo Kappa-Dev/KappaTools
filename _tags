@@ -27,6 +27,7 @@
 "KaSa_rep/data_structures/mvbdu" : include
 "KaSa_rep/sanity_test" : include
 "KaSa_rep/reachability_analysis" : include
+"KaSa_rep/symmetries_analysis" : include
 
 true : debug, bin_annot, safe_string
 true : package(str), package(num), package(unix), package(yojson)
