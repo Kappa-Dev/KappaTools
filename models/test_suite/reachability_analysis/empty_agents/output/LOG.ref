@@ -346,3 +346,6 @@ D()=> [D(x~u)]
 execution finished without any exception
 agent_type:3:site_type:0
 agent_type:5:site_type:0
+With predictate
+agent_type:3:site_type:0
+agent_type:5:site_type:0

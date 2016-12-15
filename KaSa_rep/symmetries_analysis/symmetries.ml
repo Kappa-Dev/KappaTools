@@ -13,18 +13,13 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-(*xRy iff x and y may take the same value (u or p) for internal state.
-  If binding state the same set of potential partners.
-  Partition map:
-  agent_type -> site list list
-*)
-
-
 let declare_agent parameters error agent store_result =
 Ckappa_sig.Agent_map_and_set.Map.add parameters error
   agent
   Ckappa_sig.Site_map_and_set.Map.empty
   store_result
+
+(*-------------------------------------------------------------*)
 
 let declare_site parameters error agent site store_result =
   let error, store_result_a =
@@ -44,6 +39,8 @@ let declare_site parameters error agent site store_result =
     agent
     store_result_a
     store_result
+
+(*-------------------------------------------------------------*)
 
 let add_link_in_contact_map parameters error (agent,site) (agent',site')
     store_result =
@@ -103,10 +100,12 @@ let add_internal_state_in_contact_map parameters error (agent_type,site_name) st
     store_result'_a
     store_result
 
+(*-------------------------------------------------------------*)
+
 let init_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty
 
-let export_contact_map parameters error handler =
-  let store_result = init_contact_map in
+let export_contact_map parameters error handler store_result =
+  (*let store_result = init_contact_map in*)
   (*----------------------------------------------------------------*)
   let error, store_result =
     Ckappa_sig.Dictionary_of_agents.fold
@@ -156,7 +155,7 @@ let export_contact_map parameters error handler =
   let error, store_result =
     Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameters error
-      (fun _parameters error (agent, (site , _state))
+      (fun parameters error (agent, (site , _state))
         (agent', site', _state')store_result ->
         add_link_in_contact_map parameters error
           (agent, site)
@@ -187,18 +186,22 @@ type symmetries =
         Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t;
     store_partition_contact_map :
       Ckappa_sig.c_site_name list list
-        Ckappa_sig.Agent_map_and_set.Map.t
+        Ckappa_sig.Agent_map_and_set.Map.t;
+    store_partition_with_predicate :
+      Ckappa_sig.c_site_name list list
+        Ckappa_sig.Agent_map_and_set.Map.t;
   }
 
 let init_symmetries =
   {
     store_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty;
-    store_partition_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty
+    store_partition_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty;
+    store_partition_with_predicate = Ckappa_sig.Agent_map_and_set.Map.empty
   }
 
 (***************************************************************************)
 
-let partition_contact_map parameters error contact_map store_result =
+let collect_partition_contact_map parameters error contact_map store_result =
   let error, store_result =
     Ckappa_sig.Agent_map_and_set.Map.fold
       (fun agent_type site_map (error, store_result) ->
@@ -235,6 +238,57 @@ let partition_contact_map parameters error contact_map store_result =
       ) contact_map (error, store_result)
   in
   error, store_result
+
+(***************************************************************************)
+
+let collect_partition_with_predicate parameters error
+    partition_contact_map
+    (predicate_ab: Ckappa_sig.c_site_name -> Ckappa_sig.c_site_name -> bool)
+    store_result =
+  let error, store_result =
+    Ckappa_sig.Agent_map_and_set.Map.fold
+      (fun agent_type list (error, store_result) ->
+         let error, old_list =
+           match
+             Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
+               parameters error
+               agent_type
+               store_result
+           with
+           | error, None -> error, []
+           | error, Some l -> error, l
+         in
+         let error, new_partition_list =
+           List.fold_left (fun (error, current_list) l ->
+               let partition_list =
+                 let rec aux acc =
+                   match acc with
+                   | [] | _ :: [] -> acc
+                   | a :: b :: tl ->
+                     if predicate_ab a b
+                     then acc
+                     else aux tl
+                 in
+                 aux l
+               in
+               let new_list = partition_list :: current_list in
+               error, new_list
+             ) (error, []) list
+         in
+         let error, store_result =
+           Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
+             parameters
+             error
+             agent_type
+             new_partition_list
+             store_result
+         in
+         error, store_result
+      ) partition_contact_map (error, store_result)
+  in
+  error, store_result
+
+
 
 (***************************************************************************)
 
@@ -288,27 +342,67 @@ let print_contact_map parameters error contact_map =
 
 (***************************************************************************)
 
+let print_partition_with_predicate parameters error store_result =
+  Ckappa_sig.Agent_map_and_set.Map.fold
+    (fun agent_type l error ->
+       List.fold_left (fun error l' ->
+           List.fold_left (fun error site ->
+               let () =
+                 Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                   "agent_type:%i:site_type:%i\n"
+                   (Ckappa_sig.int_of_agent_name agent_type)
+                   (Ckappa_sig.int_of_site_name site)
+               in
+               error
+             ) error l'
+         ) error l
+    ) store_result error
+
+(***************************************************************************)
+
 let scan_rule parameters error handler =
   let store_result = init_symmetries in
+  (*-------------------------------------------------------------*)
   let error, store_contact_map =
-     export_contact_map parameters error handler
+    export_contact_map parameters error handler
+      store_result.store_contact_map
   in
+  (*-------------------------------------------------------------*)
   let error, store_partition_contact_map =
-    partition_contact_map
+    collect_partition_contact_map
       parameters error
       store_contact_map
       store_result.store_partition_contact_map
   in
+  (*-------------------------------------------------------------*)
+  let error, store_partition_with_predicate =
+    collect_partition_with_predicate
+      parameters error
+      store_partition_contact_map
+      (=)
+      store_result.store_partition_with_predicate
+  in
+  (*-------------------------------------------------------------*)
   let store_result =
     {
       store_contact_map = store_contact_map;
-      store_partition_contact_map = store_partition_contact_map
+      store_partition_contact_map = store_partition_contact_map;
+      store_partition_with_predicate = store_partition_with_predicate
     }
   in
+  (*-------------------------------------------------------------*)
   let error =
     print_partition_contact_map parameters error
       store_result.store_partition_contact_map
   in
+  let _ =
+    Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      "With predictate\n";
+      print_partition_with_predicate
+      parameters error
+      store_result.store_partition_with_predicate
+  in
+
   (*let error =
     print_contact_map parameters error
       store_result.store_contact_map
