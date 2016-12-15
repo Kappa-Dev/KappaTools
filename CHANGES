@@ -11,8 +11,8 @@ by default in "simulated time unit" but you can switch to event using
 The motivation is interactivity. If you don't specify any limit, the
 simulation will run forever.  (Use Ctrl-c to stop).
 
-- Data files are printed using the comma separated value format (instead of space separated
-  value) by default.
+- Data files are printed using the comma separated value format
+  (instead of space separated value) by default.
 
 The default name of the output file is therefore 'data.csv'.
 
@@ -42,6 +42,10 @@ As a (more or less direct) consequence, you can write
 and
 $TRACK "pattern" [true]
 
+- Modification $STOP without argument does not dump a snapshot
+
+Use $STOP "something" to get one
+
 - Ctrl-c does not stop the simulation
 
 It pauses and launches a toplevel in which you can do modification
@@ -53,8 +57,7 @@ interactive' to pause the simulation just after the initialization
 phase.
 
 Concretely the old behavior of Ctrl-c and then y(es I want a snapshot)
-is recovered by Ctrl-c and the modification
-$SNAPSHOT "dump.ka"; $STOP
+is recovered by Ctrl-c and the modification $STOP "dump.ka"
 
 - Rates for unary instances of rule involving ambiguous molecularity
   are in {} instead of ()

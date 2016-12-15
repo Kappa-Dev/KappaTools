@@ -115,14 +115,11 @@ let do_modification ~outputs env counter graph state modification =
                                 counter graph ~get_alg expr)) in
     (false, Rule_interpreter.extra_outdated_var i graph, state)
   | Primitives.STOP pexpr ->
-    let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
-    let () = outputs (Data.Snapshot
-                        (Rule_interpreter.snapshot env counter file graph)) in
+    let () = if pexpr <> [] then
+        let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
+        outputs (Data.Snapshot
+                   (Rule_interpreter.snapshot env counter file graph)) in
     (true,graph,state)
-  (*     raise (ExceptionDefn.StopReached
-         (Format.sprintf
-         "STOP instruction was satisfied at (%d e,%f t.u)"
-         (Mods.Counter.event counter) (Mods.Counter.time counter))) *)
   | Primitives.PRINT (pe_file,pe_expr) ->
     let file_opt =
       match pe_file with
