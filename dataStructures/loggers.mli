@@ -50,9 +50,15 @@ val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
 val dump_json: t -> Yojson.Basic.json -> unit
 
 val get_expr:
-  t -> Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id,int) Alg_expr.e Location.annot option
+  t -> Ode_loggers_sig.variable ->
+  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id)
+    Alg_expr.e Location.annot option
 val set_expr:
-  t -> Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id,int) Alg_expr.e Location.annot -> unit
+  t -> Ode_loggers_sig.variable ->
+  (
+    Ode_loggers_sig.ode_var_id,
+    Ode_loggers_sig.ode_var_id)
+    Alg_expr.e Location.annot -> unit
 val is_const:
   t -> Ode_loggers_sig.variable -> bool
 

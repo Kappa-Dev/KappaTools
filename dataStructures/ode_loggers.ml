@@ -495,7 +495,16 @@ let string_of_bool_op logger op =
         | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
       end
 
-let rec print_alg_expr_in_sbml logger alg_expr network =
+let rec print_alg_expr_in_sbml logger
+    (alg_expr:
+       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
+        Alg_expr.e Location.annot
+    )
+    (network:
+       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
+         network_handler
+    )
+             =
   match fst alg_expr with
   | Alg_expr.CONST (Nbr.I n)  ->
     Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
@@ -504,7 +513,18 @@ let rec print_alg_expr_in_sbml logger alg_expr network =
   | Alg_expr.CONST (Nbr.F f) ->
     Loggers.fprintf logger "<cn type=\"real\"> %f </cn>" f
   | Alg_expr.ALG_VAR x ->
+    begin
+      match
+        Loggers.get_expr logger (Ode_loggers_sig.Expr x)
+      with
+      | Some expr ->
+        print_alg_expr_in_sbml
+          logger
+          expr
+          network
+      | None ->
     Loggers.fprintf logger "<ci>v%i</ci>" (network.int_of_obs x)
+    end
   | Alg_expr.KAPPA_INSTANCE x ->
     Loggers.fprintf logger "<ci>y%i</ci>" (network.int_of_kappa_instance x)
   | Alg_expr.TOKEN_ID x ->
@@ -605,7 +625,8 @@ and eval_init_bool_expr expr network =
       (eval_init_alg_expr a network) (eval_init_alg_expr b network)
   | Alg_expr.BOOL_OP (op,a,b) ->
     of_bool_op op
-      (eval_init_bool_expr a network) (eval_init_bool_expr expr b)
+      (eval_init_bool_expr a network)
+      (eval_init_bool_expr b network)
 
 let rec print_alg_expr ?init_mode logger alg_expr network =
   let var = match init_mode with
@@ -723,6 +744,20 @@ and print_bool_expr ?init_mode logger expr network =
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+let print_sbml_parameters logger variable expr network =
+  let () = Loggers.fprintf logger "<parameter>" in
+  let () = Loggers.print_breakable_space logger in
+  let () =
+    Loggers.fprintf
+      logger "<id =\"%s\" value=\"%s\">"
+      (string_of_variable variable)
+      (Nbr.to_string expr)
+  in
+  let () = Loggers.print_breakable_space logger in
+  let () = Loggers.fprintf logger "</parameter>" in
+  let () = Loggers.print_newline logger in
+  ()
+
 let print_comment
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
@@ -739,7 +774,8 @@ let print_comment
         format
       with
       | Loggers.Matlab
-      | Loggers.Octave -> Loggers.fprintf logger "%%%s" string
+      | Loggers.Octave ->
+        Loggers.fprintf logger "%%%s" string
       | Loggers.Maple
       | Loggers.SBML
       | Loggers.Json
@@ -752,6 +788,7 @@ let print_comment
       | Loggers.XLS -> ()
 
 let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable alg_expr network =
+  let () = Loggers.set_expr logger variable alg_expr in
   match
     Loggers.get_encoding_format logger
   with
@@ -765,8 +802,41 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable
       let () = Loggers.print_newline logger in
       ()
     end
+  | Loggers.SBML ->
+    begin
+      match variable, init_mode with
+      | Ode_loggers_sig.Expr i, _ -> ()
+      | Ode_loggers_sig.Init i, true -> ()
+      | Ode_loggers_sig.Init _, false -> ()
+      | Ode_loggers_sig.Initbis _, _ -> ()
+      | Ode_loggers_sig.Concentration _,_ -> ()
+      | Ode_loggers_sig.Deriv _,_ -> ()
+      | Ode_loggers_sig.Obs _,_ -> ()
+      | Ode_loggers_sig.Jacobian _,_ -> ()
+      | (Ode_loggers_sig.Tinit |
+         Ode_loggers_sig.Tend |
+         Ode_loggers_sig.Period_t_points
+        ) ,_ ->
+        print_sbml_parameters
+          logger
+          variable
+          (eval_init_alg_expr alg_expr network)
+          network
+
+      | Ode_loggers_sig.InitialStep,_  -> ()
+      | Ode_loggers_sig.Rate _,_ -> ()
+      | Ode_loggers_sig.Rated _,_ -> ()
+      | Ode_loggers_sig.Rateun _,_ -> ()
+      | Ode_loggers_sig.Rateund _,_ -> ()
+      | Ode_loggers_sig.N_rules,_ -> ()
+      | Ode_loggers_sig.N_ode_var,_ -> ()
+      | Ode_loggers_sig.N_var,_
+      | Ode_loggers_sig.N_obs,_
+      | Ode_loggers_sig.N_rows,_ -> ()
+      | Ode_loggers_sig.Tmp,_ -> ()
+      | Ode_loggers_sig.Current_time,_ -> ()
+    end
   | Loggers.Maple
-  | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
