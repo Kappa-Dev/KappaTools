@@ -15,30 +15,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type variable =
-  | Expr of int
-  | Init of int
-  | Initbis of int
-  | Concentration of int
-  | Deriv of int
-  | Obs of int
-  | Jacobian of int * int
-  | Tinit
-  | Tend
-  | InitialStep
-  | Period_t_points
-  | Rate of int
-  | Rated of int
-  | Rateun of int
-  | Rateund of int
-  | N_rules
-  | N_ode_var
-  | N_var
-  | N_obs
-  | N_rows
-  | Tmp
-  | Current_time
-
 type correct = Div of int | Mul of int | Nil
 
 type ('a,'b) network_handler =
@@ -60,19 +36,19 @@ val print_ode_preamble:
   ?filter_out:Loggers.encoding list -> unit ->
   unit
 
-val declare_global: Loggers.t -> variable -> unit
+val declare_global: Loggers.t -> Ode_loggers_sig.variable -> unit
 val print_options: Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
 val print_integrate: Loggers.t -> unit
 val print_interpolate: Loggers.t -> unit
 val print_dump_plots: data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
 
-val initialize: Loggers.t -> variable -> unit
+val initialize: Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
-  ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
+  ?init_mode:bool -> ?comment:string -> Loggers.t -> Ode_loggers_sig.variable ->
   ('a,'b) Alg_expr.e Location.annot -> ('a, 'b) network_handler -> unit
 val increment:
-  ?init_mode:bool -> ?comment:string -> Loggers.t -> variable ->
+  ?init_mode:bool -> ?comment:string -> Loggers.t -> Ode_loggers_sig.variable ->
   ('a,'b) Alg_expr.e Location.annot -> ('a, 'b) network_handler -> unit
 val associate_nrows: Loggers.t -> unit
 val associate_t: Loggers.t -> int -> unit
@@ -82,11 +58,11 @@ val declare_init: ?comment:string -> Loggers.t -> int -> unit
 
 val launch_main: Loggers.t -> unit
 
-val consume: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> (variable * correct) list -> unit
-val produce: Loggers.t -> variable -> nauto_in_species:int -> nauto_in_lhs:int -> variable -> (variable * correct) list -> unit
+val consume: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
+val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
 val update_token:
-  Loggers.t -> variable -> nauto_in_lhs:int -> variable ->
-  ('a,'b) Alg_expr.e Location.annot -> (variable * correct) list ->
+  Loggers.t -> Ode_loggers_sig.variable -> nauto_in_lhs:int -> Ode_loggers_sig.variable ->
+  ('a,'b) Alg_expr.e Location.annot -> (Ode_loggers_sig.variable * correct) list ->
   ('a, 'b) network_handler -> unit
 
 val print_comment:

@@ -16,30 +16,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type variable =
-  | Expr of int
-  | Init of int
-  | Initbis of int
-  | Concentration of int
-  | Deriv of int
-  | Obs of int
-  | Jacobian of int * int
-  | Tinit
-  | Tend
-  | InitialStep
-  | Period_t_points
-  | Rate of int
-  | Rated of int
-  | Rateun of int
-  | Rateund of int
-  | N_rules
-  | N_ode_var
-  | N_var
-  | N_obs
-  | N_rows
-  | Tmp
-  | Current_time
-
 type correct = Div of int | Mul of int | Nil
 
 type ('a,'b) network_handler =
@@ -138,53 +114,53 @@ let print_ode_preamble
 
 let string_of_variable var =
   match var with
-  | Rate int -> Printf.sprintf "k(%i)" int
-  | Rated int -> Printf.sprintf "kd(%i)" int
-  | Rateun int -> Printf.sprintf "kun(%i)" int
-  | Rateund int -> Printf.sprintf "kdun(%i)" int
-  | Expr int -> Printf.sprintf "var(%i)" int
-  | Obs int -> Printf.sprintf "obs(%i)" int
-  | Init int -> Printf.sprintf "init(%i)" int
-  | Initbis int -> Printf.sprintf "Init(%i)" int
-  | Concentration int -> Printf.sprintf "y(%i)" int
-  | Deriv int -> Printf.sprintf "dydt(%i)" int
-  | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
-  | Tinit -> "tinit"
-  | Tend -> "tend"
-  | InitialStep -> "initialstep"
-  | Period_t_points -> "period_t_point"
-  | N_ode_var -> "nodevar"
-  | N_var -> "nvar"
-  | N_obs -> "nobs"
-  | N_rules -> "nrules"
-  | N_rows -> "nrows"
-  | Tmp -> "tmp"
-  | Current_time -> "t"
+  | Ode_loggers_sig.Rate int -> Printf.sprintf "k(%i)" int
+  | Ode_loggers_sig.Rated int -> Printf.sprintf "kd(%i)" int
+  | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun(%i)" int
+  | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun(%i)" int
+  | Ode_loggers_sig.Expr int -> Printf.sprintf "var(%i)" int
+  | Ode_loggers_sig.Obs int -> Printf.sprintf "obs(%i)" int
+  | Ode_loggers_sig.Init int -> Printf.sprintf "init(%i)" int
+  | Ode_loggers_sig.Initbis int -> Printf.sprintf "Init(%i)" int
+  | Ode_loggers_sig.Concentration int -> Printf.sprintf "y(%i)" int
+  | Ode_loggers_sig.Deriv int -> Printf.sprintf "dydt(%i)" int
+  | Ode_loggers_sig.Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
+  | Ode_loggers_sig.Tinit -> "tinit"
+  | Ode_loggers_sig.Tend -> "tend"
+  | Ode_loggers_sig.InitialStep -> "initialstep"
+  | Ode_loggers_sig.Period_t_points -> "period_t_point"
+  | Ode_loggers_sig.N_ode_var -> "nodevar"
+  | Ode_loggers_sig.N_var -> "nvar"
+  | Ode_loggers_sig.N_obs -> "nobs"
+  | Ode_loggers_sig.N_rules -> "nrules"
+  | Ode_loggers_sig.N_rows -> "nrows"
+  | Ode_loggers_sig.Tmp -> "tmp"
+  | Ode_loggers_sig.Current_time -> "t"
 
 let string_of_array_name var =
   match var with
-  | Rate _ -> "k"
-  | Rated _ -> "kd"
-  | Rateun _ -> "kun"
-  | Rateund _ -> "kdun"
-  | Expr _ -> "var"
-  | Obs _ -> "obs"
-  | Init _ -> "init"
-  | Initbis _ -> "Init"
-  | Concentration _ -> "y"
-  | Deriv _ -> "dydt"
-  | Jacobian _ -> "Jac"
-  | Tinit -> "tinit"
-  | Tend -> "tend"
-  | InitialStep -> "initialstep"
-  | Period_t_points -> "period_t_point"
-  | N_ode_var -> "nodevar"
-  | N_var -> "nvar"
-  | N_obs -> "nobs"
-  | N_rows -> "nrows"
-  | N_rules -> "nrules"
-  | Tmp -> "tmp"
-  | Current_time -> "t"
+  | Ode_loggers_sig.Rate _ -> "k"
+  | Ode_loggers_sig.Rated _ -> "kd"
+  | Ode_loggers_sig.Rateun _ -> "kun"
+  | Ode_loggers_sig.Rateund _ -> "kdun"
+  | Ode_loggers_sig.Expr _ -> "var"
+  | Ode_loggers_sig.Obs _ -> "obs"
+  | Ode_loggers_sig.Init _ -> "init"
+  | Ode_loggers_sig.Initbis _ -> "Init"
+  | Ode_loggers_sig.Concentration _ -> "y"
+  | Ode_loggers_sig.Deriv _ -> "dydt"
+  | Ode_loggers_sig.Jacobian _ -> "Jac"
+  | Ode_loggers_sig.Tinit -> "tinit"
+  | Ode_loggers_sig.Tend -> "tend"
+  | Ode_loggers_sig.InitialStep -> "initialstep"
+  | Ode_loggers_sig.Period_t_points -> "period_t_point"
+  | Ode_loggers_sig.N_ode_var -> "nodevar"
+  | Ode_loggers_sig.N_var -> "nvar"
+  | Ode_loggers_sig.N_obs -> "nobs"
+  | Ode_loggers_sig.N_rows -> "nrows"
+  | Ode_loggers_sig.N_rules -> "nrules"
+  | Ode_loggers_sig.Tmp -> "tmp"
+  | Ode_loggers_sig.Current_time -> "t"
 
 let declare_global logger string =
   let format = Loggers.get_encoding_format logger in
@@ -213,50 +189,65 @@ let initialize logger variable =
     begin
       let () =
         match variable with
-        | Rate _ -> Loggers.fprintf logger "k=zeros(nrules,1)"
-        | Rated _ -> Loggers.fprintf logger "kd=sparse(nrules,1)"
-        | Rateun _ -> Loggers.fprintf logger "kun=sparse(nrules,1)"
-        | Rateund _ -> Loggers.fprintf logger "kdun=sparse(nrules,1)"
-        | Expr _ -> Loggers.fprintf logger "var=zeros(nvar,1);"
-        | Init _ -> Loggers.fprintf logger "init=sparse(nodevar,1);"
-        | Initbis _ -> Loggers.fprintf logger "Init=zeros(nodevar,1);"
-        | Concentration _ -> Loggers.fprintf logger "y=zeros(nodevar,1)"
-        | Deriv _ -> Loggers.fprintf logger "dydt=zeros(nodevar,1);"
-        | Jacobian _ -> Loggers.fprintf logger "Jac = sparse(nodevar,nodevar);"
-        | Obs _ -> Loggers.fprintf logger "obs = zeros(nobs,1);"
-        | Tinit
-        | Tend
-        | InitialStep
-        | Period_t_points
-        | N_ode_var
-        | N_var
-        | N_rows
-        | N_obs
-        | Current_time
-        | N_rules -> ()
-        | Tmp -> Loggers.fprintf logger "tmp = zeros(nodevar,1);"
+        | Ode_loggers_sig.Rate _ ->
+          Loggers.fprintf logger "k=zeros(nrules,1)"
+        | Ode_loggers_sig.Rated _ ->
+          Loggers.fprintf logger "kd=sparse(nrules,1)"
+        | Ode_loggers_sig.Rateun _ ->
+          Loggers.fprintf logger "kun=sparse(nrules,1)"
+        | Ode_loggers_sig.Rateund _ ->
+          Loggers.fprintf logger "kdun=sparse(nrules,1)"
+        | Ode_loggers_sig.Expr _ ->
+          Loggers.fprintf logger "var=zeros(nvar,1);"
+        | Ode_loggers_sig.Init _ ->
+          Loggers.fprintf logger "init=sparse(nodevar,1);"
+        | Ode_loggers_sig.Initbis _ ->
+          Loggers.fprintf logger "Init=zeros(nodevar,1);"
+        | Ode_loggers_sig.Concentration _ ->
+          Loggers.fprintf logger "y=zeros(nodevar,1)"
+        | Ode_loggers_sig.Deriv _ ->
+          Loggers.fprintf logger "dydt=zeros(nodevar,1);"
+        | Ode_loggers_sig.Jacobian _ ->
+          Loggers.fprintf logger "Jac = sparse(nodevar,nodevar);"
+        | Ode_loggers_sig.Obs _ ->
+          Loggers.fprintf logger "obs = zeros(nobs,1);"
+        | Ode_loggers_sig.Tinit
+        | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.Period_t_points
+        | Ode_loggers_sig.N_ode_var
+        | Ode_loggers_sig.N_var
+        | Ode_loggers_sig.N_rows
+        | Ode_loggers_sig.N_obs
+        | Ode_loggers_sig.Current_time
+        | Ode_loggers_sig.N_rules -> ()
+        | Ode_loggers_sig.Tmp -> Loggers.fprintf logger "tmp = zeros(nodevar,1);"
 
       in
       let () =
         match variable with
-        | Tmp | Rate _ | Rateun _ | Rated _ | Rateund _
-        | Expr _
-        | Init _
-        | Initbis _
-        | Concentration _
-        | Deriv _
-        | Obs _
-        | Jacobian _ -> Loggers.print_newline logger
-        | Tinit
-        | Tend
-        | InitialStep
-        | N_ode_var
-        | N_rows
-        | N_var
-        | N_obs
-        | N_rules
-        | Current_time
-        | Period_t_points -> ()
+        | Ode_loggers_sig.Tmp
+        | Ode_loggers_sig.Rate _
+        | Ode_loggers_sig.Rateun _
+        | Ode_loggers_sig.Rated _
+        | Ode_loggers_sig.Rateund _
+        | Ode_loggers_sig.Expr _
+        | Ode_loggers_sig.Init _
+        | Ode_loggers_sig.Initbis _
+        | Ode_loggers_sig.Concentration _
+        | Ode_loggers_sig.Deriv _
+        | Ode_loggers_sig.Obs _
+        | Ode_loggers_sig.Jacobian _ -> Loggers.print_newline logger
+        | Ode_loggers_sig.Tinit
+        | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.N_ode_var
+        | Ode_loggers_sig.N_rows
+        | Ode_loggers_sig.N_var
+        | Ode_loggers_sig.N_obs
+        | Ode_loggers_sig.N_rules
+        | Ode_loggers_sig.Current_time
+        | Ode_loggers_sig.Period_t_points -> ()
       in
       ()
     end
@@ -469,6 +460,11 @@ let string_of_compare_op logger op =
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
 
+let of_bool_op op =
+  match op with
+  | Operator.AND -> ( && )
+  | Operator.OR -> ( || )
+
 let string_of_bool_op logger op =
   let format = Loggers.get_encoding_format logger in
   match op with
@@ -567,6 +563,49 @@ and
     let () = print_bool_expr_in_sbml logger b network in
     let () = Loggers.fprintf logger "</apply>" in
     ()
+
+let rec eval_init_alg_expr alg_expr network =
+  match fst alg_expr with
+  | Alg_expr.CONST x  -> x
+  | Alg_expr.ALG_VAR _x -> Nbr.zero (* to do *)
+  (*  Loggers.fprintf logger "var(%i)" (network.int_of_obs x)*)
+  | Alg_expr.KAPPA_INSTANCE _x -> Nbr.zero (* to do *)
+  (*  Loggers.fprintf logger "%s(%i)" var (network.int_of_kappa_instance x) *)
+  | Alg_expr.TOKEN_ID _x -> Nbr.zero (* to do *)
+  (*  Loggers.fprintf logger "%s(%i)" var (network.int_of_token_id x)*)
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) -> Nbr.zero(* to do *)
+    (* Loggers.fprintf logger "tend" *)
+  | Alg_expr.STATE_ALG_OP
+      ( Operator.CPUTIME
+      | Operator.TIME_VAR
+      | Operator.EVENT_VAR
+      | Operator.EMAX_VAR
+      | Operator.NULL_EVENT_VAR ) -> Nbr.zero
+  | Alg_expr.BIN_ALG_OP (op, a, b) ->
+    Nbr.of_bin_alg_op
+      op
+      (eval_init_alg_expr a network)
+      (eval_init_alg_expr b network)
+  | Alg_expr.UN_ALG_OP (op, a) ->
+    Nbr.of_un_alg_op
+      op
+      (eval_init_alg_expr a network)
+  | Alg_expr.IF (cond, yes, no) ->
+    if eval_init_bool_expr cond network
+    then
+      eval_init_alg_expr yes network
+    else
+      eval_init_alg_expr no network
+and eval_init_bool_expr expr network =
+  match fst expr with
+  | Alg_expr.TRUE -> true
+  | Alg_expr.FALSE -> false
+  | Alg_expr.COMPARE_OP (op,a,b) ->
+    Nbr.of_compare_op op
+      (eval_init_alg_expr a network) (eval_init_alg_expr b network)
+  | Alg_expr.BOOL_OP (op,a,b) ->
+    of_bool_op op
+      (eval_init_bool_expr a network) (eval_init_bool_expr expr b)
 
 let rec print_alg_expr ?init_mode logger alg_expr network =
   let var = match init_mode with
@@ -1172,7 +1211,7 @@ let launch_main logger =
   | Loggers.Octave ->
     let () = Loggers.fprintf logger "main();" in
     Loggers.print_newline logger
-  | Loggers.SBML 
+  | Loggers.SBML
   | Loggers.Matlab
   | Loggers.Maple
   | Loggers.Json

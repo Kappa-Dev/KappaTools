@@ -17,6 +17,14 @@
   * under the terms of the GNU Library General Public License *)
 
 module StringMap = Map.Make (struct type t = string let compare = compare end)
+module VarOrd =
+struct
+  type t = Ode_loggers_sig.variable
+  let compare = compare
+end
+module VarMap = Map.Make(VarOrd)
+module VarSet = Set.Make(VarOrd)
+
 type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
   | Matlab | Maple | Json | SBML
@@ -48,6 +56,8 @@ type t =
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
+    env: (Ode_loggers_sig.ode_var_id,int) Alg_expr.e Location.annot VarMap.t ref ;
+    const: VarSet.t ref
   }
 
 let refresh_id t =
@@ -68,7 +78,10 @@ let dummy_html_logger =
     channel_opt = None;
     current_line = [];
     nodes = ref [];
-    edges = ref []}
+    edges = ref [];
+    env = ref VarMap.empty;
+    const = ref VarSet.empty;
+  }
 
 let dummy_txt_logger =
   {
@@ -79,7 +92,10 @@ let dummy_txt_logger =
     logger = DEVNUL;
     current_line = [];
     nodes = ref [];
-    edges = ref []
+    edges = ref [];
+    env = ref VarMap.empty;
+    const = ref VarSet.empty;
+
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -262,6 +278,9 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      env = ref VarMap.empty;
+      const = ref VarSet.empty;
+
     }
   in
   let () = print_preamble logger in
@@ -278,6 +297,8 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      env = ref VarMap.empty;
+      const = ref VarSet.empty;
     }
   in
   let () = print_preamble logger in
@@ -293,6 +314,8 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    env = ref VarMap.empty;
+    const = ref VarSet.empty;
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
@@ -306,6 +329,8 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      env = ref VarMap.empty;
+      const = ref VarSet.empty;
     }
   in
   let () = print_preamble logger in
@@ -368,6 +393,31 @@ let channel_of_logger logger = logger.channel_opt
 let add_node t s d = t.nodes:= (s,d)::(!(t.nodes))
 let add_edge t s1 s2 d = t.edges:= (s1,s2,d)::(!(t.edges))
 let graph_of_logger logger = List.rev !(logger.nodes), List.rev !(logger.edges)
+
+let get_expr t v =
+  try
+    Some (VarMap.find v (!(t.env)))
+  with
+  | Not_found -> None
+
+let set_expr t v expr =
+  let const = Ode_loggers_sig.is_expr_const expr in
+  let () =
+    if const then
+      begin
+        let _ = VarSet.remove v (!(t.const)) in
+        ()
+      end
+    else
+        begin
+          let _ = VarSet.add v (!(t.const)) in
+          ()
+        end
+  in
+  let _ = VarMap.add v expr (!(t.env)) in ()
+
+let is_const t v =
+  VarSet.mem v (!(t.const))
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in
