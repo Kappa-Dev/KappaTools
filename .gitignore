@@ -42,6 +42,7 @@ man/KaSim_manual.toc
 man/zzKaSim_manual.ps
 
 # test suite
+models/test_suite/*/*/output/*.xml
 models/test_suite/*/*/output/*.html
 models/test_suite/*/*/output/*.diff
 models/test_suite/*/*/output/*.dot
