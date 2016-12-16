@@ -31,16 +31,18 @@ let space f = pp_print_space f ()
 let cut f = pp_print_cut f ()
 let empty f = pp_print_string f ""
 let pair ppa ppb f (a,b) = fprintf f "(%a, %a)" ppa a ppb b
-let option pr f = function
+let option ?(with_space=true) pr f = function
   | None -> ()
-  | Some x -> fprintf f "@ %a" pr x
+  | Some x -> fprintf f "%t%a"
+                (fun f -> if with_space then Format.pp_print_space f () else ())
+                pr x
 
 let array ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
   let rec aux i f =
     if i < Array.length a then
       let () = pr_el i f a.(i) in
       if i < Array.length a - 1 then
-	let () = pr_sep f in aux (succ i) f
+        let () = pr_sep f in aux (succ i) f
       else if i > 0 then trailing f
   in aux 0 f
 
@@ -49,7 +51,7 @@ let plain_array pr_el f a =
     if i < Array.length a then
       let () = Format.fprintf f "%i:%a" i pr_el a.(i) in
       if i < Array.length a - 1 then
-	Format.fprintf f ";@,%t" (aux (succ i))
+        Format.fprintf f ";@,%t" (aux (succ i))
   in Format.fprintf f "[|%t|]" (aux 0)
 
 let error pr x =

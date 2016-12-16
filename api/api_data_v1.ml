@@ -32,9 +32,9 @@ let plot_values
         ("time"::plot.Api_types_v1_j.legend))::
      List.rev_map
        (fun (observable : Api_types_v1_j.observable) ->
-          Format.asprintf "%a"
+          Format.asprintf "@[<h>%a@]"
             (Pp.list (fun f -> Format.pp_print_string f separator)
-               (Pp.option (fun f -> Format.fprintf f "%e")))
+               (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e")))
             (Some observable.Api_types_v1_j.observation_time
              ::observable.Api_types_v1_j.observation_values)
        )

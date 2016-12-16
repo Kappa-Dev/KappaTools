@@ -13,9 +13,10 @@ val set :
   ('b -> 'a list) -> (formatter -> unit) -> (formatter -> 'a -> unit) ->
   formatter -> 'b -> unit
 val hashtbl : (formatter -> unit) -> (formatter -> 'a * 'b -> unit) ->
-	  formatter -> ('a,'b) Hashtbl.t -> unit
+  formatter -> ('a,'b) Hashtbl.t -> unit
 
-val option : (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
+val option : ?with_space:bool ->
+  (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
 val pair : (formatter -> 'a -> unit) -> (formatter -> 'b -> unit) ->
   formatter -> 'a * 'b -> unit
 val bottom : formatter -> unit
@@ -37,6 +38,6 @@ val plain_array : (formatter -> 'a -> unit) -> formatter -> 'a array -> unit
 val error : (formatter -> 'a -> unit) -> 'a Location.annot -> unit
 
 val list_to_string : (unit -> string) ->
-		     (unit -> 'a -> string) -> unit -> 'a list -> string
+  (unit -> 'a -> string) -> unit -> 'a list -> string
 val set_to_string : ('b -> 'a list) -> (unit -> string) ->
-		    (unit -> 'a -> string) -> unit -> 'b -> string
+  (unit -> 'a -> string) -> unit -> 'b -> string
