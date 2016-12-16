@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Sep 01 2016>
+  * Last modification: Time-stamp: <Dec 16 2016>
 *)
 
 type compil =
@@ -192,6 +192,17 @@ let print_rule_name ?compil f r =
   let env = environment_opt compil in
   let id = r.Primitives.syntactic_rule in
   Environment.print_ast_rule ?env f id
+
+let string_of_var_id ?compil r =
+  let env = environment_opt compil in
+  match env with
+  | None -> "var("^(string_of_int r)^")"
+  | Some env ->
+    try
+      let array = Environment.get_algs env in
+      fst (array.(r-1))
+    with
+      _ -> "var("^(string_of_int r)^")"
 
 let rate_name compil rule rule_id =
   let (_kade_id,arity,direction) = rule_id in

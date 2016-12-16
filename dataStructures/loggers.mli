@@ -25,7 +25,7 @@ sig
   type 'a t
   val add : encoding -> 'a  -> 'a t -> 'a t
   val find : encoding -> 'a t -> 'a
-  val empty : 'a t 
+  val empty : 'a t
 end
 
 module FormatMap:FormatMap
@@ -47,6 +47,7 @@ val open_logger_from_channel: ?mode:encoding -> out_channel -> t
 val open_row: t -> unit
 val close_row: t -> unit
 val print_breakable_space: t -> unit
+val print_breakable_hint: t -> unit
 val dummy_txt_logger: t
 val dummy_html_logger: t
 val redirect: t -> Format.formatter -> t

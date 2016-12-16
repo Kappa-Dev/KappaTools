@@ -1,5 +1,7 @@
 type ode_var_id = int
 
+let int_of_ode_var_id i = i
+
 type variable =
   | Expr of int
   | Init of int
@@ -49,3 +51,53 @@ and is_bool_const expr =
     is_expr_const a && is_expr_const b
   | Alg_expr.BOOL_OP (_,a,b),_ ->
     is_bool_const a && is_bool_const b
+
+    let string_of_variable var =
+      match var with
+      | Rate int -> Printf.sprintf "k(%i)" int
+      | Rated int -> Printf.sprintf "kd(%i)" int
+      | Rateun int -> Printf.sprintf "kun(%i)" int
+      | Rateund int -> Printf.sprintf "kdun(%i)" int
+      | Expr int -> Printf.sprintf "var(%i)" int
+      | Obs int -> Printf.sprintf "obs(%i)" int
+      | Init int -> Printf.sprintf "init(%i)" int
+      | Initbis int -> Printf.sprintf "Init(%i)" int
+      | Concentration int -> Printf.sprintf "y(%i)" int
+      | Deriv int -> Printf.sprintf "dydt(%i)" int
+      | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
+      | Tinit -> "tinit"
+      | Tend -> "tend"
+      | InitialStep -> "initialstep"
+      | Period_t_points -> "period_t_point"
+      | N_ode_var -> "nodevar"
+      | N_var -> "nvar"
+      | N_obs -> "nobs"
+      | N_rules -> "nrules"
+      | N_rows -> "nrows"
+      | Tmp -> "tmp"
+      | Current_time -> "t"
+
+    let string_of_array_name var =
+      match var with
+      | Rate _ -> "k"
+      | Rated _ -> "kd"
+      | Rateun _ -> "kun"
+      | Rateund _ -> "kdun"
+      | Expr _ -> "var"
+      | Obs _ -> "obs"
+      | Init _ -> "init"
+      | Initbis _ -> "Init"
+      | Concentration _ -> "y"
+      | Deriv _ -> "dydt"
+      | Jacobian _ -> "Jac"
+      | Tinit -> "tinit"
+      | Tend -> "tend"
+      | InitialStep -> "initialstep"
+      | Period_t_points -> "period_t_point"
+      | N_ode_var -> "nodevar"
+      | N_var -> "nvar"
+      | N_obs -> "nobs"
+      | N_rows -> "nrows"
+      | N_rules -> "nrules"
+      | Tmp -> "tmp"
+      | Current_time -> "t"

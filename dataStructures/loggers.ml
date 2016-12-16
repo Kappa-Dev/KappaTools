@@ -43,6 +43,7 @@ module FormatMap =
 type token =
   | String of string
   | Breakable_space
+  | Breakable_hint
 
 type logger =
   | DEVNUL
@@ -170,6 +171,21 @@ let print_breakable_space logger =
   else
     fprintf logger " "
 
+let print_breakable_hint logger =
+      if breakable logger.encoding
+      then
+        match
+          logger.logger
+        with
+        | DEVNUL
+        | Formatter _ ->
+          fprintf logger "@,"
+        | Circular_buffer _
+        | Infinite_buffer _ ->
+          logger.current_line <- Breakable_hint::logger.current_line
+      else
+        fprintf logger ""
+
 let end_of_line_symbol logger =
   match
     logger.encoding
@@ -187,7 +203,9 @@ let dump_token f x =
     Format.pp_print_string
       f s
   | Breakable_space ->
-    Format.fprintf f "@ " (* Check with Pierre *)
+    Format.fprintf f "@ "
+  | Breakable_hint ->
+    Format.fprintf f "@,"
 
 let print_newline logger =
   let () =
@@ -422,17 +440,11 @@ let set_expr t v expr =
   let const = Ode_loggers_sig.is_expr_const expr in
   let () =
     if const then
-      begin
-        let _ = VarSet.remove v (!(t.const)) in
-        ()
-      end
+        t.const := VarSet.remove v (!(t.const))
     else
-        begin
-          let _ = VarSet.add v (!(t.const)) in
-          ()
-        end
+      t.const := VarSet.add v (!(t.const))
   in
-  let _ = VarMap.add v expr (!(t.env)) in ()
+  t.env := VarMap.add v expr (!(t.env))
 
 let is_const t v =
   VarSet.mem v (!(t.const))

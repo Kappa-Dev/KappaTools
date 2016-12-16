@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Sep 01 2016>
+  * Last modification: Time-stamp: <Dec 16 2016>
 *)
 
 module type Interface =
@@ -85,6 +85,8 @@ sig
     ?compil:compil -> Format.formatter -> rule -> unit
   val print_rule_name:
     ?compil:compil -> Format.formatter -> rule -> unit
+  val string_of_var_id: 
+    ?compil:compil -> int -> string
   val rate:
     compil -> rule -> rule_id_with_mode ->
     (connected_component array list,int) Alg_expr.e Location.annot option

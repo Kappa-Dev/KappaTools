@@ -17,13 +17,6 @@
 
 type correct = Div of int | Mul of int | Nil
 
-type ('a,'b) network_handler =
-  {
-    int_of_obs: 'b -> int;
-    int_of_kappa_instance:  'a -> int;
-    int_of_token_id: 'b -> int;
-  }
-
 type options =
   | Comment of string
 
@@ -45,12 +38,14 @@ val print_dump_plots: data_file:string ->  command_line:string ->  titles:string
 
 val initialize: Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
-  ?init_mode:bool -> ?comment:string -> Loggers.t -> Ode_loggers_sig.variable ->
-  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) network_handler -> unit
+  ?init_mode:bool -> ?comment:string ->
+  (int -> string) ->
+  Loggers.t -> Ode_loggers_sig.variable ->
+  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val increment:
   ?init_mode:bool -> ?comment:string -> Loggers.t -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,
-   Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) network_handler -> unit
+   Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val associate_nrows: Loggers.t -> unit
 val associate_t: Loggers.t -> int -> unit
 val init_time: Loggers.t -> int -> unit
@@ -64,7 +59,10 @@ val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> na
 val update_token:
   Loggers.t -> Ode_loggers_sig.variable -> nauto_in_lhs:int -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.variable * correct) list ->
-  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) network_handler -> unit
+  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
+
+val print_newline:
+  Loggers.t -> unit
 
 val print_comment:
   Loggers.t ->
