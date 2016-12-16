@@ -5,7 +5,32 @@ let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
 let influenceFileName = ref ""
-let odeFileName = ref "ode.m"
+let odeFileName  =
+  begin
+    List.fold_left
+      (fun map (key,value) ->
+         Loggers.FormatMap.add key (ref value) map)
+      Loggers.FormatMap.empty
+      [
+        Loggers.Octave, "ode.m";
+        Loggers.Matlab, "ode.m";
+        Loggers.SBML, "network.xml"
+      ]
+  end
+
+let get_odeFileName backend =
+  try
+    Loggers.FormatMap.find backend odeFileName
+  with
+    Not_found ->
+    let output = ref "" in
+    let _ = Loggers.FormatMap.add backend output odeFileName in
+    output
+
+let set_odeFileName backend name =
+  let reference = get_odeFileName backend in
+  reference:=name
+
 let fluxFileName = ref ""
 let distancesFileName = ref "distances"
 
@@ -63,7 +88,9 @@ let setOutputName () =
   set snapshotFileName (Some "dot");
   set influenceFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
-  set odeFileName (Some "m") ;
+  set (get_odeFileName Loggers.Octave) (Some "m") ;
+  set (get_odeFileName Loggers.Matlab) (Some "m") ;
+  set (get_odeFileName Loggers.SBML) (Some "xml") ;
   set marshalizedOutFile None
 
 let setCheckFileExists ~batchmode outputFile =
@@ -84,7 +111,7 @@ let setCheckFileExists ~batchmode outputFile =
   check !marshalizedOutFile ;
   check outputFile
 
-let setCheckFileExistsODE ~batchmode =
+let setCheckFileExistsODE ~batchmode ~mode =
     let check file =
       match file with
       | "" -> ()
@@ -98,7 +125,7 @@ let setCheckFileExistsODE ~batchmode =
     if answer<>"y" then exit 1
     in
     let () = setOutputName () in
-    check !odeFileName
+    check !(get_odeFileName mode)
 
 let with_channel str f =
   if str <> ""  then
@@ -123,8 +150,10 @@ let set_dir s =
 
 let get_dir () = !outputDirName
 
-let set_ode f = odeFileName := f
-let get_ode () = !odeFileName
+let set_ode ~mode f =
+  set_odeFileName mode f
+let get_ode ~mode =
+  !(get_odeFileName mode)
 
 let set_distances f = distancesFileName := f
 let get_distances () = !distancesFileName

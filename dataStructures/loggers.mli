@@ -19,6 +19,17 @@
 type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
   | Matlab | Maple | Json | SBML
+
+module type FormatMap =
+sig
+  type 'a t
+  val add : encoding -> 'a  -> 'a t -> 'a t
+  val find : encoding -> 'a t -> 'a
+  val empty : 'a t 
+end
+
+module FormatMap:FormatMap
+
 type t
 
 val refresh_id: t -> unit
@@ -64,3 +75,4 @@ val is_const:
 
 val of_json: Yojson.Basic.json -> string list
 val to_json: t -> Yojson.Basic.json
+val get_fresh_reaction_id: t -> int

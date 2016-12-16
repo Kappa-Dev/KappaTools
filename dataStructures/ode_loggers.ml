@@ -744,19 +744,15 @@ and print_bool_expr ?init_mode logger expr network =
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_sbml_parameters logger variable expr network =
-  let () = Loggers.fprintf logger "<parameter>" in
-  let () = Loggers.print_breakable_space logger in
-  let () =
-    Loggers.fprintf
-      logger "<id =\"%s\" value=\"%s\">"
-      (string_of_variable variable)
-      (Nbr.to_string expr)
-  in
-  let () = Loggers.print_breakable_space logger in
-  let () = Loggers.fprintf logger "</parameter>" in
-  let () = Loggers.print_newline logger in
-  ()
+let print_sbml_parameters logger variable expr _network =
+  Sbml_backend.add_box
+    logger
+    "parameter"
+    (fun logger ->
+       Loggers.fprintf
+         logger "<id =\"%s\" value=\"%s\">"
+         (string_of_variable variable)
+         (Nbr.to_string expr))
 
 let print_comment
     logger
@@ -805,8 +801,8 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") logger variable
   | Loggers.SBML ->
     begin
       match variable, init_mode with
-      | Ode_loggers_sig.Expr i, _ -> ()
-      | Ode_loggers_sig.Init i, true -> ()
+      | Ode_loggers_sig.Expr _i, _ -> ()
+      | Ode_loggers_sig.Init _i, true -> ()
       | Ode_loggers_sig.Init _, false -> ()
       | Ode_loggers_sig.Initbis _, _ -> ()
       | Ode_loggers_sig.Concentration _,_ -> ()

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 14 2016>
+  * Last modification: Time-stamp: <Dec 16 2016>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -82,7 +82,10 @@ let main () =
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
     let () =
-      Kappa_files.setCheckFileExistsODE ~batchmode:cli_args.Run_cli_args.batchmode in
+      Kappa_files.setCheckFileExistsODE 
+        ~batchmode:cli_args.Run_cli_args.batchmode
+        ~mode:backend
+    in
     let command_line =
       Format.asprintf "%a"
         (Pp.array (fun f -> Format.fprintf f " ")
@@ -103,7 +106,9 @@ let main () =
       A.get_compil
         ~rate_convention ~show_reactions ~count ~compute_jacobian cli_args in
     let network = A.network_from_compil compil in
-    let out_channel = Kappa_files.open_out (Kappa_files.get_ode ()) in
+    let out_channel =
+      Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
+    in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
     let () = A.export_network
         ~command_line

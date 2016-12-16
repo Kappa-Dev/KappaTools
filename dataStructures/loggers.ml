@@ -29,6 +29,17 @@ type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
   | Matlab | Maple | Json | SBML
 
+module type FormatMap =
+sig
+  type 'a t
+  val add : encoding -> 'a  -> 'a t -> 'a t
+  val find : encoding -> 'a t -> 'a
+  val empty : 'a t
+end
+
+module FormatMap =
+  Map.Make(struct type t = encoding let compare = compare end)
+
 type token =
   | String of string
   | Breakable_space
@@ -53,6 +64,7 @@ type t =
     channel_opt: out_channel option;
     id_map: int StringMap.t ref ;
     fresh_id: int ref ;
+    fresh_reaction_id: int ref;
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
@@ -79,6 +91,7 @@ let dummy_html_logger =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
   }
@@ -93,6 +106,7 @@ let dummy_txt_logger =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
 
@@ -278,6 +292,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
 
@@ -297,6 +312,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
     }
@@ -314,6 +330,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
   }
@@ -329,6 +346,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
     }
@@ -418,6 +436,11 @@ let set_expr t v expr =
 
 let is_const t v =
   VarSet.mem v (!(t.const))
+
+let get_fresh_reaction_id t =
+  let output = !(t.fresh_reaction_id) in
+  let () = t.fresh_reaction_id:=succ output in
+  output
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in

@@ -3,12 +3,12 @@ val open_out : string -> out_channel
 val path : string -> string
 val mk_dir_r : string -> unit
 val setCheckFileExists : batchmode:bool -> string -> unit
-val setCheckFileExistsODE : batchmode:bool -> unit
+val setCheckFileExistsODE : batchmode:bool -> mode:Loggers.encoding -> unit
 val set_dir : string -> unit
 val get_dir : unit -> string
 
-val set_ode : string -> unit
-val get_ode : unit -> string
+val set_ode : mode:Loggers.encoding -> string -> unit
+val get_ode : mode:Loggers.encoding -> string
 
 val set_distances : string -> unit
 val get_distances : unit -> string

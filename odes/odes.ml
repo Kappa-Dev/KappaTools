@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 15 2016>
+  * Last modification: Time-stamp: <Dec 16 2016>
 *)
 
 let local_trace = false
@@ -106,6 +106,13 @@ struct
       lhs_cc: (connected_component_id * I.connected_component) list ;
       divide_rate_by: int
     }
+
+  let get_comment e = e.comment
+  let get_rule_id_with_mode e = e.rule_id_with_mode
+  let get_rule e = e.rule
+  let get_lhs e = e.lhs
+  let get_lhs_cc e = e.lhs_cc
+  let get_divide_rate_by e = e.divide_rate_by
 
   let rule_id_of e =
     let (a,_,_) = e.rule_id_with_mode in a
@@ -1267,7 +1274,9 @@ struct
 
   let export_dydt logger compil network split =
     let is_zero = fresh_is_zero network in
+    let label = "listOfReactions" in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
+    let () = Sbml_backend.open_box logger label in
     let () = print_newline logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
@@ -1310,12 +1319,27 @@ struct
     let () =
       List.iter
         (fun (reactants, products, token_vector, enriched_rule) ->
+           let () =
+             Sbml_backend.dump_sbml_reaction
+               get_rule
+               I.print_rule_name
+               (fun ?compil logger i ->
+                  I.print_chemical_species ?compil logger i)
+               (fun i -> species_of_species_id network i)
+               (Some compil)
+               logger
+               reactants
+               products
+               token_vector
+               enriched_rule
+           in
            let nauto_in_lhs = enriched_rule.divide_rate_by in
            let () =
              if I.do_we_prompt_reactions compil
              then
                let rule_string =
-                 Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule in
+                 Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule
+               in
                let () = print_newline logger in
                let () =
                  Ode_loggers.print_comment logger ("rule    : "^rule_string)
@@ -1375,6 +1399,7 @@ struct
     let () = Ode_loggers.associate logger (Ode_loggers_sig.Deriv (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network) in
     let () = print_newline logger in
     let () = Ode_loggers.close_procedure logger in
+    let () = Sbml_backend.close_box logger label in
     let () = print_newline logger in
     let () = print_newline logger in
     ()
