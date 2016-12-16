@@ -58,7 +58,17 @@ val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) 
 val pop_json: parameter -> Yojson.Basic.json option
 val profiling_state_to_json: parameter -> Yojson.Basic.json
 val error_list_to_json: parameter -> Yojson.Basic.json
-val computation_steps_to_json: parameter -> Yojson.Basic.json 
+val computation_steps_to_json: parameter -> Yojson.Basic.json
+
+(* on the fly causal compression *)
+type on_the_fly_cut_state
+val on_the_fly_cut_init : on_the_fly_cut_state
+val on_the_fly_cut_step :
+  on_the_fly_cut_state -> Trace.step -> on_the_fly_cut_state
+val on_the_fly_cut_finalize : on_the_fly_cut_state -> Trace.step list
+
+val cut_rev_trace:
+  Trace.step list (*reverse order*) -> Trace.step list (* correct order *)
 
 (** traces *)
 type trace

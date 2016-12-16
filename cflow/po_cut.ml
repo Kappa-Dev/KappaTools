@@ -23,6 +23,17 @@ sig
   module K:Kappa_instantiation.Cflow_signature
 
   val cut: (Trace.t,(Trace.t * int )) K.H.unary
+
+  type on_the_fly_state
+  val init_cut : on_the_fly_state
+  val cut_step :
+    on_the_fly_state -> Trace.step -> on_the_fly_state
+  val finalize_cut : on_the_fly_state -> Trace.step list * int
+
+  val cut_rev_trace:
+    Trace.step list (*reverse order*) -> Trace.step list (* correct order *) * int
+
+
 end
 
 module Po_cut =
@@ -93,83 +104,92 @@ module Po_cut =
     let predicates_of_side_effects sides =
       List.map (fun ((ag_id,_),s_id) -> Bound_site(ag_id,s_id)) sides
 
-    let cut parameter handler info error event_list =
-      let seen_predicates = PS.empty in
+    type on_the_fly_state = PS.t * Trace.step list * int
+    let init_cut = (PS.empty, [], 0)
+    let finalize_cut (a,b,c) = b,c
+
+    let cut_step (seen,kept,n_cut) event =
+      let rec keep l =
+        match l
+        with
+        | [] -> false
+        | t0::q0 ->
+          let rec aux1 l =
+            match l
+            with
+            | [] -> keep q0
+            | t1::q1 ->
+              if PS.mem t1 seen
+              then true
+              else aux1 q1
+          in
+          aux1 (predicates_of_action t0)
+      in
+      let rec keep2 l =
+        match l
+        with
+        | [] -> false
+        | t::q ->
+          if PS.mem t seen
+          then
+            true
+          else
+            keep2 q
+      in
+      let (action_list,_) = Trace.actions_of_step event in
+      let seen =
+        List.fold_left
+          (fun seen action ->
+             List.fold_left
+               (fun seen elt -> PS.remove elt seen)
+               seen
+               (created_predicates_of_action action)
+          )
+          seen action_list
+      in
+      let (actions,_) = Trace.actions_of_step event in
+      if (Trace.step_is_obs event)
+      || (keep actions)
+      || (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
+      then
+        begin
+          let kept = event::kept in
+          let tests = Trace.tests_of_step event in
+          let tests' = predicates_of_side_effects (K.get_kasim_side_effects event) in
+          let seen =
+            List.fold_left
+              (fun seen test ->
+                 List.fold_left
+                   (fun seen predicate_info -> PS.add predicate_info seen)
+                   seen
+                   (predicates_of_test test)
+              )
+              seen
+              tests
+          in
+          let seen =
+            List.fold_left
+              (fun seen predicate_info -> PS.add predicate_info seen)
+              seen
+              tests'
+          in
+          (seen,kept,n_cut)
+        end
+      else
+        (seen,kept,n_cut+1)
+
+    let cut_rev_trace rev_event_list =
       let _,event_list,n =
         List.fold_left
-          (fun (seen,kept,n_cut) event ->
-             let rec keep l =
-               match l
-               with
-               | [] -> false
-               | t0::q0 ->
-                 let rec aux1 l =
-                   match l
-                   with
-                   | [] -> keep q0
-                   | t1::q1 ->
-                     if PS.mem t1 seen
-                     then true
-                     else aux1 q1
-                 in
-                 aux1 (predicates_of_action t0)
-             in
-             let rec keep2 l =
-               match l
-               with
-               | [] -> false
-               | t::q ->
-                 if PS.mem t seen
-                 then
-                   true
-                 else
-                   keep2 q
-             in
-             let (action_list,_) = Trace.actions_of_step event in
-             let seen =
-               List.fold_left
-                 (fun seen action ->
-                    List.fold_left
-                      (fun seen elt -> PS.remove elt seen)
-                      seen
-                      (created_predicates_of_action action)
-                 )
-                 seen action_list
-             in
-             let (actions,_) = Trace.actions_of_step event in
-             if (Trace.step_is_obs event)
-             || (keep actions)
-             || (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
-             then
-               begin
-                 let kept = event::kept in
-                 let tests = Trace.tests_of_step event in
-                 let tests' = predicates_of_side_effects (K.get_kasim_side_effects event) in
-                 let seen =
-                   List.fold_left
-                     (fun seen test ->
-                        List.fold_left
-                          (fun seen predicate_info -> PS.add predicate_info seen)
-                          seen
-                          (predicates_of_test test)
-                     )
-                     seen
-                     tests
-                 in
-                 let seen =
-                   List.fold_left
-                     (fun seen predicate_info -> PS.add predicate_info seen)
-                     seen
-                     tests'
-                 in
-                 (seen,kept,n_cut)
-               end
-             else
-               (seen,kept,n_cut+1)
-          )
-          (seen_predicates,[],0)
-          (List.rev event_list)
+          cut_step
+          init_cut
+          rev_event_list
       in
-      error,info,(event_list,n)
+      (event_list,n)
+
+    let cut _parameter _handler info error event_list =
+      let trace = cut_rev_trace (List.rev event_list) in
+      error, info, trace
+
 
   end:Po_cut)

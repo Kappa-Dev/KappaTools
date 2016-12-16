@@ -303,6 +303,19 @@ let cut =
     Require_the_abscence_of_ambiguity
     Neutral
 
+type on_the_fly_cut_state = S.PH.B.PB.CI.Po.on_the_fly_state
+let on_the_fly_cut_init =
+  S.PH.B.PB.CI.Po.init_cut
+let on_the_fly_cut_step =
+  S.PH.B.PB.CI.Po.cut_step
+let on_the_fly_cut_finalize cut_state =
+  fst (S.PH.B.PB.CI.Po.finalize_cut cut_state)
+
+let cut_rev_trace rev_trace =
+    on_the_fly_cut_finalize
+      (List.fold_left on_the_fly_cut_step on_the_fly_cut_init rev_trace)
+
+
 let remove_obs_before parameter handler log_info error last_eid trace =
   error,log_info,
   (
