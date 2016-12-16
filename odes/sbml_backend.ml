@@ -82,12 +82,13 @@ let rec print_alg_expr_in_sbml logger
           expr
           network
       | None ->
-        Loggers.fprintf logger "<ci>v%i</ci>" (network.int_of_obs x)
+        Loggers.fprintf logger "<ci>v%i</ci>" (network.Network_handler.int_of_obs x)
     end
   | Alg_expr.KAPPA_INSTANCE x ->
-    Loggers.fprintf logger "<ci>y%i</ci>" (network.int_of_kappa_instance x)
+    Loggers.fprintf logger "<ci>y%i</ci>"
+      (network.Network_handler.int_of_kappa_instance x)
   | Alg_expr.TOKEN_ID x ->
-    Loggers.fprintf logger "<ci>y%i</ci>" (network.int_of_token_id x)
+    Loggers.fprintf logger "<ci>y%i</ci>" (network.Network_handler.int_of_token_id x)
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
     Loggers.fprintf logger "<ci>tend</ci>"
   | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
@@ -258,6 +259,9 @@ let dump_list_of_species_reference
 
 let dump_kinetic_law
     logger compil network print_species species_of_id reactants var_rule correct =
+  do_sbml logger
+    (fun logger  ->
+       begin
   let expr_opt =
     Loggers.get_expr logger var_rule in
   let expr = unsome expr_opt in
@@ -299,7 +303,8 @@ let dump_kinetic_law
                     aux q)
            in aux reactants
         )
-
+       end
+    )
 
 let dump_reactants_of_token_vector
     print_chemical_species

@@ -129,6 +129,23 @@ end
 
 
 
+function Init=ode_init()
+
+global nodevar
+global init
+Init=zeros(nodevar,1);
+
+Init(1) = init(1); %B(x)
+Init(2) = init(2); %A(x)
+Init(3) = init(3); %R(e, r)
+Init(4) = init(4); %E(r)
+Init(5) = init(5); %E(r!1), R(e!1, r)
+Init(6) = init(6); %E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
+Init(7) = init(7); %A(x!1), B(x!1)
+Init(8) = init(8); %t
+end
+
+
 function dydt=ode_aux(t,y)
 
 global nodevar
@@ -213,23 +230,6 @@ dydt(5)=dydt(5)+k(1)*y(4)*y(3);
 dydt(3)=dydt(3)+k(6);
 dydt(8)=1;
 
-end
-
-
-function Init=ode_init()
-
-global nodevar
-global init
-Init=zeros(nodevar,1);
-
-Init(1) = init(1); %B(x)
-Init(2) = init(2); %A(x)
-Init(3) = init(3); %R(e, r)
-Init(4) = init(4); %E(r)
-Init(5) = init(5); %E(r!1), R(e!1, r)
-Init(6) = init(6); %E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
-Init(7) = init(7); %A(x!1), B(x!1)
-Init(8) = init(8); %t
 end
 
 

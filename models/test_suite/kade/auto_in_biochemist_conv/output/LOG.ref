@@ -19,6 +19,6 @@ done
 	 -observables 
 + exporting the network... 
 	 -main function 
-	 -ode system 
 	 -initial state 
+	 -ode system 
 	 -observables 
