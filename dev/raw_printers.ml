@@ -7,7 +7,7 @@ let print_bool f a =
     (fun f (x,_) -> Format.pp_print_string f x)
     (fun f (x,_) -> Format.pp_print_string f x) f a
 let print_cc = Pattern.print_cc ?sigs:None ?cc_id:None
-let print_place = Agent_place.print ?sigs:None
+let print_place = Matching.Agent.print ?sigs:None
 let print_transformation = Primitives.Transformation.print ?sigs:None
 let print_rule = Kappa_printer.elementary_rule ?env:None
 let print_modification = Kappa_printer.modification ?env:None

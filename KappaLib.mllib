@@ -23,7 +23,6 @@ LKappa
 Signature
 NamedDecls
 Agent
-Agent_place
 Instantiation
 Alg_expr
 Primitives
@@ -36,6 +35,7 @@ Raw_mixture
 Edges
 Navigation
 Pattern
+Matching
 Snip
 Edges
 Trace

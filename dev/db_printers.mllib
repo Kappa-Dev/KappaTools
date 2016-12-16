@@ -17,6 +17,7 @@ Tk_version
 Git_commit_info
 Config
 Int_storage
+Fifo
 Exception_without_parameter
 Exception
 Remanent_state_signature

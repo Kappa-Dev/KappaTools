@@ -863,8 +863,8 @@ module PreEnv : sig
   val to_work : t -> work
 
   val add_cc :
-    ?origin:Operator.DepSet.elt -> prepoint list Mods.IntMap.t -> id -> cc ->
-    prepoint list Mods.IntMap.t * Renaming.t * id
+    toplevel:bool -> ?origin:Operator.DepSet.elt -> prepoint list Mods.IntMap.t ->
+    id -> cc -> prepoint list Mods.IntMap.t * Renaming.t * id
   val get : t -> id -> cc
 
   val sigs : t -> Signature.s
@@ -979,28 +979,37 @@ end = struct
             (Renaming.compose false inj_dst2nav inj_nav''2q) h.Env.dst nav'' in
     insert_nav_sons point.Env.sons
 
-  let add_cc ?origin env p_id element =
+  let add_cc ~toplevel ?origin env p_id element =
     let w = weight element in
     let rec aux = function
       | [] ->
-        let roots =
-          match origin,find_root element with
-          | _, None | None, _ -> None
-          | Some _, Some (rid,rty) ->
-            Some (List.sort Mods.int_compare
-                    (List.map
-                       (fun r -> Renaming.apply r rid)
-                       (automorphisms element)),rty) in
+        let roots = if toplevel then
+            match find_root element with
+            | None -> None
+            | Some (rid,rty) ->
+              Some (List.sort Mods.int_compare
+                      (List.map
+                         (fun r -> Renaming.apply r rid)
+                         (automorphisms element)),rty)
+          else None in
         [{p_id; element;roots;
           depending=add_origin Operator.DepSet.empty origin}],
         identity_injection element,p_id
       | h :: t -> match equal element h.element with
         | None -> let a,b,c = aux t in h::a,b,c
         | Some r ->
-          {p_id=h.p_id;
-           element=h.element;
-           depending=add_origin h.depending origin;
-           roots=h.roots}::t,r,h.p_id in
+          let roots =
+            if h.roots <> None || not toplevel then h.roots
+            else match find_root element with
+              | None -> None
+              | Some (rid,rty) ->
+                Some (List.sort Mods.int_compare
+                        (List.map
+                           (fun r -> Renaming.apply r rid)
+                           (automorphisms element)),rty) in
+          {p_id=h.p_id; element=h.element;
+           depending=add_origin h.depending origin; roots;
+          }::t,r,h.p_id in
     let env_w,r,out = aux (Mods.IntMap.find_default [] w env) in
     Mods.IntMap.add w env_w env,r,out
 
@@ -1018,7 +1027,8 @@ end = struct
             (fun (mid,acc) r ->
                let id' = succ mid in
                let x,_,id =
-                 add_cc acc id' (intersection r this.element h.element) in
+                 add_cc ~toplevel:false acc id'
+                   (intersection r this.element h.element) in
               ((if id = id' then id else mid),x))
             acc list in
        saturate_one this max_l level acc' t
@@ -1144,7 +1154,8 @@ let finish_new ?origin wk =
   let cc_candidate =
     { nodes_by_type = wk.used_id; nodes = wk.cc_nodes;
       recogn_nav = raw_to_navigation false wk.used_id wk.cc_nodes} in
-  let preenv,r,out = PreEnv.add_cc ?origin wk.cc_env wk.cc_id cc_candidate in
+  let preenv,r,out = PreEnv.add_cc
+      ~toplevel:true ?origin wk.cc_env wk.cc_id cc_candidate in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out
 
 let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
