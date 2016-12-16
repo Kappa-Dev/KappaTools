@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
+<model metaid="untitled" id="">
+<listOfParameters>
+<parameter><id ="tinit" value="0."></parameter>
+<parameter><id ="tend" value="1."></parameter>
+<parameter><id ="period_t_point" value="0.1"></parameter>
+<parameter><id ="n_ab" value="1000"></parameter>
+<parameter><id ="var(10)" value="0"></parameter>
+<parameter><id ="Cpp" value="0"></parameter>
+<parameter><id ="Cpu" value="0"></parameter>
+<parameter><id ="n_c" value="10000"></parameter>
+<parameter><id ="Cuu" value="1000"></parameter>
+<parameter><id ="AB" value="0"></parameter>
+<parameter><id ="mod_rate" value="1"></parameter>
+<parameter><id ="off_rate" value="0.1"></parameter>
+<parameter><id ="on_rate" value="0.001"></parameter>
+</listOfParameters>
+<listOfSepcies><species metaid="s1" id="C(x1~u, x2~u)" name="C(x1~u, x2~u)" compartment="default" initialAmount="1000">
+<species metaid="s2" id="A(x, c)" name="A(x, c)" compartment="default" initialAmount="0">
+<species metaid="s3" id="B(x)" name="B(x)" compartment="default" initialAmount="0">
+<species metaid="s4" id="A(x!1, c), B(x!1)" name="A(x!1, c), B(x!1)" compartment="default" initialAmount="0">
+<species metaid="s5" id="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)" name="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)" compartment="default" initialAmount="0">
+<species metaid="s6" id="A(x, c!1), C(x1~u!1, x2~u)" name="A(x, c!1), C(x1~u!1, x2~u)" compartment="default" initialAmount="0">
+<species metaid="s7" id="C(x1~p, x2~u)" name="C(x1~p, x2~u)" compartment="default" initialAmount="0">
+<species metaid="s8" id="A(x, c!1), C(x1~p, x2~u!1)" name="A(x, c!1), C(x1~p, x2~u!1)" compartment="default" initialAmount="0">
+<species metaid="s9" id="A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)" name="A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)" compartment="default" initialAmount="0">
+<species metaid="s10" id="C(x1~p, x2~p)" name="C(x1~p, x2~p)" compartment="default" initialAmount="0">
+<species metaid="s11" id="t" name="t" compartment="default" initialAmount="0">
+</listOfSepcies>
+<listOfReactions>
+<reactionid="re1" name="mod x1" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x, c!1), C(x1~u!1, x2~u)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x, c)">
+<speciesReference species="C(x1~p, x2~u)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="real"> 0.100000 </cn><ci>A(x, c!1), C(x1~u!1, x2~u)</ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re2" name="a.b" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="B(x)">
+<speciesReference species="A(x, c!1), C(x1~u!1, x2~u)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci>v1</ci><apply>
+<times/><ci>A(x, c!1), C(x1~u!1, x2~u)</ci><ci>B(x)</ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re3" name="a.b_op" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="B(x)">
+<speciesReference species="A(x, c!1), C(x1~p, x2~u!1)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="real"> 0.001000 </cn><ci>A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)</ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re4" name="mod x2" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x, c!1), C(x1~p, x2~u!1)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x, c)">
+<speciesReference species="C(x1~p, x2~p)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="real"> 0.100000 </cn><ci>A(x, c!1), C(x1~p, x2~u!1)</ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re5" name="a.b" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="B(x)">
+<speciesReference species="A(x, c!1), C(x1~p, x2~u!1)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci>v1</ci><apply>
+<times/><ci>A(x, c!1), C(x1~p, x2~u!1)</ci><ci>B(x)</ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re6" name="a.c" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x, c)">
+<speciesReference species="C(x1~p, x2~u)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x, c!1), C(x1~p, x2~u!1)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci>v1</ci><apply>
+<times/><ci>A(x, c)</ci><ci>C(x1~p, x2~u)</ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re7" name="mod x1" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x!1, c), B(x!1)">
+<speciesReference species="C(x1~p, x2~u)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="real"> 0.100000 </cn><ci>A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)</ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re8" name="a.b_op" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="B(x)">
+<speciesReference species="A(x, c!1), C(x1~u!1, x2~u)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="real"> 0.001000 </cn><ci>A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)</ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re9" name="ab.c" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="C(x1~u, x2~u)">
+<speciesReference species="A(x!1, c), B(x!1)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci>v1</ci><apply>
+<times/><ci>A(x!1, c), B(x!1)</ci><ci>C(x1~u, x2~u)</ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re10" name="a.b_op" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x!1, c), B(x!1)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x, c)">
+<speciesReference species="B(x)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="real"> 0.001000 </cn><ci>A(x!1, c), B(x!1)</ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reactionid="re11" name="a.b" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference species="A(x, c)">
+<speciesReference species="B(x)">
+</listOfReactants>
+<listOfProducts>
+<speciesReference species="A(x!1, c), B(x!1)">
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci>v1</ci><apply>
+<times/><ci>A(x, c)</ci><ci>B(x)</ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+</listOfReactions>
+</model>
+</sbml>
