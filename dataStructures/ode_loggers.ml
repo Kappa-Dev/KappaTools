@@ -89,7 +89,38 @@ let print_ode_preamble
             [
               "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
               "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
-              "<model metaid=\"untitled\" id=\"\">";
+              "<model metaid=\"untitled\" id=\"KaDe output\">";
+              "<listOfUnitDefinitions>";
+              "<unitDefinition metaid=\"substance\" id=\"substance\" name=\"substance\">";
+              "<listOfUnits>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\"  kind=\"mole\"/>";
+              "</listOfUnits>";
+              "</unitDefinition>";
+              "<unitDefinition metaid=\"volume\" id=\"volume\" name=\"volume\">";
+              "<listOfUnits>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"litre\"/>";
+              "</listOfUnits>";
+              "</unitDefinition>";
+              "<unitDefinition metaid=\"area\" id=\"area\" name=\"area\">";
+              "<listOfUnits>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\"  kind=\"metre\" exponent=\"2\"/>";
+              "</listOfUnits>";
+              "</unitDefinition>";
+              "<unitDefinition metaid=\"length\" id=\"length\" name=\"length\">";
+              "<listOfUnits>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"metre\"/>";
+              "</listOfUnits>";
+              "</unitDefinition>";
+              "<unitDefinition metaid=\"time\" id=\"time\" name=\"time\">";
+              "<listOfUnits>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"second\"/>";
+              "</listOfUnits>";
+              "</unitDefinition>";
+              "</listOfUnitDefinitions>";
+              "<listOfCompartments>";
+              "<compartment metaid=\"default\" id=\"default\" size=\"1\" units=\"volume\"/>";
+              "</listOfCompartments>";
+
             ]
         in ()
       end
@@ -388,12 +419,12 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.Current_time -> "t"
 
 let print_sbml_parameters string_of_var_id logger variable expr =
-  Sbml_backend.add_box
+  Sbml_backend.single_box
     logger
     "parameter"
-    (fun logger ->
-       Loggers.fprintf
-         logger "<id =\"%s\" value=\"%s\">"
+    ~options:(fun _logger ->
+        Format.sprintf
+         "id=\"%s\" value=\"%s\""
          (string_of_variable_sbml string_of_var_id variable)
          (Nbr.to_string expr))
 

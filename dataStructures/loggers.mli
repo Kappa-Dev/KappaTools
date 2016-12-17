@@ -77,3 +77,4 @@ val is_const:
 val of_json: Yojson.Basic.json -> string list
 val to_json: t -> Yojson.Basic.json
 val get_fresh_reaction_id: t -> int
+val get_fresh_meta_id: t -> int

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 16 2016>
+  * Last modification: Time-stamp: <Dec 17 2016>
 *)
 
 let local_trace = false
@@ -1336,11 +1336,6 @@ let export_main
              Sbml_backend.dump_sbml_reaction
                get_rule
                I.print_rule_name
-               (fun ?compil logger (i:I.chemical_species) ->
-                  I.print_chemical_species ?compil
-                    logger
-                    i)
-               (fun i -> species_of_species_id network i)
                (Some compil)
                logger
                (handler_expr network)
@@ -1426,6 +1421,9 @@ let export_main
     let () = Ode_loggers.associate
         (I.string_of_var_id ~compil) logger (Ode_loggers_sig.Deriv (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network) in
     let () = Ode_loggers.print_newline logger in
+    let () =
+      Sbml_backend.time_advance logger (get_last_ode_var_id network)
+    in
     let () = Ode_loggers.close_procedure logger in
     let () = Sbml_backend.close_box logger label in
     let () = Ode_loggers.print_newline logger in
@@ -1433,7 +1431,7 @@ let export_main
     ()
 
   let export_init logger compil network =
-    let label = "listOfSepcies" in
+    let label = "listOfSpecies" in
     let () = Sbml_backend.open_box logger label in
     let () = Ode_loggers.open_procedure logger "Init" "ode_init" [] in
     let () = Ode_loggers.print_newline logger in

@@ -65,6 +65,7 @@ type t =
     channel_opt: out_channel option;
     id_map: int StringMap.t ref ;
     fresh_id: int ref ;
+    fresh_meta_id: int ref ;
     fresh_reaction_id: int ref;
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
@@ -85,6 +86,7 @@ let get_encoding_format t = t.encoding
 let dummy_html_logger =
   {
     id_map = ref StringMap.empty ;
+    fresh_meta_id = ref 1 ;
     fresh_id = ref 1 ;
     encoding = HTML;
     logger = DEVNUL;
@@ -99,6 +101,7 @@ let dummy_html_logger =
 
 let dummy_txt_logger =
   {
+    fresh_meta_id = ref 1 ;
     fresh_id = ref 1;
     id_map = ref StringMap.empty;
     encoding = TXT;
@@ -303,6 +306,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
   let logger =
     {
       id_map = ref StringMap.empty;
+      fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
       logger = Formatter formatter;
       channel_opt = Some channel;
@@ -323,6 +327,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
   let logger =
     {
       id_map = ref StringMap.empty;
+      fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
       logger = Formatter formatter;
       channel_opt = None;
@@ -341,6 +346,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
 let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   {
     id_map = ref StringMap.empty;
+    fresh_meta_id = ref 1 ;
     fresh_id = ref 1;
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     channel_opt = None;
@@ -357,6 +363,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
   let logger =
     {
       id_map = ref StringMap.empty;
+      fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
       logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
       channel_opt = None;
@@ -415,7 +422,10 @@ let fresh_id logger =
   let i = !(logger.fresh_id) in
   let () = logger.fresh_id := i+1 in
   i
-
+let get_fresh_meta_id logger =
+  let i = !(logger.fresh_meta_id) in
+  let () = logger.fresh_meta_id := i+1 in
+  i
 let int_of_string_id logger string =
   try
     StringMap.find string !(logger.id_map)

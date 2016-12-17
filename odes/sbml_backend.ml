@@ -1,3 +1,6 @@
+let meta_id_of_logger logger =
+  "CMD"^(string_of_int (Loggers.get_fresh_meta_id logger))
+
 let of_bool_op op =
   match op with
   | Operator.AND -> ( && )
@@ -174,13 +177,19 @@ let line_sbml  logger =
   do_sbml logger
     Loggers.print_newline
 
+let extend s =
+  if s="" || String.sub s 0 1 = " "  then s else " "^s
 
 let open_box ?options:(options=fun () -> "") logger label =
-  let () = print_sbml logger ("<"^label^(options ())^">") in
+  let () = print_sbml logger ("<"^label^(extend (options ()))^">") in
   break_sbml logger
 
 let close_box logger label =
   let () = print_sbml logger ("</"^label^">") in
+  line_sbml logger
+
+let single_box ?options:(options=fun () -> "") logger label =
+  let () = print_sbml logger ("<"^label^(extend (options ()))^"/>") in
   line_sbml logger
 
 let potential_break break logger =
@@ -198,6 +207,8 @@ let add_box ?break:(break=false) ?options:(options=fun () -> "") logger label co
   ()
 
 let break = true
+let replace_space_with_underscore =
+  String.map (fun c -> if c=' ' then '_' else c)
 
 let dump_initial_species loggers name species =
   let expr =
@@ -208,29 +219,25 @@ let dump_initial_species loggers name species =
   let concentration = eval_init_alg_expr loggers expr in
   let s =
     Format.sprintf
-      " metaid=\"s%i\" id=\"%s\" name=\"%s\" compartment=\"default\" initialAmount=\"%s\""
+      "metaid=\"%s\" id=\"s%i\" name=\"%s\" compartment=\"default\" initialAmount=\"%s\""
+      (meta_id_of_logger loggers)
       species
-      name
       name
       (Nbr.to_string concentration)
   in
-  let () = open_box ~options:(fun () -> s) loggers "species" in
-  let () = line_sbml loggers in
+  let () = single_box ~options:(fun () -> s) loggers "species" in
   ()
 
 
-let dump_species_reference print_chemical_species species_of_species_id compil loggers species i =
+let dump_species_reference loggers species i =
   let s =
-    Format.asprintf
-      " species=\"%a\"%s"
-      (fun log id ->
-         print_chemical_species ?compil log
-           (fst (species_of_species_id id)))
+    Format.sprintf
+      "metaid=\"%s\" species=\"s%i\"%s"
+      (meta_id_of_logger loggers)
       species
-      (if i=1 then "" else "stoichiometry=\""^(string_of_int i))
+      (if i=1 then "" else " stoichiometry=\""^(string_of_int i)^"\"")
   in
-  let () = open_box ~options:(fun () -> s) loggers "speciesReference" in
-  let () = line_sbml loggers in
+  let () = single_box ~options:(fun () -> s) loggers "speciesReference" in
   ()
 
 let add map id =
@@ -244,21 +251,17 @@ let add map id =
   Mods.IntMap.add id (succ old) map
 
 let dump_list_of_species_reference
-    print_chemical_species
-    species_of_species_id
-    compil
     loggers
     list
   =
   let map = List.fold_left add Mods.IntMap.empty list in
   List.iter
     (fun (s,i) ->
-       dump_species_reference
-         print_chemical_species species_of_species_id compil loggers s i)
+       dump_species_reference loggers s i)
     (Mods.IntMap.bindings map)
 
 let dump_kinetic_law
-    logger compil network print_species species_of_id reactants var_rule correct =
+    logger network reactants var_rule correct =
   do_sbml logger
     (fun logger  ->
        begin
@@ -287,43 +290,28 @@ let dump_kinetic_law
              match list with
                [] -> ()
              | [t] ->
-               Loggers.fprintf logger "<ci>%a</ci>"
-                 (fun log id ->
-                    print_species ?compil log
-                      (fst (species_of_id id))) t
+               Loggers.fprintf logger "<ci> s%i </ci>" t
              | t::q ->
                add_box ~break logger "apply"
                  (fun logger ->
                     let () = Loggers.fprintf logger "<times/>" in
-                    let () = Loggers.fprintf logger "<ci>%a</ci>"
-                        (fun log id ->
-                           print_species ?compil log
-                             (fst (species_of_id id))) t
-                    in
+                    let () = Loggers.fprintf logger "<ci> s%i </ci>" t in
                     aux q)
            in aux reactants
         )
        end
     )
 
-let dump_reactants_of_token_vector
-    print_chemical_species
-    species_of_id
-    compil logger token_vector =
+let dump_reactants_of_token_vector _logger _token_vector =
   ()
 
-let dump_products_of_token_vector
-    print_chemical_species
-    species_of_id
-    compil logger token_vector =
+let dump_products_of_token_vector _logger _token_vector =
   ()
 
 
 let dump_sbml_reaction
     get_rule
     print_rule_name
-    print_chemical_species
-    species_of_species_id
     compil
     logger
     network
@@ -349,15 +337,11 @@ let dump_sbml_reaction
            add_box ~break logger label_list_of_reactants
              (fun logger ->
                 let () =
-                  dump_list_of_species_reference
-                    print_chemical_species
-                    species_of_species_id
-                    compil logger reactants in
+                  dump_list_of_species_reference logger reactants
+                in
                 let () =
                   dump_reactants_of_token_vector
-                    print_chemical_species
-                    species_of_species_id
-                    compil logger token_vector
+                     logger token_vector
                 in
                 ()
              )
@@ -367,14 +351,10 @@ let dump_sbml_reaction
              (fun logger ->
                 let () =
                   dump_list_of_species_reference
-                print_chemical_species
-                species_of_species_id
-                compil logger products in
+                    logger products in
                 let () =
                   dump_products_of_token_vector
-                    print_chemical_species
-                    species_of_species_id
-                    compil logger token_vector
+                   logger token_vector
                 in
                 ())
          in
@@ -388,9 +368,52 @@ let dump_sbml_reaction
                   logger "math"
                   (fun logger ->
                 dump_kinetic_law
-                  logger compil network
-                  print_chemical_species
-                  species_of_species_id reactants var_rule correct)
+                  logger network
+                   reactants var_rule correct)
+             )
+         in
+         ()
+      )
+  in
+  ()
+
+let time_advance logger id =
+  let reaction_id = Loggers.get_fresh_reaction_id logger in
+  let label_reaction  = "reaction" in
+  let label_list_of_reactants = "listOfReactants" in
+  let options =
+    (fun () -> Format.asprintf
+        "id=\"re%i\" name=\"time advance\" reversible=\"false\" fast=\"false\"" reaction_id)
+  in
+  let () =
+    add_box ~options ~break logger label_reaction
+      (fun logger ->
+         let () =
+           add_box ~break logger label_list_of_reactants
+             (fun logger ->
+                let s =
+                  Format.sprintf
+                    "metaid=\"%s\" species=\"s%i\""
+                    (meta_id_of_logger logger)
+                    id
+                in
+                let () =
+                  single_box ~options:(fun () -> s) logger "speciesReference" in
+                ()
+             )
+         in
+         let () =
+           add_box ~break logger "kineticLaw"
+             (fun logger ->
+                add_box
+                  ~break
+                  ~options:(fun () ->
+                      " xmlns=\"http://www.w3.org/1998/Math/MathML\"")
+                  logger "math"
+                  (fun logger ->
+                     print_sbml logger ("<ci> s"^(string_of_int id)^" </ci>"
+                                       ))
+
              )
          in
          ()
