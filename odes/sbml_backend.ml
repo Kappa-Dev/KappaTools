@@ -267,25 +267,39 @@ let dump_species_reference loggers species i =
   let () = single_box ~options:(fun () -> s) loggers "speciesReference" in
   ()
 
-let add map id =
+let add map (id,sym) =
   let old =
     match
       Mods.IntMap.find_option id map
     with
-    | Some i -> i
+    | Some (i,_) -> i
     | None -> 0
   in
-  Mods.IntMap.add id (succ old) map
+  Mods.IntMap.add id ((succ old),sym) map
 
 let dump_list_of_species_reference
     loggers
     list
   =
-  let map = List.fold_left add Mods.IntMap.empty list in
+  let map =
+    List.fold_left
+      add
+      Mods.IntMap.empty
+      list
+  in
   List.iter
-    (fun (s,i) ->
-       dump_species_reference loggers s i)
+    (fun (s,(i,j)) ->
+       dump_species_reference loggers s (i*j))
     (Mods.IntMap.bindings map)
+
+let dump_pair logger (t,i) =
+  if i = 1 then
+    Loggers.fprintf logger "<ci> s%i </ci>" t
+  else
+    add_box ~break logger "apply"
+      (fun logger ->
+         let () = Loggers.fprintf logger "<divide/>" in
+         Loggers.fprintf logger "<ci> s%i </ci><cn type=\"integer\"> %i </cn>" t i)
 
 let dump_kinetic_law
     logger network reactants var_rule correct =
@@ -317,12 +331,12 @@ let dump_kinetic_law
              match list with
                [] -> ()
              | [t] ->
-               Loggers.fprintf logger "<ci> s%i </ci>" t
+               dump_pair logger t
              | t::q ->
                add_box ~break logger "apply"
                  (fun logger ->
                     let () = Loggers.fprintf logger "<times/>" in
-                    let () = Loggers.fprintf logger "<ci> s%i </ci>" t in
+                    let () = dump_pair logger t in
                     aux q)
            in aux reactants
         )
@@ -364,7 +378,8 @@ let dump_sbml_reaction
            add_box ~break logger label_list_of_reactants
              (fun logger ->
                 let () =
-                  dump_list_of_species_reference logger reactants
+                  dump_list_of_species_reference
+                    logger reactants
                 in
                 let () =
                   dump_reactants_of_token_vector

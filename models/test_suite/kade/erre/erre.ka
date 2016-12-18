@@ -14,6 +14,7 @@ A(x), B(x) <-> A(x!1),B(x!1) @12,13
 %obs: 'dimmers' |R(r!_)|/2
 %obs: 'monomers' |R(r)|
 
+%init: 10 E(r!1),R(e!1,r!2),R(r!2,e!3),E(r!3)
 %init: 10 E(r)
 %init: 100 R(r,e)
 %init: 4.5 A()

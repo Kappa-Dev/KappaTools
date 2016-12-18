@@ -1332,6 +1332,24 @@ let export_main
     let () =
       List.iter
         (fun (reactants, products, token_vector, enriched_rule) ->
+           let add_factor l  =
+             if I.do_we_count_in_embeddings compil
+             then
+               List.rev_map
+                 (fun x ->
+                    let nauto = snd
+                        (species_of_species_id network x)
+                    in
+                    (x,
+                     nauto))
+                 (List.rev l)
+             else
+               List.rev_map
+                 (fun x -> (x,1))
+                 (List.rev l)
+           in
+           let reactants' = add_factor reactants in
+           let products' = add_factor products in
            let () =
              Sbml_backend.dump_sbml_reaction
                get_rule
@@ -1339,12 +1357,22 @@ let export_main
                (Some compil)
                logger
                (handler_expr network)
-               reactants
-               products
+               reactants'
+               products'
                token_vector
                enriched_rule
                (var_of_rule enriched_rule)
                enriched_rule.divide_rate_by
+           in
+           let reactants'  =
+             List.rev_map
+               (fun x ->
+                  let nauto = snd
+                      (species_of_species_id network x)
+                  in
+                  (Ode_loggers_sig.Concentration x,
+                   to_nocc_correct compil nauto))
+               (List.rev reactants)
            in
            let nauto_in_lhs = enriched_rule.divide_rate_by in
            let () =
@@ -1390,16 +1418,6 @@ let export_main
                  | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
                  | Loggers.Json -> ()
 
-           in
-           let reactants' =
-             List.rev_map
-               (fun x ->
-                  let nauto = snd
-                      (species_of_species_id network x)
-                  in
-                  (Ode_loggers_sig.Concentration x,
-                   to_nocc_correct compil nauto))
-               (List.rev reactants)
            in
            let () = Ode_loggers.print_newline logger in
            let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
