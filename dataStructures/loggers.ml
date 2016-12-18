@@ -71,7 +71,8 @@ type t =
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
     env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot VarMap.t ref ;
-    const: VarSet.t ref
+    const: VarSet.t ref;
+    id_of_parameters: string VarMap.t ref
   }
 
 let refresh_id t =
@@ -97,6 +98,7 @@ let dummy_html_logger =
     fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
+    id_of_parameters = ref VarMap.empty;
   }
 
 let dummy_txt_logger =
@@ -113,7 +115,7 @@ let dummy_txt_logger =
     fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
-
+    id_of_parameters = ref VarMap.empty;
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -317,6 +319,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
+      id_of_parameters = ref VarMap.empty;
 
     }
   in
@@ -338,6 +341,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
+      id_of_parameters = ref VarMap.empty;
     }
   in
   let () = print_preamble logger in
@@ -357,6 +361,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
+    id_of_parameters = ref VarMap.empty;
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
@@ -374,6 +379,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
+      id_of_parameters = ref VarMap.empty;
     }
   in
   let () = print_preamble logger in
@@ -463,6 +469,15 @@ let get_fresh_reaction_id t =
   let output = !(t.fresh_reaction_id) in
   let () = t.fresh_reaction_id:=succ output in
   output
+
+let get_id_of_global_parameter t var =
+  try
+    VarMap.find var (!(t.id_of_parameters))
+  with
+    Not_found -> ""
+
+let set_id_of_global_parameter t var id =
+  t.id_of_parameters := VarMap.add var id (!(t.id_of_parameters))
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in

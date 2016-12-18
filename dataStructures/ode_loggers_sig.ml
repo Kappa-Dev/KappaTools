@@ -63,8 +63,8 @@ let is_expr_alias expr =
   | Alg_expr.CONST _,_
   | Alg_expr.IF _,_
   | Alg_expr.BIN_ALG_OP _,_
-  | Alg_expr.UN_ALG_OP _,_ -> false
-  | Alg_expr.ALG_VAR _,_ -> true
+  | Alg_expr.UN_ALG_OP _,_ -> None
+  | Alg_expr.ALG_VAR x,_ -> Some x 
 
 let string_of_variable var =
   match var with

@@ -64,6 +64,8 @@ and eval_init_bool_expr logger network_handler expr =
       (eval_init_bool_expr logger network_handler a)
       (eval_init_bool_expr logger network_handler b)
 
+(*module EMap = Map.Make (type t = )*)
+
 let rec print_alg_expr_in_sbml logger
     (alg_expr:
        (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
@@ -71,69 +73,80 @@ let rec print_alg_expr_in_sbml logger
     ) (network:
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
   =
-  match fst alg_expr with
-  | Alg_expr.CONST (Nbr.I n)  ->
-    Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
-  | Alg_expr.CONST (Nbr.I64 n) ->
-    Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" (Int64.to_int n)
-  | Alg_expr.CONST (Nbr.F f) ->
-    Loggers.fprintf logger "<cn type=\"real\"> %f </cn>" f
-  | Alg_expr.ALG_VAR x ->
+  match
+    Ode_loggers_sig.is_expr_alias alg_expr
+  with
+  | Some x ->
+    Loggers.fprintf logger "<ci> %s </ci>"
+      (Loggers.get_id_of_global_parameter
+         logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
+  | None ->
     begin
-      let id =
-        network.Network_handler.int_of_obs x
-      in
-      match
-        Loggers.get_expr logger (Ode_loggers_sig.Expr id)
-      with
-      | Some expr ->
-        print_alg_expr_in_sbml
-          logger
-          expr
-          network
-      | None ->
-        Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
+      match fst alg_expr with
+      | Alg_expr.CONST (Nbr.I n)  ->
+        Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
+      | Alg_expr.CONST (Nbr.I64 n) ->
+        Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" (Int64.to_int n)
+      | Alg_expr.CONST (Nbr.F f) ->
+        Loggers.fprintf logger "<cn type=\"real\"> %f </cn>" f
+      | Alg_expr.ALG_VAR x ->
+        begin
+          let id =
+            network.Network_handler.int_of_obs x
+          in
+          match
+            Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+          with
+          | Some expr ->
+            print_alg_expr_in_sbml
+              logger
+              expr
+              network
+          | None ->
+            Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
+        end
+      | Alg_expr.KAPPA_INSTANCE x ->
+        Loggers.fprintf logger "<ci>s%i</ci>"
+          (network.Network_handler.int_of_kappa_instance x)
+      | Alg_expr.TOKEN_ID x ->
+        Loggers.fprintf logger "<ci>t%i</ci>"
+          (network.Network_handler.int_of_token_id x)
+      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
+        Loggers.fprintf logger "<ci>tend</ci>"
+      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
+        Loggers.fprintf logger "<ci>0</ci>"
+      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
+        Loggers.fprintf logger "<ci>t</ci>"
+      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
+        Loggers.fprintf logger "<ci>0</ci>"
+      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
+        Loggers.fprintf logger "<ci>event_max</ci>"
+      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
+        Loggers.fprintf logger "<ci>0</ci>"
+      | Alg_expr.BIN_ALG_OP (op, a, b) ->
+        let string_op = Loggers_string_of_op.string_of_bin_op logger op in
+        let () = Loggers.fprintf logger "<apply>" in
+        let () = Loggers.fprintf logger "%s" string_op in
+        let () = print_alg_expr_in_sbml logger a network in
+        let () = print_alg_expr_in_sbml logger b network in
+        let () = Loggers.fprintf logger "</apply>" in
+        ()
+      | Alg_expr.UN_ALG_OP (op, a) ->
+        let string_op = Loggers_string_of_op.string_of_un_op logger op in
+        let () = Loggers.fprintf logger "<apply>" in
+        let () = Loggers.fprintf logger "%s" string_op in
+        let () = print_alg_expr_in_sbml logger a network in
+        let () = Loggers.fprintf logger "</apply>" in
+        ()
+      | Alg_expr.IF (cond, yes, no) ->
+        let () = Loggers.fprintf logger "<apply>" in
+        let () = Loggers.fprintf logger "<if-then-else>"  in
+        let () = print_bool_expr_in_sbml logger cond network in
+        let () = print_alg_expr_in_sbml logger yes network in
+        let () = print_alg_expr_in_sbml logger no network in
+        let () = Loggers.fprintf logger "</apply>" in
+        ()
     end
-  | Alg_expr.KAPPA_INSTANCE x ->
-    Loggers.fprintf logger "<ci>s%i</ci>"
-      (network.Network_handler.int_of_kappa_instance x)
-  | Alg_expr.TOKEN_ID x ->
-    Loggers.fprintf logger "<ci>t%i</ci>" (network.Network_handler.int_of_token_id x)
-  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
-    Loggers.fprintf logger "<ci>tend</ci>"
-  | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
-    Loggers.fprintf logger "<ci>0</ci>"
-  | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
-    Loggers.fprintf logger "<ci>t</ci>"
-  | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
-    Loggers.fprintf logger "<ci>0</ci>"
-  | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
-    Loggers.fprintf logger "<ci>event_max</ci>"
-  | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
-    Loggers.fprintf logger "<ci>0</ci>"
-  | Alg_expr.BIN_ALG_OP (op, a, b) ->
-    let string_op = Loggers_string_of_op.string_of_bin_op logger op in
-    let () = Loggers.fprintf logger "<apply>" in
-    let () = Loggers.fprintf logger "%s" string_op in
-    let () = print_alg_expr_in_sbml logger a network in
-    let () = print_alg_expr_in_sbml logger b network in
-    let () = Loggers.fprintf logger "</apply>" in
-    ()
-  | Alg_expr.UN_ALG_OP (op, a) ->
-    let string_op = Loggers_string_of_op.string_of_un_op logger op in
-    let () = Loggers.fprintf logger "<apply>" in
-    let () = Loggers.fprintf logger "%s" string_op in
-    let () = print_alg_expr_in_sbml logger a network in
-    let () = Loggers.fprintf logger "</apply>" in
-    ()
-  | Alg_expr.IF (cond, yes, no) ->
-    let () = Loggers.fprintf logger "<apply>" in
-    let () = Loggers.fprintf logger "<if-then-else>"  in
-    let () = print_bool_expr_in_sbml logger cond network in
-    let () = print_alg_expr_in_sbml logger yes network in
-    let () = print_alg_expr_in_sbml logger no network in
-    let () = Loggers.fprintf logger "</apply>" in
-    ()
 and
   print_bool_expr_in_sbml logger cond network =
   match fst cond with
@@ -141,7 +154,8 @@ and
   | Alg_expr.FALSE -> Loggers.fprintf logger "<false/>"
   | Alg_expr.COMPARE_OP (op,a,b) ->
     let () = Loggers.fprintf logger "<apply>" in
-    let () = Loggers.fprintf logger "%s"
+    let () =
+      Loggers.fprintf logger "%s"
         (Loggers_string_of_op.string_of_compare_op logger op) in
     let () = print_alg_expr_in_sbml logger a network in
     let () = print_alg_expr_in_sbml logger b network in
@@ -393,7 +407,7 @@ let dump_sbml_reaction
 let time_advance logger id =
   let reaction_id = Loggers.get_fresh_reaction_id logger in
   let label_reaction  = "reaction" in
-  let label_list_of_reactants = "listOfReactants" in
+  let label_list_of_products = "listOfProducts" in
   let options =
     (fun () -> Format.asprintf
         "id=\"re%i\" name=\"time advance\" reversible=\"false\" fast=\"false\"" reaction_id)
@@ -402,7 +416,7 @@ let time_advance logger id =
     add_box ~options ~break logger label_reaction
       (fun logger ->
          let () =
-           add_box ~break logger label_list_of_reactants
+           add_box ~break logger label_list_of_products
              (fun logger ->
                 let s =
                   Format.sprintf
@@ -424,8 +438,7 @@ let time_advance logger id =
                       " xmlns=\"http://www.w3.org/1998/Math/MathML\"")
                   logger "math"
                   (fun logger ->
-                     print_sbml logger ("<ci> s"^(string_of_int id)^" </ci>"
-                                       ))
+                     print_sbml logger ("<cn type=\"integer\"> 1 </cn>"                    ))
 
              )
          in

@@ -89,7 +89,7 @@ let print_ode_preamble
             [
               "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
               "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
-              "<model metaid=\"untitled\" id=\"KaDe output\">";
+              "<model name=\"KaDe output:\">";
               "<listOfUnitDefinitions>";
               "<unitDefinition metaid=\"substance\" id=\"substance\" name=\"substance\">";
               "<listOfUnits>";
@@ -441,15 +441,18 @@ let print_sbml_parameters string_of_var_id logger variable expr =
     | None -> ""
     | Some x -> " units=\""^x^"\""
   in
+  let id = string_of_variable_sbml string_of_var_id variable in
+  let () = Loggers.set_id_of_global_parameter logger variable id  in
   Sbml_backend.single_box
     logger
     "parameter"
     ~options:(fun () ->
         Format.sprintf
-          "id=\"%s\" value=\"%s\"%s"
-         (string_of_variable_sbml string_of_var_id variable)
-         (Nbr.to_string expr)
-         unit_string)
+          "metaid=\"%s\" id=\"%s\" value=\"%s\"%s"
+          (Sbml_backend.meta_id_of_logger logger)
+          id
+          (Nbr.to_string expr)
+          unit_string)
 
 
 let print_comment
@@ -499,17 +502,23 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.SBML ->
     begin
       match variable, init_mode with
-      | Ode_loggers_sig.Expr _ , true
-        when not (Ode_loggers_sig.is_expr_alias alg_expr) ->
-        print_sbml_parameters
-          string_of_var_id
-          logger
-          variable
-          (Sbml_backend.eval_init_alg_expr
-             logger
-             network_handler
-             alg_expr)
-      | (Ode_loggers_sig.Tinit |
+      | Ode_loggers_sig.Expr _ , true ->
+        begin
+          match
+            Ode_loggers_sig.is_expr_alias alg_expr
+          with
+          | None ->
+            print_sbml_parameters
+              string_of_var_id
+              logger
+              variable
+              (Sbml_backend.eval_init_alg_expr
+                 logger
+                 network_handler
+                 alg_expr)
+          | Some _ -> ()
+        end
+        | (Ode_loggers_sig.Tinit |
          Ode_loggers_sig.Tend |
          Ode_loggers_sig.Period_t_points
         ) ,_ ->

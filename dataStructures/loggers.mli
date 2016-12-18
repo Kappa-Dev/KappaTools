@@ -78,3 +78,5 @@ val of_json: Yojson.Basic.json -> string list
 val to_json: t -> Yojson.Basic.json
 val get_fresh_reaction_id: t -> int
 val get_fresh_meta_id: t -> int
+val set_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string -> unit
+val get_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string
