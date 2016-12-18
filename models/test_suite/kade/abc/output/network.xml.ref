@@ -1,6 +1,20 @@
+<!-- command line:  -->
+<!--      'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-l' '1' '-p' '0.1''--ode-backend''SBML' -->
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
+<!--
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+
+init - the initial abundances of each species and token
+tinit - the initial simulation time (likely 0)
+tend - the final simulation time 
+initialstep - initial time step at the beginning of numerical integration
+period_t_point - the time period between points to return
+
+variables denote number of embeddings 
+rule rates are corrected by the number of automorphisms in the lhs of rules
+-->
 <listOfUnitDefinitions>
 <unitDefinition metaid="substance" id="substance" name="substance">
 <listOfUnits>
@@ -49,6 +63,8 @@
 <species metaid="CMD26" id="s11" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
 </listOfSpecies>
 <listOfReactions>
+<!-- rule    : mod x1 -->
+<!-- reaction: A(x, c!1), C(x1~u!1, x2~u) -> A(x, c) + C(x1~p, x2~u)  -->
 <reaction id="re1" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD27" species="s6"/>
@@ -64,6 +80,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.b -->
+<!-- reaction: B(x) + A(x, c!1), C(x1~u!1, x2~u) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)  -->
 <reaction id="re2" name="a.b" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD30" species="s3"/>
@@ -81,6 +99,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.b_op -->
+<!-- reaction: A(x!1, c!2), B(x!1), C(x1~p, x2~u!2) -> A(x, c!1), C(x1~p, x2~u!1) + B(x)  -->
 <reaction id="re3" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD33" species="s9"/>
@@ -96,6 +116,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : mod x2 -->
+<!-- reaction: A(x, c!1), C(x1~p, x2~u!1) -> A(x, c) + C(x1~p, x2~p)  -->
 <reaction id="re4" name="mod x2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD36" species="s8"/>
@@ -111,6 +133,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.b -->
+<!-- reaction: B(x) + A(x, c!1), C(x1~p, x2~u!1) -> A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)  -->
 <reaction id="re5" name="a.b" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD39" species="s3"/>
@@ -128,6 +152,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.c -->
+<!-- reaction: C(x1~p, x2~u) + A(x, c) -> A(x, c!1), C(x1~p, x2~u!1)  -->
 <reaction id="re6" name="a.c" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD42" species="s2"/>
@@ -145,6 +171,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : mod x1 -->
+<!-- reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x!1, c), B(x!1) + C(x1~p, x2~u)  -->
 <reaction id="re7" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD45" species="s5"/>
@@ -160,6 +188,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.b_op -->
+<!-- reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x, c!1), C(x1~u!1, x2~u) + B(x)  -->
 <reaction id="re8" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD48" species="s5"/>
@@ -175,6 +205,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : ab.c -->
+<!-- reaction: C(x1~u, x2~u) + A(x!1, c), B(x!1) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)  -->
 <reaction id="re9" name="ab.c" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD51" species="s1"/>
@@ -192,6 +224,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.b_op -->
+<!-- reaction: A(x!1, c), B(x!1) -> A(x, c) + B(x)  -->
 <reaction id="re10" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD54" species="s4"/>
@@ -207,6 +241,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : a.b -->
+<!-- reaction: B(x) + A(x, c) -> A(x!1, c), B(x!1)  -->
 <reaction id="re11" name="a.b" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD57" species="s2"/>

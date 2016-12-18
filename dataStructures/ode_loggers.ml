@@ -90,6 +90,32 @@ let print_ode_preamble
               "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
               "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
               "<model name=\"KaDe output:\">";
+              "<!--";
+              "THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
+              "";
+              "init - the initial abundances of each species and token";
+              "tinit - the initial simulation time (likely 0)";
+              "tend - the final simulation time ";
+              "initialstep - initial time step at the beginning of numerical integration";
+              "period_t_point - the time period between points to return";
+              "" ;
+              ""^
+              (match
+                 count
+               with
+               | Ode_args.Embeddings -> "variables denote number of embeddings "
+               | Ode_args.Occurrences -> "variables denote numbers occurrences");
+              ""^
+              (match
+                 rate_convention
+               with
+               | Ode_args.Biochemist ->
+                 "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
+               | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+                 "rule rates are corrected by the number of automorphisms in the lhs of rules"
+               | Ode_args.KaSim ->
+                 "no correcion is applied on rule rates");
+              "-->";
               "<listOfUnitDefinitions>";
               "<unitDefinition metaid=\"substance\" id=\"substance\" name=\"substance\">";
               "<listOfUnits>";
@@ -456,6 +482,7 @@ let print_sbml_parameters string_of_var_id logger variable expr =
 
 
 let print_comment
+    ?breakline:(breakline=false)
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
     string
@@ -472,9 +499,14 @@ let print_comment
       with
       | Loggers.Matlab
       | Loggers.Octave ->
-        Loggers.fprintf logger "%%%s" string
+        let () = Loggers.fprintf logger "%% %s" string in
+        if breakline then Loggers.print_newline logger
+      | Loggers.SBML ->
+        let () = Loggers.fprintf logger "<!-- %s -->" string in
+        if breakline then
+          Loggers.print_newline logger
+        else Loggers.print_breakable_hint logger
       | Loggers.Maple
-      | Loggers.SBML
       | Loggers.Json
       | Loggers.DOT
       | Loggers.HTML_Graph

@@ -1,6 +1,6 @@
 function main=main()
-%% command line: 
-%%     'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-l' '1' '-p''0.1'
+% command line: 
+%      'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-l' '1' '-p''0.1'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -39,7 +39,7 @@ init(2)=(1*var(10));
 var(7)=(1*init(10));
 var(6)=(1*((init(7)+init(8))+init(9)));
 var(9)=10000;
-init(1)=(1*var(9)); %C(x1~u, x2~u)
+init(1)=(1*var(9)); % C(x1~u, x2~u)
 var(5)=(1*((init(1)+init(6))+init(5)));
 var(4)=(1*((init(4)+init(5))+init(9)));
 var(3)=1;
@@ -136,17 +136,17 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); %C(x1~u, x2~u)
-Init(2) = init(2); %A(x, c)
-Init(3) = init(3); %B(x)
-Init(4) = init(4); %A(x!1, c), B(x!1)
-Init(5) = init(5); %A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
-Init(6) = init(6); %A(x, c!1), C(x1~u!1, x2~u)
-Init(7) = init(7); %C(x1~p, x2~u)
-Init(8) = init(8); %A(x, c!1), C(x1~p, x2~u!1)
-Init(9) = init(9); %A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)
-Init(10) = init(10); %C(x1~p, x2~p)
-Init(11) = init(11); %t
+Init(1) = init(1); % C(x1~u, x2~u)
+Init(2) = init(2); % A(x, c)
+Init(3) = init(3); % B(x)
+Init(4) = init(4); % A(x!1, c), B(x!1)
+Init(5) = init(5); % A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
+Init(6) = init(6); % A(x, c!1), C(x1~u!1, x2~u)
+Init(7) = init(7); % C(x1~p, x2~u)
+Init(8) = init(8); % A(x, c!1), C(x1~p, x2~u!1)
+Init(9) = init(9); % A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)
+Init(10) = init(10); % C(x1~p, x2~p)
+Init(11) = init(11); % t
 end
 
 
@@ -173,78 +173,78 @@ k(6)=var(3);
 
 dydt=zeros(nodevar,1);
 
-%rule    : mod x1
-%reaction: A(x, c!1), C(x1~u!1, x2~u) -> A(x, c) + C(x1~p, x2~u)
+% rule    : mod x1
+% reaction: A(x, c!1), C(x1~u!1, x2~u) -> A(x, c) + C(x1~p, x2~u) 
 
 dydt(6)=dydt(6)-k(4)*y(6);
 dydt(7)=dydt(7)+k(4)*y(6);
 dydt(2)=dydt(2)+k(4)*y(6);
 
-%rule    : a.b
-%reaction: B(x) + A(x, c!1), C(x1~u!1, x2~u) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
+% rule    : a.b
+% reaction: B(x) + A(x, c!1), C(x1~u!1, x2~u) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) 
 
 dydt(6)=dydt(6)-k(1)*y(6)*y(3);
 dydt(3)=dydt(3)-k(1)*y(6)*y(3);
 dydt(5)=dydt(5)+k(1)*y(6)*y(3);
 
-%rule    : a.b_op
-%reaction: A(x!1, c!2), B(x!1), C(x1~p, x2~u!2) -> A(x, c!1), C(x1~p, x2~u!1) + B(x)
+% rule    : a.b_op
+% reaction: A(x!1, c!2), B(x!1), C(x1~p, x2~u!2) -> A(x, c!1), C(x1~p, x2~u!1) + B(x) 
 
 dydt(9)=dydt(9)-k(2)*y(9);
 dydt(3)=dydt(3)+k(2)*y(9);
 dydt(8)=dydt(8)+k(2)*y(9);
 
-%rule    : mod x2
-%reaction: A(x, c!1), C(x1~p, x2~u!1) -> A(x, c) + C(x1~p, x2~p)
+% rule    : mod x2
+% reaction: A(x, c!1), C(x1~p, x2~u!1) -> A(x, c) + C(x1~p, x2~p) 
 
 dydt(8)=dydt(8)-k(6)*y(8);
 dydt(10)=dydt(10)+k(6)*y(8);
 dydt(2)=dydt(2)+k(6)*y(8);
 
-%rule    : a.b
-%reaction: B(x) + A(x, c!1), C(x1~p, x2~u!1) -> A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)
+% rule    : a.b
+% reaction: B(x) + A(x, c!1), C(x1~p, x2~u!1) -> A(x!1, c!2), B(x!1), C(x1~p, x2~u!2) 
 
 dydt(8)=dydt(8)-k(1)*y(8)*y(3);
 dydt(3)=dydt(3)-k(1)*y(8)*y(3);
 dydt(9)=dydt(9)+k(1)*y(8)*y(3);
 
-%rule    : a.c
-%reaction: C(x1~p, x2~u) + A(x, c) -> A(x, c!1), C(x1~p, x2~u!1)
+% rule    : a.c
+% reaction: C(x1~p, x2~u) + A(x, c) -> A(x, c!1), C(x1~p, x2~u!1) 
 
 dydt(2)=dydt(2)-k(5)*y(2)*y(7);
 dydt(7)=dydt(7)-k(5)*y(2)*y(7);
 dydt(8)=dydt(8)+k(5)*y(2)*y(7);
 
-%rule    : mod x1
-%reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x!1, c), B(x!1) + C(x1~p, x2~u)
+% rule    : mod x1
+% reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x!1, c), B(x!1) + C(x1~p, x2~u) 
 
 dydt(5)=dydt(5)-k(4)*y(5);
 dydt(7)=dydt(7)+k(4)*y(5);
 dydt(4)=dydt(4)+k(4)*y(5);
 
-%rule    : a.b_op
-%reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x, c!1), C(x1~u!1, x2~u) + B(x)
+% rule    : a.b_op
+% reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x, c!1), C(x1~u!1, x2~u) + B(x) 
 
 dydt(5)=dydt(5)-k(2)*y(5);
 dydt(3)=dydt(3)+k(2)*y(5);
 dydt(6)=dydt(6)+k(2)*y(5);
 
-%rule    : ab.c
-%reaction: C(x1~u, x2~u) + A(x!1, c), B(x!1) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)
+% rule    : ab.c
+% reaction: C(x1~u, x2~u) + A(x!1, c), B(x!1) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) 
 
 dydt(4)=dydt(4)-k(3)*y(4)*y(1);
 dydt(1)=dydt(1)-k(3)*y(4)*y(1);
 dydt(5)=dydt(5)+k(3)*y(4)*y(1);
 
-%rule    : a.b_op
-%reaction: A(x!1, c), B(x!1) -> A(x, c) + B(x)
+% rule    : a.b_op
+% reaction: A(x!1, c), B(x!1) -> A(x, c) + B(x) 
 
 dydt(4)=dydt(4)-k(2)*y(4);
 dydt(3)=dydt(3)+k(2)*y(4);
 dydt(2)=dydt(2)+k(2)*y(4);
 
-%rule    : a.b
-%reaction: B(x) + A(x, c) -> A(x!1, c), B(x!1)
+% rule    : a.b
+% reaction: B(x) + A(x, c) -> A(x!1, c), B(x!1) 
 
 dydt(2)=dydt(2)-k(1)*y(2)*y(3);
 dydt(3)=dydt(3)-k(1)*y(2)*y(3);

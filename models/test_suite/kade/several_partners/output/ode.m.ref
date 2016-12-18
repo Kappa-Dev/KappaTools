@@ -1,6 +1,6 @@
 function main=main()
-%% command line: 
-%%     'KaDE' 'several_partners.ka' '-d' 'output' '-l' '1' '-p''0.01'
+% command line: 
+%      'KaDE' 'several_partners.ka' '-d' 'output' '-l' '1' '-p''0.01'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -32,8 +32,8 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(6)=t;
-init(1)=(1*6); %B(x, y)
-init(2)=(1*4.500000); %A(x)
+init(1)=(1*6); % B(x, y)
+init(2)=(1*4.500000); % A(x)
 var(1)=((1*0)*t);
 
 global k
@@ -41,7 +41,7 @@ global kd
 global kun
 global kdun
 
-k(1)=1; %A(x), B(x) -> A(x!1), B(x!1)
+k(1)=1; % A(x), B(x) -> A(x!1), B(x!1)
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -123,12 +123,12 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); %B(x, y)
-Init(2) = init(2); %A(x)
-Init(3) = init(3); %A(x!1), B(x!1, y)
-Init(4) = init(4); %A(x!1), B(x, y!1)
-Init(5) = init(5); %A(x!1), B(x!1, y!2), A(x!2)
-Init(6) = init(6); %t
+Init(1) = init(1); % B(x, y)
+Init(2) = init(2); % A(x)
+Init(3) = init(3); % A(x!1), B(x!1, y)
+Init(4) = init(4); % A(x!1), B(x, y!1)
+Init(5) = init(5); % A(x!1), B(x!1, y!2), A(x!2)
+Init(6) = init(6); % t
 end
 
 
@@ -149,53 +149,53 @@ k(4)=var(1);
 
 dydt=zeros(nodevar,1);
 
-%rule    : A(x!_) -> 
-%reaction: A(x!1), B(x!1, y) -> B(x, y)
+% rule    : A(x!_) -> 
+% reaction: A(x!1), B(x!1, y) -> B(x, y) 
 
 dydt(3)=dydt(3)-k(3)*y(3);
 dydt(1)=dydt(1)+k(3)*y(3);
 
-%rule    : A(x), B(y) -> A(x!1), B(y!1)
-%reaction: A(x!1), B(x!1, y) + A(x) -> A(x!1), B(x!1, y!2), A(x!2)
+% rule    : A(x), B(y) -> A(x!1), B(y!1)
+% reaction: A(x!1), B(x!1, y) + A(x) -> A(x!1), B(x!1, y!2), A(x!2) 
 
 dydt(2)=dydt(2)-k(2)*y(2)*y(3);
 dydt(3)=dydt(3)-k(2)*y(2)*y(3);
 dydt(5)=dydt(5)+k(2)*y(2)*y(3);
 
-%rule    : A(x!_) -> 
-%reaction: A(x!1), B(x!1, y!2), A(x!2) -> A(x!1), B(x!1, y)
+% rule    : A(x!_) -> 
+% reaction: A(x!1), B(x!1, y!2), A(x!2) -> A(x!1), B(x!1, y) 
 
 dydt(5)=dydt(5)-k(4)*y(5);
 dydt(3)=dydt(3)+k(4)*y(5);
 
-%rule    : A(x!_) -> 
-%reaction: A(x!1), B(x!1, y!2), A(x!2) -> A(x!1), B(x, y!1)
+% rule    : A(x!_) -> 
+% reaction: A(x!1), B(x!1, y!2), A(x!2) -> A(x!1), B(x, y!1) 
 
 dydt(5)=dydt(5)-k(3)*y(5);
 dydt(4)=dydt(4)+k(3)*y(5);
 
-%rule    : A(x!_) -> 
-%reaction: A(x!1), B(x, y!1) -> B(x, y)
+% rule    : A(x!_) -> 
+% reaction: A(x!1), B(x, y!1) -> B(x, y) 
 
 dydt(4)=dydt(4)-k(4)*y(4);
 dydt(1)=dydt(1)+k(4)*y(4);
 
-%rule    : A(x), B(x) -> A(x!1), B(x!1)
-%reaction: A(x!1), B(x, y!1) + A(x) -> A(x!1), B(x!1, y!2), A(x!2)
+% rule    : A(x), B(x) -> A(x!1), B(x!1)
+% reaction: A(x!1), B(x, y!1) + A(x) -> A(x!1), B(x!1, y!2), A(x!2) 
 
 dydt(2)=dydt(2)-k(1)*y(2)*y(4);
 dydt(4)=dydt(4)-k(1)*y(2)*y(4);
 dydt(5)=dydt(5)+k(1)*y(2)*y(4);
 
-%rule    : A(x), B(y) -> A(x!1), B(y!1)
-%reaction: B(x, y) + A(x) -> A(x!1), B(x, y!1)
+% rule    : A(x), B(y) -> A(x!1), B(y!1)
+% reaction: B(x, y) + A(x) -> A(x!1), B(x, y!1) 
 
 dydt(2)=dydt(2)-k(2)*y(2)*y(1);
 dydt(1)=dydt(1)-k(2)*y(2)*y(1);
 dydt(4)=dydt(4)+k(2)*y(2)*y(1);
 
-%rule    : A(x), B(x) -> A(x!1), B(x!1)
-%reaction: B(x, y) + A(x) -> A(x!1), B(x!1, y)
+% rule    : A(x), B(x) -> A(x!1), B(x!1)
+% reaction: B(x, y) + A(x) -> A(x!1), B(x!1, y) 
 
 dydt(2)=dydt(2)-k(1)*y(2)*y(1);
 dydt(1)=dydt(1)-k(1)*y(2)*y(1);

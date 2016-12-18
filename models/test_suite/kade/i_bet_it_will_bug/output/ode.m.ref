@@ -1,6 +1,6 @@
 function main=main()
-%% command line: 
-%%     'KaDE' 'bet.ka' '-d' 'output' '-l' '1' '-p''0.01'
+% command line: 
+%      'KaDE' 'bet.ka' '-d' 'output' '-l' '1' '-p''0.01'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -32,14 +32,14 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(2)=t;
-init(1)=(1*4.500000); %A()
+init(1)=(1*4.500000); % A()
 
 global k
 global kd
 global kun
 global kdun
 
-k(1)=1; %A(), A() -> 
+k(1)=1; % A(), A() -> 
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -121,8 +121,8 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); %A()
-Init(2) = init(2); %t
+Init(1) = init(1); % A()
+Init(2) = init(2); % t
 end
 
 
@@ -139,8 +139,8 @@ global kdun
 
 dydt=zeros(nodevar,1);
 
-%rule    : A(), A() -> 
-%reaction: A() + A() -> 
+% rule    : A(), A() -> 
+% reaction: A() + A() ->  
 
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);

@@ -1,6 +1,20 @@
+<!-- command line:  -->
+<!--      'KaDE' 'erre.ka' '-d' 'output' '-l' '1' '-p' '0.1' '--ode-backend''SBML' -->
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
+<!--
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+
+init - the initial abundances of each species and token
+tinit - the initial simulation time (likely 0)
+tend - the final simulation time 
+initialstep - initial time step at the beginning of numerical integration
+period_t_point - the time period between points to return
+
+variables denote number of embeddings 
+rule rates are corrected by the number of automorphisms in the lhs of rules
+-->
 <listOfUnitDefinitions>
 <unitDefinition metaid="substance" id="substance" name="substance">
 <listOfUnits>
@@ -39,6 +53,8 @@
 <species metaid="CMD16" id="s8" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
 </listOfSpecies>
 <listOfReactions>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r)  -->
 <reaction id="re1" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD17" species="s6" stoichiometry="2"/>
@@ -55,6 +71,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r)  -->
 <reaction id="re2" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD19" species="s6" stoichiometry="2"/>
@@ -71,6 +89,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s) + E(r!1, s), R(e!1, r)  -->
 <reaction id="re3" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s6" stoichiometry="2"/>
@@ -88,6 +108,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)  -->
 <reaction id="re4" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD24" species="s6" stoichiometry="2"/>
@@ -105,6 +127,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r)  -->
 <reaction id="re5" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD27" species="s7"/>
@@ -120,6 +144,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r)  -->
 <reaction id="re6" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD30" species="s7"/>
@@ -135,6 +161,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s) + E(r, s!1), R(e!1, r)  -->
 <reaction id="re7" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD33" species="s7"/>
@@ -150,6 +178,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)  -->
 <reaction id="re8" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD36" species="s7"/>
@@ -165,6 +195,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
+<!-- reaction: E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)  -->
 <reaction id="re9" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD39" species="s3"/>
@@ -182,6 +214,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
+<!-- reaction: E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)  -->
 <reaction id="re10" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD42" species="s3"/>
@@ -199,6 +233,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
+<!-- reaction: E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s)  -->
 <reaction id="re11" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD45" species="s3" stoichiometry="2"/>
@@ -215,6 +251,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(e!_,r) -> R(e,r) -->
+<!-- reaction: E(r!1, s), R(e!1, r) -> E(r, s) + R(e, r)  -->
 <reaction id="re12" name="R(e!_,r) -> R(e,r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD47" species="s3"/>
@@ -230,6 +268,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r)  -->
 <reaction id="re13" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD50" species="s5" stoichiometry="2"/>
@@ -246,6 +286,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r)  -->
 <reaction id="re14" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD52" species="s5" stoichiometry="2"/>
@@ -262,6 +304,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s) + E(r, s!1), R(e!1, r)  -->
 <reaction id="re15" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD54" species="s5" stoichiometry="2"/>
@@ -279,6 +323,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s)  -->
 <reaction id="re16" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD57" species="s5" stoichiometry="2"/>
@@ -296,6 +342,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
+<!-- reaction: E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3)  -->
 <reaction id="re17" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD60" species="s4" stoichiometry="2"/>
@@ -312,6 +360,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : R(e!_,r) -> R(e,r) -->
+<!-- reaction: E(r, s!1), R(e!1, r) -> E(r, s) + R(e, r)  -->
 <reaction id="re18" name="R(e!_,r) -> R(e,r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD62" species="s4"/>
@@ -327,6 +377,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : E(r,s), R(e) -> E(r,s!1), R(e!1) -->
+<!-- reaction: R(e, r) + E(r, s) -> E(r, s!1), R(e!1, r)  -->
 <reaction id="re19" name="E(r,s), R(e) -> E(r,s!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD65" species="s1"/>
@@ -344,6 +396,8 @@
 </math>
 </kineticLaw>
 </reaction>
+<!-- rule    : E(r,s), R(e) -> E(r!1,s), R(e!1) -->
+<!-- reaction: R(e, r) + E(r, s) -> E(r!1, s), R(e!1, r)  -->
 <reaction id="re20" name="E(r,s), R(e) -> E(r!1,s), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD68" species="s1"/>

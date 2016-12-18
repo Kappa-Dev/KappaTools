@@ -1,6 +1,6 @@
 function main=main()
-%% command line: 
-%%     'KaDE' 'auto.ka' '-d' 'output' '-l' '1' '-p' '0.01' '--rate-convention''Biochemist'
+% command line: 
+%      'KaDE' 'auto.ka' '-d' 'output' '-l' '1' '-p' '0.01' '--rate-convention''Biochemist'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -32,10 +32,10 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(7)=t;
-init(1)=(1*6); %B()
-init(2)=(1*4.500000); %A()
-init(4)=(1*10); %E(r)
-init(3)=(1*100); %R(e, r)
+init(1)=(1*6); % B()
+init(2)=(1*4.500000); % A()
+init(4)=(1*10); % E(r)
+init(3)=(1*100); % R(e, r)
 var(2)=(1*(init(3)+init(5)));
 var(1)=((1*(2*init(6)))/2);
 
@@ -44,15 +44,15 @@ global kd
 global kun
 global kdun
 
-k(1)=3; %R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(2)=4; %R(e!_,r!1), R(e!_,r!1) -> R(e!_,r), R(e!_,r)
-k(3)=5; %A(), A(), B(), B(), B() -> 
-k(4)=7; %R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B() -> R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B(x)
-k(5)=8; %R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
-k(6)=1; %E(r), R(e) -> E(r!1), R(e!1), R(e!2,r), E(r!2)
-k(7)=1; %E(r), E(r) -> E(r), E(r!1), R(e!1,r)
-k(8)=1; %E(r), E(r), R(e,r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
-k(9)=1; %E(r), E(r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
+k(1)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(2)=4; % R(e!_,r!1), R(e!_,r!1) -> R(e!_,r), R(e!_,r)
+k(3)=5; % A(), A(), B(), B(), B() -> 
+k(4)=7; % R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B() -> R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B(x)
+k(5)=8; % R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
+k(6)=1; % E(r), R(e) -> E(r!1), R(e!1), R(e!2,r), E(r!2)
+k(7)=1; % E(r), E(r) -> E(r), E(r!1), R(e!1,r)
+k(8)=1; % E(r), E(r), R(e,r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
+k(9)=1; % E(r), E(r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -136,13 +136,13 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); %B()
-Init(2) = init(2); %A()
-Init(3) = init(3); %R(e, r)
-Init(4) = init(4); %E(r)
-Init(5) = init(5); %E(r!1), R(e!1, r)
-Init(6) = init(6); %E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2)
-Init(7) = init(7); %t
+Init(1) = init(1); % B()
+Init(2) = init(2); % A()
+Init(3) = init(3); % R(e, r)
+Init(4) = init(4); % E(r)
+Init(5) = init(5); % E(r!1), R(e!1, r)
+Init(6) = init(6); % E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2)
+Init(7) = init(7); % t
 end
 
 
@@ -161,8 +161,8 @@ var(1)=((1*(2*y(6)))/2);
 
 dydt=zeros(nodevar,1);
 
-%rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
-%reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
+% reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
@@ -176,8 +176,8 @@ dydt(5)=dydt(5)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 
-%rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
-%reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
+% reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
@@ -191,8 +191,8 @@ dydt(5)=dydt(5)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 
-%rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
-%reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
+% reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
@@ -206,8 +206,8 @@ dydt(5)=dydt(5)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 
-%rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
-%reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B() -> R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B()
+% reaction: B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(6)=dydt(6)-2/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
@@ -221,8 +221,8 @@ dydt(5)=dydt(5)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(5)*y(6)/2*y(6)/2*y(1)*y(1)*y(1);
 
-%rule    : R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B() -> R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B(x)
-%reaction: B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2)
+% rule    : R(e!_,r), R(e!_,r), R(e!_,r), R(e!_,r), B(), B() -> R(e!_,r!1), R(e!_,r!1), R(e!_,r!2), R(e!_,r!2), B(), B(), B(x)
+% reaction: B() + B() + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> B() + B() + B() + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) + E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) 
 
 dydt(5)=dydt(5)-1/16*k(4)*y(5)*y(5)*y(5)*y(5)*y(1)*y(1);
 dydt(5)=dydt(5)-1/16*k(4)*y(5)*y(5)*y(5)*y(5)*y(1)*y(1);
@@ -236,8 +236,8 @@ dydt(1)=dydt(1)+1/16*k(4)*y(5)*y(5)*y(5)*y(5)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(4)*y(5)*y(5)*y(5)*y(5)*y(1)*y(1);
 dydt(1)=dydt(1)+1/16*k(4)*y(5)*y(5)*y(5)*y(5)*y(1)*y(1);
 
-%rule    : A(), A(), B(), B(), B() -> 
-%reaction: B() + B() + B() + A() + A() -> 
+% rule    : A(), A(), B(), B(), B() -> 
+% reaction: B() + B() + B() + A() + A() ->  
 
 dydt(2)=dydt(2)-1/12*k(3)*y(2)*y(2)*y(1)*y(1)*y(1);
 dydt(2)=dydt(2)-1/12*k(3)*y(2)*y(2)*y(1)*y(1)*y(1);
@@ -245,8 +245,8 @@ dydt(1)=dydt(1)-1/12*k(3)*y(2)*y(2)*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)-1/12*k(3)*y(2)*y(2)*y(1)*y(1)*y(1);
 dydt(1)=dydt(1)-1/12*k(3)*y(2)*y(2)*y(1)*y(1)*y(1);
 
-%rule    : E(r), E(r), R(e,r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
-%reaction: R(e, r) + E(r) + E(r) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : E(r), E(r), R(e,r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
+% reaction: R(e, r) + E(r) + E(r) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(4)=dydt(4)-k(8)*y(4)*y(4)*y(3);
 dydt(4)=dydt(4)-k(8)*y(4)*y(4)*y(3);
@@ -254,45 +254,45 @@ dydt(3)=dydt(3)-k(8)*y(4)*y(4)*y(3);
 dydt(5)=dydt(5)+k(8)*y(4)*y(4)*y(3);
 dydt(5)=dydt(5)+k(8)*y(4)*y(4)*y(3);
 
-%rule    : E(r), R(e) -> E(r!1), R(e!1), R(e!2,r), E(r!2)
-%reaction: R(e, r) + E(r) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : E(r), R(e) -> E(r!1), R(e!1), R(e!2,r), E(r!2)
+% reaction: R(e, r) + E(r) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(4)=dydt(4)-k(6)*y(4)*y(3);
 dydt(3)=dydt(3)-k(6)*y(4)*y(3);
 dydt(5)=dydt(5)+k(6)*y(4)*y(3);
 dydt(5)=dydt(5)+k(6)*y(4)*y(3);
 
-%rule    : R(e!_,r!1), R(e!_,r!1) -> R(e!_,r), R(e!_,r)
-%reaction: E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : R(e!_,r!1), R(e!_,r!1) -> R(e!_,r), R(e!_,r)
+% reaction: E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(6)=dydt(6)-2/2*k(2)*y(6)/2;
 dydt(5)=dydt(5)+1/2*k(2)*y(6)/2;
 dydt(5)=dydt(5)+1/2*k(2)*y(6)/2;
 
-%rule    : R(e!_,r!1), R(e!_,r!1) -> R(e!_,r), R(e!_,r)
-%reaction: E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : R(e!_,r!1), R(e!_,r!1) -> R(e!_,r), R(e!_,r)
+% reaction: E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(6)=dydt(6)-2/2*k(2)*y(6)/2;
 dydt(5)=dydt(5)+1/2*k(2)*y(6)/2;
 dydt(5)=dydt(5)+1/2*k(2)*y(6)/2;
 
-%rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-%reaction: E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2)
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: E(r!1), R(e!1, r) + E(r!1), R(e!1, r) -> E(r!1), R(e!2, r!3), R(e!1, r!3), E(r!2) 
 
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(5);
 dydt(5)=dydt(5)-1/2*k(1)*y(5)*y(5);
 dydt(6)=dydt(6)+2/2*k(1)*y(5)*y(5);
 
-%rule    : E(r), E(r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
-%reaction: E(r) + E(r) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r)
+% rule    : E(r), E(r) -> E(r!2), E(r!1), R(e!1,r), R(e!2,r)
+% reaction: E(r) + E(r) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
 
 dydt(4)=dydt(4)-1/2*k(9)*y(4)*y(4);
 dydt(4)=dydt(4)-1/2*k(9)*y(4)*y(4);
 dydt(5)=dydt(5)+1/2*k(9)*y(4)*y(4);
 dydt(5)=dydt(5)+1/2*k(9)*y(4)*y(4);
 
-%rule    : E(r), E(r) -> E(r), E(r!1), R(e!1,r)
-%reaction: E(r) + E(r) -> E(r!1), R(e!1, r) + E(r)
+% rule    : E(r), E(r) -> E(r), E(r!1), R(e!1,r)
+% reaction: E(r) + E(r) -> E(r!1), R(e!1, r) + E(r) 
 
 dydt(4)=dydt(4)-k(7)*y(4)*y(4);
 dydt(4)=dydt(4)-k(7)*y(4)*y(4);

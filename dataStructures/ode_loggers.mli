@@ -65,6 +65,7 @@ val print_newline:
   Loggers.t -> unit
 
 val print_comment:
+  ?breakline:bool ->
   Loggers.t ->
   ?filter_in:Loggers.encoding list option ->
   ?filter_out:Loggers.encoding list ->

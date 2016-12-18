@@ -1148,27 +1148,19 @@ struct
       | Loggers.Json -> ()
     in
     ()
-let export_main
+
+
+  let breakline = true
+
+
+  let export_main
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
       logger compil network split =
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
-    let () =
-      match Loggers.get_encoding_format logger with
-      | Loggers.Octave | Loggers.Matlab ->
-        let () = Loggers.fprintf logger "%%%% command line: " in
-        let () = Ode_loggers.print_newline logger in
-        let () = Loggers.fprintf logger "%%" in
-        let () = Ode_loggers.print_comment logger ("     "^command_line_quotes)
-        in
-        let () = Ode_loggers.print_newline logger in
-        ()
-      | Loggers.Maple | Loggers.SBML | Loggers.TXT
-      | Loggers.TXT_Tabular | Loggers.XLS
-      | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
-      | Loggers.Json -> ()
-    in
+    let () = Ode_loggers.print_comment ~breakline logger "command line: " in
+    let () = Ode_loggers.print_comment ~breakline logger ("     "^command_line_quotes) in
     let count = I.what_do_we_count compil in
     let rate_convention = I.rate_convention compil in
     let () = Ode_loggers.print_ode_preamble ~count ~rate_convention logger () in
@@ -1351,6 +1343,48 @@ let export_main
            let reactants' = add_factor reactants in
            let products' = add_factor products in
            let () =
+             if I.do_we_prompt_reactions compil
+             then
+               let rule_string =
+                 Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule
+               in
+               let () = Ode_loggers.print_newline logger in
+               let () =
+                 Ode_loggers.print_comment ~breakline logger ("rule    : "^rule_string)
+               in
+               let dump fmt list  =
+                 let _ =
+                   List.fold_left
+                     (fun bool k ->
+                        let prefix = if bool then " + " else "" in
+                        let species_string =
+                          Format.asprintf "%a"
+                            (fun log id -> I.print_chemical_species ~compil log
+                                (fst (Mods.DynArray.get network.species_tab id)))
+                            k
+                        in
+                        let () = Format.fprintf fmt "%s%s" prefix species_string in
+                        true)
+                     false
+                     (List.rev list)
+                 in ()
+               in
+               match
+                 Loggers.get_encoding_format logger
+               with
+               | Loggers.Matlab | Loggers.Octave  | Loggers.SBML ->
+                 let s = Format.asprintf
+                     "reaction: %a -> %a "
+                     dump reactants dump products
+                 in
+                 Ode_loggers.print_comment ~breakline logger s
+               | Loggers.Maple | Loggers.TXT
+               | Loggers.TXT_Tabular | Loggers.XLS
+               | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+               | Loggers.HTML_Tabular | Loggers.Json -> ()
+
+           in   
+           let () =
              Sbml_backend.dump_sbml_reaction
                get_rule
                I.print_rule_name
@@ -1375,50 +1409,6 @@ let export_main
                (List.rev reactants)
            in
            let nauto_in_lhs = enriched_rule.divide_rate_by in
-           let () =
-             if I.do_we_prompt_reactions compil
-             then
-               let rule_string =
-                 Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule
-               in
-               let () = Ode_loggers.print_newline logger in
-               let () =
-                 Ode_loggers.print_comment logger ("rule    : "^rule_string)
-               in
-               let () = Ode_loggers.print_newline logger in
-               let dump list  =
-                 let _ =
-                   List.fold_left
-                     (fun bool k ->
-                        let prefix = if bool then " + " else "" in
-                        let species_string =
-                          Format.asprintf "%a"
-                            (fun log id -> I.print_chemical_species ~compil log
-                                (fst (Mods.DynArray.get network.species_tab id)))
-                            k
-                        in
-                        let () = Loggers.fprintf logger "%s%s" prefix species_string in
-                        true)
-                     false
-                     (List.rev list)
-                 in ()
-               in
-               match
-                 Loggers.get_encoding_format logger
-               with
-               | Loggers.Matlab | Loggers.Octave ->
-                 let () = Ode_loggers.print_comment logger "reaction: "in
-                 let () = dump reactants in
-                 let () = Loggers.fprintf logger " -> " in
-                 let () = dump products in
-                 let () = Ode_loggers.print_newline logger in
-                 ()
-               | Loggers.Maple | Loggers.SBML | Loggers.TXT
-                 | Loggers.TXT_Tabular | Loggers.XLS
-                 | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
-                 | Loggers.Json -> ()
-
-           in
            let () = Ode_loggers.print_newline logger in
            let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
            let () = do_it Ode_loggers.produce products reactants' enriched_rule in
