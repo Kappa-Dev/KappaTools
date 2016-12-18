@@ -4,22 +4,12 @@
 <listOfUnitDefinitions>
 <unitDefinition metaid="substance" id="substance" name="substance">
 <listOfUnits>
-<unit metaid="CMD5"  kind="mole"/>
+<unit metaid="CMD3"  kind="mole"/>
 </listOfUnits>
 </unitDefinition>
 <unitDefinition metaid="volume" id="volume" name="volume">
 <listOfUnits>
-<unit metaid="CMD4" kind="litre"/>
-</listOfUnits>
-</unitDefinition>
-<unitDefinition metaid="area" id="area" name="area">
-<listOfUnits>
-<unit metaid="CMD3"  kind="metre" exponent="2"/>
-</listOfUnits>
-</unitDefinition>
-<unitDefinition metaid="length" id="length" name="length">
-<listOfUnits>
-<unit metaid="CMD2" kind="metre"/>
+<unit metaid="CMD2" kind="litre"/>
 </listOfUnits>
 </unitDefinition>
 <unitDefinition metaid="time" id="time" name="time">
@@ -32,60 +22,60 @@
 <compartment metaid="default" id="default" size="1" units="volume"/>
 </listOfCompartments>
 <listOfParameters>
-<parameter id="tinit" value="0."/>
-<parameter id="tend" value="1."/>
-<parameter id="period_t_point" value="0.1"/>
+<parameter id="tinit" value="0." units="time"/>
+<parameter id="tend" value="1." units="time"/>
+<parameter id="period_t_point" value="0.1" units="time"/>
 <parameter id="n_ab" value="1000"/>
-<parameter id="var(10)" value="0"/>
 <parameter id="Cpp" value="0"/>
 <parameter id="Cpu" value="0"/>
 <parameter id="n_c" value="10000"/>
-<parameter id="Cuu" value="1000"/>
+<parameter id="Cuu" value="10000"/>
 <parameter id="AB" value="0"/>
 <parameter id="mod_rate" value="1"/>
 <parameter id="off_rate" value="0.1"/>
 <parameter id="on_rate" value="0.001"/>
 </listOfParameters>
-<listOfSpecies><species metaid="CMD6" id="s1" name="C(x1~u, x2~u)" compartment="default" initialAmount="1000"/>
-<species metaid="CMD7" id="s2" name="A(x, c)" compartment="default" initialAmount="0"/>
-<species metaid="CMD8" id="s3" name="B(x)" compartment="default" initialAmount="0"/>
-<species metaid="CMD9" id="s4" name="A(x!1, c), B(x!1)" compartment="default" initialAmount="0"/>
-<species metaid="CMD10" id="s5" name="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)" compartment="default" initialAmount="0"/>
-<species metaid="CMD11" id="s6" name="A(x, c!1), C(x1~u!1, x2~u)" compartment="default" initialAmount="0"/>
-<species metaid="CMD12" id="s7" name="C(x1~p, x2~u)" compartment="default" initialAmount="0"/>
-<species metaid="CMD13" id="s8" name="A(x, c!1), C(x1~p, x2~u!1)" compartment="default" initialAmount="0"/>
-<species metaid="CMD14" id="s9" name="A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)" compartment="default" initialAmount="0"/>
-<species metaid="CMD15" id="s10" name="C(x1~p, x2~p)" compartment="default" initialAmount="0"/>
-<species metaid="CMD16" id="s11" name="t" compartment="default" initialAmount="0"/>
+<listOfSpecies>
+<species metaid="CMD4" id="s1" name="C(x1~u, x2~u)" compartment="default" initialAmount="10000" substanceUnits="substance"/>
+<species metaid="CMD5" id="s2" name="A(x, c)" compartment="default" initialAmount="1000" substanceUnits="substance"/>
+<species metaid="CMD6" id="s3" name="B(x)" compartment="default" initialAmount="1000" substanceUnits="substance"/>
+<species metaid="CMD7" id="s4" name="A(x!1, c), B(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD8" id="s5" name="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD9" id="s6" name="A(x, c!1), C(x1~u!1, x2~u)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD10" id="s7" name="C(x1~p, x2~u)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD11" id="s8" name="A(x, c!1), C(x1~p, x2~u!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD12" id="s9" name="A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD13" id="s10" name="C(x1~p, x2~p)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD14" id="s11" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
 </listOfSpecies>
 <listOfReactions>
 <reaction id="re1" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD17" species="s6"/>
+<speciesReference metaid="CMD15" species="s6"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD18" species="s2"/>
-<speciesReference metaid="CMD19" species="s7"/>
+<speciesReference metaid="CMD16" species="s2"/>
+<speciesReference metaid="CMD17" species="s7"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.100000 </cn><ci> s6 </ci></apply>
+<times/><cn type="integer"> 1 </cn><ci> s6 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <reaction id="re2" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD20" species="s3"/>
-<speciesReference metaid="CMD21" species="s6"/>
+<speciesReference metaid="CMD18" species="s3"/>
+<speciesReference metaid="CMD19" species="s6"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD22" species="s5"/>
+<speciesReference metaid="CMD20" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci>v1</ci><apply>
+<times/><cn type="real"> 0.001000 </cn><apply>
 <times/><ci> s6 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -93,46 +83,46 @@
 </reaction>
 <reaction id="re3" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD23" species="s9"/>
+<speciesReference metaid="CMD21" species="s9"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD24" species="s3"/>
-<speciesReference metaid="CMD25" species="s8"/>
+<speciesReference metaid="CMD22" species="s3"/>
+<speciesReference metaid="CMD23" species="s8"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><ci> s9 </ci></apply>
+<times/><cn type="real"> 0.100000 </cn><ci> s9 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <reaction id="re4" name="mod x2" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD26" species="s8"/>
+<speciesReference metaid="CMD24" species="s8"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD27" species="s2"/>
-<speciesReference metaid="CMD28" species="s10"/>
+<speciesReference metaid="CMD25" species="s2"/>
+<speciesReference metaid="CMD26" species="s10"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.100000 </cn><ci> s8 </ci></apply>
+<times/><cn type="integer"> 1 </cn><ci> s8 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <reaction id="re5" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD29" species="s3"/>
-<speciesReference metaid="CMD30" species="s8"/>
+<speciesReference metaid="CMD27" species="s3"/>
+<speciesReference metaid="CMD28" species="s8"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD31" species="s9"/>
+<speciesReference metaid="CMD29" species="s9"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci>v1</ci><apply>
+<times/><cn type="real"> 0.001000 </cn><apply>
 <times/><ci> s8 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -140,16 +130,16 @@
 </reaction>
 <reaction id="re6" name="a.c" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD32" species="s2"/>
-<speciesReference metaid="CMD33" species="s7"/>
+<speciesReference metaid="CMD30" species="s2"/>
+<speciesReference metaid="CMD31" species="s7"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD34" species="s8"/>
+<speciesReference metaid="CMD32" species="s8"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci>v1</ci><apply>
+<times/><cn type="real"> 0.001000 </cn><apply>
 <times/><ci> s2 </ci><ci> s7 </ci></apply>
 </apply>
 </math>
@@ -157,11 +147,26 @@
 </reaction>
 <reaction id="re7" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD35" species="s5"/>
+<speciesReference metaid="CMD33" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD36" species="s4"/>
-<speciesReference metaid="CMD37" species="s7"/>
+<speciesReference metaid="CMD34" species="s4"/>
+<speciesReference metaid="CMD35" species="s7"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><cn type="integer"> 1 </cn><ci> s5 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<reaction id="re8" name="a.b_op" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD36" species="s5"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD37" species="s3"/>
+<speciesReference metaid="CMD38" species="s6"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -170,33 +175,18 @@
 </math>
 </kineticLaw>
 </reaction>
-<reaction id="re8" name="a.b_op" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD38" species="s5"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD39" species="s3"/>
-<speciesReference metaid="CMD40" species="s6"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><cn type="real"> 0.001000 </cn><ci> s5 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
 <reaction id="re9" name="ab.c" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD41" species="s1"/>
-<speciesReference metaid="CMD42" species="s4"/>
+<speciesReference metaid="CMD39" species="s1"/>
+<speciesReference metaid="CMD40" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD43" species="s5"/>
+<speciesReference metaid="CMD41" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci>v1</ci><apply>
+<times/><cn type="real"> 0.001000 </cn><apply>
 <times/><ci> s4 </ci><ci> s1 </ci></apply>
 </apply>
 </math>
@@ -204,31 +194,31 @@
 </reaction>
 <reaction id="re10" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD44" species="s4"/>
+<speciesReference metaid="CMD42" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD45" species="s2"/>
-<speciesReference metaid="CMD46" species="s3"/>
+<speciesReference metaid="CMD43" species="s2"/>
+<speciesReference metaid="CMD44" species="s3"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><ci> s4 </ci></apply>
+<times/><cn type="real"> 0.100000 </cn><ci> s4 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <reaction id="re11" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD47" species="s2"/>
-<speciesReference metaid="CMD48" species="s3"/>
+<speciesReference metaid="CMD45" species="s2"/>
+<speciesReference metaid="CMD46" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD49" species="s4"/>
+<speciesReference metaid="CMD47" species="s4"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci>v1</ci><apply>
+<times/><cn type="real"> 0.001000 </cn><apply>
 <times/><ci> s2 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -236,7 +226,7 @@
 </reaction>
 <reaction id="re12" name="time advance" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD50" species="s11"/>
+<speciesReference metaid="CMD48" species="s11"/>
 </listOfReactants>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">

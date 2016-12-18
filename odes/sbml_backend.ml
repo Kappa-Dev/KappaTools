@@ -12,21 +12,24 @@ let unsome expr_opt =
   | None -> Location.dummy_annot (Alg_expr.CONST Nbr.zero)
   | Some expr -> expr
 
-let rec eval_init_alg_expr logger alg_expr =
+let rec eval_init_alg_expr logger network_handler alg_expr =
   match fst alg_expr with
   | Alg_expr.CONST x  -> x
   | Alg_expr.ALG_VAR x ->
-    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr x) in
-    eval_init_alg_expr logger (unsome expr_opt)
+    let id = network_handler.Network_handler.int_of_obs x in
+    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+    eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.KAPPA_INSTANCE x ->
-  let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Init x) in
-  eval_init_alg_expr logger (unsome expr_opt)
+      let id = network_handler.Network_handler.int_of_kappa_instance x in
+    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Init id) in
+    eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.TOKEN_ID x ->
-  let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Init x) in
-  eval_init_alg_expr logger (unsome expr_opt)
+    let id = network_handler.Network_handler.int_of_token_id x in
+    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Init id) in
+    eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
     let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
-    eval_init_alg_expr logger (unsome expr_opt)
+    eval_init_alg_expr logger network_handler (unsome expr_opt)
   | Alg_expr.STATE_ALG_OP
       ( Operator.CPUTIME
       | Operator.TIME_VAR
@@ -36,29 +39,30 @@ let rec eval_init_alg_expr logger alg_expr =
   | Alg_expr.BIN_ALG_OP (op, a, b) ->
     Nbr.of_bin_alg_op
       op
-      (eval_init_alg_expr logger a)
-      (eval_init_alg_expr logger b)
+      (eval_init_alg_expr logger network_handler a)
+      (eval_init_alg_expr logger network_handler b)
   | Alg_expr.UN_ALG_OP (op, a) ->
     Nbr.of_un_alg_op
       op
-      (eval_init_alg_expr logger a)
+      (eval_init_alg_expr logger network_handler a)
   | Alg_expr.IF (cond, yes, no) ->
-    if eval_init_bool_expr logger cond
+    if eval_init_bool_expr logger network_handler cond
     then
-      eval_init_alg_expr logger yes
+      eval_init_alg_expr logger network_handler yes
     else
-      eval_init_alg_expr logger no
-and eval_init_bool_expr logger expr =
+      eval_init_alg_expr logger network_handler no
+and eval_init_bool_expr logger network_handler expr =
   match fst expr with
   | Alg_expr.TRUE -> true
   | Alg_expr.FALSE -> false
   | Alg_expr.COMPARE_OP (op,a,b) ->
     Nbr.of_compare_op op
-      (eval_init_alg_expr logger a) (eval_init_alg_expr logger b)
+      (eval_init_alg_expr logger network_handler a)
+      (eval_init_alg_expr logger network_handler b)
   | Alg_expr.BOOL_OP (op,a,b) ->
     of_bool_op op
-      (eval_init_bool_expr logger a)
-      (eval_init_bool_expr logger b)
+      (eval_init_bool_expr logger network_handler a)
+      (eval_init_bool_expr logger network_handler b)
 
 let rec print_alg_expr_in_sbml logger
     (alg_expr:
@@ -76,8 +80,11 @@ let rec print_alg_expr_in_sbml logger
     Loggers.fprintf logger "<cn type=\"real\"> %f </cn>" f
   | Alg_expr.ALG_VAR x ->
     begin
+      let id =
+        network.Network_handler.int_of_obs x
+      in
       match
-        Loggers.get_expr logger (Ode_loggers_sig.Expr x)
+        Loggers.get_expr logger (Ode_loggers_sig.Expr id)
       with
       | Some expr ->
         print_alg_expr_in_sbml
@@ -85,13 +92,13 @@ let rec print_alg_expr_in_sbml logger
           expr
           network
       | None ->
-        Loggers.fprintf logger "<ci>v%i</ci>" (network.Network_handler.int_of_obs x)
+        Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
     end
   | Alg_expr.KAPPA_INSTANCE x ->
-    Loggers.fprintf logger "<ci>y%i</ci>"
+    Loggers.fprintf logger "<ci>s%i</ci>"
       (network.Network_handler.int_of_kappa_instance x)
   | Alg_expr.TOKEN_ID x ->
-    Loggers.fprintf logger "<ci>y%i</ci>" (network.Network_handler.int_of_token_id x)
+    Loggers.fprintf logger "<ci>t%i</ci>" (network.Network_handler.int_of_token_id x)
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
     Loggers.fprintf logger "<ci>tend</ci>"
   | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
@@ -210,20 +217,26 @@ let break = true
 let replace_space_with_underscore =
   String.map (fun c -> if c=' ' then '_' else c)
 
-let dump_initial_species loggers name species =
+let dump_initial_species ?units loggers network_handler name species =
   let expr =
     match Loggers.get_expr loggers (Ode_loggers_sig.Init species) with
     | Some a -> a
     | None -> Location.dummy_annot (Alg_expr.CONST Nbr.zero)
   in
-  let concentration = eval_init_alg_expr loggers expr in
+  let units =
+    match units with
+    | None -> "substance"
+    | Some units -> units
+  in
+  let concentration = eval_init_alg_expr loggers network_handler expr in
   let s =
     Format.sprintf
-      "metaid=\"%s\" id=\"s%i\" name=\"%s\" compartment=\"default\" initialAmount=\"%s\""
+      "metaid=\"%s\" id=\"s%i\" name=\"%s\" compartment=\"default\" initialAmount=\"%s\" substanceUnits=\"%s\""
       (meta_id_of_logger loggers)
       species
       name
       (Nbr.to_string concentration)
+      units
   in
   let () = single_box ~options:(fun () -> s) loggers "species" in
   ()

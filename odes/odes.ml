@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 17 2016>
+  * Last modification: Time-stamp: <Dec 18 2016>
 *)
 
 let local_trace = false
@@ -1050,13 +1050,13 @@ struct
     {
       Network_handler.int_of_obs = (fun i  -> i) ;
       Network_handler.int_of_kappa_instance = (fun i -> i) ;
-      Network_handler.int_of_token_id = (fun i -> Printf.fprintf stdout "%i" i ; i) ;
+      Network_handler.int_of_token_id = (fun i ->  i) ;
     }
 
   let handler_expr network =
     {
       Network_handler.int_of_obs =
-        (fun s -> Mods.IntMap.find_default 0 s network.varmap) ;
+        (fun s -> Mods.IntMap.find_default s s network.varmap) ;
       Network_handler.int_of_kappa_instance = (fun i -> i) ;
       Network_handler.int_of_token_id =
         (fun s -> Mods.IntMap.find_default 0 s network.tokenmap) ;
@@ -1418,7 +1418,8 @@ let export_main
         network.reactions
     in
     (* Derivative of time is equal to 1 *)
-    let () = Ode_loggers.associate
+    let () =
+      Ode_loggers.associate
         (I.string_of_var_id ~compil) logger (Ode_loggers_sig.Deriv (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network) in
     let () = Ode_loggers.print_newline logger in
     let () =
@@ -1433,6 +1434,7 @@ let export_main
   let export_init logger compil network =
     let label = "listOfSpecies" in
     let () = Sbml_backend.open_box logger label in
+    let () = Sbml_backend.line_sbml logger in
     let () = Ode_loggers.open_procedure logger "Init" "ode_init" [] in
     let () = Ode_loggers.print_newline logger in
     let () =
@@ -1449,20 +1451,22 @@ let export_main
       then
         ()
       else
-        let comment =
-          if k = get_fresh_ode_var_id network - 1 then "t"
+        let comment, units  =
+          if k = get_fresh_ode_var_id network - 1 then "t", Some "time"
           else
             Format.asprintf "%a"
               (fun log id -> I.print_chemical_species ~compil log
                   (fst (Mods.DynArray.get network.species_tab id)))
-              k
+              k, None
         in
         let () = Ode_loggers.declare_init ~comment logger k in
         let () =
           Sbml_backend.dump_initial_species
-              logger
-              comment
-              k
+            ?units
+            logger
+            (handler_expr network)
+            comment
+            k
         in
         aux (next_id k)
     in
