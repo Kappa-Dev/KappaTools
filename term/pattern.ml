@@ -249,6 +249,95 @@ let raw_to_navigation (full:bool) nodes_by_type nodes =
   | Some (x,_) -> (*(ag_sort,ag_id)*)
     build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
+let rec sub_minimize_renaming r = function
+  | [], _ -> r
+  | _::_, [] -> assert false
+  | x::q as l,y::q' -> match Renaming.add x y r with
+    | Some r' -> sub_minimize_renaming r' (q,q')
+    | None -> sub_minimize_renaming r (l,q')
+let minimize_renaming dst_nbt ref_nbt =
+  let re = Tools.array_fold_lefti
+      (fun ty ->
+         List.fold_left (fun r id ->
+             let ids' =
+               Tools.list_smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
+             if ids' == dst_nbt.(ty) then r
+             else let () = dst_nbt.(ty) <- ids' in
+               Tools.unsome Renaming.empty (Renaming.add id id r)))
+      Renaming.empty ref_nbt in
+  Tools.array_fold_lefti
+    (fun ty r ids -> sub_minimize_renaming r (ids,ref_nbt.(ty))) re dst_nbt
+let minimize cand_nbt cand_nodes ref_nbt =
+  let re = minimize_renaming cand_nbt ref_nbt in
+  let nodes_by_type =
+    Array.map (List.filter (fun a -> Renaming.mem a re)) ref_nbt in
+  let nodes =
+    Mods.IntMap.fold
+      (fun id sites acc ->
+         let sites' = Array.map (function
+             | Link (n,s),i -> Link (Renaming.apply re n,s),i
+             | (UnSpec|Free),_ as x -> x) sites in
+         Mods.IntMap.add (Renaming.apply re id) sites' acc)
+      cand_nodes Mods.IntMap.empty in
+  { nodes_by_type; nodes;
+    recogn_nav =
+      raw_to_navigation false nodes_by_type nodes; }
+
+let infs cc1 cc2 =
+  let possibilities =
+    ref (potential_pairing cc1.nodes_by_type cc2.nodes_by_type) in
+  let rec aux rename nodes = function
+    | [] -> nodes
+    | (o,p as pair)::todos ->
+      let () = possibilities := Mods.Int2Set.remove pair !possibilities in
+      let lnk1 = Mods.IntMap.find_default [||] o cc1.nodes in
+      let (todos',ren'),outl =
+        Tools.array_fold_left_mapi
+          (fun k (todo,ren as acc) (ly,iy) ->
+             let (lx,ix) = lnk1.(k) in
+             match lx, ly with
+             | (Link _, Free| Free, Link _
+               | Link _, UnSpec |UnSpec, Link _
+               | UnSpec, Free| Free, UnSpec
+               | UnSpec, UnSpec) ->
+               acc,(UnSpec,if ix = iy then iy else -1)
+             | Free, Free -> acc,(Free,if ix = iy then iy else -1)
+             | Link (n1,s1) as x, Link (n2,s2) ->
+               if s1 = s2 then
+                 if Renaming.mem n1 ren then
+                   (acc,
+                    ((if Renaming.apply ren n1 = n2 then x else UnSpec),
+                     if ix = iy then iy else -1))
+                 else match Renaming.add n1 n2 ren with
+                   | None -> acc,(UnSpec,if ix = iy then iy else -1)
+                   | Some r' ->
+                     if find_ty cc1 n1 = find_ty cc2 n2
+                     then ((n1,n2)::todo,r'),(x,if ix = iy then iy else -1)
+                     else acc,(UnSpec,if ix = iy then iy else -1)
+               else (acc,(UnSpec,if ix = iy then iy else -1))
+          )
+          (todos,rename)
+          (Mods.IntMap.find_default [||] p cc2.nodes) in
+      if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true outl
+      then aux ren' nodes todos'
+      else aux ren' (Mods.IntMap.add o outl nodes) todos' in
+  let rec for_one_root acc =
+    match Mods.Int2Set.choose !possibilities with
+    | None -> acc
+    | Some (root1,root2) ->
+      match Renaming.add root1 root2 Renaming.empty with
+      | None -> assert false
+      | Some r ->
+        let nodes = aux r Mods.IntMap.empty [root1,root2] in
+        let acc' =
+          if Mods.IntMap.is_empty nodes then acc else
+            let nodes_by_type = Array.map
+                (List.filter (fun a -> Mods.IntMap.mem a nodes))
+                cc1.nodes_by_type in
+            (minimize nodes_by_type nodes cc1.nodes_by_type)::acc in
+        for_one_root acc'
+  in for_one_root []
+
 let intersection renaming cc1 cc2 =
   let nodes,image =
     Renaming.fold
@@ -869,7 +958,7 @@ module PreEnv : sig
 
   val sigs : t -> Signature.s
 
-  val finalize : t -> Env.t * stat
+  val finalize : max_sharing:bool -> t -> Env.t * stat
   val of_env : Env.t -> t
 end = struct
   type t = {
@@ -1013,34 +1102,37 @@ end = struct
     let env_w,r,out = aux (Mods.IntMap.find_default [] w env) in
     Mods.IntMap.add w env_w env,r,out
 
-  let rec saturate_one this max_l level (_,domain as acc) = function
+  let rec saturate_one ~max_sharing this max_l level (_,domain as acc) =
+    function
     | [] -> if level < max_l then
-        saturate_one this max_l (succ level) acc
+        saturate_one ~max_sharing this max_l (succ level) acc
           (Mods.IntMap.find_default [] (succ level) domain)
       else acc
     | h :: t ->
+      let news =
+        if max_sharing then infs this.element h.element
+        else
+          List.rev_map
+            (fun r -> intersection r this.element h.element)
+            (matchings this.element h.element) in
       let acc' =
-        match matchings this.element h.element with
-        | [] -> acc
-        | list ->
-          List.fold_left
-            (fun (mid,acc) r ->
-               let id' = succ mid in
-               let x,_,id =
-                 add_cc ~toplevel:false acc id'
-                   (intersection r this.element h.element) in
-              ((if id = id' then id else mid),x))
-            acc list in
-       saturate_one this max_l level acc' t
-  let rec saturate_level max_l level (_,domain as acc) =
+        List.fold_left
+          (fun (mid,acc) cc ->
+             let id' = succ mid in
+             let x,_,id = add_cc ~toplevel:false acc id' cc in
+             ((if id = id' then id else mid),x))
+          acc news in
+       saturate_one ~max_sharing this max_l level acc' t
+  let rec saturate_level ~max_sharing max_l level (_,domain as acc) =
     match Mods.IntMap.find_option level domain with
-    | None -> if level <= 0 then acc else saturate_level max_l (pred level) acc
+    | None -> if level <= 0 then acc
+      else saturate_level ~max_sharing max_l (pred level) acc
     | Some list ->
       let rec aux acc = function
-        | [] -> saturate_level max_l (pred level) acc
-        | h::t -> aux (saturate_one h max_l level acc t) t in
+        | [] -> saturate_level ~max_sharing max_l (pred level) acc
+        | h::t -> aux (saturate_one ~max_sharing h max_l level acc t) t in
       aux acc list
-  let saturate domain =
+  let saturate ~max_sharing domain =
     match Mods.IntMap.max_key domain with
     | None -> 0,domain
     | Some l ->
@@ -1048,10 +1140,10 @@ end = struct
         Mods.IntMap.fold
           (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l)
           domain 0 in
-      saturate_level l l (si,domain)
+      saturate_level ~max_sharing l l (si,domain)
 
-  let finalize env =
-    let si,complete_domain = saturate env.domain in
+  let finalize ~max_sharing env =
+    let si,complete_domain = saturate ~max_sharing env.domain in
     let domain = Array.make (succ si) (empty_point env.sig_decl) in
     let singles = (Mods.IntMap.find_default [] 1 complete_domain) in
     let elementaries = fill_elem env.sig_decl singles in

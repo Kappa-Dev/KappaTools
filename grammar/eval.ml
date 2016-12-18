@@ -554,7 +554,7 @@ let init_kasa called_from sigs result =
   translate_contact_map sigs contact_map,
   Export_to_KaSim.flush_errors kasa_state
 *)
-let compile ~outputs ~pause ~return
+let compile ~outputs ~pause ~return ~max_sharing
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
@@ -586,7 +586,7 @@ let compile ~outputs ~pause ~return
 
   outputs (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
-  let domain,dom_stats = Pattern.PreEnv.finalize preenv in
+  let domain,dom_stats = Pattern.PreEnv.finalize ~max_sharing preenv in
   outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
                      " (sub)observables "^
                      string_of_int dom_stats.Pattern.PreEnv.nav_steps^

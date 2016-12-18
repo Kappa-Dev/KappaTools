@@ -22,7 +22,7 @@ val compile :
   return:(Environment.t * (bool*bool*bool) option *
           bool option * string (*cflowFormat*) * string option (*cflowFile*) *
           (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
-  ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
+  max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Signature.contact_map ->
   ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
 

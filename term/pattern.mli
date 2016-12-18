@@ -64,7 +64,7 @@ module PreEnv : sig
 
   val get : t -> id -> cc (** Awfully inefficient *)
 
-  val finalize : t -> Env.t * stat
+  val finalize : max_sharing:bool -> t -> Env.t * stat
   val of_env : Env.t -> t
 end
 

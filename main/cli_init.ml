@@ -1,6 +1,6 @@
 type directive_unit = Time | Event
 
-let get_compilation ?(unit=Time) cli_args =
+let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
   let init_t,max_time,init_e,max_event,plot_period =
     match unit with
     | Time ->
@@ -28,10 +28,9 @@ let get_compilation ?(unit=Time) cli_args =
       let (env, story_compression, unary_distances,
            formatCflow, cflowFile, init_l) =
         Eval.compile
-          ~pause:(fun f -> f ())
-          ~return:(fun x -> x)
-          ?rescale_init:cli_args.Run_cli_args.rescale
           ~outputs:(Outputs.go (Signature.create [||]))
+          ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
+          ?rescale_init:cli_args.Run_cli_args.rescale
           sigs_nd tk_nd contact_map result' in
       (env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflow, cflowFile,init_l),counter,[]

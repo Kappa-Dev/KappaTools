@@ -7,6 +7,7 @@ type t = {
   mutable traceFile : string option;
   mutable eclipseMode : bool;
   mutable compileMode : bool;
+  mutable maxSharing : bool;
 }
 
 let default : t = {
@@ -18,6 +19,7 @@ let default : t = {
   traceFile = None;
   eclipseMode = false;
   compileMode = false;
+  maxSharing = false;
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -48,11 +50,12 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("-seed", Arg.Int (fun i -> t.seedValue <- Some i),
    "Seed for the random number generator") ;
   ("--eclipse",
-   Arg.Unit
-     (fun () -> t.eclipseMode <- true),
+   Arg.Unit (fun () -> t.eclipseMode <- true),
    "enable this flag for running KaSim behind eclipse plugin") ;
+  ("--max-sharing",
+   Arg.Unit (fun () -> t.maxSharing <- true),
+   "Initialization is heavier but simulation is faster");
   ("--compile",
-   Arg.Unit
-     (fun () -> t.compileMode <- true),
+   Arg.Unit (fun () -> t.compileMode <- true),
    "Display rule compilation as action list") ;
   ]
