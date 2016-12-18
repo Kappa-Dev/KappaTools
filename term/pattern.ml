@@ -667,7 +667,7 @@ end = struct
       Format.fprintf
         f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
         (print_cc ~sigs:env.sig_decl ~cc_id:p_id) p.content
-        (fun f -> if not (Operator.DepSet.is_empty p.deps) then
+        (fun f -> if p.roots <> None then
             Format.fprintf
               f "@[[%a]@]@ "
               (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
@@ -1143,7 +1143,7 @@ let check_dangling wk =
 
 let begin_new env = PreEnv.to_work env
 
-let finish_new ?origin wk =
+let raw_finish_new ~toplevel ?origin wk =
   let () = check_dangling wk in
   (* rebuild env *)
   let () =
@@ -1155,8 +1155,10 @@ let finish_new ?origin wk =
     { nodes_by_type = wk.used_id; nodes = wk.cc_nodes;
       recogn_nav = raw_to_navigation false wk.used_id wk.cc_nodes} in
   let preenv,r,out = PreEnv.add_cc
-      ~toplevel:true ?origin wk.cc_env wk.cc_id cc_candidate in
+      ~toplevel ?origin wk.cc_env wk.cc_id cc_candidate in
   PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out
+
+let finish_new ?origin wk = raw_finish_new ~toplevel:true ?origin wk
 
 let new_link wk ((x,_ as n1),i) ((y,_ as n2),j) =
   let x_n = Mods.IntMap.find_default [||] x wk.cc_nodes in
@@ -1217,14 +1219,14 @@ let minimal_env sigs contact_map =
             let w = begin_new acc in
             let n,w = new_node w ty in
             let w = new_free w (n,s) in
-            let acc',_,_cc = finish_new w in
+            let acc',_,_cc = raw_finish_new ~toplevel:false w in
             let acc'' =
               List.fold_left
                 (fun acc i ->
                    let w = begin_new acc in
                    let n,w = new_node w ty in
                    let w = new_internal_state w (n,s) i in
-                   let out,_,_cc = finish_new w in
+                   let out,_,_cc = raw_finish_new ~toplevel:false w in
                    out) acc' ints in
             List.fold_left
               (fun acc (ty',s') ->
@@ -1232,12 +1234,12 @@ let minimal_env sigs contact_map =
                  let n,w = new_node w ty in
                  let n',w = new_node w ty' in
                  let w = new_link w (n,s) (n',s') in
-                 let out,_,_cc = finish_new w in
+                 let out,_,_cc = raw_finish_new ~toplevel:false w in
                  if ty = ty' && s < s' then
                    let w = begin_new out in
                    let n,w = new_node w ty in
                    let w = new_link w (n,s) (n,s') in
-                   let out',_,_cc' = finish_new w in
+                   let out',_,_cc' = raw_finish_new ~toplevel:false w in
                    out'
                  else out) acc'' links
          ))
