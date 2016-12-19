@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
-<!--       KaDE   tokens3.ka    d   output    l   1    p   0.1     ode backend  SBML  -->
+<!--       KaDE   tokens3.ka   -d   output   -l   1   -p   0.1    -ode-backend  SBML  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
 <!--
@@ -52,7 +52,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfSpecies>
 <listOfReactions>
 <!-- rule    : expo -->
-<!-- reaction: T()  > T() + T()  -->
+<!-- reaction: T() -> T() + T()  -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD15" species="s1"/>
@@ -68,7 +68,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : expo3 -->
-<!-- reaction:   >   -->
+<!-- reaction:  ->   -->
 <reaction id="re2" name="expo3" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD17" species="t2" stoichiometry="1.1"/>
@@ -82,7 +82,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : expo2 -->
-<!-- reaction:   >   -->
+<!-- reaction:  ->   -->
 <reaction id="re3" name="expo2" reversible="false" fast="false">
 <listOfReactants>
 </listOfReactants>

@@ -1,11 +1,26 @@
 let string_in_comment s =
-  String.map
+  let s =
+    String.map
     (fun x ->
        match x with
        | '\'' -> ' '
-       | '-' -> ' '
        | _ -> x )
     s
+  in
+  let size = String.length s in
+  let rec aux k s =
+    if k+1=size
+    then Bytes.to_string s
+    else
+      let () =
+        if Bytes.get s k ='-' && Bytes.get s (k+1) = '-' 
+        then
+          Bytes.set s k ' '
+      in
+      aux (k+1) s
+  in aux 0 (Bytes.of_string s)
+
+
 
 let meta_id_of_logger logger =
   "CMD"^(string_of_int (Loggers.get_fresh_meta_id logger))
