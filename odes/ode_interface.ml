@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 16 2016>
+  * Last modification: Time-stamp: <Dec 19 2016>
 *)
 
 type compil =
@@ -63,6 +63,12 @@ let print_chemical_species ?compil =
   Pattern.print_cc
     ?sigs:(Tools.option_map Environment.signatures (environment_opt compil))
     ?cc_id:None
+
+let print_token ?compil fmt k =
+  Format.fprintf fmt
+    "%a"
+    (Environment.print_token ?env:(environment_opt compil))
+    k
 
 let print_canonic_species = print_chemical_species
 
@@ -183,6 +189,9 @@ let token_vector a =
     (fun token_vector (a,b) ->
        (Location.dummy_annot (Alg_expr.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
     add remove
+
+let consumed_tokens a = a.Primitives.consumed_tokens
+let produced_tokens a = a.Primitives.injected_tokens
 
 let token_vector_of_init = token_vector
 let print_rule_id log = Format.fprintf log "%i"

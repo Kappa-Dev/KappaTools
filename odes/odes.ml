@@ -1354,6 +1354,25 @@ struct
                let rule_string =
                  Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule
                in
+               let tokens_cons = I.consumed_tokens enriched_rule.rule in
+               let tokens_prod = I.produced_tokens enriched_rule.rule in
+               let dump_token_list fmt list =
+                 let _ =
+                   List.fold_left
+                     (fun bool (alg,k) ->
+                      let prefix = if bool then " + " else " | " in
+                      let token_string =
+                        Format.asprintf "%a"
+                          (I.print_token ~compil)
+                          k
+                      in
+                      let alg_string = "" in
+                      let () =
+                        Format.fprintf fmt "%s%s:%s" prefix alg_string token_string
+                      in true
+                   ) false (List.rev list)
+                 in ()
+               in
                let () = Ode_loggers.print_newline logger in
                let () =
                  Ode_loggers.print_comment ~breakline logger ("rule    : "^rule_string)
@@ -1365,11 +1384,12 @@ struct
                         let prefix = if bool then " + " else "" in
                         let species_string =
                           Format.asprintf "%a"
-                            (fun log id -> I.print_chemical_species ~compil log
-                                (fst (Mods.DynArray.get network.species_tab id)))
+                            (fun log id -> I.print_chemical_species ~compil log (fst (Mods.DynArray.get network.species_tab id)))
                             k
                         in
-                        let () = Format.fprintf fmt "%s%s" prefix species_string in
+                        let () =
+                          Format.fprintf fmt "%s%s" prefix species_string
+                        in
                         true)
                      false
                      (List.rev list)
@@ -1380,8 +1400,8 @@ struct
                with
                | Loggers.Matlab | Loggers.Octave  | Loggers.SBML ->
                  let s = Format.asprintf
-                     "reaction: %a -> %a "
-                     dump reactants dump products
+                     "reaction: %a%a -> %a%a "
+                     dump reactants dump_token_list tokens_cons dump products dump_token_list tokens_prod
                  in
                  Ode_loggers.print_comment ~breakline logger s
                | Loggers.Maple | Loggers.TXT

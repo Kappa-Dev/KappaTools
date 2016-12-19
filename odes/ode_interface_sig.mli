@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 16 2016>
+  * Last modification: Time-stamp: <Dec 19 2016>
 *)
 
 module type Interface =
@@ -30,7 +30,8 @@ sig
     connected_component -> connected_component -> int
   val print_connected_component :
     ?compil:compil -> Format.formatter -> connected_component -> unit
-
+  val print_token :
+    ?compil:compil -> Format.formatter -> int -> unit
   val print_chemical_species:
     ?compil:compil -> Format.formatter -> chemical_species -> unit
   val print_canonic_species:
@@ -77,6 +78,12 @@ sig
   val token_vector:
     rule ->
     ((connected_component array list,int) Alg_expr.e Location.annot * int) list
+  val consumed_tokens:
+    rule ->
+    ((connected_component array list,int) Alg_expr.e Location.annot * int) list
+  val produced_tokens:
+    rule ->
+    ((connected_component array list,int) Alg_expr.e Location.annot * int) list
   val token_vector_of_init:
     hidden_init ->
     ((connected_component array list,int) Alg_expr.e Location.annot * int) list
@@ -85,7 +92,7 @@ sig
     ?compil:compil -> Format.formatter -> rule -> unit
   val print_rule_name:
     ?compil:compil -> Format.formatter -> rule -> unit
-  val string_of_var_id: 
+  val string_of_var_id:
     ?compil:compil -> int -> string
   val rate:
     compil -> rule -> rule_id_with_mode ->
