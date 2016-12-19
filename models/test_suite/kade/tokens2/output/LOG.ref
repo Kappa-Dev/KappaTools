@@ -1,0 +1,48 @@
+Parsing ../../simulation/activity/activity.ka...
+done
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 1 (sub)observables 0 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -observables 
+Parsing ../../simulation/activity/activity.ka...
+done
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 1 (sub)observables 0 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -observables 

@@ -1,0 +1,50 @@
+Parsing tokens3.ka...
+done
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 1 (sub)observables 0 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -observables 
+Parsing tokens3.ka...
+done
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 1 (sub)observables 0 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+line 0, characters -1--1:: Expressions for token consumption/production should be constants 
+ Cowardly replace it with 0line 0, characters -1--1:: Expressions for token consumption/production should be constants 
+ Cowardly replace it with 0	 -observables 

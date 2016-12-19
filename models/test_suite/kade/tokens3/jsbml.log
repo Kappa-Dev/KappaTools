@@ -1,0 +1,22 @@
+[13:41:02,222  WARN SBMLCoreParser:534] - No Species matches the speciesID '' of speciesReference.
+[13:41:02,223  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[13:41:02,224  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[13:41:24,254  WARN SBMLCoreParser:534] - No Species matches the speciesID '' of speciesReference.
+[13:41:24,256  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[13:41:24,256  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:04:23,585  WARN SBMLCoreParser:534] - No Species matches the speciesID '' of speciesReference.
+[14:04:23,586  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:04:23,586  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:04:23,587  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:12:42,364  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:13:17,605  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:14:42,072 ERROR Model:3265] - An element with the id 'expo_rate' is already present in this model. The new element will not be added to the model.
+[14:14:42,074 ERROR IdentifierException:57] - An element with the id 'expo_rate' is already present in the SBML model. The identifier of parameter will not be set to this value.
+[14:14:42,075 ERROR SBMLCoreParser:326] - org.sbml.jsbml.IdentifierException: Cannot set duplicate identifier 'expo_rate' for parameter.
+[14:14:42,075  INFO SBMLCoreParser:327] - Attribute = id, element = parameter
+[14:14:42,075  WARN SBMLCoreParser:353] - The attribute id on the element parameter is not recognized. Please, check the SBML specifications
+[14:14:42,087  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.
+[14:39:24,976 ERROR SBMLCoreParser:326] - "KaDe output" is not a valid identifier for this model.
+[14:39:24,978  INFO SBMLCoreParser:327] - Attribute = id, element = model
+[14:39:24,978  WARN SBMLCoreParser:353] - The attribute id on the element model is not recognized. Please, check the SBML specifications
+[14:39:25,014  WARN SBMLCoreParser:546] - No Species matches the speciesID '' of speciesReference.

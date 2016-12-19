@@ -1,3 +1,12 @@
+let string_in_comment s =
+  String.map
+    (fun x ->
+       match x with
+       | '\'' -> ' '
+       | '-' -> ' '
+       | _ -> x )
+    s
+
 let meta_id_of_logger logger =
   "CMD"^(string_of_int (Loggers.get_fresh_meta_id logger))
 
@@ -64,7 +73,146 @@ and eval_init_bool_expr logger network_handler expr =
       (eval_init_bool_expr logger network_handler a)
       (eval_init_bool_expr logger network_handler b)
 
-(*module EMap = Map.Make (type t = )*)
+let rec propagate_def_in_alg_expr logger network_handler alg_expr =
+  match alg_expr with
+  | Alg_expr.CONST _,_
+  | Alg_expr.TOKEN_ID _,_
+  | Alg_expr.KAPPA_INSTANCE _,_ -> alg_expr
+  | Alg_expr.ALG_VAR x,loc ->
+    let id = network_handler.Network_handler.int_of_obs x in
+    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+    fst (propagate_def_in_alg_expr logger network_handler (unsome expr_opt)),loc
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR),loc ->
+    let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
+    fst (propagate_def_in_alg_expr logger network_handler (unsome expr_opt)),loc
+  | Alg_expr.STATE_ALG_OP
+      ( Operator.CPUTIME
+      | Operator.TIME_VAR
+      | Operator.EVENT_VAR
+      | Operator.EMAX_VAR
+      | Operator.NULL_EVENT_VAR ),loc ->
+    Alg_expr.CONST Nbr.zero,loc
+  | Alg_expr.BIN_ALG_OP (op, a, b),loc ->
+    Alg_expr.BIN_ALG_OP (
+      op,
+      (propagate_def_in_alg_expr logger network_handler a),
+      (propagate_def_in_alg_expr logger network_handler b)),loc
+  | Alg_expr.UN_ALG_OP (op, a),loc ->
+    Alg_expr.UN_ALG_OP (
+      op,
+      (propagate_def_in_alg_expr logger network_handler a)),loc
+  | Alg_expr.IF (cond, yes, no),loc ->
+    Alg_expr.IF
+      (propagate_def_in_bool_expr logger network_handler cond,
+       propagate_def_in_alg_expr logger network_handler yes,
+       propagate_def_in_alg_expr logger network_handler no), loc
+and propagate_def_in_bool_expr logger network_handler expr =
+  match expr with
+  | Alg_expr.TRUE,_
+  | Alg_expr.FALSE,_ -> expr
+  | Alg_expr.COMPARE_OP (op,a,b),loc ->
+    Alg_expr.COMPARE_OP
+      (op,
+       (propagate_def_in_alg_expr logger network_handler a),
+       (propagate_def_in_alg_expr  logger network_handler b)),
+    loc
+  | Alg_expr.BOOL_OP (op,a,b),loc ->
+    Alg_expr.BOOL_OP
+      (op,
+       (propagate_def_in_bool_expr logger network_handler a),
+       (propagate_def_in_bool_expr logger network_handler b)),
+    loc
+
+let rec eval_const_alg_expr logger network_handler alg_expr =
+  match fst alg_expr with
+  | Alg_expr.CONST x -> Some x
+  | Alg_expr.TOKEN_ID _
+  | Alg_expr.KAPPA_INSTANCE _ -> None
+  | Alg_expr.ALG_VAR x ->
+    let id = network_handler.Network_handler.int_of_obs x in
+    let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+    eval_const_alg_expr logger network_handler (unsome expr_opt)
+  | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
+    let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
+    eval_const_alg_expr logger network_handler (unsome expr_opt)
+  | Alg_expr.STATE_ALG_OP
+      ( Operator.CPUTIME
+      | Operator.TIME_VAR
+      | Operator.EVENT_VAR
+      | Operator.EMAX_VAR
+      | Operator.NULL_EVENT_VAR ) -> Some (Nbr.zero)
+  | Alg_expr.BIN_ALG_OP (op, a, b) ->
+    let const_a_opt =
+      eval_const_alg_expr logger network_handler a
+    in
+    let const_b_opt =
+      eval_const_alg_expr logger network_handler b
+    in
+    begin
+      match const_a_opt, const_b_opt with
+      | None, _ | _,None -> None
+      | Some a, Some b ->
+        Some (Nbr.of_bin_alg_op op a b)
+    end
+  | Alg_expr.UN_ALG_OP (op, a) ->
+    let const_a_opt =
+      eval_const_alg_expr logger network_handler a
+    in
+    begin
+      match const_a_opt with
+      | None -> None
+      | Some a ->
+        Some (Nbr.of_un_alg_op op a )
+    end
+  | Alg_expr.IF (cond, yes, no) ->
+    let const_cond_opt =
+      eval_const_bool_expr logger network_handler cond
+    in
+    begin
+      match const_cond_opt with
+      | None -> None
+      | Some true ->
+        eval_const_alg_expr logger network_handler yes
+      | Some false ->
+        eval_const_alg_expr logger network_handler no
+    end
+
+and eval_const_bool_expr logger network_handler expr =
+  match fst expr with
+  | Alg_expr.TRUE -> Some true
+  | Alg_expr.FALSE -> Some false
+  | Alg_expr.COMPARE_OP (op,a,b) ->
+    let const_a_opt =
+      eval_const_alg_expr logger network_handler a
+    in
+    let const_b_opt =
+      eval_const_alg_expr logger network_handler b
+    in
+    begin
+      match const_a_opt, const_b_opt with
+      | None, _ | _,None -> None
+      | Some a, Some b ->
+        Some (Nbr.of_compare_op op a b)
+    end
+  | Alg_expr.BOOL_OP (op,a,b) ->
+    let const_a_opt =
+      eval_const_bool_expr logger network_handler a
+    in
+    let const_b_opt =
+      eval_const_bool_expr logger network_handler b
+    in
+    begin
+      match const_a_opt, const_b_opt with
+      | None, _ | _,None -> None
+      | Some a, Some b ->
+        begin
+          match op with
+          | Operator.AND -> Some (a && b)
+          | Operator.OR -> Some (a || b)
+        end
+    end
+
+
 
 let rec print_alg_expr_in_sbml logger
     (alg_expr:
@@ -184,6 +332,20 @@ let do_sbml logger f =
   | Loggers.XLS | Loggers.Octave
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
+let do_not_sbml logger f =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.SBML -> ()
+  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+  | Loggers.XLS | Loggers.Octave
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
+    let () =
+      f logger
+    in
+    ()
+
 let print_sbml logger s =
   do_sbml logger
     (fun logger ->
@@ -223,7 +385,7 @@ let potential_break break logger =
 let add_box ?break:(break=false) ?options:(options=fun () -> "") logger label cont =
   let () = open_box ~options logger label in
   let () = potential_break break logger in
-  let () = cont logger in
+  let () = do_sbml logger cont in
   let () = close_box logger label in
   ()
 
@@ -231,9 +393,9 @@ let break = true
 let replace_space_with_underscore =
   String.map (fun c -> if c=' ' then '_' else c)
 
-let dump_initial_species ?units loggers network_handler name species =
+let dump_initial_species ?units loggers network_handler k name species =
   let expr =
-    match Loggers.get_expr loggers (Ode_loggers_sig.Init species) with
+    match Loggers.get_expr loggers (Ode_loggers_sig.Init k) with
     | Some a -> a
     | None -> Location.dummy_annot (Alg_expr.CONST Nbr.zero)
   in
@@ -245,7 +407,7 @@ let dump_initial_species ?units loggers network_handler name species =
   let concentration = eval_init_alg_expr loggers network_handler expr in
   let s =
     Format.sprintf
-      "metaid=\"%s\" id=\"s%i\" name=\"%s\" compartment=\"default\" initialAmount=\"%s\" substanceUnits=\"%s\""
+      "metaid=\"%s\" id=\"%s\" name=\"%s\" compartment=\"default\" initialAmount=\"%s\" substanceUnits=\"%s\""
       (meta_id_of_logger loggers)
       species
       name
@@ -343,11 +505,54 @@ let dump_kinetic_law
        end
     )
 
-let dump_reactants_of_token_vector _logger _token_vector =
-  ()
 
-let dump_products_of_token_vector _logger _token_vector =
-  ()
+let negative_part expr =
+  Location.dummy_annot
+    (Alg_expr.UN_ALG_OP
+    (Operator.UMINUS,
+     Location.dummy_annot
+       (Alg_expr.BIN_ALG_OP(Operator.MIN,
+                            Location.dummy_annot(
+                              Alg_expr.CONST (Nbr.zero)),expr))))
+
+let positive_part expr =
+  Location.dummy_annot
+    (Alg_expr.BIN_ALG_OP(Operator.MAX,
+                         Location.dummy_annot(
+                           Alg_expr.CONST (Nbr.zero)),expr))
+
+let dump_token_vector convert logger network_handler token_vector =
+  List.iter
+    (fun (expr,(id,_)) ->
+       let stochiometry_opt =
+         eval_const_alg_expr logger network_handler (convert expr)
+       in
+       match stochiometry_opt with
+       | None ->
+         let () =
+           Printf.printf "%s: Expressions for token consumption/production should be constants \n Cowardly replace it with 0" (Location.to_string (snd expr))
+         in
+         ()
+       | Some x when Nbr.is_zero x -> ()
+       | Some x ->
+         let s =
+           Format.sprintf
+             "metaid=\"%s\" species=\"t%i\"%s"
+             (meta_id_of_logger logger)
+             id
+             (if Nbr.is_equal x (Nbr.I 1) then "" else " stoichiometry=\""^(Nbr.to_string x)^"\"")
+         in
+         let () = single_box ~options:(fun () -> s) logger "speciesReference" in
+         ())
+    token_vector
+
+
+
+let dump_products_of_token_vector logger network_handler token_vector =
+  dump_token_vector positive_part logger network_handler token_vector
+let dump_reactants_of_token_vector logger network_handler token_vector =
+  dump_token_vector negative_part logger network_handler token_vector
+
 
 
 let dump_sbml_reaction
@@ -383,7 +588,7 @@ let dump_sbml_reaction
                 in
                 let () =
                   dump_reactants_of_token_vector
-                     logger token_vector
+                    logger network token_vector
                 in
                 ()
              )
@@ -396,7 +601,7 @@ let dump_sbml_reaction
                     logger products in
                 let () =
                   dump_products_of_token_vector
-                   logger token_vector
+                    logger network token_vector
                 in
                 ())
          in
@@ -419,7 +624,7 @@ let dump_sbml_reaction
   in
   ()
 
-let time_advance logger id =
+let time_advance logger  =
   let reaction_id = Loggers.get_fresh_reaction_id logger in
   let label_reaction  = "reaction" in
   let label_list_of_products = "listOfProducts" in
@@ -435,9 +640,8 @@ let time_advance logger id =
              (fun logger ->
                 let s =
                   Format.sprintf
-                    "metaid=\"%s\" species=\"s%i\""
+                    "metaid=\"%s\" species=\"time\""
                     (meta_id_of_logger logger)
-                    id
                 in
                 let () =
                   single_box ~options:(fun () -> s) logger "speciesReference" in

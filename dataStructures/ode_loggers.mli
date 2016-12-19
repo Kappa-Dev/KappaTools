@@ -23,6 +23,7 @@ type options =
 
 val print_ode_preamble:
   Loggers.t ->
+  (Loggers.t -> unit) -> 
   count:Ode_args.count ->
   rate_convention:Ode_args.rate_convention ->
   ?filter_in:Loggers.encoding list option ->

@@ -40,6 +40,7 @@ let print_list logger l =
 
 let print_ode_preamble
     logger
+    command_line
     ~count
     ~rate_convention
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
@@ -53,6 +54,7 @@ let print_ode_preamble
     with
     | Loggers.Matlab  | Loggers.Octave ->
       begin
+        let () = command_line logger in
         let () = print_list logger
             [
               "%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
@@ -87,7 +89,10 @@ let print_ode_preamble
       begin
         let () = print_list logger
             [
-              "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+              "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";] in
+        let () = command_line logger in
+        let () = print_list logger
+            [
               "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
               "<model name=\"KaDe output:\">";
               "<!--";
@@ -502,7 +507,7 @@ let print_comment
         let () = Loggers.fprintf logger "%% %s" string in
         if breakline then Loggers.print_newline logger
       | Loggers.SBML ->
-        let () = Loggers.fprintf logger "<!-- %s -->" string in
+        let () = Loggers.fprintf logger "<!-- %s -->" (Sbml_backend.string_in_comment string) in
         if breakline then
           Loggers.print_newline logger
         else Loggers.print_breakable_hint logger

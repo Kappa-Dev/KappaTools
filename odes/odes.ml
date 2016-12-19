@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 18 2016>
+  * Last modification: Time-stamp: <Dec 19 2016>
 *)
 
 let local_trace = false
@@ -1159,12 +1159,18 @@ struct
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
-    let () = Ode_loggers.print_comment ~breakline logger "command line: " in
-    let () = Ode_loggers.print_comment ~breakline logger ("     "^command_line_quotes) in
+    let command_line_closure logger =
+      let () = Ode_loggers.print_comment ~breakline logger "command line: " in
+      let () = Ode_loggers.print_comment ~breakline logger ("     "^command_line_quotes) in ()
+    in
     let count = I.what_do_we_count compil in
     let rate_convention = I.rate_convention compil in
-    let () = Ode_loggers.print_ode_preamble ~count ~rate_convention logger () in
+    let () =
+      Ode_loggers.print_ode_preamble
+        ~count ~rate_convention logger command_line_closure ()
+    in
     let () = Ode_loggers.print_newline logger in
+
     let () = Sbml_backend.open_box logger "listOfParameters" in
     let () = Sbml_backend.line_sbml logger in
     let () =
@@ -1383,7 +1389,7 @@ struct
                | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
                | Loggers.HTML_Tabular | Loggers.Json -> ()
 
-           in   
+           in
            let () =
              Sbml_backend.dump_sbml_reaction
                get_rule
@@ -1430,9 +1436,7 @@ struct
       Ode_loggers.associate
         (I.string_of_var_id ~compil) logger (Ode_loggers_sig.Deriv (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network) in
     let () = Ode_loggers.print_newline logger in
-    let () =
-      Sbml_backend.time_advance logger (get_last_ode_var_id network)
-    in
+    let () = Sbml_backend.time_advance logger in
     let () = Ode_loggers.close_procedure logger in
     let () = Sbml_backend.close_box logger label in
     let () = Ode_loggers.print_newline logger in
@@ -1459,13 +1463,25 @@ struct
       then
         ()
       else
-        let comment, units  =
-          if k = get_fresh_ode_var_id network - 1 then "t", Some "time"
+        let id, comment, units  =
+          if k = get_fresh_ode_var_id network - 1 then "time","t", Some "time"
           else
-            Format.asprintf "%a"
-              (fun log id -> I.print_chemical_species ~compil log
-                  (fst (Mods.DynArray.get network.species_tab id)))
-              k, None
+            let variable = Mods.DynArray.get network.ode_vars_tab k in
+            begin
+              match variable with
+              | Dummy -> "dummy", "", None
+              | Token id ->
+                "t"^(string_of_int k),
+                Format.asprintf "%a"
+                  (fun _log _id -> ()) id ,
+                (Some "substance")
+              | Noccurrences _ | Nembed _ ->
+                "s"^(string_of_int k),
+                Format.asprintf "%a"
+                  (fun log k -> I.print_chemical_species ~compil log
+                      (fst (Mods.DynArray.get network.species_tab k))) k,
+                Some "substance"
+            end
         in
         let () = Ode_loggers.declare_init ~comment logger k in
         let () =
@@ -1473,8 +1489,9 @@ struct
             ?units
             logger
             (handler_expr network)
-            comment
             k
+            comment
+            id
         in
         aux (next_id k)
     in
