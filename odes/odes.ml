@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 19 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
 *)
 
 let local_trace = false
@@ -1359,16 +1359,41 @@ struct
                let dump_token_list fmt list =
                  let _ =
                    List.fold_left
-                     (fun bool (alg,k) ->
+                     (fun bool ((alg,_),k) ->
                       let prefix = if bool then " + " else " | " in
-                      let token_string =
-                        Format.asprintf "%a"
+                      let () =
+                        Format.fprintf fmt "%s%a:%a"
+                          prefix
+                          (
+                             Alg_expr.print
+                               (fun fmt mixture ->
+                                  let () = Format.fprintf fmt "|" in
+                                  let
+                                    _  =
+                                    List.fold_left
+                                    (
+                                      Array.fold_left
+                                         (fun bool connected_component ->
+                                            let prefix = if bool then " , " else "" in
+                                            let () =
+                                              Format.fprintf
+                                              fmt
+                                              "%s%a"
+                                              prefix
+                                              (I.print_connected_component ~compil)
+                                              connected_component
+                                            in true)
+                                         )
+                                         false mixture
+                                  in
+                                  let () = Format.fprintf fmt "|" in
+                                  ())
+                               (I.print_token ~compil)
+                               (fun fmt var_id -> Format.fprintf fmt "%s" (I.string_of_var_id ~compil (succ var_id)))
+                          )
+                          alg
                           (I.print_token ~compil)
                           k
-                      in
-                      let alg_string = "" in
-                      let () =
-                        Format.fprintf fmt "%s%s:%s" prefix alg_string token_string
                       in true
                    ) false (List.rev list)
                  in ()
@@ -1388,7 +1413,9 @@ struct
                             k
                         in
                         let () =
-                          Format.fprintf fmt "%s%s" prefix species_string
+                          Format.fprintf fmt "%s%s"
+                            prefix
+                            species_string
                         in
                         true)
                      false
@@ -1401,7 +1428,10 @@ struct
                | Loggers.Matlab | Loggers.Octave  | Loggers.SBML ->
                  let s = Format.asprintf
                      "reaction: %a%a -> %a%a "
-                     dump reactants dump_token_list tokens_cons dump products dump_token_list tokens_prod
+                     dump reactants
+                     dump_token_list tokens_cons
+                     dump products
+                     dump_token_list tokens_prod
                  in
                  Ode_loggers.print_comment ~breakline logger s
                | Loggers.Maple | Loggers.TXT

@@ -1,3 +1,81 @@
+let do_sbml logger f =
+match
+  Loggers.get_encoding_format logger
+with
+| Loggers.SBML ->
+  let () =
+    f logger
+  in
+  ()
+| Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+| Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+| Loggers.XLS | Loggers.Octave
+| Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
+
+let do_not_sbml logger f =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.SBML -> ()
+  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+  | Loggers.XLS | Loggers.Octave
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
+    let () =
+      f logger
+    in
+    ()
+
+let print_sbml logger s =
+  do_sbml logger
+    (fun logger ->
+       Loggers.fprintf logger "%s" s
+    )
+
+let break_sbml logger =
+  do_sbml logger
+    Loggers.print_breakable_hint
+
+let line_sbml  logger =
+  do_sbml logger
+    Loggers.print_newline
+
+let extend s =
+  if s="" || String.sub s 0 1 = " "  then s else " "^s
+
+let open_box ?options:(options=fun () -> "") logger label =
+  let () = print_sbml logger ("<"^label^(extend (options ()))^">") in
+  break_sbml logger
+
+let close_box logger label =
+  let () = print_sbml logger ("</"^label^">") in
+  line_sbml logger
+
+let single_box ?options:(options=fun () -> "") logger label =
+  let () = print_sbml logger ("<"^label^(extend (options ()))^"/>") in
+  line_sbml logger
+
+let potential_break break logger =
+  if break
+  then
+    line_sbml logger
+  else
+    break_sbml logger
+
+let add_box ?break:(break=false) ?options:(options=fun () -> "") logger label cont =
+  let () = open_box ~options logger label in
+  let () = potential_break break logger in
+  let () = do_sbml logger cont in
+  let () = close_box logger label in
+  ()
+
+let clean_variable_id =
+    String.map
+      (function
+        | '(' -> '_'
+        | ')' -> ' '
+        | x -> x )
+
 let string_in_comment s =
   let s =
     String.map
@@ -13,17 +91,89 @@ let string_in_comment s =
     then Bytes.to_string s
     else
       let () =
-        if Bytes.get s k ='-' && Bytes.get s (k+1) = '-' 
+        if Bytes.get s k ='-' && Bytes.get s (k+1) = '-'
         then
           Bytes.set s k ' '
       in
       aux (k+1) s
   in aux 0 (Bytes.of_string s)
 
+let string_of_variable string_of_var_id variable =
+  match variable with
+  | Ode_loggers_sig.Expr i ->
+    string_of_var_id i
+  | Ode_loggers_sig.Concentration i -> "s"^(string_of_int i)
+  | Ode_loggers_sig.Init _
+  | Ode_loggers_sig.Initbis _
+  | Ode_loggers_sig.Deriv _
+  | Ode_loggers_sig.Obs _
+  | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.Tinit
+  | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.Period_t_points
+  | Ode_loggers_sig.N_rules
+  | Ode_loggers_sig.N_ode_var
+  | Ode_loggers_sig.N_var
+  | Ode_loggers_sig.N_obs
+  | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_variable variable
+  | Ode_loggers_sig.Current_time -> "t"
+  | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
+  | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
+  | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
+  | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun%i" int
 
+
+
+let unit_of_variable variable =
+  match variable with
+  | Ode_loggers_sig.Current_time
+  | Ode_loggers_sig.Period_t_points
+  | Ode_loggers_sig.Tinit
+  | Ode_loggers_sig.Tend -> Some "time"
+  | Ode_loggers_sig.Obs _
+  | Ode_loggers_sig.Init _
+  | Ode_loggers_sig.Concentration _
+  | Ode_loggers_sig.Initbis _ -> Some "substance"
+  | Ode_loggers_sig.Expr _
+  | Ode_loggers_sig.Deriv _
+  | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.Rate _
+  | Ode_loggers_sig.Rated _
+  | Ode_loggers_sig.Rateun _
+  | Ode_loggers_sig.Rateund _
+  | Ode_loggers_sig.N_rules
+  | Ode_loggers_sig.N_ode_var
+  | Ode_loggers_sig.N_var
+  | Ode_loggers_sig.N_obs
+  | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.Tmp -> None
 
 let meta_id_of_logger logger =
   "CMD"^(string_of_int (Loggers.get_fresh_meta_id logger))
+
+let print_parameters string_of_var_id logger variable expr =
+  let unit_string =
+    match
+      unit_of_variable variable
+    with
+    | None -> ""
+    | Some x -> " units=\""^x^"\""
+  in
+  let id = string_of_variable string_of_var_id variable in
+  let () = Loggers.set_id_of_global_parameter logger variable id  in
+  single_box
+    logger
+    "parameter"
+    ~options:(fun () ->
+        Format.sprintf
+          "metaid=\"%s\" id=\"%s\" value=\"%s\"%s"
+          (meta_id_of_logger logger)
+          id
+          (Nbr.to_string expr)
+          unit_string)
 
 let of_bool_op op =
   match op with
@@ -333,77 +483,6 @@ and
     let () = Loggers.fprintf logger "</apply>" in
     ()
 
-let do_sbml logger f =
-  match
-    Loggers.get_encoding_format logger
-  with
-  | Loggers.SBML ->
-    let () =
-      f logger
-    in
-    ()
-  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
-
-let do_not_sbml logger f =
-  match
-    Loggers.get_encoding_format logger
-  with
-  | Loggers.SBML -> ()
-  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
-    let () =
-      f logger
-    in
-    ()
-
-let print_sbml logger s =
-  do_sbml logger
-    (fun logger ->
-       Loggers.fprintf logger "%s" s
-    )
-
-let break_sbml logger =
-  do_sbml logger
-    Loggers.print_breakable_hint
-
-let line_sbml  logger =
-  do_sbml logger
-    Loggers.print_newline
-
-let extend s =
-  if s="" || String.sub s 0 1 = " "  then s else " "^s
-
-let open_box ?options:(options=fun () -> "") logger label =
-  let () = print_sbml logger ("<"^label^(extend (options ()))^">") in
-  break_sbml logger
-
-let close_box logger label =
-  let () = print_sbml logger ("</"^label^">") in
-  line_sbml logger
-
-let single_box ?options:(options=fun () -> "") logger label =
-  let () = print_sbml logger ("<"^label^(extend (options ()))^"/>") in
-  line_sbml logger
-
-let potential_break break logger =
-  if break
-  then
-    line_sbml logger
-  else
-    break_sbml logger
-
-let add_box ?break:(break=false) ?options:(options=fun () -> "") logger label cont =
-  let () = open_box ~options logger label in
-  let () = potential_break break logger in
-  let () = do_sbml logger cont in
-  let () = close_box logger label in
-  ()
-
 let break = true
 let replace_space_with_underscore =
   String.map (fun c -> if c=' ' then '_' else c)
@@ -486,15 +565,46 @@ let dump_kinetic_law
   let expr_opt =
     Loggers.get_expr logger var_rule in
   let expr = unsome expr_opt in
-  let expr =
-    if correct = 1
-    then expr
+  let f logger =
+    if Ode_loggers_sig.is_expr_const expr
+    then
+      if correct = 1
+      then
+        Loggers.fprintf logger "<ci> %s </ci>"
+          (string_of_variable
+             (fun var -> string_of_int
+                 (* this line is error prone, check*)
+                 (network.Network_handler.int_of_kappa_instance var))
+             var_rule)
+      else
+        add_box ~break logger "apply"
+          (fun logger ->
+            let () = Loggers.fprintf logger "<divide/>" in
+            let () =
+              Loggers.fprintf logger "<ci> %s </ci><cn type=\"integer\"> %i </cn>"
+                (string_of_variable
+                   (fun var -> string_of_int
+                      (* this line is error prone, check*)
+                       (network.Network_handler.int_of_kappa_instance var))
+                   var_rule)
+                correct
+            in
+            let () = Loggers.print_newline logger in
+            ()
+          )
+
     else
-      Location.dummy_annot
-        (Alg_expr.BIN_ALG_OP
-           (Operator.DIV,
-            expr,
-            Location.dummy_annot (Alg_expr.CONST (Nbr.I correct))))
+      let expr =
+        if correct = 1
+        then expr
+        else
+          Location.dummy_annot
+            (Alg_expr.BIN_ALG_OP
+               (Operator.DIV,
+                expr,
+                Location.dummy_annot (Alg_expr.CONST (Nbr.I correct))))
+      in
+      print_alg_expr_in_sbml logger expr network
   in
   match reactants with
   | [] ->
@@ -503,7 +613,7 @@ let dump_kinetic_law
       add_box ~break logger "apply"
         (fun logger ->
            let () = Loggers.fprintf logger "<times/>" in
-           let () = print_alg_expr_in_sbml logger expr network in
+           let () = f logger in
            let rec aux list =
              match list with
                [] -> ()

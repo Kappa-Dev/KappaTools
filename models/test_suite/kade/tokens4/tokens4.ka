@@ -1,0 +1,13 @@
+%agent: T()
+%token: t
+
+%var: 'nT' 10
+
+%init: 'nT' T()
+%init: t <- 10
+
+'expo'  T() -> T(),T() @1
+'expo2' | |t|:t -> | 2:t @|t|
+'expo3' | (|T()|+|t|+'nT'):t -> | 2.2:t @|t|
+%obs: 't' |t|
+%obs: 'T' |T()|

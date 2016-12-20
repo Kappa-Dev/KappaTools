@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'tokens3.ka' '-d' 'output' '-l' '1' '-p''0.1'
+%      'KaDE' 'tokens4.ka' '-d' 'output' '-l' '1' '-p''0.1'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -104,7 +104,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE tokens3.ka -d output -l 1 -p 0.1\n')
+fprintf(fid,'# KaDE tokens4.ka -d output -l 1 -p 0.1\n')
 fprintf(fid,'# t')
 fprintf(fid,',|t|')
 fprintf(fid,',|T|')
@@ -162,9 +162,9 @@ dydt(1)=dydt(1)+k(1)*y(1);
 dydt(1)=dydt(1)+k(1)*y(1);
 
 % rule    : expo3
-% reaction:  | 1.1:t ->  | 2.2:t 
+% reaction:  | ((|T()| + |t|) + 'nT'):t ->  | 2.2:t 
 
-dydt(2)=dydt(2)+k(3)*((-1.100000));
+dydt(2)=dydt(2)+k(3)*((-(((1*y(1))+y(2))+var(1))));
 dydt(2)=dydt(2)+k(3)*(2.200000);
 
 % rule    : expo2

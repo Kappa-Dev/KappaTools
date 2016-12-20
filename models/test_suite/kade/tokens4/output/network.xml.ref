@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
-<!--       KaDE   ../../simulation/activity/activity.ka   -d   output   -l   1   -p  0.1    -ode-backend  SBML  -->
+<!--       KaDE   tokens4.ka   -d   output   -l   1   -p   0.1    -ode-backend  SBML  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
 <!--
@@ -39,26 +39,27 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <parameter metaid="CMD4" id="tinit" value="0." units="time"/>
 <parameter metaid="CMD5" id="tend" value="1." units="time"/>
 <parameter metaid="CMD6" id="period_t_point" value="0.1" units="time"/>
-<parameter metaid="CMD7" id="expo2_rate" value="1"/>
-<parameter metaid="CMD8" id="nT" value="10"/>
-<parameter metaid="CMD9" id="T" value="10"/>
-<parameter metaid="CMD10" id="t" value="1"/>
-<parameter metaid="CMD11" id="k1" value="1"/>
+<parameter metaid="CMD7" id="expo3_rate" value="1"/>
+<parameter metaid="CMD8" id="expo2_rate" value="1"/>
+<parameter metaid="CMD9" id="nT" value="10"/>
+<parameter metaid="CMD10" id="T" value="10"/>
+<parameter metaid="CMD11" id="t" value="1"/>
+<parameter metaid="CMD12" id="k1" value="1"/>
 </listOfParameters>
 <listOfSpecies>
-<species metaid="CMD12" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD13" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
-<species metaid="CMD14" id="time" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
+<species metaid="CMD13" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD14" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD15" id="time" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
 </listOfSpecies>
 <listOfReactions>
 <!-- rule    : expo -->
 <!-- reaction: T() -> T() + T()  -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD15" species="s1"/>
+<speciesReference metaid="CMD16" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD16" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD17" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -67,23 +68,35 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : expo2 -->
-<!-- reaction:  | 1:t ->  | 2:t  -->
-<reaction id="re2" name="expo2" reversible="false" fast="false">
+<!-- rule    : expo3 -->
+<!-- reaction:  | ((|T()| + |t|) +  nT ):t ->  | 2.2:t  -->
+<reaction id="re2" name="expo3" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD17" species="t2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD18" species="t2" stoichiometry="2"/>
+<speciesReference metaid="CMD18" species="t2" stoichiometry="2.2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<ci> expo3_rate </ci></math>
+</kineticLaw>
+</reaction>
+<!-- rule    : expo2 -->
+<!-- reaction:  | |t|:t ->  | 2:t  -->
+<reaction id="re3" name="expo2" reversible="false" fast="false">
+<listOfReactants>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD19" species="t2" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <ci> expo2_rate </ci></math>
 </kineticLaw>
 </reaction>
-<reaction id="re3" name="time advance" reversible="false" fast="false">
+<reaction id="re4" name="time advance" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD19" species="time"/>
+<speciesReference metaid="CMD20" species="time"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">

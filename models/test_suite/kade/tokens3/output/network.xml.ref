@@ -44,37 +44,38 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <parameter metaid="CMD9" id="nT" value="10"/>
 <parameter metaid="CMD10" id="T" value="10"/>
 <parameter metaid="CMD11" id="t" value="1"/>
+<parameter metaid="CMD12" id="k1" value="1"/>
 </listOfParameters>
 <listOfSpecies>
-<species metaid="CMD12" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD13" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
-<species metaid="CMD14" id="time" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
+<species metaid="CMD13" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD14" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD15" id="time" name="t" compartment="default" initialAmount="0" substanceUnits="time"/>
 </listOfSpecies>
 <listOfReactions>
 <!-- rule    : expo -->
 <!-- reaction: T() -> T() + T()  -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD15" species="s1"/>
+<speciesReference metaid="CMD16" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD16" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD17" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="integer"> 1 </cn><ci> s1 </ci></apply>
+<times/><ci> k1 </ci><ci> s1 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : expo3 -->
-<!-- reaction:  | :t ->  | :t  -->
+<!-- reaction:  | 1.1:t ->  | 2.2:t  -->
 <reaction id="re2" name="expo3" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD17" species="t2" stoichiometry="1.1"/>
+<speciesReference metaid="CMD18" species="t2" stoichiometry="1.1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD18" species="t2" stoichiometry="2.2"/>
+<speciesReference metaid="CMD19" species="t2" stoichiometry="2.2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -82,12 +83,12 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : expo2 -->
-<!-- reaction:  | :t ->  | :t  -->
+<!-- reaction:  | |t|:t ->  | 2:t  -->
 <reaction id="re3" name="expo2" reversible="false" fast="false">
 <listOfReactants>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD19" species="t2" stoichiometry="2"/>
+<speciesReference metaid="CMD20" species="t2" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -96,7 +97,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <reaction id="re4" name="time advance" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD20" species="time"/>
+<speciesReference metaid="CMD21" species="time"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
