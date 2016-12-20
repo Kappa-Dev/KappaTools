@@ -162,13 +162,13 @@ dydt(1)=dydt(1)+k(1)*y(1);
 dydt(1)=dydt(1)+k(1)*y(1);
 
 % rule    : expo3
-% reaction:  ->  
+% reaction:  | :t ->  | :t 
 
 dydt(2)=dydt(2)+k(3)*((-1.100000));
 dydt(2)=dydt(2)+k(3)*(2.200000);
 
 % rule    : expo2
-% reaction:  ->  
+% reaction:  | :t ->  | :t 
 
 dydt(2)=dydt(2)+k(2)*((-y(2)));
 dydt(2)=dydt(2)+k(2)*(2);
