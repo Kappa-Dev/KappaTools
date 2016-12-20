@@ -620,15 +620,9 @@ struct
 
   (***********************************************************)
 
-  let maybe_reachable static dynamic error flag (pattern:Cckappa_sig.mixture)
-      precondition =
-    match
-      flag
-    with
-    | Analyzer_headers.Morphisms ->
-      (* This domain provides no information for the research of potential morphisms *)
-      error, dynamic, Some precondition
-    | Analyzer_headers.Embeddings ->
+  let maybe_reachable static dynamic error flag pattern precondition =
+  (* non parallel bonds in a pattern can be maps to parallel ones through morphisms *)
+  (* thus when the flag is Morphisms with ignore non parallel bonds *)
     let parameters = get_parameter static in
     let error, parallel_map =
       Parallel_bonds_static.collect_double_bonds_in_pattern
@@ -638,6 +632,20 @@ struct
     let list =
       Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.bindings
         parallel_map
+    in
+    let list =
+      match
+        flag
+      with
+      | Analyzer_headers.Morphisms ->
+        List.fold_left
+          (fun list (a,b) ->
+             if b 
+             then (a,b)::list
+             else list)
+          [] (List.rev list)
+      | Analyzer_headers.Embeddings ->
+        list
     in
     let store_value = get_value dynamic in
     let error, bool =
