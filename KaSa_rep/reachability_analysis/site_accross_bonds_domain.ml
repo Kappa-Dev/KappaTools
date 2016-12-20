@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Dec 20 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -335,6 +335,15 @@ struct
     -> 'a
     -> 'b
     -> Exception.method_handler * dynamic_information * 'c
+
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
 
 (****************************************************************)
 (*rule*)
@@ -843,7 +852,8 @@ struct
 
   (***********************************************************)
 
-  let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
+  (* the flag can be safely ignored for this abstract domai *)
+  let maybe_reachable static dynamic error _flag (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
     let error, dynamic, bdu_false =

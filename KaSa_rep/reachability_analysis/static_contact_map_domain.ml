@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Dec 20 2016>
    *
    * Abstract domain to record live rules
    *
@@ -132,6 +132,16 @@ struct
     -> 'b
     -> Exception.method_handler * dynamic_information * 'c
 
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
+
+
   (**************************************************************************)
   (*Implementation*)
 
@@ -145,7 +155,7 @@ struct
 
   (***********************************************************)
 
-  let maybe_reachable _static dynamic error _pattern precondition =
+  let maybe_reachable _static dynamic error _flag _pattern precondition =
     error, dynamic, Some precondition
 
   (**************************************************************************)

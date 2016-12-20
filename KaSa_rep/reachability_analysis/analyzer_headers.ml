@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -13,6 +13,10 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+type pattern_matching_flag =
+  | Embeddings
+  | Morphisms
+  
 type compilation_result =
   {
     cc_code       : Cckappa_sig.compil;

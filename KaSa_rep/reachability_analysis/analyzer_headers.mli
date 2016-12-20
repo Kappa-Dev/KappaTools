@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 06 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -15,6 +15,10 @@
 
 (** type declarations and values shared among the abstract domains *)
 
+type pattern_matching_flag =
+  | Embeddings
+  | Morphisms
+  
 type compilation_result
 
 (** type of the static information to be passed to each domain, let us

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 06 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -252,6 +252,15 @@ struct
     -> 'a
     -> 'b
     -> Exception.method_handler * dynamic_information * 'c
+
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
 
   (****************************************************************)
   (*rule*)
@@ -611,8 +620,15 @@ struct
 
   (***********************************************************)
 
-  let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
+  let maybe_reachable static dynamic error flag (pattern:Cckappa_sig.mixture)
       precondition =
+    match
+      flag
+    with
+    | Analyzer_headers.Morphisms ->
+      (* This domain provides no information for the research of potential morphisms *)
+      error, dynamic, Some precondition
+    | Analyzer_headers.Embeddings ->
     let parameters = get_parameter static in
     let error, parallel_map =
       Parallel_bonds_static.collect_double_bonds_in_pattern

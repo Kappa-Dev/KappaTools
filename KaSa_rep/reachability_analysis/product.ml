@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 05 2016>
+   * Last modification: Time-stamp: <Dec 20 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -121,6 +121,15 @@ module Product
       -> 'b
       -> Exception.method_handler * dynamic_information * 'c
 
+    type ('a, 'b, 'c, 'd) ternary =
+      static_information
+      -> dynamic_information
+      -> Exception.method_handler
+      -> 'a
+      -> 'b
+      -> 'c
+      -> Exception.method_handler * dynamic_information * 'd
+
     let add_initial_state static dynamic error initial_state =
       let error, underlying_domain_dynamic, event_list =
         Underlying_domain.add_initial_state
@@ -225,11 +234,14 @@ module Product
         Underlying_domain.is_enabled
         New_domain.is_enabled
 
-    let maybe_reachable =
-      gen_predicate
-        Underlying_domain.maybe_reachable
-        New_domain.maybe_reachable
+    let lift_arg f arg =
+      (fun static dynamic error -> f static dynamic error arg)
 
+    let maybe_reachable static dynamic error arg  =
+      gen_predicate
+        (lift_arg Underlying_domain.maybe_reachable arg)
+        (lift_arg New_domain.maybe_reachable arg)
+        static dynamic error
     (***********************************************************)
 
     let apply_rule static dynamic error rule_id precondition =

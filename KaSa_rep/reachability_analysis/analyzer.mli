@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -49,8 +49,9 @@ sig
     static_information ->
     dynamic_information ->
     Exception.method_handler ->
+    Analyzer_headers.pattern_matching_flag -> 
     Cckappa_sig.mixture ->
-    Exception.method_handler * dynamic_information * bool 
+    Exception.method_handler * dynamic_information * bool
 end
 
 module Make : functor (Domain:Composite_domain.Composite_domain) -> Analyzer

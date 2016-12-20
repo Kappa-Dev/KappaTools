@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -45,6 +45,15 @@ sig
     -> 'b
     -> Exception.method_handler * dynamic_information * 'c
 
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
+
   val next_rule: Ckappa_sig.c_rule_id option zeroary
 
   val add_initial_state: (Analyzer_headers.initial_state, unit) unary
@@ -65,7 +74,8 @@ sig
   val print: (Loggers.t, unit) unary
 
   val maybe_reachable:
-    (Cckappa_sig.mixture, Communication.precondition option) unary
+    (Analyzer_headers.pattern_matching_flag,
+     Cckappa_sig.mixture, Communication.precondition option) binary
 
   val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
 
@@ -137,6 +147,15 @@ struct
     -> 'a
     -> 'b
     -> Exception.method_handler * dynamic_information * 'c
+
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
 
   (** push r_id in the working_list *)
 
@@ -302,6 +321,14 @@ struct
     in
     let dynamic = set_domain domain_dynamic dynamic in
     error, dynamic, output
+
+  let lift_ternary f static dynamic error a b c =
+    let error, domain_dynamic, output =
+      f (get_domain_static_information static) dynamic.domain error a b c
+    in
+    let dynamic = set_domain domain_dynamic dynamic in
+    error, dynamic, output
+
 
   (**[is_enabled static dynamic error a] returns a triple of type binary
      when given a rule_id [a], check that if this rule is enable or not *)
@@ -539,12 +566,13 @@ struct
     lift_unary Domain.print static dynamic error loggers
 
 
-  let maybe_reachable (static:static_information) dynamic error mixture =
-    lift_binary
+  let maybe_reachable (static:static_information) dynamic error flag mixture =
+    lift_ternary
       Domain.maybe_reachable
       static
       dynamic
       error
+      flag
       mixture
       Communication.dummy_precondition
 

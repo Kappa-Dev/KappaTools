@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 06 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -916,15 +916,18 @@ let compute_high_res_internal_influence_map show_title state =
   let error = Remanent_state.get_errors state in
   let state, (static, dynamic) = get_reachability_analysis state in
   let () = show_title state in
+  let maybe_reachable static dynamic error =
+    Reachability.maybe_reachable static dynamic error Analyzer_headers.Morphisms
+  in
   let (error,dynamic), wake_up_map =
     Algebraic_construction.filter_influence_high
-      Reachability.maybe_reachable
+      maybe_reachable
       parameters handler error compil
       static dynamic wake_up_map true
   in
   let (error,dynamic), inhibition_map =
     Algebraic_construction.filter_influence_high
-      Reachability.maybe_reachable
+      maybe_reachable
       parameters handler error compil
       static dynamic inhibition_map false
   in

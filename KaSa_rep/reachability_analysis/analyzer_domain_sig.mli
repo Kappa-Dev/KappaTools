@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Dec 20 2016>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -69,6 +69,15 @@ sig
     -> 'a
     -> 'b -> Exception.method_handler * dynamic_information * 'c
 
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
+
   val add_initial_state:
     (Analyzer_headers.initial_state, Communication.event list) unary
 
@@ -98,9 +107,10 @@ sig
   val print: (Loggers.t, unit) unary
 
   val maybe_reachable:
-    (Cckappa_sig.mixture,
+    (Analyzer_headers.pattern_matching_flag,
+     Cckappa_sig.mixture,
      Communication.precondition,
      Communication.precondition option)
-      binary
+      ternary
 
 end

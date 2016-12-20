@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Dec 20 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -296,6 +296,15 @@ struct
     -> 'a
     -> 'b
     -> Exception.method_handler * dynamic_information * 'c
+
+  type ('a, 'b, 'c, 'd) ternary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
+    -> 'c
+    -> Exception.method_handler * dynamic_information * 'd
 
   (*----------------------------------------------------------------------*)
   (*Instantiate of functions that store the static and dynamic information
@@ -3121,7 +3130,8 @@ struct
     with
       False (error, dynamic) -> error, (dynamic, precondition), false
 
-  let maybe_reachable static dynamic error (pattern:Cckappa_sig.mixture)
+  (* the flag can be safely ignored in this abstract domain *)
+  let maybe_reachable static dynamic error _flag pattern
       precondition =
     let error, (dynamic, precondition), maybe_reachable =
       maybe_reachable_aux static dynamic error
