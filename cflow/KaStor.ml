@@ -68,6 +68,39 @@ let server_mode () =
       | `Exn e -> Format.eprintf "%s@." (Printexc.to_string e))
     (Yojson.Basic.linestream_from_channel stdin)
 
+
+let get_simulation fname =
+  let desc = open_in fname in
+  let lex_buf = Lexing.from_channel desc in
+  let lex_st = Yojson.init_lexer ~fname () in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = Yojson.Basic.read_lcurl lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let ident = Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "env") in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = Yojson.Basic.read_colon lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let env = Environment.of_yojson
+      (Yojson.Basic.read_json lex_st lex_buf) in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = Yojson.Basic.read_comma lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let ident = Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "trace") in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = Yojson.Basic.read_colon lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let steps = Yojson.Basic.read_list
+      (fun x y -> Trace.step_of_yojson (Yojson.Basic.read_json x y))
+      lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = try Yojson.Basic.read_object_end lex_buf
+    with Yojson.End_of_object -> () in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = close_in desc in
+  (env,steps)
+
 let main () =
   let () =
     Arg.parse
@@ -84,15 +117,11 @@ let main () =
     let parameter =
       Compression_main.build_parameter
         ~called_from:Remanent_parameters_sig.KaSim ~none ~weak ~strong in
-    let desc = open_in (!file) in
     let () =
       Loggers.fprintf (Compression_main.get_logger parameter)
         "+ Loading trace@." in
-    let json = Yojson.Basic.from_channel desc in
-    let () = close_in desc in
-    let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
-    let steps = Trace.of_yojson (Yojson.Basic.Util.member "trace" json) in
     let dotFormat = !dotCflows in
+    let env,steps = get_simulation !file in
     Compression_main.compress_and_print
       parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
 
