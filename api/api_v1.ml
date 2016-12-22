@@ -481,10 +481,10 @@ end = struct
         let simulation_id = file_id in
         let file =
           { Api_types_j.file_metadata = {
-            Api_types_j.file_metadata_compile = true;
-            Api_types_j.file_metadata_hash = None;
-            Api_types_j.file_metadata_id = file_id;
-            Api_types_j.file_metadata_position = 0; } ;
+                Api_types_j.file_metadata_compile = true ;
+                Api_types_j.file_metadata_hash = None ;
+                Api_types_j.file_metadata_id = file_id ;
+                Api_types_j.file_metadata_position = 0 ; } ;
             Api_types_j.file_content = parameter.Api_types_v1_j.code ; }
         in
         self#manager () >>=

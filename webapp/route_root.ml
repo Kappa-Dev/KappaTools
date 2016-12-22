@@ -395,15 +395,4 @@ let route
             )
          )
      };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulations/{simulationid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_delete project_id simulation_id) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
-            )
-         )
-     };
   ]

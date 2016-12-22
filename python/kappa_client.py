@@ -18,7 +18,7 @@ class FileMetadata(object):
                  file_metadata_id,
                  file_metadata_position,
                  file_metadata_compile = True ,
-                 file_metadata_hash = None , ):
+                 file_metadata_hash = None):
         self.file_metadata_id = file_metadata_id
         self.file_metadata_position = file_metadata_position
         self.file_metadata_compile = file_metadata_compile
@@ -167,10 +167,6 @@ class KappaStd(kappa_common.StdBase):
     def simulation_list(self,project_id):
         return(self.dispatch("SimulationInfoSnapshot",
                              project_id))
-
-    def simulation_pause(self,project_id,simulation_id):
-        return(self.dispatch("SimulationPause",
-                             [project_id,simulation_id]))
 
     def simulation_pause(self,project_id,simulation_id):
         return(self.dispatch("SimulationPause",

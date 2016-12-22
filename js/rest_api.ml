@@ -162,7 +162,7 @@ class manager
       send
         timeout
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s"
+           "%s/v2/projects/%s/simulations/%s/continue"
            url project_id
            simulation_id)
         `PUT
@@ -179,7 +179,7 @@ class manager
            url
            project_id
            simulation_id)
-        `PUT
+        `DELETE
         None
         (fun _ -> ())
         (fun result -> `SimulationDelete result)
@@ -337,7 +337,7 @@ class manager
       send
         timeout
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s"
+           "%s/v2/projects/%s/simulations/%s/pause"
            url
            project_id
            simulation_id)
@@ -350,7 +350,7 @@ class manager
       send
         timeout
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s"
+           "%s/v2/projects/%s/simulations/%s/perturbation"
            url
            project_id
            simulation_id)
