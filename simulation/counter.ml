@@ -47,7 +47,7 @@ end =
             f "\tValid embedding but no longer unary when required: %.2f%%@,"
             (100. *. (float_of_int t.(no_more_unary)) /. (float_of_int t.(all))) in
       let () = if t.(no_more_binary) > 0 then Format.fprintf
-            f "\tValid embedding but not binary when required: %f.2%%@,"
+            f "\tValid embedding but not binary when required: %.2f%%@,"
             (100. *. (float_of_int t.(no_more_binary)) /. (float_of_int t.(all))) in
       let () = if t.(clashing_instance) > 0 then Format.fprintf
             f "\tClashing instance: %.2f%%@,"
