@@ -1177,24 +1177,3 @@ A(t!B.t,z!B.z)=> [A(t!2,z!1),B(z!1),B(t!2)]
 B(t!A.t,z!A.z)=> [B(t!2,z!1),A(z!1),A(t!2)]
 
 execution finished without any exception
-agent_type:0:site_type:2
-agent_type:0:site_type:2
-agent_type:0:site_type:1
-agent_type:0:site_type:1
-agent_type:0:site_type:0
-agent_type:1:site_type:2
-agent_type:1:site_type:2
-agent_type:1:site_type:1
-agent_type:1:site_type:1
-agent_type:1:site_type:0
-With predictate
-agent_type:0:site_type:0
-agent_type:0:site_type:1
-agent_type:0:site_type:1
-agent_type:0:site_type:2
-agent_type:0:site_type:2
-agent_type:1:site_type:0
-agent_type:1:site_type:1
-agent_type:1:site_type:1
-agent_type:1:site_type:2
-agent_type:1:site_type:2

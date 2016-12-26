@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Dec 26 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -360,7 +360,7 @@ let print_partition_with_predicate parameters error store_result =
 
 (***************************************************************************)
 
-let scan_rule parameters error handler =
+let detect_symmetries parameters error handler =
   let store_result = init_symmetries in
   (*-------------------------------------------------------------*)
   let error, store_contact_map =
@@ -392,17 +392,23 @@ let scan_rule parameters error handler =
   in
   (*-------------------------------------------------------------*)
   let error =
-    print_partition_contact_map parameters error
-      store_result.store_partition_contact_map
+    if Remanent_parameters.get_trace parameters
+    then
+      let error =
+        print_partition_contact_map parameters error
+          store_result.store_partition_contact_map
+      in
+      let _ =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "With predictate\n";
+        print_partition_with_predicate
+          parameters error
+          store_result.store_partition_with_predicate
+      in
+      error
+    else
+      error
   in
-  let _ =
-    Loggers.fprintf (Remanent_parameters.get_logger parameters)
-      "With predictate\n";
-      print_partition_with_predicate
-      parameters error
-      store_result.store_partition_with_predicate
-  in
-
   (*let error =
     print_contact_map parameters error
       store_result.store_contact_map

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Dec 13 2016>
+  * Last modification: Time-stamp: <Dec 26 2016>
   * *
   * primitive to parse command-line options
   *
@@ -108,6 +108,11 @@ let options =
       Bool Config.with_site_accross_bonds_analysis,
       "enable the analysis of the relation amond the states of sites in connected agents",
       ["0_Actions";"2_Reachability_analysis"],Normal;
+
+      "--compute-symmetries",
+      Bool Config.do_symmetries,
+      "Look up for pairs of symmetric sites",
+      ["0_Actions"],Hidden;
       (*"--view-analysis",
       (Choice
          ([

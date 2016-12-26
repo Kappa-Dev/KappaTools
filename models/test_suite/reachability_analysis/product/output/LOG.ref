@@ -1253,14 +1253,3 @@ A(t!1),A(t!1)=> [
 
 Some exceptions have been raised
 error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 24: Label 'r3' is already used; exception:Exit
-agent_type:0:site_type:2
-agent_type:0:site_type:2
-agent_type:0:site_type:1
-agent_type:0:site_type:1
-agent_type:0:site_type:0
-With predictate
-agent_type:0:site_type:0
-agent_type:0:site_type:1
-agent_type:0:site_type:1
-agent_type:0:site_type:2
-agent_type:0:site_type:2

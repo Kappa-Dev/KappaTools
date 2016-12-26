@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Dec 06 2016>
+  * Last modification: Time-stamp: <Dec 26 2016>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -115,3 +115,6 @@ let with_dynamic_contact_map = ref "dynamic"
 let view_accuracy_level = ref "High"
 let influence_map_accuracy_level = ref "Medium"
 let contact_map_accuracy_level = ref "Low"
+
+(* Symmetries *)
+let do_symmetries = ref false

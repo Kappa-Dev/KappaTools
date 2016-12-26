@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 20 2016>
+  * Last modification: Time-stamp: <Dec 26 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1383,5 +1383,17 @@ let get_constraints_list_to_json state =
   in
     state,
     Remanent_state.lemmas_list_to_json constraints_list
+
+let get_symmetries state =
+  let state, handler = get_handler state in
+  let parameters = get_parameters state in
+  let errors = get_errors state in
+  let errors, symmetries =
+    Symmetries.detect_symmetries
+      parameters errors handler
+  in
+  let state = set_errors errors state in
+  state,
+  symmetries
 
   end

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Dec 01 2016>
+  * Last modification:  Time-stamp: <Dec 26 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -123,6 +123,7 @@ type marshalisable_parameters =
    do_ODE_flow_of_information : bool ;
    do_stochastic_flow_of_information : bool ;
    do_site_dependencies : bool ;
+   do_symmetries_analysis : bool ; 
    dump_site_dependencies : bool ;
    do_reachability_analysis : bool ;
    called_from : called_from;

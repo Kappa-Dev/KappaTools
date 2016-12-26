@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Dec 06 2016>
+ * Last modification: Time-stamp: <Dec 26 2016>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -118,16 +118,18 @@ let main () =
       state, None
   in
   (*-----------------------------------------------------------------------*)
-  let _ = state, stochastic_flow_opt, ode_flow_opt in
-  let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
-  (*-----------------------------------------------------------------------*)
   (*symmetries*)
-  let state, handler = Export_to_KaSa.get_handler state in
-  let _ =
-    Symmetries.scan_rule parameters errors handler
+  let state, symmetries =
+    if Remanent_parameters.get_compute_symmetries parameters
+    then
+      let state, symmetries = Export_to_KaSa.get_symmetries state in
+      state, Some symmetries
+    else
+      state, None
   in
-
-
+  (*-----------------------------------------------------------------------*)
+  let _ = state, symmetries, stochastic_flow_opt, ode_flow_opt in
+  let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
   ()
 
 let () = main ()

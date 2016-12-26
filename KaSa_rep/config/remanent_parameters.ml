@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Dec 13 2016>
+  * Last modification: Time-stamp: <Dec 26 2016>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -320,7 +320,8 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
    !Config.do_ODE_flow_of_information ;
  Remanent_parameters_sig.do_stochastic_flow_of_information =
    !Config.do_stochastic_flow_of_information ;
-	Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
+ Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
+ Remanent_parameters_sig.do_symmetries_analysis = !Config.do_symmetries ;
  Remanent_parameters_sig.dump_site_dependencies =
    !Config.dump_site_dependencies ;
         (*different reachability output*)
@@ -413,6 +414,7 @@ let get_rev_arrow_symbol_1         symbol = symbol.Remanent_parameters_sig.rev_a
 let get_bi_arrow_symbol_1          symbol = symbol.Remanent_parameters_sig.bi_arrow
 let get_uni_arrow_no_poly_symbol_1 symbol = symbol.Remanent_parameters_sig.uni_arrow_nopoly
 
+
 let get_im_format_1            influence = influence.Remanent_parameters_sig.im_format
 let get_im_file_1              influence = influence.Remanent_parameters_sig.im_file
 let get_im_directory_1         influence = influence.Remanent_parameters_sig.im_directory
@@ -480,6 +482,8 @@ let get_parallel_bonds_analysis_1 r =
   r.Remanent_parameters_sig.parallel_bonds
 let get_dynamic_contact_map_1 r = r.Remanent_parameters_sig.dynamic_contact_map
 
+let get_compute_symmetries_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.do_symmetries_analysis
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
 let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output
@@ -554,6 +558,7 @@ let get_dump_site_dependencies = upgrade_from_marshal_field get_dump_site_depend
 (**)
 let get_symbols = upgrade_from_marshal_field get_symbols_1
 let get_file = upgrade_from_marshal_field get_file_1
+let get_compute_symmetries = upgrade_from_marshal_field get_compute_symmetries_1
 let get_influence_map = upgrade_from_marshal_field get_influence_map_1
 let get_contact_map = upgrade_from_marshal_field get_contact_map_1
 (*add reachability*)

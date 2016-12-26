@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Nov 21 2016>
+  * Last modification: Time-stamp: <Dec 26 2016>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -66,6 +66,8 @@ sig
   val get_ctmc_flow: state -> state * ctmc_flow
 
   val get_ode_flow: state -> state * ode_flow
+
+  val get_symmetries: state -> state * Symmetries.symmetries
 
   val dump_c_compil: state -> c_compilation -> state
 
