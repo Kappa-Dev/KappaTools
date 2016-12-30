@@ -250,7 +250,7 @@ Compilation:rules:1:rhs:agent_id_7:agent_type_5:site_type_0->state:[state_min:2;
 Compilation:rules:1:rhs:bonds:agent_id_4:
 Compilation:rules:1:rhs:bonds:agent_id_4:site_type_0->agent_id_5.site_type_0
 Compilation:rules:1:rhs:bonds:agent_id_5:
-Compilation:rules:1:rhs:bonds:agent_id_5:site_type_0->agent_id_0.site_type_0
+Compilation:rules:1:rhs:bonds:agent_id_5:site_type_0->agent_id_4.site_type_0
 Compilation:rules:1:rhs:bonds:agent_id_5:site_type_1->agent_id_6.site_type_0
 Compilation:rules:1:rhs:bonds:agent_id_6:
 Compilation:rules:1:rhs:bonds:agent_id_6:site_type_0->agent_id_5.site_type_1
@@ -412,7 +412,7 @@ Compilation:rules:4:rhs:agent_id_7:agent_type_7:site_type_0->state:[state_min:1;
 Compilation:rules:4:rhs:bonds:agent_id_4:
 Compilation:rules:4:rhs:bonds:agent_id_4:site_type_0->agent_id_5.site_type_0
 Compilation:rules:4:rhs:bonds:agent_id_5:
-Compilation:rules:4:rhs:bonds:agent_id_5:site_type_0->agent_id_0.site_type_0
+Compilation:rules:4:rhs:bonds:agent_id_5:site_type_0->agent_id_4.site_type_0
 Compilation:rules:4:rhs:bonds:agent_id_5:site_type_1->agent_id_6.site_type_0
 Compilation:rules:4:rhs:bonds:agent_id_6:
 Compilation:rules:4:rhs:bonds:agent_id_6:site_type_0->agent_id_5.site_type_1

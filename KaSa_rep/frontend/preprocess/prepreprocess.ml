@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Aug 15 2016>
+ * Last modification: Time-stamp: <Dec 30 2016>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -452,7 +452,7 @@ let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mix
     if
       Ckappa_sig.compare_agent_id
         i
-        (Ckappa_sig.agent_id_of_int prefix_size)
+        (Ckappa_sig.agent_id_of_int (prefix_size-1))
       > 0
     then
       Ckappa_sig.add_agent_id i empty_size

@@ -55,7 +55,7 @@ Compilation:rules:0:rhs:agent_id_3:agent_type_0:site_type_0->state:[state_min:1;
 Compilation:rules:0:rhs:agent_id_4:
 Compilation:rules:0:rhs:agent_id_4:agent_type_0:site_type_0->state:[state_min:2;state_max:2]
 Compilation:rules:0:rhs:bonds:agent_id_0:
-Compilation:rules:0:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
+Compilation:rules:0:rhs:bonds:agent_id_0:site_type_0->agent_id_3.site_type_0
 Compilation:rules:0:rhs:bonds:agent_id_0:site_type_1->agent_id_4.site_type_0
 Compilation:rules:0:rhs:bonds:agent_id_3:
 Compilation:rules:0:rhs:bonds:agent_id_3:site_type_0->agent_id_0.site_type_0
@@ -85,7 +85,7 @@ Compilation:rules:0:actions:deletion:documented_site:(agent_id_2,agent_type_0)@s
 Compilation:rules:0:actions:deletion:undocumented_site:(agent_id_2,agent_type_0)@site_type_1
 Compilation:rules:0:actions:creation:(agent_id_3,agent_type_0)
 Compilation:rules:0:actions:creation:(agent_id_4,agent_type_0)
-Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_0)@site_type_0
+Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_3,agent_type_0)@site_type_0
 Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_4,agent_type_0)@site_type_0
 Compilation:initial_states:0:
 Compilation:initial_states:0:mixture:
@@ -531,14 +531,4 @@ C(z!C.t)=> [C(t,z!C.t)]
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-Some exceptions have been raised
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: KaSa_rep/frontend/preprocess/preprocess.ml; message: line 1304; exception:Exit
+execution finished without any exception
