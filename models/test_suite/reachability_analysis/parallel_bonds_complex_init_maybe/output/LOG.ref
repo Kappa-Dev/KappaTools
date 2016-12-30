@@ -595,12 +595,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=36
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=29
+  Id=35
    Node(site_type:1<2)
     Id=17
      Node(site_type:2<0)
@@ -636,12 +636,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=37
+Id=43
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=36
+  Id=42
    Node(site_type:1<1)
     Id=17
      Node(site_type:2<0)
@@ -681,7 +681,7 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -722,12 +722,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=50
+Id=57
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=49
+  Id=56
    Node(site_type:1<1)
     Id=26
      Node(site_type:2<1)
@@ -777,21 +777,21 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=71
+Id=73
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:1<2)
-    Id=46
+    Id=53
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=45
+      Id=52
        Node(site_type:2<1)
-        Id=31
+        Id=37
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -851,12 +851,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=78
+Id=75
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=77
+  Id=74
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -891,12 +891,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=78
+Id=75
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=77
+  Id=74
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -962,12 +962,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=100
+Id=102
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=99
+  Id=101
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1012,12 +1012,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=100
+Id=102
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=99
+  Id=101
    Node(site_type:1<1)
     Id=21
      Node(site_type:2<1)
@@ -1105,21 +1105,21 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=98
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=81
+  Id=78
    Node(site_type:1<2)
-    Id=80
+    Id=77
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=79
+      Id=76
        Node(site_type:2<2)
-        Id=31
+        Id=37
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -1139,21 +1139,21 @@ Id=98
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=98
+Id=100
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=81
+  Id=78
    Node(site_type:1<2)
-    Id=80
+    Id=77
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=79
+      Id=76
        Node(site_type:2<2)
-        Id=31
+        Id=37
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -1177,7 +1177,7 @@ Id=98
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1192,7 +1192,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1207,12 +1207,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1222,7 +1222,7 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1237,7 +1237,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1252,12 +1252,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1277,7 +1277,7 @@ B() => [ B(x~u) v B(x~p) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1292,7 +1292,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1307,12 +1307,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1322,7 +1322,7 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1337,7 +1337,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1352,12 +1352,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1392,7 +1392,7 @@ A(z!1),B(z!1) =>
 A(t!B.t,z!B.z) => A(t!2,z!1),B(t!2,z!1)
 B(t!A.t,z!A.z) => B(t!2,z!1),A(t!2,z!1)
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1407,7 +1407,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1422,12 +1422,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1437,7 +1437,7 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1452,7 +1452,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1467,12 +1467,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1482,7 +1482,7 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1497,7 +1497,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1512,12 +1512,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1527,7 +1527,7 @@ Id=55
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=53
+Id=48
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1542,7 +1542,7 @@ Id=53
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=64
+Id=63
  Node(site_type:2<0)
   Id=0
    Leaf False 
@@ -1557,12 +1557,12 @@ Id=64
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=55
+Id=50
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=54
+  Id=49
    Node(site_type:0<2)
     Id=1
      Leaf True 

@@ -78,6 +78,11 @@ Reachability analysis...
 
 		B(x!A@x,x~p)
 
+		Update information about potential sites accross domain
+
+		B(x~p!1),A(x~u!1)
+		A(x~u!1),B(x~p!1)
+
 			(rule 0) should be investigated
 			(rule 1) should be investigated
 			(rule 2) should be investigated

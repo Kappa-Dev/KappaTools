@@ -671,7 +671,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -709,7 +709,7 @@ Id=3
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=27
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -766,7 +766,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -781,12 +781,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -811,7 +811,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -826,12 +826,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -866,7 +866,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -881,12 +881,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -911,7 +911,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -926,12 +926,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -943,11 +943,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(z!1),B(z!1) => 
-	[
-		  A(t!B.t,z!1),B(t!A.t,z!1)
-		v A(t,z!1),B(t,z!1)
-	]
 A(t!1),B(t!1) => 
 	[
 		  A(t!1,z!B.z),B(t!1,z)
@@ -974,7 +969,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -989,12 +984,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1019,7 +1014,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1034,12 +1029,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1064,7 +1059,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1079,12 +1074,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1109,7 +1104,7 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1124,12 +1119,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=30
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=29
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -1163,9 +1158,6 @@ A()=> [
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z!1),B(z!1)=> [
-		  A(t!B.t,z!1),B(t!A.t,z!1)
-		v A(t,z!1),B(t,z!1)]
 A(t!1),B(t!1)=> [
 		  A(t!1,z!B.z),B(t!1,z)
 		v A(t!1,z),B(t!1,z!A.z)]

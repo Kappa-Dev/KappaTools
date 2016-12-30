@@ -729,12 +729,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z~,z!,t~)
 
 INTENSIONAL DESCRIPTION:
-Id=69
+Id=70
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=68
+  Id=69
    Node(site_type:1<2)
     Id=63
      Node(site_type:2<0)
@@ -844,12 +844,12 @@ Id=55
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=73
+Id=74
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=72
+  Id=73
    Node(site_type:1<1)
     Id=63
      Node(site_type:2<0)
@@ -874,9 +874,9 @@ Id=73
         Id=0
          Leaf False 
 
-    Id=71
+    Id=72
      Node(site_type:1<2)
-      Id=70
+      Id=71
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -907,7 +907,7 @@ Id=73
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -937,7 +937,7 @@ Id=75
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -991,7 +991,7 @@ B() => [ B(z~u?) v B(z~p?) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1058,7 +1058,7 @@ Id=81
 
     Id=79
      Node(site_type:0<2)
-      Id=74
+      Id=66
        Node(site_type:1<0)
         Id=0
          Leaf False 
@@ -1088,7 +1088,7 @@ A(z!1),B(z!1) =>
 * Properties of pairs of bonds
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1118,7 +1118,7 @@ Id=75
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1163,7 +1163,7 @@ Id=75
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=74
+Id=66
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1230,7 +1230,7 @@ Id=81
 
     Id=79
      Node(site_type:0<2)
-      Id=74
+      Id=66
        Node(site_type:1<0)
         Id=0
          Leaf False 

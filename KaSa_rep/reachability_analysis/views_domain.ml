@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 20 2016>
+   * Last modification: Time-stamp: <Dec 30 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1661,7 +1661,7 @@ struct
                             new_pair_list
                         in
                         let error, handler, conj_bdu =
-                          Ckappa_sig.Views_bdu.mvbdu_and
+                          Ckappa_sig.Views_bdu.mvbdu_or
                             parameters
                             handler
                             error
