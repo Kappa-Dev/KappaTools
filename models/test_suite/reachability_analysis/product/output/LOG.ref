@@ -573,29 +573,29 @@ Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:7->[0;1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(3):'r3' A(z~p,t)->A(z~u,t)[0->0]
-Influence_map:Wake_up_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1]
-Influence_map:Wake_up_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->0];[0->1]
+Influence_map:Wake_up_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1]
+Influence_map:Wake_up_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->0];[0->1]
 Influence_map:Wake_up_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(2):'r2' A(z~u,t)->A(z~p,t)[0->0]
-Influence_map:Wake_up_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->0];[0->1]
-Influence_map:Wake_up_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->0];[0->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->0];[0->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->0];[0->1]
 Influence_map:Inhibition_map:rule(0):'r0' A(z~u!1,t!2),A(z~u!1,t!2)->A(z~p!1,t!2),A(z~u!1,t!2) -> rule(0):'r0' A(z~u!1,t!2),A(z~u!1,t!2)->A(z~p!1,t!2),A(z~u!1,t!2)[0->1]
 Influence_map:Inhibition_map:rule(1):'r1' A(z~p!1,t!2),A(z~p!1,t!2)->A(z~p!1,t!2),A(z~u!1,t!2) -> rule(1):'r1' A(z~p!1,t!2),A(z~p!1,t!2)->A(z~p!1,t!2),A(z~u!1,t!2)[1->0]
-Influence_map:Inhibition_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->0];[0->1]
-Influence_map:Inhibition_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->0];[0->1]
-Influence_map:Inhibition_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1]
-Influence_map:Inhibition_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->0];[0->1]
-Influence_map:Inhibition_map:rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t) -> rule(2):'r2' A(z~u,t)->A(z~p,t)[0->0];[1->0]
-Influence_map:Inhibition_map:rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t) -> rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->1];[1->0]
-Influence_map:Inhibition_map:rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t) -> rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->0];[0->1];[1->0];[1->1]
-Influence_map:Inhibition_map:rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1) -> rule(2):'r2' A(z~u,t)->A(z~p,t)[0->0];[1->0]
-Influence_map:Inhibition_map:rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1) -> rule(4):'r3' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->0];[0->1];[1->0];[1->1]
-Influence_map:Inhibition_map:rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1) -> rule(5):'r4' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->1];[1->0]
-Influence_map:Inhibition_map:rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t) -> rule(3):'r3' A(z~p,t)->A(z~u,t)[0->0];[1->0]
-Influence_map:Inhibition_map:rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t) -> rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->1];[1->0]
-Influence_map:Inhibition_map:rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t) -> rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->0];[0->1];[1->0];[1->1]
-Influence_map:Inhibition_map:rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(3):'r3' A(z~p,t)->A(z~u,t)[0->0];[1->0]
-Influence_map:Inhibition_map:rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(6):'r5' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1];[1->0];[1->1]
-Influence_map:Inhibition_map:rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(7):'r6' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->0];[0->1]
+Influence_map:Inhibition_map:rule(2):'r2' A(z~u,t)->A(z~p,t) -> rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->0];[0->1]
+Influence_map:Inhibition_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1]
+Influence_map:Inhibition_map:rule(3):'r3' A(z~p,t)->A(z~u,t) -> rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->0];[0->1]
+Influence_map:Inhibition_map:rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t) -> rule(2):'r2' A(z~u,t)->A(z~p,t)[0->0];[1->0]
+Influence_map:Inhibition_map:rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t) -> rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t) -> rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->0];[0->1];[1->0];[1->1]
+Influence_map:Inhibition_map:rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1) -> rule(2):'r2' A(z~u,t)->A(z~p,t)[0->0];[1->0]
+Influence_map:Inhibition_map:rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1) -> rule(4):'r4' A(z~u,t),A(z~u,t)->A(z~u!1,t),A(z~u!1,t)[0->0];[0->1];[1->0];[1->1]
+Influence_map:Inhibition_map:rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1) -> rule(5):'r5' A(z~u,t),A(z~u,t)->A(z~u,t!1),A(z~u,t!1)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t) -> rule(3):'r3' A(z~p,t)->A(z~u,t)[0->0];[1->0]
+Influence_map:Inhibition_map:rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t) -> rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t) -> rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->0];[0->1];[1->0];[1->1]
+Influence_map:Inhibition_map:rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(3):'r3' A(z~p,t)->A(z~u,t)[0->0];[1->0]
+Influence_map:Inhibition_map:rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(6):'r6' A(z~p,t),A(z~p,t)->A(z~p!1,t),A(z~p!1,t)[0->0];[0->1];[1->0];[1->1]
+Influence_map:Inhibition_map:rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1) -> rule(7):'r7' A(z~p,t),A(z~p,t)->A(z~p,t!1),A(z~p,t!1)[0->1];[1->0]
 Reachability analysis...
 	Views in initial state:
 
@@ -695,10 +695,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 4: r3:
+	Applying rule 4: r4:
 		the precondition is satisfied
 
-		rule 4: r3 is applied for the first time
+		rule 4: r4 is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -742,10 +742,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 5: r4:
+	Applying rule 5: r5:
 		the precondition is satisfied
 
-		rule 5: r4 is applied for the first time
+		rule 5: r5 is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -789,10 +789,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 6: r5:
+	Applying rule 6: r6:
 		the precondition is satisfied
 
-		rule 6: r5 is applied for the first time
+		rule 6: r6 is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -836,10 +836,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 7: r6:
+	Applying rule 7: r7:
 		the precondition is satisfied
 
-		rule 7: r6 is applied for the first time
+		rule 7: r7 is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -883,7 +883,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 8: r7:
+	Applying rule 8: r8:
 		the precondition is not satisfied yet
 
 	Applying rule 0: r0:
@@ -902,28 +902,28 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 4: r3:
+	Applying rule 4: r4:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 5: r4:
+	Applying rule 5: r5:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 6: r5:
+	Applying rule 6: r6:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 7: r6:
+	Applying rule 7: r7:
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
@@ -935,7 +935,7 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 rule 1: r1 will never be applied.
-rule 8: r7 will never be applied.
+rule 8: r8 will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 
@@ -1251,5 +1251,4 @@ A(t!1),A(t!1)=> [
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-Some exceptions have been raised
-error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 24: Label 'r3' is already used; exception:Exit
+execution finished without any exception
