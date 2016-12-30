@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 30 2016>
+   * Last modification: Time-stamp: <Dec 20 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -386,19 +386,6 @@ struct
     (*------------------------------------------------------------*)
     let store_views_lhs = get_views_lhs static in
     let store_bonds_lhs = get_bonds_lhs static in
-    let store_potential_tuple_pair = get_potential_tuple_pair static in
-    let error, store_potential_tuple_pair =
-      Site_accross_bonds_domain_static.collect_potential_tuple_pair
-        parameters error
-        rule_id
-        store_bonds_lhs
-        store_views_lhs
-        store_potential_tuple_pair
-    in
-    let static =
-      set_potential_tuple_pair store_potential_tuple_pair
-        static
-    in
     let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
     let error, store_potential_tuple_pair_lhs =
       Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs
@@ -412,6 +399,25 @@ struct
       set_potential_tuple_pair_lhs store_potential_tuple_pair_lhs
         static
     in
+    (*------------------------------------------------------------*)
+    (*TODO*)
+    (*let store_bonds_lhs_pattern = get_bonds_lhs_pattern static in
+    let store_views_lhs_pattern = get_views_lhs_pattern static in
+    let store_potential_tuple_pair_lhs_pattern =
+      get_potential_tuple_pair_lhs_pattern static in
+    let error, store_potential_tuple_pair_lhs_pattern =
+      Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs_pattern
+        parameters error
+        rule.Cckappa_sig.rule_lhs
+        store_bonds_lhs_pattern
+        store_views_lhs_pattern
+        store_potential_tuple_pair_lhs_pattern
+    in
+    let static =
+      set_potential_tuple_pair_lhs_pattern
+        store_potential_tuple_pair_lhs_pattern
+        static
+    in*)
     (*------------------------------------------------------------*)
     error, static
 
