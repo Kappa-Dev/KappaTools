@@ -614,12 +614,12 @@ Id=23
 
       Id=20
        Node(site_type:2<1)
-        Id=19
+        Id=17
          Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=18
+          Id=16
            Node(site_type:3<1)
             Id=1
              Leaf True 
@@ -665,12 +665,12 @@ Id=25
 
       Id=20
        Node(site_type:2<1)
-        Id=19
+        Id=17
          Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=18
+          Id=16
            Node(site_type:3<1)
             Id=1
              Leaf True 
@@ -717,12 +717,12 @@ Id=36
 
       Id=33
        Node(site_type:2<2)
-        Id=19
+        Id=17
          Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=18
+          Id=16
            Node(site_type:3<1)
             Id=1
              Leaf True 
@@ -764,12 +764,12 @@ Id=29
 
       Id=26
        Node(site_type:2<1)
-        Id=7
+        Id=3
          Node(site_type:3<1)
           Id=0
            Leaf False 
 
-          Id=6
+          Id=2
            Node(site_type:3<2)
             Id=1
              Leaf True 
@@ -811,12 +811,12 @@ Id=48
 
       Id=33
        Node(site_type:2<2)
-        Id=19
+        Id=17
          Node(site_type:3<0)
           Id=0
            Leaf False 
 
-          Id=18
+          Id=16
            Node(site_type:3<1)
             Id=1
              Leaf True 
@@ -858,12 +858,12 @@ Id=31
 
       Id=26
        Node(site_type:2<1)
-        Id=7
+        Id=3
          Node(site_type:3<1)
           Id=0
            Leaf False 
 
-          Id=6
+          Id=2
            Node(site_type:3<2)
             Id=1
              Leaf True 
@@ -962,7 +962,7 @@ Id=65
           Id=0
            Leaf False 
 
-          Id=6
+          Id=2
            Node(site_type:3<2)
             Id=1
              Leaf True 
@@ -972,12 +972,12 @@ Id=65
 
         Id=33
          Node(site_type:2<2)
-          Id=19
+          Id=17
            Node(site_type:3<0)
             Id=0
              Leaf False 
 
-            Id=18
+            Id=16
              Node(site_type:3<1)
               Id=1
                Leaf True 
@@ -1085,12 +1085,12 @@ Id=72
 
     Id=56
      Node(site_type:1<2)
-      Id=17
+      Id=19
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=16
+        Id=18
          Node(site_type:2<1)
           Id=1
            Leaf True 
@@ -1202,12 +1202,12 @@ Id=72
 
     Id=56
      Node(site_type:1<2)
-      Id=17
+      Id=19
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=16
+        Id=18
          Node(site_type:2<1)
           Id=1
            Leaf True 

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Dec 13 2016>
+   * Last modification: Time-stamp: <Dec 31 2016>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -53,7 +53,7 @@ type bdu_analysis_static_pattern =
     (*pattern*)
     store_proj_bdu_test_restriction_pattern :
       (Covering_classes_type.cv_id *
-       Ckappa_sig.c_state
+       Ckappa_sig.c_state Cckappa_sig.interval 
        Ckappa_sig.Site_map_and_set.Map.t) list
   }
 
@@ -625,6 +625,47 @@ let build_bdu parameters handler error (pair_list: (Ckappa_sig.c_site_name * Cka
   in
   error, handler, bdu_result
 
+let build_bdu_range parameters handler error pair_list =
+  let error, handler, bdu_true =
+    Ckappa_sig.Views_bdu.mvbdu_true
+      parameters handler error
+  in
+  let error, handler, bdu_false =
+    Ckappa_sig.Views_bdu.mvbdu_false
+      parameters handler error
+  in
+  List.fold_left
+    (fun (error, handler, mvbdu) (x,state) ->
+       let min = state.Cckappa_sig.min in
+       let max = state.Cckappa_sig.max in
+       let rec aux k l =
+         if Ckappa_sig.compare_state_index k max > 0
+         then l
+         else
+           aux (Ckappa_sig.next_state_index k) (k::l)
+       in
+       let l = aux min [] in
+       let error, handler, mvbdu_aux =
+         List.fold_left
+           (fun (error, handler, mvbdu) state ->
+              let error, handler, mvbdu' =
+                Ckappa_sig.Views_bdu.mvbdu_of_association_list
+                  parameters handler error
+                  [x,state]
+              in
+              Ckappa_sig.Views_bdu.mvbdu_or
+                parameters handler error
+                mvbdu mvbdu')
+           (error, handler, bdu_false) l
+       in
+       Ckappa_sig.Views_bdu.mvbdu_and
+         parameters handler error
+         mvbdu mvbdu_aux)
+    (error, handler, bdu_true)
+    pair_list
+
+
+
 (****************************************************************************)
 
 let collect_bdu_creation_restriction_map parameters handler error
@@ -704,13 +745,23 @@ let collect_bdu_creation_restriction_map parameters handler error
                      in
                      (*----------------------------------------------------*)
                      let error', map_res =
-                       Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
+                       try Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
                          parameters error
-                         (fun site port -> add site port.Cckappa_sig.site_state.Cckappa_sig.min)
+                         (fun site port m ->
+                            if
+                              port.Cckappa_sig.site_state.Cckappa_sig.min =
+                              port.Cckappa_sig.site_state.Cckappa_sig.max
+                            then
+                              add
+                                site
+                                port.Cckappa_sig.site_state.Cckappa_sig.min
+                                m
+                            else raise Exit)
                          (fun site -> add site Ckappa_sig.dummy_state_index)
                          set
                          agent.Cckappa_sig.agent_interface
                          Ckappa_sig.Site_map_and_set.Map.empty
+                       with Exit -> Exception.warn parameters error __POS__ Exit  Ckappa_sig.Site_map_and_set.Map.empty
                      in
                      let error =
                        Exception.check_point
@@ -849,6 +900,13 @@ let collect_modif_list_restriction_map
                    error
                    (fun site port (error, store_result) ->
                       let state = port.Cckappa_sig.site_state.Cckappa_sig.min in
+                      let error, () =
+                        if state = port.Cckappa_sig.site_state.Cckappa_sig.max
+                        then
+                          error, ()
+                        else
+                          Exception.warn parameters error __POS__ Exit ()
+                      in
                       let error, site' =
                         Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
                           parameters
@@ -1175,8 +1233,7 @@ let collect_bdu_test_restriction_map parameters handler_kappa
                   Ckappa_sig.Site_map_and_set.Map.fold_restriction
                     parameters error
                     (fun site port (error, store_result) ->
-                       let state = port.Cckappa_sig.site_state.Cckappa_sig.min
-                       in
+                       let state = port.Cckappa_sig.site_state in
                        let error, site' =
                          Ckappa_sig.Site_map_and_set.Map.find_default parameters
                            error
@@ -1212,14 +1269,14 @@ let collect_bdu_test_restriction_map parameters handler_kappa
                   begin
                     let error, pair_list =
                       Ckappa_sig.Site_map_and_set.Map.fold
-                        (fun site' state (error, current_list) ->
+                        (fun site' state (error,current_list)  ->
                            let pair_list = (site', state) :: current_list in
                            error, pair_list
                         ) map_res (error, [])
                     in
                     (*build bdu_test*)
                     let error, handler, bdu_test =
-                      build_bdu parameters handler error pair_list
+                      build_bdu_range parameters handler error pair_list
                     in
                     (*  let error, agent_string =
                       Handler.string_of_agent parameters error handler_kappa agent_type
@@ -1332,7 +1389,7 @@ let collect_proj_bdu_test_restriction_pattern parameters error
                     Ckappa_sig.Site_map_and_set.Map.fold_restriction
                       parameters error
                       (fun site port (error, store_result) ->
-                         let state = port.Cckappa_sig.site_state.Cckappa_sig.min
+                         let state = port.Cckappa_sig.site_state
                          in
                          let error, site' =
                            Ckappa_sig.Site_map_and_set.Map.find_default

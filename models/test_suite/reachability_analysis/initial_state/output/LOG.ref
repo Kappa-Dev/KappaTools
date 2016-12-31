@@ -162,12 +162,12 @@ Id=7
 
   Id=6
    Node(site_type:1<1)
-    Id=5
+    Id=3
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=4
+      Id=2
        Node(site_type:2<1)
         Id=1
          Leaf True 
@@ -200,12 +200,12 @@ Id=11
 
   Id=10
    Node(site_type:1<2)
-    Id=5
+    Id=3
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=4
+      Id=2
        Node(site_type:2<1)
         Id=1
          Leaf True 
@@ -264,12 +264,12 @@ EXTENSIONAL DESCRIPTION:
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
-Id=3
+Id=5
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:1<1)
     Id=1
      Leaf True 
@@ -326,12 +326,12 @@ Id=19
 
     Id=10
      Node(site_type:1<2)
-      Id=5
+      Id=3
        Node(site_type:2<0)
         Id=0
          Leaf False 
 
-        Id=4
+        Id=2
          Node(site_type:2<1)
           Id=1
            Leaf True 
@@ -343,12 +343,12 @@ Id=19
        Leaf False 
 
 agent_type:1:D:cv_id:0
-Id=3
+Id=5
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:1<1)
     Id=1
      Leaf True 
@@ -435,12 +435,12 @@ Id=29
 
     Id=27
      Node(site_type:0<2)
-      Id=3
+      Id=5
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=2
+        Id=4
          Node(site_type:1<1)
           Id=1
            Leaf True 
@@ -542,12 +542,12 @@ Id=29
 
     Id=27
      Node(site_type:0<2)
-      Id=3
+      Id=5
        Node(site_type:1<0)
         Id=0
          Leaf False 
 
-        Id=2
+        Id=4
          Node(site_type:1<1)
           Id=1
            Leaf True 
