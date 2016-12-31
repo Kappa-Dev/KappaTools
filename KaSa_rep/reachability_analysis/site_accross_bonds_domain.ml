@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 20 2016>
+   * Last modification: Time-stamp: <Dec 31 2016>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -562,6 +562,22 @@ struct
         store_rule_partition_created_bonds_map_2 static
     in
     (*------------------------------------------------------------*)
+    (* Restrict tuples in lhs to the tuples of interest *)
+    let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
+    let store_potential_tuple_pair_lhs =
+      Ckappa_sig.Rule_map_and_set.Map.map
+        (
+          Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.filter
+            (fun ((a,b,c,d,_),(a',b',c',d',_)) ->
+               Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem ((a,b,c,d),(a',b',c',d'))
+                 store_potential_tuple_pair))
+        store_potential_tuple_pair_lhs
+    in
+    let static =
+      set_potential_tuple_pair_lhs
+        store_potential_tuple_pair_lhs
+        static
+    in
     error, static, dynamic
 
   (****************************************************************)
@@ -892,6 +908,14 @@ struct
         ) bonds_lhs
         (error,
          Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
+    in
+    let store_potential_tuple_pair = get_potential_tuple_pair static in
+    let tuple_set =
+      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.filter
+        (fun ((a,b,c,d,_),(a',b',c',d',_)) ->
+           Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem ((a,b,c,d),(a',b',c',d'))
+             store_potential_tuple_pair)
+        tuple_set
     in
     let list =
       Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements
@@ -1267,19 +1291,18 @@ struct
               (*-----------------------------------------------------------*)
               let error, bool, dynamic, precondition, modified_sites =
                 match state'_list_other with
-                | _::_::_ | []->
-                  (*we know for sure that none of the two sites have been
-                    modified*)
+                | [] | _::_::_ ->
+                  (* we know for sure that the site has not been modified *)
                   error, bool, dynamic, precondition, modified_sites
-                | [_] -> (*general case, singleton*)
-                  List.fold_left
-                    (fun (error, bool, dynamic, precondition, modified_sites)
-                      state'_other ->
-                       let store_result = get_value dynamic in
-                       let pair_list =
-                         match pos
-                         with Fst ->
-                           [Ckappa_sig.fst_site, state_mod;
+                | [_]  ->
+                List.fold_left
+                  (fun (error, bool, dynamic, precondition, modified_sites)
+                    state'_other ->
+                    let store_result = get_value dynamic in
+                    let pair_list =
+                      match pos
+                      with Fst ->
+                        [Ckappa_sig.fst_site, state_mod;
                             Ckappa_sig.snd_site, state'_other]
                             | Snd ->
                               [Ckappa_sig.fst_site, state'_other;
@@ -1403,12 +1426,6 @@ struct
                mvbdu_cap
                redefine
            in
-           let error, handler, mvbdu_or =
-             Ckappa_sig.Views_bdu.mvbdu_or
-               parameters handler error
-               mvbdu
-               mvbdu'
-           in
            (*check the freshness of the value *)
            let error, bool, handler, modified_sites, result =
              Site_accross_bonds_domain_type.add_link_and_check
@@ -1419,7 +1436,7 @@ struct
                bool
                dump_title
                (x,y)
-               mvbdu (*FIXME: mvbdu_or?*)
+               mvbdu'
                modified_sites
                result
            in
