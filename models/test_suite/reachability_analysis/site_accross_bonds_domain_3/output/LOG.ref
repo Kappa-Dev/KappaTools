@@ -1447,12 +1447,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1462,7 +1462,7 @@ Id=44
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=42
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1477,12 +1477,12 @@ Id=42
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1507,12 +1507,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1537,12 +1537,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1552,12 +1552,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1567,12 +1567,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1582,12 +1582,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1597,12 +1597,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1643,12 +1643,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1658,7 +1658,7 @@ Id=44
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=42
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1673,12 +1673,12 @@ Id=42
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1703,12 +1703,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1733,12 +1733,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1748,12 +1748,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1763,12 +1763,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1778,12 +1778,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1793,12 +1793,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1813,12 +1813,16 @@ EXTENSIONAL DESCRIPTION:
 A(t!1),B(t!1) => 
 	[
 		  A(t!1,z!D.x),B(t!1,z!D.x)
+		v A(t!1,z!C.x),B(t!1,z)
 		v A(t!1,z!C.x),B(t!1,z!C.x)
+		v A(t!1,z),B(t!1,z)
+		v A(t!1,z),B(t!1,z!C.x)
 	]
 E(t!1),F(t!1) => 
 	[
 		  E(t!1,z!G.x),F(t!1,z!H.x)
 		v E(t!1,z!C.x),F(t!1,z!D.x)
+		v E(t!1,z),F(t!1,z!D.x)
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1839,12 +1843,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1854,7 +1858,7 @@ Id=44
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=42
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -1869,12 +1873,12 @@ Id=42
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1899,12 +1903,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -1929,12 +1933,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1944,12 +1948,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1959,12 +1963,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -1974,12 +1978,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -1989,12 +1993,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2019,12 +2023,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -2034,7 +2038,7 @@ Id=44
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=42
+Id=49
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -2049,12 +2053,12 @@ Id=42
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2079,12 +2083,12 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=44
+Id=51
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=43
+  Id=50
    Node(site_type:0<3)
     Id=1
      Leaf True 
@@ -2109,12 +2113,12 @@ Id=10
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2124,12 +2128,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2139,12 +2143,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=48
+Id=55
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=47
+  Id=54
    Node(site_type:0<4)
     Id=1
      Leaf True 
@@ -2154,12 +2158,12 @@ Id=48
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2169,12 +2173,12 @@ Id=46
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=46
+Id=53
  Node(site_type:0<1)
   Id=0
    Leaf False 
 
-  Id=45
+  Id=52
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -2225,10 +2229,14 @@ A()=> [A(t!B.t)]
 ------------------------------------------------------------
 A(t!1),B(t!1)=> [
 		  A(t!1,z!D.x),B(t!1,z!D.x)
-		v A(t!1,z!C.x),B(t!1,z!C.x)]
+		v A(t!1,z!C.x),B(t!1,z)
+		v A(t!1,z!C.x),B(t!1,z!C.x)
+		v A(t!1,z),B(t!1,z)
+		v A(t!1,z),B(t!1,z!C.x)]
 E(t!1),F(t!1)=> [
 		  E(t!1,z!G.x),F(t!1,z!H.x)
-		v E(t!1,z!C.x),F(t!1,z!D.x)]
+		v E(t!1,z!C.x),F(t!1,z!D.x)
+		v E(t!1,z),F(t!1,z!D.x)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
