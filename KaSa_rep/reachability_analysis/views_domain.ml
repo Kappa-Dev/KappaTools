@@ -983,7 +983,7 @@ struct
     let parameters = get_parameter static in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_result =
-      Bdu_static_views.build_bdu
+      Ckappa_sig.Views_bdu.mvbdu_of_association_list
         parameters
         handler
         error
@@ -1696,7 +1696,7 @@ struct
                             site_correspondence
                     in
                     let error, handler, mvbdu_B_y =
-                      Bdu_static_views.build_bdu
+                      Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list
                         parameters
                         handler
                         error
@@ -2551,7 +2551,8 @@ struct
                parameters error
                (fun site port (error, store_result) ->
                   let state =
-                    port.Cckappa_sig.site_state.Cckappa_sig.min
+                    port.Cckappa_sig.site_state.Cckappa_sig.min,
+                    port.Cckappa_sig.site_state.Cckappa_sig.max
                   in
                   let error, site' =
                     Ckappa_sig.Site_map_and_set.Map.find_default
@@ -2586,12 +2587,14 @@ struct
     =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
-      (fun parameters error agent_id agent (dynamic, current_list) ->
+      (fun parameters error _agent_id agent (dynamic, current_list) ->
          match agent with
          | Cckappa_sig.Unknown_agent _
          | Cckappa_sig.Ghost
          | Cckappa_sig.Dead_agent _ ->
-           error, (dynamic, current_list) (*FIXME*)
+           Exception.warn
+             parameters error __POS__
+             Exit (dynamic,current_list)
          | Cckappa_sig.Agent agent ->
            let agent_type = agent.Cckappa_sig.agent_name in
            let error, get_pair_list =
@@ -2617,7 +2620,8 @@ struct
                      Analyzer_headers.get_mvbdu_handler dynamic
                    in
                    let error, handler, bdu_test =
-                     Bdu_static_views.build_bdu parameters
+                     Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list
+                       parameters
                        handler error
                        pair_list
                    in
@@ -2909,7 +2913,7 @@ struct
                         in
                         let handler = get_mvbdu_handler dynamic in
                         let error, handler, bdu_test =
-                          Bdu_static_views.build_bdu parameters handler error
+                          Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list parameters handler error
                             pair_list
                         in
                         let dynamic = set_mvbdu_handler handler dynamic in

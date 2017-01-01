@@ -209,7 +209,7 @@ let collect_modif_map parameters error store_modification_sites =
 
 let collect_test_sites parameters error rule_id viewslhs
     store_result =
-  let add_link (agent_id, agent_type, site_type) rule_id store_result =
+  let add_link error (agent_id, agent_type, site_type) rule_id store_result =
     let error', current_set =
       Ckappa_sig.Rule_map_and_set.Set.add
         parameters
@@ -243,7 +243,7 @@ let collect_test_sites parameters error rule_id viewslhs
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type _ (error, store_result) ->
                   let error, store_result_test =
-                    add_link (agent_id, agent_type, site_type) rule_id store_result
+                    add_link error (agent_id, agent_type, site_type) rule_id store_result
                   in
                   error, store_result_test
                ) agent.Cckappa_sig.agent_interface (error, store_result)
@@ -607,85 +607,6 @@ let collect_remanent_triple parameters error store_remanent store_result =
 (******************************************************************)
 (*creation rules*)
 
-let build_bdu parameters handler error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
-    Ckappa_sig.Views_bdu.mvbdu_of_association_list
-      parameters handler error pair_list
-
-let build_bdu_range parameters handler error range_list =
-  (*let () =
-    Loggers.fprintf
-      (Remanent_parameters.get_logger parameters)
-      "BUILD BDU RANGE:"
-    in*)
-  let range_list =
-    List.rev_map
-      (fun (a,b) -> (a,(b.Cckappa_sig.min,b.Cckappa_sig.max)))
-      (List.rev range_list)
-  in
-  (*let () =
-    List.iter
-      (fun (a,(b,c)) ->
-         Loggers.fprintf
-           (Remanent_parameters.get_logger parameters)
-           "%i:[%i,%i];" (Ckappa_sig.int_of_site_name a)
-           (Ckappa_sig.int_of_state_index b)
-           (Ckappa_sig.int_of_state_index c))
-      range_list
-    in*)
-  let error, handler, mvbdu =
-    Ckappa_sig.Views_bdu.mvbdu_of_range_list
-      parameters handler error range_list
-  in
-  (*let () =
-    Ckappa_sig.Views_bdu.print
-      parameters mvbdu
-    in*)
-  error, handler, mvbdu
-
-
-
-(*let error, handler, bdu_true =
-    Ckappa_sig.Views_bdu.mvbdu_true
-      parameters handler error
-  in
-  let error, handler, bdu_false =
-    Ckappa_sig.Views_bdu.mvbdu_false
-      parameters handler error
-  in
-  List.fold_left
-    (fun (error, handler, mvbdu) (x,state) ->
-       let min = state.Cckappa_sig.min in
-       let max = state.Cckappa_sig.max in
-       let rec aux k l =
-         if Ckappa_sig.compare_state_index k max > 0
-         then l
-         else
-           aux (Ckappa_sig.next_state_index k) (k::l)
-       in
-       let l = aux min [] in
-       let error, handler, mvbdu_aux =
-         List.fold_left
-           (fun (error, handler, mvbdu) state ->
-              let error, handler, mvbdu' =
-                Ckappa_sig.Views_bdu.mvbdu_of_association_list
-                  parameters handler error
-                  [x,state]
-              in
-              Ckappa_sig.Views_bdu.mvbdu_or
-                parameters handler error
-                mvbdu mvbdu')
-           (error, handler, bdu_false) l
-       in
-       Ckappa_sig.Views_bdu.mvbdu_and
-         parameters handler error
-         mvbdu mvbdu_aux)
-    (error, handler, bdu_true)
-    pair_list*)
-
-
-
-(****************************************************************************)
-
 let collect_bdu_creation_restriction_map parameters handler error
     rule_id rule
     store_remanent_triple store_result =
@@ -802,7 +723,8 @@ let collect_bdu_creation_restriction_map parameters handler error
                           ) map_res (error, [])
                       in
                       let error, handler, bdu_creation =
-                        build_bdu parameters handler error pair_list
+                        Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list
+                          parameters handler error pair_list
                       in
                       let error, handler, store_result =
                         add_link handler error
@@ -1089,7 +1011,8 @@ let store_bdu_potential_restriction_map_aux parameters handler error
                            (*-----------------------------------------------*)
                            (*build bdu_potential side effects*)
                            let error, handler, bdu_potential_effect =
-                             build_bdu parameters handler error [site', state]
+                             Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list
+                               parameters handler error [site', state]
                            in
                            (*union of bdu and bdu effect*)
                            let error, handler, bdu =
@@ -1189,7 +1112,7 @@ let collect_proj_bdu_potential_restriction_map parameters handler error
 
 (**************************************************************************)
 
-let collect_bdu_test_restriction_map parameters handler_kappa
+let collect_bdu_test_restriction_map parameters _handler_kappa
     handler error rule_id rule
     store_remanent_triple store_result =
   let error, handler, bdu_false =
@@ -1288,17 +1211,15 @@ let collect_bdu_test_restriction_map parameters handler_kappa
                     let error, pair_list =
                       Ckappa_sig.Site_map_and_set.Map.fold
                         (fun site' state (error,current_list)  ->
-                           let pair_list = (site', state) :: current_list in
+                           let pair_list = (site', (state.Cckappa_sig.min, state.Cckappa_sig.max)) :: current_list in
                            error, pair_list
                         ) map_res (error, [])
                     in
                     (*build bdu_test*)
                     let error, handler, bdu_test =
-                      build_bdu_range parameters handler error pair_list
+                      Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list
+                        parameters handler error pair_list
                     in
-                    (*  let error, agent_string =
-                      Handler.string_of_agent parameters error handler_kappa agent_type
-                        in*)
                     let error, store_result =
                       error, Covering_classes_type.AgentsRuleCV_setmap.Map.add
                         (agent_id, agent_type, rule_id, cv_id)
@@ -1375,7 +1296,7 @@ let collect_proj_bdu_test_restriction_pattern parameters error
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
-      (fun parameters error agent_id agent store_result ->
+      (fun parameters error _agent_id agent store_result ->
          match agent with
          | Cckappa_sig.Unknown_agent _
          | Cckappa_sig.Ghost
