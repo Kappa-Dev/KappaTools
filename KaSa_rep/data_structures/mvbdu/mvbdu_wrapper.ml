@@ -704,16 +704,8 @@ module Internalize(M:Mvbdu
   (struct
 
     module Mvbdu = M
+    include Mvbdu
 
-    type key = int
-    type value = int
-    type mvbdu = Mvbdu.mvbdu
-    type hconsed_association_list = Mvbdu.hconsed_association_list
-    type hconsed_variables_list = Mvbdu.hconsed_variables_list
-    type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
-    type hconsed_range_list = Mvbdu.hconsed_range_list
-
-    type handler = Mvbdu.handler
     let handler = ref None
     let parameter = ref (Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised ())
     let import_handler h = handler:=Some h
@@ -736,7 +728,7 @@ module Internalize(M:Mvbdu
 
     let init parameters =
       let error = Exception.empty_error_handler in
-      let error',output = M.init parameters error in
+      let error',output = init parameters error in
       let () = parameter := parameters in
       check __POS__ error error' output
 
@@ -900,13 +892,7 @@ module Internalize(M:Mvbdu
     let mvbdu_cartesian_decomposition_depth =
       lift_binary __POS__ M.mvbdu_cartesian_decomposition_depth
 
-    let print = M.print
-    let print_association_list = M.print_association_list
-    let print_variables_list = M.print_variables_list
-
-    let hash_of_association_list = M.hash_of_association_list
-    let hash_of_variables_list = M.hash_of_variables_list
-  end:Internalized_mvbdu
+    end:Internalized_mvbdu
   with
     type key = int
    and type value = int
@@ -916,34 +902,10 @@ module Internalize(M:Mvbdu
 module Optimize(M:Mvbdu with type key = int and type value = int) =
   (struct
     module Mvbdu = M
-    type key = Mvbdu.key
-    type value = Mvbdu.value
-    type handler = Mvbdu.handler
+    include Mvbdu
 
-    type mvbdu = Mvbdu.mvbdu
-
-    type hconsed_association_list = Mvbdu.hconsed_association_list
-    type hconsed_variables_list = Mvbdu.hconsed_variables_list
-    type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
-    type hconsed_range_list = Mvbdu.hconsed_range_list
-
-    type 'output constant = 'output Mvbdu.constant
-    type ('input,'output) unary =  ('input,'output) Mvbdu.unary
-    type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
-    type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
-
-
-    let last_entry = Mvbdu.last_entry
-    let init = Mvbdu.init
-    let is_init = Mvbdu.is_init
-    let equal = Mvbdu.equal
-    let equal_with_logs = Mvbdu.equal_with_logs
-    let mvbdu_nand  = Mvbdu.mvbdu_nand
     let mvbdu_not parameters handler error a = mvbdu_nand parameters handler error a a
 
-    let mvbdu_id = Mvbdu.mvbdu_id
-    let mvbdu_true = Mvbdu.mvbdu_true
-    let mvbdu_false = Mvbdu.mvbdu_false
     let mvbdu_unary_true parameters handler error a =
       let error,handler,nota = mvbdu_not parameters handler error a in
       mvbdu_nand parameters handler error a nota
@@ -979,57 +941,8 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
     let mvbdu_nrev_imply parameters handler error a b = mvbdu_nimply parameters handler error b a
     let mvbdu_bi_true parameters handler error a _ = M.mvbdu_unary_true parameters handler error a
     let mvbdu_bi_false parameters handler error a _ = M.mvbdu_unary_false parameters handler error a
-    let mvbdu_fst = M.mvbdu_fst
-    let mvbdu_snd = M.mvbdu_snd
     let mvbdu_nfst parameters handler error a _ = mvbdu_not parameters handler error a
     let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a
-
-    let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
-    let mvbdu_redefine = M.mvbdu_redefine
-    let mvbdu_redefine_range = M.mvbdu_redefine_range
-    let mvbdu_rename = M.mvbdu_rename
-    let mvbdu_project_keep_only = M.mvbdu_project_keep_only
-    let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
-    let build_association_list = M.build_association_list
-    let build_sorted_association_list = M.build_sorted_association_list
-    let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
-    let build_variables_list = M.build_variables_list
-    let build_sorted_variables_list = M.build_sorted_variables_list
-    let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
-    let build_renaming_list = M.build_renaming_list
-    let build_sorted_renaming_list = M.build_sorted_renaming_list
-    let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
-    let build_reverse_sorted_range_list =
-      M.build_reverse_sorted_range_list
-    let build_range_list =
-        M.build_range_list
-    let build_sorted_range_list =
-          M.build_sorted_range_list
-    let empty_association_list = M.empty_association_list
-    let empty_variables_list = M.empty_variables_list
-    let empty_renaming_list = M.empty_renaming_list
-    let empty_range_list = M.empty_range_list
-
-    let merge_variables_lists = M.merge_variables_lists
-    let overwrite_association_lists = M.overwrite_association_lists
-    let nbr_variables = M.nbr_variables
-
-    let extensional_of_association_list = M.extensional_of_association_list
-    let extensional_of_range_list = M.extensional_of_range_list
-    let extensional_of_variables_list = M.extensional_of_variables_list
-    let extensional_of_mvbdu = M.extensional_of_mvbdu
-    let variables_list_of_mvbdu = M.variables_list_of_mvbdu
-
-    let mvbdu_subseteq = M.mvbdu_subseteq
-    let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
-    let mvbdu_of_association_list = M.mvbdu_of_association_list
-    let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
-    let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
-    let mvbdu_of_range_list = M.mvbdu_of_range_list
-    let mvbdu_of_reverse_sorted_range_list =
-      M.mvbdu_of_reverse_sorted_range_list
-    let mvbdu_of_sorted_range_list = M.mvbdu_of_sorted_range_list
-    let mvbdu_of_hconsed_range = M.mvbdu_of_hconsed_range
 
     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth
@@ -1054,16 +967,6 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
       with
       | None -> error,handler,list
       | Some bdu -> error,handler,bdu::list
-
-    let print = M.print
-    let print_association_list = M.print_association_list
-    let print_variables_list = M.print_variables_list
-
-    let store_by_variables_list = M.store_by_variables_list
-    let store_by_mvbdu = M.store_by_mvbdu
-    let hash_of_association_list = M.hash_of_association_list
-    let hash_of_variables_list = M.hash_of_variables_list
-    let hash_of_range_list = M.hash_of_range_list
 
   end:Mvbdu with type key = int and type value = int)
 
