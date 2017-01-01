@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Jan 01 2017>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -12,7 +12,7 @@
    * en Automatique.  All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let build_without_and_with_compressing (allocate:('a,'b,'c,'d) Sanity_test_sig.f)
+let build_without_and_with_compressing (allocate:('a,'b,'c,'d,'e) Sanity_test_sig.f)
     error handler bdu_skel bdu_val  =
   let error, output =
     Mvbdu_core.build_already_compressed_cell
@@ -61,12 +61,12 @@ let build_without_and_with_compressing (allocate:('a,'b,'c,'d) Sanity_test_sig.f
 let bdu_test remanent parameters =
   let error = remanent.Sanity_test_sig.error in
   let allocate = remanent.Sanity_test_sig.allocate_mvbdu in
-  let (handler:('b,'a,'c,'d,bool,int) Memo_sig.handler) =
+  let (handler:('b,'a,'c,'d,'e,bool,int) Memo_sig.handler) =
     remanent.Sanity_test_sig.mvbdu_handler
   in
   let a_val = Mvbdu_sig.Leaf true in
   let b_val = Mvbdu_sig.Leaf false in
-  let error,(handler:('b,'a,'c,'d,bool,int) Memo_sig.handler),a',(a'_id:int),a'',_a''_id =
+  let error,(handler:('b,'a,'c,'d,'e,bool,int) Memo_sig.handler),a',(a'_id:int),a'',_a''_id =
     build_without_and_with_compressing
       allocate
       error

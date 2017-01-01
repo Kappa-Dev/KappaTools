@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 11th of March
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Dec 31 2016>
    * *
    * This library provides primitives to deal set of finite maps from integers to integers
    *
@@ -31,6 +31,13 @@ struct
   let print _ _ = ()
 end
 
+module Range_List_Skeleton =
+struct
+  type t = (int * int) List_sig.skeleton
+  let (compare:t->t->int) = compare
+  let print _ _ = ()
+end
+
 module Variables_List_Skeleton =
 struct
   type t = unit List_sig.skeleton
@@ -53,6 +60,11 @@ module D_Association_list_skeleton =
   (Dictionary.Dictionary_of_Ord (Association_List_Skeleton):Dictionary.Dictionary
    with type key = int
     and type value = int List_sig.skeleton)
+
+module D_Range_list_skeleton =
+  (Dictionary.Dictionary_of_Ord (Range_List_Skeleton):Dictionary.Dictionary
+   with type key = int
+    and type value = (int * int) List_sig.skeleton)
 
 module D_Variables_list_skeleton =
   (Dictionary.Dictionary_of_Ord (Variables_List_Skeleton):Dictionary.Dictionary
@@ -86,6 +98,7 @@ type memo_tables =
     boolean_mvbdu_clean_head  : bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;
+    boolean_mvbdu_redefine_range    : bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
@@ -95,7 +108,10 @@ type memo_tables =
 
     boolean_mvbdu_extensional_description_of_variables_list: int list Hash_1.t;
 
-    boolean_mvbdu_extensional_description_of_association_list: (int * int) list Hash_1.t; (*FIXME*)
+    boolean_mvbdu_extensional_description_of_association_list: (int * int) list Hash_1.t;
+    boolean_mvbdu_extensional_description_of_range_list: (int * (int*int)) list
+        Hash_1.t;
+
 
     boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
 
@@ -104,13 +120,16 @@ type memo_tables =
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
 type association_list_dic  = (int List_sig.cell, int List_sig.list) D_Association_list_skeleton.dictionary
+type range_list_dic = ((int * int) List_sig.cell, (int * int) List_sig.list)
+D_Range_list_skeleton.dictionary
 type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_Variables_list_skeleton.dictionary
-type handler   = (memo_tables, mvbdu_dic, association_list_dic, variables_list_dic, bool, int) Memo_sig.handler
+type handler   = (memo_tables, mvbdu_dic, association_list_dic, range_list_dic,variables_list_dic, bool, int) Memo_sig.handler
 
 type unary_memoized_fun =
   (bool,
    mvbdu_dic,
    association_list_dic,
+   range_list_dic,
    variables_list_dic,
    Exception.method_handler -> bool -> Exception.method_handler  *
                                        (bool Mvbdu_sig.mvbdu,bool) Mvbdu_sig.premvbdu, memo_tables,
@@ -157,12 +176,16 @@ let split_memo error handler =
   [ (* _ -> int list *)
     "extensional_of_variables_list:", x.boolean_mvbdu_extensional_description_of_variables_list;
   ],
-  [ (* _ -> (int * int) list *) (*FIXME*)
+  [ (* _ -> (int * int) list *)
     "Boolean_mvbdu_extensional_description_of_association_list:",
     x.boolean_mvbdu_extensional_description_of_association_list;
   ],
+  [ (* _ -> (int * (int * int)) list *)
+    "Boolean_mvbdu_extensional_description_of_range_list:",
+    x.boolean_mvbdu_extensional_description_of_range_list;
+  ],
   [ (* _ -> (int * int) list list *)
-    "Boolean_mvbdu+extensional_description_of_mvbdu:",x.boolean_mvbdu_extensional_description_of_mvbdu;
+    "Boolean_mvbdu_extensional_description_of_mvbdu:",x.boolean_mvbdu_extensional_description_of_mvbdu;
   ]
 
 let rec print_cell parameter cell =
@@ -229,11 +252,13 @@ let init_data parameters error =
   let error,mvbdu_nimply = Hash_2.create parameters error (0,0) in
   let error,mvbdu_nis_implied = Hash_2.create parameters error (0,0) in
   let error,mvbdu_redefine = Hash_2.create parameters error (0,0) in
+  let error,mvbdu_redefine_range = Hash_2.create parameters error (0,0) in
   let error,mvbdu_project_keep_only = Hash_2.create parameters error (0,0) in
   let error,mvbdu_project_abstract_away = Hash_2.create parameters error (0,0) in
   let error,mvbdu_merge = Hash_2.create parameters error (0,0) in
   let error,mvbdu_length = Hash_1.create parameters error 0 in
   let error,mvbdu_overwrite = Hash_2.create parameters error (0,0) in
+  let error,mvbdu_extensional_range_list = Hash_1.create parameters error 0 in
   let error,mvbdu_extensional_variables_list = Hash_1.create parameters error 0 in
   let error,mvbdu_extensional_association_list = Hash_1.create parameters error 0 in
   let error,mvbdu_variables_of = Hash_1.create parameters error 0 in
@@ -260,6 +285,7 @@ let init_data parameters error =
     boolean_mvbdu_nis_implied = mvbdu_nis_implied;
     boolean_mvbdu_nimply = mvbdu_nimply;
     boolean_mvbdu_redefine = mvbdu_redefine;
+    boolean_mvbdu_redefine_range = mvbdu_redefine_range;
     boolean_mvbdu_monotonicaly_rename = mvbdu_rename;
     boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
     boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
@@ -268,6 +294,8 @@ let init_data parameters error =
     boolean_mvbdu_overwrite_association_list = mvbdu_overwrite;
     boolean_mvbdu_extensional_description_of_variables_list = mvbdu_extensional_variables_list;
     boolean_mvbdu_extensional_description_of_association_list = mvbdu_extensional_association_list;
+    boolean_mvbdu_extensional_description_of_range_list =
+      mvbdu_extensional_range_list;
     boolean_mvbdu_variables_of_mvbdu = mvbdu_variables_of;
     boolean_mvbdu_extensional_description_of_mvbdu = mvbdu_extensional_description_of_mvbdu;
   }
@@ -276,6 +304,7 @@ let init_remanent parameters error =
   let error,data = init_data parameters error in
   error,{
     Memo_sig.data = data;
+    Memo_sig.range_list_dictionary = D_Range_list_skeleton.init () ;
     Memo_sig.mvbdu_dictionary = D_mvbdu_skeleton.init ();
     Memo_sig.association_list_dictionary = D_Association_list_skeleton.init ();
     Memo_sig.variables_list_dictionary = D_Variables_list_skeleton.init ();
@@ -286,7 +315,7 @@ let init_remanent parameters error =
 
 let mvbdu_allocate =
   (fun parameters error b c d e
-    (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) ->
+    (old_handler:('a,mvbdu_dic,association_list_dic,range_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) ->
     let old_dictionary = old_handler.Memo_sig.mvbdu_dictionary in
     let error,output =
       D_mvbdu_skeleton.allocate
@@ -623,7 +652,7 @@ let boolean_mvbdu_nsnd parameters =
        (fun x -> x.Memo_sig.data.boolean_mvbdu_nsnd)
        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nsnd = x}}))
 
-let gen_list_allocate allocate get_dic update parameters error b c d e (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) =
+let gen_list_allocate allocate get_dic update parameters error b c d e (old_handler:('a,mvbdu_dic,association_list_dic,range_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) =
   let old_dictionary = get_dic old_handler in
   let error,output =
     allocate
@@ -650,6 +679,11 @@ let association_list_allocate parameters error b c d e old_handler =
   gen_list_allocate D_Association_list_skeleton.allocate (fun x -> x.Memo_sig.association_list_dictionary)
     List_core.update_association_dictionary
     parameters error b c d e old_handler
+
+let range_list_allocate parameters error b c d e old_handler =
+      gen_list_allocate D_Range_list_skeleton.allocate (fun x -> x.Memo_sig.range_list_dictionary)
+        List_core.update_range_dictionary
+        parameters error b c d e old_handler
 
 let variables_list_allocate parameters error b c d e old_handler =
   gen_list_allocate D_Variables_list_skeleton.allocate (fun x -> x.Memo_sig.variables_list_dictionary)
@@ -741,6 +775,7 @@ let memo_keep_head_only =
 
 let reset_handler error =
   {
+    Memo_sig.empty_range_list = error, memo_identity;
     Memo_sig.empty_association_list = error,memo_identity;
     Memo_sig.empty_variables_list = error,memo_identity;
     Memo_sig.leaf = (fun bool -> error,(fun error -> error, Mvbdu_sig.Leaf bool));
@@ -802,6 +837,19 @@ let redefine parameters error handler mvbdu_input list_input =
          h with Memo_sig.data =
                   {
                     h.Memo_sig.data with boolean_mvbdu_redefine = x
+                  }
+       })
+    parameters error handler mvbdu_input list_input
+
+let redefine_range parameters error handler mvbdu_input list_input =
+  gen_bin_mvbdu_list
+    Mvbdu_algebra.redefine_range
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine_range)
+    (fun x h ->
+       {
+         h with Memo_sig.data =
+                  {
+                    h.Memo_sig.data with boolean_mvbdu_redefine_range = x
                   }
        })
     parameters error handler mvbdu_input list_input
@@ -977,6 +1025,33 @@ let extensional_description_of_association_list _parameters error handler list =
                         }
        })
     error handler list
+
+let extensional_description_of_range_list _parameters error handler list =
+  List_algebra.extensional_with_asso
+    (fun parameter error handler x ->
+       let error, output =
+         Hash_1.unsafe_get parameter error
+           x.List_sig.id
+           handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_range_list
+       in
+       error, (handler, output))
+    (fun parameter error handler x output ->
+       let error, memo =
+         Hash_1.set parameter error
+           x.List_sig.id
+           output
+           handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_range_list
+       in
+       error,
+       {
+         handler with Memo_sig.data =
+                        {
+                          handler.Memo_sig.data with
+                          boolean_mvbdu_extensional_description_of_range_list = memo
+                        }
+       })
+    error handler list
+
 
 let rec variables_of_mvbdu parameters error handler mvbdu =
   match
@@ -1269,10 +1344,21 @@ let print_hash7 p error log =
     log
 
 let print_hash8 p error log =
+      Hash_1.print p error (fun a b c ->
+          let log = Remanent_parameters.get_logger a in
+          let prefix = a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
+          let () = Loggers.fprintf log "%s" prefix in
+          let () = List.iter (fun (a,(b,c)) -> Loggers.fprintf log "%i,[%i,%i];" a b c) c in
+          let () = Loggers.print_newline log in b)
+        log
+
+let print_hash9 p error log =
   Hash_1.print p error
     (fun a b c ->
        let log = Remanent_parameters.get_logger a in
-       let prefix = a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
+       let prefix =
+         a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix
+       in
        let () = Loggers.fprintf log "%s" prefix in
        let () =
          List.iter
@@ -1296,7 +1382,7 @@ let print_gen log parameters error (title,print_hash,l) =
     error l
 
 let print_memo (error:Exception.method_handler) handler parameters =
-  let error,l1,l2,l3,l4,l5,l6,l7,l8 = split_memo error handler in
+  let error,l1,l2,l3,l4,l5,l6,l7,l8,l9 = split_memo error handler in
   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   let error = print_gen stdout parameters error ("Print Hash_1",print_hash1,l1) in
@@ -1307,6 +1393,7 @@ let print_memo (error:Exception.method_handler) handler parameters =
   let error = print_gen stdout parameters error ("Print Hash_6",print_hash6,l6) in
   let error = print_gen stdout parameters error ("Print Hash_7",print_hash7,l7) in
   let error = print_gen stdout parameters error ("Print Hash_8",print_hash8,l8) in
+  let error = print_gen stdout parameters error ("Print Hash_9",print_hash9,l9) in
   error
 
 let last_entry parameter handler error =

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Dec 31 2016>
+   * Last modification: Time-stamp: <Jan 01 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -53,7 +53,7 @@ type bdu_analysis_static_pattern =
     (*pattern*)
     store_proj_bdu_test_restriction_pattern :
       (Covering_classes_type.cv_id *
-       Ckappa_sig.c_state Cckappa_sig.interval 
+       Ckappa_sig.c_state Cckappa_sig.interval
        Ckappa_sig.Site_map_and_set.Map.t) list
   }
 
@@ -608,25 +608,43 @@ let collect_remanent_triple parameters error store_remanent store_result =
 (*creation rules*)
 
 let build_bdu parameters handler error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
-  let error, handler, bdu_true =
-    Ckappa_sig.Views_bdu.mvbdu_true
-      parameters handler error
-  in
-  let error, handler, list_a =
-    Ckappa_sig.Views_bdu.build_association_list
-      parameters
-      handler
-      error
-      pair_list
-  in
-  let error, handler, bdu_result =
-    Ckappa_sig.Views_bdu.mvbdu_redefine
-      parameters handler error bdu_true list_a
-  in
-  error, handler, bdu_result
+    Ckappa_sig.Views_bdu.mvbdu_of_association_list
+      parameters handler error pair_list
 
-let build_bdu_range parameters handler error pair_list =
-  let error, handler, bdu_true =
+let build_bdu_range parameters handler error range_list =
+  (*let () =
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "BUILD BDU RANGE:"
+    in*)
+  let range_list =
+    List.rev_map
+      (fun (a,b) -> (a,(b.Cckappa_sig.min,b.Cckappa_sig.max)))
+      (List.rev range_list)
+  in
+  (*let () =
+    List.iter
+      (fun (a,(b,c)) ->
+         Loggers.fprintf
+           (Remanent_parameters.get_logger parameters)
+           "%i:[%i,%i];" (Ckappa_sig.int_of_site_name a)
+           (Ckappa_sig.int_of_state_index b)
+           (Ckappa_sig.int_of_state_index c))
+      range_list
+    in*)
+  let error, handler, mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_of_range_list
+      parameters handler error range_list
+  in
+  (*let () =
+    Ckappa_sig.Views_bdu.print
+      parameters mvbdu
+    in*)
+  error, handler, mvbdu
+
+
+
+(*let error, handler, bdu_true =
     Ckappa_sig.Views_bdu.mvbdu_true
       parameters handler error
   in
@@ -662,7 +680,7 @@ let build_bdu_range parameters handler error pair_list =
          parameters handler error
          mvbdu mvbdu_aux)
     (error, handler, bdu_true)
-    pair_list
+    pair_list*)
 
 
 

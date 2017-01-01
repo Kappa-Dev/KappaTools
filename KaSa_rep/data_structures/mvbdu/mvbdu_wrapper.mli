@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jul 02 2016>
+   * Last modification: Time-stamp: <Dec 31 2016>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -17,11 +17,13 @@ module type Mvbdu =
   sig
     type key
     type value
-    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.range_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu
+    type hconsed_range_list
     type hconsed_association_list
     type hconsed_variables_list
     type hconsed_renaming_list
+
 
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
@@ -55,11 +57,16 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
+    val mvbdu_redefine_range: (mvbdu,hconsed_range_list,mvbdu) binary
     val mvbdu_subseteq: (mvbdu,mvbdu,bool) binary
     val mvbdu_of_hconsed_asso: (hconsed_association_list,mvbdu) unary
     val mvbdu_of_association_list: ((key * value) list,mvbdu) unary
     val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
     val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
+    val mvbdu_of_hconsed_range: (hconsed_range_list,mvbdu) unary
+    val mvbdu_of_range_list: ((key * (value * value)) list,mvbdu) unary
+    val mvbdu_of_sorted_range_list: ((key * (value * value)) list,mvbdu) unary
+    val mvbdu_of_reverse_sorted_range_list: ((key * (value * value)) list,mvbdu) unary
 
     val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
@@ -74,6 +81,12 @@ module type Mvbdu =
     val build_sorted_association_list: ((key * value) list,hconsed_association_list) unary
     val build_reverse_sorted_association_list: ((key * value) list,hconsed_association_list) unary
     val empty_association_list : hconsed_association_list constant
+
+    val build_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+    val build_sorted_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+    val build_reverse_sorted_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+    val empty_range_list : hconsed_range_list constant
+
 
     val build_variables_list: (key list,hconsed_variables_list) unary
     val build_sorted_variables_list: (key list,hconsed_variables_list) unary
@@ -90,6 +103,7 @@ module type Mvbdu =
     val nbr_variables: (hconsed_variables_list,int) unary
     val extensional_of_variables_list: (hconsed_variables_list,key list) unary
     val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
+    val extensional_of_range_list: (hconsed_range_list,(key*(value*value)) list) unary
     val extensional_of_mvbdu: (mvbdu,(key * value) list list) unary
 
     val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
@@ -133,6 +147,7 @@ module type Mvbdu =
        (mvbdu,'data,'map,'map) ternary
 
     val last_entry: (unit,int) unary
+    val hash_of_range_list: hconsed_range_list -> int
     val hash_of_association_list: hconsed_association_list -> int
     val hash_of_variables_list: hconsed_variables_list -> int
 
@@ -144,7 +159,8 @@ module type Internalized_mvbdu =
     type value
     type mvbdu
     type handler =
-      (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+      (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.range_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+    type hconsed_range_list
     type hconsed_association_list
     type hconsed_variables_list
     type hconsed_renaming_list
@@ -177,11 +193,17 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_redefine:  mvbdu -> hconsed_association_list -> mvbdu
+    val mvbdu_redefine_range: mvbdu -> hconsed_range_list -> mvbdu
     val mvbdu_subseteq: mvbdu -> mvbdu -> bool
     val mvbdu_of_hconsed_asso: hconsed_association_list -> mvbdu
     val mvbdu_of_association_list: (key * value) list -> mvbdu
     val mvbdu_of_sorted_association_list: (key * value) list -> mvbdu
     val mvbdu_of_reverse_sorted_association_list: (key * value) list -> mvbdu
+    val mvbdu_of_hconsed_range: hconsed_range_list -> mvbdu
+    val mvbdu_of_range_list: (key * (value * value)) list -> mvbdu
+    val mvbdu_of_sorted_range_list: (key * (value * value)) list -> mvbdu
+    val mvbdu_of_reverse_sorted_range_list: (key * (value * value)) list -> mvbdu
+
 
     val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
@@ -194,6 +216,12 @@ module type Internalized_mvbdu =
     val build_sorted_association_list: (key * value) list -> hconsed_association_list
     val build_reverse_sorted_association_list: (key * value) list -> hconsed_association_list
     val empty_association_list : unit -> hconsed_association_list
+
+    val build_range_list: (key * (value * value)) list ->  hconsed_range_list
+    val build_sorted_range_list: (key * (value * value)) list -> hconsed_range_list
+    val build_reverse_sorted_range_list: (key * (value * value)) list -> hconsed_range_list
+    val empty_range_list : unit -> hconsed_range_list
+
     val build_variables_list: key list ->  hconsed_variables_list
     val build_sorted_variables_list: key list -> hconsed_variables_list
     val build_reverse_sorted_variables_list: key list -> hconsed_variables_list

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Nov 18 2016>
+   * Last modification: Time-stamp: <Jan 01 2017>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -16,20 +16,22 @@ module type Mvbdu =
 sig
   type key
   type value
-  type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+  type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.range_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
   type mvbdu
+  type hconsed_range_list
   type hconsed_association_list
   type hconsed_variables_list
   type hconsed_renaming_list
 
+
   type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
   type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
-  type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->  Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
-  type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
+  type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
+  type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
 
   val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
   val is_init: unit -> bool
-val equal: mvbdu -> mvbdu -> bool
+  val equal: mvbdu -> mvbdu -> bool
   val equal_with_logs: (mvbdu,mvbdu,bool) binary
   val mvbdu_false: mvbdu constant
   val mvbdu_true:  mvbdu constant
@@ -54,23 +56,37 @@ val equal: mvbdu -> mvbdu -> bool
   val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
   val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
   val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
+  val mvbdu_redefine_range: (mvbdu,hconsed_range_list,mvbdu) binary
   val mvbdu_subseteq: (mvbdu,mvbdu,bool) binary
   val mvbdu_of_hconsed_asso: (hconsed_association_list,mvbdu) unary
   val mvbdu_of_association_list: ((key * value) list,mvbdu) unary
   val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
   val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
+  val mvbdu_of_hconsed_range: (hconsed_range_list,mvbdu) unary
+  val mvbdu_of_range_list: ((key * (value * value)) list,mvbdu) unary
+  val mvbdu_of_sorted_range_list: ((key * (value * value)) list,mvbdu) unary
+  val mvbdu_of_reverse_sorted_range_list: ((key * (value * value)) list,mvbdu) unary
+
   val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
   val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
   val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
   val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
   val mvbdu_full_cartesian_decomposition: (mvbdu,mvbdu list) unary
+
   val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary
 
   val build_association_list: ((key * value) list,hconsed_association_list) unary
   val build_sorted_association_list: ((key * value) list,hconsed_association_list) unary
-  val build_reverse_sorted_association_list: ((key * value) list, hconsed_association_list) unary
+  val build_reverse_sorted_association_list: ((key * value) list,hconsed_association_list) unary
   val empty_association_list : hconsed_association_list constant
+
+  val build_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+  val build_sorted_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+  val build_reverse_sorted_range_list: ((key * (value * value)) list,hconsed_range_list) unary
+  val empty_range_list : hconsed_range_list constant
+
+
   val build_variables_list: (key list,hconsed_variables_list) unary
   val build_sorted_variables_list: (key list,hconsed_variables_list) unary
   val build_reverse_sorted_variables_list: (key list,hconsed_variables_list) unary
@@ -81,16 +97,13 @@ val equal: mvbdu -> mvbdu -> bool
   val build_reverse_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
   val empty_renaming_list : hconsed_renaming_list constant
 
-
   val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
   val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
-  val nbr_variables:
-    (hconsed_variables_list,int) unary
-
-  val extensional_of_variables_list: (hconsed_variables_list, key list) unary
+  val nbr_variables: (hconsed_variables_list,int) unary
+  val extensional_of_variables_list: (hconsed_variables_list,key list) unary
   val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
-  val extensional_of_mvbdu: (mvbdu, (key * value) list list) unary
-
+  val extensional_of_range_list: (hconsed_range_list,(key*(value*value)) list) unary
+  val extensional_of_mvbdu: (mvbdu,(key * value) list list) unary
 
   val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
 
@@ -98,7 +111,6 @@ val equal: mvbdu -> mvbdu -> bool
   val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
   val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
 
-  (*get set default join parameters handler error hash_consed_object data storage =*)
   val store_by_variables_list:
     ( Remanent_parameters_sig.parameters ->
       Exception.method_handler ->
@@ -133,25 +145,28 @@ val equal: mvbdu -> mvbdu -> bool
     ('data,'data,'data) binary ->
     (mvbdu,'data,'map,'map) ternary
 
-  val last_entry: (unit, int) unary
+  val last_entry: (unit,int) unary
+  val hash_of_range_list: hconsed_range_list -> int
   val hash_of_association_list: hconsed_association_list -> int
   val hash_of_variables_list: hconsed_variables_list -> int
-end
 
+end
 
 module type Internalized_mvbdu =
 sig
   type key
   type value
   type mvbdu
-  type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+  type handler =
+    (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.range_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+  type hconsed_range_list
   type hconsed_association_list
   type hconsed_variables_list
   type hconsed_renaming_list
 
   val init: Remanent_parameters_sig.parameters -> unit
   val import_handler: handler -> unit
-  val export_handler: Exception.method_handler -> Exception.method_handler * handler option
+  val export_handler: Exception.method_handler-> Exception.method_handler * handler option
   val is_init: unit -> bool
   val equal: mvbdu -> mvbdu -> bool
   val mvbdu_false: unit -> mvbdu
@@ -176,12 +191,18 @@ sig
   val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu
   val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
   val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
-  val mvbdu_redefine: mvbdu -> hconsed_association_list -> mvbdu
+  val mvbdu_redefine:  mvbdu -> hconsed_association_list -> mvbdu
+  val mvbdu_redefine_range: mvbdu -> hconsed_range_list -> mvbdu
   val mvbdu_subseteq: mvbdu -> mvbdu -> bool
   val mvbdu_of_hconsed_asso: hconsed_association_list -> mvbdu
-  val mvbdu_of_association_list: ((key * value) list) -> mvbdu
-  val mvbdu_of_sorted_association_list: ((key * value) list) -> mvbdu
-  val mvbdu_of_reverse_sorted_association_list: ((key * value) list) -> mvbdu
+  val mvbdu_of_association_list: (key * value) list -> mvbdu
+  val mvbdu_of_sorted_association_list: (key * value) list -> mvbdu
+  val mvbdu_of_reverse_sorted_association_list: (key * value) list -> mvbdu
+  val mvbdu_of_hconsed_range: hconsed_range_list -> mvbdu
+  val mvbdu_of_range_list: (key * (value * value)) list -> mvbdu
+  val mvbdu_of_sorted_range_list: (key * (value * value)) list -> mvbdu
+  val mvbdu_of_reverse_sorted_range_list: (key * (value * value)) list -> mvbdu
+
 
   val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
   val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
@@ -194,11 +215,17 @@ sig
   val build_sorted_association_list: (key * value) list -> hconsed_association_list
   val build_reverse_sorted_association_list: (key * value) list -> hconsed_association_list
   val empty_association_list : unit -> hconsed_association_list
-  val build_variables_list: key list -> hconsed_variables_list
+
+  val build_range_list: (key * (value * value)) list ->  hconsed_range_list
+  val build_sorted_range_list: (key * (value * value)) list -> hconsed_range_list
+  val build_reverse_sorted_range_list: (key * (value * value)) list -> hconsed_range_list
+  val empty_range_list : unit -> hconsed_range_list
+
+  val build_variables_list: key list ->  hconsed_variables_list
   val build_sorted_variables_list: key list -> hconsed_variables_list
   val build_reverse_sorted_variables_list: key list -> hconsed_variables_list
   val empty_variables_list : unit -> hconsed_variables_list
-  val build_renaming_list: (key * key) list -> hconsed_renaming_list
+  val build_renaming_list: (key * key) list ->  hconsed_renaming_list
   val build_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
   val build_reverse_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
   val empty_renaming_list : unit -> hconsed_renaming_list
@@ -206,12 +233,9 @@ sig
   val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
   val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
   val nbr_variables: hconsed_variables_list -> int
-
   val extensional_of_variables_list: hconsed_variables_list -> key list
   val extensional_of_association_list: hconsed_association_list -> (key*value) list
   val extensional_of_mvbdu: mvbdu -> (key * value) list list
-
-
 
   val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 
@@ -220,7 +244,6 @@ sig
   val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
   val hash_of_association_list: hconsed_association_list -> int
   val hash_of_variables_list: hconsed_variables_list -> int
-
 
 end
 
@@ -232,8 +255,9 @@ module Make (M:Nul)  =
   (struct
     type key = int
     type value = int
-    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.range_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu = bool Mvbdu_sig.mvbdu
+    type hconsed_range_list = (value * value) List_sig.list
     type hconsed_association_list = value List_sig.list
     type hconsed_variables_list = unit List_sig.list
     type hconsed_renaming_list = key List_sig.list
@@ -303,10 +327,20 @@ module Make (M:Nul)  =
         f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a
       in a,b,c
 
+    let lift1bisbis _string f parameters handler error a =
+        let a,(b,c) =
+          f (Boolean_mvbdu.range_list_allocate parameters) error parameters handler a
+        in a,b,c
+
     let lift1ter _string f parameters handler error a =
       let a,(b,c) =
         f (Boolean_mvbdu.association_list_allocate parameters) parameters error handler a
       in a,b,c
+
+      let lift1terter _string f parameters handler error a =
+        let a,(b,c) =
+          f (Boolean_mvbdu.range_list_allocate parameters) parameters error handler a
+        in a,b,c
 
     let liftvbis _string f parameters handler error a =
       let a,(b,c) =
@@ -448,6 +482,8 @@ module Make (M:Nul)  =
     let mvbdu_nfst = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nfst
     let mvbdu_nsnd = lift2 __POS__ Boolean_mvbdu.boolean_mvbdu_nsnd
     let mvbdu_redefine = lift2bis __POS__ Boolean_mvbdu.redefine
+    let mvbdu_redefine_range = lift2bis __POS__ Boolean_mvbdu.redefine_range
+
     let mvbdu_rename = lift2bis __POS__ Boolean_mvbdu.monotonicaly_rename
     let mvbdu_project_keep_only = lift2ter __POS__ Boolean_mvbdu.project_keep_only
     let mvbdu_project_abstract_away = lift2ter __POS__ Boolean_mvbdu.project_abstract_away
@@ -460,6 +496,17 @@ module Make (M:Nul)  =
     let build_reverse_sorted_association_list =
       lift1ter __POS__ List_algebra.build_reversed_sorted_list
 
+    let build_range_list = lift1bisbis __POS__ List_algebra.build_list
+
+    let build_sorted_range_list =
+      lift1terter __POS__ List_algebra.build_sorted_list
+
+    let build_reverse_sorted_range_list =
+      lift1terter __POS__ List_algebra.build_reversed_sorted_list
+
+
+    let empty_range_list parameter handler error =
+      build_range_list parameter handler error []
     let empty_association_list parameter handler error = build_association_list parameter handler error []
 
     let mvbdu_subseteq parameter handler error mvbdu1 mvbdu2 =
@@ -470,14 +517,36 @@ module Make (M:Nul)  =
       let error, handler, mvbdu_true = mvbdu_true parameter handler error in
       mvbdu_redefine parameter handler error mvbdu_true asso
 
+    let mvbdu_of_hconsed_range parameter handler error asso =
+      let error, handler, mvbdu_true = mvbdu_true parameter handler error in
+      mvbdu_redefine_range parameter handler error mvbdu_true asso
+
     let mvbdu_of_asso_gen f parameter handler error asso =
       let error, handler, hconsed_list = f parameter handler error asso in
       mvbdu_of_hconsed_asso parameter handler error hconsed_list
 
-    let mvbdu_of_association_list = mvbdu_of_asso_gen build_association_list
-    let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen build_sorted_association_list
-    let mvbdu_of_reverse_sorted_association_list = mvbdu_of_asso_gen build_reverse_sorted_association_list
+    let mvbdu_of_range_gen f parameter handler error asso =
+      let error, handler, hconsed_list = f parameter handler error asso in
+      mvbdu_of_hconsed_range parameter handler error hconsed_list
 
+    let mvbdu_of_hconsed_range parameter handler error asso =
+      let error, handler, mvbdu_true = mvbdu_true parameter handler error in
+      mvbdu_redefine_range parameter handler error mvbdu_true asso
+
+
+    let mvbdu_of_association_list = mvbdu_of_asso_gen build_association_list
+
+    let mvbdu_of_range_list =
+      mvbdu_of_range_gen
+        build_range_list
+
+
+    let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen build_sorted_association_list
+    let mvbdu_of_sorted_range_list = mvbdu_of_range_gen
+        build_sorted_range_list
+    let mvbdu_of_reverse_sorted_association_list = mvbdu_of_asso_gen build_reverse_sorted_association_list
+    let mvbdu_of_reverse_sorted_range_list = mvbdu_of_range_gen
+        build_reverse_sorted_range_list
 
     let build_renaming_list = build_association_list
     let build_sorted_renaming_list = build_sorted_association_list
@@ -505,6 +574,11 @@ module Make (M:Nul)  =
       lift1five
         __POS__
         Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
+
+    let extensional_of_range_list parameters handler error l =
+          lift1five
+            __POS__
+            Boolean_mvbdu.extensional_description_of_range_list parameters handler error l
 
     let extensional_of_variables_list parameters handler error l =
       lift1five
@@ -620,6 +694,7 @@ module Make (M:Nul)  =
 
     let hash_of_association_list x = List_core.id_of_list x
     let hash_of_variables_list x = List_core.id_of_list x
+    let hash_of_range_list x = List_core.id_of_list x
 
   end: Mvbdu with type key = int and type value = int)
 
@@ -636,6 +711,7 @@ module Internalize(M:Mvbdu
     type hconsed_association_list = Mvbdu.hconsed_association_list
     type hconsed_variables_list = Mvbdu.hconsed_variables_list
     type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+    type hconsed_range_list = Mvbdu.hconsed_range_list
 
     type handler = Mvbdu.handler
     let handler = ref None
@@ -743,6 +819,7 @@ module Internalize(M:Mvbdu
     let mvbdu_nrev_imply = lift_binary __POS__ M.mvbdu_nrev_imply
     let mvbdu_equiv = lift_binary __POS__ M.mvbdu_equiv
     let mvbdu_redefine = lift_binary __POS__ M.mvbdu_redefine
+    let mvbdu_redefine_range = lift_binary __POS__ M.mvbdu_redefine_range
     let mvbdu_rename = lift_binary __POS__ Mvbdu.mvbdu_rename
     let mvbdu_project_keep_only = lift_binary __POS__ M.mvbdu_project_keep_only
     let mvbdu_project_abstract_away =
@@ -762,6 +839,12 @@ module Internalize(M:Mvbdu
       lift_unary __POS__ M.build_reverse_sorted_renaming_list
     let empty_renaming_list () = build_renaming_list []
 
+    let build_range_list = lift_unary __POS__ M.build_range_list
+    let build_sorted_range_list =
+      lift_unary __POS__ M.build_sorted_range_list
+    let build_reverse_sorted_range_list =
+      lift_unary __POS__ M.build_reverse_sorted_range_list
+    let empty_range_list () = build_range_list []
 
     let mvbdu_subseteq mvbdu1 mvbdu2 =
       equal (mvbdu_or mvbdu1 mvbdu2) mvbdu2
@@ -772,6 +855,15 @@ module Internalize(M:Mvbdu
     let mvbdu_of_association_list = mvbdu_of_asso_gen (build_association_list)
     let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen (build_sorted_association_list)
     let mvbdu_of_reverse_sorted_association_list = mvbdu_of_asso_gen (build_reverse_sorted_association_list)
+    let mvbdu_of_range_gen f asso =
+      mvbdu_redefine_range (mvbdu_true ()) (f asso)
+
+    let mvbdu_of_hconsed_range = mvbdu_of_range_gen (fun x -> x)
+    let mvbdu_of_range_list = mvbdu_of_range_gen (build_range_list)
+    let mvbdu_of_sorted_range_list = mvbdu_of_range_gen (build_sorted_range_list)
+    let mvbdu_of_reverse_sorted_range_list = mvbdu_of_range_gen (build_reverse_sorted_range_list)
+
+
     let build_variables_list = lift_unary __POS__ M.build_variables_list
     let build_sorted_variables_list =
       lift_unary __POS__ M.build_sorted_variables_list
@@ -827,10 +919,14 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
     type key = Mvbdu.key
     type value = Mvbdu.value
     type handler = Mvbdu.handler
+
     type mvbdu = Mvbdu.mvbdu
+
     type hconsed_association_list = Mvbdu.hconsed_association_list
     type hconsed_variables_list = Mvbdu.hconsed_variables_list
     type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+    type hconsed_range_list = Mvbdu.hconsed_range_list
+
     type 'output constant = 'output Mvbdu.constant
     type ('input,'output) unary =  ('input,'output) Mvbdu.unary
     type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
@@ -890,6 +986,7 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
 
     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
     let mvbdu_redefine = M.mvbdu_redefine
+    let mvbdu_redefine_range = M.mvbdu_redefine_range
     let mvbdu_rename = M.mvbdu_rename
     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
@@ -902,16 +999,23 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
     let build_renaming_list = M.build_renaming_list
     let build_sorted_renaming_list = M.build_sorted_renaming_list
     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
-
+    let build_reverse_sorted_range_list =
+      M.build_reverse_sorted_range_list
+    let build_range_list =
+        M.build_range_list
+    let build_sorted_range_list =
+          M.build_sorted_range_list
     let empty_association_list = M.empty_association_list
     let empty_variables_list = M.empty_variables_list
     let empty_renaming_list = M.empty_renaming_list
+    let empty_range_list = M.empty_range_list
 
     let merge_variables_lists = M.merge_variables_lists
     let overwrite_association_lists = M.overwrite_association_lists
     let nbr_variables = M.nbr_variables
 
     let extensional_of_association_list = M.extensional_of_association_list
+    let extensional_of_range_list = M.extensional_of_range_list
     let extensional_of_variables_list = M.extensional_of_variables_list
     let extensional_of_mvbdu = M.extensional_of_mvbdu
     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
@@ -921,6 +1025,11 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
     let mvbdu_of_association_list = M.mvbdu_of_association_list
     let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
+    let mvbdu_of_range_list = M.mvbdu_of_range_list
+    let mvbdu_of_reverse_sorted_range_list =
+      M.mvbdu_of_reverse_sorted_range_list
+    let mvbdu_of_sorted_range_list = M.mvbdu_of_sorted_range_list
+    let mvbdu_of_hconsed_range = M.mvbdu_of_hconsed_range
 
     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth
@@ -954,6 +1063,7 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
     let store_by_mvbdu = M.store_by_mvbdu
     let hash_of_association_list = M.hash_of_association_list
     let hash_of_variables_list = M.hash_of_variables_list
+    let hash_of_range_list = M.hash_of_range_list
 
   end:Mvbdu with type key = int and type value = int)
 
@@ -967,6 +1077,7 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
     type hconsed_association_list = Mvbdu.hconsed_association_list
     type hconsed_variables_list = Mvbdu.hconsed_variables_list
     type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+    type hconsed_range_list = Mvbdu.hconsed_range_list
     type handler = Mvbdu.handler
 
     let import_handler = Mvbdu.import_handler
@@ -1004,13 +1115,21 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
     let build_renaming_list = M.build_renaming_list
     let build_sorted_renaming_list = M.build_sorted_renaming_list
     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
+    let build_range_list = M.build_range_list
+    let build_sorted_range_list = M.build_sorted_range_list
+    let build_reverse_sorted_range_list = M.build_reverse_sorted_range_list
     let mvbdu_redefine = M.mvbdu_redefine
+    let mvbdu_redefine_range = M.mvbdu_redefine_range
     let mvbdu_subseteq = M.mvbdu_subseteq
     let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
     let mvbdu_of_association_list = M.mvbdu_of_association_list
     let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
-
+    let mvbdu_of_reverse_sorted_range_list = M.mvbdu_of_reverse_sorted_range_list
+    let mvbdu_of_sorted_range_list =
+      M.mvbdu_of_sorted_range_list
+    let mvbdu_of_range_list = M.mvbdu_of_range_list
+    let mvbdu_of_hconsed_range = M.mvbdu_of_hconsed_range
     let mvbdu_rename = M.mvbdu_rename
     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
@@ -1020,6 +1139,7 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
     let empty_renaming_list = M.empty_renaming_list
     let empty_variables_list = M.empty_variables_list
     let empty_association_list = M.empty_association_list
+    let empty_range_list = M.empty_range_list
     let merge_variables_lists = M.merge_variables_lists
     let overwrite_association_lists = M.overwrite_association_lists
     let print = M.print

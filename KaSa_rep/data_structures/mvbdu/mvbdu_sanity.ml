@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Jan 01 2017>
    * *
    * This library provides primitives to check that set of finite maps are well-formed
    *
@@ -73,7 +73,7 @@ let rec safety_compare_nodes_working_list working_list =
 let safety_compare_nodes a b = safety_compare_nodes_working_list
   [a.Mvbdu_sig.value, b.Mvbdu_sig.value]
 
-let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.f) error working_list handler =
+let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c,'d,'e) Sanity_test_sig.f) error working_list handler =
   match working_list with
     | [] -> error,true,handler
     | mvbdu::tail ->
@@ -105,7 +105,7 @@ let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c,'
           end
 
 let safety_check_maximal_sharing
-    (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.f) error mvbdu =
+    (allocate_uniquely:('a,'b,'c,'d,'e) Sanity_test_sig.f) error mvbdu =
   safety_check_maximal_sharing_working_list allocate_uniquely error [mvbdu]
 
 let rec safety_check_maximaly_compressed_working_list error working_list =
@@ -185,7 +185,7 @@ let print_flag log bool =
   else Printf.fprintf log "No"
 
 let sanity_check
-    (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.f) error _log
+    (allocate_uniquely:('a,'b,'c,'d,'e) Sanity_test_sig.f) error _log
     handler mvbdu =
   let error,bool1 = safety_check_increasing_nodes error mvbdu in
   let error,bool2,dictionary =

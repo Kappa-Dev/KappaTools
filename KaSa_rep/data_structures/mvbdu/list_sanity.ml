@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Aug 05 2016>
+   * Last modification: Time-stamp: <Jan 01 2017>
    * *
    * This library provides primitives to check consistency of accociation lists
    *
@@ -23,7 +23,7 @@ let rec safety_equal_list list_x list_y  =
     | List_sig.Empty,_ | _,List_sig.Empty -> false
 
 
-let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g)
+let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d,'e) Sanity_test_sig.g)
     error list handler =
   let list_val = list.List_sig.value in
   match list_val with
@@ -83,7 +83,7 @@ let print_flag log bool =
   then Printf.fprintf log "Yes"
   else Printf.fprintf log "No"
 
-let sanity_check (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g) error _log handler mvbdu =
+let sanity_check (allocate_uniquely:('a,'b,'c,'d,'e) Sanity_test_sig.g) error _log handler mvbdu =
   let error,bool1 =
     safety_check_increasing_nodes
       error

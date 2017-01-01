@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 08/03/2010
-    * Last modification: Time-stamp: <Aug 05 2016>
+    * Last modification: Time-stamp: <Dec 31 2016>
     * *
     * This library provides primitives to deal associations list
     *
@@ -45,6 +45,13 @@ let update_association_dictionary handler dictionary =
     handler
   else
     {handler with Memo_sig.association_list_dictionary = dictionary}
+
+let update_range_dictionary handler dictionary =
+  if handler.Memo_sig.range_list_dictionary == dictionary
+  then
+    handler
+  else
+    {handler with Memo_sig.range_list_dictionary = dictionary}
 
 let update_variables_dictionary handler dictionary =
   if handler.Memo_sig.variables_list_dictionary == dictionary
