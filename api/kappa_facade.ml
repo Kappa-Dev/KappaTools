@@ -509,45 +509,17 @@ let perturbation
        if t.is_running then
          Lwt.return (`Error (Api_data.api_message_errors msg_process_not_paused))
        else
-         let cc_preenv =
-           Pattern.PreEnv.of_env (Environment.domain t.env) in
-         let contact_map' = Array.map Array.copy t.contact_map in
-         let e',_ =
-           Tools.list_fold_right_map
-             (LKappa.modif_expr_of_ast
-                (Environment.signatures t.env)
-                (Environment.tokens_finder t.env)
-                (Environment.algs_finder t.env) contact_map')
-             (KappaParser.effect_list KappaLexer.token lexbuf) [] in
-         if Tools.array_fold_lefti
-             (fun n -> Tools.array_fold_lefti
-                 (fun s b x -> b || x != t.contact_map.(n).(s)))
-             false contact_map' then
-           Lwt.fail (ExceptionDefn.Malformed_Decl
-                       (Location.dummy_annot "Creating new link type is forbidden"))
-         else
-           let cc_preenv', e'' = Eval.compile_modifications_no_track
-               t.contact_map cc_preenv e' in
-           let graph' =
-             if cc_preenv == cc_preenv' then t.graph
-             else
-               let domain',_ =
-                 Pattern.PreEnv.finalize ~max_sharing:false cc_preenv' in
-               let () =
-                 t.env <- Environment.new_domain domain' t.env in
-               List.fold_left
-                 (Rule_interpreter.incorporate_extra_pattern domain')
-                 t.graph (Primitives.extract_connected_components_modifications e'') in
-           let _,graph'',state' =
-             List.fold_left
-               (fun (stop,graph',state' as acc) x ->
-                  if stop then acc else
-                    State_interpreter.do_modification
-                      ~outputs:(outputs t) t.env t.counter graph' state' x)
-               (false,graph',t.state) e'' in
-           let () = t.graph <- graph'' in
-           let () = t.state <- state' in
-           Lwt.return (`Ok ()))
+         Lwt.wrap2 KappaParser.effect_list KappaLexer.token lexbuf >>=
+         fun e ->
+         Lwt.wrap6
+           (Evaluator.do_interactive_directives
+              ~outputs:(outputs t) ~max_sharing:false)
+           t.contact_map t.env t.counter t.graph t.state e >>=
+         fun (env',(_,graph'',state')) ->
+         let () = t.env <- env' in
+         let () = t.graph <- graph'' in
+         let () = t.state <- state' in
+         Lwt.return (`Ok ()))
     (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
 
 let continue
