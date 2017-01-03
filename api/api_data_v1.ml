@@ -14,11 +14,10 @@ let plot_pg_store
       Pp_svg.legend = Array.of_list plot.Api_types_v1_j.legend;
       Pp_svg.points =
         List.map
-          (fun (observable : Api_types_v1_j.observable) ->
-             (observable.Api_types_v1_j.observation_time ,
-              Tools.array_map_of_list
-                (function Some x -> Nbr.F x | None -> Nbr.F nan)
-                observable.Api_types_v1_j.observation_values))
+          (fun observable ->
+             Tools.array_map_of_list
+               (function Some x -> Nbr.F x | None -> Nbr.F nan)
+               observable)
           plot.Api_types_v1_j.time_series
     }
 
@@ -31,13 +30,9 @@ let plot_values
         separator
         ("time"::plot.Api_types_v1_j.legend))::
      List.rev_map
-       (fun (observable : Api_types_v1_j.observable) ->
-          Format.asprintf "@[<h>%a@]"
+       (Format.asprintf "@[<h>%a@]"
             (Pp.list (fun f -> Format.pp_print_string f separator)
-               (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e")))
-            (Some observable.Api_types_v1_j.observation_time
-             ::observable.Api_types_v1_j.observation_values)
-       )
+               (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e"))))
     plot.Api_types_v1_j.time_series)
 
 let api_file_line (file_line : Data.file_line) : Api_types_v1_j.file_line =
@@ -391,14 +386,7 @@ let api_files (f : Api_types_j.file_line) : Api_types_v1_j.file_line =
 
 let api_plot (p) =
   { Api_types_v1_j.legend = p.Api_types_j.plot_legend ;
-    Api_types_v1_j.time_series =
-      List.map
-        (fun t ->
-           { Api_types_v1_j.observation_time =
-               t.Api_types_j.observable_time ;
-             Api_types_v1_j.observation_values =
-               t.Api_types_j.observable_values ; })
-        p.Api_types_j.plot_time_series;
+    Api_types_v1_j.time_series = p.Api_types_j.plot_time_series;
   }
 
 let api_snapshot (snapshot : Api_types_j.snapshot) : Api_types_v1_j.snapshot =

@@ -79,11 +79,12 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 </g>
 
 <g id="legend">
+  
   <text x="785" y="10">'fS(s~o)'</text>
   <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
   <text x="785" y="25">'fS(s~x)'</text>
   <use xlink:href="#cross" style="color:purple" x="793" y="25"/>
-  </g>
+</g>
 
 <g id="data">
 <g id="data_0" style="color:blue">
@@ -661,6 +662,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <title>'fS(s~x)' t=0.84 v=5</title></use>
   <use xlink:href="#cross" x="70.000000" y="575.000000">
   <title>'fS(s~x)' t=0 v=0</title></use>
-  </g></g>
+  </g>
+</g>
 
 </svg>

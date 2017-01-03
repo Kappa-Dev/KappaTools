@@ -23,6 +23,9 @@ val one : t
 val is_strictly_positive : t -> bool
 val print : Format.formatter -> t -> unit
 
+val pretty_print : Format.formatter -> t -> unit
+(** Floats are compactly printed *)
+
 val print_option : Format.formatter -> t -> unit
 (** Prints nothing in case of infinity or Not a Number *)
 

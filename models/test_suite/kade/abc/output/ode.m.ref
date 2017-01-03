@@ -21,7 +21,7 @@ period_t_point=0.100000;
 global nodevar
 nodevar=11;
 nvar=11;
-nobs=4;
+nobs=5;
 nrules=6;
 
 global var
@@ -110,16 +110,16 @@ end
 filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE ../../cflows/abc/abc.ka -d output -l 1 -p 0.1\n')
-fprintf(fid,'# t')
-fprintf(fid,',|AB|')
-fprintf(fid,',|Cuu|')
-fprintf(fid,',|Cpu|')
-fprintf(fid,',|Cpp|')
+fprintf(fid,'# ')
+fprintf(fid,'[T],')
+fprintf(fid,'|AB|,')
+fprintf(fid,'|Cuu|,')
+fprintf(fid,'|Cpu|,')
+fprintf(fid,'|Cpp|,')
 fprintf(fid,'\n')
 for j=1:n_points
-    fprintf(fid,'%f',t(j));
     for i=1:nobs
-        fprintf(fid,',%f',y(j,i));
+        fprintf(fid,'%f,',y(j,i));
     end
     fprintf(fid,'\n');
 end
@@ -266,10 +266,11 @@ var(6)=(1*((y(7)+y(8))+y(9)));
 var(5)=(1*((y(1)+y(6))+y(5)));
 var(4)=(1*((y(4)+y(5))+y(9)));
 
-obs(1)=var(4);
-obs(2)=var(5);
-obs(3)=var(6);
-obs(4)=var(7);
+obs(1)=t;
+obs(2)=var(4);
+obs(3)=var(5);
+obs(4)=var(6);
+obs(5)=var(7);
 
 end
 

@@ -3,7 +3,7 @@ type store = {
   title: string;
   descr: string;
   legend: string array;
-  mutable points: (float * Nbr.t array) list;
+  mutable points: Nbr.t array list;
 }
 
 let new_file name =
@@ -43,8 +43,8 @@ let style f =
     Format.fprintf f "@[<hv 2>#data use:hover {@,fill:green;@,}@]@," in*)
   Format.fprintf f "]]>@,</style>@,@,"
 
-let colors = [|"blue";"purple";"green";"peru"|]
-let styles = [|"plus";"cross";"point"|]
+let colors = [|"peru";"blue";"purple";"green"|]
+let styles = [|"point";"plus";"cross"|]
 let defs f =
   let () = Format.fprintf f "<defs>@," in
   let () = Format.fprintf
@@ -60,35 +60,37 @@ let defs f =
   Format.fprintf f "</defs>@,@,"
 
 let legend w f a =
-  let pp_line i f s =
-    let () = Format.fprintf f "@[<h><text x=\"%i\" y=\"%i\">%s</text>@]@,"
-        (w-15) (10+i*15) s in
-    Format.fprintf
-      f "<use xlink:href=\"#%s\" style=\"color:%s\" x=\"%i\" y=\"%i\"/>"
-      styles.(i mod Array.length styles) colors.(i mod Array.length colors)
-      (w-7) (10+i*15) in
-  Format.fprintf f "@[<hv 2><g id=\"legend\">@,%a@]</g>@,@,"
-    (Pp.array ~trailing:Pp.cut Pp.cut pp_line) a
+  let pp_line i' f s =
+    if i' > 0 then
+      let i = pred i' in
+      let () = Format.fprintf f "@[<h><text x=\"%i\" y=\"%i\">%s</text>@]@,"
+          (w-15) (10+i*15) s in
+      Format.fprintf
+        f "<use xlink:href=\"#%s\" style=\"color:%s\" x=\"%i\" y=\"%i\"/>"
+        styles.(i' mod Array.length styles) colors.(i' mod Array.length colors)
+        (w-7) (10+i*15) in
+  Format.fprintf f "@[<hv 2><g id=\"legend\">@,%a@]@,</g>@,@,"
+    (Pp.array Pp.cut pp_line) a
 
 let get_limits l =
-  let dummy_values = (0.,0.,0.) in
+  let dummy_values = (0.,-1.,1.) in
   let rec aux t_max va_min va_max = function
     | [] ->
        if va_min = va_max then
          t_max,va_min -. 1., va_max +. 1.
        else
          t_max,min va_min 0.,va_max
-    | (t,va)::q ->
-      aux (max t t_max)
-        (Array.fold_left (fun a x -> match Nbr.to_float x with
-             | Some x -> min a x
-             | None -> a) va_min va)
-        (Array.fold_left (fun a x -> match Nbr.to_float x with
-             | Some x -> max a x
-             | None -> a) va_max va) q in
+    | va::q ->
+      aux (max (Tools.unsome 0. (Nbr.to_float va.(0))) t_max)
+        (Tools.array_fold_lefti (fun i a x -> match Nbr.to_float x with
+             | Some x when i <> 0 -> min a x
+             | _ -> a) va_min va)
+        (Tools.array_fold_lefti (fun i a x -> match Nbr.to_float x with
+             | Some x when i <> 0 -> max a x
+             | _ -> a) va_max va) q in
   match l with
   | [] -> dummy_values
-  | (_,va)::_ when Array.length va = 0 -> dummy_values
+  | va::_ when Array.length va < 2 -> dummy_values
   | l -> aux 0. infinity 0. l
 
 let draw_in_data ((t_max,va_min,va_max),(zero_w,zero_h,draw_w,draw_h)) =
@@ -101,7 +103,7 @@ let draw_in_data ((t_max,va_min,va_max),(zero_w,zero_h,draw_w,draw_h)) =
     match Nbr.to_float y with
     | None -> ()
     | Some y' ->
-      f (zero_w' +. ((x *. draw_w') /. t_max))
+      f (zero_w' +. (((Tools.unsome 0. @@ Nbr.to_float x) *. draw_w') /. t_max))
       (zero_h' -. (((y' -. va_min) *. draw_h') /. delta_va))
 
 let graduation_step draw_l min_grad_l va_min va_max =
@@ -145,7 +147,7 @@ let axis (w,h) (b_op,b_w,b_h) f l =
                  (x -. 8.) y v in
              Format.fprintf f "<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\"/>@,"
                (x -. 5.) y (x +. 5.) y)
-           0. (Nbr.F v)) (succ nb_h) in
+           Nbr.zero (Nbr.F v)) (succ nb_h) in
   let () =
     Format.fprintf f "@]</g>@,@[<hv 2><g id=\"axis_t\">@," in
   let () = Format.fprintf f "<title>Time (arbitrary unit)</title>@," in
@@ -162,7 +164,7 @@ let axis (w,h) (b_op,b_w,b_h) f l =
              Format.fprintf
                f "<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\"/>@,"
                x (y -. 5.) x (y +. 5.))
-           v (Nbr.F va_min')) (succ nb_w) in
+           (Nbr.F v) (Nbr.F va_min')) (succ nb_w) in
   let () = Format.fprintf f "@]</g>@,</g>@,@," in
   draw_fun
 
@@ -173,19 +175,20 @@ let data draw_fun l f p =
           Format.fprintf
             f "@[<><use xlink:href=\"#%s\" x=\"%f\" y=\"%f\">@,"
             styles.(i mod Array.length styles) x y in
-        Format.fprintf f "<title>%s t=%g v=%a</title>@,</use>@]"
-          s t Nbr.print va
+        Format.fprintf f "<title>%s t=%a v=%a</title>@,</use>@]@,"
+          s Nbr.pretty_print t Nbr.print va
       ) t va in
   Format.fprintf
     f "<g id=\"data\">@,%a</g>@,@,"
-    (Pp.array Pp.cut
+    (Pp.array Pp.empty
        (fun i f s ->
-          Format.fprintf
-            f "@[<hv 2><g id=\"data_%i\" style=\"color:%s\">@,%a@]</g>"
-            i colors.(i mod Array.length colors)
-            (Pp.list ~trailing:Pp.cut Pp.cut
-               (fun f (t,e) -> one_point s t i f e.(i)))
-            p)) l
+          if i > 0 then
+            Format.fprintf
+              f "@[<hv 2><g id=\"data_%i\" style=\"color:%s\">@,%a@]</g>@,"
+              (pred i) colors.(i mod Array.length colors)
+              (Pp.list Pp.empty
+                 (fun f e -> one_point s e.(0) i f e.(i)))
+              p)) l
 
 let draw (w,h as size) border f s =
   let () = Format.fprintf

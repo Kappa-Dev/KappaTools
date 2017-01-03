@@ -21,7 +21,7 @@ period_t_point=0.100000;
 global nodevar
 nodevar=3;
 nvar=7;
-nobs=2;
+nobs=3;
 nrules=3;
 
 global var
@@ -105,14 +105,14 @@ end
 filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE tokens4.ka -d output -l 1 -p 0.1\n')
-fprintf(fid,'# t')
-fprintf(fid,',|t|')
-fprintf(fid,',|T|')
+fprintf(fid,'# ')
+fprintf(fid,'[T],')
+fprintf(fid,'|t|,')
+fprintf(fid,'|T|,')
 fprintf(fid,'\n')
 for j=1:n_points
-    fprintf(fid,'%f',t(j));
     for i=1:nobs
-        fprintf(fid,',%f',y(j,i));
+        fprintf(fid,'%f,',y(j,i));
     end
     fprintf(fid,'\n');
 end
@@ -189,8 +189,9 @@ var(4)=y(2);
 var(3)=(1*y(1));
 var(2)=y(2);
 
-obs(1)=var(2);
-obs(2)=var(3);
+obs(1)=t;
+obs(2)=var(2);
+obs(3)=var(3);
 
 end
 

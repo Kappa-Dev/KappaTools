@@ -5,7 +5,7 @@ Environment:
   Alg_expr:
     0:one: 1
     1:two: 2
-  Plot: 
+  Plot: [T]
   Rules:
     
   Perturbations:

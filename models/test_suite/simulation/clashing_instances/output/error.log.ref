@@ -4,7 +4,7 @@ Environment:
   Tokens: 
   Alg_expr:
     
-  Plot: 
+  Plot: [T]
   Rules:
     0: 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x)
       -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1

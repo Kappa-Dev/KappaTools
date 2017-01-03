@@ -14,8 +14,7 @@ val initialize :
 (** [initial env counter graph state] builds up the initial state *)
 
 val observables_values :
-  Environment.t -> Counter.t -> Rule_interpreter.t ->
-  t -> Nbr.t array
+  Environment.t -> Rule_interpreter.t -> t -> Counter.t -> Nbr.t array
 (** Returns (the current biological time, an array of the current
 values of observables) *)
 

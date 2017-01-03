@@ -21,7 +21,7 @@ period_t_point=0.100000;
 global nodevar
 nodevar=2;
 nvar=1;
-nobs=0;
+nobs=1;
 nrules=0;
 
 global var
@@ -98,12 +98,12 @@ end
 filename = 'data.csv';
 fid = fopen (filename,'w');
 fprintf(fid,'# KaDE ../../compiler/tokens/tokens.ka -d output -l 1 -p 0.1\n')
-fprintf(fid,'# t')
+fprintf(fid,'# ')
+fprintf(fid,'[T],')
 fprintf(fid,'\n')
 for j=1:n_points
-    fprintf(fid,'%f',t(j));
     for i=1:nobs
-        fprintf(fid,',%f',y(j,i));
+        fprintf(fid,'%f,',y(j,i));
     end
     fprintf(fid,'\n');
 end
@@ -150,6 +150,7 @@ obs = zeros(nobs,1);
 
 t = y(2);
 
+obs(1)=t;
 
 end
 

@@ -79,6 +79,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 </g>
 
 <g id="legend">
+  
   <text x="785" y="10">'AB'</text>
   <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
   <text x="785" y="25">'Cuu'</text>
@@ -89,7 +90,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#plus" style="color:peru" x="793" y="55"/>
   <text x="785" y="70">'n_c'</text>
   <use xlink:href="#cross" style="color:blue" x="793" y="70"/>
-  </g>
+</g>
 
 <g id="data">
 <g id="data_0" style="color:blue">
@@ -1111,6 +1112,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <title>'n_c' t=3.18857 v=0</title></use>
   <use xlink:href="#cross" x="70.000000" y="575.000000">
   <title>'n_c' t=0 v=0</title></use>
-  </g></g>
+  </g>
+</g>
 
 </svg>

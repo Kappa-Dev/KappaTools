@@ -79,11 +79,12 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 </g>
 
 <g id="legend">
+  
   <text x="785" y="10">'t'</text>
   <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
   <text x="785" y="25">'T'</text>
   <use xlink:href="#cross" style="color:purple" x="793" y="25"/>
-  </g>
+</g>
 
 <g id="data">
 <g id="data_0" style="color:blue">
@@ -293,6 +294,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <title>'T' t=0.88543 v=17</title></use>
   <use xlink:href="#cross" x="70.000000" y="566.940086">
   <title>'T' t=0 v=10</title></use>
-  </g></g>
+  </g>
+</g>
 
 </svg>

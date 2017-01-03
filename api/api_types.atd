@@ -80,8 +80,7 @@ type simulation_parameter = {
 
 type simulation_perturbation = { perturbation_code : string }
 
-type observable = { observable_time : float <json name="time"> ;
-                    observable_values : float nullable list <json name="values"> }
+type observable = float nullable list
 
 (* plot *)
 type plot = { plot_legend: string list <json name="legend"> ;

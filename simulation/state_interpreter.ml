@@ -88,7 +88,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                  (fun x _ y -> Random_tree.add x y state0.activities)
                  env counter graph,state0))
 
-let observables_values env counter graph state =
+let observables_values env graph state counter =
   let get_alg i = get_alg env state i in
   Environment.map_observables
     (Rule_interpreter.value_alg counter graph ~get_alg)
@@ -133,8 +133,7 @@ let do_modification ~outputs env counter graph state modification =
         (Data.Print {Data.file_line_name = file_opt ; Data.file_line_text = line;}) in
     (false, graph, state)
   | Primitives.PLOTENTRY ->
-    let () = outputs (Data.Plot (Counter.current_time counter,
-                                 observables_values env counter graph state)) in
+    let () = outputs (Data.Plot (observables_values env graph state counter)) in
     (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
@@ -348,7 +347,7 @@ let a_loop ~outputs env counter graph state =
         one_rule ~outputs dt stop env counter graph' state' in
   let () =
     Counter.fill ~outputs
-      counter (observables_values env counter graph' state') in
+      counter (observables_values env graph' state') in
   if stop then
     let (_,graph'',state'') =
       perturbate ~outputs env counter graph' state' in

@@ -133,7 +133,7 @@ let () =
         Environment.map_observables
           (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
           env in
-      if head <> [||] then
+      if Array.length head > 1 then
         let title = "Output of " ^ command_line in
         Some (cli_args.Run_cli_args.outputDataFile,title,head)
       else None in
@@ -176,9 +176,8 @@ let () =
             (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
               Outputs.go (Environment.signatures env)
                 (Data.Plot
-                   (Counter.current_time counter,
-                    State_interpreter.observables_values
-                      env counter graph state)) in
+                   (State_interpreter.observables_values
+                      env graph state counter)) in
 
     let () =
       match unary_distances with

@@ -79,8 +79,10 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 </g>
 
 <g id="legend">
+  
   <text x="785" y="10">'Ap'</text>
-  <use xlink:href="#plus" style="color:blue" x="793" y="10"/></g>
+  <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
+</g>
 
 <g id="data">
 <g id="data_0" style="color:blue">
@@ -286,6 +288,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <title>'Ap' t=0.0051306 v=0</title></use>
   <use xlink:href="#plus" x="70.000000" y="575.000000">
   <title>'Ap' t=0 v=0</title></use>
-  </g></g>
+  </g>
+</g>
 
 </svg>

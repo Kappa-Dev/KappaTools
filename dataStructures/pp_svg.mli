@@ -3,7 +3,7 @@ type store = {
   title: string;
   descr: string;
   legend: string array;
-  mutable points: (float * Nbr.t array) list;
+  mutable points: Nbr.t array list;
 }
 
 val to_string : ?width:int -> store -> string

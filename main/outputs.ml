@@ -210,15 +210,14 @@ let print_header_raw is_tsv f a =
   let print_sep =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
     else Pp.comma in
-  Format.fprintf f "@[<h>%s%t%a@]@."
-    "[T]" print_sep
+  Format.fprintf f "@[<h>%a@]@."
     (Pp.array print_sep (fun _ -> Format.pp_print_string)) a
 
-let print_values_raw is_tsv f (time,l) =
+let print_values_raw is_tsv f l =
   let print_sep =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
     else Pp.comma in
-  Format.fprintf f "@[<h>%s%t%a@]@." (string_of_float time) print_sep
+  Format.fprintf f "@[<h>%a@]@."
     (Pp.array print_sep (fun _ -> Nbr.print_option)) l
 
 let traceDescr = ref None
@@ -310,7 +309,7 @@ let snapshot env s =
 let go env = function
   | Data.Snapshot s -> snapshot env s
   | Data.Flux f -> output_flux f
-  | Data.Plot (x,y) -> plot_now (x,y)
+  | Data.Plot x -> plot_now x
   | Data.Print p ->
     let desc =
       match p.Data.file_line_name with

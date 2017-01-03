@@ -11,7 +11,7 @@ Environment:
   Tokens: 
   Alg_expr:
     0:init: 100
-  Plot: 
+  Plot: [T]
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
@@ -35,7 +35,7 @@ Environment:
   Tokens: 
   Alg_expr:
     0:init: 100
-  Plot: 
+  Plot: [T]
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
@@ -59,7 +59,7 @@ Environment:
   Tokens: 
   Alg_expr:
     0:init: 100
-  Plot: 
+  Plot: [T]
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥

@@ -66,42 +66,41 @@ let create_dimension ~(height : int)
 
 class type plot_observable =
   object
-    val time : float Js.t Js.prop
-    val values : float Js.t Js.opt Js.js_array Js.t Js.prop
+    method time : float Js.prop
+    method values : float Js.opt Js.js_array Js.t Js.prop
   end
 let constructor_observable : plot_observable Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 let create_observable ~(observable : ApiTypes.observable)
   : plot_observable Js.t  =
   let configuration : plot_observable Js.t = new%js constructor_observable in
-  let () = (Js.Unsafe.coerce configuration)
-           ##.
-             time := observable.ApiTypes.observation_time;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      values := Js.array (Tools.array_map_of_list
-                            Js.Opt.option observable.ApiTypes.observation_values);
-    ()
+  let () =
+    match observable with
+    | Some time :: l ->
+      configuration##.time := time;
+      configuration##.values :=
+        Js.array (Tools.array_map_of_list  Js.Opt.option l)
+    | _ -> failwith "problematic output line"
   in configuration
 
 
 class type plot_data =
   object
-    val legend : Js.js_string Js.js_array Js.t Js.prop
-    val timeSeries : (plot_observable Js.t) Js.js_array Js.t Js.prop
+    method legend : Js.js_string Js.t Js.js_array Js.t Js.prop
+    method timeSeries : (plot_observable Js.t) Js.js_array Js.t Js.prop
   end
 let constructor_data : plot_data Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_data ~(plot : ApiTypes.plot)
   : plot_data Js.t  =
-  let configuration : plot_observable Js.t = new%js constructor_observable in
+  let configuration : plot_data Js.t = new%js constructor_data in
   let () =
-    (Js.Unsafe.coerce configuration)##.legend := Js.array
-	(Array.map
-           (fun l -> Js.string l)
-           (Array.of_list plot.ApiTypes.legend));
-    (Js.Unsafe.coerce configuration)##.timeSeries := Js.array
-	(Array.map (fun o -> create_observable ~observable:o)
-           (Array.of_list plot.ApiTypes.time_series));
+    configuration##.legend := Js.array
+        (Tools.array_map_of_list
+           Js.string
+           plot.ApiTypes.legend);
+    configuration##.timeSeries := Js.array
+        (Tools.array_map_of_list (fun o -> create_observable ~observable:o)
+           plot.ApiTypes.time_series);
     ()
   in configuration
 

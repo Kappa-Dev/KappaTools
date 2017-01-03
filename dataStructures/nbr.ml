@@ -115,6 +115,11 @@ let print f = function
   | I64 x -> Format.fprintf f "%Ld" x
   | I x -> Format.fprintf f "%d" x
 
+let pretty_print f = function
+  | F x -> Format.fprintf f "%g" x
+  | I64 x -> Format.fprintf f "%Ld" x
+  | I x -> Format.fprintf f "%d" x
+
 let print_option f = function
   | I x -> Format.fprintf f "%d" x
   | I64 x -> Format.fprintf f "%Ld" x

@@ -301,7 +301,9 @@ let to_plot_points counter =
       (if n <> 0 then [counter.time] else []),counter
 
 let fill ~outputs counter observables_values =
-  let points, _counter =
-    to_plot_points counter in
-  if observables_values <> [||] then
-    List.iter (fun t -> outputs (Data.Plot (t,observables_values))) points
+  let points, counter' = to_plot_points counter in
+  List.iter
+    (fun time ->
+       let cand = observables_values {counter' with time} in
+       if Array.length cand > 1 then outputs (Data.Plot cand))
+    points

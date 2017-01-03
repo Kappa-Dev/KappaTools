@@ -287,14 +287,12 @@ let outputs (simulation : t) =
   function
   | Data.Flux flux_map ->
     simulation.flux_maps <- flux_map::simulation.flux_maps
-  | Data.Plot (time,new_observables) ->
+  | Data.Plot new_observables ->
     let new_values = prepare_plot_value new_observables in
     simulation.plot <-
       {simulation.plot with
        Api_types_j.plot_time_series =
-         { Api_types_j.observable_time = time ;
-           Api_types_j.observable_values = new_values ; }
-         :: simulation.plot.Api_types_j.plot_time_series }
+         new_values :: simulation.plot.Api_types_j.plot_time_series }
   | Data.Print file_line ->
     simulation.files <- file_line::simulation.files
   | Data.Snapshot snapshot ->
@@ -441,7 +439,7 @@ let start
                     t.env in
                 let first_obs =
                   State_interpreter.observables_values
-                    t.env t.counter graph state in
+                    t.env graph state t.counter in
                 let first_values = prepare_plot_value first_obs in
 
                 let () =
@@ -449,13 +447,8 @@ let start
                     { Api_types_j.plot_legend =
                         Array.to_list legend;
                       Api_types_j.plot_time_series =
-                        [
-                          { Api_types_j.observable_time =
-                              Counter.current_time t.counter;
-                            Api_types_j.observable_values =
-                              first_values;
-                          }
-                        ]} in
+                        [ Some (Counter.current_time t.counter)
+                          :: first_values ]} in
                 run_simulation ~system_process:system_process ~t:t
              )
            )

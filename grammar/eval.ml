@@ -141,12 +141,17 @@ let rules_of_ast
   unary_ccs',rules_l
 
 let obs_of_result contact_map domain res =
-  List.fold_left
-    (fun (domain,cont) alg_expr ->
-       let (domain',alg_pos) =
-         compile_alg contact_map domain alg_expr in
-       domain',alg_pos :: cont)
-    (domain,[]) res.observables
+  let time =
+    Location.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
+  match res.observables with
+  | [] -> domain,[time]
+  | _ :: _ ->
+    List.fold_left
+      (fun (domain,cont) alg_expr ->
+         let (domain',alg_pos) =
+           compile_alg contact_map domain alg_expr in
+         domain',alg_pos :: cont)
+      (domain,[time]) res.observables
 
 let compile_print_expr contact_map domain ex =
   List.fold_right

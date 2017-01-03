@@ -263,7 +263,8 @@ let get_rules compil =
     (fun _ acc r -> r::acc) [] (environment compil)
 let get_variables compil = Environment.get_algs (environment compil)
 let get_obs compil =
-  Array.to_list @@ Environment.map_observables (fun r -> r) (environment compil)
+  Array.to_list
+    (Environment.map_observables (fun r -> r) (environment compil))
 
 let remove_escape_char =
   (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are moe knowledgeable *)

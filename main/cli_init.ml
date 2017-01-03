@@ -1,21 +1,9 @@
 type directive_unit = Time | Event
 
 let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
-  let init_t,max_time,init_e,max_event,plot_period =
-    match unit with
-    | Time ->
-      Some cli_args.Run_cli_args.minValue, cli_args.Run_cli_args.maxValue,
-      None,None,Counter.DT cli_args.Run_cli_args.plotPeriod
-    | Event ->
-      None,None,
-      Some (int_of_float cli_args.Run_cli_args.minValue),
-      Tools.option_map int_of_float cli_args.Run_cli_args.maxValue,
-      Counter.DE (int_of_float (ceil cli_args.Run_cli_args.plotPeriod)) in
-  let counter =
-    Counter.create ?init_t ?init_e ?max_time ?max_event ~plot_period in
   let (env, contact_map, updated_vars, story_compression,
        unary_distances, formatCflows, cflowFile, init_l),
-      counter,alg_overwrite =
+      alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
     | "" ->
       let result =
@@ -33,7 +21,7 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
           ?rescale_init:cli_args.Run_cli_args.rescale
           sigs_nd tk_nd contact_map result' in
       (env, contact_map, updated_vars, story_compression,
-       unary_distances, formatCflow, cflowFile,init_l),counter,[]
+       unary_distances, formatCflow, cflowFile,init_l),[]
     | marshalized_file ->
       try
         let d = open_in_bin marshalized_file in
@@ -63,7 +51,7 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
             (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
         (env,contact_map,updated_vars',story_compression,
          unary_distances,formatCflow,cflowFile,init_l),
-        counter,alg_overwrite
+        alg_overwrite
       with
       | ExceptionDefn.Malformed_Decl _ as e -> raise e
       | _exn ->
@@ -71,5 +59,19 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
           Format.std_formatter
           "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
         exit 1 in
+
+    let init_t,max_time,init_e,max_event,plot_period =
+    match unit with
+    | Time ->
+      Some cli_args.Run_cli_args.minValue, cli_args.Run_cli_args.maxValue,
+      None,None,Counter.DT cli_args.Run_cli_args.plotPeriod
+    | Event ->
+      None,None,
+      Some (int_of_float cli_args.Run_cli_args.minValue),
+      Tools.option_map int_of_float cli_args.Run_cli_args.maxValue,
+      Counter.DE (int_of_float (ceil cli_args.Run_cli_args.plotPeriod)) in
+  let counter =
+    Counter.create ?init_t ?init_e ?max_time ?max_event ~plot_period in
+
   (env, contact_map, updated_vars, story_compression,
    unary_distances, formatCflows, cflowFile, init_l),counter,alg_overwrite

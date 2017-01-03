@@ -8,7 +8,7 @@ Environment:
   Tokens: tt
   Alg_expr:
     
-  Plot: 
+  Plot: [T]
   Rules:
     
   Perturbations:
