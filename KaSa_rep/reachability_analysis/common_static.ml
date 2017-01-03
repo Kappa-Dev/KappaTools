@@ -20,7 +20,8 @@ let trace = false
 (**************************************************************************)
 
 type half_break_action =
-  (int list * (Ckappa_sig.c_rule_id * Ckappa_sig.c_state) list) Ckappa_sig.AgentSite_map_and_set.Map.t
+  (int list * (Ckappa_sig.c_rule_id * Ckappa_sig.c_state) list)
+    Ckappa_sig.AgentSite_map_and_set.Map.t
 
 type remove_action =
   (int list * Ckappa_sig.c_rule_id list) Ckappa_sig.AgentSite_map_and_set.Map.t
@@ -317,8 +318,8 @@ let add_link_pair_agent_rule parameters error (agent_type, rule_id)
   in
   error, result
 
-(*let collect_potential_free_and_bind parameter error handler agent_type
-    site_type k store_result =
+let collect_potential_free_and_bind parameter error handler rule_id
+    (agent_type, site_type) k store_result =
   (*potential partner*)
   match Handler.dual parameter error handler agent_type site_type k with
   | error, None -> error, store_result
@@ -335,7 +336,7 @@ let add_link_pair_agent_rule parameters error (agent_type, rule_id)
         ((site2, state2) :: [])
         (snd store_result)
     in
-    error, (store_potential_free, store_potential_bind)*)
+    error, (store_potential_free, store_potential_bind)
 
 let store_potential_half_break parameter error handler rule_id half_break
     store_result =
@@ -368,25 +369,16 @@ let store_potential_half_break parameter error handler rule_id half_break
            error, store_result
          else
            (*potential partner*)
-           match Handler.dual parameter error handler agent_type site_type k
-           with
-           | error, None -> error, store_result
-           | error, Some (agent_type2, site2, state2) ->
-             let error, store_potential_free =
-               add_link_pair_agent_rule parameter error
-                 (agent_type2, rule_id)
-                 ((site2,Ckappa_sig.dummy_state_index) :: [])
-                 (fst store_result)
-             in
-             let error, store_potential_bind =
-               add_link_pair_agent_rule parameter error
-                 (agent_type2, rule_id)
-                 ((site2, state2) :: [])
-                 (snd store_result)
-             in
-             aux
-               (Ckappa_sig.next_state_index k)
-               (error, (store_potential_free, store_potential_bind))
+           let error, (store_potential_free, store_potential_bind) =
+             collect_potential_free_and_bind
+               parameter error handler rule_id
+               (agent_type, site_type)
+               k
+               store_result
+           in
+           aux
+             (Ckappa_sig.next_state_index k)
+             (error, (store_potential_free, store_potential_bind))
        in aux state_min (error, store_result)
     ) (error, store_result) half_break
 
@@ -417,31 +409,18 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                     error, store_result
                   else
                     (*potential partner*)
-                    match
-                      Handler.dual parameter error handler agent_type site_type
+                    let error, (store_potential_free, store_potential_bind) =
+                      collect_potential_free_and_bind
+                        parameter error
+                        handler
+                        rule_id
+                        (agent_type, site_type)
                         k
-                    with
-                    | error, None -> error, store_result
-                    | error, Some (agent_type2, site2, state2) ->
-                      (*----------------------------------------------------*)
-                      let error, store_potential_free =
-                        add_link_pair_agent_rule
-                          parameter
-                          error
-                          (agent_type2, rule_id)
-                          ((site2, Ckappa_sig.dummy_state_index):: [])
-                          (fst store_result)
-                      in
-                      let error, store_potential_bind =
-                        add_link_pair_agent_rule parameter
-                          error
-                          (agent_type2, rule_id)
-                          ((site2, state2):: [])
-                          (snd store_result)
-                      in
-                      aux
-                        (Ckappa_sig.next_state_index k)
-                        (error, (store_potential_free, store_potential_bind))
+                        store_result
+                    in
+                    aux
+                      (Ckappa_sig.next_state_index k)
+                      (error, (store_potential_free, store_potential_bind))
                 in
                 aux Ckappa_sig.dummy_state_index_1 (error, store_result)
               end
@@ -453,6 +432,49 @@ let store_potential_remove parameter error handler rule_id remove store_result =
     ) (error, store_result) remove
 
 (***************************************************************************)
+
+let combine_half_break_and_remove parameter error
+    fst_or_snd_store_result_hb
+    fst_or_snd_store_result_remove
+    store_result_map =
+    (*-----------------------------------------------------------------------*)
+  Ckappa_sig.AgentRule_map_and_set.Map.fold2
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, rule_id) l1 store_result ->
+       let error, store_result =
+         add_link_pair_agent_rule parameter error
+           (agent_type, rule_id)
+           l1
+           store_result
+       in
+       error, store_result
+    )
+    (*exists in 'b t*)
+    (fun paramter error (agent_type, rule_id) l2 store_result ->
+       let error, store_result =
+         add_link_pair_agent_rule paramter error
+           (agent_type, rule_id)
+           l2
+           store_result
+       in
+       error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+       let concat = List.concat [l1; l2] in
+       let error, store_result =
+         add_link_pair_agent_rule parameter error
+           (agent_type, rule_id)
+           concat
+           store_result
+       in
+       error, store_result
+    )
+    fst_or_snd_store_result_hb
+    fst_or_snd_store_result_remove
+    store_result_map
 
 let collect_potential_side_effects_free parameter error handler rule_id
     half_break remove store_result_map =
@@ -477,34 +499,7 @@ let collect_potential_side_effects_free parameter error handler rule_id
        Ckappa_sig.AgentRule_map_and_set.Map.empty)
   in
   (*-----------------------------------------------------------------------*)
-  Ckappa_sig.AgentRule_map_and_set.Map.fold2
-    parameter
-    error
-    (*exists in 'a t*)
-    (fun parameter error (agent_type, rule_id) l1 store_result ->
-       let error, store_result =
-         add_link_pair_agent_rule parameter error (agent_type, rule_id) l1
-           store_result
-       in
-       error, store_result
-    )
-    (*exists in 'b t*)
-    (fun paramter error (agent_type, rule_id) l2 store_result ->
-       let error, store_result =
-         add_link_pair_agent_rule paramter error
-           (agent_type, rule_id) l2 store_result
-       in
-       error, store_result
-    )
-    (*exists in both*)
-    (fun _parameter error (agent_type, rule_id) l1 l2 store_result ->
-       let concat = List.concat [l1; l2] in
-       let error, store_result =
-         add_link_pair_agent_rule parameter error
-           (agent_type, rule_id) concat store_result
-       in
-       error, store_result
-    )
+  combine_half_break_and_remove parameter error
     (fst store_result_hb)
     (fst store_result_remove)
     store_result_map
@@ -534,34 +529,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
        Ckappa_sig.AgentRule_map_and_set.Map.empty)
   in
   (*------------------------------------------------------------------------*)
-  Ckappa_sig.AgentRule_map_and_set.Map.fold2
-    parameter
-    error
-    (*exists in 'a t*)
-    (fun parameter error (agent_type, rule_id) l1 store_result ->
-       let error, store_result =
-         add_link_pair_agent_rule parameter error
-           (agent_type, rule_id) l1 store_result
-       in
-       error, store_result
-    )
-    (*exists in 'b t*)
-    (fun paramter error (agent_type, rule_id) l2 store_result ->
-       let error, store_result =
-         add_link_pair_agent_rule paramter error
-           (agent_type, rule_id) l2 store_result
-       in
-       error, store_result
-    )
-    (*exists in both*)
-    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
-       let concat = List.concat [l1; l2] in
-       let error, store_result =
-         add_link_pair_agent_rule parameter error
-           (agent_type, rule_id) concat store_result
-       in
-       error, store_result
-    )
+  combine_half_break_and_remove parameter error
     (snd store_result_hb)
     (snd store_result_remove)
     store_result_map
@@ -655,8 +623,6 @@ let collect_agent_type_state parameter error agent site_type =
     error, (agent_type1, state1)
 
 (**************************************************************************)
-
-(* JF: the name of this function is misleading *)
 (* What you collect is the type fingerprint of a bond *)
 
 let collect_fingerprint_of_bond parameter error site_add agent_id site_type_source
@@ -721,13 +687,24 @@ let get_set parameter error rule_id empty_set store_result =
   in
   error, set
 
-let collect_bonds parameter error rule_id views bonds store_result =
+(*let collect_bonds' parameter error rule_id views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter error
     (fun parameter error agent_id bonds_map store_result ->
        Ckappa_sig.Site_map_and_set.Map.fold
          (fun site_type_source site_add (error, store_result) ->
+            let error, ((agent_type1, site_type_source, state1),
+                 (agent_type2, site_type_target, state2)) =
+              collect_fingerprint_of_bond parameter
+                error
+                site_add
+                agent_id
+                site_type_source
+                views
+            in
             let agent_id_target = site_add.Cckappa_sig.agent_index in
+            (*let site_type_target = site_add.Cckappa_sig.site in*)
+            (*let agent_id_target = site_add.Cckappa_sig.agent_index in
             let site_type_target = site_add.Cckappa_sig.site in
             let error, agent_source =
               match
@@ -766,7 +743,7 @@ let collect_bonds parameter error rule_id views bonds store_result =
                 error
                 agent_target
                 site_type_target
-            in
+            in*)
             (*-----------------------------------------------------*)
             (*get old set*)
             let error, old_set =
@@ -803,8 +780,9 @@ let collect_bonds parameter error rule_id views bonds store_result =
             in
             error, store_result
          ) bonds_map (error, store_result)
-    ) bonds store_result
+    ) bonds store_result*)
 
+(*
 let collect_bonds_rhs parameter error rule_id rule store_result =
   collect_bonds parameter error
     rule_id
@@ -818,7 +796,7 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
     rule_id
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
-    store_result
+    store_result*)
 
 (***************************************************************************)
 (*TODO: pattern*)
@@ -830,8 +808,17 @@ let collect_bonds_pattern parameters error views bonds store_result =
        Ckappa_sig.Site_map_and_set.Map.fold
          (fun site_type_source site_add (error, store_result) ->
          let agent_id_target = site_add.Cckappa_sig.agent_index in
-         let site_type_target = site_add.Cckappa_sig.site in
-         let error, agent_source =
+         (*let site_type_target = site_add.Cckappa_sig.site in*)
+         let error, ((agent_type1, site_type_source, state1),
+              (agent_type2, site_type_target, state2)) =
+           collect_fingerprint_of_bond parameters
+             error
+             site_add
+             agent_id
+             site_type_source
+             views
+         in
+         (*let error, agent_source =
            match
              Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                parameters error agent_id views
@@ -868,7 +855,7 @@ let collect_bonds_pattern parameters error views bonds store_result =
              error
              agent_target
              site_type_target
-         in
+         in*)
          let error', new_set =
            Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
              parameters error
@@ -886,6 +873,36 @@ let collect_bonds_pattern parameters error views bonds store_result =
          error, store_result
          ) bonds_map (error, store_result)
     ) bonds store_result
+
+let collect_bonds parameters error rule_id views bonds store_result =
+  let error, store_set =
+    collect_bonds_pattern parameters error views bonds
+      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
+  in
+  let error, store_result =
+    Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+      parameters
+      error
+      rule_id
+      store_set
+      store_result
+  in
+  error, store_result
+
+let collect_bonds_rhs parameter error rule_id rule store_result =
+  collect_bonds parameter error
+    rule_id
+    rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+    rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds
+    store_result
+
+let collect_bonds_lhs parameter error rule_id rule store_result =
+  collect_bonds
+    parameter error
+    rule_id
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
+    store_result
 
 (***************************************************************************)
 (*action binding in the rhs*)
