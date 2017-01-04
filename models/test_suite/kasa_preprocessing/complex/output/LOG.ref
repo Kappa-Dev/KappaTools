@@ -519,6 +519,6 @@ C cannot occur in the model
 ------------------------------------------------------------
 
 Some exceptions have been raised
-error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 848; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 848; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 871; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 870; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 870; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 893; exception:Exit
