@@ -162,7 +162,7 @@ let store_set parameters error fst_list snd_list store_result =
 let collect_potential_tuple_pair parameters error
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error', bonds_set =
-    Common_static.get_set parameters error
+    Common_static.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       store_bonds_rhs
@@ -173,7 +173,7 @@ let collect_potential_tuple_pair parameters error
       __POS__ Exit
   in
   let error'', views_set =
-    Common_static.get_set parameters error rule_id
+    Common_static.get_rule_id_set parameters error rule_id
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_views_rhs
   in
@@ -234,7 +234,7 @@ let collect_potential_tuple_pair_rule_rhs parameters error rule_id
 let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
     store_views_lhs store_result =
   let error', bonds_lhs_set =
-    Common_static.get_set parameters error
+    Common_static.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       store_bonds_lhs
@@ -245,7 +245,7 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
       __POS__ Exit
   in
   let error'', views_lhs_set =
-    Common_static.get_set parameters error
+    Common_static.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_views_lhs

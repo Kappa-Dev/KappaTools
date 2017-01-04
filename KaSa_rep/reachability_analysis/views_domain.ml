@@ -2856,48 +2856,6 @@ struct
                     site_correspondence
                     agent
                 in
-
-                (*
-                let error, get_pair_list =
-                  List.fold_left
-                    (fun (error, current_list) (cv_id, list, set) ->
-                     (*----------------------------------------------------------*)
-                     (*new index for site type in covering class*)
-                       let error, (map_new_index_forward, _) =
-                         Bdu_static_views.new_index_pair_map parameters error list
-                       in
-                     (*----------------------------------------------------------*)
-                       let error', map_res =
-                         Ckappa_sig.Site_map_and_set.Map.fold_restriction
-                           parameters error
-                           (fun site port (error, store_result) ->
-                              let state = port.Cckappa_sig.site_state.Cckappa_sig.min
-                              in
-                              let error, site' =
-                                Ckappa_sig.Site_map_and_set.Map.find_default
-                                  parameters
-                                  error
-                                  Ckappa_sig.dummy_site_name
-                                  site map_new_index_forward
-                              in
-                              let error, map_res =
-                                Ckappa_sig.Site_map_and_set.Map.add parameters error
-                                  site'
-                                  state
-                                  store_result
-                              in
-                              error, map_res
-                           ) set agent.Cckappa_sig.agent_interface
-                           Ckappa_sig.Site_map_and_set.Map.empty
-                       in
-                       let error =
-                         Exception.check_point
-                           Exception.warn parameters error error'
-                           __POS__ Exit
-                       in
-                       error, (cv_id, map_res) :: current_list)
-                    (error, []) site_correspondence
-                in*)
                 (*build bdu_test*)
                 let error, dynamic =
                   List.fold_left (fun (error, dynamic) (cv_id, map_res) ->

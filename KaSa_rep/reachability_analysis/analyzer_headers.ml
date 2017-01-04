@@ -16,7 +16,7 @@
 type pattern_matching_flag =
   | Embeddings
   | Morphisms
-  
+
 type compilation_result =
   {
     cc_code       : Cckappa_sig.compil;
@@ -230,7 +230,7 @@ let set_views_lhs sites static =
     }
     static
 
-let get_created_bonds static =
+(*let get_created_bonds static =
   (get_bdu_common_static static).Common_static.store_created_bonds
 
 let set_created_bonds sites static =
@@ -239,7 +239,7 @@ let set_created_bonds sites static =
       (get_bdu_common_static static) with
       Common_static.store_created_bonds = sites
     }
-    static
+    static*)
 
 let get_modified_map static =
   (get_bdu_common_static static).Common_static.store_modified_map

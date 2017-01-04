@@ -103,7 +103,8 @@ struct
 
   let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
 
-  let get_created_bonds static = lift Analyzer_headers.get_created_bonds static
+  let get_action_binding static = lift Analyzer_headers.get_action_binding static
+  (*let get_created_bonds static = lift Analyzer_headers.get_created_bonds static*)
 
   let get_modified_map static = lift Analyzer_headers.get_modified_map static
 
@@ -950,9 +951,10 @@ struct
     let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     (*------------------------------------------------------*)
-    let store_created_bonds = get_created_bonds static in
+    (*let store_created_bonds = get_created_bonds static in*)
+    let store_created_bonds = get_action_binding static in
     let error, created_bonds_set =
-      Common_static.get_set parameters error
+      Common_static.get_rule_id_set parameters error
         rule_id
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
         store_created_bonds
@@ -1346,7 +1348,7 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store_modified_map = get_modified_map static in
     let error, modified_set =
-      Common_static.get_set parameters
+      Common_static.get_rule_id_set parameters
         error
         rule_id
         Ckappa_sig.AgentsSiteState_map_and_set.Set.empty

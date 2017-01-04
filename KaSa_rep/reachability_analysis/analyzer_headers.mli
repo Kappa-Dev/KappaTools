@@ -18,7 +18,7 @@
 type pattern_matching_flag =
   | Embeddings
   | Morphisms
-  
+
 type compilation_result
 
 (** type of the static information to be passed to each domain, let us
@@ -167,7 +167,7 @@ val set_views_lhs :
   global_static_information ->
   global_static_information
 
-val get_created_bonds :
+(*val get_created_bonds :
   global_static_information ->
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t
@@ -176,7 +176,7 @@ val set_created_bonds :
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
-  global_static_information
+  global_static_information*)
 
 val get_modified_map :
   global_static_information ->
