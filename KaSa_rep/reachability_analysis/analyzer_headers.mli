@@ -167,17 +167,6 @@ val set_views_lhs :
   global_static_information ->
   global_static_information
 
-(*val get_created_bonds :
-  global_static_information ->
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
-    Ckappa_sig.Rule_map_and_set.Map.t
-
-val set_created_bonds :
-  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
-    Ckappa_sig.Rule_map_and_set.Map.t ->
-  global_static_information ->
-  global_static_information*)
-
 val get_modified_map :
   global_static_information ->
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t

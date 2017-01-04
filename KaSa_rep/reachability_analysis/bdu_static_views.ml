@@ -15,6 +15,10 @@
 
 let local_trace = false
 
+(***************************************************************************)
+(*TYPE*)
+(***************************************************************************)
+
 type pre_static =
   {
     store_modification_sites  :
@@ -35,6 +39,11 @@ type pre_static =
         Ckappa_sig.AgentSite_map_and_set.Map.t;
   }
 
+
+(***************************************************************************)
+(*initial values of pre_state*)
+(***************************************************************************)
+
 let init_pre_static =
   {
     store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
@@ -46,7 +55,8 @@ let init_pre_static =
   }
 
 (***************************************************************************)
-(*TODO: pattern*)
+(*TYPE of pattern*)
+(***************************************************************************)
 
 type bdu_analysis_static_pattern =
   {
@@ -57,11 +67,17 @@ type bdu_analysis_static_pattern =
        Ckappa_sig.Site_map_and_set.Map.t) list
   }
 
+(***************************************************************************)
+(*initial values of pattern *)
+(***************************************************************************)
+
 let init_bdu_analysis_static_pattern =
   {
     store_proj_bdu_test_restriction_pattern = []
   }
 
+(***************************************************************************)
+(*TYPE of BDU static*)
 (***************************************************************************)
 
 type bdu_analysis_static =
@@ -70,7 +86,6 @@ type bdu_analysis_static =
     store_covering_classes:
       Covering_classes_type.remanent
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-
     store_list_of_site_type_in_covering_classes:
       Ckappa_sig.c_site_name list
         Covering_classes_type.AgentCV_map_and_set.Map.t;
@@ -88,22 +103,23 @@ type bdu_analysis_static =
       Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
-
     store_modif_list_restriction_map:
       Ckappa_sig.Views_bdu.hconsed_association_list
         Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
-
     store_proj_bdu_potential_restriction_map :
       (Ckappa_sig.Views_bdu.mvbdu *
        Ckappa_sig.Views_bdu.hconsed_association_list)
         Covering_classes_type.AgentSiteCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
-
     store_proj_bdu_test_restriction :
       Ckappa_sig.Views_bdu.mvbdu
         Covering_classes_type.AgentsCV_setmap.Map.t
         Ckappa_sig.Rule_setmap.Map.t;
   }
+
+(***************************************************************************)
+(*initial values of BDU static*)
+(***************************************************************************)
 
 let init_bdu_analysis_static parameters error =
   let error, init_covering_classes =
@@ -136,8 +152,9 @@ let init_bdu_analysis_static parameters error =
   error, init_bdu_analysis_static
 
 (***************************************************************************)
-(*implementation of pre_static*)
-
+(*Modification*)
+(***************************************************************************)
+(*REMOVE*)
 let collect_modification_sites parameters error rule_id diff_direct store_result =
   let add_link error (agent_id, agent_type, site_type) rule_id store_result =
     let error', current_set =
@@ -185,7 +202,7 @@ let collect_modification_sites parameters error rule_id diff_direct store_result
   error, store_result
 
 (*update of the views due to modification without agent_id*)
-
+(*REMOVE*)
 let collect_modif_map parameters error store_modification_sites =
   Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameters error (_agent_id, agent_type, site_type) ->
@@ -243,7 +260,10 @@ let collect_test_sites parameters error rule_id viewslhs
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type _ (error, store_result) ->
                   let error, store_result_test =
-                    add_link error (agent_id, agent_type, site_type) rule_id store_result
+                    add_link error
+                      (agent_id, agent_type, site_type)
+                      rule_id
+                      store_result
                   in
                   error, store_result_test
                ) agent.Cckappa_sig.agent_interface (error, store_result)
@@ -291,7 +311,8 @@ let collect_test_modification_sites
     let error, old =
       match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs
               parameters error
-              (agent_id, agent_type, site_type) store_result
+              (agent_id, agent_type, site_type)
+              store_result
       with
       | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
       | error, Some s -> error, s
@@ -302,7 +323,8 @@ let collect_test_modification_sites
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
         parameters error
         (agent_id, agent_type, site_type)
-        union store_result
+        union
+        store_result
     in
     error, result
   in

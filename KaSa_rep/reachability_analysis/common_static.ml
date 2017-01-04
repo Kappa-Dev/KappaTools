@@ -60,9 +60,6 @@ type bdu_common_static =
     store_views_lhs :
       Ckappa_sig.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    (*store_created_bonds :
-      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_modified_map :
       Ckappa_sig.AgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
@@ -88,7 +85,6 @@ let init_bdu_common_static =
     Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_views_lhs = Ckappa_sig.Rule_map_and_set.Map.empty in
-  (*let init_created_bonds = Ckappa_sig.Rule_map_and_set.Map.empty in*)
   let init_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_project_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_common_static =
@@ -106,7 +102,6 @@ let init_bdu_common_static =
       store_action_binding = init_action_binding;
       store_views_rhs = init_views_rhs;
       store_views_lhs = init_views_lhs;
-      (*store_created_bonds = init_created_bonds;*)
       store_modified_map = init_modified_map;
       store_project_modified_map = init_project_modified_map;
     }
@@ -190,7 +185,7 @@ let add_link_pair_agent_site parameters error (agent_type, site_type) x
       parameters
       error
       (agent_type, site_type)
-      (l, (*(r, state)*) x :: old)
+      (l, x :: old)
       store_result
   in
   error, store_result
@@ -296,7 +291,7 @@ let remove_action parameters error rule_id remove store_result =
 (*return a potential sites of side effects in the case of half break action*)
 
 let add_link_pair_agent_rule parameters error (agent_type, rule_id)
-    l(*(site_type, state)*) store_result =
+    l store_result =
   let error, old =
     match
       Ckappa_sig.AgentRule_map_and_set.Map.find_option_without_logs
@@ -312,7 +307,6 @@ let add_link_pair_agent_rule parameters error (agent_type, rule_id)
     Ckappa_sig.AgentRule_map_and_set.Map.add_or_overwrite
       parameters error
       (agent_type, rule_id)
-      (*((site_type, state) :: old)*)
       new_list
       store_result
   in
@@ -999,7 +993,8 @@ let collect_modified_map parameter error rule_id rule store_result =
            (*let agent_type = agent.Cckappa_sig.agent_name in*)
            (*old set*)
            let error, old_set =
-             get_rule_id_set parameter error rule_id
+             get_rule_id_set parameter error
+               rule_id
                Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
                store_result
            in
@@ -1072,7 +1067,9 @@ let store_project_modified_map parameter error rule_id store_modified_map
   in
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.add
-      parameter error rule_id project_set
+      parameter error
+      rule_id
+      project_set
       store_result
   in
   error, store_result

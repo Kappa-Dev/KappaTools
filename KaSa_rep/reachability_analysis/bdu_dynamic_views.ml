@@ -342,7 +342,7 @@ let scan_rule_dynamic parameters log_info error _compiled
       parameters
       log_info
       error
-      store_pre_static.Bdu_static_views.store_test_modif_map
+      store_pre_static.Bdu_static_views.store_test_modif_map (*common-static*)
       store_potential_side_effects
       store_covering_classes_id
       covering_classes

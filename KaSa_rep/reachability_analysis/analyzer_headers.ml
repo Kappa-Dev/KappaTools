@@ -230,17 +230,6 @@ let set_views_lhs sites static =
     }
     static
 
-(*let get_created_bonds static =
-  (get_bdu_common_static static).Common_static.store_created_bonds
-
-let set_created_bonds sites static =
-  set_bdu_common_static
-    {
-      (get_bdu_common_static static) with
-      Common_static.store_created_bonds = sites
-    }
-    static*)
-
 let get_modified_map static =
   (get_bdu_common_static static).Common_static.store_modified_map
 
