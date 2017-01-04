@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 03 2017>
+  * Last modification: Time-stamp: <Jan 04 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -240,7 +240,7 @@ let half_break_action parameters error handler rule_id half_break store_result =
             parameters
             error
             (agent_type, site_type)
-            (rule_id, state_min)
+            (rule_id, state_min) (* JF: No: You should not privilieged the min value, you should store the interval as a pair of states *)
             store_result
         in
         error, store_result
@@ -608,6 +608,7 @@ let collect_agent_type_state parameter error agent site_type =
           parameter error __POS__ Exit Ckappa_sig.dummy_state_index
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+        (* JF: Why do you output only the upper bound and not the interval (as a apir of state) ? *)
         if Ckappa_sig.compare_state_index state Ckappa_sig.dummy_state_index > 0
         then
           error, state
@@ -822,7 +823,8 @@ let get_agent_info_from_agent_interface parameters error agent_id agent
        let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
        let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
        if state_max = state_min
-       then
+       then (* JF: No, you should store the interval as a pair of sites,
+               and not only one random bond *)
          let error, store_result =
            Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
              parameters error
@@ -847,6 +849,12 @@ let collect_views_pattern_aux parameter error views store_result =
       (fun parameter error agent_id agent store_result ->
          match agent with
          | Cckappa_sig.Unknown_agent _
+(* JF: Unknown_agent cannot be dealt as ghost agent *)
+(* -> A ghost agent denotes no agent in a pattern, thus it is always satisfy *
+(* A Dead_agent or an unknown agent, can never be satisfied *)
+(* Whatever you do, a ghost agent shoudl not change the result *)
+(* If the pattern contains an Unknown agent or a dead agent the pattern may not be reachable *)
+
          | Cckappa_sig.Ghost -> error, store_result (*CHECK*)
            (*Exception.warn parameter error __POS__ Exit
              ~message: "views in a pattern on the lhs is an unknown agent or a ghost agent"
