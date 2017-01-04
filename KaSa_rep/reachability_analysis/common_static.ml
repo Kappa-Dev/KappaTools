@@ -850,7 +850,7 @@ let collect_views_pattern_aux parameter error views store_result =
          match agent with
          | Cckappa_sig.Unknown_agent _
 (* JF: Unknown_agent cannot be dealt as ghost agent *)
-(* -> A ghost agent denotes no agent in a pattern, thus it is always satisfy *
+(* -> A ghost agent denotes no agent in a pattern, thus it is always satisfy *)
 (* A Dead_agent or an unknown agent, can never be satisfied *)
 (* Whatever you do, a ghost agent shoudl not change the result *)
 (* If the pattern contains an Unknown agent or a dead agent the pattern may not be reachable *)
