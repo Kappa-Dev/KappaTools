@@ -1,5 +1,5 @@
 # Output of 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-u' 'event' '-l' '2000' '-d' 'output' '-p' '20' '--time-independent'
-[T], AB, Cuu, Cpu, Cpp
+"[T]", "AB", "Cuu", "Cpu", "Cpp"
 0., 0, 10000, 0, 0
 0.163219624196, 17, 10000, 0, 0
 0.307225214229, 31, 9999, 1, 0

@@ -211,7 +211,7 @@ let print_header_raw is_tsv f a =
     if is_tsv then fun f -> Format.pp_print_string f "\t"
     else Pp.comma in
   Format.fprintf f "@[<h>%a@]@."
-    (Pp.array print_sep (fun _ -> Format.pp_print_string)) a
+    (Pp.array print_sep (fun _ f x -> Format.fprintf f "\"%s\"" x)) a
 
 let print_values_raw is_tsv f l =
   let print_sep =

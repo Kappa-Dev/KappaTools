@@ -1,5 +1,5 @@
 # Output of 'KaSim' 'abc-pert.ka' '-seed' '924556145' '-u' 'e' '-l' '100000' '-p' '0' '-d' 'output' '--time-independent' '-mode' 'batch'
-[T], AB, Cuu, Cpu, Cpp, 'n_c'
+"[T]", "AB", "Cuu", "Cpu", "Cpp", "n_c"
 0., 0, 0, 0, 0, 0
 0., 0, 0, 0, 0, 0
 9.94411282076, 730, 0, 0, 0, 0

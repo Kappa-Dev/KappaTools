@@ -1,5 +1,5 @@
 # Output of 'KaSim' 'empty.ka' '-l' '6' '-d' 'output' '-seed' '126704914' '-p' '0.2' '--time-independent'
-[T], goal
+"[T]", "goal"
 0., 0
 0.2, 1
 0.4, 1

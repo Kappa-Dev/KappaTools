@@ -28,7 +28,8 @@ let not_an_id s =
     String.iter
       (fun c ->
          let i = int_of_char c in
-         if i < 48 || i > 122 || (i > 57 && (i < 65 || (i > 90 && i < 97)))
+         if i < 48 || i > 122 ||
+            (i > 57 && (i < 65 || (i > 90 && i <> 95 && i < 97)))
          then raise Not_found)
       s;
     false

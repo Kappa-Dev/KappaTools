@@ -1,5 +1,5 @@
 # Output of 'KaSim' 'pseudo.ka' '-seed' '924556145' '-var' 'n_a' '1000' '-u' 'e' '-l' '10000' '-d' 'output' '--time-independent' '-p' '100'
-[T], c
+"[T]", "c"
 0., 0
 0.0526567245143, 0
 0.100830106607, 2
