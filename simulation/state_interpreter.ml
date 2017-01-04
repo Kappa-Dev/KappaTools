@@ -181,8 +181,6 @@ let do_modification ~outputs env counter graph state modification =
     (false, graph, state)
 
 let perturbate ~outputs env counter graph state =
-  let () = Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
-      state.perturbations_not_done_yet in
   let get_alg i = get_alg env state i in
   let rec do_until_noop i graph state stop =
     if stop || i >= Environment.nb_perturbations env then
@@ -277,6 +275,9 @@ let one_rule ~outputs dt stop env counter graph state =
         (fun fl -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
         state.flux in
     let () =
+      Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
+        state.perturbations_not_done_yet in
+    let () =
       if !Parameter.debugModeOn then
         Format.printf "@[<v>Obtained@ %a@]@."
           (Rule_interpreter.print env) graph'' in
@@ -349,6 +350,9 @@ let a_loop ~outputs env counter graph state =
     Counter.fill ~outputs
       counter (observables_values env graph' state') in
   if stop then
+    let () =
+      Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
+        state.perturbations_not_done_yet in
     let (_,graph'',state'') =
       perturbate ~outputs env counter graph' state' in
     (true,graph'',state'')
