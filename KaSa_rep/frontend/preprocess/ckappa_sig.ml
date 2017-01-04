@@ -391,6 +391,17 @@ module PairAgentSiteState_map_and_set =
          let print _ _ = ()
        end))
 
+module PairAgentSitesState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (c_agent_name * c_site_name * c_site_name * c_state) *
+           (c_agent_name * c_site_name * c_site_name * c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
 (*******************************************************************)
 
 module Views_bdu =
@@ -676,7 +687,7 @@ let rec join_mixture parameters error mixture1 mixture2 =
   | _,PLUS(_)->
     Exception.warn parameters error __POS__ Exit EMPTY_MIX
 
-let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX 
+let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX
 (*TO DO*)
 
 type 'mixture rule =

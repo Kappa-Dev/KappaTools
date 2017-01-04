@@ -819,6 +819,33 @@ let collect_action_binding parameter error rule_id rule store_result =
 (*views in pattern, this function test pattern on the lhs*)
 (***************************************************************************)
 
+let get_agent_info_from_agent_interface parameters error agent_id agent
+    store_result =
+  let agent_type = agent.Cckappa_sig.agent_name in
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site_type port (error, store_result) ->
+       (*TODO: check state*)
+       let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+       let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
+       if state_max = state_min
+       then
+         let error, store_result =
+           Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
+             parameters error
+             (agent_id, agent_type, site_type, state_max)
+             store_result
+         in
+         error, store_result
+       else
+         let error, store_result =
+           Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
+             parameters error
+             (agent_id, agent_type, site_type, state_min)
+             store_result
+         in
+         error, store_result
+    ) agent.Cckappa_sig.agent_interface (error, store_result)
+
 let collect_views_pattern_aux parameter error views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
@@ -826,25 +853,46 @@ let collect_views_pattern_aux parameter error views store_result =
       (fun parameter error agent_id agent store_result ->
          match agent with
          | Cckappa_sig.Unknown_agent _
-         | Cckappa_sig.Ghost -> error, store_result
+         | Cckappa_sig.Ghost -> error, store_result (*CHECK*)
+           (*Exception.warn parameter error __POS__ Exit
+             ~message: "views in a pattern on the lhs is an unknown agent or a ghost agent"
+             store_result*)
          | Cckappa_sig.Dead_agent (agent,_,_,_)
          | Cckappa_sig.Agent agent ->
-           let agent_type = agent.Cckappa_sig.agent_name in
            let error, store_result =
+             get_agent_info_from_agent_interface
+               parameter error
+               agent_id
+               agent
+               store_result
+           in
+           (*let agent_type = agent.Cckappa_sig.agent_name in*)
+           (*let error, store_result =
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type port (error, store_result) ->
                   (*TODO: check state*)
-                  let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-                  let error, store_set =
-                    Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
-                      parameter error
-                      (agent_id, agent_type, site_type, state)
-                      store_result
-                  in
-                  error, store_result
+                  let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                  let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
+                  if state_max = state_min
+                  then
+                    let error, store_result =
+                      Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
+                        parameter error
+                        (agent_id, agent_type, site_type, state_max)
+                        store_result
+                    in
+                    error, store_result
+                  else
+                    let error, store_result =
+                      Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
+                        parameter error
+                        (agent_id, agent_type, site_type, state_min)
+                        store_result
+                    in
+                    error, store_result
                ) agent.Cckappa_sig.agent_interface
                (error, store_result)
-           in
+           in*)
            error, store_result
       ) views store_result
   in
@@ -855,7 +903,16 @@ let collect_views_pattern_aux parameter error views store_result =
 (***************************************************************************)
 
 let collect_views_aux parameter error rule_id views store_result =
+  let error, store_set =
+    collect_views_pattern_aux parameter error views
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
+  in
   let error, store_result =
+    add_map_rule parameter error rule_id store_set store_result
+  in
+  error, store_result
+
+  (*let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
       error
       (fun parameter error agent_id agent store_result ->
@@ -907,8 +964,9 @@ let collect_views_aux parameter error rule_id views store_result =
            error, store_result
       ) views store_result
   in
-  error, store_result
+    error, store_result*)
 
+(*TODO: check the state*)
 let collect_views_rhs parameter error rule_id rule store_result =
   collect_views_aux
     parameter error
@@ -916,6 +974,7 @@ let collect_views_rhs parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
     store_result
 
+(*TODO: check the state*)
 let collect_views_lhs parameter error rule_id rule store_result =
   collect_views_aux
     parameter error
@@ -924,90 +983,8 @@ let collect_views_lhs parameter error rule_id rule store_result =
     store_result
 
 (***************************************************************************)
-
-(*let collect_created_bonds parameter error rule rule_id store_result =
-  List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
-      let agent_id = site_add1.Cckappa_sig.agent_index in
-      let site_type = site_add1.Cckappa_sig.site in
-      let error, agent =
-        match
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter error
-            agent_id
-            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        with
-        | error, None ->
-          Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
-        | error, Some agent -> error, agent
-      in
-      let error, (agent_type, state) =
-        collect_agent_type_state
-          parameter
-          error
-          agent
-          site_type
-      in
-      (*------------------------------------------------------------*)
-      (*second agent*)
-      let agent_id1 = site_add2.Cckappa_sig.agent_index in
-      let site_type1 = site_add2.Cckappa_sig.site in
-      let error, agent1 =
-        match
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-            parameter error
-            agent_id1
-            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-        with
-        | error, None ->
-          Exception.warn parameter error __POS__ Exit Cckappa_sig.Ghost
-        | error, Some agent -> error, agent
-      in
-      let error, (agent_type1, state1) =
-        collect_agent_type_state
-          parameter
-          error
-          agent1
-          site_type1
-      in
-      (*------------------------------------------------------------*)
-      let error, old_set =
-        get_rule_id_set parameter error rule_id
-          Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-          store_result
-      in
-      let pair =
-        (agent_id, agent_type, site_type, state),
-        (agent_id1, agent_type1, site_type1, state1)
-      in
-      let sym (x,y) = (y,x) in
-      let error', new_set =
-        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-          parameter error pair old_set
-      in
-      let error =
-        Exception.check_point
-          Exception.warn parameter error error' __POS__ Exit
-      in
-      let error', new_set =
-        (* Be careful, in some domains bonds are oriented *)
-        (* Thus, when adding a bond, both direction should be considered *)
-        Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-          parameter error (sym pair) new_set
-      in
-      let error =
-        Exception.check_point
-          Exception.warn parameter error error' __POS__ Exit
-      in
-      (*------------------------------------------------------------*)
-      let error, store_result =
-        Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-          parameter error
-          rule_id
-          new_set
-          store_result
-      in
-      error, store_result
-    ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind*)
+(*Modification*)
+(***************************************************************************)
 
 let collect_modified_map parameter error rule_id rule store_result =
   let error, store_result =
@@ -1019,14 +996,21 @@ let collect_modified_map parameter error rule_id rule store_result =
              agent.Cckappa_sig.agent_interface
          then error, store_result
          else
-           let agent_type = agent.Cckappa_sig.agent_name in
+           (*let agent_type = agent.Cckappa_sig.agent_name in*)
            (*old set*)
            let error, old_set =
              get_rule_id_set parameter error rule_id
                Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
                store_result
            in
-           let error', new_set =
+           let error, new_set =
+             get_agent_info_from_agent_interface
+               parameter error
+               agent_id
+               agent
+               old_set
+           in
+           (*let error', new_set =
              Ckappa_sig.Site_map_and_set.Map.fold
                (fun site_type port (error, store_set) ->
                   (*TODO: check state*)
@@ -1045,7 +1029,7 @@ let collect_modified_map parameter error rule_id rule store_result =
            let error =
              Exception.check_point
                Exception.warn parameter error error' __POS__ Exit
-           in
+           in*)
            let error, store_result =
              Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
                parameter
@@ -1072,11 +1056,9 @@ let collect_modified_map parameter error rule_id rule store_result =
 let store_project_modified_map parameter error rule_id store_modified_map
     store_result =
   let error, modified_set =
-    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-            parameter error rule_id store_modified_map
-    with
-    | error, None -> error, Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-    | error, Some s -> error, s
+    get_rule_id_set parameter error rule_id
+      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
+      store_modified_map
   in
   (*project set*)
   let error, project_set =
@@ -1108,7 +1090,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       rule
       store_result.store_agent_name
   in
-  (*TODO*)
   let error, store_agent_name_from_pattern =
     collect_agent_name_from_pattern
       parameter
@@ -1173,13 +1154,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   let error, store_views_lhs =
     collect_views_lhs parameter error rule_id rule store_result.store_views_lhs
   in
-  (*let error, store_created_bonds =
-    collect_action_binding
-    (*collect_created_bonds*)
-      parameter error rule_id
-      rule
-      store_result.store_created_bonds
-  in*)
   let error, store_modified_map =
     collect_modified_map parameter error rule_id rule
       store_result.store_modified_map
@@ -1199,7 +1173,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_action_binding = store_action_binding;
    store_views_rhs = store_views_rhs;
    store_views_lhs = store_views_lhs;
-   (*store_created_bonds = store_created_bonds;*)
    store_modified_map = store_modified_map;
    store_project_modified_map = store_project_modified_map;
   }
@@ -1290,45 +1263,20 @@ let consolidate_site_rule_dependencies parameter error site_to_rules =
 
 let wake_up parameter error agent site site_to_rules =
   match
-    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get parameter error
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.unsafe_get
+      parameter error
       (agent,site)
       site_to_rules
   with
   | error, None -> error, []
   | error, Some l -> error, l
 
-(*Ckappa_sig?*)
-module PairAgentSitesState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name *
-            Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
-            Ckappa_sig.c_state) *
-           (Ckappa_sig.c_agent_name *
-            Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
-            Ckappa_sig.c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module AgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
 let get_tuple_of_interest parameters error agent site map =
   match
-    AgentSite_map_and_set.Map.find_option_without_logs
+    Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
       parameters error
       (agent, site)
       map
   with
-  | error, None -> error, PairAgentSitesState_map_and_set.Set.empty
+  | error, None -> error, Ckappa_sig.PairAgentSitesState_map_and_set.Set.empty
   | error, Some s -> error, s

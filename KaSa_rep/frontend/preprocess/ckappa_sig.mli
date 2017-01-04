@@ -235,6 +235,11 @@ module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
          (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
 
+module PairAgentSitesState_map_and_set: Map_wrapper.S_with_logs
+  with type elt =
+         (c_agent_name * c_site_name * c_site_name * c_state) *
+         (c_agent_name * c_site_name * c_site_name * c_state)
+
 (****************************************************************************)
 
 type binding_state =
