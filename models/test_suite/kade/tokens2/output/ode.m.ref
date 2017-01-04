@@ -106,8 +106,8 @@ fid = fopen (filename,'w');
 fprintf(fid,'# KaDE ../../simulation/activity/activity.ka -d output -l 1 -p 0.1\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
-fprintf(fid,'|t|,')
-fprintf(fid,'|T|,')
+fprintf(fid,'t,')
+fprintf(fid,'T,')
 fprintf(fid,'\n')
 for j=1:n_points
     for i=1:nobs

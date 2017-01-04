@@ -92,7 +92,7 @@ and bool_of_yojson f_mix f_id = function
 
 let rec print pr_mix pr_tok pr_var f = function
   | CONST n -> Nbr.print f n
-  | ALG_VAR lab -> Format.fprintf f "'%a'" pr_var lab
+  | ALG_VAR lab -> pr_var f lab
   | KAPPA_INSTANCE ast -> pr_mix f ast
   | TOKEN_ID tk -> Format.fprintf f "|%a|" pr_tok tk
   | STATE_ALG_OP op -> Operator.print_state_alg_op f op

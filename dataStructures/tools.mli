@@ -43,6 +43,7 @@ val remove_consecutive_double_in_list : 'a list -> 'a list
 (** {5 Misc utilities } *)
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
+val not_an_id : string -> bool
 val read_input : unit -> string
 val min_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
 val max_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)

@@ -1,5 +1,5 @@
 # Output of 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-p' '100' '--time-independent'
-[T], 'C'
+[T], C
 0., 0
 0.00987921280956, 0
 0.0189313906544, 2

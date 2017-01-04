@@ -45,7 +45,6 @@ rule token = parse
 	 | "<->" {KAPPA_LRAR}
 	 | "->" {KAPPA_RAR}
 	 | "<-" {LAR}
-	 | ":=" {ASSIGN}
 	 | "<>" {DIFF}
 	 | pert as s {match s with
 		      | "$DEL" -> DELETE
@@ -54,7 +53,7 @@ rule token = parse
 		      | "$STOP" -> STOP
 		      | "$FLUX" -> FLUX
 		      | "$TRACK" -> TRACK
-		      | "$UPDATE" -> ASSIGN2
+		      | "$UPDATE" -> ASSIGN
 		      | "$PRINT" -> PRINTF
 		      | "$PRINTF" -> PRINTF
 		      | "$PLOTENTRY" -> PLOTENTRY

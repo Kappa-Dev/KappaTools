@@ -1,5 +1,5 @@
 # Output of 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent'
-[T], 'AB', 'Cuu', 'Cpu', 'Cpp', 0
+[T], AB, Cuu, Cpu, Cpp, 0
 0., 0, 0, 0, 0, 0
 3.18857310231, 698, 0, 0, 0, 0
 5.19436641162, 734, 9930, 70, 0, 0

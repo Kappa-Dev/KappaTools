@@ -272,7 +272,7 @@ let print_one_size tk f mix =
        (fun f -> Format.pp_print_string f " + ")
        (print_tok
           (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
-          Format.pp_print_string Format.pp_print_string))
+          Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)))
     tk
 let print_arrow f bidir =
   Format.pp_print_string f (if bidir then "<->" else "->")
@@ -290,7 +290,7 @@ let print_rates un op f def =
     f "%a%t"
     (print_raw_rate
        (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
-       Format.pp_print_string Format.pp_print_string op)
+       Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x) op)
     def
     (fun f ->
        match un with
@@ -300,12 +300,13 @@ let print_rates un op f def =
            f "(%a:%a)"
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
-              Format.pp_print_string Format.pp_print_string) d
+              Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)) d
            (Pp.option (fun f (md,_) ->
                         Format.fprintf f ":%a"
                         (Alg_expr.print
                            (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
-                           Format.pp_print_string Format.pp_print_string) md))
+                           Format.pp_print_string
+                           (fun f x -> Format.fprintf f "'%s'" x)) md))
            max_dist)
 
 let print_ast_rule f r =

@@ -23,6 +23,17 @@ let read_input () =
   with
   | Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
 
+let not_an_id s =
+  try
+    String.iter
+      (fun c ->
+         let i = int_of_char c in
+         if i < 48 || i > 122 || (i > 57 && (i < 65 || (i > 90 && i < 97)))
+         then raise Not_found)
+      s;
+    false
+  with Not_found -> true
+
 let unsome default = function
   | None -> default
   | Some a -> a

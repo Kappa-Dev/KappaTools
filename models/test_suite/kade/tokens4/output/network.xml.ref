@@ -69,7 +69,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : expo3 -->
-<!-- reaction:  | ((|T()| + |t|) +  nT ):t ->  | 2.2:t  -->
+<!-- reaction:  | ((|T()| + |t|) + nT):t ->  | 2.2:t  -->
 <reaction id="re2" name="expo3" reversible="false" fast="false">
 <listOfReactants>
 </listOfReactants>

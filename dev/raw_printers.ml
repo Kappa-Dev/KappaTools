@@ -1,6 +1,6 @@
 let print_ast_alg f a =
   Alg_expr.print (fun _ () -> ()) (fun f (x,_) -> Format.pp_print_string f x)
-		    (fun f (x,_) -> Format.pp_print_string f x) f a
+    (fun f (x,_) -> Format.fprintf f "'%s'" x) f a
 let print_alg = Kappa_printer.alg_expr ?env:None
 let print_bool f a =
   Alg_expr.print_bool (fun _ () -> ())

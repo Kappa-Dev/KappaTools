@@ -11,7 +11,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN ASSIGN2 PRINTF STOP SNAPSHOT RUN THEN ELSE
+%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -166,18 +166,9 @@ effect_list:
     ;
 
 effect:
-    | LABEL ASSIGN alg_expr
-      /*updating the rate of a rule -backward compatibility*/
-				{
-				  ExceptionDefn.deprecated
-				    ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
-							  (Parsing.symbol_end_pos ()))
-				    "perturbation effect"
-				    (fun f ->
-				     Format.pp_print_string
-				       f "use $UPDATE perturbation instead of the ':=' assignment (see Manual)");
-					Ast.UPDATE (($1,rhs_pos 1),$3)}
-    | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
+    | ASSIGN ID alg_expr /*updating the rate of a rule*/
+						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
+    | ASSIGN LABEL alg_expr /*updating the rate of a rule*/
 						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
     | TRACK LABEL boolean
 	    {Ast.CFLOWLABEL ($3,($2,rhs_pos 2))}
@@ -190,13 +181,11 @@ effect:
 	   else if $4 && $3 = "relative" then Ast.FLUX (true,$2)
 	     else raise (ExceptionDefn.Syntax_Error
 	       ("Incorrect FLUX expression",rhs_pos 3))}
-    | INTRO multiple_mixture
-	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix)}
+    | INTRO alg_expr non_empty_mixture {Ast.INTRO ($2,($3, rhs_pos 3))}
     | INTRO error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'"))}
-    | DELETE multiple_mixture
-	     {let (alg,mix) = $2 in Ast.DELETE (alg,mix)}
+    | DELETE alg_expr non_empty_mixture {Ast.DELETE ($2,($3, rhs_pos 3))}
     | DELETE error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
@@ -235,6 +224,7 @@ variable_declaration:
 	      in
 	      (($1,rhs_pos 1),(Alg_expr.KAPPA_INSTANCE $2,rhs_pos 2))}
     | LABEL alg_expr {(($1,rhs_pos 1),$2)}
+    | ID alg_expr {(($1,rhs_pos 1),$2)}
     | LABEL error
 	    {raise
 	       (ExceptionDefn.Syntax_Error
@@ -312,6 +302,7 @@ constant:
 variable:
     | PIPE ID PIPE {add_pos (Alg_expr.TOKEN_ID ($2))}
     | PIPE non_empty_mixture PIPE { add_pos (Alg_expr.KAPPA_INSTANCE $2) }
+    | ID {add_pos (Alg_expr.ALG_VAR ($1))}
     | LABEL {add_pos (Alg_expr.ALG_VAR ($1))}
     | TIME {add_pos (Alg_expr.STATE_ALG_OP (Operator.TIME_VAR))}
     | EVENT {add_pos (Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR))}
@@ -369,13 +360,6 @@ rate:
 alg_with_radius:
     | alg_expr {($1,None)}
     | alg_expr TYPE alg_expr {($1, Some $3)}
-    ;
-
-multiple_mixture:
-    | alg_expr non_empty_mixture {($1,($2, rhs_pos 2))}
-      /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
-    | non_empty_mixture
-	{(Location.dummy_annot (Alg_expr.CONST (Nbr.one)),add_pos $1)}
     ;
 
 non_empty_mixture:

@@ -112,10 +112,10 @@ fid = fopen (filename,'w');
 fprintf(fid,'# KaDE ../../cflows/abc/abc.ka -d output -l 1 -p 0.1\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
-fprintf(fid,'|AB|,')
-fprintf(fid,'|Cuu|,')
-fprintf(fid,'|Cpu|,')
-fprintf(fid,'|Cpp|,')
+fprintf(fid,'AB,')
+fprintf(fid,'Cuu,')
+fprintf(fid,'Cpu,')
+fprintf(fid,'Cpp,')
 fprintf(fid,'\n')
 for j=1:n_points
     for i=1:nobs

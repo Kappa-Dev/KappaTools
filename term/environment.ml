@@ -79,7 +79,12 @@ let print_alg ?env f id =
   match env with
   | None -> Format.fprintf f "__alg_%i" id
   | Some env ->
-    Format.fprintf f "%s" (NamedDecls.elt_name env.algs id)
+    let name = NamedDecls.elt_name env.algs id in
+    let special = Tools.not_an_id name in
+    let () = if special then Format.pp_print_string f "'" in
+    let () = Format.pp_print_string f name in
+    if special then Format.pp_print_string f "'"
+
 let print_token ?env f id =
   match env with
   | None -> Format.fprintf f "__token_%i" id

@@ -1,5 +1,5 @@
 # Output of 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent'
-[T], 'AB', 'Cuu', 'Cpu', 'Cpp', 'n_c'
+[T], AB, Cuu, Cpu, Cpp, 'n_c'
 0., 0, 0, 0, 0, 0
 39.5853048404, 2, 9994, 6, 0, 10000
 42.5224814125, 1, 9984, 16, 0, 10000

@@ -44,7 +44,7 @@ Environment:
     6:Cpp: |C(x1~p?, x2~p?)|
     7:n_ab: 1000
     8:n_c: 10000
-  Plot: [T] 'AB' 'Cuu' 'Cpu' 'Cpp'
+  Plot: [T] AB Cuu Cpu Cpp
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc6*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
