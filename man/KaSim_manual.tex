@@ -74,7 +74,7 @@
 
 \newcommand{\Remark}{\paragraph{Remark}}
 
-\def\version{3.90}
+\def\version{4.0}
 
 \title{KaSim~\& KaSa~reference manual\\ \small (release \version)}
 \author{Pierre Boutillier, J\'er\^ome Feret, Jean Krivine\thanks{corresponding author: jean.krivine@irif.fr} and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
@@ -339,12 +339,12 @@ skeletons (describe formaly in fig~\ref{tab:patterns}):
   just write its name to represent its state. If it has a internal
   state, you write it after a '\intstate'. For example, the graph
   TODO is written A(x,y\intstate{}p,z\intstate{}0)
-\item When a site is part of an edge, you assign an integer identifier
-  $n$ to this edge and you specify the appartenance of the site to
-  this edge by writing site\_name$!n$. The graph TODO can be
+\item When a site is part of an edge, you assign an arbitrary integer
+  identifier $n$ to this edge and you specify the appartenance of the
+  site to this edge by writing site\_name$!n$. The graph TODO can be
   reprensented as A(x!23,y\intstate{}u!4,z\intstate{}1),
-  A(x!4,y\intstate{}u!954,z\intstate{}1),
-  A(x!95,y\intstate{}u!234,z\intstate{}1).
+  A(x!4,y\intstate{}u!95,z\intstate{}1),
+  A(x!95,y\intstate{}u!23,z\intstate{}1).
 
   \Remark{Each link identifier appears exactly twice of course. this is a
   consequence of the regidity of Kappa.}
@@ -355,7 +355,7 @@ Kappa strength is to describe transformations by only mentionning (and
 storing) the relevant part of the subgraph required for that
 transfor;ation to be possible. It plays a key role in resisting
 combinatorial explosion when writing models. We use the \emph{don't
-  care, don't write}\index{don't care don't write} principle. If a
+  care, don't write} (DCDW)\index{don't care don't write} principle. If a
 transformation occurs independently of the state of a site of an
 agent, don't mention it in the \emph{pattern} to match. The pattern
 A(x,z) represents an agent of type A whose sites x and z are free but
@@ -428,7 +428,7 @@ declare a \imp{bi-directional rule} using the convention:
 \item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it kappa\_expression} $\lrar$ {\it kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}
 }
 
-Note that the above declaration\index{declaration} is equivalent to
+The above declaration\index{declaration} is equivalent to
 writing, in addition of \ttt{\var{my-rule}}, another rule named
 \ttt{\var{my rule\_op}} which swaps left and right hand sides, and has
 rate \textit{rate$^-$}.
@@ -477,26 +477,73 @@ With the signature\index{agent signature} of \ttt{A} defined in the previous sec
 \begin{lstlisting}[language=kappa]
 'A dimerization' A(x),A(y~p) -> A(x!1),A(y~p!1) @ 'gamma'
 \end{lstlisting}
-declares a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond). Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write}.
+declares a dimerization rule between two instances of agent \ttt{A}
+provided the second is phosphorylated (say that is here the meaning of
+\ttt{p}) on site \ttt{y}.
 
-\subsubsection*{Adding and deleting agents}
-Sticking with \ttt{A}'s signature\index{agent signature}, the rule
+Remember that the identifier \ttt{!1} of the bound is arbitrary and
+that following (DCDW)\index{don't care don't write}, the site \ttt{z}
+of \ttt{A} is not mentioned in the expression because it has no
+influence on the triggering of this rule.
+
+\subsubsection*{Degradation and synthesis}
+In the right hand side of a rule, the k-th agent is supposed to
+correspond to the (transformed) k-th agent of the left hand side. If
+you put more agent on the left, supernumerary agents are deleted. If
+you put more on the right, agents are created.
+
+Sticking with \ttt{A}'s signature\index{agent signature}, one can
+express that an unphosphoralated \ttt{A} can collapse if not linked to
+anyone (regardless of the state of z) by writing
+\begin{lstlisting}[language=kappa]
+'destroy A' A(x,y~u,z) -> @ 'gamma'
+\end{lstlisting}
+
+Similarly, the rule
 \begin{lstlisting}[language=kappa]
 'budding A' A(z) -> A(z!1),A(x!1) @ 'gamma'
 \end{lstlisting}
-indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, the interface of the new copy is not completely described. Following the DCDW convention\index{don't care don't write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature\index{agent signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
+indicates that an agent \ttt{A} free on site \ttt{z}, no matter what
+its internal state is, may beget a new copy of \ttt{A} bound to it
+\via site \ttt{x}.
 
-Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS.
-In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the largest $i\leq n,k$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same sites. In which case we say that for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
+Note that in the RHS, the interface of the new copy is not completely
+described. Following the DCDW convention\index{don't care don't
+  write}, \KaSim~will then assume that the sites that are not
+mentioned are created in the \emph{default state}\index{default
+  state}, \ie they appear free of any bond and their internal state
+(if any) is the first of the list shown in the signature\index{agent
+  signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
+
+Determining which agents are kept (potentially transformed), which
+are deleted, which are created is in fact a bit tricky.
+\KaSim~respects the \emph{longest prefix convention}\index{longest
+  prefix convention} to determine which agent in the RHS stems from an
+agent in the LHS.  In a word, from a rule of the form
+$a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being
+agents, one computes the largest $i\leq n,k$ such that the agents
+$a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the
+$a_j$s and $b_j$s have the same name and the same sites. In which case
+we say that for all $j\leq i$, $a_j$ is \emph{preserved} by the
+transition and for all $j>i$, $a_j$ is \emph{deleted} by the
+transition and $b_j$ is \emph{created} by the transition.
+
+This convention makes
 \begin{lstlisting}[language=kappa]
 'deleting A' A(x!1),A(z!1)} -> A(x) @ 'gamma'
 \end{lstlisting}
-which will remove the \ttt{A} agent in the mixture\index{mixture} that will match the second occurrence of \ttt{A} in this rule.
-Note that the rule:
+and
 \begin{lstlisting}[language=kappa]
-'weird' A(x!1),A(z!1) -> A(z) @ 'gamma'
+'weird' A(z!1),A(x!1) -> A(x) @ 'gamma'
 \end{lstlisting}
-will delete both \ttt{A}s and create a new one with a free \ttt{z} site.
+extremmely diferent.
+
+The first one removes the \ttt{A} agent in the mixture\index{mixture}
+that will match the second occurrence of \ttt{A} in the rule (the one
+that used to be linked on \ttt{z}) and it leaves the other sites than
+\ttt{x} of the first \ttt{A} untouched.  The second one will delete
+both \ttt{A}s and create a fresh new \ttt{A} with all its site
+free. Side-effects (explained right below) are dramatically different.
 
 \subsubsection*{Side effects}\label{sec:side-effect}
 
