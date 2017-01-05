@@ -31,7 +31,7 @@ OCAMLINCLUDES = -I KaSa_rep/lib/light
 endif
 
 SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
-SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness)
+SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness) $(MANGENREP)version.tex
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 VERSION=generated/version.ml
@@ -95,6 +95,10 @@ $(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css api/tes
 	./dev/generate-string.sh $^  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
+	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
+	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
+
+$(MANGENREP)version.tex: $(MANREP)version.tex.skel $(wildcard .git/refs/heads/*) $(MANGENREP)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
