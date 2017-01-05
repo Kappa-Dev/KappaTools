@@ -304,20 +304,22 @@ let one_rule ~outputs dt stop env counter graph state =
 let activity state = Random_tree.total state.activities
 
 let a_loop ~outputs env counter graph state =
-  let activity = activity state in
-  let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
+  let (stop,graph',state') =
+    perturbate ~outputs env counter graph state in
+  let activity = activity state' in
+  let rd = Random.State.float (Rule_interpreter.get_random_state graph') 1.0 in
   let dt = abs_float (log rd /. activity) in
 
-  let (stop,graph',state' as out) =
+  let (stop,graph'',state'' as out) =
     (*Activity is null or dt is infinite*)
     if not (activity > 0.) || dt = infinity then
-      match state.stopping_times with
+      match state'.stopping_times with
       | [] ->
         let () =
           if !Parameter.dumpIfDeadlocked then
             outputs
               (Data.Snapshot
-                 (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
+                 (Rule_interpreter.snapshot env counter "deadlock.ka" graph')) in
         let () =
           ExceptionDefn.warning
             (fun f ->
@@ -325,37 +327,35 @@ let a_loop ~outputs env counter graph state =
                  f "A deadlock was reached after %d events and %Es (Activity = %.5f)"
                  (Counter.current_event counter)
                  (Counter.current_time counter) activity) in
-        (true,graph,state)
+        (true,graph',state')
       | (ti,_) :: tail ->
-        let () = state.stopping_times <- tail in
+        let () = state'.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
-        let stop,graph',state' =
-          perturbate ~outputs env counter graph state in
-        (not continue||stop,graph',state')
+        let stop,graph'',state'' =
+          perturbate ~outputs env counter graph' state' in
+        (not continue||stop,graph'',state'')
     else
       (*activity is positive*)
       match state.stopping_times with
       | (ti,_) :: tail
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
-        let () = state.stopping_times <- tail in
+        let () = state'.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
-        let stop,graph',state' =
-          perturbate ~outputs env counter graph state in
-        (not continue||stop,graph',state')
+        let stop,graph'',state'' =
+          perturbate ~outputs env counter graph' state' in
+        (not continue||stop,graph'',state'')
       | _ ->
-        let (stop,graph',state') =
-          perturbate ~outputs env counter graph state in
         one_rule ~outputs dt stop env counter graph' state' in
   let () =
     Counter.fill ~outputs
-      counter (observables_values env graph' state') in
+      counter (observables_values env graph'' state'') in
   if stop then
     let () =
       Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
         state.perturbations_not_done_yet in
-    let (_,graph'',state'') =
-      perturbate ~outputs env counter graph' state' in
-    (true,graph'',state'')
+    let (_,graph''',state''') =
+      perturbate ~outputs env counter graph'' state'' in
+    (true,graph''',state''')
   else out
 
 let end_of_simulation ~outputs form env counter state =
