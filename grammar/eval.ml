@@ -50,8 +50,8 @@ let compile_alg ?origin contact_map domain (alg,pos) =
   | Some (_, _,domain),alg -> domain,alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
-let compile_bool contact_map domain (alg,pos) =
-  match compile_bool (Some (None,contact_map,domain)) (alg,pos) with
+let compile_bool ?origin contact_map domain (alg,pos) =
+  match compile_bool (Some (origin,contact_map,domain)) (alg,pos) with
   | Some (_, _,domain),alg -> domain,alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
@@ -284,8 +284,8 @@ let pert_of_result ast_algs ast_rules contact_map domain res =
     List.fold_left
       (fun (domain, p_id, lpert, tracking_enabled)
         ((pre_expr, modif_expr_list, opt_post),_) ->
-        let (domain',(pre,pre_pos)) =
-          compile_bool contact_map domain pre_expr in
+        let (domain',(pre,pre_pos)) = compile_bool
+            ~origin:(Operator.PERT p_id) contact_map domain pre_expr in
         let (domain, effects) =
           effects_of_modifs
             ast_algs ast_rules contact_map domain' modif_expr_list in
@@ -621,7 +621,7 @@ let build_initial_state
          List.fold_left (fun acc s -> (s,i)::acc) acc s)
       [] env in
   let graph0 = Rule_interpreter.empty
-      ~with_trace ~store_distances random_state env in
-  let state0 = State_interpreter.empty env stops alg_overwrite in
+      ~with_trace ~store_distances random_state env counter alg_overwrite in
+  let state0 = State_interpreter.empty env stops in
   State_interpreter.initialize
     ~bind ~return ~outputs env counter graph0 state0 init_l

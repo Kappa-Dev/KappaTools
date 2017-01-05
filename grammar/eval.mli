@@ -7,7 +7,7 @@
   Primitives.contact_map * Export_to_KaSim.state
 *)
 val compile_bool:
-  Signature.contact_map -> Pattern.PreEnv.t ->
+  ?origin:Operator.rev_dep -> Signature.contact_map -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Alg_expr.bool Location.annot ->
   Pattern.PreEnv.t *
   (Pattern.id array list,int) Alg_expr.bool Location.annot

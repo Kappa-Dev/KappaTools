@@ -2,8 +2,8 @@
 
 type t (** Abstract state *)
 
-val empty : Environment.t -> (Nbr.t * int) list -> (int * Alg_expr.t) list -> t
-(** [empty env stopping_times variable_overwrite] *)
+val empty : Environment.t -> (Nbr.t * int) list -> t
+(** [empty env stopping_times] *)
 
 val initialize :
   bind:('a -> (Rule_interpreter.t * t -> 'a) -> 'a) ->
@@ -14,7 +14,7 @@ val initialize :
 (** [initial env counter graph state] builds up the initial state *)
 
 val observables_values :
-  Environment.t -> Rule_interpreter.t -> t -> Counter.t -> Nbr.t array
+  Environment.t -> Rule_interpreter.t -> Counter.t -> Nbr.t array
 (** Returns (the current biological time, an array of the current
 values of observables) *)
 

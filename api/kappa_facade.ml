@@ -150,21 +150,8 @@ let t_range (t : t) (range : Api_types_j.range) =
   | None -> range
   | Some indexes ->  localize_range range indexes
 
-let create_t
-    ~contact_map
-    ~env
-    ~graph
-    ~state
-    ~store_distances
-    ~init_l
-    ~has_tracking
-    ~lastyield
-    ~file_indexes
-  : t =
-  let counter =
-    Counter.create
-      ~init_t:(0. : float) ~init_e:(0 : int)
-      ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
+let create_t ~contact_map ~env ~counter ~graph ~state ~store_distances
+    ~init_l ~has_tracking ~lastyield ~file_indexes : t =
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   {
@@ -184,8 +171,9 @@ let clone_t t =
   create_t
     ~contact_map:t.contact_map
     ~env:t.env
-    ~graph:t.graph
-    ~state:t.state
+    ~counter:t.counter (* FALSE imperatively modified *)
+    ~graph:t.graph (* FALSE imperatively modified *)
+    ~state:t.state (* FALSE imperatively modified *)
     ~store_distances:t.store_distances
     ~init_l:t.init_l
     ~has_tracking:t.has_tracking
@@ -264,14 +252,17 @@ let build_ast
                     ~max_sharing:false sig_nd tk_nd contact_map result >>=
                   (fun (env,has_tracking,store_distances,_,_,init_l) ->
                      let store_distances = store_distances<>None in
+                     let counter =
+                       Counter.create
+                         ~init_t:(0. : float) ~init_e:(0 : int)
+                         ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
                      let simulation =
                        create_t
-                         ~contact_map:contact_map
-                         ~env:env
+                         ~contact_map ~env ~counter
                          ~graph:(Rule_interpreter.empty
                                    ~with_trace:(has_tracking <>None)
-                                   ~store_distances random_state env)
-                         ~state:(State_interpreter.empty env [] [])
+                                   ~store_distances random_state env counter [])
+                         ~state:(State_interpreter.empty env [])
                          ~store_distances ~init_l ~has_tracking ~lastyield
                          ~file_indexes:(Some indexes)
                      in
@@ -438,8 +429,7 @@ let start
                           ~env:t.env))
                     t.env in
                 let first_obs =
-                  State_interpreter.observables_values
-                    t.env graph state t.counter in
+                  State_interpreter.observables_values t.env graph t.counter in
                 let first_values = prepare_plot_value first_obs in
 
                 let () =

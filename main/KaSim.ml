@@ -176,8 +176,7 @@ let () =
             (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
               Outputs.go (Environment.signatures env)
                 (Data.Plot
-                   (State_interpreter.observables_values
-                      env graph state counter)) in
+                   (State_interpreter.observables_values env graph counter)) in
 
     let () =
       match unary_distances with
