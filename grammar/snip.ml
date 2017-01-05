@@ -1,3 +1,11 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
 let link_occurence_failure key pos =
   raise (ExceptionDefn.Internal_Error
            ("Bug: Link "^string_of_int key^

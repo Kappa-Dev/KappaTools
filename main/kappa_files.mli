@@ -1,4 +1,13 @@
-(** {5 Utilities on files } *)
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
+(** Utilities on files *)
+
 val open_out : string -> out_channel
 val path : string -> string
 val mk_dir_r : string -> unit

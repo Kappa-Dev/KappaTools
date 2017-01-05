@@ -1,3 +1,11 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
 type t = (unit NamedDecls.t * bool array array option) NamedDecls.t
 
 let fold f = NamedDecls.fold (fun i n o _ -> f i n o)

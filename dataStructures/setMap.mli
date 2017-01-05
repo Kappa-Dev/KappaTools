@@ -1,9 +1,15 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
 (** Our own implementattion of Set and Map
 
     Purely functionnal.
-    No function without _with_logs there raises any exception.
-
-    Time-stamp: <Aug 01 2016>*)
+    Functions without _with_logs do NOT raise any exception.*)
 
 module type OrderedType =
 sig

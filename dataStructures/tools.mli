@@ -1,3 +1,13 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
+(** Misc utilities *)
+
 (** {5 Combinators on primitive types *)
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 val unsome : 'a -> 'a option -> 'a

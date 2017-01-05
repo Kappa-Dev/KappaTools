@@ -1,3 +1,11 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
 let int_compare (x: int) y = Pervasives.compare x y
 let int_pair_compare (p,q) (p',q') =
   let o = int_compare p p' in

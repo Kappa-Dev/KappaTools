@@ -1,21 +1,10 @@
-(**
-   * setMap.ml
-   * openkappa
-   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
-   * KaSim
-   * Pierre Boutillier, PPS, CNRS - Univ Paris Diderot
-   *
-   * Creation: 2010, the 7th of July
-   * Last modification: Time-stamp: <Aug 01 2016>
-   *
-   * This library provides primitives to deal with Set and Maps of of ordered
-   * elements, in the fashion of Ocaml's Map; It provides efficient iterators
-   *
-   * Copyright 2010,2011,2012,2013 Institut National de Recherche en
-   * Informatique et en Automatique.
-   * Copyright 2015 Havard Medical School
-   * All rights reserved.  This file is distributed under the terms of the GNU
-   * Library General Public License *)
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
 
 module type OrderedType =
 sig

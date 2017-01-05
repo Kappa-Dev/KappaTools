@@ -1,3 +1,11 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
 type t = Renaming.t Mods.IntMap.t * Mods.IntSet.t
 (* (map,set)
    map: point_i -> (node_j(i) -> id_node_graph_in_current_matching)

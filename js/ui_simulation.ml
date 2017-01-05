@@ -1,4 +1,12 @@
-open Lwt
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
+open Lwt.Infix
 
 let poll_interval : float = 0.5
 type ready_state =
@@ -363,7 +371,7 @@ let start_simulation
   ready_simulation
     ~stopped:
       (fun runtime_state ->
-         catch
+         Lwt.catch
            (fun () ->
               let () = Ui_state.clear_model_error () in
               let () = t.setter SIMULATION_INITALIZING in

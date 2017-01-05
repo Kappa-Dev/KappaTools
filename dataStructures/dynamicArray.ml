@@ -1,22 +1,14 @@
-(**
-  * dynamicarray.ml
-  *
-  * Array with dynamic size: a module for KaSim
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
-  * Jean Krivine, Université Paris-Diderot, CNRS
-  *
-  * KaSim
-  * Jean Krivine, Université Paris-Diderot, CNRS
-  *
-  * Creation: 01/03/2012
-  * Last modification: 01/03/2012
-  * *
-  *
-  * It uses imperative styles to ensure compatibility with other modules
-  *
-  * Copyright 2011,2012  Institut National de Recherche en Informatique et
-  * en Automatique.  All rights reserved.  This file is distributed
-  * under the terms of the GNU Library General Public License *)
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
+(** Array with dynamic size
+
+    It uses imperative styles to ensure compatibility with other modules *)
 
 module DynArray =
   (functor (G:GenArray.GenArray) ->

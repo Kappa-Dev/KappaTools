@@ -1,3 +1,11 @@
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
+
 let value_state_alg_op counter ?(time=Counter.current_time counter) = function
   | Operator.CPUTIME -> Nbr.F (Sys.time ())
   | Operator.TIME_VAR -> Nbr.F time
