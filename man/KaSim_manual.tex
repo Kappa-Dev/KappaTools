@@ -896,6 +896,27 @@ will generate a file \ttt{model.out} containing the trajectories of the observab
 }
 will generate a file \ttt{data.csv} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). %The order in which the files are given does not matter.
 
+\section{Interactivity}
+Simulations are interuptible by sending a \verb:SIGINT: to the
+simulator. (Easiest way to send a \verb:SIGINT: to a process is to
+press Ctrl-c in the terminal window it runs into.)
+
+In batch mode, this stops the simulation. In other circonstances, it
+launches a toplevel in which you can either type
+\begin{itemize} \verb:$RUN:
+  (optionnaly followed by a pause condition) to resume simulation or
+\item any of the \emph{effect} described in \ref{sec:mod} to trigger
+  it immediatly.
+\end{itemize}
+
+A pause condition is a boolean expression (also described in
+\ref{sec:mod}) under which the simulator will stop and fall back in
+the toplevel in order to allow a new interactive session.
+
+The option \ttt{-mode interactive} ``interrupts automaticaly the
+simulation'' (and launches the toplevel) just after the initialization
+of the simulation.
+
 \chapter{A simple model}\label{chap:abc}
 
 We describe below the content of a simple Kappa model and give examples of some typical run\footnote{The corresponding kappa file is included in the distribution of \KaSim, in the directory \ttt{models/}}.
@@ -957,7 +978,16 @@ We will use this model as a running example for the next chapter, in order to il
 
 \section{Perturbation language}\label{sec:mod}
 
-It is possible to use variables\index{variable} of the model as precondition for triggering a \emph{perturbation}\index{perturbation} of the simulation. Note that, by default, a perturbation is applied whenever its pre-condition is satisfied and then discarded. Such perturbation is called \emph{"one shot"}\index{perturbation!one shot}. It is however possible to re-apply the same perturbation each time its pre-condition is satisfied and until a certain condition is met, using the \ttt{repeat ... until} constructors.
+It is possible to trigger a \emph{perturbation}\index{perturbation} of
+the simulation when a \textit{precondition}\index{precondition} (depending on the
+variables\index{variable} of the model) is satisfied.
+
+By default, a perturbation is applied as ssoon as its precondition is
+satisfied and then discarded. Such perturbation is called \emph{"one
+  shot"}\index{perturbation!one shot}. It is however possible to
+re-apply the same perturbation each time its precondition is
+satisfied and until a certain condition is met, using the \ttt{repeat
+  ... until} constructors.
 
 Basic perturbations are obtained using the declaration \index{declaration}:
 \ITE{
@@ -1002,11 +1032,16 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
   \label{tab:pert}
 \end{table}
 
-The boolean expression is used as a \textit{precondition}\index{precondition} that determines when the perturbation will be triggered, for instance a user writes
+A example of boolean expression used as a precondition is
 \begin{lstlisting}[language=kappa]
 %mod: ([T]>10) && ('v1' /'v2') > 1 do ...
 \end{lstlisting}
-to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1. Recall that the perturbations are "one shot" interventions on the simulation. Possible interventions are described in the following sections using examples.
+
+It indicate the wish to trigger a perturbation whenever the simulation
+time has passed 10 time units and the ratio of variables \ttt{v1} over
+\ttt{v2} is above 1. Recall that the perturbations are "one shot"
+interventions on the simulation. Possible interventions are described
+in the following sections using examples.
 
 \textbf{Note on time dependent preconditions:}
 \\Consider a perturbation of the form:
@@ -1016,7 +1051,6 @@ to indicate she wishes to trigger a perturbation whenever the simulation time ha
 where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general with a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve. Therefore the only time dependent precondition with an equality test that is allowed in \KaSim~has to be of the form $\mathtt{[T]=}n$ with $n\in\Nat$. For instance:
 \lstinline[language=kappa]*%mod: [T]=10 do $STOP*
 will interrupt the simulation after exactly 10 time units.
-
 
 \subsection{Adding or deleting agents during a simulation}
 
@@ -1045,19 +1079,32 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 \end{center}
 \end{figure}
 
-\subsection{Using snapshots to define a new initial state}
+\subsection{Get a snapshot of the mixture (to define a new initial state)}
 
 In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) kappa file.
 For instance, the declaration\index{declaration}:
 \lstinline[language=kappa]*%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"*
-will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables. Note that one may omit to define a prefix and simply type:
+will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables.
+
+One may omit to define a prefix and simply type:
 \lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT!
 in which case the default prefix \ttt{snap.ka} will be used for naming snapshots.
-If the name already exists a counter will be appended at the end of the file to prevent overwriting. Snapshots can be performed multiple times, for instance every 1000 events, using the declaration\index{declaration}:
+
+If the name already exists a counter will be appended at the end of
+the file to prevent overwriting. Snapshots can be performed multiple
+times, for instance every 1000 events, using the
+declaration\index{declaration}:
 \begin{lstlisting}[language=kappa]
 %mod: repeat ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka" until [false]
 \end{lstlisting}
-which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state.ka"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture\index{mixture}. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT ``snap.dot!).
+which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
+
+Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
+
+\subsection{Interrupt simulation}
+The perturbation \ttt{\$STOP "final\_state.ka"} will terminate the
+simulation whenever its precondition is satisfied and produce a
+snapshot of the last mixture\index{mixture}.
 
 \subsection{Changing the value of a token}
 The concentration of any token can be reset on the fly using a perturbation. For instance the declaration\index{declaration}:
