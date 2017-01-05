@@ -115,12 +115,14 @@ site/external: site
 site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: externals.mk
 	FILE=$$(mktemp -t bootstrapXXXX); \
 	curl -LsS -o $$FILE https://github.com/twbs/bootstrap/releases/download/v$(BOOTSTRAP_VERSION)/bootstrap-$(BOOTSTRAP_VERSION)-dist.zip && \
-	rm -rf $@ && unzip -D -d $(dir $@) $$FILE && rm $$FILE
+	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
+	touch $@
 
 site/external/codemirror-$(CODEMIRROR_VERSION): externals.mk
 	FILE=$$(mktemp -t codemirrorXXXX); \
 	curl -LsS -o $$FILE http://codemirror.net/codemirror-$(CODEMIRROR_VERSION).zip &&\
-	rm -rf $@ && unzip -D -d $(dir $@) $$FILE && rm $$FILE
+	rm -rf $@ && unzip -d $(dir $@) $$FILE && rm $$FILE
+	touch $@
 
 site/external/d3: externals.mk
 	mkdir -p $@
