@@ -332,10 +332,10 @@ let finalize_simulation ~(t : t) : unit =
 
 let run_simulation
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+    ~(t : t) stopped : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
   Lwt.catch
     (fun () ->
-       let rstop = ref false in
+       let rstop = ref stopped in
        let rec iter () =
          let () =
            while (not !rstop) &&
@@ -410,7 +410,7 @@ let start
                ~store_distances:t.store_distances
                random_state
                t.init_l >>=
-             (fun (graph,state) ->
+             (fun (stop,graph,state) ->
                 let () = t.graph <- graph;
                   t.state <- state in
                 let log_form =
@@ -439,7 +439,7 @@ let start
                       Api_types_j.plot_time_series =
                         [ Some (Counter.current_time t.counter)
                           :: first_values ]} in
-                run_simulation ~system_process:system_process ~t:t
+                run_simulation ~system_process:system_process ~t:t stop
              )
            )
            (catch_error
@@ -529,7 +529,7 @@ let continue
          let () =
            Lwt.async
              (fun () ->
-                run_simulation ~system_process:system_process ~t:t)
+                run_simulation ~system_process:system_process ~t:t false)
          in
          Lwt.return (`Ok ())
     )

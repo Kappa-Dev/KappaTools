@@ -27,8 +27,8 @@ val compile :
   ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
 
 val build_initial_state :
-  bind:('a -> (Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
-  return:(Rule_interpreter.t * State_interpreter.t -> 'a) ->
+  bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
+  return:(bool * Rule_interpreter.t * State_interpreter.t -> 'a) ->
   outputs:(Data.t -> unit) -> (int * Alg_expr.t) list -> Counter.t ->
   Environment.t -> with_trace:bool -> store_distances:bool -> Random.State.t ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->

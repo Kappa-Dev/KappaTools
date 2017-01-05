@@ -6,8 +6,8 @@ val empty : Environment.t -> (Nbr.t * int) list -> t
 (** [empty env stopping_times] *)
 
 val initialize :
-  bind:('a -> (Rule_interpreter.t * t -> 'a) -> 'a) ->
-  return:(Rule_interpreter.t * t -> 'a) -> outputs:(Data.t -> unit) ->
+  bind:('a -> (bool * Rule_interpreter.t * t -> 'a) -> 'a) ->
+  return:(bool * Rule_interpreter.t * t -> 'a) -> outputs:(Data.t -> unit) ->
   Environment.t -> Counter.t -> Rule_interpreter.t -> t ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
   'a
@@ -18,10 +18,10 @@ val observables_values :
 (** Returns (the current biological time, an array of the current
 values of observables) *)
 
-val do_modification :
+val do_modifications :
   outputs:(Data.t -> unit) -> Environment.t -> Counter.t ->
-  Rule_interpreter.t -> t -> Primitives.modification ->
-  bool * Rule_interpreter.t * t
+  Rule_interpreter.t -> t -> Primitives.modification list ->
+  (bool * Rule_interpreter.t * t)
 
 val activity : t -> float
 (** Returns the current activity *)

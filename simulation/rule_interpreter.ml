@@ -506,15 +506,14 @@ let update_outdated_activities store env counter state =
       match Mods.IntMap.pop i state.unary_candidates with
            | None,_ -> state
            | Some _, match' -> { state with unary_candidates = match' } in
-  let rec aux state deps =
+  let rec aux dep acc =
     Operator.DepSet.fold
-      (fun dep state ->
+      (fun dep (state,perts as acc) ->
          match dep with
          | Operator.ALG j ->
            let () = recompute env counter state j in
-           aux state (Environment.get_alg_reverse_dependencies env j)
-         | Operator.PERT (-1) -> state (* TODO *)
-         | Operator.PERT _ -> state (* TODO *)
+           aux (Environment.get_alg_reverse_dependencies env j) acc
+         | Operator.PERT p -> (state,p::perts)
          | Operator.RULE i ->
            let rule = Environment.get_rule env i in
            let pattern_va = raw_instance_number
@@ -525,16 +524,17 @@ let update_outdated_activities store env counter state =
                (fst rule.Primitives.rate) pattern_va in
            let state' = if changed_connectivity then state
              else unary_rule_update i state rule in
-           match Mods.IntMap.pop i state'.matchings_of_rule with
-           | None,_ -> state'
-           | Some _, match' -> { state' with matchings_of_rule = match' })
-      deps state in
-  let state' = aux state (Environment.get_always_outdated env) in
-  let state'' = aux state' deps in
-  let state''' =
-    if not changed_connectivity then state''
-    else Environment.fold_rules unary_rule_update state'' env in
-  {state''' with outdated_elements = Operator.DepSet.empty,false }
+           ((match Mods.IntMap.pop i state'.matchings_of_rule with
+               | None,_ -> state'
+               | Some _, match' ->
+                 { state' with matchings_of_rule = match' }),perts))
+      dep acc in
+  let pack = aux (Environment.get_always_outdated env) (state,[]) in
+  let state',perts = aux deps pack in
+  let state'' =
+    if not changed_connectivity then state'
+    else Environment.fold_rules unary_rule_update state' env in
+  ({state'' with outdated_elements = Operator.DepSet.empty,false },perts)
 
 let overwrite_var i counter state expr =
   let rdeps,changed_connectivity = state.outdated_elements in

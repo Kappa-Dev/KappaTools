@@ -75,8 +75,8 @@ let rules_of_ast
     match deps_machinery with
     | None -> None,None
     | Some (o,d) -> Some o, Some d in
-  let crp = compile_pure_alg rule.LKappa.r_rate in
   let unary_infos =
+    let crp = compile_pure_alg rule.LKappa.r_rate in
     match rule.LKappa.r_un_rate with
     | None -> fun _ uncc -> crp,None,uncc
     | Some ((_,pos as rate),dist) ->
@@ -102,7 +102,11 @@ let rules_of_ast
       (fun x ->
          let origin =
            match origin with Some o -> o | None -> failwith "ugly Eval.rule_of_ast" in
-         Alg_expr.add_dep x origin crp)
+         let x' =
+           match unrate with
+           | None -> x
+           | Some (ur,_) -> Alg_expr.add_dep x origin ur in
+         Alg_expr.add_dep x' origin rate)
       deps,un_ccs',{
       Primitives.unary_rate = unrate;
       Primitives.rate = rate;
@@ -120,18 +124,11 @@ let rules_of_ast
     Snip.connected_components_sum_of_ambiguous_rule
       contact_map domain'' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
   let deps_algs',unary_ccs',rules_l =
-    match rule_mixtures with
-    | [] -> deps,Pattern.Set.empty,[]
-    | [ r ] ->
-      let deps_algs',un_ccs',r' =
-        build deps Pattern.Set.empty r in
-      deps_algs', un_ccs',[r']
-    | _ ->
-      List.fold_right
-        (fun r (deps_algs,un_ccs,out) ->
-           let deps_algs',un_ccs',r' = build deps_algs un_ccs r in
-           deps_algs',un_ccs',r'::out)
-        rule_mixtures (deps,Pattern.Set.empty,[]) in
+    List.fold_right
+      (fun r (deps_algs,un_ccs,out) ->
+         let deps_algs',un_ccs',r' = build deps_algs un_ccs r in
+         deps_algs',un_ccs',r'::out)
+      rule_mixtures (deps,Pattern.Set.empty,[]) in
   domain',(match origin' with
       | None -> None
       | Some o -> Some (o,
@@ -164,7 +161,8 @@ let compile_print_expr contact_map domain ex =
          (domain',(Ast.Alg_pexpr alg::out)))
     ex (domain,[])
 
-let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
+let cflows_of_label
+    origin contact_map domain on algs rules (label,pos) rev_effects =
   let adds tests l x =
     if on then Primitives.CFLOW (Some label,x,tests) :: l
     else Primitives.CFLOWOFF x :: l in
@@ -187,7 +185,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
                ,pos)) in
   let domain',ccs =
     Snip.connected_components_sum_of_ambiguous_mixture
-      contact_map domain ~origin:(Operator.PERT(-1)) mix in
+      contact_map domain ~origin mix in
   (domain',
    List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 
@@ -213,7 +211,7 @@ let rule_effect
    (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects)
 
 let effects_of_modif
-    ast_algs ast_rules contact_map (domain,rev_effects) = function
+    ast_algs ast_rules origin contact_map (domain,rev_effects) = function
   | INTRO (alg_expr, (ast_mix,mix_pos)) ->
     rule_effect contact_map domain alg_expr
       ([],LKappa.to_raw_mixture (Pattern.PreEnv.sigs domain) ast_mix,
@@ -244,14 +242,14 @@ let effects_of_modif
     (domain', (Primitives.STOP pexpr')::rev_effects)
   | CFLOWLABEL (on,lab) ->
     cflows_of_label
-      contact_map domain on ast_algs ast_rules lab rev_effects
+      origin contact_map domain on ast_algs ast_rules lab rev_effects
   | CFLOWMIX (on,(ast,_)) ->
     let adds tests l x =
       if on then Primitives.CFLOW (None,x,tests) :: l
       else Primitives.CFLOWOFF x :: l in
     let domain',ccs =
       Snip.connected_components_sum_of_ambiguous_mixture
-        contact_map domain ~origin:(Operator.PERT(-1)) ast in
+        contact_map domain ~origin ast in
     (domain',
      List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
   | FLUX (rel,pexpr) ->
@@ -271,24 +269,27 @@ let effects_of_modif
   | PLOTENTRY ->
     (domain, (Primitives.PLOTENTRY)::rev_effects)
 
-let effects_of_modifs ast_algs ast_rules contact_map domain l =
+let effects_of_modifs ast_algs ast_rules origin contact_map domain l =
   let domain',rev_effects =
-    List.fold_left (effects_of_modif ast_algs ast_rules contact_map)
+    List.fold_left (effects_of_modif ast_algs ast_rules origin contact_map)
       (domain,[]) l in
   domain',List.rev rev_effects
 
-let compile_modifications_no_track = effects_of_modifs [] []
+let compile_modifications_no_track =
+  effects_of_modifs [] [] (Operator.PERT (-1))
 
-let pert_of_result ast_algs ast_rules contact_map domain res =
-  let (domain, _, lpert,tracking_enabled) =
+let pert_of_result ast_algs ast_rules alg_deps contact_map domain res =
+  let (domain, out_alg_deps, _, lpert,tracking_enabled) =
     List.fold_left
-      (fun (domain, p_id, lpert, tracking_enabled)
+      (fun (domain, alg_deps, p_id, lpert, tracking_enabled)
         ((pre_expr, modif_expr_list, opt_post),_) ->
-        let (domain',(pre,pre_pos)) = compile_bool
-            ~origin:(Operator.PERT p_id) contact_map domain pre_expr in
+        let origin = Operator.PERT p_id in
+        let (domain',pre) =
+          compile_bool ~origin contact_map domain pre_expr in
+        let alg_deps' = Alg_expr.add_dep_bool alg_deps origin pre in
         let (domain, effects) =
           effects_of_modifs
-            ast_algs ast_rules contact_map domain' modif_expr_list in
+            ast_algs ast_rules origin contact_map domain' modif_expr_list in
         let domain,opt =
           match opt_post with
           | None -> (domain,None)
@@ -307,15 +308,15 @@ let pert_of_result ast_algs ast_rules contact_map domain res =
                 Primitives.PLOTENTRY | Primitives.STOP _ |
                 Primitives.ITER_RULE _) -> false) effects in
         let pert =
-          { Primitives.precondition = (pre,pre_pos);
+          { Primitives.precondition = pre;
             Primitives.effect = effects;
             Primitives.abort = opt;
           } in
-        (domain, succ p_id, pert::lpert,has_tracking)
+        (domain, alg_deps', succ p_id, pert::lpert,has_tracking)
       )
-      (domain, 0, [], false) res.perturbations
+      (domain, alg_deps, 0, [], false) res.perturbations
   in
-  (domain, List.rev lpert,tracking_enabled)
+  (domain, out_alg_deps, List.rev lpert,tracking_enabled)
 
 let inits_of_result ?rescale contact_map env preenv res =
   let init_l,preenv' =
@@ -581,8 +582,9 @@ let compile ~outputs ~pause ~return ~max_sharing
 
   pause @@ fun () ->
   outputs (Data.Log "\t -perturbations");
-  let (preenv,pert,has_tracking) =
-    pert_of_result result.variables result.rules contact_map preenv' result in
+  let (preenv,alg_deps'',pert,has_tracking) =
+    pert_of_result
+      result.variables result.rules alg_deps' contact_map preenv' result in
 
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
@@ -598,7 +600,7 @@ let compile ~outputs ~pause ~return ~max_sharing
                      " navigation steps"));
 
   let env =
-    Environment.init domain tk_nd alg_nd alg_deps'
+    Environment.init domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules,rule_nd,cc_unaries)
       (Array.of_list (List.rev obs)) (Array.of_list pert) in
 

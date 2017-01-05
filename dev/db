@@ -12,6 +12,7 @@ install_printer Mods.CharSetMap.Set.print
 install_printer Random_tree.debug_print
 install_printer Renaming.print_full
 install_printer Ast.print_ast_mix
+install_printer Operator.DepSet.print
 install_printer Raw_printers.print_ast_alg
 install_printer Raw_printers.print_alg
 install_printer Raw_printers.print_bool

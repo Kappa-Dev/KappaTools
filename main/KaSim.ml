@@ -138,17 +138,17 @@ let () =
         Some (cli_args.Run_cli_args.outputDataFile,title,head)
       else None in
 
-
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
       cli_args.Run_cli_args.outputDataFile;
-    if not !Parameter.compileModeOn then Outputs.initialize trace_file plotPack env;
+    if not !Parameter.compileModeOn then
+      Outputs.initialize trace_file plotPack env;
 
     let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in
     let () = Format.printf "+ Building initial state@." in
-    let (graph,state) =
+    let (stop,graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
         ~outputs alg_overwrite counter env
@@ -170,13 +170,13 @@ let () =
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then let () = remove_trace () in exit 0 else ();
 
-        let () = match plotPack with
-          | None -> ()
-          | Some _ ->
-            (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
-              Outputs.go (Environment.signatures env)
-                (Data.Plot
-                   (State_interpreter.observables_values env graph counter)) in
+    let () = match plotPack with
+      | Some _ ->
+        (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
+        Outputs.go (Environment.signatures env)
+          (Data.Plot
+             (State_interpreter.observables_values env graph counter))
+      | _ -> () in
 
     let () =
       match unary_distances with
@@ -190,7 +190,11 @@ let () =
         Outputs.create_distances names inJson in
 
     let () =
-      if cli_args.Run_cli_args.batchmode then
+      if stop then
+        finalize
+          ~outputs formatCflows cflowFile trace_file
+          env counter state story_compression
+      else if cli_args.Run_cli_args.batchmode then
         let (_,state') =
           State_interpreter.batch_loop
             ~outputs Format.std_formatter env counter graph state in
@@ -265,11 +269,11 @@ let () =
               ~outputs formatCflows cflowFile trace_file
               env counter state' story_compression
           else
-          let () =
-            Format.printf
-              "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
-               @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
-               @ effect@ to@ perform@ it@]" in
+            let () =
+              Format.printf
+                "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
+                 @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
+                 @ effect@ to@ perform@ it@]" in
             toplevel env0 graph' state' in
     Format.printf "Simulation ended";
     remove_trace ();

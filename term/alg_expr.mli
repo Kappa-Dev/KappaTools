@@ -51,6 +51,11 @@ val add_dep :
   Operator.rev_dep ->
   ('a,int) e Location.annot ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+val add_dep_bool :
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->
+  Operator.rev_dep ->
+  ('a,int) bool Location.annot ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
 val setup_alg_vars_rev_dep :
   unit NamedDecls.t ->
   (string Location.annot * ('a,int) e Location.annot) array ->

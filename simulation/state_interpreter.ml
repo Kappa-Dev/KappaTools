@@ -37,52 +37,12 @@ let empty env stopping_times =
     flux = [];
   }
 
-let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
-  let mgraph =
-    List.fold_left
-      (fun mstate (alg,compiled_rule,pos) ->
-         bind
-           mstate
-           (fun (state,state0) ->
-              let value =
-                Rule_interpreter.value_alg counter state alg in
-              let actions,_,_ = snd compiled_rule.Primitives.instantiations in
-              let creations_sort =
-                List.fold_left
-                  (fun l -> function
-                     | Instantiation.Create (x,_) ->
-                       Matching.Agent.get_type x :: l
-                     | Instantiation.Mod_internal _ | Instantiation.Bind _
-                     | Instantiation.Bind_to _ | Instantiation.Free _
-                     | Instantiation.Remove _ -> l) [] actions in
-              return (
-                Nbr.iteri
-                  (fun _ s ->
-                     match Rule_interpreter.apply_rule
-                             ~outputs env
-                             (Environment.connected_components_of_unary_rules env)
-                             counter s (Trace.INIT creations_sort)
-                             compiled_rule with
-                     | Rule_interpreter.Success s -> s
-                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
-                       raise (ExceptionDefn.Internal_Error
-                                ("Bugged initial rule",pos)))
-                  state value,state0))) (return (graph0,state0)) init_l in
-  bind
-    mgraph
-    (fun (graph,state0) ->
-       let () =
-         initial_activity env counter graph state0.activities in
-       return (Rule_interpreter.update_outdated_activities
-                 (fun x _ y -> Random_tree.add x y state0.activities)
-                 env counter graph,state0))
-
 let observables_values env graph counter =
   Environment.map_observables
     (Rule_interpreter.value_alg counter graph)
     env
 
-let do_modification ~outputs env counter graph state modification =
+let do_modification ~outputs env counter graph state extra modification =
   let print_expr_val =
     Kappa_printer.print_expr_val
       (Rule_interpreter.value_alg counter graph) in
@@ -96,24 +56,24 @@ let do_modification ~outputs env counter graph state modification =
              (Environment.connected_components_of_unary_rules env)
              counter g (Trace.PERT "pert") r)
         graph (Rule_interpreter.value_alg counter graph v) in
-    let graph'' =
+    let graph'',extra' =
       Rule_interpreter.update_outdated_activities
         (fun x _ y -> Random_tree.add x y state.activities)
         env counter graph' in
-    (false,graph'',state)
+    ((false,graph'',state),List.rev_append extra' extra)
   | Primitives.UPDATE (i,(expr,_)) ->
     let graph' = Rule_interpreter.overwrite_var i counter graph expr in
-    let graph'' =
+    let graph'',extra' =
         Rule_interpreter.update_outdated_activities
           (fun x _ y -> Random_tree.add x y state.activities)
           env counter graph' in
-    (false, graph'', state)
+    ((false, graph'', state),List.rev_append extra' extra)
   | Primitives.STOP pexpr ->
     let () = if pexpr <> [] then
         let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
         outputs (Data.Snapshot
                    (Rule_interpreter.snapshot env counter file graph)) in
-    (true,graph,state)
+    ((true,graph,state),extra)
   | Primitives.PRINT (pe_file,pe_expr) ->
     let file_opt =
       match pe_file with
@@ -122,16 +82,17 @@ let do_modification ~outputs env counter graph state modification =
     in
     let line = Format.asprintf "%a" print_expr_val pe_expr in
     let () = outputs
-        (Data.Print {Data.file_line_name = file_opt ; Data.file_line_text = line;}) in
-    (false, graph, state)
+        (Data.Print
+           {Data.file_line_name = file_opt ; Data.file_line_text = line;}) in
+    ((false, graph, state),extra)
   | Primitives.PLOTENTRY ->
     let () = outputs (Data.Plot (observables_values env graph counter)) in
-    (false, graph, state)
+    ((false, graph, state),extra)
   | Primitives.SNAPSHOT pexpr  ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
     let () = outputs (Data.Snapshot
                         (Rule_interpreter.snapshot env counter file graph)) in
-    (false, graph, state)
+    ((false, graph, state),extra)
   | Primitives.CFLOW (name,cc,tests) ->
     let name = match name with
       | Some s -> s
@@ -141,11 +102,12 @@ let do_modification ~outputs env counter graph state modification =
           "@[<h>%a@]"
           (Pp.array Pp.comma
              (fun _ -> Pattern.print ~domain ~with_id:false)) cc in
-    (false,
-     Rule_interpreter.add_tracked cc (Trace.OBS name) tests graph,
-     state)
+    ((false,
+      Rule_interpreter.add_tracked cc (Trace.OBS name) tests graph,
+      state),
+     extra)
   | Primitives.CFLOWOFF cc ->
-    (false, Rule_interpreter.remove_tracked cc graph, state)
+    ((false, Rule_interpreter.remove_tracked cc graph, state),extra)
   | Primitives.FLUX (rel,s) ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =
@@ -161,7 +123,7 @@ let do_modification ~outputs env counter graph state modification =
     in
     let () = state.flux <-
         Fluxmap.create_flux env counter rel file::state.flux in
-    (false, graph, state)
+    ((false, graph, state),extra)
   | Primitives.FLUXOFF s ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let (these,others) =
@@ -170,37 +132,88 @@ let do_modification ~outputs env counter graph state modification =
         (fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
         these in
     let () = state.flux <- others in
-    (false, graph, state)
+    ((false, graph, state),extra)
 
-let perturbate ~outputs env counter graph state =
-  let rec do_until_noop i graph state stop =
-    if stop || i >= Environment.nb_perturbations env then
-      (stop,graph,state)
+let rec perturbate ~outputs env counter graph state = function
+  | [] -> (false,graph,state)
+  | i :: tail ->
+    let pert = Environment.get_perturbation env i in
+    if state.perturbations_alive.(i) &&
+       state.perturbations_not_done_yet.(i) &&
+       Rule_interpreter.value_bool
+         counter graph (fst pert.Primitives.precondition)
+    then
+      let (stop,graph,state as acc,extra) =
+        List.fold_left (fun ((stop,graph,state),extra as acc) effect ->
+            if stop then acc else
+              do_modification ~outputs env counter graph state extra effect)
+          ((false,graph,state),[]) pert.Primitives.effect in
+      let () = state.perturbations_not_done_yet.(i) <- false in
+      let () =
+        state.perturbations_alive.(i) <-
+          match pert.Primitives.abort with
+          | None -> false
+          | Some (ex,_) ->
+            not (Rule_interpreter.value_bool counter graph ex) in
+      if stop then acc else
+        perturbate ~outputs env counter graph state (List.rev_append extra tail)
     else
-      let pert = Environment.get_perturbation env i in
-      if state.perturbations_alive.(i) &&
-         state.perturbations_not_done_yet.(i) &&
-         Rule_interpreter.value_bool
-           counter graph (fst pert.Primitives.precondition)
-      then
-        let stop,graph,state =
-          List.fold_left (fun (stop,graph,state as acc) effect ->
-              if stop then acc else
-                do_modification ~outputs env counter graph state effect)
-            (stop,graph,state) pert.Primitives.effect in
-        let () = state.perturbations_not_done_yet.(i) <- false in
-        let () =
-          state.perturbations_alive.(i) <-
-            match pert.Primitives.abort with
-            | None -> false
-            | Some (ex,_) ->
-              not (Rule_interpreter.value_bool counter graph ex) in
-        do_until_noop 0 graph state stop
-      else
-        do_until_noop (succ i) graph state stop in
-  do_until_noop 0 graph state false
+      perturbate ~outputs env counter graph state tail
 
-let one_rule ~outputs dt stop env counter graph state =
+let do_modifications ~outputs env counter graph state list =
+  let (stop,graph,state as acc,extra) =
+    List.fold_left (fun ((stop,graph,state),extra as acc) effect ->
+        if stop then acc else
+          do_modification ~outputs env counter graph state extra effect)
+      ((false,graph,state),[]) list in
+  if stop then acc else perturbate ~outputs env counter graph state extra
+
+let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
+  let mgraph =
+    List.fold_left
+      (fun mstate (alg,compiled_rule,pos) ->
+         bind
+           mstate
+           (fun (stop,state,state0) ->
+              let value =
+                Rule_interpreter.value_alg counter state alg in
+              let actions,_,_ = snd compiled_rule.Primitives.instantiations in
+              let creations_sort =
+                List.fold_left
+                  (fun l -> function
+                     | Instantiation.Create (x,_) ->
+                       Matching.Agent.get_type x :: l
+                     | Instantiation.Mod_internal _ | Instantiation.Bind _
+                     | Instantiation.Bind_to _ | Instantiation.Free _
+                     | Instantiation.Remove _ -> l) [] actions in
+              return (stop,
+                Nbr.iteri
+                  (fun _ s ->
+                     match Rule_interpreter.apply_rule
+                             ~outputs env
+                             (Environment.connected_components_of_unary_rules env)
+                             counter s (Trace.INIT creations_sort)
+                             compiled_rule with
+                     | Rule_interpreter.Success s -> s
+                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
+                       raise (ExceptionDefn.Internal_Error
+                                ("Bugged initial rule",pos)))
+                  state value,state0))) (return (false,graph0,state0)) init_l in
+  bind
+    mgraph
+    (fun (_,graph,state0) ->
+       let () =
+         initial_activity env counter graph state0.activities in
+       let mid_graph,_ =
+         Rule_interpreter.update_outdated_activities
+           (fun x _ y -> Random_tree.add x y state0.activities)
+           env counter graph in
+       let everybody =
+         let t  = Array.length state0.perturbations_alive in
+         Tools.recti (fun l i -> (t-i-1)::l) [] t in
+       return (perturbate ~outputs env counter mid_graph state0 everybody))
+
+let one_rule ~outputs dt env counter graph state =
   let choice,_ = Random_tree.random
       (Rule_interpreter.get_random_state graph) state.activities in
   let rule_id = choice/2 in
@@ -252,9 +265,12 @@ let one_rule ~outputs dt stop env counter graph state =
           env (Environment.connected_components_of_unary_rules env)
           counter graph cause rule with
   | Rule_interpreter.Success (graph') ->
-    let graph'' =
+    let final_step = not (Counter.one_constructive_event counter dt) in
+    let graph'',extra_pert =
       Rule_interpreter.update_outdated_activities
         register_new_activity env counter graph' in
+    let (stop,graph''',state') =
+      perturbate ~outputs env counter graph'' state extra_pert in
     let () =
       List.iter
         (fun fl -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
@@ -266,7 +282,7 @@ let one_rule ~outputs dt stop env counter graph state =
       if !Parameter.debugModeOn then
         Format.printf "@[<v>Obtained@ %a@]@."
           (Rule_interpreter.print env) graph'' in
-    (not (Counter.one_constructive_event counter dt)||stop,graph'',state)
+    (final_step||stop,graph''',state')
   | (Rule_interpreter.Clash | Rule_interpreter.Corrected) as out ->
     let continue =
       if out = Rule_interpreter.Clash then
@@ -274,11 +290,10 @@ let one_rule ~outputs dt stop env counter graph state =
       else if choice mod 2 = 1
       then Counter.one_no_more_unary_event counter dt
       else Counter.one_no_more_binary_event counter dt in
-    if Counter.consecutive_null_event counter <
-       !Parameter.maxConsecutiveClash
-    then (not continue||stop,graph,state)
+    if Counter.consecutive_null_event counter < !Parameter.maxConsecutiveClash
+    then (not continue,graph,state)
     else
-      (not continue||stop,
+      (not continue,
        (if choice mod 2 = 1
         then Rule_interpreter.adjust_unary_rule_instances
             ~rule_id register_new_activity env counter graph rule
@@ -293,7 +308,7 @@ let a_loop ~outputs env counter graph state =
   let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
   let dt = abs_float (log rd /. activity) in
 
-  let (stop,graph',state' as out) =
+  let (_,graph',_ as out) =
     (*Activity is null or dt is infinite*)
     if not (activity > 0.) || dt = infinity then
       match state.stopping_times with
@@ -311,37 +326,27 @@ let a_loop ~outputs env counter graph state =
                  (Counter.current_event counter)
                  (Counter.current_time counter) activity) in
         (true,graph,state)
-      | (ti,_) :: tail ->
+      | (ti,pe) :: tail ->
         let () = state.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
         let stop,graph',state' =
-          perturbate ~outputs env counter graph state in
+          perturbate ~outputs env counter graph state [pe] in
         (not continue||stop,graph',state')
     else
       (*activity is positive*)
       match state.stopping_times with
-      | (ti,_) :: tail
+      | (ti,pe) :: tail
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
         let () = state.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
         let stop,graph',state' =
-          perturbate ~outputs env counter graph state in
+          perturbate ~outputs env counter graph state [pe] in
         (not continue||stop,graph',state')
       | _ ->
-        let (stop,graph',state') =
-          perturbate ~outputs env counter graph state in
-        one_rule ~outputs dt stop env counter graph' state' in
+        one_rule ~outputs dt env counter graph state in
   let () =
-    Counter.fill ~outputs
-      counter (observables_values env graph') in
-  if stop then
-    let () =
-      Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
-        state.perturbations_not_done_yet in
-    let (_,graph'',state'') =
-      perturbate ~outputs env counter graph' state' in
-    (true,graph'',state'')
-  else out
+    Counter.fill ~outputs counter (observables_values env graph') in
+  out
 
 let end_of_simulation ~outputs form env counter state =
   let () =

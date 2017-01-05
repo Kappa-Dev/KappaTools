@@ -52,7 +52,8 @@ val incorporate_extra_pattern : Pattern.Env.t -> t -> Pattern.id -> t
 
 val overwrite_var : int -> Counter.t -> t -> Alg_expr.t -> t
 val update_outdated_activities :
-  (int -> int -> float -> unit) -> Environment.t -> Counter.t -> t -> t
+  (int -> int -> float -> unit) ->
+  Environment.t -> Counter.t -> t -> (t * int list)
 (** Resynchronize the state after a rule application.
 
 It takes the function to store the new activities as an argument whose
@@ -60,7 +61,9 @@ It takes the function to store the new activities as an argument whose
 
 As long as you don't use any algebraic variable (that include don't
 pick a rule randomly), you can apply several rules in row before
-resynchronizing. (This is what initial state and perturbations do.) *)
+resynchronizing. (This is what initial state does.)
+
+@returns the list of perturbations to try *)
 
 val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
 

@@ -28,9 +28,4 @@ let do_interactive_directives
          graph
          (Primitives.extract_connected_components_modifications e'')) in
   env',
-  List.fold_left
-    (fun (stop,graph',state' as acc) x ->
-       if stop then acc else
-         State_interpreter.do_modification
-           ~outputs env' counter graph' state' x)
-    (false,graph',state) e''
+  State_interpreter.do_modifications ~outputs env' counter graph' state e''
