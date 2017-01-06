@@ -25,7 +25,8 @@ let navcontent (t : Ui_simulation.t) =
              manager
              project_id
              simulation_id ->
-             (Api_v1.assemble_log_message manager project_id simulation_id)
+             (manager#simulation_detail_log_message
+                project_id simulation_id)
              >>=
              (Api_common.result_map
                 ~ok:(fun _ (log_messages : Api_types_j.log_message list) ->
