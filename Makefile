@@ -312,7 +312,7 @@ Kappapp.app:
 	+$(MAKE) all bin/StdSim
 	+$(MAKE) ide/Kappa.icns ide/Info.plist
 	FILE=$$(mktemp -t nwjsXXXX); \
-	curl -LsS -o $$FILE https://dl.nwjs.io/v0.19.0/nwjs-v$(NWJS_VERSION)-osx-x64.zip && \
+	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-osx-x64.zip && \
 	unzip $$FILE && rm -f $$FILE
 	mv nwjs-v$(NWJS_VERSION)-osx-x64/nwjs.app $@
 	rm -r nwjs-v$(NWJS_VERSION)-osx-x64/
