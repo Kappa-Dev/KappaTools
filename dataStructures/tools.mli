@@ -8,7 +8,8 @@
 
 (** Misc utilities *)
 
-(** {5 Combinators on primitive types *)
+(** {5 Combinators on primitive types} *)
+
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 val unsome : 'a -> 'a option -> 'a
 val iteri : (int -> unit) -> int -> unit
@@ -28,6 +29,7 @@ val array_min_equal_not_null :
   (int * 'a list) array -> (int * 'b list) array -> ('a list * 'b list) option
 
 (** {5 Misc utilities } *)
+
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
 val not_an_id : string -> bool

@@ -12,7 +12,7 @@ Including the KaSa machinery:
 
 
 In term/ directory stands all definitions the simulator works on.
-{!modules: Agent Agent_place Signature Pattern
+{!modules: Agent Signature Pattern
 Instantiation Alg_expr Raw_mixture Primitives Model Kappa_printer }
 
 In grammar/ are the parser and the compilers
