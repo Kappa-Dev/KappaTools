@@ -1,0 +1,20 @@
++ Command line to rerun is: 'KaSim' '-u' 'Event' '-l' '25' '-d' 'output' '-seed' '20543' 'pert_null_event.ka'
+Parsing pert_null_event.ka...
+done
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 2 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
+Simulation ended (eff.: 0.862069, detail below)
+	Clashing instance: 100.00%
