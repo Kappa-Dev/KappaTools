@@ -638,7 +638,7 @@ function observable_plot(configuration){
         var rawData = that.getRawData();
         var timeSeries = rawData.timeSeries;
         var legend = rawData.legend;
-        var header = "'time'\t"+legend.join("\t");
+        var header = legend.join("\t");
         var body = timeSeries.map(function(d)
                                   { var row = [d["time"]];
                                     row = row.concat(d["values"]);

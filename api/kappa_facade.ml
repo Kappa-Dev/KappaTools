@@ -434,11 +434,8 @@ let start
 
                 let () =
                   t.plot <-
-                    { Api_types_j.plot_legend =
-                        Array.to_list legend;
-                      Api_types_j.plot_time_series =
-                        [ Some (Counter.current_time t.counter)
-                          :: first_values ]} in
+                    { Api_types_j.plot_legend = Array.to_list legend;
+                      Api_types_j.plot_time_series = [ first_values ]} in
                 run_simulation ~system_process:system_process ~t:t stop
              )
            )

@@ -149,8 +149,7 @@ let update_plot
          ~ok:(fun _ (data : Api_types_t.plot)  ->
              let () = serialize_json  := (fun _ -> Api_types_j.string_of_plot data) in
              let () = plot##setDimensions(get_dimension ()) in
-             let data : Api_types_v1_j.plot = Api_data_v1.api_plot data in
-             let () = serialize_csv := fun _ ->Api_data_v1.plot_values data in
+             let () = serialize_csv := fun _ -> Api_data.plot_values data in
              let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot:data in
              let () = plot##setPlot(data) in
              Lwt.return_unit

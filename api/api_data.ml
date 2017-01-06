@@ -130,3 +130,15 @@ let api_simulation_status
   in
   { Api_types_j.simulation_info_progress = progress ;
     Api_types_j.simulation_info_output = output ; }
+
+let plot_values
+    ?(separator : string = ",")
+    (plot : Api_types_j.plot) : string =
+  Format.asprintf "@[<v>%a@]"
+    (Pp.list Pp.space Format.pp_print_string)
+    ((String.concat separator plot.Api_types_j.plot_legend)::
+     List.rev_map
+       (Format.asprintf "@[<h>%a@]"
+            (Pp.list (fun f -> Format.pp_print_string f separator)
+               (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e"))))
+    plot.Api_types_j.plot_time_series)

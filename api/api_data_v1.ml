@@ -21,20 +21,6 @@ let plot_pg_store
           plot.Api_types_v1_j.time_series
     }
 
-let plot_values
-    ?(separator : string = ",")
-    (plot : Api_types_v1_j.plot) : string =
-  Format.asprintf "@[<v>%a@]"
-    (Pp.list Pp.space Format.pp_print_string)
-    ((String.concat
-        separator
-        ("time"::plot.Api_types_v1_j.legend))::
-     List.rev_map
-       (Format.asprintf "@[<h>%a@]"
-            (Pp.list (fun f -> Format.pp_print_string f separator)
-               (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e"))))
-    plot.Api_types_v1_j.time_series)
-
 let api_file_line (file_line : Data.file_line) : Api_types_v1_j.file_line =
   { Api_types_v1_j.file_name = file_line.Data.file_line_name
   ; Api_types_v1_j.line = file_line.Data.file_line_text
@@ -384,7 +370,7 @@ let api_files (f : Api_types_j.file_line) : Api_types_v1_j.file_line =
   { Api_types_v1_j.file_name = f.Api_types_j.file_line_name ;
     Api_types_v1_j.line = f.Api_types_j.file_line_text ; }
 
-let api_plot (p) =
+let api_plot p =
   { Api_types_v1_j.legend = p.Api_types_j.plot_legend ;
     Api_types_v1_j.time_series = p.Api_types_j.plot_time_series;
   }

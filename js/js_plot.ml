@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module ApiTypes = Api_types_v1_j
+module ApiTypes = Api_types_j
 
 class type plot_configuration =
   object
@@ -105,10 +105,10 @@ let create_data ~(plot : ApiTypes.plot)
     configuration##.legend := Js.array
         (Tools.array_map_of_list
            Js.string
-           plot.ApiTypes.legend);
+           (List.tl plot.ApiTypes.plot_legend));
     configuration##.timeSeries := Js.array
         (Tools.array_map_of_list (fun o -> create_observable ~observable:o)
-           plot.ApiTypes.time_series);
+           plot.ApiTypes.plot_time_series);
     ()
   in configuration
 
