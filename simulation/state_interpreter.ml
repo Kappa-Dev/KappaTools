@@ -10,6 +10,7 @@ type t = {
   init_stopping_times : (Nbr.t * int) list;
   mutable stopping_times : (Nbr.t * int) list;
   perturbations_alive : bool array;
+  mutable active_perturbations : int list;
   perturbations_not_done_yet : bool array;
   (* internal array for perturbate function (global to avoid useless alloc) *)
   activities : Random_tree.tree;
@@ -39,6 +40,7 @@ let empty env stopping_times =
     stopping_times = stops;
     perturbations_alive =
       Array.make (Environment.nb_perturbations env) true;
+    active_perturbations = [];
     perturbations_not_done_yet =
       Array.make (Environment.nb_perturbations env) true;
     activities = activity_tree;
@@ -157,12 +159,13 @@ let rec perturbate ~outputs env counter graph state = function
               do_modification ~outputs env counter graph state extra effect)
           ((false,graph,state),[]) pert.Primitives.effect in
       let () = state.perturbations_not_done_yet.(i) <- false in
-      let () =
-        state.perturbations_alive.(i) <-
+      let alive =
           match pert.Primitives.abort with
           | None -> false
-          | Some (ex,_) ->
-            not (Rule_interpreter.value_bool counter graph ex) in
+          | Some (ex,_) -> not (Rule_interpreter.value_bool counter graph ex) in
+      let () = if alive then
+          state.active_perturbations <- i::state.active_perturbations in
+      let () = state.perturbations_alive.(i) <- alive in
       if stop then acc else
         perturbate ~outputs env counter graph state (List.rev_append extra tail)
     else
@@ -219,7 +222,11 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
        let everybody =
          let t  = Array.length state0.perturbations_alive in
          Tools.recti (fun l i -> (t-i-1)::l) [] t in
-       return (perturbate ~outputs env counter mid_graph state0 everybody))
+       let out = perturbate ~outputs env counter mid_graph state0 everybody in
+       let () =
+         Array.iteri (fun i _ -> state0.perturbations_not_done_yet.(i) <- true)
+           state0.perturbations_not_done_yet in
+       return out)
 
 let one_rule ~outputs dt env counter graph state =
   let choice,_ = Random_tree.random
@@ -277,8 +284,11 @@ let one_rule ~outputs dt env counter graph state =
     let graph'',extra_pert =
       Rule_interpreter.update_outdated_activities
         register_new_activity env counter graph' in
+    let actives = state.active_perturbations in
+    let () = state.active_perturbations <- [] in
     let (stop,graph''',state') =
-      perturbate ~outputs env counter graph'' state extra_pert in
+      perturbate ~outputs env counter graph'' state
+        (List.rev_append actives extra_pert) in
     let () =
       List.iter
         (fun fl -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
