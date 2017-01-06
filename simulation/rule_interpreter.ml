@@ -521,7 +521,8 @@ let update_outdated_activities store env counter state =
          | Operator.ALG j ->
            let () = recompute env counter state j in
            aux (Environment.get_alg_reverse_dependencies env j) acc
-         | Operator.PERT p -> (state,p::perts)
+         | Operator.PERT p ->
+           (state,Tools.list_merge_uniq Mods.int_compare [p] perts)
          | Operator.RULE i ->
            let rule = Environment.get_rule env i in
            let pattern_va = raw_instance_number

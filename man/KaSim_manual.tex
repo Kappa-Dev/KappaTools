@@ -247,9 +247,9 @@ Declarations can be: agent and token \emph{signatures}
 
 The KF\index{kappa file}'s structure is quite flexible. Neither
 dividing into several sub-files nor the order of
-declaration\index{declaration}s matters (to the exception of variable
-declaration\index{declaration}s, see Section~\ref{sec:var} for
-details).
+declaration\index{declaration}s matters (to the exception of
+perturbations and variable declaration\index{declaration}s, see
+respectively Sections \ref{sec:mod} and \ref{sec:var} for details).
 
 Comments\index{comments} can be used either by inserting the marker
 \ttt{\#} that tells \KaSim~to ignore the rest of the line or by
@@ -983,12 +983,17 @@ It is possible to trigger a \emph{perturbation}\index{perturbation} of
 the simulation when a \textit{precondition}\index{precondition} (depending on the
 variables\index{variable} of the model) is satisfied.
 
-By default, a perturbation is applied as ssoon as its precondition is
+By default, a perturbation is applied as soon as its precondition is
 satisfied and then discarded. Such perturbation is called \emph{"one
   shot"}\index{perturbation!one shot}. It is however possible to
 re-apply the same perturbation each time its precondition is
 satisfied and until a certain condition is met, using the \ttt{repeat
   ... until} constructors.
+
+When the precondition of several perturbations are satisfied at the
+same time. Perturbations are triggered in the order in which they have
+been declared in the KF\index{kappa file}. A perturbation can only be
+fired once per event loop.
 
 Basic perturbations are obtained using the declaration \index{declaration}:
 \ITE{

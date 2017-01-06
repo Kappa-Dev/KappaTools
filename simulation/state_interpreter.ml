@@ -70,14 +70,14 @@ let do_modification ~outputs env counter graph state extra modification =
       Rule_interpreter.update_outdated_activities
         (fun x _ y -> Random_tree.add x y state.activities)
         env counter graph' in
-    ((false,graph'',state),List.rev_append extra' extra)
+    ((false,graph'',state),Tools.list_merge_uniq Mods.int_compare  extra' extra)
   | Primitives.UPDATE (i,(expr,_)) ->
     let graph' = Rule_interpreter.overwrite_var i counter graph expr in
     let graph'',extra' =
         Rule_interpreter.update_outdated_activities
           (fun x _ y -> Random_tree.add x y state.activities)
           env counter graph' in
-    ((false, graph'', state),List.rev_append extra' extra)
+    ((false, graph'', state),Tools.list_merge_uniq Mods.int_compare  extra' extra)
   | Primitives.STOP pexpr ->
     let () = if pexpr <> [] then
         let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
@@ -164,10 +164,12 @@ let rec perturbate ~outputs env counter graph state = function
           | None -> false
           | Some (ex,_) -> not (Rule_interpreter.value_bool counter graph ex) in
       let () = if alive then
-          state.active_perturbations <- i::state.active_perturbations in
+          state.active_perturbations <- Tools.list_merge_uniq
+              Mods.int_compare [i] state.active_perturbations in
       let () = state.perturbations_alive.(i) <- alive in
       if stop then acc else
-        perturbate ~outputs env counter graph state (List.rev_append extra tail)
+        perturbate ~outputs env counter graph state
+          (Tools.list_merge_uniq Mods.int_compare extra tail)
     else
       perturbate ~outputs env counter graph state tail
 
