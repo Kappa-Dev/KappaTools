@@ -90,7 +90,7 @@ let do_modification ~outputs env counter graph state extra modification =
         [] -> None
       | _ -> Some (Format.asprintf "@[<h>%a@]" print_expr_val pe_file)
     in
-    let line = Format.asprintf "%a" print_expr_val pe_expr in
+    let line = Format.asprintf "@[<h>%a@]" print_expr_val pe_expr in
     let () = outputs
         (Data.Print
            {Data.file_line_name = file_opt ; Data.file_line_text = line;}) in
