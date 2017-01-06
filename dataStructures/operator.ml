@@ -119,10 +119,10 @@ let compare_op_of_json = function
 let print_rev_dep f = function
   | RULE id ->
     Format.fprintf f "rate_of_rule [%i]" id
-  (*"rate of rule '%a'" (Environment.print_rule env) id*)
+  (*"rate of rule '%a'" (Model.print_rule env) id*)
   | ALG id ->
     Format.fprintf f "algebraic variable [%i]" id
-  (*"variable '%a'" (Environment.print_alg env) id*)
+  (*"variable '%a'" (Model.print_alg env) id*)
   | PERT id -> Format.fprintf f "perturbation [%i]" id
 module DepSetMap = SetMap.Make (struct type t = rev_dep
     let compare = compare

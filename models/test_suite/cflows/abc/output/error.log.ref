@@ -111,4 +111,4 @@ Intial graph;
   
 File "abc.ka", line 39, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
-Warning: Environment.to_json is partial
+Warning: Model.to_yojson is partial

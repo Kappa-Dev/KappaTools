@@ -131,7 +131,7 @@ type t =
     mutable files : Api_types_j.file_line list ;
     mutable error_messages : Api_types_j.errors ;
     contact_map : Signature.contact_map ;
-    mutable env : Environment.t ;
+    mutable env : Model.t ;
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
     store_distances : bool ;
@@ -289,12 +289,12 @@ let outputs (simulation : t) =
   | Data.Snapshot snapshot ->
     simulation.snapshots <-
       (Api_data.label_snapshot
-         (Environment.signatures simulation.env)
+         (Model.signatures simulation.env)
          snapshot)::simulation.snapshots
   | Data.UnaryDistance d -> simulation.distances <-
       {Api_types_j.distance_rule =
          Format.asprintf
-           "%a" (Environment.print_ast_rule ~env:simulation.env)
+           "%a" (Model.print_ast_rule ~env:simulation.env)
            d.Data.distance_rule;
        Api_types_j.distance_time = d.Data.distance_time;
        Api_types_j.distance_length = d.Data.distance_length}
@@ -422,7 +422,7 @@ let start
                     log_form
                 in
                 let legend =
-                  Environment.map_observables
+                  Model.map_observables
                     (Format.asprintf
                        "%a"
                        (Kappa_printer.alg_expr
@@ -586,5 +586,5 @@ let info
 
 let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map
-    (Environment.signatures t.env)
+    (Model.signatures t.env)
     t.contact_map

@@ -328,10 +328,10 @@ let pert_of_result ast_algs ast_rules alg_deps contact_map domain res =
 
 let inits_of_result ?rescale contact_map env preenv res =
   let init_l,preenv' =
-    Tools.list_fold_right_map
+    List_util.fold_right_map
       (fun (_opt_vol,alg,init_t) preenv -> (*TODO deal with volumes*)
          let () =
-           if Alg_expr.has_mix ~var_decls:(Environment.get_alg env) (fst alg) then
+           if Alg_expr.has_mix ~var_decls:(Model.get_alg env) (fst alg) then
              raise
                (ExceptionDefn.Malformed_Decl
                   ("Initial quantities cannot depend on a number of occurence",
@@ -345,7 +345,7 @@ let inits_of_result ?rescale contact_map env preenv res =
                    Location.dummy_annot (Alg_expr.CONST (Nbr.F r)))) in
          match init_t with
          | INIT_MIX ast,mix_pos ->
-           let sigs = Environment.signatures env in
+           let sigs = Model.signatures env in
            let (preenv',alg') = compile_alg contact_map preenv alg in
            let fake_rule =
              { LKappa.r_mix = [];
@@ -509,7 +509,7 @@ let short_branch_agents contact_map =
              0 s = 1)
         non in
     if oui' = [] then oui
-    else aux (Tools.list_rev_map_append fst oui' oui) non' in
+    else aux (List_util.rev_map_append fst oui' oui) non' in
   aux [] (Tools.array_fold_lefti (fun ag acc s -> (ag,s)::acc) [] contact_map)
 
 let compile_rules alg_deps contact_map domain rules =
@@ -608,7 +608,7 @@ let compile ~outputs ~pause ~return ~max_sharing
                      " navigation steps"));
 
   let env =
-    Environment.init domain tk_nd alg_nd alg_deps''
+    Model.init domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules,rule_nd,cc_unaries)
       (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
@@ -624,10 +624,10 @@ let compile ~outputs ~pause ~return ~max_sharing
 let build_initial_state
     ~bind ~return ~outputs alg_overwrite counter env
     ~with_trace ~store_distances random_state init_l =
-  let stops = Environment.fold_perturbations
+  let stops = Model.fold_perturbations
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation
-             (Environment.all_dependencies env) p in
+             (Model.all_dependencies env) p in
          List.fold_left (fun acc s -> (s,i)::acc) acc s)
       [] env in
   let graph0 = Rule_interpreter.empty

@@ -382,7 +382,7 @@ let fill_siphon =
 let  (remove_events_after_last_obs: (trace,trace) unary) =
   lift_to_care_about_ambiguities
     (transform_trace_gen
-       (monadic_lift ((List_utilities.remove_suffix_after_last_occurrence Trace.step_is_obs)))
+       (monadic_lift ((List_util.remove_suffix_after_last_occurrence Trace.step_is_obs)))
        (Some "\t- removing events occurring after the last observable")
        "Trace after having removed the events after the last observable"
        StoryProfiling.Remove_events_after_last_observable

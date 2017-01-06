@@ -9,14 +9,14 @@
 let do_interactive_directives
     ~outputs ~max_sharing contact_map env counter graph state e =
   let cc_preenv =
-    Pattern.PreEnv.of_env (Environment.domain env) in
+    Pattern.PreEnv.of_env (Model.domain env) in
   let contact_map' = Array.map Array.copy contact_map in
   let e',_ =
-    Tools.list_fold_right_map
+    List_util.fold_right_map
       (LKappa.modif_expr_of_ast
-         (Environment.signatures env)
-         (Environment.tokens_finder env)
-         (Environment.algs_finder env) contact_map') e [] in
+         (Model.signatures env)
+         (Model.tokens_finder env)
+         (Model.algs_finder env) contact_map') e [] in
   let () =
     if Tools.array_fold_lefti
         (fun n -> Tools.array_fold_lefti
@@ -30,7 +30,7 @@ let do_interactive_directives
     if cc_preenv == cc_preenv' then (env,graph)
     else
       let fenv,_ = Pattern.PreEnv.finalize ~max_sharing cc_preenv' in
-      (Environment.new_domain fenv env,
+      (Model.new_domain fenv env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern fenv)
          graph

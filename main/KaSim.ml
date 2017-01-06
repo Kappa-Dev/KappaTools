@@ -121,12 +121,12 @@ let () =
     let () =
       if cli_args.Run_cli_args.batchmode &&
        Counter.max_time counter = None && Counter.max_events counter = None then
-        Environment.check_if_counter_is_filled_enough env0 in
-    let env = Environment.propagate_constant
+        Model.check_if_counter_is_filled_enough env0 in
+    let env = Model.propagate_constant
         ?max_time:(Counter.max_time counter)
         ?max_events:(Counter.max_events counter) updated_vars env0 in
 
-    let outputs = Outputs.go (Environment.signatures env) in
+    let outputs = Outputs.go (Model.signatures env) in
     let trace_file =
       match kasim_args.Kasim_args.traceFile with
       | Some _ as x -> x
@@ -138,7 +138,7 @@ let () =
           !tmp_trace in
     let plotPack =
       let head =
-        Environment.map_observables
+        Model.map_observables
           (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
           env in
       if Array.length head > 1 then
@@ -168,20 +168,20 @@ let () =
         Format.eprintf
           "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
           Kappa_printer.env env
-          Pattern.Env.print (Environment.domain env)
+          Pattern.Env.print (Model.domain env)
           (Rule_interpreter.print env) graph in
     let () = match kasim_args.Kasim_args.domainOutputFile with
       | None -> ()
       | Some domainOutputFile ->
         Yojson.Basic.to_file (Kappa_files.path domainOutputFile)
-          (Pattern.Env.to_yojson (Environment.domain env)) in
+          (Pattern.Env.to_yojson (Model.domain env)) in
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then let () = remove_trace () in exit 0 else ();
 
     let () = match plotPack with
       | Some _ ->
         (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
-        Outputs.go (Environment.signatures env)
+        Outputs.go (Model.signatures env)
           (Data.Plot
              (State_interpreter.observables_values env graph counter))
       | _ -> () in
@@ -190,11 +190,11 @@ let () =
       match unary_distances with
       | None -> ()
       | Some inJson ->
-        let size = Environment.nb_syntactic_rules env + 1 in
+        let size = Model.nb_syntactic_rules env + 1 in
         let names =
           Array.init
             size
-            (Format.asprintf "%a" (Environment.print_ast_rule ~env)) in
+            (Format.asprintf "%a" (Model.print_ast_rule ~env)) in
         Outputs.create_distances names inJson in
 
     let () =
@@ -218,22 +218,22 @@ let () =
               match KappaParser.interactive_command KappaLexer.token lexbuf with
               | Ast.RUN b ->
                 let cc_preenv =
-                  Pattern.PreEnv.of_env (Environment.domain env) in
+                  Pattern.PreEnv.of_env (Model.domain env) in
                 let b' =
                   LKappa.bool_expr_of_ast
-                    (Environment.signatures env) (Environment.tokens_finder env)
-                    (Environment.algs_finder env) (Location.dummy_annot b) in
+                    (Model.signatures env) (Model.tokens_finder env)
+                    (Model.algs_finder env) (Location.dummy_annot b) in
                 let cc_preenv',(b'',pos_b'') =
                   Eval.compile_bool contact_map cc_preenv b' in
                 let env' =
                   if cc_preenv == cc_preenv' then env else
-                    Environment.new_domain
+                    Model.new_domain
                       (fst @@ Pattern.PreEnv.finalize
                          ~max_sharing:kasim_args.Kasim_args.maxSharing cc_preenv')
                       env in
                 env',
                 if try Alg_expr.stops_of_bool
-                         (Environment.all_dependencies env) b'' <> []
+                         (Model.all_dependencies env) b'' <> []
                   with ExceptionDefn.Unsatisfiable -> true then
                   let () =
                     Pp.error Format.pp_print_string

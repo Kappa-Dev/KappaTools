@@ -44,14 +44,14 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
         let env,contact_map,updated_vars,story_compression,
             unary_distances,formatCflow,cflowFile,init_l =
           (Marshal.from_channel d :
-             Environment.t*Signature.contact_map*int list*
+             Model.t*Signature.contact_map*int list*
              (bool*bool*bool) option*bool option*string*string option*
              (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
         let () = Pervasives.close_in d  in
         let alg_overwrite =
           List.map
             (fun (s,v) ->
-               Environment.num_of_alg (Location.dummy_annot s) env,
+               Model.num_of_alg (Location.dummy_annot s) env,
                Alg_expr.CONST v)
             cli_args.Run_cli_args.alg_var_overwrite in
         let updated_vars' =

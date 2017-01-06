@@ -40,7 +40,7 @@ type result = Clash | Corrected | Success of t
 
 let raw_get_alg env overwr i =
   match overwr.(i) with
-  | None -> Environment.get_alg env i
+  | None -> Model.get_alg env i
   | Some expr -> expr
 
 let raw_instance_number state patterns_l =
@@ -74,33 +74,33 @@ let recompute env counter state i =
 let empty ~with_trace ~store_distances random_state env counter alg_overwrite =
   let with_connected_components =
     not (Pattern.Set.is_empty
-           (Environment.connected_components_of_unary_rules env)) in
-  let variables_overwrite = Array.make (Environment.nb_algs env) None in
+           (Model.connected_components_of_unary_rules env)) in
+  let variables_overwrite = Array.make (Model.nb_algs env) None in
   let () =
     List.iter (fun (i,v) -> variables_overwrite.(i) <- Some v) alg_overwrite in
-  let variables_cache = Array.make (Environment.nb_algs env) Nbr.zero in
+  let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
   let cand =
     {
       outdated = false;
       roots_of_patterns = Pattern.Env.new_obs_map
-          (Environment.domain env) (fun _ -> Mods.IntSet.empty);
+          (Model.domain env) (fun _ -> Mods.IntSet.empty);
       roots_of_unary_patterns = Pattern.Env.new_obs_map
-          (Environment.domain env) (fun _ -> Mods.IntMap.empty);
+          (Model.domain env) (fun _ -> Mods.IntMap.empty);
       matchings_of_rule = Mods.IntMap.empty;
       unary_candidates = Mods.IntMap.empty;
       variables_overwrite; variables_cache;
       edges = Edges.empty ~with_connected_components;
-      tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
+      tokens = Array.make (Model.nb_tokens env) Nbr.zero;
       outdated_elements = Operator.DepSet.empty,false;
       random_state;
       story_machinery =
         if with_trace then
           Some (Pattern.Env.new_obs_map
-                  (Environment.domain env) (fun _ -> []))
+                  (Model.domain env) (fun _ -> []))
         else None;
       store_distances;
     } in
-  let () = Tools.iteri (recompute env counter cand) (Environment.nb_algs env) in
+  let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
   cand
 
 let print_injections ?domain f roots_of_patterns =
@@ -268,14 +268,14 @@ let apply_positive_transformation
     let (id,_ as nc) = Matching.Agent.concretize inj2graph n in (*(A,23)*)
     let edges' = Edges.add_free id s edges in
     let side_effects' =
-      Tools.list_smart_filter (fun x -> x <> (nc,s)) side_effects in
+      List_util.smart_filter (fun x -> x <> (nc,s)) side_effects in
     (inj2graph,side_effects',roots_by_cc,edges'),
     Primitives.Transformation.Freed (nc,s)
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
     let nc = Matching.Agent.concretize inj2graph n in
     let nc' = Matching.Agent.concretize inj2graph n' in
     let edges',modif_cc = Edges.add_link nc s nc' s' edges in
-    let side_effects' = Tools.list_smart_filter
+    let side_effects' = List_util.smart_filter
         (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
     (inj2graph,side_effects',merge_cc roots_by_cc modif_cc,edges'),
     Primitives.Transformation.Linked ((nc,s),(nc',s'))
@@ -338,7 +338,7 @@ let add_path_to_tests path tests =
       tests in
   List.rev_append
     path_tests
-    (Tools.list_rev_map_append
+    (List_util.rev_map_append
        (fun (x,y) -> Instantiation.Is_Bound_to (x,y)) path tests')
 
 let step_of_event counter = function
@@ -481,7 +481,7 @@ let store_activity store env counter state id syntax_id rate cc_va =
     if !Parameter.debugModeOn then
       Format.printf "@[%sule %a has now %i instances.@]@."
         (if id mod 2 = 1 then "Unary r" else "R")
-        (Environment.print_rule ~env) (id/2) cc_va in
+        (Model.print_rule ~env) (id/2) cc_va in
   let act =
     match Nbr.to_float @@ value_alg counter state rate with
     | None -> if cc_va = 0 then 0. else infinity
@@ -520,11 +520,11 @@ let update_outdated_activities store env counter state =
          match dep with
          | Operator.ALG j ->
            let () = recompute env counter state j in
-           aux (Environment.get_alg_reverse_dependencies env j) acc
+           aux (Model.get_alg_reverse_dependencies env j) acc
          | Operator.PERT p ->
-           (state,Tools.list_merge_uniq Mods.int_compare [p] perts)
+           (state,List_util.merge_uniq Mods.int_compare [p] perts)
          | Operator.RULE i ->
-           let rule = Environment.get_rule env i in
+           let rule = Model.get_rule env i in
            let pattern_va = raw_instance_number
                state [rule.Primitives.connected_components] in
            let () =
@@ -538,11 +538,11 @@ let update_outdated_activities store env counter state =
                | Some _, match' ->
                  { state' with matchings_of_rule = match' }),perts))
       dep acc in
-  let pack = aux (Environment.get_always_outdated env) (state,[]) in
+  let pack = aux (Model.get_always_outdated env) (state,[]) in
   let state',perts = aux deps pack in
   let state'' =
     if not changed_connectivity then state'
-    else Environment.fold_rules unary_rule_update state' env in
+    else Model.fold_rules unary_rule_update state' env in
   ({state'' with outdated_elements = Operator.DepSet.empty,false },perts)
 
 let overwrite_var i counter state expr =
@@ -561,7 +561,7 @@ let update_tokens env counter state consumed injected =
     List.fold_left
       (fun st (va,i) ->
          let () = st.tokens.(i) <- op st.tokens.(i) va in
-         let deps' = Environment.get_token_reverse_dependencies env i in
+         let deps' = Model.get_token_reverse_dependencies env i in
          if Operator.DepSet.is_empty deps' then st
          else
            let rdeps,changed_connectivity = st.outdated_elements in
@@ -578,17 +578,17 @@ let transform_by_a_rule outputs env unary_patterns counter
     update_tokens
       env counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges outputs counter (Environment.domain env) unary_patterns inj
+  update_edges outputs counter (Model.domain env) unary_patterns inj
     state' event_kind ?path rule
 
 let apply_unary_rule
     ~outputs ~rule_id env unary_ccs counter state event_kind rule =
   let () = assert (not state.outdated) in
-  let domain = Environment.domain env in
+  let domain = Model.domain env in
   let inj,path =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l ->
-      let inj,path = Tools.list_random state.random_state l in Some inj,path
+      let inj,path = List_util.random state.random_state l in Some inj,path
     | None ->
       let map1 =
         Pattern.ObsMap.get state.roots_of_unary_patterns
@@ -677,7 +677,7 @@ let apply_unary_rule
 let apply_rule
     ~outputs ?rule_id env unary_patterns counter state event_kind rule =
   let () = assert (not state.outdated) in
-  let domain = Environment.domain env in
+  let domain = Model.domain env in
   let from_patterns () =
     Tools.array_fold_lefti
       (fun id inj_rev_roots pattern ->
@@ -701,7 +701,7 @@ let apply_rule
     | Some id ->
       match Mods.IntMap.find_option id state.matchings_of_rule with
       | Some [] -> None
-      | Some l -> Some (Tools.list_random state.random_state l)
+      | Some l -> Some (List_util.random state.random_state l)
       | None -> from_patterns () in
   match inj_roots with
   | None -> Clash
@@ -753,17 +753,17 @@ let force_rule
              Some (loc,Some (max_dist_to_int counter state d))) in
     match all_injections
             ?unary_rate:max_distance
-            (Environment.domain env) state.edges
+            (Model.domain env) state.edges
             state.roots_of_patterns rule.Primitives.connected_components with
     | [] -> state
     | l ->
-       let (h,_) = Tools.list_random state.random_state l in
+       let (h,_) = List_util.random state.random_state l in
        (transform_by_a_rule
           outputs env unary_patterns counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id store env counter state rule =
   let () = assert (not state.outdated) in
-  let domain = Environment.domain env in
+  let domain = Model.domain env in
   let max_distance = match rule.Primitives.unary_rate with
     | None -> None
     | Some (loc, dist_opt) ->
@@ -785,7 +785,7 @@ let adjust_rule_instances ~rule_id store env counter state rule =
 
 let adjust_unary_rule_instances ~rule_id store env counter state rule =
   let () = assert (not state.outdated) in
-  let domain = Environment.domain env in
+  let domain = Model.domain env in
   let pattern1 = rule.Primitives.connected_components.(0) in
   let pattern2 = rule.Primitives.connected_components.(1) in
   let (),(cands,len) =
@@ -853,13 +853,13 @@ let snapshot env counter fn state = {
   Data.snapshot_file = fn;
   Data.snapshot_event = Counter.current_event counter;
   Data.snapshot_agents =
-    Edges.build_snapshot (Environment.signatures env) state.edges;
+    Edges.build_snapshot (Model.signatures env) state.edges;
   Data.snapshot_tokens = Array.mapi (fun i x ->
-      (Format.asprintf "%a" (Environment.print_token ~env) i,x)) state.tokens;
+      (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.tokens;
 }
 
 let print env f state =
-  let sigs = Environment.signatures env in
+  let sigs = Model.signatures env in
   Format.fprintf
     f "@[<v>%a@,%a@]"
     (Pp.list Pp.space (fun f (i,mix) ->
@@ -869,7 +869,7 @@ let print env f state =
     (Pp.array Pp.space (fun i f el ->
          Format.fprintf
            f "%%init: %a <- %a"
-           (Environment.print_token ~env) i Nbr.print el))
+           (Model.print_token ~env) i Nbr.print el))
     state.tokens
 
 let debug_print f state =

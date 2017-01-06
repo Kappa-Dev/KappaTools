@@ -38,7 +38,7 @@ let find_implicit_infos contact_map ags =
               (free_id,(p,a),or_ty,new_switch s)::cor))
           (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
       | (Ast.LNK_SOME,_), s ->
-        Tools.list_map_flatten
+        List_util.map_flatten
           (fun (free_id,ports,ags,cor) ->
              List.map
                (fun (a,p) ->
@@ -71,7 +71,7 @@ let find_implicit_infos contact_map ags =
           let () = ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained in
           aux_one ag_tail ty_id max_id ports (succ i)
         | _pfcm ->
-          (*Tools.list_map_flatten
+          (*List_util.map_flatten
             (fun (free_id,ports,ags,cor) ->
             let () = ports.(i) <-
             (Location.dummy_annot Ast.FREE,
@@ -491,7 +491,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                   sigs transf l_t place site_id s in
               match List.partition (is_linked_on i) re with
               | [], re' ->
-                if Tools.list_exists_uniq (is_linked_on i) acc then
+                if List_util.exists_uniq (is_linked_on i) acc then
                   handle_ports
                     wk' r_l' c_l transf' l_t' re' acc (succ site_id)
                 else
@@ -601,10 +601,10 @@ let connected_components_of_mixture created mix (env,origin) =
       let (env',inj, cc) =
         Pattern.finish_new ?origin wk_out in
       let added' =
-        Tools.list_smart_map
+        List_util.smart_map
           (Primitives.Transformation.rename id inj) added in
       let removed' =
-        Tools.list_smart_map
+        List_util.smart_map
           (Primitives.Transformation.rename id inj) removed in
       let event' =
         Instantiation.rename_abstract_event id inj event in
@@ -645,7 +645,7 @@ let connected_components_sum_of_ambiguous_rule
                             (Raw_mixture.print ~compact:false sigs)
                             (List.rev created))))
         all_mixs in
-  Tools.list_fold_right_map (connected_components_of_mixture created)
+  List_util.fold_right_map (connected_components_of_mixture created)
     all_mixs (env,origin)
 
 let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =

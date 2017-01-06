@@ -9,6 +9,7 @@ DynamicArray
 LargeArray
 SetMap
 Mods
+List_util
 Tools
 Renaming
 Random_tree
@@ -26,7 +27,7 @@ Agent
 Instantiation
 Alg_expr
 Primitives
-Environment
+Model
 Kappa_printer
 
 Version

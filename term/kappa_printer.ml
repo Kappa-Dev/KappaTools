@@ -9,7 +9,7 @@
 let cc_mix ?env =
   let domain = match env with
     | None -> None
-    | Some e -> Some (Environment.domain e) in
+    | Some e -> Some (Model.domain e) in
   Pp.list
     (fun f -> Format.fprintf f " +@ ")
     (fun f ccs ->
@@ -23,14 +23,14 @@ let cc_mix ?env =
 let alg_expr ?env =
   Alg_expr.print
     (cc_mix ?env)
-    (fun f i -> Format.fprintf f "|%a|" (Environment.print_token ?env) i)
-    (Environment.print_alg ?env)
+    (fun f i -> Format.fprintf f "|%a|" (Model.print_token ?env) i)
+    (Model.print_alg ?env)
 
 let bool_expr ?env =
   Alg_expr.print_bool
     (cc_mix ?env)
-    (fun f i -> Format.fprintf f "|%a|" (Environment.print_token ?env) i)
-    (Environment.print_alg ?env)
+    (fun f i -> Format.fprintf f "|%a|" (Model.print_token ?env) i)
+    (Model.print_alg ?env)
 
 let print_expr ?env f e =
   let aux f = function
@@ -48,12 +48,12 @@ let print_expr_val alg_val f e =
 let elementary_rule ?env f r =
   let domain,sigs = match env with
     | None -> None,None
-    | Some e -> Some (Environment.domain e), Some (Environment.signatures e) in
+    | Some e -> Some (Model.domain e), Some (Model.signatures e) in
   let pr_alg f (a,_) = alg_expr ?env f a in
   let pr_tok f (va,tok) =
     Format.fprintf
       f "%a <- %a"
-      (Environment.print_token ?env) tok
+      (Model.print_token ?env) tok
       pr_alg va in
   let pr_trans f t =
     Primitives.Transformation.print ?sigs f t in
@@ -87,7 +87,7 @@ let elementary_rule ?env f r =
 let modification ?env f m =
   let domain = match env with
     | None -> None
-    | Some e -> Some (Environment.domain e) in
+    | Some e -> Some (Model.domain e) in
   match m with
   | Primitives.PRINT (nme,va) ->
     Format.fprintf f "$PRINTF %a <%a>"
@@ -99,7 +99,7 @@ let modification ?env f m =
         match rule.Primitives.injected_tokens with
         | [ va, id ] ->
           Format.fprintf f "%a <- %a"
-            (Environment.print_token ?env) id
+            (Model.print_token ?env) id
             (fun f (a,_) -> alg_expr ?env f a) va
         | _ -> assert false
       else
@@ -117,7 +117,7 @@ let modification ?env f m =
         (elementary_rule ?env) rule (* TODO Later *)
   | Primitives.UPDATE (id,(va,_)) ->
     Format.fprintf f "$UPDATE %a %a"
-      (Environment.print_alg ?env) id (alg_expr ?env) va
+      (Model.print_alg ?env) id (alg_expr ?env) va
   | Primitives.SNAPSHOT fn ->
     Format.fprintf f "SNAPSHOT %a" (print_expr ?env) fn
   | Primitives.STOP fn ->
@@ -152,5 +152,5 @@ let perturbation ?env f pert =
     Format.fprintf f "%%mod: repeat %t until %a" aux (bool_expr ?env) ab
 
 let env f env =
-  Environment.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)
+  Model.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)
     (fun env -> perturbation ~env) f env

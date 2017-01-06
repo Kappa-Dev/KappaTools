@@ -144,7 +144,7 @@ let initialize codemirror () =
            | None -> ()
            | Some u ->
              let filename =
-               Tools.list_last
+               List_util.last
                  (match u with
                   | (Url.Http h | Url.Https h) -> h.Url.hu_path
                   | Url.File f -> f.Url.fu_path) in

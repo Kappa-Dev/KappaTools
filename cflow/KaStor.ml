@@ -42,7 +42,7 @@ let server_mode () =
       | `Json json ->
         begin
           try
-            let env = Environment.of_yojson (Yojson.Basic.Util.member "env" json) in
+            let env = Model.of_yojson (Yojson.Basic.Util.member "env" json) in
             let steps = Trace.of_yojson (Yojson.Basic.Util.member "trace" json) in
             let none = match Yojson.Basic.Util.to_bool_option
                                (Yojson.Basic.Util.member "none" json)
@@ -81,7 +81,7 @@ let get_simulation fname =
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let () = Yojson.Basic.read_colon lex_st lex_buf in
   let () = Yojson.Basic.read_space lex_st lex_buf in
-  let env = Environment.of_yojson
+  let env = Model.of_yojson
       (Yojson.Basic.read_json lex_st lex_buf) in
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let () = Yojson.Basic.read_comma lex_st lex_buf in

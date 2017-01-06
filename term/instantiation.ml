@@ -173,15 +173,15 @@ let rename_abstract_side_effect id inj x =
   subst_map_agent_in_side_effect (Matching.Agent.rename id inj) x
 
 let subst_map_agent_in_event f (tests,(acs,kasa_side,kasim_side)) =
-  (Tools.list_smart_map (subst_map_agent_in_test f) tests,
-   (Tools.list_smart_map (subst_map_agent_in_action f) acs,
-    Tools.list_smart_map (subst_map_agent_in_side_effect f) kasa_side,
-    Tools.list_smart_map (subst_map_site f) kasim_side))
+  (List_util.smart_map (subst_map_agent_in_test f) tests,
+   (List_util.smart_map (subst_map_agent_in_action f) acs,
+    List_util.smart_map (subst_map_agent_in_side_effect f) kasa_side,
+    List_util.smart_map (subst_map_site f) kasim_side))
 let subst_map2_agent_in_event f f' (tests,(acs,kasa_side,kasim_side)) =
-  (Tools.list_smart_map (subst_map_agent_in_test f) tests,
-   (Tools.list_smart_map (subst_map2_agent_in_action f f') acs,
-    Tools.list_smart_map (subst_map_agent_in_side_effect f) kasa_side,
-    Tools.list_smart_map (subst_map_site f) kasim_side))
+  (List_util.smart_map (subst_map_agent_in_test f) tests,
+   (List_util.smart_map (subst_map2_agent_in_action f f') acs,
+    List_util.smart_map (subst_map_agent_in_side_effect f) kasa_side,
+    List_util.smart_map (subst_map_site f) kasim_side))
 
 let subst_map_agent_in_concrete_event f x =
   subst_map_agent_in_event (subst_map_concrete_agent f) x

@@ -48,7 +48,7 @@ val empty_grid : unit -> grid
 val record :
   (Trace.event_kind *
    Instantiation.concrete Instantiation.event * unit Trace.Simulation_info.t) ->
-  int -> Environment.t -> grid -> grid
+  int -> Model.t -> grid -> grid
 val record_obs :
   (Trace.event_kind *
    Instantiation.concrete Instantiation.test list
@@ -56,7 +56,7 @@ val record_obs :
   Instantiation.concrete Instantiation.site list -> int -> grid -> grid
 val record_init :
   int list * Instantiation.concrete Instantiation.action list ->
-  int -> Environment.t -> grid -> grid
+  int -> Model.t -> grid -> grid
 
 val cut : ?with_reduction:bool ->
   Remanent_parameters_sig.parameters ->
@@ -108,7 +108,7 @@ val pretty_print :
   'a ->
   StoryProfiling.StoryStats.log_info ->
   Exception.method_handler ->
-  Environment.t ->
+  Model.t ->
   Graph_closure.config ->
   string ->
   string -> (Trace.t * grid * 'b Trace.Simulation_info.t list) list ->

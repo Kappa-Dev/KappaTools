@@ -6,7 +6,7 @@
 type compil =
   {
     contact_map: (int list * (int * int) list) array array ;
-    environment: Environment.t ;
+    environment: Model.t ;
     init: (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
     rate_convention: Ode_args.rate_convention ;
     show_reactions: bool ;
@@ -30,7 +30,7 @@ let lift_opt f compil_opt =
 
 let contact_map compil = compil.contact_map
 let environment compil = compil.environment
-let domain compil = Environment.domain (environment compil)
+let domain compil = Model.domain (environment compil)
 
 let domain_opt = lift_opt domain
 let environment_opt = lift_opt environment
@@ -61,13 +61,13 @@ let do_we_prompt_reactions compil =
 
 let print_chemical_species ?compil =
   Pattern.print_cc
-    ?sigs:(Tools.option_map Environment.signatures (environment_opt compil))
+    ?sigs:(Tools.option_map Model.signatures (environment_opt compil))
     ?cc_id:None
 
 let print_token ?compil fmt k =
   Format.fprintf fmt
     "%a"
-    (Environment.print_token ?env:(environment_opt compil))
+    (Model.print_token ?env:(environment_opt compil))
     k
 
 let print_canonic_species = print_chemical_species
@@ -112,15 +112,15 @@ let find_embeddings_unary_binary compil p x =
   Tools.array_fold_lefti
     (fun i acc cc ->
        let em = find_embeddings compil cc x in
-       Tools.list_map_flatten
+       List_util.map_flatten
          (fun m ->
-            Tools.list_map_option (fun r -> Matching.add_cc m i r) em)
+            List_util.map_option (fun r -> Matching.add_cc m i r) em)
          acc)
     [Matching.empty]
     p
 
 let disjoint_union compil l =
-  let sigs = Environment.signatures (compil.environment) in
+  let sigs = Model.signatures (compil.environment) in
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
   let _,em,mix =
     List.fold_left
@@ -200,7 +200,7 @@ let print_rule ?compil =
 let print_rule_name ?compil f r =
   let env = environment_opt compil in
   let id = r.Primitives.syntactic_rule in
-  Environment.print_ast_rule ?env f id
+  Model.print_ast_rule ?env f id
 
 let string_of_var_id ?compil r =
   let env = environment_opt compil in
@@ -208,7 +208,7 @@ let string_of_var_id ?compil r =
   | None -> "var("^(string_of_int r)^")"
   | Some env ->
     try
-      let array = Environment.get_algs env in
+      let array = Model.get_algs env in
       fst (array.(r-1))
     with
       _ -> "var("^(string_of_int r)^")"
@@ -229,7 +229,7 @@ let rate_name compil rule rule_id =
     arity_tag direction_tag
 
 let apply compil rule inj_nodes mix =
-  let sigs = Environment.signatures compil.environment in
+  let sigs = Model.signatures compil.environment in
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
                 (inj_nodes,Mods.IntMap.empty)) rule.Primitives.removed in
@@ -255,16 +255,16 @@ let apply compil rule inj_nodes mix =
 let lift_species compil x =
   fst @@
   Pattern.add_fully_specified_to_graph
-    (Environment.signatures compil.environment)
+    (Model.signatures compil.environment)
     (Edges.empty ~with_connected_components:false) x
 
 let get_rules compil =
-  Environment.fold_rules
+  Model.fold_rules
     (fun _ acc r -> r::acc) [] (environment compil)
-let get_variables compil = Environment.get_algs (environment compil)
+let get_variables compil = Model.get_algs (environment compil)
 let get_obs compil =
   Array.to_list
-    (Environment.map_observables (fun r -> r) (environment compil))
+    (Model.map_observables (fun r -> r) (environment compil))
 
 let remove_escape_char =
   (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are moe knowledgeable *)
@@ -275,7 +275,7 @@ let remove_escape_char =
 let get_obs_titles compil =
   let env = environment compil in
   Array.to_list @@
-  Environment.map_observables
+  Model.map_observables
     (fun x -> remove_escape_char
         (Format.asprintf "%a"
            (Kappa_printer.alg_expr ~env) x))
@@ -296,7 +296,7 @@ let get_compil
   }
 
 let empty_cache compil =
-  Pattern.PreEnv.of_env (Environment.domain compil.environment)
+  Pattern.PreEnv.of_env (Model.domain compil.environment)
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
 let mixture_of_init compil c =
@@ -305,7 +305,7 @@ let mixture_of_init compil c =
   m
 
 let nb_tokens compil =
-  Environment.nb_tokens (environment compil)
+  Model.nb_tokens (environment compil)
 
 
 let divide_rule_rate_by cache compil rule =
@@ -314,6 +314,6 @@ let divide_rule_rate_by cache compil rule =
   | Ode_args.Biochemist | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
     let rule_id = rule.Primitives.syntactic_rule  in
     let lkappa_rule =
-      Environment.get_ast_rule compil.environment rule_id
+      Model.get_ast_rule compil.environment rule_id
     in
     LKappa_auto.nauto compil.rate_convention cache lkappa_rule.LKappa.r_mix lkappa_rule.LKappa.r_created

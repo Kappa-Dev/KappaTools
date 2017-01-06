@@ -208,7 +208,7 @@ let kappa_instance_to_yojson =
 let to_yojson env =
   let () =
     ExceptionDefn.warning
-      (fun f -> Format.pp_print_string f "Environment.to_json is partial") in
+      (fun f -> Format.pp_print_string f "Model.to_yojson is partial") in
   `Assoc [
     "update", Pattern.Env.to_yojson (domain env);
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;

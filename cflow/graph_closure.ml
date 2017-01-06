@@ -108,7 +108,7 @@ let is_strict_sublist p a b =
     | _,_::t' -> aux a t'
   in aux a b
 
-let insert_elt p e = Tools.list_merge_uniq p [e]
+let insert_elt p e = List_util.merge_uniq p [e]
 
 let diff_list p a b =
   let rec aux a b accu =
@@ -124,7 +124,7 @@ let diff_list p a b =
 let compare_bool a b = compare a b < 0
 let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing =
-  Tools.list_merge_uniq (fun x y -> Pervasives.compare y x)
+  List_util.merge_uniq (fun x y -> Pervasives.compare y x)
 
 
 let closure_bottom_up_with_fold parameter handler log_info error event config prec is_obs f a  =

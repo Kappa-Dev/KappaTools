@@ -38,7 +38,7 @@ module type Cflow_handler =
 
     type handler =   (*handler to interpret abstract values*)
         {
-          env: Environment.t ;
+          env: Model.t ;
 	  rule_name_cache: string array;
 	  agent_name_cache: string array;
 	    steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
@@ -82,7 +82,7 @@ module type Cflow_handler =
     val use_fusion_sort: parameter -> parameter
     val always_disambiguate: parameter -> bool
     val set_always_disambiguate: parameter -> bool -> parameter
-    val init_handler: Environment.t -> handler
+    val init_handler: Model.t -> handler
     val string_of_rule_id: handler -> int -> string
     val string_of_agent_id: handler -> int -> string
     val get_predicate_map: handler -> (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t

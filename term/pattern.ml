@@ -268,7 +268,7 @@ let minimize_renaming dst_nbt ref_nbt =
       (fun ty ->
          List.fold_left (fun r id ->
              let ids' =
-               Tools.list_smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
+               List_util.smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
              if ids' == dst_nbt.(ty) then r
              else let () = dst_nbt.(ty) <- ids' in
                Tools.unsome Renaming.empty (Renaming.add id id r)))
@@ -522,7 +522,7 @@ let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
       reserved_ids in
   let used_ids =
     Array.map
-      (Tools.list_map_option
+      (List_util.map_option
          (fun id -> if Renaming.mem id inj1_to_2
            then Some (Renaming.apply inj1_to_2 id)
            else None))
@@ -624,7 +624,7 @@ let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
   let () =
     Array.iteri
       (fun i x -> reserved_ids.(i) <-
-          Tools.list_merge_uniq Mods.int_compare nodes_by_type.(i) x)
+          List_util.merge_uniq Mods.int_compare nodes_by_type.(i) x)
       available_ids in
   (pack',
    {

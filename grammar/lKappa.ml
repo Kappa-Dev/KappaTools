@@ -414,9 +414,9 @@ let add_link_contact_map ?contact_map sty sp dty dp =
     let si,sl = contact_map.(sty).(sp) in
     let di,dl = contact_map.(dty).(dp) in
     let () = contact_map.(sty).(sp) <-
-        si,Tools.list_merge_uniq Mods.int_pair_compare sl [dty,dp] in
+        si,List_util.merge_uniq Mods.int_pair_compare sl [dty,dp] in
     contact_map.(dty).(dp) <-
-      di,Tools.list_merge_uniq Mods.int_pair_compare dl [sty,sp]
+      di,List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
 
 let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
@@ -1079,7 +1079,7 @@ let modif_expr_of_ast sigs tok algs contact_map modif acc =
 let perturbation_of_ast
     sigs tok algs contact_map ((pre,mods,post),pos) up_vars =
   let mods',up_vars' =
-    Tools.list_fold_right_map
+    List_util.fold_right_map
       (modif_expr_of_ast sigs tok algs contact_map) mods up_vars in
   ((bool_expr_of_ast sigs tok algs pre,mods',
     match post with
@@ -1133,7 +1133,7 @@ let compil_of_ast overwrite c =
     List.fold_right
       name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
   let alg_vars_over =
-    Tools.list_rev_map_append
+    List_util.rev_map_append
       (fun (x,v) -> (Location.dummy_annot x,
                      Location.dummy_annot (Alg_expr.CONST v))) overwrite
       (List.filter
@@ -1147,12 +1147,12 @@ let compil_of_ast overwrite c =
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
   let perts',updated_vars =
-    Tools.list_fold_right_map
+    List_util.fold_right_map
       (perturbation_of_ast sigs tok algs contact_map) c.Ast.perturbations [] in
   sigs,contact_map,tk_nd,updated_vars,
   {
     Ast.variables =
-      Tools.list_mapi
+      List_util.mapi
         (fun i (lab,expr) ->
            (lab,alg_expr_of_ast ~max_allowed_var:(pred i) sigs tok algs expr))
         alg_vars_over;

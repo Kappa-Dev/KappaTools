@@ -78,11 +78,11 @@ let print_event_kind ?env f x =
     match x with
     | OBS name -> Format.pp_print_string f name
     | PERT s -> Format.pp_print_string f s
-    | RULE r_id -> Environment.print_ast_rule ~env f r_id
+    | RULE r_id -> Model.print_ast_rule ~env f r_id
     | INIT s ->
       Format.fprintf
         f "Intro @[<h>%a@]"
-        (Pp.list Pp.comma (Environment.print_agent ~env)) s
+        (Pp.list Pp.comma (Model.print_agent ~env)) s
 
 let event_kind_to_json = function
   | OBS s -> `List [`String "OBS"; `String s]
@@ -101,14 +101,14 @@ let print_event_kind_dot_annot env f = function
   | RULE r_id  ->
     Format.fprintf
       f "[label=\"%a\", shape=%s, style=%s, fillcolor = %s]"
-      (Environment.print_ast_rule ~env) r_id "invhouse" "filled" "lightblue"
+      (Model.print_ast_rule ~env) r_id "invhouse" "filled" "lightblue"
   | OBS name  ->
     Format.fprintf
       f "[label=\"%s\", style=filled, fillcolor=red]" name
   | INIT s ->
     Format.fprintf
       f "[label=\"Intro @[<h>%a@]\", shape=%s, style=%s, fillcolor=green]"
-      (Pp.list Pp.comma (Environment.print_agent ~env)) s "house" "filled"
+      (Pp.list Pp.comma (Model.print_agent ~env)) s "house" "filled"
   | PERT s ->
     Format.fprintf
       f "[label=\"%s\", shape=%s, style=%s, fillcolor = %s]"
@@ -139,16 +139,16 @@ let print_subs _f (_a,_b)  = ()
 let print_site ?env f ((ag_id,ag),s) =
   Format.fprintf
     f "%a_%i.%a"
-    (Environment.print_agent ?env) ag ag_id
+    (Model.print_agent ?env) ag ag_id
     (match env with
      | Some env ->
-       Signature.print_site (Environment.signatures env) ag
+       Signature.print_site (Model.signatures env) ag
      | None -> Format.pp_print_int) s
 
 let print_init ~compact ?env log actions =
   let sigs = match env with
     | None -> None
-    | Some env -> Some (Environment.signatures env) in
+    | Some env -> Some (Model.signatures env) in
   if compact then
     Format.fprintf
       log "INIT:%a"
@@ -166,12 +166,12 @@ let print_side_effects ?env =
          f "Side_effects(%a,%a)"
          (print_site ?env) site
          (Instantiation.print_concrete_binding_state
-            ?sigs:(Tools.option_map Environment.signatures env)) state)
+            ?sigs:(Tools.option_map Model.signatures env)) state)
 
 let print_event ~compact ?env log (ev_kind,(tests,(actions,side_sites,_))) =
   let sigs = match env with
     | None -> None
-    | Some env -> Some (Environment.signatures env) in
+    | Some env -> Some (Model.signatures env) in
   if compact then print_event_kind ?env log ev_kind
   else
     Format.fprintf
@@ -184,7 +184,7 @@ let print_event ~compact ?env log (ev_kind,(tests,(actions,side_sites,_))) =
 let print_obs ~compact ?env f (ev_kind,tests,_) =
   let sigs = match env with
     | None -> None
-    | Some env -> Some (Environment.signatures env) in
+    | Some env -> Some (Model.signatures env) in
   if compact then
     Format.fprintf f "OBS %a" (print_event_kind ?env) ev_kind
   else

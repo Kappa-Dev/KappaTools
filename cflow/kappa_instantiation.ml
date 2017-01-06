@@ -138,7 +138,7 @@ module Cflow_linker =
                empty_set,counter+1,Mods.IntMap.empty
              | Trace.Obs (id,tests,info) ->
                let tests' =
-                 Tools.list_smart_map
+                 List_util.smart_map
                    (PI.subst_map_agent_in_concrete_test translate) tests in
                Causal.record_obs
                  (id,tests',info) side_effect counter grid,
@@ -147,7 +147,7 @@ module Cflow_linker =
                grid, side_effect, counter, Mods.IntMap.add a b subs
              | Trace.Init actions ->
                let actions' =
-                 Tools.list_smart_map
+                 List_util.smart_map
                    (PI.subst_map_agent_in_concrete_action translate) actions in
                Causal.record_init (Trace.creation_of_actions snd actions',actions')
                  counter env grid,
@@ -212,13 +212,13 @@ module Cflow_linker =
            info)
       | Trace.Obs (a,b,c) ->
         Trace.Obs(a,
-                  Tools.list_smart_map
+                  List_util.smart_map
                     (PI.subst_map_agent_in_concrete_test
                        (fun x -> AgentIdMap.find_default x x mapping)) b,
                   c)
       | Trace.Init b ->
         Trace.Init
-          (Tools.list_smart_map
+          (List_util.smart_map
              (PI.subst_map_agent_in_concrete_action
                 (fun x -> AgentIdMap.find_default x x mapping')) b)
       | Trace.Dummy _ | Trace.Subs _ as event -> event

@@ -527,7 +527,7 @@ let rec post_condition error rule_id r precondition static dynamic path  =
                 l
             in
             let l_all =
-              Tools.remove_consecutive_double_in_list
+              List_util.remove_consecutive_double
                 (List.sort Ckappa_sig.compare_state_index
                    (List.rev_append list l_side))
             in

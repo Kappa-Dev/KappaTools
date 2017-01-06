@@ -37,9 +37,9 @@ type event_kind =
   | PERT of string (** the rule *)
 
 val print_event_kind :
-  ?env:Environment.t -> Format.formatter -> event_kind -> unit
+  ?env:Model.t -> Format.formatter -> event_kind -> unit
 val print_event_kind_dot_annot :
-  Environment.t -> Format.formatter -> event_kind -> unit
+  Model.t -> Format.formatter -> event_kind -> unit
 
 type event =
   event_kind *
@@ -80,7 +80,7 @@ val creation_of_actions :
 val creation_of_step : step -> int list
 
 val print_step:
-  ?compact:bool -> ?env:Environment.t -> Format.formatter -> step -> unit
+  ?compact:bool -> ?env:Model.t -> Format.formatter -> step -> unit
 
 val step_to_yojson : step -> Yojson.Basic.json
 val step_of_yojson : Yojson.Basic.json -> step

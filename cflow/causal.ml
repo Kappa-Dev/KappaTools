@@ -213,7 +213,7 @@ let add_actions env grid event_number kind actions =
       aux (add site true atom_modified grid event_number kind) q
     | (Instantiation.Create ((_,na as ag),_)
       | Instantiation.Remove (_,na as ag)) :: q ->
-      let sigs = Environment.signatures env in
+      let sigs = Model.signatures env in
       let ag_intf = Signature.get sigs na in
       let grid = add (ag,-1) true atom_modified grid event_number kind in
       let grid =
@@ -748,7 +748,7 @@ let pretty_print
     let () = match dotFormat with
         Json -> let env_filename =
                   Kappa_files.get_cflow [compression_type;"env"] "json" in
-                Yojson.Basic.to_file env_filename (Environment.to_yojson env)
+                Yojson.Basic.to_file env_filename (Model.to_yojson env)
       | Dot | Html -> () in
     let _ =
       Kappa_files.with_cflow_file

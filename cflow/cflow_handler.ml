@@ -60,7 +60,7 @@ sig
 
   type handler =   (*handler to interpret abstract values*)
     {
-      env: Environment.t ;
+      env: Model.t ;
       rule_name_cache: string array;
       agent_name_cache: string array;
       steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
@@ -104,7 +104,7 @@ sig
   val use_fusion_sort: parameter -> parameter
   val always_disambiguate: parameter -> bool
   val set_always_disambiguate: parameter -> bool -> parameter
-  val init_handler: Environment.t -> handler
+  val init_handler: Model.t -> handler
   val string_of_rule_id: handler -> int -> string
   val string_of_agent_id: handler -> int -> string
   val get_predicate_map: handler -> (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
@@ -232,7 +232,7 @@ module Cflow_handler =
 
     type handler =
       {
-        env: Environment.t ;
+        env: Model.t ;
         rule_name_cache: string array;
         agent_name_cache: string array;
         steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
@@ -245,10 +245,10 @@ module Cflow_handler =
     type ('a,'b,'c,'d,'e) quaternary  = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'e
 
     let init_handler env =
-      let n_rules = Environment.nb_syntactic_rules env in
-      let rule_name_cache = Array.init (n_rules+1) (Format.asprintf "%a" (Environment.print_ast_rule ~env:env)) in
-      let n_agents = Signature.size (Environment.signatures env) in
-      let agent_name_cache = Array.init n_agents (Format.asprintf "%a" (Environment.print_agent ~env:env)) in
+      let n_rules = Model.nb_syntactic_rules env in
+      let rule_name_cache = Array.init (n_rules+1) (Format.asprintf "%a" (Model.print_ast_rule ~env:env)) in
+      let n_agents = Signature.size (Model.signatures env) in
+      let agent_name_cache = Array.init n_agents (Format.asprintf "%a" (Model.print_agent ~env:env)) in
       let steps_by_column = Predicate_maps.QPredicateMap.empty 0 in
       {env = env;
        rule_name_cache=rule_name_cache;

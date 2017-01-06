@@ -26,29 +26,6 @@ val array_fold_left2i :
   (int -> 'a -> 'b -> 'c -> 'a) -> 'a -> 'b array -> 'c array -> 'a
 val array_min_equal_not_null :
   (int * 'a list) array -> (int * 'b list) array -> ('a list * 'b list) option
-val list_last : 'a list -> 'a
-val list_exists_uniq :
-  ('a -> bool) -> 'a list -> bool
-val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
-val list_map_flatten : ('a -> 'b list) -> 'a list -> 'b list
-val list_fold_right_map :
-  ('a -> 'b -> 'c * 'b) -> 'a list -> 'b -> 'c list * 'b
-val list_fold_left2 :
-  ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
-val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
-val list_map_option : ('a -> 'b option) -> 'a list -> 'b list
-val list_random : Random.State.t -> 'a list -> 'a
-
-(** Set union of 2 sorted list
-  When l1 is included in l2:
-  [list_merge_uniq l1 l2 == list_merge_uniq l2 l1 == l2] *)
-val list_merge_uniq : ('a -> 'a -> int) -> 'a list -> 'a list -> 'a list
-
-(** not tail rec but don't allocate if unecessary *)
-val list_smart_filter : ('a -> bool) -> 'a list -> 'a list
-val list_smart_map : ('a -> 'a) -> 'a list -> 'a list
-
-val remove_consecutive_double_in_list : 'a list -> 'a list
 
 (** {5 Misc utilities } *)
 val pow : int -> int -> int

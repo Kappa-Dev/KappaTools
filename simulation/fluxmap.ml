@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 let create_flux env counter flux_normalized flux_name =
-  let size = Environment.nb_syntactic_rules env + 1 in
+  let size = Model.nb_syntactic_rules env + 1 in
   {
     Data.flux_name; Data.flux_normalized;
     Data.flux_start = Counter.current_time counter;
@@ -26,10 +26,10 @@ let get_flux_name flux = flux.Data.flux_name
 let flux_has_name name flux = flux.Data.flux_name = name
 
 let stop_flux env counter flux_data =
-  let size = Environment.nb_syntactic_rules env + 1 in
+  let size = Model.nb_syntactic_rules env + 1 in
   let flux_rules =
     Array.init size
-      (Format.asprintf "%a" (Environment.print_ast_rule ~env)) in
+      (Format.asprintf "%a" (Model.print_ast_rule ~env)) in
   let () =
     if flux_data.Data.flux_normalized then
       Array.iteri

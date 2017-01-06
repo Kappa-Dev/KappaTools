@@ -246,7 +246,7 @@ let initialize trace_file plotPack env =
     | Some s ->
       let desc = Kappa_files.open_out s in
       let () = output_string desc "{\"env\":" in
-      let () = Yojson.Basic.to_channel desc (Environment.to_yojson env) in
+      let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
       let () = output_string desc ",\"trace\":[" in
       traceDescr := Some desc in
   match plotPack with

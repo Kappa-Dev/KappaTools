@@ -965,7 +965,7 @@ module Preblackboard =
 
     let print_data_structure parameter handler error data =
       (*  let stderr = parameter.CI.Po.K.H.out_channel_err in
-          let sigs = Environment.signatures handler.CI.Po.K.H.env in
+          let sigs = Model.signatures handler.CI.Po.K.H.env in
           let _ = Format.fprintf stderr "New agents: @." in
           let _ =
           AgentIdSet.iter (Format.fprintf stderr " %i @.") data.new_agents
@@ -1882,17 +1882,17 @@ module Preblackboard =
                (fun (error,log_info,blackboard,init_step,nlist) mixture_ag_id ->
                   let step = Trace.subs_step rule_ag_id mixture_ag_id in
                   let test_list =
-                    Tools.list_smart_map
+                    List_util.smart_map
                       (Instantiation.subst_agent_in_concrete_test rule_ag_id mixture_ag_id)
                       test_list
                   in
                   let action_list =
-                    Tools.list_smart_map
+                    List_util.smart_map
                       (Instantiation.subst_agent_in_concrete_action rule_ag_id mixture_ag_id)
                       action_list
                   in
                   let side_effect =
-                    Tools.list_smart_map
+                    List_util.smart_map
                       (Instantiation.subst_agent_in_concrete_side_effect rule_ag_id mixture_ag_id)
                       side_effect in
                   let fictitious_local_list = [] in
@@ -2191,10 +2191,10 @@ module Preblackboard =
                                let f x =
                                  AgentIdMap.find_default x x subs
                                in
-                               Tools.list_smart_map
+                               List_util.smart_map
                                  (Instantiation.subst_map_agent_in_concrete_test f)
                                  test_list,
-                               Tools.list_smart_map
+                               List_util.smart_map
                                  (Instantiation.subst_map_agent_in_concrete_action f)
                                  action_list
                            in
