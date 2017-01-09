@@ -14,7 +14,7 @@ MANGENREP = $(MANREP)$(GENIMG)/
 KASAREP = KaSa_rep/
 RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
 
-OCAMLBEST := $(shell which ocamlopt > /dev/null && echo native || echo byte)
+OCAMLBEST := $(shell which `ocamlfind opt -only-show` > /dev/null && echo native || echo byte)
 OCAMLBUILDFLAGS = $(EXTRAFLAGS)
 
 USE_TK?=0
@@ -57,7 +57,7 @@ endif
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: check build-tests doc clean_doc fetch_version KappaBin.zip debug
-.PHONY: profiling Kappapp.app
+.PHONY: profiling Kappapp.app kappalib install-lib
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -103,7 +103,11 @@ $(MANGENREP)version.tex: $(MANREP)version.tex.skel $(wildcard .git/refs/heads/*)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*) generated
+META: META.skel $(wildcard .git/refs/heads/*)
+	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
+	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
+
+ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
@@ -242,6 +246,14 @@ profiling:
 
 all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE bin/KaSa_json
 
+kappalib: KappaLib.cma
+ifeq ($(OCAMLBEST),native)
+	@+$(MAKE) KappaLib.cmxa
+endif
+
+install-lib:
+	ocamlfind install KappaLib META _build/KappaLib.cma $(wildcard _build/*/*.cmi) $(wildcard _build/*/*.mli) -optional _build/KappaLib.cmxa
+
 clean_ide:
 	rm -f StdSim bin/StdSim
 	rm -rf ide/Kappa.iconset
@@ -259,7 +271,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
-	rm -f KaDE bin/KaDE
+	rm -f KaDE bin/KaDE META KappaLib.cm*
 	rm -rf KappaBin KappaBin.zip
 	rm -rf site generated
 	find . -name \*~ -delete

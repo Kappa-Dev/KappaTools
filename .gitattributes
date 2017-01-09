@@ -3,3 +3,5 @@
 .travis.yml	export-ignore
 main/version.ml.skel	export-subst
 ide/Info.plist.skel	export-subst
+man/version.tex.skel	export-subst
+META.skel	export-subst

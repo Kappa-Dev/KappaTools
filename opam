@@ -12,7 +12,7 @@ bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
 dev-repo: "https://github.com/Kappa-Dev/KaSim.git"
 
 depends : [
-  "ocamlfind" {build}
+  "ocamlfind"
   "ocamlbuild" {build}
   "yojson"
 ]
@@ -23,9 +23,12 @@ depopts: [
 ]
 
 build: [
-  [ make "USE_TK=1" {labltk:installed} "all" ]
+  [ make "USE_TK=1" {labltk:installed} "all" "META" "kappalib"]
   [ make "bin/WebSim" ] {atdgen:installed & lwt:installed & cohttp:installed}
 ]
+
+install: [ [ make "install-lib" ] ]
+remove: [ [ "ocamlfind" "remove" "KappaLib" ] ]
 
 build-test: [ [ make "check" ] ]
 

@@ -1,7 +1,6 @@
 js/external
 main/version.ml
 todo.org
-index.html
 *.cm*
 *.o
 *.annot
@@ -18,15 +17,12 @@ _build/
 ._ncdi/
 Kappapp.app
 
-#js
-JaSim.byte
-js/JaSim.js
-
 #server
 WebSim
 StdSim
 ide/Kappa.icns
 ide/Kappa.iconset/
+ide/Info.plist
 
 # doc
 *.log
@@ -40,6 +36,7 @@ man/KaSim_manual.lot
 man/KaSim_manual.toc
 *.witness
 man/zzKaSim_manual.ps
+man/generated_img/
 
 # test suite
 models/test_suite/*/*/output/*.xml
@@ -66,6 +63,7 @@ generated
 site
 *.byte
 *.native
+META
 
 # python
 *.pyc
