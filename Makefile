@@ -14,6 +14,7 @@ MANGENREP = $(MANREP)$(GENIMG)/
 KASAREP = KaSa_rep/
 RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
 
+OCAMLBEST := $(shell which ocamlopt > /dev/null && echo native || echo byte)
 OCAMLBUILDFLAGS = $(EXTRAFLAGS)
 
 USE_TK?=0
@@ -106,7 +107,7 @@ ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*) generated
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-%.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
+%.cma %.cmxa %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 site: $(RESOURCES_HTML)
@@ -186,15 +187,7 @@ WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(lwt)" \
 	$@
 
-WebWorkerV1.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I js -I api \
-	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(lwt)" \
-	$@
-
-WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-I webapp -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
@@ -202,15 +195,7 @@ WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GEN
 	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
-WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I webapp -I api \
-	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
-	$@
-
-StdSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+StdSim.native StdSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-I webapp -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
@@ -218,7 +203,7 @@ StdSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GEN
 	-tag-line "<webapp/*> : thread, package(lwt),package(lwt.unix),package(atdgen)" \
 	$@
 
-bin/%: %.native Makefile
+bin/%: %.$(OCAMLBEST) Makefile
 	[ -d bin ] || mkdir bin && strip -o $@ $<
 	rm -f $(notdir $@) && ln -s $@ $(notdir $@)
 
