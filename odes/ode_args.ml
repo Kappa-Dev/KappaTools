@@ -11,6 +11,9 @@ type t = {
   mutable count : string ;
   mutable show_reactions : bool ;
   mutable compute_jacobian : bool ;
+  mutable octave_output : string option ;
+  mutable matlab_output : string option ;
+  mutable sbml_output : string option ;
 }
 
 let default : t =
@@ -20,12 +23,24 @@ let default : t =
     count = "Embeddings" ;
     show_reactions = true ;
     compute_jacobian = false ;
+    octave_output = None  ;
+    matlab_output = None ;
+    sbml_output = None ;
   }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
-  ("--ode-backend",
+  "--ode-backend",
    Arg.String (fun backend -> t.backend <- backend),
-   "Available backends are Octave and Matlab") ;
+   "Available backends are Octave and Matlab" ;
+  "--matlab-output",
+  Arg.String (fun backend -> t.matlab_output <- Some backend),
+  "ODEs file for matlab backend";
+  "--octave-output",
+  Arg.String (fun backend -> t.octave_output <- Some backend),
+  "ODEs file for octave backend";
+  "--sbml-output",
+  Arg.String (fun backend -> t.sbml_output <- Some backend),
+  "ODEs file for sbml backend";
   "--rate-convention",
   Arg.String (fun rate_convention -> t.rate_convention <- rate_convention),
   "Tune which correction is applied to rule rates \n\t KaSim -> we do not divide; \n\t Divide_by_nbr_of_autos_in_lhs -> we divide by the number of autos in the lhs \n\t Biochemist -> we divide by the number of autos in the lhs that induce an auto in the rhs" ;

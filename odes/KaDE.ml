@@ -10,7 +10,7 @@ let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file]\n"
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -57,6 +57,36 @@ let main () =
           ("Wrong option "^s^".\nOnly KaSim and Biochemist are supported.");
         exit 0
       end
+    in
+    let () =
+      match
+        ode_args.Ode_args.matlab_output
+      with
+      | None -> ()
+      | Some s ->
+        Kappa_files.set_ode
+          Loggers.Matlab
+          s
+    in
+    let () =
+      match
+        ode_args.Ode_args.octave_output
+      with
+      | None -> ()
+      | Some s ->
+        Kappa_files.set_ode
+          Loggers.Octave
+          s
+    in
+    let () =
+      match
+        ode_args.Ode_args.sbml_output
+      with
+      | None -> ()
+      | Some s ->
+        Kappa_files.set_ode
+          Loggers.SBML
+          s
     in
     let count =
       match lowercase ode_args.Ode_args.count with
