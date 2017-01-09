@@ -25,6 +25,7 @@ type variable =
   | N_rows
   | Tmp
   | Current_time
+  | Time_scale_factor
 
 
 let rec is_expr_const expr = (* constant propagation is already done *)
@@ -123,6 +124,7 @@ let string_of_variable var =
   | N_rows -> "nrows"
   | Tmp -> "tmp"
   | Current_time -> "t"
+  | Time_scale_factor -> "t_correct_unit"
 
 let string_of_array_name var =
   match var with
@@ -148,3 +150,4 @@ let string_of_array_name var =
   | N_rules -> "nrules"
   | Tmp -> "tmp"
   | Current_time -> "t"
+  | Time_scale_factor -> "t_correct_dimmension"

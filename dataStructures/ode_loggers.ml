@@ -41,6 +41,7 @@ let print_list logger l =
 let print_ode_preamble
     logger
     command_line
+    ~may_be_not_time_homogeneous
     ~count
     ~rate_convention
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
@@ -92,7 +93,7 @@ let print_ode_preamble
               "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";] in
         let () = command_line logger in
         let () = print_list logger
-            [
+            ([
               "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
               "<model name=\"KaDe output:\">";
               "<!--";
@@ -131,18 +132,25 @@ let print_ode_preamble
               "<listOfUnits>";
               "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"litre\"/>";
               "</listOfUnits>";
-              "</unitDefinition>";
+              "</unitDefinition>";]@(if may_be_not_time_homogeneous then
+                                       [
               "<unitDefinition metaid=\"time\" id=\"time\" name=\"time\">";
               "<listOfUnits>";
               "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"second\"/>";
               "</listOfUnits>";
               "</unitDefinition>";
+              "<unitDefinition metaid=\"time_per_substance\" id=\"time_per_substance\" name=\"time_per_substance\">";
+              "<listOfUnits>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"second\"/>";
+              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"mole\" exponent=\"-1\"/>";
+              "</listOfUnits>";
+              "</unitDefinition>";] else [])@[
               "</listOfUnitDefinitions>";
               "<listOfCompartments>";
               "<compartment metaid=\"default\" id=\"default\" size=\"1\" units=\"volume\"/>";
               "</listOfCompartments>";
 
-            ]
+              ])
         in ()
       end
     | Loggers.Maple -> ()
@@ -209,6 +217,7 @@ let initialize logger variable =
         | Ode_loggers_sig.N_rows
         | Ode_loggers_sig.N_obs
         | Ode_loggers_sig.Current_time
+        | Ode_loggers_sig.Time_scale_factor
         | Ode_loggers_sig.N_rules -> ()
         | Ode_loggers_sig.Tmp -> Loggers.fprintf logger "tmp = zeros(nodevar,1);"
 
@@ -235,6 +244,7 @@ let initialize logger variable =
         | Ode_loggers_sig.N_var
         | Ode_loggers_sig.N_obs
         | Ode_loggers_sig.N_rules
+        | Ode_loggers_sig.Time_scale_factor
         | Ode_loggers_sig.Current_time
         | Ode_loggers_sig.Period_t_points -> ()
       in
@@ -433,6 +443,7 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
   | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_variable variable
+  | Ode_loggers_sig.Time_scale_factor -> "t_correct_dimmension"
   | Ode_loggers_sig.Current_time -> "t"
   | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
   | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
@@ -447,6 +458,7 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.Period_t_points
     | Ode_loggers_sig.Tinit
     | Ode_loggers_sig.Tend -> Some "time"
+    | Ode_loggers_sig.Time_scale_factor -> Some "time-per-substance"
     | Ode_loggers_sig.Obs _
     | Ode_loggers_sig.Init _
     | Ode_loggers_sig.Concentration _
@@ -466,7 +478,7 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.N_rows
     | Ode_loggers_sig.Tmp -> None
 
-let print_sbml_parameters string_of_var_id logger variable expr =
+let print_sbml_parameters string_of_var_id logger logger_buffer variable expr =
   let unit_string =
     match
       unit_of_variable_sbml variable
@@ -477,7 +489,7 @@ let print_sbml_parameters string_of_var_id logger variable expr =
   let id = string_of_variable_sbml string_of_var_id variable in
   let () = Loggers.set_id_of_global_parameter logger variable id  in
   Sbml_backend.single_box
-    logger
+    logger_buffer
     "parameter"
     ~options:(fun () ->
         Format.sprintf
@@ -523,7 +535,7 @@ let print_comment
       | Loggers.TXT_Tabular
       | Loggers.XLS -> ()
 
-let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_id logger variable alg_expr network_handler =
+let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_id logger logger_buffer variable alg_expr network_handler =
   let () = Loggers.set_expr logger variable alg_expr in
   match
     Loggers.get_encoding_format logger
@@ -550,6 +562,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
             print_sbml_parameters
               string_of_var_id
               logger
+              logger_buffer
               variable
               (Sbml_backend.eval_init_alg_expr
                  logger
@@ -564,6 +577,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
         print_sbml_parameters
           string_of_var_id
           logger
+          logger_buffer
           variable
           (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
         | Ode_loggers_sig.Rate _,_
@@ -574,6 +588,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
             print_sbml_parameters
               string_of_var_id
               logger
+              logger_buffer
               variable
               (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
           else
@@ -592,6 +607,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
       | Ode_loggers_sig.N_obs,_
       | Ode_loggers_sig.N_rows,_
       | Ode_loggers_sig.Tmp,_
+      | Ode_loggers_sig.Time_scale_factor,_
       | Ode_loggers_sig.Current_time,_ -> ()
     end
   | Loggers.Maple

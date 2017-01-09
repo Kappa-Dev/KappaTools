@@ -119,6 +119,7 @@ let string_of_variable string_of_var_id variable =
   | Ode_loggers_sig.N_rows
   | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_variable variable
   | Ode_loggers_sig.Current_time -> "t"
+  | Ode_loggers_sig.Time_scale_factor -> "t_scale_factor"
   | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
   | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
   | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
@@ -128,14 +129,15 @@ let string_of_variable string_of_var_id variable =
 
 let unit_of_variable variable =
   match variable with
-  | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend -> Some "time"
+  | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Init _
   | Ode_loggers_sig.Concentration _
   | Ode_loggers_sig.Initbis _ -> Some "substance"
+  | Ode_loggers_sig.Time_scale_factor -> Some "time_per_substance"
   | Ode_loggers_sig.Expr _
   | Ode_loggers_sig.Deriv _
   | Ode_loggers_sig.Jacobian _
@@ -154,7 +156,7 @@ let unit_of_variable variable =
 let meta_id_of_logger logger =
   "CMD"^(string_of_int (Loggers.get_fresh_meta_id logger))
 
-let print_parameters string_of_var_id logger variable expr =
+let print_parameters string_of_var_id logger logger_buffer variable expr =
   let unit_string =
     match
       unit_of_variable variable
@@ -165,7 +167,7 @@ let print_parameters string_of_var_id logger variable expr =
   let id = string_of_variable string_of_var_id variable in
   let () = Loggers.set_id_of_global_parameter logger variable id  in
   single_box
-    logger
+    logger_buffer
     "parameter"
     ~options:(fun () ->
         Format.sprintf
@@ -427,7 +429,8 @@ let rec print_alg_expr_in_sbml logger
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
         Loggers.fprintf logger "<ci>0</ci>"
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
-        Loggers.fprintf logger "<ci>t</ci>"
+        Loggers.fprintf logger "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
+          (Loggers_string_of_op.string_of_bin_op logger Operator.MULT)
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
         Loggers.fprintf logger "<ci>0</ci>"
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
@@ -480,6 +483,70 @@ and
     let () = print_bool_expr_in_sbml logger b network in
     let () = Loggers.fprintf logger "</apply>" in
     ()
+
+let rec maybe_time_dependent_alg_expr_in_sbml logger
+    (alg_expr:
+       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
+         Alg_expr.e Location.annot
+    ) (network:
+         (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
+  =
+  match
+    Ode_loggers_sig.is_expr_alias alg_expr
+  with
+  | Some x -> false
+  | None ->
+    begin
+      match fst alg_expr with
+      | Alg_expr.CONST (Nbr.I _)
+      | Alg_expr.CONST (Nbr.I64 _)
+      | Alg_expr.CONST (Nbr.F _) -> false
+      | Alg_expr.ALG_VAR x ->
+        begin
+          let id =
+            network.Network_handler.int_of_obs x
+          in
+          match
+            Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+          with
+          | Some expr ->
+            maybe_time_dependent_alg_expr_in_sbml
+              logger
+              expr
+              network
+          | None -> false
+        end
+      | Alg_expr.KAPPA_INSTANCE _
+      | Alg_expr.TOKEN_ID _
+      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR)
+      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> false
+      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> true
+      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
+      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR)
+      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> false
+      | Alg_expr.BIN_ALG_OP (op, a, b) ->
+        maybe_time_dependent_alg_expr_in_sbml logger a network
+        || maybe_time_dependent_alg_expr_in_sbml logger b network
+      | Alg_expr.UN_ALG_OP (op, a) ->
+        maybe_time_dependent_alg_expr_in_sbml logger a network
+      | Alg_expr.IF (cond, yes, no) ->
+        maybe_time_dependent_bool_expr_in_sbml logger cond network
+        ||
+        maybe_time_dependent_alg_expr_in_sbml logger yes network
+        ||
+          maybe_time_dependent_alg_expr_in_sbml logger no network
+    end
+and
+  maybe_time_dependent_bool_expr_in_sbml logger cond network =
+  match fst cond with
+  | Alg_expr.TRUE
+  | Alg_expr.FALSE -> false
+  | Alg_expr.COMPARE_OP (op,a,b) ->
+    maybe_time_dependent_alg_expr_in_sbml logger a network
+    || maybe_time_dependent_alg_expr_in_sbml logger b network
+  | Alg_expr.BOOL_OP (op,a,b) ->
+    maybe_time_dependent_bool_expr_in_sbml logger a network
+    || maybe_time_dependent_bool_expr_in_sbml logger b network
 
 let break = true
 let replace_space_with_underscore =
@@ -554,6 +621,22 @@ let dump_pair logger (t,i) =
       (fun logger ->
          let () = Loggers.fprintf logger "<divide/>" in
          Loggers.fprintf logger "<ci> s%i </ci><cn type=\"integer\"> %i </cn>" t i)
+
+let maybe_time_dependent logger network var_rule =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.SBML ->
+    let expr_opt =
+      Loggers.get_expr logger var_rule in
+    let expr = unsome expr_opt in
+    maybe_time_dependent_alg_expr_in_sbml logger expr network
+  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+  | Loggers.XLS | Loggers.Octave
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+
+
 
 let dump_kinetic_law
     logger network reactants var_rule correct =
@@ -669,7 +752,22 @@ let dump_token_vector convert logger network_handler token_vector =
          ())
     token_vector
 
+let has_good_token_token_vector convert logger network_handler token_vector =
+  List.exists
+    (fun (expr,(id,_)) ->
+       let stochiometry_opt =
+         eval_const_alg_expr logger network_handler (convert expr)
+       in
+       match stochiometry_opt with
+       | None -> false
+       | Some x when Nbr.is_zero x -> false
+       | Some x -> true)
+    token_vector
 
+let has_reactants_in_token_vector logger network_handler token_vector =
+  has_good_token_token_vector negative_part logger network_handler token_vector
+let has_products_in_token_vector logger network_handler token_vector =
+  has_good_token_token_vector positive_part logger network_handler token_vector
 
 let dump_products_of_token_vector logger network_handler token_vector =
   dump_token_vector positive_part logger network_handler token_vector
@@ -695,6 +793,7 @@ let dump_sbml_reaction
   let label_reaction  = "reaction" in
   let label_list_of_reactants = "listOfReactants" in
   let label_list_of_products = "listOfProducts" in
+  let label_list_of_mods = "listOfModifiers" in
   let options =
     (fun () -> Format.asprintf
         "id=\"re%i\" name=\"%a\" reversible=\"false\" fast=\"false\"" reaction_id (print_rule_name ?compil) (get_rule enriched_rule))
@@ -703,30 +802,53 @@ let dump_sbml_reaction
     add_box ~options ~break logger label_reaction
       (fun logger ->
          let () =
-           add_box ~break logger label_list_of_reactants
-             (fun logger ->
-                let () =
-                  dump_list_of_species_reference
-                    logger reactants
-                in
-                let () =
-                  dump_reactants_of_token_vector
-                    logger network token_vector
-                in
-                ()
-             )
+           if reactants = [] &&
+            not (has_reactants_in_token_vector logger network token_vector)
+           then ()
+           else
+             add_box ~break logger label_list_of_reactants
+               (fun logger ->
+                  let () =
+                    dump_list_of_species_reference
+                      logger reactants
+                  in
+                  let () =
+                    dump_reactants_of_token_vector
+                      logger network token_vector
+                  in
+                  ()
+               )
          in
          let () =
-           add_box ~break logger label_list_of_products
-             (fun logger ->
-                let () =
-                  dump_list_of_species_reference
-                    logger products in
-                let () =
-                  dump_products_of_token_vector
-                    logger network token_vector
-                in
-                ())
+           if products = [] &&
+              not (has_products_in_token_vector logger network  token_vector)
+           then ()
+           else
+             add_box ~break logger label_list_of_products
+               (fun logger ->
+                  let () =
+                    dump_list_of_species_reference
+                      logger products in
+                  let () =
+                    dump_products_of_token_vector
+                      logger network token_vector
+                  in
+                  ())
+         in
+         let () =
+           if maybe_time_dependent logger network var_rule
+           then
+             add_box ~break logger label_list_of_mods
+               (fun
+                 logger ->
+                 let s =
+                   Format.sprintf
+                   "metaid=\"%s\" species=\"time\""
+                   (meta_id_of_logger logger)
+                 in
+                 let () = single_box ~options:(fun () -> s) logger "modifierSpeciesReference" in
+                 ()
+                )
          in
          let () =
            add_box ~break logger "kineticLaw"

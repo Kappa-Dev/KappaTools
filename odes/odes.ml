@@ -159,10 +159,39 @@ struct
 
       obs: (obs_id * ('a,'b) Alg_expr.e Location.annot) list ;
       n_obs: int ;
-      time_homogeneous: bool option ;
-
+      time_homogeneous_obs: bool option ;
+      time_homogeneous_vars: bool option ;
+      time_homogeneous_rates: bool option ;
     }
 
+  let may_be_time_homogeneous_gen a =
+    match
+      a
+    with
+    | Some false -> false
+    | Some true | None -> true
+
+  let may_be_not_time_homogeneous_gen a =
+      match
+        a
+      with
+      | Some false | None -> true
+      | Some true -> false
+
+  let var_may_be_not_time_homogeneous network =
+      may_be_not_time_homogeneous_gen network.time_homogeneous_vars
+
+  let obs_may_be_not_time_homogeneous network =
+    var_may_be_not_time_homogeneous network
+    || may_be_not_time_homogeneous_gen network.time_homogeneous_obs
+
+  let rate_may_be_not_time_homogeneous network =
+    var_may_be_not_time_homogeneous network
+    || may_be_not_time_homogeneous_gen network.time_homogeneous_rates
+
+  let may_be_not_time_homogeneous network =
+    rate_may_be_not_time_homogeneous network
+    || may_be_not_time_homogeneous_gen network.time_homogeneous_obs
 
   let get_fresh_var_id network = network.fresh_var_id
   let get_last_var_id network = network.fresh_var_id-1
@@ -203,8 +232,9 @@ struct
       n_rules = 0 ;
       obs = [] ;
       n_obs = 1 ;
-      time_homogeneous = None ;
-    }
+      time_homogeneous_vars = None ;
+      time_homogeneous_obs = None ;
+      time_homogeneous_rates = None  }
 
   let from_nembed_correct compil nauto =
     if I.do_we_count_in_embeddings compil then
@@ -1055,12 +1085,21 @@ struct
   let check_time_homogeneity ~ignore_obs compil network =
     {network
      with
-     time_homogeneous =
-       Some
-         (time_homogeneity_of_rates compil network
-          && time_homogeneity_of_vars network
-          && (ignore_obs || time_homogeneity_of_obs network))
-    }
+      time_homogeneous_vars = Some (time_homogeneity_of_vars network) ;
+      time_homogeneous_obs =
+        Some (
+          if ignore_obs then true
+          else
+            time_homogeneity_of_obs network) ;
+      time_homogeneous_rates = Some (time_homogeneity_of_rates compil network) }
+
+  let string_of_bool b =
+    if b then "true" else "false"
+
+  let string_of_bool_opt b_opt =
+    match b_opt with
+    | None -> "none"
+    | Some b -> string_of_bool b
 
   let network_from_compil ~ignore_obs compil =
     let () = Format.printf "+ generate the network... @." in
@@ -1102,14 +1141,14 @@ struct
     }
 
   let increment
-      is_zero ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var logger x =
+      is_zero ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var logger logger_buffer x =
     if is_zero x
     then
-      Ode_loggers.associate ~init_mode ~comment string_of_var logger (Ode_loggers_sig.Init x)
+      Ode_loggers.associate ~init_mode ~comment string_of_var logger logger_buffer  (Ode_loggers_sig.Init x)
     else
       Ode_loggers.increment ~init_mode ~comment logger (Ode_loggers_sig.Init x)
 
-  let affect_var is_zero ?init_mode:(init_mode=false) logger compil network decl =
+  let affect_var is_zero ?init_mode:(init_mode=false) logger logger_buffer compil network decl =
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl -> ()
@@ -1131,12 +1170,12 @@ struct
           in
           increment
             is_zero ~init_mode ~comment
-            (I.string_of_var_id ~compil) logger a expr handler_expr
+            (I.string_of_var_id ~compil) logger logger_buffer a expr handler_expr
         | _ ->
           let () = Ode_loggers.associate
               ~init_mode
               (I.string_of_var_id ~compil)
-              logger (Ode_loggers_sig.Expr id') expr handler_expr
+              logger logger_buffer (Ode_loggers_sig.Expr id') expr handler_expr
           in
           List.iter
             (fun id ->
@@ -1150,12 +1189,12 @@ struct
                in
                increment
                  is_zero (I.string_of_var_id ~compil)
-                 logger ~init_mode id expr handler_init)
+                 logger logger_buffer ~init_mode id expr handler_init)
             list
       end
     | Var (id,_comment,expr) ->
       Ode_loggers.associate
-        ~init_mode (I.string_of_var_id ~compil) logger
+        ~init_mode (I.string_of_var_id ~compil) logger logger_buffer
         (Ode_loggers_sig.Expr id) expr handler_expr
 
   let fresh_is_zero network =
@@ -1194,7 +1233,7 @@ struct
 
   let export_main
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
-      logger compil network split =
+      logger logger_buffer compil network split =
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
@@ -1204,41 +1243,41 @@ struct
     in
     let count = I.what_do_we_count compil in
     let rate_convention = I.rate_convention compil in
+    let may_be_not_time_homogeneous = may_be_not_time_homogeneous network in
     let () =
-      Ode_loggers.print_ode_preamble
+      Ode_loggers.print_ode_preamble ~may_be_not_time_homogeneous
         ~count ~rate_convention logger command_line_closure ()
     in
     let () = Ode_loggers.print_newline logger in
-
-    let () = Sbml_backend.open_box logger "listOfParameters" in
-    let () = Sbml_backend.line_sbml logger in
+    let () = Sbml_backend.open_box logger_buffer "listOfParameters" in
+    let () = Sbml_backend.line_sbml logger_buffer in
     let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil) logger Ode_loggers_sig.Tinit (alg_of_float init_t) handler_expr in
+      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tinit (alg_of_float init_t) handler_expr in
     let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil) logger Ode_loggers_sig.Tend
+      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tend
         (alg_of_float max_t)
         handler_expr
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
-        logger Ode_loggers_sig.InitialStep
+        logger logger_buffer Ode_loggers_sig.InitialStep
         (alg_of_float  0.000001) handler_expr
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
-        logger Ode_loggers_sig.Period_t_points
+        logger logger_buffer Ode_loggers_sig.Period_t_points
         (alg_of_float plot_period) handler_expr
     in
-    let () = Ode_loggers.print_newline logger in
+    let () = Ode_loggers.print_newline logger_buffer in
     let () =
-      Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
+      Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
-        logger
+        logger logger_buffer
         Ode_loggers_sig.N_ode_var
         (alg_of_int (get_last_ode_var_id network))
         handler_expr
@@ -1246,7 +1285,7 @@ struct
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
-        logger
+        logger logger_buffer
         Ode_loggers_sig.N_var
         (alg_of_int (get_last_var_id network))
         handler_expr
@@ -1254,51 +1293,62 @@ struct
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
-        logger
+        logger logger_buffer
         Ode_loggers_sig.N_obs
         (alg_of_int network.n_obs)
         handler_expr in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
-        logger
+        logger logger_buffer
         Ode_loggers_sig.N_rules
         (alg_of_int network.n_rules)
         handler_expr
     in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.declare_global logger (Ode_loggers_sig.Expr network.fresh_var_id) in
-    let () = Ode_loggers.initialize logger (Ode_loggers_sig.Expr network.fresh_var_id) in
-    let () = Ode_loggers.declare_global logger (Ode_loggers_sig.Init network.fresh_ode_var_id) in
-    let () = Ode_loggers.initialize logger (Ode_loggers_sig.Init network.fresh_ode_var_id) in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.start_time logger init_t in
-    let () = Ode_loggers.print_newline logger in
+    let () = Ode_loggers.print_newline logger_buffer in
+    let () = Ode_loggers.declare_global logger_buffer (Ode_loggers_sig.Expr network.fresh_var_id) in
+    let () = Ode_loggers.initialize logger_buffer (Ode_loggers_sig.Expr network.fresh_var_id) in
+    let () = Ode_loggers.declare_global logger_buffer (Ode_loggers_sig.Init network.fresh_ode_var_id) in
+    let () = Ode_loggers.initialize logger_buffer (Ode_loggers_sig.Init network.fresh_ode_var_id) in
+    let () = Ode_loggers.print_newline logger_buffer in
+    let () = Ode_loggers.start_time logger_buffer init_t in
+    let () = Ode_loggers.print_newline logger_buffer in
     let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil)
-        logger
-        (Ode_loggers_sig.Init (get_last_ode_var_id network))
-        (Location.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
-        handler_init
+      if may_be_not_time_homogeneous
+      then
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil)
+            logger logger_buffer
+            (Ode_loggers_sig.Init (get_last_ode_var_id network))
+            (Location.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
+            handler_init
+        in
+          Sbml_backend.do_sbml logger
+            (fun logger ->
+               Sbml_backend.print_parameters I.string_of_var_id
+                 logger logger_buffer
+                 Ode_loggers_sig.Time_scale_factor Nbr.one
+            )
+      else ()
     in
     let () =
       List.iter
-        (affect_var is_zero logger ~init_mode:true compil network)
+        (affect_var is_zero logger logger_buffer ~init_mode:true compil network)
         network.var_declaration
     in
-    let () = Ode_loggers.print_newline logger in
-    let () = declare_rates_global logger network in
+    let () = Ode_loggers.print_newline logger_buffer in
+    let () = declare_rates_global logger_buffer network in
     let () =
       List.iter
         (fun (rule,rate) ->
            Ode_loggers.associate
              (I.string_of_var_id ~compil)
-             ~comment:rule.comment logger
+             ~comment:rule.comment logger logger_buffer
              (var_of_rate rule.rule_id_with_mode) rate handler_expr)
         split.const_rate
     in
-    let () = Sbml_backend.close_box logger "listOfParameters" in
+    let () = Sbml_backend.close_box logger_buffer  "listOfParameters" in
     let titles = I.get_obs_titles compil in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_license_check logger in
@@ -1336,14 +1386,14 @@ struct
     let () = declare_rates_global logger network in
     let () =
       List.iter
-        (affect_var is_zero logger ~init_mode:false compil network) split.var_decl in
+        (affect_var is_zero logger logger ~init_mode:false compil network) split.var_decl in
     let () = Ode_loggers.print_newline logger in
     let () =
       List.iter
         (fun (rule,rate) ->
            Ode_loggers.associate
              (I.string_of_var_id ~compil)
-             logger
+             logger logger
              (var_of_rule rule) rate (handler_expr network))
         split.var_rate
     in
@@ -1522,19 +1572,18 @@ struct
     in
     (* Derivative of time is equal to 1 *)
     let () =
-      match
-        network.time_homogeneous
-      with
-      | Some true -> ()
-      | None | Some false ->
+      if may_be_not_time_homogeneous network
+      then
         let () =
           Ode_loggers.associate
-            (I.string_of_var_id ~compil) logger
+            (I.string_of_var_id ~compil) logger logger
             (Ode_loggers_sig.Deriv
                (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network)
         in
         let () = Ode_loggers.print_newline logger in
         let () = Sbml_backend.time_advance logger in
+        ()
+      else
         ()
     in
     let () = Ode_loggers.close_procedure logger in
@@ -1564,7 +1613,10 @@ struct
         ()
       else
         let id, comment, units  =
-          if k = get_fresh_ode_var_id network - 1 then "time","t", Some "time"
+          if
+            may_be_not_time_homogeneous network &&
+            k = get_fresh_ode_var_id network - 1
+          then "time","t", Some "substance"
           else
             let variable = Mods.DynArray.get network.ode_vars_tab k in
             begin
@@ -1617,19 +1669,25 @@ struct
       Ode_loggers.initialize logger (Ode_loggers_sig.Obs (network.n_obs))
     in
     let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.associate_t logger
-        (get_last_ode_var_id network)
+    let () =
+      if
+        obs_may_be_not_time_homogeneous network
+      then
+        Ode_loggers.associate_t logger
+          (get_last_ode_var_id network)
+      else
+        ()
     in
     let () =
       List.iter
-        (affect_var is_zero logger ~init_mode:false compil network) split.var_decl
+        (affect_var is_zero logger logger ~init_mode:false compil network) split.var_decl
     in
     let () = Ode_loggers.print_newline logger in
     let () =
       List.iter
         (fun (id,expr) ->
            Ode_loggers.associate
-             (I.string_of_var_id ~compil) logger (Ode_loggers_sig.Obs id) expr (handler_expr network))
+             (I.string_of_var_id ~compil) logger logger (Ode_loggers_sig.Obs id) expr (handler_expr network))
         network.obs
     in
     let () = Ode_loggers.print_newline logger in
@@ -1640,15 +1698,15 @@ struct
 
   let export_network
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
-      logger compil network =
+      logger logger_buffer compil network =
     let network =
-      match
-        network.time_homogeneous
-      with
-      | Some true -> network
-      | None | Some false ->
+      if
+        may_be_not_time_homogeneous network
+      then
         (* add a spurious variable for time *)
         inc_fresh_ode_var_id network
+      else
+        network
     in
     let sorted_rules_and_decl =
       split_rules_and_decl compil network
@@ -1658,10 +1716,17 @@ struct
     let () =
       export_main
         ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
-        logger compil network sorted_rules_and_decl
+        logger logger_buffer compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
     let () = export_init logger compil network in
+    let () =
+      match
+        Loggers.formatter_of_logger logger
+      with
+      | None -> ()
+      | Some fmt -> Loggers.flush_buffer logger_buffer fmt
+    in
     let () = Format.printf "\t -ode system @." in
     let () = export_dydt logger compil network sorted_rules_and_decl in
     let () = Format.printf "\t -observables @." in

@@ -109,7 +109,7 @@ let main () =
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> true
-      | Loggers.Octave 
+      | Loggers.Octave
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
     in
     let compil =
@@ -120,13 +120,23 @@ let main () =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in
     let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
+    let logger_buffer =
+      match backend with
+      | Loggers.SBML ->
+        Loggers.open_infinite_buffer ~mode:backend ()
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+      | Loggers.XLS -> logger
+      | Loggers.Octave
+      | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
+    in
     let () = A.export_network
         ~command_line
         ~command_line_quotes
         ~data_file:cli_args.Run_cli_args.outputDataFile
         ~init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxValue)
-        ~plot_period:cli_args.Run_cli_args.plotPeriod logger compil network in
+        ~plot_period:cli_args.Run_cli_args.plotPeriod logger logger_buffer compil network in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in
     ()

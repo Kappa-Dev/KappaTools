@@ -23,7 +23,8 @@ type options =
 
 val print_ode_preamble:
   Loggers.t ->
-  (Loggers.t -> unit) -> 
+  (Loggers.t -> unit) ->
+  may_be_not_time_homogeneous:bool ->
   count:Ode_args.count ->
   rate_convention:Ode_args.rate_convention ->
   ?filter_in:Loggers.encoding list option ->
@@ -41,7 +42,7 @@ val initialize: Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->
-  Loggers.t -> Ode_loggers_sig.variable ->
+  Loggers.t -> Loggers.t -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val increment:
   ?init_mode:bool -> ?comment:string -> Loggers.t -> Ode_loggers_sig.variable ->

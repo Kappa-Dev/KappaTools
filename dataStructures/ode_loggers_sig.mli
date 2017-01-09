@@ -23,6 +23,7 @@ type variable =
   | N_rows
   | Tmp
   | Current_time
+  | Time_scale_factor 
 
 val is_expr_const: (ode_var_id,int) Alg_expr.e Location.annot -> bool
 val is_expr_time_homogeneous: ('a,int) Alg_expr.e Location.annot -> bool

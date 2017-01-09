@@ -17,6 +17,7 @@ done
 	 -tokens 
 	 -variables 
 	 -observables 
+	 -check time homogeneity 
 + exporting the network... 
 	 -main function 
 	 -initial state 
@@ -41,6 +42,7 @@ done
 	 -tokens 
 	 -variables 
 	 -observables 
+	 -check time homogeneity 
 + exporting the network... 
 	 -main function 
 	 -initial state 
