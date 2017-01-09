@@ -1,4 +1,5 @@
-open Lwt
+open Lwt.Infix
+
 (* utility for results *)
 let result_data_map
     ~(ok:'ok -> 'a)
@@ -113,8 +114,8 @@ let project_kappa_code project : string =
     (List.map
        (fun file -> file.Api_types_j.file_content)
        (List.sort
-	  (fun l r -> compare l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-            r.Api_types_j.file_metadata.Api_types_j.file_metadata_position) project#get_files))
+          (fun l r -> compare l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
+              r.Api_types_j.file_metadata.Api_types_j.file_metadata_position) project#get_files))
 
 (* functor to deal with collections *)
 module type COLLECTION_TYPE = sig

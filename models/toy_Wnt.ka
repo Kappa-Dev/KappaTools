@@ -60,18 +60,18 @@ I can then obtain the rate of degradation.*/
 'S->P' GSK(),Cat(S~x) -> GSK(),Cat(S~p) @ 0.0 {'Kcat'}
 'APC\' APC() -> @ 'r_APC\'
 
-%obs: 'Cat()' |Cat()|						# Total number of Cat in the system
-%obs: 'Cat(S~x)' |Cat(S~x)|					# Number of Cat in state 'x', bound or not
-%obs: 'Cat(S~p)' |Cat(S~p)|					# Number of Cat in state 'p', bound or not
-%obs: 'CatGhost' |CatGhost|					# Current value of the token CatGhost
-%obs: 'APC()' |APC()|						# Total number of APC in the system
-%obs: 'Axn(APC!1),APC(Ax1!1)' |Axn(APC!1),APC(Ax1!1)|		# Amount of Axn bound to an APC's Ax1 site
-%obs: 'Axn(APC!1),APC(Ax2!1)' |Axn(APC!1),APC(Ax2!1)|		# Amount of Axn bound to an APC's Ax2 site
-%obs: 'Axn(APC!1),APC(Ax3!1)' |Axn(APC!1),APC(Ax3!1)|		# Amount of Axn bound to an APC's Ax3 site
-%obs: 'GSK(Axn!1),Axn(GSK!1)' |GSK(Axn!1),Axn(GSK!1)|		# Amount of GSK bound to an Axn
-%obs: 'Axn(Ax1!1),Axn(Ax2!1)' |Axn(Ax1!1),Axn(Ax2!1)|		# Amount of Axn bound to another Axn; note a trimer would count as 2 for this pattern
-%obs: 'Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax1!2)' |Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2)|
-%obs: 'Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2,Ax1!3),Axn(Ax2!3)' |Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2,Ax1!3),Axn(Ax2!3)|
+%plot: |Cat()|						# Total number of Cat in the system
+%plot: |Cat(S~x)|					# Number of Cat in state 'x', bound or not
+%plot: |Cat(S~p)|					# Number of Cat in state 'p', bound or not
+%plot: |CatGhost|					# Current value of the token CatGhost
+%plot: |APC()|						# Total number of APC in the system
+%plot: |Axn(APC!1),APC(Ax1!1)|		# Amount of Axn bound to an APC's Ax1 site
+%plot: |Axn(APC!1),APC(Ax2!1)|		# Amount of Axn bound to an APC's Ax2 site
+%plot: |Axn(APC!1),APC(Ax3!1)|		# Amount of Axn bound to an APC's Ax3 site
+%plot: |GSK(Axn!1),Axn(GSK!1)|		# Amount of GSK bound to an Axn
+%plot: |Axn(Ax1!1),Axn(Ax2!1)|		# Amount of Axn bound to another Axn; note a trimer would count as 2 for this pattern
+%plot: |Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2)|
+%plot: |Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2,Ax1!3),Axn(Ax2!3)|
 
 %init: 1000 Axn()
 %init: 50 GSK()

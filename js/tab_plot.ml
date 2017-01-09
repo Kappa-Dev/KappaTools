@@ -39,13 +39,12 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
               let data = !serialize_csv ()
               in
               Common.saveFile
-		~data:data
-		~mime:"text/csv"
-		~filename:filename
+                ~data:data
+                ~mime:"text/csv"
+                ~filename:filename
         }
       ];
     show = React.S.map has_plot simulation_output
-
   }
 
 let content (t : Ui_simulation.t) =
@@ -76,20 +75,21 @@ let content (t : Ui_simulation.t) =
          </div>
       </div>
       <div class="row">
-         <div id="|}display_id{|" class="col-sm-12"> |}[ Html.entity "nbsp"]{| </div>
+         <div id="|}display_id{|" class="col-sm-12"> |}[ Html.entity "nbsp"]{|
+         </div>
       </div>
       <div class="row">
-	 <div class="col-sm-2">
-	    |}[plot_show_legend]{| Legend
-	 </div>
-         <div class="col-sm-3">
- 	     Log X |}[plot_x_axis_log_checkbox]{|
+        <div class="col-sm-2">
+     |}[plot_show_legend]{| Legend
+        </div>
+      <div class="col-sm-3">
+       Log X |}[plot_x_axis_log_checkbox]{|
              Log Y |}[plot_y_axis_log_checkbox]{|
-         </div>
-
-         <div class="col-sm-4" id="|}div_axis_select_id{|">
-	 </div>
       </div>
+
+      <div class="col-sm-4" id="|}div_axis_select_id{|">
+      </div>
+    </div>
   </div>
   <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
@@ -101,31 +101,31 @@ let navcontent (t : Ui_simulation.t) : [> Html_types.div ] Html.elt list =
 
 let dimension_ref : Js_plot.plot_dimension Js.t option ref = ref None
 let calculate_dimension () =
-    let min_width = 400 in
-    let min_height = 100 in
-    let offset_width = 100 in
-    let offset_height = 250 in
-    let width =
-      max
-        min_width
-        ((Js.Optdef.get
-            (Dom_html.window##.innerWidth)
-            (fun () -> assert false)) - offset_width)
-    in
-    let height =
-      max
-        min_height
-        ((Js.Optdef.get
-            (Dom_html.window##.innerHeight)
-            (fun () -> assert false)) - offset_height)
-    in
-    let dimension =
-      Js_plot.create_dimension
-        ~height:height
-        ~width:width
-    in
-    let () = dimension_ref := Some dimension
-    in dimension
+  let min_width = 400 in
+  let min_height = 100 in
+  let offset_width = 100 in
+  let offset_height = 250 in
+  let width =
+    max
+      min_width
+      ((Js.Optdef.get
+          (Dom_html.window##.innerWidth)
+          (fun () -> assert false)) - offset_width)
+  in
+  let height =
+    max
+      min_height
+      ((Js.Optdef.get
+          (Dom_html.window##.innerHeight)
+          (fun () -> assert false)) - offset_height)
+  in
+  let dimension =
+    Js_plot.create_dimension
+      ~height:height
+      ~width:width
+  in
+  let () = dimension_ref := Some dimension
+  in dimension
 
 let get_dimension () =
   match !dimension_ref with
@@ -133,30 +133,32 @@ let get_dimension () =
   | Some dimension -> dimension
 
 let update_plot
-  (t : Ui_simulation.t)
-  (plot : Js_plot.observable_plot Js.t) : unit =
+    (t : Ui_simulation.t)
+    (plot : Js_plot.observable_plot Js.t) : unit =
   Ui_simulation.manager_operation
     t
     (fun
-     manager
-     project_id
-     simulation_id ->
+      manager
+      project_id
+      simulation_id ->
       (manager#simulation_detail_plot
          project_id
          simulation_id
       ) >>=
       (Api_common.result_map
          ~ok:(fun _ (data : Api_types_t.plot)  ->
-             let () = serialize_json  := (fun _ -> Api_types_j.string_of_plot data) in
+             let () = serialize_json :=
+                 (fun _ -> Api_types_j.string_of_plot data) in
              let () = plot##setDimensions(get_dimension ()) in
              let () = serialize_csv := fun _ -> Api_data.plot_values data in
-             let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot:data in
+             let data : Js_plot.plot_data Js.t =
+               Js_plot.create_data ~plot:data in
              let () = plot##setPlot(data) in
              Lwt.return_unit
-          )
-        ~error:(fun _ errors  ->
-            let () = Ui_state.set_model_error __LOC__ errors in
-            Lwt.return_unit)
+           )
+         ~error:(fun _ errors  ->
+             let () = Ui_state.set_model_error __LOC__ errors in
+             Lwt.return_unit)
       )
     )
 
@@ -184,15 +186,15 @@ let onload (t : Ui_simulation.t) =
       "#navplot"
       "shown.bs.tab"
       (fun _ ->
-	 match (React.S.value simulation_output) with
+         match (React.S.value simulation_output) with
          | None -> ()
-	 | Some _ -> update_plot t plot)
+         | Some _ -> update_plot t plot)
   in
   let _ =
     React.S.l1
       (fun state -> match state with
            None -> ()
-	 | Some _ -> update_plot t plot)
+         | Some _ -> update_plot t plot)
       simulation_output
   in
   ()
@@ -208,7 +210,7 @@ let onresize (t : Ui_simulation.t) =
     | None -> ()
     | Some plot ->
       (match React.S.value simulation_output with
-      | None -> ()
-      | Some _ -> update_plot t plot)
+       | None -> ()
+       | Some _ -> update_plot t plot)
   in
   ()
