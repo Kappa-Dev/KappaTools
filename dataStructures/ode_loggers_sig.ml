@@ -37,7 +37,8 @@ let rec is_expr_const expr = (* constant propagation is already done *)
     is_bool_const a && is_expr_const b && is_expr_const c
   | Alg_expr.BIN_ALG_OP (_,a,b),_ ->
     is_expr_const a && is_expr_const b
-  | Alg_expr.UN_ALG_OP _,_
+  | Alg_expr.UN_ALG_OP (_,a),_ ->
+    is_expr_const a
   | Alg_expr.ALG_VAR _,_
   | Alg_expr.STATE_ALG_OP _,_
   | Alg_expr.TOKEN_ID _,_
@@ -52,6 +53,38 @@ and is_bool_const expr =
   | Alg_expr.BOOL_OP (_,a,b),_ ->
     is_bool_const a && is_bool_const b
 
+let rec is_expr_time_homogeneous expr =
+  (* does not take into account symbolic propagation of expression *)
+      match
+        expr
+      with
+      | Alg_expr.CONST _,_ -> true
+      | Alg_expr.IF (a,b,c),_ ->
+        is_bool_time_homogeneous a && is_expr_time_homogeneous b && is_expr_time_homogeneous c
+      | Alg_expr.BIN_ALG_OP (_,a,b),_ ->
+        is_expr_time_homogeneous a && is_expr_time_homogeneous b
+      | Alg_expr.UN_ALG_OP (_,a),_ ->
+        is_expr_time_homogeneous a
+      | Alg_expr.STATE_ALG_OP
+          ( Operator.EVENT_VAR
+          | Operator.CPUTIME
+          | Operator.NULL_EVENT_VAR
+          | Operator.TMAX_VAR
+          | Operator.EMAX_VAR) ,_
+      | Alg_expr.ALG_VAR _,_
+      | Alg_expr.TOKEN_ID _,_
+      | Alg_expr.KAPPA_INSTANCE _,_ -> true
+      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR),_ -> false
+
+and is_bool_time_homogeneous expr =
+      match
+        expr
+      with
+      | Alg_expr.TRUE,_ | Alg_expr.FALSE,_ -> true
+      | Alg_expr.COMPARE_OP (_,a,b),_ ->
+        is_expr_time_homogeneous a && is_expr_time_homogeneous b
+      | Alg_expr.BOOL_OP (_,a,b),_ ->
+        is_bool_time_homogeneous a && is_bool_time_homogeneous b
 
 let is_expr_alias expr =
   match

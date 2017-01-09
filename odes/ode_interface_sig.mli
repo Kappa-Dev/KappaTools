@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 20 2016>
+  * Last modification: Time-stamp: <Jan 09 2017>
 *)
 
 module type Interface =

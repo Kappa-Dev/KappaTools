@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Dec 20 2016>
+  * Last modification: Time-stamp: <Jan 09 2017>
 *)
 
 let local_trace = false
@@ -159,6 +159,7 @@ struct
 
       obs: (obs_id * ('a,'b) Alg_expr.e Location.annot) list ;
       n_obs: int ;
+      time_homogeneous: bool option ;
 
     }
 
@@ -202,6 +203,7 @@ struct
       n_rules = 0 ;
       obs = [] ;
       n_obs = 1 ;
+      time_homogeneous = None ;
     }
 
   let from_nembed_correct compil nauto =
@@ -1025,7 +1027,42 @@ struct
   let split_rules_and_decl compil network =
     split_rules compil network (split_var_declaration network init_sort_rules_and_decl)
 
-  let network_from_compil compil =
+  let time_homogeneity_of_rates compil network =
+    let rules = network.rules in
+    List.for_all
+      (fun rule ->
+        let rate_opt = I.rate compil rule.rule rule.rule_id_with_mode in
+        match rate_opt with
+        | None -> true
+        | Some rate -> Ode_loggers_sig.is_expr_time_homogeneous rate)
+      rules
+
+  let time_homogeneity_of_vars network =
+    let vars_decl = network.var_declaration in
+    List.for_all
+      (fun decl ->
+         match decl with
+         | Dummy_decl | Init_expr _ -> true
+         | Var (_,_,expr) -> Ode_loggers_sig.is_expr_time_homogeneous expr)
+      vars_decl
+
+  let time_homogeneity_of_obs network =
+    let obs = network.obs in
+    List.for_all
+      (fun (_,expr) -> Ode_loggers_sig.is_expr_time_homogeneous expr)
+      obs
+
+  let check_time_homogeneity ~ignore_obs compil network =
+    {network
+     with
+     time_homogeneous =
+       Some
+         (time_homogeneity_of_rates compil network
+          && time_homogeneity_of_vars network
+          && (ignore_obs || time_homogeneity_of_obs network))
+    }
+
+  let network_from_compil ~ignore_obs compil =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let network = init compil in
@@ -1044,6 +1081,8 @@ struct
     let network = convert_var_defs compil network in
     let () = Format.printf "\t -observables @." in
     let network = convert_obs compil network in
+    let () = Format.printf "\t -check time homogeneity @." in
+    let network = check_time_homogeneity ~ignore_obs compil network in
     network
 
   let handler_init =
@@ -1483,10 +1522,21 @@ struct
     in
     (* Derivative of time is equal to 1 *)
     let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil) logger (Ode_loggers_sig.Deriv (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network) in
-    let () = Ode_loggers.print_newline logger in
-    let () = Sbml_backend.time_advance logger in
+      match
+        network.time_homogeneous
+      with
+      | Some true -> ()
+      | None | Some false ->
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil) logger
+            (Ode_loggers_sig.Deriv
+               (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network)
+        in
+        let () = Ode_loggers.print_newline logger in
+        let () = Sbml_backend.time_advance logger in
+        ()
+    in
     let () = Ode_loggers.close_procedure logger in
     let () = Sbml_backend.close_box logger label in
     let () = Ode_loggers.print_newline logger in
@@ -1591,8 +1641,15 @@ struct
   let export_network
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
       logger compil network =
-    (* add a spurious variable for time *)
-    let network = inc_fresh_ode_var_id network in
+    let network =
+      match
+        network.time_homogeneous
+      with
+      | Some true -> network
+      | None | Some false ->
+        (* add a spurious variable for time *)
+        inc_fresh_ode_var_id network
+    in
     let sorted_rules_and_decl =
       split_rules_and_decl compil network
     in

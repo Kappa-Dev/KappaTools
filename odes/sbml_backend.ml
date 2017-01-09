@@ -377,8 +377,6 @@ and eval_const_bool_expr logger network_handler expr =
         end
     end
 
-
-
 let rec print_alg_expr_in_sbml logger
     (alg_expr:
        (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Dec 16 2016>
+  * Last modification: Time-stamp: <Jan 09 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -82,7 +82,7 @@ let main () =
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
     let () =
-      Kappa_files.setCheckFileExistsODE 
+      Kappa_files.setCheckFileExistsODE
         ~batchmode:cli_args.Run_cli_args.batchmode
         ~mode:backend
     in
@@ -102,10 +102,20 @@ let main () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
+    let ignore_obs =
+      match backend
+      with
+      | Loggers.SBML -> true
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+      | Loggers.XLS -> true
+      | Loggers.Octave 
+      | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+    in
     let compil =
       A.get_compil
         ~rate_convention ~show_reactions ~count ~compute_jacobian cli_args in
-    let network = A.network_from_compil compil in
+    let network = A.network_from_compil ~ignore_obs compil in
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in
