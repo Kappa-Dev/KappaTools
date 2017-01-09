@@ -9,7 +9,7 @@
 (** Intermediate representation of model on wich sanity has been checked *)
 
 type switching =
-  | Linked of int Location.annot | Freed | Maintained | Erased
+  | Linked of int Locality.annot | Freed | Maintained | Erased
 
 type rule_internal =
   | I_ANY
@@ -21,9 +21,9 @@ type rule_internal =
 type rule_agent =
   { ra_type: int;
     ra_erased: bool;
-    ra_ports: ((int,int*int) Ast.link Location.annot * switching) array;
+    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
     ra_ints: rule_internal array;
-    ra_syntax: (((int,int*int) Ast.link Location.annot * switching) array *
+    ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
                 rule_internal array) option;
   }
 (** A representation of 'left-hand-side' agent that stores how
@@ -50,12 +50,12 @@ type rule =
   { r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_rm_tokens :
-      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
+      ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_add_tokens :
-      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
-    r_rate : (rule_mixture,int) Alg_expr.e Location.annot;
-    r_un_rate : ((rule_mixture,int) Alg_expr.e Location.annot
-                 * (rule_mixture,int) Alg_expr.e Location.annot option) option;
+      ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
+    r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
+    r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
+                 * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
   }
 
 val print_rule :
@@ -69,13 +69,13 @@ val rule_of_json : Yojson.Basic.json -> rule
 val bool_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
    ?max_allowed_var: int ->
-  (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
-    Alg_expr.bool Location.annot ->
-  (rule_agent list, int) Alg_expr.bool Location.annot
+  (((String.t * Locality.t) * Ast.port list) list, Mods.StringMap.elt)
+    Alg_expr.bool Locality.annot ->
+  (rule_agent list, int) Alg_expr.bool Locality.annot
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   Signature.contact_map ->
-  (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
+  (((String.t * Locality.t) * Ast.port list) list, Mods.StringMap.elt)
     Ast.modif_expr -> int list ->
   (rule_agent list, int) Ast.modif_expr * int list
 

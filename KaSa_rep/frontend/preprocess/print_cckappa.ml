@@ -325,7 +325,7 @@ let print_var parameters error handler var =
     then Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s: " var.Cckappa_sig.e_id
   in
   print_short_alg
-    parameters error handler (Location.dummy_annot var.Cckappa_sig.c_variable)
+    parameters error handler (Locality.dummy_annot var.Cckappa_sig.c_variable)
 
 
 let print_variables parameters error handler var =

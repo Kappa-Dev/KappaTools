@@ -318,10 +318,10 @@ let api_message_errors
 
 let api_location_errors
     ?(severity:Api_types_v1_j.severity = `Error)
-    ((message,location) : string Location.annot) =
+    ((message,location) : string Locality.annot) =
   [{ Api_types_v1_j.severity = severity;
      Api_types_v1_j.message = message ;
-     Api_types_v1_j.range = Some (Location.to_range location) }]
+     Api_types_v1_j.range = Some (Locality.to_range location) }]
 
 let api_exception_errors (e : exn) =
   api_message_errors (Printexc.to_string e)

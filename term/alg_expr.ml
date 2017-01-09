@@ -10,34 +10,34 @@ type pervasives_bool = bool
 
 type ('mix,'id) e =
     BIN_ALG_OP of Operator.bin_alg_op *
-                  ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
-  | UN_ALG_OP of Operator.un_alg_op * ('mix,'id) e Location.annot
+                  ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
+  | UN_ALG_OP of Operator.un_alg_op * ('mix,'id) e Locality.annot
   | STATE_ALG_OP of Operator.state_alg_op
   | ALG_VAR of 'id
   | KAPPA_INSTANCE of 'mix
   | TOKEN_ID of 'id
   | CONST of Nbr.t
-  | IF of ('mix,'id) bool Location.annot *
-          ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
+  | IF of ('mix,'id) bool Locality.annot *
+          ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
 and ('mix,'id) bool =
   | TRUE
   | FALSE
   | BOOL_OP of
       Operator.bool_op *
-      ('mix,'id) bool Location.annot * ('mix,'id) bool Location.annot
+      ('mix,'id) bool Locality.annot * ('mix,'id) bool Locality.annot
   | COMPARE_OP of Operator.compare_op *
-                  ('mix,'id) e Location.annot * ('mix,'id) e Location.annot
+                  ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
 
 type t = (Pattern.id array list, int) e
 
 let rec e_to_yojson f_mix f_id = function
   | BIN_ALG_OP (op,a,b) ->
     `List [Operator.bin_alg_op_to_json op;
-           Location.annot_to_json (e_to_yojson f_mix f_id) a;
-           Location.annot_to_json (e_to_yojson f_mix f_id) b]
+           Locality.annot_to_json (e_to_yojson f_mix f_id) a;
+           Locality.annot_to_json (e_to_yojson f_mix f_id) b]
   | UN_ALG_OP (op,a) ->
     `List [Operator.un_alg_op_to_json op;
-           Location.annot_to_json (e_to_yojson f_mix f_id) a]
+           Locality.annot_to_json (e_to_yojson f_mix f_id) a]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [`String "VAR"; f_id i]
   | KAPPA_INSTANCE cc -> `List [`String "MIX"; f_mix cc]
@@ -45,37 +45,37 @@ let rec e_to_yojson f_mix f_id = function
   | CONST n -> Nbr.to_json n
   | IF (cond,yes,no) ->
     `List [`String "IF";
-           Location.annot_to_json (bool_to_yojson f_mix f_id) cond;
-           Location.annot_to_json (e_to_yojson f_mix f_id) yes;
-           Location.annot_to_json (e_to_yojson f_mix f_id) no]
+           Locality.annot_to_json (bool_to_yojson f_mix f_id) cond;
+           Locality.annot_to_json (e_to_yojson f_mix f_id) yes;
+           Locality.annot_to_json (e_to_yojson f_mix f_id) no]
 and bool_to_yojson f_mix f_id = function
   | TRUE -> `Bool true
   | FALSE -> `Bool false
   | BOOL_OP (op,a,b) ->
     `List [ Operator.bool_op_to_json op;
-            Location.annot_to_json (bool_to_yojson f_mix f_id) a;
-            Location.annot_to_json (bool_to_yojson f_mix f_id) b ]
+            Locality.annot_to_json (bool_to_yojson f_mix f_id) a;
+            Locality.annot_to_json (bool_to_yojson f_mix f_id) b ]
   | COMPARE_OP (op,a,b) ->
     `List [ Operator.compare_op_to_json op;
-            Location.annot_to_json (e_to_yojson f_mix f_id) a;
-            Location.annot_to_json (e_to_yojson f_mix f_id) b ]
+            Locality.annot_to_json (e_to_yojson f_mix f_id) a;
+            Locality.annot_to_json (e_to_yojson f_mix f_id) b ]
 
 let rec e_of_yojson f_mix f_id = function
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
-       Location.annot_of_json (e_of_yojson f_mix f_id) a,
-       Location.annot_of_json (e_of_yojson f_mix f_id) b)
+       Locality.annot_of_json (e_of_yojson f_mix f_id) a,
+       Locality.annot_of_json (e_of_yojson f_mix f_id) b)
   | `List [`String "VAR"; i] -> ALG_VAR (f_id i)
   | `List [`String "TOKEN"; i] -> TOKEN_ID (f_id i)
   | `List [`String "MIX"; cc] -> KAPPA_INSTANCE (f_mix cc)
   | `List [op;a] ->
     UN_ALG_OP (Operator.un_alg_op_of_json op,
-               Location.annot_of_json (e_of_yojson f_mix f_id) a)
+               Locality.annot_of_json (e_of_yojson f_mix f_id) a)
   | `List [`String "IF"; cond; yes; no] ->
-    IF (Location.annot_of_json (bool_of_yojson f_mix f_id) cond,
-        Location.annot_of_json (e_of_yojson f_mix f_id) yes,
-        Location.annot_of_json (e_of_yojson f_mix f_id) no)
+    IF (Locality.annot_of_json (bool_of_yojson f_mix f_id) cond,
+        Locality.annot_of_json (e_of_yojson f_mix f_id) yes,
+        Locality.annot_of_json (e_of_yojson f_mix f_id) no)
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
@@ -87,12 +87,12 @@ and bool_of_yojson f_mix f_id = function
   | `List [op; a; b] as x ->
     begin
       try BOOL_OP (Operator.bool_op_of_json op,
-                   Location.annot_of_json (bool_of_yojson f_mix f_id) a,
-                   Location.annot_of_json (bool_of_yojson f_mix f_id) b)
+                   Locality.annot_of_json (bool_of_yojson f_mix f_id) a,
+                   Locality.annot_of_json (bool_of_yojson f_mix f_id) b)
       with Yojson.Basic.Util.Type_error _ ->
       try COMPARE_OP (Operator.compare_op_of_json op,
-                      Location.annot_of_json (e_of_yojson f_mix f_id) a,
-                      Location.annot_of_json (e_of_yojson f_mix f_id) b)
+                      Locality.annot_of_json (e_of_yojson f_mix f_id) a,
+                      Locality.annot_of_json (e_of_yojson f_mix f_id) b)
       with Yojson.Basic.Util.Type_error _ ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect bool expr",x))
     end

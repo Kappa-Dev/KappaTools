@@ -20,7 +20,7 @@ let empty_agent handler error =
     Cckappa_sig.agent_kasim_id = Ckappa_sig.dummy_agent_id;
     Cckappa_sig.agent_name = Ckappa_sig.dummy_agent_name;
     Cckappa_sig.agent_interface = interface;
-    Cckappa_sig.agent_position = Location.dummy
+    Cckappa_sig.agent_position = Locality.dummy
   }
 
 let empty_mixture handler error =
@@ -77,7 +77,7 @@ let empty_e_rule handler error =
         Ckappa_sig.lhs = Ckappa_sig.EMPTY_MIX ;
         Ckappa_sig.bidirectional = false ;
         Ckappa_sig.rhs = Ckappa_sig.EMPTY_MIX;
-        Ckappa_sig.k_def = Location.dummy_annot (Alg_expr.CONST (Nbr.F 0.));
+        Ckappa_sig.k_def = Locality.dummy_annot (Alg_expr.CONST (Nbr.F 0.));
         (*Ckappa_sig.k_un_radius = None ; *)
         Ckappa_sig.k_un = None};
     Cckappa_sig.e_rule_c_rule = rule }
@@ -252,7 +252,7 @@ let translate_agent_sig
               site_name
               {
                 Cckappa_sig.site_name = site_name ;
-                Cckappa_sig.site_position = Location.dummy ; (*port.Ckappa_sig.port_pos ;*)
+                Cckappa_sig.site_position = Locality.dummy ; (*port.Ckappa_sig.port_pos ;*)
                 Cckappa_sig.site_state = internal_list ;
                 Cckappa_sig.site_free = port.Ckappa_sig.port_free
               } c_interface
@@ -286,7 +286,7 @@ let translate_agent_sig
                   parameters error site_name
                   {
                     Cckappa_sig.site_name = site_name ;
-                    Cckappa_sig.site_position = Location.dummy ;
+                    Cckappa_sig.site_position = Locality.dummy ;
                     Cckappa_sig.site_state = [Ckappa_sig.dummy_state_index] ;
                     Cckappa_sig.site_free = port.Ckappa_sig.port_free
                   }
@@ -314,7 +314,7 @@ let translate_agent_sig
     Cckappa_sig.agent_kasim_id = kasim_id ;
     Cckappa_sig.agent_name = agent_name ;
     Cckappa_sig.agent_interface = c_interface ;
-    Cckappa_sig.agent_position = Location.dummy ;
+    Cckappa_sig.agent_position = Locality.dummy ;
   }:Cckappa_sig.agent_sig)
 
 let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
@@ -441,7 +441,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                           site_name
                           {
                             Cckappa_sig.site_name = site_name ;
-                            Cckappa_sig.site_position = Location.dummy ;
+                            Cckappa_sig.site_position = Locality.dummy ;
                             Cckappa_sig.site_free = None ;
                             Cckappa_sig.site_state =
                               {
@@ -516,7 +516,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         {
                           Cckappa_sig.site_name = site_name ;
                           Cckappa_sig.site_free = port.Ckappa_sig.port_free;
-                          Cckappa_sig.site_position = Location.dummy ;
+                          Cckappa_sig.site_position = Locality.dummy ;
                           Cckappa_sig.site_state =
                             {Cckappa_sig.min = state_min;
                              Cckappa_sig.max = max}
@@ -555,7 +555,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                       site_name
                       {
                         Cckappa_sig.site_name = site_name ;
-                        Cckappa_sig.site_position = Location.dummy ;
+                        Cckappa_sig.site_position = Locality.dummy ;
                         Cckappa_sig.site_free = port.Ckappa_sig.port_free ;
                         Cckappa_sig.site_state =
                           {Cckappa_sig.min = Ckappa_sig.dummy_state_index ;
@@ -652,7 +652,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                             {
                               Cckappa_sig.site_name = site_name ;
                               Cckappa_sig.site_free = port.Ckappa_sig.port_free;
-                              Cckappa_sig.site_position = Location.dummy ;
+                              Cckappa_sig.site_position = Locality.dummy ;
                               Cckappa_sig.site_state =
                                 {Cckappa_sig.min = state_min ;
                                  Cckappa_sig.max = max}
@@ -802,7 +802,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                                 {
                                   Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                                   Cckappa_sig.site_name = site_name ;
-                                  Cckappa_sig.site_position = Location.dummy ;
+                                  Cckappa_sig.site_position = Locality.dummy ;
                                   Cckappa_sig.site_state =
                                     {Cckappa_sig.min = i; Cckappa_sig.max = i}
                                 }
@@ -932,7 +932,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
                         {
                           Cckappa_sig.site_free = port.Ckappa_sig.port_free;
                           Cckappa_sig.site_name = site_name ;
-                          Cckappa_sig.site_position = Location.dummy ;
+                          Cckappa_sig.site_position = Locality.dummy ;
                           Cckappa_sig.site_state =
                             {Cckappa_sig.min = i; Cckappa_sig.max = i}
                         }
@@ -968,7 +968,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             Cckappa_sig.agent_kasim_id = kasim_id ;
             Cckappa_sig.agent_name = agent_name ;
             Cckappa_sig.agent_interface = c_interface ;
-            Cckappa_sig.agent_position = Location.dummy ;
+            Cckappa_sig.agent_position = Locality.dummy ;
           }
       else
         Cckappa_sig.Dead_agent
@@ -976,7 +976,7 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
             Cckappa_sig.agent_kasim_id = kasim_id ;
             Cckappa_sig.agent_name = agent_name ;
             Cckappa_sig.agent_interface = c_interface ;
-            Cckappa_sig.agent_position = Location.dummy ;
+            Cckappa_sig.agent_position = Locality.dummy ;
           },
             dead_sites,
             dead_state_sites,

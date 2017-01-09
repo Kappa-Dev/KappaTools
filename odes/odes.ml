@@ -14,9 +14,9 @@ module Make(I:Ode_interface_sig.Interface) =
 struct
 
   let alg_of_int i =
-    Location.dummy_annot (Alg_expr.CONST (Nbr.I i))
+    Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))
   let alg_of_float f =
-    Location.dummy_annot (Alg_expr.CONST (Nbr.F f))
+    Locality.dummy_annot (Alg_expr.CONST (Nbr.F f))
   module SpeciesSetMap =
     SetMap.Make
       (struct
@@ -86,9 +86,9 @@ struct
 
   type 'a decl =
     | Var of
-        var_id * string option * ('a,int) Alg_expr.e Location.annot
+        var_id * string option * ('a,int) Alg_expr.e Locality.annot
     | Init_expr of
-        var_id  * ('a,int) Alg_expr.e Location.annot * ode_var_id list
+        var_id  * ('a,int) Alg_expr.e Locality.annot * ode_var_id list
     | Dummy_decl
 
   let var_id_of_decl decl =
@@ -139,7 +139,7 @@ struct
       ode_variables : VarSet.t ;
       reactions:
         (id list * id list *
-         (('a,'b) Alg_expr.e Location.annot*id Location.annot) list
+         (('a,'b) Alg_expr.e Locality.annot*id Locality.annot) list
          * enriched_rule) list ;
 
       ode_vars_tab: ode_var Mods.DynArray.t ;
@@ -157,7 +157,7 @@ struct
 
       n_rules: int ;
 
-      obs: (obs_id * ('a,'b) Alg_expr.e Location.annot) list ;
+      obs: (obs_id * ('a,'b) Alg_expr.e Locality.annot) list ;
       n_obs: int ;
       time_homogeneous_obs: bool option ;
       time_homogeneous_vars: bool option ;
@@ -265,10 +265,10 @@ struct
     | Ode_loggers.Nil -> expr
     | Ode_loggers.Div n ->
       Alg_expr.BIN_ALG_OP
-        (Operator.DIV,Location.dummy_annot expr,alg_of_int n)
+        (Operator.DIV,Locality.dummy_annot expr,alg_of_int n)
     | Ode_loggers.Mul n ->
       Alg_expr.BIN_ALG_OP
-        (Operator.MULT,alg_of_int n,Location.dummy_annot expr)
+        (Operator.MULT,alg_of_int n,Locality.dummy_annot expr)
 
   let to_nembed = lift to_nembed_correct
   let to_nocc = lift to_nocc_correct
@@ -451,15 +451,15 @@ struct
                       (Alg_expr.BIN_ALG_OP
                          (Operator.MULT,
                           alg_of_int n_embs,
-                          Location.dummy_annot species)) nauto)
+                          Locality.dummy_annot species)) nauto)
                    nauto
              in
              if alg = Alg_expr.CONST (Nbr.zero) then term
              else
                Alg_expr.BIN_ALG_OP
                  (Operator.SUM,
-                  Location.dummy_annot alg,
-                  Location.dummy_annot term)
+                  Locality.dummy_annot alg,
+                  Locality.dummy_annot term)
       )
       network.id_of_ode_var
       (Alg_expr.CONST (Nbr.zero))
@@ -482,8 +482,8 @@ struct
             (fun expr h ->
                Alg_expr.BIN_ALG_OP
                  (Operator.MULT,
-                  Location.dummy_annot expr,
-                  Location.dummy_annot
+                  Locality.dummy_annot expr,
+                  Locality.dummy_annot
                     (nembed_of_connected_component compil network  h)))
             (Alg_expr.CONST Nbr.one)
             x
@@ -495,8 +495,8 @@ struct
             (fun acc l ->
                Alg_expr.BIN_ALG_OP
                  (Operator.SUM,
-                  Location.dummy_annot acc,
-                  Location.dummy_annot @@
+                  Locality.dummy_annot acc,
+                  Locality.dummy_annot @@
                   f l))
             (f head)
             tail, loc
@@ -533,7 +533,7 @@ struct
         (fun (remanent, tokens) (a,b) ->
            let remanent, id = translate_token b remanent in
            let a' = convert_alg_expr compil (snd remanent) a in
-           remanent,(a',(Location.dummy_annot id))::tokens)
+           remanent,(a',(Locality.dummy_annot id))::tokens)
         (remanent,[])
         tokens
     in
@@ -833,7 +833,7 @@ struct
     in
     let dec_tab =
       Mods.DynArray.create network.fresh_var_id
-        (Dummy_decl,None,Location.dummy_annot (Alg_expr.CONST Nbr.zero))
+        (Dummy_decl,None,Locality.dummy_annot (Alg_expr.CONST Nbr.zero))
     in
     let add_succ i j =
       let () = Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
@@ -935,7 +935,7 @@ struct
            inc_fresh_obs_id
              {network with
               obs = (get_fresh_obs_id network,
-                     convert_alg_expr compil network (Location.dummy_annot obs))
+                     convert_alg_expr compil network (Locality.dummy_annot obs))
                     ::network.obs})
         network
         list_obs
@@ -955,7 +955,7 @@ struct
          cc_cache',List.rev_append acc list)
       (cc_cache,[])
 
-  type ('a,'b) rate = ('a,'b) Alg_expr.e Location.annot
+  type ('a,'b) rate = ('a,'b) Alg_expr.e Locality.annot
 
   type ('a,'b) sort_rules_and_decl =
     {
@@ -1159,7 +1159,7 @@ struct
         | [a] ->
           let species, n = species_of_species_id network a in
           let expr =
-            Location.dummy_annot
+            Locality.dummy_annot
               (to_nembed compil (from_nocc compil (fst expr) n) n)
           in
           let comment =
@@ -1183,7 +1183,7 @@ struct
                  snd (species_of_species_id network id)
                in
                let expr =
-                 Location.dummy_annot
+                 Locality.dummy_annot
                    (to_nembed compil
                       (from_nocc compil (Alg_expr.ALG_VAR id') n) n)
                in
@@ -1321,7 +1321,7 @@ struct
             (I.string_of_var_id ~compil)
             logger logger_buffer
             (Ode_loggers_sig.Init (get_last_ode_var_id network))
-            (Location.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
+            (Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR))
             handler_init
         in
           Sbml_backend.do_sbml logger

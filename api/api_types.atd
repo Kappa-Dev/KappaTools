@@ -6,11 +6,11 @@ type ('ok,'error) result_data <ocaml_biniou t="result"> =
      [ Ok of 'ok
      | Error of 'error ] <json repr="object">
 
-type position <ocaml predef module="Location"> =
+type position <ocaml predef module="Locality"> =
      { chr : int ;
        line : int }
 
-type range <ocaml predef module="Location"> =
+type range <ocaml predef module="Locality"> =
      { range_file          <ocaml name="file">          : string ;
        range_from_position <ocaml name="from_position"> : position <json name="from"> ;
        range_to_position   <ocaml name="to_position">   : position <json name="to"> }

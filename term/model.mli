@@ -12,13 +12,13 @@ type t
 
 val init :
   Pattern.Env.t -> unit NamedDecls.t ->
-  Alg_expr.t Location.annot NamedDecls.t ->
+  Alg_expr.t Locality.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
-  ((string Location.annot option * LKappa.rule Location.annot) array *
+  ((string Locality.annot option * LKappa.rule Locality.annot) array *
      Primitives.elementary_rule array *
        Pattern.Set.t) ->
-  Alg_expr.t Location.annot array -> Primitives.perturbation array -> t
+  Alg_expr.t Locality.annot array -> Primitives.perturbation array -> t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
 
@@ -36,7 +36,7 @@ val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t
 
 val get_alg : t -> int -> Alg_expr.t
-val get_algs : t -> (string * Alg_expr.t Location.annot) array
+val get_algs : t -> (string * Alg_expr.t Locality.annot) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
 val get_ast_rule: t -> int -> LKappa.rule
@@ -53,9 +53,9 @@ val all_dependencies :
   t -> (Operator.DepSet.t * Operator.DepSet.t *
         Operator.DepSet.t array * Operator.DepSet.t array)
 
-val num_of_agent : string Location.annot -> t -> int
-val num_of_alg : string Location.annot -> t -> int
-val num_of_token : string Location.annot -> t -> int
+val num_of_agent : string Locality.annot -> t -> int
+val num_of_alg : string Locality.annot -> t -> int
+val num_of_token : string Locality.annot -> t -> int
 val nums_of_rule : string -> t -> int list
 
 val print_ast_rule : ?env:t -> Format.formatter -> int -> unit

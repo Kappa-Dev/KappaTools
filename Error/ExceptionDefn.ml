@@ -22,13 +22,13 @@ exception Break of int
 exception Null_event of int
 exception StopReached of string
 
-exception Syntax_Error of string Location.annot
-exception Malformed_Decl of string Location.annot
-exception Internal_Error of string Location.annot
+exception Syntax_Error of string Locality.annot
+exception Malformed_Decl of string Locality.annot
+exception Internal_Error of string Locality.annot
 exception Unsatisfiable
 
 let warning_buffer:
-      (Location.t option*(Format.formatter -> unit)) list ref = ref []
+      (Locality.t option*(Format.formatter -> unit)) list ref = ref []
 
 let warning ?pos msg =
   warning_buffer :=(pos,msg)::!warning_buffer
@@ -43,5 +43,5 @@ let flush_warning f =
 	     let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
 	     match pos with
 	     | Some pos ->
-		Format.fprintf f "@[<v>%a@]@." (Location.print_annot pr) ((),pos)
+		Format.fprintf f "@[<v>%a@]@." (Locality.print_annot pr) ((),pos)
 	     | None -> Format.fprintf f "@[%a@]@." pr ()) l

@@ -46,12 +46,12 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
           (Marshal.from_channel d :
              Model.t*Signature.contact_map*int list*
              (bool*bool*bool) option*bool option*string*string option*
-             (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
+             (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) in
         let () = Pervasives.close_in d  in
         let alg_overwrite =
           List.map
             (fun (s,v) ->
-               Model.num_of_alg (Location.dummy_annot s) env,
+               Model.num_of_alg (Locality.dummy_annot s) env,
                Alg_expr.CONST v)
             cli_args.Run_cli_args.alg_var_overwrite in
         let updated_vars' =

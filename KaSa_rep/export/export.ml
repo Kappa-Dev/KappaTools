@@ -1122,7 +1122,7 @@ let compute_signature show_title state =
   let l =
     Mods.StringSetMap.Map.fold
       (fun a interface list ->
-         (Location.dummy_annot a,
+         (Locality.dummy_annot a,
           NamedDecls.create
             (Array.of_list
                (Mods.StringSetMap.Map.fold
@@ -1130,12 +1130,12 @@ let compute_signature show_title state =
                      let binding' =
                        List.map
                          (fun (x,y) ->
-                            (Location.dummy_annot x, Location.dummy_annot y))
+                            (Locality.dummy_annot x, Locality.dummy_annot y))
                          binding in
-                     (Location.dummy_annot x,
+                     (Locality.dummy_annot x,
                       (NamedDecls.create
                          (Tools.array_map_of_list
-                            (fun i -> (Location.dummy_annot i,())) states),
+                            (fun i -> (Locality.dummy_annot i,())) states),
                        binding'))::acc)
                   interface [])))::list)
       l [] in

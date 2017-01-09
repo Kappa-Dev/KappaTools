@@ -135,7 +135,7 @@ type t =
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
     store_distances : bool ;
-    init_l : (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
+    init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     has_tracking : (bool * bool * bool) option ;
     mutable lastyield : float ;
     mutable file_indexes : file_index list option;
@@ -186,20 +186,20 @@ let catch_error : 'a .
   (Api_types_j.errors -> 'a) -> exn -> 'a =
   fun f handler ->
     (function
-      |  ExceptionDefn.Syntax_Error ((message,location) : string Location.annot) ->
+      |  ExceptionDefn.Syntax_Error ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (f (Location.to_range location)))
+             ~region:(Some (f (Locality.to_range location)))
              message)
-      | ExceptionDefn.Malformed_Decl ((message,location) : string Location.annot) ->
+      | ExceptionDefn.Malformed_Decl ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (f (Location.to_range location)))
+             ~region:(Some (f (Locality.to_range location)))
              message)
-      | ExceptionDefn.Internal_Error ((message,location) : string Location.annot) ->
+      | ExceptionDefn.Internal_Error ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (f (Location.to_range location)))
+             ~region:(Some (f (Locality.to_range location)))
              message)
       | Invalid_argument error ->
         handler (Api_data.api_message_errors ("Runtime error "^ error))

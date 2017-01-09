@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type switching =
-  | Linked of int Location.annot | Freed | Maintained | Erased
+  | Linked of int Locality.annot | Freed | Maintained | Erased
 
 type rule_internal =
   | I_ANY
@@ -18,9 +18,9 @@ type rule_internal =
 type rule_agent =
   { ra_type: int;
     ra_erased: bool;
-    ra_ports: ((int,int*int) Ast.link Location.annot * switching) array;
+    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
     ra_ints: rule_internal array;
-    ra_syntax: (((int,int*int) Ast.link Location.annot * switching) array *
+    ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
                 rule_internal array) option;
   }
 
@@ -30,12 +30,12 @@ type rule =
   { r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_rm_tokens :
-      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
+      ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_add_tokens :
-      ((rule_mixture,int) Alg_expr.e Location.annot * int) list;
-    r_rate : (rule_mixture,int) Alg_expr.e Location.annot;
-    r_un_rate : ((rule_mixture,int) Alg_expr.e Location.annot
-                 * (rule_mixture,int) Alg_expr.e Location.annot option) option;
+      ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
+    r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
+    r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
+                 * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
   }
 
 let print_link_annot ~ltypes sigs f (s,a) =
@@ -84,12 +84,12 @@ let switching_to_json = function
   | Freed -> `String "Freed"
   | Maintained -> `String "Maintained"
   | Erased -> `String "Erased"
-  | Linked i -> Location.annot_to_json JsonUtil.of_int i
+  | Linked i -> Locality.annot_to_json JsonUtil.of_int i
 let switching_of_json = function
   | `String "Freed" -> Freed
   | `String "Maintained" -> Maintained
   | `String "Erased"-> Erased
-  | x -> Linked (Location.annot_of_json
+  | x -> Linked (Locality.annot_of_json
                    (JsonUtil.to_int~error_msg:"Invalid Switching") x)
 
 let print_rule_link sigs f ((e,_),s) =
@@ -288,7 +288,7 @@ let rule_agent_to_json a =
     `List (Array.fold_right
              (fun (e,s) c ->
                 (`List [
-                    Location.annot_to_json
+                    Locality.annot_to_json
                       (Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
                          (fun (s,a) -> [`Int s;`Int a])) e;
                        switching_to_json s])::c)
@@ -308,7 +308,7 @@ let rule_agent_of_json = function
             Tools.array_map_of_list
               (function
                 | `List [e;s] ->
-                  (Location.annot_of_json
+                  (Locality.annot_of_json
                      (Ast.link_of_json
                         (fun _ -> Yojson.Basic.Util.to_int)
                         Yojson.Basic.Util.to_int
@@ -350,21 +350,21 @@ let rule_to_json r =
       "rm_tokens",
       JsonUtil.of_list
         (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-           (Location.annot_to_json lalg_expr_to_json)
+           (Locality.annot_to_json lalg_expr_to_json)
            JsonUtil.of_int)
         r.r_rm_tokens;
       "add_tokens",
       JsonUtil.of_list
         (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-           (Location.annot_to_json lalg_expr_to_json)
+           (Locality.annot_to_json lalg_expr_to_json)
            JsonUtil.of_int)
         r.r_add_tokens;
-      "rate", Location.annot_to_json lalg_expr_to_json r.r_rate;
+      "rate", Locality.annot_to_json lalg_expr_to_json r.r_rate;
       "unary_rate",
       JsonUtil.of_option
         (JsonUtil.of_pair
-           (Location.annot_to_json lalg_expr_to_json)
-           (JsonUtil.of_option (Location.annot_to_json lalg_expr_to_json)))
+           (Locality.annot_to_json lalg_expr_to_json)
+           (JsonUtil.of_option (Locality.annot_to_json lalg_expr_to_json)))
         r.r_un_rate;
     ]
 let rule_of_json = function
@@ -377,22 +377,22 @@ let rule_of_json = function
           r_rm_tokens =
             JsonUtil.to_list
               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                 (Location.annot_of_json lalg_expr_of_json)
+                 (Locality.annot_of_json lalg_expr_of_json)
                  (JsonUtil.to_int ?error_msg:None))
               (List.assoc "rm_tokens" l);
           r_add_tokens =
             JsonUtil.to_list
               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                 (Location.annot_of_json lalg_expr_of_json)
+                 (Locality.annot_of_json lalg_expr_of_json)
                  (JsonUtil.to_int ?error_msg:None))
               (List.assoc "rm_tokens" l);
-          r_rate = Location.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
+          r_rate = Locality.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
           r_un_rate =
             (try
                JsonUtil.to_option
                  (JsonUtil.to_pair
-                    (Location.annot_of_json lalg_expr_of_json)
-                    (JsonUtil.to_option (Location.annot_of_json
+                    (Locality.annot_of_json lalg_expr_of_json)
+                    (JsonUtil.to_option (Locality.annot_of_json
                                            lalg_expr_of_json)))
                  (List.assoc "unary_rate" l)
              with Not_found -> None);
@@ -547,9 +547,9 @@ let of_raw_mixture x =
          Array.map
            (function
              | Raw_mixture.VAL i ->
-                 (Location.dummy_annot (Ast.LNK_VALUE (i,(-1,-1))), Maintained)
+                 (Locality.dummy_annot (Ast.LNK_VALUE (i,(-1,-1))), Maintained)
              | Raw_mixture.FREE ->
-               (Location.dummy_annot Ast.FREE, Maintained)
+               (Locality.dummy_annot Ast.FREE, Maintained)
            )
            r.Raw_mixture.a_ports in
        { ra_type = r.Raw_mixture.a_type; ra_erased = false;
@@ -561,7 +561,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (Location.dummy_annot Ast.LNK_ANY, Erased) in
+  let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, Erased) in
   let internals =
     Array.init arity
       (fun i ->
@@ -610,7 +610,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
                build_l_type sigs pos_lnk dst_ty dst_p Erased in
            (lannot,pset')
          | [Ast.FREE,_] | [] ->
-           let () = ports.(p_id) <- Location.dummy_annot Ast.FREE, Erased in
+           let () = ports.(p_id) <- Locality.dummy_annot Ast.FREE, Erased in
            (lannot,pset')
          | [Ast.LNK_VALUE (i,()), pos] ->
            let va,lannot' =
@@ -668,7 +668,7 @@ let annotate_agent_with_diff
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (Location.dummy_annot Ast.LNK_ANY, Maintained) in
+  let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, Maintained) in
   let internals = Array.make arity I_ANY in
   let register_port_modif p_id lnk1 p' (lhs_links,rhs_links as links_annot) =
     match lnk1,p'.Ast.port_lnk with
@@ -709,7 +709,7 @@ let annotate_agent_with_diff
       let () = ports.(p_id) <- build_l_type sigs pos_lnk dst_ty dst_p Freed in
       links_annot
     | ([Ast.FREE,_] | []), ([Ast.FREE,_] | []) ->
-      let () = ports.(p_id) <- (Location.dummy_annot Ast.FREE, Maintained) in
+      let () = ports.(p_id) <- (Locality.dummy_annot Ast.FREE, Maintained) in
       links_annot
     | [Ast.LNK_VALUE (i,()),pos], ([Ast.FREE,_] | []) ->
       let va,lhs_links' =
@@ -749,7 +749,7 @@ let annotate_agent_with_diff
       lhs_links,rhs_links'
     | ([Ast.FREE,_] | []), [Ast.LNK_VALUE (i,()),pos] ->
       let () =
-        ports.(p_id) <- (Location.dummy_annot Ast.FREE, Linked (i,pos)) in
+        ports.(p_id) <- (Locality.dummy_annot Ast.FREE, Linked (i,pos)) in
       let _,rhs_links' =
         build_link sigs ?contact_map pos i ag_id p_id Freed rhs_links in
       lhs_links,rhs_links'
@@ -818,7 +818,7 @@ although it is left unpecified in the left hand side"
          let p_na = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let () = register_internal_modif p_id [] p in
-         register_port_modif p_id [Location.dummy_annot Ast.LNK_ANY] p annot)
+         register_port_modif p_id [Locality.dummy_annot Ast.LNK_ANY] p annot)
       annot rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},annot'
@@ -907,8 +907,8 @@ let add_un_variable k_un acc rate_var =
   | None -> (acc,None)
   | Some (k,dist) ->
     let acc_un,k' = if Alg_expr.has_mix (fst k) then
-        ((Location.dummy_annot rate_var,k)::acc,
-         Location.dummy_annot (Alg_expr.ALG_VAR rate_var))
+        ((Locality.dummy_annot rate_var,k)::acc,
+         Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
       else (acc,k) in
     (acc_un,Some (k',dist))
 
@@ -934,8 +934,8 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
   let acc',k_def =
     if Alg_expr.has_mix (fst r.Ast.k_def) then
       let rate_var = label^"_rate" in
-      ((Location.dummy_annot rate_var,r.Ast.k_def)::acc,
-       Location.dummy_annot (Alg_expr.ALG_VAR rate_var))
+      ((Locality.dummy_annot rate_var,r.Ast.k_def)::acc,
+       Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
     else (acc,r.Ast.k_def) in
   let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
   let acc''',rules' =
@@ -944,10 +944,10 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
       let rate_var = (Ast.flip_label label)^"_rate" in
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
-      ((Location.dummy_annot rate_var,k)::acc_un,
+      ((Locality.dummy_annot rate_var,k)::acc_un,
        (Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
         r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-        Location.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
+        Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
     | true, Some rate ->
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
@@ -1134,8 +1134,8 @@ let compil_of_ast overwrite c =
       name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
   let alg_vars_over =
     List_util.rev_map_append
-      (fun (x,v) -> (Location.dummy_annot x,
-                     Location.dummy_annot (Alg_expr.CONST v))) overwrite
+      (fun (x,v) -> (Locality.dummy_annot x,
+                     Locality.dummy_annot (Alg_expr.CONST v))) overwrite
       (List.filter
          (fun ((x,_),_) ->
             List.for_all (fun (x',_) -> x <> x') overwrite)

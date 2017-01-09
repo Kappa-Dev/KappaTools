@@ -9,9 +9,9 @@
 type t = {
   domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
-  algs : (Alg_expr.t Location.annot) NamedDecls.t;
-  observables : Alg_expr.t Location.annot array;
-  ast_rules : (string Location.annot option * LKappa.rule Location.annot) array;
+  algs : (Alg_expr.t Locality.annot) NamedDecls.t;
+  observables : Alg_expr.t Locality.annot array;
+  ast_rules : (string Locality.annot option * LKappa.rule Locality.annot) array;
   rules : Primitives.elementary_rule array;
   cc_of_unaries : Pattern.Set.t;
   perturbations : Primitives.perturbation array;
@@ -158,12 +158,12 @@ let check_if_counter_is_filled_enough x =
                   Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
                   Primitives.PRINT _) -> false) x.perturbations then
     raise (ExceptionDefn.Malformed_Decl
-             (Location.dummy_annot
+             (Locality.dummy_annot
                 "There is no way for the simulation to stop."))
 
 let propagate_constant ?max_time ?max_events updated_vars x =
   let algs' =
-    Array.map (fun (x,y) -> (Location.dummy_annot x,y))
+    Array.map (fun (x,y) -> (Locality.dummy_annot x,y))
       x.algs.NamedDecls.decls in
   let () =
     Array.iteri
@@ -247,14 +247,14 @@ let of_yojson = function
         { domain = Pattern.Env.of_yojson (List.assoc "update" l);
           tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
           algs = NamedDecls.of_json
-              (fun x -> Location.dummy_annot
+              (fun x -> Locality.dummy_annot
                   (Alg_expr.e_of_yojson kappa_instance_of_yojson
                      (JsonUtil.to_int ?error_msg:None) x))
               (List.assoc "algs" l);
           observables = (match List.assoc "observables" l with
               | `List o ->
                 Tools.array_map_of_list
-                  (fun x -> Location.dummy_annot
+                  (fun x -> Locality.dummy_annot
                       (Alg_expr.e_of_yojson kappa_instance_of_yojson
                          (JsonUtil.to_int ?error_msg:None) x)) o
               | _ -> raise Not_found);
@@ -263,10 +263,10 @@ let of_yojson = function
                 Tools.array_map_of_list
                   (function
                     | `List [`Null;r]->
-                      (None, Location.dummy_annot (LKappa.rule_of_json r))
+                      (None, Locality.dummy_annot (LKappa.rule_of_json r))
                     | `List [`String n;r]->
-                      (Some (Location.dummy_annot n),
-                       Location.dummy_annot (LKappa.rule_of_json r))
+                      (Some (Locality.dummy_annot n),
+                       Locality.dummy_annot (LKappa.rule_of_json r))
                     | _ -> raise Not_found) o
               | _ -> raise Not_found);
           rules = [||];

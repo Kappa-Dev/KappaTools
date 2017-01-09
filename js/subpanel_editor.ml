@@ -82,7 +82,7 @@ let xml (_ : Ui_simulation.t) =
 
 let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
   let position p =
-    new%js Codemirror.position (p.Location.line-1) (p.Location.chr) in
+    new%js Codemirror.position (p.Locality.line-1) (p.Locality.chr) in
   let hydrate (error  : Api_types_j.message) : lint Js.t option =
     match error.Api_types_j.message_range with
     | None -> None
@@ -97,8 +97,8 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
                   | `Warning -> Codemirror.Warning
                   | `Info -> Codemirror.Warning
                 )
-              ~from:(position range.Location.from_position)
-              ~to_:(position range.Location.to_position)) in
+              ~from:(position range.Locality.from_position)
+              ~to_:(position range.Locality.to_position)) in
   Js.array
     (Array.of_list
        (List.fold_left

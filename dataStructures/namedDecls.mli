@@ -16,10 +16,10 @@ type 'a t = private
  }
 
 val create :
-  ?forbidden:Mods.StringSet.t -> (string Location.annot *'a) array -> 'a t
+  ?forbidden:Mods.StringSet.t -> (string Locality.annot *'a) array -> 'a t
 val size : 'a t -> int
 val elt_name : 'a t -> int -> string
-val elt_id : ?kind:string -> 'a t -> string Location.annot -> int
+val elt_id : ?kind:string -> 'a t -> string Locality.annot -> int
 
 val fold : (int -> string -> 'a -> 'b -> 'a) -> 'a -> 'b t -> 'a
 

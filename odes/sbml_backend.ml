@@ -185,7 +185,7 @@ let of_bool_op op =
 let unsome expr_opt =
   match expr_opt
   with
-  | None -> Location.dummy_annot (Alg_expr.CONST Nbr.zero)
+  | None -> Locality.dummy_annot (Alg_expr.CONST Nbr.zero)
   | Some expr -> expr
 
 let rec eval_init_alg_expr logger network_handler alg_expr =
@@ -382,7 +382,7 @@ and eval_const_bool_expr logger network_handler expr =
 let rec print_alg_expr_in_sbml logger
     (alg_expr:
        (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
-         Alg_expr.e Location.annot
+         Alg_expr.e Locality.annot
     ) (network:
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
   =
@@ -487,7 +487,7 @@ and
 let rec maybe_time_dependent_alg_expr_in_sbml logger
     (alg_expr:
        (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
-         Alg_expr.e Location.annot
+         Alg_expr.e Locality.annot
     ) (network:
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
   =
@@ -556,7 +556,7 @@ let dump_initial_species ?units loggers network_handler k name species =
   let expr =
     match Loggers.get_expr loggers (Ode_loggers_sig.Init k) with
     | Some a -> a
-    | None -> Location.dummy_annot (Alg_expr.CONST Nbr.zero)
+    | None -> Locality.dummy_annot (Alg_expr.CONST Nbr.zero)
   in
   let units =
     match units with
@@ -679,11 +679,11 @@ let dump_kinetic_law
         if correct = 1
         then expr
         else
-          Location.dummy_annot
+          Locality.dummy_annot
             (Alg_expr.BIN_ALG_OP
                (Operator.DIV,
                 expr,
-                Location.dummy_annot (Alg_expr.CONST (Nbr.I correct))))
+                Locality.dummy_annot (Alg_expr.CONST (Nbr.I correct))))
       in
       print_alg_expr_in_sbml logger expr network
   in
@@ -713,18 +713,18 @@ let dump_kinetic_law
 
 
 let negative_part expr =
-  Location.dummy_annot
+  Locality.dummy_annot
     (Alg_expr.UN_ALG_OP
     (Operator.UMINUS,
-     Location.dummy_annot
+     Locality.dummy_annot
        (Alg_expr.BIN_ALG_OP(Operator.MIN,
-                            Location.dummy_annot(
+                            Locality.dummy_annot(
                               Alg_expr.CONST (Nbr.zero)),expr))))
 
 let positive_part expr =
-  Location.dummy_annot
+  Locality.dummy_annot
     (Alg_expr.BIN_ALG_OP(Operator.MAX,
-                         Location.dummy_annot(
+                         Locality.dummy_annot(
                            Alg_expr.CONST (Nbr.zero)),expr))
 
 let dump_token_vector convert logger network_handler token_vector =
@@ -736,7 +736,7 @@ let dump_token_vector convert logger network_handler token_vector =
        match stochiometry_opt with
        | None ->
          let () =
-           Printf.printf "%s: Expressions for token consumption/production should be constants \n Cowardly replace it with 0" (Location.to_string (snd expr))
+           Printf.printf "%s: Expressions for token consumption/production should be constants \n Cowardly replace it with 0" (Locality.to_string (snd expr))
          in
          ()
        | Some x when Nbr.is_zero x -> ()

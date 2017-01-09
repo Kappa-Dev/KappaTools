@@ -15,52 +15,52 @@ type ('a,'annot) link =
   | LNK_SOME
   | LNK_TYPE of 'a * 'a (** port * agent_type *)
 
-type internal = string Location.annot list
+type internal = string Locality.annot list
 
-type port = {port_nme:string Location.annot;
+type port = {port_nme:string Locality.annot;
              port_int:internal;
-             port_lnk:(string Location.annot,unit) link Location.annot list;}
+             port_lnk:(string Locality.annot,unit) link Locality.annot list;}
 
-type agent = (string Location.annot * port list)
+type agent = (string Locality.annot * port list)
 
 type mixture = agent list
 
 type rule = {
   lhs: mixture ;
-  rm_token: ((mixture,string) Alg_expr.e Location.annot *
-             string Location.annot) list;
+  rm_token: ((mixture,string) Alg_expr.e Locality.annot *
+             string Locality.annot) list;
   bidirectional:bool ;
   rhs: mixture ;
-  add_token: ((mixture,string) Alg_expr.e Location.annot *
-              string Location.annot) list;
-  k_def: (mixture,string) Alg_expr.e Location.annot ;
+  add_token: ((mixture,string) Alg_expr.e Locality.annot *
+              string Locality.annot) list;
+  k_def: (mixture,string) Alg_expr.e Locality.annot ;
   k_un:
-    ((mixture,string) Alg_expr.e Location.annot *
-     (mixture,string) Alg_expr.e Location.annot option) option;
+    ((mixture,string) Alg_expr.e Locality.annot *
+     (mixture,string) Alg_expr.e Locality.annot option) option;
   (*k_1:radius_opt*)
-  k_op: (mixture,string) Alg_expr.e Location.annot option ;
+  k_op: (mixture,string) Alg_expr.e Locality.annot option ;
   k_op_un:
-    ((mixture,string) Alg_expr.e Location.annot *
-     (mixture,string) Alg_expr.e Location.annot option) option;
+    ((mixture,string) Alg_expr.e Locality.annot *
+     (mixture,string) Alg_expr.e Locality.annot option) option;
   (*rate for backward rule*)
 }
 
 val flip_label : string -> string
 
 type 'alg_expr print_expr =
-  | Str_pexpr of string Location.annot
-  | Alg_pexpr of 'alg_expr Location.annot
+  | Str_pexpr of string Locality.annot
+  | Alg_pexpr of 'alg_expr Locality.annot
 
 type ('mixture,'id) modif_expr =
   | INTRO of
-      (('mixture,'id) Alg_expr.e Location.annot * 'mixture Location.annot)
+      (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
   | DELETE of
-      (('mixture,'id) Alg_expr.e Location.annot * 'mixture Location.annot)
+      (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
   | UPDATE of
-      ('id Location.annot * ('mixture,'id) Alg_expr.e Location.annot)
+      ('id Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
   | UPDATE_TOK of
-      ('id Location.annot * ('mixture,'id) Alg_expr.e Location.annot)
+      ('id Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
   | STOP of ('mixture,'id) Alg_expr.e print_expr list
   | SNAPSHOT of ('mixture,'id) Alg_expr.e print_expr list
@@ -69,21 +69,21 @@ type ('mixture,'id) modif_expr =
       ((('mixture,'id) Alg_expr.e print_expr list) *
        (('mixture,'id) Alg_expr.e print_expr list))
   | PLOTENTRY
-  | CFLOWLABEL of (bool * string Location.annot)
-  | CFLOWMIX of (bool * 'mixture Location.annot)
+  | CFLOWLABEL of (bool * string Locality.annot)
+  | CFLOWMIX of (bool * 'mixture Locality.annot)
   | FLUX of bool * ('mixture,'id) Alg_expr.e print_expr list
   | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
 
 type ('mixture,'id) perturbation =
-  (('mixture,'id) Alg_expr.bool Location.annot *
+  (('mixture,'id) Alg_expr.bool Locality.annot *
    (('mixture,'id) modif_expr list) *
-   ('mixture,'id) Alg_expr.bool Location.annot option)
-    Location.annot
+   ('mixture,'id) Alg_expr.bool Locality.annot option)
+    Locality.annot
 
-type configuration = string Location.annot * (string Location.annot list)
+type configuration = string Locality.annot * (string Locality.annot list)
 
 type ('mixture,'id) variable_def =
-  string Location.annot * ('mixture,'id) Alg_expr.e Location.annot
+  string Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot
 
 type ('mixture,'id) init_t =
   | INIT_MIX of 'mixture
@@ -91,16 +91,16 @@ type ('mixture,'id) init_t =
 
 type ('mixture,'id) instruction =
   | SIG      of agent
-  | TOKENSIG of string Location.annot
+  | TOKENSIG of string Locality.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
   | INIT     of
-      string Location.annot option *
-      ('mixture,'id) Alg_expr.e Location.annot *
-      ('mixture,'id) init_t Location.annot
+      string Locality.annot option *
+      ('mixture,'id) Alg_expr.e Locality.annot *
+      ('mixture,'id) init_t Locality.annot
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
-  | PLOT     of ('mixture,'id) Alg_expr.e Location.annot
+  | PLOT     of ('mixture,'id) Alg_expr.e Locality.annot
   | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
 
@@ -117,22 +117,22 @@ type ('agent,'mixture,'id,'rule) compil =
     signatures :
       'agent list; (*agent signature declaration*)
     rules :
-      (string Location.annot option * 'rule Location.annot) list;
+      (string Locality.annot option * 'rule Locality.annot) list;
     (*rules (possibly named)*)
     observables :
-      ('mixture,'id) Alg_expr.e Location.annot list;
+      ('mixture,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
     init :
-      (string Location.annot option *
-       ('mixture,'id) Alg_expr.e Location.annot *
-       ('mixture,'id) init_t Location.annot) list;
+      (string Locality.annot option *
+       ('mixture,'id) Alg_expr.e Locality.annot *
+       ('mixture,'id) init_t Locality.annot) list;
     (*initial graph declaration*)
     perturbations :
       ('mixture,'id) perturbation list;
     configurations :
       configuration list;
     tokens :
-      string Location.annot list;
+      string Locality.annot list;
     volumes :
       (string * float * string) list
   }

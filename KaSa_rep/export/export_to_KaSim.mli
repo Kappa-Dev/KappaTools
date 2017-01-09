@@ -21,7 +21,7 @@ module type Type =
 
 
     val init:
-      ?compil:(string Location.annot * Ast.port list, Ast.mixture, string, Ast.rule)  Ast.compil ->
+      ?compil:(string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule)  Ast.compil ->
       called_from:Remanent_parameters_sig.called_from ->
       unit -> state
 

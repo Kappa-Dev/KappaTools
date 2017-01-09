@@ -21,8 +21,8 @@ sig
   val get_reactions:
     ('a,'b) network ->
     (ode_var_id list * ode_var_id list *
-     (('a,'b) Alg_expr.e Location.annot *
-      ode_var_id  Location.annot) list  * I.rule) list
+     (('a,'b) Alg_expr.e Locality.annot *
+      ode_var_id  Locality.annot) list  * I.rule) list
 
   val export_network:
     command_line:string ->

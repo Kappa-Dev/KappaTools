@@ -43,11 +43,11 @@ val associate:
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->
   Loggers.t -> Loggers.t -> Ode_loggers_sig.variable ->
-  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
+  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val increment:
   ?init_mode:bool -> ?comment:string -> Loggers.t -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,
-   Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
+   Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val associate_nrows: Loggers.t -> unit
 val associate_t: Loggers.t -> int -> unit
 val init_time: Loggers.t -> int -> unit
@@ -60,7 +60,7 @@ val consume: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> na
 val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
 val update_token:
   Loggers.t -> Ode_loggers_sig.variable -> nauto_in_lhs:int -> Ode_loggers_sig.variable ->
-  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot -> (Ode_loggers_sig.variable * correct) list ->
+  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.variable * correct) list ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 
 val print_newline:

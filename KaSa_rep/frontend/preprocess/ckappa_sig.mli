@@ -16,7 +16,7 @@ module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
 (***************************************************************************)
 
-type position       = Location.t
+type position       = Locality.t
 type agent_name     = string
 type site_name      = string
 type internal_state = string
@@ -280,7 +280,7 @@ and link =
   | FREE
   | LNK_ANY   of position
   | LNK_SOME  of position
-  | LNK_TYPE  of (string Location.annot * string Location.annot)
+  | LNK_TYPE  of (string Locality.annot * string Locality.annot)
 
 val rename_link:
   Remanent_parameters_sig.parameters ->
@@ -321,8 +321,8 @@ type 'mixture rule =
     lhs   : 'mixture;
     bidirectional : bool;
     rhs   : 'mixture;
-    k_def : ('mixture,string) Alg_expr.e Location.annot;
-    k_un  : ('mixture,string) Alg_expr.e Location.annot option
+    k_def : ('mixture,string) Alg_expr.e Locality.annot;
+    k_un  : ('mixture,string) Alg_expr.e Locality.annot option
   }
 
 type 'mixture perturbation = ('mixture,string) Ast.perturbation
@@ -494,7 +494,7 @@ type c_compil =
     c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)
     c_perturbations :
-      c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t
+      c_mixture Locality.annot perturbation Int_storage.Nearly_inf_Imperatif.t
   }
 
 val array_of_list_rule_id:
@@ -515,6 +515,6 @@ val introduceable_species_in_pertubation:
   Exception.method_handler ->
   (Remanent_parameters_sig.parameters ->
    Exception.method_handler ->
-   string Location.annot option -> ('a, string) Alg_expr.e Location.annot -> 'a Location.annot -> Exception.method_handler * 'b) ->
+   string Locality.annot option -> ('a, string) Alg_expr.e Locality.annot -> 'a Locality.annot -> Exception.method_handler * 'b) ->
   'a perturbation ->
   Exception.method_handler * 'b list

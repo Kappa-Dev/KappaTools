@@ -25,10 +25,10 @@ type variable =
   | Current_time
   | Time_scale_factor 
 
-val is_expr_const: (ode_var_id,int) Alg_expr.e Location.annot -> bool
-val is_expr_time_homogeneous: ('a,int) Alg_expr.e Location.annot -> bool
-val is_expr_alias: (ode_var_id,int) Alg_expr.e Location.annot -> ode_var_id option
-val is_bool_const: (ode_var_id,int) Alg_expr.bool Location.annot -> bool
+val is_expr_const: (ode_var_id,int) Alg_expr.e Locality.annot -> bool
+val is_expr_time_homogeneous: ('a,int) Alg_expr.e Locality.annot -> bool
+val is_expr_alias: (ode_var_id,int) Alg_expr.e Locality.annot -> ode_var_id option
+val is_bool_const: (ode_var_id,int) Alg_expr.bool Locality.annot -> bool
 val int_of_ode_var_id: ode_var_id -> int
 val string_of_variable: variable -> string
 val string_of_array_name: variable -> string

@@ -23,7 +23,7 @@ let do_interactive_directives
             (fun s b x -> b || x != contact_map.(n).(s)))
         false contact_map' then
       raise (ExceptionDefn.Malformed_Decl
-               (Location.dummy_annot "Creating new link type is forbidden")) in
+               (Locality.dummy_annot "Creating new link type is forbidden")) in
   let cc_preenv', e'' = Eval.compile_modifications_no_track
       contact_map cc_preenv e' in
   let env',graph' =

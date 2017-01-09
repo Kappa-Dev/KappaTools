@@ -64,13 +64,13 @@ val dump_json: t -> Yojson.Basic.json -> unit
 val get_expr:
   t -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id)
-    Alg_expr.e Location.annot option
+    Alg_expr.e Locality.annot option
 val set_expr:
   t -> Ode_loggers_sig.variable ->
   (
     Ode_loggers_sig.ode_var_id,
     Ode_loggers_sig.ode_var_id)
-    Alg_expr.e Location.annot -> unit
+    Alg_expr.e Locality.annot -> unit
 val is_const:
   t -> Ode_loggers_sig.variable -> bool
 

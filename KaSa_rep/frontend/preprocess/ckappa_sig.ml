@@ -18,7 +18,7 @@ let local_trace = true
 
 (****************************************************************************)
 
-type position       = Location.t
+type position       = Locality.t
 type agent_name     = string
 type site_name      = string
 type internal_state = string
@@ -449,13 +449,13 @@ and link =
   | FREE
   | LNK_ANY   of position
   | LNK_SOME  of position
-  | LNK_TYPE  of (string Location.annot * string Location.annot)
+  | LNK_TYPE  of (string Locality.annot * string Locality.annot)
 
 let dummy_agent =
   {
     ag_nme = "" ;
     ag_intf = EMPTY_INTF ;
-    ag_nme_pos = Location.dummy
+    ag_nme_pos = Locality.dummy
   }
 
 let rename_link parameters error f link =
@@ -479,19 +479,19 @@ let join_link parameters error link1 link2 =
     | LNK_ANY _, _ -> error, link2
     | _, LNK_ANY _ -> error, link1
     | FREE, _ | _, FREE ->
-      Exception.warn parameters error __POS__ Exit (LNK_ANY Location.dummy)
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
     | LNK_SOME _, _ -> error, link2
     | _, LNK_SOME _ -> error, link1
     | LNK_TYPE ((a,_),(b,_)), LNK_TYPE ((a',_),(b',_)) when a=a' && b=b' ->
       error, link1
-    | LNK_TYPE _, LNK_TYPE _ -> Exception.warn parameters error __POS__ Exit (LNK_ANY Location.dummy)
+    | LNK_TYPE _, LNK_TYPE _ -> Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
     | LNK_VALUE(_,x,y,_,_), LNK_TYPE((a,_),(b,_)) when x=a && b=y -> error, link1
     | LNK_TYPE((a,_),(b,_)), LNK_VALUE(_,x,y,_,_) when x=a && b=y -> error, link2
     | LNK_VALUE(ag,x,y,ag1,_), LNK_VALUE(ag',x',y',ag1',_) when
         ag=ag' && x=x' && y=y' && ag1=ag1'
       -> error, link1
     | (LNK_VALUE _ | LNK_TYPE _ ), (LNK_VALUE _ | LNK_TYPE _ ) ->
-      Exception.warn parameters error __POS__ Exit (LNK_ANY Location.dummy)
+      Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
 
 let rename_port parameters error f port =
   let error, port_lnk = rename_link parameters error f port.port_lnk in
@@ -697,8 +697,8 @@ type 'mixture rule =
     lhs   : 'mixture;
     bidirectional : bool;
     rhs   : 'mixture;
-    k_def : ('mixture,string) Alg_expr.e Location.annot;
-    k_un  : ('mixture,string) Alg_expr.e Location.annot option
+    k_def : ('mixture,string) Alg_expr.e Locality.annot;
+    k_un  : ('mixture,string) Alg_expr.e Locality.annot option
   }
 
 type 'mixture perturbation = ('mixture,string) Ast.perturbation
@@ -902,7 +902,7 @@ type c_compil =
     c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)
     c_perturbations :
-      c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t
+      c_mixture Locality.annot perturbation Int_storage.Nearly_inf_Imperatif.t
   }
 
 let lift to_int from_int p =

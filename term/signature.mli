@@ -10,11 +10,11 @@
 
 type t (** Store of one agent *)
 
-val num_of_site : ?agent_name:string -> string Location.annot -> t -> int
+val num_of_site : ?agent_name:string -> string Locality.annot -> t -> int
 val site_of_num : int -> t -> string
 val fold : (int -> string -> 'a -> 'a) -> 'a -> t -> 'a
 
-val num_of_internal_state : int -> string Location.annot -> t -> int
+val num_of_internal_state : int -> string Locality.annot -> t -> int
 (** [num_of_internal_state site_id state_name sign] *)
 
 val internal_state_of_num : int -> int -> t -> string
@@ -22,9 +22,9 @@ val internal_state_of_num : int -> int -> t -> string
 type s (** Store of all the agents *)
 
 val create :
-  (string Location.annot *
+  (string Locality.annot *
    (unit NamedDecls.t *
-    (string Location.annot * string Location.annot) list) NamedDecls.t) array ->
+    (string Locality.annot * string Locality.annot) list) NamedDecls.t) array ->
   s
 
 val size : s -> int
@@ -37,14 +37,14 @@ val arity : s -> int -> int
 val max_arity : s -> int
 (** [max_arity sigs] returns max {arities sigs i} *)
 
-val num_of_agent : string Location.annot -> s -> int
+val num_of_agent : string Locality.annot -> s -> int
 
-val id_of_site : string Location.annot -> string Location.annot -> s -> int
+val id_of_site : string Locality.annot -> string Locality.annot -> s -> int
 (** [id_of_site agent_type site_name sigs] *)
 
 val id_of_internal_state :
-  string Location.annot -> string Location.annot ->
-  string Location.annot -> s -> int
+  string Locality.annot -> string Locality.annot ->
+  string Locality.annot -> s -> int
 (** [id_of_internal_state agent_type site_name state_name sigs] *)
 
 val internal_states_number : int -> int -> s -> int

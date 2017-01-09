@@ -18,7 +18,7 @@ sig
 
   type hidden_init
   type init =
-    ((connected_component array list,int) Alg_expr.e * hidden_init * Location.t) list
+    ((connected_component array list,int) Alg_expr.e * hidden_init * Locality.t) list
 
   val empty_cache: compil -> cache
   val empty_lkappa_cache: unit -> nauto_in_rules_cache
@@ -77,16 +77,16 @@ sig
   val lhs: compil -> rule_id_with_mode -> rule -> pattern
   val token_vector:
     rule ->
-    ((connected_component array list,int) Alg_expr.e Location.annot * int) list
+    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
   val consumed_tokens:
     rule ->
-    ((connected_component array list,int) Alg_expr.e Location.annot * int) list
+    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
   val produced_tokens:
     rule ->
-    ((connected_component array list,int) Alg_expr.e Location.annot * int) list
+    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
   val token_vector_of_init:
     hidden_init ->
-    ((connected_component array list,int) Alg_expr.e Location.annot * int) list
+    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
   val print_rule_id: Format.formatter -> rule_id -> unit
   val print_rule:
     ?compil:compil -> Format.formatter -> rule -> unit
@@ -96,7 +96,7 @@ sig
     ?compil:compil -> int -> string
   val rate:
     compil -> rule -> rule_id_with_mode ->
-    (connected_component array list,int) Alg_expr.e Location.annot option
+    (connected_component array list,int) Alg_expr.e Locality.annot option
   val rate_name:
     compil -> rule -> rule_id_with_mode -> rule_name
   val apply: compil -> rule -> embedding_forest -> mixture  -> mixture
@@ -111,7 +111,7 @@ sig
   val get_variables:
     compil ->
     (string *
-     (connected_component array list,int) Alg_expr.e Location.annot) array
+     (connected_component array list,int) Alg_expr.e Locality.annot) array
   val get_obs: compil -> (connected_component array list,int) Alg_expr.e list
 
   val get_obs_titles: compil -> string list

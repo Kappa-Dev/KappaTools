@@ -250,7 +250,7 @@ let apply_negative_transformation
   | Primitives.Transformation.PositiveInternalized _ ->
     raise
       (ExceptionDefn.Internal_Error
-         (Location.dummy_annot "PositiveInternalized in negative update"))
+         (Locality.dummy_annot "PositiveInternalized in negative update"))
   | Primitives.Transformation.NegativeInternalized ((id,_),s) ->
     let edges' = Edges.remove_internal id s edges in
     (side_effects,roots_by_cc,edges')
@@ -282,7 +282,7 @@ let apply_positive_transformation
   | Primitives.Transformation.NegativeWhatEver _ ->
     raise
       (ExceptionDefn.Internal_Error
-         (Location.dummy_annot "NegativeWhatEver in positive update"))
+         (Locality.dummy_annot "NegativeWhatEver in positive update"))
   | Primitives.Transformation.PositiveInternalized (n,s,i) ->
     let (id,_ as nc) = Matching.Agent.concretize inj2graph n in
     let edges' = Edges.add_internal id s i edges in
@@ -291,7 +291,7 @@ let apply_positive_transformation
   | Primitives.Transformation.NegativeInternalized _ ->
     raise
       (ExceptionDefn.Internal_Error
-         (Location.dummy_annot "NegativeInternalized in positive update"))
+         (Locality.dummy_annot "NegativeInternalized in positive update"))
 
 let obs_from_transformation domain edges acc = function
   | Primitives.Transformation.Agent nc ->

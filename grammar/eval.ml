@@ -147,7 +147,7 @@ let rules_of_ast
 
 let obs_of_result contact_map domain res =
   let time =
-    Location.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
+    Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
   match res.observables with
   | [] -> domain,[time]
   | _ :: _ ->
@@ -202,7 +202,7 @@ let rule_effect
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
       LKappa.r_rm_tokens = rm; LKappa.r_add_tokens = add;
-      LKappa.r_rate = Location.dummy_annot (Alg_expr.CONST Nbr.zero);
+      LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
       LKappa.r_un_rate = None; } in
   let (domain',alg_pos) =
     compile_alg contact_map domain alg_expr in
@@ -234,9 +234,9 @@ let effects_of_modif
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
   | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
     rule_effect contact_map domain
-      (Location.dummy_annot (Alg_expr.CONST (Nbr.one)))
+      (Locality.dummy_annot (Alg_expr.CONST (Nbr.one)))
       ([],[],
-       [Location.dummy_annot (Alg_expr.TOKEN_ID tk_id), tk_id],
+       [Locality.dummy_annot (Alg_expr.TOKEN_ID tk_id), tk_id],
        [(alg_expr, tk_id)])
       tk_pos rev_effects
   | SNAPSHOT pexpr ->
@@ -339,10 +339,10 @@ let inits_of_result ?rescale contact_map env preenv res =
          let alg = match rescale with
            | None -> alg
            | Some r ->
-             Location.dummy_annot
+             Locality.dummy_annot
                (Alg_expr.BIN_ALG_OP
                   (Operator.MULT,alg,
-                   Location.dummy_annot (Alg_expr.CONST (Nbr.F r)))) in
+                   Locality.dummy_annot (Alg_expr.CONST (Nbr.F r)))) in
          match init_t with
          | INIT_MIX ast,mix_pos ->
            let sigs = Model.signatures env in
@@ -351,7 +351,7 @@ let inits_of_result ?rescale contact_map env preenv res =
              { LKappa.r_mix = [];
                LKappa.r_created = LKappa.to_raw_mixture sigs ast;
                LKappa.r_rm_tokens = []; LKappa.r_add_tokens = [];
-               LKappa.r_rate = Location.dummy_annot (Alg_expr.CONST Nbr.zero);
+               LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
                LKappa.r_un_rate = None; } in
            let preenv'',state' =
              match
@@ -370,12 +370,12 @@ let inits_of_result ?rescale contact_map env preenv res =
            let fake_rule =
              { LKappa.r_mix = []; LKappa.r_created = []; LKappa.r_rm_tokens = [];
                LKappa.r_add_tokens = [(alg, tk_id)];
-               LKappa.r_rate = Location.dummy_annot (Alg_expr.CONST Nbr.zero);
+               LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
                LKappa.r_un_rate = None; } in
            match
              rules_of_ast
                contact_map preenv ~syntax_ref:0 []
-               (Location.dummy_annot fake_rule)
+               (Locality.dummy_annot fake_rule)
            with
            | domain'',_,_,[ compiled_rule ] ->
              (Alg_expr.CONST (Nbr.I 1),compiled_rule,pos_tk),domain''
@@ -532,7 +532,7 @@ let compile_rules alg_deps contact_map domain rules =
     failwith "The origin of Eval.compile_rules has been lost"
 
 (*let translate_contact_map sigs kasa_contact_map =
-  let wdl = Location.dummy_annot in
+  let wdl = Locality.dummy_annot in
   let sol = Array.init
       (Signature.size sigs)
       (fun i -> Array.make (Signature.arity sigs i) ([],[])) in

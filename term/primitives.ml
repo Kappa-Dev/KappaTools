@@ -90,24 +90,24 @@ module Transformation = struct
 end
 
 type elementary_rule = {
-  rate : Alg_expr.t Location.annot;
-  unary_rate : (Alg_expr.t Location.annot * Alg_expr.t option) option;
+  rate : Alg_expr.t Locality.annot;
+  unary_rate : (Alg_expr.t Locality.annot * Alg_expr.t option) option;
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
   fresh_bindings :
     (Instantiation.abstract Instantiation.site *
      Instantiation.abstract Instantiation.site) list;
-  consumed_tokens : (Alg_expr.t Location.annot * int) list;
-  injected_tokens : (Alg_expr.t Location.annot * int) list;
+  consumed_tokens : (Alg_expr.t Locality.annot * int) list;
+  injected_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
 }
 
 type modification =
-    ITER_RULE of Alg_expr.t Location.annot * elementary_rule
-  | UPDATE of int * Alg_expr.t Location.annot
+    ITER_RULE of Alg_expr.t Locality.annot * elementary_rule
+  | UPDATE of int * Alg_expr.t Locality.annot
   | SNAPSHOT of Alg_expr.t Ast.print_expr list
   | STOP of Alg_expr.t Ast.print_expr list
   | CFLOW of string option * Pattern.id array *
@@ -122,10 +122,10 @@ type modification =
 
 type perturbation =
   { precondition:
-      (Pattern.id array list,int) Alg_expr.bool Location.annot;
+      (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
-      Alg_expr.bool Location.annot option;
+      Alg_expr.bool Locality.annot option;
   }
 
 let exists_modification check l =

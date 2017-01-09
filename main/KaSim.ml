@@ -51,7 +51,7 @@ let finalize
     | _, Unix.WEXITED 127 ->
       raise
         (ExceptionDefn.Malformed_Decl
-           (Location.dummy_annot
+           (Locality.dummy_annot
               ("Executable '"^prog^"' can not be found to compute stories.")))
     | _, Unix.WEXITED n -> if n <> 0 then exit n
     | _, Unix.WSIGNALED n -> failwith ("Killed with signal "^string_of_int n)
@@ -222,7 +222,7 @@ let () =
                 let b' =
                   LKappa.bool_expr_of_ast
                     (Model.signatures env) (Model.tokens_finder env)
-                    (Model.algs_finder env) (Location.dummy_annot b) in
+                    (Model.algs_finder env) (Locality.dummy_annot b) in
                 let cc_preenv',(b'',pos_b'') =
                   Eval.compile_bool contact_map cc_preenv b' in
                 let env' =

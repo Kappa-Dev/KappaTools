@@ -33,7 +33,7 @@ let find_implicit_infos contact_map ags =
           (fun (free_id,ports,ags,cor) ->
              let () =
                ports.(i) <-
-                 (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+                 (Locality.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
              (succ free_id, ports, ags,
               (free_id,(p,a),or_ty,new_switch s)::cor))
           (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
@@ -45,7 +45,7 @@ let find_implicit_infos contact_map ags =
                   let ports' = Array.copy ports in
                   let () =
                     ports'.(i) <-
-                      (Location.dummy_annot
+                      (Locality.dummy_annot
                          (Ast.LNK_VALUE (free_id,(p,a))),s) in
                   (succ free_id, ports', ags,
                    (free_id,(p,a),or_ty,new_switch s)::cor))
@@ -74,14 +74,14 @@ let find_implicit_infos contact_map ags =
           (*List_util.map_flatten
             (fun (free_id,ports,ags,cor) ->
             let () = ports.(i) <-
-            (Location.dummy_annot Ast.FREE,
+            (Locality.dummy_annot Ast.FREE,
             if s = LKappa.Freed then LKappa.Maintained else s) in
             (free_id, ports, ags, cor) ::
             List.map
             (fun (a,p) ->
             let ports' = Array.copy ports in
             let () =
-            ports'.(i) <- (Location.dummy_annot
+            ports'.(i) <- (Locality.dummy_annot
             (Ast.LNK_VALUE (free_id,(p,a))),s) in
             (succ free_id, ports', ags,
             (free_id,(p,a),or_ty,new_switch s)::cor))
@@ -112,7 +112,7 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
                ports'.(i) <-
-                 (Location.dummy_annot
+                 (Locality.dummy_annot
                     (Ast.LNK_VALUE (id,dst_info)),p_switch) in
              ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                 LKappa.ra_ints = ag.LKappa.ra_ints;
@@ -123,7 +123,7 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
                ports'.(i) <-
-                 (Location.dummy_annot (Ast.LNK_VALUE (id,dst_info)),s) in
+                 (Locality.dummy_annot (Ast.LNK_VALUE (id,dst_info)),s) in
              ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                 LKappa.ra_ints = ag.LKappa.ra_ints;
                 LKappa.ra_erased = ag.LKappa.ra_erased;
@@ -140,7 +140,7 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
                let ports' = Array.copy ag.LKappa.ra_ports in
                let () = assert (x = dst_info) in
                let () = ports'.(i) <-
-                   (Location.dummy_annot (Ast.LNK_VALUE (id,x)),s) in
+                   (Locality.dummy_annot (Ast.LNK_VALUE (id,x)),s) in
                ({ LKappa.ra_type = ag.LKappa.ra_type; LKappa.ra_ports = ports';
                   LKappa.ra_ints = ag.LKappa.ra_ints;
                   LKappa.ra_erased = ag.LKappa.ra_erased;
@@ -156,10 +156,10 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
   let arity = Signature.arity sigs ty_id in
   let ports =
-    Array.make arity (Location.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
+    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
   let () = ports.(port) <-
-      (Location.dummy_annot (Ast.LNK_VALUE (link,dst_info)),switch) in
+      (Locality.dummy_annot (Ast.LNK_VALUE (link,dst_info)),switch) in
   { LKappa.ra_type = ty_id; LKappa.ra_ports = ports; LKappa.ra_ints = internals;
     LKappa.ra_erased = false; LKappa.ra_syntax = None;}
 
@@ -382,7 +382,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
   | [] ->
     begin match Mods.IntMap.root registered_links with
       | None -> (wk,transf,links_transf,instantiations,remains)
-      | Some (key,_) -> link_occurence_failure key Location.dummy
+      | Some (key,_) -> link_occurence_failure key Locality.dummy
     end
   | ag :: ag_l ->
     let (node,wk) = Pattern.new_node wk ag.LKappa.ra_type in
@@ -437,7 +437,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
             wk'' r_l c_l transf' l_t' re acc (succ site_id)
         | ((Ast.LNK_SOME | Ast.LNK_TYPE _),_),_ ->
           raise (ExceptionDefn.Internal_Error
-                   (Location.dummy_annot
+                   (Locality.dummy_annot
                       "Try to create the connected components of an ambiguous mixture."))
         | (Ast.LNK_VALUE (i,_),pos),s ->
           match Mods.IntMap.find_option i r_l with
@@ -510,7 +510,7 @@ let rec complete_with_creation
     begin match Mods.IntMap.root links_transf with
       | None -> List.rev_append actions create_actions,
                 (List.rev removed, List.rev added)
-      | Some (i,_) -> link_occurence_failure i Location.dummy
+      | Some (i,_) -> link_occurence_failure i Locality.dummy
     end
   | ag :: ag_l ->
     let place = Matching.Agent.Fresh (ag.Raw_mixture.a_type,fresh) in

@@ -347,7 +347,7 @@ let log_event id quarks event_kind steps =
                   | Instantiation.Bind _-> true
                 | Instantiation.Mod_internal _ | Instantiation.Remove _ ->
                    raise (ExceptionDefn.Internal_Error
-                            (Location.dummy_annot
+                            (Locality.dummy_annot
                                "init event has actions not allowed"))) actions
           | Event _ | Obs _ | Subs _ | Dummy _ -> false) steps in
      `List [`Int id; step_to_yojson stp ]

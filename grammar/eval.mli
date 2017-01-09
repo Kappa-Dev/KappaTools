@@ -10,15 +10,15 @@
 
 (*val init_kasa :
   Remanent_parameters_sig.called_from -> Signature.s ->
-  (string Location.annot * Ast.port list, Ast.mixture, string, Ast.rule)
+  (string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule)
     Ast.compil ->
   Primitives.contact_map * Export_to_KaSim.state
 *)
 val compile_bool:
   ?origin:Operator.rev_dep -> Signature.contact_map -> Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, int) Alg_expr.bool Location.annot ->
+  (LKappa.rule_mixture, int) Alg_expr.bool Locality.annot ->
   Pattern.PreEnv.t *
-  (Pattern.id array list,int) Alg_expr.bool Location.annot
+  (Pattern.id array list,int) Alg_expr.bool Locality.annot
 
 val compile_modifications_no_track:
   Signature.contact_map -> Pattern.PreEnv.t ->
@@ -29,7 +29,7 @@ val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * (bool*bool*bool) option *
           bool option * string (*cflowFormat*) * string option (*cflowFile*) *
-          (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
+          (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Signature.contact_map ->
   ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
@@ -39,5 +39,5 @@ val build_initial_state :
   return:(bool * Rule_interpreter.t * State_interpreter.t -> 'a) ->
   outputs:(Data.t -> unit) -> (int * Alg_expr.t) list -> Counter.t ->
   Model.t -> with_trace:bool -> store_distances:bool -> Random.State.t ->
-  (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
+  (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ->
   'a

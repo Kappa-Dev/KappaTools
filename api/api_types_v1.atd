@@ -2,11 +2,11 @@ type token = int
 type catalog = int list
 type code = string
 
-type position <ocaml predef module="Location"> =
+type position <ocaml predef module="Locality"> =
      { chr : int ;
        line : int }
 
-type range <ocaml predef module="Location"> =
+type range <ocaml predef module="Locality"> =
      { file : string ;
        from_position : position <json name="from"> ;
        to_position : position <json name="to"> }

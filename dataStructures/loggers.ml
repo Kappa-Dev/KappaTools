@@ -70,7 +70,7 @@ type t =
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
-    env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Location.annot VarMap.t ref ;
+    env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot VarMap.t ref ;
     const: VarSet.t ref;
     id_of_parameters: string VarMap.t ref
   }

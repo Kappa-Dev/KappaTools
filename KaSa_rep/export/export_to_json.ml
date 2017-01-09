@@ -16,7 +16,7 @@ sig
   type state
 
   val init:
-    ?compil:(string Location.annot * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil ->
+    ?compil:(string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil ->
     unit -> state
 
   val get_contact_map:

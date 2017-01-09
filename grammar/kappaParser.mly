@@ -8,9 +8,9 @@
 
 %{
   let add_pos x =
-    (x,Location.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
+    (x,Locality.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
   let rhs_pos i =
-  Location.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
+  Locality.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR AT TYPE LAR
@@ -122,7 +122,7 @@ instruction:
 			  ) mod_expr_list
 		     then
 		       ExceptionDefn.warning
-			 ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+			 ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
 					       (Parsing.symbol_end_pos ()))
 			 (fun f ->
 			  Format.pp_print_string
@@ -133,7 +133,7 @@ instruction:
     | PERT bool_expr DO effect_list UNTIL bool_expr
       /* backward compatibility */
 	   {ExceptionDefn.deprecated
-	      ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+	      ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
 				    (Parsing.symbol_end_pos ()))
 	      "perturbation"
 	      (fun f -> Format.pp_print_string
@@ -159,7 +159,7 @@ perturbation_declaration:
     | bool_expr DO effect_list {($1,$3)}
     | bool_expr SET effect_list
 		{ExceptionDefn.deprecated
-		   ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
 					 (Parsing.symbol_end_pos ()))
 		   "perturbation"
 		   (fun f -> Format.pp_print_string
@@ -224,7 +224,7 @@ variable_declaration:
     | LABEL non_empty_mixture
 	    {let () =
 	       ExceptionDefn.deprecated
-		~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+		~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
 				      (Parsing.symbol_end_pos ()))
 		 "variable"
 		 (fun f -> Format.pp_print_string
@@ -283,7 +283,7 @@ mixture:
 rule_expression:
     | rule_label lhs_rhs arrow lhs_rhs birate
 		 { let pos =
-		     Location.of_pos (Parsing.rhs_start_pos 2)
+		     Locality.of_pos (Parsing.rhs_start_pos 2)
 				     (Parsing.symbol_end_pos ()) in
 		   let (k2,k1,kback,kback1) = $5 in
 		   let lhs,token_l = $2 and rhs,token_r = $4 in
@@ -360,9 +360,9 @@ rate:
     | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3)}
     | alg_expr {($1,None)}
     | OP_CUR alg_with_radius CL_CUR
-      {(Location.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
+      {(Locality.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
     | alg_expr OP_CUR CL_CUR
-      {($1,Some (Location.dummy_annot (Alg_expr.CONST Nbr.zero),None))}
+      {($1,Some (Locality.dummy_annot (Alg_expr.CONST Nbr.zero),None))}
     ;
 
 alg_with_radius:

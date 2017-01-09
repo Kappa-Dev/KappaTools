@@ -45,7 +45,7 @@ let warn_with_exn parameters error_handler (file,line,_,_) ?message:(message="")
   let pos =
     match pos with
     | None -> ""
-    | Some s -> ", "^Location.to_string s
+    | Some s -> ", "^Locality.to_string s
   in
   warn_aux
     parameters error_handler
@@ -115,7 +115,7 @@ let lift_error_logs_for_KaSa f =
               string_opt exn (fun  () -> ())))
 
 let check_point
-    (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Location.t ->
+    (warn:Remanent_parameters_sig.parameters -> method_handler -> 'a -> ?message:string -> ?pos:Locality.t ->
      exn -> unit -> method_handler * unit)
     parameter error error' s ?message ?pos exn =
   if error==error'

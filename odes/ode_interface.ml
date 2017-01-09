@@ -7,7 +7,7 @@ type compil =
   {
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
-    init: (Alg_expr.t * Primitives.elementary_rule * Location.t) list ;
+    init: (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     rate_convention: Ode_args.rate_convention ;
     show_reactions: bool ;
     count: Ode_args.count ;
@@ -17,7 +17,7 @@ type compil =
 type cache = Pattern.PreEnv.t
 type nauto_in_rules_cache = LKappa_auto.cache
 type hidden_init = Primitives.elementary_rule
-type init = (Alg_expr.t * hidden_init * Location.t) list
+type init = (Alg_expr.t * hidden_init * Locality.t) list
 
 let get_init compil= compil.init
 
@@ -187,7 +187,7 @@ let token_vector a =
   in
   List.fold_left
     (fun token_vector (a,b) ->
-       (Location.dummy_annot (Alg_expr.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
+       (Locality.dummy_annot (Alg_expr.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
     add remove
 
 let consumed_tokens a = a.Primitives.consumed_tokens

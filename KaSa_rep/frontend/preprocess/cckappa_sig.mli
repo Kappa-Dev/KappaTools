@@ -202,7 +202,7 @@ type enriched_init =
   {
     e_init_factor     : (Ckappa_sig.mixture,string) Alg_expr.e;
     e_init_c_factor   : (mixture,string) Alg_expr.e;
-    e_init_string_pos : string Location.annot option;
+    e_init_string_pos : string Locality.annot option;
     e_init_mixture    : Ckappa_sig.mixture;
     e_init_c_mixture  : mixture
   }
@@ -219,7 +219,7 @@ type compil =
     rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
     (*rules (possibly named)*)
     observables :
-      (mixture,string) Alg_expr.e Location.annot Int_storage.Nearly_inf_Imperatif.t;
+      (mixture,string) Alg_expr.e Locality.annot Int_storage.Nearly_inf_Imperatif.t;
     (*list of patterns to plot*)
     init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)

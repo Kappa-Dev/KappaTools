@@ -376,7 +376,7 @@ let in_same_connected_component ag ag' graph =
   match graph.connected_component with
   | None ->
     raise (ExceptionDefn.Internal_Error
-             (Location.dummy_annot
+             (Locality.dummy_annot
                 "in_same_connected_component while not tracking ccs"))
   | Some ccs ->
     Mods.DynArray.get ccs ag = Mods.DynArray.get ccs ag'
@@ -385,7 +385,7 @@ let get_connected_component ag graph =
   match graph.connected_component with
   | None ->
     raise (ExceptionDefn.Internal_Error
-             (Location.dummy_annot
+             (Locality.dummy_annot
                 "get_connected_component while not tracking ccs"))
   | Some ccs -> Mods.DynArray.get ccs ag
 

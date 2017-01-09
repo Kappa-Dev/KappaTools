@@ -12,5 +12,5 @@ val get_compilation :
   ?unit:directive_unit -> ?max_sharing:bool -> Run_cli_args.t ->
   (Model.t * Signature.contact_map * int list *
    (bool*bool*bool) option * bool option * string * string option *
-   (Alg_expr.t * Primitives.elementary_rule * Location.t) list) *
+   (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) *
   Counter.t * (int * Alg_expr.t) list

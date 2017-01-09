@@ -16,7 +16,7 @@
 (**********************)
 
 type compilation =
-    ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule)
+    ((string Locality.annot) * Ast.port list, Ast.mixture, string, Ast.rule)
       Ast.compil
 
 type init =
