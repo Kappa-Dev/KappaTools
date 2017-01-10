@@ -153,14 +153,12 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
   match Renaming.add root1 root2 Renaming.empty with
   | None -> assert false
   | Some r ->
-    if
-      (* is_single_agent *)
+    let a_single_agent =
       Array.fold_left (fun b (l,i) -> b && i = -1 && l = UnSpec)
-        true (Mods.IntMap.find_default [||] root1 cc1.nodes) &&
+        true (Mods.IntMap.find_default [||] root1 cc1.nodes) ||
       Array.fold_left (fun b (l,i) -> b && i = -1 && l = UnSpec)
-        true (Mods.IntMap.find_default [||] root2 cc2.nodes)
-    then Some r
-    else aux false r [root1,root2]
+        true (Mods.IntMap.find_default [||] root2 cc2.nodes) in
+    aux a_single_agent r [root1,root2]
 
 (** @returns injection from a to b *)
 let equal a b =
@@ -361,10 +359,7 @@ let intersection renaming cc1 cc2 =
                     let (l1,i1) = nodes1.(k) in
                     ((if l1 = UnSpec then UnSpec else l2),
                      (if i1 = -1 then -1 else i2))) nodes2 in
-             if Array.fold_left
-                 (fun b (l,i) -> b && l = UnSpec && i < 0) true out
-             then acc
-             else (Mods.IntMap.add j out accn, j::l))
+             (Mods.IntMap.add j out accn, j::l))
       renaming (Mods.IntMap.empty,[]) in
   let nodes_by_type = Array.map
       (List.filter (fun a -> List.mem a image)) cc2.nodes_by_type in
@@ -921,56 +916,13 @@ let print ?domain ~with_id f id =
     let cc_id = if with_id then Some id else None in
     print_cc ~sigs:(Env.signatures env) ?cc_id f env.Env.domain.(id).Env.content
 
-let is_less_specific root1 cc1 root2 cc2 =
-  let rec aux rename = function
-    | [] -> Some rename
-    | (o,p)::todos ->
-      match Tools.array_fold_left2i
-              (fun _ c (lx,ix) (ly,iy) ->
-                 match c with
-                 | None -> c
-                 | Some (todo,ren) ->
-                   if (ix = -1 || ix = iy)
-                   then
-                     match lx, ly with
-                     | UnSpec, _ -> Some (todo,ren)
-                     | (Link _, Free| Free, Link _) -> None
-                     | Free, UnSpec
-                     | Link _, UnSpec -> None
-                     | Free, Free -> Some (todo,ren)
-                     | Link (n1,s1), Link (n2,s2) ->
-                       if s1 = s2 then
-                         if Renaming.mem n1 ren then
-                           if Renaming.apply ren n1 = n2
-                           then Some (todo,ren)
-                           else None
-                         else match Renaming.add n1 n2 ren with
-                           | None -> None
-                           | Some r' ->
-                             if find_ty cc1 n1 = find_ty cc2 n2
-                             then Some ((n1,n2)::todo,r')
-                             else None
-                       else None
-                   else None
-              )
-              (Some (todos,rename))
-              (Mods.IntMap.find_default [||] o cc1.nodes)
-              (Mods.IntMap.find_default [||] p cc2.nodes) with
-      | None -> None
-      | Some (todos',ren') -> aux ren' todos' in
-  match Renaming.add root1 root2 Renaming.empty with
-  | None -> assert false
-  | Some r ->
-   aux r [root1,root2]
-
-
 let embeddings_to_fully_specified domain a_id b =
   let a = domain.Env.domain.(a_id).Env.content in
   match find_root a with
   | None -> [Renaming.empty]
   | Some (h,ty) ->
     List.fold_left (fun acc ag ->
-      match is_less_specific  h a ag b with
+      match are_compatible ~strict:false h a ag b with
       | None -> acc
       | Some r -> r::acc) [] b.nodes_by_type.(ty)
 
