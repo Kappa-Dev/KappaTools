@@ -342,7 +342,7 @@ let add_path_to_tests path tests =
        (fun (x,y) -> Instantiation.Is_Bound_to (x,y)) path tests')
 
 let step_of_event counter = function
-  | Trace.INIT _,(_,(actions,_,_)) -> (Trace.Init actions)
+  | Trace.INIT _,e -> (Trace.Init e.Instantiation.actions)
   | Trace.OBS _,_ -> assert false
   | (Trace.RULE _ | Trace.PERT _ as k),x ->
     (Trace.Event (k,x,Counter.current_simulation_info counter))
@@ -351,16 +351,18 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
     ?path extra_side_effects rule outputs = function
   | None -> ()
   | Some _ ->
-    let (ctests,(ctransfs,cside_sites,csides)) =
-      Instantiation.concretize_event
-        inj2graph rule.Primitives.instantiations in
-    let cactions =
-      (ctransfs,cside_sites,List.rev_append extra_side_effects csides) in
-    let full_concrete_event =
-      match path with
-      | None -> ctests,cactions
-      | Some path ->
-        add_path_to_tests path ctests,cactions in
+    let cevent =
+      Instantiation.concretize_event inj2graph rule.Primitives.instantiations in
+    let full_concrete_event = {
+      Instantiation.tests = (match path with
+          | None -> cevent.Instantiation.tests
+          | Some path ->
+            add_path_to_tests path cevent.Instantiation.tests);
+      Instantiation.actions = cevent.Instantiation.actions;
+      Instantiation.side_effects_src = cevent.Instantiation.side_effects_src;
+      Instantiation.side_effects_dst = List.rev_append
+          extra_side_effects cevent.Instantiation.side_effects_dst;
+    } in
     let () =
       outputs (Data.TraceStep
                  (step_of_event counter (event_kind,full_concrete_event))) in

@@ -190,7 +190,8 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
            (fun (stop,state,state0) ->
               let value =
                 Rule_interpreter.value_alg counter state alg in
-              let actions,_,_ = snd compiled_rule.Primitives.instantiations in
+              let actions =
+                compiled_rule.Primitives.instantiations.Instantiation.actions in
               let creations_sort =
                 List.fold_left
                   (fun l -> function

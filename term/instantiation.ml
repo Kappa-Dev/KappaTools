@@ -40,9 +40,15 @@ type 'a binding_state =
   | BOUND_TYPE of binding_type
   | BOUND_to of 'a site
 
-type 'a event =
-  'a test list *
-  ('a action list * ('a site * 'a binding_state) list * 'a site list)
+type 'a event = {
+  tests : 'a test list;
+  actions : 'a action list;
+  side_effects_src : ('a site * 'a binding_state) list;
+  side_effects_dst :  'a site list;
+}
+
+let empty_event =
+  { tests = []; actions = []; side_effects_src = []; side_effects_dst = []; }
 
 let concretize_binding_state inj2graph = function
   | ANY -> ANY
@@ -76,16 +82,19 @@ let concretize_action inj2graph = function
   | Free (pl,s) -> Free (Matching.Agent.concretize inj2graph pl,s)
   | Remove pl -> Remove (Matching.Agent.concretize inj2graph pl)
 
-let concretize_event inj2graph (tests,(actions,kasa_side,kasim_side)) =
-  (List.rev_map (concretize_test inj2graph) tests,
-   (List.rev_map (concretize_action inj2graph) actions,
-    List.rev_map
-      (fun ((pl,s),b) ->
-         ((Matching.Agent.concretize inj2graph pl,s),
-          concretize_binding_state inj2graph b))
-      kasa_side,
-    List.rev_map
-      (fun (pl,s) -> (Matching.Agent.concretize inj2graph pl,s)) kasim_side))
+let concretize_event inj2graph e =
+  {
+    tests = List.rev_map (concretize_test inj2graph) e.tests;
+    actions = List.rev_map (concretize_action inj2graph) e.actions;
+    side_effects_src = List.rev_map
+        (fun ((pl,s),b) ->
+           ((Matching.Agent.concretize inj2graph pl,s),
+            concretize_binding_state inj2graph b))
+        e.side_effects_src;
+    side_effects_dst = List.rev_map
+        (fun (pl,s) -> (Matching.Agent.concretize inj2graph pl,s))
+        e.side_effects_dst;
+  }
 
 let subst_map_concrete_agent f (id,na as agent) =
   try if f id == id then agent else (f id,na)
@@ -172,16 +181,25 @@ let subst_agent_in_concrete_side_effect id id' x =
 let rename_abstract_side_effect id inj x =
   subst_map_agent_in_side_effect (Matching.Agent.rename id inj) x
 
-let subst_map_agent_in_event f (tests,(acs,kasa_side,kasim_side)) =
-  (List_util.smart_map (subst_map_agent_in_test f) tests,
-   (List_util.smart_map (subst_map_agent_in_action f) acs,
-    List_util.smart_map (subst_map_agent_in_side_effect f) kasa_side,
-    List_util.smart_map (subst_map_site f) kasim_side))
-let subst_map2_agent_in_event f f' (tests,(acs,kasa_side,kasim_side)) =
-  (List_util.smart_map (subst_map_agent_in_test f) tests,
-   (List_util.smart_map (subst_map2_agent_in_action f f') acs,
-    List_util.smart_map (subst_map_agent_in_side_effect f) kasa_side,
-    List_util.smart_map (subst_map_site f) kasim_side))
+let subst_map_agent_in_event f e =
+  {
+    tests = List_util.smart_map (subst_map_agent_in_test f) e.tests;
+    actions = List_util.smart_map (subst_map_agent_in_action f) e.actions;
+    side_effects_src =
+      List_util.smart_map (subst_map_agent_in_side_effect f) e.side_effects_src;
+    side_effects_dst =
+      List_util.smart_map (subst_map_site f) e.side_effects_dst;
+  }
+
+let subst_map2_agent_in_event f f' e =
+  {
+    tests = List_util.smart_map (subst_map_agent_in_test f) e.tests;
+    actions = List_util.smart_map (subst_map2_agent_in_action f f') e.actions;
+    side_effects_src =
+      List_util.smart_map (subst_map_agent_in_side_effect f) e.side_effects_src;
+    side_effects_dst =
+      List_util.smart_map (subst_map_site f) e.side_effects_dst;
+  }
 
 let subst_map_agent_in_concrete_event f x =
   subst_map_agent_in_event (subst_map_concrete_agent f) x
@@ -357,31 +375,36 @@ let binding_state_of_json f = function
   | `Assoc ["site", `Int s; "agent", ag] -> BOUND_to (f ag,s)
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect binding_state",x))
 
-let event_to_json f (tests,(actions,side_origin,side_dst)) =
+let event_to_json f e =
   `Assoc [
-    "tests", `List (List.map (test_to_json f) tests);
-    "actions", `List (List.map (action_to_json f) actions);
-    "side_effect_origins",
+    "tests", `List (List.map (test_to_json f) e.tests);
+    "actions", `List (List.map (action_to_json f) e.actions);
+    "side_effect_src",
     `List (List.map
              (fun (s,b) -> `List [quark_to_json f s; binding_state_to_json f b])
-             side_origin);
-    "side_effect_destinations", `List (List.map (quark_to_json f) side_dst)
+             e.side_effects_src);
+    "side_effect_dst", `List (List.map (quark_to_json f) e.side_effects_dst)
   ]
 let event_of_json f = function
   | `Assoc l as x when List.length l = 4 ->
     begin
-      try
-        ((match List.assoc "tests" l
-          with `List l -> List.map (test_of_json f) l | _ -> raise Not_found),
-         ((match List.assoc "actions" l
-           with `List l -> List.map (action_of_json f) l | _ -> raise Not_found),
-          (match List.assoc "side_effect_origins" l with
+      try {
+        tests =
+          (match List.assoc "tests" l
+           with `List l -> List.map (test_of_json f) l | _ -> raise Not_found);
+        actions =
+          (match List.assoc "actions" l
+           with `List l -> List.map (action_of_json f) l | _ -> raise Not_found);
+        side_effects_src =
+          (match List.assoc "side_effect_src" l with
            | `List l -> List.map (function
                | `List [s;b] -> (quark_of_json f s, binding_state_of_json f b)
                | _ -> raise Not_found) l
-           | _ -> raise Not_found),
-          (match List.assoc "side_effect_destinations" l
-           with `List l -> List.map (quark_of_json f) l | _ -> raise Not_found)))
+           | _ -> raise Not_found);
+        side_effects_dst =
+          (match List.assoc "side_effect_dst" l
+           with `List l -> List.map (quark_of_json f) l | _ -> raise Not_found);
+      }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect event",x))
     end

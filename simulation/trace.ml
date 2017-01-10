@@ -168,7 +168,7 @@ let print_side_effects ?env =
          (Instantiation.print_concrete_binding_state
             ?sigs:(Tools.option_map Model.signatures env)) state)
 
-let print_event ~compact ?env log (ev_kind,(tests,(actions,side_sites,_))) =
+let print_event ~compact ?env log (ev_kind,e) =
   let sigs = match env with
     | None -> None
     | Some env -> Some (Model.signatures env) in
@@ -177,9 +177,11 @@ let print_event ~compact ?env log (ev_kind,(tests,(actions,side_sites,_))) =
     Format.fprintf
       log "@[***Refined event:***@,* Kappa_rule %a Story encoding:%a%a%a@]"
       (print_event_kind ?env) ev_kind
-      (Pp.list Pp.empty (Instantiation.print_concrete_test ?sigs)) tests
-      (Pp.list Pp.empty (Instantiation.print_concrete_action ?sigs)) actions
-      (print_side_effects ?env) side_sites
+      (Pp.list Pp.empty (Instantiation.print_concrete_test ?sigs))
+      e.Instantiation.tests
+      (Pp.list Pp.empty (Instantiation.print_concrete_action ?sigs))
+      e.Instantiation.actions
+      (print_side_effects ?env) e.Instantiation.side_effects_src
 
 let print_obs ~compact ?env f (ev_kind,tests,_) =
   let sigs = match env with
@@ -262,20 +264,21 @@ let creation_of_actions op actions =
          | Instantiation.Bind_to _ | Instantiation.Free _
          | Instantiation.Remove _) -> l) [] actions
 let creation_of_step = function
-  | (Event (_,(_,(ac,_,_)),_) | Init ac) -> creation_of_actions fst ac
+  | (Event (_,{ Instantiation.actions = ac; _ },_)
+    | Init ac) -> creation_of_actions fst ac
   | Obs _ | Dummy _ | Subs _ -> []
 let has_creation_of_step x = creation_of_step x <> []
 
 let tests_of_step = function
   | Subs _ -> []
-  | Event (_,(y,(_,_,_)),_) -> y
+  | Event (_,e,_) -> e.Instantiation.tests
   | Init _ -> []
   | Obs (_,x,_) -> x
   | Dummy _ -> []
 
 let actions_of_step = function
   | Subs _ -> ([],[])
-  | Event (_,(_,(x,y,_)),_) -> (x,y)
+  | Event (_,e,_) -> (e.Instantiation.actions,e.Instantiation.side_effects_src)
   | Init y -> (y,[])
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
@@ -355,10 +358,12 @@ let log_event id quarks event_kind steps =
      let stp =
        List.find
          (function
-          | Event (ekind,(tests,(actions,_,_)),_) ->
+          | Event (ekind,e,_) ->
              (match ekind with
               | RULE rid' ->
-                 ((rid=rid')&&(check_event_quarks actions tests quarks))
+                ((rid=rid')&&
+                 (check_event_quarks
+                    e.Instantiation.actions e.Instantiation.tests quarks))
              | PERT _ | OBS _ | INIT _ -> false)
           | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
      `List [`Int id; step_to_yojson stp]
@@ -373,10 +378,12 @@ let log_event id quarks event_kind steps =
      let stp =
        List.find
          (function
-          | Event (ekind,(tests,(actions,_,_)),_) ->
+          | Event (ekind,e,_) ->
              (match ekind with
-              | PERT pert' ->((pert=pert')&&
-                                (check_event_quarks actions tests quarks))
+               | PERT pert' ->
+                 ((pert=pert')&&
+                  (check_event_quarks
+                     e.Instantiation.actions e.Instantiation.tests quarks))
               | OBS _ | INIT _ | RULE _ -> false)
           | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
      `List [`Int id; step_to_yojson stp]

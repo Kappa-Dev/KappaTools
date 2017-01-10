@@ -305,16 +305,20 @@ let add_extra_side_effects side_effects place refined =
 
 (* Deals with tests, erasure internal state change and release (but
    not binding)*)
-let make_instantiation
-    place links (tests,(actions,side_sites,side_effects)) ref_ports is_erased =
+let make_instantiation place links event ref_ports is_erased =
   function
-  | None ->
-    (tests,
-     (actions,side_sites,add_extra_side_effects side_effects place ref_ports))
+  | None -> {
+      Instantiation.tests = event.Instantiation.tests;
+      Instantiation.actions = event.Instantiation.actions;
+      Instantiation.side_effects_src = event.Instantiation.side_effects_src;
+      Instantiation.side_effects_dst = add_extra_side_effects
+          event.Instantiation.side_effects_dst place ref_ports;
+    }
   | Some (ports, ints) ->
-    let rec aux site_id tests actions side_sites side_effects links =
+    let rec aux site_id tests actions side_effects_src side_effects_dst links =
       if site_id >= Array.length ports
-      then (tests,(actions,side_sites,side_effects))
+      then { Instantiation.tests; Instantiation.actions;
+             Instantiation.side_effects_src; Instantiation.side_effects_dst }
       else
         let tests',actions' =
           match ints.(site_id) with
@@ -337,44 +341,47 @@ let make_instantiation
               match s with
               | LKappa.Maintained ->
                 add_freed_side_effect
-                  side_effects place site_id ref_ports.(site_id)
-              | LKappa.Erased | LKappa.Linked _ | LKappa.Freed -> side_effects in
+                  side_effects_dst place site_id ref_ports.(site_id)
+              | LKappa.Erased | LKappa.Linked _ | LKappa.Freed ->
+                side_effects_dst in
             tests', add_instantiation_free actions' place site_id s,
-            add_side_site side_sites Instantiation.ANY
+            add_side_site side_effects_src Instantiation.ANY
               place site_id s,
             side_effects',
             links
           | (Ast.FREE,_), s ->
             (Instantiation.Is_Free (place,site_id) :: tests'),
-            add_instantiation_free actions' place site_id s,side_sites,
-            side_effects, links
+            add_instantiation_free actions' place site_id s,side_effects_src,
+            side_effects_dst, links
           | (Ast.LNK_SOME,_), s ->
             Instantiation.Is_Bound (place,site_id) :: tests',
             add_instantiation_free actions' place site_id s,
-            add_side_site side_sites Instantiation.BOUND
+            add_side_site side_effects_src Instantiation.BOUND
               place site_id s,
-            side_effects, links
+            side_effects_dst, links
           | (Ast.LNK_TYPE (b,a),_),s ->
             Instantiation.Has_Binding_type ((place,site_id),(a,b))
             :: tests',
             add_instantiation_free actions' place site_id s,
             add_side_site
-              side_sites (Instantiation.BOUND_TYPE (a,b))
+              side_effects_src (Instantiation.BOUND_TYPE (a,b))
               place site_id s,
-            side_effects, links
+            side_effects_dst, links
           | (Ast.LNK_VALUE (i,_),_),s ->
             match Mods.IntMap.find_option i links with
             | Some x -> x :: tests',
                         add_instantiation_free actions' place site_id s,
-                        side_sites, side_effects, Mods.IntMap.remove i links
+                        side_effects_src, side_effects_dst,
+                        Mods.IntMap.remove i links
             | None ->
               tests', add_instantiation_free actions' place site_id s,
-              side_sites, side_effects, links in
+              side_effects_src, side_effects_dst, links in
         aux (succ site_id) tests'' actions'' side_sites' side_effects' links' in
-    aux 0 (Instantiation.Is_Here place :: tests)
+    aux 0 (Instantiation.Is_Here place :: event.Instantiation.tests)
       (if is_erased
-       then Instantiation.Remove place :: actions
-       else actions) side_sites side_effects links
+       then Instantiation.Remove place :: event.Instantiation.actions
+       else event.Instantiation.actions) event.Instantiation.side_effects_src
+      event.Instantiation.side_effects_dst links
 
 let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
     links_transf instantiations remains =
@@ -569,7 +576,6 @@ let connected_components_of_mixture created mix (env,origin) =
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
       let removed,added = transformations in
-      let tests,(actions,side_sites,side_effects) = instantiations in
       let actions' =
         List.fold_left
           (fun acs -> function
@@ -584,13 +590,14 @@ let connected_components_of_mixture created mix (env,origin) =
                 Primitives.Transformation.PositiveInternalized _ |
                 Primitives.Transformation.NegativeInternalized _ |
                 Primitives.Transformation.Agent _) -> acs)
-          actions added in
+          instantiations.Instantiation.actions added in
       let transformations' = (List.rev removed, List.rev added) in
       let actions'',transformations'' =
         complete_with_creation
           sigs transformations' links_transf [] actions' 0 created in
       ((origin,Tools.array_rev_of_list acc,
-        (tests,(actions'',side_sites,side_effects)), transformations''),
+        { instantiations with Instantiation.actions = actions'' },
+        transformations''),
        (env,Tools.option_map incr_origin origin))
     | h :: t ->
       let wk = Pattern.begin_new env in
@@ -613,8 +620,7 @@ let connected_components_of_mixture created mix (env,origin) =
              let p' = Matching.Agent.rename id inj p in
              if p == p' then x else ((p',s),b)) l_t in
       aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
-  in aux env ([],[]) ([],([],[],[]))
-    Mods.IntMap.empty [] 0 mix
+  in aux env ([],[]) Instantiation.empty_event Mods.IntMap.empty [] 0 mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
   add_implicit_infos
@@ -653,5 +659,5 @@ let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =
     connected_components_sum_of_ambiguous_rule
       contact_map env ?origin mix [] in
   (cc_env, List.map
-     (function _, l, (tests,_), ([],[]) -> l,tests
+     (function _, l, event, ([],[]) -> l,event.Instantiation.tests
              | _ -> assert false) rules)

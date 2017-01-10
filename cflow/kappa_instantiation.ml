@@ -85,7 +85,7 @@ module Cflow_linker =
     type internal_state  = int
 
     let get_kasim_side_effects = function
-      | Trace.Event ((_,(_,(_,_,a)),_)) -> a
+      | Trace.Event ((_,e,_)) -> e.Instantiation.side_effects_dst
       | Trace.Subs _ | Trace.Obs _ | Trace.Dummy _ | Trace.Init _ -> []
 
     let empty_side_effect = []
@@ -129,11 +129,18 @@ module Cflow_linker =
              let translate y = Mods.IntMap.find_default y y subs in
              match k with
              | Trace.Event (id,event,info) ->
-               let (tests,(actions,side_effects,kappa_side)) =
+               let event' =
                  PI.subst_map_agent_in_concrete_event translate event in
-               let kasim_side_effect = maybe_side_effect kappa_side in
+               let side_effects_dst =
+                 maybe_side_effect event'.Instantiation.side_effects_dst in
                Causal.record
-                 (id,(tests,(actions,side_effects,kasim_side_effect)),info)
+                 (id,{
+                     Instantiation.tests = event'.Instantiation.tests;
+                     Instantiation.actions = event'.Instantiation.actions;
+                     Instantiation.side_effects_src =
+                       event'.Instantiation.side_effects_src;
+                     Instantiation.side_effects_dst;
+                   },info)
                  counter env grid,
                empty_set,counter+1,Mods.IntMap.empty
              | Trace.Obs (id,tests,info) ->
@@ -412,7 +419,8 @@ module Cflow_linker =
                 match refined_step
                 with
                 | Trace.Init init -> convert_init remanent step_list init
-                | _ -> (refined_step::step_list,remanent))
+                | Trace.Subs _ | Trace.Obs _ | Trace.Dummy _ | Trace.Event _ ->
+                  (refined_step::step_list,remanent))
              ([],remanent)
              (List.rev refined_step_list))
 
@@ -423,7 +431,7 @@ module Cflow_linker =
           (fun (step_list,remanent) refined_step ->
              match refined_step with
              | Trace.Init init -> convert_init remanent step_list init
-             | Trace.Event (_,(_,(action,_,kasim_side)),_) ->
+             | Trace.Event (_,event,_) ->
                let remanent,set =
                  List.fold_left
                    (fun recur ->
@@ -435,9 +443,10 @@ module Cflow_linker =
                         bind site1 (bind site2 recur)
                       | PI.Free site -> unbind site recur
                       | PI.Remove _ -> recur )
-                   (remanent,AgentIdSet.empty) action in
+                   (remanent,AgentIdSet.empty) event.Instantiation.actions in
                let remanent,set =
-                 List.fold_right unbind kasim_side (remanent,set)
+                 List.fold_right unbind
+                   event.Instantiation.side_effects_dst (remanent,set)
                in
                ((AgentIdSet.fold
                    (fun id list ->

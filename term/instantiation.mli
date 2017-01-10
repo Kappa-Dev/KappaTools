@@ -45,13 +45,18 @@ type 'a binding_state =
   | BOUND_TYPE of binding_type
   | BOUND_to of 'a site
 
-type 'a event =
-  'a test list *
-    ('a action list * ('a site * 'a binding_state) list * 'a site list)
-(** (The tests asked by the user, (The modifications asked by the
-    user, the site of the agents mentioned by the users where trere is
-    a side effects, the site of agents not mentionned by the users
-    that have been freed by side effect)) *)
+type 'a event = {
+  tests : 'a test list; (** The tests written in the rule *)
+  actions : 'a action list; (** The modifications written in the rule *)
+  side_effects_src : ('a site * 'a binding_state) list
+(** the site of the agents mentioned in the rule where there is a side
+    effects *);
+  side_effects_dst : 'a site list
+(** the site of agents not mentionned in the rule that have been freed
+    by side effect *);
+}
+
+val empty_event : 'a event
 
 val rename_abstract_test :
   int -> Renaming.t -> abstract test -> abstract test

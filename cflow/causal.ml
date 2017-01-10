@@ -244,15 +244,15 @@ let add_tests grid event_number kind tests =
       aux (add site1 true atom_tested grid' event_number kind) q
   in aux grid tests
 
-let record (kind,(tests,(actions,_,side_effects)),_)
-    event_number env grid =
-  let grid = add_tests grid event_number kind tests in
-  let grid = add_actions env grid event_number kind actions in
+let record (kind,event,_) event_number env grid =
+  let grid = add_tests grid event_number kind event.Instantiation.tests in
+  let grid =
+    add_actions env grid event_number kind event.Instantiation.actions in
   List.fold_left
     (fun grid site ->
        add (fst site,-1) true atom_tested
          (add site true atom_modified grid event_number kind) event_number kind)
-    grid side_effects
+    grid event.Instantiation.side_effects_dst
 
 let record_obs (kind,tests,_) side_effects event_number grid =
   let grid = add_obs_eid event_number grid in
