@@ -7,6 +7,7 @@
 (******************************************************************************)
 
 val last : 'a list -> 'a
+val cons_option : 'a option -> 'a list -> 'a list
 val exists_uniq : ('a -> bool) -> 'a list -> bool
 val rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 val map_flatten : ('a -> 'b list) -> 'a list -> 'b list

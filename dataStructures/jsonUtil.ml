@@ -37,6 +37,7 @@ let to_list ?error_msg:(error_msg=build_msg "list") of_json = function
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error (error_msg,x))
     end
+  | `Null -> []
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
 let of_array to_json a =
@@ -44,7 +45,13 @@ let of_array to_json a =
 
 let to_array ?error_msg:(error_msg=build_msg "array") of_json = function
   | `List l -> Tools.array_map_of_list of_json l
+  | `Null -> [||]
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+let smart_assoc l =
+  `Assoc (List.rev (List.fold_left (fun acc -> function
+      | _,(`Null | `Assoc [] | `List []) -> acc
+      | x -> x::acc) [] l))
 
 let of_assoc to_json l =
   `Assoc (List.rev_map to_json (List.rev l))
@@ -61,6 +68,7 @@ let to_assoc
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error (error_msg,x))
     end
+  | `Null -> []
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
 

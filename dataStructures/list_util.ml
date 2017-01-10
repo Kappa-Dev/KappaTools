@@ -22,6 +22,11 @@ let rec last = function
   | [ x ] -> x
   | _ :: l -> last l
 
+let cons_option h t  =
+  match h with
+  | Some x -> x :: t
+  | None -> t
+
 let rec smart_filter f = function
   | t :: q as l ->
     let q' = smart_filter f q in
@@ -41,13 +46,9 @@ let mapi f l =
     | h :: q -> f i h :: aux_mapi (succ i) q in
   aux_mapi 0 l
 
-let map_option f l =
-  let rec aux_map_option = function
-    | [] -> []
-    | h :: q -> match f h with
-      | None -> aux_map_option q
-      | Some x -> x :: aux_map_option q in
-  aux_map_option l
+let rec map_option f = function
+  | [] -> []
+  | h :: q -> cons_option (f h) (map_option f q)
 
 let exists_uniq f l =
   let rec second = function

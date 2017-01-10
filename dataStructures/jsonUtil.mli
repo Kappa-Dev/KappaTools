@@ -31,6 +31,9 @@ val of_array: ('a -> Yojson.Basic.json) -> 'a array -> Yojson.Basic.json
 val to_array:
   ?error_msg:string -> (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a array
 
+val smart_assoc: (string * Yojson.Basic.json) list -> Yojson.Basic.json
+(** Do not put fields whose value is 'null', '[]' or '{}' *)
+
 val of_assoc:
   ('a  -> string * Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
 
@@ -62,7 +65,6 @@ val to_map:
   (Yojson.Basic.json -> 'key) ->
   (Yojson.Basic.json -> 'value) ->
   Yojson.Basic.json -> 'map
-
 
 val of_unix_label:
   UnixLabels.error -> Yojson.Basic.json

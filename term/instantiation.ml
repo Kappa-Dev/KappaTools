@@ -376,7 +376,7 @@ let binding_state_of_json f = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect binding_state",x))
 
 let event_to_json f e =
-  `Assoc [
+  JsonUtil.smart_assoc [
     "tests", `List (List.map (test_to_json f) e.tests);
     "actions", `List (List.map (action_to_json f) e.actions);
     "side_effect_src",
@@ -386,24 +386,28 @@ let event_to_json f e =
     "side_effect_dst", `List (List.map (quark_to_json f) e.side_effects_dst)
   ]
 let event_of_json f = function
-  | `Assoc l as x when List.length l = 4 ->
+  | `Assoc l as x when List.length l <= 4 ->
     begin
       try {
         tests =
-          (match List.assoc "tests" l
-           with `List l -> List.map (test_of_json f) l | _ -> raise Not_found);
+          (match Yojson.Basic.Util.member "tests" x
+           with `List l -> List.map (test_of_json f) l | `Null -> []
+              | _ -> raise Not_found);
         actions =
-          (match List.assoc "actions" l
-           with `List l -> List.map (action_of_json f) l | _ -> raise Not_found);
+          (match  Yojson.Basic.Util.member "actions" x
+           with `List l -> List.map (action_of_json f) l | `Null -> []
+              | _ -> raise Not_found);
         side_effects_src =
-          (match List.assoc "side_effect_src" l with
+          (match  Yojson.Basic.Util.member "side_effect_src" x with
            | `List l -> List.map (function
                | `List [s;b] -> (quark_of_json f s, binding_state_of_json f b)
                | _ -> raise Not_found) l
+           | `Null -> []
            | _ -> raise Not_found);
         side_effects_dst =
-          (match List.assoc "side_effect_dst" l
-           with `List l -> List.map (quark_of_json f) l | _ -> raise Not_found);
+          (match  Yojson.Basic.Util.member "side_effect_dst" x
+           with `List l -> List.map (quark_of_json f) l | `Null -> []
+              | _ -> raise Not_found);
       }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect event",x))

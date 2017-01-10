@@ -36,14 +36,14 @@ module Simulation_info = struct
   }
 
   let to_json f x =
-    `Assoc [
+    JsonUtil.smart_assoc [
       ("id",`Int x.story_id);
       ("time",`Float x.story_time);
       ("event",`Int x.story_event);
       ("profiling",f x.profiling_info)]
 
   let of_json f = function
-    | `Assoc l as x when List.length l = 4 ->
+    | `Assoc l as x when List.length l <= 4 ->
       begin
         try
           { story_id =
@@ -52,7 +52,7 @@ module Simulation_info = struct
                           with `Float i -> i | _ -> raise Not_found);
             story_event = (match List.assoc "event" l
                            with `Int i -> i | _ -> raise Not_found);
-            profiling_info = f (List.assoc "profiling" l)}
+            profiling_info = f (Yojson.Basic.Util.member "profiling" x)}
         with Not_found ->
           raise (Yojson.Basic.Util.Type_error ("Not a simulation_info",x))
       end
