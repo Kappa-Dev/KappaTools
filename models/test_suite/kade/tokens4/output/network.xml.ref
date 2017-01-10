@@ -31,29 +31,25 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <compartment metaid="default" id="default" size="1" units="volume"/>
 </listOfCompartments>
 <listOfSpecies>
-<species metaid="CMD12" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD13" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD8" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD9" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
 <parameter metaid="CMD4" id="tend" value="1." units="time"/>
 <parameter metaid="CMD5" id="period_t_point" value="0.1" units="time"/>
-<parameter metaid="CMD6" id="expo3_rate" value="1"/>
-<parameter metaid="CMD7" id="expo2_rate" value="1"/>
-<parameter metaid="CMD8" id="nT" value="10"/>
-<parameter metaid="CMD9" id="T" value="10"/>
-<parameter metaid="CMD10" id="t" value="1"/>
-<parameter metaid="CMD11" id="k1" value="1"/>
+<parameter metaid="CMD6" id="nT" value="10"/>
+<parameter metaid="CMD7" id="k1" value="1"/>
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : expo -->
 <!-- reaction: T() -> T() + T()  -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD14" species="s1"/>
+<speciesReference metaid="CMD10" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD15" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD11" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -66,22 +62,28 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction:  | ((|T()| + |t|) + nT):t ->  | 2.2:t  -->
 <reaction id="re2" name="expo3" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD16" species="t2" stoichiometry="2.2"/>
+<speciesReference metaid="CMD12" species="t2" stoichiometry="2.2"/>
 </listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD13" species="t2"/>
+</listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
-<ci> expo3_rate </ci></math>
+<ci>t2</ci></math>
 </kineticLaw>
 </reaction>
 <!-- rule    : expo2 -->
 <!-- reaction:  | |t|:t ->  | 2:t  -->
 <reaction id="re3" name="expo2" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD17" species="t2" stoichiometry="2"/>
+<speciesReference metaid="CMD14" species="t2" stoichiometry="2"/>
 </listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD15" species="t2"/>
+</listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
-<ci> expo2_rate </ci></math>
+<ci>t2</ci></math>
 </kineticLaw>
 </reaction>
 </listOfReactions>

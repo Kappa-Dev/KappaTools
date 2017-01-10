@@ -387,13 +387,14 @@ let rec print_alg_expr_in_sbml logger
          (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
   =
   match
-    Ode_loggers_sig.is_expr_alias alg_expr
+    Ode_loggers_sig.is_expr_alias alg_expr,
+    Ode_loggers_sig.is_expr_const alg_expr
   with
-  | Some x ->
+  | Some x, true ->
     Loggers.fprintf logger "<ci> %s </ci>"
       (Loggers.get_id_of_global_parameter
          logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
-  | None ->
+  | None, _ | Some _, false ->
     begin
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  ->
@@ -483,6 +484,85 @@ and
     let () = print_bool_expr_in_sbml logger b network in
     let () = Loggers.fprintf logger "</apply>" in
     ()
+
+let rec substance_expr_in_sbml logger
+    (alg_expr:
+       (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
+         Alg_expr.e Locality.annot
+    ) (network:
+         (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t)
+  =
+  match
+    Ode_loggers_sig.is_expr_alias alg_expr,
+    Ode_loggers_sig.is_expr_const alg_expr
+  with
+  | Some x, true ->
+    Mods.StringSet.singleton
+      (Loggers.get_id_of_global_parameter
+         logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
+  | None, _ | Some _, false ->
+    begin
+      match fst alg_expr with
+      | Alg_expr.CONST _
+      | Alg_expr.STATE_ALG_OP (Operator.CPUTIME)
+      | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
+      | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR)
+        ->
+        Mods.StringSet.empty
+      | Alg_expr.ALG_VAR x ->
+        begin
+          let id =
+            network.Network_handler.int_of_obs x
+          in
+          match
+            Loggers.get_expr logger (Ode_loggers_sig.Expr id)
+          with
+          | Some expr ->
+            substance_expr_in_sbml
+              logger
+              expr
+              network
+          | None ->(* TO DO *)
+            Mods.StringSet.empty
+        end
+      | Alg_expr.KAPPA_INSTANCE x ->
+        Mods.StringSet.singleton
+          ("s"^(string_of_int (network.Network_handler.int_of_kappa_instance x)))
+      | Alg_expr.TOKEN_ID x ->
+        Mods.StringSet.singleton
+          ("t"^(string_of_int (network.Network_handler.int_of_token_id x)))
+      | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
+        Mods.StringSet.singleton "tend"
+      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
+        Mods.StringSet.singleton "time"
+      | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
+        Mods.StringSet.singleton "event_max"
+      | Alg_expr.BIN_ALG_OP (op, a, b) ->
+        Mods.StringSet.union
+          (substance_expr_in_sbml logger a network)
+          (substance_expr_in_sbml logger b network)
+      | Alg_expr.UN_ALG_OP (op, a) ->
+        substance_expr_in_sbml logger a network
+      | Alg_expr.IF (cond, yes, no) ->
+        Mods.StringSet.union
+          (substance_bool_expr_in_sbml logger cond network)
+          (Mods.StringSet.union
+             (substance_expr_in_sbml logger yes network)
+             (substance_expr_in_sbml logger no network))
+    end
+and
+  substance_bool_expr_in_sbml logger cond network =
+  match fst cond with
+  | Alg_expr.TRUE
+  | Alg_expr.FALSE -> Mods.StringSet.empty
+  | Alg_expr.COMPARE_OP (_,a,b) ->
+    Mods.StringSet.union
+      (substance_expr_in_sbml logger a network)
+      (substance_expr_in_sbml logger b network)
+  | Alg_expr.BOOL_OP (_,a,b) ->
+  Mods.StringSet.union
+    (substance_bool_expr_in_sbml logger a network)
+    (substance_bool_expr_in_sbml logger b network)
 
 let rec maybe_time_dependent_alg_expr_in_sbml logger
     (alg_expr:
@@ -835,6 +915,21 @@ let dump_sbml_reaction
                   in
                   ())
          in
+         let expr_opt =
+           Loggers.get_expr logger var_rule in
+         let expr = unsome expr_opt in
+         let modifiers =
+           substance_expr_in_sbml
+             logger expr network
+         in
+         let modifiers =
+           List.fold_left
+             (fun set (a,_) ->
+                Mods.StringSet.remove ("s"^(string_of_int a)) set)
+             modifiers
+             reactants
+         in
+         (*
          let () =
            if maybe_time_dependent logger network var_rule
            then
@@ -849,7 +944,26 @@ let dump_sbml_reaction
                  let () = single_box ~options:(fun () -> s) logger "modifierSpeciesReference" in
                  ()
                 )
+         in*)
+         let () =
+           if Mods.StringSet.is_empty modifiers
+           then
+             ()
+           else
+           add_box ~break logger label_list_of_mods
+             (fun
+               logger ->
+               Mods.StringSet.iter
+                 (fun string ->
+                    let s =
+                 Format.sprintf
+                   "metaid=\"%s\" species=\"%s\""
+                 (meta_id_of_logger logger) string
+               in
+               let () = single_box ~options:(fun () -> s) logger "modifierSpeciesReference" in
+               ()) modifiers)
          in
+
          let () =
            add_box ~break logger "kineticLaw"
              (fun logger ->

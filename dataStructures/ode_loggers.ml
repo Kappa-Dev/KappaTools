@@ -556,9 +556,10 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
       | Ode_loggers_sig.Expr _ , true ->
         begin
           match
-            Ode_loggers_sig.is_expr_alias alg_expr
+            Ode_loggers_sig.is_expr_alias alg_expr,
+            Ode_loggers_sig.is_expr_const alg_expr
           with
-          | None ->
+          | None, true  ->
             print_sbml_parameters
               string_of_var_id
               logger
@@ -568,7 +569,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
                  logger
                  network_handler
                  alg_expr)
-          | Some _ -> ()
+          | Some _, _ | _, false -> ()
         end
         | (Ode_loggers_sig.Tinit |
          Ode_loggers_sig.Tend |

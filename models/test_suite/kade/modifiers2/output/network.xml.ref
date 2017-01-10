@@ -31,35 +31,34 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <compartment metaid="default" id="default" size="1" units="volume"/>
 </listOfCompartments>
 <listOfSpecies>
-<species metaid="CMD11" id="s1" name="U(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD12" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD13" id="s3" name="T(x!1), U(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD7" id="s1" name="U(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD8" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD9" id="s3" name="T(x!1), U(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
 <parameter metaid="CMD4" id="tend" value="1." units="time"/>
 <parameter metaid="CMD5" id="period_t_point" value="0.1" units="time"/>
 <parameter metaid="CMD6" id="nT" value="10"/>
-<parameter metaid="CMD7" id="unbind_rate" value="10"/>
-<parameter metaid="CMD8" id="T" value="10"/>
-<parameter metaid="CMD9" id="t" value="10"/>
-<parameter metaid="CMD10" id="qU" value="10"/>
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : unbind -->
 <!-- reaction: T(x!1), U(x!1) -> T(x) + U(x)  -->
 <reaction id="re1" name="unbind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD14" species="s3"/>
+<speciesReference metaid="CMD10" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD15" species="s1"/>
-<speciesReference metaid="CMD16" species="s2"/>
+<speciesReference metaid="CMD11" species="s1"/>
+<speciesReference metaid="CMD12" species="s2"/>
 </listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD13" species="s2"/>
+</listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> unbind_rate </ci><ci> s3 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><ci>s2</ci><ci>s3</ci></apply></apply><ci> s3 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -67,16 +66,19 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x) + U(x) -> T(x!1), U(x!1)  -->
 <reaction id="re2" name="bind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD17" species="s1"/>
-<speciesReference metaid="CMD18" species="s2"/>
+<speciesReference metaid="CMD14" species="s1"/>
+<speciesReference metaid="CMD15" species="s2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD19" species="s3"/>
+<speciesReference metaid="CMD16" species="s3"/>
 </listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD17" species="s3"/>
+</listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> qU </ci><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><ci>s1</ci><ci>s3</ci></apply></apply><apply>
 <times/><ci> s1 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
