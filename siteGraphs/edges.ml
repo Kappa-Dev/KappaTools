@@ -150,53 +150,49 @@ let copy graph =
        | Some ccs -> Some (Mods.DynArray.copy ccs));
   }
 
-let add_agent sigs ty graph =
+let add_agent ?id sigs ty graph =
   let ar = Signature.arity sigs ty in
   let al = Array.make ar None in
   let ai = Array.make ar None in
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  match graph.free_id with
-  | new_id,h :: t ->
-    let missings' = Tools.recti (fun a s -> Mods.Int2Set.add (h,s) a)
-        graph.missings ar in
-    let () = Mods.DynArray.set graph.connect h al in
-    let () = Mods.DynArray.set graph.state h ai in
-    let () = Mods.DynArray.set graph.sort h (Some ty) in
-    let () = match graph.connected_component with
-      | None -> ()
-      | Some ccs -> Mods.DynArray.set ccs h (Some h) in
-    h,
-    {
-      outdated = false;
-      connect = graph.connect;
-      missings = missings';
-      state = graph.state;
-      sort = graph.sort;
-      cache = graph.cache;
-      free_id = (new_id,t);
-      connected_component = graph.connected_component;
-    }
-  | new_id,[] ->
-    let missings' = Tools.recti (fun a s -> Mods.Int2Set.add (new_id,s) a)
-        graph.missings ar in
-    let () = Mods.DynArray.set graph.connect new_id al in
-    let () = Mods.DynArray.set graph.state new_id ai in
-    let () = Mods.DynArray.set graph.sort new_id (Some ty) in
-    let () = match graph.connected_component with
-      | None -> ()
-      | Some ccs -> Mods.DynArray.set ccs new_id (Some new_id) in
-    new_id,
-    {
-      outdated = false;
-      connect = graph.connect;
-      missings = missings';
-      state = graph.state;
-      sort = graph.sort;
-      cache = graph.cache;
-      free_id = (succ new_id,[]);
-      connected_component = graph.connected_component;
-    }
+  let h,free_id =
+    match id with
+    | Some id ->
+      (id,
+       let new_id,l = graph.free_id in
+       if id < new_id then
+         match List.partition (fun i -> i = id) l with
+         | [ _ ], t -> (new_id,t)
+         | _, _ ->
+           raise
+             (ExceptionDefn.Internal_Error
+                (Locality.dummy_annot "Try to add an agent with a non free id"))
+       else
+         (succ id, Tools.recti (fun acc k -> (k+new_id)::acc) l (id-new_id+1))
+      )
+    | None -> match graph.free_id with
+      | new_id,h :: t -> h,(new_id,t)
+      | new_id,[] -> new_id,(succ new_id,[]) in
+  let missings' = Tools.recti (fun a s -> Mods.Int2Set.add (h,s) a)
+      graph.missings ar in
+  let () = Mods.DynArray.set graph.connect h al in
+  let () = Mods.DynArray.set graph.state h ai in
+  let () = Mods.DynArray.set graph.sort h (Some ty) in
+  let () = match graph.connected_component with
+    | None -> ()
+    | Some ccs -> Mods.DynArray.set ccs h (Some h) in
+  h,
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = missings';
+    state = graph.state;
+    sort = graph.sort;
+    cache = graph.cache;
+    free_id;
+    connected_component = graph.connected_component;
+  }
 
 let add_free ag s graph =
   let () = assert (not graph.outdated) in
@@ -292,22 +288,26 @@ let get_internal ag s graph =
   | Some i -> i
   | None ->
     failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
-              " has no internal state to remove in the current graph.")
+              " has no internal state in the current graph.")
 
 let remove_internal ag s graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
+  let i = (Mods.DynArray.get graph.state ag).(s) in
   let () = (Mods.DynArray.get graph.state ag).(s) <- None in
-  {
-    outdated = false;
-    connect = graph.connect;
-    missings = graph.missings;
-    state = graph.state;
-    sort = graph.sort;
-    cache = graph.cache;
-    free_id = graph.free_id;
-    connected_component = graph.connected_component;
-  }
+  match i with
+    None -> assert false
+  | Some i ->
+    i, {
+      outdated = false;
+      connect = graph.connect;
+      missings = graph.missings;
+      state = graph.state;
+      sort = graph.sort;
+      cache = graph.cache;
+      free_id = graph.free_id;
+      connected_component = graph.connected_component;
+    }
 
 let remove_link ag s ag' s' graph =
   let () = assert (not graph.outdated) in

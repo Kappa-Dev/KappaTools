@@ -252,7 +252,7 @@ let apply_negative_transformation
       (ExceptionDefn.Internal_Error
          (Locality.dummy_annot "PositiveInternalized in negative update"))
   | Primitives.Transformation.NegativeInternalized ((id,_),s) ->
-    let edges' = Edges.remove_internal id s edges in
+    let _,edges' = Edges.remove_internal id s edges in
     (side_effects,roots_by_cc,edges')
 
 let apply_positive_transformation

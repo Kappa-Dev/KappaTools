@@ -15,8 +15,8 @@ val empty : with_connected_components : bool -> t
 val copy : t -> t
 (** You'd better NOT use that on the state of a simulation *)
 
-val add_agent : Signature.s -> int -> t -> int * t
-(** [add_agent sigs agent_type graph] *)
+val add_agent : ?id:int ->  Signature.s -> int -> t -> int * t
+(** [add_agent ?id sigs agent_type graph] *)
 
 val add_free : int -> int -> t -> t
 (** [add_free agent_id site graph] *)
@@ -30,7 +30,7 @@ val add_link : Agent.t -> int -> Agent.t -> int -> t -> t * (int*int) option
 
 val remove_agent : int -> t -> t
 val remove_free : int -> int -> t -> t
-val remove_internal : int -> int -> t -> t
+val remove_internal : int -> int -> t -> int * t
 val remove_link : int -> int -> int -> int -> t -> t * (int*int) option
 (** Some (i,j) as second returned element means separate "new" cc j from cc i *)
 
