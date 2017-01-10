@@ -246,7 +246,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
-<cn type="integer"> 6 </cn></math>
+<ci> k6 </ci></math>
 </kineticLaw>
 </reaction>
 <reaction id="re11" name="time advance" reversible="false" fast="false">

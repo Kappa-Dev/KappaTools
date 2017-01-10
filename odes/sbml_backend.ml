@@ -775,7 +775,7 @@ let dump_kinetic_law
   in
   match reactants with
   | [] ->
-    print_alg_expr_in_sbml string_of_var_id logger expr network
+    f logger 
   | _::_ ->
       add_box ~break logger "apply"
         (fun logger ->
