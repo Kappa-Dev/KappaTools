@@ -6,7 +6,7 @@ describe the API bottom-up.
 The folder dataStructures/ has a transparent name. You can find there:
 {!modules: DynamicArray SetMap Operator Nbr NamedDecls Locality}
 Some pretty printing utilities are here too:
-{!modules: Pp Pp_svg Pp_html}
+{!modules: Pp Pp_svg Pp_html Progress_report}
 Including the KaSa machinery:
 {!modules: Loggers Graph_loggers Ode_loggers}
 

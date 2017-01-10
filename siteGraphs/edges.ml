@@ -167,7 +167,9 @@ let add_agent ?id sigs ty graph =
          | _, _ ->
            raise
              (ExceptionDefn.Internal_Error
-                (Locality.dummy_annot "Try to add an agent with a non free id"))
+                (Locality.dummy_annot
+                   ("Try to add an agent with a the free id "
+                    ^string_of_int id)))
        else
          (succ id, Tools.recti (fun acc k -> (k+new_id)::acc) l (id-new_id+1))
       )
