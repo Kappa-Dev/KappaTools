@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jan 09 2017>
+  * Last modification: Time-stamp: <Jan 10 2017>
 *)
 
 type compil =
@@ -107,6 +107,20 @@ let lift_embedding x =
     (Matching.add_cc Matching.empty 0 x)
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
+
+(*let find_embeddings compil pattern species =
+  let () =
+    print_connected_component ~compil Format.std_formatter pattern
+  in
+  let () = Format.fprintf Format.std_formatter " into " in
+  let () =
+    print_chemical_species ~compil Format.std_formatter species
+  in
+  let l =
+    find_embeddings compil pattern species
+  in
+  let () = Format.fprintf Format.std_formatter "? embeddings: %i \n" (List.length l) in
+  l*)
 
 let find_embeddings_unary_binary compil p x =
   Tools.array_fold_lefti
