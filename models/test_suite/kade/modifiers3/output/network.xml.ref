@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- command line:  -->
+<!--       KaDE   modifiers.ka   -d   output   -l   1   -p   0.1    -ode-backend  SBML  -->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
+<model name="KaDe output:">
+<!--
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+
+init - the initial abundances of each species and token
+tinit - the initial simulation time (likely 0)
+tend - the final simulation time 
+initialstep - initial time step at the beginning of numerical integration
+period_t_point - the time period between points to return
+
+variables denote number of embeddings 
+rule rates are corrected by the number of automorphisms in the lhs of rules
+-->
+<listOfUnitDefinitions>
+<unitDefinition metaid="substance" id="substance" name="substance">
+<listOfUnits>
+<unit metaid="CMD2"  kind="mole"/>
+</listOfUnits>
+</unitDefinition>
+<unitDefinition metaid="volume" id="volume" name="volume">
+<listOfUnits>
+<unit metaid="CMD1" kind="litre"/>
+</listOfUnits>
+</unitDefinition>
+</listOfUnitDefinitions>
+<listOfCompartments>
+<compartment metaid="default" id="default" size="1" units="volume"/>
+</listOfCompartments>
+<listOfSpecies>
+<species metaid="CMD13" id="s1" name="U(x, y~u?)" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD14" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD15" id="s3" name="U(x, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD16" id="s4" name="T(x!1), U(x!1, y~u?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD17" id="s5" name="T(x!1), U(x!1, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+</listOfSpecies>
+<listOfParameters>
+<parameter metaid="CMD3" id="tinit" value="0." units="time"/>
+<parameter metaid="CMD4" id="tend" value="1." units="time"/>
+<parameter metaid="CMD5" id="period_t_point" value="0.1" units="time"/>
+<parameter metaid="CMD6" id="nT" value="10"/>
+<parameter metaid="CMD7" id="unbind_rate" value="10"/>
+<parameter metaid="CMD8" id="T" value="10"/>
+<parameter metaid="CMD9" id="t" value="10"/>
+<parameter metaid="CMD10" id="qU" value="10"/>
+<parameter metaid="CMD11" id="k1" value="1"/>
+<parameter metaid="CMD12" id="k2" value="1"/>
+</listOfParameters>
+<listOfReactions>
+<!-- rule    : bind -->
+<!-- reaction: T(x) + U(x, y~p?) -> T(x!1), U(x!1, y~p?)  -->
+<reaction id="re1" name="bind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD18" species="s2"/>
+<speciesReference metaid="CMD19" species="s3"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD20" species="s5"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> qU </ci><apply>
+<times/><ci> s3 </ci><ci> s2 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai -->
+<!-- reaction: U(x, y~p?) -> T(x)  -->
+<reaction id="re2" name="essai" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD21" species="s3"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD22" species="s2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s3 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : unbind -->
+<!-- reaction: T(x!1), U(x!1, y~p?) -> T(x) + U(x, y~p?)  -->
+<reaction id="re3" name="unbind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD23" species="s5"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD24" species="s2"/>
+<speciesReference metaid="CMD25" species="s3"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> unbind_rate </ci><ci> s5 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai -->
+<!-- reaction: T(x!1), U(x!1, y~p?) -> T(x) + T(x)  -->
+<reaction id="re4" name="essai" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD26" species="s5"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD27" species="s2" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s5 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : unbind -->
+<!-- reaction: T(x!1), U(x!1, y~u?) -> T(x) + U(x, y~u?)  -->
+<reaction id="re5" name="unbind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD28" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD29" species="s1"/>
+<speciesReference metaid="CMD30" species="s2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> unbind_rate </ci><ci> s4 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai2 -->
+<!-- reaction: T(x!1), U(x!1, y~u?) -> T(x!1), U(x!1, y~p?)  -->
+<reaction id="re6" name="essai2" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD31" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD32" species="s5"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k2 </ci><ci> s4 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai -->
+<!-- reaction: T(x!1), U(x!1, y~u?) -> T(x) + T(x)  -->
+<reaction id="re7" name="essai" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD33" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD34" species="s2" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s4 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : bind -->
+<!-- reaction: T(x) + U(x, y~u?) -> T(x!1), U(x!1, y~u?)  -->
+<reaction id="re8" name="bind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD35" species="s1"/>
+<speciesReference metaid="CMD36" species="s2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD37" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> qU </ci><apply>
+<times/><ci> s1 </ci><ci> s2 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai2 -->
+<!-- reaction: U(x, y~u?) -> U(x, y~p?)  -->
+<reaction id="re9" name="essai2" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD38" species="s1"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD39" species="s3"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k2 </ci><ci> s1 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai -->
+<!-- reaction: U(x, y~u?) -> T(x)  -->
+<reaction id="re10" name="essai" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD40" species="s1"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD41" species="s2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s1 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+</listOfReactions>
+</model>
+</sbml>
