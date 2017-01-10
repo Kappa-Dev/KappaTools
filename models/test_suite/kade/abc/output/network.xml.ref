@@ -66,7 +66,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="integer"> 1 </cn><ci> s6 </ci></apply>
+<times/><ci> mod_rate </ci><ci> s6 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -83,7 +83,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><apply>
+<times/><ci> on_rate </ci><apply>
 <times/><ci> s6 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -102,7 +102,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.100000 </cn><ci> s9 </ci></apply>
+<times/><ci> off_rate </ci><ci> s9 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -119,7 +119,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="integer"> 1 </cn><ci> s8 </ci></apply>
+<times/><ci> mod_rate </ci><ci> s8 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -136,7 +136,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><apply>
+<times/><ci> on_rate </ci><apply>
 <times/><ci> s8 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -155,7 +155,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><apply>
+<times/><ci> on_rate </ci><apply>
 <times/><ci> s2 </ci><ci> s7 </ci></apply>
 </apply>
 </math>
@@ -174,7 +174,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="integer"> 1 </cn><ci> s5 </ci></apply>
+<times/><ci> mod_rate </ci><ci> s5 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -191,7 +191,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.100000 </cn><ci> s5 </ci></apply>
+<times/><ci> off_rate </ci><ci> s5 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -208,7 +208,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><apply>
+<times/><ci> on_rate </ci><apply>
 <times/><ci> s4 </ci><ci> s1 </ci></apply>
 </apply>
 </math>
@@ -227,7 +227,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.100000 </cn><ci> s4 </ci></apply>
+<times/><ci> off_rate </ci><ci> s4 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -244,7 +244,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><cn type="real"> 0.001000 </cn><apply>
+<times/><ci> on_rate </ci><apply>
 <times/><ci> s2 </ci><ci> s3 </ci></apply>
 </apply>
 </math>

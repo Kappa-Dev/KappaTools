@@ -379,7 +379,7 @@ and eval_const_bool_expr logger network_handler expr =
         end
     end
 
-let rec print_alg_expr_in_sbml logger
+let rec print_alg_expr_in_sbml string_of_var_id logger
     (alg_expr:
        (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
          Alg_expr.e Locality.annot
@@ -412,10 +412,16 @@ let rec print_alg_expr_in_sbml logger
             Loggers.get_expr logger (Ode_loggers_sig.Expr id)
           with
           | Some expr ->
-            print_alg_expr_in_sbml
-              logger
-              expr
-              network
+            if Ode_loggers_sig.is_expr_const expr
+            then
+              Loggers.fprintf logger "<ci> %s </ci>"
+                (string_of_var_id id)
+            else
+              print_alg_expr_in_sbml
+                string_of_var_id
+                logger
+                expr
+                network
           | None ->
             Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
         end
@@ -442,28 +448,28 @@ let rec print_alg_expr_in_sbml logger
         let string_op = Loggers_string_of_op.string_of_bin_op logger op in
         let () = Loggers.fprintf logger "<apply>" in
         let () = Loggers.fprintf logger "%s" string_op in
-        let () = print_alg_expr_in_sbml logger a network in
-        let () = print_alg_expr_in_sbml logger b network in
+        let () = print_alg_expr_in_sbml string_of_var_id logger a network in
+        let () = print_alg_expr_in_sbml string_of_var_id logger b network in
         let () = Loggers.fprintf logger "</apply>" in
         ()
       | Alg_expr.UN_ALG_OP (op, a) ->
         let string_op = Loggers_string_of_op.string_of_un_op logger op in
         let () = Loggers.fprintf logger "<apply>" in
         let () = Loggers.fprintf logger "%s" string_op in
-        let () = print_alg_expr_in_sbml logger a network in
+        let () = print_alg_expr_in_sbml string_of_var_id logger a network in
         let () = Loggers.fprintf logger "</apply>" in
         ()
       | Alg_expr.IF (cond, yes, no) ->
         let () = Loggers.fprintf logger "<apply>" in
         let () = Loggers.fprintf logger "<if-then-else>"  in
-        let () = print_bool_expr_in_sbml logger cond network in
-        let () = print_alg_expr_in_sbml logger yes network in
-        let () = print_alg_expr_in_sbml logger no network in
+        let () = print_bool_expr_in_sbml string_of_var_id logger cond network in
+        let () = print_alg_expr_in_sbml string_of_var_id logger yes network in
+        let () = print_alg_expr_in_sbml string_of_var_id logger no network in
         let () = Loggers.fprintf logger "</apply>" in
         ()
     end
 and
-  print_bool_expr_in_sbml logger cond network =
+  print_bool_expr_in_sbml string_of_var_id logger cond network =
   match fst cond with
   | Alg_expr.TRUE -> Loggers.fprintf logger "<true/>"
   | Alg_expr.FALSE -> Loggers.fprintf logger "<false/>"
@@ -472,16 +478,16 @@ and
     let () =
       Loggers.fprintf logger "%s"
         (Loggers_string_of_op.string_of_compare_op logger op) in
-    let () = print_alg_expr_in_sbml logger a network in
-    let () = print_alg_expr_in_sbml logger b network in
+    let () = print_alg_expr_in_sbml string_of_var_id logger a network in
+    let () = print_alg_expr_in_sbml string_of_var_id logger b network in
     let () = Loggers.fprintf logger "</apply>" in
     ()
   | Alg_expr.BOOL_OP (op,a,b) ->
     let () = Loggers.fprintf logger "<apply>" in
     let () = Loggers.fprintf logger "%s"
         (Loggers_string_of_op.string_of_bool_op logger op) in
-    let () = print_bool_expr_in_sbml logger a network in
-    let () = print_bool_expr_in_sbml logger b network in
+    let () = print_bool_expr_in_sbml string_of_var_id logger a network in
+    let () = print_bool_expr_in_sbml string_of_var_id logger b network in
     let () = Loggers.fprintf logger "</apply>" in
     ()
 
@@ -719,7 +725,7 @@ let maybe_time_dependent logger network var_rule =
 
 
 let dump_kinetic_law
-    logger network reactants var_rule correct =
+    string_of_var_id logger network reactants var_rule correct =
   do_sbml logger
     (fun logger  ->
        begin
@@ -765,11 +771,11 @@ let dump_kinetic_law
                 expr,
                 Locality.dummy_annot (Alg_expr.CONST (Nbr.I correct))))
       in
-      print_alg_expr_in_sbml logger expr network
+      print_alg_expr_in_sbml string_of_var_id logger expr network
   in
   match reactants with
   | [] ->
-    print_alg_expr_in_sbml logger expr network
+    print_alg_expr_in_sbml string_of_var_id logger expr network
   | _::_ ->
       add_box ~break logger "apply"
         (fun logger ->
@@ -857,6 +863,7 @@ let dump_reactants_of_token_vector logger network_handler token_vector =
 
 
 let dump_sbml_reaction
+    string_of_var_id
     get_rule
     print_rule_name
     compil
@@ -973,9 +980,10 @@ let dump_sbml_reaction
                       " xmlns=\"http://www.w3.org/1998/Math/MathML\"")
                   logger "math"
                   (fun logger ->
-                dump_kinetic_law
-                  logger network
-                   reactants var_rule correct)
+                     dump_kinetic_law
+                       string_of_var_id
+                       logger network
+                       reactants var_rule correct)
              )
          in
          ()

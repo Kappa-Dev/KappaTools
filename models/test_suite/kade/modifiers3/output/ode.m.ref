@@ -46,7 +46,6 @@ global kun
 global kdun
 
 k(1)=1; % essai
-k(2)=1; % essai2
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -153,6 +152,7 @@ var(4)=(1*y(2));
 var(3)=(1*(y(1)+y(3)));
 var(2)=(1*(((y(1)+y(3))+y(4))+y(5)));
 
+k(2)=var(1);
 k(3)=var(2);
 k(4)=var(5);
 

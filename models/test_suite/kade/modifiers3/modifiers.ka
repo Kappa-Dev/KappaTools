@@ -8,7 +8,7 @@
 %init: 'nT' U()
 
 'essai' U() -> T() @ 1
-'essai2' U(y~u) -> U(y~p) @1
+'essai2' U(y~u) -> U(y~p) @ 'nT'
 'bind' U(x),T(x) -> U(x!1),T(x!1)   @ 'qU'
 'unbind' U(x!1),T(x!1) -> U(x),T(x) @ |T(x?)|
 

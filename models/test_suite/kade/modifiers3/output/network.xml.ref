@@ -31,11 +31,11 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <compartment metaid="default" id="default" size="1" units="volume"/>
 </listOfCompartments>
 <listOfSpecies>
-<species metaid="CMD9" id="s1" name="U(x, y~u?)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD10" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD11" id="s3" name="U(x, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD12" id="s4" name="T(x!1), U(x!1, y~u?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD13" id="s5" name="T(x!1), U(x!1, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD8" id="s1" name="U(x, y~u?)" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD9" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD10" id="s3" name="U(x, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD11" id="s4" name="T(x!1), U(x!1, y~u?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD12" id="s5" name="T(x!1), U(x!1, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -43,23 +43,22 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <parameter metaid="CMD5" id="period_t_point" value="0.1" units="time"/>
 <parameter metaid="CMD6" id="nT" value="10"/>
 <parameter metaid="CMD7" id="k1" value="1"/>
-<parameter metaid="CMD8" id="k2" value="1"/>
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : bind -->
 <!-- reaction: T(x) + U(x, y~p?) -> T(x!1), U(x!1, y~p?)  -->
 <reaction id="re1" name="bind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD14" species="s2"/>
-<speciesReference metaid="CMD15" species="s3"/>
+<speciesReference metaid="CMD13" species="s2"/>
+<speciesReference metaid="CMD14" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD16" species="s5"/>
+<speciesReference metaid="CMD15" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD17" species="s1"/>
-<modifierSpeciesReference metaid="CMD18" species="s4"/>
-<modifierSpeciesReference metaid="CMD19" species="s5"/>
+<modifierSpeciesReference metaid="CMD16" species="s1"/>
+<modifierSpeciesReference metaid="CMD17" species="s4"/>
+<modifierSpeciesReference metaid="CMD18" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -74,10 +73,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: U(x, y~p?) -> T(x)  -->
 <reaction id="re2" name="essai" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD20" species="s3"/>
+<speciesReference metaid="CMD19" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD21" species="s2"/>
+<speciesReference metaid="CMD20" species="s2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -90,15 +89,15 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x!1), U(x!1, y~p?) -> T(x) + U(x, y~p?)  -->
 <reaction id="re3" name="unbind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD22" species="s5"/>
+<speciesReference metaid="CMD21" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD23" species="s2"/>
-<speciesReference metaid="CMD24" species="s3"/>
+<speciesReference metaid="CMD22" species="s2"/>
+<speciesReference metaid="CMD23" species="s3"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD25" species="s2"/>
-<modifierSpeciesReference metaid="CMD26" species="s4"/>
+<modifierSpeciesReference metaid="CMD24" species="s2"/>
+<modifierSpeciesReference metaid="CMD25" species="s4"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -111,10 +110,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x!1), U(x!1, y~p?) -> T(x) + T(x)  -->
 <reaction id="re4" name="essai" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD27" species="s5"/>
+<speciesReference metaid="CMD26" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD28" species="s2" stoichiometry="2"/>
+<speciesReference metaid="CMD27" species="s2" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -127,15 +126,15 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x!1), U(x!1, y~u?) -> T(x) + U(x, y~u?)  -->
 <reaction id="re5" name="unbind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD29" species="s4"/>
+<speciesReference metaid="CMD28" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD30" species="s1"/>
-<speciesReference metaid="CMD31" species="s2"/>
+<speciesReference metaid="CMD29" species="s1"/>
+<speciesReference metaid="CMD30" species="s2"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD32" species="s2"/>
-<modifierSpeciesReference metaid="CMD33" species="s5"/>
+<modifierSpeciesReference metaid="CMD31" species="s2"/>
+<modifierSpeciesReference metaid="CMD32" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -148,15 +147,15 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x!1), U(x!1, y~u?) -> T(x!1), U(x!1, y~p?)  -->
 <reaction id="re6" name="essai2" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD34" species="s4"/>
+<speciesReference metaid="CMD33" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD35" species="s5"/>
+<speciesReference metaid="CMD34" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k2 </ci><ci> s4 </ci></apply>
+<times/><ci> nT </ci><ci> s4 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -164,10 +163,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x!1), U(x!1, y~u?) -> T(x) + T(x)  -->
 <reaction id="re7" name="essai" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD36" species="s4"/>
+<speciesReference metaid="CMD35" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD37" species="s2" stoichiometry="2"/>
+<speciesReference metaid="CMD36" species="s2" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -180,16 +179,16 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T(x) + U(x, y~u?) -> T(x!1), U(x!1, y~u?)  -->
 <reaction id="re8" name="bind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD38" species="s1"/>
-<speciesReference metaid="CMD39" species="s2"/>
+<speciesReference metaid="CMD37" species="s1"/>
+<speciesReference metaid="CMD38" species="s2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD40" species="s4"/>
+<speciesReference metaid="CMD39" species="s4"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD41" species="s3"/>
-<modifierSpeciesReference metaid="CMD42" species="s4"/>
-<modifierSpeciesReference metaid="CMD43" species="s5"/>
+<modifierSpeciesReference metaid="CMD40" species="s3"/>
+<modifierSpeciesReference metaid="CMD41" species="s4"/>
+<modifierSpeciesReference metaid="CMD42" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -204,15 +203,15 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: U(x, y~u?) -> U(x, y~p?)  -->
 <reaction id="re9" name="essai2" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD44" species="s1"/>
+<speciesReference metaid="CMD43" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD45" species="s3"/>
+<speciesReference metaid="CMD44" species="s3"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k2 </ci><ci> s1 </ci></apply>
+<times/><ci> nT </ci><ci> s1 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -220,10 +219,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: U(x, y~u?) -> T(x)  -->
 <reaction id="re10" name="essai" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD46" species="s1"/>
+<speciesReference metaid="CMD45" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD47" species="s2"/>
+<speciesReference metaid="CMD46" species="s2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">

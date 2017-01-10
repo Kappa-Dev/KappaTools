@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jan 09 2017>
+  * Last modification: Time-stamp: <Jan 10 2017>
 *)
 
 let local_trace = false
@@ -1146,7 +1146,7 @@ struct
     then
       Ode_loggers.associate ~init_mode ~comment string_of_var logger logger_buffer  (Ode_loggers_sig.Init x)
     else
-      Ode_loggers.increment ~init_mode ~comment logger (Ode_loggers_sig.Init x)
+      Ode_loggers.increment ~init_mode ~comment string_of_var logger (Ode_loggers_sig.Init x)
 
   let affect_var is_zero ?init_mode:(init_mode=false) logger logger_buffer compil network decl =
     let handler_expr = handler_expr network in
@@ -1531,6 +1531,7 @@ struct
            in
            let () =
              Sbml_backend.dump_sbml_reaction
+               (I.string_of_var_id ~compil)
                get_rule
                I.print_rule_name
                (Some compil)
@@ -1561,6 +1562,7 @@ struct
              List.iter
                (fun (expr,(token,_loc)) ->
                   Ode_loggers.update_token
+                    (I.string_of_var_id ~compil)
                     logger
                     (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
                     (var_of_rule enriched_rule)

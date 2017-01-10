@@ -297,7 +297,7 @@ let is_fun _logger op =
   | Operator.INT-> true
 
 
-let rec print_alg_expr ?init_mode logger alg_expr network_handler  =
+let rec print_alg_expr ?init_mode string_of_var_id logger alg_expr network_handler  =
   let var = match init_mode with
     | None -> "y"
     | Some init_mode -> if init_mode then "init" else "y" in
@@ -336,24 +336,24 @@ let rec print_alg_expr ?init_mode logger alg_expr network_handler  =
           with
           | INFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr ?init_mode logger a network_handler in
+            let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
             let () = Loggers.fprintf logger "%s" string_op in
-            let () = print_alg_expr ?init_mode logger b network_handler in
+            let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
             let () = Loggers.fprintf logger ")" in
             ()
           | PREFIX ->
             let () = Loggers.fprintf logger "%s" string_op in
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr ?init_mode logger a network_handler in
+            let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr ?init_mode logger b network_handler in
+            let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
             let () = Loggers.fprintf logger ")" in
             ()
           | POSTFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr ?init_mode logger a network_handler in
+            let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr ?init_mode logger b network_handler in
+            let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
             let () = Loggers.fprintf logger ")" in
             let () = Loggers.fprintf logger "%s" string_op in
             ()
@@ -364,24 +364,24 @@ let rec print_alg_expr ?init_mode logger alg_expr network_handler  =
         let string_op = Loggers_string_of_op.string_of_un_op logger op in
         let () = Loggers.fprintf logger "%s" string_op in
         let () = if is_fun logger op then Loggers.fprintf logger "(" in
-        let () = print_alg_expr ?init_mode logger a network_handler in
+        let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
         let () = if is_fun logger op then Loggers.fprintf logger ")" in
         let () = Loggers.fprintf logger ")" in
         ()
       | Alg_expr.IF (cond, yes, no) ->
         let () = Loggers.fprintf logger "merge(" in
-        let () = print_bool_expr ?init_mode logger cond network_handler in
+        let () = print_bool_expr ?init_mode string_of_var_id logger cond network_handler in
         let () = Loggers.fprintf logger "," in
-        let () = print_alg_expr ?init_mode logger yes network_handler in
+        let () = print_alg_expr ?init_mode string_of_var_id logger yes network_handler in
         let () = Loggers.fprintf logger "," in
-        let () = print_alg_expr ?init_mode logger no network_handler in
+        let () = print_alg_expr ?init_mode string_of_var_id logger no network_handler in
         let () = Loggers.fprintf logger ")" in
             ()
     end
   | Loggers.SBML ->
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
     let () =
-      Sbml_backend.print_alg_expr_in_sbml logger alg_expr
+      Sbml_backend.print_alg_expr_in_sbml string_of_var_id logger alg_expr
         network_handler in
     let () = Loggers.fprintf logger "</math>" in
     ()
@@ -390,7 +390,7 @@ let rec print_alg_expr ?init_mode logger alg_expr network_handler  =
   | Loggers.DOT
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
-and print_bool_expr ?init_mode logger expr network_handler =
+and print_bool_expr ?init_mode string_of_var_id logger expr network_handler =
  match Loggers.get_encoding_format logger with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
@@ -400,22 +400,22 @@ and print_bool_expr ?init_mode logger expr network_handler =
       | Alg_expr.COMPARE_OP (op,a,b) ->
         let () = Loggers.fprintf logger "(" in
         let () =
-          print_alg_expr ?init_mode logger a network_handler in
+          print_alg_expr ?init_mode string_of_var_id logger a network_handler in
         let () = Loggers.fprintf logger "%s" (Loggers_string_of_op.string_of_compare_op logger op) in
-        let () = print_alg_expr ?init_mode logger b network_handler in
+        let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
         let () = Loggers.fprintf logger ")" in
         ()
       | Alg_expr.BOOL_OP (op,a,b) ->
         let () = Loggers.fprintf logger "(" in
-        let () = print_bool_expr ?init_mode logger a network_handler in
+        let () = print_bool_expr ?init_mode string_of_var_id logger a network_handler in
         let () = Loggers.fprintf logger "%s" (Loggers_string_of_op.string_of_bool_op logger op) in
-        let () = print_bool_expr ?init_mode logger b network_handler in
+        let () = print_bool_expr ?init_mode string_of_var_id logger b network_handler in
         let () = Loggers.fprintf logger ")" in
         ()
     end
   | Loggers.SBML ->
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
-    let () = Sbml_backend.print_bool_expr_in_sbml logger expr network_handler in
+    let () = Sbml_backend.print_bool_expr_in_sbml string_of_var_id logger expr network_handler in
     let () = Loggers.fprintf logger "</math>" in ()
   | Loggers.Maple -> ()
   | Loggers.Json
@@ -543,7 +543,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.Matlab  | Loggers.Octave ->
     begin
       let () = Loggers.fprintf logger "%s=" (Ode_loggers_sig.string_of_variable variable) in
-      let () = print_alg_expr ~init_mode logger alg_expr network_handler in
+      let () = print_alg_expr ~init_mode string_of_var_id logger alg_expr network_handler in
       let () = Loggers.fprintf logger ";" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
@@ -661,7 +661,7 @@ let init_time logger n =
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let increment ?init_mode:(init_mode=false) ?comment:(comment="") logger variable alg_expr network =
+let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_id logger variable alg_expr network =
   match
     Loggers.get_encoding_format logger
   with
@@ -669,7 +669,7 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") logger variable
     begin
       let var = Ode_loggers_sig.string_of_variable variable in
       let () = Loggers.fprintf logger "%s=%s+(" var var in
-      let () = print_alg_expr ~init_mode logger alg_expr network in
+      let () = print_alg_expr ~init_mode string_of_var_id logger alg_expr network in
       let () = Loggers.fprintf logger ");" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
@@ -747,7 +747,7 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
 let consume = gen "-"
 let produce = gen "+"
 
-let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
+let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler =
   match
     Loggers.get_encoding_format logger
   with
@@ -778,7 +778,7 @@ let update_token logger var_token ~nauto_in_lhs var_rate expr var_list handler =
           var_list
       in
       let () = Loggers.fprintf logger "*(" in
-      let () = print_alg_expr logger expr handler in
+      let () = print_alg_expr string_of_var_id logger expr handler in
       let () = Loggers.fprintf logger ");" in
       let () = Loggers.print_newline logger in
       ()
