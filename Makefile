@@ -252,7 +252,7 @@ ifeq ($(OCAMLBEST),native)
 endif
 
 install-lib:
-	ocamlfind install KappaLib META _build/KappaLib.cma $(wildcard _build/*/*.cmi) $(wildcard _build/*/*.mli) -optional _build/KappaLib.cmxa _build/KappaLib.a
+	ocamlfind install KappaLib META _build/KappaLib.cma $(wildcard _build/*/*.cmi) $(wildcard _build/*/*.mli) -optional _build/KappaLib.cmxa _build/KappaLib.a $(wildcard _build/*/*.cmx)
 
 clean_ide:
 	rm -f StdSim bin/StdSim
