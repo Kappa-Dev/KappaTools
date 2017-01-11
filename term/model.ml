@@ -48,6 +48,13 @@ let get_rule env i = env.rules.(i)
 let get_ast_rule env i =
   fst (snd (env.ast_rules.(i-1)))
 
+let get_ast_rule_rate_pos ~unary env i =
+  if unary then
+    match (fst (snd (env.ast_rules.(i-1)))).LKappa.r_un_rate with
+    | None -> failwith "No unary rate to get position of"
+    | Some ((_,pos),_) -> pos
+  else snd (fst (snd (env.ast_rules.(i-1)))).LKappa.r_rate
+
 let nb_rules env = Array.length env.rules
 let nums_of_rule name env =
   fold_rules
@@ -144,9 +151,6 @@ let print pr_alg pr_rule pr_pert f env =
     (Pp.array Pp.space (fun i f p ->
          Format.fprintf f "@[<2>/*%i*/%a@]" i (pr_pert env) p))
     env.perturbations
-(*
-  desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
- *)
 
 let check_if_counter_is_filled_enough x =
   if not @@

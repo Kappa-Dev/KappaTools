@@ -488,6 +488,17 @@ let store_activity store env counter state id syntax_id rate cc_va =
     match Nbr.to_float @@ value_alg counter state rate with
     | None -> if cc_va = 0 then 0. else infinity
     | Some rate -> rate *. float_of_int cc_va in
+  let () =
+    if act < 0. then
+      let unary = id mod 2 = 1 in
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ((Format.asprintf
+               "At t=%.2f %sctivity of rule %a has become negative (%f)"
+               (Counter.current_time counter)
+               (if unary then "Unary " else "")
+               (Model.print_ast_rule ~env) syntax_id act),
+            Model.get_ast_rule_rate_pos ~unary env syntax_id)) in
   store id syntax_id act
 
 let update_outdated_activities store env counter state =
