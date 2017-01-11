@@ -187,13 +187,10 @@ let blit a1 ofs1 a2 ofs2 len =
       set a2 (ofs2 + i) (get a1 (ofs1 + i))
     done
 
-let fold_left f init = function
-  | Unary a -> Array.fold_left f init a
-  | Binary a -> Array.fold_left (Array.fold_left f) init a
-
 let fold_lefti f init a  =
-  let g (i,current) k = (i+1,f i current k) in
-  snd (fold_left g (0,init) a)
+  let y = ref init in
+  let () = iteri (fun i e -> y := f i !y e) a in
+  !y
 
 let fold_right f a init  =
   match a with
