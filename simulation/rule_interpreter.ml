@@ -43,11 +43,12 @@ let raw_get_alg env overwr i =
   | None -> Model.get_alg env i
   | Some expr -> expr
 
+let size_rin state pattern =
+  Mods.IntSet.size (Pattern.ObsMap.get state.roots_of_patterns pattern)
 let raw_instance_number state patterns_l =
-  let size pattern =
-    Mods.IntSet.size (Pattern.ObsMap.get state.roots_of_patterns pattern) in
   let rect_approx patterns =
-    Array.fold_left (fun acc pattern ->  acc * (size pattern)) 1 patterns in
+    Array.fold_left
+      (fun acc pattern ->  acc * (size_rin state  pattern)) 1 patterns in
   List.fold_left (fun acc patterns -> acc + (rect_approx patterns)) 0 patterns_l
 let instance_number state patterns_l =
   Nbr.I (raw_instance_number state patterns_l)

@@ -68,37 +68,7 @@ let copy_in t1 t2 =
 
 let is_root i = i = 1
 
-let rec update_structure t =
-  if t.consistent then t
-  else
-    let n_layer = t.layer.(t.size) in
-    let weight_of_subtree k =
-      if k > t.size then 0.
-      else t.weight_of_subtrees.(k)
-    in
-    let rec aux k =
-      if k = 0 then ()
-      else
-        let l = t.unbalanced_events_by_layer.(k) in
-        let () = t.unbalanced_events_by_layer.(k) <- [] in
-        let () =
-          List.iter
-            (fun i ->
-               let () = t.weight_of_subtrees.(i) <-
-                   t.weight_of_nodes.(i)
-                   +. weight_of_subtree (2 * i)
-                   +. weight_of_subtree (2 * i + 1) in
-               let () = t.unbalanced_events.(i) <- false in
-               if not (is_root i) then
-                 let father = i / 2 in
-                 declare_unbalanced father t
-            ) l in
-        aux (k - 1)
-    in
-    let () = aux n_layer in
-    let () = t.consistent <- true in
-    t
-and declare_unbalanced i t =
+let declare_unbalanced i t =
   let () =
     if not t.unbalanced_events.(i) then
       let l = t.layer.(i) in
@@ -107,6 +77,31 @@ and declare_unbalanced i t =
         i :: (t.unbalanced_events_by_layer.(l))
   in
   t.consistent <- false
+
+let update_structure t =
+  if t.consistent then t
+  else
+    let n_layer = t.layer.(t.size) in
+    let update_structure_aux i =
+      let () = t.weight_of_subtrees.(i) <-
+          t.weight_of_nodes.(i)
+          +. (if 2*i > t.size then 0. else t.weight_of_subtrees.(2*i))
+          +. (if 2*i+1 > t.size then 0. else t.weight_of_subtrees.(2*i+1)) in
+      let () = t.unbalanced_events.(i) <- false in
+      if not (is_root i) then
+        let father = i / 2 in
+        declare_unbalanced father t in
+    let rec aux k =
+      if k = 0 then ()
+      else
+        let l = t.unbalanced_events_by_layer.(k) in
+        let () = t.unbalanced_events_by_layer.(k) <- [] in
+        let () = List.iter update_structure_aux l in
+        aux (k - 1)
+    in
+    let () = aux n_layer in
+    let () = t.consistent <- true in
+    t
 
 let create n =
   let t_node = Array.make (n + 1) 0. in
