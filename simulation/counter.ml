@@ -183,16 +183,16 @@ let reinitialize counter =
   counter.last_point <- 0;
   counter.stat_null <- Stat_null_events.init ()
 
-let rec tick f c =
+let rec tick c =
   match c.progress_report with
   | None ->
     let () =
       c.progress_report <-
         Some (Progress_report.create
-                !Parameter.progressBarSize !Parameter.progressBarSymbol f) in
-    tick f c
+                !Parameter.progressBarSize !Parameter.progressBarSymbol) in
+    tick c
   | Some pr ->
-    Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) f pr
+    Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) pr
 
   let current_simulation_info c =
   { Trace.Simulation_info.story_id = current_story c;
@@ -203,10 +203,10 @@ let rec tick f c =
     let () = inc_stories c in
     current_simulation_info c
 
-let complete_progress_bar f c =
+let complete_progress_bar c =
   match c.progress_report with
   | None -> ()
-  | Some pr -> Progress_report.complete_progress_bar c.time c.events f pr
+  | Some pr -> Progress_report.complete_progress_bar c.time c.events pr
 
 let next_point counter =
   match counter.plot_period with

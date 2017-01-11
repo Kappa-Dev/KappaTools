@@ -17,11 +17,41 @@ let rec waitpid_non_intr pid =
   try Unix.waitpid [] pid
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
+
+let batch_loop ~outputs env counter graph state =
+  let rec iter graph state =
+    let stop,graph',state' =
+      State_interpreter.a_loop ~outputs env counter graph state in
+    if stop then (graph',state')
+    else let () = Counter.tick counter in iter graph' state'
+  in iter graph state
+
+let interactive_loop ~outputs pause_criteria env counter graph state =
+  let user_interrupted = ref false in
+  let old_sigint_behavior =
+    Sys.signal
+      Sys.sigint (Sys.Signal_handle
+                    (fun _ -> if !user_interrupted then raise Sys.Break
+                      else user_interrupted := true)) in
+  let rec iter graph state =
+    if !user_interrupted ||
+       Rule_interpreter.value_bool counter graph pause_criteria then
+      let () = Sys.set_signal Sys.sigint old_sigint_behavior in
+      (false,graph,state)
+    else
+      let stop,graph',state' as out =
+        State_interpreter.a_loop ~outputs env counter graph state in
+      if stop then
+        let () = Sys.set_signal Sys.sigint old_sigint_behavior in
+        out
+      else let () = Counter.tick counter in iter graph' state'
+  in iter graph state
+
 let finalize
     ~outputs dotFormat cflow_file trace_file
     env counter state stories_compression =
   let () = Outputs.close () in
-  let () = Counter.complete_progress_bar Format.std_formatter counter in
+  let () = Counter.complete_progress_bar counter in
   let () = State_interpreter.end_of_simulation
       ~outputs Format.std_formatter env counter state in
   let () = ExceptionDefn.flush_warning Format.err_formatter in
@@ -203,9 +233,7 @@ let () =
           ~outputs formatCflows cflowFile trace_file
           env counter state story_compression
       else if cli_args.Run_cli_args.batchmode then
-        let (_,state') =
-          State_interpreter.batch_loop
-            ~outputs Format.std_formatter env counter graph state in
+        let (_,state') = batch_loop ~outputs env counter graph state in
         finalize
           ~outputs formatCflows cflowFile trace_file
           env counter state' story_compression
@@ -239,9 +267,7 @@ let () =
                     Pp.error Format.pp_print_string
                       ("[T] can only be used in inequalities",pos_b'') in
                   (false,graph,state)
-                else State_interpreter.interactive_loop
-                    ~outputs
-                    Format.std_formatter b'' env' counter graph state
+                else interactive_loop ~outputs b'' env' counter graph state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 Evaluator.do_interactive_directives
@@ -269,9 +295,7 @@ let () =
           toplevel env0 graph state
         else
           let (stop,graph',state') =
-            State_interpreter.interactive_loop
-              ~outputs Format.std_formatter
-              Alg_expr.FALSE env counter graph state in
+            interactive_loop ~outputs Alg_expr.FALSE env counter graph state in
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file

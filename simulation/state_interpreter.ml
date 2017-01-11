@@ -382,31 +382,3 @@ let end_of_simulation ~outputs form env counter state =
          outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
       state.flux in
   ExceptionDefn.flush_warning form
-
-let batch_loop ~outputs form env counter graph state =
-  let rec iter graph state =
-    let stop,graph',state' = a_loop ~outputs env counter graph state in
-    if stop then (graph',state')
-    else let () = Counter.tick form counter in iter graph' state'
-  in iter graph state
-
-let interactive_loop ~outputs form pause_criteria env counter graph state =
-  let user_interrupted = ref false in
-  let old_sigint_behavior =
-    Sys.signal
-      Sys.sigint (Sys.Signal_handle
-                    (fun _ -> if !user_interrupted then raise Sys.Break
-                      else user_interrupted := true)) in
-  let rec iter graph state =
-    if !user_interrupted ||
-       Rule_interpreter.value_bool counter graph pause_criteria then
-      let () = Sys.set_signal Sys.sigint old_sigint_behavior in
-      (false,graph,state)
-    else
-      let stop,graph',state' as out =
-        a_loop ~outputs env counter graph state in
-      if stop then
-        let () = Sys.set_signal Sys.sigint old_sigint_behavior in
-        out
-      else let () = Counter.tick form counter in iter graph' state'
-  in iter graph state

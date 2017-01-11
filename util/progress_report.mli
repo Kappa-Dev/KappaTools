@@ -10,6 +10,6 @@
 
 type t
 
-val create : int -> char -> Format.formatter -> t
-val tick : float -> float -> int -> float -> Format.formatter -> t -> unit
-val complete_progress_bar : float -> int -> Format.formatter -> t -> unit
+val create : int -> char -> t
+val tick : float -> float -> int -> float -> t -> unit
+val complete_progress_bar : float -> int -> t -> unit

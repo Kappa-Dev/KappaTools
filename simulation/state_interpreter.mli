@@ -43,17 +43,3 @@ val end_of_simulation :
   outputs:(Data.t -> unit) -> Format.formatter ->
   Model.t -> Counter.t -> t -> unit
 (** What to do after stopping simulation. *)
-
-val batch_loop :
-  outputs:(Data.t -> unit) -> Format.formatter -> Model.t -> Counter.t ->
-  Rule_interpreter.t -> t -> (Rule_interpreter.t * t)
-(** [loop message_formatter env counter graph]
- does a simulation in the command-line setting *)
-
-val interactive_loop :
-  outputs:(Data.t -> unit) -> Format.formatter ->
-  (Pattern.id array list,int) Alg_expr.bool ->
-  Model.t -> Counter.t -> Rule_interpreter.t -> t ->
-  (bool * Rule_interpreter.t * t)
-(** [interactive_loop message_formatter env counter graph]
- does a simulation in the command-line setting up to an interruption *)

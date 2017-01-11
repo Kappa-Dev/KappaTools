@@ -171,7 +171,7 @@ let add_agent ?id sigs ty graph =
                    ("Try to add an agent with a the free id "
                     ^string_of_int id)))
        else
-         (succ id, Tools.recti (fun acc k -> (k+new_id)::acc) l (id-new_id+1))
+         (succ id, Tools.recti (fun acc k -> (k+new_id)::acc) l (id-new_id))
       )
     | None -> match graph.free_id with
       | new_id,h :: t -> h,(new_id,t)
