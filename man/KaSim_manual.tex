@@ -365,7 +365,7 @@ linked or not to anything.
 If the link state of a site does not matter but the internal state
 does, an '?' has to be added after the site name (and internal state).
 An agent A whose sites x and z are free, y is in state u and z in
-state 2 is written A(x,y\intstate{}u?4,z\intstate{}2).
+state 2 is written A(x,y\intstate{}u?,z\intstate{}2).
 
 \begin{table}[ht!]
   \centering
@@ -536,7 +536,7 @@ and
 \begin{lstlisting}[language=kappa]
 'weird' A(z!1),A(x!1) -> A(x) @ 'gamma'
 \end{lstlisting}
-extremmely diferent.
+extremely different.
 
 The first one removes the \ttt{A} agent in the mixture\index{mixture}
 that will match the second occurrence of \ttt{A} in the rule (the one
