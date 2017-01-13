@@ -20,7 +20,7 @@ let trace = false
 (**************************************************************************)
 
 type half_break_action =
-  (int list * (Ckappa_sig.c_rule_id * Ckappa_sig.c_state) list)
+  (int list * (Ckappa_sig.c_rule_id * Ckappa_sig.pair_of_states) list)
     Ckappa_sig.AgentSite_map_and_set.Map.t
 
 type remove_action =
@@ -242,7 +242,7 @@ let half_break_action parameters error handler rule_id half_break store_result =
             parameters
             error
             (agent_type, site_type)
-            (rule_id, state_min) (* JF: No: You should not privilieged the min value, you should store the interval as a pair of states *)
+            (rule_id, (state_min, state_max)) (* JF: No: You should not privilieged the min value, you should store the interval as a pair of states *)
             store_result
         in
         error, store_result
@@ -587,7 +587,7 @@ let collect_side_effects parameter error handler rule_id half_break remove
 (*Collect bonds in the rhs and lhs*)
 (***************************************************************************)
 
-let collect_agent_type_state parameter error agent site_type =
+let collect_agent_type_binding_state parameter error agent site_type =
   match agent with
   | Cckappa_sig.Ghost
   | Cckappa_sig.Unknown_agent _ ->
@@ -609,14 +609,20 @@ let collect_agent_type_state parameter error agent site_type =
         Exception.warn
           parameter error __POS__ Exit Ckappa_sig.dummy_state_index
       | error, Some port ->
-        let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+        let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+        let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
         (* JF: Why do you output only the upper bound and not the interval (as a apir of state) ? *)
-        if Ckappa_sig.compare_state_index state Ckappa_sig.dummy_state_index > 0
+        if state_min = state_max
+        then error, state_min
+        else
+        Exception.warn
+          parameter error __POS__ Exit Ckappa_sig.dummy_state_index
+        (*if Ckappa_sig.compare_state_index state Ckappa_sig.dummy_state_index > 0
         then
           error, state
         else
           Exception.warn
-            parameter error __POS__ Exit Ckappa_sig.dummy_state_index
+            parameter error __POS__ Exit Ckappa_sig.dummy_state_index*)
     in
     error, (agent_type1, state1)
 
@@ -637,7 +643,7 @@ let collect_fingerprint_of_binding parameter error agent_id site_type views =
   in
   (*get pair agent_type, state*)
   let error, (agent_type, state) =
-    collect_agent_type_state
+    collect_agent_type_binding_state
       parameter
       error
       agent_source

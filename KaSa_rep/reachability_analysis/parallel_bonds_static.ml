@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Jan 13 2017>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -78,11 +78,11 @@ let init_local_static =
 
 (*******************************************************************)
 
-let translate_bond parameters error site_add agent_id site_type_source views =
+(*let translate_bond parameters error site_add agent_id site_type_source views =
   let error, pair =
     let agent_index_target = site_add.Cckappa_sig.agent_index in
     let site_type_target = site_add.Cckappa_sig.site in
-    let error', agent_source =
+    let error, agent_source =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameters error agent_id views
@@ -91,12 +91,7 @@ let translate_bond parameters error site_add agent_id site_type_source views =
         Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
-    let error =
-      Exception.check_point
-        Exception.warn parameters error error'
-        __POS__ Exit
-    in
-    let error'', agent_target =
+    let error, agent_target =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameters error agent_index_target views
@@ -105,41 +100,26 @@ let translate_bond parameters error site_add agent_id site_type_source views =
         Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
-    let error =
-      Exception.check_point
-        Exception.warn parameters error error''
-        __POS__ Exit
-    in
-    let error''', (agent_type1, state1) =
-      Common_static.collect_agent_type_state
+    let error, (agent_type1, state1) =
+      Common_static.collect_agent_type_binding_state
         parameters
         error
         agent_source
         site_type_source
     in
-    let error =
-      Exception.check_point
-        Exception.warn parameters error error'''
-        __POS__ Exit
-    in
-    let error'''', (agent_type2, state2) =
-      Common_static.collect_agent_type_state
+    let error, (agent_type2, state2) =
+      Common_static.collect_agent_type_binding_state
         parameters
         error
         agent_target
         site_type_target
-    in
-    let error =
-      Exception.check_point
-        Exception.warn parameters error error''''
-        __POS__ Exit
     in
     let pair = ((agent_type1, site_type_source, state1),
                 (agent_type2, site_type_target, state2))
     in
     error, pair
   in
-  error, pair
+  error, pair*)
 
 let collect_double_bonds_in_pattern
     parameters error ?tuple_of_interest pattern =
@@ -158,20 +138,16 @@ let collect_double_bonds_in_pattern
         Ckappa_sig.Site_map_and_set.Map.fold
           (fun site_type_source site_add
             (error, store_result) ->
-            let error',
+            let error,
                 ((agent_type_source, site_type_source, state_source),
                  (agent_type_target, site_type_target, state_target)) =
-              translate_bond
+              (*translate_bond*)
+              Common_static.collect_fingerprint_of_bond
                 parameters error
                 site_add
                 agent_id_source
                 site_type_source
                 pattern.Cckappa_sig.views
-            in
-            let error =
-              Exception.check_point
-                Exception.warn parameters error error'
-                __POS__ Exit
             in
             Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source' site_add'
@@ -188,20 +164,16 @@ let collect_double_bonds_in_pattern
                     (* if the ids of the targets is the same, we have a parallel bond, other with it is a non parallel bond *)
                     agent_id_target = agent_id_target'
                   in
-                  let error',
+                  let error,
                       ((_,_,state_source'),
                        (_, site_type_target', state_target')) =
-                    translate_bond
+                    (*translate_bond*)
+                    Common_static.collect_fingerprint_of_bond
                       parameters error
                       site_add'
                       agent_id_source
                       site_type_source'
                       pattern.Cckappa_sig.views
-                  in
-                  let error =
-                    Exception.check_point
-                      Exception.warn parameters error error'
-                      __POS__ Exit
                   in
                   (* the two target sites  should also have different types *)
                   if site_type_target <> site_type_target'
