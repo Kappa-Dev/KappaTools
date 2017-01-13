@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Dec 31 2016>
+   * Last modification: Time-stamp: <Jan 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -400,26 +400,6 @@ struct
       set_potential_tuple_pair_lhs store_potential_tuple_pair_lhs
         static
     in
-    (*------------------------------------------------------------*)
-    (*TODO*)
-    (*let store_bonds_lhs_pattern = get_bonds_lhs_pattern static in
-    let store_views_lhs_pattern = get_views_lhs_pattern static in
-    let store_potential_tuple_pair_lhs_pattern =
-      get_potential_tuple_pair_lhs_pattern static in
-    let error, store_potential_tuple_pair_lhs_pattern =
-      Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs_pattern
-        parameters error
-        rule.Cckappa_sig.rule_lhs
-        store_bonds_lhs_pattern
-        store_views_lhs_pattern
-        store_potential_tuple_pair_lhs_pattern
-    in
-    let static =
-      set_potential_tuple_pair_lhs_pattern
-        store_potential_tuple_pair_lhs_pattern
-        static
-    in*)
-    (*------------------------------------------------------------*)
     error, static
 
 (****************************************************************)
@@ -568,7 +548,7 @@ struct
     let store_potential_tuple_pair_lhs =
       Ckappa_sig.Rule_map_and_set.Map.map
         (
-          Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.filter
+          Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.filter
             (fun ((a,b,c,d,_),(a',b',c',d',_)) ->
                Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem ((a,b,c,d),(a',b',c',d'))
                  store_potential_tuple_pair))
@@ -830,6 +810,55 @@ struct
     in
     scan list error
 
+
+  let common_scan' parameters error bdu_false
+      dynamic store_value list =
+    let rec scan list error =
+      match list with
+      | [] -> error, true, dynamic
+      | tuple :: tail ->
+        let proj (b,c,d,e,f) = (b,c,d,e) in
+        let proj2 (x, y) = proj x, proj y in
+        let tuple' = proj2 tuple in
+        let error, mvbdu_value =
+          match
+            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Map.find_option_without_logs
+              parameters error
+              tuple'
+              store_value
+          with
+          | error, None -> error, bdu_false
+          | error, Some mvbdu -> error, mvbdu
+        in
+        (*build mvbdu for the tuple in the lhs, then do the
+          intersection with the result*)
+        let ((_, _, _, _, pair_of_state2),
+             (_, _, _, _, pair_of_state2')) = tuple in
+        let pair_list =
+          [Ckappa_sig.fst_site, pair_of_state2;
+           Ckappa_sig.snd_site, pair_of_state2']
+        in
+        let handler = get_mvbdu_handler dynamic in
+        let error, handler, mvbdu =
+          Ckappa_sig.Views_bdu.mvbdu_of_range_list
+          (*Ckappa_sig.Views_bdu.mvbdu_of_association_list*)
+            parameters handler error pair_list
+        in
+        (*intersection*)
+        let error, handler, new_mvbdu =
+          Ckappa_sig.Views_bdu.mvbdu_and
+            parameters handler error mvbdu mvbdu_value
+        in
+        let dynamic = set_mvbdu_handler handler dynamic in
+        (*check*)
+        if Ckappa_sig.Views_bdu.equal new_mvbdu bdu_false
+        then
+          error, false, dynamic
+        else
+          scan tail error
+    in
+    scan list error
+
   (***********************************************************)
 
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
@@ -847,16 +876,16 @@ struct
       with
       | error, None ->
         error,
-        Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty
+        Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.empty
       | error, Some s -> error, s
     in
     let list =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements tuple_set
+      Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.elements tuple_set
     in
     let store_value = get_value dynamic in
     (*check if this pattern belong to the set of the patterns in the result*)
     let error, bool, dynamic =
-      common_scan
+      common_scan'
         parameters error
         bdu_false
         dynamic
@@ -883,24 +912,24 @@ struct
         pattern.Cckappa_sig.bonds
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
     in
-    let error, views_lhs =
+    let error, views_lhs = (*TODO: change the type return. *)
       Common_static.collect_views_pattern_aux
         parameters
         error
         pattern.Cckappa_sig.views
-        Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
+        Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
     in
     let error, tuple_set =
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
         (fun (x, y) (error, store_result) ->
            let error, fst_list =
-             Site_accross_bonds_domain_static.collect_tuples error x views_lhs
+             Site_accross_bonds_domain_static.collect_tuples' error x views_lhs
            in
            let error, snd_list =
-             Site_accross_bonds_domain_static.collect_tuples error y views_lhs
+             Site_accross_bonds_domain_static.collect_tuples' error y views_lhs
            in
            let error, store_result =
-             Site_accross_bonds_domain_static.store_set
+             Site_accross_bonds_domain_static.store_set'
                parameters error
                fst_list snd_list
                store_result
@@ -908,23 +937,23 @@ struct
            error, store_result
         ) bonds_lhs
         (error,
-         Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.empty)
+         Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.empty)
     in
     let store_potential_tuple_pair = get_potential_tuple_pair static in
     let tuple_set =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.filter
+      Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.filter
         (fun ((a,b,c,d,_),(a',b',c',d',_)) ->
            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.mem ((a,b,c,d),(a',b',c',d'))
              store_potential_tuple_pair)
         tuple_set
     in
     let list =
-      Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.elements
+      Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.elements
         tuple_set
     in
     let store_value = get_value dynamic in
     let error, bool, dynamic =
-      common_scan parameters
+      common_scan' parameters
         error
         bdu_false
         dynamic

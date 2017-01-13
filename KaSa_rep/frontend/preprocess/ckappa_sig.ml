@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Dec 06 2016>
+ * Last modification: Time-stamp: <Jan 12 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -366,6 +366,18 @@ module AgentsSiteState_map_and_set =
          type t = c_agent_id * c_agent_name * c_site_name * c_state
          let compare = compare
          let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d
+       end))
+
+type pair_of_states = c_state * c_state
+
+module AgentsSitePState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name * c_site_name * pair_of_states
+         let compare = compare
+(*let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d*)
+         let print _ _ = ()
        end))
 
 (***************************************************************************)

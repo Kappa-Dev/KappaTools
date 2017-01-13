@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 20 2016>
+   * Last modification: Time-stamp: <Jan 12 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -98,6 +98,21 @@ module PairAgentSitesStates_map_and_set =
            (Ckappa_sig.c_agent_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
             Ckappa_sig.c_state * Ckappa_sig.c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module PairAgentSitesPStates_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (Ckappa_sig.c_agent_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state * Ckappa_sig.pair_of_states) *
+           (Ckappa_sig.c_agent_name *
+            Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+            Ckappa_sig.c_state * Ckappa_sig.pair_of_states)
          let compare = compare
          let print _ _ = ()
        end))

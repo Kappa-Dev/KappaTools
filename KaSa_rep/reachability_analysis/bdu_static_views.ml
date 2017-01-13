@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jan 01 2017>
+   * Last modification: Time-stamp: <Jan 12 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -251,7 +251,8 @@ let collect_test_sites parameters error rule_id viewslhs
       error
       (fun _parameters error agent_id agent store_result ->
          match agent with
-         | Cckappa_sig.Unknown_agent _
+         | Cckappa_sig.Unknown_agent _ ->
+           Exception.warn parameters error __POS__ Exit store_result
          | Cckappa_sig.Ghost -> error, store_result
          | Cckappa_sig.Dead_agent (agent,_,_,_)
          | Cckappa_sig.Agent agent ->
@@ -857,7 +858,7 @@ let collect_modif_list_restriction_map
                  new_index_pair_map parameters error list
                in
                (*-----------------------------------------------------------*)
-               let error', map_res =
+               let error, map_res =
                  Ckappa_sig.Site_map_and_set.Map.fold_restriction parameters
                    error
                    (fun site port (error, store_result) ->
@@ -886,11 +887,6 @@ let collect_modif_list_restriction_map
                       error, map_res
                    ) set agent_modif.Cckappa_sig.agent_interface
                    Ckappa_sig.Site_map_and_set.Map.empty
-               in
-               let error =
-                 Exception.check_point
-                   Exception.warn parameters error error'
-                   __POS__ Exit
                in
                error, (cv_id, map_res) :: current_list
              ) (error, []) triple_list
