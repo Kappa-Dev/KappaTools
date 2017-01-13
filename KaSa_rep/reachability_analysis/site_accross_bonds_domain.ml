@@ -398,7 +398,7 @@ struct
         store_bonds_lhs
         store_views_lhs
         store_potential_tuple_pair_lhs
-    in
+    in(*TODO*)
     (*let store_views_lhs' = get_views_lhs' static in
       let store_bonds_lhs = get_bonds_lhs static in
       let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
@@ -943,7 +943,7 @@ struct
              Site_accross_bonds_domain_static.collect_tuples' error y views_lhs
            in
            let error, store_result =
-             Site_accross_bonds_domain_static.store_set'
+             Site_accross_bonds_domain_static.store_set' (*TODO: optimize*)
                parameters error
                fst_list snd_list
                store_result
@@ -1648,19 +1648,6 @@ struct
 
   (*-----------------------------------------------------------*)
 
-  (*let get_partition_created_bonds pos static =
-    match pos with
-    | Fst -> get_partition_created_bonds_map_1 static
-    | Snd -> get_partition_created_bonds_map_2 static
-
-  let get_rule_partition_created_bonds pos static =
-    match pos with
-    | Fst -> get_rule_partition_created_bonds_map_1 static
-    | Snd -> get_rule_partition_created_bonds_map_2 static*)
-
-  (*-----------------------------------------------------------*)
-
-
   let apply_event_list static dynamic error _event_list  =
     error, dynamic, []
 
@@ -1737,28 +1724,6 @@ struct
                      site_type2
                      pattern
                  in
-                 (*let string_version =
-                   Ckappa_backend.Ckappa_backend.get_string_version
-                     pattern
-                 in
-                 let error, site_graph =
-                   Ckappa_site_graph.site_graph_to_list error string_version
-                 in
-                 let error, refinement =
-                   Ckappa_site_graph.pair_list_to_list parameters
-                     error kappa_handler
-                     pattern
-                     agent_id1 site_type1'
-                     agent_id2 site_type2'
-                     pair_list
-                 in
-                 let lemma =
-                   {
-                     Remanent_state.hyp = site_graph;
-                     Remanent_state.refinement = refinement
-                   }
-                 in
-                 let current_list = lemma :: current_list in*)
                  (*---------------------------------------------------*)
                  (*internal constraint list*)
                  let error, refine =
@@ -1786,19 +1751,6 @@ struct
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_mvbdu_handler handler dynamic in
-    (*let constraint_list = Remanent_state.get_constraints_list kasa_state in
-    let error, constraint_list =
-      match
-        constraint_list
-      with
-      | None ->
-        Exception.warn parameters error __POS__ Exit []
-      | Some l -> error, l
-    in
-    let pair_list = (domain_name, List.rev current_list) :: constraint_list in
-    let kasa_state =
-      Remanent_state.set_constraints_list pair_list kasa_state
-    in*)
     (*------------------------------------------------------------------*)
     (*internal constraint list*)
     let internal_constraints_list =

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jan 01 2017>
+   * Last modification: Time-stamp: <Jan 13 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1292,27 +1292,6 @@ struct
         (fun (error, output) list ->
            match list with
            | [_, state] -> (* the site name is fictitious, do not take it *)
-             (*let error, _site_string =
-               try
-                 Handler.string_of_site parameters error kappa_handler
-                   agent_type site_name
-               with
-               | _ ->
-                 Exception.warn
-                   parameters error __POS__ Exit
-                   (Ckappa_sig.string_of_site_name site_name)
-             in
-             let error, _state_string =
-               try
-                 Handler.string_of_state_fully_deciphered parameters error
-                   kappa_handler
-                   agent_type site_name state
-               with
-               | _ ->
-                 Exception.warn
-                   parameters error __POS__ Exit
-                   (Ckappa_sig.string_of_state_index state)
-             in*)
                error, state :: output
            | _ ->
              Exception.warn

@@ -168,7 +168,7 @@ let collect_tuples' error (agent_id, agent_type, site_type, state)
       error, list
 
 let collect_tuples'' parameters error (agent_id, agent_type, site_type, state)
-    views_set' current_list =
+    views_set' current_list = (*TODO*)
   match
     Ckappa_sig.Agent_id_map_and_set.Map.find_option_without_logs
       parameters error
@@ -187,7 +187,7 @@ let collect_tuples'' parameters error (agent_id, agent_type, site_type, state)
     else
       error, current_list
 
-let store_set' parameters error fst_list snd_list store_result =
+let store_set' parameters error fst_list snd_list store_result = (*TODO*)
   List.fold_left (fun (error, store_result) x ->
       List.fold_left (fun (error, store_result) y ->
           let error, store_result =
@@ -302,7 +302,7 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
       parameters error rule_id pair_set store_result
 
 let collect_potential_tuple_pair_lhs' parameters error rule_id store_bonds_lhs
-    store_views_lhs' store_result =
+    store_views_lhs' store_result = (*TODO*)
   let error, bonds_lhs_set =
     Common_static.get_rule_id_set parameters error
       rule_id
@@ -416,7 +416,7 @@ let collect_rule_partition_aux parameters error rule_id
   let error, store_result =
     Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.fold
       (fun pair_site tuple_set (error, store_result) ->
-         let error', old_set =
+         let error, old_set =
            match
              Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
                parameters error
@@ -428,19 +428,14 @@ let collect_rule_partition_aux parameters error rule_id
              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
            | error, Some s -> error, s
          in
-         let error =
-           Exception.check_point
-             Exception.warn parameters error error'
-             __POS__ Exit
-         in
-         let error'', new_set =
+         let error;, new_set =
            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.union
              parameters error
              old_set
              tuple_set
          in
          let error = Exception.check_point Exception.warn parameters error
-             error'' __POS__ Exit in
+             error __POS__ Exit in
          let error, store_result =
            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
              parameters error
@@ -607,7 +602,6 @@ let collect_views_init parameters error init_state =
          let error, store_result =
            Ckappa_sig.Site_map_and_set.Map.fold
              (fun site_type port (error, store_set) ->
-                (*TODO:*)
                 let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
                 let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
                 Ckappa_sig.AgentsSitePState_map_and_set.Set.add_when_not_in
@@ -705,7 +699,6 @@ let collect_potential_tuple_pair_init
             (Ckappa_sig.snd_site, pair_of_state2')]
          in
          let error, handler, mvbdu =
-           (*Ckappa_sig.Views_bdu.mvbdu_of_association_list*)
            Ckappa_sig.Views_bdu.mvbdu_of_range_list
              parameters
              handler error pair_list
