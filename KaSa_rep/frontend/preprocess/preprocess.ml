@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Nov 29 2016>
+   * Last modification: Time-stamp: <Jan 13 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -1316,7 +1316,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
 
 
 let translate_rule parameters error handler rule =
-  let label,((direction,rule),_position) = rule in
+  let label,((direction,rule),position) = rule in
   let error,c_rule_lhs,question_marks_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
   let error,c_rule_rhs,question_marks_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
   let error,c_rule_lhs = clean_question_marks parameters error question_marks_r c_rule_lhs in (* remove ? in the lhs when they occur in the rhs (according to the BNF, they have to occur in the lhs as well *)
@@ -1438,7 +1438,8 @@ let translate_rule parameters error handler rule =
               )
             end
           | Some Cckappa_sig.Agent lagk,Some Cckappa_sig.Agent ragk
-          | Some Cckappa_sig.Dead_agent (lagk,_,_,_), Some Cckappa_sig.Agent ragk ->
+          | Some Cckappa_sig.Dead_agent (lagk,_,_,_),
+            Some (Cckappa_sig.Dead_agent (ragk,_,_,_) | Cckappa_sig.Agent ragk) ->
             (* TO DO Exception.check_point Exception.warn  what happen if one site is dead *)
             let agent_type = lagk.Cckappa_sig.agent_name in
             let error',ldiff,rdiff =
@@ -1500,10 +1501,10 @@ let translate_rule parameters error handler rule =
           | _, Some Cckappa_sig.Unknown_agent _
           | Some Cckappa_sig.Ghost,Some Cckappa_sig.Ghost
           | _,Some Cckappa_sig.Dead_agent _ | None,_ | _,None ->
-            (print_string (Ckappa_sig.string_of_agent_id k);
-             print_newline ();
-             Exception.warn
-               parameters error __POS__ Exit
+            ( Exception.warn
+               parameters error __POS__
+               ~pos:position
+               Exit
                (direct,
                 reverse,
                 actions,
