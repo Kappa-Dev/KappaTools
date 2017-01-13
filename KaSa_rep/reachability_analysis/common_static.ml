@@ -822,27 +822,6 @@ let collect_action_binding parameter error rule_id rule store_result =
 (*views in pattern, this function test pattern on the lhs*)
 (***************************************************************************)
 
-let get_agent_info_from_agent_interface' parameters error agent_id agent
-    store_result =
-  let agent_type = agent.Cckappa_sig.agent_name in
-  Ckappa_sig.Site_map_and_set.Map.fold
-    (fun site_type port (error, store_result) -> (*TODO: to change a new
-                                                   function *)
-       (*TODO: check state*)
-       let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
-       let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
-       (*if state_max = state_min
-       then*) (* JF: No, you should store the interval as a pair of sites,
-               and not only one random bond *)
-         let error, store_result =
-           Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
-             parameters error
-             (agent_id, agent_type, site_type, state_max)
-             store_result
-         in
-         error, store_result
-    ) agent.Cckappa_sig.agent_interface (error, store_result)
-
 let get_agent_info_from_agent_interface parameters error agent_id agent
     store_result =
   let agent_type = agent.Cckappa_sig.agent_name in
@@ -972,6 +951,30 @@ let collect_views_lhs parameter error rule_id rule store_result =
 (***************************************************************************)
 (*Modification*)
 (***************************************************************************)
+
+
+let get_agent_info_from_agent_interface' parameters error agent_id agent
+    store_result =
+  let agent_type = agent.Cckappa_sig.agent_name in
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site_type port (error, store_result) ->
+       let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+       let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
+       (*NOTE: state in modification is a singleton state*)
+       let error, state =
+         if state_min = state_max
+         then error, state_min
+         else Exception.warn parameters error __POS__ Exit
+             Ckappa_sig.dummy_state_index
+       in
+       let error, store_result =
+         Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
+           parameters error
+           (agent_id, agent_type, site_type, state)
+           store_result
+       in
+       error, store_result
+    ) agent.Cckappa_sig.agent_interface (error, store_result)
 
 let collect_modified_map parameter error rule_id rule store_result =
   let error, store_result =
