@@ -428,7 +428,7 @@ let collect_rule_partition_aux parameters error rule_id
              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
            | error, Some s -> error, s
          in
-         let error;, new_set =
+         let error, new_set =
            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.union
              parameters error
              old_set
