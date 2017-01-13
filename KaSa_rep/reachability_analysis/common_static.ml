@@ -66,6 +66,11 @@ type bdu_common_static =
     store_project_modified_map : (*use in parallel domain*)
     Ckappa_sig.AgentSite_map_and_set.Set.t
       Ckappa_sig.Rule_map_and_set.Map.t;
+    store_views_lhs' : (*TODO*)
+      (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *
+       Ckappa_sig.pair_of_states)
+        Ckappa_sig.Agent_id_map_and_set.Map.t
+        Ckappa_sig.Rule_map_and_set.Map.t
   }
 
 (*****************************************************************************)
@@ -104,6 +109,7 @@ let init_bdu_common_static =
       store_views_lhs = init_views_lhs;
       store_modified_map = init_modified_map;
       store_project_modified_map = init_project_modified_map;
+      store_views_lhs' = Ckappa_sig.Rule_map_and_set.Map.empty
     }
   in
   init_common_static
@@ -220,7 +226,7 @@ let half_break_action parameters error handler rule_id half_break store_result =
         let agent_type = site_address.Cckappa_sig.agent_type in
         let site_type = site_address.Cckappa_sig.site in
         (*state*)
-        let error, (state_min, state_max) = (*FIXME: compute state_max*)
+        let error, (state_min, state_max) =
           match state_op with
           | None ->
             begin
@@ -242,7 +248,7 @@ let half_break_action parameters error handler rule_id half_break store_result =
             parameters
             error
             (agent_type, site_type)
-            (rule_id, (state_min, state_max)) (* JF: No: You should not privilieged the min value, you should store the interval as a pair of states *)
+            (rule_id, (state_min, state_max))
             store_result
         in
         error, store_result
@@ -611,7 +617,7 @@ let collect_agent_type_binding_state parameter error agent site_type =
       | error, Some port ->
         let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
         let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
-        (* JF: Why do you output only the upper bound and not the interval (as a apir of state) ? *)
+        (* It is a binding state *)
         if state_min = state_max
         then error, state_min
         else
@@ -826,13 +832,10 @@ let get_agent_info_from_agent_interface parameters error agent_id agent
     store_result =
   let agent_type = agent.Cckappa_sig.agent_name in
   Ckappa_sig.Site_map_and_set.Map.fold
-    (fun site_type port (error, store_result) -> (*TODO: to change a new
-                                                   function *)
-       (*TODO: check state*)
+    (fun site_type port (error, store_result) ->
        let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
        let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
-       (*if state_max = state_min
-         then*) (* JF: No, you should store the interval as a pair of sites,
+       (* JF: No, you should store the interval as a pair of sites,
                  and not only one random bond *)
        let error, store_result =
          Ckappa_sig.AgentsSitePState_map_and_set.Set.add_when_not_in
@@ -932,7 +935,6 @@ let collect_views_aux parameter error rule_id views store_result =
   in
   error, store_result
 
-(*TODO: check the state*)
 let collect_views_rhs parameter error rule_id rule store_result =
   collect_views_aux
     parameter error
@@ -940,9 +942,59 @@ let collect_views_rhs parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
     store_result
 
-(*TODO: check the state*)
 let collect_views_lhs parameter error rule_id rule store_result =
   collect_views_aux
+    parameter error
+    rule_id
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    store_result
+
+let collect_views_aux' parameter error rule_id views store_result =
+  let error, store_result =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_id agent store_result ->
+         match agent with
+         | Cckappa_sig.Unknown_agent _ ->
+           Exception.warn parameter error __POS__ Exit store_result
+         | Cckappa_sig.Ghost -> error, store_result
+         | Cckappa_sig.Dead_agent (agent,_,_,_)
+         | Cckappa_sig.Agent agent ->
+           let agent_type = agent.Cckappa_sig.agent_name in
+           let error, old_map =
+             get_rule_id_set parameter error
+               rule_id
+               Ckappa_sig.Agent_id_map_and_set.Map.empty
+               store_result
+           in
+           let error, map =
+             Ckappa_sig.Site_map_and_set.Map.fold
+               (fun site_type port (error, store_map) ->
+                  let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                  let state_min =
+                    port.Cckappa_sig.site_state.Cckappa_sig.min
+                  in
+                  let error, store_map =
+                    Ckappa_sig.Agent_id_map_and_set.Map.add_or_overwrite
+                      parameter error
+                      agent_id
+                      (agent_type, site_type, (state_min, state_max))
+                      store_map
+                  in
+                  error, store_map
+               ) agent.Cckappa_sig.agent_interface (error, old_map)
+           in
+           let error, store_result =
+             add_map_rule parameter error rule_id map store_result
+           in
+           error, store_result
+      ) views store_result
+  in
+  error, store_result
+
+let collect_views_lhs' parameter error rule_id rule store_result =
+  collect_views_aux'
     parameter error
     rule_id
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
@@ -986,7 +1038,6 @@ let collect_modified_map parameter error rule_id rule store_result =
              agent.Cckappa_sig.agent_interface
          then error, store_result
          else
-           (*let agent_type = agent.Cckappa_sig.agent_name in*)
            (*old set*)
            let error, old_set =
              get_rule_id_set parameter error
@@ -1001,26 +1052,6 @@ let collect_modified_map parameter error rule_id rule store_result =
                agent
                old_set
            in
-           (*let error', new_set =
-             Ckappa_sig.Site_map_and_set.Map.fold
-               (fun site_type port (error, store_set) ->
-                  (*TODO: check state*)
-                  let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-                  let error, store_set =
-                    Ckappa_sig.AgentsSiteState_map_and_set.Set.add_when_not_in
-                      parameter error
-                      (agent_id, agent_type, site_type, state)
-                      store_set
-                  in
-                  error, store_set
-               )
-               agent.Cckappa_sig.agent_interface
-               (error, old_set)
-           in
-           let error =
-             Exception.check_point
-               Exception.warn parameter error error' __POS__ Exit
-           in*)
            let error, store_result =
              Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
                parameter
@@ -1155,6 +1186,10 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
     store_project_modified_map parameter error rule_id store_modified_map
       store_result.store_project_modified_map
   in
+  let error, store_views_lhs' =
+    collect_views_lhs' parameter error rule_id rule
+      store_result.store_views_lhs'
+  in
   error,
   {store_result with
    store_agent_name = store_agent_name;
@@ -1168,6 +1203,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_views_lhs = store_views_lhs;
    store_modified_map = store_modified_map;
    store_project_modified_map = store_project_modified_map;
+   store_views_lhs' = store_views_lhs'
   }
 
 (******************************************************************************)

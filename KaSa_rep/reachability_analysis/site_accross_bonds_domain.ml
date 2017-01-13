@@ -103,6 +103,9 @@ struct
 
   let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
 
+  let get_views_lhs' static = lift Analyzer_headers.get_views_lhs' static
+
+
   let get_action_binding static = lift Analyzer_headers.get_action_binding static
   (*let get_created_bonds static = lift Analyzer_headers.get_created_bonds static*)
 
@@ -396,6 +399,17 @@ struct
         store_views_lhs
         store_potential_tuple_pair_lhs
     in
+    (*let store_views_lhs' = get_views_lhs' static in
+      let store_bonds_lhs = get_bonds_lhs static in
+      let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
+      let error, store_potential_tuple_pair_lhs =
+        Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs'
+          parameters error
+          rule_id
+          store_bonds_lhs
+          store_views_lhs'
+          store_potential_tuple_pair_lhs
+    in*)
     let static =
       set_potential_tuple_pair_lhs store_potential_tuple_pair_lhs
         static

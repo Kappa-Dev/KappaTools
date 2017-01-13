@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 20 2016>
+  * Last modification: Time-stamp: <Jan 13 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -227,6 +227,17 @@ let set_views_lhs sites static =
     {
       (get_bdu_common_static static) with
       Common_static.store_views_lhs = sites
+    }
+    static
+
+let get_views_lhs' static =
+  (get_bdu_common_static static).Common_static.store_views_lhs'
+
+let set_views_lhs' sites static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+      Common_static.store_views_lhs' = sites
     }
     static
 

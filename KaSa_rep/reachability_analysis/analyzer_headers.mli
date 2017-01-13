@@ -167,6 +167,20 @@ val set_views_lhs :
   global_static_information ->
   global_static_information
 
+val get_views_lhs' :
+  global_static_information ->
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.pair_of_states)
+  Ckappa_sig.Agent_id_map_and_set.Map.t
+    Ckappa_sig.Rule_map_and_set.Map.t
+
+val set_views_lhs' :
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.pair_of_states)
+  Ckappa_sig.Agent_id_map_and_set.Map.t
+  Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
+
 val get_modified_map :
   global_static_information ->
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t
