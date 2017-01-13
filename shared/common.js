@@ -252,8 +252,8 @@ function inputEnter(id,handler){
     });
 }
 
-function ajaxRequest(url,type,data,handler){
-    var parameter = { url : url , type : type };
+function ajaxRequest(url,type,timeout,data,handler){
+    var parameter = { url : url , type : type, timeout : timeout };
     if(data){ parameter.data = data; }
     debug(parameter);
     $.ajax(parameter)

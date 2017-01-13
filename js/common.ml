@@ -114,6 +114,7 @@ let method_to_string : meth -> string =
 let ajax_request
     ~(url : string)
     ~(meth : meth)
+    ~(timeout:float)
     ~(data : string option)
     ~(handler : int -> string -> unit) =
   Js.Unsafe.fun_call
@@ -122,6 +123,7 @@ let ajax_request
          (Js.string url);
        Js.Unsafe.inject
          (Js.string (method_to_string meth));
+       Js.Unsafe.inject (1000. *. timeout);
        Js.Unsafe.inject
          (Js.Opt.option
             (match data with

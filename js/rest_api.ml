@@ -12,67 +12,56 @@ exception BadResponseCode of int
 exception TimeOut
 
 
-let send :
-  float ->
-  string ->
-  Common.meth ->
-  string option ->
-  (string -> 'a) ->
-  ('a Api.result -> Mpi_message_j.response) ->
-  Mpi_message_j.response Api.result Lwt.t =
-  fun
+let send
     (timeout : float)
     (url : string)
     (meth : Common.meth)
     (data : string option)
     (hydrate : string -> 'a)
     (wrap : 'a Api.result -> Mpi_message_j.response)
-    ->
-      let reply,feeder = Lwt.task () in
-      let handler status response_text =
-        let result_code : Api.manager_code option =
-          match status with
-          | 200 -> Some `OK
-          | 201 -> Some `CREATED
-          | 202 -> Some `ACCEPTED
-          | 400 -> Some `ERROR
-          | 404 -> Some `NOT_FOUND
-          | 409 -> Some `CONFLICT
-          | _ -> None
+  : Mpi_message_j.response Api.result Lwt.t =
+  let reply,feeder = Lwt.task () in
+  let handler status response_text =
+    let result_code : Api.manager_code option =
+      match status with
+      | 200 -> Some `OK
+      | 201 -> Some `CREATED
+      | 202 -> Some `ACCEPTED
+      | 400 -> Some `ERROR
+      | 404 -> Some `NOT_FOUND
+      | 409 -> Some `CONFLICT
+      | _ -> None in
+    let result : Mpi_message_j.response Api.result =
+      match result_code with
+      | None ->
+        Api_common.result_error_exception (BadResponseCode status)
+      | Some result_code ->
+        let result : 'a Api.result =
+          if (400 <= status) && (status < 500) then
+            Api_common.result_messages
+              ~result_code:result_code
+              (Api_types_j.errors_of_string response_text)
+          else
+            let response = hydrate response_text in
+            let () = Common.debug "response:hydrated" in
+            let () = Common.debug response in
+            Api_common.result_ok
+              ~result_code:result_code
+              response
         in
-        let result : Mpi_message_j.response Api.result =
-                match result_code with
-              | None ->
-                (Api_common.result_error_exception
-                   (BadResponseCode status))
-              | Some result_code ->
-                let result : 'a Api.result =
-                  if (400 <= status) && (status < 500) then
-                     Api_common.result_messages
-                       ~result_code:result_code
-                       (Api_types_j.errors_of_string response_text)
-                  else
-                    let response = hydrate response_text in
-                    let () = Common.debug "response:hydrated" in
-                    let () = Common.debug response in
-                    Api_common.result_ok
-                      ~result_code:result_code
-                      response
-                in
-                let response : Mpi_message_j.response = wrap result in
-                let () = Common.debug response in
-                Api_common.result_ok response
-        in
-        let () = Lwt.wakeup feeder result in
-        ()
-      in
-      let () =
-        Common.ajax_request
-          ~url:url
-          ~meth:meth
-          ~data:data
-          ~handler:handler
+        let response : Mpi_message_j.response = wrap result in
+        let () = Common.debug response in
+        Api_common.result_ok response
+    in
+    let () = Lwt.wakeup feeder result in ()
   in
+  let () =
+    Common.ajax_request
+      ~url:url
+      ~meth:meth
+      ~timeout
+      ~data:data
+      ~handler:handler in
   Lwt.pick
     [ reply ;
       (Lwt_js.sleep timeout >>=
@@ -81,7 +70,7 @@ let send :
             (Api_common.result_error_exception TimeOut)))]
 
 class manager
-    ?(timeout:float = 10.0)
+    ?(timeout:float = 30.0)
     (url:string) =
   object
   method message :

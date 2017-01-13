@@ -1,4 +1,4 @@
-open Lwt
+open Lwt.Infix
 
 let detail_projection :
   environment:Api_environment.environment ->
