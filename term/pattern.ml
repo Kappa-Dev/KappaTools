@@ -27,6 +27,12 @@ type id = int
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
+let hash_prime = 29
+let coarse_hash cc =
+  Array.fold_left
+    (fun acc l -> List.length l + hash_prime * acc)
+    0 cc.nodes_by_type
+
 let id_to_yojson cc = `Int cc
 let id_of_yojson = function
   | `Int cc -> cc
@@ -935,7 +941,7 @@ type prepoint = {
 
 type work = {
   sigs: Signature.s;
-  cc_env: prepoint list Mods.IntMap.t;
+  cc_env: prepoint list Mods.IntMap.t Mods.IntMap.t;
   reserved_id: int list array;
   used_id: int list array;
   free_id: int;
@@ -951,12 +957,14 @@ module PreEnv : sig
 
   val empty : Signature.s -> t
   val fresh :
-    Signature.s -> int list array -> int -> prepoint list Mods.IntMap.t -> t
+    Signature.s -> int list array -> int ->
+    prepoint list Mods.IntMap.t Mods.IntMap.t -> t
   val to_work : t -> work
 
   val add_cc :
-    toplevel:bool -> ?origin:Operator.DepSet.elt -> prepoint list Mods.IntMap.t ->
-    id -> cc -> prepoint list Mods.IntMap.t * Renaming.t * id
+    toplevel:bool -> ?origin:Operator.DepSet.elt ->
+    prepoint list Mods.IntMap.t Mods.IntMap.t ->
+    id -> cc -> prepoint list Mods.IntMap.t Mods.IntMap.t * Renaming.t * id
   val get : t -> id -> cc
 
   val sigs : t -> Signature.s
@@ -968,7 +976,7 @@ end = struct
     sig_decl: Signature.s;
     id_by_type: int list array;
     nb_id: int;
-    domain: prepoint list Mods.IntMap.t;
+    domain: prepoint list Mods.IntMap.t Mods.IntMap.t;
     mutable used_by_a_begin_new: bool;
   }
 
@@ -989,17 +997,20 @@ end = struct
 
   let get env id =
     Mods.IntMap.fold
-      (fun _ l acc ->
-         List.fold_left (fun acc p -> if p.p_id = id then p.element else acc)
-           acc l)
+      (fun _ ->
+         Mods.IntMap.fold
+           (fun _ l acc ->
+              List.fold_left (fun acc p -> if p.p_id = id then p.element else acc)
+                acc l))
       env.domain
       (empty_cc env.sig_decl)
 
   let fresh_id env =
     succ
       (Mods.IntMap.fold
-         (fun _ x acc ->
-            List.fold_left (fun acc p -> max acc p.p_id) acc x)
+         (fun _ -> Mods.IntMap.fold
+             (fun _ x acc ->
+                List.fold_left (fun acc p -> max acc p.p_id) acc x))
          env.domain 0)
 
   let check_vitality env = assert (env.used_by_a_begin_new = false)
@@ -1029,24 +1040,25 @@ end = struct
       Array.init (Signature.size sigs)
         (fun i -> Array.make (Signature.arity sigs i) []) in
     let () =
-      List.iter (fun p ->
-          match p.element.recogn_nav with
-          | [] | ((Navigation.Existing _,_),_) :: _ -> assert false
-          | ((Navigation.Fresh _,_),_) :: _ :: _ -> ()
-          | [(Navigation.Fresh (_,ty1),s1),arr as step] ->
-            let sa1 = elementaries.(ty1) in
-            let () = sa1.(s1) <- (step,p.p_id) :: sa1.(s1) in
-            match arr with
-            | Navigation.ToNode (Navigation.Fresh (_,ty2),s2) ->
-              if ty1 = ty2 && s1 <> s2 then
-                sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
-              else
-                let sa2 = elementaries.(ty2) in
-                sa2.(s2) <- (step,p.p_id) :: sa2.(s2)
-            | Navigation.ToNode (Navigation.Existing _,s2) ->
-              sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
-            | Navigation.ToNothing | Navigation.ToInternal _ -> ())
-    bottom in
+      Mods.IntMap.iter
+        (fun _ -> List.iter (fun p ->
+             match p.element.recogn_nav with
+             | [] | ((Navigation.Existing _,_),_) :: _ -> assert false
+             | ((Navigation.Fresh _,_),_) :: _ :: _ -> ()
+             | [(Navigation.Fresh (_,ty1),s1),arr as step] ->
+               let sa1 = elementaries.(ty1) in
+               let () = sa1.(s1) <- (step,p.p_id) :: sa1.(s1) in
+               match arr with
+               | Navigation.ToNode (Navigation.Fresh (_,ty2),s2) ->
+                 if ty1 = ty2 && s1 <> s2 then
+                   sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
+                 else
+                   let sa2 = elementaries.(ty2) in
+                   sa2.(s2) <- (step,p.p_id) :: sa2.(s2)
+               | Navigation.ToNode (Navigation.Existing _,s2) ->
+                 sa1.(s2) <- (step,p.p_id) :: sa1.(s2)
+               | Navigation.ToNothing | Navigation.ToInternal _ -> ()))
+        bottom in
     elementaries
 
   let rec insert_navigation domain dst inj_dst2nav p_id nav =
@@ -1073,6 +1085,7 @@ end = struct
 
   let add_cc ~toplevel ?origin env p_id element =
     let w = weight element in
+    let hash = coarse_hash element in
     let rec aux = function
       | [] ->
         let roots = if toplevel then
@@ -1102,14 +1115,17 @@ end = struct
           {p_id=h.p_id; element=h.element;
            depending=add_origin h.depending origin; roots;
           }::t,r,h.p_id in
-    let env_w,r,out = aux (Mods.IntMap.find_default [] w env) in
-    Mods.IntMap.add w env_w env,r,out
+    let env_w = Mods.IntMap.find_default Mods.IntMap.empty w env in
+    let env_w_h,r,out = aux (Mods.IntMap.find_default [] hash env_w) in
+    Mods.IntMap.add w (Mods.IntMap.add hash env_w_h env_w) env,r,out
 
   let rec saturate_one ~max_sharing this max_l level (_,domain as acc) =
     function
     | [] -> if level < max_l then
         saturate_one ~max_sharing this max_l (succ level) acc
-          (Mods.IntMap.find_default [] (succ level) domain)
+          (Mods.IntMap.fold (fun _ -> List.rev_append)
+             (Mods.IntMap.find_default Mods.IntMap.empty (succ level) domain)
+             [])
       else acc
     | h :: t ->
       let news =
@@ -1127,81 +1143,89 @@ end = struct
           acc news in
        saturate_one ~max_sharing this max_l level acc' t
   let rec saturate_level ~max_sharing max_l level (_,domain as acc) =
-    match Mods.IntMap.find_option level domain with
-    | None -> if level <= 0 then acc
-      else saturate_level ~max_sharing max_l (pred level) acc
-    | Some list ->
-      let rec aux acc = function
-        | [] -> saturate_level ~max_sharing max_l (pred level) acc
-        | h::t -> aux (saturate_one ~max_sharing h max_l level acc t) t in
-      aux acc list
+    if level < 2 then acc else
+      match Mods.IntMap.find_option level domain with
+      | None -> saturate_level ~max_sharing max_l (pred level) acc
+      | Some list ->
+        let rec aux acc = function
+          | [] -> saturate_level ~max_sharing max_l (pred level) acc
+          | h::t -> aux (saturate_one ~max_sharing h max_l level acc t) t in
+        aux acc (Mods.IntMap.fold (fun _ -> List.rev_append) list [])
   let saturate ~max_sharing domain =
     match Mods.IntMap.max_key domain with
     | None -> 0,domain
     | Some l ->
       let si =
         Mods.IntMap.fold
-          (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l)
+          (fun _ -> Mods.IntMap.fold
+              (fun _ l m -> List.fold_left (fun m p -> max m p.p_id) m l))
           domain 0 in
       saturate_level ~max_sharing l l (si,domain)
 
   let finalize ~max_sharing env =
     let si,complete_domain = saturate ~max_sharing env.domain in
     let domain = Array.make (succ si) (empty_point env.sig_decl) in
-    let singles = (Mods.IntMap.find_default [] 1 complete_domain) in
+    let singles =
+      Mods.IntMap.find_default Mods.IntMap.empty 1 complete_domain in
     let elementaries = fill_elem env.sig_decl singles in
     let () =
-      List.iter
-        (fun x ->
-           domain.(x.p_id) <-
-             { Env.content = x.element; Env.sons = [];
-               Env.deps = x.depending; Env.roots = x.roots; })
+      Mods.IntMap.iter
+        (fun _ -> List.iter
+            (fun x ->
+               domain.(x.p_id) <-
+                 { Env.content = x.element; Env.sons = [];
+                   Env.deps = x.depending; Env.roots = x.roots; }))
         singles in
     let nav_steps =
       Mods.IntMap.fold
-        (fun level l acc ->
-           if level <= 1 then acc else
-             List.fold_left (fun acc x ->
-                 let () =  domain.(x.p_id) <-
-                     { Env.content = x.element; Env.sons = [];
-                       Env.roots = x.roots; Env.deps = x.depending;} in
-                 List.fold_left (fun acc e ->
-                     match matchings e.element x.element with
-                     | [] -> acc
-                     | injs ->
-                       List.fold_left
-                         (fun acc inj_e_x ->
-                            let (inj_e2sup,_),sup =
-                              merge_compatible env.id_by_type env.nb_id
-                                inj_e_x e.element x.element in
-                            match equal sup x.element with
-                            | None -> assert false
-                            | Some inj_sup2x ->
-                              let inj =
-                                Renaming.inverse
-                                  (Renaming.compose
-                                     false inj_e2sup inj_sup2x) in
-                              let nav = build_navigation_between
-                                  inj e.element x.element in
-                              insert_navigation domain x.p_id inj e.p_id nav
-                              + acc
-                         )
-                           acc injs
-                   ) acc singles) acc l)
+        (fun level domain_level acc_level ->
+           if level <= 1 then acc_level else
+             Mods.IntMap.fold
+               (fun _ l acc ->
+                  List.fold_left (fun acc x ->
+                      let () =  domain.(x.p_id) <-
+                          { Env.content = x.element; Env.sons = [];
+                            Env.roots = x.roots; Env.deps = x.depending;} in
+                      Mods.IntMap.fold (fun _ ll accl->
+                          List.fold_left (fun acc e ->
+                              match matchings e.element x.element with
+                              | [] -> acc
+                              | injs ->
+                                List.fold_left
+                                  (fun acc inj_e_x ->
+                                     let (inj_e2sup,_),sup =
+                                       merge_compatible env.id_by_type env.nb_id
+                                         inj_e_x e.element x.element in
+                                     match equal sup x.element with
+                                     | None -> assert false
+                                     | Some inj_sup2x ->
+                                       let inj =
+                                         Renaming.inverse
+                                           (Renaming.compose
+                                              false inj_e2sup inj_sup2x) in
+                                       let nav = build_navigation_between
+                                           inj e.element x.element in
+                                       insert_navigation domain x.p_id inj e.p_id nav
+                                       + acc
+                                  )
+                                  acc injs
+                            ) accl ll) singles acc) acc l)
+               domain_level acc_level)
         complete_domain 0 in
-    let level0 = Mods.IntMap.find_default [] 0 complete_domain in
+    let level0 = Mods.IntMap.find_default Mods.IntMap.empty 0 complete_domain in
     let single_agent_points =
       Array.make (Array.length env.id_by_type) None in
     let () =
-      List.iter
-        (fun p ->
-           match find_root p.element with
-           | None -> ()
-           | Some (_,ty) ->
-             let () = domain.(p.p_id) <-
-                 { Env.content = p.element; Env.roots = p.roots;
-                   Env.deps = p.depending; Env.sons = []; } in
-             single_agent_points.(ty) <- Some (p.p_id,p.depending))
+      Mods.IntMap.iter (fun _ ->
+          List.iter
+            (fun p ->
+               match find_root p.element with
+               | None -> ()
+               | Some (_,ty) ->
+                 let () = domain.(p.p_id) <-
+                     { Env.content = p.element; Env.roots = p.roots;
+                       Env.deps = p.depending; Env.sons = []; } in
+                 single_agent_points.(ty) <- Some (p.p_id,p.depending)))
         level0 in
     {
       Env.sig_decl = env.sig_decl;
@@ -1215,8 +1239,11 @@ end = struct
   let of_env env =
     let add_cc acc p =
       let w = weight p.element in
-      Mods.IntMap.add
-        w (p::Mods.IntMap.find_default [] w acc) acc in
+      let hash = coarse_hash p.element in
+      let acc_w = Mods.IntMap.find_default Mods.IntMap.empty w acc in
+      Mods.IntMap.add w
+        (Mods.IntMap.add hash (p::Mods.IntMap.find_default [] hash acc_w) acc_w)
+        acc in
     let domain' =
       Tools.array_fold_lefti (fun p_id acc p ->
           add_cc acc {p_id; element=p.Env.content;
