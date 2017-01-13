@@ -416,7 +416,7 @@ let collect_rule_partition_aux parameters error rule_id
   let error, store_result =
     Site_accross_bonds_domain_type.AgentSite_map_and_set.Map.fold
       (fun pair_site tuple_set (error, store_result) ->
-         let error, old_set =
+         let error', old_set =
            match
              Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
                parameters error
@@ -428,14 +428,16 @@ let collect_rule_partition_aux parameters error rule_id
              Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.empty
            | error, Some s -> error, s
          in
-         let error, new_set =
+         let error'', new_set =
            Site_accross_bonds_domain_type.PairAgentSitesState_map_and_set.Set.union
-             parameters error
+             parameters error'
              old_set
              tuple_set
          in
-         let error = Exception.check_point Exception.warn parameters error
-             error __POS__ Exit in
+         let error =
+           Exception.check_point Exception.warn parameters error
+             error'' __POS__ Exit
+         in
          let error, store_result =
            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
              parameters error
