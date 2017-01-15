@@ -14,6 +14,7 @@ import threading
 import kappa_common
 
 class FileMetadata(object):
+
     def __init__(self,
                  file_metadata_id,
                  file_metadata_position,
@@ -23,15 +24,18 @@ class FileMetadata(object):
         self.file_metadata_position = file_metadata_position
         self.file_metadata_compile = file_metadata_compile
         self.file_metadata_hash = file_metadata_hash
+
     def toJSON(self):
         return({ "file_metadata_compile" : self.file_metadata_compile ,
                  "file_metadata_hash" : self.file_metadata_hash ,
                  "file_metadata_id" : self.file_metadata_id ,
                  "file_metadata_position" : self.file_metadata_position })
+
     def get_file_id(self):
         return(self.file_metadata_id)
 
 class File(object):
+
     def __init__(self,
                  file_metadata,
                  file_content):
@@ -48,21 +52,72 @@ class File(object):
         return(self.file_content)
 
 class SimulationParameter(object):
+
     def __init__(self,
                  simulation_plot_period,
                  simulation_id,
                  simulation_max_time = None,
-                 simulation_max_events = None) :
+                 simulation_max_events = None,
+                 simulation_seed = None) :
         self.simulation_plot_period = simulation_plot_period
         self.simulation_id = simulation_id
         self.simulation_max_time = simulation_max_time
         self.simulation_max_events = simulation_max_events
+        self.simulation_seed = simulation_seed
 
     def toJSON(self):
         return({ "simulation_plot_period" : self.simulation_plot_period,
                  "simulation_id" : self.simulation_id,
                  "simulation_max_time" : self.simulation_max_time,
-                 "simulation_max_events" : self.simulation_max_events })
+                 "simulation_max_events" : self.simulation_max_events ,
+                 "simulation_seed" : self.simulation_seed })
+
+class PlotLimit(object):
+
+    def __init__(self,
+                 plot_limit_offset,
+                 plot_limit_points = None) :
+        self.plot_limit_offset = plot_limit_offset
+        self.plot_limit_points = plot_limit_points
+
+    def toURL(self):
+
+        if self.plot_limit_offset :
+            url_plot_limit_offset = "&plot_limit_offset={0}".format(self.plot_limit_offset)
+        else :
+            url_plot_limit_offset = ""
+
+        if self.plot_limit_points :
+            url_plot_limit_points = "&plot_limit_points={0}".format(self.plot_limit_points)
+        else :
+            url_plot_limit_points = ""
+
+        url_plot_limit = "{0}{1}".format(url_plot_limit_offset,
+                                         url_plot_limit_points)
+        return url_plot_limit
+
+    def toJSON(self):
+        return({ "plot_limit_offset" : self.plot_limit_offset ,
+                 "plot_limit_points" : self.plot_limit_points })
+
+class PlotParameter(object):
+    def __init__(self,
+                 plot_parameter_plot_limit = None) :
+        self.plot_parameter_plot_limit = plot_parameter_plot_limit
+
+    def toJSON(self):
+        if self.plot_parameter_plot_limit :
+            limit = self.plot_parameter_plot_limit.toJSON()
+        else:
+            limit =  None
+        return({ "plot_parameter_plot_limit" : limit })
+
+    def toURL(self):
+        if self.plot_parameter_plot_limit :
+            url = self.plot_parameter_plot_limit.toURL()
+        else:
+            url = ""
+        return url
 
 # the outputs are returned as json hydrate to an object model
 def hydrate_filemetada (info):
@@ -132,9 +187,14 @@ class KappaStd(kappa_common.StdBase):
         return(self.dispatch("SimulationDetailLogMessage",
                              [project_id,simulation_id]))
 
-    def simulation_detail_plot(self,project_id,simulation_id):
+    def simulation_detail_plot(self,project_id,simulation_id,plot_parameter = None):
+        if plot_parameter :
+            parameter = plot_parameter.toJSON()
+        else:
+            parameter = PlotParameter().toJSON()
+
         return(self.dispatch("SimulationDetailPlot",
-                             [project_id,simulation_id]))
+                             [project_id,simulation_id,parameter]))
 
     def simulation_detail_snapshot(self,project_id,simulation_id,snapshot_id):
         return(self.dispatch("SimulationDetailSnapshot",
@@ -247,17 +307,21 @@ class KappaRest(kappa_common.RestBase):
         url = "{0}/projects/{1}/simulations/{2}/logmessages".format(self.url,project_id,simulation_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_plot(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}/plot".format(self.url,project_id,simulation_id)
+    def simulation_detail_plot(self,project_id,simulation_id,plot_parameter = None):
+        if plot_parameter :
+            parameter = "?{0}".format(plot_parameter.toURL())
+        else:
+            parameter =  ""
+        url = "{0}/projects/{1}/simulations/{2}/plot{3}".format(self.url,project_id,simulation_id,parameter)
+        print(url)
         return(self.dispatch("GET",url,None))
-
 
     def simulation_detail_snapshot(self,project_id,simulation_id,snapshot_id):
         url = "{0}/projects/{1}/simulations/{2}/snapshots/{3}".format(self.url,project_id,snapshot_id)
         return(self.dispatch("GET",url,None))
 
     def simulation_info(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,project_id)
+        url = "{0}/projects/{1}/simulations/{2}".format(self.url,project_id,simulation_id)
         return(self.dispatch("GET",url,None))
 
     def simulation_info_file_line(self,project_id,simulation_id):
@@ -299,9 +363,9 @@ class KappaRest(kappa_common.RestBase):
         return(self.dispatch("PUT",url,message ))
 
     def simulation_start(self,project_id,simulation_parameter):
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,project_id,snapshot_id)
+        url = "{0}/projects/{1}/simulations".format(self.url,project_id)
         message = simulation_parameter.toJSON()
-        return(self.dispatch("PUT",url,message ))
+        return(self.dispatch("POST",url,message ))
 
 def scratch():
     file_id = str(uuid.uuid1())
@@ -337,6 +401,117 @@ def scratch():
 
 
 def main():
+    # command line
+    argv = sys.argv[1:]
+    cmd = "kappa_client.py"
+
+    # default arguments
+    inputfile = None  # if missing input file just get version
+    url = "http://localhost:8080"
+    max_time = None
+    max_events = None
+    plot_period = 0.1
+    seed = None
+
+    try:
+        opts, args = getopt.getopt(argv,
+                                   "hk:u:t:e:pp:s",
+                                   ["kappafile=",
+                                    "url=",
+                                    "max_time=",
+                                    "max_events=",
+                                    "plot_period=",
+                                    "seed=", ])
+    except:
+        print(cmd
+              + ' -k <kappafile> '
+              + ' -u <url or path to stdsim> '
+              + ' -t <max_time> '
+              + ' -e <max_events> '
+              + ' -pp <plot_period> '
+              + ' -s <random_seed> ')
+
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print(cmd+' -i <inputfile> -o <outputfile>')
+            sys.exit()
+        elif opt in ("-k", "--kappafile"):
+            inputfile = arg
+        elif opt in ("-u", "--url"):
+            url = arg
+        elif opt in ("-t", "--max_time"):
+            max_time = float(arg)
+        elif opt in ("-e", "--max-events"):
+            max_events = int(arg)
+        elif opt in ("-pp", "--plot_period"):
+            plot_period = float(arg)
+        elif opt in ("-s", "--seed"):
+            seed = int(arg)
+
+    print('Input file is : {0} '.format(inputfile))
+    print('Endpoint url : {0} '.format(url))
+    print('Max time : {0}'.format(max_time))
+    print('Max events : {0} '.format(max_events))
+    print('Plot period : {0} '.format(plot_period))
+    print('Random seed : {0} '.format(seed))
+
+    try:
+        if url.startswith('http'):
+            runtime = KappaRest(url)
+        else:
+            runtime = KappaStd(url)
+        project_id = "{0}-{1}".format(cmd,str(uuid.uuid1()))
+        print("project_id : {0}".format(runtime.project_create(project_id)))
+        if inputfile:
+            with open(inputfile) as f:
+                code = f.read()
+                file_content = str(code)
+                file_metadata = FileMetadata(inputfile,0)
+                file_object = File(file_metadata,file_content)
+                runtime.file_create(project_id,file_object)
+                simulation_id = str(uuid.uuid1())
+                print("simulation_id : {0}".format(simulation_id))
+
+
+                end_time = 10.0
+                simulation_parameter = SimulationParameter(plot_period,
+                                                           simulation_id,
+                                                           max_time,
+                                                           max_events,
+                                                           seed)
+                runtime.simulation_start(project_id,simulation_parameter)
+
+                simulation_info = runtime.simulation_info(project_id,simulation_id)
+
+                while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
+                    time.sleep(1)
+
+                    percentage = ""
+                    time_percentage = simulation_info["simulation_info_progress"]["simulation_progress_time_percentage"]
+                    event_percentage = simulation_info["simulation_info_progress"]["simulation_progress_event_percentage"]
+
+                    if time_percentage or time_percentage == 0 :
+                        percentage = time_percentage
+                    if event_percentage or event_percentage == 0 :
+                        percentage = event_percentage
+
+                    sys.stdout.write("..{0}.. ".format(percentage))
+                    sys.stdout.flush()
+                    simulation_info = runtime.simulation_info(project_id,simulation_id)
+
+                print("")
+                print("info")
+                print(simulation_info)
+                plot_detail = runtime.simulation_detail_plot(project_id,simulation_id,)
+                print("plot")
+                print(plot_detail)
+        else:
+            print(runtime.info())
+    except kappa_common.KappaError as exception:
+        print(exception.errors)
+    return None
     None
 
 if __name__ == "__main__":

@@ -307,3 +307,11 @@ let features
   match matches with
   | [] -> default
   | _::_ -> matches
+
+
+let input_change input_dom signal_handler =
+  input_dom##.onchange :=
+    Dom_html.handler
+      (fun _ ->
+         let () = signal_handler (Js.to_string (input_dom##.value)) in
+         Js._true)

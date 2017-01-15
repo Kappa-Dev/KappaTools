@@ -69,8 +69,8 @@ let on_message
   | `SimulationDetailLogMessage (project_id,simulation_id) ->
     (manager#simulation_detail_log_message project_id simulation_id) >>=
     (handler (fun result -> `SimulationDetailLogMessage result))
-  | `SimulationDetailPlot (project_id,simulation_id) ->
-    (manager#simulation_detail_plot project_id simulation_id) >>=
+  | `SimulationDetailPlot (project_id,simulation_id,plot_parameter) ->
+    (manager#simulation_detail_plot project_id simulation_id plot_parameter) >>=
     (handler (fun result -> `SimulationDetailPlot result))
   | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
     (manager#simulation_detail_snapshot project_id simulation_id snapshot_id) >>=
@@ -327,10 +327,12 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_detail_plot
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.plot Api.result Lwt.t =
+        (simulation_id : Api_types_j.simulation_id)
+        (plot_parameter : Api_types_j.plot_parameter)
+      :
+      Api_types_j.plot_detail Api.result Lwt.t =
       self#message (`SimulationDetailPlot
-                      (project_id,simulation_id)) >>=
+                      (project_id,simulation_id,plot_parameter)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailPlot plot ->

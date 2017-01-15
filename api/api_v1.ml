@@ -103,9 +103,11 @@ let assemble_plot
     (manager#simulation_detail_plot
        project_id
        simulation_id
+       { Api_types_j.plot_parameter_plot_limit = None ; }
     ) >>=
        Api_common.result_bind_lwt
-         ~ok:(fun (plot : Api_types_j.plot) ->
+         ~ok:(fun (plot_detail : Api_types_j.plot_detail) ->
+             let plot : Api_types_j.plot = plot_detail.Api_types_j.plot_detail_plot in
              Lwt.return
                (Api_common.result_ok (Some (Api_data_v1.api_plot plot)))
            )

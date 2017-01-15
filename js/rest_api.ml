@@ -221,7 +221,23 @@ class manager
         None
         Mpi_message_j.log_message_detail_of_string
         (fun result -> `SimulationDetailLogMessage result)
-    | `SimulationDetailPlot (project_id,simulation_id) ->
+    | `SimulationDetailPlot (project_id,simulation_id,plot_parameters) ->
+      let args =
+        String.concat
+          "&"
+          (List.map
+             (fun (key,value) -> Format.sprintf "%s=%s" key value)
+             (match plot_parameters.Api_types_j.plot_parameter_plot_limit with
+              | None -> []
+              | Some plot_limit ->
+                (match plot_limit.Api_types_j.plot_limit_offset with
+                 | None -> []
+                 | Some plot_limit_offset -> [("plot_limit_offset",string_of_int plot_limit_offset)])
+                @
+                (match plot_limit.Api_types_j.plot_limit_points with
+                 | None -> []
+                 | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
+             )) in
       send
         timeout
         (Format.sprintf
@@ -230,8 +246,8 @@ class manager
            project_id
            simulation_id)
         `GET
-        None
-        Mpi_message_j.plot_of_string
+        (Some args)
+        Mpi_message_j.plot_detail_of_string
         (fun result -> `SimulationDetailPlot result)
     | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
       send

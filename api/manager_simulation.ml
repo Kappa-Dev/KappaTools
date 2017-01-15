@@ -180,29 +180,115 @@ class manager_log_message
 
   end;;
 
+let plot_time_series
+  (start_time : float option)
+  (plot : Api_types_j.plot) :
+  Api_types_j.observable list =
+  match start_time with
+  | None -> plot.Api_types_j.plot_time_series
+  | Some start_time ->
+    List.filter
+      (fun (observable : Api_types_j.observable) ->
+         match List.nth observable 0 with
+         | None -> false
+         | Some time -> time >= start_time)
+      plot.Api_types_j.plot_time_series
+
+let plot_index
+    (plot_limit : Api_types_j.plot_limit)
+    (plot : Api_types_j.plot) :
+  (int * Api_types_j.observable) list =
+  let observables_size : int = List.length plot.Api_types_j.plot_time_series in
+  let observables_index : (int * Api_types_j.observable) list =
+    List.mapi
+      (fun index observable -> (index,observable))
+      plot.Api_types_j.plot_time_series
+  in
+  let observables_filtered : (int * Api_types_j.observable) list =
+    List.filter
+      (match plot_limit.Api_types_j.plot_limit_offset with
+       | None -> fun _ -> true
+       | Some offset -> fun (index,_) -> offset < observables_size - index)
+      observables_index in
+  observables_filtered
+
+let rec plot_range (data : (int * Api_types_j.observable) list) :
+  Api_types_j.plot_range option =
+  match data with
+  | [] -> None
+  | (start_index,_)::tail ->
+    (match plot_range tail with
+    | None -> Some { Api_types_j.plot_range_begin = start_index ;
+                     Api_types_j.plot_range_end = start_index ; }
+    | Some { Api_types_j.plot_range_begin = plot_range_begin ;
+             Api_types_j.plot_range_end = plot_range_end ; } ->
+      Some { Api_types_j.plot_range_begin = min start_index plot_range_begin ;
+             Api_types_j.plot_range_end = max start_index plot_range_end ; })
+
+let plot_plot (data : (int * Api_types_j.observable) list) :
+  Api_types_j.observable list =
+  List.map snd data
+
+let plot_limit
+    (plot_limit : Api_types_j.plot_limit)
+    (plot : Api_types_j.plot) :
+  (int * Api_types_j.observable) list =
+  let rec first n =
+    function | [] -> (0,[])
+             | h::t ->
+               let (len,l) = first n t in
+               if len < n then
+                 (len + 1,h::l)
+               else
+                 (len + 1,l)
+  in
+  let points = plot_index plot_limit plot in
+  match plot_limit.Api_types_j.plot_limit_points with
+  | None -> points
+  | Some plot_limit_points ->
+    snd (first plot_limit_points points)
+
 class manager_plot
     (environment : Api_environment.environment)
     (system_process : Kappa_facade.system_process) :
   Api.manager_plot =
   object(self)
-
-    method private get_plot (detail : Api_types_j.simulation_detail) :
-      Api_types_j.plot Api.result =
+    method private get_plot
+        (plot_parameter : Api_types_j.plot_parameter)
+        (detail : Api_types_j.simulation_detail) :
+      Api_types_j.plot_detail Api.result =
       match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_plot with
-      | Some plot -> Api_common.result_ok plot
+      | Some plot ->
+        let plot_detail_size = List.length plot.Api_types_j.plot_time_series  in
+        Api_common.result_ok
+          (match  plot_parameter.Api_types_j.plot_parameter_plot_limit with
+           | None ->
+             { Api_types_j.plot_detail_plot = plot ;
+     	       Api_types_j.plot_detail_range =
+               Some { Api_types_j.plot_range_begin = 0 ;
+     		      Api_types_j.plot_range_end = plot_detail_size - 1 ; } ;
+	       Api_types_j.plot_detail_size = plot_detail_size ; }
+           | Some plot_parameter ->
+             let observable_index = plot_limit plot_parameter plot in
+             { Api_types_j.plot_detail_plot =
+                 { plot with Api_types_j.plot_time_series = List.map snd observable_index } ;
+               Api_types_j.plot_detail_range = plot_range observable_index ;
+               Api_types_j.plot_detail_size = List.length plot.Api_types_j.plot_time_series ; }
+          )
       | None -> let m : string = "plot not available" in
         Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
     method simulation_detail_plot
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.plot Api.result Lwt.t =
+        (simulation_id : Api_types_j.simulation_id)
+        (plot_parameter : Api_types_j.plot_parameter) :
+      Api_types_j.plot_detail Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
           ~simulation_id:simulation_id
-          ~projection:self#get_plot
+          ~projection:(self#get_plot plot_parameter)
   end;;
 
 class manager_snapshot

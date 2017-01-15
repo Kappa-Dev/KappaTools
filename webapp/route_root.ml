@@ -233,13 +233,41 @@ let route
      };
      { Webapp_common.path =
          "/v2/projects/{projectid}/simulations/{simulationid}/plot" ;
+       (* get args *)
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
+            (* "max_points" "limit_method" *)
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let query = Uri.get_query_param  uri in
+            let plot_limit_points : int option =
+              match query "plot_limit_points" with
+              | None -> None
+              | Some plot_limit_points ->
+                Some (int_of_string plot_limit_points)
+            in
+            let plot_limit_offset : int option =
+              match query "plot_limit_offset" with
+              | None -> None
+              | Some t -> Some (int_of_string t)
+            in
+            let plot_limit : Api_types_j.plot_limit =
+              { Api_types_j.plot_limit_offset = plot_limit_offset  ;
+                Api_types_j.plot_limit_points = plot_limit_points ; } in
             let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_detail_plot project_id simulation_id) >>=
+            (* handle malformed *)
+            (Lwt.return
+               (Api_common.result_ok
+                  { Api_types_j.plot_parameter_plot_limit  = Some plot_limit ;
+                  } )) >>=
+            (Api_common.result_bind_lwt
+               ~ok:(fun plot_parameter ->
+                   manager#simulation_detail_plot project_id simulation_id plot_parameter
+               )
+            )>>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_plot ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_plot_detail ?len:None)
             )
          )
      };

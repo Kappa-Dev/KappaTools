@@ -99,7 +99,8 @@ class type  manager_plot =
     method simulation_detail_plot :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
-      Api_types_j.plot result Lwt.t
+      Api_types_j.plot_parameter ->
+      Api_types_j.plot_detail result Lwt.t
   end;;
 
 class type  manager_snapshot =

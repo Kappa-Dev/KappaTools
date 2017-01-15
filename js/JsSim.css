@@ -10,6 +10,7 @@ span.filler:empty:before {
 }
 .kappa-code {
     white-space : pre;
+    font-family: monospace;
 }
 
 .plot-axis path,

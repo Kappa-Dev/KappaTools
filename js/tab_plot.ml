@@ -13,13 +13,30 @@ let div_axis_select_id  = "plot-axis-select"
 let display_id = "plot-display"
 let export_id = "plot-export"
 
+type offset = { offset_current : int ;
+                offset_max : int ; }
+let offset , set_offset = React.S.create (None : offset option)
+
+let default_point = 1000
+let point , set_points = React.S.create default_point
+
 let has_plot
     (state : Api_types_j.simulation_info option) :
   bool =
   match state with
   | None -> false
   | Some state ->
-    state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot
+    state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot > 0
+let plot_time
+    (state : Api_types_j.simulation_info option) : float option =
+  match state with
+  | None -> None
+  | Some state ->
+    Some state.
+           Api_types_j.
+           simulation_info_progress.
+           Api_types_j.
+           simulation_progress_time
 
 let serialize_json : (unit -> string) ref = ref (fun _ -> "null")
 let serialize_csv : (unit -> string) ref = ref (fun _ -> "")
@@ -46,6 +63,36 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
       ];
     show = React.S.map has_plot simulation_output
   }
+
+let plot_points_input_id = "plot_points_input"
+let plot_points_input =
+  Html.input ~a:[ Html.a_id plot_points_input_id ;
+                  Html.a_input_type `Number;
+                  Html.a_class ["form-control"];
+                  Html.a_size 5;
+                ] ()
+
+let plot_offset_input_id = "plot_offset_input"
+let plot_offset_input =
+  Html.input ~a:[ Tyxml_js.R.Html.a_class
+                     (React.S.bind
+                       offset
+                       (function
+                         | None -> React.S.const [ "hide" ]
+                         | Some _ -> React.S.const [])
+                     );
+                  Tyxml_js.R.Html.a_input_max
+                    (React.S.bind
+                       offset
+                       (function
+                         | None -> React.S.const (`Number 0)
+                         | Some max_offset -> React.S.const (`Number max_offset.offset_max))
+                    );
+                  Html.a_id plot_offset_input_id ;
+                  Html.a_input_type `Range ;
+                  Html.a_input_min (`Number 0) ;
+                  Html.a_placeholder "offset" ;
+                ] ()
 
 let content (t : Ui_simulation.t) =
   let plot_show_legend =
@@ -79,17 +126,25 @@ let content (t : Ui_simulation.t) =
          </div>
       </div>
       <div class="row">
-        <div class="col-sm-2">
-     |}[plot_show_legend]{| Legend
+        <div class="col-sm-1">
+             |}[plot_show_legend]{| Legend
         </div>
-      <div class="col-sm-3">
-       Log X |}[plot_x_axis_log_checkbox]{|
+        <div class="col-sm-2">
+             Log X |}[plot_x_axis_log_checkbox]{|
              Log Y |}[plot_y_axis_log_checkbox]{|
-      </div>
+        </div>
+        <div class="col-sm-2" id="|}div_axis_select_id{|"></div>
+        <div class="col-sm-2">
+           <div class="input-group">
+              <span class="input-group-addon">Points</span>
+              |}[plot_points_input]{|
+           </div>
+        </div>
+        <div class="col-sm-2">
+           |}[plot_offset_input]{|
 
-      <div class="col-sm-4" id="|}div_axis_select_id{|">
+        </div>
       </div>
-    </div>
   </div>
   <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
@@ -132,28 +187,81 @@ let get_dimension () =
   | None -> calculate_dimension ()
   | Some dimension -> dimension
 
+let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) : int =
+  let plot_size = simulation_info.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot in
+  max 0 (plot_size - (React.S.value point))
+
+let update_offset
+    (update_offset_input : bool)
+    (t : Ui_simulation.t) : unit =
+  match React.S.value (Ui_simulation.simulation_output t) with
+  | None -> ()
+  | Some simulation_info ->
+    if simulation_info.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_is_running then
+      (* If it is running no slider because update causes jitters. *)
+      set_offset None
+    else
+      let offset_max = simulation_info_offset_max simulation_info in
+      let old_offset = React.S.value offset in
+      let offset_current = match old_offset with
+        | Some offset -> offset.offset_current
+        | None -> offset_max in
+      let () =
+        if update_offset_input then
+          let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
+          let () = Common.debug (Js.string (string_of_int offset_current)) in
+          let () = plot_offset_input_dom##.value := Js.string (string_of_int offset_current) in
+          ()
+        else
+          ()
+      in
+      let new_offset =
+        if offset_max > 0 then
+          Some { offset_current = offset_current ;
+                 offset_max = offset_max ; }
+        else
+          None
+      in set_offset new_offset
+
+let plot_limit_offset (t : Ui_simulation.t) : int =
+  match React.S.value offset with
+  | None ->
+    (match React.S.value (Ui_simulation.simulation_output t) with
+     | None -> 0
+     | Some t -> simulation_info_offset_max t)
+  | Some offset -> offset.offset_current
+
+
+let plot_parameter (t : Ui_simulation.t) : Api_types_j.plot_parameter =
+  let point = React.S.value point in
+  { Api_types_j.plot_parameter_plot_limit =
+      Some { Api_types_j.plot_limit_offset = Some (plot_limit_offset t) ;
+             Api_types_j.plot_limit_points = Some point ; } }
+
+
 let update_plot
+    (update_offset_input : bool)
     (t : Ui_simulation.t)
-    (plot : Js_plot.observable_plot Js.t) : unit =
+    (js_plot : Js_plot.observable_plot Js.t) : unit =
   Ui_simulation.manager_operation
     t
     (fun
       manager
       project_id
       simulation_id ->
+      let () = update_offset true t in
       (manager#simulation_detail_plot
          project_id
          simulation_id
-      ) >>=
+         (plot_parameter t)) >>=
       (Api_common.result_map
-         ~ok:(fun _ (data : Api_types_t.plot)  ->
-             let () = serialize_json :=
-                 (fun _ -> Api_types_j.string_of_plot data) in
-             let () = plot##setDimensions(get_dimension ()) in
-             let () = serialize_csv := fun _ -> Api_data.plot_values data in
-             let data : Js_plot.plot_data Js.t =
-               Js_plot.create_data ~plot:data in
-             let () = plot##setPlot(data) in
+         ~ok:(fun _ (plot_detail : Api_types_t.plot_detail)  ->
+             let plot = plot_detail.Api_types_j.plot_detail_plot in
+             let () = serialize_json := (fun _ -> Api_types_j.string_of_plot plot) in
+             let () = js_plot##setDimensions(get_dimension ()) in
+             let () = serialize_csv := fun _ -> Api_data.plot_values plot in
+             let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot in
+             let () = js_plot##setPlot(data) in
              Lwt.return_unit
            )
          ~error:(fun _ errors  ->
@@ -162,8 +270,42 @@ let update_plot
       )
     )
 
+let onload_plot_points_input
+    (t : Ui_simulation.t)
+    (js_plot : Js_plot.observable_plot Js.t) : unit =
+  let plot_points_input_dom : Dom_html.inputElement Js.t = Tyxml_js.To_dom.of_input plot_points_input in
+  let js_point : Js.js_string Js.t = Js.string (string_of_int (React.S.value point)) in
+  let () = plot_points_input_dom##.value := js_point in
+  let () = plot_points_input_dom##.onchange :=
+      Dom_html.handler
+        (fun _ ->
+           let plot_points_string : string = Js.to_string plot_points_input_dom##.value in
+           let plot_points_option : int option =
+             try let plot_point = int_of_string plot_points_string in
+               if plot_point > 0 then
+                 Some plot_point
+               else
+                 None
+             with Failure _ -> None
+           in
+           let () =
+             match plot_points_option with
+             | Some plot_points -> set_points plot_points
+             | None ->
+               let plot_point : int = React.S.value point in
+               let plot_point_string = string_of_int plot_point in
+               let () = plot_points_input_dom##.value := Js.string plot_point_string in
+               let () = set_points default_point in ()
+           in
+           let () = update_plot true t js_plot in
+           Js._true)
+  in
+  ()
+
 let plot_ref = ref None
+
 let onload (t : Ui_simulation.t) =
+  let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
   let simulation_output = (Ui_simulation.simulation_output t) in
   let () = Widget_export.onload (configuration t) in
   let configuration : Js_plot.plot_configuration Js.t =
@@ -181,6 +323,7 @@ let onload (t : Ui_simulation.t) =
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)
+  let () = onload_plot_points_input t plot in
   let () = plot_ref := Some plot in
   let () = Common.jquery_on
       "#navplot"
@@ -188,14 +331,28 @@ let onload (t : Ui_simulation.t) =
       (fun _ ->
          match (React.S.value simulation_output) with
          | None -> ()
-         | Some _ -> update_plot t plot)
+         | Some _ -> update_plot true t plot)
   in
   let _ =
     React.S.l1
       (fun state -> match state with
-           None -> ()
-         | Some _ -> update_plot t plot)
+         | None -> ()
+         | Some _ -> update_plot true t plot)
       simulation_output
+  in
+  let () =
+    Ui_common.input_change
+      plot_offset_input_dom
+      (fun value ->
+         let () = try set_offset
+                        (match React.S.value offset with
+                         | None -> None
+                         | Some offset -> Some { offset with offset_current = int_of_string value })
+           with | Failure _ -> ()
+         in
+         let () = update_plot true t plot in
+         ()
+      )
   in
   ()
 
@@ -211,6 +368,6 @@ let onresize (t : Ui_simulation.t) =
     | Some plot ->
       (match React.S.value simulation_output with
        | None -> ()
-       | Some _ -> update_plot t plot)
+       | Some _ -> update_plot true t plot)
   in
   ()
