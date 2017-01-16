@@ -101,13 +101,11 @@ struct
 
   let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
 
-  (*let get_views_lhs static = lift Analyzer_headers.get_views_lhs static*)
 
   let get_views_lhs' static = lift Analyzer_headers.get_views_lhs' static
 
   let get_action_binding static =
     lift Analyzer_headers.get_action_binding static
-  (*let get_created_bonds static = lift Analyzer_headers.get_created_bonds static*)
 
   let get_modified_map static = lift Analyzer_headers.get_modified_map static
 

@@ -97,7 +97,7 @@ let add_dependency_triple_sites_rule parameters error
 
 (****************************************************************************)
 
-let add_triple_agents_site_rule parameters error (*CHECK this function*)
+let add_triple_agents_site_rule parameters error
     (agent_id, agent_type, site_type) rule_id
     store_result =
   let error', current_set =

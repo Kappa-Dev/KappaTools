@@ -243,17 +243,6 @@ let set_views_rhs sites static =
     }
     static
 
-(*let get_views_lhs static =
-  (get_test_views static).Common_static.store_views_lhs
-
-let set_views_lhs sites static =
-  set_test_views
-    {
-      (get_test_views static) with
-      Common_static.store_views_lhs = sites
-    }
-    static*)
-
 let get_views_lhs' static =
   (get_test_views static).Common_static.store_views_lhs'
 

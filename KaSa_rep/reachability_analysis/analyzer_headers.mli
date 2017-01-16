@@ -157,17 +157,6 @@ val set_views_rhs :
   global_static_information ->
   global_static_information
 
-(*val get_views_lhs :
-  global_static_information ->
-  Ckappa_sig.AgentsSitePState_map_and_set.Set.t
-    Ckappa_sig.Rule_map_and_set.Map.t
-
-val set_views_lhs :
-  Ckappa_sig.AgentsSitePState_map_and_set.Set.t
-    Ckappa_sig.Rule_map_and_set.Map.t ->
-  global_static_information ->
-  global_static_information*)
-
 val get_views_lhs' :
   global_static_information ->
   Ckappa_sig.pair_of_states

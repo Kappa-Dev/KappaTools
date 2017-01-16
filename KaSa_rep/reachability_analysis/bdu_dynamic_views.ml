@@ -342,7 +342,6 @@ let scan_rule_dynamic parameters log_info error _compiled
       parameters
       log_info
       error
-(*store_pre_static.Bdu_static_views.store_test_modif_map (*common-static*)*)
       store_test_modif_map
       store_potential_side_effects
       store_covering_classes_id
@@ -383,7 +382,6 @@ let scan_rule_set_dynamic
     compiled
     kappa_handler
     handler_bdu
-(*store_common_static*)
     store_test_modif_map
     covering_classes
     store_covering_classes_id
@@ -399,7 +397,6 @@ let scan_rule_set_dynamic
       covering_classes
       store_covering_classes_id
       store_potential_side_effects
-(*store_common_static*)
       store_test_modif_map
       init_bdu_analysis_dynamic
   in

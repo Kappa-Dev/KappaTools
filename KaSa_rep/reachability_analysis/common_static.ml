@@ -61,9 +61,6 @@ type test_views =
     store_views_rhs :
       Ckappa_sig.AgentsSitePState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    (*store_views_lhs :
-      Ckappa_sig.AgentsSitePState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;*) (*REMOVE*)
     store_views_lhs' : (*TODO*)
       Ckappa_sig.pair_of_states
         Ckappa_sig.Site_map_and_set.Map.t
@@ -84,7 +81,7 @@ type test_views =
 
   }*)
 
-type common_views = (*CHANGE NAME*)
+type common_views =
   {
     store_agent_name             : Ckappa_sig.c_agent_name
         Ckappa_sig.RuleAgent_map_and_set.Map.t;
@@ -129,7 +126,6 @@ let init_modification_views =
 let init_test_views =
   {
     store_views_rhs = empty_rule;
-    (*store_views_lhs = empty_rule; (*REMOVE*)*)
     store_views_lhs' = empty_rule;
     store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
   }
@@ -929,18 +925,11 @@ let collect_views_aux parameter error rule_id views store_result =
   in
   error, store_result
 
-let collect_views_rhs parameter error rule_id rule store_result =
+let collect_views_rhs parameter error rule_id rule store_result = (*TODO*)
   collect_views_aux
     parameter error
     rule_id
     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-    store_result
-
-let collect_views_lhs parameter error rule_id rule store_result =
-  collect_views_aux
-    parameter error
-    rule_id
-    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     store_result
 
 let collect_views_aux' parameter error rule_id views store_result =
@@ -1012,13 +1001,6 @@ let error, store_views_rhs =
     rule
     store_result.store_views_rhs
 in
-(*let error, store_views_lhs =
-  collect_views_lhs
-    parameters error
-    rule_id
-    rule
-    store_result.store_views_lhs
-in*)
 let error, store_views_lhs' =
   collect_views_lhs'
     parameters error
@@ -1037,7 +1019,6 @@ in
 error,
 {
   store_views_rhs = store_views_rhs;
-  (*store_views_lhs = store_views_lhs;*)
   store_views_lhs' = store_views_lhs';
   store_test_sites = store_test_sites;
 }
