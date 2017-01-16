@@ -28,12 +28,6 @@ type pre_static =
         Ckappa_sig.AgentsSite_map_and_set.Map.t;
     store_test_modification_sites : Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentsSite_map_and_set.Map.t;
-    (*views that are tested and modificated without agent_id, will be used in
-      update function*)
-    (*store_modif_map: Ckappa_sig.Rule_map_and_set.Set.t
-        Ckappa_sig.AgentSite_map_and_set.Map.t;*)
-    (*store_test_map : Ckappa_sig.Rule_map_and_set.Set.t
-        Ckappa_sig.AgentSite_map_and_set.Map.t;*)
     store_test_modif_map:
       Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentSite_map_and_set.Map.t;
@@ -49,8 +43,6 @@ let init_pre_static =
     store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-    (*store_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;*)
-    (*store_test_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;*)
     store_test_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty
   }
 
@@ -201,48 +193,6 @@ let collect_modification_sites parameters error rule_id diff_direct
   in
   error, store_result
 
-(*update of the views due to modification without agent_id*)
-(*NOTE: this function does not use anywhere*)
-(*let collect_projection_agent_id_from_triple parameters error store_result =
-  Covering_classes_type.Project2_modif.monadic_proj_map
-    (fun parameters error (_agent_id, agent_type, site_type) ->
-       error, (agent_type, site_type))
-    parameters
-    error
-    (Ckappa_sig.Rule_map_and_set.Set.empty)
-    (fun parameters error s1 s2 ->
-       let error', new_set =
-         Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
-       in
-       let error =
-         Exception.check_point
-           Exception.warn parameters error error' __POS__ Exit
-       in
-       error, new_set
-    ) store_result*)
-
-(*let collect_modif_map parameters error store_modification_sites =
-  collect_projetion_agent_id_from_triple
-    parameters error
-    store_result*)
-
-(*Covering_classes_type.Project2_modif.monadic_proj_map
-    (fun _parameters error (_agent_id, agent_type, site_type) ->
-       error, (agent_type, site_type))
-    parameters
-    error
-    Ckappa_sig.Rule_map_and_set.Set.empty
-    (fun parameters error s1 s2 ->
-       let error', new_set =
-         Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
-       in
-       let error =
-         Exception.check_point
-           Exception.warn parameters error error' __POS__ Exit
-       in
-       error, new_set
-    ) store_modification_sites*)
-
 (**************************************************************************)
 (*collect a set of rule_id of test rule and modification *)
 
@@ -275,27 +225,6 @@ let collect_test_sites parameters error rule_id viewslhs
     Ckappa_sig.AgentsSite_map_and_set.Map.map (fun x -> x) store_result
   in
   error, store_result
-
-(*valuations of the views that are created without agent_id*)
-
-(*let collect_test_map parameters error store_test_sites =
-  collect_*)
-  (*Covering_classes_type.Project2_modif.monadic_proj_map
-    (fun _parameters error (_agent_id, agent_type, site_type) ->
-       error, (agent_type, site_type))
-    parameters
-    error
-    (Ckappa_sig.Rule_map_and_set.Set.empty)
-    (fun parameters error s1 s2 ->
-       let error', new_set =
-         Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
-       in
-       let error =
-         Exception.check_point
-           Exception.warn parameters error error' __POS__ Exit
-       in
-       error, new_set
-    ) store_test_sites*)
 
 (**************************************************************************)
 (*modification and test rule that has rule_id union together.
@@ -352,27 +281,6 @@ let collect_test_modification_sites
        error, store_result
     ) store_modification_map store_test_map store_result
 
-(*valuations of the views that are created without agent_id*)
-(*MOVE*)
-(*let collect_test_modif_map parameters error store_test_modification_sites =
-  Covering_classes_type.Project2_modif.monadic_proj_map
-    (fun _parameters error (_agent_id, agent_type, site_type) ->
-       error, (agent_type, site_type)
-    )
-    parameters error
-    (Ckappa_sig.Rule_map_and_set.Set.empty)
-    (fun parameters error s1 s2 ->
-       let error', new_set =
-         Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
-       in
-       let error =
-         Exception.check_point
-           Exception.warn parameters error error' __POS__ Exit
-       in
-       error, new_set
-    )
-    store_test_modification_sites*)
-
 (****************************************************************************)
 
 let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
@@ -387,14 +295,6 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
       rule.Cckappa_sig.diff_direct
       store_result.store_modification_sites
   in
-  (*--------------------------------------------------------------*)
-  (*update of the views due to modification without agent_id*)
-  (*let error, store_modif_map =
-    collect_modif_map
-      parameters
-      error
-      store_modification_sites
-  in*)
   (*-------------------------------------------------------------*)
   (*valuations of the views that are tested with agent_id*)
   let error, store_test_sites =
@@ -405,14 +305,6 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       store_result.store_test_sites
   in
-  (*---------------------------------------------------------------*)
-  (*valuations of the views that are tested without agent_id*)
-  (*let error, store_test_map =
-    collect_test_map
-      parameters
-      error
-      store_test_sites
-  in*)
   (*---------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification with
     agent_id*)
@@ -438,8 +330,6 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
     store_modification_sites      = store_modification_sites;
     store_test_sites              = store_test_sites;
     store_test_modification_sites = store_test_modification_sites;
-    (*store_modif_map               = store_modif_map;*)
-    (*store_test_map                = store_test_map;*)
     store_test_modif_map          = store_test_modif_map;
   }
 
@@ -1280,11 +1170,6 @@ let collect_proj_bdu_test_restriction parameters handler_kappa handler error
            Ckappa_sig.Views_bdu.mvbdu_and
              parameters handler error bdu bdu'
          in
-         (*let _ =
-           Loggers.fprintf (Remanent_parameters.get_logger parameters) "BDU_UNION:\n";
-           Ckappa_sig.Views_bdu.print parameters bdu_union
-         in
-         *)
          (error, handler), bdu_union
       )
       store_bdu_test_restriction_map

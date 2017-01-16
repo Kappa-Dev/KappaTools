@@ -176,28 +176,6 @@ let collect_agent_name_from_pattern parameters error pattern store_result =
 (*Side effects*)
 (**************************************************************************)
 
-(*let add_link_pair_agent_site parameters error (agent_type, site_type) x
-    store_result =
-  let error, (l, old) =
-    match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-            parameters
-            error
-            (agent_type, site_type)
-            store_result
-    with
-    | error, None -> error, ([], [])
-    | error, Some (l, l') -> error, (l, l')
-  in
-  let error, store_result =
-    Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
-      parameters
-      error
-      (agent_type, site_type)
-      (l, x :: old)
-      store_result
-  in
-  error, store_result*)
-
 let get_last_entry_in_state_dic parameters error (agent_type, site_type)
     handler  =
   let error, state_dic =
@@ -297,28 +275,6 @@ let remove_action parameters error rule_id remove store_result =
 
 (****************************************************************************)
 (*return a potential sites of side effects in the case of half break action*)
-
-(*let add_link_pair_agent_rule parameters error (agent_type, rule_id)
-    l store_result =
-  let error, old =
-    match
-      Ckappa_sig.AgentRule_map_and_set.Map.find_option_without_logs
-        parameters error
-        (agent_type, rule_id)
-        store_result
-    with
-    | error, None -> error, []
-    | error, Some l -> error, l
-  in
-  let new_list = List.concat [l; old] in
-  let error, result =
-    Ckappa_sig.AgentRule_map_and_set.Map.add_or_overwrite
-      parameters error
-      (agent_type, rule_id)
-      new_list
-      store_result
-  in
-  error, result*)
 
 let collect_potential_free_and_bind parameter error handler rule_id
     (agent_type, site_type) k store_result =
