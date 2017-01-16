@@ -997,7 +997,7 @@ struct
     (*let store_created_bonds = get_created_bonds static in*)
     let store_created_bonds = get_action_binding static in
     let error, created_bonds_set =
-      Common_static.get_rule_id_set parameters error
+      Common_map.get_rule_id_set parameters error
         rule_id
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
         store_created_bonds
@@ -1391,7 +1391,7 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store_modified_map = get_modified_map static in
     let error, modified_set =
-      Common_static.get_rule_id_set parameters
+      Common_map.get_rule_id_set parameters
         error
         rule_id
         Ckappa_sig.AgentsSiteState_map_and_set.Set.empty

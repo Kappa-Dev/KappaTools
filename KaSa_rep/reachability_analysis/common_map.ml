@@ -142,3 +142,46 @@ let collect_projection_agent_id_from_triple parameters error store_result =
        in
        error, new_set
     ) store_result
+
+(****************************************************************************)
+(****************************************************************************)
+
+let get_rule_id_set parameter error rule_id empty_set store_result =
+  let error, set =
+    match
+      Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+        parameter
+        error
+        rule_id
+        store_result
+    with
+    | error, None -> error, empty_set
+    | error, Some s -> error, s
+  in
+  error, set
+
+(****************************************************************************)
+
+(*let add_set parameter error (x, y) set =
+  let error', set =
+    Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+      parameter
+      error
+      (x, y)
+      set
+  in
+  let error =
+    Exception.check_point
+      Exception.warn parameter error error' __POS__ Exit
+  in
+  error, set*)
+
+(****************************************************************************)
+
+(*let add_map_rule parameter error rule_id contain_map store_result =
+  Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+    parameter
+    error
+    rule_id
+    contain_map
+    store_result*)

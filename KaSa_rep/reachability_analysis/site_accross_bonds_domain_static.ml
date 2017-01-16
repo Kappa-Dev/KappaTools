@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 29th of June
-   * Last modification: Time-stamp: <Jan 13 2017>
+   * Last modification: Time-stamp: <Jan 16 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -216,13 +216,13 @@ let store_set parameters error fst_list snd_list store_result =
 let collect_potential_tuple_pair parameters error
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_set =
-    Common_static.get_rule_id_set parameters error
+    Common_map.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       store_bonds_rhs
   in
   let error, views_set =
-    Common_static.get_rule_id_set parameters error rule_id
+    Common_map.get_rule_id_set parameters error rule_id
       Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
       store_views_rhs
   in
@@ -268,13 +268,13 @@ let collect_potential_tuple_pair_rule_rhs parameters error rule_id
 let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
     store_views_lhs store_result =
   let error, bonds_lhs_set =
-    Common_static.get_rule_id_set parameters error
+    Common_map.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       store_bonds_lhs
   in
   let error, views_lhs_set =
-    Common_static.get_rule_id_set parameters error
+    Common_map.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
       store_views_lhs
@@ -304,13 +304,13 @@ let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
 let collect_potential_tuple_pair_lhs' parameters error rule_id store_bonds_lhs
     store_views_lhs' store_result = (*TODO*)
   let error, bonds_lhs_set =
-    Common_static.get_rule_id_set parameters error
+    Common_map.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
       store_bonds_lhs
   in
   let error, views_lhs_map =
-    Common_static.get_rule_id_set parameters error
+    Common_map.get_rule_id_set parameters error
       rule_id
       Ckappa_sig.Agent_id_map_and_set.Map.empty
       store_views_lhs'
