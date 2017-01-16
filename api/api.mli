@@ -60,19 +60,6 @@ class type manager_file =
 
   end;;
 
-class type  manager_distance =
-  object
-    method simulation_info_distance :
-      Api_types_j.project_id ->
-      Api_types_j.simulation_id ->
-      Api_types_j.distance_info result Lwt.t
-    method simulation_detail_distance :
-      Api_types_j.project_id ->
-      Api_types_j.simulation_id ->
-      Api_types_j.distance_id ->
-      Api_types_j.distance result Lwt.t
-  end;;
-
 class type  manager_file_line =
   object
     method simulation_info_file_line :
@@ -166,7 +153,6 @@ class type  manager_simulation =
       Api_types_j.simulation_id ->
       Api_types_j.simulation_info result Lwt.t
 
-    inherit  manager_distance
     inherit  manager_file_line
     inherit  manager_flux_map
     inherit  manager_log_message

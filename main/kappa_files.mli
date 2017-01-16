@@ -19,9 +19,6 @@ val get_dir : unit -> string
 val set_ode : mode:Loggers.encoding -> string -> unit
 val get_ode : mode:Loggers.encoding -> string
 
-val set_distances : string -> unit
-val get_distances : unit -> string
-
 val set_marshalized : string -> unit
 val with_marshalized : (out_channel -> unit) -> unit
 
@@ -35,8 +32,6 @@ val open_branch_and_cut_engine_profiling: unit -> out_channel
 
 val set_flux : string -> int -> unit
 val with_flux : string -> (Format.formatter -> unit) -> unit
-
-val with_unary_distances : (Format.formatter -> unit) -> unit
 
 val with_snapshot :
   string -> int -> string -> (Format.formatter -> unit) -> unit

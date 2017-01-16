@@ -111,7 +111,7 @@ type modification =
   | SNAPSHOT of Alg_expr.t Ast.print_expr list
   | STOP of Alg_expr.t Ast.print_expr list
   | CFLOW of string option * Pattern.id array *
-             Instantiation.abstract Instantiation.test list
+             Instantiation.abstract Instantiation.test list list
   | FLUX of bool * Alg_expr.t Ast.print_expr list
   | FLUXOFF of Alg_expr.t Ast.print_expr list
   | CFLOWOFF of Pattern.id array

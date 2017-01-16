@@ -12,7 +12,7 @@ val connected_components_sum_of_ambiguous_mixture :
   Signature.contact_map -> Pattern.PreEnv.t -> ?origin:Operator.rev_dep ->
   LKappa.rule_mixture ->
   Pattern.PreEnv.t *
-  (Pattern.id array * Instantiation.abstract Instantiation.test list) list
+  (Pattern.id array * Instantiation.abstract Instantiation.test list list) list
 
 val connected_components_sum_of_ambiguous_rule :
   Signature.contact_map -> Pattern.PreEnv.t -> ?origin:Operator.rev_dep ->

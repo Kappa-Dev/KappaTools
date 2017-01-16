@@ -29,9 +29,6 @@ type simulation_parameter <ocaml from="Api_types"> = abstract
 type simulation_perturbation  <ocaml from="Api_types"> = abstract
 type simulation_info <ocaml from="Api_types"> = abstract
 
-type distance_id <ocaml from="Api_types"> = abstract
-type distance  <ocaml from="Api_types"> = abstract
-
 type file_line_id <ocaml from="Api_types"> = abstract
 type file_line  <ocaml from="Api_types"> = abstract
 type file_id  <ocaml from="Api_types"> = abstract
@@ -48,7 +45,6 @@ type plot <ocaml from="Api_types"> = abstract
 type snapshot <ocaml from="Api_types"> = abstract
 type snapshot_id <ocaml from="Api_types"> = abstract
 
-type distance_info <ocaml from="Api_types"> = abstract
 type file_line_info <ocaml from="Api_types"> = abstract
 type flux_map_info <ocaml from="Api_types"> = abstract
 type snapshot_info <ocaml from="Api_types"> = abstract
@@ -68,14 +64,12 @@ type request = [ EnvironmentInfo of unit
                | ProjectInfo of unit
                | SimulationContinue of (project_id * simulation_id * simulation_parameter)
                | SimulationDelete of (project_id * simulation_id)
-               | SimulationDetailDistance of (project_id * simulation_id * distance_id)
                | SimulationDetailFileLine of (project_id * simulation_id * file_line_id)
                | SimulationDetailFluxMap of (project_id * simulation_id * flux_map_id)
                | SimulationDetailLogMessage of (project_id * simulation_id)
                | SimulationDetailPlot of (project_id * simulation_id)
                | SimulationDetailSnapshot of (project_id * simulation_id * snapshot_id)
                | SimulationInfo of (project_id * simulation_id)
-               | SimulationInfoDistance of (project_id * simulation_id)
                | SimulationInfoFileLine of (project_id * simulation_id)
                | SimulationInfoFluxMap of (project_id * simulation_id)
                | SimulationInfoSnapshot of (project_id * simulation_id)
@@ -96,14 +90,12 @@ type response = [ EnvironmentInfo of environment_info result
                 | ProjectInfo of project_info result
                 | SimulationContinue of unit result
                 | SimulationDelete of unit result
-                | SimulationDetailDistance of distance result
                 | SimulationDetailFileLine of file_line_detail result
                 | SimulationDetailFluxMap of flux_map result
                 | SimulationDetailLogMessage of log_message_detail result
                 | SimulationDetailPlot of plot result
                 | SimulationDetailSnapshot of snapshot result
                 | SimulationInfo of simulation_info result
-                | SimulationInfoDistance of distance_info result
                 | SimulationInfoFileLine of file_line_info result
                 | SimulationInfoFluxMap of flux_map_info result
                 | SimulationInfoSnapshot of snapshot_info result

@@ -41,7 +41,7 @@ type 'a binding_state =
   | BOUND_to of 'a site
 
 type 'a event = {
-  tests : 'a test list;
+  tests : 'a test list list;
   actions : 'a action list;
   side_effects_src : ('a site * 'a binding_state) list;
   side_effects_dst :  'a site list;
@@ -84,7 +84,7 @@ let concretize_action inj2graph = function
 
 let concretize_event inj2graph e =
   {
-    tests = List.rev_map (concretize_test inj2graph) e.tests;
+    tests = List.map (List.rev_map (concretize_test inj2graph)) e.tests;
     actions = List.rev_map (concretize_action inj2graph) e.actions;
     side_effects_src = List.rev_map
         (fun ((pl,s),b) ->
@@ -183,7 +183,8 @@ let rename_abstract_side_effect id inj x =
 
 let subst_map_agent_in_event f e =
   {
-    tests = List_util.smart_map (subst_map_agent_in_test f) e.tests;
+    tests = List_util.smart_map
+        (List_util.smart_map (subst_map_agent_in_test f)) e.tests;
     actions = List_util.smart_map (subst_map_agent_in_action f) e.actions;
     side_effects_src =
       List_util.smart_map (subst_map_agent_in_side_effect f) e.side_effects_src;
@@ -193,7 +194,8 @@ let subst_map_agent_in_event f e =
 
 let subst_map2_agent_in_event f f' e =
   {
-    tests = List_util.smart_map (subst_map_agent_in_test f) e.tests;
+    tests = List_util.smart_map
+        (List_util.smart_map (subst_map_agent_in_test f)) e.tests;
     actions = List_util.smart_map (subst_map2_agent_in_action f f') e.actions;
     side_effects_src =
       List_util.smart_map (subst_map_agent_in_side_effect f) e.side_effects_src;
@@ -377,7 +379,8 @@ let binding_state_of_json f = function
 
 let event_to_json f e =
   JsonUtil.smart_assoc [
-    "tests", `List (List.map (test_to_json f) e.tests);
+    "tests", `List
+      (List.map (fun cct -> `List (List.map (test_to_json f) cct)) e.tests);
     "actions", `List (List.map (action_to_json f) e.actions);
     "side_effect_src",
     `List (List.map
@@ -391,7 +394,9 @@ let event_of_json f = function
       try {
         tests =
           (match Yojson.Basic.Util.member "tests" x
-           with `List l -> List.map (test_of_json f) l | `Null -> []
+           with `List l ->
+             List.map (function `List ccl -> List.map (test_of_json f) ccl
+                              | _ -> raise Not_found) l | `Null -> []
               | _ -> raise Not_found);
         actions =
           (match  Yojson.Basic.Util.member "actions" x

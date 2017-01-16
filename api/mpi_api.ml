@@ -60,9 +60,6 @@ let on_message
   | `SimulationDelete (project_id,simulation_id) ->
     (manager#simulation_delete project_id simulation_id) >>=
     (handler (fun result -> `SimulationDelete result))
-  | `SimulationDetailDistance (project_id,simulation_id,distance_id) ->
-    (manager#simulation_detail_distance project_id simulation_id distance_id) >>=
-    (handler (fun result -> `SimulationDetailDistance result))
   | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
     (manager#simulation_detail_file_line project_id simulation_id file_line_id) >>=
     (handler (fun result -> `SimulationDetailFileLine result))
@@ -81,9 +78,6 @@ let on_message
   | `SimulationInfo (project_id,simulation_id) ->
     (manager#simulation_info project_id simulation_id) >>=
     (handler (fun result -> `SimulationInfo result))
-  | `SimulationInfoDistance (project_id,simulation_id) ->
-    (manager#simulation_info_distance project_id simulation_id) >>=
-    (handler (fun result -> `SimulationInfoDistance result))
   | `SimulationInfoFileLine (project_id,simulation_id) ->
     (manager#simulation_info_file_line project_id simulation_id) >>=
     (handler (fun result -> `SimulationInfoFileLine result))
@@ -283,24 +277,6 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-
-    method simulation_detail_distance
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
-      (distance_id : Api_types_j.distance_id) :
-      Api_types_j.distance Api.result Lwt.t =
-      self#message (`SimulationDetailDistance
-                      (project_id,simulation_id,distance_id)) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `SimulationDetailDistance distance ->
-              Lwt.return distance
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-
     method simulation_detail_file_line
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id)
@@ -390,21 +366,6 @@ class virtual  manager_base () : manager_base_type =
         ~ok:(function
             | `SimulationInfo simulation_status ->
               Lwt.return simulation_status
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method simulation_info_distance
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.distance_info Api.result Lwt.t =
-      self#message (`SimulationInfoDistance
-                      (project_id,simulation_id)) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `SimulationInfoDistance info ->
-              Lwt.return info
             | response ->
               Lwt.return
                 (Api_common.result_error_exception

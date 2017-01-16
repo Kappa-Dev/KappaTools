@@ -142,62 +142,6 @@ let output_flux out =
   then json_of_flux out
   else dot_of_flux out
 
-let jsonDistancesDescr = ref false
-let distances = ref (None : (string array * (float * int) list array) option)
-
-let create_distances names in_json =
-  let () = jsonDistancesDescr := in_json in
-  distances := Some (names, Array.make (Array.length names) [])
-
-let print_json_of_unary_distances f unary_distances rules =
-  (*unary_distances: (float, int) option list array
-    one_big_list: (int, float, int) list*)
-  let one_big_list =
-    Tools.array_fold_lefti
-      (fun i l ls ->
-         List.fold_left (fun acc (t,d) -> (i,t,d)::acc) l ls)
-      [] unary_distances in
-  Format.fprintf
-    f "[%a]@."
-    (Pp.list
-       Pp.comma
-       (fun f (id,time,distance) ->
-          Format.fprintf
-            f "@[{ \"rule\" : \"%s\", @ \"time\" : %e, @ \"distance\" : %d }@]"
-            rules.(id) time distance)) (List.rev one_big_list)
-
-let json_of_unary_distances unary_distances rules =
-  Kappa_files.with_unary_distances
-    (fun f -> print_json_of_unary_distances f unary_distances rules)
-
-let print_out_of_unary_distances f distances rule_name =
-  let () = Format.fprintf f "Rule %s: " rule_name in
-  let () = Format.fprintf f "@[<h>%s @]@." "time distance" in
-  Format.fprintf f "@[%a@]"
-    (Pp.list Pp.space (fun f (time,distance) ->
-         Format.fprintf f "@[ %e @ %d @]@."
-           time distance)) distances
-
-let out_of_unary_distances unary_distances rules =
-  Array.iteri (fun id distances_list ->
-      match distances_list with
-      | [] -> ()
-      | ls ->
-        (*create the file *)
-        let filename = Kappa_files.get_distances () in
-        let filename_string = filename^(string_of_int id)^".out" in
-        let d = Kappa_files.open_out filename_string in
-        let f = Format.formatter_of_out_channel d in
-        (*print data*)
-        let () = print_out_of_unary_distances f ls rules.(id) in
-        (*close the file*)
-        close_out d) unary_distances
-
-let output_unary_distances in_json distances_data distances_rules =
-  if in_json
-  then json_of_unary_distances distances_data distances_rules
-  else out_of_unary_distances distances_data distances_rules
-
 type fd = {
   desc:out_channel;
   form:Format.formatter;
@@ -334,20 +278,8 @@ let go env = function
           if !traceNotEmpty then output_char d ',' else traceNotEmpty := true in
         Yojson.Basic.to_channel d (Trace.step_to_yojson step)
     end
-  | Data.UnaryDistance d ->
-    match !distances with
-    | None -> ()
-    | Some (_,tab) ->
-      tab.(d.Data.distance_rule) <-
-        (d.Data.distance_time,d.Data.distance_length)
-        ::tab.(d.Data.distance_rule)
 
 let close () =
   let () = close_plot () in
   let () = close_trace () in
-  let () =
-    match !distances with
-    | None -> ()
-    | Some (rules,data) ->
-      output_unary_distances !jsonDistancesDescr data rules in
   close_desc ()

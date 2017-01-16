@@ -120,10 +120,6 @@ class KappaStd(kappa_common.StdBase):
     def simulation_delete(self,project_id,simulation_id):
         return(self.dispatch("SimulationDelete",[project_id,simulation_id]))
 
-    def simulation_detail_distance(self,project_id,simulation_id,distance_id):
-        return(self.dispatch("SimulationDetailDistance",
-                             [project_id,simulation_id,distance_id]))
-
     def simulation_detail_file_line(self,project_id,simulation_id,file_line_id):
         return(self.dispatch("SimulationDetailFileLine",
                              [project_id,simulation_id,file_line_id]))
@@ -146,10 +142,6 @@ class KappaStd(kappa_common.StdBase):
 
     def simulation_info(self,project_id,simulation_id):
         return(self.dispatch("SimulationInfo",
-                             [project_id,simulation_id]))
-
-    def simulation_info_distance(self,project_id,simulation_id):
-        return(self.dispatch("SimulationInfoDistance",
                              [project_id,simulation_id]))
 
     def simulation_info_file_line(self,project_id,simulation_id):
@@ -243,11 +235,6 @@ class KappaRest(kappa_common.RestBase):
         body = None
         return(self.dispatch(method,url,body))
 
-    def simulation_detail_distance(self,project_id,simulation_id,distance_id):
-        url = "{0}/projects/{1}/simulations/{2}/distances/{3}".format(self.url,project_id,simulation_id,distance_id)
-        return(self.dispatch("GET",url,None))
-
-
     def simulation_detail_file_line(self,project_id,simulation_id,file_line_id):
         url = "{0}/projects/{1}/simulations/{2}/file_lines/{3}".format(self.url,project_id,simulation_id,file_line_id)
         return(self.dispatch("GET",url,None))
@@ -271,10 +258,6 @@ class KappaRest(kappa_common.RestBase):
 
     def simulation_info(self,project_id,simulation_id):
         url = "{0}/projects/{1}/simulations/{2}".format(self.url,project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_info_distance(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}/distances".format(self.url,project_id,simulation_id)
         return(self.dispatch("GET",url,None))
 
     def simulation_info_file_line(self,project_id,simulation_id):

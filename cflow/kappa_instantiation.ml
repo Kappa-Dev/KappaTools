@@ -146,7 +146,8 @@ module Cflow_linker =
              | Trace.Obs (id,tests,info) ->
                let tests' =
                  List_util.smart_map
-                   (PI.subst_map_agent_in_concrete_test translate) tests in
+                   (List_util.smart_map
+                      (PI.subst_map_agent_in_concrete_test translate)) tests in
                Causal.record_obs
                  (id,tests',info) side_effect counter grid,
                maybe_side_effect empty_set,counter+1,Mods.IntMap.empty
@@ -220,8 +221,9 @@ module Cflow_linker =
       | Trace.Obs (a,b,c) ->
         Trace.Obs(a,
                   List_util.smart_map
-                    (PI.subst_map_agent_in_concrete_test
-                       (fun x -> AgentIdMap.find_default x x mapping)) b,
+                    (List_util.smart_map
+                       (PI.subst_map_agent_in_concrete_test
+                          (fun x -> AgentIdMap.find_default x x mapping))) b,
                   c)
       | Trace.Init b ->
         Trace.Init
@@ -467,12 +469,13 @@ module Cflow_linker =
       | Trace.Obs (_,tests,_) ->
         error, info,
         List.fold_left
-          (fun l x ->
-             match x with
-             | PI.Is_Here x ->
-               AgentIdSet.add (agent_id_of_agent x) l
-             | PI.Is_Bound _ | PI.Is_Free _ | PI.Has_Binding_type _
-             | PI.Is_Bound_to _ | PI.Has_Internal _ -> l)
+          (List.fold_left
+             (fun l x ->
+                match x with
+                | PI.Is_Here x ->
+                  AgentIdSet.add (agent_id_of_agent x) l
+                | PI.Is_Bound _ | PI.Is_Free _ | PI.Has_Binding_type _
+                | PI.Is_Bound_to _ | PI.Has_Internal _ -> l))
           AgentIdSet.empty
           tests
   end:Cflow_signature)

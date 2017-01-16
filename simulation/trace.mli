@@ -47,7 +47,7 @@ type event =
   unit Simulation_info.t
 type obs =
   event_kind *
-  Instantiation.concrete Instantiation.test list *
+  Instantiation.concrete Instantiation.test list list *
   unit Simulation_info.t
 type step =
   | Subs of int * int

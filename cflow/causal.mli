@@ -51,7 +51,7 @@ val record :
   int -> Model.t -> grid -> grid
 val record_obs :
   (Trace.event_kind *
-   Instantiation.concrete Instantiation.test list
+   Instantiation.concrete Instantiation.test list list
    * unit Trace.Simulation_info.t) ->
   Instantiation.concrete Instantiation.site list -> int -> grid -> grid
 val record_init :

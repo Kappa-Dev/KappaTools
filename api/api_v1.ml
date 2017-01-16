@@ -13,42 +13,6 @@ let msg_observables_less_than_zero =
 let msg_missing_perturbation_context =
   "Invalid runtime state missing missing perturbation context"
 
-let () = Printexc.record_backtrace true
-
-let assemble_distance
-    (manager : Api.manager)
-    (project_id : Api_types_j.project_id)
-    (simulation_id : Api_types_j.simulation_id)
-  : Api_types_v1_t.distances Api.result Lwt.t =
-  (manager#simulation_info_distance
-     project_id
-     simulation_id
-  ) >>=
-  Api_common.result_bind_lwt
-    ~ok:(fun (distance_info : Api_types_j.distance_info) ->
-        Api_common.result_fold_lwt
-          ~f:(fun result (distance_id : Api_types_j.distance_id) ->
-              Api_common.result_bind_lwt
-                ~ok:(fun (distances : Api_types_v1_j.distances) ->
-                     (manager#simulation_detail_distance
-                       project_id
-                       simulation_id
-                       distance_id)
-                     >>=
-                     (Api_common.result_bind_lwt
-                        ~ok:(fun (distance : Api_types_j.distance) ->
-                            let distance : Api_types_v1_j.distance =
-                              Api_data_v1.api_distance distance in
-                            Lwt.return (Api_common.result_ok
-                                       (distance::distances))
-                          )
-                        ))
-                result
-             )
-          ~id:(Api_common.result_ok [])
-          distance_info.Api_types_j.distance_ids
-      )
-
 let assemble_file_line
     (manager : Api.manager)
     (project_id : Api_types_j.project_id)
@@ -192,17 +156,6 @@ let assemble_state
   >>=
   Api_common.result_bind_lwt
     ~ok:(fun (state : Api_types_v1_j.state) ->
-        (assemble_distance manager project_id simulation_id)
-        >>=
-        Api_common.result_bind_lwt
-          ~ok:(fun (distances : Api_types_v1_t.distances) ->
-              Lwt.return
-                (Api_common.result_ok
-                   { state with Api_types_v1_t.distances = Some distances }))
-      )
-  >>=
-  Api_common.result_bind_lwt
-    ~ok:(fun (state : Api_types_v1_j.state) ->
         (assemble_file_line manager project_id simulation_id)
         >>=
         Api_common.result_bind_lwt
@@ -323,7 +276,6 @@ end = struct
       (status : Api_types_j.simulation_info) : Api_types_v1_j.state Api.result Lwt.t =
     let state =
       { Api_types_v1_j.plot             = None;
-        Api_types_v1_j.distances        = None;
         Api_types_v1_j.time             = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time ;
         Api_types_v1_j.time_percentage  = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage ;
         Api_types_v1_j.event            = status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event ;

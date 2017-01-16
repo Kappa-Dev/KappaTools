@@ -85,20 +85,6 @@ let api_mixture sigs mix =
        }
     ) (Array.of_list mix)
 
-let api_snapshot sigs (snapshot : Data.snapshot) : Api_types_v1_j.snapshot =
-  { Api_types_v1_j.snap_file = snapshot.Data.snapshot_file
-  ; Api_types_v1_j.snap_event = snapshot.Data.snapshot_event
-  ; Api_types_v1_j.agents =
-      List.map
-        (fun (agent,mixture) -> (agent,api_mixture sigs mixture))
-        snapshot.Data.snapshot_agents
-  ; Api_types_v1_j.tokens =
-      List.map
-        (fun (token,value) -> (Tools.unsome infinity (Nbr.to_float value),token))
-        (Array.to_list snapshot.Data.snapshot_tokens)
-  }
-
-
 let find_link cm (a,s) =
   let rec auxs i j = function
     | [] -> raise Not_found
@@ -360,11 +346,6 @@ let rec eq_errors  l r =
     && eq_range l.Api_types_v1_j.range r.Api_types_v1_j.range
     && eq_errors l_tail r_tail
   | _ -> false
-
-let api_distance (distance)  =
-  { Api_types_v1_j.rule_dist = distance.Api_types_j.distance_rule ;
-    Api_types_v1_j.time_dist = distance.Api_types_j.distance_time ;
-    Api_types_v1_j.dist = distance.Api_types_j.distance_length ; }
 
 let api_files (f : Api_types_j.file_line) : Api_types_v1_j.file_line =
   { Api_types_v1_j.file_name = f.Api_types_j.file_line_name ;

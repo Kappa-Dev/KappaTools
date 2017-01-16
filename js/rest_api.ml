@@ -180,19 +180,6 @@ class manager
         None
         (fun _ -> ())
         (fun result -> `SimulationDelete result)
-    | `SimulationDetailDistance (project_id,simulation_id,distance_id) ->
-      send
-        timeout
-        (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/distances/%d"
-           url
-           project_id
-           simulation_id
-           distance_id)
-        `GET
-        None
-        Mpi_message_j.distance_of_string
-        (fun result -> `SimulationDetailDistance result)
     | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
       send
         timeout
@@ -271,18 +258,6 @@ class manager
         None
         Mpi_message_j.simulation_info_of_string
         (fun result -> `SimulationInfo result)
-    | `SimulationInfoDistance (project_id,simulation_id) ->
-      send
-        timeout
-        (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/distances"
-           url
-           project_id
-           simulation_id)
-        `GET
-        None
-        Mpi_message_j.distance_info_of_string
-        (fun result -> `SimulationInfoDistance result)
     | `SimulationInfoFileLine (project_id,simulation_id) ->
       send
         timeout

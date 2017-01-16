@@ -6,9 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt
 open Cohttp_lwt_unix
 open Cohttp
+open Lwt
 open Request
 open Api
 open Conduit_lwt_unix
@@ -196,19 +196,6 @@ let route
          )
      };
      { Webapp_common.path =
-         "/v2/projects/{projectid}/simulations/{simulationid}/distances/{distanceid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,simulation_id,distance_id) = field_ref context "distanceid" in
-            let distance_id = int_of_string distance_id in
-            (manager#simulation_detail_distance project_id simulation_id distance_id) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_distance ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
          "/v2/projects/{projectid}/simulations/{simulationid}/filelines/{filelinesid}" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
@@ -277,18 +264,6 @@ let route
             (manager#simulation_info project_id simulation_id) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_info ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulations/{simulationid}/distances" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_info_distance project_id simulation_id) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_distance_info ?len:None)
             )
          )
      };

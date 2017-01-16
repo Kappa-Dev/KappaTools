@@ -84,15 +84,7 @@ type observable = float nullable list
 
 (* plot *)
 type plot = { plot_legend: string list <json name="legend"> ;
-      	      plot_time_series : observable list <json name="time_series"> }
-
-(* distance *)
-type distance = { distance_rule : string ;
-     	          distance_time : float;
-		  distance_length : int ; }
-type distance_id = int
-type distances = distance list
-type distance_info = { distance_ids : distance_id list }
+              plot_time_series : observable list <json name="time_series"> }
 
 (* flux *)
 type flux_map_id = string
@@ -138,10 +130,9 @@ type simulation_state = [ Running
                         | Paused
                         | Stopped ]
 
-type ('plot,'distances,'flux_maps,'file_lines,'snapshots,'log_messages)
+type ('plot,'flux_maps,'file_lines,'snapshots,'log_messages)
      simulation_output
      = { simulation_output_plot : 'plot ;
-         simulation_output_distances : 'distances ;
          simulation_output_flux_maps : 'flux_maps ;
          simulation_output_file_lines : 'file_lines ;
          simulation_output_snapshots : 'snapshots;
@@ -149,7 +140,6 @@ type ('plot,'distances,'flux_maps,'file_lines,'snapshots,'log_messages)
 
 type simulation_info_output =
      (bool,
-      int,
       int,
       int,
       int,
@@ -164,11 +154,10 @@ type simulation_progress = { simulation_progress_time : float;
                              simulation_progress_is_running : bool ; }
 
 type simulation_info = { simulation_info_progress : simulation_progress  ;
-		     	 simulation_info_output : simulation_info_output; }
+			 simulation_info_output : simulation_info_output; }
 
 type simulation_detail_output =
      (plot nullable,
-      distances nullable,
       flux_map list,
       file_line list,
       snapshot list,
@@ -176,7 +165,7 @@ type simulation_detail_output =
      simulation_output
 
 type simulation_detail = { simulation_detail_progress : simulation_progress ;
-     		           simulation_detail_output : simulation_detail_output ; }
+                           simulation_detail_output : simulation_detail_output ; }
 
 (* file *)
 type file_id = string

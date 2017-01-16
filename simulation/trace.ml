@@ -120,7 +120,7 @@ type event =
   unit Simulation_info.t
 type obs =
   event_kind *
-  Instantiation.concrete Instantiation.test list *
+  Instantiation.concrete Instantiation.test list list *
   unit Simulation_info.t
 type step =
   | Subs of int * int
@@ -177,7 +177,8 @@ let print_event ~compact ?env log (ev_kind,e) =
     Format.fprintf
       log "@[***Refined event:***@,* Kappa_rule %a Story encoding:%a%a%a@]"
       (print_event_kind ?env) ev_kind
-      (Pp.list Pp.empty (Instantiation.print_concrete_test ?sigs))
+      (Pp.list Pp.empty
+         (Pp.list Pp.empty (Instantiation.print_concrete_test ?sigs)))
       e.Instantiation.tests
       (Pp.list Pp.empty (Instantiation.print_concrete_action ?sigs))
       e.Instantiation.actions
@@ -192,7 +193,9 @@ let print_obs ~compact ?env f (ev_kind,tests,_) =
   else
     Format.fprintf
       f "***@[<1>OBS %a:%a@]***" (print_event_kind ?env) ev_kind
-      (Pp.list Pp.space (Instantiation.print_concrete_test ?sigs)) tests
+      (Pp.list Pp.space
+         (Pp.list Pp.space (Instantiation.print_concrete_test ?sigs)))
+      tests
 
 let print_step ?(compact=false) ?env f = function
   | Subs (a,b) -> print_subs f (a,b)
@@ -215,7 +218,10 @@ let step_to_yojson = function
   | Obs (x,y,z) ->
     `List [`String "Obs";
            event_kind_to_json x;
-           `List (List.map (Instantiation.test_to_json Agent.to_json) y);
+           `List
+             (List.map (fun z ->
+                  `List (List.map (Instantiation.test_to_json Agent.to_json)
+                           z)) y);
            Simulation_info.to_json (fun () -> `Null) z]
   | Dummy _ -> `Null
 let step_of_yojson = function
@@ -228,7 +234,11 @@ let step_of_yojson = function
     Init (List.map (Instantiation.action_of_json Agent.of_json) l)
   | `List [`String "Obs"; x; `List l; z] ->
     Obs (event_kind_of_json x,
-         List.map (Instantiation.test_of_json Agent.of_json) l,
+         (List.map (function  `List ccl ->
+              List.map (Instantiation.test_of_json Agent.of_json) ccl
+                            | _ as x ->
+                              raise (Yojson.Basic.Util.Type_error
+                                       ("Not a test list",x))) l),
          Simulation_info.of_json (function _ -> ()) z)
   | `Null -> Dummy ""
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect trace step",x))
@@ -271,9 +281,9 @@ let has_creation_of_step x = creation_of_step x <> []
 
 let tests_of_step = function
   | Subs _ -> []
-  | Event (_,e,_) -> e.Instantiation.tests
+  | Event (_,e,_) -> List.concat e.Instantiation.tests
   | Init _ -> []
-  | Obs (_,x,_) -> x
+  | Obs (_,x,_) -> List.concat x
   | Dummy _ -> []
 
 let actions_of_step = function
@@ -319,7 +329,7 @@ let check_event_quarks actions tests quarks =
           (fun (c,(n,_,_)) ->
             ((c=2)||(c=3))&&(n=aid)) quarks)
     actions)&&
-  (List.for_all
+  (List.for_all (List.for_all
     (function
      | Instantiation.Is_Here (aid,_) ->
         List.exists
@@ -332,7 +342,7 @@ let check_event_quarks actions tests quarks =
         check_tested_quarks asite 1 quarks
      | Instantiation.Is_Bound_to (asite1,asite2) ->
         (check_tested_quarks asite1 1 quarks)&&
-          (check_tested_quarks asite2 1 quarks))
+          (check_tested_quarks asite2 1 quarks)))
     tests)
 
 let log_event id quarks event_kind steps =

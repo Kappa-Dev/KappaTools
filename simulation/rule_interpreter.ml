@@ -31,9 +31,8 @@ type t =
     random_state : Random.State.t;
     story_machinery :
        (Trace.event_kind * Pattern.id array *
-        Instantiation.abstract Instantiation.test list)
+        Instantiation.abstract Instantiation.test list list)
          list Pattern.ObsMap.t (*currently tracked ccs *) option;
-    store_distances: bool;
   }
 
 type result = Clash | Corrected | Success of t
@@ -72,7 +71,7 @@ let recompute env counter state i =
   state.variables_cache.(i) <-
     value_alg counter state (raw_get_alg env state.variables_overwrite i)
 
-let empty ~with_trace ~store_distances random_state env counter alg_overwrite =
+let empty ~with_trace random_state env counter alg_overwrite =
   let with_connected_components =
     not (Pattern.Set.is_empty
            (Model.connected_components_of_unary_rules env)) in
@@ -99,7 +98,6 @@ let empty ~with_trace ~store_distances random_state env counter alg_overwrite =
           Some (Pattern.Env.new_obs_map
                   (Model.domain env) (fun _ -> []))
         else None;
-      store_distances;
     } in
   let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
   cand
@@ -358,7 +356,7 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
       Instantiation.tests = (match path with
           | None -> cevent.Instantiation.tests
           | Some path ->
-            add_path_to_tests path cevent.Instantiation.tests);
+            [add_path_to_tests path (List.concat cevent.Instantiation.tests)]);
       Instantiation.actions = cevent.Instantiation.actions;
       Instantiation.side_effects_src = cevent.Instantiation.side_effects_src;
       Instantiation.side_effects_dst = List.rev_append
@@ -384,8 +382,9 @@ let store_obs domain edges roots obs acc = function
                 List.fold_left
                   (fun acc (inj,_) ->
                      let tests' =
-                       List.map (Instantiation.concretize_test
-                                   (inj,Mods.IntMap.empty)) tests in
+                       List.map
+                         (List.map (Instantiation.concretize_test
+                                      (inj,Mods.IntMap.empty))) tests in
                      (ev,tests') :: acc)
                   acc
                   (all_injections ~excp:(pattern,root) domain edges roots patterns))
@@ -474,7 +473,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
     outdated_elements = rev_deps,mod_connectivity;
     random_state = state.random_state;
     story_machinery = state.story_machinery;
-    store_distances = state.store_distances; }
+  }
 
 let max_dist_to_int counter state d =
   Nbr.to_int (value_alg counter state d)
@@ -656,14 +655,7 @@ let apply_unary_rule
     let nodes = Matching.elements_with_types
         domain rule.Primitives.connected_components inj in
     match path with
-    | Some p ->
-      let () =
-        if state'.store_distances then
-          outputs (Data.UnaryDistance {
-              Data.distance_rule = rule.Primitives.syntactic_rule;
-              Data.distance_time = Counter.current_time counter;
-              Data.distance_length = (List.length p);
-            }) in
+    | Some _ ->
       Success
         (transform_by_a_rule outputs env unary_ccs counter state'
            event_kind ?path rule inj)
@@ -676,14 +668,7 @@ let apply_unary_rule
            | Some d -> Some (max_dist_to_int counter state' d)) in
       match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
       | None -> Corrected
-      | Some p as path ->
-        let () =
-          if state'.store_distances then
-            outputs (Data.UnaryDistance {
-                Data.distance_rule = rule.Primitives.syntactic_rule;
-                Data.distance_time = Counter.current_time counter;
-                Data.distance_length = (List.length p);
-              }) in
+      | Some _ as path ->
         Success
           (transform_by_a_rule outputs env unary_ccs counter state'
              event_kind ?path rule inj)

@@ -40,7 +40,6 @@ let set_odeFileName backend name =
   reference:=name
 
 let fluxFileName = ref ""
-let distancesFileName = ref "distances"
 
 let path f =
   if Filename.is_implicit f && Filename.dirname f = Filename.current_dir_name
@@ -163,9 +162,6 @@ let set_ode ~mode f =
 let get_ode ~mode =
   !(get_odeFileName mode)
 
-let set_distances f = distancesFileName := f
-let get_distances () = !distancesFileName
-
 let set_marshalized f = marshalizedOutFile := f
 let with_marshalized f =
   match !marshalizedOutFile with
@@ -192,10 +188,6 @@ let set_flux nme event =
 
 let with_flux str f =
   with_formatter (match str with "" -> !fluxFileName | _ -> str) f
-
-let with_unary_distances f =
-  let str = !distancesFileName^".json" in
-  with_formatter str f
 
 let with_snapshot str event ext f =
   let str = if str="" then !snapshotFileName else str in

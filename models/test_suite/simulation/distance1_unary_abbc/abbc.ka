@@ -9,9 +9,6 @@
 
 %obs: 'Ap' |A(a~p?)|
 
-%def: "storeUnaryHorizon" "true"
-%def: "jsonUnaryHorizon" "true"
-
 %init: 100 A(a~u)
 %init: 100 B()
 %init: 100 C()

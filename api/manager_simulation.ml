@@ -34,59 +34,6 @@ let detail_projection :
        )
     )
   )
-class manager_distance
-    (environment : Api_environment.environment)
-    (system_process : Kappa_facade.system_process) : Api.manager_distance =
-  object(self)
-    method private info_distance (detail : Api_types_j.simulation_detail) :
-      Api_types_j.distance_info Api.result =
-      match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_distances with
-      | Some distance ->
-        let distance_ids : Api_types_j.distance_id list =
-          List.mapi (fun i _ -> i) distance in
-        Api_common.result_ok
-          { Api_types_j.distance_ids = distance_ids }
-      | None -> let m : string = "distance not available" in
-        Api_common.result_error_msg ~result_code:`NOT_FOUND m
-
-    method private get_distance
-        (distance_id : Api_types_j.distance_id)
-        (detail : Api_types_j.simulation_detail) :
-      Api_types_j.distance Api.result  =
-      match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_distances with
-      | Some distance ->
-        (try Api_common.result_ok (List.nth distance distance_id)
-         with _ ->
-           let m : string = Format.sprintf "id %d not found" distance_id in
-           Api_common.result_error_msg ~result_code:`NOT_FOUND m)
-      | None -> let m : string = "distance not available" in
-        Api_common.result_error_msg ~result_code:`NOT_FOUND m
-
-
-    method simulation_info_distance
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.distance_info Api.result Lwt.t =
-      detail_projection
-          ~environment:environment
-          ~system_process:system_process
-          ~project_id:project_id
-          ~simulation_id:simulation_id
-          ~projection:self#info_distance
-
-    method simulation_detail_distance
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
-        (distance_id : Api_types_j.distance_id) :
-      Api_types_j.distance Api.result Lwt.t =
-      detail_projection
-          ~environment:environment
-          ~system_process:system_process
-          ~project_id:project_id
-          ~simulation_id:simulation_id
-          ~projection:(self#get_distance distance_id)
-
-  end;;
 
 class manager_file_line
     (environment : Api_environment.environment)
@@ -505,7 +452,6 @@ class manager_simulation
            )
         )
 
-    inherit  manager_distance environment system_process
     inherit  manager_file_line environment system_process
     inherit  manager_flux_map environment system_process
     inherit  manager_log_message environment system_process

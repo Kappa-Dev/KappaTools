@@ -29,11 +29,6 @@ type ('agent,'token) generic_snapshot   = {
     snapshot_tokens : 'token array; }
 
 type snapshot =  ((int * Raw_mixture.t),(string * Nbr.t)) generic_snapshot
-type distance = {
-  distance_rule : int;
-  distance_time : float;
-  distance_length : int;
-}
 
 type t = Flux of flux_map
        | Plot of Nbr.t array (** Must have length >= 1 (at least [T] or [E]) *)
@@ -41,4 +36,3 @@ type t = Flux of flux_map
        | TraceStep of Trace.step
        | Snapshot of snapshot
        | Log of string
-       | UnaryDistance of distance

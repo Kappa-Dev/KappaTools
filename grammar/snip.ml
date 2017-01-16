@@ -315,73 +315,78 @@ let make_instantiation place links event ref_ports is_erased =
           event.Instantiation.side_effects_dst place ref_ports;
     }
   | Some (ports, ints) ->
-    let rec aux site_id tests actions side_effects_src side_effects_dst links =
-      if site_id >= Array.length ports
-      then { Instantiation.tests; Instantiation.actions;
-             Instantiation.side_effects_src; Instantiation.side_effects_dst }
-      else
-        let tests',actions' =
-          match ints.(site_id) with
-          | (LKappa.I_ANY | LKappa.I_ANY_ERASED) -> tests,actions
-          | LKappa.I_ANY_CHANGED j ->
-            tests,
-            Instantiation.Mod_internal ((place,site_id),j) :: actions
-          | LKappa.I_VAL_CHANGED (i,j) ->
-            Instantiation.Has_Internal ((place,site_id),i) :: tests,
-            if i <> j then
+    match event.Instantiation.tests with
+    | [] -> assert false
+    | this_cc_tests :: o_cc_tests ->
+      let rec aux site_id tests actions side_effects_src side_effects_dst links=
+        if site_id >= Array.length ports
+        then { Instantiation.tests = tests :: o_cc_tests;
+               Instantiation.actions;
+               Instantiation.side_effects_src; Instantiation.side_effects_dst }
+        else
+          let tests',actions' =
+            match ints.(site_id) with
+            | (LKappa.I_ANY | LKappa.I_ANY_ERASED) -> tests,actions
+            | LKappa.I_ANY_CHANGED j ->
+              tests,
               Instantiation.Mod_internal ((place,site_id),j) :: actions
-            else actions
-          | LKappa.I_VAL_ERASED i ->
-            Instantiation.Has_Internal ((place,site_id),i) :: tests,
-            actions in
-        let tests'',actions'',side_sites',side_effects',links' =
-          match ports.(site_id) with
-          | (Ast.LNK_ANY,_), s ->
-            let side_effects' =
-              match s with
-              | LKappa.Maintained ->
-                add_freed_side_effect
-                  side_effects_dst place site_id ref_ports.(site_id)
-              | LKappa.Erased | LKappa.Linked _ | LKappa.Freed ->
-                side_effects_dst in
-            tests', add_instantiation_free actions' place site_id s,
-            add_side_site side_effects_src Instantiation.ANY
-              place site_id s,
-            side_effects',
-            links
-          | (Ast.FREE,_), s ->
-            (Instantiation.Is_Free (place,site_id) :: tests'),
-            add_instantiation_free actions' place site_id s,side_effects_src,
-            side_effects_dst, links
-          | (Ast.LNK_SOME,_), s ->
-            Instantiation.Is_Bound (place,site_id) :: tests',
-            add_instantiation_free actions' place site_id s,
-            add_side_site side_effects_src Instantiation.BOUND
-              place site_id s,
-            side_effects_dst, links
-          | (Ast.LNK_TYPE (b,a),_),s ->
-            Instantiation.Has_Binding_type ((place,site_id),(a,b))
-            :: tests',
-            add_instantiation_free actions' place site_id s,
-            add_side_site
-              side_effects_src (Instantiation.BOUND_TYPE (a,b))
-              place site_id s,
-            side_effects_dst, links
-          | (Ast.LNK_VALUE (i,_),_),s ->
-            match Mods.IntMap.find_option i links with
-            | Some x -> x :: tests',
-                        add_instantiation_free actions' place site_id s,
-                        side_effects_src, side_effects_dst,
-                        Mods.IntMap.remove i links
-            | None ->
+            | LKappa.I_VAL_CHANGED (i,j) ->
+              Instantiation.Has_Internal ((place,site_id),i) :: tests,
+              if i <> j then
+                Instantiation.Mod_internal ((place,site_id),j) :: actions
+              else actions
+            | LKappa.I_VAL_ERASED i ->
+              Instantiation.Has_Internal ((place,site_id),i) :: tests,
+              actions in
+          let tests'',actions'',side_sites',side_effects',links' =
+            match ports.(site_id) with
+            | (Ast.LNK_ANY,_), s ->
+              let side_effects' =
+                match s with
+                | LKappa.Maintained ->
+                  add_freed_side_effect
+                    side_effects_dst place site_id ref_ports.(site_id)
+                | LKappa.Erased | LKappa.Linked _ | LKappa.Freed ->
+                  side_effects_dst in
               tests', add_instantiation_free actions' place site_id s,
-              side_effects_src, side_effects_dst, links in
-        aux (succ site_id) tests'' actions'' side_sites' side_effects' links' in
-    aux 0 (Instantiation.Is_Here place :: event.Instantiation.tests)
-      (if is_erased
-       then Instantiation.Remove place :: event.Instantiation.actions
-       else event.Instantiation.actions) event.Instantiation.side_effects_src
-      event.Instantiation.side_effects_dst links
+              add_side_site side_effects_src Instantiation.ANY
+                place site_id s,
+              side_effects',
+              links
+            | (Ast.FREE,_), s ->
+              (Instantiation.Is_Free (place,site_id) :: tests'),
+              add_instantiation_free actions' place site_id s,side_effects_src,
+              side_effects_dst, links
+            | (Ast.LNK_SOME,_), s ->
+              Instantiation.Is_Bound (place,site_id) :: tests',
+              add_instantiation_free actions' place site_id s,
+              add_side_site side_effects_src Instantiation.BOUND
+                place site_id s,
+              side_effects_dst, links
+            | (Ast.LNK_TYPE (b,a),_),s ->
+              Instantiation.Has_Binding_type ((place,site_id),(a,b))
+              :: tests',
+              add_instantiation_free actions' place site_id s,
+              add_side_site
+                side_effects_src (Instantiation.BOUND_TYPE (a,b))
+                place site_id s,
+              side_effects_dst, links
+            | (Ast.LNK_VALUE (i,_),_),s ->
+              match Mods.IntMap.find_option i links with
+              | Some x -> x :: tests',
+                          add_instantiation_free actions' place site_id s,
+                          side_effects_src, side_effects_dst,
+                          Mods.IntMap.remove i links
+              | None ->
+                tests', add_instantiation_free actions' place site_id s,
+                side_effects_src, side_effects_dst, links in
+          aux (succ site_id) tests''
+            actions'' side_sites' side_effects' links' in
+      aux 0 (Instantiation.Is_Here place :: this_cc_tests)
+        (if is_erased
+         then Instantiation.Remove place :: event.Instantiation.actions
+         else event.Instantiation.actions) event.Instantiation.side_effects_src
+        event.Instantiation.side_effects_dst links
 
 let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
     links_transf instantiations remains =
@@ -508,7 +513,8 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                 handle_ports
                   wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
               | _, _ -> link_occurence_failure i pos in
-   handle_ports wk registered_links Mods.IntMap.empty transf' links_transf remains ag_l 0
+    handle_ports wk registered_links Mods.IntMap.empty
+      transf' links_transf remains ag_l 0
 
 let rec complete_with_creation
     sigs (removed,added) links_transf create_actions actions fresh =
@@ -601,10 +607,17 @@ let connected_components_of_mixture created mix (env,origin) =
        (env,Tools.option_map incr_origin origin))
     | h :: t ->
       let wk = Pattern.begin_new env in
+      let instantiations' = {
+        Instantiation.tests = [] :: instantiations.Instantiation.tests;
+        Instantiation.actions = instantiations.Instantiation.actions;
+        Instantiation.side_effects_src =
+          instantiations.Instantiation.side_effects_src;
+        Instantiation.side_effects_dst =
+          instantiations.Instantiation.side_effects_dst } in
       let (wk_out,(removed,added),l_t,event, remains) =
         add_agents_in_cc
           sigs id wk Mods.IntMap.empty transformations
-          links_transf instantiations t [h] in
+          links_transf instantiations' t [h] in
       let (env',inj, cc) =
         Pattern.finish_new ?origin wk_out in
       let added' =
@@ -659,5 +672,5 @@ let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =
     connected_components_sum_of_ambiguous_rule
       contact_map env ?origin mix [] in
   (cc_env, List.map
-     (function _, l, event, ([],[]) -> l,event.Instantiation.tests
+     (function _, l, event, ([],[]) -> l, event.Instantiation.tests
              | _ -> assert false) rules)

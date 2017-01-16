@@ -46,7 +46,8 @@ type 'a binding_state =
   | BOUND_to of 'a site
 
 type 'a event = {
-  tests : 'a test list; (** The tests written in the rule *)
+  tests : 'a test list list;
+  (** The tests written in the rule (pattern by pattern) *)
   actions : 'a action list; (** The modifications written in the rule *)
   side_effects_src : ('a site * 'a binding_state) list
 (** the site of the agents mentioned in the rule where there is a side

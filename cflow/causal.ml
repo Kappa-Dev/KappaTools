@@ -229,20 +229,20 @@ let add_actions env grid event_number kind actions =
   in aux grid actions
 
 let add_tests grid event_number kind tests =
-  let rec aux grid = function
-    | [] -> grid
-    | Instantiation.Is_Here ag :: q ->
-      aux (add (ag,-1) true atom_tested grid event_number kind) q
-    | Instantiation.Has_Internal (site,_) :: q ->
-      aux (add site false atom_tested grid event_number kind) q
-    | (Instantiation.Is_Free site
-      | Instantiation.Is_Bound site
-      | Instantiation.Has_Binding_type (site,_)) :: q ->
-      aux (add site true atom_tested grid event_number kind) q
-    | Instantiation.Is_Bound_to (site1,site2) :: q ->
-      let grid' = add site2 true atom_tested grid event_number kind in
-      aux (add site1 true atom_tested grid' event_number kind) q
-  in aux grid tests
+  List.fold_left
+    (List.fold_left (fun grid -> function
+         | Instantiation.Is_Here ag ->
+           add (ag,-1) true atom_tested grid event_number kind
+         | Instantiation.Has_Internal (site,_) ->
+           add site false atom_tested grid event_number kind
+         | Instantiation.Is_Free site
+         | Instantiation.Is_Bound site
+         | Instantiation.Has_Binding_type (site,_) ->
+           add site true atom_tested grid event_number kind
+         | Instantiation.Is_Bound_to (site1,site2) ->
+           let grid' = add site2 true atom_tested grid event_number kind in
+           add site1 true atom_tested grid' event_number kind))
+    grid tests
 
 let record (kind,event,_) event_number env grid =
   let grid = add_tests grid event_number kind event.Instantiation.tests in

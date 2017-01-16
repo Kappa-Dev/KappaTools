@@ -28,7 +28,7 @@ val compile_modifications_no_track:
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * (bool*bool*bool) option *
-          bool option * string (*cflowFormat*) * string option (*cflowFile*) *
+          string (*cflowFormat*) * string option (*cflowFile*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Signature.contact_map ->
@@ -38,6 +38,6 @@ val build_initial_state :
   bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
   return:(bool * Rule_interpreter.t * State_interpreter.t -> 'a) ->
   outputs:(Data.t -> unit) -> (int * Alg_expr.t) list -> Counter.t ->
-  Model.t -> with_trace:bool -> store_distances:bool -> Random.State.t ->
+  Model.t -> with_trace:bool -> Random.State.t ->
   (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ->
   'a

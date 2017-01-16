@@ -147,7 +147,7 @@ let () =
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
     let (env0, contact_map, updated_vars, story_compression,
-         unary_distances, formatCflows, cflowFile, init_l as init_result),
+         formatCflows, cflowFile, init_l as init_result),
         counter,alg_overwrite = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
         ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
@@ -193,8 +193,7 @@ let () =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x)
         ~outputs alg_overwrite counter env
-        ~with_trace:(trace_file<>None) ~store_distances:(unary_distances<>None)
-        random_state init_l in
+        ~with_trace:(trace_file<>None) random_state init_l in
     let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
@@ -218,17 +217,6 @@ let () =
           (Data.Plot
              (State_interpreter.observables_values env graph counter))
       | _ -> () in
-
-    let () =
-      match unary_distances with
-      | None -> ()
-      | Some inJson ->
-        let size = Model.nb_syntactic_rules env + 1 in
-        let names =
-          Array.init
-            size
-            (Format.asprintf "%a" (Model.print_ast_rule ~env)) in
-        Outputs.create_distances names inJson in
 
     let () =
       if stop then

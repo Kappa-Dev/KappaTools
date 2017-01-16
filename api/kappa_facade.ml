@@ -125,7 +125,6 @@ type t =
     log_buffer : Buffer.t ;
     log_form : Format.formatter ;
     mutable plot : Api_types_j.plot ;
-    mutable distances : Api_types_j.distances ;
     mutable snapshots : Api_types_j.snapshot list ;
     mutable flux_maps : Api_types_j.flux_map list ;
     mutable files : Api_types_j.file_line list ;
@@ -134,7 +133,6 @@ type t =
     mutable env : Model.t ;
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
-    store_distances : bool ;
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     has_tracking : (bool * bool * bool) option ;
     mutable lastyield : float ;
@@ -150,7 +148,7 @@ let t_range (t : t) (range : Api_types_j.range) =
   | None -> range
   | Some indexes ->  localize_range range indexes
 
-let create_t ~contact_map ~env ~counter ~graph ~state ~store_distances
+let create_t ~contact_map ~env ~counter ~graph ~state
     ~init_l ~has_tracking ~lastyield ~file_indexes : t =
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
@@ -158,12 +156,11 @@ let create_t ~contact_map ~env ~counter ~graph ~state ~store_distances
     is_running = true; run_finalize = false; counter; log_buffer; log_form;
     plot = { Api_types_j.plot_legend = [] ;
              Api_types_j.plot_time_series = [] ; } ;
-    distances = [];
     snapshots = [];
     flux_maps = [];
     files = [];
     error_messages = [];
-    contact_map; env; graph; state; store_distances; init_l; has_tracking;
+    contact_map; env; graph; state; init_l; has_tracking;
     lastyield; file_indexes;
   }
 
@@ -174,7 +171,6 @@ let clone_t t =
     ~counter:t.counter (* FALSE imperatively modified *)
     ~graph:t.graph (* FALSE imperatively modified *)
     ~state:t.state (* FALSE imperatively modified *)
-    ~store_distances:t.store_distances
     ~init_l:t.init_l
     ~has_tracking:t.has_tracking
     ~lastyield:t.lastyield
@@ -247,11 +243,9 @@ let build_ast
                         | Data.Flux _
                         | Data.Plot _
                         | Data.TraceStep _
-                        | Data.Print _
-                        | Data.UnaryDistance _ -> assert false)
+                        | Data.Print _ -> assert false)
                     ~max_sharing:false sig_nd tk_nd contact_map result >>=
-                  (fun (env,has_tracking,store_distances,_,_,init_l) ->
-                     let store_distances = store_distances<>None in
+                  (fun (env,has_tracking,_,_,init_l) ->
                      let counter =
                        Counter.create
                          ~init_t:(0. : float) ~init_e:(0 : int)
@@ -261,9 +255,9 @@ let build_ast
                          ~contact_map ~env ~counter
                          ~graph:(Rule_interpreter.empty
                                    ~with_trace:(has_tracking <>None)
-                                   ~store_distances random_state env counter [])
+                                   random_state env counter [])
                          ~state:(State_interpreter.empty env [])
-                         ~store_distances ~init_l ~has_tracking ~lastyield
+                         ~init_l ~has_tracking ~lastyield
                          ~file_indexes:(Some indexes)
                      in
                      Lwt.return (`Ok simulation)))))))
@@ -291,14 +285,6 @@ let outputs (simulation : t) =
       (Api_data.label_snapshot
          (Model.signatures simulation.env)
          snapshot)::simulation.snapshots
-  | Data.UnaryDistance d -> simulation.distances <-
-      {Api_types_j.distance_rule =
-         Format.asprintf
-           "%a" (Model.print_ast_rule ~env:simulation.env)
-           d.Data.distance_rule;
-       Api_types_j.distance_time = d.Data.distance_time;
-       Api_types_j.distance_length = d.Data.distance_length}
-      :: simulation.distances
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.TraceStep _ -> () (*TODO*)
 
@@ -407,7 +393,6 @@ let start
                ~with_trace:(t.has_tracking <> None)
                t.counter
                t.env
-               ~store_distances:t.store_distances
                random_state
                t.init_l >>=
              (fun (stop,graph,state) ->
@@ -552,8 +537,6 @@ let create_info ~(t : t) : Api_types_j.simulation_detail =
   let output : Api_types_j.simulation_detail_output =
     { Api_types_j.simulation_output_plot =
         Some t.plot ;
-      Api_types_j.simulation_output_distances =
-        Some t.distances ;
       Api_types_j.simulation_output_flux_maps =
         t.flux_maps ;
       Api_types_j.simulation_output_file_lines =
