@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 13 2017>
+  * Last modification: Time-stamp: <Jan 16 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -176,7 +176,7 @@ let collect_agent_name_from_pattern parameters error pattern store_result =
 (*Side effects*)
 (**************************************************************************)
 
-let add_link_pair_agent_site parameters error (agent_type, site_type) x
+(*let add_link_pair_agent_site parameters error (agent_type, site_type) x
     store_result =
   let error, (l, old) =
     match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -196,7 +196,7 @@ let add_link_pair_agent_site parameters error (agent_type, site_type) x
       (l, x :: old)
       store_result
   in
-  error, store_result
+  error, store_result*)
 
 let get_last_entry_in_state_dic parameters error (agent_type, site_type)
     handler  =
@@ -244,7 +244,7 @@ let half_break_action parameters error handler rule_id half_break store_result =
         (*-------------------------------------------------------------------*)
         (*return result*)
         let error, store_result =
-          add_link_pair_agent_site
+          Common_map.add_dependency_pair_sites
             parameters
             error
             (agent_type, site_type)
@@ -277,7 +277,7 @@ let remove_action parameters error rule_id remove store_result =
          let error, store_result =
            List.fold_left
              (fun (error, store_result) site_type ->
-                add_link_pair_agent_site
+                Common_map.add_dependency_pair_sites
                   parameters
                   error
                   (agent_type, site_type)
@@ -298,7 +298,7 @@ let remove_action parameters error rule_id remove store_result =
 (****************************************************************************)
 (*return a potential sites of side effects in the case of half break action*)
 
-let add_link_pair_agent_rule parameters error (agent_type, rule_id)
+(*let add_link_pair_agent_rule parameters error (agent_type, rule_id)
     l store_result =
   let error, old =
     match
@@ -318,7 +318,7 @@ let add_link_pair_agent_rule parameters error (agent_type, rule_id)
       new_list
       store_result
   in
-  error, result
+  error, result*)
 
 let collect_potential_free_and_bind parameter error handler rule_id
     (agent_type, site_type) k store_result =
@@ -327,13 +327,13 @@ let collect_potential_free_and_bind parameter error handler rule_id
   | error, None -> error, store_result
   | error, Some (agent_type2, site2, state2) ->
     let error, store_potential_free =
-      add_link_pair_agent_rule parameter error
+      Common_map.add_dependency_pair_sites_rule parameter error
         (agent_type2, rule_id)
         ((site2,Ckappa_sig.dummy_state_index) :: [])
         (fst store_result)
     in
     let error, store_potential_bind =
-      add_link_pair_agent_rule parameter error
+      Common_map.add_dependency_pair_sites_rule parameter error
         (agent_type2, rule_id)
         ((site2, state2) :: [])
         (snd store_result)
@@ -446,7 +446,7 @@ let combine_half_break_and_remove parameter error
     (*exists in 'a t*)
     (fun parameter error (agent_type, rule_id) l1 store_result ->
        let error, store_result =
-         add_link_pair_agent_rule parameter error
+         Common_map.add_dependency_pair_sites_rule parameter error
            (agent_type, rule_id)
            l1
            store_result
@@ -456,7 +456,7 @@ let combine_half_break_and_remove parameter error
     (*exists in 'b t*)
     (fun paramter error (agent_type, rule_id) l2 store_result ->
        let error, store_result =
-         add_link_pair_agent_rule paramter error
+         Common_map.add_dependency_pair_sites_rule paramter error
            (agent_type, rule_id)
            l2
            store_result
@@ -467,7 +467,7 @@ let combine_half_break_and_remove parameter error
     (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
        let concat = List.concat [l1; l2] in
        let error, store_result =
-         add_link_pair_agent_rule parameter error
+         Common_map.add_dependency_pair_sites_rule parameter error
            (agent_type, rule_id)
            concat
            store_result

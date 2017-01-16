@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jan 12 2017>
+   * Last modification: Time-stamp: <Jan 16 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -30,10 +30,10 @@ type pre_static =
         Ckappa_sig.AgentsSite_map_and_set.Map.t;
     (*views that are tested and modificated without agent_id, will be used in
       update function*)
-    store_modif_map: Ckappa_sig.Rule_map_and_set.Set.t
-        Ckappa_sig.AgentSite_map_and_set.Map.t;
-    store_test_map : Ckappa_sig.Rule_map_and_set.Set.t
-        Ckappa_sig.AgentSite_map_and_set.Map.t;
+    (*store_modif_map: Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentSite_map_and_set.Map.t;*)
+    (*store_test_map : Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentSite_map_and_set.Map.t;*)
     store_test_modif_map:
       Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentSite_map_and_set.Map.t;
@@ -49,8 +49,8 @@ let init_pre_static =
     store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-    store_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;
-    store_test_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;
+    (*store_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;*)
+    (*store_test_map = Ckappa_sig.AgentSite_map_and_set.Map.empty;*)
     store_test_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty
   }
 
@@ -154,44 +154,44 @@ let init_bdu_analysis_static parameters error =
 (***************************************************************************)
 (*Modification*)
 (***************************************************************************)
-(*REMOVE*)
-let collect_modification_sites parameters error rule_id diff_direct store_result =
-  let add_link error (agent_id, agent_type, site_type) rule_id store_result =
-    let error', current_set =
-      Ckappa_sig.Rule_map_and_set.Set.add
-        parameters
-        error
-        rule_id
-        Ckappa_sig.Rule_map_and_set.Set.empty
-    in
-    let error =
-      Exception.check_point
-        Exception.warn parameters error error'
-        __POS__ Exit
-    in
-    let error, result =
-      Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite parameters error
-        (agent_id, agent_type, site_type)
-        current_set store_result
-    in
-    error, result
-  in
+
+let collect_sites_map_in_agent_interface parameters error agent
+    rule_id
+    (agent_id, agent_type)
+    store_result =
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site_type _ (error, store_result) ->
+       let error, store_result =
+         Common_map.add_triple_agents_site_rule (*CHECK this function*)
+           parameters
+           error
+           (agent_id, agent_type, site_type)
+           rule_id
+           store_result
+       in
+       error, store_result
+      ) agent.Cckappa_sig.agent_interface (error, store_result)
+
+let collect_modification_sites parameters error rule_id diff_direct
+    store_result =
   let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters error
-      (fun _parameters error agent_id agent_modif store_result ->
-         if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameters error
+      (fun parameters error agent_id agent_modif store_result ->
+         if Ckappa_sig.Site_map_and_set.Map.is_empty
+             agent_modif.Cckappa_sig.agent_interface
          then error, store_result
          else
            let agent_type = agent_modif.Cckappa_sig.agent_name in
            (*return*)
            let error, store_result =
-             Ckappa_sig.Site_map_and_set.Map.fold
-               (fun site_type _ (error, store_result) ->
-                  let error, store_result =
-                    add_link error (agent_id, agent_type, site_type) rule_id store_result
-                  in
-                  error, store_result
-               ) agent_modif.Cckappa_sig.agent_interface (error, store_result)
+             collect_sites_map_in_agent_interface
+               parameters
+               error
+               agent_modif
+               rule_id
+               (agent_id, agent_type)
+               store_result
            in
            error, store_result
       ) diff_direct store_result
@@ -202,9 +202,31 @@ let collect_modification_sites parameters error rule_id diff_direct store_result
   error, store_result
 
 (*update of the views due to modification without agent_id*)
-(*REMOVE*)
-let collect_modif_map parameters error store_modification_sites =
+(*NOTE: this function does not use anywhere*)
+(*let collect_projection_agent_id_from_triple parameters error store_result =
   Covering_classes_type.Project2_modif.monadic_proj_map
+    (fun parameters error (_agent_id, agent_type, site_type) ->
+       error, (agent_type, site_type))
+    parameters
+    error
+    (Ckappa_sig.Rule_map_and_set.Set.empty)
+    (fun parameters error s1 s2 ->
+       let error', new_set =
+         Ckappa_sig.Rule_map_and_set.Set.union parameters error s1 s2
+       in
+       let error =
+         Exception.check_point
+           Exception.warn parameters error error' __POS__ Exit
+       in
+       error, new_set
+    ) store_result*)
+
+(*let collect_modif_map parameters error store_modification_sites =
+  collect_projetion_agent_id_from_triple
+    parameters error
+    store_result*)
+
+(*Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameters error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type))
     parameters
@@ -219,33 +241,13 @@ let collect_modif_map parameters error store_modification_sites =
            Exception.warn parameters error error' __POS__ Exit
        in
        error, new_set
-    ) store_modification_sites
+    ) store_modification_sites*)
 
 (**************************************************************************)
 (*collect a set of rule_id of test rule and modification *)
 
 let collect_test_sites parameters error rule_id viewslhs
     store_result =
-  let add_link error (agent_id, agent_type, site_type) rule_id store_result =
-    let error', current_set =
-      Ckappa_sig.Rule_map_and_set.Set.add
-        parameters
-        error
-        rule_id
-        Ckappa_sig.Rule_map_and_set.Set.empty
-    in
-    let error =
-      Exception.check_point
-        Exception.warn parameters error error' __POS__ Exit
-    in
-    let error, result =
-      Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
-        parameters error
-        (agent_id, agent_type, site_type)
-        current_set store_result
-    in
-    error, result
-  in
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
@@ -257,19 +259,16 @@ let collect_test_sites parameters error rule_id viewslhs
          | Cckappa_sig.Dead_agent (agent,_,_,_)
          | Cckappa_sig.Agent agent ->
            let agent_type = agent.Cckappa_sig.agent_name in
-           let error, store_result_test =
-             Ckappa_sig.Site_map_and_set.Map.fold
-               (fun site_type _ (error, store_result) ->
-                  let error, store_result_test =
-                    add_link error
-                      (agent_id, agent_type, site_type)
-                      rule_id
-                      store_result
-                  in
-                  error, store_result_test
-               ) agent.Cckappa_sig.agent_interface (error, store_result)
+           let error, store_result =
+             collect_sites_map_in_agent_interface
+               parameters
+               error
+               agent
+               rule_id
+               (agent_id, agent_type)
+               store_result
            in
-           error, store_result_test
+           error, store_result
       ) viewslhs store_result
   in
   let store_result =
@@ -279,8 +278,9 @@ let collect_test_sites parameters error rule_id viewslhs
 
 (*valuations of the views that are created without agent_id*)
 
-let collect_test_map parameters error store_test_sites =
-  Covering_classes_type.Project2_modif.monadic_proj_map
+(*let collect_test_map parameters error store_test_sites =
+  collect_*)
+  (*Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameters error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type))
     parameters
@@ -295,7 +295,7 @@ let collect_test_map parameters error store_test_sites =
            Exception.warn parameters error error' __POS__ Exit
        in
        error, new_set
-    ) store_test_sites
+    ) store_test_sites*)
 
 (**************************************************************************)
 (*modification and test rule that has rule_id union together.
@@ -307,41 +307,28 @@ let collect_test_map parameters error store_test_sites =
 
 let collect_test_modification_sites
     parameters error store_modification_map store_test_map store_result =
-  let add_link error (agent_id, agent_type, site_type) rule_id_set store_result
-    =
-    let error, old =
-      match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs
-              parameters error
-              (agent_id, agent_type, site_type)
-              store_result
-      with
-      | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
-      | error, Some s -> error, s
-    in
-    let error, union =
-      Ckappa_sig.Rule_map_and_set.Set.union parameters error old rule_id_set in
-    let error, result =
-      Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
-        parameters error
-        (agent_id, agent_type, site_type)
-        union
-        store_result
-    in
-    error, result
-  in
   Ckappa_sig.AgentsSite_map_and_set.Map.fold2
     parameters error
     (*exists in 'a t*)
-    (fun _parameters error (agent_id, agent_type, site_type) s1 store_result ->
+    (fun parameters error (agent_id, agent_type, site_type) s1 store_result ->
        let error, store_result =
-         add_link error (agent_id, agent_type, site_type) s1 store_result
+         Common_map.add_dependency_triple_sites_rule
+           parameters
+           error
+           (agent_id, agent_type, site_type)
+           s1
+           store_result
        in
        error, store_result
     )
     (*exists in 'b t*)
-    (fun _parameters error (agent_id, agent_type, site_type) s2 store_result ->
+    (fun parameters error (agent_id, agent_type, site_type) s2 store_result ->
        let error, store_result =
-         add_link error (agent_id, agent_type, site_type) s2 store_result
+         Common_map.add_dependency_triple_sites_rule parameters
+           error
+           (agent_id, agent_type, site_type)
+           s2
+           store_result
        in
        error, store_result
     )
@@ -356,14 +343,18 @@ let collect_test_modification_sites
            Exception.warn parameters error error' __POS__ Exit
        in
        let error, store_result =
-         add_link error (agent_id, agent_type, site_type) union store_result
+         Common_map.add_dependency_triple_sites_rule parameters
+           error
+           (agent_id, agent_type, site_type)
+           union
+           store_result
        in
        error, store_result
     ) store_modification_map store_test_map store_result
 
 (*valuations of the views that are created without agent_id*)
-
-let collect_test_modif_map parameters error store_test_modification_sites =
+(*MOVE*)
+(*let collect_test_modif_map parameters error store_test_modification_sites =
   Covering_classes_type.Project2_modif.monadic_proj_map
     (fun _parameters error (_agent_id, agent_type, site_type) ->
        error, (agent_type, site_type)
@@ -380,7 +371,7 @@ let collect_test_modif_map parameters error store_test_modification_sites =
        in
        error, new_set
     )
-    store_test_modification_sites
+    store_test_modification_sites*)
 
 (****************************************************************************)
 
@@ -398,12 +389,12 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
   in
   (*--------------------------------------------------------------*)
   (*update of the views due to modification without agent_id*)
-  let error, store_modif_map =
+  (*let error, store_modif_map =
     collect_modif_map
       parameters
       error
       store_modification_sites
-  in
+  in*)
   (*-------------------------------------------------------------*)
   (*valuations of the views that are tested with agent_id*)
   let error, store_test_sites =
@@ -416,12 +407,12 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
   in
   (*---------------------------------------------------------------*)
   (*valuations of the views that are tested without agent_id*)
-  let error, store_test_map =
+  (*let error, store_test_map =
     collect_test_map
       parameters
       error
       store_test_sites
-  in
+  in*)
   (*---------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification with
     agent_id*)
@@ -437,7 +428,7 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
   (*valuations and update of the views that are tested and modification
     without agent_id*)
   let error, store_test_modif_map =
-    collect_test_modif_map
+    Common_map.collect_projection_agent_id_from_triple
       parameters
       error
       store_test_modification_sites
@@ -447,8 +438,8 @@ let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
     store_modification_sites      = store_modification_sites;
     store_test_sites              = store_test_sites;
     store_test_modification_sites = store_test_modification_sites;
-    store_modif_map               = store_modif_map;
-    store_test_map                = store_test_map;
+    (*store_modif_map               = store_modif_map;*)
+    (*store_test_map                = store_test_map;*)
     store_test_modif_map          = store_test_modif_map;
   }
 

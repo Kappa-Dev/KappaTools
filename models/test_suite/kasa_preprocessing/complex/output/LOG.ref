@@ -521,5 +521,5 @@ C cannot occur in the model
 Some exceptions have been raised
 error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1019; exception:Exit
 error: file_name: KaSa_rep/reachability_analysis/common_static.ml; message: line 1019; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 871; exception:Exit
-error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 871; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 862; exception:Exit
+error: file_name: KaSa_rep/reachability_analysis/bdu_static_views.ml; message: line 862; exception:Exit
