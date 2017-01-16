@@ -19,32 +19,32 @@ let local_trace = false
 (*TYPE*)
 (***************************************************************************)
 
-type pre_static =
+(*type pre_static = (*MOVE TO COMMON STATIC*)
   {
-    store_modification_sites  :
+    (*store_modification_sites  :
       Ckappa_sig.Rule_map_and_set.Set.t
-        Ckappa_sig.AgentsSite_map_and_set.Map.t;
-    store_test_sites : Ckappa_sig.Rule_map_and_set.Set.t
-        Ckappa_sig.AgentsSite_map_and_set.Map.t;
+        Ckappa_sig.AgentsSite_map_and_set.Map.t;*)
+    (*store_test_sites : Ckappa_sig.Rule_map_and_set.Set.t
+        Ckappa_sig.AgentsSite_map_and_set.Map.t;*)
     store_test_modification_sites : Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentsSite_map_and_set.Map.t;
     store_test_modif_map:
       Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentSite_map_and_set.Map.t;
-  }
+  }*)
 
 
 (***************************************************************************)
 (*initial values of pre_state*)
 (***************************************************************************)
 
-let init_pre_static =
+(*let init_pre_static =
   {
-    store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
-    store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
+    (*store_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;*)
+    (*store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;*)
     store_test_modification_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_modif_map = Ckappa_sig.AgentSite_map_and_set.Map.empty
-  }
+  }*)
 
 (***************************************************************************)
 (*TYPE of pattern*)
@@ -74,7 +74,7 @@ let init_bdu_analysis_static_pattern =
 
 type bdu_analysis_static =
   {
-    store_pre_static : pre_static;
+    (*store_pre_static : pre_static;*)
     store_covering_classes:
       Covering_classes_type.remanent
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
@@ -124,7 +124,7 @@ let init_bdu_analysis_static parameters error =
   in
   let init_bdu_analysis_static =
     {
-      store_pre_static = init_pre_static;
+      (*store_pre_static = init_pre_static;*)
       store_covering_classes = init_covering_classes;
       store_list_of_site_type_in_covering_classes =
         Covering_classes_type.AgentCV_map_and_set.Map.empty;
@@ -143,60 +143,10 @@ let init_bdu_analysis_static parameters error =
   in
   error, init_bdu_analysis_static
 
-(***************************************************************************)
-(*Modification*)
-(***************************************************************************)
-
-let collect_sites_map_in_agent_interface parameters error agent
-    rule_id
-    (agent_id, agent_type)
-    store_result =
-  Ckappa_sig.Site_map_and_set.Map.fold
-    (fun site_type _ (error, store_result) ->
-       let error, store_result =
-         Common_map.add_triple_agents_site_rule (*CHECK this function*)
-           parameters
-           error
-           (agent_id, agent_type, site_type)
-           rule_id
-           store_result
-       in
-       error, store_result
-      ) agent.Cckappa_sig.agent_interface (error, store_result)
-
-let collect_modification_sites parameters error rule_id diff_direct
-    store_result =
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameters error
-      (fun parameters error agent_id agent_modif store_result ->
-         if Ckappa_sig.Site_map_and_set.Map.is_empty
-             agent_modif.Cckappa_sig.agent_interface
-         then error, store_result
-         else
-           let agent_type = agent_modif.Cckappa_sig.agent_name in
-           (*return*)
-           let error, store_result =
-             collect_sites_map_in_agent_interface
-               parameters
-               error
-               agent_modif
-               rule_id
-               (agent_id, agent_type)
-               store_result
-           in
-           error, store_result
-      ) diff_direct store_result
-  in
-  let store_result =
-    Ckappa_sig.AgentsSite_map_and_set.Map.map (fun x -> x) store_result
-  in
-  error, store_result
-
 (**************************************************************************)
 (*collect a set of rule_id of test rule and modification *)
 
-let collect_test_sites parameters error rule_id viewslhs
+(*let collect_test_sites parameters error rule_id viewslhs
     store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -210,7 +160,7 @@ let collect_test_sites parameters error rule_id viewslhs
          | Cckappa_sig.Agent agent ->
            let agent_type = agent.Cckappa_sig.agent_name in
            let error, store_result =
-             collect_sites_map_in_agent_interface
+             Common_map.collect_sites_map_in_agent_interface
                parameters
                error
                agent
@@ -224,7 +174,7 @@ let collect_test_sites parameters error rule_id viewslhs
   let store_result =
     Ckappa_sig.AgentsSite_map_and_set.Map.map (fun x -> x) store_result
   in
-  error, store_result
+  error, store_result*)
 
 (**************************************************************************)
 (*modification and test rule that has rule_id union together.
@@ -234,7 +184,7 @@ let collect_test_sites parameters error rule_id viewslhs
   => result: agent_type:0:site_type:0:[4;5;6;7]
 *)
 
-let collect_test_modification_sites
+(*let collect_test_modification_sites
     parameters error store_modification_map store_test_map store_result =
   Ckappa_sig.AgentsSite_map_and_set.Map.fold2
     parameters error
@@ -279,59 +229,59 @@ let collect_test_modification_sites
            store_result
        in
        error, store_result
-    ) store_modification_map store_test_map store_result
+    ) store_modification_map store_test_map store_result*)
 
 (****************************************************************************)
 
-let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
+(*let scan_rule_pre_static parameters error (rule_id:Ckappa_sig.c_rule_id) rule
     handler_bdu store_result =
   (*------------------------------------------------------------------------*)
   (*update of the views due to modification with agent_id*)
-  let error, store_modification_sites =
-    collect_modification_sites
+  (*let error, store_modification_sites =
+    Bdu_static_modification_action.collect_modification_sites
       parameters
       error
       rule_id
       rule.Cckappa_sig.diff_direct
       store_result.store_modification_sites
-  in
+  in*)
   (*-------------------------------------------------------------*)
   (*valuations of the views that are tested with agent_id*)
-  let error, store_test_sites =
+  (*let error, store_test_sites =
     collect_test_sites
       parameters
       error
       rule_id
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       store_result.store_test_sites
-  in
+  in*)
   (*---------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification with
     agent_id*)
-  let error, store_test_modification_sites =
-    collect_test_modification_sites
+  (*let error, store_test_modification_sites =
+    collect_test_modification_sites (*MOVE*)
       parameters
       error
       store_modification_sites
       store_test_sites
       store_result.store_test_modification_sites
-  in
+  in*)
   (*--------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification
     without agent_id*)
-  let error, store_test_modif_map =
+  (*let error, store_test_modif_map =
     Common_map.collect_projection_agent_id_from_triple
       parameters
       error
       store_test_modification_sites
-  in
+  in*)
   error, handler_bdu,
   {
-    store_modification_sites      = store_modification_sites;
-    store_test_sites              = store_test_sites;
+    (*store_modification_sites      = store_modification_sites;*)
+    (*store_test_sites              = store_test_sites;*)
     store_test_modification_sites = store_test_modification_sites;
     store_test_modif_map          = store_test_modif_map;
-  }
+  }*)
 
 (******************************************************************)
 (*implementation of bdu_analysis_static*)
@@ -1266,7 +1216,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
       (StoryProfiling.Scan_rule_static (Ckappa_sig.int_of_rule_id rule_id))
       None log_info
   in
-  let error, handler_bdu, store_pre_static =
+  (*let error, handler_bdu, store_pre_static =
     scan_rule_pre_static
       parameters
       error
@@ -1274,7 +1224,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
       rule
       handler_bdu
       store_result.store_pre_static
-  in
+  in*)
   (*-----------------------------------------------------------------------*)
   let error, store_covering_classes =
     Covering_classes_main.covering_classes
@@ -1359,7 +1309,7 @@ let scan_rule_static parameters log_info error handler_kappa handler_bdu
   in
   error, log_info, handler_bdu,
   {
-    store_pre_static = store_pre_static;
+    (*store_pre_static = store_pre_static;*)
     store_covering_classes = store_covering_classes;
     store_list_of_site_type_in_covering_classes =
       store_list_of_site_type_in_covering_classes;

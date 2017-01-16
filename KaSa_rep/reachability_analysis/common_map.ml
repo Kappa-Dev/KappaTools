@@ -144,7 +144,6 @@ let collect_projection_agent_id_from_triple parameters error store_result =
     ) store_result
 
 (****************************************************************************)
-(****************************************************************************)
 
 let get_rule_id_set parameter error rule_id empty_set store_result =
   let error, set =
@@ -162,26 +161,19 @@ let get_rule_id_set parameter error rule_id empty_set store_result =
 
 (****************************************************************************)
 
-(*let add_set parameter error (x, y) set =
-  let error', set =
-    Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-      parameter
-      error
-      (x, y)
-      set
-  in
-  let error =
-    Exception.check_point
-      Exception.warn parameter error error' __POS__ Exit
-  in
-  error, set*)
-
-(****************************************************************************)
-
-(*let add_map_rule parameter error rule_id contain_map store_result =
-  Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-    parameter
-    error
+let collect_sites_map_in_agent_interface parameters error agent
     rule_id
-    contain_map
-    store_result*)
+    (agent_id, agent_type)
+    store_result =
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site_type _ (error, store_result) ->
+       let error, store_result =
+         add_triple_agents_site_rule
+           parameters
+           error
+           (agent_id, agent_type, site_type)
+           rule_id
+           store_result
+       in
+       error, store_result
+    ) agent.Cckappa_sig.agent_interface (error, store_result)

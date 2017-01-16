@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jan 13 2017>
+  * Last modification: Time-stamp: <Jan 16 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -61,10 +61,11 @@ val get_parameter: global_static_information -> Remanent_parameters_sig.paramete
 
 val get_compilation_information: global_static_information -> compilation_result
 
-val get_bdu_common_static : global_static_information -> Common_static.bdu_common_static
+val get_common_views :
+  global_static_information -> Common_static.common_views
 
-val set_bdu_common_static:
-  Common_static.bdu_common_static ->
+val set_common_views:
+  Common_static.common_views ->
   global_static_information ->
   global_static_information
 
@@ -156,7 +157,7 @@ val set_views_rhs :
   global_static_information ->
   global_static_information
 
-val get_views_lhs :
+(*val get_views_lhs :
   global_static_information ->
   Ckappa_sig.AgentsSitePState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t
@@ -165,21 +166,22 @@ val set_views_lhs :
   Ckappa_sig.AgentsSitePState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
-  global_static_information
+  global_static_information*)
 
 val get_views_lhs' :
   global_static_information ->
-  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.pair_of_states)
-  Ckappa_sig.Agent_id_map_and_set.Map.t
+  Ckappa_sig.pair_of_states
+    Ckappa_sig.Site_map_and_set.Map.t
+    Ckappa_sig.Agent_id_map_and_set.Map.t
     Ckappa_sig.Rule_map_and_set.Map.t
 
 val set_views_lhs' :
-  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.pair_of_states)
-  Ckappa_sig.Agent_id_map_and_set.Map.t
-  Ckappa_sig.Rule_map_and_set.Map.t ->
+  Ckappa_sig.pair_of_states
+    Ckappa_sig.Site_map_and_set.Map.t
+    Ckappa_sig.Agent_id_map_and_set.Map.t
+    Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
-
 
 val get_modified_map :
   global_static_information ->
@@ -189,6 +191,18 @@ val get_modified_map :
 val set_modified_map :
   Ckappa_sig.AgentsSiteState_map_and_set.Set.t
     Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
+(**)
+val get_test_modif_map :
+  global_static_information ->
+  Ckappa_sig.Rule_map_and_set.Set.t
+    Ckappa_sig.AgentSite_map_and_set.Map.t
+
+val set_test_modif_map :
+  Ckappa_sig.Rule_map_and_set.Set.t
+    Ckappa_sig.AgentSite_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
 

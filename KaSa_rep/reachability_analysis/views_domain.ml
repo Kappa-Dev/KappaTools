@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jan 13 2017>
+   * Last modification: Time-stamp: <Jan 16 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -105,7 +105,11 @@ struct
 
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
-  let get_bdu_common_static static = Analyzer_headers.get_bdu_common_static static
+  (*let get_bdu_common_static static = (*CHANGE NAME*)
+    Analyzer_headers.get_bdu_common_static static*)
+
+  let get_test_modif_map static =
+    lift Analyzer_headers.get_test_modif_map static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
@@ -130,11 +134,11 @@ struct
   let get_covering_classes_id static =
     (get_domain_static static).Bdu_static_views.store_covering_classes_id
 
-  let get_pre_static static =
-    (get_domain_static static).Bdu_static_views.store_pre_static
+  (*let get_pre_static static =
+    (get_domain_static static).Bdu_static_views.store_pre_static*)
 
-  let get_test_modif_map static =
-    (get_pre_static static).Bdu_static_views.store_test_modif_map
+  (*let get_test_modif_map static =
+    (get_pre_static static).Bdu_static_views.store_test_modif_map*)
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -378,7 +382,9 @@ struct
     let compiled = get_compil static in
     let kappa_handler = get_kappa_handler static in
     let handler_bdu = get_mvbdu_handler dynamic in
-    let store_pre_static = get_pre_static static in
+    (*let store_pre_static = get_pre_static static in*)
+    (*let store_common_static = get_bdu_common_static static in*)
+    let store_test_modif_map = get_test_modif_map static in
     let covering_classes = get_covering_classes static in
     let covering_classes_id = get_covering_classes_id static in
     let potential_side_effects = get_potential_side_effects static in
@@ -391,7 +397,9 @@ struct
         compiled
         kappa_handler
         handler_bdu
-        store_pre_static
+(*store_pre_static*)
+(*store_common_static*)
+        store_test_modif_map
         covering_classes
         covering_classes_id
         potential_side_effects

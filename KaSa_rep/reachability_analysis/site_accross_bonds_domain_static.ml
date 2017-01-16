@@ -176,16 +176,20 @@ let collect_tuples'' parameters error (agent_id, agent_type, site_type, state)
       views_set'
   with
   | error, None -> error, current_list
-  | error, Some (agent_type_v, site_type_v, pair_of_state_v) ->
-    if agent_type = agent_type_v && site_type <> site_type_v
-    then
-    let list =
-      (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
-      current_list
-    in
-    error, list
-    else
-      error, current_list
+  | error, Some site_map ->
+    Ckappa_sig.Site_map_and_set.Map.fold
+      (fun site_type_v pair_of_state_v (error, current_list) ->
+         if site_type <> site_type_v
+         then
+           let list =
+             (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
+             current_list
+           in
+           error, list
+         else
+           error, current_list)
+      site_map
+      (error, current_list)
 
 let store_set' parameters error fst_list snd_list store_result = (*TODO*)
   List.fold_left (fun (error, store_result) x ->

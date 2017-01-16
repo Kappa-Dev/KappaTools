@@ -101,12 +101,12 @@ struct
 
   let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
 
-  let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
+  (*let get_views_lhs static = lift Analyzer_headers.get_views_lhs static*)
 
   let get_views_lhs' static = lift Analyzer_headers.get_views_lhs' static
 
-
-  let get_action_binding static = lift Analyzer_headers.get_action_binding static
+  let get_action_binding static =
+    lift Analyzer_headers.get_action_binding static
   (*let get_created_bonds static = lift Analyzer_headers.get_created_bonds static*)
 
   let get_modified_map static = lift Analyzer_headers.get_modified_map static
@@ -388,7 +388,7 @@ struct
         store_potential_tuple_pair_rule_rhs static
     in
     (*------------------------------------------------------------*)
-    let store_views_lhs = get_views_lhs static in
+    (*let store_views_lhs = get_views_lhs static in
     let store_bonds_lhs = get_bonds_lhs static in
     let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
     let error, store_potential_tuple_pair_lhs =
@@ -398,8 +398,8 @@ struct
         store_bonds_lhs
         store_views_lhs
         store_potential_tuple_pair_lhs
-    in(*TODO*)
-    (*let store_views_lhs' = get_views_lhs' static in
+    in*)
+    let store_views_lhs' = get_views_lhs' static in
       let store_bonds_lhs = get_bonds_lhs static in
       let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
       let error, store_potential_tuple_pair_lhs =
@@ -409,7 +409,7 @@ struct
           store_bonds_lhs
           store_views_lhs'
           store_potential_tuple_pair_lhs
-    in*)
+    in
     let static =
       set_potential_tuple_pair_lhs store_potential_tuple_pair_lhs
         static
