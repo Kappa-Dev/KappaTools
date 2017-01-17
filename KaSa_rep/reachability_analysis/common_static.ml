@@ -63,18 +63,14 @@ type test_views =
       Ckappa_sig.Site_map_and_set.Map.t
       Ckappa_sig.Agent_id_map_and_set.Map.t
       Ckappa_sig.Rule_map_and_set.Map.t;
-      (*Ckappa_sig.AgentsSitePState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;*)
     store_views_lhs :
       Ckappa_sig.pair_of_states
         Ckappa_sig.Site_map_and_set.Map.t
         Ckappa_sig.Agent_id_map_and_set.Map.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    (**)
     store_test_sites : Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentsSite_map_and_set.Map.t;
   }
-
 
 (***************************************************************************)
 (*SIDE EFFECTS*)
@@ -84,6 +80,25 @@ type test_views =
   {
 
   }*)
+
+(***************************************************************************)
+(*BINDING*)
+(***************************************************************************)
+
+type binding_views =
+  {
+    store_bonds_rhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    store_bonds_lhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+    store_action_binding : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+        Ckappa_sig.Rule_map_and_set.Map.t;
+  }
+
+
+(***************************************************************************)
+(*COMMON VIEWS*)
+(***************************************************************************)
 
 type common_views =
   {
@@ -98,12 +113,13 @@ type common_views =
       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
         list Ckappa_sig.Rule_map_and_set.Map.t;
     (*bond in the rhs and in the lhs*)
-    store_bonds_rhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
+    (*store_bonds_rhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_lhs : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
     store_action_binding : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
-        Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.Rule_map_and_set.Map.t;*)
+    store_binding_views : binding_views;
     store_modification : modification_views;
     store_test : test_views;
     store_test_modification_sites :
@@ -134,6 +150,14 @@ let init_test_views =
     store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
   }
 
+let init_binding_views =
+  {
+    store_bonds_rhs = empty_rule;
+    store_bonds_lhs = empty_rule;
+    store_action_binding = empty_rule;
+  }
+
+
 let init_common_views =
   let empty_agentsite = Ckappa_sig.AgentSite_map_and_set.Map.empty in
   let empty_agentrule = Ckappa_sig.AgentRule_map_and_set.Map.empty in
@@ -144,9 +168,10 @@ let init_common_views =
       store_side_effects = (empty_agentsite, empty_agentsite);
       store_potential_side_effects = (empty_agentrule, empty_agentrule);
       store_potential_side_effects_per_rule = empty_rule;
-      store_bonds_rhs = empty_rule;
+      store_binding_views = init_binding_views;
+      (*store_bonds_rhs = empty_rule;
       store_bonds_lhs = empty_rule;
-      store_action_binding = empty_rule;
+      store_action_binding = empty_rule;*)
       store_modification = init_modification_views;
       store_test = init_test_views;
       store_test_modification_sites =
@@ -588,7 +613,7 @@ let collect_side_effects parameter error handler rule_id half_break remove
   error, (store_half_break_action, store_remove_action)
 
 (***************************************************************************)
-(*Collect bonds in the rhs and lhs*)
+(*BINDING*)
 (***************************************************************************)
 
 let collect_agent_type_binding_state parameter error agent site_type =
@@ -649,8 +674,8 @@ let collect_fingerprint_of_binding parameter error agent_id site_type views =
   in
   error, (agent_type, state)
 
-let collect_fingerprint_of_bond parameter error site_add agent_id site_type_source
-    views =
+let collect_fingerprint_of_bond parameter error site_add agent_id
+    site_type_source views =
   let error, pair =
     let agent_index_target = site_add.Cckappa_sig.agent_index in
     let site_type_target = site_add.Cckappa_sig.site in
@@ -672,10 +697,6 @@ let collect_fingerprint_of_bond parameter error site_add agent_id site_type_sour
     error, pair
   in
   error, pair
-
-(***************************************************************************)
-(*BINDING*)
-(***************************************************************************)
 
 let collect_bonds_pattern parameters error views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -739,7 +760,6 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
 
 (***************************************************************************)
 (*action binding in the rhs*)
-(***************************************************************************)
 
 let collect_action_binding parameter error rule_id rule store_result =
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
@@ -766,8 +786,9 @@ let collect_action_binding parameter error rule_id rule store_result =
       in
       let error, set =
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-          parameter error ((agent_id1, agent_type1, site_type1, state1),
-                                 (agent_id2, agent_type2, site_type2, state2))
+          parameter error
+          ((agent_id1, agent_type1, site_type1, state1),
+           (agent_id2, agent_type2, site_type2, state2))
           old_set
       in
       let error, set =
@@ -787,8 +808,40 @@ let collect_action_binding parameter error rule_id rule store_result =
       error, store_result
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
 
+let scan_rule_binding_views parameter error rule_id rule store_result =
+  let error, store_bonds_rhs =
+    collect_bonds_rhs
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_bonds_rhs
+  in
+  let error, store_bonds_lhs =
+    collect_bonds_lhs
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_bonds_lhs
+  in
+  let error, store_action_binding =
+    collect_action_binding
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_action_binding
+  in
+  error,
+  {
+    store_bonds_rhs = store_bonds_rhs;
+    store_bonds_lhs = store_bonds_lhs;
+    store_action_binding = store_action_binding;
+  }
+
 (***************************************************************************)
-(*views in pattern, this function test pattern on the lhs*)
+(*VIEWS*)
 (***************************************************************************)
 
 let collect_views_pattern_aux parameter error views store_result =
@@ -825,10 +878,6 @@ let collect_views_pattern_aux parameter error views store_result =
   in
   error, store_result
 
-(***************************************************************************)
-(*VIEWS*)
-(***************************************************************************)
-
 let collect_test_sites parameters error rule_id viewslhs store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
@@ -858,8 +907,6 @@ let collect_test_sites parameters error rule_id viewslhs store_result =
   in
   error, store_result
 
-(*****************************************************************************)
-
 let collect_views_aux parameter error rule_id views store_result =
   let error, old_map =
     Common_map.get_rule_id_set parameter error
@@ -885,64 +932,7 @@ let collect_views_lhs parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     store_result
 
-(*REMOVE*)
-let collect_views_aux' parameter error rule_id views store_result =
-  (*let error, store_set =
-    collect_views_pattern_aux parameter error views
-      Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-    in
-    let error, store_result =
-    add_map_rule parameter error rule_id store_set store_result
-    in
-    error, store_result*)
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
-      error
-      (fun parameter error agent_id agent store_result ->
-         match agent with
-         | Cckappa_sig.Unknown_agent _ ->
-           Exception.warn parameter error __POS__ Exit store_result
-         | Cckappa_sig.Ghost -> error, store_result
-         | Cckappa_sig.Dead_agent (agent,_,_,_)
-         | Cckappa_sig.Agent agent ->
-           let agent_type = agent.Cckappa_sig.agent_name in
-           let error, old_set =
-             Common_map.get_rule_id_set parameter error
-               rule_id
-               Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
-               store_result
-           in
-           let error', set =
-             Ckappa_sig.Site_map_and_set.Map.fold
-               (fun site_type port (error, store_set) ->
-                  (*CHECK max = min*)
-                  let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
-                  let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
-                  let error, store_set =
-                    Ckappa_sig.AgentsSitePState_map_and_set.Set.add_when_not_in
-                      parameter error
-                      (agent_id, agent_type, site_type,
-                       (state_min, state_max))
-                      store_set
-                  in
-                  error, store_set
-               ) agent.Cckappa_sig.agent_interface (error, old_set)
-           in
-           let error =
-             Exception.check_point
-               Exception.warn parameter error error'
-               __POS__ Exit
-           in
-           let error, store_result =
-             Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-               parameter error rule_id set store_result
-           in
-           error, store_result
-      ) views store_result
-  in
-  error, store_result
-
-let collect_views_rhs parameter error rule_id rule store_result = (*TODO*)
+let collect_views_rhs parameter error rule_id rule store_result =
   collect_views_aux
     parameter error
     rule_id
@@ -1006,8 +996,6 @@ let collect_sites_from_agent_interface parameters error agent_id agent
        error, store_result
     ) agent.Cckappa_sig.agent_interface (error, store_result)
 
-(*********************************************************************)
-
 let collect_modified_map parameter error rule_id rule store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
@@ -1046,8 +1034,6 @@ let collect_modified_map parameter error rule_id rule store_result =
   in
   error, store_result
 
-(*********************************************************************)
-
 let collect_modification_sites parameters error rule_id diff_direct
     store_result =
   let error, store_result =
@@ -1076,8 +1062,6 @@ let collect_modification_sites parameters error rule_id diff_direct
     Ckappa_sig.AgentsSite_map_and_set.Map.map (fun x -> x) store_result
   in
   error, store_result
-
-(*********************************************************************)
 
 module Proj_modif =
   Map_wrapper.Proj
@@ -1191,7 +1175,6 @@ let collect_test_modification_sites
         error, store_result
     ) store_modification_map store_test_map store_result
 
-
 (***************************************************************************)
 (*RULE*)
 (***************************************************************************)
@@ -1239,38 +1222,13 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       store_result.store_potential_side_effects
   in
   (*------------------------------------------------------------------------*)
-  (*bonds in the rhs and lhs*)
-  let error, store_bonds_rhs =
-    collect_bonds_rhs
-      parameter
-      error
-      rule_id
-      rule
-      store_result.store_bonds_rhs
-  in
-  let error, store_bonds_lhs =
-    collect_bonds_lhs
-      parameter
-      error
-      rule_id
-      rule
-      store_result.store_bonds_lhs
+  let error, store_binding_views =
+    scan_rule_binding_views
+      parameter error
+      rule_id rule
+      store_result.store_binding_views
   in
   (*------------------------------------------------------------------------*)
-  let error, store_action_binding =
-    collect_action_binding
-      parameter
-      error
-      rule_id
-      rule
-      store_result.store_action_binding
-  in
-  (*let error, store_views_rhs =
-    collect_views_rhs parameter error rule_id rule store_result.store_views_rhs
-  in
-  let error, store_views_lhs =
-    collect_views_lhs parameter error rule_id rule store_result.store_views_lhs
-    in*)
   let error, store_modification =
     scan_rule_modification
       parameter error
@@ -1278,12 +1236,14 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       rule
       store_result.store_modification
   in
+  (*------------------------------------------------------------------------*)
   let error, store_test =
     scan_rule_test parameter error
       rule_id
       rule
       store_result.store_test
   in
+  (*------------------------------------------------------------------------*)
   let error, store_test_modification_sites =
     collect_test_modification_sites
       parameter
@@ -1307,9 +1267,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_agent_name_from_pattern = store_agent_name_from_pattern;
    store_side_effects = store_side_effects;
    store_potential_side_effects = store_potential_side_effects;
-   store_bonds_rhs = store_bonds_rhs;
-   store_bonds_lhs = store_bonds_lhs;
-   store_action_binding = store_action_binding;
+   store_binding_views = store_binding_views;
    store_modification = store_modification;
    store_test = store_test;
    store_test_modification_sites = store_test_modification_sites;
@@ -1354,6 +1312,9 @@ let scan_rule_set parameter error handler_kappa compil =
    with
     store_potential_side_effects_per_rule = potential_side_effects_per_rule
   }
+
+(******************************************************************)
+(******************************************************************)
 
 type site_to_rules_tmp =
   Ckappa_sig.Rule_map_and_set.Set.t

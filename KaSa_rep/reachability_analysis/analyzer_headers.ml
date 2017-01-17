@@ -188,35 +188,46 @@ let set_potential_side_effects_per_rule eff static =
 (*BINDING*)
 (*****************************************************************************)
 
-let get_bonds_rhs static =
-  (get_common_views static).Common_static.store_bonds_rhs
+let get_binding_views static =
+  (get_common_views static).Common_static.store_binding_views
 
-let set_bonds_rhs bonds static =
+let set_binding_views b static =
   set_common_views
     {
       (get_common_views static) with
+      Common_static.store_binding_views = b
+    }
+    static
+
+let get_bonds_rhs static =
+  (get_binding_views static).Common_static.store_bonds_rhs
+
+let set_bonds_rhs bonds static =
+  set_binding_views
+    {
+      (get_binding_views static) with
       Common_static.store_bonds_rhs = bonds
     }
     static
 
 let get_bonds_lhs static =
-  (get_common_views static).Common_static.store_bonds_lhs
+  (get_binding_views static).Common_static.store_bonds_lhs
 
 let set_bonds_lhs bonds static =
-  set_common_views
+  set_binding_views
     {
-      (get_common_views static) with
+      (get_binding_views static) with
       Common_static.store_bonds_lhs = bonds
     }
     static
 
 let get_action_binding static =
-  (get_common_views static).Common_static.store_action_binding
+  (get_binding_views static).Common_static.store_action_binding
 
 let set_action_binding bonds static =
-  set_common_views
+  set_binding_views
     {
-      (get_common_views static) with
+      (get_binding_views static) with
       Common_static.store_action_binding = bonds
     }
     static
