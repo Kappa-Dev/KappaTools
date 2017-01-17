@@ -59,6 +59,7 @@ type test_views =
 (***************************************************************************)
 (*SIDE EFFECTS*)
 (***************************************************************************)
+
 type half_break_action =
   (int list * (Ckappa_sig.c_rule_id * Ckappa_sig.pair_of_states) list)
     Ckappa_sig.AgentSite_map_and_set.Map.t
@@ -584,9 +585,6 @@ let collect_potential_side_effects parameter error handler rule_id half_break
   in
   error, (store_result_free, store_result_bind)
 
-(***************************************************************************)
-(*compute side effects: this is an update before discover bond function *)
-
 let scan_rule_side_effects_views parameter error handler_kappa rule_id rule
     store_result =
   let error, store_side_effects =
@@ -653,9 +651,6 @@ let collect_agent_type_binding_state parameter error agent site_type =
           parameter error __POS__ Exit Ckappa_sig.dummy_state_index
     in
     error, (agent_type1, state1)
-
-(**************************************************************************)
-(* What you collect is the type fingerprint of a bond *)
 
 let collect_fingerprint_of_binding parameter error agent_id site_type views =
   let error, agent_source =
@@ -762,9 +757,6 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
     store_result
-
-(***************************************************************************)
-(*action binding in the rhs*)
 
 let collect_action_binding parameter error rule_id rule store_result =
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
@@ -1202,30 +1194,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       rule.Cckappa_sig.rule_lhs
       store_result.store_agent_name_from_pattern
   in
-  (*-------------------------------------------------------------------------*)
-  (*side effects*)
-  (*let error, store_side_effects =
-    collect_side_effects
-      parameter
-      error
-      handler_kappa
-      rule_id
-      rule.Cckappa_sig.actions.Cckappa_sig.half_break
-      rule.Cckappa_sig.actions.Cckappa_sig.remove
-      store_result.store_side_effects
-  in
-  (*-----------------------------------------------------------------------*)
-  (*potential partner side effects*)
-  let error, store_potential_side_effects =
-    collect_potential_side_effects
-      parameter
-      error
-      handler_kappa
-      rule_id
-      rule.Cckappa_sig.actions.Cckappa_sig.half_break
-      rule.Cckappa_sig.actions.Cckappa_sig.remove
-      store_result.store_potential_side_effects
-    in*)
+  (*------------------------------------------------------------------------*)
   let error, store_side_effects_views =
     scan_rule_side_effects_views
       parameter error handler_kappa rule_id rule
@@ -1276,8 +1245,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
    store_agent_name = store_agent_name;
    store_agent_name_from_pattern = store_agent_name_from_pattern;
    store_side_effects_views = store_side_effects_views;
-   (*store_side_effects = store_side_effects;
-   store_potential_side_effects = store_potential_side_effects;*)
    store_binding_views = store_binding_views;
    store_modification = store_modification;
    store_test = store_test;

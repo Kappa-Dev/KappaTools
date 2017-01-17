@@ -143,6 +143,12 @@ let collect_projection_agent_id_from_triple parameters error store_result =
        error, new_set
     ) store_result
 
+let project_second_site (b, c, _, e) = (b, c, e)
+let project_second_site_state (b, c, _, _) = (b, c)
+let project_first_site_state (b, _, d, _) = (b, d)
+let project_state (b, c, _) = (b, c)
+
+
 (****************************************************************************)
 
 let get_rule_id_set parameter error rule_id empty store_result =
