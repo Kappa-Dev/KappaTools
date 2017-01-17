@@ -27,6 +27,7 @@ let dot_color_encoding x =
   | Graph_loggers_sig.Black -> "black"
   | Graph_loggers_sig.LightSkyBlue -> "#87ceeb"
   | Graph_loggers_sig.PaleGreen -> "#98fb98"
+  | Graph_loggers_sig.Brown -> "brown"
 
 let svg_color_encoding x =
   match
@@ -39,6 +40,7 @@ let svg_color_encoding x =
   | Graph_loggers_sig.Black -> "#000"
   | Graph_loggers_sig.LightSkyBlue -> "#8ce"
   | Graph_loggers_sig.PaleGreen -> "#9f9"
+  | Graph_loggers_sig.Brown -> "#fc9"
 
 type node_attribute =
   {
@@ -53,7 +55,7 @@ type node_attribute =
 type edge_attribute =
   {
     edge_color: Graph_loggers_sig.color option;
-    edge_label: string option ;
+    edge_label: string list option ;
     edge_style: Graph_loggers_sig.linestyle ;
     edge_direction: Graph_loggers_sig.direction ;
     edge_arrowhead: Graph_loggers_sig.headkind ;
@@ -191,6 +193,32 @@ let print_graph_preamble
     | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
+let string_of_arrow_in_html logger bool title style =
+  match style
+  with
+  | Graph_loggers_sig.Tee | Graph_loggers_sig.Normal -> bool
+  (*| Tee ->
+        let () = between_attributes_in_html logger bool in
+        let () =
+          Loggers.fprintf logger "%s: \"tee\"" title
+        in
+        true*)
+  | Graph_loggers_sig.Vee ->
+    let () = between_attributes_in_html logger bool in
+    let () =
+      Loggers.fprintf logger "%s: \"vee\"" title
+    in
+    true
+  | Graph_loggers_sig.No_head ->
+    (*  let () = between_attributes_in_html logger bool in
+        let () =
+        Loggers.fprintf logger "%s: \"none\"" title
+        in
+        true*) bool
+
+let merge s s' =
+  if s = Graph_loggers_sig.No_head then s' else s
+                                              
 let print_graph_foot logger =
   match
     Loggers.get_encoding_format logger
@@ -200,6 +228,114 @@ let print_graph_foot logger =
     Loggers.print_newline logger
   | Loggers.HTML_Graph ->
     begin
+      let () =
+        Mods.String2Map.iter
+          (fun (id1,id2) list ->
+             let list = List.rev list in
+             let id1_int = Loggers.int_of_string_id logger id1 in
+             let id2_int = Loggers.int_of_string_id logger id2 in
+             let attributes = dummy_edge in
+             let attributes =
+               match Loggers.get_encoding_format logger with
+               | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT | Loggers.HTML ->
+                 List.fold_left
+                   (fun attributes option_list ->
+                      List.fold_left
+                        (fun attributes option ->
+                           match
+                             option
+                           with
+                           | Graph_loggers_sig.Label s ->
+                             begin
+                               match attributes.edge_label
+                               with
+                               | None ->
+                                 {attributes with
+                                  edge_label = Some [s] }
+                               | Some s' ->
+                                 {attributes with
+                                  edge_label = Some (s::","::s') }
+                             end
+                           | Graph_loggers_sig.Color s ->
+                             begin
+                               match attributes.edge_color with
+                               | None ->
+                                 {attributes with edge_color = Some s }
+                               | Some s' when s=s' -> attributes
+                               | Some _ ->
+                                 {attributes with edge_color = Some Graph_loggers_sig.Brown}
+                             end
+                           | Graph_loggers_sig.LineStyle s -> {attributes with
+                                                               edge_style = s}
+                           | Graph_loggers_sig.Direction s -> {attributes with
+                                                               edge_direction = s}
+                           | Graph_loggers_sig.ArrowTail s -> {attributes with
+                                                               edge_arrowtail = merge s attributes.edge_arrowtail }
+                           | Graph_loggers_sig.ArrowHead s -> {attributes with
+                                                               edge_arrowhead = merge s
+                                                              attributes.edge_arrowhead}
+                           | Graph_loggers_sig.Shape _
+                           | Graph_loggers_sig.Width _
+                           | Graph_loggers_sig.Height _
+                           | Graph_loggers_sig.FillColor _ -> attributes
+                        )
+                        attributes option_list)
+                   attributes
+                   list
+               | Loggers.Json
+               | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
+               | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular -> attributes
+             in
+
+             let () =
+               Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int
+                id2_int in
+             let attributes =
+               match attributes.edge_direction
+               with
+               | Graph_loggers_sig.Undirected ->
+                 {attributes with
+                  edge_arrowhead=Graph_loggers_sig.No_head ;
+                  edge_arrowtail=Graph_loggers_sig.No_head}
+               | Graph_loggers_sig.Direct ->
+                 {attributes with
+                  edge_arrowtail=Graph_loggers_sig.No_head}
+               | Graph_loggers_sig.Reverse ->
+                 {attributes with edge_arrowhead=Graph_loggers_sig.No_head}
+               | Graph_loggers_sig.Both -> attributes
+             in
+             let bool = false in
+             let bool =
+               match attributes.edge_label
+               with
+               | None -> bool
+               | Some string_list ->
+                 let () = Loggers.fprintf logger "label: \"" in
+                 let () = List.iter (Loggers.fprintf logger "%s") (List.rev string_list) in
+                 let () = Loggers.fprintf logger "\"" in
+                 true
+             in
+             let bool =
+               match attributes.edge_color
+               with
+               | None -> bool
+               | Some s ->
+                 let () = between_attributes_in_html logger bool in
+                 let color = svg_color_encoding s in
+                 let () =
+                   Loggers.fprintf logger
+                     "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
+                color color color
+                 in
+            true
+        in
+        let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
+        let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
+        let () = if bool then () else () in
+        let () = Loggers.fprintf logger " });@," in
+        ())
+          (Loggers.get_edge_map logger)
+      in
       let f_opt = Loggers.formatter_of_logger logger in
       match
         f_opt
@@ -310,28 +446,6 @@ let string_of_arrow_tail_in_dot style =
   | Graph_loggers_sig.Tee -> "|"
   | Graph_loggers_sig.No_head -> ""
 
-let string_of_arrow_in_html logger bool title style =
-  match style
-  with
-  | Graph_loggers_sig.Tee | Graph_loggers_sig.Normal -> bool
-  (*| Tee ->
-        let () = between_attributes_in_html logger bool in
-        let () =
-          Loggers.fprintf logger "%s: \"tee\"" title
-        in
-        true*)
-  | Graph_loggers_sig.Vee ->
-    let () = between_attributes_in_html logger bool in
-    let () =
-      Loggers.fprintf logger "%s: \"vee\"" title
-    in
-    true
-  | Graph_loggers_sig.No_head ->
-    (*  let () = between_attributes_in_html logger bool in
-        let () =
-        Loggers.fprintf logger "%s: \"none\"" title
-        in
-        true*) bool
 
 let print_node logger ?directives:(directives=[]) id =
   let attributes = dummy_node in
@@ -565,7 +679,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
            match
              option
            with
-           | Graph_loggers_sig.Label s -> {attributes with edge_label = Some s }
+           | Graph_loggers_sig.Label s -> {attributes with edge_label = Some [s] }
            | Graph_loggers_sig.Color s -> {attributes with edge_color = Some s }
            | Graph_loggers_sig.LineStyle s -> {attributes with edge_style = s}
            | Graph_loggers_sig.Direction s -> {attributes with edge_direction = s}
@@ -608,8 +722,15 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
             match attributes.edge_label
             with
             | None -> bool
-            | Some string ->
-              let () = Loggers.fprintf logger "label=\"%s\"" string in
+            | Some string_list ->
+              let () = Loggers.fprintf logger "label=\"" in
+              let () =
+                List.iter
+                  (Loggers.fprintf logger "%s")
+                  (List.rev string_list)
+              in
+              let () = Loggers.fprintf logger "\"" in
+
               true
           in
           let bool =
@@ -687,7 +808,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
           ()
       in ()
     end
-  | Loggers.HTML_Graph ->
+(*  | Loggers.HTML_Graph ->
     let id1_int = Loggers.int_of_string_id logger id1 in
     let id2_int = Loggers.int_of_string_id logger id2 in
     let () = Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int id2_int in
@@ -726,13 +847,13 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
     let () = if bool then () else () in
     let () = Loggers.fprintf logger " });@," in
-    ()
+    ()*)
   | Loggers.TXT   | Loggers.HTML ->
     let label =
       match
         attributes.edge_label
       with
-      | None -> ""
+      | None -> [""]
       | Some x -> x
     in
     let arrow =
@@ -743,10 +864,11 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
       | Graph_loggers_sig.Normal | Graph_loggers_sig.Vee  -> "->"
       | Graph_loggers_sig.Tee -> "-|"
     in
-    let () = Loggers.fprintf logger "%s%s %s %s%s" prefix id1 arrow id2 label in
+    let () = Loggers.fprintf logger "%s%s %s %s" prefix id1 arrow id2 in
+    let () = List.iter (Loggers.fprintf logger "%s") (List.rev label) in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Json -> Loggers.add_edge logger id1 id2 directives
+  | Loggers.Json | Loggers.HTML_Graph -> Loggers.add_edge logger id1 id2 directives
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 

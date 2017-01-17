@@ -70,6 +70,7 @@ type t =
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
+    edges_map: Graph_loggers_sig.options list list Mods.String2Map.t ref ;
     env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot VarMap.t ref ;
     const: VarSet.t ref;
     id_of_parameters: string VarMap.t ref
@@ -95,6 +96,7 @@ let dummy_html_logger =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    edges_map = ref Mods.String2Map.empty;
     fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
@@ -112,6 +114,7 @@ let dummy_txt_logger =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    edges_map = ref Mods.String2Map.empty;
     fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
@@ -316,6 +319,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      edges_map = ref Mods.String2Map.empty;
       fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
@@ -338,6 +342,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      edges_map = ref Mods.String2Map.empty;
       fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
@@ -358,6 +363,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     current_line = [];
     nodes = ref [];
     edges = ref [];
+    edges_map = ref Mods.String2Map.empty;
     fresh_reaction_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
@@ -376,6 +382,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       current_line = [];
       nodes = ref [];
       edges = ref [];
+      edges_map = ref Mods.String2Map.empty;
       fresh_reaction_id = ref 1;
       env = ref VarMap.empty;
       const = ref VarSet.empty;
@@ -443,7 +450,22 @@ let int_of_string_id logger string =
 let channel_of_logger logger = logger.channel_opt
 
 let add_node t s d = t.nodes:= (s,d)::(!(t.nodes))
-let add_edge t s1 s2 d = t.edges:= (s1,s2,d)::(!(t.edges))
+let add_edge t s1 s2 d =
+  let () = t.edges:= (s1,s2,d)::(!(t.edges)) in
+  let map = !(t.edges_map) in
+  let old_list =
+    match
+    Mods.String2Map.find_option
+      (s1,s2)
+      map
+    with Some l -> l
+       | None -> []
+  in
+  let () =
+    t.edges_map :=
+      Mods.String2Map.add (s1,s2) (d::old_list) map
+  in
+  ()
 let graph_of_logger logger = List.rev !(logger.nodes), List.rev !(logger.edges)
 
 let get_expr t v =
@@ -522,3 +544,4 @@ let to_json logger =
     gen_iter Infinite_buffers.iter !b
 
 let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json
+let get_edge_map t = !(t.edges_map)

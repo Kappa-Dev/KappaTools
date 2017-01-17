@@ -53,7 +53,7 @@ let color_to_json color =
   | Graph_loggers_sig.Black -> `String "black"
   | Graph_loggers_sig.LightSkyBlue -> `String "lightskyblue"
   | Graph_loggers_sig.PaleGreen -> `String "palegreen"
-
+  | Graph_loggers_sig.Brown -> `String "brown"
 let directive_to_json option =
   match option
   with
@@ -130,6 +130,7 @@ let color_of_json = function
   | `String "black" -> Graph_loggers_sig.Black
   | `String "lightskyblue" -> Graph_loggers_sig.LightSkyBlue
   | `String "palegreen" -> Graph_loggers_sig.PaleGreen
+  | `String "brown" -> Graph_loggers_sig.Brown
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct color",x))
 
 let directive_of_json =

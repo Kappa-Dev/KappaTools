@@ -60,6 +60,7 @@ val graph_of_logger: t -> Graph_loggers_sig.graph
 val add_node: t -> string -> Graph_loggers_sig.options list -> unit
 val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
 val dump_json: t -> Yojson.Basic.json -> unit
+val get_edge_map: t -> Graph_loggers_sig.options list list Mods.String2Map.t
 
 val get_expr:
   t -> Ode_loggers_sig.variable ->

@@ -15,6 +15,9 @@ module StringSetMap : SetMap.S with type elt = string
 module StringSet = StringSetMap.Set
 module StringMap = StringSetMap.Map
 
+module String2SetMap : SetMap.S with type elt = string*string
+module String2Map = String2SetMap.Map
+
 module IntSetMap : SetMap.S with type elt = int
 module IntSet = IntSetMap.Set
 module IntMap = IntSetMap.Map

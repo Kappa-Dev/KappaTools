@@ -35,10 +35,10 @@ Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a P
   g.setNode(4, { label: "3:A(x~u,z~p,w~u)->A(x~u,z~p,w~p)", shape: "rect", style: "fill: #8ce"  });
   g.setNode(5, { label: "4:A(x~u,z~u)->A(x~u,z~p)", shape: "rect", style: "fill: #8ce"  });
   g.setEdge(1,2,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
-  g.setEdge(2,3,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
-  g.setEdge(5,4,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   g.setEdge(1,4,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
   g.setEdge(1,5,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+  g.setEdge(2,3,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+  g.setEdge(5,4,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   var svg = d3.select("svg"),inner = svg.select("g");
   // Set up zoom support
   var zoom = d3.behavior.zoom().on("zoom", function() {

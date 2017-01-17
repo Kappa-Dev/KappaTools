@@ -10,6 +10,9 @@ let int_compare (x: int) y = Pervasives.compare x y
 let int_pair_compare (p,q) (p',q') =
   let o = int_compare p p' in
   if o = 0 then int_compare q q' else o
+let string_pair_compare (p,q) (p',q') =
+  let o = String.compare p p' in
+  if o=0 then String.compare q q' else o
 
 module StringSetMap =
   SetMap.Make (struct type t = string
@@ -17,6 +20,12 @@ module StringSetMap =
     let print = Format.pp_print_string end)
 module StringSet = StringSetMap.Set
 module StringMap = StringSetMap.Map
+module String2SetMap =
+  SetMap.Make (struct type t = string*string
+    let compare = string_pair_compare
+    let print f (a,b) =
+      Format.fprintf f "(%s, %s)" a b end)
+module String2Map = String2SetMap.Map
 module IntSetMap =
   SetMap.Make (struct type t = int
     let compare = int_compare
