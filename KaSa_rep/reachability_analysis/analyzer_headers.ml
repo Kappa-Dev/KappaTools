@@ -151,24 +151,36 @@ let set_agent_name_from_pattern agent_name static =
 (*SIDE EFFECTS*)
 (*****************************************************************************)
 
-let get_side_effects static =
-  (get_common_views static).Common_static.store_side_effects
+let get_side_effects_views static =
+  (get_common_views static).Common_static.store_side_effects_views
 
-let set_side_effects eff static =
+let set_side_effects_views eff static =
   set_common_views
     {
       (get_common_views static) with
+      Common_static.store_side_effects_views = eff
+    }
+    static
+
+
+let get_side_effects static =
+  (get_side_effects_views static).Common_static.store_side_effects
+
+let set_side_effects eff static =
+  set_side_effects_views
+    {
+      (get_side_effects_views static) with
       Common_static.store_side_effects = eff
     }
     static
 
 let get_potential_side_effects static =
-  (get_common_views static).Common_static.store_potential_side_effects
+  (get_side_effects_views static).Common_static.store_potential_side_effects
 
 let set_potential_side_effects eff static =
-  set_common_views
+  set_side_effects_views
     {
-      (get_common_views static) with
+      (get_side_effects_views static) with
       Common_static.store_potential_side_effects = eff
     }
     static
