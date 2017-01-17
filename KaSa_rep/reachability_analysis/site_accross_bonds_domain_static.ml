@@ -108,90 +108,49 @@ let init_basic_static_information =
 (***************************************************************)
 (*collect a set of tuple pair (A.x.y, B.z.t) on the rhs*)
 
-let collect_tuple error (agent_id, agent_type, site_type, state) views_set =
-  let error, list =
-    Ckappa_sig.AgentsSitePState_map_and_set.Set.fold
-      (fun v (error, current_list) ->
-         let (agent_id_v, agent_type_v, site_type_v, _state_v) = v in
-         if agent_id = agent_id_v &&
-            agent_type = agent_type_v &&
-            site_type <> site_type_v
-         then
-           let list =
-             (agent_type, site_type, site_type_v, state) ::
-             current_list
-           in
-           error, list
-         else error, current_list
-      ) views_set (error, [])
+let collect_tuple parameters error (agent_id, agent_type, site_type, state)
+    views_set current_list =
+  let error, site_map =
+    Common_map.get_agent_id parameters error
+      agent_id Ckappa_sig.Site_map_and_set.Map.empty
+      views_set
   in
-  error, list
-
-(*TODO*)
-(*  let collect_tuples error (agent_id, agent_type, site_type, state) views_set =
-    let error, list =
-      Ckappa_sig.AgentsSiteState_map_and_set.Set.fold
-        (fun v (error, current_list) ->
-           let (agent_id_v, agent_type_v, site_type_v, state_v) = v in
-           if agent_id = agent_id_v &&
-              agent_type = agent_type_v &&
-              site_type <> site_type_v
-           then
-             let list =
-               (agent_type, site_type, site_type_v, state, state_v) ::
-               current_list
-             in
-             error, list
-           else error, current_list
-        ) views_set (error, [])
-    in
-    error, list*)
-
-(*let collect_tuples' error (agent_id, agent_type, site_type, state)
-    views_set =
-      let error, list =
-        Ckappa_sig.AgentsSitePState_map_and_set.Set.fold
-          (fun v (error, current_list) ->
-             let (agent_id_v, agent_type_v, site_type_v, pair_of_state_v) = v in
-             if agent_id = agent_id_v &&
-                agent_type = agent_type_v &&
-                site_type <> site_type_v
-             then
-               let list =
-                 (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
-                 current_list
-               in
-               error, list
-             else error, current_list
-          ) views_set (error, [])
-      in
-      error, list*)
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site_type_v _pair_of_state_v (error, current_list) ->
+       if site_type <> site_type_v
+       then
+         let list =
+           (agent_type, site_type, site_type_v, state) ::
+           current_list
+         in
+         error, list
+       else
+         error, current_list)
+    site_map
+    (error, current_list)
 
 let collect_tuples parameters error (agent_id, agent_type, site_type, state)
-    views_set current_list = (*TODO*)
-  match
-    Ckappa_sig.Agent_id_map_and_set.Map.find_option_without_logs
-      parameters error
-      agent_id
+    views_set current_list =
+  let error, site_map =
+    Common_map.get_agent_id parameters error
+      agent_id Ckappa_sig.Site_map_and_set.Map.empty
       views_set
-  with
-  | error, None -> error, current_list
-  | error, Some site_map ->
-    Ckappa_sig.Site_map_and_set.Map.fold
-      (fun site_type_v pair_of_state_v (error, current_list) ->
-         if site_type <> site_type_v
-         then
-           let list =
-             (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
-             current_list
-           in
-           error, list
-         else
-           error, current_list)
-      site_map
-      (error, current_list)
+  in
+  Ckappa_sig.Site_map_and_set.Map.fold
+    (fun site_type_v pair_of_state_v (error, current_list) ->
+       if site_type <> site_type_v
+       then
+         let list =
+           (agent_type, site_type, site_type_v, state, pair_of_state_v) ::
+           current_list
+         in
+         error, list
+       else
+         error, current_list)
+    site_map
+    (error, current_list)
 
-let store_set parameters error fst_list snd_list store_result = (*TODO*)
+let store_set parameters error fst_list snd_list store_result =
   List.fold_left (fun (error, store_result) x ->
       List.fold_left (fun (error, store_result) y ->
           let error, store_result =
@@ -204,19 +163,6 @@ let store_set parameters error fst_list snd_list store_result = (*TODO*)
         ) (error, store_result) snd_list
     ) (error, store_result) fst_list
 
-(*let store_set parameters error fst_list snd_list store_result =
-  List.fold_left (fun (error, store_result) x ->
-      List.fold_left (fun (error, store_result) y ->
-          let error, store_result =
-            Site_accross_bonds_domain_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
-              parameters error
-              (x, y)
-              store_result
-          in
-          error, store_result
-        ) (error, store_result) snd_list
-    ) (error, store_result) fst_list*)
-
 let collect_potential_tuple_pair parameters error
     rule_id store_bonds_rhs store_views_rhs store_result =
   let error, bonds_set =
@@ -227,20 +173,22 @@ let collect_potential_tuple_pair parameters error
   in
   let error, views_set =
     Common_map.get_rule_id_set parameters error rule_id
-      Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
+      Ckappa_sig.Agent_id_map_and_set.Map.empty
       store_views_rhs
   in
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
     (fun (x, y) (error, store_result) ->
        let error, fst_list =
-         collect_tuple error
+         collect_tuple parameters error
            x
            views_set
+           []
        in
        let error, snd_list =
-         collect_tuple error
+         collect_tuple parameters error
            y
            views_set
+           []
        in
        let error, store_result =
          List.fold_left (fun (error, store_result) x ->
@@ -269,44 +217,8 @@ let collect_potential_tuple_pair_rule_rhs parameters error rule_id
 (*-------------------------------------------------------*)
 (*potential tuple pair on the rhs*)
 
-(*let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
-    store_views_lhs store_result =
-  let error, bonds_lhs_set =
-    Common_map.get_rule_id_set parameters error
-      rule_id
-      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
-      store_bonds_lhs
-  in
-  let error, views_lhs_set =
-    Common_map.get_rule_id_set parameters error
-      rule_id
-      Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
-      store_views_lhs
-  in
-  let error, pair_set =
-    Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
-    (fun (x, y) (error, store_result) ->
-       (*binding information*)
-       let error, fst_list =
-         collect_tuples' error x views_lhs_set
-       in
-       let error, snd_list =
-         collect_tuples' error y views_lhs_set
-       in
-       let error, store_result =
-         store_set' parameters error fst_list snd_list store_result
-       in
-       error, store_result
-    ) bonds_lhs_set
-    (error,
-     Site_accross_bonds_domain_type.PairAgentSitesPStates_map_and_set.Set.empty)
-  in
-  (*add the set of tuple to rule_id map*)
-    Ckappa_sig.Rule_map_and_set.Map.add
-      parameters error rule_id pair_set store_result*)
-
 let collect_potential_tuple_pair_lhs parameters error rule_id store_bonds_lhs
-    store_views_lhs store_result = (*TODO*)
+    store_views_lhs store_result =
   let error, bonds_lhs_set =
     Common_map.get_rule_id_set parameters error
       rule_id

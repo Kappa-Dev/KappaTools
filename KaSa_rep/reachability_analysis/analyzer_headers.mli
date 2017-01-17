@@ -148,12 +148,21 @@ val set_action_binding :
 
 val get_views_rhs :
   global_static_information ->
-  Ckappa_sig.AgentsSitePState_map_and_set.Set.t
+  Ckappa_sig.pair_of_states
+    Ckappa_sig.Site_map_and_set.Map.t
+    Ckappa_sig.Agent_id_map_and_set.Map.t
     Ckappa_sig.Rule_map_and_set.Map.t
 
+(*Ckappa_sig.AgentsSitePState_map_and_set.Set.t
+  Ckappa_sig.Rule_map_and_set.Map.t*)
+
 val set_views_rhs :
-  Ckappa_sig.AgentsSitePState_map_and_set.Set.t
-  Ckappa_sig.Rule_map_and_set.Map.t ->
+Ckappa_sig.pair_of_states
+  Ckappa_sig.Site_map_and_set.Map.t
+  Ckappa_sig.Agent_id_map_and_set.Map.t
+  Ckappa_sig.Rule_map_and_set.Map.t
+(*Ckappa_sig.AgentsSitePState_map_and_set.Set.t
+  Ckappa_sig.Rule_map_and_set.Map.t*) ->
   global_static_information ->
   global_static_information
 
