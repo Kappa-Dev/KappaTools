@@ -125,4 +125,5 @@ let main () =
     Compression_main.compress_and_print
       parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
 
+let () = Sys.catch_break true  
 let () = main ()
