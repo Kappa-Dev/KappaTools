@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jan 16 2017>
+   * Last modification: Time-stamp: <Jan 17 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -101,8 +101,7 @@ struct
 
   let get_views_rhs static = lift Analyzer_headers.get_views_rhs static
 
-
-  let get_views_lhs' static = lift Analyzer_headers.get_views_lhs' static
+  let get_views_lhs static = lift Analyzer_headers.get_views_lhs static
 
   let get_action_binding static =
     lift Analyzer_headers.get_action_binding static
@@ -397,15 +396,15 @@ struct
         store_views_lhs
         store_potential_tuple_pair_lhs
     in*)
-    let store_views_lhs' = get_views_lhs' static in
+    let store_views_lhs = get_views_lhs static in
       let store_bonds_lhs = get_bonds_lhs static in
       let store_potential_tuple_pair_lhs = get_potential_tuple_pair_lhs static in
       let error, store_potential_tuple_pair_lhs =
-        Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs'
+        Site_accross_bonds_domain_static.collect_potential_tuple_pair_lhs
           parameters error
           rule_id
           store_bonds_lhs
-          store_views_lhs'
+          store_views_lhs
           store_potential_tuple_pair_lhs
     in
     let static =
@@ -924,24 +923,27 @@ struct
         pattern.Cckappa_sig.bonds
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
     in
-    let error, views_lhs = (*TODO: change the type return. *)
+    let error, views_lhs =
       Common_static.collect_views_pattern_aux
-        parameters
-        error
+        parameters error
         pattern.Cckappa_sig.views
-        Ckappa_sig.AgentsSitePState_map_and_set.Set.empty
+        Ckappa_sig.Agent_id_map_and_set.Map.empty
     in
     let error, tuple_set =
       Ckappa_sig.PairAgentsSiteState_map_and_set.Set.fold
         (fun (x, y) (error, store_result) ->
            let error, fst_list =
-             Site_accross_bonds_domain_static.collect_tuples' error x views_lhs
+             Site_accross_bonds_domain_static.collect_tuples
+               parameters
+               error x views_lhs []
            in
            let error, snd_list =
-             Site_accross_bonds_domain_static.collect_tuples' error y views_lhs
+             Site_accross_bonds_domain_static.collect_tuples
+               parameters
+               error y views_lhs []
            in
            let error, store_result =
-             Site_accross_bonds_domain_static.store_set' (*TODO: optimize*)
+             Site_accross_bonds_domain_static.store_set
                parameters error
                fst_list snd_list
                store_result

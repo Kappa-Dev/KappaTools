@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 16 2017>
+  * Last modification: Time-stamp: <Jan 17 2017>
   *
   *
   *
@@ -145,8 +145,8 @@ let collect_projection_agent_id_from_triple parameters error store_result =
 
 (****************************************************************************)
 
-let get_rule_id_set parameter error rule_id empty_set store_result =
-  let error, set =
+let get_rule_id_set parameter error rule_id empty store_result =
+  let error, result =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
         parameter
@@ -154,10 +154,24 @@ let get_rule_id_set parameter error rule_id empty_set store_result =
         rule_id
         store_result
     with
-    | error, None -> error, empty_set
+    | error, None -> error, empty
     | error, Some s -> error, s
   in
-  error, set
+  error, result
+
+let get_agent_id parameter error agent_id empty store_result =
+  let error, result =
+    match
+      Ckappa_sig.Agent_id_map_and_set.Map.find_option_without_logs
+        parameter
+        error
+        agent_id
+        store_result
+    with
+    | error, None -> error, empty
+    | error, Some s -> error, s
+  in
+  error, result
 
 (****************************************************************************)
 
@@ -177,3 +191,23 @@ let collect_sites_map_in_agent_interface parameters error agent
        in
        error, store_result
     ) agent.Cckappa_sig.agent_interface (error, store_result)
+
+let collect_site_map_for_views parameters error agent =
+  let error, site_map =
+    Ckappa_sig.Site_map_and_set.Map.fold
+      (fun site_type port (error, store_map) ->
+         let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
+         let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
+         let error, store_map =
+           Ckappa_sig.Site_map_and_set.Map.add
+             parameters error
+             site_type
+             (state_min, state_max)
+             store_map
+         in
+         error, store_map
+      )
+      agent.Cckappa_sig.agent_interface
+      (error, Ckappa_sig.Site_map_and_set.Map.empty)
+  in
+  error, site_map

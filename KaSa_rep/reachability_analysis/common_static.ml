@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 16 2017>
+  * Last modification: Time-stamp: <Jan 17 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -61,7 +61,7 @@ type test_views =
     store_views_rhs :
       Ckappa_sig.AgentsSitePState_map_and_set.Set.t
         Ckappa_sig.Rule_map_and_set.Map.t;
-    store_views_lhs' : (*TODO*)
+    store_views_lhs : (*TODO*)
       Ckappa_sig.pair_of_states
         Ckappa_sig.Site_map_and_set.Map.t
         Ckappa_sig.Agent_id_map_and_set.Map.t
@@ -126,7 +126,7 @@ let init_modification_views =
 let init_test_views =
   {
     store_views_rhs = empty_rule;
-    store_views_lhs' = empty_rule;
+    store_views_lhs = empty_rule;
     store_test_sites = Ckappa_sig.AgentsSite_map_and_set.Map.empty;
   }
 
@@ -823,11 +823,15 @@ let collect_views_pattern_aux parameter error views store_result =
            Exception.warn parameter error __POS__ Exit store_result
          | Cckappa_sig.Dead_agent (agent,_,_,_)
          | Cckappa_sig.Agent agent ->
+           let error, site_map =
+             Common_map.collect_site_map_for_views
+               parameter error agent
+           in
            let error, store_result =
-             get_agent_info_from_agent_interface
+             Ckappa_sig.Agent_id_map_and_set.Map.add
                parameter error
                agent_id
-               agent
+               site_map
                store_result
            in
            error, store_result
@@ -839,8 +843,7 @@ let collect_views_pattern_aux parameter error views store_result =
 (*VIEWS*)
 (***************************************************************************)
 
-let collect_test_sites parameters error rule_id viewslhs
-    store_result =
+let collect_test_sites parameters error rule_id viewslhs store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
       error
@@ -869,16 +872,82 @@ let collect_test_sites parameters error rule_id viewslhs
   in
   error, store_result
 
+(*****************************************************************************)
+
 let collect_views_aux parameter error rule_id views store_result =
+  let error, old_map =
+    Common_map.get_rule_id_set parameter error
+      rule_id
+      Ckappa_sig.Agent_id_map_and_set.Map.empty
+      store_result
+  in
+  let error, map =
+    collect_views_pattern_aux parameter error
+      views
+      old_map
+  in
+  let error, store_result =
+    Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+      parameter error rule_id map store_result
+  in
+  error, store_result
+  (*let error, store_result =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_id agent store_result ->
+         match agent with
+         | Cckappa_sig.Unknown_agent _ ->
+           Exception.warn parameter error __POS__ Exit store_result
+         | Cckappa_sig.Ghost -> error, store_result
+         | Cckappa_sig.Dead_agent (agent,_,_,_)
+         | Cckappa_sig.Agent agent ->
+           let agent_type = agent.Cckappa_sig.agent_name in
+           let error, old_map =
+             Common_map.get_rule_id_set parameter error
+               rule_id
+               Ckappa_sig.Agent_id_map_and_set.Map.empty
+               store_result
+           in
+           let error, site_map =
+             Common_map.collect_site_map_for_views
+               parameter error
+               agent
+           in
+           let error, map =
+             Ckappa_sig.Agent_id_map_and_set.Map.add
+               parameter error
+               agent_id
+               site_map
+               old_map
+           in
+           let error, store_result =
+             Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+               parameter error rule_id map store_result
+           in
+           error, store_result
+      ) views store_result
+  in
+  error, store_result*)
+
+let collect_views_lhs parameter error rule_id rule store_result =
+  collect_views_aux
+    parameter error
+    rule_id
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    store_result
+
+(*REMOVE*)
+let collect_views_aux' parameter error rule_id views store_result =
   (*let error, store_set =
     collect_views_pattern_aux parameter error views
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
-  in
-  let error, store_result =
+    in
+    let error, store_result =
     add_map_rule parameter error rule_id store_set store_result
-  in
-  error, store_result*)
-   let error, store_result =
+    in
+    error, store_result*)
+  let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
       error
       (fun parameter error agent_id agent store_result ->
@@ -901,14 +970,14 @@ let collect_views_aux parameter error rule_id views store_result =
                   (*CHECK max = min*)
                   let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
                   let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
-                    let error, store_set =
-                      Ckappa_sig.AgentsSitePState_map_and_set.Set.add_when_not_in
-                        parameter error
-                        (agent_id, agent_type, site_type,
-                         (state_min, state_max))
-                        store_set
-                    in
-                    error, store_set
+                  let error, store_set =
+                    Ckappa_sig.AgentsSitePState_map_and_set.Set.add_when_not_in
+                      parameter error
+                      (agent_id, agent_type, site_type,
+                       (state_min, state_max))
+                      store_set
+                  in
+                  error, store_set
                ) agent.Cckappa_sig.agent_interface (error, old_set)
            in
            let error =
@@ -926,72 +995,12 @@ let collect_views_aux parameter error rule_id views store_result =
   error, store_result
 
 let collect_views_rhs parameter error rule_id rule store_result = (*TODO*)
-  collect_views_aux
+  collect_views_aux'
     parameter error
     rule_id
     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
     store_result
 
-let collect_views_aux' parameter error rule_id views store_result =
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameter
-      error
-      (fun parameter error agent_id agent store_result ->
-         match agent with
-         | Cckappa_sig.Unknown_agent _ ->
-           Exception.warn parameter error __POS__ Exit store_result
-         | Cckappa_sig.Ghost -> error, store_result
-         | Cckappa_sig.Dead_agent (agent,_,_,_)
-         | Cckappa_sig.Agent agent ->
-           let agent_type = agent.Cckappa_sig.agent_name in
-           let error, old_map =
-             Common_map.get_rule_id_set parameter error
-               rule_id
-               Ckappa_sig.Agent_id_map_and_set.Map.empty
-               store_result
-           in
-           let error, site_map =
-             Ckappa_sig.Site_map_and_set.Map.fold
-               (fun site_type port (error, store_map) ->
-                  let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
-                  let state_min =
-                    port.Cckappa_sig.site_state.Cckappa_sig.min
-                  in
-                  let error, store_map =
-                    Ckappa_sig.Site_map_and_set.Map.add
-                      parameter error
-                      site_type
-                      (state_min, state_max)
-                      store_map
-                  in
-                  error, store_map
-               )
-               agent.Cckappa_sig.agent_interface
-               (error, Ckappa_sig.Site_map_and_set.Map.empty)
-           in
-           let error, map =
-             Ckappa_sig.Agent_id_map_and_set.Map.add
-               parameter error
-               agent_id
-               site_map
-               old_map
-           in
-           let error, store_result =
-             Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-               parameter error rule_id map store_result
-           in
-           error, store_result
-      ) views store_result
-  in
-  error, store_result
-
-let collect_views_lhs' parameter error rule_id rule store_result =
-  collect_views_aux'
-    parameter error
-    rule_id
-    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-    store_result
 
 let scan_rule_test parameters error rule_id rule store_result =
 let error, store_views_rhs =
@@ -1001,12 +1010,12 @@ let error, store_views_rhs =
     rule
     store_result.store_views_rhs
 in
-let error, store_views_lhs' =
-  collect_views_lhs'
+let error, store_views_lhs =
+  collect_views_lhs
     parameters error
     rule_id
     rule
-    store_result.store_views_lhs'
+    store_result.store_views_lhs
 in
 let error, store_test_sites =
   collect_test_sites
@@ -1019,7 +1028,7 @@ in
 error,
 {
   store_views_rhs = store_views_rhs;
-  store_views_lhs' = store_views_lhs';
+  store_views_lhs = store_views_lhs;
   store_test_sites = store_test_sites;
 }
 

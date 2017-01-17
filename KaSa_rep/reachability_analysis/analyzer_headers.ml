@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jan 16 2017>
+  * Last modification: Time-stamp: <Jan 17 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -148,6 +148,8 @@ let set_agent_name_from_pattern agent_name static =
     static
 
 (*****************************************************************************)
+(*SIDE EFFECTS*)
+(*****************************************************************************)
 
 let get_side_effects static =
   (get_common_views static).Common_static.store_side_effects
@@ -182,6 +184,8 @@ let set_potential_side_effects_per_rule eff static =
     }
     static
 
+(*****************************************************************************)
+(*BINDING*)
 (*****************************************************************************)
 
 let get_bonds_rhs static =
@@ -243,14 +247,14 @@ let set_views_rhs sites static =
     }
     static
 
-let get_views_lhs' static =
-  (get_test_views static).Common_static.store_views_lhs'
+let get_views_lhs static =
+  (get_test_views static).Common_static.store_views_lhs
 
-let set_views_lhs' sites static =
+let set_views_lhs sites static =
   set_test_views
     {
       (get_test_views static) with
-      Common_static.store_views_lhs' = sites
+      Common_static.store_views_lhs = sites
     }
     static
 
@@ -292,6 +296,7 @@ let set_project_modified_map sites static =
     static
 
 (*****************************************************************************)
+(*VIEWS AND MODIFICATION*)
 
 let get_test_modif_map static =
   (get_common_views static).Common_static.store_test_modif_map
@@ -306,6 +311,7 @@ let set_test_modif_map sites static =
 
 
 (*****************************************************************************)
+(*INITIAL STATES*)
 
 let compute_initial_state error static =
   let parameters = get_parameter static in
@@ -347,6 +353,8 @@ let compute_initial_state error static =
   in
   error, List.rev init
 
+(*****************************************************************************)
+(*RULE*)
 (*****************************************************************************)
 
 let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
