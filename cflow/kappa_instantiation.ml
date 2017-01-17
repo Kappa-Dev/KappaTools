@@ -140,6 +140,8 @@ module Cflow_linker =
                      Instantiation.side_effects_src =
                        event'.Instantiation.side_effects_src;
                      Instantiation.side_effects_dst;
+                     Instantiation.connectivity_tests =
+                       event'.Instantiation.connectivity_tests;
                    },info)
                  counter env grid,
                empty_set,counter+1,Mods.IntMap.empty

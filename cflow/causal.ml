@@ -247,6 +247,8 @@ let add_tests grid event_number kind tests =
 let record (kind,event,_) event_number env grid =
   let grid = add_tests grid event_number kind event.Instantiation.tests in
   let grid =
+    add_tests grid event_number kind [event.Instantiation.connectivity_tests] in
+  let grid =
     add_actions env grid event_number kind event.Instantiation.actions in
   List.fold_left
     (fun grid site ->

@@ -313,6 +313,7 @@ let make_instantiation place links event ref_ports is_erased =
       Instantiation.side_effects_src = event.Instantiation.side_effects_src;
       Instantiation.side_effects_dst = add_extra_side_effects
           event.Instantiation.side_effects_dst place ref_ports;
+      Instantiation.connectivity_tests = event.Instantiation.connectivity_tests;
     }
   | Some (ports, ints) ->
     match event.Instantiation.tests with
@@ -322,7 +323,9 @@ let make_instantiation place links event ref_ports is_erased =
         if site_id >= Array.length ports
         then { Instantiation.tests = tests :: o_cc_tests;
                Instantiation.actions;
-               Instantiation.side_effects_src; Instantiation.side_effects_dst }
+               Instantiation.side_effects_src; Instantiation.side_effects_dst;
+               Instantiation.connectivity_tests =
+                 event.Instantiation.connectivity_tests; }
         else
           let tests',actions' =
             match ints.(site_id) with
@@ -613,7 +616,9 @@ let connected_components_of_mixture created mix (env,origin) =
         Instantiation.side_effects_src =
           instantiations.Instantiation.side_effects_src;
         Instantiation.side_effects_dst =
-          instantiations.Instantiation.side_effects_dst } in
+          instantiations.Instantiation.side_effects_dst;
+        Instantiation.connectivity_tests =
+          instantiations.Instantiation.connectivity_tests } in
       let (wk_out,(removed,added),l_t,event, remains) =
         add_agents_in_cc
           sigs id wk Mods.IntMap.empty transformations

@@ -45,10 +45,16 @@ type 'a event = {
   actions : 'a action list;
   side_effects_src : ('a site * 'a binding_state) list;
   side_effects_dst :  'a site list;
+  connectivity_tests : 'a test list;
 }
 
-let empty_event =
-  { tests = []; actions = []; side_effects_src = []; side_effects_dst = []; }
+let empty_event = {
+  tests = [];
+  actions = [];
+  side_effects_src = [];
+  side_effects_dst = [];
+  connectivity_tests = [];
+}
 
 let concretize_binding_state inj2graph = function
   | ANY -> ANY
@@ -94,6 +100,8 @@ let concretize_event inj2graph e =
     side_effects_dst = List.rev_map
         (fun (pl,s) -> (Matching.Agent.concretize inj2graph pl,s))
         e.side_effects_dst;
+    connectivity_tests =
+      List.rev_map (concretize_test inj2graph) e.connectivity_tests;
   }
 
 let subst_map_concrete_agent f (id,na as agent) =
@@ -190,6 +198,8 @@ let subst_map_agent_in_event f e =
       List_util.smart_map (subst_map_agent_in_side_effect f) e.side_effects_src;
     side_effects_dst =
       List_util.smart_map (subst_map_site f) e.side_effects_dst;
+    connectivity_tests =
+      List_util.smart_map (subst_map_agent_in_test f) e.connectivity_tests;
   }
 
 let subst_map2_agent_in_event f f' e =
@@ -201,6 +211,8 @@ let subst_map2_agent_in_event f f' e =
       List_util.smart_map (subst_map_agent_in_side_effect f) e.side_effects_src;
     side_effects_dst =
       List_util.smart_map (subst_map_site f) e.side_effects_dst;
+    connectivity_tests =
+      List_util.smart_map (subst_map_agent_in_test f) e.connectivity_tests;
   }
 
 let subst_map_agent_in_concrete_event f x =
@@ -386,17 +398,20 @@ let event_to_json f e =
     `List (List.map
              (fun (s,b) -> `List [quark_to_json f s; binding_state_to_json f b])
              e.side_effects_src);
-    "side_effect_dst", `List (List.map (quark_to_json f) e.side_effects_dst)
+    "side_effect_dst", `List (List.map (quark_to_json f) e.side_effects_dst);
+    "connectivity_tests",
+    `List (List.map (test_to_json f) e.connectivity_tests);
   ]
 let event_of_json f = function
-  | `Assoc l as x when List.length l <= 4 ->
+  | `Assoc l as x when List.length l <= 5 ->
     begin
       try {
         tests =
           (match Yojson.Basic.Util.member "tests" x
            with `List l ->
              List.map (function `List ccl -> List.map (test_of_json f) ccl
-                              | _ -> raise Not_found) l | `Null -> []
+                              | _ -> raise Not_found) l
+              | `Null -> []
               | _ -> raise Not_found);
         actions =
           (match  Yojson.Basic.Util.member "actions" x
@@ -412,6 +427,10 @@ let event_of_json f = function
         side_effects_dst =
           (match  Yojson.Basic.Util.member "side_effect_dst" x
            with `List l -> List.map (quark_of_json f) l | `Null -> []
+              | _ -> raise Not_found);
+        connectivity_tests =
+          (match Yojson.Basic.Util.member "connectivity_tests" x
+           with `List l -> List.map (test_of_json f) l | `Null -> []
               | _ -> raise Not_found);
       }
       with Not_found ->

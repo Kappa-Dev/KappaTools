@@ -179,7 +179,7 @@ let print_event ~compact ?env log (ev_kind,e) =
       (print_event_kind ?env) ev_kind
       (Pp.list Pp.empty
          (Pp.list Pp.empty (Instantiation.print_concrete_test ?sigs)))
-      e.Instantiation.tests
+      (e.Instantiation.tests @ [e.Instantiation.connectivity_tests])
       (Pp.list Pp.empty (Instantiation.print_concrete_action ?sigs))
       e.Instantiation.actions
       (print_side_effects ?env) e.Instantiation.side_effects_src
@@ -281,7 +281,9 @@ let has_creation_of_step x = creation_of_step x <> []
 
 let tests_of_step = function
   | Subs _ -> []
-  | Event (_,e,_) -> List.concat e.Instantiation.tests
+  | Event (_,e,_) ->
+    List.fold_right
+      List.append e.Instantiation.tests e.Instantiation.connectivity_tests
   | Init _ -> []
   | Obs (_,x,_) -> List.concat x
   | Dummy _ -> []
@@ -373,7 +375,9 @@ let log_event id quarks event_kind steps =
               | RULE rid' ->
                 ((rid=rid')&&
                  (check_event_quarks
-                    e.Instantiation.actions e.Instantiation.tests quarks))
+                    e.Instantiation.actions
+                    (e.Instantiation.connectivity_tests::e.Instantiation.tests)
+                    quarks))
              | PERT _ | OBS _ | INIT _ -> false)
           | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
      `List [`Int id; step_to_yojson stp]
@@ -393,7 +397,9 @@ let log_event id quarks event_kind steps =
                | PERT pert' ->
                  ((pert=pert')&&
                   (check_event_quarks
-                     e.Instantiation.actions e.Instantiation.tests quarks))
+                     e.Instantiation.actions
+                     (e.Instantiation.connectivity_tests::e.Instantiation.tests)
+                     quarks))
               | OBS _ | INIT _ | RULE _ -> false)
           | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
      `List [`Int id; step_to_yojson stp]

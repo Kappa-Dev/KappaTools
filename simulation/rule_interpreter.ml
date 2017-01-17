@@ -315,8 +315,29 @@ let obs_from_transformation domain edges acc = function
       Matching.observables_from_link
         domain edges acc nc s nc' s'
 
-let add_path_to_tests path tests =
-  let path_agents,path_tests =
+let path_tests path tests =
+  let known_agents =
+    List.fold_left
+      (List.fold_left
+         (fun acc -> function
+            | Instantiation.Is_Here (id,_) -> Mods.IntSet.add id acc
+            | Instantiation.Is_Bound_to _ | Instantiation.Is_Bound _
+            | Instantiation.Has_Internal _ | Instantiation.Has_Binding_type _
+            | Instantiation.Is_Free _ -> acc)) Mods.IntSet.empty tests in
+  let pretests =
+    List_util.map_option
+      (fun (x,y) ->
+         if List.for_all
+             (List.for_all
+                (function
+                  | Instantiation.Is_Bound_to (a,b) ->
+                    x <> a && x <> b && y<>a && y<>b
+                  | Instantiation.Has_Internal _ | Instantiation.Is_Free _
+                  | Instantiation.Is_Bound _ | Instantiation.Has_Binding_type _
+                  | Instantiation.Is_Here _ -> true)) tests
+         then Some (Instantiation.Is_Bound_to (x,y))
+         else None) path in
+  let _,path_tests =
     List.fold_left
       (fun (ag,te) (((id,_ as a),_),((id',_ as a'),_)) ->
          let ag',te' =
@@ -324,21 +345,8 @@ let add_path_to_tests path tests =
            else Mods.IntSet.add id ag,Instantiation.Is_Here a::te in
          if Mods.IntSet.mem id' ag' then ag',te'
          else Mods.IntSet.add id' ag',Instantiation.Is_Here a'::te')
-      (Mods.IntSet.empty,[]) path in
-  let tests' =
-    List.filter (function
-        | Instantiation.Is_Here (id, _) ->
-          not @@ Mods.IntSet.mem id path_agents
-        | Instantiation.Is_Bound_to (a,b) ->
-          List.for_all (fun (x,y) -> x <> a && x <> b && y<>a && y<>b) path
-        | (Instantiation.Has_Internal _ | Instantiation.Is_Free _
-          | Instantiation.Is_Bound _
-          | Instantiation.Has_Binding_type _) -> true)
-      tests in
-  List.rev_append
-    path_tests
-    (List_util.rev_map_append
-       (fun (x,y) -> Instantiation.Is_Bound_to (x,y)) path tests')
+      (known_agents,pretests) path in
+  path_tests
 
 let step_of_event counter = function
   | Trace.INIT _,e -> (Trace.Init e.Instantiation.actions)
@@ -353,14 +361,15 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
     let cevent =
       Instantiation.concretize_event inj2graph rule.Primitives.instantiations in
     let full_concrete_event = {
-      Instantiation.tests = (match path with
-          | None -> cevent.Instantiation.tests
-          | Some path ->
-            [add_path_to_tests path (List.concat cevent.Instantiation.tests)]);
+      Instantiation.tests = cevent.Instantiation.tests;
       Instantiation.actions = cevent.Instantiation.actions;
       Instantiation.side_effects_src = cevent.Instantiation.side_effects_src;
       Instantiation.side_effects_dst = List.rev_append
           extra_side_effects cevent.Instantiation.side_effects_dst;
+      Instantiation.connectivity_tests =
+        (match path with
+         | None -> []
+         | Some path -> path_tests path cevent.Instantiation.tests);
     } in
     let () =
       outputs (Data.TraceStep

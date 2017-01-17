@@ -55,6 +55,8 @@ type 'a event = {
   side_effects_dst : 'a site list
 (** the site of agents not mentionned in the rule that have been freed
     by side effect *);
+  connectivity_tests : 'a test list;
+  (** witness that patterns where connected (unary instances only of course) *)
 }
 
 val empty_event : 'a event
