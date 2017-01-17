@@ -77,6 +77,9 @@ let finalize
       dir^"KaStor" in
     let pid = Unix.create_process prog (Array.of_list (prog::args))
         Unix.stdin Unix.stdout Unix.stderr in
+  let _old_sigint_behavior =
+    Sys.signal
+      Sys.sigint (Sys.Signal_handle (fun si -> Unix.kill pid si)) in
     match waitpid_non_intr pid with
     | _, Unix.WEXITED 127 ->
       raise
