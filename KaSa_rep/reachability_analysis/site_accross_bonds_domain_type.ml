@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jan 12 2017>
+   * Last modification: Time-stamp: <Jan 18 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -221,7 +221,9 @@ module PairAgentSite_map_and_set =
          let print _ _ = ()
        end))
 
-(***************************************************************)
+(***************************************************************************)
+(*PRINT*)
+(***************************************************************************)
 
 let convert_single_without_state parameters error kappa_handler single =
   let (agent, site) = single in
@@ -264,9 +266,16 @@ let convert_tuple parameters error kappa_handler tuple =
   in
   error, (agent,site,site', state, agent'',site'',site''', state'')
 
-(*remove states*)
+(***************************************************************************)
+(*PROJECTION*)
+(***************************************************************************)
+
 let project (_,b,c,d,_,_) = (b,c,d)
 let project2 (x,y) = (project x,project y)
+
+(***************************************************************************)
+(*PRINT*)
+(***************************************************************************)
 
 let print_site_accross_domain
     ?verbose:(verbose=true)
@@ -439,17 +448,26 @@ let print_site_accross_domain
               error, handler
           ) (error, handler) pair_list
 
+(***************************************************************************)
+(***************************************************************************)
+
+let get_mvbdu_from_tuple_pair parameters error tuple bdu_false store_value  =
+  let error, mvbdu_value =
+    match
+      PairAgentSitesState_map_and_set.Map.find_option_without_logs
+        parameters error
+        tuple
+        store_value
+    with
+    | error, None -> error, bdu_false
+    | error, Some mvbdu -> error, mvbdu
+  in
+  error, mvbdu_value
+
 let add_link parameter error bdu_false handler kappa_handler pair mvbdu
     store_result =
   let error, bdu_old =
-    match
-      PairAgentSitesState_map_and_set.Map.find_option_without_logs
-        parameter error
-        pair
-        store_result
-    with
-    | error, None -> error, bdu_false
-    | error, Some bdu -> error, bdu
+    get_mvbdu_from_tuple_pair parameter error pair bdu_false store_result
   in
   (*-----------------------------------------------------------*)
   (*new bdu, union*)
@@ -457,10 +475,6 @@ let add_link parameter error bdu_false handler kappa_handler pair mvbdu
     Ckappa_sig.Views_bdu.mvbdu_or
       parameter handler error bdu_old mvbdu
   in
-  (*compare mvbdu and old mvbdu*)
-  (*if Ckappa_sig.Views_bdu.equal new_bdu bdu_false
-  then error, handler, store_result
-  else*)
   (*print each step*)
   let error, handler =
     if Remanent_parameters.get_dump_reachability_analysis_diff parameter
@@ -493,15 +507,8 @@ let add_sites_from_tuples parameters error tuple modified_sites =
 let add_link_and_check parameter error bdu_false handler
     kappa_handler bool dump_title x mvbdu modified_sites store_result =
   let error, bdu_old =
-    match
-      PairAgentSitesState_map_and_set.Map.find_option_without_logs
-        parameter error
-        x
-        store_result
-    with
-    | error, None -> error, bdu_false
-    | error, Some bdu -> error, bdu
-  in
+    get_mvbdu_from_tuple_pair parameter error x bdu_false store_result
+  in 
   (*-----------------------------------------------------------*)
   (*new bdu, union*)
   let error, handler, new_bdu =

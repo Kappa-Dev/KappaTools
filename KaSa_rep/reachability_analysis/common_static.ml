@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 17 2017>
+  * Last modification: Time-stamp: <Jan 18 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -777,7 +777,7 @@ let collect_action_binding parameter error rule_id rule store_result =
       in
       (*add the pair inside the set*)
       let error, old_set =
-        Common_map.get_rule_id_set parameter error rule_id
+        Common_map.get_rule_id_map_and_set parameter error rule_id
           Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
           store_result
       in
@@ -906,7 +906,7 @@ let collect_test_sites parameters error rule_id viewslhs store_result =
 
 let collect_views_aux parameter error rule_id views store_result =
   let error, old_map =
-    Common_map.get_rule_id_set parameter error
+    Common_map.get_rule_id_map_and_set parameter error
       rule_id
       Ckappa_sig.Agent_id_map_and_set.Map.empty
       store_result
@@ -1005,7 +1005,7 @@ let collect_modified_map parameter error rule_id rule store_result =
          else
            (*old set*)
            let error, old_set =
-             Common_map.get_rule_id_set
+             Common_map.get_rule_id_map_and_set
                parameter error
                rule_id
                Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
@@ -1068,7 +1068,7 @@ module Proj_modif =
 let store_project_modified_map parameter error rule_id store_modified_map
     store_result =
   let error, modified_set =
-    Common_map.get_rule_id_set
+    Common_map.get_rule_id_map_and_set
       parameter error rule_id
       Ckappa_sig.AgentsSiteState_map_and_set.Set.empty
       store_modified_map

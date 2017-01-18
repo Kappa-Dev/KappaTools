@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 17 2017>
+  * Last modification: Time-stamp: <Jan 18 2017>
   *
   *
   *
@@ -151,7 +151,7 @@ let project_state (b, c, _) = (b, c)
 
 (****************************************************************************)
 
-let get_rule_id_set parameter error rule_id empty store_result =
+let get_rule_id_map_and_set parameter error rule_id empty store_result =
   let error, result =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
