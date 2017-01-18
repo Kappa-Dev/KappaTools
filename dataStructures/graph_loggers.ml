@@ -275,7 +275,7 @@ let print_graph_foot logger =
     let () = Loggers.close_row logger in
     let () = Loggers.print_newline logger in
     let () = Loggers.fprintf logger "\"hits\" :" in
-    let () = Loggers.print_newline logger in 
+    let () = Loggers.print_newline logger in
     let () = Loggers.open_row logger in
     let _ =
       List.fold_left
@@ -956,9 +956,9 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let () = List.iter (Loggers.fprintf logger "%s") (List.rev label) in
     let () = Loggers.print_newline logger in
    ()
-  | Loggers.Json | Loggers.HTML_Graph -> Loggers.add_edge logger id1 id2 directives
+  | Loggers.Matrix | Loggers.Json | Loggers.HTML_Graph -> Loggers.add_edge logger id1 id2 directives
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
-  | Loggers.Matrix | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_one_to_n_relation
     logger ?directives:(directives=[])
