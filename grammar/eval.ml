@@ -565,7 +565,7 @@ let compile ~outputs ~pause ~return ~max_sharing
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let story_compression,formatCflow,cflowFile =
+  let (nstor,wstor,sstor as story_compression),formatCflow,cflowFile =
     configurations_of_result result in
   pause @@ fun () ->
   let preenv = Pattern.minimal_env sigs_nd contact_map in
@@ -611,7 +611,8 @@ let compile ~outputs ~pause ~return ~max_sharing
     inits_of_result
       ?rescale:rescale_init contact_map env preenv result in
   return (env,
-          (if has_tracking then Some story_compression else None),
+          (if has_tracking && (nstor||wstor||sstor)
+           then Some story_compression else None),
           formatCflow, cflowFile, init_l)
 
 let build_initial_state
