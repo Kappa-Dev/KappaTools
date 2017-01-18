@@ -155,18 +155,18 @@ k(2)=var(5);
 dydt=zeros(nodevar,1);
 
 % rule    : unbind
-% reaction: T(x!1), U(x!1) -> T(x) + U(x) 
+% reaction: T(x!1), U(x!1) -> U(x) + T(x) 
 
 dydt(3)=dydt(3)-k(2)*y(3);
-dydt(1)=dydt(1)+k(2)*y(3);
 dydt(2)=dydt(2)+k(2)*y(3);
+dydt(1)=dydt(1)+k(2)*y(3);
 
 % rule    : bind
-% reaction: T(x) + U(x) -> T(x!1), U(x!1) 
+% reaction: U(x) + T(x) -> T(x!1), U(x!1) 
 
-dydt(1)=dydt(1)-k(1)*y(1)*y(2);
-dydt(2)=dydt(2)-k(1)*y(1)*y(2);
-dydt(3)=dydt(3)+k(1)*y(1)*y(2);
+dydt(2)=dydt(2)-k(1)*y(2)*y(1);
+dydt(1)=dydt(1)-k(1)*y(2)*y(1);
+dydt(3)=dydt(3)+k(1)*y(2)*y(1);
 dydt(4)=1;
 
 end

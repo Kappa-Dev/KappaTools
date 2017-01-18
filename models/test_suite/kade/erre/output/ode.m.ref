@@ -163,11 +163,11 @@ k(4)=t;
 dydt=zeros(nodevar,1);
 
 % rule    : A(x!1), B(x!1) -> A(x), B(x)
-% reaction: A(x!1), B(x!1) -> A(x) + B(x) 
+% reaction: A(x!1), B(x!1) -> B(x) + A(x) 
 
 dydt(7)=dydt(7)-k(8)*y(7);
-dydt(1)=dydt(1)+k(8)*y(7);
 dydt(2)=dydt(2)+k(8)*y(7);
+dydt(1)=dydt(1)+k(8)*y(7);
 
 % rule    : A(x), B(x) -> A(x!1), B(x!1)
 % reaction: B(x) + A(x) -> A(x!1), B(x!1) 
@@ -191,11 +191,11 @@ dydt(6)=dydt(6)-1/2*k(3)*y(6)*y(6);
 dydt(5)=dydt(5)+2/2*k(3)*y(6)*y(6);
 
 % rule    : E(r!1), R(e!1,r) -> E(r), R(e,r)
-% reaction: E(r!1), R(e!1, r) -> E(r) + R(e, r) 
+% reaction: E(r!1), R(e!1, r) -> R(e, r) + E(r) 
 
 dydt(6)=dydt(6)-k(2)*y(6);
-dydt(3)=dydt(3)+k(2)*y(6);
 dydt(4)=dydt(4)+k(2)*y(6);
+dydt(3)=dydt(3)+k(2)*y(6);
 
 % rule    : R(r!_) -> R(r)
 % reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r!1), R(e!1, r) 
@@ -212,11 +212,11 @@ dydt(6)=dydt(6)+k(5)*y(5)/2;
 dydt(6)=dydt(6)+k(5)*y(5)/2;
 
 % rule    : R(r!_) -> 
-% reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r) + E(r!1), R(e!1, r) 
+% reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r) 
 
 dydt(5)=dydt(5)-2*k(4)*y(5)/2;
-dydt(6)=dydt(6)+k(4)*y(5)/2;
 dydt(4)=dydt(4)+k(4)*y(5)/2;
+dydt(6)=dydt(6)+k(4)*y(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3) -> E(r!1), R(e!1, r) + E(r) 

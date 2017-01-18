@@ -32,8 +32,8 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfCompartments>
 <listOfSpecies>
 <species metaid="CMD11" id="s1" name="C(x1~u, x2~u)" compartment="default" initialAmount="10000" substanceUnits="substance"/>
-<species metaid="CMD12" id="s2" name="A(x, c)" compartment="default" initialAmount="1000" substanceUnits="substance"/>
-<species metaid="CMD13" id="s3" name="B(x)" compartment="default" initialAmount="1000" substanceUnits="substance"/>
+<species metaid="CMD12" id="s2" name="B(x)" compartment="default" initialAmount="1000" substanceUnits="substance"/>
+<species metaid="CMD13" id="s3" name="A(x, c)" compartment="default" initialAmount="1000" substanceUnits="substance"/>
 <species metaid="CMD14" id="s4" name="A(x!1, c), B(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD15" id="s5" name="A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD16" id="s6" name="A(x, c!1), C(x1~u!1, x2~u)" compartment="default" initialAmount="0" substanceUnits="substance"/>
@@ -54,13 +54,13 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : mod x1 -->
-<!-- reaction: A(x, c!1), C(x1~u!1, x2~u) -> A(x, c) + C(x1~p, x2~u)  -->
+<!-- reaction: A(x, c!1), C(x1~u!1, x2~u) -> C(x1~p, x2~u) + A(x, c)  -->
 <reaction id="re1" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s6"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD22" species="s2"/>
+<speciesReference metaid="CMD22" species="s3"/>
 <speciesReference metaid="CMD23" species="s7"/>
 </listOfProducts>
 <kineticLaw>
@@ -71,10 +71,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b -->
-<!-- reaction: B(x) + A(x, c!1), C(x1~u!1, x2~u) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)  -->
+<!-- reaction: A(x, c!1), C(x1~u!1, x2~u) + B(x) -> A(x!1, c!2), B(x!1), C(x1~u!2, x2~u)  -->
 <reaction id="re2" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD24" species="s3"/>
+<speciesReference metaid="CMD24" species="s2"/>
 <speciesReference metaid="CMD25" species="s6"/>
 </listOfReactants>
 <listOfProducts>
@@ -84,7 +84,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s6 </ci><ci> s3 </ci></apply>
+<times/><ci> s2 </ci><ci> s6 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -96,7 +96,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <speciesReference metaid="CMD27" species="s9"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD28" species="s3"/>
+<speciesReference metaid="CMD28" species="s2"/>
 <speciesReference metaid="CMD29" species="s8"/>
 </listOfProducts>
 <kineticLaw>
@@ -107,13 +107,13 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : mod x2 -->
-<!-- reaction: A(x, c!1), C(x1~p, x2~u!1) -> A(x, c) + C(x1~p, x2~p)  -->
+<!-- reaction: A(x, c!1), C(x1~p, x2~u!1) -> C(x1~p, x2~p) + A(x, c)  -->
 <reaction id="re4" name="mod x2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD30" species="s8"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD31" species="s2"/>
+<speciesReference metaid="CMD31" species="s3"/>
 <speciesReference metaid="CMD32" species="s10"/>
 </listOfProducts>
 <kineticLaw>
@@ -124,10 +124,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b -->
-<!-- reaction: B(x) + A(x, c!1), C(x1~p, x2~u!1) -> A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)  -->
+<!-- reaction: A(x, c!1), C(x1~p, x2~u!1) + B(x) -> A(x!1, c!2), B(x!1), C(x1~p, x2~u!2)  -->
 <reaction id="re5" name="a.b" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD33" species="s3"/>
+<speciesReference metaid="CMD33" species="s2"/>
 <speciesReference metaid="CMD34" species="s8"/>
 </listOfReactants>
 <listOfProducts>
@@ -137,7 +137,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s8 </ci><ci> s3 </ci></apply>
+<times/><ci> s2 </ci><ci> s8 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -146,7 +146,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: C(x1~p, x2~u) + A(x, c) -> A(x, c!1), C(x1~p, x2~u!1)  -->
 <reaction id="re6" name="a.c" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD36" species="s2"/>
+<speciesReference metaid="CMD36" species="s3"/>
 <speciesReference metaid="CMD37" species="s7"/>
 </listOfReactants>
 <listOfProducts>
@@ -156,13 +156,13 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s2 </ci><ci> s7 </ci></apply>
+<times/><ci> s3 </ci><ci> s7 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : mod x1 -->
-<!-- reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> A(x!1, c), B(x!1) + C(x1~p, x2~u)  -->
+<!-- reaction: A(x!1, c!2), B(x!1), C(x1~u!2, x2~u) -> C(x1~p, x2~u) + A(x!1, c), B(x!1)  -->
 <reaction id="re7" name="mod x1" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD39" species="s5"/>
@@ -185,7 +185,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <speciesReference metaid="CMD42" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD43" species="s3"/>
+<speciesReference metaid="CMD43" species="s2"/>
 <speciesReference metaid="CMD44" species="s6"/>
 </listOfProducts>
 <kineticLaw>
@@ -215,7 +215,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : a.b_op -->
-<!-- reaction: A(x!1, c), B(x!1) -> A(x, c) + B(x)  -->
+<!-- reaction: A(x!1, c), B(x!1) -> B(x) + A(x, c)  -->
 <reaction id="re10" name="a.b_op" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD48" species="s4"/>
@@ -245,7 +245,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> on_rate </ci><apply>
-<times/><ci> s2 </ci><ci> s3 </ci></apply>
+<times/><ci> s3 </ci><ci> s2 </ci></apply>
 </apply>
 </math>
 </kineticLaw>

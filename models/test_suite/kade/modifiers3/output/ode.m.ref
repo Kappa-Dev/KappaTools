@@ -159,11 +159,11 @@ k(4)=var(5);
 dydt=zeros(nodevar,1);
 
 % rule    : bind
-% reaction: T(x) + U(x, y~p?) -> T(x!1), U(x!1, y~p?) 
+% reaction: U(x, y~p?) + T(x) -> T(x!1), U(x!1, y~p?) 
 
-dydt(3)=dydt(3)-k(3)*y(3)*y(2);
-dydt(2)=dydt(2)-k(3)*y(3)*y(2);
-dydt(5)=dydt(5)+k(3)*y(3)*y(2);
+dydt(2)=dydt(2)-k(3)*y(2)*y(3);
+dydt(3)=dydt(3)-k(3)*y(2)*y(3);
+dydt(5)=dydt(5)+k(3)*y(2)*y(3);
 
 % rule    : essai
 % reaction: U(x, y~p?) -> T(x) 
@@ -172,11 +172,11 @@ dydt(3)=dydt(3)-k(1)*y(3);
 dydt(2)=dydt(2)+k(1)*y(3);
 
 % rule    : unbind
-% reaction: T(x!1), U(x!1, y~p?) -> T(x) + U(x, y~p?) 
+% reaction: T(x!1), U(x!1, y~p?) -> U(x, y~p?) + T(x) 
 
 dydt(5)=dydt(5)-k(4)*y(5);
-dydt(3)=dydt(3)+k(4)*y(5);
 dydt(2)=dydt(2)+k(4)*y(5);
+dydt(3)=dydt(3)+k(4)*y(5);
 
 % rule    : essai
 % reaction: T(x!1), U(x!1, y~p?) -> T(x) + T(x) 
@@ -186,11 +186,11 @@ dydt(2)=dydt(2)+k(1)*y(5);
 dydt(2)=dydt(2)+k(1)*y(5);
 
 % rule    : unbind
-% reaction: T(x!1), U(x!1, y~u?) -> T(x) + U(x, y~u?) 
+% reaction: T(x!1), U(x!1, y~u?) -> U(x, y~u?) + T(x) 
 
 dydt(4)=dydt(4)-k(4)*y(4);
-dydt(1)=dydt(1)+k(4)*y(4);
 dydt(2)=dydt(2)+k(4)*y(4);
+dydt(1)=dydt(1)+k(4)*y(4);
 
 % rule    : essai2
 % reaction: T(x!1), U(x!1, y~u?) -> T(x!1), U(x!1, y~p?) 
@@ -206,11 +206,11 @@ dydt(2)=dydt(2)+k(1)*y(4);
 dydt(2)=dydt(2)+k(1)*y(4);
 
 % rule    : bind
-% reaction: T(x) + U(x, y~u?) -> T(x!1), U(x!1, y~u?) 
+% reaction: U(x, y~u?) + T(x) -> T(x!1), U(x!1, y~u?) 
 
-dydt(1)=dydt(1)-k(3)*y(1)*y(2);
-dydt(2)=dydt(2)-k(3)*y(1)*y(2);
-dydt(4)=dydt(4)+k(3)*y(1)*y(2);
+dydt(2)=dydt(2)-k(3)*y(2)*y(1);
+dydt(1)=dydt(1)-k(3)*y(2)*y(1);
+dydt(4)=dydt(4)+k(3)*y(2)*y(1);
 
 % rule    : essai2
 % reaction: U(x, y~u?) -> U(x, y~p?) 

@@ -46,7 +46,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : bind -->
-<!-- reaction: T(x) + U(x, y~p?) -> T(x!1), U(x!1, y~p?)  -->
+<!-- reaction: U(x, y~p?) + T(x) -> T(x!1), U(x!1, y~p?)  -->
 <reaction id="re1" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD13" species="s2"/>
@@ -64,7 +64,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s4</ci></apply><ci>s5</ci></apply></apply><apply>
-<times/><ci> s3 </ci><ci> s2 </ci></apply>
+<times/><ci> s2 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
 </kineticLaw>
@@ -86,7 +86,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: T(x!1), U(x!1, y~p?) -> T(x) + U(x, y~p?)  -->
+<!-- reaction: T(x!1), U(x!1, y~p?) -> U(x, y~p?) + T(x)  -->
 <reaction id="re3" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s5"/>
@@ -123,7 +123,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: T(x!1), U(x!1, y~u?) -> T(x) + U(x, y~u?)  -->
+<!-- reaction: T(x!1), U(x!1, y~u?) -> U(x, y~u?) + T(x)  -->
 <reaction id="re5" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD28" species="s4"/>
@@ -176,7 +176,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: T(x) + U(x, y~u?) -> T(x!1), U(x!1, y~u?)  -->
+<!-- reaction: U(x, y~u?) + T(x) -> T(x!1), U(x!1, y~u?)  -->
 <reaction id="re8" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD37" species="s1"/>
@@ -194,7 +194,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s4</ci></apply><ci>s5</ci></apply></apply><apply>
-<times/><ci> s1 </ci><ci> s2 </ci></apply>
+<times/><ci> s2 </ci><ci> s1 </ci></apply>
 </apply>
 </math>
 </kineticLaw>

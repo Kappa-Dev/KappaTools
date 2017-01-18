@@ -29,9 +29,9 @@ let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
 let hash_prime = 29
 let coarse_hash cc =
-  Array.fold_left
-    (fun acc l -> List.length l + hash_prime * acc)
-    0 cc.nodes_by_type
+  Array.fold_right
+    (fun l acc -> List.length l + hash_prime * acc)
+    cc.nodes_by_type 0
 
 let id_to_yojson cc = `Int cc
 let id_of_yojson = function

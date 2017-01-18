@@ -12,7 +12,11 @@ type agent =
     { a_type: int; a_ports: link array; a_ints: internal array; }
 type t = agent list
 
-val equal : Signature.s -> t -> t -> bool
+type snapshot
+val empty_snapshot : snapshot
+val increment_in_snapshot : Signature.s -> t -> snapshot -> snapshot
+val output_snapshot : snapshot -> (int * t) list
+
 val print : compact:bool -> Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> int -> Format.formatter -> t -> unit
 

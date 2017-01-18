@@ -432,14 +432,9 @@ let one_connected_component sigs ty node graph =
 
 let build_snapshot sigs graph =
   let () = assert (not graph.outdated) in
-  let rec increment x = function
-    | [] -> [1,x]
-    | (n,y as h)::t ->
-      if Raw_mixture.equal sigs x y then (succ n,y)::t
-      else h::increment x t in
   let rec aux ccs node =
     if node = Mods.DynArray.length graph.sort
-    then let () = Cache.reset graph.cache in ccs
+    then let () = Cache.reset graph.cache in Raw_mixture.output_snapshot ccs
     else
     if Cache.test graph.cache node
     then aux ccs (succ node)
@@ -448,8 +443,8 @@ let build_snapshot sigs graph =
       | Some ty ->
         let (out,_) =
           one_connected_component sigs ty node graph in
-        aux (increment out ccs) (succ node) in
-  aux [] 0
+        aux (Raw_mixture.increment_in_snapshot sigs out ccs) (succ node) in
+  aux Raw_mixture.empty_snapshot 0
 
 let debug_print f graph =
   let print_sites ag =

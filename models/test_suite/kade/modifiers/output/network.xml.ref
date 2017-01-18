@@ -43,7 +43,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : unbind -->
-<!-- reaction: T(x!1), U(x!1) -> T(x) + U(x)  -->
+<!-- reaction: T(x!1), U(x!1) -> U(x) + T(x)  -->
 <reaction id="re1" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD10" species="s3"/>
@@ -63,7 +63,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: T(x) + U(x) -> T(x!1), U(x!1)  -->
+<!-- reaction: U(x) + T(x) -> T(x!1), U(x!1)  -->
 <reaction id="re2" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD14" species="s1"/>
@@ -76,7 +76,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><apply><times/><cn type="integer"> 1 </cn><ci>s1</ci></apply><apply>
-<times/><ci> s1 </ci><ci> s2 </ci></apply>
+<times/><ci> s2 </ci><ci> s1 </ci></apply>
 </apply>
 </math>
 </kineticLaw>

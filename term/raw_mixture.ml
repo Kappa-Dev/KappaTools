@@ -165,7 +165,8 @@ let rec agents_are_compatibles remains = function
     | Some (todo',rem') -> agents_are_compatibles rem' todo'
     | _ -> false
 
-let classify_by_type len mix =
+let classify_by_type sigs mix =
+  let len = Signature.size sigs in
   let out = Array.make len (0,[]) in
   let classify ag =
     let nb,ags = out.(ag.a_type) in
@@ -173,11 +174,9 @@ let classify_by_type len mix =
   let () = List.iter classify mix in
   out
 
-let equal sigs a b =
-  let len = Signature.size sigs in
+let equal cbt_a a cbt_b b =
   let rem_me x l = List.filter (fun y -> x != y) l in
-  match Tools.array_min_equal_not_null
-          (classify_by_type len a) (classify_by_type len b) with
+  match Tools.array_min_equal_not_null cbt_a cbt_b with
   | None -> false
   | Some ([],ags) -> ags = []
   | Some (h1::_,ags) ->
@@ -185,3 +184,26 @@ let equal sigs a b =
     List.fold_left
       (fun bool ag -> bool || agents_are_compatibles (a',rem_me ag b) [h1,ag])
       false ags
+
+let hash_prime = 29
+let coarse_hash cbt =
+  Array.fold_right (fun (l,_) acc -> l + hash_prime * acc) cbt 0
+
+type snapshot =  (int * (int * agent list) array * t) list Mods.IntMap.t
+
+let empty_snapshot = Mods.IntMap.empty
+
+let increment_in_snapshot sigs x s =
+  let cbt_x = classify_by_type sigs x in
+  let hs = coarse_hash cbt_x in
+  let l = Mods.IntMap.find_default [] hs s in
+  let rec aux_increment = function
+  | [] -> [1,cbt_x,x]
+  | (n,cbt_y,y as h)::t ->
+    if equal cbt_x x cbt_y y then (succ n,cbt_y,y)::t
+    else h::aux_increment t in
+  Mods.IntMap.add hs (aux_increment l) s
+
+let output_snapshot s =
+  Mods.IntMap.fold (fun _ l acc ->
+      List_util.rev_map_append (fun (x,_,y) -> (x,y)) l acc) s []
