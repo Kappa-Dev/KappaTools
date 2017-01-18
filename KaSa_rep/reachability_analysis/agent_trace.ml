@@ -512,12 +512,45 @@ let pw parameters error list =
          acc acc)
     map [[]]
 
+let smash_side_effect parameters error static rules =
+  let error, init =
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+  in
+  Ckappa_sig.AgentRule_map_and_set.Map.fold
+    (fun (agent_name,rule_id) list (error,map) ->
+       let error, old_asso =
+         match Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                 parameters error
+                 agent_name map
+         with
+         | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+         | error, Some set -> error, set
+       in
+       let error, new_asso =
+         Ckappa_sig.Rule_map_and_set.Set.add parameters error rule_id old_asso
+       in
+       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
+         parameters error
+         agent_name
+         new_asso
+         map)
+    (snd (Analyzer_headers.get_potential_side_effects static))
+    (error, init)
+
 let build_side_effect
-    parameters error static rules agent_name site_set =
+    parameters error static agent_name site_set smashed_map =
   let error, init = Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create parameters error 0 in
-  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-    parameters error
-    (fun parameters error r_id _rule map ->
+  let error, ruleset  =
+    match
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+        parameters error
+        agent_name smashed_map
+    with
+    | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+    | error, Some set -> error, set
+  in
+  Ckappa_sig.Rule_map_and_set.Set.fold
+    (fun r_id (error,map) ->
        let error', list =
          Ckappa_sig.AgentRule_map_and_set.Map.find_default_without_logs
            parameters
@@ -537,8 +570,8 @@ let build_side_effect
        let error, list = pw parameters error list in
        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
          parameters error r_id list map)
-    rules
-    init
+    ruleset
+    (error, init)
 
 
 
@@ -1147,6 +1180,10 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
   let () = Ckappa_sig.Views_intbdu.import_handler handler in
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
+  let error, side_effects =
+    smash_side_effect
+      parameters error static rules
+  in
   let error, (support, creation, degradation) =
     build_support parameters error rules
   in
@@ -1256,7 +1293,7 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                   in
                   let error, potential_side_effect =
                     build_side_effect
-                      parameters error static rules agent_type site_set
+                      parameters error static agent_type site_set side_effects
                   in
                   let error, support =
                     LabelMap.fold
