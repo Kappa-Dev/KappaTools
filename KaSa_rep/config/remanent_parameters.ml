@@ -20,7 +20,7 @@ let add_extension_if_not_already_mentioned a ext =
   try
     if
       size_a < size_ext ||
-        (String.sub a (size_a - size_ext) size_ext = ext)
+      (String.sub a (size_a - size_ext) size_ext = ext)
     then a
     else  a^ext
   with
@@ -31,8 +31,8 @@ let open_out a ext =
   let a = add_extension_if_not_already_mentioned a ext in
   let d = Filename.dirname a in
   let () = try
-	     if not (Sys.is_directory d)
-	     then (Format.eprintf "'%s' is not a directory@." d; exit 1)
+      if not (Sys.is_directory d)
+      then (Format.eprintf "'%s' is not a directory@." d; exit 1)
     with Sys_error _ -> Kappa_files.mk_dir_r d in
   open_out a
 
@@ -55,7 +55,7 @@ let fetch_level_gen s r =
   | "high" -> Remanent_parameters_sig.High
   | "complete" | "full" -> Remanent_parameters_sig.Full
   | x ->
-    let _ = Printf.fprintf stderr "%s: %s is not a valid level !!!" s x in raise Exit
+    let () = Printf.eprintf "%s: %s is not a valid level !!!" s x in raise Exit
 
 let fetch_graph_format f =
   match
@@ -64,7 +64,8 @@ let fetch_graph_format f =
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
   | "dim" -> Remanent_parameters_sig.DIM
-  | x -> let _ = Printf.fprintf stderr "%s is not a valid graph format !!!" x in raise Exit
+  | x ->
+    let () = Printf.eprintf "%s is not a valid graph format !!!" x in raise Exit
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
 let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
 
@@ -88,23 +89,24 @@ let get_symbols () =
     Remanent_parameters_sig.rev_arrow = "<-" ;
     Remanent_parameters_sig.bi_arrow = "<->" ;
     Remanent_parameters_sig.uni_arrow_nopoly = "-!->"
-    }
+  }
 
 
 let get_influence_map () =
   {
-    Remanent_parameters_sig.im_format = fetch_graph_format Config.influence_map_format ;
+    Remanent_parameters_sig.im_format =
+      fetch_graph_format Config.influence_map_format ;
     Remanent_parameters_sig.im_file =
       (match !Config.influence_map_file
-      with
-      | "" -> None
-      | x -> Some x) ;
+       with
+       | "" -> None
+       | x -> Some x) ;
 
     Remanent_parameters_sig.im_directory =
       (match !Config.output_im_directory
-      with
-      | "" -> Some ""
-      | x -> Some (x^"/")) ;
+       with
+       | "" -> Some ""
+       | x -> Some (x^"/")) ;
 
     Remanent_parameters_sig.rule_shape = !Config.rule_shape ;
     Remanent_parameters_sig.rule_color = !Config.rule_color ;
@@ -115,28 +117,30 @@ let get_influence_map () =
     Remanent_parameters_sig.wake_up_arrow = !Config.wake_up_arrow ;
     Remanent_parameters_sig.inhibition_arrow = !Config.inhibition_arrow ;
     Remanent_parameters_sig.prompt_full_var_def = !Config.prompt_full_var_def ;
-    Remanent_parameters_sig.prompt_full_rule_def = !Config.prompt_full_rule_def ;
+    Remanent_parameters_sig.prompt_full_rule_def =
+      !Config.prompt_full_rule_def ;
     Remanent_parameters_sig.make_labels_compatible =
       List.fold_left
-	(fun map (a,l) -> Remanent_parameters_sig.CharMap.add a l map)
-	Remanent_parameters_sig.CharMap.empty
-	!Config.make_labels_compatible_with_dot
-}
+        (fun map (a,l) -> Remanent_parameters_sig.CharMap.add a l map)
+        Remanent_parameters_sig.CharMap.empty
+        !Config.make_labels_compatible_with_dot
+  }
 
 let get_contact_map () =
-   {
-     Remanent_parameters_sig.cm_format = fetch_graph_format Config.contact_map_format;
-     Remanent_parameters_sig.cm_file =
-       (match !Config.contact_map_file
-	with
-	| "" -> None
-	| x -> Some x) ;
+  {
+    Remanent_parameters_sig.cm_format =
+      fetch_graph_format Config.contact_map_format;
+    Remanent_parameters_sig.cm_file =
+      (match !Config.contact_map_file
+       with
+       | "" -> None
+       | x -> Some x) ;
 
-     Remanent_parameters_sig.cm_directory =
-       (match !Config.output_cm_directory
-	with
-	| "" -> Some ""
-      | x -> Some (x^"/")) ;
+    Remanent_parameters_sig.cm_directory =
+      (match !Config.output_cm_directory
+       with
+       | "" -> Some ""
+       | x -> Some (x^"/")) ;
     Remanent_parameters_sig.pure_contact = !Config.pure_contact ;
     Remanent_parameters_sig.binding_site_shape = !Config.binding_site_shape ;
     Remanent_parameters_sig.binding_site_color = !Config.binding_site_color ;
@@ -149,7 +153,7 @@ let get_contact_map () =
     Remanent_parameters_sig.link_color = !Config.link_color ;
     Remanent_parameters_sig.influence_color = !Config.influence_color ;
     Remanent_parameters_sig.influence_arrow = !Config.influence_arrow ;
-   }
+  }
 
 let reachability_map_0 =
   {
@@ -170,13 +174,14 @@ let reachability_map_0 =
     Remanent_parameters_sig.smash_relations = false;
     Remanent_parameters_sig.use_natural_language =
       Remanent_parameters_sig.Kappa;
-    Remanent_parameters_sig.format_for_local_traces = Remanent_parameters_sig.DOT ;
+    Remanent_parameters_sig.format_for_local_traces =
+      Remanent_parameters_sig.DOT ;
     Remanent_parameters_sig.trace_prefix = "Agent_trace_";
     Remanent_parameters_sig.trace_directory =
       (match !Config.output_local_trace_directory
-	with
-	| "" -> ""
- | x -> (x^"/")) ;
+       with
+       | "" -> ""
+       | x -> (x^"/")) ;
   }
 
 let reachability_map_1 =
@@ -203,58 +208,58 @@ let add_debugging_parameters_to_reachability_map reachability =
   let reachability =
     {
       reachability
-    with
-      Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
-      = !Config.hide_one_d_relations_from_cartesian_decomposition;
-      Remanent_parameters_sig.smash_relations = !Config.smash_relations;
-      Remanent_parameters_sig.use_natural_language =
-        begin
-          match !Config.use_natural_language with
-        | "raw" | "RAW" | "Raw" -> Remanent_parameters_sig.Raw
-        | "kappa" | "KAPPA" | "Kappa" -> Remanent_parameters_sig.Kappa
-        | "English" | "ENGLISH" | "english" ->
-          Remanent_parameters_sig.Natural_language
-        | _ -> Remanent_parameters_sig.Kappa
-        end;
-      Remanent_parameters_sig.compute_local_traces =
-        !Config.compute_local_traces;
-      Remanent_parameters_sig.ignore_trivial_losanges =
-        !Config.do_not_compress_trivial_losanges;
-      Remanent_parameters_sig.add_singular_macrostates =
-        !Config.add_singular_macrostates;
-      Remanent_parameters_sig.add_singular_microstates =
-        !Config.add_singular_microstates;
-      Remanent_parameters_sig.show_rule_names_in_local_traces =
-        !Config.show_rule_names_in_local_traces ;
-      Remanent_parameters_sig.use_macrotransitions_in_local_traces =
-        !Config.use_macrotransitions_in_local_traces ;
-      Remanent_parameters_sig.format_for_local_traces =
-        fetch_graph_format Config.local_trace_format ;
-      Remanent_parameters_sig.trace_prefix =
-        !Config.local_trace_prefix ;
-      Remanent_parameters_sig.trace_directory =
-        match !Config.output_local_trace_directory
-        with "" -> ""
-           | x -> x^"/" ;
+      with
+        Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
+        = !Config.hide_one_d_relations_from_cartesian_decomposition;
+        Remanent_parameters_sig.smash_relations = !Config.smash_relations;
+        Remanent_parameters_sig.use_natural_language =
+          begin
+            match !Config.use_natural_language with
+            | "raw" | "RAW" | "Raw" -> Remanent_parameters_sig.Raw
+            | "kappa" | "KAPPA" | "Kappa" -> Remanent_parameters_sig.Kappa
+            | "English" | "ENGLISH" | "english" ->
+              Remanent_parameters_sig.Natural_language
+            | _ -> Remanent_parameters_sig.Kappa
+          end;
+        Remanent_parameters_sig.compute_local_traces =
+          !Config.compute_local_traces;
+        Remanent_parameters_sig.ignore_trivial_losanges =
+          !Config.do_not_compress_trivial_losanges;
+        Remanent_parameters_sig.add_singular_macrostates =
+          !Config.add_singular_macrostates;
+        Remanent_parameters_sig.add_singular_microstates =
+          !Config.add_singular_microstates;
+        Remanent_parameters_sig.show_rule_names_in_local_traces =
+          !Config.show_rule_names_in_local_traces ;
+        Remanent_parameters_sig.use_macrotransitions_in_local_traces =
+          !Config.use_macrotransitions_in_local_traces ;
+        Remanent_parameters_sig.format_for_local_traces =
+          fetch_graph_format Config.local_trace_format ;
+        Remanent_parameters_sig.trace_prefix =
+          !Config.local_trace_prefix ;
+        Remanent_parameters_sig.trace_directory =
+          match !Config.output_local_trace_directory
+          with "" -> ""
+             | x -> x^"/" ;
     }
   in
   if trace then
     { reachability
-    with
-      Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
-        !Config.dump_reachability_analysis_covering_classes;
-      Remanent_parameters_sig.dump_reachability_analysis_static =
-        !Config.dump_reachability_analysis_static;
-      Remanent_parameters_sig.dump_reachability_analysis_dynamic =
-        !Config.dump_reachability_analysis_dynamic;
-      }
+      with
+        Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
+          !Config.dump_reachability_analysis_covering_classes;
+        Remanent_parameters_sig.dump_reachability_analysis_static =
+          !Config.dump_reachability_analysis_static;
+        Remanent_parameters_sig.dump_reachability_analysis_dynamic =
+          !Config.dump_reachability_analysis_dynamic;
+    }
   else reachability
 
 let get_reachability_map () =
   add_debugging_parameters_to_reachability_map
     begin
       match
-	fetch_verbosity_level Config.verbosity_level_for_reachability_analysis
+        fetch_verbosity_level Config.verbosity_level_for_reachability_analysis
       with
       | Remanent_parameters_sig.None -> reachability_map_0
       | Remanent_parameters_sig.Low -> reachability_map_1
@@ -270,7 +275,7 @@ let get_reachability_parameters () =
       !Config.with_site_accross_bonds_analysis ;
     Remanent_parameters_sig.parallel_bonds =
       !Config.with_parallel_bonds_analysis ;
-        Remanent_parameters_sig.dynamic_contact_map =
+    Remanent_parameters_sig.dynamic_contact_map =
       match String.lowercase !Config.with_dynamic_contact_map
       with
       | "dynamic" -> true
@@ -280,7 +285,7 @@ let get_reachability_parameters () =
 
 let open_tasks_profiling =
   let cache = ref None in
-  let f () =
+  fun () ->
     match
       !cache
     with
@@ -289,82 +294,86 @@ let open_tasks_profiling =
       let () = cache := Some channel in
       channel
     | Some channel -> channel
-  in
-  f
 
 let get_parameters ?html_mode:(html_mode=true) ~called_from () =
   let channel,html_mode,command  =
     match
       called_from
     with
-    | Remanent_parameters_sig.Server -> None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
+    | Remanent_parameters_sig.Server ->
+      None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
     | Remanent_parameters_sig.Internalised ->
       Some stdout,false || html_mode, Sys.argv
 
     | Remanent_parameters_sig.KaSim ->
-      Some (open_tasks_profiling ()),
-      false || html_mode, Sys.argv
+      Some (open_tasks_profiling ()), false || html_mode, Sys.argv
     | Remanent_parameters_sig.KaSa ->
-       begin
-         match
-           !Config.output_directory,"profiling",".html" (*temporary, to do: provide a parameterisable filename*)
+      begin
+        match
+          !Config.output_directory,"profiling",".html"
+        (*temporary, to do: provide a parameterisable filename*)
          with
          | _,"",_ -> Some stdout
          | "",a,ext -> Some (open_out a ext)
          | a,b,ext -> Some (open_out (a^"/"^b) ext)
-       end, false || html_mode, Sys.argv
+      end, false || html_mode, Sys.argv
   in
   { Remanent_parameters_sig.marshalisable_parameters =
       {
-	Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ;
-	Remanent_parameters_sig.do_influence_map = !Config.do_influence_map ;
- Remanent_parameters_sig.do_ODE_flow_of_information =
-   !Config.do_ODE_flow_of_information ;
- Remanent_parameters_sig.do_stochastic_flow_of_information =
-   !Config.do_stochastic_flow_of_information ;
- Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
- Remanent_parameters_sig.do_symmetries_analysis = !Config.do_symmetries ;
- Remanent_parameters_sig.dump_site_dependencies =
-   !Config.dump_site_dependencies ;
+        Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ;
+        Remanent_parameters_sig.do_influence_map = !Config.do_influence_map ;
+        Remanent_parameters_sig.do_ODE_flow_of_information =
+          !Config.do_ODE_flow_of_information ;
+        Remanent_parameters_sig.do_stochastic_flow_of_information =
+          !Config.do_stochastic_flow_of_information ;
+        Remanent_parameters_sig.do_site_dependencies =
+          !Config.do_site_dependencies ;
+        Remanent_parameters_sig.do_symmetries_analysis = !Config.do_symmetries ;
+        Remanent_parameters_sig.dump_site_dependencies =
+          !Config.dump_site_dependencies ;
         (*different reachability output*)
- Remanent_parameters_sig.do_reachability_analysis =
-   !Config.do_reachability_analysis ;
+        Remanent_parameters_sig.do_reachability_analysis =
+          !Config.do_reachability_analysis ;
 
         (**)
- Remanent_parameters_sig.file = !Config.file ;
- Remanent_parameters_sig.symbols = get_symbols () ;
- Remanent_parameters_sig.influence_map_output = get_influence_map () ;
- Remanent_parameters_sig.contact_map_output = get_contact_map () ;
- Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
- Remanent_parameters_sig.reachability_analysis_parameters = get_reachability_parameters ();
+        Remanent_parameters_sig.file = !Config.file ;
+        Remanent_parameters_sig.symbols = get_symbols () ;
+        Remanent_parameters_sig.influence_map_output = get_influence_map () ;
+        Remanent_parameters_sig.contact_map_output = get_contact_map () ;
+        Remanent_parameters_sig.reachability_map_output =
+          get_reachability_map ();
+        Remanent_parameters_sig.reachability_analysis_parameters =
+          get_reachability_parameters ();
 
- Remanent_parameters_sig.unsafe = !Config.unsafe ;
- Remanent_parameters_sig.trace  = !Config.trace ;
- Remanent_parameters_sig.dump_error_as_soon_as_they_occur =   !Config.dump_error_as_soon_as_they_occur;
- Remanent_parameters_sig.prefix = "" ;
- Remanent_parameters_sig.call_stack = [];
- Remanent_parameters_sig.link_mode = !Config.link_mode ;
- Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state ;
- Remanent_parameters_sig.launching_date =
-   Unix.localtime (Unix.gettimeofday ()) ;
- Remanent_parameters_sig.time_shift=(
-	  let x = Unix.gettimeofday () in
-	  (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour)  ;
- Remanent_parameters_sig.hostname=
-   begin try Unix.gethostname () with Failure _ -> "javascript" end;
- Remanent_parameters_sig.command_line= command;
- Remanent_parameters_sig.short_version=Version.version_string;
- Remanent_parameters_sig.version=Version.version_kasa_full_name;
- Remanent_parameters_sig.tk_interface=Tk_version.tk;
- Remanent_parameters_sig.influence_map_accuracy_level = fetch_accuracy_level
-     Config.influence_map_accuracy_level ;
- Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level
-     Config.contact_map_accuracy_level ;
- Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level
-     Config.view_accuracy_level ;
-        Remanent_parameters_sig.called_from = called_from ;
- Remanent_parameters_sig.html_mode = html_mode ;
-     } ;
+        Remanent_parameters_sig.unsafe = !Config.unsafe ;
+        Remanent_parameters_sig.trace  = !Config.trace ;
+        Remanent_parameters_sig.dump_error_as_soon_as_they_occur =
+          !Config.dump_error_as_soon_as_they_occur;
+        Remanent_parameters_sig.prefix = "" ;
+        Remanent_parameters_sig.call_stack = [];
+        Remanent_parameters_sig.link_mode = !Config.link_mode ;
+        Remanent_parameters_sig.kasa_state =
+          Remanent_state_signature.empty_engine_state ;
+        Remanent_parameters_sig.launching_date =
+          Unix.localtime (Unix.gettimeofday ()) ;
+        Remanent_parameters_sig.time_shift =
+          (let x = Unix.gettimeofday () in
+           (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour) ;
+          Remanent_parameters_sig.hostname =
+            begin try Unix.gethostname () with Failure _ -> "javascript" end;
+          Remanent_parameters_sig.command_line= command;
+          Remanent_parameters_sig.short_version=Version.version_string;
+          Remanent_parameters_sig.version=Version.version_kasa_full_name;
+          Remanent_parameters_sig.tk_interface=Tk_version.tk;
+          Remanent_parameters_sig.influence_map_accuracy_level =
+            fetch_accuracy_level Config.influence_map_accuracy_level ;
+          Remanent_parameters_sig.contact_map_accuracy_level =
+            fetch_accuracy_level Config.contact_map_accuracy_level ;
+          Remanent_parameters_sig.view_accuracy_level =
+            fetch_accuracy_level Config.view_accuracy_level ;
+          Remanent_parameters_sig.called_from = called_from ;
+          Remanent_parameters_sig.html_mode = html_mode ;
+      } ;
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
     Remanent_parameters_sig.save_progress_bar = (fun _ -> ());
     Remanent_parameters_sig.reset_progress_bar = (fun _ -> ());
@@ -372,21 +381,21 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
     Remanent_parameters_sig.reset_current_phase_title = (fun _ -> ());
     Remanent_parameters_sig.logger =
       (match channel with
-      | None -> Loggers.dummy_txt_logger
-      | Some _ -> Loggers.open_logger_from_formatter !Config.formatter);
+       | None -> Loggers.dummy_txt_logger
+       | Some _ -> Loggers.open_logger_from_formatter !Config.formatter);
     Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
     Remanent_parameters_sig.profiler =
       match
-	channel
+        channel
       with
       | None -> Loggers.dummy_txt_logger
       | Some a ->
-	Loggers.open_logger_from_channel ~mode:Loggers.HTML_Tabular a
+        Loggers.open_logger_from_channel ~mode:Loggers.HTML_Tabular a
   }
 
 let dummy_parameters ~called_from =
   let cache = ref None in
-  let f () =
+  fun () ->
     match
       !cache
     with
@@ -395,8 +404,7 @@ let dummy_parameters ~called_from =
       let () = cache := Some p in
       p
     | Some p -> p
-  in
-  f
+
 let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep
 let get_bound_symbol_1             symbol = symbol.Remanent_parameters_sig.bound
 let get_at_symbol_1                symbol = symbol.Remanent_parameters_sig.at
@@ -521,11 +529,11 @@ let get_launching_date_1                             marshalisable =
   let t = marshalisable.Remanent_parameters_sig.launching_date in
   let gmt = marshalisable.Remanent_parameters_sig.time_shift in
   Printf.sprintf "Analysis launched at %04i/%02i/%02i %02i:%02i:%02i (GMT%+i)"
-		   (t.Unix.tm_year+1900)
-		   (t.Unix.tm_mon+1)
-		   (t.Unix.tm_mday)
-		   t.Unix.tm_hour
-		   t.Unix.tm_min t.Unix.tm_sec gmt
+          (t.Unix.tm_year+1900)
+          (t.Unix.tm_mon+1)
+          (t.Unix.tm_mday)
+          t.Unix.tm_hour
+          t.Unix.tm_min t.Unix.tm_sec gmt
 let get_short_version_1                              marshalisable =
   marshalisable.Remanent_parameters_sig.version
 let get_full_version_1                               marshalisable =
@@ -703,9 +711,9 @@ let update_call_stack parameters bool name =
       | None,false -> set_trace parameters rep_bool
       | Some x,true -> set_call_stack parameters (x::(get_call_stack parameters))
       | Some x,false ->
-	set_call_stack
-	  (set_trace parameters rep_bool)
-	  (x::(get_call_stack parameters))
+       set_call_stack
+         (set_trace parameters rep_bool)
+         (x::(get_call_stack parameters))
 
 let open_influence_map_file  parameters =
   let channel =
@@ -738,7 +746,7 @@ let open_contact_map_file parameters =
       parameters
      with
        Remanent_parameters_sig.logger =
-	Loggers.open_logger_from_channel channel}
+       Loggers.open_logger_from_channel channel}
 
  let persistent_mode = false
 
