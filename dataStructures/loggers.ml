@@ -415,7 +415,7 @@ let close_row logger =
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>@."
-  | Matrix -> fprintf logger "],\n"
+  | Matrix -> fprintf logger "]\n"
   | Json | Matlab | Octave | Maple | SBML | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =

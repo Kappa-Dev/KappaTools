@@ -43,7 +43,7 @@ let ext_format x =
   with
   | Remanent_parameters_sig.DOT -> ".dot"
   | Remanent_parameters_sig.HTML -> ".html"
-  | Remanent_parameters_sig.DIM -> ".dim"
+  | Remanent_parameters_sig.DIM -> ".dim.json"
 
 let fetch_level_gen s r =
   match
@@ -63,7 +63,7 @@ let fetch_graph_format f =
   with
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
-  | "dim" -> Remanent_parameters_sig.DIM 
+  | "dim" -> Remanent_parameters_sig.DIM
   | x -> let _ = Printf.fprintf stderr "%s is not a valid graph format !!!" x in raise Exit
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
 let fetch_verbosity_level r = fetch_level_gen "a verbosity" r

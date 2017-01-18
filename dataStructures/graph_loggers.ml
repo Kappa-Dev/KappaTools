@@ -273,6 +273,7 @@ let print_graph_foot logger =
         "" nodes
     in
     let () = Loggers.close_row logger in
+    let () = Loggers.fprintf logger "," in
     let () = Loggers.print_newline logger in
     let () = Loggers.fprintf logger "\"hits\" :" in
     let () = Loggers.print_newline logger in
@@ -286,13 +287,20 @@ let print_graph_foot logger =
         "" nodes
     in
     let () = Loggers.close_row logger in
+    let () = Loggers.fprintf logger "," in
     let () = Loggers.print_newline logger in
     let () = Loggers.fprintf logger "\"fluxs\" :" in
     let () = Loggers.print_newline logger in
     let () = Loggers.open_row logger in
-    let () =
-      List.iter
-        (fun (s1,_) ->
+    let _ =
+      List.fold_left
+        (fun b (s1,_) ->
+           let () =
+             if b then
+               let () = Loggers.fprintf logger "," in
+               let () = Loggers.print_newline logger in
+               ()
+           in
            let () = Loggers.open_row logger in
            let _ =
              List.fold_left
@@ -313,9 +321,8 @@ let print_graph_foot logger =
                "" nodes
            in
            let () = Loggers.close_row logger in
-           let () = Loggers.print_newline logger in
-           ()
-        )  nodes
+           true
+        )  false nodes
     in
     let () = Loggers.close_row logger in
     let () = Loggers.print_newline logger in
