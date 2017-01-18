@@ -400,15 +400,27 @@ let print_graph_foot logger =
                | Graph_loggers_sig.Both -> attributes
              in
              let bool = false in
-             let bool =
+             let bool, s_opt=
                match attributes.edge_label
                with
-               | None -> bool
+               | None -> bool,None
                | Some string_list ->
                  let () = Loggers.fprintf logger "label: \"" in
-                 let () = List.iter (Loggers.fprintf logger "%s") (List.rev string_list) in
+                 let s =
+                   Format.asprintf
+                     "%a" (fun fmt -> List.iter (Format.fprintf fmt "%s")) (List.rev string_list)
+                 in
+                 let s_opt,s' =
+                   if
+                     String.length s > 100
+                   then
+                     Some s, (String.sub s 0 100)^"..."
+                   else
+                     None, s
+                 in
+                 let () = Loggers.fprintf logger "%s" s' in
                  let () = Loggers.fprintf logger "\"" in
-                 true
+                 true, s_opt
              in
              let bool =
                match attributes.edge_color
@@ -428,6 +440,12 @@ let print_graph_foot logger =
         let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
         let () = if bool then () else () in
         let () = Loggers.fprintf logger " });@," in
+        let () =
+          match s_opt
+          with None -> ()
+             | Some s ->
+               Loggers.fprintf logger "<!--%s-->\n" s
+        in
         ())
           (Loggers.get_edge_map logger)
       in
@@ -473,7 +491,7 @@ let print_comment
       format
     with
     | Loggers.DOT -> Loggers.fprintf logger "#%s" string
-    | Loggers.HTML_Graph -> Loggers.fprintf logger "//%s" string
+    | Loggers.HTML_Graph -> Loggers.fprintf logger "%s" string
     | Loggers.Json
     | Loggers.Matrix | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
