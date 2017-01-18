@@ -543,18 +543,21 @@ let breadth_first_traversal
    nodes_y: adent_id list = int list *)
 let are_connected ?max_distance graph nodes_x nodes_y =
   let () = assert (not graph.outdated) in
-  (* look for the closest node in nodes_y *)
-  let is_in_nodes_y z = if List.mem z nodes_y then Some () else None in
-  (* breadth first search is called on a list of sites;
-     start the breadth first search with the boundaries of nodes_x,
-     that is all sites that are connected to other nodes in x
-     and with all nodes in nodes_x marked as done *)
-  let prepare =
-    List.fold_left (fun acc (id,_ as ag) ->
-        let () = Cache.mark graph.cache id in
-        (ag,[])::acc) [] nodes_x in
-  match breadth_first_traversal ~looping:((-1,-1),-1) ?max_distance true
-          is_in_nodes_y graph.connect graph.cache [] prepare
-  with [] -> let () = Cache.reset graph.cache in None
-     | [ _,p ] -> let () = Cache.reset graph.cache in Some p
-     | _ :: _ -> failwith "Edges.are_they_connected completely broken"
+  if in_same_connected_component
+      (fst (List.hd nodes_x)) (fst (List.hd nodes_y)) graph then
+    (* look for the closest node in nodes_y *)
+    let is_in_nodes_y z = if List.mem z nodes_y then Some () else None in
+    (* breadth first search is called on a list of sites;
+       start the breadth first search with the boundaries of nodes_x,
+       that is all sites that are connected to other nodes in x
+       and with all nodes in nodes_x marked as done *)
+    let prepare =
+      List.fold_left (fun acc (id,_ as ag) ->
+          let () = Cache.mark graph.cache id in
+          (ag,[])::acc) [] nodes_x in
+    match breadth_first_traversal ~looping:((-1,-1),-1) ?max_distance true
+            is_in_nodes_y graph.connect graph.cache [] prepare
+    with [] -> let () = Cache.reset graph.cache in None
+       | [ _,p ] -> let () = Cache.reset graph.cache in Some p
+       | _ :: _ -> failwith "Edges.are_they_connected completely broken"
+  else None
