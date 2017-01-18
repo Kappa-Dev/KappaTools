@@ -26,7 +26,7 @@ module VarMap = Map.Make(VarOrd)
 module VarSet = Set.Make(VarOrd)
 
 type encoding =
-  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
+  | Matrix | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
   | Matlab | Maple | Json | SBML
 
 module type FormatMap =
@@ -56,7 +56,7 @@ let breakable x =
     x
   with
   | HTML_Tabular | HTML | HTML_Graph | TXT -> true
-  | Json | Matlab | Octave | Maple | SBML | DOT | TXT_Tabular | XLS -> false
+  | Matrix | Json | Matlab | Octave | Maple | SBML | DOT | TXT_Tabular | XLS -> false
 
 type t =
   {
@@ -199,7 +199,7 @@ let end_of_line_symbol logger =
     logger.encoding
   with
   | HTML | HTML_Graph -> "<Br>"
-  | Matlab | Octave | Maple | SBML
+  | Matrix | Matlab | Octave | Maple | SBML
   | Json | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
 
@@ -269,7 +269,7 @@ let print_cell logger s =
     with
     | HTML_Tabular -> "<TD>","</TD>"
     | TXT_Tabular -> "","\t"
-    | Json | Matlab | Octave | Maple | SBML | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
+    | Matrix | Json | Matlab | Octave | Maple | SBML | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
@@ -291,6 +291,8 @@ let close_logger logger =
       fprintf logger "</div>\n</body>\n"
     | HTML_Tabular ->
       fprintf logger "</TABLE>\n</div>\n</body>"
+    | Matrix ->
+      fprintf logger "}\n"
     | Json | Matlab | Octave | Maple  | SBML | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
   in
   let () = flush_logger logger in
@@ -304,6 +306,14 @@ let print_preamble logger =
     fprintf logger "<body>\n<div>\n"
   | HTML_Tabular ->
     fprintf logger "<body>\n<div>\n<TABLE>\n"
+  | Matrix ->
+    let () = fprintf logger "{" in
+    let () = print_newline logger in
+    let () = fprintf logger "\"bioBeginTime\" : 0.000000e+00," in
+    let () = print_newline logger in
+    let () = fprintf logger "\"bioEndTime\" : 0.000000e+00," in
+    let () = print_newline logger in
+    ()
   | Json | Matlab | Octave | Maple | SBML | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
@@ -397,6 +407,7 @@ let open_row logger =
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>"
+  | Matrix -> fprintf logger "["
   | Json | Matlab | Octave | Maple | SBML | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
@@ -404,6 +415,7 @@ let close_row logger =
     logger.encoding
   with
   | HTML_Tabular -> fprintf logger "<tr>@."
+  | Matrix -> fprintf logger "],\n"
   | Json | Matlab | Octave | Maple | SBML | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =
@@ -545,3 +557,4 @@ let to_json logger =
 
 let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json
 let get_edge_map t = !(t.edges_map)
+let get_nodes t = !(t.nodes)

@@ -189,7 +189,7 @@ let print_graph_preamble
             Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
           ()
       end
-    | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
+      | Loggers.Matrix | Loggers.Json | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -218,7 +218,39 @@ let string_of_arrow_in_html logger bool title style =
 
 let merge s s' =
   if s = Graph_loggers_sig.No_head then s' else s
-                                              
+
+let matrix_string_of_options l =
+  let i =
+    List.fold_left
+      (
+         List.fold_left
+           (fun i l ->
+              match l with
+                Graph_loggers_sig.Color x ->
+                begin
+                  match x with
+                  | Graph_loggers_sig.Brown -> i*7
+                  | Graph_loggers_sig.Black -> i
+                  | Graph_loggers_sig.Green -> i*3
+                  | Graph_loggers_sig.Red -> i*(-1)
+                  | Graph_loggers_sig.Blue -> i*5
+                  | Graph_loggers_sig.White -> i
+                  | Graph_loggers_sig.LightSkyBlue -> i*11
+                  | Graph_loggers_sig.PaleGreen -> i*13
+                end
+              | Graph_loggers_sig.ArrowHead _
+              | Graph_loggers_sig.ArrowTail _
+              | Graph_loggers_sig.FillColor _
+              | Graph_loggers_sig.Label _
+              | Graph_loggers_sig.Width _
+              | Graph_loggers_sig.Height _
+              | Graph_loggers_sig.Direction _
+              | Graph_loggers_sig.Shape _
+              | Graph_loggers_sig.LineStyle _
+                -> i
+           )) 1 l in
+  string_of_int i
+
 let print_graph_foot logger =
   match
     Loggers.get_encoding_format logger
@@ -226,6 +258,68 @@ let print_graph_foot logger =
   | Loggers.DOT ->
     let () = Loggers.fprintf logger "}" in
     Loggers.print_newline logger
+  | Loggers.Matrix ->
+    let nodes = Loggers.get_nodes logger in
+    let edges = Loggers.get_edge_map logger in
+    let () = Loggers.fprintf logger "\"rules\" :" in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.open_row logger in
+    let _ =
+      List.fold_left
+        (fun sep (s,_) ->
+           let () = Loggers.fprintf logger "%s\"%s\"" sep s in
+           ", "
+        )
+        "" nodes
+    in
+    let () = Loggers.close_row logger in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "\"hits\" :" in
+    let () = Loggers.print_newline logger in 
+    let () = Loggers.open_row logger in
+    let _ =
+      List.fold_left
+        (fun sep _ ->
+           let () = Loggers.fprintf logger "%s1" sep in
+           ", "
+        )
+        "" nodes
+    in
+    let () = Loggers.close_row logger in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "\"fluxs\" :" in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.open_row logger in
+    let () =
+      List.iter
+        (fun (s1,_) ->
+           let () = Loggers.open_row logger in
+           let _ =
+             List.fold_left
+               (fun sep (s2,_) ->
+                  let color_value =
+                    match
+                      Mods.String2Map.find_option
+                        (s1,s2)
+                        edges
+                    with
+                    | None -> "0"
+                    | Some options -> matrix_string_of_options options
+                  in
+                  let () =
+                    Loggers.fprintf logger "%s%s" sep color_value in
+                  ", "
+               )
+               "" nodes
+           in
+           let () = Loggers.close_row logger in
+           let () = Loggers.print_newline logger in
+           ()
+        )  nodes
+    in
+    let () = Loggers.close_row logger in
+    let () = Loggers.print_newline logger in
+    ()
   | Loggers.HTML_Graph ->
     begin
       let () =
@@ -236,8 +330,6 @@ let print_graph_foot logger =
              let id2_int = Loggers.int_of_string_id logger id2 in
              let attributes = dummy_edge in
              let attributes =
-               match Loggers.get_encoding_format logger with
-               | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT | Loggers.HTML ->
                  List.fold_left
                    (fun attributes option_list ->
                       List.fold_left
@@ -282,11 +374,7 @@ let print_graph_foot logger =
                         attributes option_list)
                    attributes
                    list
-               | Loggers.Json
-               | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
-               | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular -> attributes
              in
-
              let () =
                Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int
                 id2_int in
@@ -380,20 +468,20 @@ let print_comment
     | Loggers.DOT -> Loggers.fprintf logger "#%s" string
     | Loggers.HTML_Graph -> Loggers.fprintf logger "//%s" string
     | Loggers.Json
-    | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+    | Loggers.Matrix | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let open_asso logger =
   match Loggers.get_encoding_format logger with
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t<p><dl>\n"
   | Loggers.Json | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave
-  | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.Matrix | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let close_asso logger =
   match Loggers.get_encoding_format logger with
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t</dl></p>\n"
   | Loggers.Json
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
-  | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.Matrix | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_asso logger string1 string2 =
@@ -401,7 +489,7 @@ let print_asso logger string1 string2 =
   | Loggers.DOT -> Loggers.fprintf logger "/*%s %s*/" string1 string2
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
   | Loggers.Json
-  | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  | Loggers.Matrix | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
 
@@ -470,7 +558,7 @@ let print_node logger ?directives:(directives=[]) id =
         )
         attributes
         directives
-    | Loggers.Json
+    | Loggers.Matrix | Loggers.Json
     | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML
       -> attributes
@@ -665,7 +753,7 @@ let print_node logger ?directives:(directives=[]) id =
         let () = Loggers.print_newline logger in
         ()
     end
-  | Loggers.Json -> Loggers.add_node logger id directives
+  | Loggers.Matrix | Loggers.Json -> Loggers.add_node logger id directives
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -673,7 +761,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
   let attributes = dummy_edge in
   let attributes =
     match Loggers.get_encoding_format logger with
-    | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT | Loggers.HTML ->
+    | Loggers.Matrix | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT | Loggers.HTML ->
       List.fold_left
         (fun attributes option ->
            match
@@ -867,10 +955,10 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let () = Loggers.fprintf logger "%s%s %s %s" prefix id1 arrow id2 in
     let () = List.iter (Loggers.fprintf logger "%s") (List.rev label) in
     let () = Loggers.print_newline logger in
-    ()
+   ()
   | Loggers.Json | Loggers.HTML_Graph -> Loggers.add_edge logger id1 id2 directives
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
-  | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Matrix | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_one_to_n_relation
     logger ?directives:(directives=[])
@@ -885,7 +973,7 @@ let print_one_to_n_relation
     | Loggers.HTML_Graph ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Circle)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(Graph_loggers_sig.FillColor Graph_loggers_sig.Black)::(List.rev directives))
     | Loggers.Json
-    | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
+    | Loggers.Matrix  | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular
     | Loggers.TXT_Tabular | Loggers.XLS ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Invisible)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(List.rev directives))

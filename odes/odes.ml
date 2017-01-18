@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jan 10 2017>
+  * Last modification: Time-stamp: <Jan 18 2017>
 *)
 
 let local_trace = false
@@ -1222,7 +1222,7 @@ struct
         Ode_loggers.print_newline logger
       | Loggers.Maple | Loggers.SBML | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
-      | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
       | Loggers.Json -> ()
     in
     ()
@@ -1523,7 +1523,7 @@ struct
                      dump_token_list tokens_prod
                  in
                  Ode_loggers.print_comment ~breakline logger s
-               | Loggers.Maple | Loggers.TXT
+               | Loggers.Matrix | Loggers.Maple | Loggers.TXT
                | Loggers.TXT_Tabular | Loggers.XLS
                | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
                | Loggers.HTML_Tabular | Loggers.Json -> ()

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Dec 26 2016>
+  * Last modification: Time-stamp: <Jan 18 2017>
   * *
   * primitive to parse command-line options
   *
@@ -274,7 +274,8 @@ let options =
       "--influence-map-format",
       (Choice ([
            "DOT","dot format";
-           "HTML","HTML format"
+           "DIM","DIM format";
+           "HTML","HTML format";
          ],
            Config.influence_map_format)),
       "Tune the output format for the influence map",

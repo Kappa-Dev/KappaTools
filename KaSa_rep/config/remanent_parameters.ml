@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Dec 26 2016>
+  * Last modification: Time-stamp: <Jan 18 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -43,6 +43,7 @@ let ext_format x =
   with
   | Remanent_parameters_sig.DOT -> ".dot"
   | Remanent_parameters_sig.HTML -> ".html"
+  | Remanent_parameters_sig.DIM -> ".dim"
 
 let fetch_level_gen s r =
   match
@@ -62,6 +63,7 @@ let fetch_graph_format f =
   with
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
+  | "dim" -> Remanent_parameters_sig.DIM 
   | x -> let _ = Printf.fprintf stderr "%s is not a valid graph format !!!" x in raise Exit
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
 let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
@@ -717,6 +719,7 @@ let open_influence_map_file  parameters =
       match get_im_format parameters with
       | Remanent_parameters_sig.DOT -> Loggers.DOT
       | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
+      | Remanent_parameters_sig.DIM -> Loggers.Matrix
     in
     let logger = Loggers.open_logger_from_channel ~mode:format channel
   in

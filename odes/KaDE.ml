@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jan 09 2017>
+  * Last modification: Time-stamp: <Jan 18 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -136,7 +136,7 @@ let main () =
       match backend
       with
       | Loggers.SBML -> true
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> true
       | Loggers.Octave
@@ -154,7 +154,7 @@ let main () =
       match backend with
       | Loggers.SBML ->
         Loggers.open_infinite_buffer ~mode:backend ()
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> logger
       | Loggers.Octave

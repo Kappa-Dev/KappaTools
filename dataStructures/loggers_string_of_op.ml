@@ -12,7 +12,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.LOG ->
@@ -26,7 +26,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.SQRT ->
@@ -40,7 +40,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.EXP ->
@@ -54,7 +54,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.SINUS ->
@@ -68,7 +68,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.COSINUS ->
@@ -82,7 +82,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.TAN ->
@@ -96,7 +96,8 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
-      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
+      | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
   | Operator.INT ->
@@ -110,6 +111,7 @@ let string_of_un_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
+      | Loggers.Matrix
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -128,6 +130,7 @@ let string_of_compare_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
+      | Loggers.Matrix
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -142,6 +145,7 @@ let string_of_compare_op logger op =
       | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
+      | Loggers.Matrix
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
@@ -155,6 +159,7 @@ let string_of_compare_op logger op =
         "<"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -169,6 +174,7 @@ let string_of_compare_op logger op =
         ">"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -186,6 +192,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "mod"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -199,6 +206,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "max"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -212,6 +220,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "min"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -225,6 +234,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "/"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -238,6 +248,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "+"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -251,6 +262,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "-"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -264,6 +276,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "*"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -277,6 +290,7 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "**"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -294,6 +308,7 @@ let string_of_bool_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "&"
       | Loggers.Maple
       | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
@@ -306,6 +321,7 @@ let string_of_bool_op logger op =
       | Loggers.SBML -> "<or/>"
       | Loggers.Octave | Loggers.Matlab -> "|"
       | Loggers.Maple
+      | Loggers.Matrix
       | Loggers.Json
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular

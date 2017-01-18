@@ -17,8 +17,7 @@
   * under the terms of the GNU Library General Public License *)
 
 type encoding =
-  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave
-  | Matlab | Maple | Json | SBML
+  | Matrix | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave | Matlab | Maple | Json | SBML
 
 module type FormatMap =
 sig
@@ -61,7 +60,7 @@ val add_node: t -> string -> Graph_loggers_sig.options list -> unit
 val add_edge: t -> string -> string -> Graph_loggers_sig.options list -> unit
 val dump_json: t -> Yojson.Basic.json -> unit
 val get_edge_map: t -> Graph_loggers_sig.options list list Mods.String2Map.t
-
+val get_nodes: t -> (string * Graph_loggers_sig.options list) list
 val get_expr:
   t -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id)

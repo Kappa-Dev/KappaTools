@@ -7,7 +7,7 @@ with
     f logger
   in
   ()
-| Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+| Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
 | Loggers.XLS | Loggers.Octave
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
@@ -17,7 +17,7 @@ let do_not_sbml logger f =
     Loggers.get_encoding_format logger
   with
   | Loggers.SBML -> ()
-  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave
   | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
@@ -543,11 +543,11 @@ let rec substance_expr_in_sbml logger
         Mods.StringSet.singleton "time"
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
         Mods.StringSet.singleton "event_max"
-      | Alg_expr.BIN_ALG_OP (op, a, b) ->
+      | Alg_expr.BIN_ALG_OP (_op, a, b) ->
         Mods.StringSet.union
           (substance_expr_in_sbml logger a network)
           (substance_expr_in_sbml logger b network)
-      | Alg_expr.UN_ALG_OP (op, a) ->
+      | Alg_expr.UN_ALG_OP (_op, a) ->
         substance_expr_in_sbml logger a network
       | Alg_expr.IF (cond, yes, no) ->
         Mods.StringSet.union
@@ -580,7 +580,7 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
   match
     Ode_loggers_sig.is_expr_alias alg_expr
   with
-  | Some x -> false
+  | Some _ -> false
   | None ->
     begin
       match fst alg_expr with
@@ -610,10 +610,10 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR)
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> false
-      | Alg_expr.BIN_ALG_OP (op, a, b) ->
+      | Alg_expr.BIN_ALG_OP (_op, a, b) ->
         maybe_time_dependent_alg_expr_in_sbml logger a network
         || maybe_time_dependent_alg_expr_in_sbml logger b network
-      | Alg_expr.UN_ALG_OP (op, a) ->
+      | Alg_expr.UN_ALG_OP (_op, a) ->
         maybe_time_dependent_alg_expr_in_sbml logger a network
       | Alg_expr.IF (cond, yes, no) ->
         maybe_time_dependent_bool_expr_in_sbml logger cond network
@@ -627,10 +627,10 @@ and
   match fst cond with
   | Alg_expr.TRUE
   | Alg_expr.FALSE -> false
-  | Alg_expr.COMPARE_OP (op,a,b) ->
+  | Alg_expr.COMPARE_OP (_op,a,b) ->
     maybe_time_dependent_alg_expr_in_sbml logger a network
     || maybe_time_dependent_alg_expr_in_sbml logger b network
-  | Alg_expr.BOOL_OP (op,a,b) ->
+  | Alg_expr.BOOL_OP (_op,a,b) ->
     maybe_time_dependent_bool_expr_in_sbml logger a network
     || maybe_time_dependent_bool_expr_in_sbml logger b network
 
@@ -717,7 +717,7 @@ let maybe_time_dependent logger network var_rule =
       Loggers.get_expr logger var_rule in
     let expr = unsome expr_opt in
     maybe_time_dependent_alg_expr_in_sbml logger expr network
-  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
@@ -775,7 +775,7 @@ let dump_kinetic_law
   in
   match reactants with
   | [] ->
-    f logger 
+    f logger
   | _::_ ->
       add_box ~break logger "apply"
         (fun logger ->
@@ -840,14 +840,14 @@ let dump_token_vector convert logger network_handler token_vector =
 
 let has_good_token_token_vector convert logger network_handler token_vector =
   List.exists
-    (fun (expr,(id,_)) ->
+    (fun (expr,_) ->
        let stochiometry_opt =
          eval_const_alg_expr logger network_handler (convert expr)
        in
        match stochiometry_opt with
        | None -> false
        | Some x when Nbr.is_zero x -> false
-       | Some x -> true)
+       | Some _ -> true)
     token_vector
 
 let has_reactants_in_token_vector logger network_handler token_vector =
