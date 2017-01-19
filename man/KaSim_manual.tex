@@ -704,7 +704,7 @@ and that we give Figure~\ref{fig:species}.
 For rules with unary rates, one can also specify an \emph{horizon}.
 For example in the rule
 \begin{lstlisting}[language=kappa]
-'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k_1'\{'k_2':5\}
+'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k2'{'k1':5}
 \end{lstlisting}
 the unary rate is applied only when the agents $A$ and $B$ are at an
 horizon $5$ (or closer), of each other. Horizon is an algebraic expression
@@ -1086,6 +1086,8 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 \end{figure}
 
 \subsection{Get a snapshot of the mixture (to define a new initial state)}
+
+A snapshot is an instant photography of the current state of the mixture (a dump of the state at a given moment in the simulation).
 
 In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) kappa file.
 For instance, the declaration\index{declaration}:
