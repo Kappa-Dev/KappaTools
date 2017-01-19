@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 18 2017>
+  * Last modification: Time-stamp: <Jan 19 2017>
   *
   *
   *
@@ -17,9 +17,36 @@ let trace = false
 
 (***************************************************************************)
 
-let add_dependency_pair_sites parameters error
-    (agent_type, site_type)
-    x
+let get_list_from_agent_site parameters error (agent_type, site_type)
+    store_result =
+  let error, result =
+    match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+            parameters error
+            (agent_type, site_type)
+            store_result
+    with
+    | error, None -> error, []
+    | error, Some l -> error, l
+  in
+  error, result
+
+let add_dependency_pair_sites_cv parameters error (agent_type, site_type)
+    cv_id store_result =
+  let error, old =
+    get_list_from_agent_site parameters error (agent_type, site_type)
+      store_result
+  in
+  let error, store_result =
+    Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameters error
+      (agent_type, site_type)
+      (cv_id :: old)
+      store_result
+  in
+  error, store_result
+
+(***************************************************************************)
+
+let add_dependency_pair_sites parameters error (agent_type, site_type) x
     store_result =
   let error, (l, old) =
     match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -152,7 +179,7 @@ let project_state (b, c, _) = (b, c)
 (****************************************************************************)
 
 let get_rule_id_map_and_set parameter error rule_id empty store_result =
-  let error, result =
+  let error, store_result =
     match
       Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
         parameter
@@ -163,10 +190,10 @@ let get_rule_id_map_and_set parameter error rule_id empty store_result =
     | error, None -> error, empty
     | error, Some s -> error, s
   in
-  error, result
+  error, store_result
 
 let get_agent_id parameter error agent_id empty store_result =
-  let error, result =
+  let error, store_result =
     match
       Ckappa_sig.Agent_id_map_and_set.Map.find_option_without_logs
         parameter
@@ -177,7 +204,64 @@ let get_agent_id parameter error agent_id empty store_result =
     | error, None -> error, empty
     | error, Some s -> error, s
   in
-  error, result
+  error, store_result
+
+let get_pair_agent_cv parameters error (agent_type, cv_id) store_result =
+  match
+    Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+      parameters error
+      (agent_type, cv_id)
+      store_result
+  with
+  | error, None -> error, []
+  | error, Some l -> error, l
+
+(****************************************************************************)
+
+let list2set parameters error list =
+  let error', set =
+    List.fold_left (fun (error,current_set) elt ->
+        Ckappa_sig.Site_map_and_set.Set.add
+          parameters error elt current_set
+      ) (error, Ckappa_sig.Site_map_and_set.Set.empty) list
+  in
+  let error =
+    Exception.check_point
+      Exception.warn parameters error error' __POS__ Exit
+  in
+  error, set
+
+(****************************************************************************)
+
+let new_index_pair_map parameters error l = (*TODO*)
+  (*JF:  it should be computed only once *)
+  let rec aux acc k map1 map2 error =
+    match acc with
+    | [] -> error, (map1, map2)
+    | h :: tl ->
+      let error, map1 =
+        Ckappa_sig.Site_map_and_set.Map.add parameters error h k map1 in
+      let error, map2 =
+        Ckappa_sig.Site_map_and_set.Map.add parameters error k h map2 in
+      aux
+        tl
+        (Ckappa_sig.site_name_of_int ((Ckappa_sig.int_of_site_name k)+1))
+        map1
+        map2
+        error
+  in
+  let error', (map1, map2) =
+    aux
+      l
+      (Ckappa_sig.site_name_of_int 1)
+      Ckappa_sig.Site_map_and_set.Map.empty
+      Ckappa_sig.Site_map_and_set.Map.empty error
+  in
+  let error =
+    Exception.check_point
+      Exception.warn parameters error error' __POS__ Exit
+  in
+  error,(map1,map2)
 
 (****************************************************************************)
 
