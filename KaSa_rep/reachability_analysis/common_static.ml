@@ -1226,24 +1226,6 @@ let collect_test_modification_sites
 (***************************************************************************)
 
 let site_covering_classes parameters error covering_classes =
-  (*let add_link (agent_type, site_type) cv_id store_result =
-    let error, old =
-      match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-              parameters error
-              (agent_type, site_type)
-              store_result
-      with
-      | error, None -> error, []
-      | error, Some l -> error, l
-    in
-    let error, result =
-      Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameters error
-        (agent_type, site_type)
-        (cv_id :: old)
-        store_result
-    in
-    error, result
-  in*)
   let error, store_result =
     (*From sites return a list of covering_class_id*)
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -1291,17 +1273,6 @@ let list_of_site_type_in_covering_class parameters error covering_classes =
                   Common_map.get_pair_agent_cv parameters error
                     (agent_type_cv, cv_id) store_result
                 in
-
-                (*let error, old =
-                  match
-                    Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                      parameters error
-                      (agent_type_cv, cv_id)
-                      store_result
-                  with
-                  | error, None -> error, []
-                  | error, Some l -> error, l
-                in*)
                 let new_list = List.append list_of_site_type old in
                 let error, store_result =
                   Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
@@ -1391,7 +1362,6 @@ let scan_predicate_covering_classes parameters error handler_kappa compil
   }
 
 (***************************************************************************)
-
 
 (*let new_index_pair_map parameters error store_remanent_triple =
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameters
