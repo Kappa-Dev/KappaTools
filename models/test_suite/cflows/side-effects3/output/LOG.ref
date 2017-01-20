@@ -16,7 +16,6 @@ done
 Done
 ____________________________________________________________
 ############################################################
-+ Loading trace
 Simulation ended
 + Loading trace
 	- removing events occurring after the last observable: -112 events 

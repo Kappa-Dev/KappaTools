@@ -894,10 +894,10 @@ let debug_print f state =
 
 let add_tracked patterns event_kind tests state =
   let () = assert (not state.outdated) in
-  let () = state.outdated <- true in
   match state.story_machinery with
   | None -> state
   | Some tpattern ->
+    let () = state.outdated <- true in
     let () =
       Array.iter
         (fun pattern ->
