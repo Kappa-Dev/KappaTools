@@ -1,5 +1,7 @@
 bin: [
   "bin/KaSim"
   "bin/KaSa"
+  "bin/KaStor"
+  "bin/KaDE"
   "?bin/WebSim"
 ]
