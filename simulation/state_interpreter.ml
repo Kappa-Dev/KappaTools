@@ -329,7 +329,7 @@ let a_loop ~outputs env counter graph state =
   let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
   let dt = abs_float (log rd /. activity) in
 
-  let (_,graph',_ as out) =
+  let out =
     (*Activity is null or dt is infinite*)
     if not (activity > 0.) || dt = infinity then
       match state.stopping_times with
@@ -350,6 +350,8 @@ let a_loop ~outputs env counter graph state =
       | (ti,pe) :: tail ->
         let () = state.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
+        let () =
+          Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
         let stop,graph',state' =
           perturbate ~outputs env counter graph state [pe] in
         (not continue||stop,graph',state')
@@ -360,16 +362,21 @@ let a_loop ~outputs env counter graph state =
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
         let () = state.stopping_times <- tail in
         let continue = Counter.one_time_correction_event counter ti in
+        let () =
+          Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
         let stop,graph',state' =
           perturbate ~outputs env counter graph state [pe] in
         (not continue||stop,graph',state')
       | _ ->
+        let () =
+          Counter.fill ~outputs counter ~dt (observables_values env graph) in
+
         one_rule ~outputs dt env counter graph state in
-  let () =
-    Counter.fill ~outputs counter (observables_values env graph') in
   out
 
-let end_of_simulation ~outputs form env counter state =
+let end_of_simulation ~outputs form env counter graph state =
+  let () =
+    Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
   let () =
     List.iter
       (fun e ->

@@ -41,5 +41,5 @@ val a_loop :
 
 val end_of_simulation :
   outputs:(Data.t -> unit) -> Format.formatter ->
-  Model.t -> Counter.t -> t -> unit
+  Model.t -> Counter.t -> Rule_interpreter.t -> t -> unit
 (** What to do after stopping simulation. *)

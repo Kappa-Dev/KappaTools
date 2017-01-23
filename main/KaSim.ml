@@ -49,12 +49,11 @@ let interactive_loop ~outputs pause_criteria env counter graph state =
 
 let finalize
     ~outputs dotFormat cflow_file trace_file
-    env counter state stories_compression =
-  let () = Outputs.close () in
-  let () = Counter.complete_progress_bar counter in
+    env counter graph state stories_compression =
   let () = State_interpreter.end_of_simulation
-      ~outputs Format.std_formatter env counter state in
-  let () = ExceptionDefn.flush_warning Format.err_formatter in
+      ~outputs  Format.err_formatter env counter graph state in
+  let () = Counter.complete_progress_bar counter in
+  let () = Outputs.close () in
   match trace_file,stories_compression with
   | None,_ -> ()
   | Some _, None -> ()
@@ -222,12 +221,12 @@ let () =
       if stop then
         finalize
           ~outputs formatCflows cflowFile trace_file
-          env counter state story_compression
+          env counter graph state story_compression
       else if cli_args.Run_cli_args.batchmode then
-        let (_,state') = batch_loop ~outputs env counter graph state in
+        let (graph',state') = batch_loop ~outputs env counter graph state in
         finalize
           ~outputs formatCflows cflowFile trace_file
-          env counter state' story_compression
+          env counter graph' state' story_compression
       else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel env graph state =
@@ -274,7 +273,7 @@ let () =
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file
-              env counter state' story_compression
+              env counter graph' state' story_compression
           else
             toplevel env' graph' state' in
         if cli_args.Run_cli_args.interactive then
@@ -290,7 +289,7 @@ let () =
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file
-              env counter state' story_compression
+              env counter graph' state' story_compression
           else
             let () =
               Format.printf

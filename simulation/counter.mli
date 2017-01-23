@@ -20,7 +20,8 @@ val reinitialize : t -> unit
 val current_simulation_info : t -> unit Trace.Simulation_info.t
 val next_story : t -> unit Trace.Simulation_info.t
 
-val fill : outputs:(Data.t -> unit) -> t -> (t -> Nbr.t array) -> unit
+val fill :
+  outputs:(Data.t -> unit) -> t -> dt:float -> (t -> Nbr.t array) -> unit
 
 val one_constructive_event : t -> float -> bool
 val one_clashing_instance_event : t -> float -> bool

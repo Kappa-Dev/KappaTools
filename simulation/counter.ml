@@ -208,19 +208,19 @@ let complete_progress_bar c =
   | None -> ()
   | Some pr -> Progress_report.complete_progress_bar c.time c.events pr
 
-let next_point counter =
+let next_point counter dt =
   match counter.plot_period with
   | DT dT ->
     if dT <= 0. then 0 else
       int_of_float
-        ((min (Tools.unsome infinity (max_time counter)) (current_time counter)
-          -. counter.init_time) /. dT)
+        ((min (Tools.unsome infinity (max_time counter))
+            (dt +. current_time counter) -. counter.init_time) /. dT)
   | DE dE ->
     if dE <= 0 then 0 else
       (current_event counter - counter.init_event) / dE
 
-let to_plot_points counter =
-  let next = next_point counter in
+let to_plot_points counter dt =
+  let next = next_point counter dt in
   let last = counter.last_point in
   let () = counter.last_point <- next in
   let n = next - last in
@@ -239,8 +239,8 @@ let to_plot_points counter =
     else
       (if n <> 0 then [counter.time] else []),counter
 
-let fill ~outputs counter observables_values =
-  let points, counter' = to_plot_points counter in
+let fill ~outputs counter ~dt observables_values =
+  let points, counter' = to_plot_points counter dt in
   List.iter
     (fun time ->
        let cand = observables_values {counter' with time} in

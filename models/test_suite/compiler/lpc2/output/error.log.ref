@@ -4,3 +4,4 @@ File "lpc2.ka", line 4, characters 32-33:
 Warning: Site 'z' was not mentionned in the left-hand side.This agent and the
          following will be removed and recreated (probably causing side
          effects).
+Warning: A deadlock was reached after 1 events and 1.857359E-01s (Activity = 0.00000)

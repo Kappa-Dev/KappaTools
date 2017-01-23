@@ -314,7 +314,7 @@ let time_yield
 
 let finalize_simulation ~(t : t) : unit =
   State_interpreter.end_of_simulation
-    ~outputs:(outputs t) t.log_form t.env t.counter t.state
+    ~outputs:(outputs t) t.log_form t.env t.counter t.graph t.state
 
 let run_simulation
     ~(system_process : system_process)
