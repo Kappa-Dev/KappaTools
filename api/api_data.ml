@@ -113,11 +113,6 @@ let api_simulation_status
         (match detail.Api_types_j.simulation_output_plot with
         | None -> 0
         | Some plot -> List.length plot.Api_types_j.plot_time_series);
-      Api_types_j.simulation_output_distances =
-        (match detail.Api_types_j.simulation_output_distances with
-         | None -> 0
-         | Some simulation_output_distances ->
-           List.length simulation_output_distances);
       Api_types_j.simulation_output_flux_maps =
         List.length detail.Api_types_j.simulation_output_flux_maps ;
       Api_types_j.simulation_output_file_lines =
