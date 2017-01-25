@@ -224,7 +224,7 @@ let print_snapshot sigs f s =
     f "@[<v>%a@,%a@]"
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i @[<h>%a@]" i
-           (Raw_mixture.print ~compact:false sigs) mix))
+           (Raw_mixture.print ~compact:false ~sigs) mix))
     s.Data.snapshot_agents
     (Pp.array Pp.space (fun _ f (na,el) ->
          Format.fprintf

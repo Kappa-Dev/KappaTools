@@ -70,7 +70,7 @@ module Agent: sig
 
   val get_type : t -> int
   val same_connected_component : t -> t -> bool
-  val is_site_from_fresh : (t * int) -> bool
+  val is_fresh : t -> bool
 
   val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
   val print_site : ?sigs:Signature.s -> t -> Format.formatter -> int -> unit

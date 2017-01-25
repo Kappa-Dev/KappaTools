@@ -216,7 +216,7 @@ let print_rhs ~ltypes sigs created f mix =
     | [] ->
       Format.fprintf f "%t%a"
         (if empty || created = [] then Pp.empty else Pp.comma)
-        (Raw_mixture.print ~compact:true sigs) created
+        (Raw_mixture.print ~compact:true ~sigs) created
     | h :: t ->
       if h.ra_erased then aux empty t
       else

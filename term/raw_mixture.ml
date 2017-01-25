@@ -16,25 +16,36 @@ let print_link f = function
   | FREE -> ()
   | VAL i -> Format.fprintf f "!%i" i
 
-let print_intf compact with_link sigs ag_ty f (ports,ints) =
+let aux_pp_si sigs a s f i =
+  match sigs with
+  | Some sigs -> Signature.print_site_internal_state sigs a s f i
+  | None ->
+    match i with
+    | Some i -> Format.fprintf f "%i~%i" s i
+    | None -> Format.pp_print_int f s
+let print_intf compact with_link ?sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
           f "%t%a%a"
           (if empty then Pp.empty
            else if compact then Pp.compact_comma else Pp.comma)
-          (Signature.print_site_internal_state sigs ag_ty i)
+          (aux_pp_si sigs ag_ty i)
           ints.(i) (if with_link then print_link else (fun _ _ -> ()))
           ports.(i) in
       aux false (succ i) in
   aux true 0
 
-let print_agent compact link sigs f ag =
-  Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type
-    (print_intf compact link sigs ag.a_type) (ag.a_ports,ag.a_ints)
+let aux_pp_ag sigs f a =
+  match sigs with
+  | Some sigs -> Signature.print_agent sigs f a
+  | None -> Format.pp_print_int f a
+let print_agent compact link ?sigs f ag =
+  Format.fprintf f "%a(@[<h>%a@])" (aux_pp_ag sigs) ag.a_type
+    (print_intf compact link ?sigs ag.a_type) (ag.a_ports,ag.a_ints)
 
-let print ~compact sigs f mix =
-  Pp.list Pp.comma (print_agent compact true sigs) f mix
+let print ~compact ?sigs f mix =
+  Pp.list Pp.comma (print_agent compact true ?sigs) f mix
 
 let agent_to_json a =
   `Assoc
@@ -89,7 +100,7 @@ let print_dot sigs nb_cc f mix =
     (fun i f ag ->
        Format.fprintf
          f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-         nb_cc i (print_agent true false sigs) ag
+         nb_cc i (print_agent true false ~sigs) ag
          (get_color ag.a_type);
        Format.fprintf
          f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
