@@ -9,6 +9,10 @@
 val do_interactive_directives :
   outputs:(Data.t -> unit) -> max_sharing:bool -> Signature.contact_map ->
   Model.t -> Counter.t -> Rule_interpreter.t -> State_interpreter.t ->
-  (((String.t * Locality.t) * Ast.port list) list, Mods.StringMap.elt)
-    Ast.modif_expr list ->
+  (Ast.mixture, string) Ast.modif_expr list ->
   Model.t * (bool * Rule_interpreter.t * State_interpreter.t)
+
+val get_pause_criteria :
+  max_sharing:bool -> Signature.contact_map -> Model.t ->
+  (Ast.mixture, string) Alg_expr.bool Locality.annot ->
+  Model.t * (Pattern.id array list, int) Alg_expr.bool

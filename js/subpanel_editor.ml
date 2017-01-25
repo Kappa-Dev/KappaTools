@@ -122,16 +122,11 @@ let setup_lint _ _ _ =
 let initialize codemirror () =
   let args = Url.Current.arguments in
   let () =
-    try Ui_state.set_model_max_events
-          (Some (int_of_string (List.assoc "nb_events" args)))
+    try Ui_state.set_model_pause_condition (List.assoc "pause" args)
     with Not_found | Failure _ -> () in
   let () =
     try Ui_state.set_model_plot_period
           (float_of_string (List.assoc "plot_period" args))
-    with Not_found | Failure _ -> () in
-  let () =
-    try Ui_state.set_model_max_time
-          (Some (float_of_string (List.assoc "time_limit" args)))
     with Not_found | Failure _ -> () in
   try
     let url = List.assoc "model" args in

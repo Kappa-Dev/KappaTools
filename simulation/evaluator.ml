@@ -37,3 +37,24 @@ let do_interactive_directives
          (Primitives.extract_connected_components_modifications e'')) in
   env',
   State_interpreter.do_modifications ~outputs env' counter graph' state e''
+
+let get_pause_criteria ~max_sharing contact_map env b =
+  let cc_preenv =
+    Pattern.PreEnv.of_env (Model.domain env) in
+  let b' =
+    LKappa.bool_expr_of_ast
+      (Model.signatures env) (Model.tokens_finder env)
+      (Model.algs_finder env) b in
+  let cc_preenv',(b'',pos_b'') =
+    Eval.compile_bool contact_map cc_preenv b' in
+  let env' =
+    if cc_preenv == cc_preenv' then env else
+      Model.new_domain
+        (fst @@ Pattern.PreEnv.finalize ~max_sharing cc_preenv')
+        env in
+  let () = if try Alg_expr.stops_of_bool
+                    (Model.all_dependencies env) b'' <> []
+    with ExceptionDefn.Unsatisfiable -> true then
+      raise (ExceptionDefn.Malformed_Decl
+               ("[T] can only be used in inequalities",pos_b'')) in
+    (env',b'')

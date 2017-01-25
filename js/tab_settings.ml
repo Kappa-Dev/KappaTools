@@ -10,80 +10,24 @@ module UIState = Ui_state
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 
-type simulation_limit = TIME_LIMIT | EVENTS_LIMIT
-let simulation_limit_to_string : simulation_limit -> string =
-    function
-    | TIME_LIMIT -> "time"
-    | EVENTS_LIMIT -> "event"
-let string_to_simulation_limit : string -> simulation_limit option =
-    function
-    | "time" -> Some TIME_LIMIT
-    | "event" -> Some EVENTS_LIMIT
-    |  _ -> None
-
-let signal_simulation_limit, set_simulation_limit = React.S.create TIME_LIMIT
-let signal_simulation_value, set_simulation_value = React.S.create ""
-(*  event update *)
-let _ = React.S.map
-           (fun x ->
-              match React.S.value signal_simulation_limit with
-              | TIME_LIMIT -> ()
-              | EVENTS_LIMIT ->
-                (match x with
-                 | Some va -> set_simulation_value (string_of_int va)
-                 | None -> ()))
-           UIState.model_max_events
-
-let _ = React.S.map
-           (fun x ->
-              match React.S.value signal_simulation_limit with
-            | TIME_LIMIT ->
-              (match x with
-               | None -> ()
-               | Some value ->
-                 let value = string_of_float value in
-                 let format_float n =
-                   let length = String.length n in
-                   if length > 0 && String.get n (length - 1) = '.' then
-                     n^"0"
-                   else
-                     n
-                 in
-                 let value = format_float value in
-                 set_simulation_value value)
-            | EVENTS_LIMIT ->
-
-              ())
-           UIState.model_max_time
-
-let simulation_limit_id = "simulation_limit"
-let simulation_limit_input =
+let simulation_pause_id = "simulation_limit"
+let simulation_pause_input =
   Html.input
-    ~a:[Html.a_id simulation_limit_id ;
-        Html.a_input_type `Number;
+    ~a:[Html.a_id simulation_pause_id ;
+        Html.a_input_type `Text;
         Html.a_class ["form-control"];
-        Tyxml_js.R.Html.a_placeholder
-          (React.S.l1
-             (function
-               | TIME_LIMIT -> "time limit"
-               | EVENTS_LIMIT -> "max number")
-             signal_simulation_limit
-          ) ;
-        Tyxml_js.R.Html.a_value signal_simulation_value;
+        Html.a_placeholder "[T] = 100" ;
+        Tyxml_js.R.Html.a_value UIState.model_pause_condition
        ]
     ()
 
-let simulation_limit_selector_id = "simulation_limit_selector"
-let simulation_limit_selector =
-  let option value =
-    (* to ensure mapping of limit type only happens in on location *)
-    let label = simulation_limit_to_string value in
-    Html.option ~a:[ Html.a_value label ] (Html.pcdata label)
-  in
-  Html.select
-    ~a:[Html.a_id simulation_limit_selector_id ; ]
-    (List.map option [ TIME_LIMIT ; EVENTS_LIMIT ; ])
-
+let format_float_string value =
+  let n = string_of_float value in
+  let length = String.length n in
+  if length > 0 && String.get n (length - 1) = '.' then
+    n^"0"
+  else
+    n
 
 let plot_period_input =
   Html.input
@@ -91,7 +35,7 @@ let plot_period_input =
         Html.a_class [ "form-control"];
         Html.a_placeholder "time units";
         Tyxml_js.R.Html.a_value
-          (React.S.l1 string_of_float UIState.model_plot_period)]
+          (React.S.l1 format_float_string UIState.model_plot_period)]
     ()
 
 let perturbation_code_id = "perturbation_code"
@@ -384,8 +328,8 @@ let stopped_xml (t : Ui_simulation.t) =
         <div class="col-md-3">
         <form class="form-horizontal">
           <div class="form-group">
-           <label class="col-sm-6">Max |}[ simulation_limit_selector ]{|</label>
-           <div class="col-sm-6">|}[ simulation_limit_input ]{|</div>
+           <label class="col-sm-5">Pause if</label>
+           <div class="col-sm-7">|}[ simulation_pause_input ]{|</div>
           </div>
       |}[ Html.div
             ~a:[ Tyxml_js.R.Html.a_class
@@ -393,9 +337,9 @@ let stopped_xml (t : Ui_simulation.t) =
                       t
                       ~a_class:[ "form-group" ]
                       [ Ui_simulation.STOPPED ; ]) ]
-            [ Html.label ~a:[Html.a_class ["col-sm-6"] ]
+            [ Html.label ~a:[Html.a_class ["col-sm-5"] ]
                 [ Html.pcdata  "Plot period" ] ;
-              Html.div ~a:[Html.a_class ["col-sm-6"] ] [plot_period_input] ]
+              Html.div ~a:[Html.a_class ["col-sm-7"] ] [plot_period_input] ]
         ]{|
         </form></div>
         <div class="col-md-9">|}[ alert_messages ]{|</div>
@@ -540,9 +484,6 @@ let onload (t : Ui_simulation.t) : unit =
   let perturbation_code_input_dom =
     Tyxml_js.To_dom.of_input perturbation_code_input
   in
-  let simulation_limit_selector_dom =
-    Tyxml_js.To_dom.of_select simulation_limit_selector
-  in
 
   let args = Url.Current.arguments in
   let set_runtime
@@ -631,29 +572,6 @@ let onload (t : Ui_simulation.t) : unit =
                (fun _ -> Ui_simulation.start_simulation t) in
            Js._true)
   in
-  let handle_simulation_limit_selector () =
-    match string_to_simulation_limit
-            (Js.to_string simulation_limit_selector_dom##.value)
-    with
-    | Some simulation_limit ->
-      let () = Common.debug simulation_limit in
-      let () =
-        (let () = set_simulation_value "" in
-         match simulation_limit with
-         | TIME_LIMIT -> Ui_state.set_model_max_events None
-         | EVENTS_LIMIT -> Ui_state.set_model_max_time None)
-      in
-      set_simulation_limit simulation_limit
-    | None ->
-      let () = Common.debug "handle_simulation_limit_selector" in
-      () (* failwith "handle_simulation_limit_selector" *)
-  in
-  let () = handle_simulation_limit_selector () in
-  let () = simulation_limit_selector_dom ##.onchange :=
-      Dom.handler
-        (fun _ -> let () = handle_simulation_limit_selector () in
-          Js._true)
-  in
   let () = select_runtime_dom##.onchange :=
       Dom.handler
         (fun _ ->
@@ -670,19 +588,10 @@ let onload (t : Ui_simulation.t) : unit =
            Js._true
         )
   in
-  let () = signal_change (Tyxml_js.To_dom.of_input simulation_limit_input)
+  let () = signal_change (Tyxml_js.To_dom.of_input simulation_pause_input)
       (fun value ->
-         match React.S.value signal_simulation_limit with
-         | TIME_LIMIT ->
-           UIState.set_model_max_time
-             (try Some (float_of_string value)
-              with | Failure _ -> None)
-         | EVENTS_LIMIT ->
-           UIState.set_model_max_events
-             (try Some (int_of_string value)
-              with | Failure _ -> None)
-      )
-  in
+         let v' = if value = "" then "[false]" else value in
+           UIState.set_model_pause_condition v') in
   let () = signal_change (Tyxml_js.To_dom.of_input plot_period_input)
       (fun value ->
          try UIState.set_model_plot_period (float_of_string value)

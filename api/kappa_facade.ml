@@ -121,6 +121,7 @@ let localize_errors (errors : Api_types_j.errors) (indexes : file_index list) =
 type t =
   { mutable is_running : bool ;
     mutable run_finalize : bool ;
+    mutable pause_condition : (Pattern.id array list,int) Alg_expr.bool ;
     counter : Counter.t ;
     log_buffer : Buffer.t ;
     log_form : Format.formatter ;
@@ -154,6 +155,7 @@ let create_t ~contact_map ~env ~counter ~graph ~state
   let log_form = Format.formatter_of_buffer log_buffer in
   {
     is_running = true; run_finalize = false; counter; log_buffer; log_form;
+    pause_condition = Alg_expr.FALSE;
     plot = { Api_types_j.plot_legend = [] ;
              Api_types_j.plot_time_series = [] ; } ;
     snapshots = [];
@@ -331,7 +333,8 @@ let run_simulation
                State_interpreter.a_loop
                  ~outputs:(outputs t)
                  t.env t.counter t.graph t.state in
-             rstop := stop;
+             rstop := stop || Rule_interpreter.value_bool
+                        t.counter graph' t.pause_condition;
              t.graph <- graph';
              t.state <- state'
            done in
@@ -355,27 +358,34 @@ let run_simulation
           Lwt.return (`Ok ())))
     (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
 
-
-
 let start
     ~(system_process : system_process)
     ~(parameter : Api_types_j.simulation_parameter)
     ~(t : t)
   : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+  let lexbuf =
+    Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
   let () =
     Lwt.async
       (fun () ->
          Lwt.catch (fun () ->
-             let () =
+             (*let () =
                Counter.set_max_time
                  t.counter
                  parameter.Api_types_j.simulation_max_time
-             in
-             let () =
+               in
+               let () =
                Counter.set_max_events
                  t.counter
                  parameter.Api_types_j.simulation_max_events
-             in
+               in*)
+             Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
+             fun pause ->
+             Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
+               t.contact_map t.env pause >>=
+             fun (env',b'') ->
+             let () = t.env <- env' in
+             let () = t.pause_condition <- b'' in
              let () =
                Counter.set_plot_period
                  t.counter
@@ -492,13 +502,21 @@ let continue
     ~(t : t)
     ~(parameter : Api_types_j.simulation_parameter)
   : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+  let lexbuf =
+    Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
   Lwt.catch
     (fun () ->
        if t.is_running then
          Lwt.return (`Ok ())
        else
-         let () = t.is_running <- true in
-         let () =
+         Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
+         fun pause ->
+         Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
+           t.contact_map t.env pause >>=
+         fun (env',b'') ->
+         let () = t.env <- env' in
+         let () = t.pause_condition <- b'' in
+         (*let () =
            Counter.set_max_time
              t.counter
              parameter.Api_types_j.simulation_max_time
@@ -507,12 +525,12 @@ let continue
            Counter.set_max_events
              t.counter
              parameter.Api_types_j.simulation_max_events
-         in
+           in*)
+         let () = t.is_running <- true in
          let () =
            Lwt.async
              (fun () ->
-                run_simulation ~system_process:system_process ~t:t false)
-         in
+                run_simulation ~system_process:system_process ~t:t false) in
          Lwt.return (`Ok ())
     )
     (catch_error

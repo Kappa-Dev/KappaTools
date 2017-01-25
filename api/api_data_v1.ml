@@ -389,9 +389,15 @@ let api_errors (errors : Api_types_j.errors) : Api_types_v1_t.errors =
          Api_types_v1_t.range = e.Api_types_t.message_range })
     errors
 
-let api_parameter (parameter : Api_types_v1_j.parameter) : Api_types_j.simulation_parameter =
+let api_parameter (parameter : Api_types_v1_j.parameter) simulation_id
+  : Api_types_j.simulation_parameter =
   { Api_types_j.simulation_plot_period = parameter.Api_types_v1_j.plot_period ;
-    Api_types_j.simulation_max_time = parameter.Api_types_v1_j.max_time ;
-    Api_types_j.simulation_max_events = parameter.Api_types_v1_j.max_events ;
+    Api_types_j.simulation_pause_condition =
+      (match parameter.Api_types_v1_j.max_time, parameter.Api_types_v1_j.max_events with
+       | None, None -> "[false]"
+       | Some t, None -> "[T] > "^string_of_float t
+       | None, Some e -> "[E] = "^string_of_int e
+       | Some t, Some e ->
+          "[T] > "^string_of_float t^" || [E] = "^string_of_int e) ;
     Api_types_j.simulation_seed = parameter.Api_types_v1_j.seed ;
-    Api_types_j.simulation_id = "ignore" ; }
+    Api_types_j.simulation_id ; }

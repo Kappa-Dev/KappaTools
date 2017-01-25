@@ -235,29 +235,10 @@ let () =
             try
               match KappaParser.interactive_command KappaLexer.token lexbuf with
               | Ast.RUN b ->
-                let cc_preenv =
-                  Pattern.PreEnv.of_env (Model.domain env) in
-                let b' =
-                  LKappa.bool_expr_of_ast
-                    (Model.signatures env) (Model.tokens_finder env)
-                    (Model.algs_finder env) (Locality.dummy_annot b) in
-                let cc_preenv',(b'',pos_b'') =
-                  Eval.compile_bool contact_map cc_preenv b' in
-                let env' =
-                  if cc_preenv == cc_preenv' then env else
-                    Model.new_domain
-                      (fst @@ Pattern.PreEnv.finalize
-                         ~max_sharing:kasim_args.Kasim_args.maxSharing cc_preenv')
-                      env in
-                env',
-                if try Alg_expr.stops_of_bool
-                         (Model.all_dependencies env) b'' <> []
-                  with ExceptionDefn.Unsatisfiable -> true then
-                  let () =
-                    Pp.error Format.pp_print_string
-                      ("[T] can only be used in inequalities",pos_b'') in
-                  (false,graph,state)
-                else interactive_loop ~outputs b'' env' counter graph state
+                let env',b'' = Evaluator.get_pause_criteria
+                    ~max_sharing:kasim_args.Kasim_args.maxSharing
+                    contact_map env b in
+                 env',interactive_loop ~outputs b'' env' counter graph state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 Evaluator.do_interactive_directives

@@ -46,6 +46,10 @@
 %start effect_list
 %type <(Ast.mixture,string) Ast.modif_expr list> effect_list
 
+%start bool_expr
+%type <(Ast.mixture,string) Alg_expr.bool Locality.annot> bool_expr
+
+
 %% /*Grammar rules*/
 
 newline:
@@ -420,8 +424,8 @@ link_state:
 ;
 
 interactive_command:
-	| RUN NEWLINE {Ast.RUN (Alg_expr.FALSE)}
-	| RUN bool_expr NEWLINE {Ast.RUN (fst $2)}
+	| RUN NEWLINE {Ast.RUN (Locality.dummy_annot Alg_expr.FALSE)}
+	| RUN bool_expr NEWLINE {Ast.RUN $2}
 	| effect_list NEWLINE {Ast.MODIFY $1}
 	| EOF {Ast.QUIT}
 	| error

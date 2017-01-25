@@ -149,8 +149,8 @@ let manager_operation
 let create_parameter (simulation_id : Api_types_j.simulation_id ) :
   Api_types_j.simulation_parameter =
   { Api_types_j.simulation_plot_period = React.S.value Ui_state.model_plot_period ;
-    Api_types_j.simulation_max_time = React.S.value Ui_state.model_max_time ;
-    Api_types_j.simulation_max_events = React.S.value Ui_state.model_max_events ;
+    Api_types_j.simulation_pause_condition =
+      React.S.value Ui_state.model_pause_condition ;
     Api_types_j.simulation_seed = React.S.value Ui_state.model_seed;
     Api_types_j.simulation_id = simulation_id ;
   }
@@ -219,9 +219,8 @@ let continue_simulation
                 let () = Common.async (fun _ -> update_simulation t) in
                 let () = Common.debug (Js.string "continue_simulation.3") in
                 Lwt.return_unit)
-            ~error:(fun _ _ ->
-                let () = Ui_state.clear_model_error () in
-                let () = Common.async (fun _ -> update_simulation t) in
+            ~error:(fun _ errors ->
+                let () = Ui_state.set_model_error __LOC__ errors in
                 let () = Common.debug (Js.string "continue_simulation.3") in
                 Lwt.return_unit))
       )

@@ -103,7 +103,7 @@ type ('mixture,'id) instruction =
   | CONFIG   of configuration
 
 type ('mixture,'id) command =
-  | RUN of ('mixture,'id) Alg_expr.bool
+  | RUN of ('mixture,'id) Alg_expr.bool Locality.annot
   | MODIFY of ('mixture,'id) modif_expr list
   | QUIT
 

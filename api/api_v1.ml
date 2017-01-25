@@ -386,12 +386,12 @@ end = struct
                     Api_types_j.file_modification_compile = None ;
                     Api_types_j.file_modification_id = None ;
                     Api_types_j.file_modification_position = None ;
-		    Api_types_j.file_modification_patch = Some {
+                    Api_types_j.file_modification_patch = Some {
                       Api_types_j.file_patch_start = None ;
                       Api_types_j.file_patch_end = None;
                       Api_types_j.file_patch_content =  code;
                     };
-		    Api_types_j.file_modification_hash = None;
+                    Api_types_j.file_modification_hash = None;
                   } in
                   (manager#file_update
                      parse_project_id
@@ -457,18 +457,8 @@ end = struct
                               ~ok:(fun _ ->
                                   manager#simulation_start
                                     project_id
-                                    { Api_types_j.simulation_plot_period =
-                                        parameter.Api_types_v1_j.plot_period ;
-                                      Api_types_j.simulation_max_time =
-                                        parameter.Api_types_v1_j.max_time ;
-                                      Api_types_j.simulation_max_events =
-                                        parameter.Api_types_v1_j.max_events ;
-                                      Api_types_j.simulation_seed =
-                                        parameter.Api_types_v1_j.seed ;
-                                      Api_types_j.simulation_id =
-                                        simulation_id ;
-                                    })
-                          )
+                                    (Api_data_v1.api_parameter
+                                       parameter simulation_id)))
                       )
 
                  )
@@ -603,7 +593,7 @@ end = struct
                  (manager#simulation_continue
                     project_id
                     simulation_id
-                    (Api_data_v1.api_parameter parameter)
+                    (Api_data_v1.api_parameter parameter simulation_id)
                  ))
         ) >>=
         (Api_common.result_map

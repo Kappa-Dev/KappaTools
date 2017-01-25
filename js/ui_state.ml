@@ -28,13 +28,11 @@ let has_model_error () =
   match React.S.value model_error with
   | None -> false
   | Some _ -> true
-let model_max_events, set_model_max_events =
-  React.S.create (None : int option)
-let model_max_time, set_model_max_time =
-  React.S.create (None : float option)
+let model_pause_condition, set_model_pause_condition =
+  React.S.create "[T] > 100"
 let model_seed, set_model_seed =
   React.S.create (None : int option)
-let model_plot_period, set_model_plot_period = React.S.create 1.
+let model_plot_period, set_model_plot_period = React.S.create 1.0
 let current_file , set_current_file =
   React.S.create (None : Api_types_j.file option)
 let current_project_id, set_current_project_id =
