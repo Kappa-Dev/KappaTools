@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jan 10 2017>
+  * Last modification: Time-stamp: <Jan 24 2017>
 *)
 
 type compil =
@@ -29,7 +29,9 @@ let lift_opt f compil_opt =
   | Some a -> Some (f a)
 
 let contact_map compil = compil.contact_map
+
 let environment compil = compil.environment
+
 let domain compil = Model.domain (environment compil)
 
 let domain_opt = lift_opt domain
@@ -76,6 +78,7 @@ let nbr_automorphisms_in_chemical_species x =
   List.length (Pattern.automorphisms x)
 
 let compare_connected_component = Pattern.compare_canonicals
+
 let print_connected_component ?compil =
   Pattern.print ?domain:(domain_opt compil) ~with_id:false
 
@@ -105,6 +108,7 @@ let lift_embedding x =
   Tools.unsome
     Matching.empty
     (Matching.add_cc Matching.empty 0 x)
+
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
@@ -180,6 +184,7 @@ let mode_of_rule compil rule =
     Direct
   else
     Op
+
 let valid_modes compil rule id =
   let mode = mode_of_rule compil rule in
   List.rev_map
@@ -205,12 +210,16 @@ let token_vector a =
     add remove
 
 let consumed_tokens a = a.Primitives.consumed_tokens
+
 let produced_tokens a = a.Primitives.injected_tokens
 
 let token_vector_of_init = token_vector
+
 let print_rule_id log = Format.fprintf log "%i"
+
 let print_rule ?compil =
   Kappa_printer.elementary_rule ?env:(environment_opt compil)
+
 let print_rule_name ?compil f r =
   let env = environment_opt compil in
   let id = r.Primitives.syntactic_rule in
@@ -246,24 +255,32 @@ let apply compil rule inj_nodes mix =
   let sigs = Model.signatures compil.environment in
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
-                (inj_nodes,Mods.IntMap.empty)) rule.Primitives.removed in
-  let (side_effects,dummy,edges_after_neg) =
+                (inj_nodes, Mods.IntMap.empty))
+      rule.Primitives.removed
+  in
+  let (side_effects, dummy, edges_after_neg) =
     List.fold_left
       Rule_interpreter.apply_negative_transformation
-      ([],Pattern.ObsMap.dummy Mods.IntMap.empty,mix) concrete_removed in
-  let (_,remaining_side_effects,_,edges'),concrete_inserted =
+      ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
+      concrete_removed
+  in
+  let (_, remaining_side_effects, _, edges'), concrete_inserted =
     List.fold_left
       (fun (x,p) h ->
          let (x',h') =
            Rule_interpreter.apply_positive_transformation sigs x h in
-         (x',h'::p))
-      (((inj_nodes,Mods.IntMap.empty),side_effects,dummy,edges_after_neg),[])
-      rule.Primitives.inserted in
+         (x', h' :: p))
+      (((inj_nodes, Mods.IntMap.empty),
+        side_effects, dummy, edges_after_neg), [])
+      rule.Primitives.inserted
+  in
   let (edges'',_) =
     List.fold_left
       (fun (e,i)  ((id,_ as nc),s) ->
-         Edges.add_free id s e,Primitives.Transformation.Freed (nc,s)::i)
-      (edges',concrete_inserted) remaining_side_effects in
+         Edges.add_free id s e,
+         Primitives.Transformation.Freed (nc, s) :: i)
+      (edges', concrete_inserted) remaining_side_effects
+  in
   edges''
 
 let lift_species compil x =
@@ -275,16 +292,17 @@ let lift_species compil x =
 let get_rules compil =
   Model.fold_rules
     (fun _ acc r -> r::acc) [] (environment compil)
+
 let get_variables compil = Model.get_algs (environment compil)
+
 let get_obs compil =
   Array.to_list
     (Model.map_observables (fun r -> r) (environment compil))
 
 let remove_escape_char =
-  (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are moe knowledgeable *)
+  (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are more knowledgeable *)
   String.map
     (function '\'' -> '|' | x -> x)
-
 
 let get_obs_titles compil =
   let env = environment compil in
@@ -297,7 +315,7 @@ let get_obs_titles compil =
 
 let get_compil
     ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args =
-  let (env,contact_map,_,_,_,_,init),_,_ =
+  let (env, contact_map, _, _, _, _, init), _, _ =
     Cli_init.get_compilation cli_args in
   {
     environment = env ;
@@ -311,6 +329,7 @@ let get_compil
 
 let empty_cache compil =
   Pattern.PreEnv.of_env (Model.domain compil.environment)
+
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
 let mixture_of_init compil c =
@@ -321,13 +340,14 @@ let mixture_of_init compil c =
 let nb_tokens compil =
   Model.nb_tokens (environment compil)
 
-
 let divide_rule_rate_by cache compil rule =
   match compil.rate_convention with
   | Ode_args.KaSim -> cache, 1
-  | Ode_args.Biochemist | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+  | Ode_args.Biochemist
+  | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
     let rule_id = rule.Primitives.syntactic_rule  in
     let lkappa_rule =
       Model.get_ast_rule compil.environment rule_id
     in
-    LKappa_auto.nauto compil.rate_convention cache lkappa_rule.LKappa.r_mix lkappa_rule.LKappa.r_created
+    LKappa_auto.nauto compil.rate_convention cache
+      lkappa_rule.LKappa.r_mix lkappa_rule.LKappa.r_created

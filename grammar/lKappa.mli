@@ -88,7 +88,7 @@ val compil_of_ast :
 
 @return the signature of agent, the signature of tokens and an
 Ast.compil where identifiers are integers and not string, syntactic
-sugar on rules are expansed (syntaxtic sugar on mixture are not)
+sugar on rules are expansed (syntactic sugar on mixture are not)
 
 This function sorts out longest prefix convention as well as ensure a
 lot of sanity on mixtures:

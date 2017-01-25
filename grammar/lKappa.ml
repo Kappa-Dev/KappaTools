@@ -15,8 +15,10 @@ type rule_internal =
   | I_ANY_ERASED
   | I_VAL_CHANGED of int * int
   | I_VAL_ERASED of int
+
 type rule_agent =
-  { ra_type: int;
+  {
+    ra_type: int;
     ra_erased: bool;
     ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
     ra_ints: rule_internal array;
@@ -27,7 +29,8 @@ type rule_agent =
 type rule_mixture = rule_agent list
 
 type rule =
-  { r_mix: rule_mixture;
+  {
+    r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_rm_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
@@ -66,6 +69,7 @@ let rule_internal_to_json = function
   | I_ANY_ERASED -> `String "ERASED"
   | I_VAL_CHANGED (i,j) -> `List [`Int i; `Int j]
   | I_VAL_ERASED i -> `List [ `Int i; `String "ERASED"]
+
 let rule_internal_of_json = function
   | `Null -> I_ANY
   | `List [`String "ANY"; `Int j] -> I_ANY_CHANGED j
@@ -85,6 +89,7 @@ let switching_to_json = function
   | Maintained -> `String "Maintained"
   | Erased -> `String "Erased"
   | Linked i -> Locality.annot_to_json JsonUtil.of_int i
+
 let switching_of_json = function
   | `String "Freed" -> Freed
   | `String "Maintained" -> Maintained
@@ -411,12 +416,12 @@ let add_link_contact_map ?contact_map sty sp dty dp =
   match contact_map with
   | None -> ()
   | Some contact_map ->
-    let si,sl = contact_map.(sty).(sp) in
+    let si, sl = contact_map.(sty).(sp) in
     let di,dl = contact_map.(dty).(dp) in
     let () = contact_map.(sty).(sp) <-
-        si,List_util.merge_uniq Mods.int_pair_compare sl [dty,dp] in
+        si, List_util.merge_uniq Mods.int_pair_compare sl [dty,dp] in
     contact_map.(dty).(dp) <-
-      di,List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
+      di, List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
 
 let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
   if Mods.IntMap.mem i links_two then

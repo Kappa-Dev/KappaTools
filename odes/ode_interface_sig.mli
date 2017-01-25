@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jan 09 2017>
+  * Last modification: Time-stamp: <Jan 24 2017>
 *)
 
 module type Interface =
@@ -41,7 +41,9 @@ sig
   val what_do_we_count: compil -> Ode_args.count
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
+
   val nbr_automorphisms_in_chemical_species: chemical_species -> int
+
   val canonic_form: chemical_species -> canonic_species
 
   val connected_components_of_patterns: pattern -> connected_component list
@@ -72,9 +74,10 @@ sig
   val divide_rule_rate_by:
     nauto_in_rules_cache -> compil -> rule -> nauto_in_rules_cache * int
 
-
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
+
   val lhs: compil -> rule_id_with_mode -> rule -> pattern
+
   val token_vector:
     rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list

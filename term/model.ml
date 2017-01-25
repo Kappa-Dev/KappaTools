@@ -41,10 +41,12 @@ let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
 
 let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
+
 let fold_perturbations f x env =
   Tools.array_fold_lefti (fun i x p -> f i x p) x env.perturbations
 
 let get_rule env i = env.rules.(i)
+
 let get_ast_rule env i =
   fst (snd (env.ast_rules.(i-1)))
 
@@ -56,6 +58,7 @@ let get_ast_rule_rate_pos ~unary env i =
   else snd (fst (snd (env.ast_rules.(i-1)))).LKappa.r_rate
 
 let nb_rules env = Array.length env.rules
+
 let nums_of_rule name env =
   fold_rules
     (fun i acc r ->
@@ -90,6 +93,7 @@ let print_agent ?env f i =
   match env with
   | None -> Format.fprintf f "__agent_%i" i
   | Some env -> Signature.print_agent (signatures env) f i
+
 let print_alg ?env f id =
   match env with
   | None -> Format.fprintf f "__alg_%i" id

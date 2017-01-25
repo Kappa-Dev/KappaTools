@@ -19,6 +19,7 @@ type ('mix,'id) e =
   | CONST of Nbr.t
   | IF of ('mix,'id) bool Locality.annot *
           ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
+  
 and ('mix,'id) bool =
   | TRUE
   | FALSE

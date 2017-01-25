@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jan 18 2017>
+  * Last modification: Time-stamp: <Jan 24 2017>
 *)
 
 let local_trace = false
@@ -15,8 +15,10 @@ struct
 
   let alg_of_int i =
     Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))
+
   let alg_of_float f =
     Locality.dummy_annot (Alg_expr.CONST (Nbr.F f))
+
   module SpeciesSetMap =
     SetMap.Make
       (struct
@@ -30,6 +32,7 @@ struct
   type connected_component_id = int
   let fst_cc_id = 1
   let next_cc_id = succ
+
   module Store =
     SetMap.Make
       (struct
@@ -67,8 +70,8 @@ struct
   type ode_var =
     | Noccurrences of I.canonic_species
     | Nembed of I.canonic_species | Token of int | Dummy
-  type lhs_decl = Init_decl | Var_decl of string | Init_value of ode_var
 
+  type lhs_decl = Init_decl | Var_decl of string | Init_value of ode_var
 
   module VarSetMap =
     SetMap.Make
@@ -394,6 +397,7 @@ struct
   let petrify_species compil species =
     translate_canonic_species compil
       (I.canonic_form species) species
+
   let petrify_species_list compil l remanent =
     fold_left_swap
       (fun species (remanent,l) ->
@@ -507,6 +511,7 @@ struct
       Alg_expr.IF (convert_bool_expr compil network cond,
                    convert_alg_expr compil network yes,
                    convert_alg_expr compil network no),pos
+
   and convert_bool_expr compil network = function
     | (Alg_expr.TRUE | Alg_expr.FALSE),_ as a -> a
     | Alg_expr.COMPARE_OP (op,a,b),pos ->
@@ -757,6 +762,7 @@ struct
 
   let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
+
   let get_reactions network = network.reactions
 
   let convert_initial_state compil intro network =

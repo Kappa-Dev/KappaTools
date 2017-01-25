@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 19 2017>
+  * Last modification: Time-stamp: <Jan 23 2017>
   *
   *
   *
@@ -214,6 +214,17 @@ let get_pair_agent_cv parameters error (agent_type, cv_id) store_result =
       store_result
   with
   | error, None -> error, []
+  | error, Some l -> error, l
+
+let get_agent_type parameters error agent_type empty store_result =
+  match
+    Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
+      parameters
+      error
+      agent_type
+      store_result
+  with
+  | error, None -> error, empty
   | error, Some l -> error, l
 
 (****************************************************************************)

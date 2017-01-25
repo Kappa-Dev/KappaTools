@@ -12,13 +12,14 @@ type link = UnSpec | Free | Link of int * int (** node_id, site_id *)
 
     The internal state of site k of node i is [snd nodes(i).(k)]. A
     negative number means UnSpec. *)
-type cc = {
-  nodes_by_type: int list array;
-  nodes: (link * int) array Mods.IntMap.t;
+type cc =
+  {
+    nodes_by_type: int list array;
+    nodes: (link * int) array Mods.IntMap.t;
   (*pattern graph id -> [|... (link_j,state_j)...|] i.e agent_id on site_j has
     a link link_j and internal state state_j (-1 means any) *)
-  recogn_nav: Navigation.t;
-}
+    recogn_nav: Navigation.t;
+  }
 
 type t = cc
 
@@ -182,14 +183,17 @@ let equal a b =
       None ags
 
 let automorphisms a =
-  match Array.fold_left
-          (fun acc x -> Tools.min_pos_int_not_zero acc (List.length x,x))
-          (0,[]) a.nodes_by_type with
-  | _,[] -> [Renaming.empty]
-  | _,(h::_ as l) -> List.fold_left (fun acc ag ->
-      match are_compatible ~strict:true h a ag a with
-      | None -> acc
-      | Some r -> r::acc) [] l
+  match
+    Array.fold_left
+      (fun acc x -> Tools.min_pos_int_not_zero acc (List.length x,x))
+      (0,[]) a.nodes_by_type
+  with
+  | _, [] -> [Renaming.empty]
+  | _, (h :: _ as l) ->
+    List.fold_left (fun acc ag ->
+        match are_compatible ~strict:true h a ag a with
+        | None -> acc
+        | Some r -> r::acc) [] l
 
 let potential_pairing =
   Tools.array_fold_left2i
@@ -197,6 +201,7 @@ let potential_pairing =
         (fun acc b -> List.fold_left
             (fun acc a -> Mods.Int2Set.add (a,b) acc) acc la) acc)
     Mods.Int2Set.empty
+
 let matchings a b =
   let possibilities = ref (potential_pairing a.nodes_by_type b.nodes_by_type) in
   let rec for_one_root acc =
@@ -267,6 +272,7 @@ let rec sub_minimize_renaming r = function
   | x::q as l,y::q' -> match Renaming.add x y r with
     | Some r' -> sub_minimize_renaming r' (q,q')
     | None -> sub_minimize_renaming r (l,q')
+
 let minimize_renaming dst_nbt ref_nbt =
   let re = Tools.array_fold_lefti
       (fun ty ->
@@ -279,6 +285,7 @@ let minimize_renaming dst_nbt ref_nbt =
       Renaming.empty ref_nbt in
   Tools.array_fold_lefti
     (fun ty r ids -> sub_minimize_renaming r (ids,ref_nbt.(ty))) re dst_nbt
+
 let minimize cand_nbt cand_nodes ref_nbt =
   let re = minimize_renaming cand_nbt ref_nbt in
   let nodes_by_type =
@@ -333,6 +340,7 @@ let infs cc1 cc2 =
       if Array.fold_left (fun b (l,i) -> b && l = UnSpec && i < 0) true outl
       then aux ren' nodes todos'
       else aux ren' (Mods.IntMap.add o outl nodes) todos' in
+
   let rec for_one_root acc =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
@@ -487,7 +495,6 @@ let of_yojson sig_decl = function
   | `Null -> empty_cc sig_decl
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a pattern",x))
 
-
 let add_fully_specified_to_graph sigs graph cc =
   let e,g =
     Tools.array_fold_lefti
@@ -534,6 +541,7 @@ let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
           (fun l _ -> List.tl l) l (List.length cc1.nodes_by_type.(i)))
       reserved_ids in
   let free_id_for_cc1 = ref free_id in
+
   let get_cc2 j ((inj1,free_id),inj2,(todos1,todos2) as pack) =
     if Renaming.mem j inj2 then (Renaming.apply inj2 j,pack)
     else
@@ -553,6 +561,7 @@ let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
         free_id'),
        (match Renaming.add j img inj2 with Some x -> x | None -> assert false),
        (todos1,(j,img)::todos2)) in
+
   let get_cc1 i ((inj1,free_id),inj2,(todos1,todos2) as pack) =
     if Renaming.mem i inj1 then (Renaming.apply inj1 i,pack)
     else
@@ -970,6 +979,7 @@ module PreEnv : sig
   val sigs : t -> Signature.s
 
   val finalize : max_sharing:bool -> t -> Env.t * stat
+
   val of_env : Env.t -> t
 end = struct
   type t = {

@@ -56,11 +56,13 @@ struct
   let compare = compare
   let print log =
     function
-    | Regular (i,a,b) -> Format.fprintf log "Regular (%i,%a,%a);" i PropertiesCache.print a BindingCache.print b
+    | Regular (i,a,b) -> Format.fprintf log "Regular (%i,%a,%a);" i
+                           PropertiesCache.print a BindingCache.print b
     | Back_to i -> Format.fprintf log "Back_to(%i);" i
 end
 
 module CannonicCache = Hashed_list.Make(Node)
+
 module CannonicSet_and_map =
   SetMap.Make
     (struct
@@ -68,6 +70,7 @@ module CannonicSet_and_map =
       let compare = CannonicCache.compare
       let print _ _ = ()
     end)
+
 module CannonicMap = CannonicSet_and_map.Map
 
 type cache =
@@ -94,7 +97,7 @@ let id =
   | Ast.LNK_TYPE (a,b) -> Ast.LNK_TYPE (a,b)
 
 (* This function translate a mixture into an array of views and a function
-   mapping each binding site to its partnet *)
+   mapping each binding site to its partner *)
 (* In views, any location annotation has been removed *)
 (* Link values have been replaced with the corresponding binding type *)
 (* Lastly, each agent is provided with its set of bond sites *)
@@ -107,14 +110,16 @@ let translate rate_convention cache lkappa_mixture ag_created =
   let add_map rate_convention i j map =
     match rate_convention, i  with
     | Ode_args.KaSim, _  -> assert false
-    | Ode_args.Divide_by_nbr_of_autos_in_lhs , Lhs _ | Ode_args.Biochemist, _  ->
+    | Ode_args.Divide_by_nbr_of_autos_in_lhs , Lhs _
+    | Ode_args.Biochemist, _  ->
       Binding_idMap.add
         i (j::(Binding_idMap.find_default [] i map)) map
     | Ode_args.Divide_by_nbr_of_autos_in_lhs, Rhs _ -> map
   in
   let ag_created =
     match rate_convention with
-    | Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs -> []
+    | Ode_args.KaSim
+    | Ode_args.Divide_by_nbr_of_autos_in_lhs -> []
     | Ode_args.Biochemist -> ag_created
   in
   let n_agents_wo_creation = List.length lkappa_mixture in
@@ -447,7 +452,6 @@ let decompose bonds_map array =
 (* the following function does a depth-first exploration of a cc starting from the root *)
 (* Only a spanning tree is explored, in case of cycles, a pointer to the position of the node in the list is given *)
 
-
 let cannonical_of_root bonds_map array ag_id =
   let rec aux node_id stack (acc: 'a list) port_seen agent_seen =
     match stack
@@ -612,5 +616,6 @@ let nauto_of_map map =
     1
 
 let nauto rate_convention cache lkappa_mixture created =
-  let cache, map = mixture_to_species_map rate_convention cache lkappa_mixture created  in
+  let cache, map =
+    mixture_to_species_map rate_convention cache lkappa_mixture created in
   cache, nauto_of_map map

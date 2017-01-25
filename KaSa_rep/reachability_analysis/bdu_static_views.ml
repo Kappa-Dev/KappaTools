@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 18th of Feburary
-   * Last modification: Time-stamp: <Jan 19 2017>
+   * Last modification: Time-stamp: <Jan 23 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -114,7 +114,8 @@ let add_dependency_triple_bdu parameters handler error
       parameters handler error
   in
   let error, old_bdu =
-    get_bdu_map_and_set error bdu_false (agent_type, rule_id, cv_id)
+    get_bdu_map_and_set error bdu_false
+      (agent_type, rule_id, cv_id)
       store_result
   in
   (* In the case when the agent is created twice, we take the union *)

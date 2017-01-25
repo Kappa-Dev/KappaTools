@@ -135,6 +135,7 @@ let extract_connected_components_expr acc e =
   List.fold_left
     (List.fold_left (fun acc a -> List.rev_append (Array.to_list a) acc))
     acc (Alg_expr.extract_connected_components e)
+
 let extract_connected_components_rule acc r =
   let a =
     List.fold_left
@@ -149,6 +150,7 @@ let extract_connected_components_rule acc r =
     | Some (x,_) -> extract_connected_components_expr b x in
   let d = extract_connected_components_expr c r.rate in
   List.rev_append (Array.to_list r.connected_components) d
+
 let extract_connected_components_print acc x =
   List.fold_left (fun acc -> function
       | Ast.Str_pexpr _ -> acc
