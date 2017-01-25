@@ -588,9 +588,9 @@ let connected_components_of_mixture created mix (env,origin) =
       let actions' =
         List.fold_left
           (fun acs -> function
-             | Primitives.Transformation.Linked (x,y)
-               when Matching.Agent.is_site_from_fresh x ||
-                    Matching.Agent.is_site_from_fresh y ->
+             | Primitives.Transformation.Linked ((ax, _ as x),(ay, _ as y))
+               when Matching.Agent.is_fresh ax ||
+                    Matching.Agent.is_fresh ay ->
                Instantiation.Bind_to (x,y) :: acs
              | Primitives.Transformation.Linked (x,y) ->
                Instantiation.Bind (x,y) :: acs
@@ -666,7 +666,7 @@ let connected_components_sum_of_ambiguous_rule
                    | [] -> ()
                    | _ -> Format.fprintf
                             f "@ (+%t) %a" Pp.nu
-                            (Raw_mixture.print ~compact:false sigs)
+                            (Raw_mixture.print ~compact:false ~sigs)
                             (List.rev created))))
         all_mixs in
   List_util.fold_right_map (connected_components_of_mixture created)

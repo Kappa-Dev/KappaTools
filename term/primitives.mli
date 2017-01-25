@@ -29,6 +29,12 @@ sig
   val print :
     ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit
 
+  val raw_mixture_of_fresh :
+    Signature.s -> Instantiation.abstract t list ->
+    (int * Raw_mixture.agent) list *
+    (Instantiation.abstract * Instantiation.site_name * int) list *
+    Instantiation.abstract t list
+
   val fresh_bindings :
     short_branch_agents:int list -> Instantiation.abstract t list ->
     (Instantiation.abstract Instantiation.site *
@@ -59,6 +65,7 @@ type modification =
   | STOP of Alg_expr.t Ast.print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
+  (** First string is the named used by the user *)
   | FLUX of bool * Alg_expr.t Ast.print_expr list
   | FLUXOFF of Alg_expr.t Ast.print_expr list
   | CFLOWOFF of Pattern.id array

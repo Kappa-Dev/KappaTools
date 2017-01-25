@@ -17,7 +17,7 @@ val empty_snapshot : snapshot
 val increment_in_snapshot : Signature.s -> t -> snapshot -> snapshot
 val output_snapshot : snapshot -> (int * t) list
 
-val print : compact:bool -> Signature.s -> Format.formatter -> t -> unit
+val print : compact:bool -> ?sigs:Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> int -> Format.formatter -> t -> unit
 
 val to_json : t -> Yojson.Basic.json

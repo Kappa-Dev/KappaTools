@@ -232,9 +232,9 @@ module Agent = struct
     | Fresh (_,i), Fresh (_,i') -> i=i'
     | Existing (_,id), Existing (_,id') -> id=id'
 
-  let is_site_from_fresh = function
-    | (Existing _,_) -> false
-    | (Fresh _, _) -> true
+  let is_fresh = function
+    | Existing _ -> false
+    | Fresh _ -> true
 
   let concretize (inj_nodes,inj_fresh) = function
     | Existing (n,id) -> (get (n,id) inj_nodes,Agent.sort n)

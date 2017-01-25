@@ -58,13 +58,16 @@ let do_modification ~outputs env counter graph state extra modification =
       (Rule_interpreter.value_alg counter graph) in
   match modification with
   | Primitives.ITER_RULE ((v,_),r) ->
+    let text =
+      Format.asprintf
+        "@[<h>%a@]" (Kappa_printer.modification ~env) modification in
     let graph' =
       Nbr.iteri
         (fun _ g ->
            Rule_interpreter.force_rule
              ~outputs env
              (Model.connected_components_of_unary_rules env)
-             counter g (Trace.PERT "pert") r)
+             counter g (Trace.PERT text) r)
         graph (Rule_interpreter.value_alg counter graph v) in
     let graph'',extra' =
       Rule_interpreter.update_outdated_activities

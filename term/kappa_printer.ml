@@ -51,26 +51,33 @@ let elementary_rule ?env f r =
     | Some e -> Some (Model.domain e), Some (Model.signatures e) in
   let pr_alg f (a,_) = alg_expr ?env f a in
   let pr_tok f (va,tok) =
-    Format.fprintf
-      f "%a <- %a"
-      (Model.print_token ?env) tok
-      pr_alg va in
-  let pr_trans f t =
-    Primitives.Transformation.print ?sigs f t in
+    Format.fprintf f "%a <- %a" (Model.print_token ?env) tok pr_alg va in
+  let pr_trans f t = Primitives.Transformation.print ?sigs f t in
+  let pr_mixte f (a,s,i) =
+    Format.fprintf f "@[%a.%a!%i@]"
+      (Matching.Agent.print ?sigs) a (Matching.Agent.print_site ?sigs a) s i in
   let boxed_cc i f cc =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
     let () = Pattern.print ?domain ~with_id:true f cc in
     Format.pp_close_box f () in
+  let ins_fresh,ins_mixte,ins_existing =
+    match sigs with
+    | None -> [],[],r.Primitives.inserted
+    | Some sigs ->
+      Primitives.Transformation.raw_mixture_of_fresh
+        sigs r.Primitives.inserted in
   Format.fprintf
-    f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a@]%t@[%a@]@]@ @@%a%t"
+    f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a%a%a@]%t@[%a@]@]@ @@%a%t"
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
     (Pp.list Pp.comma pr_trans) r.Primitives.removed
     (if r.Primitives.removed <> [] && r.Primitives.consumed_tokens <> []
      then Pp.space else Pp.empty)
     (Pp.list Pp.space pr_tok) r.Primitives.consumed_tokens
-    (Pp.list Pp.comma pr_trans) r.Primitives.inserted
+    (Raw_mixture.print ~compact:true ?sigs) (List.map snd ins_fresh)
+    (Pp.list ~trailing:Pp.space Pp.comma pr_mixte) ins_mixte
+    (Pp.list Pp.comma pr_trans) ins_existing
     (if r.Primitives.inserted <> [] && r.Primitives.injected_tokens <> []
      then Pp.space else Pp.empty)
     (Pp.list Pp.space pr_tok) r.Primitives.injected_tokens
@@ -113,8 +120,23 @@ let modification ?env f m =
           (Pp.array Pp.comma boxed_cc)
           rule.Primitives.connected_components
     else
-      Format.fprintf f "$APPLY %a %a" (alg_expr ?env) n
-        (elementary_rule ?env) rule (* TODO Later *)
+      begin
+        match env with
+        | None ->
+          Format.fprintf f "$APPLY %a %a" (alg_expr ?env) n
+            (elementary_rule ?env) rule
+        | Some env ->
+          let sigs = Model.signatures env in
+          let ins_fresh,_,ins_existing =
+            Primitives.Transformation.raw_mixture_of_fresh
+              sigs rule.Primitives.inserted in
+          if ins_existing = [] then
+            Format.fprintf f "$ADD %a %a" (alg_expr ~env) n
+              (Raw_mixture.print ~compact:false ~sigs) (List.map snd ins_fresh)
+          else
+            Format.fprintf f "$APPLY %a %a" (alg_expr ~env) n
+              (elementary_rule ~env) rule
+      end
   | Primitives.UPDATE (id,(va,_)) ->
     Format.fprintf f "$UPDATE %a %a"
       (Model.print_alg ?env) id (alg_expr ?env) va

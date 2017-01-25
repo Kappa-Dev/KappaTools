@@ -97,14 +97,6 @@ type plot_detail = { plot_detail_plot : plot;
      		     plot_detail_range : plot_range nullable;
 	             plot_detail_size : int ; }
 
-(* distance *)
-type distance = { distance_rule : string ;
-     	          distance_time : float;
-		  distance_length : int ; }
-type distance_id = int
-type distances = distance list
-type distance_info = { distance_ids : distance_id list }
-
 (* flux *)
 type flux_map_id = string
 type flux_flux = float list <ocaml repr="array">

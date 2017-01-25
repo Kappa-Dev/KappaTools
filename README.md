@@ -31,6 +31,7 @@ above as well as _ocamlbuild_, _findlib_ and
 _Yojson_ library. To check whether you have them, type
 
 `ocamlfind ocamlopt -version`
+
 ` ocamlfind query yojson`
 
 If you use a package manager (or opam, the OCaml package manager),
@@ -57,11 +58,12 @@ gnuplot) to visualize curves.
 
 ## Usage
 
-In order to run a simulation of 1000 rule applications, type
+In order to run a simulation for 100 time units printing observables values
+every 0.5 time unit, type
 
-`bin/KaSim kappa_file_1 ... kappa_file_n -e 1000 -p 1000 -o data_file`
+`bin/KaSim kappa_file_1 ... kappa_file_n -l 100 -p 0.5 -o data_file`
 
-This will produce a data file of 1000 point (-p option) containing the
+This will produce a data file of 200 point containing the
 trajectory that was produced during the simulation.
 
 Type:
