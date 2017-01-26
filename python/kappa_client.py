@@ -56,20 +56,17 @@ class SimulationParameter(object):
     def __init__(self,
                  simulation_plot_period,
                  simulation_id,
-                 simulation_max_time = None,
-                 simulation_max_events = None,
+                 simulation_pause_condition,
                  simulation_seed = None) :
         self.simulation_plot_period = simulation_plot_period
         self.simulation_id = simulation_id
-        self.simulation_max_time = simulation_max_time
-        self.simulation_max_events = simulation_max_events
+        self.simulation_pause_condition = simulation_pause_condition
         self.simulation_seed = simulation_seed
 
     def toJSON(self):
         return({ "simulation_plot_period" : self.simulation_plot_period,
                  "simulation_id" : self.simulation_id,
-                 "simulation_max_time" : self.simulation_max_time,
-                 "simulation_max_events" : self.simulation_max_events ,
+                 "simulation_pause_condition": self.simulation_pause_condition ,
                  "simulation_seed" : self.simulation_seed })
 
 class PlotLimit(object):
@@ -394,7 +391,8 @@ def scratch():
     #     code = f.read()
     #     file = File(FileMetadata(file_id,0),code)
     #     print(kappaStd.file_create(project_id_1,file))
-    #     simulation_parameter = SimulationParameter(1,project_id_1,simulation_max_events = 10)
+    #     simulation_parameter =
+    #       SimulationParameter(1,project_id_1,simulation_pause_condition = "[E] = 10")
     #     print(kappaStd.simulation_start(project_id_1,simulation_parameter))
     #     print(kappaStd.simulation_info(project_id_1,project_id_1))
     # kappaStd.shutdown()
@@ -408,8 +406,7 @@ def main():
     # default arguments
     inputfile = None  # if missing input file just get version
     url = "http://localhost:8080"
-    max_time = None
-    max_events = None
+    pause_condition = "[false]"
     plot_period = 0.1
     seed = None
 
@@ -419,7 +416,7 @@ def main():
                                    ["kappafile=",
                                     "url=",
                                     "max_time=",
-                                    "max_events=",
+                                    "max_event=",
                                     "plot_period=",
                                     "seed=", ])
     except:
@@ -442,9 +439,9 @@ def main():
         elif opt in ("-u", "--url"):
             url = arg
         elif opt in ("-t", "--max_time"):
-            max_time = float(arg)
-        elif opt in ("-e", "--max-events"):
-            max_events = int(arg)
+            pause_condition = "[T]>"+arg+" || "+pause_condition
+        elif opt in ("-e", "--max_events"):
+            pause_condition = "[E]>"+arg+" || "+pause_condition
         elif opt in ("-pp", "--plot_period"):
             plot_period = float(arg)
         elif opt in ("-s", "--seed"):
@@ -452,8 +449,7 @@ def main():
 
     print('Input file is : {0} '.format(inputfile))
     print('Endpoint url : {0} '.format(url))
-    print('Max time : {0}'.format(max_time))
-    print('Max events : {0} '.format(max_events))
+    print('Pause conditon : {0}'.format(pause_condition))
     print('Plot period : {0} '.format(plot_period))
     print('Random seed : {0} '.format(seed))
 
@@ -478,8 +474,7 @@ def main():
                 end_time = 10.0
                 simulation_parameter = SimulationParameter(plot_period,
                                                            simulation_id,
-                                                           max_time,
-                                                           max_events,
+                                                           pause_condition,
                                                            seed)
                 runtime.simulation_start(project_id,simulation_parameter)
 

@@ -91,8 +91,8 @@ class KappaClientTest(object):
             file_object = kappa_client.File(file_metadata,file_content)
             runtime.file_create(project_id,file_object)
             simulation_id = str(uuid.uuid1())
-            end_time = 10.0
-            simulation_parameter = kappa_client.SimulationParameter(0.1,simulation_id,end_time)
+            pause_condition = "[T] > 10.0"
+            simulation_parameter = kappa_client.SimulationParameter(0.1,simulation_id,pause_condition)
             runtime.simulation_start(project_id,simulation_parameter)
 
             simulation_info = runtime.simulation_info(project_id,simulation_id)
