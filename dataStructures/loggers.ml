@@ -234,10 +234,10 @@ let print_newline logger =
       let bf' =
         Circular_buffers.add
           (Format.asprintf "%a"
-             (Pp.list
-                (fun _ -> ())
-                dump_token)
-             (List.rev logger.current_line))
+              (Pp.list
+                 (fun _ -> ())
+                 dump_token)
+              (List.rev logger.current_line))
           !bf
       in
       let () = bf:=bf' in
@@ -249,10 +249,10 @@ let print_newline logger =
       let bf' =
         Infinite_buffers.add
           (Format.asprintf "%a"
-             (Pp.list
-                (fun _ -> ())
-                dump_token)
-             (List.rev logger.current_line))
+              (Pp.list
+                 (fun _ -> ())
+                 dump_token)
+              (List.rev logger.current_line))
           !bf
       in
       let () = bf:=bf' in

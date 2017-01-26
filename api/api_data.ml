@@ -93,9 +93,9 @@ let api_contact_map
                   Api_types_j.site_links = links;
                   Api_types_j.site_states =
                     List.map
-                      (Format.asprintf
+                      (fun s -> Format.asprintf
                          "%a"
-                         (Signature.print_internal_state sigs ag site))
+                         (Signature.print_internal_state sigs ag site) s)
                       states;
                 }) sites;
        })

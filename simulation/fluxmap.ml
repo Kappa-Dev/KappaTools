@@ -29,7 +29,7 @@ let stop_flux env counter flux_data =
   let size = Model.nb_syntactic_rules env + 1 in
   let flux_rules =
     Array.init size
-      (Format.asprintf "%a" (Model.print_ast_rule ~env)) in
+      (fun x -> Format.asprintf "%a" (Model.print_ast_rule ~env) x) in
   let () =
     if flux_data.Data.flux_normalized then
       Array.iteri

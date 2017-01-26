@@ -246,9 +246,11 @@ module Cflow_handler =
 
     let init_handler env =
       let n_rules = Model.nb_syntactic_rules env in
-      let rule_name_cache = Array.init (n_rules+1) (Format.asprintf "%a" (Model.print_ast_rule ~env:env)) in
+      let rule_name_cache = Array.init (n_rules+1)
+          (fun x -> Format.asprintf "%a" (Model.print_ast_rule ~env:env) x) in
       let n_agents = Signature.size (Model.signatures env) in
-      let agent_name_cache = Array.init n_agents (Format.asprintf "%a" (Model.print_agent ~env:env)) in
+      let agent_name_cache = Array.init n_agents
+          (fun x -> Format.asprintf "%a" (Model.print_agent ~env:env) x) in
       let steps_by_column = Predicate_maps.QPredicateMap.empty 0 in
       {env = env;
        rule_name_cache=rule_name_cache;

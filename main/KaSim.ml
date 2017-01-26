@@ -171,7 +171,7 @@ let () =
     let plotPack =
       let head =
         Model.map_observables
-          (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+          (fun o -> Format.asprintf "%a" (Kappa_printer.alg_expr ~env) o)
           env in
       if Array.length head > 1 then
         let title = "Output of " ^ command_line in

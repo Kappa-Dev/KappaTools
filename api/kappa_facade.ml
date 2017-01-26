@@ -418,10 +418,10 @@ let start
                 in
                 let legend =
                   Model.map_observables
-                    (Format.asprintf
+                    (fun o -> Format.asprintf
                        "%a"
                        (Kappa_printer.alg_expr
-                          ~env:t.env))
+                          ~env:t.env) o)
                     t.env in
                 let first_obs =
                   State_interpreter.observables_values t.env graph t.counter in
