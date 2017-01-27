@@ -154,7 +154,7 @@ let create_t ~contact_map ~env ~counter ~graph ~state
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   {
-    is_running = true; run_finalize = false; counter; log_buffer; log_form;
+    is_running = false; run_finalize = false; counter; log_buffer; log_form;
     pause_condition = Alg_expr.FALSE;
     plot = { Api_types_j.plot_legend = [] ;
              Api_types_j.plot_time_series = [] ; } ;
@@ -235,6 +235,8 @@ let build_ast
                   (* The last yield is updated after the last yield.
                      It is gotten here for the initial last yeild value. *)
                   let lastyield = Sys.time () in
+                  try (* exception raised by compile must have used Lwt.fail.
+                         Something is wrong for now *)
                   Eval.compile
                     ~pause:(fun f -> Lwt.bind (yield ()) f)
                     ~return:Lwt.return ?rescale_init:None
@@ -262,7 +264,12 @@ let build_ast
                          ~init_l ~has_tracking ~lastyield
                          ~file_indexes:(Some indexes)
                      in
-                     Lwt.return (`Ok simulation)))))))
+                     Lwt.return (`Ok simulation))
+                  with e ->
+                   (catch_error
+                      (fun range -> localize_range range indexes)
+                      (fun e -> Lwt.return (`Error e))) e
+               )))))
     (catch_error
        (fun range -> localize_range range indexes)
        (fun e -> Lwt.return (`Error e)))
@@ -319,34 +326,36 @@ let finalize_simulation ~(t : t) : unit =
     ~outputs:(outputs t) t.log_form t.env t.counter t.graph t.state
 
 let run_simulation
-    ~(system_process : system_process)
-    ~(t : t) stopped : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+    ~(system_process : system_process) ~(t : t) stopped : unit Lwt.t =
   Lwt.catch
     (fun () ->
        let rstop = ref stopped in
+       let () = t.is_running <- true in
        let rec iter () =
-         let () =
-           while (not !rstop) &&
-                 Sys.time () -. t.lastyield < system_process#min_run_duration ()
-           do
-             let (stop,graph',state') =
-               State_interpreter.a_loop
-                 ~outputs:(outputs t)
-                 t.env t.counter t.graph t.state in
-             rstop := stop || Rule_interpreter.value_bool
-                        t.counter graph' t.pause_condition;
-             t.graph <- graph';
-             t.state <- state'
-           done in
-         if !rstop then
-           let () = t.is_running <- false in
-           Lwt.return_unit
-         else if t.is_running then
-           (system_process#yield ()) >>= (fun () ->
-               let () = t.lastyield <- Sys.time () in iter ())
-         else
-           Lwt.return_unit
-       in
+         try
+           let () =
+             while (not !rstop) &&
+                   Sys.time () -. t.lastyield <
+                   system_process#min_run_duration ()
+             do
+               let (stop,graph',state') =
+                 State_interpreter.a_loop
+                   ~outputs:(outputs t)
+                   t.env t.counter t.graph t.state in
+               rstop := stop || Rule_interpreter.value_bool
+                          t.counter graph' t.pause_condition;
+               t.graph <- graph';
+               t.state <- state'
+             done in
+           if !rstop then
+             let () = t.is_running <- false in
+             Lwt.return_unit
+           else if t.is_running then
+             (system_process#yield ()) >>= (fun () ->
+                 let () = t.lastyield <- Sys.time () in iter ())
+           else
+             Lwt.return_unit
+         with e -> Lwt.fail e in
        (iter ()) >>=
        (fun () ->
           let () =
@@ -355,8 +364,11 @@ let run_simulation
             else
               ()
           in
-          Lwt.return (`Ok ())))
-    (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
+          Lwt.return_unit))
+    (catch_error (t_range t) (fun e ->
+           let () = t.is_running <- false in
+           let () = t.error_messages <- e in
+         Lwt.return_unit))
 
 let start
     ~(system_process : system_process)
@@ -365,12 +377,9 @@ let start
   : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
   let lexbuf =
     Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
-  let () =
-    Lwt.async
-      (fun () ->
-         Lwt.catch (fun () ->
-             (*let () =
-               Counter.set_max_time
+  Lwt.catch (fun () ->
+      (*let () =
+          Counter.set_max_time
                  t.counter
                  parameter.Api_types_j.simulation_max_time
                in
@@ -379,68 +388,69 @@ let start
                  t.counter
                  parameter.Api_types_j.simulation_max_events
                in*)
-             Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
-             fun pause ->
-             Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
-               t.contact_map t.env pause >>=
-             fun (env',b'') ->
-             let () = t.env <- env' in
-             let () = t.pause_condition <- b'' in
-             let () =
-               Counter.set_plot_period
+      Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
+      fun pause ->
+      Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
+        t.contact_map t.env pause >>=
+      fun (env',b'') ->
+      let () = t.env <- env' in
+      let () = t.pause_condition <- b'' in
+      let () =
+        Counter.set_plot_period
+          t.counter
+          (Counter.DT parameter.Api_types_j.simulation_plot_period) in
+      let random_state =
+        match parameter.Api_types_j.simulation_seed with
+        | None -> Random.State.make_self_init ()
+        | Some seed -> Random.State.make [|seed|] in
+      let () =
+        Lwt.async
+          (fun () ->
+             try (* exception raised by build_initial_state must have been
+                    raised with Lwt.fail. Something is wrong for now... *)
+               Eval.build_initial_state
+                 ~bind:(fun x f ->
+                     (time_yield ~system_process:system_process ~t:t) >>=
+                     (fun () -> x >>= f))
+                 ~return:Lwt.return ~outputs:(outputs t) []
+                 ~with_trace:(t.has_tracking <> None)
                  t.counter
-                 (Counter.DT parameter.Api_types_j.simulation_plot_period)
-             in
-             let random_state =
-               match parameter.Api_types_j.simulation_seed with
-               | None -> Random.State.make_self_init ()
-               | Some seed -> Random.State.make [|seed|] in
-             Eval.build_initial_state
-               ~bind:(fun x f ->
-                   (time_yield ~system_process:system_process ~t:t) >>=
-                   (fun () -> x >>= f))
-               ~return:Lwt.return ~outputs:(outputs t) []
-               ~with_trace:(t.has_tracking <> None)
-               t.counter
-               t.env
-               random_state
-               t.init_l >>=
-             (fun (stop,graph,state) ->
-                let () = t.graph <- graph;
-                  t.state <- state in
-                let log_form =
-                  Format.formatter_of_buffer
-                    t.log_buffer
-                in
-                let () =
-                  ExceptionDefn.flush_warning
-                    log_form
-                in
-                let legend =
-                  Model.map_observables
-                    (fun o -> Format.asprintf
-                       "%a"
-                       (Kappa_printer.alg_expr
-                          ~env:t.env) o)
-                    t.env in
-                let first_obs =
-                  State_interpreter.observables_values t.env graph t.counter in
-                let first_values = prepare_plot_value first_obs in
-
-                let () =
-                  t.plot <-
-                    { Api_types_j.plot_legend = Array.to_list legend;
-                      Api_types_j.plot_time_series = [ first_values ]} in
-                run_simulation ~system_process:system_process ~t:t stop
-             )
-           )
-           (catch_error
-              (t_range t)
-              (fun e ->
-                 let () = t.error_messages <- e in
-                 Lwt.return (`Error e))
-           )) in
-  Lwt.return (`Ok ())
+                 t.env
+                 random_state
+                 t.init_l >>=
+               (fun (stop,graph,state) ->
+                  let () = t.graph <- graph; t.state <- state in
+                  let log_form = Format.formatter_of_buffer t.log_buffer in
+                  let () = ExceptionDefn.flush_warning log_form in
+                  let legend =
+                    Model.map_observables
+                      (fun o -> Format.asprintf
+                          "%a"
+                          (Kappa_printer.alg_expr
+                             ~env:t.env) o)
+                      t.env in
+                  let first_obs =
+                    State_interpreter.observables_values
+                      t.env graph t.counter in
+                  let first_values = prepare_plot_value first_obs in
+                  let () =
+                    t.plot <-
+                      { Api_types_j.plot_legend = Array.to_list legend;
+                        Api_types_j.plot_time_series = [ first_values ]} in
+                  run_simulation ~system_process:system_process ~t:t stop)
+             with e ->
+               catch_error
+                 (t_range t)
+                 (fun e ->
+                    let () = t.error_messages <- e in
+                    Lwt.return_unit) e
+          ) in
+      Lwt.return (`Ok ()))
+    (catch_error
+       (t_range t)
+       (fun e ->
+          let () = t.error_messages <- e in
+          Lwt.return (`Error e)))
 
 let pause
     ~(system_process : system_process)
@@ -463,7 +473,7 @@ let stop
     (fun () ->
        let () = t.run_finalize <- true in
        (if t.is_running then
-          (pause ~system_process:system_process ~t:t)
+          pause ~system_process:system_process ~t:t
         else
           let () = finalize_simulation ~t:t in
           Lwt.return (`Ok ()))
@@ -482,7 +492,8 @@ let perturbation
   Lwt.catch
     (fun () ->
        if t.is_running then
-         Lwt.return (`Error (Api_data.api_message_errors msg_process_not_paused))
+         Lwt.return
+           (`Error (Api_data.api_message_errors msg_process_not_paused))
        else
          Lwt.wrap2 KappaParser.effect_list KappaLexer.token lexbuf >>=
          fun e ->
@@ -526,7 +537,6 @@ let continue
              t.counter
              parameter.Api_types_j.simulation_max_events
            in*)
-         let () = t.is_running <- true in
          let () =
            Lwt.async
              (fun () ->
