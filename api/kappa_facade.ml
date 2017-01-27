@@ -166,6 +166,24 @@ let create_t ~contact_map ~env ~counter ~graph ~state
     lastyield; file_indexes;
   }
 
+let reinitialize random_state t =
+  let () = Counter.reinitialize t.counter in
+  let () = Format.pp_print_flush t.log_form () in
+  let () = Buffer.reset t.log_buffer in
+  t.is_running <- false;
+  t.run_finalize <- false;
+  t.pause_condition <- Alg_expr.FALSE;
+  t.plot <- { Api_types_j.plot_legend = [] ;
+              Api_types_j.plot_time_series = [] ; } ;
+  t.snapshots <- [];
+  t.flux_maps <- [];
+  t.files <- [];
+  t.error_messages <- [];
+  t.graph <- Rule_interpreter.empty
+      ~with_trace:(t.has_tracking <>None)
+      random_state t.env t.counter [];
+  t.state <- State_interpreter.empty t.env []
+
 let clone_t t =
   create_t
     ~contact_map:t.contact_map
@@ -395,14 +413,15 @@ let start
       fun (env',b'') ->
       let () = t.env <- env' in
       let () = t.pause_condition <- b'' in
-      let () =
-        Counter.set_plot_period
-          t.counter
-          (Counter.DT parameter.Api_types_j.simulation_plot_period) in
       let random_state =
         match parameter.Api_types_j.simulation_seed with
         | None -> Random.State.make_self_init ()
         | Some seed -> Random.State.make [|seed|] in
+      let () = reinitialize random_state t in
+      let () =
+        Counter.set_plot_period
+          t.counter
+          (Counter.DT parameter.Api_types_j.simulation_plot_period) in
       let () =
         Lwt.async
           (fun () ->
