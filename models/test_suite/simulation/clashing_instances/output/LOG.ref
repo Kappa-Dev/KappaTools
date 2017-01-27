@@ -935,5 +935,6 @@ Applied 0:
 ++  @1
 Rule rule has now 0 instances.
 ###########
-Simulation ended (eff.: 0.925234, detail below)
+Simulation ended
+92.52% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

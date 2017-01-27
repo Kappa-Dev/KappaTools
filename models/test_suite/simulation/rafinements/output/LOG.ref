@@ -16,5 +16,6 @@ done
 Done
 ____________________________________________________________
 ############################################################
-Simulation ended (eff.: 0.999995, detail below)
+Simulation ended
+100.00% of event loops were productive. Null event cause:
 	Perturbation interrupting time advance: 100.00%

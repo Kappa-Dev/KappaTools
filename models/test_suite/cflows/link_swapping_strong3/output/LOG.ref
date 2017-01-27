@@ -448,5 +448,6 @@ ____________________________________________________________
 
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.789474, detail below)
+Simulation ended
+78.95% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

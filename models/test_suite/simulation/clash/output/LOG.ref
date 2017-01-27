@@ -16,5 +16,6 @@ done
 Done
 ____________________________________________________________
 ############################################################
-Simulation ended (eff.: 0.500000, detail below)
+Simulation ended
+50.00% of event loops were productive. Null event cause:
 	Clashing instance: 100.00%

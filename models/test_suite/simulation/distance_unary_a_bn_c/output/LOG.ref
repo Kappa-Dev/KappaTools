@@ -16,5 +16,6 @@ done
 Done
 ____________________________________________________________
 ############################################################
-Simulation ended (eff.: 0.653595, detail below)
+Simulation ended
+65.36% of event loops were productive. Null event cause:
 	Valid embedding but no longer unary when required: 100.00%
