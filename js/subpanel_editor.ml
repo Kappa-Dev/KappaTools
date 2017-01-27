@@ -9,7 +9,7 @@
 open Js
 open Codemirror
 
-open Lwt
+open Lwt.Infix
 let document = Dom_html.window##.document
 let has_been_modified = ref (false)
 
@@ -132,7 +132,7 @@ let initialize codemirror () =
     let url = List.assoc "model" args in
     XmlHttpRequest.get url >>=
     (fun content ->
-       if content.XmlHttpRequest.code <> 200 then return_unit
+       if content.XmlHttpRequest.code <> 200 then Lwt.return_unit
        else
          let () =
            match Url.url_of_string content.XmlHttpRequest.url with
@@ -149,7 +149,7 @@ let initialize codemirror () =
              let () = Ui_state.set_file filename filecontent in
              let () = codemirror##setValue(Js.string filecontent) in
              ()  in
-         return_unit)
+         Lwt.return_unit)
   with Not_found ->
     let filename = "default.ka" in
     let filecontent =
@@ -158,7 +158,7 @@ let initialize codemirror () =
     in
     let () = Ui_state.set_file filename filecontent in
     let () = codemirror##setValue(Js.string filecontent) in
-    return_unit
+    Lwt.return_unit
 
 let onload (t : Ui_simulation.t) : unit =
   let lint_config =
@@ -245,33 +245,41 @@ let onload (t : Ui_simulation.t) : unit =
            let () = Ui_state.set_editor_full (not editor_full) in
            Js._true) in
   let file_select_handler () =
-    let files = Js.Optdef.get (file_select_dom##.files)
-        (fun () -> assert false)
-    in
-    let file = Js.Opt.get (files##item (0))
-        (fun () -> assert false)
-    in
-    let filename = to_string file##.name in
-    let () = set_file_label filename in
-    let () =
-      Common.async
-        ((fun _ ->
-            File.readAsText file >>=
-            (fun  (va : Js.js_string Js.t) ->
-               let () = Ui_state.set_file filename "" in
-               Lwt.return va
-            ) >>=
-            (fun  (va : Js.js_string Js.t) ->
-               let () = codemirror##setValue(va) in
-              Ui_simulation.flush_simulation t)))
-    in
-    let () = has_been_modified := false in
-    return_unit
-  in
+    Js.Optdef.case (file_select_dom##.files)
+      (fun () -> Lwt.return_unit)
+      (fun files ->
+         Js.Opt.case (files##item (0))
+           (fun () -> Lwt.return_unit)
+           (fun file ->
+              let filename = to_string file##.name in
+              let () = set_file_label filename in
+              let () =
+                Common.async
+                  ((fun _ ->
+                      File.readAsText file >>=
+                      (fun  (va : Js.js_string Js.t) ->
+                         let () = Ui_state.set_file filename "" in
+                         Lwt.return va
+                      ) >>=
+                      (fun  (va : Js.js_string Js.t) ->
+                         let () = codemirror##setValue(va) in
+                         Ui_simulation.flush_simulation t)))
+              in
+              let () = has_been_modified := false in
+              Lwt.return_unit)) in
   let confirm () : bool = Js.to_bool
       (Dom_html.window##confirm
          (Js.string "Modifications will be lost, do you wish to continue?"))
   in
+  let () =
+    Lwt_js_events.async
+      (fun () ->
+         Lwt_js_events.clicks
+           file_select_dom
+           (fun _ _ ->
+              let () =
+                file_select_dom##.value := file_select_dom##.defaultValue in
+              Lwt.return_unit)) in
   let ()  =
     Common.async
       (fun () ->
@@ -280,7 +288,7 @@ let onload (t : Ui_simulation.t) : unit =
            (fun _ _ ->
               if (not !has_been_modified) || confirm ()
               then file_select_handler ()
-              else return_unit))
+              else Lwt.return_unit))
   in ()
 
 let onunload () = ()
