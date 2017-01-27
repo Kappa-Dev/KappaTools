@@ -796,8 +796,8 @@ let print_stat f _parameter _handler enriched_grid =
   let () = Format.fprintf f  "@[<v>Stats:@," in
   let () = Format.fprintf f " number of step   : %i@," n_step in
   let () = Format.fprintf f " longest story    : %i@," longest_story in
-  let () = Format.fprintf f " average length   : %F@,"
+  let () = Format.fprintf f " average length   : %.4g@,"
       (float length_sum /. float n_nonempty) in
-  let () = Format.fprintf f " geometric mean   : %F@,"
+  let () = Format.fprintf f " geometric mean   : %.4g@,"
       (sqrt (float length_square_sum /. float n_nonempty)) in
   Format.fprintf f "@]@."
