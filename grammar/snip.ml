@@ -623,7 +623,7 @@ let connected_components_of_mixture created mix (env,origin) =
         add_agents_in_cc
           sigs id wk Mods.IntMap.empty transformations
           links_transf instantiations' t [h] in
-      let (env',inj, cc) =
+      let (env',inj, cc, cc_id) =
         Pattern.finish_new ?origin wk_out in
       let added' =
         List_util.smart_map
@@ -637,7 +637,7 @@ let connected_components_of_mixture created mix (env,origin) =
           (fun (((p,s),b) as x) ->
              let p' = Matching.Agent.rename id inj p in
              if p == p' then x else ((p',s),b)) l_t in
-      aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
+      aux env' (removed',added') event' l_t' ((cc_id,cc)::acc) (succ id) remains
   in aux env ([],[]) Instantiation.empty_event Mods.IntMap.empty [] 0 mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =

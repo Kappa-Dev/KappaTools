@@ -70,8 +70,6 @@ module PreEnv : sig
 
   val sigs : t -> Signature.s
 
-  val get : t -> id -> cc (** Awfully inefficient *)
-
   val finalize : max_sharing:bool -> t -> Env.t * stat
   val of_env : Env.t -> t
 end
@@ -95,7 +93,7 @@ val new_free : work -> (Agent.t * int) -> work
 val new_internal_state : work -> (Agent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 
-val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*id)
+val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*cc*id)
 
 val minimal_env : Signature.s -> Signature.contact_map -> PreEnv.t
 

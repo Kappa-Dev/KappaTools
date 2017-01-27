@@ -17,8 +17,9 @@ let rec compile_alg domain (alg,pos) =
         let domain',ccs =
           Snip.connected_components_sum_of_ambiguous_mixture
             contact_map domain ?origin ast in
+        let out_ccs = List.map (fun (x,_) -> Array.map fst x) ccs in
         (Some (origin,contact_map,domain'),
-         (Alg_expr.KAPPA_INSTANCE (List.map fst ccs),pos))
+         (Alg_expr.KAPPA_INSTANCE out_ccs,pos))
       | None ->
         raise (ExceptionDefn.Internal_Error
                  ("Theoritically pure alg_expr has a mixture",pos))
@@ -105,7 +106,8 @@ let rules_of_ast
                    ("Unary rule does not deal with "^
                     string_of_int n^" connected components.",pos)) in
   let build deps un_ccs (origin,ccs,syntax,(neg,pos)) =
-    let rate,unrate,un_ccs' = unary_infos ccs un_ccs in
+    let ccs' = Array.map fst ccs in
+    let rate,unrate,un_ccs' = unary_infos ccs' un_ccs in
     Tools.option_map
       (fun x ->
          let origin =
@@ -118,7 +120,7 @@ let rules_of_ast
       deps,un_ccs',{
       Primitives.unary_rate = unrate;
       Primitives.rate = rate;
-      Primitives.connected_components = ccs;
+      Primitives.connected_components = ccs';
       Primitives.removed = neg;
       Primitives.inserted = pos;
       Primitives.fresh_bindings =
@@ -134,8 +136,8 @@ let rules_of_ast
   let deps_algs',unary_ccs',rules_l =
     List.fold_right
       (fun r (deps_algs,un_ccs,out) ->
-         let deps_algs',un_ccs',r' = build deps_algs un_ccs r in
-         deps_algs',un_ccs',r'::out)
+         let deps_algs',un_ccs',r'' = build deps_algs un_ccs r in
+         deps_algs',un_ccs',r''::out)
       rule_mixtures (deps,Pattern.Set.empty,[]) in
   domain',(match origin' with
       | None -> None
@@ -195,7 +197,7 @@ let cflows_of_label
     Snip.connected_components_sum_of_ambiguous_mixture
       contact_map domain ~origin mix in
   (domain',
-   List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
+   List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
 let rule_effect
     contact_map domain alg_expr (mix,created,rm,add) mix_pos rev_effects =
@@ -259,7 +261,7 @@ let effects_of_modif
       Snip.connected_components_sum_of_ambiguous_mixture
         contact_map domain ~origin ast in
     (domain',
-     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
+     List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
   | FLUX (rel,pexpr) ->
     let (domain',pexpr') =
       compile_print_expr contact_map domain pexpr in

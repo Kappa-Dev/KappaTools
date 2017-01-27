@@ -94,8 +94,7 @@ let connected_components_of_mixture compil cache e =
     (fun (cache,acc) (i,m) ->
        match Snip.connected_components_sum_of_ambiguous_mixture
                contact_map cache (LKappa.of_raw_mixture m) with
-       | cache',[[|x_id|],_] ->
-         let x = Pattern.PreEnv.get cache' x_id in
+       | cache',[[|_,x|],_] ->
          cache',Tools.recti (fun a _ -> x::a) acc i
        | _ -> assert false)
     (cache,[]) snap

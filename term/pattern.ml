@@ -972,9 +972,8 @@ module PreEnv : sig
 
   val add_cc :
     toplevel:bool -> ?origin:Operator.DepSet.elt ->
-    prepoint list Mods.IntMap.t Mods.IntMap.t ->
-    id -> cc -> prepoint list Mods.IntMap.t Mods.IntMap.t * Renaming.t * id
-  val get : t -> id -> cc
+    prepoint list Mods.IntMap.t Mods.IntMap.t -> id -> cc ->
+    prepoint list Mods.IntMap.t Mods.IntMap.t * Renaming.t * cc * id
 
   val sigs : t -> Signature.s
 
@@ -1004,16 +1003,6 @@ end = struct
   let empty sigs =
     let nbt' = Array.make (Signature.size sigs) [] in
     fresh sigs nbt' 1 Mods.IntMap.empty
-
-  let get env id =
-    Mods.IntMap.fold
-      (fun _ ->
-         Mods.IntMap.fold
-           (fun _ l acc ->
-              List.fold_left (fun acc p -> if p.p_id = id then p.element else acc)
-                acc l))
-      env.domain
-      (empty_cc env.sig_decl)
 
   let fresh_id env =
     succ
@@ -1109,9 +1098,9 @@ end = struct
           else None in
         [{p_id; element;roots;
           depending=add_origin Operator.DepSet.empty origin}],
-        identity_injection element,p_id
+        identity_injection element,element,p_id
       | h :: t -> match equal element h.element with
-        | None -> let a,b,c = aux t in h::a,b,c
+        | None -> let a,b,c,d = aux t in h::a,b,c,d
         | Some r ->
           let roots =
             if h.roots <> None || not toplevel then h.roots
@@ -1124,10 +1113,10 @@ end = struct
                            (automorphisms element)),rty) in
           {p_id=h.p_id; element=h.element;
            depending=add_origin h.depending origin; roots;
-          }::t,r,h.p_id in
+          }::t,r,h.element,h.p_id in
     let env_w = Mods.IntMap.find_default Mods.IntMap.empty w env in
-    let env_w_h,r,out = aux (Mods.IntMap.find_default [] hash env_w) in
-    Mods.IntMap.add w (Mods.IntMap.add hash env_w_h env_w) env,r,out
+    let env_w_h,r,out,out_id = aux (Mods.IntMap.find_default [] hash env_w) in
+    Mods.IntMap.add w (Mods.IntMap.add hash env_w_h env_w) env,r,out,out_id
 
   let rec saturate_one ~max_sharing this max_l level (_,domain as acc) =
     function
@@ -1148,7 +1137,7 @@ end = struct
         List.fold_left
           (fun (mid,acc) cc ->
              let id' = succ mid in
-             let x,_,id = add_cc ~toplevel:false acc id' cc in
+             let x,_,_,id = add_cc ~toplevel:false acc id' cc in
              ((if id = id' then id else mid),x))
           acc news in
        saturate_one ~max_sharing this max_l level acc' t
@@ -1286,9 +1275,9 @@ let raw_finish_new ~toplevel ?origin wk =
   let cc_candidate =
     { nodes_by_type = wk.used_id; nodes = wk.cc_nodes;
       recogn_nav = raw_to_navigation false wk.used_id wk.cc_nodes} in
-  let preenv,r,out = PreEnv.add_cc
+  let preenv,r,out,out_id = PreEnv.add_cc
       ~toplevel ?origin wk.cc_env wk.cc_id cc_candidate in
-  PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out
+  PreEnv.fresh wk.sigs wk.reserved_id wk.free_id preenv,r,out,out_id
 
 let finish_new ?origin wk = raw_finish_new ~toplevel:true ?origin wk
 
@@ -1351,14 +1340,14 @@ let minimal_env sigs contact_map =
             let w = begin_new acc in
             let n,w = new_node w ty in
             let w = new_free w (n,s) in
-            let acc',_,_cc = raw_finish_new ~toplevel:false w in
+            let acc',_,_,_ = raw_finish_new ~toplevel:false w in
             let acc'' =
               List.fold_left
                 (fun acc i ->
                    let w = begin_new acc in
                    let n,w = new_node w ty in
                    let w = new_internal_state w (n,s) i in
-                   let out,_,_cc = raw_finish_new ~toplevel:false w in
+                   let out,_,_,_ = raw_finish_new ~toplevel:false w in
                    out) acc' ints in
             List.fold_left
               (fun acc (ty',s') ->
@@ -1366,12 +1355,12 @@ let minimal_env sigs contact_map =
                  let n,w = new_node w ty in
                  let n',w = new_node w ty' in
                  let w = new_link w (n,s) (n',s') in
-                 let out,_,_cc = raw_finish_new ~toplevel:false w in
+                 let out,_,_,_ = raw_finish_new ~toplevel:false w in
                  if ty = ty' && s < s' then
                    let w = begin_new out in
                    let n,w = new_node w ty in
                    let w = new_link w (n,s) (n,s') in
-                   let out',_,_cc' = raw_finish_new ~toplevel:false w in
+                   let out',_,_,_ = raw_finish_new ~toplevel:false w in
                    out'
                  else out) acc'' links
          ))
