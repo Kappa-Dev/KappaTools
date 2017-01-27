@@ -191,7 +191,7 @@ let time_progress_bar  (t : Ui_simulation.t) =
            lift (fun (status : Api_types_j.simulation_info) ->
              Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) state in
          let time : float = Tools.unsome 0.0 time in
-         string_of_float time
+         Printf.sprintf "%.4g" time
        )
        simulation_output)
 
