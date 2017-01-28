@@ -277,7 +277,9 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 
-check: bin/sanity_test bin/KaSa_json
+check:
+	@+$(MAKE) bin/sanity_test
+	@+$(MAKE) bin/KaSa_json
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite all
 
