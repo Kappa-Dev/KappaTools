@@ -9,6 +9,8 @@
 (** Printers (user readable) of Kappa compiled units *)
 
 val alg_expr : ?env:Model.t -> Format.formatter -> Alg_expr.t -> unit
+val bool_expr : ?env:Model.t -> Format.formatter ->
+  (Pattern.id array list,int) Alg_expr.bool -> unit
 
 val print_expr_val :
   ('a -> Nbr.t) -> Format.formatter -> 'a Ast.print_expr list -> unit

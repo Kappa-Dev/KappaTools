@@ -406,6 +406,11 @@ let start
                  t.counter
                  parameter.Api_types_j.simulation_max_events
                in*)
+      let random_state =
+        match parameter.Api_types_j.simulation_seed with
+        | None -> Random.State.make_self_init ()
+        | Some seed -> Random.State.make [|seed|] in
+      let () = reinitialize random_state t in
       Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
       fun pause ->
       Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
@@ -413,11 +418,6 @@ let start
       fun (env',b'') ->
       let () = t.env <- env' in
       let () = t.pause_condition <- b'' in
-      let random_state =
-        match parameter.Api_types_j.simulation_seed with
-        | None -> Random.State.make_self_init ()
-        | Some seed -> Random.State.make [|seed|] in
-      let () = reinitialize random_state t in
       let () =
         Counter.set_plot_period
           t.counter
