@@ -270,7 +270,7 @@ let effects_of_modif
     let (domain',pexpr') =
       compile_print_expr contact_map domain pexpr in
     (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
-  | PRINT (pexpr,print) ->
+  | Ast.PRINT (pexpr,print) ->
     let (domain',pexpr') =
       compile_print_expr contact_map domain pexpr in
     let (domain'',print') =
