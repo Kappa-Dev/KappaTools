@@ -180,73 +180,43 @@ class manager_log_message
 
   end;;
 
-let plot_time_series
-  (start_time : float option)
-  (plot : Api_types_j.plot) :
-  Api_types_j.observable list =
-  match start_time with
-  | None -> plot.Api_types_j.plot_time_series
-  | Some start_time ->
-    List.filter
-      (fun (observable : Api_types_j.observable) ->
-         match List.nth observable 0 with
-         | None -> false
-         | Some time -> time >= start_time)
-      plot.Api_types_j.plot_time_series
-
-let plot_index
+let select_observables
     (plot_limit : Api_types_j.plot_limit)
-    (plot : Api_types_j.plot) :
-  (int * Api_types_j.observable) list =
-  let observables_size : int = List.length plot.Api_types_j.plot_time_series in
-  let observables_index : (int * Api_types_j.observable) list =
-    List.mapi
-      (fun index observable -> (index,observable))
-      plot.Api_types_j.plot_time_series
-  in
-  let observables_filtered : (int * Api_types_j.observable) list =
-    List.filter
-      (match plot_limit.Api_types_j.plot_limit_offset with
-       | None -> fun _ -> true
-       | Some offset -> fun (index,_) -> offset < observables_size - index)
-      observables_index in
-  observables_filtered
-
-let rec plot_range (data : (int * Api_types_j.observable) list) :
-  Api_types_j.plot_range option =
-  match data with
-  | [] -> None
-  | (start_index,_)::tail ->
-    (match plot_range tail with
-    | None -> Some { Api_types_j.plot_range_begin = start_index ;
-                     Api_types_j.plot_range_end = start_index ; }
-    | Some { Api_types_j.plot_range_begin = plot_range_begin ;
-             Api_types_j.plot_range_end = plot_range_end ; } ->
-      Some { Api_types_j.plot_range_begin = min start_index plot_range_begin ;
-             Api_types_j.plot_range_end = max start_index plot_range_end ; })
-
-let plot_plot (data : (int * Api_types_j.observable) list) :
-  Api_types_j.observable list =
-  List.map snd data
-
-let plot_limit
-    (plot_limit : Api_types_j.plot_limit)
-    (plot : Api_types_j.plot) :
-  (int * Api_types_j.observable) list =
-  let rec first n =
-    function | [] -> (0,[])
-             | h::t ->
-               let (len,l) = first n t in
-               if len < n then
-                 (len + 1,h::l)
-               else
-                 (len + 1,l)
-  in
-  let points = plot_index plot_limit plot in
-  match plot_limit.Api_types_j.plot_limit_points with
-  | None -> points
-  | Some plot_limit_points ->
-    snd (first plot_limit_points points)
+    (plot : Api_types_j.plot) : Api_types_j.plot_detail =
+  let plot_time_series = Array.of_list (List.rev plot.Api_types_j.plot_time_series) in
+  let plot_detail_size = Array.length plot_time_series in
+  let plot_limit_offset = plot_limit.Api_types_j.plot_limit_offset in
+  let plot_limit_points = plot_limit.Api_types_j.plot_limit_points in
+  if (match plot_limit_offset with
+      | None -> false
+      | Some plot_limit_offset -> plot_limit_offset > plot_detail_size) then
+    { Api_types_j.plot_detail_plot = { plot with Api_types_j.plot_time_series = [] } ;
+      Api_types_j.plot_detail_range = None ;
+      Api_types_j.plot_detail_size = plot_detail_size ;
+    }
+  else
+    let start : int =
+      match plot_limit_offset with
+      | None -> 0
+      | Some plot_limit_offset -> plot_limit_offset
+    in
+    let default_size : int = max 0 (plot_detail_size - start) in
+    let len : int =
+      match plot_limit_points with
+      | None -> default_size
+      | Some plot_limit_points -> min plot_limit_points default_size in
+    let new_plot_time_series = (List.rev (Array.to_list (Array.sub plot_time_series start len))) in
+    let plot_detail_plot = { plot with Api_types_j.plot_time_series = new_plot_time_series }  in
+    let plot_detail_range : Api_types_j.plot_range option =
+      if len > 0 then
+        Some { Api_types_j.plot_range_begin = start ;
+     	       Api_types_j.plot_range_end = start + len ; }
+      else
+        None
+    in
+    { Api_types_j.plot_detail_plot = plot_detail_plot ;
+      Api_types_j.plot_detail_range = plot_detail_range ;
+      Api_types_j.plot_detail_size = plot_detail_size ; }
 
 class manager_plot
     (environment : Api_environment.environment)
@@ -268,12 +238,10 @@ class manager_plot
                Some { Api_types_j.plot_range_begin = 0 ;
      		      Api_types_j.plot_range_end = plot_detail_size - 1 ; } ;
 	       Api_types_j.plot_detail_size = plot_detail_size ; }
-           | Some plot_parameter ->
-             let observable_index = plot_limit plot_parameter plot in
-             { Api_types_j.plot_detail_plot =
-                 { plot with Api_types_j.plot_time_series = List.map snd observable_index } ;
-               Api_types_j.plot_detail_range = plot_range observable_index ;
-               Api_types_j.plot_detail_size = List.length plot.Api_types_j.plot_time_series ; }
+           | Some plot_limit ->
+             select_observables
+               plot_limit
+               plot
           )
       | None -> let m : string = "plot not available" in
         Api_common.result_error_msg ~result_code:`NOT_FOUND m

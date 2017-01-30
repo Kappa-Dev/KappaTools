@@ -101,6 +101,10 @@ class KappaClientTest(object):
                 time.sleep(1)
                 simulation_info = runtime.simulation_info(project_id,simulation_id)
 
+            # test that no limit returns all entries
+            last_status = runtime.simulation_detail_plot(project_id,simulation_id)
+            test_count = 101
+            self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
 
             print(simulation_info)
             plot_limit_offset = 100
