@@ -80,7 +80,7 @@ let lwt_error loc msg _ =
   Lwt.return_unit
 
 
-let ready_default (loc : string) (msg : string) =
+let ready_default (_loc : string) (msg : string) =
   let () = Common.debug (Js.string msg) in
   (fun _ -> Lwt.return_unit)
 (* lwt_error loc msg supress messages for now *)
@@ -164,38 +164,33 @@ let rec update_simulation (t : t) : unit Lwt.t =
          (return_project ()) >>=
          (Api_common.result_bind_lwt
             ~ok:(fun project_id ->
-                 runtime_state#simulation_info
-                   project_id
-                   ready_state.simulation_id)
-         )>>=
+                runtime_state#simulation_info
+                  project_id
+                  ready_state.simulation_id))>>=
          (fun result ->
-            ready_simulation
-              ~stopped:(fun _ -> Lwt.return_unit)
-              ~initializing:(fun _ -> Lwt.return_unit)
-              ~ready:(fun (_,ready_state) ->
-                  Api_common.result_map
-                    ~ok:(fun _ status ->
-                        let () = Ui_state.clear_model_error () in
-                        let () =
-                          t.setter
-                            (SIMULATION_READY
-                               { ready_state with
-                                 simulation_status = status }) in
-                        if status
-                           .Api_types_j
-                           .simulation_info_progress
-                           .Api_types_j
-                           .simulation_progress_is_running
-                        then
-                          update_simulation t
-                        else
-                          Lwt.return_unit
-                      )
-                    ~error:(fun _ errors ->
-                        let () = Ui_state.set_model_error __LOC__ errors in
-                            Lwt.return_unit)
-                    result)
-            t)
+            Api_common.result_map
+              ~ok:(fun _ status ->
+                  let () = Ui_state.clear_model_error () in
+                  let () =
+                    t.setter
+                      (SIMULATION_READY
+                         { ready_state with
+                           simulation_status = status }) in
+                  if status
+                     .Api_types_j
+                     .simulation_info_progress
+                     .Api_types_j
+                     .simulation_progress_is_running
+                  then
+                    (*sleep poll_interval*)Lwt.return_unit >>=
+                    fun () -> update_simulation t
+                  else
+                    Lwt.return_unit
+                )
+              ~error:(fun _ errors ->
+                  let () = Ui_state.set_model_error __LOC__ errors in
+                  Lwt.return_unit)
+              result)
       )
     t
 

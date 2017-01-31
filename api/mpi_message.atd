@@ -38,7 +38,6 @@ type flux_map_id <ocaml from="Api_types"> = abstract
 type flux_map <ocaml from="Api_types"> = abstract
 
 type log_message <ocaml from="Api_types"> = abstract
-type log_message_detail <ocaml from="Api_types"> = abstract
 
 type plot_detail <ocaml from="Api_types"> = abstract
 type plot_parameter <ocaml from="Api_types"> = abstract
@@ -92,7 +91,7 @@ type response = [ EnvironmentInfo of environment_info result
                 | SimulationDelete of unit result
                 | SimulationDetailFileLine of file_line_detail result
                 | SimulationDetailFluxMap of flux_map result
-                | SimulationDetailLogMessage of log_message_detail result
+                | SimulationDetailLogMessage of log_message result
                 | SimulationDetailPlot of plot_detail result
                 | SimulationDetailSnapshot of snapshot result
                 | SimulationInfo of simulation_info result

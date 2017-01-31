@@ -29,8 +29,8 @@ let navcontent (t : Ui_simulation.t) =
                 project_id simulation_id)
              >>=
              (Api_common.result_map
-                ~ok:(fun _ (log_messages : Api_types_j.log_message list) ->
-                    let () = set_state_log (String.concat "\n" log_messages) in
+                ~ok:(fun _ (log_messages : Api_types_j.log_message) ->
+                    let () = set_state_log log_messages in
                     Lwt.return_unit)
                 ~error:(fun _ errors  ->
                     let () = Ui_state.set_model_error __LOC__ errors in

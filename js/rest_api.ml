@@ -219,7 +219,7 @@ class manager
            simulation_id)
         `GET
         None
-        Mpi_message_j.log_message_detail_of_string
+        Mpi_message_j.log_message_of_string
         (fun result -> `SimulationDetailLogMessage result)
     | `SimulationDetailPlot (project_id,simulation_id,plot_parameters) ->
       let args =

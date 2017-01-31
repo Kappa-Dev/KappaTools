@@ -91,7 +91,7 @@ class type  manager_log_message =
     method simulation_detail_log_message :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
-      Api_types_j.log_message list result Lwt.t
+      Api_types_j.log_message result Lwt.t
   end;;
 
 class type  manager_plot =

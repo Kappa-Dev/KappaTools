@@ -18,7 +18,7 @@ val assemble_log_message :
   Api.manager ->
   Api_types_j.project_id ->
   Api_types_j.simulation_id ->
-  Api_types_j.log_message list Api.result Lwt.t
+  Api_types_j.log_message Api.result Lwt.t
 
 val assemble_plot :
   Api.manager ->

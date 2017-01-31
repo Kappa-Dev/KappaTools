@@ -313,7 +313,7 @@ class virtual  manager_base () : manager_base_type =
     method simulation_detail_log_message
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.log_message list Api.result Lwt.t =
+      Api_types_j.log_message Api.result Lwt.t =
       self#message (`SimulationDetailLogMessage
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt

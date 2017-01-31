@@ -149,10 +149,8 @@ let t_range (t : t) (range : Api_types_j.range) =
   | None -> range
   | Some indexes ->  localize_range range indexes
 
-let create_t ~contact_map ~env ~counter ~graph ~state
+let create_t ~log_form ~ log_buffer ~contact_map ~env ~counter ~graph ~state
     ~init_l ~has_tracking ~lastyield ~file_indexes : t =
-  let log_buffer = Buffer.create 512 in
-  let log_form = Format.formatter_of_buffer log_buffer in
   {
     is_running = false; run_finalize = false; counter; log_buffer; log_form;
     pause_condition = Alg_expr.FALSE;
@@ -168,8 +166,8 @@ let create_t ~contact_map ~env ~counter ~graph ~state
 
 let reinitialize random_state t =
   let () = Counter.reinitialize t.counter in
-  let () = Format.pp_print_flush t.log_form () in
-  let () = Buffer.reset t.log_buffer in
+(*  let () = Format.pp_print_flush t.log_form () in
+    let () = Buffer.reset t.log_buffer in*)
   t.is_running <- false;
   t.run_finalize <- false;
   t.pause_condition <- Alg_expr.FALSE;
@@ -186,6 +184,8 @@ let reinitialize random_state t =
 
 let clone_t t =
   create_t
+    ~log_form:t.log_form ~log_buffer:t.log_buffer
+    (* TODO pirbo: Should I create a new buffer? *)
     ~contact_map:t.contact_map
     ~env:t.env
     ~counter:t.counter (* FALSE imperatively modified *)
@@ -227,9 +227,9 @@ let build_ast
     (code : string)
     (yield : unit -> unit Lwt.t) =
   let lexbuf : Lexing.lexbuf = Lexing.from_string code in
-  let simulation_log_buffer = Buffer.create 512 in
-  let simulation_log_form =
-    Format.formatter_of_buffer simulation_log_buffer in
+  let log_buffer = Buffer.create 512 in
+  let log_form =
+    Format.formatter_of_buffer log_buffer in
   Lwt.catch
     (fun () ->
        (Lwt.wrap3 KappaParser.start_rule KappaLexer.token
@@ -260,7 +260,7 @@ let build_ast
                     ~return:Lwt.return ?rescale_init:None
                     ~outputs:(function
                         | Data.Log s ->
-                          Format.fprintf simulation_log_form "%s@." s
+                          Format.fprintf log_form "%s@." s
                         | Data.Snapshot _
                         | Data.Flux _
                         | Data.Plot _
@@ -272,9 +272,10 @@ let build_ast
                        Counter.create
                          ~init_t:(0. : float) ~init_e:(0 : int)
                          ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
+                     let () = ExceptionDefn.flush_warning log_form in
                      let simulation =
                        create_t
-                         ~contact_map ~env ~counter
+                         ~contact_map ~log_form ~log_buffer  ~env ~counter
                          ~graph:(Rule_interpreter.empty
                                    ~with_trace:(has_tracking <>None)
                                    random_state env counter [])
@@ -380,7 +381,7 @@ let run_simulation
             if t.run_finalize then
               finalize_simulation ~t:t
             else
-              ()
+              ExceptionDefn.flush_warning t.log_form
           in
           Lwt.return_unit))
     (catch_error (t_range t) (fun e ->
@@ -440,8 +441,7 @@ let start
                  t.init_l >>=
                (fun (stop,graph,state) ->
                   let () = t.graph <- graph; t.state <- state in
-                  let log_form = Format.formatter_of_buffer t.log_buffer in
-                  let () = ExceptionDefn.flush_warning log_form in
+                  let () = ExceptionDefn.flush_warning t.log_form in
                   let legend =
                     Model.map_observables
                       (fun o -> Format.asprintf
@@ -593,7 +593,7 @@ let create_info ~(t : t) : Api_types_j.simulation_detail =
       Api_types_j.simulation_output_snapshots =
         t.snapshots ;
       Api_types_j.simulation_output_log_messages =
-        [Buffer.contents t.log_buffer] ; }
+        Buffer.contents t.log_buffer ; }
   in
   { Api_types_j.simulation_detail_progress =
       progress ;

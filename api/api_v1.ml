@@ -89,7 +89,7 @@ let assemble_log_message
           (manager : Api.manager)
           (project_id : Api_types_j.project_id)
           (simulation_id : Api_types_j.simulation_id) :
-  Api_types_j.log_message list Api.result Lwt.t =
+  Api_types_j.log_message Api.result Lwt.t =
     (manager#simulation_detail_log_message
        project_id
        simulation_id
@@ -183,10 +183,10 @@ let assemble_state
         (assemble_log_message manager project_id simulation_id)
         >>=
         Api_common.result_bind_lwt
-          ~ok:(fun (log_messages : Api_types_j.log_message list) ->
+          ~ok:(fun (log_messages : Api_types_j.log_message) ->
               Lwt.return
                 (Api_common.result_ok
-                   { state with Api_types_v1_t.log_messages = log_messages }))
+                   { state with Api_types_v1_t.log_messages = [log_messages] }))
       )
     >>=
   Api_common.result_bind_lwt

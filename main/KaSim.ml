@@ -230,6 +230,7 @@ let () =
       else
         let lexbuf = Lexing.from_channel stdin in
         let rec toplevel env graph state =
+          let () = ExceptionDefn.flush_warning Format.err_formatter in
           let () = Format.printf "@.> @?" in
           let env',(stop,graph',state') =
             try
@@ -262,7 +263,7 @@ let () =
             Format.printf
               "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
-               @ effect@ to@ perform@ it@]" in
+               @ effect@ to@ perform@ it@]@." in
           toplevel env0 graph state
         else
           let (stop,graph',state') =
@@ -276,7 +277,7 @@ let () =
               Format.printf
                 "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                  @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
-                 @ effect@ to@ perform@ it@]" in
+                 @ effect@ to@ perform@ it@]@." in
             toplevel env0 graph' state' in
     Format.printf "Simulation ended@.";
     remove_trace ();

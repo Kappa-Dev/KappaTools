@@ -120,7 +120,7 @@ let api_simulation_status
       Api_types_j.simulation_output_snapshots =
         List.length detail.Api_types_j.simulation_output_snapshots ;
       Api_types_j.simulation_output_log_messages =
-        List.length detail.Api_types_j.simulation_output_log_messages ;
+        String.length detail.Api_types_j.simulation_output_log_messages ;
     }
   in
   { Api_types_j.simulation_info_progress = progress ;

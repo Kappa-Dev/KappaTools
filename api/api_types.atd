@@ -133,7 +133,6 @@ type snapshot_info = { snapshot_ids : snapshot_id list }
 
 (* log message *)
 type log_message = string
-type log_message_detail = log_message list
 
 (* info *)
 type simulation_state = [ Running
@@ -171,7 +170,7 @@ type simulation_detail_output =
       flux_map list,
       file_line list,
       snapshot list,
-      log_message list)
+      log_message)
      simulation_output
 
 type simulation_detail = { simulation_detail_progress : simulation_progress ;

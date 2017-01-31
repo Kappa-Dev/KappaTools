@@ -164,13 +164,13 @@ class manager_log_message
   object(self)
 
     method private log_message (detail : Api_types_j.simulation_detail) :
-      (Api_types_j.log_message list) Api.result =
+      Api_types_j.log_message Api.result =
       Api_common.result_ok detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_log_messages
 
     method simulation_detail_log_message
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.log_message list Api.result Lwt.t =
+      Api_types_j.log_message Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
