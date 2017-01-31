@@ -1,3 +1,4 @@
+% divide_rule_rate_by:2 
 function main=main()
 % command line: 
 %      'KaDE' 'auto.ka' '-d' 'output' '-l' '1' '-p' '0.01' '--rate-convention''Biochemist'

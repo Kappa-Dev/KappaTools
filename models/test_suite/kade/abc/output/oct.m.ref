@@ -1,3 +1,4 @@
+% divide_rule_rate_by:1 
 function main=main()
 % command line: 
 %      'KaDE' '../../cflows/abc/abc.ka' '-d' 'output' '-l' '1' '-p' '0.1''--octave-output''oct.m'

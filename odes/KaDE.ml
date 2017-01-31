@@ -1,12 +1,13 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jan 18 2017>
+  * Last modification: Time-stamp: <Jan 31 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
 
 let lowercase = String.lowercase(*_ascii  : ocaml 4.03*)
 let main () =
+
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave | SBML]
@@ -133,8 +134,7 @@ let main () =
         Sys.argv
     in
     let ignore_obs =
-      match backend
-      with
+      match backend with
       | Loggers.SBML -> true
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
@@ -160,6 +160,12 @@ let main () =
       | Loggers.Octave
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
     in
+    (*********************************************************************)
+    (*TEST*)
+    let cache, () =
+      A.get_list_of_divide_rule_by_rate compil logger
+    in
+    (*********************************************************************)
     let () = A.export_network
         ~command_line
         ~command_line_quotes

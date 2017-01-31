@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jan 24 2017>
+  * Last modification: Time-stamp: <Jan 31 2017>
 *)
 
 let local_trace = false
@@ -1704,6 +1704,33 @@ struct
     let () = Ode_loggers.print_newline logger in
     ()
 
+    (**********************************************************)
+    (*TEST*)
+
+    let get_list_of_divide_rule_by_rate compil logger =
+      let empty_cache = I.empty_lkappa_cache () in
+      let cache, i =
+        List.fold_left (fun (cache, _) rule ->
+            let cache, int =
+              I.divide_rule_rate_by cache compil rule
+            in
+            cache, int
+          ) (empty_cache, 0) (I.get_rules compil)
+      in
+      (*let () = Format.printf "+ THE divide_rule_rate_by ... @." in*)
+      let () =
+        match Loggers.formatter_of_logger logger with
+        | None -> Format.printf "None case"
+        | Some fmt ->   Format.fprintf fmt "%% divide_rule_rate_by:%i \n" i
+        (*let () =
+            List.iter (fun i ->
+                Format.fprintf fmt "divide_rule_rate_by:%i \n" i
+              ) int_list
+          in
+          ()*)
+      in
+      cache, ()
+
   let export_network
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
       logger logger_buffer compil network =
@@ -1747,5 +1774,7 @@ struct
     List.rev_map
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
+
+
 
 end

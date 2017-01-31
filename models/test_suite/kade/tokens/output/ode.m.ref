@@ -1,3 +1,4 @@
+% divide_rule_rate_by:0 
 function main=main()
 % command line: 
 %      'KaDE' '../../compiler/tokens/tokens.ka' '-d' 'output' '-l' '1' '-p''0.1'

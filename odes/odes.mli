@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jan 09 2017>
+  * Last modification: Time-stamp: <Jan 31 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -41,5 +41,8 @@ sig
   val get_lhs_cc :
     enriched_rule -> (connected_component_id * I.connected_component) list
   val get_divide_rate_by : enriched_rule -> int
+
+  val get_list_of_divide_rule_by_rate :
+    I.compil -> Loggers.t -> I.nauto_in_rules_cache * unit
 
 end

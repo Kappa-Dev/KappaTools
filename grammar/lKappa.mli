@@ -11,7 +11,7 @@
 type switching =
   | Linked of int Locality.annot | Freed | Maintained | Erased
 
-type rule_internal =
+type rule_internal = (*state*)
   | I_ANY
   | I_ANY_CHANGED of int
   | I_ANY_ERASED
@@ -19,9 +19,9 @@ type rule_internal =
   | I_VAL_ERASED of int
 
 type rule_agent =
-  { ra_type: int;
+  { ra_type: int; (*agent_id*)
     ra_erased: bool;
-    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
+    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array; (*state, _ , switch*)
     ra_ints: rule_internal array;
     ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
                 rule_internal array) option;
