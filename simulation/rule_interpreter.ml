@@ -849,12 +849,12 @@ let incorporate_extra_pattern domain state pattern =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
   let () =
-    if not (Mods.IntSet.is_empty
-              (Pattern.ObsMap.get state.roots_of_patterns pattern)) then
+    if Mods.IntSet.is_empty
+        (Pattern.ObsMap.get state.roots_of_patterns pattern) then
       Pattern.ObsMap.set
-      state.roots_of_patterns
-      pattern
-      (Matching.roots_of domain state.edges pattern) in
+        state.roots_of_patterns
+        pattern
+        (Matching.roots_of domain state.edges pattern) in
   { state with outdated = false }
 
 let snapshot env counter fn state = {
