@@ -186,6 +186,7 @@ and extract_cc_bool acc = function
   | COMPARE_OP (_,a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
 
 let extract_connected_components x = aux_extract_cc [] x
+let extract_connected_components_bool x = extract_cc_bool [] x
 
 let setup_alg_vars_rev_dep toks vars =
   let in_t = Operator.DepSet.empty in

@@ -179,6 +179,11 @@ let extract_connected_components_expr acc e =
     (List.fold_left (fun acc a -> List.rev_append (Array.to_list a) acc))
     acc (Alg_expr.extract_connected_components e)
 
+let extract_connected_components_bool e =
+  List.fold_left
+    (List.fold_left (fun acc a -> List.rev_append (Array.to_list a) acc))
+    [] (Alg_expr.extract_connected_components_bool e)
+
 let extract_connected_components_rule acc r =
   let a =
     List.fold_left

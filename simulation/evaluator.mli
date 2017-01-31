@@ -13,6 +13,6 @@ val do_interactive_directives :
   Model.t * (bool * Rule_interpreter.t * State_interpreter.t)
 
 val get_pause_criteria :
-  max_sharing:bool -> Signature.contact_map -> Model.t ->
+  max_sharing:bool -> Signature.contact_map -> Model.t -> Rule_interpreter.t ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
-  Model.t * (Pattern.id array list, int) Alg_expr.bool
+  Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool

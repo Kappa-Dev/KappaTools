@@ -413,10 +413,11 @@ let start
       let () = reinitialize random_state t in
       Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
       fun pause ->
-      Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
-        t.contact_map t.env pause >>=
-      fun (env',b'') ->
+      Lwt.wrap4 (Evaluator.get_pause_criteria ~max_sharing:false)
+        t.contact_map t.env t.graph pause >>=
+      fun (env',graph',b'') ->
       let () = t.env <- env' in
+      let () = t.graph <- graph' in
       let () = t.pause_condition <- b'' in
       let () =
         Counter.set_plot_period
@@ -541,10 +542,11 @@ let continue
        else
          Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
          fun pause ->
-         Lwt.wrap3 (Evaluator.get_pause_criteria ~max_sharing:false)
-           t.contact_map t.env pause >>=
-         fun (env',b'') ->
+         Lwt.wrap4 (Evaluator.get_pause_criteria ~max_sharing:false)
+           t.contact_map t.env t.graph pause >>=
+         fun (env',graph',b'') ->
          let () = t.env <- env' in
+         let ()  = t.graph <- graph' in
          let () = t.pause_condition <- b'' in
          (*let () =
            Counter.set_max_time

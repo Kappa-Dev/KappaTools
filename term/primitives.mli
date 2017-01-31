@@ -87,6 +87,9 @@ val exists_modification : (modification -> bool) -> perturbation array -> bool
 val extract_connected_components_modifications :
   modification list -> Pattern.id list
 
+val extract_connected_components_bool :
+  (Pattern.id array list,int) Alg_expr.bool Locality.annot -> Pattern.id list
+
 val map_expr_rule : (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
   elementary_rule -> elementary_rule
 val map_expr_perturbation :

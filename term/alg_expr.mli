@@ -72,6 +72,7 @@ val setup_alg_vars_rev_dep :
 val has_mix : ?var_decls:('b -> ('c,'b) e) -> ('a,'b) e -> pervasives_bool
 
 val extract_connected_components : ('a,'b) e Locality.annot -> 'a list
+val extract_connected_components_bool : ('a,'b) bool Locality.annot -> 'a list
 
 val propagate_constant :
   ?max_time:float -> ?max_events:int -> int list ->

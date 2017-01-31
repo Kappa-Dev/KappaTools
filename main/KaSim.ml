@@ -235,10 +235,10 @@ let () =
             try
               match KappaParser.interactive_command KappaLexer.token lexbuf with
               | Ast.RUN b ->
-                let env',b'' = Evaluator.get_pause_criteria
+                let env',graph',b'' = Evaluator.get_pause_criteria
                     ~max_sharing:kasim_args.Kasim_args.maxSharing
-                    contact_map env b in
-                 env',interactive_loop ~outputs b'' env' counter graph state
+                    contact_map env graph b in
+                 env',interactive_loop ~outputs b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 Evaluator.do_interactive_directives
