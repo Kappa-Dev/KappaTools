@@ -1,5 +1,21 @@
-% divide_rule_rate_by:1 
-<?xml version="1.0" encoding="UTF-8"?>
+mod x20: /*cc21*/ A/*1*/(x, c!1), C/*3*/(x1~p, x2~u!1)
+-- C/*3*//*0*/.x2 = A/*1*//*0*/.c, C/*3*//*0*/.x2~ =
+++ C/*3*//*0*/.x2 = ⊥, C/*3*//*0*/.x2~p =, A/*1*//*0*/.c = ⊥
+@mod_ratea.c0: /*cc19*/ A/*1*/(x, c), 1: /*cc20*/ C/*3*/(x1~p, x2~u)
+-- C/*3*//*1*/.x2 = ⊥, A/*1*//*0*/.c = ⊥
+++ C/*3*//*1*/.x2 = A/*1*//*0*/.c
+@on_ratemod x10: /*cc18*/ A/*1*/(c!1), C/*3*/(x1~u!1)
+-- A/*1*//*0*/.c = C/*3*//*0*/.x1, C/*3*//*0*/.x1~ =
+++ A/*1*//*0*/.c = ⊥, C/*3*//*0*/.x1 = ⊥, C/*3*//*0*/.x1~p =
+@mod_rateab.c0: /*cc16*/ A/*1*/(x!1, c), B/*2*/(x!1),
+             1: /*cc17*/ C/*3*/(x1~u)
+-- C/*3*//*1*/.x1 = ⊥, A/*1*//*0*/.c = ⊥
+++ C/*3*//*1*/.x1 = A/*1*//*0*/.c
+@on_ratea.b_op0: /*cc2*/ A/*1*/(x!1), B/*2*/(x!1)
+-- B/*2*//*0*/.x = A/*1*//*0*/.x ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥
+@off_ratea.b0: /*cc1*/ A/*1*/(x), 1: /*cc6*/ B/*2*/(x)
+-- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ B/*2*//*1*/.x = A/*1*//*0*/.x
+@on_ratedivide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
 <!--       KaDE   ../../cflows/abc/abc.ka   -d   output   -l   1   -p   0.1   -ode-backend   SBML    -sbml-output  abc.xml  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">

@@ -1,4 +1,10 @@
-% divide_rule_rate_by:1 
+unbind0: /*cc2*/ T/*1*/(x!1), U/*2*/(x!1) -- T/*1*//*0*/.x = U/*2*//*0*/.x
+++ T/*1*//*0*/.x = ⊥, U/*2*//*0*/.x = ⊥
+@unbind_rate
+bind0: /*cc3*/ U/*2*/(x), 1: /*cc1*/ T/*1*/(x)
+-- T/*1*//*1*/.x = ⊥, U/*2*//*0*/.x = ⊥ ++ T/*1*//*1*/.x = U/*2*//*0*/.x
+@qU
+divide_rule_rate_by: 1 divide_rule_rate_by: 1 
 function main=main()
 % command line: 
 %      'KaDE' 'modifiers.ka' '-d' 'output' '-l' '1' '-p''0.1'

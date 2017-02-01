@@ -9,7 +9,12 @@
 type internal = int option
 type link = FREE | VAL of int
 type agent =
-  { a_type: int; a_ports: link array; a_ints: internal array; }
+  {
+    a_type: int;
+    a_ports: link array;
+    a_ints: internal array;
+  }
+
 type t = agent list
 
 let print_link f = function
@@ -23,6 +28,7 @@ let aux_pp_si sigs a s f i =
     match i with
     | Some i -> Format.fprintf f "%i~%i" s i
     | None -> Format.pp_print_int f s
+
 let print_intf compact with_link ?sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
@@ -40,9 +46,10 @@ let aux_pp_ag sigs f a =
   match sigs with
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
+
 let print_agent compact link ?sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (aux_pp_ag sigs) ag.a_type
-    (print_intf compact link ?sigs ag.a_type) (ag.a_ports,ag.a_ints)
+    (print_intf compact link ?sigs ag.a_type) (ag.a_ports, ag.a_ints)
 
 let print ~compact ?sigs f mix =
   Pp.list Pp.comma (print_agent compact true ?sigs) f mix

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jan 31 2017>
+  * Last modification: Time-stamp: <Feb 01 2017>
 *)
 
 let local_trace = false
@@ -1709,26 +1709,32 @@ struct
 
     let get_list_of_divide_rule_by_rate compil logger =
       let empty_cache = I.empty_lkappa_cache () in
-      let cache, i =
-        List.fold_left (fun (cache, _) rule ->
+      let cache, i_lis =
+        List.fold_left (fun (cache, current_list) rule ->
+            let () =
+              match
+                Loggers.formatter_of_logger logger
+              with
+              | None -> ()
+              | Some fmt ->
+                let () =
+                  I.print_rule_name ~compil fmt rule
+                in
+                I.print_rule ~compil fmt rule;
+                Ode_loggers.print_newline logger
+            in
             let cache, int =
               I.divide_rule_rate_by cache compil rule
             in
-            cache, int
-          ) (empty_cache, 0) (I.get_rules compil)
+            cache, int :: current_list
+          ) (empty_cache, []) (I.get_rules compil)
       in
-      (*let () = Format.printf "+ THE divide_rule_rate_by ... @." in*)
       let () =
-        match Loggers.formatter_of_logger logger with
-        | None -> Format.printf "None case"
-        | Some fmt ->   Format.fprintf fmt "%% divide_rule_rate_by:%i \n" i
-        (*let () =
-            List.iter (fun i ->
-                Format.fprintf fmt "divide_rule_rate_by:%i \n" i
-              ) int_list
-          in
-          ()*)
+        List.iter (fun i ->
+            Loggers.fprintf logger "\ndivide_rule_rate_by: %i \n\n" i
+          ) i_lis
       in
+      let () = Ode_loggers.print_newline logger in
       cache, ()
 
   let export_network

@@ -73,18 +73,29 @@ module CannonicSet_and_map =
 
 module CannonicMap = CannonicSet_and_map.Map
 
+module Int =
+struct
+  type t = (CannonicMap.elt * int)
+  let compare = compare
+  let print _ _  = ()
+end
+
+module RuleCache  = Hashed_list.Make(Int)
+
 type cache =
   {
     internal_state_cache: PropertiesCache.cache ;
     binding_state_cache: BindingCache.cache ;
-    cannonic_cache: CannonicCache.cache
+    cannonic_cache: CannonicCache.cache;
+    rule_cache : RuleCache.cache
   }
 
 let init_cache () =
   {
     internal_state_cache = PropertiesCache.init () ;
     binding_state_cache = BindingCache.init () ;
-    cannonic_cache = CannonicCache.init ()
+    cannonic_cache = CannonicCache.init ();
+    rule_cache = RuleCache.init ()
   }
 
 (* id gets rid of location annotation *)
@@ -591,7 +602,7 @@ let mixture_to_species_map rate_convention cache lkappa_mixture created =
              with
              | None -> cache, CannonicMap.add cannonic (1,nauto) map
              | Some (occ, nauto') when nauto = nauto' ->
-               cache, CannonicMap.add cannonic (occ+1,nauto) map
+               cache, CannonicMap.add cannonic (occ,nauto) map
              | Some _ -> assert false
          else cache, map)
       (cache.cannonic_cache, map)
@@ -617,5 +628,50 @@ let nauto_of_map map =
 
 let nauto rate_convention cache lkappa_mixture created =
   let cache, map =
-    mixture_to_species_map rate_convention cache lkappa_mixture created in
+    mixture_to_species_map rate_convention cache lkappa_mixture created
+  in
+  (*let () = Loggers.fprintf logger "*****" in
+  let () = Loggers.print_newline logger in
+
+  let () =
+    CannonicMap.fold (fun cannonic (nocc, nauto) () ->
+        let () = Loggers.fprintf logger "nocc:%i - " nocc in
+        let () = Loggers.fprintf logger "nauto:%i - " nauto in
+        let () = Loggers.fprintf logger "cannonic:%a"
+            CannonicCache.print  cannonic
+        in
+        let () = Loggers.print_newline logger in
+        ()
+      ) map ()
+  in
+  let () = Loggers.fprintf logger "*****" in
+  let () = Loggers.print_newline logger in*)
   cache, nauto_of_map map
+
+(****************************************************************)
+
+let map_to_hash_list logger rate_convention cache lkappa_mixture
+    created =
+  match rate_convention with
+  | Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+    RuleCache.init (), RuleCache.empty
+  | Ode_args.Biochemist ->
+  let cache, map =
+    mixture_to_species_map Ode_args.Biochemist cache
+      lkappa_mixture created
+  in
+  let pair_list =
+    CannonicMap.fold
+      (fun cannonic (nocc, _) current_list ->
+         let list =
+           (cannonic, nocc) :: current_list
+         in
+         list
+
+      ) map []
+  in
+  let cache, hash_list =
+    RuleCache.hash cache.rule_cache pair_list
+  in
+  (*TODO:total order*)
+  cache, hash_list

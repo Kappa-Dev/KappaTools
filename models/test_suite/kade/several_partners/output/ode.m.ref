@@ -1,4 +1,16 @@
-% divide_rule_rate_by:1 
+A(x!_) -> 0: /*cc3*/ A/*1*/(x!1), B/*2*/(y!1)
+-- B/*2*//*0*/.y = A/*1*//*0*/.x, A/*1*//*0*/ ++ B/*2*//*0*/.y = ⊥
+@'r0: A(x!_) ->  @ (|A()| * [T])_rate'
+A(x!_) -> 0: /*cc2*/ A/*1*/(x!1), B/*2*/(x!1)
+-- B/*2*//*0*/.x = A/*1*//*0*/.x, A/*1*//*0*/ ++ B/*2*//*0*/.x = ⊥
+@'r0: A(x!_) ->  @ (|A()| * [T])_rate'
+A(x), B(y) -> A(x!1), B(y!1)0: /*cc1*/ A/*1*/(x), 1: /*cc5*/ B/*2*/(y)
+-- B/*2*//*1*/.y = ⊥, A/*1*//*0*/.x = ⊥ ++ B/*2*//*1*/.y = A/*1*//*0*/.x
+@[T]
+A(x), B(x) -> A(x!1), B(x!1)0: /*cc1*/ A/*1*/(x), 1: /*cc4*/ B/*2*/(x)
+-- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ B/*2*//*1*/.x = A/*1*//*0*/.x
+@1
+divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 
 function main=main()
 % command line: 
 %      'KaDE' 'several_partners.ka' '-d' 'output' '-l' '1' '-p''0.01'

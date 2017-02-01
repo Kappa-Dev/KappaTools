@@ -1,5 +1,6 @@
-% divide_rule_rate_by:1 
-<?xml version="1.0" encoding="UTF-8"?>
+expo3 -- t <- 1.1 ++ t <- 2.2 @expo3_rateexpo2 -- t <- ||t|| ++ t <- 2
+@expo2_rateexpo0: /*cc1*/ T/*1*/() --  ++ T()
+@1divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
 <!--       KaDE   tokens3.ka   -d   output   -l   1   -p   0.1    -ode-backend  SBML  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">

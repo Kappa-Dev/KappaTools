@@ -61,35 +61,50 @@ let elementary_rule ?env f r =
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
     let () = Pattern.print ?domain ~with_id:true f cc in
-    Format.pp_close_box f () in
+    Format.pp_close_box f ()
+  in
   let ins_fresh,ins_mixte,ins_existing =
     match sigs with
     | None -> [],[],r.Primitives.inserted
     | Some sigs ->
       Primitives.Transformation.raw_mixture_of_fresh
-        sigs r.Primitives.inserted in
+        sigs r.Primitives.inserted
+  in
   Format.fprintf
     f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a%a%a@]%t@[%a@]@]@ @@%a%t"
-    (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
-    (Pp.list Pp.comma pr_trans) r.Primitives.removed
+    (Pp.array Pp.comma boxed_cc)
+    r.Primitives.connected_components
+    (Pp.list Pp.comma pr_trans)
+
+    r.Primitives.removed
+
     (if r.Primitives.removed <> [] && r.Primitives.consumed_tokens <> []
      then Pp.space else Pp.empty)
-    (Pp.list Pp.space pr_tok) r.Primitives.consumed_tokens
-    (Raw_mixture.print ~compact:true ?sigs) (List.map snd ins_fresh)
-    (Pp.list ~trailing:Pp.space Pp.comma pr_mixte) ins_mixte
+
+    (Pp.list Pp.space pr_tok)
+    r.Primitives.consumed_tokens
+
+    (Raw_mixture.print ~compact:true ?sigs)
+    (List.map snd ins_fresh)
+    (Pp.list ~trailing:Pp.space Pp.comma pr_mixte)
+
+    ins_mixte
     (Pp.list Pp.comma pr_trans) ins_existing
     (if r.Primitives.inserted <> [] && r.Primitives.injected_tokens <> []
      then Pp.space else Pp.empty)
-    (Pp.list Pp.space pr_tok) r.Primitives.injected_tokens
-    pr_alg r.Primitives.rate
-    (fun f -> match r.Primitives.unary_rate with
+    (Pp.list Pp.space pr_tok)
+    r.Primitives.injected_tokens
+    pr_alg
+    r.Primitives.rate
+    (fun f ->
+       match r.Primitives.unary_rate with
        | None -> ()
-       | Some (rate, dist)
-         -> Format.fprintf
-              f " (%a%a)" pr_alg rate
-              (Pp.option (fun f md ->
-                           Format.fprintf f ":%a" (alg_expr ?env) md))
-              dist)
+       | Some (rate, dist) ->
+         Format.fprintf
+           f " (%a%a)" pr_alg rate
+           (Pp.option (fun f md ->
+                Format.fprintf f ":%a" (alg_expr ?env) md))
+           dist)
 
 let modification ?env f m =
   let domain = match env with

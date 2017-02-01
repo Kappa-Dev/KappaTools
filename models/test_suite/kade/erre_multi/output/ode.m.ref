@@ -1,4 +1,57 @@
-% divide_rule_rate_by:1 
+R(r!_) -> R(r)0: /*cc7*/ R/*2*/(r!1), R/*3*/(r!1)
+-- R/*3*//*0*/.r = R/*2*//*0*/.r ++ R/*3*//*0*/.r = ⊥, R/*2*//*0*/.r = ⊥
+@5
+R(r!_) -> 0: /*cc7*/ R/*2*/(r!1), R/*3*/(r!1)
+-- R/*3*//*0*/.r = R/*2*//*0*/.r, R/*2*//*0*/.e = ???, R/*2*//*0*/
+++ R/*3*//*0*/.r = ⊥
+@4
+R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)0: /*cc10*/ E/*1*/(s!1),
+                                                 R/*2*/(e!1, r),
+                                            1: /*cc10*/ E/*1*/(s!1),
+                                                 R/*2*/(e!1, r)
+-- R/*2*//*1*/.r = ⊥, R/*2*//*0*/.r = ⊥ ++ R/*2*//*1*/.r = R/*2*//*0*/.r
+@3
+R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)0: /*cc9*/ E/*1*/(r!1),
+                                                 R/*2*/(e!1, r),
+                                            1: /*cc10*/ E/*1*/(s!1),
+                                                 R/*2*/(e!1, r)
+-- R/*2*//*1*/.r = ⊥, R/*2*//*0*/.r = ⊥ ++ R/*2*//*1*/.r = R/*2*//*0*/.r
+@3
+R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)0: /*cc11*/ E/*1*/(r!1, s!2),
+                                                 R/*2*/(e!2, r),
+                                                 R/*3*/(e!1, r)
+-- R/*2*//*0*/.r = ⊥, R/*3*//*0*/.r = ⊥ ++ R/*2*//*0*/.r = R/*3*//*0*/.r
+@3
+R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)0: /*cc10*/ E/*1*/(s!1),
+                                                 R/*2*/(e!1, r),
+                                            1: /*cc9*/ E/*1*/(r!1),
+                                                 R/*2*/(e!1, r)
+-- R/*2*//*1*/.r = ⊥, R/*2*//*0*/.r = ⊥ ++ R/*2*//*1*/.r = R/*2*//*0*/.r
+@3
+R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)0: /*cc11*/ E/*1*/(r!1, s!2),
+                                                 R/*2*/(e!2, r),
+                                                 R/*3*/(e!1, r)
+-- R/*3*//*0*/.r = ⊥, R/*2*//*0*/.r = ⊥ ++ R/*3*//*0*/.r = R/*2*//*0*/.r
+@3
+R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)0: /*cc9*/ E/*1*/(r!1),
+                                                 R/*2*/(e!1, r),
+                                            1: /*cc9*/ E/*1*/(r!1),
+                                                 R/*2*/(e!1, r)
+-- R/*2*//*1*/.r = ⊥, R/*2*//*0*/.r = ⊥ ++ R/*2*//*1*/.r = R/*2*//*0*/.r
+@3
+R(e!_,r) -> R(e,r)0: /*cc10*/ E/*1*/(s!1), R/*2*/(e!1, r)
+-- E/*1*//*0*/.s = R/*2*//*0*/.e ++ E/*1*//*0*/.s = ⊥, R/*2*//*0*/.e = ⊥
+@2
+R(e!_,r) -> R(e,r)0: /*cc9*/ E/*1*/(r!1), R/*2*/(e!1, r)
+-- E/*1*//*0*/.r = R/*2*//*0*/.e ++ E/*1*//*0*/.r = ⊥, R/*2*//*0*/.e = ⊥
+@2
+E(r,s), R(e) -> E(r,s!1), R(e!1)0: /*cc8*/ E/*1*/(r, s), 1: /*cc5*/ R/*2*/(e)
+-- R/*2*//*1*/.e = ⊥, E/*1*//*0*/.s = ⊥ ++ R/*2*//*1*/.e = E/*1*//*0*/.s
+@1
+E(r,s), R(e) -> E(r!1,s), R(e!1)0: /*cc8*/ E/*1*/(r, s), 1: /*cc5*/ R/*2*/(e)
+-- R/*2*//*1*/.e = ⊥, E/*1*//*0*/.r = ⊥ ++ R/*2*//*1*/.e = E/*1*//*0*/.r
+@1
+divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 
 function main=main()
 % command line: 
 %      'KaDE' 'erre.ka' '-d' 'output' '-l' '1' '-p''0.01'
@@ -223,23 +276,23 @@ dydt(3)=dydt(3)+k(11)*y(7);
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) 
 
-dydt(4)=dydt(4)-1/2*k(9)*y(4)*y(3);
-dydt(3)=dydt(3)-1/2*k(9)*y(4)*y(3);
-dydt(7)=dydt(7)+1/2*k(9)*y(4)*y(3);
+dydt(4)=dydt(4)-k(9)*y(4)*y(3);
+dydt(3)=dydt(3)-k(9)*y(4)*y(3);
+dydt(7)=dydt(7)+k(9)*y(4)*y(3);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) 
 
-dydt(3)=dydt(3)-1/2*k(7)*y(3)*y(4);
-dydt(4)=dydt(4)-1/2*k(7)*y(3)*y(4);
-dydt(7)=dydt(7)+1/2*k(7)*y(3)*y(4);
+dydt(3)=dydt(3)-k(7)*y(3)*y(4);
+dydt(4)=dydt(4)-k(7)*y(3)*y(4);
+dydt(7)=dydt(7)+k(7)*y(3)*y(4);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) 
 
-dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
-dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
-dydt(6)=dydt(6)+2/2*k(5)*y(3)*y(3);
+dydt(3)=dydt(3)-k(5)*y(3)*y(3);
+dydt(3)=dydt(3)-k(5)*y(3)*y(3);
+dydt(6)=dydt(6)+2*k(5)*y(3)*y(3);
 
 % rule    : R(e!_,r) -> R(e,r)
 % reaction: E(r!1, s), R(e!1, r) -> R(e, r) + E(r, s) 
@@ -279,9 +332,9 @@ dydt(4)=dydt(4)+k(11)*y(5)/2;
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) 
 
-dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
-dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
-dydt(5)=dydt(5)+2/2*k(10)*y(4)*y(4);
+dydt(4)=dydt(4)-k(10)*y(4)*y(4);
+dydt(4)=dydt(4)-k(10)*y(4)*y(4);
+dydt(5)=dydt(5)+2*k(10)*y(4)*y(4);
 
 % rule    : R(e!_,r) -> R(e,r)
 % reaction: E(r, s!1), R(e!1, r) -> R(e, r) + E(r, s) 
