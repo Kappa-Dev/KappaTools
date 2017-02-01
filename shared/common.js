@@ -244,14 +244,6 @@ function hashColor(s){
     return "#"+hashString;
 }
 
-function inputEnter(id,handler){
-    $(document).keyup(function (e) {
-	if ($(id) && (e.keyCode === 13)) {
-	    handler();
-	}
-    });
-}
-
 function ajaxRequest(url,type,timeout,data,handler){
     var parameter = { url : url , type : type, timeout : timeout };
     if(data){ parameter.data = data; }

@@ -91,15 +91,6 @@ let saveFile
        Js.Unsafe.inject (Js.string filename)
     |]
 
-let input_enter
-    ~(id : string)
-    ~(handler : (unit -> unit))  =
-  Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr "inputEnter")
-    [| Js.Unsafe.inject (Js.string id) ;
-       Js.Unsafe.inject handler ;
-    |]
-
 type meth = [ `DELETE | `GET | `HEAD | `OPTIONS | `PATCH | `POST | `PUT ]
 let method_to_string : meth -> string =
   function

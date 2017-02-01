@@ -478,9 +478,6 @@ let onload (t : Ui_simulation.t) : unit =
   let continue_button_dom =
     Tyxml_js.To_dom.of_button continue_button
   in
-  let perturb_button_dom =
-    Tyxml_js.To_dom.of_button perturbation_button
-  in
   let perturbation_code_input_dom =
     Tyxml_js.To_dom.of_input perturbation_code_input
   in
@@ -524,7 +521,7 @@ let onload (t : Ui_simulation.t) : unit =
       | head::_ -> set_runtime head (default_runtime)
       | _ -> default_runtime ()
     with _ -> default_runtime () in
-  let run_pertubation () : unit =
+  let run_perturbation () : unit =
     Common.async
       (fun _ ->
          let code : string =
@@ -532,14 +529,6 @@ let onload (t : Ui_simulation.t) : unit =
          in
          Ui_simulation.perturb_simulation t ~code:code)
   in
-  let () = perturb_button_dom##.onclick :=
-      Dom.handler
-        (fun _ -> let () = run_pertubation () in Js._true)
-  in
-  let () =
-    Common.input_enter
-      ~id:perturbation_code_id
-      ~handler:run_pertubation in
   let () = continue_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
@@ -597,11 +586,7 @@ let onload (t : Ui_simulation.t) : unit =
          try UIState.set_model_plot_period (float_of_string value)
          with | Not_found | Failure _ -> ()) in
   let () = perturbation_button_dom##.onclick :=
-      Dom.handler
-        (fun _ ->
-           let () = run_pertubation () in
-           Js._true)
-  in
+      Dom.handler (fun _ -> let () = run_perturbation () in Js._true) in
 
   ()
 let onresize (_ : Ui_simulation.t) : unit = ()
