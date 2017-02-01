@@ -16,7 +16,7 @@ let simulation_pause_input =
     ~a:[Html.a_id simulation_pause_id ;
         Html.a_input_type `Text;
         Html.a_class ["form-control"];
-        Html.a_placeholder "[T] = 100" ;
+        Html.a_placeholder "[T] > 100" ;
         Tyxml_js.R.Html.a_value UIState.model_pause_condition
        ]
     ()

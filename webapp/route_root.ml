@@ -6,14 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Cohttp_lwt_unix
-open Cohttp
-open Lwt
-open Request
-open Api
-open Conduit_lwt_unix
-open Unix
-open Lwt_log
+open Lwt.Infix
 
 let project_ref context =
   List.assoc "projectid" context.Webapp_common.arguments
@@ -35,11 +28,11 @@ let route
   [  { Webapp_common.path = "/v2" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
-         (fun ~context:context ->
+         (fun ~context ->
             (manager#environment_info ()) >>=
             (fun (info : Api_types_j.environment_info Api.result)
               -> Webapp_common.result_response
-                  ~string_of_success:Api_types_j.string_of_environment_info
+                  ~string_of_success:(Api_types_j.string_of_environment_info ?len:None)
                   info
             )
          )
@@ -53,7 +46,7 @@ let route
                match shutdown_key with
                | Some shutdown_key when shutdown_key = body ->
                  let () =
-                   async
+                   Lwt.async
                      (fun () -> Lwt_unix.sleep 1.0 >>=
                        fun () -> exit 0)
                  in
@@ -227,7 +220,7 @@ let route
             let (project_id,simulation_id) = simulation_ref context in
             (manager#simulation_detail_log_message project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_log_message_detail ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_log_message ?len:None)
             )
          )
      };
