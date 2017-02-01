@@ -102,7 +102,8 @@ let content (t : Ui_simulation.t) =
                          let () = ReactiveData.RList.set
                              handle
                              (match file_line_info.Api_types_j.file_line_ids with
-                                key::[] ->
+                              | [] -> []
+                              | key::[] ->
                                 let () = update_outputs
                                     t (Tools.unsome "/dev/stdout" key) in
                                 [Html.h4
@@ -110,8 +111,7 @@ let content (t : Ui_simulation.t) =
                                        (Ui_common.option_label
                                           (Tools.unsome "" key)
                                        )]]
-                              | _ -> [select file_line_info]
-                             )
+                              | _ :: _ :: _ -> [select file_line_info])
                          in
                          Lwt.return_unit
                        )
