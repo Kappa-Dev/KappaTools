@@ -2,7 +2,7 @@ A(), A() -> 0: /*cc2*/ A/*1*/(), 1: /*cc2*/ A/*1*/()
 -- A/*1*//*1*/.x = ???, A/*1*//*1*/, A/*1*//*0*/.x = ???, A/*1*//*0*/ ++ 
 
 @1
-divide_rule_rate_by: 1 
+divide_rule_rate_by: 2 
 function main=main()
 % command line: 
 %      'KaDE' 'bet.ka' '-d' 'output' '-l' '1' '-p''0.01'
@@ -147,8 +147,8 @@ dydt=zeros(nodevar,1);
 % rule    : A(), A() -> 
 % reaction: A() + A() ->  
 
-dydt(1)=dydt(1)-k(1)*y(1)*y(1);
-dydt(1)=dydt(1)-k(1)*y(1)*y(1);
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
 dydt(2)=1;
 
 end

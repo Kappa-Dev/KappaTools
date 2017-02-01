@@ -602,7 +602,7 @@ let mixture_to_species_map rate_convention cache lkappa_mixture created =
              with
              | None -> cache, CannonicMap.add cannonic (1,nauto) map
              | Some (occ, nauto') when nauto = nauto' ->
-               cache, CannonicMap.add cannonic (occ,nauto) map
+               cache, CannonicMap.add cannonic (occ+1,nauto) map
              | Some _ -> assert false
          else cache, map)
       (cache.cannonic_cache, map)

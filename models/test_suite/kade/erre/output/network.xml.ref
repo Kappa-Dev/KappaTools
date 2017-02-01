@@ -17,7 +17,7 @@ A(x!1), B(x!1) -> A(x), B(x)0: /*cc7*/ A/*4*/(x!1), B/*5*/(x!1)
 -- R/*2*//*0*/.e = E/*1*//*0*/.r ++ R/*2*//*0*/.e = ⊥, E/*1*//*0*/.r = ⊥
 @2E(r), R(e) -> E(r!1), R(e!1)0: /*cc1*/ E/*1*/(r), 1: /*cc3*/ R/*2*/(e)
 -- R/*2*//*1*/.e = ⊥, E/*1*//*0*/.r = ⊥ ++ R/*2*//*1*/.e = E/*1*//*0*/.r
-@1divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 <?xml version="1.0" encoding="UTF-8"?>
+@1divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 2 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
 <!--       KaDE   erre.ka   -d   output   -l   1   -p   0.1    -ode-backend  SBML  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
@@ -151,7 +151,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k3 </ci><apply>
+<times/><apply>
+<divide/><ci> k3 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
 <times/><ci> s6 </ci><ci> s6 </ci></apply>
 </apply>
 </math>

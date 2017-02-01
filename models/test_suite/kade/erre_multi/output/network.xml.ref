@@ -41,7 +41,7 @@ R(r!_) -> R(r)0: /*cc7*/ R/*2*/(r!1), R/*3*/(r!1)
 @1E(r,s), R(e) -> E(r!1,s), R(e!1)0: /*cc8*/ E/*1*/(r, s),
                                   1: /*cc5*/ R/*2*/(e)
 -- R/*2*//*1*/.e = ⊥, E/*1*//*0*/.r = ⊥ ++ R/*2*//*1*/.e = E/*1*//*0*/.r
-@1divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 <?xml version="1.0" encoding="UTF-8"?>
+@1divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 2 divide_rule_rate_by: 2 divide_rule_rate_by: 2 divide_rule_rate_by: 2 divide_rule_rate_by: 2 divide_rule_rate_by: 2 divide_rule_rate_by: 1 divide_rule_rate_by: 1 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
 <!--       KaDE   erre.ka   -d   output   -l   1   -p   0.1    -ode-backend  SBML  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
@@ -255,7 +255,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k9 </ci><apply>
+<times/><apply>
+<divide/><ci> k9 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
 <times/><ci> s4 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -274,7 +277,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k7 </ci><apply>
+<times/><apply>
+<divide/><ci> k7 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
 <times/><ci> s3 </ci><ci> s4 </ci></apply>
 </apply>
 </math>
@@ -292,7 +298,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k5 </ci><apply>
+<times/><apply>
+<divide/><ci> k5 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
 <times/><ci> s3 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -401,7 +410,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k10 </ci><apply>
+<times/><apply>
+<divide/><ci> k10 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
 <times/><ci> s4 </ci><ci> s4 </ci></apply>
 </apply>
 </math>
