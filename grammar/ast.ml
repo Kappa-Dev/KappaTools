@@ -379,9 +379,13 @@ let print_rates un op f def =
                            (fun f x -> Format.fprintf f "'%s'" x)) md))
            max_dist)
 
+let print_ast_edit_rule f r =
+  Format.fprintf f "@[<h>%a @@@ %a@]"
+    print_ast_mix r.mix (print_rates r.un_act None) r.act
+
 let print_ast_rule f r =
   Format.fprintf
-    f "@[<h>%a %a %a @@ %a@]"
+    f "@[<h>%a %a@ %a @@ %a@]"
     (print_one_size r.rm_token) r.lhs
     print_arrow r.bidirectional
     (print_one_size r.add_token) r.rhs

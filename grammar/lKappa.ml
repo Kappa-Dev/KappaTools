@@ -343,7 +343,8 @@ let rule_agent_of_json = function
 let rule_mixture_to_json = JsonUtil.of_list rule_agent_to_json
 let rule_mixture_of_json = JsonUtil.to_list rule_agent_of_json
 
-let lalg_expr_to_json = Alg_expr.e_to_yojson rule_mixture_to_json JsonUtil.of_int
+let lalg_expr_to_json =
+  Alg_expr.e_to_yojson rule_mixture_to_json JsonUtil.of_int
 let lalg_expr_of_json =
   Alg_expr.e_of_yojson rule_mixture_of_json (JsonUtil.to_int ?error_msg:None)
 
@@ -391,7 +392,8 @@ let rule_of_json = function
                  (Locality.annot_of_json lalg_expr_of_json)
                  (JsonUtil.to_int ?error_msg:None))
               (List.assoc "rm_tokens" l);
-          r_rate = Locality.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
+          r_rate =
+            Locality.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
           r_un_rate =
             (try
                JsonUtil.to_option
@@ -457,7 +459,6 @@ let forbid_modification pos = function
   | Some _ ->
     raise (ExceptionDefn.Malformed_Decl
              ("A modification is forbidden here.",pos))
-
 
 let several_internal_states pos =
   raise (ExceptionDefn.Malformed_Decl
@@ -638,7 +639,7 @@ let annotate_dropped_agent sigs links_annot (agent_name, _ as ag_ty) intf =
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
 let annotate_created_agent
-    sigs ?contact_map rannot (agent_name, pos as ag_ty) intf =
+    sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -675,9 +676,104 @@ let annotate_created_agent
          | [Ast.FREE, _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
   rannot,
-  ({ Raw_mixture.a_type = ag_id;
-     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; },
-   pos)
+  { Raw_mixture.a_type = ag_id;
+    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+
+let translate_modification sigs ?contact_map ag_id p_id
+    ?warn (lhs_links,rhs_links as links_annot) = function
+  | None -> Maintained,links_annot
+  | Some x ->
+    let () =
+      match warn with
+      | None -> ()
+      | Some (na,pos) ->
+        ExceptionDefn.warning
+          ~pos
+          (fun f ->
+             Format.fprintf
+               f "breaking a semi-link on site '%s' will induce a side effect"
+               na) in
+    match x with
+    | None ->  Freed,links_annot
+    | Some (j,pos_j) ->
+      let _,rhs_links' =
+        build_link sigs ?contact_map pos_j j ag_id p_id Freed rhs_links in
+      Linked (j,pos_j),(lhs_links,rhs_links')
+
+let annotate_edit_agent
+    ~is_rule sigs ?contact_map (agent_name, _ as ag_ty) links_annot intf =
+  let ag_id = Signature.num_of_agent ag_ty sigs in
+  let sign = Signature.get sigs ag_id in
+  let arity = Signature.arity sigs ag_id in
+  let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, Maintained) in
+  let internals = Array.make arity I_ANY in
+  let scan_port (links_annot,pset) p =
+    let (p_na,_) = p.Ast.port_nme in
+    let p_id = Signature.num_of_site ~agent_name p.Ast.port_nme sign in
+    let pset' = Mods.IntSet.add p_id pset in
+    let () = if pset == pset' then
+        several_occurence_of_site agent_name p.Ast.port_nme in
+    let links_annot' =
+      match p.Ast.port_lnk with
+      | [(Ast.LNK_ANY | Ast.LNK_SOME), pos as x] ->
+        let (modif,links_annot') = translate_modification
+            ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+            links_annot p.Ast.port_lnk_mod in
+        let () = ports.(p_id) <- (x, modif) in
+        links_annot'
+      | [Ast.LNK_TYPE (dst_p,dst_ty), pos] ->
+        let (modif,links_annot') = translate_modification
+            ~warn:(p_na,pos) sigs ?contact_map ag_id p_id
+            links_annot p.Ast.port_lnk_mod in
+        let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p modif in
+        links_annot'
+      | ([] | [Ast.FREE, _]) ->
+        let (modif,links_annot') = translate_modification
+            ?warn:None sigs ?contact_map ag_id p_id
+            links_annot p.Ast.port_lnk_mod in
+        let () = ports.(p_id) <- (Locality.dummy_annot Ast.FREE, modif) in
+        links_annot'
+      | [Ast.LNK_VALUE (i,()), pos] ->
+        let (modif,(lhs_links,rhs_links)) = translate_modification
+            ?warn:None sigs ?contact_map ag_id p_id
+            links_annot p.Ast.port_lnk_mod in
+        let va,lhs_links' =
+          build_link
+            sigs ?contact_map:(if is_rule then None else contact_map)
+            pos i ag_id p_id modif lhs_links in
+        let () = ports.(p_id) <- va in
+        (lhs_links',rhs_links)
+      | _::(_,pos)::_ ->
+        raise (ExceptionDefn.Malformed_Decl
+                 ("Several link state for a single site",pos)) in
+    let () =
+      match p.Ast.port_int,p.Ast.port_int_mod with
+      | [], None -> ()
+      | [ va ], Some va' ->
+        internals.(p_id) <-
+          I_VAL_CHANGED (Signature.num_of_internal_state p_id va sign,
+                         Signature.num_of_internal_state p_id va' sign)
+      | [], Some (_,pos as va) ->
+        let () =
+          ExceptionDefn.warning
+            ~pos
+            (fun f ->
+               Format.fprintf
+                 f
+                 "internal state of site '%s' of agent '%s' is modified \
+                  although it is left unpecified in the left hand side"
+                 p_na agent_name) in
+        internals.(p_id) <-
+          I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
+      | [ va ], None ->
+        let i_id = Signature.num_of_internal_state p_id va sign in
+        internals.(p_id) <- I_VAL_CHANGED (i_id,i_id)
+      | _ :: (_,pos) :: _, _ -> several_internal_states pos in
+    (links_annot',pset') in
+  let annot',_ =
+    List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
+  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
+    ra_syntax = Some (Array.copy ports, Array.copy internals);},annot'
 
 let annotate_agent_with_diff
     sigs ?contact_map (agent_name, _ as ag_ty) links_annot lp rp =
@@ -927,6 +1023,55 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
     [] lhs rhs
 
+let annotate_edit_mixture ~is_rule sigs ?contact_map m =
+  let ((lhs_links_one,lhs_links_two),(rhs_links_one,_)),mix,cmix =
+    List.fold_left
+      (fun (lannot,acc,news) (ty,intf,modif) ->
+         match modif with
+         | None ->
+           let a,lannot' =
+             annotate_edit_agent ~is_rule sigs ?contact_map ty lannot intf in
+           (lannot',a::acc,news)
+         | Some Ast.Create ->
+           let rannot',x' =
+             annotate_created_agent sigs ?contact_map (snd lannot) ty intf in
+           ((fst lannot,rannot'),acc,x'::news)
+         | Some Ast.Erase ->
+           let ra,lannot' = annotate_dropped_agent sigs (fst lannot) ty intf in
+           ((lannot',snd lannot),ra::acc,news))
+      (((Mods.IntMap.empty,Mods.IntMap.empty),
+        (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
+      m in
+  let () =
+    match Mods.IntMap.root lhs_links_one with
+    | None -> ()
+    | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+  let () = refer_links_annot lhs_links_two mix in
+  let () =
+    match Mods.IntMap.root rhs_links_one with
+    | None -> ()
+    | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+  (List.rev mix, List.rev cmix)
+
+let give_rule_label bidirectional (id,set) printer r = function
+  | None ->
+    (succ id,set), Format.asprintf "r%i: %a" id printer r
+  | Some (lab,pos) ->
+    let set' = Mods.StringSet.add lab set in
+    if set == set' then
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("A rule named '"^lab^"' already exists.",pos))
+    else if bidirectional then
+      let set'' =
+        Mods.StringSet.add (Ast.flip_label lab) set' in
+      if set' == set'' then
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ("A rule named '"^Ast.flip_label lab^"' already exists.",pos))
+      else (id,set''),lab
+    else (id,set'),lab
+
 let add_un_variable k_un acc rate_var =
   match k_un with
   | None -> (acc,None)
@@ -937,25 +1082,21 @@ let add_un_variable k_un acc rate_var =
       else (acc,k) in
     (acc_un,Some (k',dist))
 
-let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
-  let id',label = match label_opt with
-    | None ->
-       (succ id,set), Format.asprintf "r%i: %a" id Ast.print_ast_rule r
-    | Some (lab,pos) ->
-      let set' = Mods.StringSet.add lab set in
-      if set == set' then
-        raise
-          (ExceptionDefn.Malformed_Decl
-             ("A rule named '"^lab^"' already exists.",pos))
-      else if r.Ast.bidirectional then
-        let set'' =
-          Mods.StringSet.add (Ast.flip_label lab) set' in
-        if set' == set'' then
-          raise
-            (ExceptionDefn.Malformed_Decl
-               ("A rule named '"^Ast.flip_label lab^"' already exists.",pos))
-        else (id,set''),lab
-      else (id,set'),lab in
+let name_and_purify_edit_rule (label_opt,r) (pack,acc,rules) =
+  let pack',label =
+    give_rule_label false pack Ast.print_ast_edit_rule r label_opt in
+  let acc',act =
+    if Alg_expr.has_mix (fst r.Ast.act) then
+      let rate_var = label^"_rate" in
+      ((Locality.dummy_annot rate_var,r.Ast.act)::acc,
+       Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
+    else (acc,r.Ast.act) in
+  let acc'',un_act = add_un_variable r.Ast.un_act acc' (label^"_un_rate") in
+  (pack',acc'',(label_opt,{Ast.mix = r.Ast.mix; Ast.act; Ast.un_act})::rules)
+
+let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
+  let pack',label =
+    give_rule_label r.Ast.bidirectional pack Ast.print_ast_rule r label_opt in
   let acc',k_def =
     if Alg_expr.has_mix (fst r.Ast.k_def) then
       let rate_var = label^"_rate" in
@@ -986,13 +1127,13 @@ let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
          (ExceptionDefn.Malformed_Decl
             ("Incompatible arrow and kinectic rate for inverse definition",
              r_pos)) in
-  (id',acc''',
+  (pack',acc''',
    (label_opt,r.Ast.lhs,r.Ast.rhs,r.Ast.rm_token,r.Ast.add_token,
     k_def,k_un,r_pos)
    ::rules')
 
 let mixture_of_ast sigs ?contact_map pos mix =
-  match annotate_lhs_with_diff sigs ?contact_map mix mix with
+  match annotate_edit_mixture ~is_rule:false sigs ?contact_map mix with
   | r, [] -> r
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
@@ -1122,6 +1263,35 @@ let init_of_ast sigs tok contact_map = function
       raise (ExceptionDefn.Malformed_Decl
                (lab ^" is not a declared token",pos))
 
+let assemble_rule
+    sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
+  let tok = tk_nd.NamedDecls.finder in
+  { r_mix; r_created;
+    r_rm_tokens =
+      List.map (fun (al,tk) ->
+          (alg_expr_of_ast sigs tok algs al,
+           NamedDecls.elt_id ~kind:"token" tk_nd tk))
+        rm_tk;
+    r_add_tokens =
+      List.map (fun (al,tk) ->
+          (alg_expr_of_ast sigs tok algs al,
+           NamedDecls.elt_id ~kind:"token" tk_nd tk))
+        add_tk;
+    r_rate = alg_expr_of_ast sigs tok algs rate;
+    r_un_rate =
+      let r_dist d =
+        alg_expr_of_ast sigs tok algs ?max_allowed_var:None d in
+      Tools.option_map
+        (fun (un_rate',dist) ->
+           let un_rate'' =
+             alg_expr_of_ast sigs tok algs
+               ?max_allowed_var:None un_rate' in
+           match dist with
+           | Some d -> (un_rate'', Some (r_dist d))
+           | None -> (un_rate'', None))
+        un_rate;
+  }
+
 let create_t ast_intf =
   NamedDecls.create (
     Tools.array_map_of_list
@@ -1154,9 +1324,12 @@ let compil_of_ast overwrite c =
           (fun s -> (Tools.recti
                        (fun a k -> k::a) []
                        (Signature.internal_states_number i s sigs),[]))) in
-  let ((_,rule_names),extra_vars,cleaned_rules) =
+  let (name_pack,var_pack,cleaned_rules) =
     List.fold_right
       name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
+  let ((_,rule_names),extra_vars,cleaned_edit_rules) =
+    List.fold_right
+      name_and_purify_edit_rule c.Ast.edit_rules (name_pack,var_pack,[]) in
   let alg_vars_over =
     List_util.rev_map_append
       (fun (x,v) -> (Locality.dummy_annot x,
@@ -1174,6 +1347,22 @@ let compil_of_ast overwrite c =
   let perts',updated_vars =
     List_util.fold_right_map
       (perturbation_of_ast sigs tok algs contact_map) c.Ast.perturbations [] in
+  let old_style_rules =
+    List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
+        let mix,created =
+          annotate_lhs_with_diff sigs ~contact_map lhs rhs in
+        label,
+        (assemble_rule sigs tk_nd algs mix created rm_tk add_tk rate un_rate,
+         r_pos))
+      cleaned_rules in
+  let edit_rules =
+    List.rev_map (fun (label,r) ->
+        let mix,cmix =
+          annotate_edit_mixture ~is_rule:true sigs ~contact_map r.Ast.mix in
+        (label, Locality.dummy_annot
+           (assemble_rule sigs tk_nd algs mix cmix [] [] r.Ast.act r.Ast.un_act)))
+      cleaned_edit_rules in
+  let rules = List.rev_append edit_rules old_style_rules in
   sigs,contact_map,tk_nd,updated_vars,
   {
     Ast.variables =
@@ -1181,36 +1370,7 @@ let compil_of_ast overwrite c =
         (fun i (lab,expr) ->
            (lab,alg_expr_of_ast ~max_allowed_var:(pred i) sigs tok algs expr))
         alg_vars_over;
-    Ast.rules =
-      List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
-          let mix,created =
-            annotate_lhs_with_diff sigs ~contact_map lhs rhs in
-          label,
-          ({ r_mix = mix; r_created = List.map fst created;
-             r_rm_tokens =
-               List.map (fun (al,tk) ->
-                   (alg_expr_of_ast sigs tok algs al,
-                    NamedDecls.elt_id ~kind:"token" tk_nd tk))
-                 rm_tk;
-             r_add_tokens =
-               List.map (fun (al,tk) ->
-                   (alg_expr_of_ast sigs tok algs al,
-                    NamedDecls.elt_id ~kind:"token" tk_nd tk))
-                 add_tk;
-             r_rate = alg_expr_of_ast sigs tok algs rate;
-             r_un_rate =
-               let r_dist d =
-                 alg_expr_of_ast sigs tok algs ?max_allowed_var:None d in
-               Tools.option_map
-                 (fun (un_rate',dist) ->
-                   let un_rate'' =
-                     alg_expr_of_ast sigs tok algs
-                                     ?max_allowed_var:None un_rate' in
-                   match dist with
-                   | Some d -> (un_rate'', Some (r_dist d))
-                   | None -> (un_rate'', None))
-                 un_rate;
-           },r_pos)) cleaned_rules (*TODO edit_rules*);
+    Ast.rules ;
     Ast.edit_rules = [];
     Ast.observables =
       List.map (fun expr -> alg_expr_of_ast sigs tok algs expr)
