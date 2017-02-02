@@ -43,7 +43,7 @@ sig
   val get_divide_rate_by : enriched_rule -> int
 
   val get_list_of_divide_rule_by_rate :
-    Remanent_parameters_sig.parameters ->
+    Loggers.t ->
     I.compil -> I.nauto_in_rules_cache * unit
 
 end

@@ -162,10 +162,10 @@ let main () =
     in
     (*********************************************************************)
     (*TEST*)
-    let errors = Exception.empty_error_handler in
-    let _, parameters, _ = Get_option.get_option errors in
+    (*let errors = Exception.empty_error_handler in
+    let _, parameters, _ = Get_option.get_option errors in*)
     let cache, () =
-      A.get_list_of_divide_rule_by_rate parameters compil
+      A.get_list_of_divide_rule_by_rate logger compil
     in
     (*********************************************************************)
     let () = A.export_network

@@ -1707,9 +1707,9 @@ struct
     (**********************************************************)
     (*TEST*)
 
-    let get_list_of_divide_rule_by_rate parameters compil =
+    let get_list_of_divide_rule_by_rate log compil =
       let empty_cache = I.empty_lkappa_cache () in
-      let log = Remanent_parameters.get_logger parameters in
+      (*let log = Remanent_parameters.get_logger parameters in*)
       let cache, i_lis =
         List.fold_left (fun (cache, current_list) rule ->
             let () =
@@ -1727,11 +1727,11 @@ struct
             let cache, int =
               I.divide_rule_rate_by cache compil rule
             in
-            let rule_cach, hash =
-              I.map_to_hash_list parameters
+            (*RULE CACHE, HASH_LIST*)
+            let rule_cache, hash =
+              I.map_to_hash_list log
                 cache compil rule
             in
-
             cache, int :: current_list
           ) (empty_cache, []) (I.get_rules compil)
       in

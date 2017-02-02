@@ -651,7 +651,7 @@ let nauto rate_convention cache lkappa_mixture created =
 
 (****************************************************************)
 
-let map_to_hash_list parameters rate_convention cache lkappa_mixture
+let map_to_hash_list log rate_convention cache lkappa_mixture
     created =
   match rate_convention with
   | Ode_args.KaSim
@@ -674,7 +674,7 @@ let map_to_hash_list parameters rate_convention cache lkappa_mixture
   let cache, hash_list =
     RuleCache.hash cache.rule_cache pair_list
   in
-  let log = Remanent_parameters.get_logger parameters in
+  (*let log = Remanent_parameters.get_logger parameters in*)
   let () =
     let () =Loggers.print_newline log in
     let () = Loggers.fprintf log "***************\n HASH LIST" in

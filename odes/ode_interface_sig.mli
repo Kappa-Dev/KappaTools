@@ -76,7 +76,7 @@ sig
 
   (*TEST*)
   val map_to_hash_list :
-    Remanent_parameters_sig.parameters ->
+    Loggers.t ->
     nauto_in_rules_cache -> compil -> rule ->
     LKappa_auto.RuleCache.cache * LKappa_auto.RuleCache.hashed_list
 

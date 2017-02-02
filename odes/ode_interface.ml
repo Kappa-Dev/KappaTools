@@ -352,12 +352,13 @@ let divide_rule_rate_by cache compil rule =
       lkappa_rule.LKappa.r_mix lkappa_rule.LKappa.r_created
 
 (*TEST*)
-let map_to_hash_list parameters cache compil rule =
+let map_to_hash_list log cache compil rule =
   let rule_id = rule.Primitives.syntactic_rule in
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
-  LKappa_auto.map_to_hash_list parameters
+  LKappa_auto.map_to_hash_list
+    log
     compil.rate_convention
     cache
     lkappa_rule.LKappa.r_mix
