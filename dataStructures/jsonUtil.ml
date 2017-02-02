@@ -21,6 +21,13 @@ let to_int ?error_msg:(error_msg=build_msg "int") =
   | `Int (s:int) -> s
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let of_unit () = `Null
+
+let to_unit ?error_msg:(error_msg=build_msg "unit") =
+  function
+  | `Null -> ()
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
 let of_option to_json = function
   | None -> `Null
   | Some x -> to_json x

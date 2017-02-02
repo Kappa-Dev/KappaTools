@@ -37,6 +37,8 @@ val space : formatter -> unit
 val cut : formatter -> unit
 val empty : formatter -> unit
 
+val unit : formatter -> unit -> unit
+
 val array :
   ?trailing:(formatter -> unit) ->
   (formatter -> unit) -> (int -> formatter -> 'a -> unit) ->

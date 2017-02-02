@@ -17,13 +17,27 @@ type ('a,'annot) link =
 
 type internal = string Locality.annot list
 
-type port = {port_nme:string Locality.annot;
-             port_int:internal;
-             port_lnk:(string Locality.annot,unit) link Locality.annot list;}
+type port = {
+  port_nme:string Locality.annot;
+  port_int:internal;
+  port_int_mod: string Locality.annot option;
+  port_lnk:(string Locality.annot,unit) link Locality.annot list;
+  port_lnk_mod: int Locality.annot option option;
+}
 
-type agent = (string Locality.annot * port list)
+type agent_mod = Erase | Create
+
+type agent = (string Locality.annot * port list * agent_mod option)
 
 type mixture = agent list
+
+type edit_rule = {
+  mix: mixture;
+  act: (mixture,string) Alg_expr.e Locality.annot;
+  un_act:
+    ((mixture,string) Alg_expr.e Locality.annot *
+     (mixture,string) Alg_expr.e Locality.annot option) option;
+}
 
 type rule = {
   lhs: mixture ;
@@ -109,16 +123,18 @@ type ('mixture,'id) command =
   | MODIFY of ('mixture,'id) modif_expr list
   | QUIT
 
-type ('agent,'mixture,'id,'rule) compil =
+type ('agent,'mixture,'id,'rule,'edit_rule) compil =
   {
     variables :
       ('mixture,'id) variable_def list;
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures :
-      'agent list; (*agent signature declaration*)
+      'agent list; (**agent signature declaration*)
     rules :
       (string Locality.annot option * 'rule Locality.annot) list;
-    (*rules (possibly named)*)
+    (**rules (possibly named)*)
+    edit_rules : (string Locality.annot option * 'edit_rule) list;
+    (** rules with explicit modifications*)
     observables :
       ('mixture,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
@@ -137,12 +153,13 @@ type ('agent,'mixture,'id,'rule) compil =
       (string * float * string) list
   }
 
-val empty_compil : (agent,mixture,string,rule) compil
+type parsing_compil = (agent,mixture,string,rule,edit_rule) compil
+
+val empty_compil : parsing_compil
 
 val no_more_site_on_right : bool -> port list -> port list -> bool
 
-val implicit_signature :
-  (agent,mixture,string,rule) compil -> (agent,mixture,string,rule) compil
+val implicit_signature : parsing_compil -> parsing_compil
 (** Infer agent signatures and tokens from init, rules and perturbations *)
 
 (** {6 Printers} *)
@@ -166,7 +183,5 @@ val link_of_json :
   ('a -> Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'a) ->
   (Yojson.Basic.json list -> 'b) -> Yojson.Basic.json -> ('a, 'b) link
 
-val compil_of_json :
-  Yojson.Basic.json -> (agent,mixture,string,rule) compil
-val compil_to_json :
-  (agent,mixture,string,rule) compil -> Yojson.Basic.json
+val compil_of_json : Yojson.Basic.json -> parsing_compil
+val compil_to_json : parsing_compil -> Yojson.Basic.json

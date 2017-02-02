@@ -725,7 +725,7 @@ type 'mixture variable     = ('mixture,string) Ast.variable_def
 type direction = Direct | Reverse
 
 type ('agent,'mixture,'rule) compil =
-  ('agent, 'mixture, string, 'rule) Ast.compil
+  ('agent, 'mixture, string, 'rule, unit) Ast.compil
 
 type ('a, 'b) site_type =
   | Internal of 'a

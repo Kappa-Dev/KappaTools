@@ -452,6 +452,13 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
                     (Signature.print_agent sigs) dst_ty,
                   pos))
 
+let forbid_modification pos = function
+  | None -> ()
+  | Some _ ->
+    raise (ExceptionDefn.Malformed_Decl
+             ("A modification is forbidden here.",pos))
+
+
 let several_internal_states pos =
   raise (ExceptionDefn.Malformed_Decl
            ("In a pattern, a site cannot have several internal states.",pos))
@@ -562,7 +569,7 @@ let of_raw_mixture x =
        ra_syntax = Some (Array.copy ports, Array.copy internals); })
     x
 
-let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
+let annotate_dropped_agent sigs links_annot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -575,11 +582,13 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   let lannot,_ =
     List.fold_left
       (fun (lannot,pset) p ->
-         let p_na = p.Ast.port_nme in
+         let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              several_occurence_of_site agent_name p.Ast.port_nme in
+         let () = forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () = forbid_modification p_pos p.Ast.port_int_mod in
 
          let () = match p.Ast.port_int with
            | [] -> ()
@@ -629,7 +638,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
 let annotate_created_agent
-    sigs ?contact_map rannot ((agent_name, pos as ag_ty),intf) =
+    sigs ?contact_map rannot (agent_name, pos as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -641,11 +650,13 @@ let annotate_created_agent
   let _,rannot =
     List.fold_left
       (fun (pset,rannot) p ->
-         let p_na = p.Ast.port_nme in
+         let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              several_occurence_of_site agent_name p.Ast.port_nme in
+         let () = forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () = forbid_modification p_pos p.Ast.port_int_mod in
          let () = match p.Ast.port_int with
            | [] -> ()
            | [ va ] ->
@@ -676,6 +687,7 @@ let annotate_agent_with_diff
   let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, Maintained) in
   let internals = Array.make arity I_ANY in
   let register_port_modif p_id lnk1 p' (lhs_links,rhs_links as links_annot) =
+    let () = forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_lnk_mod in
     match lnk1,p'.Ast.port_lnk with
     | [Ast.LNK_ANY,_], [Ast.LNK_ANY,_] -> links_annot
     | [Ast.LNK_SOME,pos], [Ast.LNK_SOME,_] ->
@@ -771,6 +783,7 @@ let annotate_agent_with_diff
       raise (ExceptionDefn.Malformed_Decl
                ("Several link state for a single site",pos)) in
   let register_internal_modif p_id int1 p' =
+    let () = forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_int_mod in
     match int1,p'.Ast.port_int with
     | [], [] -> ()
     | [ va ], [ va' ] ->
@@ -807,14 +820,17 @@ although it is left unpecified in the left hand side"
   let rp_r,annot,_ =
     List.fold_left
       (fun (rp,annot,pset) p ->
-         let p_na = p.Ast.port_nme in
+         let (_,p_pos as p_na) = p.Ast.port_nme in
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
              several_occurence_of_site agent_name p.Ast.port_nme in
+         let () = forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () = forbid_modification p_pos p.Ast.port_int_mod in
 
          let p',rp' = find_in_rp p_na rp in
-         let annot' = register_port_modif p_id p.Ast.port_lnk p' annot in
+         let annot' = register_port_modif
+             p_id p.Ast.port_lnk p' annot in
          let () = register_internal_modif p_id p.Ast.port_int p' in
          (rp',annot',pset')) (rp,links_annot,Mods.IntSet.empty) lp in
   let annot' =
@@ -859,9 +875,11 @@ Is responsible for the check that:
 let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
-    | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
+    | ((lag_na,lpos as ag_ty),lag_p,lmod)::lt, ((rag_na,rpos),rag_p,rmod)::rt
       when String.compare lag_na rag_na = 0 &&
            Ast.no_more_site_on_right true lag_p rag_p ->
+      let () = forbid_modification lpos lmod in
+      let () = forbid_modification rpos rmod in
       let ra,links_annot' =
         annotate_agent_with_diff
           sigs ?contact_map ag_ty links_annot lag_p rag_p in
@@ -869,9 +887,9 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
     | erased, added ->
       let () =
         if added <> [] then
-          List.iter (fun ((lag,pos),lag_p) ->
+          List.iter (fun ((lag,pos),lag_p,_) ->
               if List.exists
-                  (fun ((rag,_),rag_p) ->
+                  (fun ((rag,_),rag_p,_) ->
                      String.compare lag rag = 0 &&
                      Ast.no_more_site_on_right false lag_p rag_p) added then
                 ExceptionDefn.warning ~pos
@@ -881,9 +899,10 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
             erased in
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
-          (fun (acc,lannot) x ->
+          (fun (acc,lannot) ((_,pos as na),intf,modif) ->
+             let () = forbid_modification pos modif in
              let ra,lannot' =
-               annotate_dropped_agent sigs lannot x in
+               annotate_dropped_agent sigs lannot na intf in
              (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let () =
@@ -891,13 +910,14 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
         | None -> ()
         | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
       let () = refer_links_annot lhs_links_two mix in
-      let cmix,(rhs_links_one,_),_ =
+      let cmix,(rhs_links_one,_) =
         List.fold_left
-          (fun (acc,rannot,id) x ->
+          (fun (acc,rannot) ((_,pos as na),intf,modif) ->
+             let () = forbid_modification pos modif in
              let rannot',x' =
-               annotate_created_agent sigs ?contact_map rannot x in
-             x'::acc,rannot',succ id)
-          ([],snd links_annot,0) added in
+               annotate_created_agent sigs ?contact_map rannot na intf in
+             x'::acc,rannot')
+          ([],snd links_annot) added in
       let () =
         match Mods.IntMap.root rhs_links_one with
         | None -> ()
@@ -1119,7 +1139,7 @@ let create_t ast_intf =
 
 let create_sig l =
   Tools.array_map_of_list
-    (fun (name,intf) -> (name,create_t intf)) l
+    (fun (name,intf,_) -> (name,create_t intf)) l
 
 let compil_of_ast overwrite c =
   let c =
@@ -1190,7 +1210,8 @@ let compil_of_ast overwrite c =
                    | Some d -> (un_rate'', Some (r_dist d))
                    | None -> (un_rate'', None))
                  un_rate;
-           },r_pos)) cleaned_rules;
+           },r_pos)) cleaned_rules (*TODO edit_rules*);
+    Ast.edit_rules = [];
     Ast.observables =
       List.map (fun expr -> alg_expr_of_ast sigs tok algs expr)
         c.Ast.observables;

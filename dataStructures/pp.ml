@@ -37,7 +37,8 @@ let compact_comma f = fprintf f ",@,"
 let colon f = fprintf f ";@ "
 let space f = pp_print_space f ()
 let cut f = pp_print_cut f ()
-let empty f = pp_print_string f ""
+let empty _ = ()
+let unit _ () = ()
 let pair ppa ppb f (a,b) = fprintf f "(%a, %a)" ppa a ppb b
 let option ?(with_space=true) pr f = function
   | None -> ()

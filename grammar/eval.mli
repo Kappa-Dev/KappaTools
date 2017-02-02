@@ -32,7 +32,7 @@ val compile :
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Signature.contact_map ->
-  ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
+  ('c, LKappa.rule_mixture, int, LKappa.rule, unit) Ast.compil -> 'b
 
 val build_initial_state :
   bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->

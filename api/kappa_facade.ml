@@ -247,7 +247,7 @@ let build_ast
                    (Ast.agent,
                     LKappa.rule_agent list,
                     int,
-                    LKappa.rule) Ast.compil)) ->
+                    LKappa.rule, unit) Ast.compil)) ->
                (yield ()) >>=
                (fun () ->
                   (* The last yield is updated after the last yield.

@@ -16,13 +16,27 @@ type ('a,'annot) link =
 
 type internal = string Locality.annot list
 
-type port = {port_nme:string Locality.annot;
-             port_int:internal;
-             port_lnk:(string Locality.annot,unit) link Locality.annot list;}
+type port = {
+  port_nme:string Locality.annot;
+  port_int:internal;
+  port_int_mod: string Locality.annot option;
+  port_lnk:(string Locality.annot,unit) link Locality.annot list;
+  port_lnk_mod: int Locality.annot option option;
+}
 
-type agent = (string Locality.annot * port list)
+type agent_mod = Erase | Create
+
+type agent = (string Locality.annot * port list * agent_mod option)
 
 type mixture = agent list
+
+type edit_rule = {
+  mix: mixture;
+  act: (mixture,string) Alg_expr.e Locality.annot;
+  un_act:
+    ((mixture,string) Alg_expr.e Locality.annot *
+     (mixture,string) Alg_expr.e Locality.annot option) option;
+}
 
 type rule = {
   lhs: mixture ;
@@ -107,7 +121,7 @@ type ('mixture,'id) command =
   | MODIFY of ('mixture,'id) modif_expr list
   | QUIT
 
-type ('agent,'mixture,'id,'rule) compil =
+type ('agent,'mixture,'id,'rule,'edit_rule) compil =
   {
     variables :
       ('mixture,'id) variable_def list;
@@ -118,6 +132,8 @@ type ('agent,'mixture,'id,'rule) compil =
     rules :
       (string Locality.annot option * 'rule Locality.annot) list;
     (*rules (possibly named)*)
+    edit_rules :
+      (string Locality.annot option * 'edit_rule) list;
     observables :
       ('mixture,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
@@ -135,6 +151,8 @@ type ('agent,'mixture,'id,'rule) compil =
     volumes :
       (string * float * string) list
   }
+
+type parsing_compil = (agent,mixture,string,rule,edit_rule) compil
 
 let no_more_site_on_right error left right =
   List.for_all
@@ -154,6 +172,7 @@ let empty_compil =
     variables      = [];
     signatures     = [];
     rules          = [];
+    edit_rules     = [];
     init           = [];
     observables    = [];
     perturbations  = [];
@@ -200,28 +219,39 @@ let print_ast_link =
     (fun _ f (x,_) -> Format.pp_print_string f x)
     (fun f (x,_) -> Format.pp_print_string f x)
     (fun _ () -> ())
-let print_ast_internal f l =
-  Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x) f l
+let print_ast_internal =
+  Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x)
 
 let print_ast_port f p =
-  Format.fprintf f "%s%a%a" (fst p.port_nme)
-    print_ast_internal p.port_int
+  let f_mod_i = Pp.option ~with_space:false (fun _ _ -> ()) (*TODO*) in
+  let f_mod_l = Pp.option ~with_space:false (fun _ _ -> ()) (*TODO*) in
+  Format.fprintf f "%s%a%a%a%a" (fst p.port_nme)
+    print_ast_internal p.port_int f_mod_i p.port_int_mod
     (Pp.list Pp.empty (fun f (x,_) -> print_ast_link f x)) p.port_lnk
+    f_mod_l p.port_lnk_mod
 
 let string_annot_to_json = Locality.annot_to_json JsonUtil.of_string
 let string_annot_of_json =
   Locality.annot_of_json (JsonUtil.to_string ?error_msg:None)
 
 let port_to_json p =
+  let mod_l = JsonUtil.of_option
+      (JsonUtil.of_option (Locality.annot_to_json JsonUtil.of_int)) in
+  let mod_i =JsonUtil.of_option
+      (Locality.annot_to_json JsonUtil.of_string) in
   `Assoc [
     "port_nme", string_annot_to_json p.port_nme;
-    "port_int", JsonUtil.of_list string_annot_to_json p.port_int;
-    "port_lnk",
-    JsonUtil.of_list
-      (Locality.annot_to_json
-         (link_to_json
-            (fun _ -> string_annot_to_json) string_annot_to_json (fun ()->[])))
-      p.port_lnk;
+    "port_int", `Assoc [
+      "state", JsonUtil.of_list string_annot_to_json p.port_int;
+      "mod", mod_i p.port_int_mod];
+    "port_lnk", `Assoc [
+      "state", JsonUtil.of_list
+        (Locality.annot_to_json
+           (link_to_json
+              (fun _ -> string_annot_to_json)
+              string_annot_to_json (fun ()->[])))
+        p.port_lnk;
+      "mod", mod_l p.port_lnk_mod]
   ]
 let port_of_json = function
   | `Assoc [ "port_nme", n; "port_int", i; "port_lnk", l ] |
@@ -230,27 +260,63 @@ let port_of_json = function
     `Assoc [ "port_lnk", l; "port_nme", n; "port_int", i ] |
     `Assoc [ "port_int", i; "port_lnk", l; "port_nme", n ] |
     `Assoc [ "port_lnk", l; "port_int", i; "port_nme", n ] ->
+    let mod_l = JsonUtil.to_option
+        (JsonUtil.to_option
+           (Locality.annot_of_json (JsonUtil.to_int ?error_msg:None))) in
+    let mod_i = JsonUtil.to_option
+        (Locality.annot_of_json (JsonUtil.to_string ?error_msg:None)) in
+    let port_int,port_int_mod =
+      match i with
+      | `Assoc [ "state", i; "mod", m ]
+      | `Assoc [ "mod", m; "state", i ] ->
+        (JsonUtil.to_list string_annot_of_json i, mod_i m)
+      | _-> raise (Yojson.Basic.Util.Type_error ("Not internal states",i)) in
+    let port_lnk,port_lnk_mod =
+      match l with
+      | `Assoc [ "state", l; "mod", m ]
+      | `Assoc [ "mod", m; "state", l ] ->
+        (JsonUtil.to_list
+           (Locality.annot_of_json
+              (link_of_json
+                 (fun _ -> string_annot_of_json) string_annot_of_json
+                 (fun _ -> ()))) l,mod_l m)
+      | _ -> raise (Yojson.Basic.Util.Type_error ("Not link states",i)) in
     { port_nme = string_annot_of_json n;
-     port_int = JsonUtil.to_list string_annot_of_json i;
-      port_lnk =
-        JsonUtil.to_list
-          (Locality.annot_of_json
-             (link_of_json
-                (fun _ -> string_annot_of_json) string_annot_of_json
-                (fun _ -> ()))) l;}
+      port_int; port_int_mod;
+      port_lnk; port_lnk_mod;
+    }
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
-let print_ast_agent f ((ag_na,_),l) =
-  Format.fprintf f "%s(%a)" ag_na
-    (Pp.list (fun f -> Format.fprintf f ",") print_ast_port) l
+let print_ast_agent f ((ag_na,_),l,m) =
+  let f_mod _ _ = () (*TODO*) in
+  Format.fprintf f "%s%a(%a)" ag_na f_mod m
+    (Pp.list (fun f -> Format.fprintf f ",")
+       print_ast_port) l
 
-let agent_to_json (na,l) =
+let agent_mod_to_yojson = function
+  | Create -> `String "created"
+  | Erase -> `String "erase"
+
+let agent_mod_of_yojson = function
+  | `String "created" -> Create
+  | `String "erase" -> Erase
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect agent modifitcation",x))
+
+let agent_to_json (na,l,m) =
   `Assoc [ "name", Locality.annot_to_json JsonUtil.of_string na;
-         "sig", JsonUtil.of_list port_to_json l]
+           "sig", JsonUtil.of_list port_to_json l;
+           "mod", (JsonUtil.of_option agent_mod_to_yojson) m]
+
 let agent_of_json = function
-  | `Assoc [ "name", n; "sig", s ] | `Assoc [ "sig", s; "name", n ] ->
+  | `Assoc [ "name", n; "sig", s; "mod", m ]
+  | `Assoc [ "sig", s; "name", n; "mod", m ]
+  | `Assoc [ "name", n; "mod", m; "sig", s ]
+  | `Assoc [ "sig", s; "mod", m; "name", n ]
+  | `Assoc [ "mod", m; "name", n; "sig", s ]
+  | `Assoc [ "mod", m; "sig", s; "name", n ] ->
     (Locality.annot_of_json (JsonUtil.to_string ?error_msg:None) n,
-    JsonUtil.to_list port_of_json s)
+    JsonUtil.to_list port_of_json s, (JsonUtil.to_option agent_mod_of_yojson) m)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
@@ -301,12 +367,14 @@ let print_rates un op f def =
          Format.fprintf
            f "(%a:%a)"
            (Alg_expr.print
-              (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+              (fun f m ->
+                 Format.fprintf f "|%a|" print_ast_mix m)
               Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)) d
            (Pp.option (fun f (md,_) ->
                         Format.fprintf f ":%a"
                         (Alg_expr.print
-                           (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
+                           (fun f m ->
+                              Format.fprintf f "|%a|" print_ast_mix m)
                            Format.pp_print_string
                            (fun f x -> Format.fprintf f "'%s'" x)) md))
            max_dist)
@@ -407,6 +475,59 @@ let rule_of_json f_mix f_var = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST rule",x))
 
+let edit_rule_to_yojson r =
+  let mix_to_json = JsonUtil.of_list agent_to_json in
+  JsonUtil.smart_assoc [
+    "mix", JsonUtil.of_list agent_to_json r.mix;
+    "k_def", Locality.annot_to_json
+      (Alg_expr.e_to_yojson mix_to_json JsonUtil.of_string) r.act;
+    "k_un",
+    JsonUtil.of_option
+      (JsonUtil.of_pair
+         (Locality.annot_to_json
+            (Alg_expr.e_to_yojson mix_to_json JsonUtil.of_string))
+         (JsonUtil.of_option (Locality.annot_to_json
+                                (Alg_expr.e_to_yojson
+                                   mix_to_json JsonUtil.of_string))))
+      r.un_act;
+  ]
+
+let edit_rule_of_yojson r =
+  let mix_of_json =
+    JsonUtil.to_list agent_of_json in
+  match r with
+  | `Assoc [ "mix", m; "k_def", a ]
+  | `Assoc [ "k_def", a; "mix", m ] -> {
+      mix = JsonUtil.to_list agent_of_json m;
+      act = Locality.annot_of_json
+          (Alg_expr.e_of_yojson
+             mix_of_json (JsonUtil.to_string ?error_msg:None)) a;
+      un_act = None;
+    }
+  | `Assoc [ "mix", m; "k_def", a; "k_un", u ]
+  | `Assoc [ "k_def", a; "mix", m; "k_un", u ]
+  | `Assoc [ "mix", m; "k_un", u; "k_def", a ]
+  | `Assoc [ "k_def", a; "k_un", u; "mix", m ]
+  | `Assoc [ "k_un", u; "mix", m; "k_def", a ]
+  | `Assoc [ "k_un", u; "k_def", a; "mix", m ] ->  {
+      mix = JsonUtil.to_list agent_of_json m;
+      act = Locality.annot_of_json
+          (Alg_expr.e_of_yojson
+             mix_of_json (JsonUtil.to_string ?error_msg:None)) a;
+      un_act =
+        JsonUtil.to_option
+          (JsonUtil.to_pair
+             (Locality.annot_of_json
+                (Alg_expr.e_of_yojson
+                   mix_of_json (JsonUtil.to_string ?error_msg:None)))
+             (JsonUtil.to_option (Locality.annot_of_json
+                                    (Alg_expr.e_of_yojson
+                                       mix_of_json
+                                       (JsonUtil.to_string ?error_msg:None)))))
+      u;
+    }
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit rule",x))
 let print_expr_to_json f_mix f_var = function
   | Str_pexpr s -> string_annot_to_json s
   | Alg_pexpr a -> Locality.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) a
@@ -502,18 +623,19 @@ let merge_ports =
        let rec aux = function
          | [] -> [{p with port_lnk = []}]
          | h :: t when fst p.port_nme = fst h.port_nme ->
-           {h with port_int = merge_internals h.port_int p.port_int}::t
+           {h with port_int =
+                     merge_internals h.port_int p.port_int}::t
          | h :: t -> h :: aux t in
        aux acc)
 
 let merge_agents =
   List.fold_left
-    (fun acc ((na,_ as x),s) ->
+    (fun acc ((na,_ as x),s,_) ->
        let rec aux = function
          | [] -> [x,List.map
-                    (fun p -> {p with port_lnk = []}) s]
-         | ((na',_),s') :: t when String.compare na na' = 0 ->
-           (x,merge_ports s' s)::t
+                    (fun p -> {p with port_lnk = []}) s,None]
+         | ((na',_),s',_) :: t when String.compare na na' = 0 ->
+           (x,merge_ports s' s,None)::t
          | h :: t -> h :: aux t in
        aux acc)
 
@@ -563,11 +685,12 @@ let implicit_signature r =
   { r with signatures = ags; tokens = toks }
 
 let compil_to_json c =
-    let mix_to_json = JsonUtil.of_list agent_to_json in
-    let var_to_json = JsonUtil.of_string in
+  let mix_to_json = JsonUtil.of_list agent_to_json in
+  let var_to_json = JsonUtil.of_string in
   `Assoc
     [
-      "signatures", JsonUtil.of_list agent_to_json c.signatures;
+      "signatures",
+      JsonUtil.of_list agent_to_json c.signatures;
       "tokens", JsonUtil.of_list string_annot_to_json c.tokens;
       "variables", JsonUtil.of_list
         (JsonUtil.of_pair
@@ -578,8 +701,14 @@ let compil_to_json c =
       "rules", JsonUtil.of_list
         (JsonUtil.of_pair
            (JsonUtil.of_option string_annot_to_json)
-           (Locality.annot_to_json (rule_to_json mix_to_json var_to_json)))
+           (Locality.annot_to_json
+              (rule_to_json mix_to_json var_to_json)))
         c.rules;
+      "edit_rules", JsonUtil.of_list
+        (JsonUtil.of_pair
+           (JsonUtil.of_option string_annot_to_json)
+           edit_rule_to_yojson)
+        c.edit_rules;
       "observables",
       JsonUtil.of_list
         (Locality.annot_to_json (Alg_expr.e_to_yojson mix_to_json var_to_json))
@@ -610,15 +739,17 @@ let compil_to_json c =
     ]
 
 let compil_of_json = function
-  | `Assoc l as x when List.length l = 8 ->
-    let mix_of_json = JsonUtil.to_list agent_of_json in
+  | `Assoc l as x when List.length l = 9 ->
+    let mix_of_json =
+      JsonUtil.to_list agent_of_json in
     let var_of_json = JsonUtil.to_string ?error_msg:None in
     begin
       try
         {
           signatures =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST signature")
-              agent_of_json (List.assoc "signatures" l);
+              agent_of_json
+              (List.assoc "signatures" l);
           tokens =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST token sig")
               string_annot_of_json (List.assoc "tokens" l);
@@ -636,6 +767,11 @@ let compil_of_json = function
                  (Locality.annot_of_json
                     (rule_of_json mix_of_json var_of_json)))
               (List.assoc "rules" l);
+          edit_rules =
+            JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST rules")
+              (JsonUtil.to_pair
+                 (JsonUtil.to_option string_annot_of_json) edit_rule_of_yojson)
+              (List.assoc "edit_rules" l);
           observables =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST observables")
               (Locality.annot_of_json

@@ -11,8 +11,10 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+type compilation = Ast.parsing_compil
+
 type init =
-    Compil of ((string Locality.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
+    Compil of compilation
   | Files of string list
 
 type accuracy_level = Low | Medium | High | Full
@@ -39,9 +41,8 @@ type quark_map = Quark_type.quarks
 type rule_id = int
 type var_id =  int
 
-type compilation = ((string Locality.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil
-
-type refined_compilation = (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
+type refined_compilation =
+  (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
 type influence_node =
   | Rule of rule_id

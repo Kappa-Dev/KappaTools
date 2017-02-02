@@ -38,7 +38,7 @@
 %nonassoc THEN
 
 %start start_rule
-%type <(Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil -> (Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil> start_rule
+%type <Ast.parsing_compil -> Ast.parsing_compil> start_rule
 
 %start interactive_command
 %type <(Ast.mixture,string) Ast.command> interactive_command
@@ -382,7 +382,7 @@ non_empty_mixture:
 
 agent_expression:
     | ID OP_PAR interface_expression CL_PAR
-	 {(($1,rhs_pos 1), $3)}
+	 {(($1,rhs_pos 1), $3, None)}
     | ID error
 	 { raise (ExceptionDefn.Syntax_Error
 		    (add_pos ("Malformed agent '"^$1^"'")))}
@@ -401,7 +401,8 @@ ne_interface_expression:
 
 port_expression:
     | ID internal_state link_state
-	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3}}
+	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3;
+	    Ast.port_lnk_mod = None; Ast.port_int_mod = None; } }
     ;
 
 internal_state:

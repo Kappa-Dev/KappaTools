@@ -21,7 +21,8 @@ type rule_internal = (*state*)
 type rule_agent =
   { ra_type: int; (*agent_id*)
     ra_erased: bool;
-    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array; (*state, _ , switch*)
+    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
+    (*(state, _) , switch*)
     ra_ints: rule_internal array;
     ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
                 rule_internal array) option;
@@ -68,22 +69,19 @@ val rule_of_json : Yojson.Basic.json -> rule
 
 val bool_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
-   ?max_allowed_var: int ->
-  (((String.t * Locality.t) * Ast.port list) list, Mods.StringMap.elt)
-    Alg_expr.bool Locality.annot ->
+  ?max_allowed_var: int ->
+  (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   (rule_agent list, int) Alg_expr.bool Locality.annot
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   Signature.contact_map ->
-  (((String.t * Locality.t) * Ast.port list) list, Mods.StringMap.elt)
-    Ast.modif_expr -> int list ->
+  (Ast.mixture, string) Ast.modif_expr -> int list ->
   (rule_agent list, int) Ast.modif_expr * int list
 
 val compil_of_ast :
-  (string * Nbr.t) list ->
-  (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil ->
+  (string * Nbr.t) list -> Ast.parsing_compil ->
   Signature.s * Signature.contact_map * unit NamedDecls.t * int list *
-  (Ast.agent, rule_agent list, int, rule) Ast.compil
+  (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
 @return the signature of agent, the signature of tokens and an

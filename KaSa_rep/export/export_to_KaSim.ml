@@ -21,7 +21,7 @@ sig
 
 
   val init:
-    ?compil:(string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule)  Ast.compil ->
+    ?compil:Ast.parsing_compil ->
     called_from:Remanent_parameters_sig.called_from ->
     unit -> state
 

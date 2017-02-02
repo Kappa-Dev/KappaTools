@@ -15,9 +15,7 @@ module type Type =
   sig
     type state
 
-    val init:
-      ?compil:(string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil ->
-      unit -> state
+    val init: ?compil:Ast.parsing_compil -> unit -> state
 
     val get_contact_map:
       ?accuracy_level:Remanent_state.accuracy_level ->
@@ -37,8 +35,10 @@ module type Type =
 
     val of_json:
       Yojson.Basic.json ->
-      Exception_without_parameter.method_handler * 
-      Remanent_state.contact_map Remanent_state.AccuracyMap.t * Remanent_state.influence_map Remanent_state.AccuracyMap.t * Ckappa_sig.c_rule_id list option * Remanent_state.constraints_list option
+      Exception_without_parameter.method_handler *
+      Remanent_state.contact_map Remanent_state.AccuracyMap.t *
+      Remanent_state.influence_map Remanent_state.AccuracyMap.t *
+      Ckappa_sig.c_rule_id list option * Remanent_state.constraints_list option
 
 
   end

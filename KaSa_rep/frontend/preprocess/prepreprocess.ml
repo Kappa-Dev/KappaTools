@@ -170,7 +170,7 @@ let rec scan_interface parameters k agent interface remanent =
           | [] | ((Ast.LNK_ANY | Ast.FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
                   | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),set)
 
-let scan_agent parameters k ((name,_),intf) remanent =
+let scan_agent parameters k ((name,_),intf,_modif) remanent =
   fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
 
 let rec collect_binding_label
@@ -310,12 +310,13 @@ let rec translate_interface parameters is_signature int_set interface remanent =
 let translate_interface parameters is_signature =
   translate_interface parameters is_signature Mods.StringSet.empty
 
-let translate_agent parameters is_signature agent remanent =
+let translate_agent parameters is_signature
+    ((ag_nme,ag_nme_pos),intf,_modif) remanent =
   let interface,remanent =
-    translate_interface parameters is_signature (snd agent) remanent in
-  {Ckappa_sig.ag_nme = fst (fst agent);
+    translate_interface parameters is_signature intf remanent in
+  {Ckappa_sig.ag_nme;
    Ckappa_sig.ag_intf = interface ;
-   Ckappa_sig.ag_nme_pos = snd (fst agent);
+   Ckappa_sig.ag_nme_pos;
    (*     Ckappa_sig.ag_pos = position ;*)
   },
   remanent
@@ -334,7 +335,8 @@ let rec translate_mixture_zero_zero  parameters mixture remanent tail_size =
   | agent :: mixture ->
     let agent,remanent =
       translate_agent parameters false agent remanent in
-    let mixture,remanent = translate_mixture_zero_zero parameters mixture remanent tail_size  in
+    let mixture,remanent =
+      translate_mixture_zero_zero parameters mixture remanent tail_size  in
     Ckappa_sig.COMMA(agent,mixture),remanent
 (*      | Ast.DOT(i,agent,mixture) ->
           let agent,remanent = translate_agent parameters agent remanent in
@@ -402,8 +404,7 @@ let rec translate_mixture parameters mixture remanent  =
         let mixture,remanent = translate_mixture parameters mixture remanent in
         Ckappa_sig.PLUS(i,agent,mixture),remanent*)
 
-let support_agent ag =
-  let name = fst (fst ag) in
+let support_agent ((name,_),intfs,_) =
   let list =
     let rec scan intf list =
       match intf with
@@ -411,7 +412,7 @@ let support_agent ag =
       | port::intf ->
         scan intf ((fst port.Ast.port_nme)::list)
     in
-    scan (snd ag) []
+    scan intfs []
   in
   name,list
 
@@ -672,8 +673,9 @@ let refine_init_t parameters error = function
     let error,(token,_) = refine_token parameters error (token,pos) in
     error,(Ast.INIT_TOK token,pos)
 
-let refine_agent parameters error agent_set agent =
-  let error,agent_set = check_freshness parameters error "Agent" (fst (fst agent)) agent_set in
+let refine_agent parameters error agent_set ((name,_),_,_ as agent) =
+  let error,agent_set =
+    check_freshness parameters error "Agent" name agent_set in
   let error, map =
     scan_agent
       parameters
@@ -739,10 +741,14 @@ let translate_compil parameters error compil =
          in
          let ast_lhs,ast_rhs = rule.Ast.lhs,rule.Ast.rhs in
          let prefix,tail_lhs,tail_rhs = longuest_prefix ast_lhs ast_rhs in
-         let error,lhs = refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in
-         let error,rhs = refine_mixture_in_rule parameters error prefix tail_lhs 0 ast_rhs in
-         let error,k_def = alg_with_pos_map (refine_mixture parameters) error rule.Ast.k_def in
-         let error,k_un = alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.k_un) in
+         let error,lhs =
+           refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in
+         let error,rhs =
+           refine_mixture_in_rule parameters error prefix tail_lhs 0 ast_rhs in
+         let error,k_def =
+           alg_with_pos_map (refine_mixture parameters) error rule.Ast.k_def in
+         let error,k_un =
+           alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.k_un) in
          let error,direct =
            error,
            {
@@ -838,7 +844,8 @@ let translate_compil parameters error compil =
   error,{
     Ast.variables = List.rev var_rev;
     Ast.signatures = List.rev signatures_rev;
-    Ast.rules = List.rev rules_rev ;
+    Ast.rules = List.rev rules_rev ; (* TODO concatenates edit_rules *)
+    Ast.edit_rules = [] ;
     Ast.observables  = List.rev observables_rev;
     Ast.init = List.rev init_rev ;
     Ast.perturbations = List.rev perturbations_rev ;

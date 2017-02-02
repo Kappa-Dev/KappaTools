@@ -15,9 +15,7 @@
 (* compilation result *)
 (**********************)
 
-type compilation =
-    ((string Locality.annot) * Ast.port list, Ast.mixture, string, Ast.rule)
-      Ast.compil
+type compilation = Ast.parsing_compil
 
 type init =
   | Compil of compilation
@@ -25,7 +23,7 @@ type init =
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string,
-   Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
+   Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
 
 (*******************)

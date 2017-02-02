@@ -15,9 +15,7 @@ module type Type =
 sig
   type state
 
-  val init:
-    ?compil:(string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil ->
-    unit -> state
+  val init: ?compil:Ast.parsing_compil -> unit -> state
 
   val get_contact_map:
     ?accuracy_level:Remanent_state.accuracy_level ->
